@@ -400,6 +400,13 @@ namespace TiaMcp.Openness.V21
             if (target is Siemens.Engineering.SW.Tags.PlcTagTable)
                 RejectFIoAddresses(SelectPlc(change.Selector), packageFiles.SelectMany(bytes =>
                     { using (var reader = new StreamReader(new MemoryStream(bytes), true)) return TagAddressRules.TagTableAddresses(EngineeringSources.ReadXml(reader.ReadToEnd())); }).ToArray());
+            else if (target is PlcBlock)
+                foreach (var bytes in packageFiles)
+                    using (var reader = new StreamReader(new MemoryStream(bytes), true))
+                    {
+                        string content = reader.ReadToEnd();
+                        RejectFIoBlockContent(SelectPlc(change.Selector), content, content.TrimStart().StartsWith("<", StringComparison.Ordinal));
+                    }
         }
 
         // Project-ward sync rewrites the object, so it keeps the guards of the direct mutation kinds.

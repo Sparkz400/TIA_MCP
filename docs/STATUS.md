@@ -5,7 +5,7 @@ simulators you own (see the [README](../README.md)). On `main`, 2 November 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.121`: 484 features, 467 verified, 17 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Feature catalog | `0.4.127`: 484 features, 467 verified, 17 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
 | Release matrix rows | 133 shipped, 334 limited, 3 unqualified, 12 unavailable on V21, 2 deferred |
 | Matrix cells | 2,148 bound, **15 open**, 72 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76`; X07, X08, B03 and B04 on 1 November against `0.4.92`, D10 against `0.4.95` and D06 against `0.4.109`, and X07/X08 on 2 November against `0.4.121` |
@@ -13,12 +13,14 @@ simulators you own (see the [README](../README.md)). On `main`, 2 November 2026:
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
 unresolved feasibility stay release blockers ([release ledger](plans/release-obligations-20261015.md)).
 
+Fresh local completion evidence: [2 November checks and exact prerequisites](verification/local-completion-20261102.md). The recovered vendor inputs, one V20 upgrade and the production FBD OB route now have fresh proof; this does not close the release ledger.
+
 ## What is open
 
 [TODO](TODO.md) lists the open work; [open matrix rows by owner](TODO.md#open-matrix-rows-by-owner)
 names every row with an open cell.
 
-- **External prerequisites:** the VMware guest, a V20 library input, other HMI targets, a physical PLC (B05), optional products and licenses such
+- **External prerequisites:** the VMware guest, other HMI targets, a physical PLC (B05), optional products and licenses such
   as SiVArc, STEP 7 CFC, SINAMICS DCC, Test Suite execution prerequisites and the licensed AX
   trace package (B04), a native trace route (B06), nonproduction Project Server, Teamcenter and
   UMC endpoints (B10), and installations and SDKs of other TIA versions (B11).

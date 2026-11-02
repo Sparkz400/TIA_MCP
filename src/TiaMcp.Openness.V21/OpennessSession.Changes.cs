@@ -392,6 +392,7 @@ namespace TiaMcp.Openness.V21
                     string language = ChangeText(payload, "language", 16).ToUpperInvariant();
                     if (language != "SCL" && language != "STL" && language != "AWL" && language != "SIMATIC_SD") throw new BridgeException("UnsupportedLanguage", "Source writes accept SCL, STL/AWL or explicit new-block SIMATIC_SD documents.");
                     string source = ChangeText(payload, "source", 2 * 1024 * 1024);
+                    RejectFIoBlockContent(plc, source, false);
                     string declarationSource = language == "SIMATIC_SD" ? EngineeringSources.SimaticSdDeclarationEnvelope(source) : source;
                     var declared = EngineeringSources.DeclaredBlocks(declarationSource);
                     if (language == "SIMATIC_SD" && declared.Length != 1)
@@ -431,6 +432,7 @@ namespace TiaMcp.Openness.V21
                     if (change.Kind == "graph_import" && (targets.Length != 1 || targets[0].Language != "GRAPH")) throw new BridgeException("UnsupportedLanguage", "graph_import accepts exactly one GRAPH block per document.");
                     bool safety = change.Kind == "safety_import_xml";
                     if (targets.Any(target => target.IsSafety != safety)) throw new BridgeException("SafetyBoundary", "Standard and safety imports use separate workflows, and cannot be mixed or converted.");
+                    if (!safety) RejectFIoBlockContent(plc, xml, true);
                     if (safety && targets.Any(target => target.Language != "F_LAD" && target.Language != "F_FBD" && target.Language != "F_DB"))
                         throw new BridgeException("UnsupportedSafetyBlock", "Only user F-LAD, F-FBD and F-DB XML is accepted; F-system and generated call languages are excluded.");
                     if (safety) { RequireChangeBool(payload, "safetyAcknowledged"); EnsureSafetyWritable(plc.Software); preview["safetyBefore"] = ReadSafety(plc.Software); }
@@ -487,6 +489,7 @@ namespace TiaMcp.Openness.V21
                     catch (InvalidOperationException ex) { throw new BridgeException("UnsupportedGraphicalEdit", ex.Message); }
                     preview["edit"] = payload.DeepClone();
                     EngineeringSources.BlockDeclarations(document);
+                    RejectFIoBlockContent(plc, document.ToString(SaveOptions.DisableFormatting), true);
                     change.InputPath = Path.Combine(change.Directory, "requested.xml");
                     File.WriteAllText(change.InputPath, document.ToString(SaveOptions.DisableFormatting), new UTF8Encoding(true));
                     change.InputHash = ChangeFileHash(change.InputPath);
@@ -904,6 +907,7 @@ namespace TiaMcp.Openness.V21
                 {
                     var plc = SelectPlc(change.Selector);
                     VerifyBlockTargets(change, plc, false);
+                    RejectFIoBlockContent(plc, File.ReadAllText(change.InputPath), false);
                     if (payload.Value<string>("language")?.ToUpperInvariant() == "SIMATIC_SD")
                     {
                         MutationBlockGroup(change, plc).Blocks.ImportFromDocuments(new DirectoryInfo(change.Directory), Path.GetFileNameWithoutExtension(change.InputPath), ImportDocumentOptions.None);
@@ -932,6 +936,7 @@ namespace TiaMcp.Openness.V21
                     bool safety = change.Kind == "safety_import_xml";
                     VerifyBlockTargets(change, plc, safety);
                     if (safety) EnsureSafetyWritable(plc.Software);
+                    else RejectFIoBlockContent(plc, File.ReadAllText(change.InputPath), true);
                     MutationBlockGroup(change, plc).Blocks.Import(new FileInfo(change.InputPath), ImportOptions.Override);
                     VerifyExpectedBlocksExist(change, plc);
                     if (safety) change.SafetyAfter = ReadSafety(plc.Software);

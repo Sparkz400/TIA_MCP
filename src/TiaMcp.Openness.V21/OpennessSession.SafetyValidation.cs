@@ -139,7 +139,14 @@ namespace TiaMcp.Openness.V21
                     "tag_table_import_xml, which checks every address.", new JObject { ["masterCopy"] = masterCopy, ["fIoPath"] = fIo });
         }
 
-        // A tag on an F-I/O address becomes a safety tag; tag_create, tag_set, tag_table_import_xml and project-ward VCI imports refuse it before writing.
+        // Source generation and block XML imports can create implicit tags as well as blocks.
+        private static void RejectFIoBlockContent(PlcSelection plc, string content, bool xml)
+        {
+            if (TagAddressRules.AnyFIo(FIoAddressRanges(plc)) == null) return;
+            RejectFIoAddresses(plc, xml ? TagAddressRules.BlockIoAddresses(EngineeringSources.ReadXml(content)) : TagAddressRules.SourceIoAddresses(content));
+        }
+
+        // A tag on an F-I/O address becomes a safety tag; all standard tag-producing imports refuse it before writing.
         private static void RejectFIoAddresses(PlcSelection plc, IEnumerable<string> addresses)
         {
             var io = addresses.Where(address => TagAddressRules.Io(address) != null).ToArray();

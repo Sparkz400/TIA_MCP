@@ -16,6 +16,36 @@ namespace TiaMcp.Openness.V21
         private static readonly Regex IoAddress = new Regex(@"^%?(?<area>[IQEA])(?:(?<byte>\d{1,6})\.(?<bit>[0-7])|(?<size>[BWDL])(?<start>\d{1,6}))$",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
+        // Conservative lexical scan: comments and quoted text are included because source generation can create tags.
+        private static readonly Regex SourceIo = new Regex(@"(?<![\w])%?[IQEA]\s*(?:\d{1,6}\.[0-7]|[BWDL]\s*\d{1,6})(?![\w.])",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+        internal static string[] SourceIoAddresses(string source) => SourceIo.Matches(source).Cast<Match>()
+            .Select(match => Regex.Replace(match.Value, @"\s+", "")).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+
+        internal static string[] BlockIoAddresses(XDocument document)
+        {
+            var result = new List<string>(SourceIoAddresses(document.ToString(SaveOptions.DisableFormatting)));
+            foreach (var address in document.Descendants().Where(e => e.Name.LocalName == "Address"))
+            {
+                string area = address.Attribute("Area")?.Value;
+                if (area != "Input" && area != "Output") continue;
+                if (!int.TryParse(address.Attribute("BitOffset")?.Value, out int offset) || offset < 0 || offset > 7999999)
+                    throw new BridgeException("SafetyBoundary", "An absolute I/O operand has an unqualified bit offset on a PLC with F-I/O.");
+                int width = address.Attribute("Type")?.Value switch
+                {
+                    "Bool" => 1, "Byte" or "Char" or "SInt" or "USInt" => 8,
+                    "Word" or "Int" or "UInt" => 16, "DWord" or "DInt" or "UDInt" or "Real" => 32,
+                    "LWord" or "LInt" or "ULInt" or "LReal" => 64, _ => 0
+                };
+                if (width == 0) throw new BridgeException("SafetyBoundary", "An absolute I/O operand has an unqualified type on a PLC with F-I/O.");
+                string prefix = area == "Input" ? "%I" : "%Q";
+                if (width == 1) result.Add(prefix + (offset / 8) + "." + (offset % 8));
+                else for (int bit = offset; bit < offset + width; bit++) result.Add(prefix + (bit / 8) + "." + (bit % 8));
+            }
+            return result.Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        }
+
         /// <summary>The process-image direction and bit range of an absolute input or output address, or null for anything else
         /// (bit memory, data blocks, symbolic or unparseable text).</summary>
         internal static (string IoType, int StartBit, int LengthBits)? Io(string logicalAddress)

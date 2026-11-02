@@ -76,3 +76,7 @@ The 31 October audit made Test Suite system endpoints require the PLCSIM route. 
 and cannot get one yet: no build reaches `TestSuiteOwnedEndpoint`, because every system dispatch refuses at the profile
 gate first, and the qualification admission refuses system reviews. The shared route rule ran natively in front of
 `runtime_ua_call` (`local.runtime.plcsim-ua-services.20261031`). The Test Suite call site is rechecked with TS-Q03.
+
+## Operator-authorized follow-up — 2 November
+
+Temporary PLCSIM TCP/IP mode and TIA UI fixture creation are now authorized. An owned system-test seed was created and saved; this removes the earlier lack-of-UI-access constraint, not the guest-access or certificate-trust requirements. TS-Q03 remains designed rather than implemented. See the [current seed and remaining steps](local-completion-20261102.md#test-suite-operator-seed).

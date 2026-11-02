@@ -42,6 +42,10 @@
     {
       "id": "local.dmc.bulk-path-refusal.20261102",
       "reason": "Bulk DMC import exposed consumer-first ordering: Siemens created fbMotor_Reversing as a dependency in a different path before its explicit selected-root import; partial result and recovery checkpoint retained."
+    },
+    {
+      "id": "local.library.dmc-vendor-compile-boundary.20261102",
+      "reason": "The first 100 selected DMC blocks instantiated, but vendor protection/dependency and CPU-family compiler errors stopped the all-default qualification. Separate dependency-order regression passed."
     }
   ]
 }

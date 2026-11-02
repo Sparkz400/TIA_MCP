@@ -34,3 +34,5 @@ The diagram shows component boundaries, not support for every operation, target 
 - `feature_catalog` and `target_capabilities` from the running server
 
 Full detail: [system architecture guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/architecture.md).
+
+The [2 November local completion record](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/local-completion-20261102.md) covers dependency-ordered library imports, preserved target paths, the production FBD OB route and the remaining operator/equipment prerequisites.

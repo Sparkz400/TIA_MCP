@@ -1,0 +1,96 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library.upgrades-v20.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T20:44:41+00:00",
+  "source": {
+    "commit": "77b2d23e56318de21f36fd5094ab68053f15cc36",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "V14 SP1, V15, V16, V17 and V18 DMC PLC archives plus LGF V5.3.0 V20 upgrade to V21, archive and fresh reopen with exact complete version identities; four mixed HMI packages, V17 companion directory and read-only V16 directory observed; input hashes unchanged.",
+  "limitations": [
+    "One supplied LGF V20 archive and the recovered DMC inputs. Upgrade/open/archive identity only, not every library producer, protected source, HMI runtime or PLC runtime."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "ce2e7f7de82f7027c73e24f523f5f40382965fb61cdfbedc1714257da0d3abd7"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "18a4a7b0e91dc759d283e0a50f1f2808c49298e9054d42e3c0cd6284e27a1303"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "bd5d6946f4ae724fec47cf41e3a8d6c2b72e52b30ab7c360905cc9ed8f017282",
+      "bytes": 459081,
+      "completed": true,
+      "steps": [
+        "stage and classify mixed package dmc-v14",
+        "stage and classify mixed package dmc-v15",
+        "stage and classify mixed package dmc-v16",
+        "stage and classify mixed package dmc-v17",
+        "stage and classify mixed package dmc-v18",
+        "upgrade Open Library V14 SP1 (S7-300).zal14",
+        "start owned TIA upgrade Open Library V14 SP1 (S7-300)",
+        "prepare library_archive",
+        "apply library_archive",
+        "upgrade Open Library V15 PLC.zal15",
+        "start owned TIA upgrade Open Library V15 PLC",
+        "prepare library_archive",
+        "apply library_archive",
+        "upgrade Open Library V16 PLC.zal16",
+        "start owned TIA upgrade Open Library V16 PLC",
+        "prepare library_archive",
+        "apply library_archive",
+        "upgrade Open Library V17 PLC.zal17",
+        "start owned TIA upgrade Open Library V17 PLC",
+        "prepare library_archive",
+        "apply library_archive",
+        "upgrade Open Library V18 PLC.zal18",
+        "start owned TIA upgrade Open Library V18 PLC",
+        "prepare library_archive",
+        "apply library_archive",
+        "upgrade LGF V20",
+        "start owned TIA upgrade LGF",
+        "prepare library_archive",
+        "apply library_archive",
+        "upgrade (observed) Open Library V14 SP1.zal14",
+        "start owned TIA upgrade Open Library V14 SP1",
+        "upgrade (observed) Open Library V18 Comfort.zal18",
+        "start owned TIA upgrade Open Library V18 Comfort",
+        "upgrade (observed) Open Library V18 Professional.zal18",
+        "start owned TIA upgrade Open Library V18 Professional",
+        "upgrade (observed) Open Library V18 Unified.zal18",
+        "start owned TIA upgrade Open Library V18 Unified",
+        "upgrade companion directory .al17",
+        "start owned TIA upgrade Open Library V17 PLC",
+        "upgrade read-only directory .al16",
+        "start owned TIA upgrade Open Library V16 PLC"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_query",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

@@ -32,6 +32,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import xml.etree.ElementTree as ET
 from types import SimpleNamespace
 
 from library_native_harness import Harness, require
@@ -133,22 +134,30 @@ def body(h):
     if vci:
         for fmt in (x for x in vci["formats"] if x != "SimaticML"):
             probe(h, "project-ward synchronization of a %s tag-table package" % fmt, lambda fmt=fmt: other_format(h, standard, empty, vci, fmt))
-    probe(h, "standard SCL and XML blocks reading an absolute F-input", lambda: absolute_block_read(h, plc, fio, f))
+    absolute_block_read(h, plc, standard, fio, f, s)
 
 
-def absolute_block_read(h, plc, fio, scope):
-    """Record whether native compilation permits a standard direct read without creating a safety tag."""
-    before = tables(h)
+def absolute_block_read(h, plc, standard, fio, scope, standard_scope):
+    """Native source generation can create an implicit safety tag; refuse it and the equivalent XML before any write."""
     source = 'FUNCTION "FioReadProbe" : Bool\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\nBEGIN\n#FioReadProbe := %s;\nEND_FUNCTION\n' % fio
-    scl = attempt(h, "source_upsert", {"language": "SCL", "source": source, "expectedBlockNames": ["FioReadProbe"]}, scope)
-    require(tables(h) == before, "The standard block import changed a tag table")
-    if not scl["prepared"]:
-        return {"scl": scl}
-    exported = h.tool("block_read", {"plcPath": plc, "blockName": "FioReadProbe"})
+    payload = {"language": "SCL", "source": source, "expectedBlockNames": ["FioReadProbe"]}
+    refuse(h, "source generation of an implicit F-input tag", "source_upsert", payload, scope, address=fio)
+    change(h, "source_upsert", payload, standard_scope)
+    exported = h.tool("block_read", {"plcPath": standard, "blockName": "FioReadProbe"})
     xml = artifact_bytes(h.tool, exported["artifact"]).decode("utf-8-sig")
-    imported = attempt(h, "block_import_xml", {"xml": xml, "expectedBlockNames": ["FioReadProbe"]}, scope)
-    require(tables(h) == before, "The standard XML block import changed a tag table")
-    return {"scl": scl, "xml": imported, "tagTablesUnchanged": True}
+    document = ET.fromstring(xml)
+    accesses = [e for e in document.iter() if e.tag.endswith("}Access") and e.get("Scope") in ("GlobalVariable", "Address")]
+    require(len(accesses) == 1, "Expected one input read in the native standard source export")
+    access = accesses[0]
+    namespace = access.tag.rsplit("}", 1)[0] + "}"
+    access.set("Scope", "Address")
+    for child in list(access):
+        access.remove(child)
+    byte, bit = map(int, fio.removeprefix("%I").split("."))
+    ET.SubElement(access, namespace + "Address", {"Area": "Input", "Type": "Bool", "BitOffset": str(byte * 8 + bit)})
+    payload = {"xml": ET.tostring(document, encoding="unicode"), "expectedBlockNames": ["FioReadProbe"]}
+    change(h, "block_import_xml", payload, standard_scope)
+    refuse(h, "XML block import of an absolute F-input", "block_import_xml", payload, scope, address=fio)
 
 
 def vci_routes(h, plc, table, fio, f):

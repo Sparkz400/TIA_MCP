@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.126",
+  "catalogVersion": "0.4.127",
   "targetTiaVersions": [
     21
   ],
@@ -4729,6 +4729,86 @@
       ],
       "limitations": [
         "One owned Softbus CPU1511 V4.1; software/hardware configuration notifications and other IP modes not qualified."
+      ]
+    },
+    {
+      "id": "local.library.dmc-order.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "026b019247a89dd0b778f0f13a194ae3d6ddc15e",
+        "passedScope": "CPU1511 V4.1: DMC system and clock memory bytes, Open Library tags, three default FBs including selected consumer fbAirlock_Motor and dependency fbMotor_Reversing; dependency-first order with existing target paths kept, successful compilation and exact native library links."
+      },
+      "artifacts": [
+        "evidence/local.library.dmc-order.20261102.json"
+      ],
+      "limitations": [
+        "One owned CPU and three default DMC V19 FBs from the retained upgraded V21 archive. Full vendor library and runtime behavior are not qualified."
+      ]
+    },
+    {
+      "id": "local.library.upgrades-v20.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "77b2d23e56318de21f36fd5094ab68053f15cc36",
+        "passedScope": "V14 SP1, V15, V16, V17 and V18 DMC PLC archives plus LGF V5.3.0 V20 upgrade to V21, archive and fresh reopen with exact complete version identities; four mixed HMI packages, V17 companion directory and read-only V16 directory observed; input hashes unchanged."
+      },
+      "artifacts": [
+        "evidence/local.library.upgrades-v20.20261102.json"
+      ],
+      "limitations": [
+        "One supplied LGF V20 archive and the recovered DMC inputs. Upgrade/open/archive identity only, not every library producer, protected source, HMI runtime or PLC runtime."
+      ]
+    },
+    {
+      "id": "local.component.ob-production.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "77b2d23e56318de21f36fd5094ab68053f15cc36",
+        "passedScope": "Normal production Host admits the existing FBD OB caller with a fresh component and new global DB; compile, preservation, reopen and checkpoint recovery passed."
+      },
+      "artifacts": [
+        "evidence/local.component.ob-production.20261102.json"
+      ],
+      "limitations": [
+        "Single obCaller shape on owned CPU1511 V4.1; other OB combinations, software units and embedding-parent effects remain gated."
+      ]
+    },
+    {
+      "id": "local.safety.fio-routes.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "77b2d23e56318de21f36fd5094ab68053f15cc36",
+        "passedScope": "87-stage offline F-I/O import-route corpus: reviewed merged Git conflict and tag-bearing software-unit master-copy refusals on F-PLC, standard-PLC positive route, preserved tag tables and existing route regressions."
+      },
+      "artifacts": [
+        "evidence/local.safety.fio-routes.20261102.json"
+      ],
+      "limitations": [
+        "Offline owned CPU1511F and standard CPU1511 with F-DI; no safety-program changes or physical safety qualification. Optional absolute-I/O source/XML probes are observations only."
+      ]
+    },
+    {
+      "id": "local.runtime.plcsim-tcpip.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "17f7ba2965f69f27e35aeb2d15984a76cbd12e5f",
+        "passedScope": "Normal owned TCP/IP runtime: provisioning, Web and OPC UA connections, reads, subscriptions, captures, stale-pin refusals and clean disconnect, power-off and release."
+      },
+      "artifacts": [
+        "evidence/local.runtime.plcsim-tcpip.20261102.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU1511 instance; shared credential-vault route, not physical PLC or Test Suite system execution."
       ]
     }
   ],
@@ -12055,7 +12135,8 @@
           "local.library_vendor.20261025",
           "local.library_upgrades.20261024",
           "local.library_import_scale.20261027",
-          "local.library_vendor.rerun.20261102"
+          "local.library_vendor.rerun.20261102",
+          "local.library.upgrades-v20.20261102"
         ]
       },
       "availability": {
@@ -12100,7 +12181,8 @@
           "local.library_vendor.20261025",
           "local.library_upgrades.20261024",
           "local.library_import_scale.20261027",
-          "local.library_vendor.rerun.20261102"
+          "local.library_vendor.rerun.20261102",
+          "local.library.upgrades-v20.20261102"
         ]
       },
       "availability": {
@@ -12300,7 +12382,8 @@
           "local.library_preservation.20261028",
           "local.library_compatibility.rerun.20261028",
           "local.library_formats.rerun.20261028",
-          "local.library_vendor.rerun.20261102"
+          "local.library_vendor.rerun.20261102",
+          "local.library.upgrades-v20.20261102"
         ]
       },
       "availability": {
@@ -12435,7 +12518,9 @@
           "local.safety.fio-routes.20261101",
           "local.safety.fio-routes-2.20261101",
           "local.library.tag-collision.20261101",
-          "local.library_dmc_prerequisites.20261102"
+          "local.library_dmc_prerequisites.20261102",
+          "local.library.dmc-order.20261102",
+          "local.safety.fio-routes.20261102"
         ]
       },
       "availability": {
@@ -12570,7 +12655,8 @@
           "local.library_integrate.candidate_shapes.dependent_db.20261102",
           "local.library_integrate.combined_apply.regression.20261102",
           "local.library_integrate.candidate_shapes.verified.20261102",
-          "local.component.ob.20261102"
+          "local.component.ob.20261102",
+          "local.component.ob-production.20261102"
         ]
       },
       "availability": {
@@ -12637,7 +12723,8 @@
           "local.typed.component-effect-capture.20261102",
           "local.library_integrate.combined_apply.regression.20261102",
           "local.library_integrate.candidate_shapes.verified.20261102",
-          "local.component.ob.20261102"
+          "local.component.ob.20261102",
+          "local.component.ob-production.20261102"
         ]
       },
       "availability": {
@@ -23329,7 +23416,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23373,7 +23461,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23417,7 +23506,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23461,7 +23551,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23505,7 +23596,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23550,7 +23642,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23594,7 +23687,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
-          "local.runtime.plcsim-tcpip.route-gate.20261101"
+          "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23640,7 +23734,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
-          "local.runtime.plcsim-tcpip.route-gate.20261101"
+          "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23684,7 +23779,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23728,7 +23824,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23778,7 +23875,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23822,7 +23920,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23867,7 +23966,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
-          "local.runtime.plcsim-tcpip.route-gate.20261101"
+          "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23910,7 +24010,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23954,7 +24055,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23998,7 +24100,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25389,7 +25492,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25434,7 +25538,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25479,7 +25584,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25524,7 +25630,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25569,7 +25676,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25616,7 +25724,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
-          "local.runtime.plcsim-tcpip.route-gate.20261101"
+          "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25802,7 +25911,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25847,7 +25957,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25892,7 +26003,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25936,7 +26048,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25979,7 +26092,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -26022,7 +26136,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -26065,7 +26180,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -26109,7 +26225,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
-          "local.runtime.plcsim-tcpip.route-gate.20261101"
+          "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -26153,7 +26270,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -26196,7 +26314,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -26239,7 +26358,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -26282,7 +26402,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -27721,7 +27842,8 @@
         "evidenceIds": [
           "local.software_units.lifecycle.20261030",
           "local.safety.fio-routes-2.20261101",
-          "local.library.tag-collision.20261101"
+          "local.library.tag-collision.20261101",
+          "local.safety.fio-routes.20261102"
         ]
       },
       "availability": {
@@ -27878,7 +28000,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.vci_git.20261031",
-          "local.safety.fio-routes-2.20261101"
+          "local.safety.fio-routes-2.20261101",
+          "local.safety.fio-routes.20261102"
         ]
       },
       "availability": {

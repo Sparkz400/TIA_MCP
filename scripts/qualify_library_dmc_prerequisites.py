@@ -1,4 +1,4 @@
-"""Apply DMC's prerequisites, then compile one or all default PLC code blocks with their dependency closures."""
+"""Apply DMC's prerequisites, then compile representative or all default PLC code blocks with their dependency closures."""
 from __future__ import annotations
 
 import argparse
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     parser.add_argument("--worker", type=Path, required=True)
     parser.add_argument("--artifacts", type=Path, required=True)
     parser.add_argument("--vendor-report", type=Path, required=True)
-    parser.add_argument("--all-default-blocks", action="store_true", help="Compile every default PLC code-block version, not only fbIO_DigitalInput")
+    parser.add_argument("--all-default-blocks", action="store_true", help="Compile every default PLC code-block version instead of the three-block dependency regression")
     parser.add_argument("--timeout", type=int, default=600)
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
