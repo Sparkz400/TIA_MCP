@@ -31,6 +31,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import xml.etree.ElementTree as ET
 from types import SimpleNamespace
@@ -145,19 +146,22 @@ def absolute_block_read(h, plc, standard, fio, scope, standard_scope):
     change(h, "source_upsert", payload, standard_scope)
     exported = h.tool("block_read", {"plcPath": standard, "blockName": "FioReadProbe"})
     xml = artifact_bytes(h.tool, exported["artifact"]).decode("utf-8-sig")
-    document = ET.fromstring(xml)
-    accesses = [e for e in document.iter() if e.tag.endswith("}Access") and e.get("Scope") in ("GlobalVariable", "Address")]
-    require(len(accesses) == 1, "Expected one input read in the native standard source export")
-    access = accesses[0]
-    namespace = access.tag.rsplit("}", 1)[0] + "}"
-    access.set("Scope", "Address")
-    for child in list(access):
-        access.remove(child)
-    byte, bit = map(int, fio.removeprefix("%I").split("."))
-    ET.SubElement(access, namespace + "Address", {"Area": "Input", "Type": "Bool", "BitOffset": str(byte * 8 + bit)})
-    payload = {"xml": ET.tostring(document, encoding="unicode"), "expectedBlockNames": ["FioReadProbe"]}
+    payload = {"xml": absolute_xml(xml, fio), "expectedBlockNames": ["FioReadProbe"]}
     change(h, "block_import_xml", payload, standard_scope)
     refuse(h, "XML block import of an absolute F-input", "block_import_xml", payload, scope, address=fio)
+
+
+def absolute_xml(xml, fio):
+    """Keep native namespace spelling: TIA can silently drop a reserialized StructuredText body."""
+    byte, bit = map(int, fio.removeprefix("%I").split("."))
+    pattern = r'<Access\b(?=[^>]*Scope="(?:GlobalVariable|Address)")([^>]*)>.*?</Access>'
+    def replace(match):
+        attributes = re.sub(r'Scope="[^"]+"', 'Scope="Address"', match.group(1))
+        return '<Access%s><Address Area="Input" Type="Bool" BitOffset="%d" /></Access>' % (attributes, byte * 8 + bit)
+    updated, count = re.subn(pattern, replace, xml, flags=re.S)
+    require(count == 1, "Expected one input read in the native standard source export")
+    ET.fromstring(updated)
+    return updated
 
 
 def vci_routes(h, plc, table, fio, f):
