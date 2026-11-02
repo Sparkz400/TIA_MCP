@@ -328,12 +328,12 @@ class Run:
                         require(not opened, 'Only the closed fixture may be open'); self.call('project_open', {'path': project})
                     # Qualification tools return MCP's generic error text; the Host log carries the worker's refusal.
                     logged = lambda: sum(OWNERSHIP_REFUSAL in line for line in self.client.errors)
-                    before = logged()
+                    seen = logged()  # not `before`: that is the opening tia_discover
                     self.call('qualification_translation_capture', selector, expect_error=True)
                     for _ in range(50):  # stderr is read on its own thread
-                        if logged() > before: break
+                        if logged() > seen: break
                         time.sleep(0.1)
-                    require(logged() == before + 1, 'A fresh worker must refuse a fixture it did not create (' + OWNERSHIP_REFUSAL + ')')
+                    require(logged() == seen + 1, 'A fresh worker must refuse a fixture it did not create (' + OWNERSHIP_REFUSAL + ')')
                     report['adoptionRefused'] = {'tool': 'qualification_translation_capture', 'code': 'ProjectIsolationRequired', 'workerMessage': OWNERSHIP_REFUSAL,
                                                  'hostDiagnostics': f'{self.counter:03}-host-diagnostics.json'}
                 self.save('fixture-identity', {**selector, 'processId': started['processId']})
