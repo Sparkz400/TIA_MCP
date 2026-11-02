@@ -1,0 +1,61 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.translation.restricted.finalized.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T03:37:47+00:00",
+  "source": {
+    "commit": "1f9e4859a4010028905ac8e6e89d34828418889c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "The worker side of a finalized restricted entry: qualify_translation_native.py --finalized-capture (run bpfc) in default mode on the 1f9e4859 Debug build (artifacts/ap2) with the 25-proof final registry (no deployment binding) that build_translation_admission.py --finalize built from local.translation.restricted.native.20261102. An uninstalled profile was refused (TranslationImportProfileUnqualified); translation_native_capture of the admitted project passed through the Host and the worker loaders of the final entry and kept the installed category scope (5 BlockCommentCategoryData rows) with the Main OB1 comment at the replacement the finalizing packet imported; a reviewed reverse edit of it was refused at translation_native_prepare with TranslationAdmissionMismatch, because the admitted baseline was spent by that packet.",
+  "limitations": [
+    "No import through the final entry: the default-mode packet that finalizes an entry imports its one admitted edit, so the entry's baseline is spent before it is installed; an import through a final entry needs a scratch whose baseline a new packet admits.",
+    "One scratch instance, one PLC, de-DE/en-GB."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 30,
+      "sha256": "1c275ce40cb006c670f4e68601a1ff8c471190939247fe2393fba26a879b3225"
+    },
+    {
+      "name": "net48",
+      "files": 10,
+      "sha256": "7c83b02244cd67d80658167866882392acc24accd98f116f5963f52acdacbfe5"
+    }
+  ],
+  "runs": [
+    {
+      "report": "bp-finalized-restricted.json",
+      "sha256": "60d8e463e075c6c6cc81f07798dc956a41c795f040c85ff26dbedbf5a9138da6",
+      "bytes": 10466,
+      "completed": true,
+      "steps": [
+        "bpfc: finalizedCapture"
+      ],
+      "toolsPassed": [
+        "artifact_upload_begin",
+        "artifact_upload_chunk",
+        "artifact_upload_commit",
+        "project_open",
+        "tia_detach",
+        "tia_discover",
+        "tia_start",
+        "translation_approve",
+        "translation_candidate",
+        "translation_inspect",
+        "translation_native_capture",
+        "translation_prepare"
+      ],
+      "toolsRejected": [
+        "translation_native_capture",
+        "translation_native_prepare"
+      ]
+    }
+  ]
+}

@@ -26,10 +26,19 @@ def member_shapes(document, names):
     return {name: structural(next(e for e in document.iter() if e.attrib.get("Name") == name)) for name in names}
 
 
-def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace="", iec=False):
+# The PLC component pair (component-effect-*.scl): a caller FB gains the component FB, whose UDT static no scalar pair covers,
+# as the multi-instance Gate. Written qualificationOnly; the change that verified it (local.library_integrate.candidate_shapes.dependent_db.20261102)
+# removed the flag from the deployed manifest.
+COMPONENT_FB, COMPONENT_MEMBER = "TiaMcpComponentGate", "Gate"
+
+
+def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace="", iec=False, component=False):
     suffix = "" if route == "standard" else "-" + route
+    assert not (iec and component) and (not component or route == "standard"), "The component pair is one standard-route capture."
     stem, effect, appended = (("instance-effects-iec", "IecEffect", STANDARD_IEC_MEMBERS if route == "standard" else IEC_MEMBERS) if iec
+                              else ("instance-effects-component", "ComponentEffect", (COMPONENT_MEMBER,)) if component
                               else ("instance-effects", "InstanceEffect", ("Child",)))
+    member_name = COMPONENT_MEMBER if component else "Child"
     manifest = ROOT / ("fixtures/typed-graphical/" + stem + suffix + ".v1.json")
     # A recapture that adds members must reproduce every deployed member exactly, so qualified types keep their effect.
     deployed = json.loads(manifest.read_text(encoding="utf-8")) if iec and manifest.exists() else None
@@ -40,7 +49,8 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
     directory.mkdir(exist_ok=True)
     result = {"schemaVersion": 1, "builderUsed": False, "nativeImportCompileVerified": True,
               "engineeringVerified": False, "preservationVerified": False, "persistenceVerified": False,
-              "recoveryVerified": False, "runtimeVerified": False, **({} if iec else {"memberName": "Child"}),
+              "recoveryVerified": False, "runtimeVerified": False, **({} if iec else {"memberName": member_name}),
+              **({"qualificationOnly": True} if component else {}),
               "tiaVersion": "V21", "route": route, "artifacts": {}, "sources": {}}
     if namespace:
         result["namespace"] = namespace
@@ -90,13 +100,29 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
         parent = next(e for e in after.iter() if child in list(e))
         parent.remove(child)
     assert structural(before) == structural(after), "Native DB effects include more than the observed appended members."
-    result["nativeObservedEffect"] = {**({"appendedStaticMembers": list(appended)} if iec else {"appendedStaticMember": "Child"}),
+    result["nativeObservedEffect"] = {**({"appendedStaticMembers": list(appended)} if iec else {"appendedStaticMember": member_name}),
         "existingFullDbPayloadPreserved": True, "explicitStartValuePreserved": {"RetainedMarker": "42"}}
     if iec:
         caller = documents[("after", "caller")]
         types = {e.attrib["Name"]: e.attrib["Datatype"] for e in caller.iter() if e.attrib.get("Name") in appended and "Datatype" in e.attrib}
         assert set(types) == set(appended) and len(set(types.values())) == len(appended), "Every IEC member needs one distinct native type."
         result["members"] = {datatype: name for name, datatype in types.items()}
+    elif component:
+        # The component FB as the same capture exported it; the DB member nests its UDT static State, like the caller member.
+        report = json.loads(after_path.read_text(encoding="utf-8"))
+        export = next(e for entry in report["fixtures"] if COMPONENT_FB in entry["names"] for e in entry["exports"] if e["name"] == COMPONENT_FB)
+        raw = Path(export["path"]).read_bytes()
+        assert hashlib.sha256(raw).hexdigest() == export["sha256"]
+        callee = directory / "reference-callee.xml"
+        callee.write_bytes(raw)
+        result["referenceCallee"] = {"path": callee.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(raw).hexdigest(), "captureReport": checkout_relative(after_path)}
+        for kind in ("caller", "instance"):
+            # Re-read: the comparison above removed the appended member from the parsed DB.
+            gate = next(e for e in ET.fromstring((directory / ("after-" + kind + ".xml")).read_bytes()).iter() if e.attrib.get("Name") == COMPONENT_MEMBER)
+            assert gate.attrib.get("Datatype") == '"' + COMPONENT_FB + '"', "The appended member is not the component FB."
+            state = [e for e in gate.iter() if e.attrib.get("Name") == "State"]
+            assert len(state) == 1 and state[0].attrib.get("Datatype") == '"TiaMcpComponentState"' and \
+                any(e.attrib.get("Name") == "Active" for e in state[0].iter()), "The " + kind + " member does not nest the component UDT."
     else:
         callee = ROOT / ("fixtures/typed-graphical/native/" + prefix + "TemplateFB_LAD.xml")
         result["referenceCallee"] = {"path": callee.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(callee.read_bytes()).hexdigest()}
@@ -112,5 +138,6 @@ if __name__ == "__main__":
     parser.add_argument("--prefix", default="Tgp_")
     parser.add_argument("--namespace", default="")
     parser.add_argument("--iec", action="store_true", help="Extract the IEC instance-type member pair instead of the FB Child pair.")
+    parser.add_argument("--component", action="store_true", help="Extract the PLC component FB's Gate pair (component-effect-*.scl).")
     args = parser.parse_args()
-    extract(args.before.resolve(), args.after.resolve(), args.route, args.prefix, args.namespace, args.iec)
+    extract(args.before.resolve(), args.after.resolve(), args.route, args.prefix, args.namespace, args.iec, args.component)

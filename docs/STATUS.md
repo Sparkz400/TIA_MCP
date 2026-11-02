@@ -1,11 +1,11 @@
 # Current status
 
 TIA MCP is pre-1.0; use it only with offline projects, copies, scratch projects and
-simulators you own (see the [README](../README.md)). On `main`, 1 November 2026:
+simulators you own (see the [README](../README.md)). On `main`, 2 November 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.109`: 481 features, 464 verified, 17 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Feature catalog | `0.4.114`: 481 features, 464 verified, 17 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
 | Release matrix rows | 133 shipped, 331 limited, 3 unqualified, 12 unavailable on V21, 2 deferred |
 | Matrix cells | 2,127 bound, **15 open**, 72 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76`; X07, X08, B03 and B04 on 1 November against `0.4.92`, D10 against `0.4.95` and D06 against `0.4.109` |
@@ -62,7 +62,11 @@ record is cited by a feature; records no feature cites any more are in the retir
 
 ## Recent changes
 
-Dated notes, newest first, are in the [status log](history/status-log.md). From 31 October to
+Dated notes, newest first, are in the [status log](history/status-log.md). On
+[2 November](history/status-log.md#2-november-2026) most worker paths of the 31 October audit ran natively (catalog 0.4.114):
+the delete compile rule of `to_delete` and `hardware_delete`, generated-source reads, `vci_workspace_inspect`'s `contentSha256` and translation scratch
+status, with the restricted translation pipeline running end to end again after an RFC 8785 fix of its admission scripts.
+From 31 October to
 [1 November](history/status-log.md#1-november-2026): the Classic screen/tag-table import and BackColor (TP700 Comfort) and PLC-backed
 Unified tags (Unified Comfort, Unified PC) passed the HMI preservation gate natively and are admitted in production, and WinCC RT
 Professional became a recorded V21 boundary (catalog 0.4.92). Before that: project upgrade, OPC UA method calls and

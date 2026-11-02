@@ -17,7 +17,7 @@ import json
 from pathlib import Path
 
 from qualify_translation_category_probe import ref, require
-from verify_watch_workflow import canonical_sha
+from verify_watch_workflow import canonical_matches
 
 CONTRACT = 'translation.whole-project-de-DE-en-GB-main-ob1.exact.v1'
 RESTRICTED_CONTRACT = 'translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1'
@@ -42,8 +42,9 @@ def canonical(value): return json.dumps(value, sort_keys=True, separators=(',', 
 
 def build(packet, verification, portable, manifest, profile_id, deployment=None):
     packet = Path(packet).resolve()
-    forward = load(packet / 'forward-instance-key.json'); key = forward['key']; key_sha = canonical_sha(key)
-    require(forward['sha256'] == key_sha and key['contract'] in CASES, 'Forward key digest or contract differs')
+    # The proofs carry the Host's own key hash: RFC 8785 since 1 November 2026, the earlier form for older packets.
+    forward = load(packet / 'forward-instance-key.json'); key = forward['key']; key_sha = forward['sha256']
+    require(canonical_matches(key_sha, key) and key['contract'] in CASES, 'Forward key digest or contract differs')
     native_cases = CASES[key['contract']]; restricted = key['contract'] == RESTRICTED_CONTRACT
     categories = load(packet / 'category-verification.json') if restricted else None
     require(not restricted or categories['populatedMainControl'] is True and key['scope']['categoryIds'] == ['BlockCommentCategoryData'] and

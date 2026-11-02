@@ -58,6 +58,16 @@ Check(CanonicalJson.Sha256(JsonNode.Parse("{\"z\":1,\"a\":2}")!) == CanonicalJso
 Check(CanonicalJson.Sha256(JsonNode.Parse("[1,2]")!) != CanonicalJson.Sha256(JsonNode.Parse("[2,1]")!), "Row order changes identity");
 Check(CanonicalJson.Sha256(JsonNode.Parse("{\"a\":null}")!) != CanonicalJson.Sha256(JsonNode.Parse("{}")!), "Unknown versus absent stays distinct");
 Check(CanonicalJson.Sha256(JsonNode.Parse("[1000]")!) == CanonicalJson.Sha256(JsonNode.Parse("[1e3]")!), "Numbers hash by value (RFC 8785)");
+// A local Git remote is walked for links before receive-pack runs; past its bound (100,000 entries, GitRemote.RequireSafeLocal) it is refused until repacked.
+var gitBound = Directory.CreateTempSubdirectory("tiamcp-git-bound-").FullName;
+try
+{
+    for (int i = 0; i < 3; i++) File.WriteAllBytes(Path.Combine(gitBound, "loose" + i), []);
+    TiaMcp.Core.VersionControl.GitSafety.RequireNoLinksBelow(gitBound, 3); passed++;
+    File.WriteAllBytes(Path.Combine(gitBound, "loose3"), []);
+    Reject(() => TiaMcp.Core.VersionControl.GitSafety.RequireNoLinksBelow(gitBound, 3), "GitLimitExceeded");
+}
+finally { Directory.Delete(gitBound, true); }
 Console.WriteLine($"PASS Engineering identity and canonical capture contracts: {passed} checks; no native execution.");
 CanonicalJsonChecks.Run();
 EngineeringOperationChecks.Run();

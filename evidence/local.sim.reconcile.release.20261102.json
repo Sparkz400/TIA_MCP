@@ -1,0 +1,105 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.sim.reconcile.release.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T23:41:58+00:00",
+  "source": {
+    "commit": "b3787562c6ef834a7237daa7f2e9a460be45d6be",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/reconcile_provision.py at b3787562 (frozen artifacts/pc1) on every unresolved simulation_provision_scratch_credential admission on this PC: f52861ec (p24cp2, Softbus, 24 October, failed at discoverExactRuntimeAddress), ac16fa74 (p1, Softbus, 1 November, failed at captureRecoveryBaseline, observer never created) and d7b97fe0, 600a8af7, 6963dcf6 (rt, TCP/IP, 29 October). Each in a fresh owned TIA V21 session: archive hash equal, retrieved archive fingerprint (engineering plus project library revision) equal to the current project, project last saved before the archive was written, all 86 card files equal to the original manifest, storage outside the card equal to the pre-attempt inventory by metadata with only the attempt's and PLCSIM's runtime files new, the write-ahead stream never opened or armed the credential, observer absent or empty; all five released with per-resource evidence. Each Host, worker and Portal exited with code 0 under exact handle tracking, and a second fresh Portal opened each original project (lock released). No simulator tool was called.",
+  "limitations": [
+    "Only the release path ran natively; every refusal (save after the archive, storage difference, possible credential submission, observer content and the earlier ones) is covered by managed and pure-rule tests.",
+    "Opaque runtime files PLCSIM creates at power-on (retain.pms, sim_hwdb.ini) are bounded by metadata and the write-ahead stream, never read or byte-compared.",
+    "The fingerprint keeps EngineeringFingerprint policy 2's boundaries; the save-time rule covers the rest of the saved project."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "d0cb1b6204b22e709f86426667f9d6ac30e9cd5b8e0c849d84abe15a01655e10"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "62029b6287e7a98eaeebc3148f8ffac004e443fb1e63b79aef58ee6eb4544710"
+    }
+  ],
+  "runs": [
+    {
+      "report": "f52861eccea147ce96158249e7a16759.json",
+      "sha256": "af9b21d59e67b469079a3f8b16ee965810007f6eb2667d5f67a224085800c760",
+      "bytes": 59423,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "project_open",
+        "simulation_provision_reconcile",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "ac16fa74c6c34cc284805db30894d089.json",
+      "sha256": "0641a889bad200c1e4c632373406d53e00dfe36f10c37d5e917e33d858bff869",
+      "bytes": 60426,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "project_open",
+        "simulation_provision_reconcile",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "d7b97fe0d0fd4c8cba1eb7adfef05e5c.json",
+      "sha256": "0538e3cd7fe5e6b162fba478622b22462dc9418879a6e47a403a2b84e9aedda9",
+      "bytes": 60439,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "project_open",
+        "simulation_provision_reconcile",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "600a8af7b86447708c9b5dc5fbe6569d.json",
+      "sha256": "d62f2205dcedff6f661bc585a41629c8aa4fdefddafe1e16fd052c4c72193291",
+      "bytes": 60434,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "project_open",
+        "simulation_provision_reconcile",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "6963dcf66df84475830a9da702e7d148.json",
+      "sha256": "be08310d2bf3549ed86c7306041f846c397a84c75784bdcc8b348b10b19dda34",
+      "bytes": 60423,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "project_open",
+        "simulation_provision_reconcile",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

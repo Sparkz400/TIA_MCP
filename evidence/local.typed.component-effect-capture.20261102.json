@@ -1,0 +1,57 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.component-effect-capture.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T23:42:08+00:00",
+  "source": {
+    "commit": "b3787562c6ef834a7237daa7f2e9a460be45d6be",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/capture_typed_routes_owned.py at b3787562 (frozen artifacts/pc1) in a fresh SHA-bound retrieval of the de-DE CPU 1511-1 PN V4.1 reference archive, standard route: the component UDT TiaMcpComponentState and FB TiaMcpComponentGate, then FB Tgp_ComponentEffect with its instance DB Tgp_ComponentEffect_DB (RetainedMarker start value 42), then Tgp_ComponentEffect redeclared with the multi-instance Gate : TiaMcpComponentGate, the DB observed as a native dependent. Each source imported, compiled with 0 errors and saved; only the declared objects added or changed; a fresh-process reopen equalled the saved state. extract_typed_instance_effects.py --component found the DB gained exactly Gate (nesting the UDT static State with Active), everything else including the 42 start value unchanged, and wrote instance-effects-component.v1.json (qualificationOnly).",
+  "limitations": [
+    "A native capture of TIA's own effect; it qualifies no builder. The pair is used by the typed route only for a caller FB's direct instance DB, standard route, CPU 1511-1 PN V4.1, de-DE.",
+    "Embedding parents (the transitive effect of a structured member) were not captured."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "d0cb1b6204b22e709f86426667f9d6ac30e9cd5b8e0c849d84abe15a01655e10"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "62029b6287e7a98eaeebc3148f8ffac004e443fb1e63b79aef58ee6eb4544710"
+    }
+  ],
+  "runs": [
+    {
+      "report": "capture.json",
+      "sha256": "eb751f7085cefd1ef7d091fe33fecb992b702a68d7848de2f1e3ead8a7d2cf8f",
+      "bytes": 5795724,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
