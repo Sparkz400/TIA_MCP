@@ -980,7 +980,7 @@ namespace TiaMcp.Openness.V21
                 }
                 catch (Exception exception)
                 {
-                    change.State = "recovery_required"; change.Journal["failure"] = new JObject { ["code"] = (exception as BridgeException)?.Code ?? "NativeLibraryError", ["message"] = exception.Message, ["details"] = (exception as BridgeException)?.Details };
+                    change.State = "recovery_required"; change.Journal["failure"] = new JObject { ["code"] = (exception as BridgeException)?.Code ?? "NativeLibraryError", ["message"] = exception.Message, ["details"] = (exception as BridgeException)?.Details, ["nativeExceptionChain"] = NativeFailureText.Chain(exception) };
                     LibraryJournal(change, "transaction", "failed");
                     throw new BridgeException((exception as BridgeException)?.Code ?? "NativeLibraryError", exception.Message, LibraryChangeView(change));
                 }

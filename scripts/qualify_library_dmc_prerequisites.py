@@ -49,8 +49,10 @@ def body(h):
 
     versions = [x for x in all_items(h, library)["items"] if x.get("kind") == "version" and x.get("isDefault")
                 and ("CodeBlockLibraryTypeVersion" in x.get("engineeringType", "") if h.args.all_default_blocks
-                     else x.get("typeName") == "fbIO_DigitalInput")]
+                     else x.get("typeName") in ("fbIO_DigitalInput", "fbAirlock_Motor", "fbMotor_Reversing"))]
     require(versions and sum(x["typeName"] == "fbIO_DigitalInput" for x in versions) == 1, "Default DMC code-block inventory is incomplete")
+    if not h.args.all_default_blocks:
+        require({x["typeName"] for x in versions} == {"fbIO_DigitalInput", "fbAirlock_Motor", "fbMotor_Reversing"}, "The dependency-order regression pair is missing")
     h.report["compiledVendorBlocks"] = versions
     # The production intake accepts at most 100 selected components per reviewed change.
     for start in range(0, len(versions), 100):
