@@ -67,7 +67,9 @@ class FakeHost:
                     tags[table + "/tags/" + tag] = {"kind": "hmiTag", "name": tag, "properties": {"Connection": "HMI_Connection_1", "PlcTag": spelling, "DataType": "Int", "AccessMode": "SymbolicAccess"}}
                 tags[table + "/tags/SharedValue"] = {"kind": "hmiTag", "name": "SharedValue", "properties": {"Connection": "", "PlcTag": "", "DataType": "Int", "AccessMode": "SymbolicAccess"}}
                 world[hmi] = {"plc": plc, "tags": tags, "connections": {hmi + "/connections/HMI_Connection_1": {"kind": "hmiConnection", "name": "HMI_Connection_1", "properties": {"Partner": "PLC_" + "AB"[index - 1]}}},
-                              "screens": {hmi + "/screens/" + s: {"kind": "hmiScreen", "name": s, "properties": {"Width": 800, "Height": 480}} for s in ("Overview_A", "Overview_B")},
+                              "screens": {hmi + "/screens/" + s: {"kind": "hmiScreen", "name": s, "properties": {"Width": 800, "Height": 480},
+                                                                  "eventHandlers": [{"properties": {"EventType": "Loaded"}, "script": {"scriptCode": "seeded"}}] if s == "Overview_A" else []}
+                                          for s in ("Overview_A", "Overview_B")},
                               "items": {hmi + "/screens/%s/items/RepeatedItem" % s: {"kind": "hmiScreenItem", "name": "RepeatedItem", "screen": hmi + "/screens/" + s,
                                         "nativeType": "Siemens.Engineering.HmiUnified.UI.Shapes.HmiRectangle", "properties": {"Left": 30, "Top": 40, "Width": 120, "Height": 60}}
                                         for s in ("Overview_A", "Overview_B")},
@@ -504,8 +506,9 @@ class GateRouteRunTests(unittest.TestCase):
                 report = self.run_route(profile, "unified", kind="hmi_event_handler_create", errors=errors)
                 self.assertEqual([], report["failures"])
                 self.assertEqual(1, sum(c.startswith("Setup applied") for c in report["checks"]))
-                self.assertEqual(8, sum(c.startswith("Refused before any write") for c in report["checks"]))
-                self.assertEqual(["Loaded handler of screen Overview_A on HMI_RT_1", "Tapped handler of item RepeatedItem on HMI_RT_1", "Tapped handler of item QualificationButton on HMI_RT_2"],
+                self.assertEqual(9, sum(c.startswith("Refused before any write") for c in report["checks"]))
+                self.assertIn("Refused before any write: an event that already has a handler (Loaded) (HmiNameConflict)", report["checks"])
+                self.assertEqual(["Cleared handler of screen Overview_A on HMI_RT_1", "Tapped handler of item RepeatedItem on HMI_RT_1", "Tapped handler of item QualificationButton on HMI_RT_2"],
                                  [r["label"] for r in report["replays"]])
 
     def test_a_handler_that_changes_its_script_fails_the_readback(self):
@@ -515,7 +518,7 @@ class GateRouteRunTests(unittest.TestCase):
                     for handler in owner.get("eventHandlers", []):
                         handler["script"]["scriptCode"] = handler["script"]["scriptCode"].strip()
         failures = self.run_route("unified-comfort", "unified", kind="hmi_event_handler_create", leak=leak)["failures"]
-        self.assertTrue(any(f.startswith("Independent readback of the target: Loaded handler of screen Overview_A") for f in failures), failures)
+        self.assertTrue(any(f.startswith("Independent readback of the target: Cleared handler of screen Overview_A") for f in failures), failures)
 
     def test_a_screen_row_change_outside_the_created_item_fails(self):
         def leak(world):

@@ -252,10 +252,11 @@ def dynamization_present(client):
 
 
 def prepare_event_handler(scenario, client):
-    """A script handler of HMI_RT_1/Overview_A (the screen's own event type, Loaded where documented)."""
+    """A script handler of HMI_RT_1/Overview_A for one of its documented events without a handler."""
     from qualify_hmi_gate_route import devices, event_type, handler_payload, prepare, screen_fixture
-    screen = screen_fixture(client, devices(client, "unified"))["HMI_RT_1"]["screens"]["Overview_A"]
-    return scenario.step("change_prepare hmi_event_handler_create", prepare(client, "hmi_event_handler_create", handler_payload(screen, event_type(client, screen))))
+    hmis = devices(client, "unified")
+    screen = screen_fixture(client, hmis)["HMI_RT_1"]["screens"]["Overview_A"]
+    return scenario.step("change_prepare hmi_event_handler_create", prepare(client, "hmi_event_handler_create", handler_payload(screen, event_type(client, hmis["HMI_RT_1"], screen))))
 
 
 def event_handler_present(client):

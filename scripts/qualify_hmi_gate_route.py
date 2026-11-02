@@ -545,9 +545,24 @@ def event_types(client, owner):
     return allowed
 
 
-def event_type(client, owner):
-    allowed = event_types(client, owner)
-    return next((e for e in PREFERRED_EVENTS if e in allowed), allowed[0])
+def handler_row(client, device, owner):
+    """The owner's hmi_inspect row with its eventHandlers: an exact screen read (section screens with objectPath), or the item row."""
+    path = owner["identity"]["objectPath"]
+    if owner["identity"]["kind"] == "hmiScreen":
+        return rows(client, device, "screens", objectPath=path).get(path) or {}
+    return rows(client, device, "items", screenPath=path.rsplit("/items/", 1)[0]).get(path) or {}
+
+
+def handled_events(client, device, owner):
+    return [(h.get("properties") or {}).get("EventType") for h in handler_row(client, device, owner).get("eventHandlers") or []]
+
+
+def event_type(client, device, owner):
+    """A documented event of the owner without a handler (the kind is create-only; the seeded Overview_A already handles Loaded)."""
+    handled = handled_events(client, device, owner)
+    free = [e for e in event_types(client, owner) if e not in handled]
+    require(free, "Every event of %s already has a handler" % owner["identity"]["objectPath"])
+    return next((e for e in PREFERRED_EVENTS if e in free), free[0])
 
 
 def handler_owners(client, hmis, fx):
@@ -566,9 +581,10 @@ def handler_setup(fx):
 
 def handler_refusals(client, hmis, fx):
     kind = "hmi_event_handler_create"
-    screen = fx["HMI_RT_1"]["screens"]["Overview_A"]
-    event = event_type(client, screen)
-    return [("the same handler payload as hmi_engineering", "hmi_engineering", handler_payload(screen, event), "HmiPreservationUnavailable"),
+    screen, device = fx["HMI_RT_1"]["screens"]["Overview_A"], hmis["HMI_RT_1"]
+    event, handled = event_type(client, device, screen), handled_events(client, device, screen)
+    existing = [("an event that already has a handler (%s)" % handled[0], kind, handler_payload(screen, handled[0]), "HmiNameConflict")] if handled else []
+    return existing + [("the same handler payload as hmi_engineering", "hmi_engineering", handler_payload(screen, event), "HmiPreservationUnavailable"),
             ("an operation outside the kind (screen_create)", kind, screen_payload(fx["HMI_RT_1"], SCREEN), "InvalidRequest"),
             ("an event type the screen does not document", kind, handler_payload(screen, UNDOCUMENTED_EVENT), "InvalidRequest"),
             ("event type None", kind, handler_payload(screen, "None"), "InvalidRequest"),
@@ -583,15 +599,10 @@ def handler_cases(fx):
     def handled(index):
         def build(client, hmis):
             hmi, role, owner = handler_owners(client, hmis, fx)[index]
-            event, path = event_type(client, owner), owner["identity"]["objectPath"]
+            event, path = event_type(client, hmis[hmi], owner), owner["identity"]["objectPath"]
 
             def verify(client):
-                if role == "screen":
-                    row = rows(client, hmis[hmi], "screens", objectPath=path).get(path) or {}
-                else:
-                    screen_path = path.rsplit("/items/", 1)[0]
-                    row = rows(client, hmis[hmi], "items", screenPath=screen_path).get(path) or {}
-                found = [h for h in row.get("eventHandlers") or [] if (h.get("properties") or {}).get("EventType") == event]
+                found = [h for h in handler_row(client, hmis[hmi], owner).get("eventHandlers") or [] if (h.get("properties") or {}).get("EventType") == event]
                 script = (found[0].get("script") or {}) if len(found) == 1 else {}
                 observed = {"handlers": len(found), "scriptCode": script.get("scriptCode"), "sha256": script.get("scriptCodeSha256"), "executed": script.get("scriptsExecuted")}
                 expected = {"handlers": 1, "scriptCode": SCRIPT, "sha256": digest(SCRIPT.encode("utf-8")), "executed": False}
@@ -607,7 +618,7 @@ def handler_cases(fx):
 
 def handler_reopen(client, hmis, fx):
     screen = fx["HMI_RT_2"]["screens"]["Overview_A"]
-    return handler_payload(screen, event_type(client, screen))
+    return handler_payload(screen, event_type(client, hmis["HMI_RT_2"], screen))
 
 
 # Kind: family, profiles, fixture, setup applies (label, kind, payload) before the reference, refusals before any write, applies
