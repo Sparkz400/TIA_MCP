@@ -115,7 +115,8 @@ class FakeHost:
             if exported:
                 artifacts.append(self.export(hmi, exported))
         else:
-            items = [dict(self.row(hmi, path, row["kind"], row["name"], row["properties"]), **{k: row[k] for k in ("nativeType", "dynamizations") if k in row})
+            items = [dict(self.row(hmi, path, row["kind"], row["name"], row["properties"]), **{k: row[k] for k in ("nativeType", "dynamizations") if k in row},
+                          **({"behaviorCoverage": {"dynamizations": {"status": "observed", "count": len(row.get("dynamizations", []))}}} if section == "items" else {}))
                      for path, row in self.world()[hmi].get(section, {}).items() if section != "items" or row["screen"] == request.get("screenPath")]
         if request.get("objectPath") and section != "items":
             items = [r for r in items if r["identity"]["objectPath"] == request["objectPath"]]
@@ -133,10 +134,16 @@ class FakeHost:
         return {"path": str(file), "sha256": hashlib.sha256(file.read_bytes()).hexdigest()}
 
     def references(self, request):
+        edges = self.edges(request)
+        offset, limit = request.get("offset", 0), request.get("limit", 100)
+        return {"relationships": edges[offset:offset + limit], "nextOffset": offset + limit if offset + limit < len(edges) else None}
+
+    def edges(self, request):
         hmi = request["target"]["hmiPath"]
         plc, table = self.world()[hmi]["plc"], hmi + "/tagTables/Default%20tag%20table"
         base = {"projectPath": self.active, "plcPath": plc, "scopePath": plc}
-        return {"relationships": [
+        # 199 unrelated edges first, so the item edges land on the second page as on the native fixture (run hb3).
+        return [{"relation": "hmiNativePayload", "sourcePath": hmi + "/filler/%d" % i, "resolution": "unresolved"} for i in range(199)] + [
             {"relation": "hmiPlcDeclaration", "sourcePath": table + "/tags/LinkedSignal", "resolution": "resolved",
              "target": {**base, "kind": "tag", "objectPath": plc + "/tags/QualificationTags/tags/SharedSignal", "name": "SharedSignal", "dataType": "Int"}},
             {"relation": "hmiPlcDeclaration", "sourcePath": table + "/tags/LinkedDbValue", "resolution": "resolved",
@@ -144,7 +151,7 @@ class FakeHost:
                         "blockPath": plc + "/blocks/QualificationDB", "pathComponents": ["Value"], "xmlLine": 7}}] + [
             {"relation": "hmiScreenItemTag", "sourcePath": path, "sourceProperty": "Dynamizations/%s/Tag" % d["property"], "resolution": "resolved",
              "target": {"objectPath": table + "/tags/" + d["properties"]["Tag"]}}
-            for path, row in self.world()[hmi].get("items", {}).items() for d in row.get("dynamizations", [])]}
+            for path, row in self.world()[hmi].get("items", {}).items() for d in row.get("dynamizations", [])]
 
     # The worker's refusals, in its order: request rules, kind, body, gate, StaleRevision.
     def check(self, kind, payload, admitted):
