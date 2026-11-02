@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.109`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.111`.
 
 ### Added
 
@@ -130,8 +130,20 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   `capabilities.experimental["tiaMcp/featureCatalog"].version`.
 - Bundles from `scripts/Package.ps1` carry the product version in their name and `manifest.json`.
 - Combined PLC library apply is on by default for the natively verified recipe shapes;
-  `--enable-library-integrate-apply` is still accepted and changes nothing.
+  `--enable-library-integrate-apply` is still accepted and changes nothing. Since 2 November these
+  are 23 shapes: every combination of LAD/FBD FC and FB callers, earlier placement, reuse and the
+  reused-FB multi-instance (`local.library_integrate.candidate_shapes.combinations.20261102`), and a
+  multi-instance caller FB with its own instance DB, which gains the member through the newly captured
+  component effect (`local.typed.component-effect-capture.20261102`,
+  `local.library_integrate.candidate_shapes.dependent_db.20261102`); an embedding parent is still
+  refused before admission with `DependencyProfileUnavailable`.
 - Production Hosts dispatch the qualified force-table document edits.
+- `simulation_provision_reconcile` also requires the project's save time before its pre-provision
+  archive (and compares the project library), the storage outside the card against its pre-attempt
+  inventory by metadata, and a write-ahead stream that never opened or armed the credential; an
+  observer that was never created is unchanged. All five retained provisioning admissions on this
+  PC were released (`local.sim.reconcile.release.20261102`); `reconcile_provision.py` tracks every
+  process exactly and proves the project lock released.
 - `plc_station_upload` can trust an owned PLCSIM instance's TLS (`trustOwnedSimulationCertificate`,
   off by default); `safety_import_xml` compiles every device; the device compile lists devices
   without a compile service as not compiled instead of refusing.

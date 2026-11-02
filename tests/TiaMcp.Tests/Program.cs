@@ -312,6 +312,7 @@ internal static partial class Program
             ("Typed global FB instances retain native storage defaults without guessing layouts", TypedGraphicalTests.GlobalInstanceTemplatesRetainObservedDefaults),
             ("Typed structured members map only onto an identical captured member", TypedGraphicalTests.StructuredMembersMapOnlyOntoIdenticalCapturedMembers),
             ("Typed qualification-only templates serve only the component qualification scratch", TypedGraphicalTests.QualificationOnlyTemplatesServeOnlyTheComponentScratch),
+            ("Typed component multi-instances map onto the captured dependent DB member only", TypedGraphicalTests.ComponentDependentDbFollowsItsCapturedEffect),
             ("Typed factories preserve every captured scalar creation and instance default", TypedGraphicalTests.CapturedCreationAndInstanceDefaultsRemainComplete),
             ("Typed captured branches preserve the complete native XML after replacement", TypedGraphicalCorpusTests.CapturedBranchRoundtripPreservesCompleteNativeXml),
             ("Typed inserted networks allocate native UIds within their own network", TypedGraphicalCorpusTests.NewNetworkIdsAreNativeScoped),
