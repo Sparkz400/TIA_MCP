@@ -43,6 +43,12 @@ def captured_source(entry):
     return local.resolve() if local.is_file() and sha(local) == entry.get("fileSha256") else path
 
 
+def checkout_name(path):
+    """A capture may sit in another checkout's artifacts tree (a frozen build, the main checkout); name it relative to that checkout."""
+    path = pathlib.Path(path).resolve()
+    return path.relative_to(next((p for p in path.parents if (p / "TiaMcp.slnx").exists()), ROOT)).as_posix()
+
+
 def parse(path):
     return safe_xml(pathlib.Path(path).read_text(encoding="utf-8-sig"))
 
@@ -129,9 +135,9 @@ def audit(catalog_path, capture_path, prerequisites=()):
         equivalence.append({"committed": str(pathlib.Path(committed).as_posix()), "committedSha256": sha(committed),
                             "reexport": str(staged.relative_to(ROOT).as_posix()), "reexportSha256": sha(staged), "equivalent": same})
     return {"schemaVersion": 1, "catalog": str(pathlib.Path(catalog_path).resolve().relative_to(ROOT).as_posix()), "catalogSha256": sha(catalog_path),
-            **({"capture": str(pathlib.Path(capture_path).resolve().relative_to(ROOT).as_posix()), "captureSha256": sha(capture_path)}
+            **({"capture": checkout_name(capture_path), "captureSha256": sha(capture_path)}
                if not isinstance(capture_path, (list, tuple)) else
-               {"captures": [{"capture": str(pathlib.Path(path).resolve().relative_to(ROOT).as_posix()), "captureSha256": sha(path)} for path in capture_path]}),
+               {"captures": [{"capture": checkout_name(path), "captureSha256": sha(path)} for path in capture_path]}),
             "counts": {"sources": len(catalog["sources"]), "profiles": len(catalog["profiles"]),
                        "templates": sum(len(catalog.get(k, [])) for k in ("creationTemplates", "globalInstanceTemplates", "multiInstanceTemplates"))},
             "prerequisiteEquivalence": equivalence, "findings": findings, "passed": not findings}
