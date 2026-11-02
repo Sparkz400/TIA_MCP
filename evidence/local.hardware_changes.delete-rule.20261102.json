@@ -1,0 +1,75 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hardware_changes.delete-rule.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T01:27:09+00:00",
+  "source": {
+    "commit": "bc162ad24797efa34d3c82f87202b2b018c7c160",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_hardware_changes.py --slice delete-rule on a frozen Debug build of bc162ad2 (artifacts/ap1, git archive), 14/14 steps, in one owned scratch CPU 1511-1 PN V4.1: a DI 16x24VDC HF (6ES7 521-1BH00-0AB0) plugged at slot 2 with checkpoint, compile and save; change_apply of hardware_delete of it with compile=false refused with InvalidRequest (requires compile=true, the 31 October delete and rename rule) before its checkpoint, change_status prepared with no stage or recovery archive and the complete hardware, inventory and program state unchanged; the same prepared change then applied with checkpoint, device compile and save and removed exactly the module, its built-in submodule, their inventory rows and its system constant.",
+  "limitations": [
+    "One module in the scratch CPU's rack; no reopen and no restore here (both are qualified by local.hardware_changes.20261028).",
+    "Engineering only; nothing is downloaded and no physical topology is observed."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "3348872af8950c2fe44df538b6eca91a22816a9ee9bf19d62c0be707fbd4d4a7"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "b1e1adad419317c49f760522263417a7a34e7660e76f587412890b4d2483b010"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "0d52e227212da62a95872726fa7875cf416de64733f19e10981d41a1cedd3a76",
+      "bytes": 120331,
+      "completed": true,
+      "steps": [
+        "start owned TIA hardware changes",
+        "create owned scratch hardware changes",
+        "snapshot baseline",
+        "prepare plug HwDi",
+        "apply hardware_plug",
+        "change_status plug HwDi",
+        "snapshot plug HwDi",
+        "verify plug HwDi",
+        "prepare delete HwDi",
+        "refuse apply hardware_delete: compile=false",
+        "apply hardware_delete",
+        "change_status delete HwDi",
+        "snapshot delete HwDi",
+        "verify delete HwDi"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_status",
+        "device_inventory",
+        "hardware_inspect",
+        "project_inventory",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

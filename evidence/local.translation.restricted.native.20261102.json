@@ -1,0 +1,75 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.translation.restricted.native.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T03:37:47+00:00",
+  "source": {
+    "commit": "1f9e4859a4010028905ac8e6e89d34828418889c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "The six translation_native_* tools in default mode on the 1f9e4859 Debug build (artifacts/ap2) with the provisional restricted registry (translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1, profile ap2-restricted, 21 proofs) that build_translation_admission.py built from local.translation.restricted.qualification.20261102 with proofs in the Host's RFC 8785 key hash: qualify_translation_native.py --interrupt worker:checkpointIntent --interrupt worker:dispatchIntent --interrupt host:dispatchIntent (run bppd). Each interruption reconciled unchanged with the replay refused (RecoveryRequired); the clean lifecycle refused a forged plan, a stale revision, a replay, an existing recovery destination and the changed baseline, imported once, recovered to a new directory and reconciled verifiedApplied/verifiedRestored. Right after the import's fresh reopen of the admitted (not scratch) project, a scratch-only change_prepare (hardware_add with configureScratchSecurity) was refused with ScratchIsolationRequired: the reopen stage did not grant scratch status (31 October audit). build_translation_admission.py --finalize then produced the 25-proof final entry.",
+  "limitations": [
+    "One scratch instance; the admitted project is the qualification packet's fixture opened with project_open, so it is admitted, not the worker's scratch.",
+    "Watch ownership after the reopen is not observed separately; the scratch probe observes the scratch reference.",
+    "Interruption is process termination of the worker with its owned TIA or of the Host; power loss and remote transport are not exercised."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 30,
+      "sha256": "1c275ce40cb006c670f4e68601a1ff8c471190939247fe2393fba26a879b3225"
+    },
+    {
+      "name": "net48",
+      "files": 10,
+      "sha256": "7c83b02244cd67d80658167866882392acc24accd98f116f5963f52acdacbfe5"
+    }
+  ],
+  "runs": [
+    {
+      "report": "bp-native-restricted.json",
+      "sha256": "71abead6ec8d36432f792c1e3b89fcad6144ee1c57261d0aa56ddad3932039f1",
+      "bytes": 17976,
+      "completed": true,
+      "steps": [
+        "bppd: interruption worker:checkpointIntent unchanged",
+        "bppd: interruption worker:dispatchIntent unchanged",
+        "bppd: interruption host:dispatchIntent unchanged",
+        "bppd: scratchNotGranted",
+        "bppd: refusals"
+      ],
+      "toolsPassed": [
+        "artifact_upload_begin",
+        "artifact_upload_chunk",
+        "artifact_upload_commit",
+        "project_open",
+        "tia_detach",
+        "tia_discover",
+        "tia_start",
+        "translation_approve",
+        "translation_candidate",
+        "translation_inspect",
+        "translation_native_apply",
+        "translation_native_capture",
+        "translation_native_prepare",
+        "translation_native_reconcile",
+        "translation_native_recover",
+        "translation_native_status",
+        "translation_prepare"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "translation_native_apply",
+        "translation_native_capture",
+        "translation_native_prepare",
+        "translation_native_recover",
+        "translation_native_status"
+      ]
+    }
+  ]
+}

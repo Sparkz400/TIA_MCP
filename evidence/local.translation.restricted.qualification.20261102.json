@@ -1,0 +1,69 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.translation.restricted.qualification.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T03:37:46+00:00",
+  "source": {
+    "commit": "1f9e4859a4010028905ac8e6e89d34828418889c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Rerun of local.translation.restricted.qualification.20261031 on current main with the RFC 8785 fix of the admission scripts: the qualification_translation_* tools in an explicit --translation-qualification session on a frozen Debug build of 1f9e4859 (artifacts/ap2, git archive) under TIA Portal V21 Update 3, English UI, qualify_translation_import.py --same-instance --restricted-lifecycle (run bpsi). Category probes with the conclusive populated-Main control; Host-filtered PLC captures keeping exactly 5, 1 and 0 of 6 native rows for BlockCommentCategoryData, HwcnCommentTextCategoryData and AlarmClassDisplayNameCategory; on the filtered block-comment scope the seven forward cases (before-dispatch, source drift, lost import, compile, save, reopen and restore replies; the last three verifiedApplied), three reviewed reverse edits, 8 imports and 10 distinct restorations, all reconciled, and the final unattempted plan with the same restricted-contract key, whose Host hash is now RFC 8785 (8e2b8644...). The independent verify_translation_admission.py of 1f9e4859 passed (bpsi-verification.json).",
+  "limitations": [
+    "One owned scratch, one PLC, de-DE/en-GB, target-only text; only the BlockCommentCategoryData restriction is imported in this packet.",
+    "The first attempt on bc162ad2 (run apsi) stopped before its first case: the runner compared the Host's RFC 8785 key hash with the earlier form (fixed in 1f9e4859).",
+    "The read-only warning is matched in its English wording only."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 30,
+      "sha256": "1c275ce40cb006c670f4e68601a1ff8c471190939247fe2393fba26a879b3225"
+    },
+    {
+      "name": "net48",
+      "files": 10,
+      "sha256": "7c83b02244cd67d80658167866882392acc24accd98f116f5963f52acdacbfe5"
+    }
+  ],
+  "runs": [
+    {
+      "report": "bp-qualification-restricted.json",
+      "sha256": "cdb70d3875d0478e088c45e5177cf0cad55dee51b5f06321b861c0e3e84567af",
+      "bytes": 26107,
+      "completed": true,
+      "steps": [
+        "bpsi: before-dispatch",
+        "bpsi: source-drift",
+        "bpsi: import-reply",
+        "bpsi: compile-reply",
+        "bpsi: save-reply",
+        "bpsi: reopen-reply",
+        "bpsi: restore-reply"
+      ],
+      "toolsPassed": [
+        "project_open",
+        "qualification_translation_apply",
+        "qualification_translation_capture",
+        "qualification_translation_categories",
+        "qualification_translation_fixture",
+        "qualification_translation_prepare",
+        "qualification_translation_reconcile",
+        "qualification_translation_recover",
+        "qualification_translation_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "qualification_translation_apply",
+        "qualification_translation_recover"
+      ]
+    }
+  ]
+}
