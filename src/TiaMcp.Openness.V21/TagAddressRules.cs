@@ -17,11 +17,11 @@ namespace TiaMcp.Openness.V21
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
         // Conservative lexical scan: comments and quoted text are included because source generation can create tags.
-        private static readonly Regex SourceIo = new Regex(@"(?<![\w])%?[IQEA]\s*(?:\d{1,6}\.[0-7]|[BWDL]\s*\d{1,6})(?![\w.])",
+        private static readonly Regex SourceIo = new Regex(@"(?<![\w])%?P?[IQEA]\s*(?:\d{1,6}\s*\.\s*[0-7]|[BWDL]\s*\d{1,6})(?![\w.])",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
         internal static string[] SourceIoAddresses(string source) => SourceIo.Matches(source).Cast<Match>()
-            .Select(match => Regex.Replace(match.Value, @"\s+", "")).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+            .Select(match => Regex.Replace(Regex.Replace(match.Value, @"\s+", ""), @"^%?[Pp]", "%")).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
 
         internal static string[] BlockIoAddresses(XDocument document)
         {

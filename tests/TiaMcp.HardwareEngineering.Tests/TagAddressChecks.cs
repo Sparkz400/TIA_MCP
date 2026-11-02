@@ -18,6 +18,7 @@ internal static class TagAddressChecks
         Check(TagAddressRules.SourceIoAddresses("#x := %I1.0; L EW 2; T QD4; // %IB5\n#QI2 := %M0.0;")
             .SequenceEqual(new[] { "%I1.0", "EW2", "QD4", "%IB5" }), "source operands include spaced German and international addresses and conservatively include comments");
         Check(TagAddressRules.SourceIoAddresses("input %IW5:P").Any(a => TagAddressRules.FIoOverlap(a, ranges) == "/fdi"), "peripheral access suffix does not hide a straddling F-I/O address");
+        Check(TagAddressRules.SourceIoAddresses("L PEW 4; T PQB 1; A I 2 . 1;").SequenceEqual(new[] { "%EW4", "%QB1", "I2.1" }), "peripheral STL mnemonics and spaced bit operands retain their address ranges");
         var blockIo = TagAddressRules.BlockIoAddresses(System.Xml.Linq.XDocument.Parse("<Document><Access xmlns=\"urn:native\" Scope=\"Address\"><Address Area=\"Input\" Type=\"Word\" BitOffset=\"40\" /></Access></Document>"));
         Check(blockIo.Length == 16 && blockIo.Any(a => TagAddressRules.FIoOverlap(a, ranges) == "/fdi"), "namespaced XML operands check their complete bit range");
         bool refusedType = false;
