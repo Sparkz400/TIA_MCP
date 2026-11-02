@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.117",
+  "catalogVersion": "0.4.118",
   "targetTiaVersions": [
     21
   ],
@@ -4170,6 +4170,25 @@
       "limitations": [
         "One component window in owned scratch projects; the worker ignores the probe fields beyond hashing them, so the run shows Host/worker hash agreement, not the use of such values by a step.",
         "Numbers and text only in the advance requests; manifests and other worker-hashed values carried ASCII paths, and the earlier-form acceptance of PR 186 (records written before RFC 8785) is not exercised by this fresh store.",
+        "Qualification-only route (--component-qualification); production combined library_integrate apply stays disabled."
+      ]
+    },
+    {
+      "id": "local.component.canonical-hash.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4b970cc91fdb0532a49a0f6833f9e0cf8d664eb6",
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of 4b970cc9 (artifacts/hz3, git archive; main with PR 190's exact worker number reading and range refusal, and PR 199's id-keeping refusal), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Before the first advance, the same advance request with 1.8e308 added was refused with InvalidRequest ('A request number is outside the double range.', from the worker's request reader, relayed by the Host with the request id); the window's revision, state and children (start, applyLibrary) were unchanged, and the verifyImport advance that followed dispatched on the same Host session. Each of the three advance requests carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of all three advance requests (1e3 as 1000, 2.2250738585072014e-308, 1.7976931348623157e+308, i.e. double.MaxValue) reproduced the Host's recorded hashes c857106f, 340dd121 and c5e740ce."
+      },
+      "artifacts": [
+        "evidence/local.component.canonical-hash.20261102.json"
+      ],
+      "limitations": [
+        "One component window in owned scratch projects; the worker ignores the probe fields beyond hashing them, so the run shows Host/worker hash agreement, not the use of such values by a step.",
+        "In the component-window path the worker reads the request before the Host hashes it, so the 1.8e308 refusal came from the worker's request reader; the Host's own range refusal is covered by the shared vectors offline only.",
+        "Numbers and text only in the advance requests; the earlier-form acceptance of PR 186 and PR 190's earlier source-snapshot form are not exercised by this fresh store.",
         "Qualification-only route (--component-qualification); production combined library_integrate apply stays disabled."
       ]
     },
@@ -15877,7 +15896,7 @@
           "Qualified for a fresh FB/UDT component: complete FC/DB/call/bindings install, preservation, save/reopen, first-checkpoint recovery and PLCSIM runtime with a separate OB1 call; and installation into an existing FBD FC caller with the exact following-ID shift, preservation, save/reopen and first-checkpoint recovery. LAD/FB/OB callers and production combined library_integrate apply remain unqualified.",
           "Requires --component-qualification. Retains durable ownership across begin/status/recovery/completion; restart cannot resume installation. Unavailable on normal Hosts.",
           "Qualification-only tool registration does not enable a production mutation profile.",
-          "Host and worker hash each child request in RFC 8785 and the Host refuses a dispatch whose hashes differ; natively (local.component.canonical-hash.20261101, with PR 186's exact decimal parsing) every child of a complete window dispatched with advance requests holding a non-ASCII key and text and the literals 1e3 and 2.2250738585072012e-308."
+          "Host and worker hash each child request in RFC 8785 and the Host refuses a dispatch whose hashes differ; natively (local.component.canonical-hash.20261101, with PR 186's exact decimal parsing) every child of a complete window dispatched with advance requests holding a non-ASCII key and text and the literals 1e3 and 2.2250738585072012e-308; with PR 190 (local.component.canonical-hash.20261102) also 1.7976931348623158e308, and an advance request with 1.8e308 was refused with InvalidRequest with the window unchanged."
         ]
       },
       "qualification": {
@@ -15886,7 +15905,8 @@
           "local.plc_component.install.rerun.20261028",
           "local.plc_component.runtime.rerun.20261028",
           "local.plc_component.existing_caller.rerun.20261028",
-          "local.component.canonical-hash.20261101"
+          "local.component.canonical-hash.20261101",
+          "local.component.canonical-hash.20261102"
         ]
       },
       "availability": {
