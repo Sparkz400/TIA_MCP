@@ -374,7 +374,8 @@ namespace TiaMcp.Openness.V21
                 var screen = native as Siemens.Engineering.HmiUnified.UI.Screens.HmiScreen ?? throw new BridgeException("HmiTargetMismatch", "item_create requires an exact native Unified screen identity (kind hmiScreen).");
                 if (screen.ScreenItems.Find(payload.Value<string>("name")) != null) throw new BridgeException("HmiNameConflict", "The requested item already exists on this screen.");
                 var rectangle = (JObject)payload["placement"];
-                HmiRecipeRules.RequirePlacement(rectangle.Value<long>("left"), rectangle.Value<long>("top"), rectangle.Value<long>("width"), rectangle.Value<long>("height"), screen.Width, screen.Height);
+                try { HmiRecipeRules.RequirePlacement(rectangle.Value<long>("left"), rectangle.Value<long>("top"), rectangle.Value<long>("width"), rectangle.Value<long>("height"), screen.Width, screen.Height); }
+                catch (ArgumentException error) { throw new BridgeException("InvalidRequest", error.Message, new JObject { ["placement"] = rectangle.DeepClone(), ["screenWidth"] = screen.Width, ["screenHeight"] = screen.Height }); }
                 result["itemType"] = payload["itemType"].DeepClone(); result["name"] = payload["name"].DeepClone(); result["placement"] = rectangle.DeepClone();
                 result["screenSize"] = new JObject { ["width"] = screen.Width, ["height"] = screen.Height }; result["createdPath"] = HmiCreatedPath(payload);
                 return result;

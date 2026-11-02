@@ -66,7 +66,9 @@ class FakeHost:
                 for tag, spelling in (("LinkedSignal", "SharedSignal"), ("LinkedDbValue", "QualificationDB.Value")):
                     tags[table + "/tags/" + tag] = {"kind": "hmiTag", "name": tag, "properties": {"Connection": "HMI_Connection_1", "PlcTag": spelling, "DataType": "Int", "AccessMode": "SymbolicAccess"}}
                 world[hmi] = {"plc": plc, "tags": tags, "connections": {hmi + "/connections/HMI_Connection_1": {"kind": "hmiConnection", "name": "HMI_Connection_1", "properties": {"Partner": "PLC_" + "AB"[index - 1]}}},
-                              "screens": {hmi + "/screens/Screen_1": {"kind": "hmiScreen", "name": "Screen_1", "properties": {"Width": 800}}},
+                              "screens": {hmi + "/screens/" + s: {"kind": "hmiScreen", "name": s, "properties": {"Width": 800, "Height": 480}} for s in ("Overview_A", "Overview_B")},
+                              "items": {hmi + "/screens/Overview_A/items/RepeatedItem": {"kind": "hmiScreenItem", "name": "RepeatedItem", "screen": hmi + "/screens/Overview_A",
+                                        "nativeType": "Siemens.Engineering.HmiUnified.UI.Shapes.HmiRectangle", "properties": {"Left": 30, "Top": 40, "Width": 120, "Height": 60}}},
                               "model": {path: {"kind": row["kind"], "name": row["name"], "properties": dict(row["properties"])} for path, row in tags.items()}}
         return world
 
@@ -112,7 +114,8 @@ class FakeHost:
             if exported:
                 artifacts.append(self.export(hmi, exported))
         else:
-            items = [self.row(hmi, path, row["kind"], row["name"], row["properties"]) for path, row in self.world()[hmi].get(section, {}).items()]
+            items = [dict(self.row(hmi, path, row["kind"], row["name"], row["properties"]), **({"nativeType": row["nativeType"]} if "nativeType" in row else {}))
+                     for path, row in self.world()[hmi].get(section, {}).items() if section != "items" or row["screen"] == request.get("screenPath")]
         if request.get("objectPath") and section != "items":
             items = [r for r in items if r["identity"]["objectPath"] == request["objectPath"]]
         offset, limit = request.get("offset", 0), request.get("limit", 100)
@@ -144,8 +147,25 @@ class FakeHost:
         operation, target = payload["operation"], payload["target"]
         hmi, path = target["hmiPath"], target["objectPath"]
         if kind != "hmi_engineering":
-            family, operations = ("classic", {"classic_xml_import", "scalar_property_set"}) if kind == "hmi_classic_import" else ("unified", {"external_tag_create"})
+            family, operations = {"hmi_classic_import": ("classic", {"classic_xml_import", "scalar_property_set"}), "hmi_external_tag_create": ("unified", {"external_tag_create"}),
+                                  "hmi_screen_create": ("unified", {"screen_create", "item_create"})}[kind]
             if target["family"] != family or operation not in operations:
+                return "InvalidRequest"
+        if operation == "screen_create":
+            screens = self.world()[hmi]["screens"].values()
+            if set(payload["properties"]) != {"Width", "Height"}:
+                return "InvalidRequest"
+            if any(r["name"] == payload["name"] for r in screens):
+                return "HmiNameConflict"
+            if not any(r["properties"] == payload["properties"] for r in screens):
+                return "DependencyUnresolved"
+        if operation == "item_create":
+            place, screen = payload["placement"], self.world()[hmi]["screens"].get(path)
+            if payload["itemType"] not in ("HmiRectangle", "HmiText", "HmiButton", "HmiIOField", "HmiBar", "HmiGauge", "HmiSlider", "HmiToggleSwitch"):
+                return "InvalidRequest"
+            if path + "/items/" + payload["name"] in self.world()[hmi]["items"]:
+                return "HmiNameConflict"
+            if place["left"] + place["width"] > screen["properties"]["Width"] or place["top"] + place["height"] > screen["properties"]["Height"]:
                 return "InvalidRequest"
         if operation == "scalar_property_set" and not re.fullmatch(r"\d{1,3}, \d{1,3}, \d{1,3}", payload["properties"]["BackColor"]):
             return "InvalidRequest"
@@ -193,6 +213,16 @@ class FakeHost:
             created = path + "/tags/" + payload["name"]
             world[hmi]["tags"][created] = {"kind": "hmiTag", "name": payload["name"], "properties": properties}
             world[hmi]["model"][created] = {"kind": "hmiTag", "name": payload["name"], "properties": dict(properties)}
+        elif operation == "screen_create":
+            created = hmi + "/screens/" + payload["name"]
+            world[hmi]["screens"][created] = {"kind": "hmiScreen", "name": payload["name"], "properties": dict(payload["properties"])}
+            world[hmi]["model"][created] = {"kind": "hmiModelNode", "name": payload["name"], "properties": dict(payload["properties"])}
+        elif operation == "item_create":
+            created, place = path + "/items/" + payload["name"], payload["placement"]
+            properties = {"Left": place["left"], "Top": place["top"], "Width": place["width"], "Height": place["height"]}
+            world[hmi]["items"][created] = {"kind": "hmiScreenItem", "name": payload["name"], "screen": path, "properties": properties,
+                                            "nativeType": "Siemens.Engineering.HmiUnified.UI.Widgets." + payload["itemType"]}
+            world[hmi]["model"][created] = {"kind": "hmiModelNode", "name": payload["name"], "properties": dict(properties)}
         if self.leak:
             self.leak(world)
 
@@ -256,9 +286,10 @@ class FakeClient:
 
     def prepare(self, kind, payload):
         host = self.host
-        # The three profiles are production-admitted since 1 November; a qualification Host does not change that.
-        code = host.check(kind, payload, True)
-        gate = {"available": code is None, "admission": "production" if code is None else None, "targetProfile": host.profile, "reasonCode": code}
+        # The three profiles are production-admitted for the 1 November kinds; a qualification Host does not change that.
+        admission = route.ADMISSION.get(kind, "production")  # hmi_engineering is refused by check() before admission matters
+        code = host.check(kind, payload, admission == "production" or self.admitted == host.profile)
+        gate = {"available": code is None, "admission": admission if code is None else None, "targetProfile": host.profile, "reasonCode": code}
         if code:
             raise Refused(code, {"gate": gate})
         if payload["expectedContentHash"] != host.hash():
@@ -347,9 +378,9 @@ class GateRouteRunTests(unittest.TestCase):
             "connectionFixture": {"links": [{"isValid": True}]}, "archive": {"path": str(archive), "sha256": sha or hashlib.sha256(b"seeded").hexdigest()}}]}), encoding="utf-8")
         return report
 
-    def run_route(self, profile, family, **fake):
+    def run_route(self, profile, family, kind=None, **fake):
         host = FakeHost(self.root, family, profile, **fake)
-        arguments = types.SimpleNamespace(profile=profile, base=self.root, fixture=None, seeded_report=None)
+        arguments = types.SimpleNamespace(profile=profile, base=self.root, fixture=None, seeded_report=None, kind=kind)
         if profile == "unified-pc":
             arguments.seeded_report = self.seeded()
         else:
@@ -389,6 +420,29 @@ class GateRouteRunTests(unittest.TestCase):
     def run_route_fresh(self, profile, family, **fake):
         shutil.rmtree(self.root / "prep", ignore_errors=True)
         return self.run_route(profile, family, **fake)["failures"]
+
+    def test_screen_route_passes_on_both_unified_profiles(self):
+        for profile, errors in (("unified-comfort", 0), ("unified-pc", 2)):
+            with self.subTest(profile=profile):
+                shutil.rmtree(self.root / "hps", ignore_errors=True)
+                shutil.rmtree(self.root / "prep", ignore_errors=True)
+                report = self.run_route(profile, "unified", kind="hmi_screen_create", errors=errors)
+                self.assertEqual([], report["failures"])
+                self.assertEqual("hmi_screen_create", report["kind"])
+                self.assertEqual(9, sum(c.startswith("Refused before any write") for c in report["checks"]))
+                self.assertEqual(3, sum(c.startswith("Independent readback") for c in report["checks"]))
+                self.assertEqual(3, sum(c.startswith("Gate admits this kind and profile (production)") for c in report["checks"]))
+                self.assertIn("A production Host admits the kind with admission production", report["checks"])
+
+    def test_a_screen_row_change_outside_the_created_item_fails(self):
+        def leak(world):
+            for hmi in world:
+                world[hmi]["screens"][hmi + "/screens/Overview_B"]["properties"]["Items"] = len(world[hmi]["items"])
+        failures = self.run_route("unified-comfort", "unified", kind="hmi_screen_create", leak=leak)["failures"]
+        self.assertTrue(any("unchanged outside the intended delta: HmiButton on HMI_RT_2 Overview_B" in f for f in failures), failures)
+        shutil.rmtree(self.root / "prep")
+        with self.assertRaises(AssertionError):
+            self.run_route("classic-comfort", "classic", kind="hmi_screen_create")
 
     def test_lifecycle_lock_release_and_compile_scope_are_gated(self):
         report = self.run_route("unified-comfort", "unified")

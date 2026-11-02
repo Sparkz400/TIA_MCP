@@ -1,10 +1,12 @@
-"""Native qualification of change kinds hmi_classic_import and hmi_external_tag_create, the HMI writes that pass the closed
-preservation gate (the text-list precedent, scripts/qualify_hmi_text_list_route.py).
+"""Native qualification of change kinds hmi_classic_import, hmi_external_tag_create and hmi_screen_create, the HMI writes that
+pass the closed preservation gate (the text-list precedent, scripts/qualify_hmi_text_list_route.py).
 
 One profile per run, on a qualification Host (--hmi-change-qualification <profile>) in a copy its own worker retrieves. Since the
 three profiles passed (1 November 2026) the gate admits them in production, also on that Host (ADMISSION):
 - classic-comfort (hmi_classic_import) and unified-comfort (hmi_external_tag_create) retrieve the desk-configured fixture
   (--fixture <configured.zap21> of scripts/prepare_hmi_fixture_ui.py, checked by qualify_engineering_gaps.prepared_archive);
+- hmi_screen_create (--kind) runs on the same Unified fixtures: a new screen sized like Overview_A on HMI_RT_1, an IOField on it
+  and a button on HMI_RT_2's Overview_B;
 - unified-pc has no configured fixture yet (ruling R4): --seeded-report names the HmiSeeder qualify report
   (artifacts/q/hps/native-report.json) whose positive baseline (two HMIs, two PLCs, integrated connections, LinkedSignal and
   LinkedDbValue) is retrieved as that report recorded it. Its two encrypted-transfer password errors stay; the kind's compile
@@ -41,15 +43,17 @@ from qualify_hmi import inspect_all
 from qualify_reliability import ReliabilityClient, decoded, require
 
 PROFILES = {"classic-comfort": ("classic", "hmi_classic_import"), "unified-comfort": ("unified", "hmi_external_tag_create"),
-            "unified-pc": ("unified", "hmi_external_tag_create")}
+            "unified-pc": ("unified", "hmi_external_tag_create")}  # Each profile's family and default --kind.
 HMIS = ("HMI_RT_1", "HMI_RT_2")
 # As journaled by a complete apply of either kind (OpennessSession.HmiEngineering.cs ApplyHmiEngineeringMutation and ChangeApply).
 APPLIED_STAGES = ["prechange_project_saved", "recovery_archive_created", "hmi_baseline_compiled", "hmi_native_write_started",
                   "hmi_precise_readback_verified", "mutation_applied", "compile_finished", "hmi_unrelated_content_preserved", "changed_project_saved"]
 PLC_KEYS = ("projectPath", "plcPath", "scopePath", "objectPath", "kind", "name", "namespace")  # The worker's plcTag allowlist.
 BACKCOLOR, ALTERNATE, ADDED_TAG, EXTERNAL = "200, 210, 220", "210, 220, 230", "SharedValueAdded", "QualificationExternal"
-# The admission the gate reports for these profiles; the qualifying runs (local.hmi.*.route.20261101) saw "qualification".
-ADMISSION = "production"
+SCREEN, FIELD, BUTTON = "QualificationScreen", "QualificationField", "QualificationButton"
+# The admission the gate reports for each kind on its profiles: production since its native qualification passed (the qualifying
+# runs of local.hmi.*.route.20261101 saw "qualification"); "qualification" while a kind has no production profile.
+ADMISSION = {"hmi_classic_import": "production", "hmi_external_tag_create": "production", "hmi_screen_create": "production"}
 
 
 def digest(raw):
@@ -112,7 +116,7 @@ def outside(found, family, roots):
         parts = rest.split(" ")
         if family == "classic" and label == "items" and parts[0] in roots:
             return True
-        if family == "unified" and label not in ("tags", "model"):
+        if family == "unified" and label not in ("tags", "model", "screens", "items"):
             return False
         return any(parts[-1] == root or parts[-1].startswith(root + "/") for root in roots)
     return [row for row in found if not intended(row)]
@@ -344,6 +348,94 @@ def unified_cases(fx):
             created("HMI_RT_2", EXTERNAL, "root", "root tag on HMI_RT_2 (its own PLC)")]
 
 
+# --- Unified screens and items (hmi_screen_create) ---------------------------------------------------------------------------
+
+def screen_fixture(client, hmis):
+    """Per HMI: its device identity (the screen_create target) and the seeded Overview_A and Overview_B with their native size."""
+    fx = {}
+    for name, device in hmis.items():
+        screens = {r["name"]: r for r in rows(client, device, "screens").values()}
+        require({"Overview_A", "Overview_B"} <= set(screens), name + " lacks Overview_A or Overview_B")
+        size = {key: screens["Overview_A"]["properties"].get(key) for key in ("Width", "Height")}
+        require(all(isinstance(v, int) and v > 0 for v in size.values()), name + " Overview_A has no native size: %s" % size)
+        fx[name] = {"device": device["identity"], "screens": screens, "size": size}
+    return fx
+
+
+def screen_payload(f, name, **changes):
+    payload = {"schemaVersion": 1, "operation": "screen_create", "target": f["device"], "name": name, "properties": dict(f["size"])}
+    payload.update(changes)
+    return payload
+
+
+def item_payload(screen, name, item_type, placement, **changes):
+    payload = {"schemaVersion": 1, "operation": "item_create", "target": screen["identity"], "name": name, "itemType": item_type, "placement": placement}
+    payload.update(changes)
+    return payload
+
+
+PLACEMENT = {"left": 20, "top": 30, "width": 160, "height": 40}
+
+
+def screen_refusals(client, hmis, fx):
+    f, kind = fx["HMI_RT_1"], "hmi_screen_create"
+    overview = f["screens"]["Overview_A"]
+    width = f["size"]["Width"]
+    return [("the same screen payload as hmi_engineering", "hmi_engineering", screen_payload(f, SCREEN), "HmiPreservationUnavailable"),
+            ("an operation outside the kind (tag_create)", kind, {"schemaVersion": 1, "operation": "tag_create", "target": f["device"], "name": "QualificationInternal", "dataType": "Int"}, "InvalidRequest"),
+            ("an existing screen name", kind, screen_payload(f, "Overview_A"), "HmiNameConflict"),
+            ("a size no screen of the HMI has", kind, screen_payload(f, SCREEN, properties={"Width": width + 1, "Height": f["size"]["Height"]}), "DependencyUnresolved"),
+            ("a screen property outside Width and Height", kind, screen_payload(f, SCREEN, properties={**f["size"], "BackColor": 1}), "InvalidRequest"),
+            ("an existing item name", kind, item_payload(overview, "RepeatedItem", "HmiIOField", PLACEMENT), "HmiNameConflict"),
+            ("a rectangle outside the screen", kind, item_payload(overview, FIELD, "HmiIOField", {**PLACEMENT, "left": width - 10}), "InvalidRequest"),
+            ("an item type outside the allowlist", kind, item_payload(overview, FIELD, "HmiLine", PLACEMENT), "InvalidRequest"),
+            ("a Classic family target", kind, item_payload({"identity": {**overview["identity"], "family": "classic"}}, FIELD, "HmiIOField", PLACEMENT), "InvalidRequest")]
+
+
+def screen_cases(fx):
+    """A new screen on HMI_RT_1 sized like Overview_A, an IOField on it, then a button on HMI_RT_2's seeded Overview_B."""
+    def created_screen(hmi):
+        def build(client, hmis):
+            f = fx[hmi]
+            path = f["device"]["hmiPath"] + "/screens/" + SCREEN
+
+            def verify(client):
+                row = rows(client, hmis[hmi], "screens").get(path) or {}
+                observed = {key: (row.get("properties") or {}).get(key) for key in ("Width", "Height")}
+                items = rows(client, hmis[hmi], "items", screenPath=path) if row else None
+                ok = row.get("name") == SCREEN and observed == f["size"] and items == {}
+                return ok, None if ok else {"expected": f["size"], "observed": observed, "name": row.get("name"), "items": sorted(items or {})}
+            return {"label": "screen on " + hmi, "hmi": hmi, "payload": screen_payload(f, SCREEN), "roots": [path], "verify": verify,
+                    "absent": (path, "screens", {})}
+        return build
+
+    def created_item(hmi, screen_name, name, item_type, placement):
+        def build(client, hmis):
+            screen = next(r for r in rows(client, hmis[hmi], "screens").values() if r["name"] == screen_name)
+            path = screen["identity"]["objectPath"] + "/items/" + name
+            expected = {"Left": placement["left"], "Top": placement["top"], "Width": placement["width"], "Height": placement["height"]}
+
+            def verify(client):
+                row = rows(client, hmis[hmi], "items", screenPath=screen["identity"]["objectPath"]).get(path) or {}
+                observed = {key: (row.get("properties") or {}).get(key) for key in expected}
+                ok = row.get("name") == name and observed == expected and (row.get("nativeType") or "").endswith("." + item_type)
+                return ok, None if ok else {"expected": expected, "observed": observed, "nativeType": row.get("nativeType")}
+            return {"label": "%s on %s %s" % (item_type, hmi, screen_name), "hmi": hmi, "payload": item_payload(screen, name, item_type, placement),
+                    "roots": [path], "verify": verify, "absent": (path, "items", {"screenPath": screen["identity"]["objectPath"]})}
+        return build
+    return [created_screen("HMI_RT_1"), created_item("HMI_RT_1", SCREEN, FIELD, "HmiIOField", PLACEMENT),
+            created_item("HMI_RT_2", "Overview_B", BUTTON, "HmiButton", {"left": 40, "top": 120, "width": 120, "height": 48})]
+
+
+# Kind: family, profiles, fixture, refusals before any write, applies in order, and an unbound reopen probe of the production gate.
+KINDS = {"hmi_classic_import": ("classic", ("classic-comfort",), classic_fixture, classic_refusals, classic_cases,
+                                lambda fx: scalar(fx["HMI_RT_1"]["Overview_B"], ALTERNATE)),
+         "hmi_external_tag_create": ("unified", ("unified-comfort", "unified-pc"), unified_fixture, unified_refusals, unified_cases,
+                                     lambda fx: external(fx["HMI_RT_1"], "QualificationReopen", "root")),
+         "hmi_screen_create": ("unified", ("unified-comfort", "unified-pc"), screen_fixture, screen_refusals, screen_cases,
+                               lambda fx: screen_payload(fx["HMI_RT_1"], "QualificationReopen"))}
+
+
 # --- Change calls ------------------------------------------------------------------------------------------------------------
 
 def prepare(client, kind, payload):
@@ -415,7 +507,9 @@ def run(args, connect, watch=lambda pid: None):
     """One profile; connect(store, hostArguments, toolCalls) returns an MCP client (ReliabilityClient on a real run), watch(pid) a
     process-exit watcher of the owned TIA (OwnedTiaProcessWatcher)."""
     profile = args.profile
-    family, kind = PROFILES[profile]
+    kind = getattr(args, "kind", None) or PROFILES[profile][1]
+    family, profiles, fixture_of, refusals_of, cases_of, reopen_of = KINDS[kind]
+    require(profile in profiles, "Change kind %s runs on %s, not %s" % (kind, " and ".join(profiles), profile))
     report = {"schemaVersion": 1, "completed": False, "nativeExecuted": True, "runtimeVerified": False, "kind": kind, "profile": profile,
               "checks": [], "failures": [], "steps": [], "replays": [], "lifetimes": [], "toolCalls": []}
 
@@ -431,7 +525,6 @@ def run(args, connect, watch=lambda pid: None):
     fixture = report["fixture"] = resolve_fixture(profile, args.fixture, args.seeded_report)
     store = args.base / "h"
     require(retrieve_fits(store), "Choose a shorter --base: project_retrieve refuses a destination over 80 characters")
-    fixture_of, refusals_of, cases_of = (classic_fixture, classic_refusals, classic_cases) if family == "classic" else (unified_fixture, unified_refusals, unified_cases)
     client = connect(store, ["--hmi-change-qualification", profile], report["toolCalls"])
     project, history, watcher = None, [], None
     try:
@@ -458,11 +551,12 @@ def run(args, connect, watch=lambda pid: None):
             case = build(client, hmis)
             label, device = case["label"], hmis[case["hmi"]]
             if "absent" in case:
-                gate(case["absent"] not in rows(client, device, "tags"), "Absent before the change: " + label)
+                path, section, request = case["absent"] if isinstance(case["absent"], tuple) else (case["absent"], "tags", {})
+                gate(path not in rows(client, device, section, **request), "Absent before the change: " + label)
             prepared = step("change_prepare " + label, prepare(client, kind, case["payload"]))
             admission = prepared["preview"]["hmiEvidence"]["gate"]
-            gate(admission.get("available") is True and admission.get("admission") == ADMISSION and admission.get("targetProfile") == profile,
-                 "Gate admits this kind and profile (%s): %s" % (ADMISSION, label), admission)
+            gate(admission.get("available") is True and admission.get("admission") == ADMISSION[kind] and admission.get("targetProfile") == profile,
+                 "Gate admits this kind and profile (%s): %s" % (ADMISSION[kind], label), admission)
             if index == 0:
                 for flags in ({"compile": False, "save": False}, {"compile": True, "save": False}):
                     refused = decoded(client.raw_tool("change_apply", apply_arguments(prepared, **flags))).get("error") or {}
@@ -540,13 +634,15 @@ def run(args, connect, watch=lambda pid: None):
         hmis = devices(fresh, family)
         changed = unintended(history[-1][3], snapshots(fresh, hmis, project), family)
         gate(not changed, "Fresh reopen: hmi_inspect equals the last applied state", changed)
-        fx = fixture_of(fresh, hmis)
-        payload = scalar(fx["HMI_RT_1"]["Overview_B"], ALTERNATE) if family == "classic" else external(fx["HMI_RT_1"], "QualificationReopen", "root")
-        # Unbound, so the prepare stops at StaleRevision after the gate; its details carry the gate.
-        error = refusal(fresh, kind, payload)
+        # Unbound, so an admitted prepare stops at StaleRevision after the gate; its details carry the gate. Before a kind has a
+        # production profile the production Host refuses it at the gate (HmiPreservationUnavailable, admission null).
+        error = refusal(fresh, kind, reopen_of(fixture_of(fresh, hmis)))
         admission = (error.get("details") or {}).get("gate") or {}
-        gate(error.get("code") == "StaleRevision" and admission.get("available") is True and admission.get("admission") == "production",
-             "A production Host admits the kind with admission production", {"code": error.get("code"), "gate": {k: admission.get(k) for k in ("available", "admission", "reasonCode")}})
+        production = ADMISSION[kind] == "production"
+        gate(error.get("code") == ("StaleRevision" if production else "HmiPreservationUnavailable") and admission.get("available") is production
+             and admission.get("admission") == ("production" if production else None),
+             "A production Host admits the kind with admission production" if production else "A production Host refuses the kind before its production admission",
+             {"code": error.get("code"), "gate": {k: admission.get(k) for k in ("available", "admission", "reasonCode")}})
         fresh.tool("tia_detach")
     except Exception as error:
         gate(False, "Fresh reopen completed", repr(error))
@@ -565,6 +661,7 @@ def main(argv=None):
     parser.add_argument("--worker", type=pathlib.Path, required=True)
     parser.add_argument("--base", type=pathlib.Path, required=True, help="Short new artifact base; TIA limits project path length.")
     parser.add_argument("--profile", choices=sorted(PROFILES), required=True)
+    parser.add_argument("--kind", choices=sorted(KINDS), help="Change kind to qualify; default: the profile's (hmi_classic_import or hmi_external_tag_create)")
     parser.add_argument("--fixture", type=pathlib.Path, help="configured.zap21 of a completed scripts/prepare_hmi_fixture_ui.py run")
     parser.add_argument("--seeded-report", type=pathlib.Path, help="unified-pc only: the HmiSeeder qualify native-report.json (artifacts/q/hps)")
     args = parser.parse_args(argv)
@@ -576,7 +673,7 @@ def main(argv=None):
     report = run(args, lambda store, extra, calls: ReliabilityClient(host, worker, store, timeout=900, record=calls, extra=extra), OwnedTiaProcessWatcher)
     report.update(hostSha256=digest(host.read_bytes()), workerSha256=digest(worker.read_bytes()))
     (args.base / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps({"profile": args.profile, "completed": report["completed"], "checks": len(report["checks"]), "failures": report["failures"]}, ensure_ascii=False))
+    print(json.dumps({"profile": args.profile, "kind": report["kind"], "completed": report["completed"], "checks": len(report["checks"]), "failures": report["failures"]}, ensure_ascii=False))
     return 0 if report["completed"] else 1
 
 

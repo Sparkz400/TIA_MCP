@@ -62,7 +62,7 @@ SCENARIOS = {
 # Generic change_apply matrix: one fixture per reconciliation class, killed at each durable journal boundary.
 # Reconciliation depends on the kind only through its fingerprint route, so each class has one representative.
 # Kinds whose outcome fingerprint needs prepared in-memory targets (AdmissionReconcileRules.cs keeps the same set).
-TARGET_KINDS = {"hmi_engineering", "hmi_text_list_import", "hmi_classic_import", "hmi_external_tag_create", "hardware_attributes", "tag_set", "constant_set",
+TARGET_KINDS = {"hmi_engineering", "hmi_text_list_import", "hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create", "hardware_attributes", "tag_set", "constant_set",
                 "block_attributes_set", "project_attributes_set", "connection_set", "software_unit_publication_set",
                 "db_snapshot_create", "db_snapshot_load_actual", "simulation_download_online", "testsuite_application_import", "testsuite_system_import",
                 "vci_workspace_create", "vci_workspace_delete", "vci_mapping_add", "vci_mapping_remove", "vci_synchronize", "vci_conflict_resolve",
@@ -110,7 +110,7 @@ TEXT_LIST_POINTS = {"ckpt": POINTS["ckpt"], "mut": (_COMPILING, "worker"), "imp"
 _WRITING = lambda j: j.get("state") == "applying" and "hmi_native_write_started" in stages(j) and "mutation_applied" not in stages(j)
 GATE_POINTS = {"ckpt": POINTS["ckpt"], "mut": (_COMPILING, "worker"), "wrt": (_WRITING, "worker"), "comp": POINTS["comp"], "save": POINTS["save"],
                "hckp": (POINTS["ckpt"][0], "host"), "hwrt": (_WRITING, "host"), "hsav": (POINTS["save"][0], "host")}
-GATE_PROFILES = {"ci": ("classic-comfort",), "et": ("unified-comfort", "unified-pc")}  # The --hmi-fixture-profile each prefix runs on.
+GATE_PROFILES = {"ci": ("classic-comfort",), "et": ("unified-comfort", "unified-pc"), "sc": ("unified-comfort", "unified-pc")}  # The --hmi-fixture-profile each prefix runs on.
 
 
 def expected_outcome(kind, point):
@@ -164,7 +164,7 @@ def technology_present(client):
     return TO_NAME in {o["name"] for o in read["technologyObjects"]}
 
 
-HMI_FIXTURE = None  # --hmi-fixture: the HMI fixture archive of the tl-*, ci-* and et-* scenarios.
+HMI_FIXTURE = None  # --hmi-fixture: the HMI fixture archive of the tl-*, ci-*, et-* and sc-* scenarios.
 HMI_FIXTURE_PROFILE = "unified-comfort"  # --hmi-fixture-profile: the fixture's profile, admitted by the qualification Host.
 TEXT_LIST = "EntryTypes"  # Created by the boundary-values candidate.
 
@@ -174,7 +174,7 @@ def setup_scratch(scenario, client):
 
 
 def setup_hmi_fixture(scenario, client):
-    require(HMI_FIXTURE is not None, "tl-*, ci-* and et-* scenarios need --hmi-fixture")
+    require(HMI_FIXTURE is not None, "tl-*, ci-*, et-* and sc-* scenarios need --hmi-fixture")
     scenario.step("project_retrieve HMI fixture", client.tool("project_retrieve", {
         "archivePath": str(HMI_FIXTURE), "expectedSha256": hashlib.sha256(HMI_FIXTURE.read_bytes()).hexdigest()}))
 
@@ -185,7 +185,7 @@ def text_list_host_arguments():
 
 
 def gate_host_arguments():
-    """The qualification-only admission of hmi_classic_import and hmi_external_tag_create (no production profile yet)."""
+    """The qualification-only admission of the fixture's profile for the gate kinds (hmi_classic_import, hmi_external_tag_create, hmi_screen_create)."""
     return ["--hmi-change-qualification", HMI_FIXTURE_PROFILE]
 
 
@@ -215,6 +215,18 @@ def external_tag_present(client):
     return any(r["identity"]["kind"] == "hmiTag" and r["name"] == EXTERNAL for r in rows(client, device, "tags").values())
 
 
+def prepare_screen(scenario, client):
+    """A new screen on HMI_RT_1 sized like its Overview_A (QualificationScreen)."""
+    from qualify_hmi_gate_route import SCREEN, devices, prepare, screen_fixture, screen_payload
+    fixture = screen_fixture(client, devices(client, "unified"))["HMI_RT_1"]
+    return scenario.step("change_prepare hmi_screen_create", prepare(client, "hmi_screen_create", screen_payload(fixture, SCREEN)))
+
+
+def screen_present(client):
+    from qualify_hmi_gate_route import SCREEN, devices, rows
+    return any(r["name"] == SCREEN for r in rows(client, devices(client, "unified")["HMI_RT_1"], "screens").values())
+
+
 def prepare_text_list(scenario, client):
     from qualify_hmi_text_list_import import boundary_requests
     from qualify_hmi_text_list_route import author, prepare, unified_device
@@ -233,7 +245,8 @@ KINDS = {"su": ("source_upsert", prepare_source, source_present, setup_scratch, 
          "to": ("to_create", prepare_technology, technology_present, setup_scratch, POINTS),
          "tl": ("hmi_text_list_import", prepare_text_list, text_list_present, setup_hmi_fixture, TEXT_LIST_POINTS),
          "ci": ("hmi_classic_import", prepare_classic_import, classic_import_present, setup_hmi_fixture, GATE_POINTS),
-         "et": ("hmi_external_tag_create", prepare_external_tag, external_tag_present, setup_hmi_fixture, GATE_POINTS)}
+         "et": ("hmi_external_tag_create", prepare_external_tag, external_tag_present, setup_hmi_fixture, GATE_POINTS),
+         "sc": ("hmi_screen_create", prepare_screen, screen_present, setup_hmi_fixture, GATE_POINTS)}
 KIND_SCENARIOS = {f"{prefix}-{point}": (prefix, point) for prefix, row in KINDS.items() for point in row[4]}
 
 # project_upgrade (X01) of the two small public examples, each copied into its scenario's inputs as qualify_project_upgrade.py does.

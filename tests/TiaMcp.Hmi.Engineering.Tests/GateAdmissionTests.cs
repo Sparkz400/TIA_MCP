@@ -1,18 +1,20 @@
 using Newtonsoft.Json.Linq;
 using TiaMcp.Model;
 
-// Change kinds hmi_classic_import and hmi_external_tag_create: production admission, standing capture notes and the compile rule they share with the text list.
+// Change kinds hmi_classic_import, hmi_external_tag_create and hmi_screen_create: production admission, standing capture notes and the compile rule they share with the text list.
 static class GateAdmissionTests
 {
     static readonly string[] AllProfiles = { "classic-comfort", "classic-rt-advanced", "classic-basic", "classic-rt-professional", "unified-comfort", "unified-pc" };
-    static readonly string[] Kinds = { "hmi_classic_import", "hmi_external_tag_create" };
+    static readonly string[] Kinds = { "hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create" };
+    static readonly string[] ScreenOperations = { "screen_create", "item_create" };
     const string Screen = "Siemens.Engineering.Hmi.Screen.Screen", TagTable = "Siemens.Engineering.Hmi.Tag.TagTable";
     static string Family(string profile) => profile.StartsWith("classic-", StringComparison.Ordinal) ? "classic" : "unified";
     static void Assert(bool value, string label) { if (!value) throw new Exception(label); }
     // The natively qualified scope of each kind (1 November 2026): what production admits, with or without a qualification profile.
     static bool Qualified(string kind, string profile, string operation, string type)
         => kind == "hmi_classic_import" ? profile == "classic-comfort" && (operation == "scalar_property_set" || operation == "classic_xml_import" && (type == Screen || type == TagTable))
-            : profile is "unified-comfort" or "unified-pc" && operation == "external_tag_create";
+            : kind == "hmi_external_tag_create" ? profile is "unified-comfort" or "unified-pc" && operation == "external_tag_create"
+            : profile is "unified-comfort" or "unified-pc" && ScreenOperations.Contains(operation); // hmi_screen_create (2 November 2026)
     static bool Open(string kind, string profile, string operation, string type, string qualification)
     {
         var gate = HmiEngineeringRules.KindGate(kind, Family(profile), profile, operation, type, qualification);
@@ -36,7 +38,7 @@ static class GateAdmissionTests
                             Assert(open || HmiEngineeringRules.KindGate(kind, Family(profile), profile, operation, type).Value<string>("reasonCode") == "HmiPreservationUnavailable", "reason code");
                             opened += open ? 1 : 0;
                         }
-            Assert(opened == 3 + 2 + 2 * 3, "classic-comfort BackColor (three types), screen and tag-table import; external_tag_create on two profiles (three types each): " + opened);
+            Assert(opened == 3 + 2 + 2 * 3 + 2 * 2 * 3, "classic-comfort BackColor (three types), screen and tag-table import; external_tag_create on two profiles (three types each); screen_create and item_create on two profiles (three types each): " + opened);
             foreach (string kind in new[] { "hmi_engineering", "hmi_text_list_import", "invented", null })
                 Reject(() => HmiEngineeringRules.KindGate(kind, "classic", "classic-comfort", "classic_xml_import", Screen), "unknown kind " + kind);
         });
@@ -71,12 +73,16 @@ static class GateAdmissionTests
             HmiEngineeringRules.RequireKind("hmi_classic_import", Payload("classic", "scalar_property_set"));
             HmiEngineeringRules.RequireKind("hmi_external_tag_create", Payload("unified", "external_tag_create"));
             HmiEngineeringRules.RequireKind("hmi_engineering", Payload("unified", "screen_create"));
+            HmiEngineeringRules.RequireKind("hmi_screen_create", Payload("unified", "screen_create"));
+            HmiEngineeringRules.RequireKind("hmi_screen_create", Payload("unified", "item_create"));
+            Reject(() => HmiEngineeringRules.RequireKind("hmi_screen_create", Payload("unified", "dynamization_set")), "a dynamization under the screen kind");
+            Reject(() => HmiEngineeringRules.RequireKind("hmi_screen_create", Payload("classic", "screen_create")), "a Classic screen under the screen kind");
             Reject(() => HmiEngineeringRules.RequireKind("hmi_classic_import", Payload("classic", "tag_create")), "Classic tag_create");
             Reject(() => HmiEngineeringRules.RequireKind("hmi_classic_import", Payload("unified", "scalar_property_set")), "Unified scalar under the Classic kind");
             Reject(() => HmiEngineeringRules.RequireKind("hmi_external_tag_create", Payload("unified", "tag_create")), "internal tag");
             Reject(() => HmiEngineeringRules.RequireKind("hmi_external_tag_create", Payload("classic", "external_tag_create")), "Classic external tag");
             Reject(() => HmiEngineeringRules.RequireKind("hmi_external_tag_create", null), "no payload");
-            Assert(HmiEngineeringRules.IsAdmittedKind("hmi_classic_import") && HmiEngineeringRules.IsAdmittedKind("hmi_external_tag_create") && !HmiEngineeringRules.IsAdmittedKind("hmi_engineering")
+            Assert(HmiEngineeringRules.IsAdmittedKind("hmi_classic_import") && HmiEngineeringRules.IsAdmittedKind("hmi_external_tag_create") && HmiEngineeringRules.IsAdmittedKind("hmi_screen_create") && !HmiEngineeringRules.IsAdmittedKind("hmi_engineering")
                 && !HmiEngineeringRules.IsAdmittedKind("hmi_text_list_import") && !HmiEngineeringRules.IsAdmittedKind(null), "admitted kinds");
         });
         check("The hmi_engineering gate names the kind that carries its three admitted operations", () => {
@@ -88,7 +94,8 @@ static class GateAdmissionTests
             Assert(scalarReason.Contains("only on classic-comfort") && !scalarReason.Contains("screen or tag table"), "the Classic scalar names its profile scope");
             Assert(importReason.Contains("only on classic-comfort and only for a screen or tag table"), "the Classic import names its profile and type scope");
             Assert(HmiEngineeringRules.Gate("unified", "unified-pc", "external_tag_create").Value<string>("reason").Contains("only on unified-comfort or unified-pc"), "the Unified kind names its profiles");
-            foreach (var (family, operation) in new[] { ("unified", "scalar_property_set"), ("unified", "classic_xml_import"), ("unified", "tag_create"), ("classic", "external_tag_create"), ("unified", "screen_create") })
+            Assert(new[] { "screen_create", "item_create" }.All(o => HmiEngineeringRules.Gate("unified", "unified-pc", o).Value<string>("reason").Contains("Change kind hmi_screen_create")), "the Unified screen kind");
+            foreach (var (family, operation) in new[] { ("unified", "scalar_property_set"), ("unified", "classic_xml_import"), ("unified", "tag_create"), ("classic", "external_tag_create"), ("classic", "screen_create"), ("unified", "dynamization_set") })
                 Assert(!HmiEngineeringRules.Gate(family, "x", operation).Value<string>("reason").Contains("Change kind"), "no kind for " + family + " " + operation);
         });
         check("Standing notes only: exactly the kind's notes of one family, no failure, a valid hash", () => {
@@ -97,6 +104,7 @@ static class GateAdmissionTests
             string classic = HmiPreservationRules.ClassicExportNote, table = HmiPreservationRules.UnifiedTagTableExportNote, typed = HmiPreservationRules.UnifiedTypedReadbackNote;
             Assert(HmiEngineeringRules.ScopeAccepted("hmi_classic_import", Manifest("classic", 2, classic, classic)), "two Classic targets");
             Assert(HmiEngineeringRules.ScopeAccepted("hmi_external_tag_create", Manifest("unified", 2, table, typed, table, typed)), "two Unified targets");
+            Assert(HmiEngineeringRules.ScopeAccepted("hmi_screen_create", Manifest("unified", 2, table, typed, table, typed)) && !HmiEngineeringRules.ScopeAccepted("hmi_screen_create", Manifest("classic", 1, classic)), "the screen kind takes the Unified notes");
             Assert(HmiEngineeringRules.ScopeAccepted("hmi_text_list_import", Manifest("unified", 1, table, typed)) && HmiTextListImportRules.ScopeAccepted(Manifest("unified", 1, table, typed)), "text list unchanged");
             Assert(!HmiEngineeringRules.ScopeAccepted("hmi_classic_import", Manifest("classic", 1, classic, "Another gap.")), "an extra note");
             Assert(!HmiEngineeringRules.ScopeAccepted("hmi_external_tag_create", Manifest("unified", 1, table, "2 Unified typed attribute read(s) failed; their readError markers are compared, their values are not. See typed-model.json.", typed)), "a typed read error");
