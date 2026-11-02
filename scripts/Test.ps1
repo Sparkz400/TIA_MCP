@@ -12,6 +12,8 @@ try {
     $env:TEMP = $testTemp
     $env:TMP = $testTemp
     & (Join-Path $PSScriptRoot 'Test-Deployment.ps1')
+    & (Join-Path $PSScriptRoot 'Test-OpennessRegistrationLogic.ps1')
+    & (Join-Path $PSScriptRoot 'Test-TiaOpennessRegistration.ps1')
     python (Join-Path $PSScriptRoot 'test_contracts.py')
     if ($LASTEXITCODE -ne 0) { throw 'Feature contract checks failed.' }
     dotnet "tests/TiaMcp.Inventory.Tests/bin/$Configuration/net10.0-windows/TiaMcp.Inventory.Tests.dll"

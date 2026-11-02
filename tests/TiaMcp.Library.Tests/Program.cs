@@ -504,7 +504,15 @@ Test("CLI native disabling preserves normal defaults and refuses qualification m
     Equal(false, HostOptions.Parse([]).SafetyFParameterDiscovery);
     try { HostOptions.Parse(["--safety-fparameter-discovery"]); throw new Exception("A normal build accepted --safety-fparameter-discovery"); }
     catch (ArgumentException) { }
-    foreach (var flag in new[] { "--diagnose", "--component-qualification", "--testsuite-scope-probe", "--translation-qualification" })
+    Equal(false, HostOptions.Parse([]).CheckOpennessRegistration);
+    Equal(true, HostOptions.Parse(["--check-openness-registration"]).CheckOpennessRegistration);
+    foreach (var conflict in new[] { "--diagnose", "--addin-handoff" })
+    {
+        try { HostOptions.Parse(["--check-openness-registration", conflict]); }
+        catch (ArgumentException) { continue; }
+        throw new Exception("Registration-only inspection accepted conflicting mode " + conflict);
+    }
+    foreach (var flag in new[] { "--check-openness-registration", "--diagnose", "--component-qualification", "--testsuite-scope-probe", "--translation-qualification" })
     {
         Equal(false, HostOptions.Parse([flag]).NoNativeWorkers);
         try { HostOptions.Parse([flag, "--no-native-workers"]); }

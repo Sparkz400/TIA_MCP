@@ -13,6 +13,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
     public TiaMcp.Core.VersionControl.GitRemote? GitRemote { get; init; }
     public string? UaClientIdentity { get; init; }
     public bool NoNativeWorkers { get; init; }
+    public bool CheckOpennessRegistration { get; init; }
     // Selected --toolsets groups; null advertises every tool.
     public IReadOnlySet<string>? Toolsets { get; init; }
     public bool AddInHandoff { get; init; }
@@ -50,6 +51,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         string? simulatorApi = null;
         var timeout = 120;
         var diagnose = false;
+        var checkOpennessRegistration = false;
         var addInHandoff = false;
         var libraryIntegrateApply = true;
         var enableLibraryIntegrateApplyGiven = false;
@@ -80,6 +82,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             if (option == "--enable-library-integrate-apply") { enableLibraryIntegrateApplyGiven = true; continue; } // the default; kept for existing launch configurations
             if (option == "--disable-library-integrate-apply") { libraryIntegrateApply = false; continue; }
             if (option == "--diagnose") { diagnose = true; continue; }
+            if (option == "--check-openness-registration") { checkOpennessRegistration = true; continue; }
             if (option == "--component-qualification") { componentQualification = true; continue; }
             if (option == "--testsuite-scope-probe") { testSuiteScopeProbe = true; continue; }
             if (option == "--translation-qualification") { translationQualification = true; continue; }
@@ -156,9 +159,10 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             throw new ArgumentException("HMI text-list qualification requires its own sequential Host.");
         if (hmiChangeQualification is not null && (componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || watchQualificationPoint is not null || hmiTextListQualification is not null))
             throw new ArgumentException("HMI change qualification requires its own sequential Host.");
-        if (noNativeWorkers && (diagnose || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || safetyFParameterDiscovery || watchQualificationPoint is not null || hmiTextListQualification is not null || hmiChangeQualification is not null))
+        if (noNativeWorkers && (checkOpennessRegistration || diagnose || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || safetyFParameterDiscovery || watchQualificationPoint is not null || hmiTextListQualification is not null || hmiChangeQualification is not null))
             throw new ArgumentException("Native diagnosis and qualification cannot run with native workers disabled.");
         if (diagnose && addInHandoff) throw new ArgumentException("Add-In handoff requires the long-running Host, not diagnosis mode.");
+        if (checkOpennessRegistration && (diagnose || addInHandoff)) throw new ArgumentException("Registration inspection cannot be combined with native diagnosis or Add-In handoff.");
         if (addInEnrollment is not null && !addInHandoff) throw new ArgumentException("--addin-enrollment requires --addin-handoff.");
         if (enableLibraryIntegrateApplyGiven && !libraryIntegrateApply)
             throw new ArgumentException("--enable-library-integrate-apply and --disable-library-integrate-apply exclude each other.");
@@ -170,7 +174,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             try { remote = TiaMcp.Core.VersionControl.GitRemote.Parse(gitRemote, gitAllowNetworkRemote); }
             catch (BridgeException error) { throw new ArgumentException("--git-remote: " + error.Message); }
         }
-        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, GitRemote = remote, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, SafetyFParameterDiscovery = safetyFParameterDiscovery, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint, HmiTextListQualificationProfile = hmiTextListQualification, HmiChangeQualificationProfile = hmiChangeQualification };
+        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { CheckOpennessRegistration = checkOpennessRegistration, UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, GitRemote = remote, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, SafetyFParameterDiscovery = safetyFParameterDiscovery, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint, HmiTextListQualificationProfile = hmiTextListQualification, HmiChangeQualificationProfile = hmiChangeQualification };
     }
 
     private static PackageIntakeLimits ReadLibraryLimits(string path)

@@ -31,17 +31,23 @@ internal static partial class Program
         }
         var typedGraphicalOnly = args.Length == 1 && args[0] == "--typed-graphical";
         var bridgeOnly = args.Length == 1 && args[0] == "--bridge-only";
+        var registrationOnly = args.Length == 1 && args[0] == "--openness-registration";
         var ownerOnly = args.Length == 1 && args[0] == "--addin-owner-only";
         var handoffOnly = args.Length == 1 && args[0] == "--addin-handoff-only";
         var receiverOnly = args.Length == 1 && args[0] == "--addin-receiver-only";
-        if (args.Length != 0 && !typedGraphicalOnly && !bridgeOnly && !ownerOnly && !handoffOnly && !receiverOnly)
+        if (args.Length != 0 && !registrationOnly && !typedGraphicalOnly && !bridgeOnly && !ownerOnly && !handoffOnly && !receiverOnly)
         {
-            Console.Error.WriteLine("Usage: TiaMcp.Tests [--verify-worker PATH | --typed-graphical | --bridge-only | --addin-owner-only | --addin-handoff-only | --addin-receiver-only]");
+            Console.Error.WriteLine("Usage: TiaMcp.Tests [--verify-worker PATH | --openness-registration | --typed-graphical | --bridge-only | --addin-owner-only | --addin-handoff-only | --addin-receiver-only]");
             return 2;
         }
 
         (string Name, Func<Task> Run)[] tests =
         [
+            ("Openness missing registration and other installations are distinguished", OpennessRegistrationTests.MissingAndOtherInstallations),
+            ("Openness timestamp and hash changes are diagnosed independently", OpennessRegistrationTests.TimestampAndHashAreIndependent),
+            ("Openness valid duplicate wins over stale identities", OpennessRegistrationTests.ValidDuplicateWins),
+            ("Openness malformed saved path is not trusted", OpennessRegistrationTests.MalformedPathIsNotTrusted),
+            ("Openness absent worker inspection has no side effects", OpennessRegistrationTests.MissingWorkerDoesNotThrow),
             ("Add-In receiver survives actual process crash and unread completion without replay", AddInReceiverTests.ExchangeAndCrash),
             ("Add-In receiver refuses actual same-user impostors and malformed bounded frames", AddInReceiverTests.ImpostorAndMalformed),
             ("Add-In receiver bounds connections deadlines and disconnect consumption", AddInReceiverTests.CapacityDeadlineAndDisconnect),
@@ -353,6 +359,7 @@ internal static partial class Program
         ];
         if (typedGraphicalOnly) tests = tests.Where(test => test.Name.StartsWith("Typed ", StringComparison.Ordinal)).ToArray();
         if (bridgeOnly) tests = tests.Where(test => test.Name.StartsWith("Bridge ", StringComparison.Ordinal)).ToArray();
+        if (registrationOnly) tests = tests.Where(test => test.Name.StartsWith("Openness ", StringComparison.Ordinal)).ToArray();
         if (ownerOnly) tests = tests.Where(test => test.Name.StartsWith("Add-In owner ", StringComparison.Ordinal)).ToArray();
         if (handoffOnly) tests = tests.Where(test => test.Name.StartsWith("Add-In handoff ", StringComparison.Ordinal)).ToArray();
         if (receiverOnly) tests = tests.Where(test => test.Name.StartsWith("Add-In receiver ", StringComparison.Ordinal)).ToArray();

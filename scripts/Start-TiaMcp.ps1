@@ -8,7 +8,8 @@ param(
     [ValidateRange(5,900)][int]$TimeoutSeconds = 300,
     [switch]$StrictBundle,
     [switch]$InteractiveSession,
-    [switch]$Diagnose
+    [switch]$Diagnose,
+    [switch]$CheckOpennessRegistration
 )
 $ErrorActionPreference = 'Stop'
 if ($PSBoundParameters.ContainsKey('UaClientIdentity') -and $UaClientIdentity -cnotmatch '^(default|[0-9a-f]{32})$') { throw 'UaClientIdentity must be default or 32 lowercase hexadecimal characters.' }
@@ -21,7 +22,8 @@ if (-not (Test-Path -LiteralPath $hostExecutable -PathType Leaf)) { throw 'Run P
 # verifier result because stdout belongs exclusively to the MCP protocol.
 $verification = & (Join-Path $PSScriptRoot 'Verify-TiaMcpBundle.ps1') -BundlePath $bundleRoot -Strict:$StrictBundle
 if (-not $verification.verified) { throw 'Bundle verification did not complete.' }
-if ($verification.bundleKind -eq 'offline' -and ($Diagnose -or $InteractiveSession -or $TiaApiDirectory -or $SimulatorApiDirectory)) { throw 'Offline bundles do not support native diagnosis, API overrides or interactive engineering sessions.' }
+if ($verification.bundleKind -eq 'offline' -and ($CheckOpennessRegistration -or $Diagnose -or $InteractiveSession -or $TiaApiDirectory -or $SimulatorApiDirectory)) { throw 'Offline bundles do not support native diagnosis, API overrides or interactive engineering sessions.' }
+if ($CheckOpennessRegistration -and ($Diagnose -or $InteractiveSession)) { throw 'Registration inspection cannot be combined with native diagnosis or an interactive engineering session.' }
 if (-not $ArtifactsDirectory) {
     if (-not $env:LOCALAPPDATA) { throw 'LOCALAPPDATA is unavailable; supply an absolute ArtifactsDirectory outside the bundle.' }
     $ArtifactsDirectory = Join-Path $env:LOCALAPPDATA 'TiaMcp/artifacts'
@@ -52,6 +54,7 @@ if ($GitExecutable) { $launchArguments += @('--git-executable', $GitExecutable) 
 if ($UaClientIdentity) { $launchArguments += @('--ua-client-identity', $UaClientIdentity) }
 if ($Toolsets) { $launchArguments += @('--toolsets', $Toolsets) }
 if ($Diagnose) { $launchArguments += '--diagnose' }
+if ($CheckOpennessRegistration) { $launchArguments += '--check-openness-registration' }
 if ($TiaApiDirectory) { $launchArguments += @('--api-dir', $TiaApiDirectory) }
 if ($SimulatorApiDirectory) { $launchArguments += @('--sim-api-dir', $SimulatorApiDirectory) }
 if ($InteractiveSession) {

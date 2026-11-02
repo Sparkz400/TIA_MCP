@@ -28,6 +28,10 @@ Changes are not transactions across Siemens calls. Each applied change has a che
 
 Run `.\scripts\Probe-Environment.ps1` and follow [environment diagnostics](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/environment-diagnostics.md) and [Openness registration](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/openness-application-registration.md). Your Windows user needs the `Siemens TIA Openness` group, and `PlcSimUsers` for simulation.
 
+## Why does TIA repeatedly ask to allow access?
+
+Siemens saves approval for an executable's path, modification time and hash. Rebuilding or moving it changes that identity; separate helpers also need their own registration. Engineering-bundle setup registers the final worker, and approved updates refresh the entry for that path. `Start-TiaMcp.ps1 -CheckOpennessRegistration` identifies missing or stale registration without starting TIA. See [registration diagnostics and setup](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/openness-application-registration.md#why-tia-still-asks). HMI support limits remain separate from authorization.
+
 ## Is this a Siemens product?
 
 No. TIA MCP is independent and not affiliated with, endorsed or supported by Siemens AG. Siemens, TIA Portal, SIMATIC, STEP 7, WinCC and PLCSIM are trademarks of Siemens AG.
