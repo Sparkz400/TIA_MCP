@@ -51,7 +51,7 @@ def body(h):
     downloads = {}
     for package in receipts["packages"]:
         if package["id"].startswith("dmc-v"):
-            path = next(Path(h.args.vendor_root).glob(package["id"] + "-dl/*.zip"))
+            path = next(Path(h.args.vendor_root).resolve().glob(package["id"] + "-dl/*.zip"))
             require(sha256(path.read_bytes()) == package["sha256"], package["id"] + " download differs from its receipt")
             downloads[package["id"]] = path
     h.report["receipts"] = [p for p in receipts["packages"] if p["id"] in downloads]

@@ -26,6 +26,18 @@
     {
       "id": "local.plcsim.relative-path-refusal.20261102",
       "reason": "Simulator test stopped at WorkerNotFound because its relative worker path was resolved from the frozen snapshot; no simulator created."
+    },
+    {
+      "id": "local.plcsim.ip-run-refusal.20261102",
+      "reason": "Owned simulator signals regression reached the added IP-change probe; SetIPSuite refused RUN with InvalidOperatingState."
+    },
+    {
+      "id": "local.upgrades.relative-path-refusal.20261102",
+      "reason": "Archive staging refused a relative vendor-root path before any native upgrade."
+    },
+    {
+      "id": "local.fio.unit-policy-refusal.20261102",
+      "reason": "F-I/O refusals passed; positive tag-bearing-unit fixture cleanup stopped before mutation because tag_delete requires explicit rejectReferenced policy."
     }
   ]
 }

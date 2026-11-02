@@ -20,6 +20,8 @@ The engineering worker and its TIA connection are reused across tool calls. Star
 
 Native changes follow **prepare → preview → checkpoint → apply → verify**. A change can partially fail across Siemens calls; recovery uses its checkpoint and journal. The public simulation workflow works only on adapter-owned simulator instances: it can download a changed program online, set virtual time and inject interrupts there, but it does not expose physical PLC download, force or CPU control.
 
+Combined PLC component installation admits only exact combinations with native preservation, reopen and recovery evidence. The qualified FBD OB case and remaining restrictions are listed in the [component workflow](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/plc-library-integration-recipes.md#combined-apply).
+
 ## Support claims
 
 The diagram shows component boundaries, not support for every operation, target or environment. Offline tests, native compilation and runtime qualification are separate claims. Check:

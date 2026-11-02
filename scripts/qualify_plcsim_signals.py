@@ -113,11 +113,17 @@ try {
             if ($action -eq 'Run') { $instance.Run(30000) }
             elseif ($action -eq 'IP') {
                 $original = $instance.ControllerIPSuite4[0]
+                $instance.Stop(30000)
+                $changed = $false
                 try {
                     $suite = New-Object Siemens.Simatic.Simulation.Runtime.SIPSuite4('192.168.0.77','255.255.255.0','0.0.0.0')
                     $instance.SetIPSuite(0, $suite, $false)
+                    $changed = $true
                     Start-Sleep -Milliseconds 1500
-                } finally { $instance.SetIPSuite(0, $original, $false) }
+                } finally {
+                    if ($changed) { $instance.SetIPSuite(0, $original, $false) }
+                    $instance.Run(30000)
+                }
             } else { $instance.Stop(30000) }
             [void]$log.Add(@{ action = $action; startedAtUtc = $started; completedAtUtc = (Now); state = "$($instance.OperatingState)" })
         }

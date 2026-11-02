@@ -249,7 +249,7 @@ class Candidates(unittest.TestCase):
         self.assertNotEqual(2, subject.HOST_FB_NUMBER)
 
     def test_candidate_cases_name_only_gate_features(self):
-        gate = {"ladCaller", "fbCaller", "multiInstance", "reusedComponent", "earlierPlacement"}
+        gate = {"ladCaller", "fbCaller", "obCaller", "multiInstance", "reusedComponent", "earlierPlacement"}
         for name, (overrides, features) in subject.CANDIDATES.items():
             with self.subTest(name=name):
                 self.assertTrue(set(features) <= gate)

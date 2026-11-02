@@ -106,9 +106,13 @@ internal static class BroadenedPlanTests
         const string Unit1 = "<SW.Blocks.CompileUnit ID=\"1\"><AttributeList><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit>";
         test("combined apply admits insertion after the last network with shifted title IDs", () => Equal(null, Refusal(Titled(Unit1, 2))));
         test("combined apply admits the verified insertion before another network", () => Equal(null, Refusal(Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3))));
-        test("combined apply refuses OB insertion by name", () => Equal(true, Refusal(Ob()).StartsWith("OB insertion is refused", StringComparison.Ordinal)));
-        test("owned qualification can exercise an OB caller without production admission", () => {
-            Equal(null, Refusal(Ob(), true)); Equal("obCaller", Features(Ob()));
+        test("combined apply admits the natively verified FBD OB shape", () => {
+            Equal(null, Refusal(Ob())); Equal("", Features(Ob()));
+        });
+        test("an unverified LAD OB combination remains refused", () => {
+            var f = Ob(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD");
+            f.Inventory["objects"][0]["language"] = "LAD";
+            Equal(true, Refusal(f) != null); Equal(null, Refusal(f, true));
         });
         Func<Fixture> ladExisting = () => { var f = new Fixture(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; };
         Func<Fixture> fbCaller = () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.FB"; f.Inventory["objects"][0]["kind"] = "FB"; return f; };

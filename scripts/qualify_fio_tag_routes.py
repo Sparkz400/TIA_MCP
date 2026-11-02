@@ -269,7 +269,7 @@ def unit_routes(h, plc, standard, s):
     require(len(masters) == 1, "Expected one master copy %s: %s" % (UNIT, masters))
     payload = {"libraryId": library, "masterCopyPath": masters[0]["masterCopyPath"], "name": UNIT}
     refuse(h, "a unit master copy into the F-PLC", "software_unit_create_from", payload, {"plcPath": plc}, module=FDI[:-1])
-    change(h, "tag_delete", {"tagTablePath": unit_table, "memberName": "UnitMarker"}, s)
+    change(h, "tag_delete", {"tagTablePath": unit_table, "memberName": "UnitMarker", "dependencyPolicy": "rejectReferenced"}, s)
     change(h, "tag_table_delete", {"tagTablePath": unit_table}, s)
     change(h, "software_unit_delete", {"unitPath": unit, "dependencyPolicy": "rejectReferenced"}, s)
     change(h, "software_unit_create_from", payload, s)
