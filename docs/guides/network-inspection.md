@@ -199,7 +199,9 @@ V21 Openness exposes a shared device in two ways, and the bridge reviews both. T
 [hardware runner](../../scripts/qualify_hardware_changes.py) applied both natively and persisted them across a reopen
 (`local.hardware_changes.topology.20261101`, [record](../verification/hardware-topology-20261031.md)), and the restore slice
 (`local.hardware_changes.topology_restores.20261101`) applied the shared assignment under the preservation rules below and
-restored it and `OutsideOfProject`. The `sharedDevice` disconnect is not exercised.
+restored it and `OutsideOfProject`. The refusal slice (`local.hardware_changes.refusals.20261102`, [record](../verification/hardware-refusals-20261102.md)) applied and
+restored the `sharedDevice` disconnect, refused a PLC-to-PLC access and configured the other side of `OutsideOfProject` in a
+second project.
 
 - **Several PLCs of one project.** An IO-device interface has several `IoConnector`s (four on the IM 155-6 PN ST V6.4).
   `network_io_assign` with `sharedDevice: true` connects a further, unassigned connector to another PLC's I/O system while
@@ -232,7 +234,10 @@ restored it and `OutsideOfProject`. The `sharedDevice` disconnect is not exercis
   the target. Optional `externalIoControllers` (1 to 32, with
   `OutsideOfProject`) also sets `NumberOfExternalIoControllers` of the station's one assigned interface in the same change, which
   TIA may require once a module is accessed outside the project; with it, a module already outside the project may change only
-  that count. The other project and module copies (`SharedDeviceCopyOfModule`) are not configured.
+  that count. Module copies (`SharedDeviceCopyOfModule`) are not configured. The other project is configured with the same
+  kinds: its own CPU assigns the same station, takes the module the first project released and sets the others
+  `OutsideOfProject`; V21 checks nothing across projects, so keeping both sides consistent is the caller's work (the refusal
+  slice compares the two stations).
 
 V21 has no per-module controller selection in one project beyond these attributes; which PLC owns a module after a second
 assignment is what TIA decides, and the readback reports it.
@@ -259,7 +264,7 @@ the manifest; only the selected instance's role and domain may change, and only 
 deletion, MRP interconnection and MRPD are not reviewed, and no MRP telegram is observed. The topology run applied and
 persisted the domain and all three roles and restored the second CPU's join and `ManagerAuto`; the restore slice
 (`local.hardware_changes.topology_restores.20261101`) restored the `createDomain` manager and the IM 155-5 PN ST client. The
-port-link refusal is not natively exercised.
+refusal slice (`local.hardware_changes.refusals.20261102`) refused the port-link rule natively both ways.
 
 ## Address-changing replacement
 
@@ -285,13 +290,15 @@ instance name. An `OrderNumber:` identifier names its firmware; a versionless `S
 equals it. A write to such a type whose firmware matches none of its profiles, or cannot be read, is refused
 (`AttributeNotWritable`) rather than left unchecked. The hardware runner writes
 `profiles.json` for every type its native run creates, merging every snapshot that shows a type (an attribute declared only in
-some states still enters); a curated run fills the contract. It holds the 13 profiles of
+some states still enters); a curated run fills the contract. It holds the operator-installed I-device GSD head (captured by the
+refusal slice, keyed by its `FirmwareVersion` V4.1) and the 13 profiles of
 `local.hardware_changes.topology.20261101`, whose own worker still bundled an empty contract; the restore slice
 (`local.hardware_changes.topology_restores.20261101`) ran the profile refusal and the `hardware_catalog_search` link below on a
 worker that bundles them.
 
 `hardware_catalog_search` names an entry's profile in `profile` (`contracts/hardware-catalog-profiles.v1.json#<typeIdentifier>`,
-else null). When the nearest item at or above the written one has a profile, `hardware_attributes`,
+else null); a versionless entry is matched by type alone, since its catalog version is no firmware (a GSD entry shows its file
+name). When the nearest item at or above the written one has a profile, `hardware_attributes`,
 `hardware_channel_attributes` and `hardware_shared_device_access` refuse an attribute that profile does not declare writable on
 the written item's row (`AttributeNotWritable`; a channel's hardware interrupt OB link, declared only while its flag is on, keeps its native check), on top of native
 access and the bridge allowlists. Plug rules are observations in the run's final configuration, not a placement rule set.
@@ -308,6 +315,11 @@ it the run records `gsdNotInstalled`, as `local.hardware_changes.topology.202611
 on a build that bundles the contract, the catalog search must name a profile and a write the profile does not declare must be
 refused by it, and the shared assignment, `OutsideOfProject`, the `createDomain` manager and the IM 155-5 PN ST client are each
 applied and restored (`local.hardware_changes.topology_restores.20261101`).
+
+`--slice refusals` runs the native refusals and paths the other runs lack: the MRP port-link rule both ways, a PLC-to-PLC
+shared access, a channel write and a versionless (GSD head) write that their profiles refuse, the `sharedDevice` disconnect, an
+address change that moves the start and a second owned scratch for `OutsideOfProject`
+(`local.hardware_changes.refusals.20261102`, [record](../verification/hardware-refusals-20261102.md)).
 
 ## Preservation manifest identity checks
 

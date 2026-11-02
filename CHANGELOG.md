@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.111`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.112`.
 
 ### Added
 
@@ -98,9 +98,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   optional `externalIoControllers` count); `network_io_assign` takes `sharedDevice` with `sharedSubmodules`, and
   `hardware_replace` takes `acceptAddressChange` with `acknowledgedTags`
   (`local.hardware_changes.topology.20261101`, `local.hardware_changes.topology_restores.20261101`).
-- **Capability profiles:** 13 module capability profiles in
-  `contracts/hardware-catalog-profiles.v1.json`, linked from `hardware_catalog_search` and checked by
-  attribute writes; technology version profiles in `contracts/technology-version-profiles.v1.json`
+- **Capability profiles:** 13 module capability profiles and the operator-installed I-device GSD
+  head's versionless profile in `contracts/hardware-catalog-profiles.v1.json`, linked from
+  `hardware_catalog_search` and checked by attribute writes; technology version profiles in `contracts/technology-version-profiles.v1.json`
   (45 cells on three CPUs) that `to_create` admits or refuses by (`local.technology.version_profiles.20261031`).
 - **Restricted translation profile:** qualification captures accept `categoryIds`, and the Host
   keeps exactly the requested categories of V21's leaking category export by row identity; a
@@ -121,6 +121,11 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 - **GSD:** the I-device GSD export reran (`local.gsd_transfer_areas.20261101`). With the GSDML
   installed by an operator, the hardware runner's `--slice gsd` adds the device, puts it on the subnet and
   assigns it with compile and checkpoint restore (`local.hardware_changes.gsd.20261101`).
+- **Hardware refusals natively:** the hardware runner's `--slice refusals` runs the MRP port-link
+  refusal both ways, the PLC-to-PLC shared-access refusal, channel and versionless capability-profile
+  refusals, the `sharedDevice` disconnect, an address change that moves the start address and a
+  second owned scratch whose CPU takes the module the first project set `OutsideOfProject`
+  (`local.hardware_changes.refusals.20261102`, [record](docs/verification/hardware-refusals-20261102.md)).
 
 ### Changed
 
@@ -205,6 +210,12 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- No `sharedDevice` disconnect could compile: V21 fails a submodule left assigned to the leaving
+  PLC. The disconnect now names that PLC's items in `sharedSubmodules`, and they go to the one
+  remaining PLC in the same change (`local.hardware_changes.refusals.20261102`).
+- `hardware_catalog_search` never named a versionless (`GSD:`, `System:`) profile, because it
+  compared the entry's catalog version, a GSD file name, with the profile's firmware; it now matches
+  the type.
 - A Test Suite system-test endpoint also needs a TCP/IP instance: a Softbus instance keeps its
   configured controller address and the PLCSIM adapter can still route to it with nothing
   listening, so it now refuses with `PlcsimEndpointUnreachable`. No build dispatches system tests
