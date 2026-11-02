@@ -13,6 +13,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Added
 
+- **Unified screens and items:** change kind `hmi_screen_create` creates a Unified screen (sized like an existing one) or an
+  allowlisted screen item past the HMI preservation gate; qualified natively and admitted on Unified Comfort and Unified PC
+  ([record](docs/verification/hmi-unified-authoring-20261102.md)).
 - **HMI lifecycle gates:** the HMI gate route checks that every compile names only the target HMI's own scope, that each Host
   lifetime ends normally (Host, worker and owned TIA exits verified) and that a new TIA process then opens the saved project
   read-write at once; passed on TP700 Comfort, MTP700 Unified Comfort and WinCC Unified PC RT

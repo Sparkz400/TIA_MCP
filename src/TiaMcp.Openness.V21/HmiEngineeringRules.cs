@@ -29,12 +29,14 @@ namespace TiaMcp.Model
         private static readonly string[] PrimitiveTypes = { "Bool", "Byte", "Word", "DWord", "LWord", "SInt", "USInt", "Int", "UInt", "DInt", "UDInt", "LInt", "ULInt", "Real", "LReal" };
         // Kinds that carry named operations past the closed gate (text-list precedent): family, operations, production profiles (those
         // whose native qualification passed: local.hmi.classic-import.*.20261101, local.hmi.external-tag.*.20261101) and the profiles a
-        // qualification Host may admit in a project its own worker retrieved or created.
+        // qualification Host may admit in a project its own worker retrieved or created. hmi_screen_create: local.hmi.screen-create.*.20261102.
         private static readonly Dictionary<string, (string Family, string[] Operations, string[] Profiles, string[] QualificationProfiles)> Kinds =
             new Dictionary<string, (string, string[], string[], string[])>(StringComparer.Ordinal)
         {
             ["hmi_classic_import"] = ("classic", new[] { "classic_xml_import", "scalar_property_set" }, new[] { "classic-comfort" }, new[] { "classic-comfort" }),
-            ["hmi_external_tag_create"] = ("unified", new[] { "external_tag_create" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" })
+            ["hmi_external_tag_create"] = ("unified", new[] { "external_tag_create" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" }),
+            // Graphics: a new screen (size copied from an existing one) and allowlisted items within a screen's rectangle.
+            ["hmi_screen_create"] = ("unified", new[] { "screen_create", "item_create" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" })
         };
         // The profiles --hmi-change-qualification may name; each kind admits only its own.
         internal static readonly string[] QualificationProfiles = Kinds.Values.SelectMany(k => k.QualificationProfiles).Distinct().ToArray();
@@ -275,9 +277,10 @@ namespace TiaMcp.Model
             gate["nativeQualification"] = production ? "verified" : "unverified";
             gate["reasonCode"] = available ? null : "HmiPreservationUnavailable";
             gate["reason"] = production ? "Opened for change kind " + kind + " on a natively qualified profile (1 November 2026); every other HMI write stays behind the closed preservation gate."
-                : qualification ? "Qualification-only admission of profile " + profile + " for change kind " + kind + " in a project this worker retrieved; production admits " + string.Join(" or ", admitted.Profiles) + "."
+                : qualification ? "Qualification-only admission of profile " + profile + " for change kind " + kind + " in a project this worker retrieved; production admits " + Admitted(admitted.Profiles) + "."
                 : !scope ? "Change kind " + kind + " admits only " + string.Join(" and ", admitted.Operations) + " on " + admitted.Family + " HMIs"
                     + (admitted.Operations.Contains("classic_xml_import") ? " (classic_xml_import of a screen or tag table only)" : "") + "; this request stays behind the closed preservation gate."
+                : admitted.Profiles.Length == 0 ? "Change kind " + kind + " has passed native qualification on no profile yet (this target's profile is " + (profile ?? "unknown") + "); it stays behind the closed preservation gate outside a qualification Host."
                 : "Change kind " + kind + " passed native qualification on " + string.Join(" and ", admitted.Profiles) + " only (this target's profile is " + (profile ?? "unknown") + "); other profiles stay behind the closed preservation gate.";
             return gate;
         }
@@ -290,17 +293,23 @@ namespace TiaMcp.Model
                 throw new ArgumentException(kind + " takes the hmi_engineering payload of " + string.Join(" or ", admitted.Operations) + " on a " + admitted.Family + " HMI.");
         }
 
+        private static string Admitted(string[] profiles) => profiles.Length == 0 ? "no profile yet" : string.Join(" or ", profiles);
+
         internal static bool IsAdmittedKind(string kind) => kind != null && Kinds.ContainsKey(kind);
 
         /// <summary>The coverage notes a kind accepts in place of a complete capture; null when it requires a complete one (hmi_engineering).</summary>
         internal static string[] StandingNotes(string kind)
-            => kind == "hmi_classic_import" ? new[] { HmiPreservationRules.ClassicExportNote }
-            : kind == "hmi_external_tag_create" || kind == "hmi_text_list_import" ? new[] { HmiPreservationRules.UnifiedTagTableExportNote, HmiPreservationRules.UnifiedTypedReadbackNote }
+            => KindFamily(kind) == "classic" ? new[] { HmiPreservationRules.ClassicExportNote }
+            : KindFamily(kind) == "unified" ? new[] { HmiPreservationRules.UnifiedTagTableExportNote, HmiPreservationRules.UnifiedTypedReadbackNote }
             : null;
+
+        // The family of an admitted kind or of hmi_text_list_import (Unified); null for hmi_engineering and unknown kinds.
+        private static string KindFamily(string kind)
+            => kind == "hmi_text_list_import" ? "unified" : kind != null && Kinds.TryGetValue(kind, out var admitted) ? admitted.Family : null;
 
         /// <summary>Whether the capture shows only the kind's standing notes, every HMI of the kind's family (StandingNotesOnly).</summary>
         internal static bool ScopeAccepted(string kind, JObject manifest)
-            => StandingNotes(kind) is string[] notes && StandingNotesOnly(manifest, kind == "hmi_classic_import" ? "classic" : "unified", notes);
+            => StandingNotes(kind) is string[] notes && StandingNotesOnly(manifest, KindFamily(kind), notes);
 
         /// <summary>A capture whose only gaps are the given standing notes of one family: no native capture failure, every target of
         /// that family, every note one of them (no typed read error, no other note) and a valid observed-artifacts hash, which then
