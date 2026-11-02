@@ -56,7 +56,8 @@ LIMITATIONS = [
     "Engineering only; runtime behavior is not observed.",
     "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (FingerprintUnavailable) by design and the retained checkpoint is the recovery input.",
     "The apply-side unresolved-change guard is reached only when a change prepared before the failure still matches its "
-    "fingerprint; the failed apply changed the project, so that change may be refused StaleRevision first (both refuse before the checkpoint).",
+    "fingerprint; the failed apply changed the project, so that change is refused first by the fingerprint check "
+    "(StaleRevision, or FingerprintUnavailable on the inconsistent block), also before the checkpoint.",
 ]
 
 DATA = '''DATA_BLOCK "X11Data"
@@ -574,8 +575,9 @@ def unresolved_guard(run, failed, late):
     def apply_refused():
         before = run.state()
         error = h.call_error("change_apply", h.apply_args(late))
-        # The failed apply changed the project, so the earlier preview's fingerprint check may refuse first.
-        require(error.get("code") in ("RecoveryRequired", "StaleRevision"), "Expected RecoveryRequired or StaleRevision: %s" % error)
+        # The failed apply changed the project, so the earlier preview's fingerprint refuses first: StaleRevision, or
+        # FingerprintUnavailable while the failed compile leaves a user block inconsistent (observed 2 November 2026).
+        require(error.get("code") in ("RecoveryRequired", "StaleRevision", "FingerprintUnavailable"), "Expected a refusal before the checkpoint: %s" % error)
         status = h.tool("change_status", {"changeId": late["changeId"]})
         archives = [str(p) for p in h.directory.glob("**/change-%s/before.zap21" % late["changeId"])]
         require(status["state"] == "prepared" and not status["stages"] and not status["recoveryArchive"] and not archives and run.state() == before,
