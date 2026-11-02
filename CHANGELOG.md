@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.114`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.116`.
 
 ### Added
 
@@ -245,7 +245,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   - Rechecked natively on 2 November ([record](docs/verification/audit-paths-20261102.md)): the
     delete and rename compile rule for all four kinds, `change_prepare`'s `RecoveryRequired` after a
     failed apply, generated-source reads with `projectModifiedBefore`/`After`, and translation reopen
-    keeping scratch status for the owned fixture and never granting it to an admitted project.
+    keeping scratch status for the owned fixture and never granting it to an admitted project. A fresh
+    worker resuming a closed translation fixture is refused its capture; no adoption route is built.
   - A missing or renamed old project path no longer blocks every change; store locks wait up to
     5 s; finished records archive past 1,000 (Hosts older than this change refuse new admissions
     on a store with an `.archive` folder); a clock step back no longer fails a dispatch.

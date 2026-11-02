@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "0f32f13ccd7f798725c8e2d0889b066dcca71826eff5450a3df840aa1b9c5c30",
-      "bytes": 1678551
+      "sha256": "7633830696e04c776b74da71e7afcd27f864b0fa2a02398d1c76a57d39a123c1",
+      "bytes": 1683046
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -101995,6 +101995,13 @@
           "artifacts": [
             "evidence/local.plc_object_mutations.rerun.20261028.json"
           ]
+        },
+        {
+          "id": "local.plc_object_mutations.audit.20261102",
+          "profileSha256": "8ac284451f6a3f3ebc8f834d0dd664ae3cc8d05a679d451dfbedcce53e939b47",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.audit.20261102.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -102218,6 +102225,13 @@
           "profileSha256": "605c81f58d53968f9bf8166dcbc6cab24981367c4454265ab638712c1144bab1",
           "artifacts": [
             "evidence/local.plc_object_mutations.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.plc_object_mutations.audit.20261102",
+          "profileSha256": "8ac284451f6a3f3ebc8f834d0dd664ae3cc8d05a679d451dfbedcce53e939b47",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.audit.20261102.json"
           ]
         }
       ],
@@ -110189,6 +110203,13 @@
           "artifacts": [
             "evidence/local.read_contracts.20261028.json"
           ]
+        },
+        {
+          "id": "local.plc_object_mutations.audit.20261102",
+          "profileSha256": "8ac284451f6a3f3ebc8f834d0dd664ae3cc8d05a679d451dfbedcce53e939b47",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.audit.20261102.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -110272,6 +110293,13 @@
           "profileSha256": "69d2451588f4002ec2c0789c8e54a4958c372cfebb1d2dcbc6ce6650dca9f432",
           "artifacts": [
             "evidence/local.read_contracts.20261102.json"
+          ]
+        },
+        {
+          "id": "local.plc_object_mutations.audit.20261102",
+          "profileSha256": "8ac284451f6a3f3ebc8f834d0dd664ae3cc8d05a679d451dfbedcce53e939b47",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.audit.20261102.json"
           ]
         }
       ],
@@ -119915,6 +119943,13 @@
           "profileSha256": "a983958875e0d7e19ba4cefc5eef8a71d10dd00a0905542b066a25a992f70afe",
           "artifacts": [
             "evidence/local.translation.qualification.20261028.json"
+          ]
+        },
+        {
+          "id": "local.translation.adoption-refusal.20261102",
+          "profileSha256": "252c2788d0d10e14659add3a11f029282a5e9c7a4bbde602bc5bb87aadc85a4e",
+          "artifacts": [
+            "evidence/local.translation.adoption-refusal.20261102.json"
           ]
         }
       ],
@@ -131521,6 +131556,11 @@
       "sha256": "88ff7615198342532fca513be3c0f2c0937d23b972949a6885accb298f14318e"
     },
     {
+      "path": "evidence/local.plc_object_mutations.audit.20261102.json",
+      "state": "observed",
+      "sha256": "82de4e79d21d9aec318eadc9c08dd3294d06152ae047107e884a5ef1cc1c32bf"
+    },
+    {
       "path": "evidence/local.plc_object_mutations.rerun.20261028.json",
       "state": "observed",
       "sha256": "6e3ec873adb7c4c2595812c2a86fefb6117bea997c4f11d40737d5937897cb59"
@@ -131784,6 +131824,11 @@
       "path": "evidence/local.testsuite.style-q01.20261101.json",
       "state": "observed",
       "sha256": "424a86424ece9926c16e9a8fb3a2d5aa854dd49e6716573dffc49bfedf47c01f"
+    },
+    {
+      "path": "evidence/local.translation.adoption-refusal.20261102.json",
+      "state": "observed",
+      "sha256": "d984a4630157e91a2f3ccff5158e339d874d80e3b0b2a3ccdc063f4484a64d12"
     },
     {
       "path": "evidence/local.translation.native.20261028.json",
@@ -132564,6 +132609,10 @@
       "profileSha256": "b98a773b76a64a25463c645a22897e8a20b756d285dc66fc37e8f9f2443a8081"
     },
     {
+      "id": "local.plc_object_mutations.audit.20261102",
+      "profileSha256": "8ac284451f6a3f3ebc8f834d0dd664ae3cc8d05a679d451dfbedcce53e939b47"
+    },
+    {
       "id": "local.plc_object_mutations.rerun.20261028",
       "profileSha256": "605c81f58d53968f9bf8166dcbc6cab24981367c4454265ab638712c1144bab1"
     },
@@ -132774,6 +132823,10 @@
     {
       "id": "local.testsuite.style-q01.20261101",
       "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9"
+    },
+    {
+      "id": "local.translation.adoption-refusal.20261102",
+      "profileSha256": "252c2788d0d10e14659add3a11f029282a5e9c7a4bbde602bc5bb87aadc85a4e"
     },
     {
       "id": "local.translation.native.20261028",
