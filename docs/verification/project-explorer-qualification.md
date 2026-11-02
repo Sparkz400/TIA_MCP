@@ -41,6 +41,8 @@ Native fixture mutations only create owned scratch data through prepared changes
 
 ## Performance, measured separately
 
+A 1 November rerun on another machine adds cold first queries, page payload sizes and per-size memory ([record](explorer-performance-20261101.md)).
+
 Reference machine: LT-PRG2024-03, Windows build 26300, Intel Core Ultra 7 155H / 22 logical processors, .NET 10.0.12, TIA Portal V21; selected native CPU1511-1PN firmware 4.1. Native capture is sequential and bounded, not incremental simply because the browser is virtualized.
 
 | Measurement | Small | Medium | Large/synthetic |

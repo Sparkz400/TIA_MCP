@@ -1,0 +1,145 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.testsuite.job-prepare.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T22:33:29+00:00",
+  "source": {
+    "commit": "4ced3b90aaacd3986efcebc333223d90cb2f4830",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_testsuite_application.py cases jobPass and jobFail on a frozen Debug build of 4ced3b90 (artifacts/tj1, git archive, TestSuiteQualification=true, Host --testsuite-qualification; reports artifacts/q/tj/tq_68318815 and tq_56f8e66f, 42 steps), each with one owned Portal, owned scratch CPU 1511-1 PN V4.1 and one owned PLCSIM Advanced V8 CPU 1511 instance on Softbus (download, generated-state save, credential provisioning, power on, RUN). After qualification_testsuite_prepare imported and scoped the TS-Q02 fixture, testsuite_application_plan_prepare reviewed the case again (externally managed, profile v21.owned-plcsim.application.qualification-v1) and retained a review byte-identical to the qualification review; testsuite_style_job_prepare queued it as a separate job (a wrong reviewed hash refused with ReviewMismatch, the repeated key returned the same job and operation, the key with a two-run review refused with IdempotencyConflict, status prepared at revision 0). qualification_testsuite_execute dispatched that job: one TestCaseExecutor.Run(TestCase) with observation, checkpoint archive, compile, preservation, fresh reopen and cleanup. jobPass: succeeded, classification passed. jobFail: assertionFailure, recoveryRequired, qualification_testsuite_recover into a new folder and qualification_testsuite_reconcile verifiedRestored. The qualification job prepared alongside stayed prepared and was never dispatched.",
+  "limitations": [
+    "One single-step application test case per Run, externally managed, on one owned PLCSIM Advanced V8 instance on Softbus, in the TS-Q02 qualification mode. Style reviews queued by testsuite_style_job_prepare have no production consumer (V21 boundary), system reviews have no qualification mode, and production admission stays closed.",
+    "The result profile matches the exact TS-Q02 fixture tree TIA V21 Update 3 wrote under its English UI; other trees fail closed. The simulator ticket expires 15 minutes after sim_create."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "c7b3b587f862ac9419d53e282181d136737a872257c18a26e2abddfadedc71da"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "c1bd4cee51f73d88328f1561cbd89eb14408d159410641dfa50d6aef0cc2d575"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "1113ee0614cccf7e61b961fa6fb2b6d9de7a1b6cac364e12db55407685bb74a0"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "a05f006a917b108b6ab68a4e01c3f054ea6998382e45c13e4f043110701d665a",
+      "bytes": 305389,
+      "completed": true,
+      "steps": [
+        "start owned TIA testsuite application jobPass",
+        "create owned scratch testsuite application jobPass",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "sim_create (owned target)",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "power on",
+        "run",
+        "qualification_testsuite_prepare",
+        "testsuite_application_plan_prepare",
+        "refuse a wrong reviewed hash",
+        "testsuite_style_job_prepare",
+        "testsuite_style_job_prepare (repeated key)",
+        "refuse the key bound to another review",
+        "qualification_testsuite_execute",
+        "testsuite_style_job_results",
+        "sim_state stop",
+        "sim_state powerOff",
+        "sim_release"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "project_inventory",
+        "qualification_testsuite_execute",
+        "qualification_testsuite_prepare",
+        "sim_create",
+        "sim_release",
+        "sim_state",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "testsuite_application_plan_prepare",
+        "testsuite_style_job_prepare",
+        "testsuite_style_job_results",
+        "testsuite_style_job_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "testsuite_style_job_prepare"
+      ]
+    },
+    {
+      "report": "qualification.json",
+      "sha256": "f68236dcb63d91c46d2d8479995b463e68833363990a24750d01f9c988424b44",
+      "bytes": 332830,
+      "completed": true,
+      "steps": [
+        "start owned TIA testsuite application jobFail",
+        "create owned scratch testsuite application jobFail",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "sim_create (owned target)",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "power on",
+        "run",
+        "qualification_testsuite_prepare",
+        "testsuite_application_plan_prepare",
+        "refuse a wrong reviewed hash",
+        "testsuite_style_job_prepare",
+        "testsuite_style_job_prepare (repeated key)",
+        "refuse the key bound to another review",
+        "qualification_testsuite_execute",
+        "testsuite_style_job_results",
+        "qualification_testsuite_recover",
+        "qualification_testsuite_reconcile",
+        "sim_state stop",
+        "sim_state powerOff",
+        "sim_release"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "project_inventory",
+        "qualification_testsuite_execute",
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_reconcile",
+        "qualification_testsuite_recover",
+        "sim_create",
+        "sim_release",
+        "sim_state",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "testsuite_application_plan_prepare",
+        "testsuite_style_job_prepare",
+        "testsuite_style_job_results",
+        "testsuite_style_job_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "testsuite_style_job_prepare"
+      ]
+    }
+  ]
+}

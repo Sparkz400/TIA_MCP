@@ -37,9 +37,11 @@ namespace TiaMcp.Openness.V21
             if (!Uri.TryCreate(serverAddress, UriKind.Absolute, out var uri) || uri.Scheme != "opc.tcp" ||
                 !simulator["controllerAddresses"].Values<string>().Contains(uri.Host, StringComparer.Ordinal))
                 throw new BridgeException("RuntimeTargetNotOwnedPlcsim", "serverAddress is not a controller address of the ticket-owned PLCSIM instance.");
-            string route = SimulationNetworkAdmission.RouteRefusal(SimulationNetworkRoute.Adapter(serverAddress));
+            string route = SimulationNetworkAdmission.EndpointRefusal(SimulationNetworkRoute.Adapter(serverAddress), SimulationTicket.Interface(SimulationTicket.Decode(ticket)));
             if (route != null) throw new BridgeException(route, route == "RuntimeTargetRouteUnverified"
                 ? "The network adapter Windows routes serverAddress through could not be determined. Nothing was written."
+                : route == "PlcsimEndpointUnreachable"
+                ? "The ticket-owned instance was created for Softbus, so no OPC UA endpoint reaches it; system tests need a TCP/IP instance. Nothing was written."
                 : "Windows routes serverAddress through a network adapter other than the PLCSIM Virtual Ethernet Adapter, where a physical PLC can hold the same address. Nothing was written.");
             return simulator;
         }
