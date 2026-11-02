@@ -176,6 +176,8 @@ internal static class AddInReceiverTests
                 await server.Crash();
             }
         }
+        // Confirm crash cleanup released the owner file before starting a receiver that refuses a held lock immediately.
+        using (PackageStorage.Lock(Path.Combine(f.Root, "addin-handoffs", "owner.lock"))) { }
         await using (var restarted = await Server.Start(f.Root, f.Binding)) {
             Check.Equal(false, oldPipe == (string)Discovery(f.Root)["pipeName"]!);
             Check.Equal(true, JsonNode.DeepEquals(completed, Result(await Send(f.Root, Request("read", id), restarted.Process.Id))));
