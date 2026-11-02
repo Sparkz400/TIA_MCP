@@ -508,6 +508,8 @@ class Scenario:
             setup(self, client)
             require(not present(client), "The fixture effect must be absent before the change")
             prepared = prepare(self, client)
+            # A setup apply (dy-*: the IOField the binding needs) is an earlier, completed admission; only later ones count.
+            earlier = {a["id"] for a in admissions(self.root, "change_apply")}
             project = pathlib.Path(prepared["preview"]["project"]["path"])
             journal = pathlib.Path(prepared["journalPath"])
             request = client.begin("tools/call", {"name": "change_apply", "arguments": self.apply_arguments(prepared)})
@@ -527,7 +529,7 @@ class Scenario:
             require(rows["checkpointMutationCompileSave"]["disposition"] == expected["project"], f"Expected project {expected['project']}")
         final = read_json(journal)
         archive, archive_hash = final.get("recoveryArchive"), final.get("recoveryArchiveSha256")
-        every = admissions(self.root, "change_apply")
+        every = [a for a in admissions(self.root, "change_apply") if a["id"] not in earlier]
         unresolved = [a["id"] for a in every if a["state"] in ("dispatchIntent", "outcomeUnknown")]
         self.step("admissions after reconcile", {"unresolved": unresolved, "total": len(every)})
         require(len(every) == 1, "Reconciliation must not dispatch another apply")
