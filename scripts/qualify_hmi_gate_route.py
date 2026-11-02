@@ -55,7 +55,7 @@ BACKCOLOR, ALTERNATE, ADDED_TAG, EXTERNAL = "200, 210, 220", "210, 220, 230", "S
 SCREEN, FIELD, BUTTON = "QualificationScreen", "QualificationField", "QualificationButton"
 # The admission the gate reports for each kind on its profiles: production since its native qualification passed (the qualifying
 # runs of local.hmi.*.route.20261101 saw "qualification"); "qualification" while a kind has no production profile.
-ADMISSION = {"hmi_classic_import": "production", "hmi_external_tag_create": "production", "hmi_screen_create": "qualification",
+ADMISSION = {"hmi_classic_import": "production", "hmi_external_tag_create": "production", "hmi_screen_create": "production",
              "hmi_dynamization_create": "qualification"}
 
 

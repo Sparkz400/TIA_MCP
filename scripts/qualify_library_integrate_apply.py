@@ -28,7 +28,7 @@ from qualification_owned_scratch import OwnedScratch, assert_snapshot, require, 
 from qualify_plc_component import (FIXTURES, ComponentRun, first_available_db_number, installed_objects, step_request,
                                    terminal_network, verify_component_call, verify_preserved_installation, verify_standalone_caller)
 from run_conformance import safe_xml
-from smoke_mcp import Client
+from smoke_mcp import Client, ROOT
 from typed_graphical_transport import artifact_bytes
 
 FLAG = "--enable-library-integrate-apply"
@@ -37,7 +37,7 @@ COMBINED_PATH_OVERHEAD = len("/changes/c/01234567/change-lib-" + "0" * 32 + "/be
 REFUSED = "PlcIntegrationNotQualified"
 # FB callers are verified since 31 October and a multi-instance of the reused FB since 1 November; a multi-instance after a fresh
 # import is not, so the refusal cases prepare an FB caller with a multi-instance of the FB they import.
-FB_REFUSAL = "A multi-instance is verified only for the reused installed FB in an existing FBD FB caller; other multi-instances stay plan-only."
+FB_REFUSAL = "A multi-instance is verified only for the reused installed FB in an existing LAD or FBD FB caller; other multi-instances stay plan-only."
 HOST_FB = "TiaMcpComponentHost"
 # The Host FB moves off FB2, the number the component FB is imported with: the captured instance profile is bound to it
 # (31 October), and prepare now refuses an occupied number (ComponentBlockNumberOccupied).
@@ -68,21 +68,82 @@ CANDIDATES = {
     "earlierPlacement": ({"callerMode": "existing", "callerSource": None, "twoNetworks": True, "insertNetworkIndex": 0}, []),
 }
 REUSE_CALLER, REUSE_INSTANCE, MULTI_NAME = "TiaMcpComponentCaller2", "TiaMcpComponentGate_2", "Gate"
+# Combinations of the verified features, each in its own owned scratch: whether the plan reuses the FB that a first verified
+# standalone FBD FC install put into the project, the caller under test, and the features its preview must name (none since the
+# runs of 2 November verified each combination). An existing caller comes from its fixture source; "networks": 2 repeats its one
+# network through its own export, so the call goes after the first. reuseExisting is the reusedComponent key with an existing
+# FBD FC, a variant its first evidence did not exercise.
+COMBINATIONS = {
+    "ladEarlier": (False, {"kind": "FC", "language": "LAD", "networks": 2}, []),
+    "fbEarlier": (False, {"kind": "FB", "language": "FBD", "networks": 2}, []),
+    "ladFb": (False, {"kind": "FB", "language": "LAD"}, []),
+    "ladFbEarlier": (False, {"kind": "FB", "language": "LAD", "networks": 2}, []),
+    "reuseExisting": (True, {"kind": "FC", "language": "FBD"}, []),
+    "reuseLad": (True, {"kind": "FC", "language": "LAD", "new": True}, []),
+    "reuseLadExisting": (True, {"kind": "FC", "language": "LAD"}, []),
+    "reuseEarlier": (True, {"kind": "FC", "language": "FBD", "networks": 2}, []),
+    "reuseLadEarlier": (True, {"kind": "FC", "language": "LAD", "networks": 2}, []),
+    "reuseFb": (True, {"kind": "FB", "language": "FBD"}, []),
+    "reuseFbEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2}, []),
+    "reuseLadFb": (True, {"kind": "FB", "language": "LAD"}, []),
+    "reuseLadFbEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2}, []),
+    "multiEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2, "multi": True}, []),
+    "multiLad": (True, {"kind": "FB", "language": "LAD", "multi": True}, []),
+    "multiLadEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2, "multi": True}, []),
+    # The Host FB with its own instance DB, which gains the member through the captured component effect.
+    "multiDependentsEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2, "multi": True, "dependents": True}, []),
+    "multiDependentsLad": (True, {"kind": "FB", "language": "LAD", "multi": True, "dependents": True}, []),
+    "multiDependentsLadEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2, "multi": True, "dependents": True}, []),
+}
+CALLER_SOURCES = {("FB", "FBD"): "callers/TiaMcpComponentHost.s7dcl", ("FB", "LAD"): "callers/TiaMcpComponentHost.lad.s7dcl",
+                  ("FC", "FBD"): "TiaMcpComponentCaller.s7dcl", ("FC", "LAD"): "callers/TiaMcpComponentCaller.lad.s7dcl"}
 # multiInstance installs through the captured component multi-instance template v21.fw41.component-gate.multi-instance.v1
 # (route-capture-component-storage-packet.v1.json); it passed natively on 1 November, so its preview names no candidate feature.
-# multiInstanceDependents gives the Host FB its own instance DB first: that dependent has no captured effect, so the plan must be
-# refused before admission (DependencyProfileUnavailable), with no admission record and the scratch unchanged.
+# multiInstanceDependents gives the Host FB its own instance DB first: the DB gains the new member through the captured component
+# effect (instance-effects-component.v1.json), which the runner checks against the captured DB member. multiInstanceParent embeds
+# the Host FB in a parent FB instead: no captured transitive effect covers it, so the plan must be refused before admission
+# (DependencyProfileUnavailable), with no admission record and the scratch unchanged.
 HOST_DB = HOST_FB + "_DB"
 HOST_DB_SOURCE = 'DATA_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\n"%s"\nBEGIN\nEND_DATA_BLOCK\n' % (HOST_DB, HOST_FB)
+PARENT_FB, PARENT_FB_NUMBER = "TiaMcpComponentParent", 31
+PARENT_SOURCE = ('FUNCTION_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\nVAR\n Host : "%s";\nEND_VAR\nBEGIN\n #Host();\nEND_FUNCTION_BLOCK\n'
+                 % (PARENT_FB, HOST_FB))
+DEPENDENT_DB_FEATURES = []  # dependentInstanceDb+fbCaller+multiInstance+reusedComponent, verified on 2 November
+COMPONENT_EFFECT = ROOT / "fixtures/typed-graphical/native/instance-effects-component/after-instance.xml"
 DEPENDENTS_REFUSED = "DependencyProfileUnavailable"
 # The worker's message for a combined apply refused while it resolves the shared-mutation scope (OpennessSession.SharedMutationAdmission).
 BEFORE_ADMISSION = "Combined apply refused before admission: "
-REFUSED_CASES = {"multiInstanceDependents"}
+REFUSED_CASES = {"multiInstanceParent"}
 
 
 def failed_candidates(outcomes):
     """Every candidate case that did not reach its outcome: installed, or refused for the refusal cases."""
     return {name: outcome for name, outcome in outcomes.items() if outcome != ("refused" if name in REFUSED_CASES else "installed")}
+
+
+def structural(node):
+    """Tag, attributes, trimmed text and children of an XML element, DocumentInfo aside (extract_typed_instance_effects.py)."""
+    return (node.tag, sorted(node.attrib.items()), (node.text or "").strip(), [structural(e) for e in node if e.tag != "DocumentInfo"])
+
+
+def top_static(document):
+    """The Static section directly under a block's Interface."""
+    statics = [s for interface in document.iter("Interface") for sections in interface for s in sections if s.get("Name") == "Static"]
+    require(len(statics) == 1, "The export lacks exactly one top-level Static section.")
+    return statics[0]
+
+
+def verify_dependent_db(before_xml, after_xml, captured_xml, member):
+    """The caller's own instance DB gains exactly the new multi-instance member, equal to the captured component effect's DB member;
+    with that member removed, the DB equals its baseline."""
+    after = safe_xml(after_xml)
+    section = top_static(after)
+    added = [m for m in section if m.get("Name") == member]
+    expected = [m for m in top_static(safe_xml(captured_xml)) if m.get("Name") == member]
+    require(len(added) == 1 and len(expected) == 1, "The instance DB or the captured effect lacks exactly one Static member " + member + ".")
+    require(structural(added[0]) == structural(expected[0]), "The new instance DB member differs from the captured component effect.")
+    section.remove(added[0])
+    require(structural(after) == structural(safe_xml(before_xml)), "The instance DB changed beyond the new member.")
 
 
 def admission_records(root):
@@ -341,8 +402,14 @@ class IntegrateApplyRun(ComponentRun):
         added = installed_objects(after, self.manifest, plc, existing) if not reused else \
             (["block:" + plan["instanceDb"]["path"]] if "instanceDb" in plan else []) + ([] if existing else ["block:" + plan["caller"]["blockPath"]])
         require(planned_objects(plan, existing) == {key for key in added if key.startswith("block:")}, "Installed blocks differ from the reviewed plan.")
-        # The new network directly follows the selected one (the last by default).
-        verify_preserved_installation(baseline, after, caller, added, multi, self.manifest.get("insertNetworkIndex", -1) if existing else None)
+        # The new network directly follows the selected one (the last by default); the caller's own instance DB gains the member.
+        dependent = self.manifest.get("dependentDb")
+        verify_preserved_installation(baseline, after, caller, added, multi, self.manifest.get("insertNetworkIndex", -1) if existing else None,
+                                      [dependent] if dependent else [])
+        if dependent:
+            before_xml, after_xml = (Path(s["objects"]["block:" + dependent]["file"]).read_text(encoding="utf-8-sig") for s in (baseline, after))
+            verify_dependent_db(before_xml, after_xml, COMPONENT_EFFECT.read_text(encoding="utf-8-sig"), multi)
+            case["dependentInstanceDbVerified"] = dependent
         caller_xml = Path(after["objects"]["block:" + caller]["file"]).read_text(encoding="utf-8-sig")
         verify_component_call(caller_xml, self.manifest)
         if existing:
@@ -373,10 +440,11 @@ class IntegrateApplyRun(ComponentRun):
         case["compileVerified"] = True; self.persist()
         self.restore(case, prepared, checkpoint, baseline, out, restored_versions)
 
-    def reuse(self, name, archive, released, multi=False, dependents=False):
+    def reuse(self, name, archive, released, multi=False, dependents=False, parent=False):
         """Candidate: a first verified install, then a plan that reuses the installed FB (exact proofs, no import step), either
         in a second new FBD FC with a new global DB or as a multi-instance in an existing FB caller. With dependents the FB
-        caller has its own instance DB, and the multi-instance must be refused before admission."""
+        caller has its own instance DB, which gains the member too; with parent a parent FB embeds the caller, and the
+        multi-instance must be refused before admission."""
         self.use({"callerMode": "createStandaloneFc"})
         case, out = self.case(name, True), self.output / name
         scratch, opened, plc = self.stage_consumer(archive, released)
@@ -389,14 +457,19 @@ class IntegrateApplyRun(ComponentRun):
         first, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
         case["first"] = {}
         self.installed(case["first"], out / "first", first, plan, baseline, plc, caller, network, released)
-        self.use({"callerMode": "existing", "caller": "TiaMcpComponentHost", "multiInstance": MULTI_NAME} if multi else
+        if parent:
+            # After the first install, which imports the component FB with its own number, so the parent cannot take it.
+            self.apply("source_upsert", {"language": "SCL", "source": PARENT_SOURCE, "expectedBlockNames": [PARENT_FB]})
+            self.apply("block_number_set", {"blockName": PARENT_FB, "number": PARENT_FB_NUMBER})
+        self.use({"callerMode": "existing", "caller": "TiaMcpComponentHost", "multiInstance": MULTI_NAME,
+                  **({"dependentDb": plc + "/blocks/" + HOST_DB} if dependents else {})} if multi else
                  {"callerMode": "createStandaloneFc", "caller": REUSE_CALLER, "instance": REUSE_INSTANCE})
         baseline = snapshot(self.call, out / "before")
         caller, caller_recipe, network = self.select_caller(baseline, plc)
         prepared, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
-        if dependents:
-            return self.dependents_refused(case, out, prepared, baseline, plc + "/blocks/" + HOST_DB, opened)
-        applied, record = self.apply_combined(case, prepared, baseline, [])
+        if parent:
+            return self.dependents_refused(case, out, prepared, baseline, plc + "/blocks/" + PARENT_FB, opened)
+        applied, record = self.apply_combined(case, prepared, baseline, DEPENDENT_DB_FEATURES if dependents else [])
         after = self.verify_installed(case, out, plan, baseline, plc, caller, network, released, record)
         self.call("library_close", {"libraryId": opened["libraryId"]})
         # The typed step's own pre-mutation archive is the recovery anchor: it holds the first installation.
@@ -405,12 +478,59 @@ class IntegrateApplyRun(ComponentRun):
                 "The reuse checkpoint is not the typed step's own archive.")
         self.finish(case, out, prepared, plc, case["initialCheckpoint"], baseline, after, sorted(version_key(n, pin) for n, pin in released.items()))
 
-    def dependents_refused(self, case, out, prepared, baseline, host_db, opened):
-        """The preview already refuses with DependencyProfileUnavailable, naming the caller's instance DB; change_apply is
+    def caller_fixture(self, plc, name, kind, language, networks=1):
+        """An existing caller before the baseline: its fixture source under this name, an FB moved to HOST_FB_NUMBER; with two
+        networks its one network twice, re-imported over itself from its own native export."""
+        source = (self.native / "documents" / CALLER_SOURCES[kind, language]).read_text(encoding="utf-8-sig")
+        source = source.replace('"' + (HOST_FB if kind == "FB" else self.base["caller"]) + '"', '"' + name + '"')
+        self.apply("source_upsert", {"language": "SIMATIC_SD", "source": source, "expectedBlockNames": [name]})
+        if kind == "FB": self.apply("block_number_set", {"blockName": name, "number": HOST_FB_NUMBER})
+        if networks == 2:
+            xml = artifact_bytes(self.call, self.call("block_read", {"blockPath": plc + "/blocks/" + name})["artifact"]).decode("utf-8-sig")
+            number = int(re.search(r"<Number>(\d+)</Number>", xml).group(1))
+            self.apply("block_import_xml", {"xml": two_network_fc(xml, name, number), "expectedBlockNames": [name]})
+
+    def combination(self, name, archive, released, reuse, caller, features):
+        """One combination of verified features. A reuse plan first installs the verified standalone FBD FC, so the plan under test
+        reuses the installed FB with a new global DB or, with "multi", a multi-instance; otherwise the plan imports it fresh."""
+        existing = not caller.get("new")
+        target = HOST_FB if caller["kind"] == "FB" else REUSE_CALLER if reuse else self.base["caller"]
+        overrides = {"callerMode": "existing" if existing else "createStandaloneFc", "caller": target, "language": caller["language"],
+                     "callerSource": None, "insertNetworkIndex": 0 if caller.get("networks") == 2 else -1,
+                     "multiInstance": MULTI_NAME if caller.get("multi") else None, **({"instance": REUSE_INSTANCE} if reuse else {})}
+        case, out = self.case(name, True), self.output / name
+        self.use({"callerMode": "createStandaloneFc"} if reuse else overrides)
+        scratch, opened, plc = self.stage_consumer(archive, released)
+        if existing: self.caller_fixture(plc, target, caller["kind"], caller["language"], caller.get("networks", 1))
+        if caller.get("dependents"):
+            self.apply("source_upsert", {"language": "SCL", "source": HOST_DB_SOURCE, "expectedBlockNames": [HOST_DB]})
+            overrides["dependentDb"] = plc + "/blocks/" + HOST_DB
+        if reuse:
+            baseline = snapshot(self.call, out / "before-first")
+            first_caller, first_recipe, first_network = self.select_caller(baseline, plc)
+            first, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, first_caller, first_recipe)
+            case["first"] = {}
+            self.installed(case["first"], out / "first", first, plan, baseline, plc, first_caller, first_network, released)
+            self.use(overrides)
+        baseline = snapshot(self.call, out / "before")
+        path, recipe, network = self.select_caller(baseline, plc)
+        prepared, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, path, recipe)
+        applied, record = self.apply_combined(case, prepared, baseline, features)
+        after = self.verify_installed(case, out, plan, baseline, plc, path, network, released, record)
+        self.call("library_close", {"libraryId": opened["libraryId"]})
+        # A reused FB's recovery anchor is the typed step's own pre-mutation archive, which holds the first installation.
+        require(not reuse or case["initialCheckpoint"]["archivePath"] != case["first"]["initialCheckpoint"]["archivePath"]
+                and case["initialCheckpoint"].get("changeId") == applied["journal"]["combinedApply"]["typedChangeId"],
+                "The reuse checkpoint is not the typed step's own archive.")
+        self.finish(case, out, prepared, plc, case["initialCheckpoint"], baseline, after,
+                    sorted(version_key(n, pin) for n, pin in released.items()) if reuse else [])
+
+    def dependents_refused(self, case, out, prepared, baseline, dependent, opened):
+        """The preview already refuses with DependencyProfileUnavailable, naming the uncovered dependent; change_apply is
         refused before admission (no admission record), the plan stays prepared and the scratch is unchanged."""
         block = case["combinedApply"] = require_combined_preview(prepared["preview"], refusal="The multi-instance caller ")
-        require(block.get("refusalCode") == DEPENDENTS_REFUSED and host_db in (block.get("refusalDetails") or {}).get("dependents", []),
-                "The preview does not refuse the caller's instance DB as a dependent: " + str(block.get("refusalDetails")))
+        require(block.get("refusalCode") == DEPENDENTS_REFUSED and dependent in (block.get("refusalDetails") or {}).get("dependents", []),
+                "The preview does not refuse the dependent " + dependent + ": " + str(block.get("refusalDetails")))
         case["refusal"] = self.refused_apply(prepared, DEPENDENTS_REFUSED)
         assert_snapshot(baseline, snapshot(self.call, out / "after-refusal"))
         case.update(outcome="refused", admissionWritten=False, projectUnchanged=True); self.persist()
@@ -506,8 +626,12 @@ class IntegrateApplyRun(ComponentRun):
         self.session.client_factory = candidate_client
         cases = [(name, lambda n=name: self.install(n, archive, released, *CANDIDATES[n])) for name in CANDIDATES]
         cases += [("reuse", lambda: self.reuse("reuse", archive, released)), ("multiInstance", lambda: self.reuse("multiInstance", archive, released, True)),
-                  ("multiInstanceDependents", lambda: self.reuse("multiInstanceDependents", archive, released, True, True))]
-        for name, operation in cases:
+                  ("multiInstanceDependents", lambda: self.reuse("multiInstanceDependents", archive, released, True, True)),
+                  ("multiInstanceParent", lambda: self.reuse("multiInstanceParent", archive, released, True, parent=True))]
+        cases += [(name, lambda n=name: self.combination(n, archive, released, *COMBINATIONS[n])) for name in COMBINATIONS]
+        selected = getattr(self.args, "case", None)
+        require(not selected or set(selected) <= {name for name, _ in cases}, "Unknown --case: " + str(selected))
+        for name, operation in [(n, o) for n, o in cases if not selected or n in selected]:
             try:
                 self.step("candidate:" + name, operation)
                 self.report["candidateCases"][name] = self.report["cases"][name].get("outcome", "installed")
@@ -561,6 +685,7 @@ def main():
     parser.add_argument("--timeout", type=int, default=600)
     parser.add_argument("--run-native", action="store_true")
     parser.add_argument("--candidates", action="store_true", help="Qualify the candidate shapes on a --component-qualification Host instead of the verified ones.")
+    parser.add_argument("--case", action="append", help="With --candidates, run only this candidate case (repeatable).")
     args = parser.parse_args()
     require(5 <= args.timeout <= 900, "Timeout must be 5..900 seconds.")
     IntegrateApplyRun(args).run()

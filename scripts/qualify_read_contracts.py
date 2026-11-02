@@ -6,7 +6,10 @@ stale or invalid selector, and a response that tells an empty or complete result
 unobserved one. The project holds a CPU 1511-1 PN scratch with seeded blocks, a UDT, an empty group, a software unit,
 a released project-library type and an empty global library; a CPU 1518-4 PN/DP is added later so that unqualified
 selectors become ambiguous and loadable generation has a supported target. Scratch creation is checked in its own
-Portal first, because a refused CPU identifier leaves the partially created project open by design.
+Portal first, because a refused CPU identifier leaves the partially created project open by design. A VCI workspace with
+two mapped blocks shows each mapping's contentSha256: distinct per object, stable across reads, and changed only for
+the block whose header is then edited. Generated-source reads report the project's unsaved state before and after, and
+every change preview reports isModified (31 October audit).
 """
 from __future__ import annotations
 
@@ -46,12 +49,15 @@ NEEDS = ("identity", "refusal", "completeness")
 NO_SELECTOR = {"library_list": "Takes no selector; identity is the exact set of registered library IDs.",
                "library_capabilities": "Takes no selector; identity is the exact native change-kind registry."}
 LIMITATIONS = [
-    "One owned scratch project: CPU 1511-1 PN V4.1 with one software unit, plus CPU 1518-4 PN/DP added by hardware_add; no "
-    "safety, technology objects, HMI, connections, VCI workspaces, PLC documents or know-how protection, so those content "
-    "families are observed only as empty, complete results.",
-    "Truncation is shown with maxItems/pageSize 1 where the fixture has more than one row; connection_inspect, "
-    "plc_document_inventory and vci_workspace_inspect have no rows to truncate here, and library_compare has a fixed "
+    "One owned scratch project: CPU 1511-1 PN V4.1 with one software unit, plus CPU 1518-4 PN/DP added by hardware_add, and "
+    "one VCI workspace (outside the project) mapping the SCL blocks RcCaller and RcFb by export; no safety, technology "
+    "objects, HMI, connections, PLC documents or know-how protection, so those content families are observed only as "
+    "empty, complete results.",
+    "Truncation is shown with maxItems/pageSize 1 (vci_workspace_inspect: 2) where the fixture has more rows; "
+    "connection_inspect and plc_document_inventory have no rows to truncate here, and library_compare has a fixed "
     "200-row bound that this fixture does not reach.",
+    "contentSha256 is checked as distinct, stable and content-tracking; it is not recomputed independently, because no "
+    "other tool exports a block without document info.",
     "A refused cpuTypeIdentifier is reported after the scratch project was created, because Siemens needs an open project "
     "for catalog access; the partial project is named in the refusal and its Portal is discarded.",
     "plc_loadable_generate is positive only on the CPU 1518; on the CPU 1511 it is refused (UnsupportedCapability), as "
@@ -305,9 +311,14 @@ def project_reads(r):
             require(result["completeness"]["complete"] is True, "Export not complete")
             artifacts = result["export"]["artifacts"]
             directory = Path(artifacts[0]["path"]).parent
+            summary = {"format": result["format"], "files": verify_artifacts(artifacts, directory)}
             if result["format"] == "generatedSource":
                 require(result["export"]["removedExternalSources"] == [], "Source generation left external sources")
-            return {"format": result["format"], "files": verify_artifacts(artifacts, directory)}
+                # Since 31 October generation runs under exclusive access and reports the unsaved state around it.
+                modified = {key: result["export"].get(key) for key in ("projectModifiedBefore", "projectModifiedAfter")}
+                require(all(isinstance(value, bool) for value in modified.values()), "Generated source does not report the project state: %s" % modified)
+                summary.update(modified)
+            return summary
         return check
     caller, udt = p1 + "/blocks/RcCaller", p1 + "/types/RcUdt"
     for fmt in ("simaticSd", "generatedSource"):
@@ -498,9 +509,11 @@ def hardware_reads(r):
     def vci(result):
         require(result["project"]["path"] == r.project and result["workspaces"] == [] and [g["kind"] for g in result["groups"]] == ["system"], "VCI inventory differs")
         require(result["completeness"]["scopeComplete"] is True and result["completeness"]["truncated"] is False, "Empty VCI inventory not complete")
+        r.vci_group = result["groups"][0]["path"]
         return {"groups": result["groups"]}
     r.ok("vci_workspace_inspect", ("identity", "completeness"), "vci_workspace_inspect has no workspaces and is complete", "vci_workspace_inspect", {}, vci)
     r.refuse("vci_workspace_inspect", "vci_workspace_inspect of an unknown project", "vci_workspace_inspect", {"projectName": "NoSuchProject"}, ("ProjectNotFound",))
+    vci_mappings(r)
 
     def texts(mode, owners):
         def check(result):
@@ -516,6 +529,51 @@ def hardware_reads(r):
     r.refuse("project_text_export", "project_text_export to an inactive culture", "project_text_export", {"sourceCulture": "en-US", "targetCultures": ["fr-FR"]}, ("LanguageInactive",))
     r.refuse("project_text_export", "project_text_export of an unknown owner", "project_text_export",
              {"sourceCulture": "en-US", "targetCultures": ["de-DE"], "owners": [r.p1 + "Missing"]}, ("OwnerNotFound",))
+
+
+def vci_mappings(r):
+    """One workspace mapping RcCaller and RcFb: each mapping names its block and carries its own export hash (contentSha256)."""
+    h, p1 = r.h, r.p1
+    root = h.directory.parent / ("vci-" + h.directory.name)  # Outside the project and the artifact store.
+    workspace = r.vci_group + "/RcVci"
+    r.apply("create VCI workspace RcVci", "vci_workspace_create", {"groupPath": r.vci_group, "name": "RcVci", "rootPath": str(root), "language": "en-US"}, {"plcPath": p1})
+    base = {"workspacePath": workspace, "mode": "export", "directory": ""}
+    error = h.call_error("change_prepare", {"kind": "vci_mapping_add", "plcPath": p1,
+                                            "payload": {**base, "objectPath": p1 + "/blocks/RcCaller", "fileName": "RcCaller", "format": "TiaMcpBogus"}})
+    require(error.get("code") == "VciFormatUnsupported", "Expected the supported formats in a VciFormatUnsupported refusal: %s" % error)
+    formats = [f.strip() for f in error["message"].rsplit(":", 1)[1].split(",")]
+    fmt = "SimaticML" if "SimaticML" in formats else formats[0]
+    h.report["vciFixture"] = {"workspace": workspace, "root": str(root), "formats": formats, "format": fmt}
+    for block in ("RcCaller", "RcFb"):
+        r.apply("map %s into RcVci" % block, "vci_mapping_add", {**base, "objectPath": p1 + "/blocks/" + block, "fileName": block, "format": fmt}, {"plcPath": p1})
+
+    def hashes(result):
+        rows = [w for w in result["workspaces"] if w["path"] == workspace]
+        require(result["project"]["path"] == r.project and len(rows) == 1 and Path(rows[0]["rootPath"]) == root, "Workspace RcVci differs")
+        mapped = {(m.get("object") or [{}])[-1].get("Name"): m for m in rows[0]["mappedObjects"]}
+        require(sorted(mapped) == ["RcCaller", "RcFb"] and all(m["fileName"] == name and m["format"] == fmt for name, m in mapped.items()),
+                "Mapped objects differ: %s" % sorted(mapped))
+        found = {name: m.get("contentSha256") for name, m in mapped.items()}
+        require(all(isinstance(v, str) and len(v) == 64 and all(c in "0123456789abcdef" for c in v) for v in found.values()), "A mapping lacks contentSha256: %s" % found)
+        require(found["RcCaller"] != found["RcFb"], "Two blocks report one content hash")
+        return found
+
+    def first(result):
+        explicit(result)
+        r.vci_hashes = hashes(result)
+        return {"contentSha256": r.vci_hashes}
+    r.ok("vci_workspace_inspect", ("identity", "completeness"), "vci_workspace_inspect names both mapped blocks with their contentSha256", "vci_workspace_inspect", {}, first)
+    r.ok("vci_workspace_inspect", ("identity",), "vci_workspace_inspect again reports the same contentSha256", "vci_workspace_inspect", {},
+         lambda result: require(hashes(result) == r.vci_hashes, "contentSha256 changed without an edit") or {"stable": True})
+    r.ok("vci_workspace_inspect", ("completeness",), "vci_workspace_inspect with maxItems 2 is truncated", "vci_workspace_inspect", {"maxItems": 2},
+         lambda result: bounded(result["completeness"], True))
+    r.apply("set RcFb's header family", "block_attributes_set", {"blockName": "RcFb", "attributes": {"HeaderFamily": "RcFam"}}, {"plcPath": p1})
+
+    def edited(result):
+        after = hashes(result)
+        require(after["RcCaller"] == r.vci_hashes["RcCaller"] and after["RcFb"] != r.vci_hashes["RcFb"], "contentSha256 did not follow the RcFb edit only: %s" % after)
+        return {"before": r.vci_hashes, "after": after}
+    r.ok("vci_workspace_inspect", ("identity",), "vci_workspace_inspect: only RcFb's contentSha256 follows its header edit", "vci_workspace_inspect", {}, edited)
 
 
 def library_reads(r):
@@ -686,8 +744,9 @@ def change_tools(r):
     def prepared(result):
         require(result["preview"]["project"]["path"] == r.project, "Preview names another project")
         require(result["changeId"] and result["previewHash"], "Preview has no identity")
+        require(isinstance(result["preview"].get("isModified"), bool), "Preview does not report isModified")
         r.prepared = result
-        return {"changeId": result["changeId"], "effects": result["preview"].get("effects")}
+        return {"changeId": result["changeId"], "effects": result["preview"].get("effects"), "isModified": result["preview"]["isModified"]}
     r.ok("change_prepare", ("identity", "completeness"), "change_prepare of group RcRestore", "change_prepare", {"kind": "group_create", "payload": payload, **scope}, prepared)
     change = {"changeId": r.prepared["changeId"]}
     r.ok("change_status", ("identity",), "change_status of the prepared change", "change_status", change,

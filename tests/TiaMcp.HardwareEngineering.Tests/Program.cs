@@ -398,6 +398,18 @@ var sharedDisconnect = new JObject { ["hardwarePath"] = remote, ["connectorIndex
 void SharedOwned(JArray rows) { SharedBase(rows); SharedAssigned(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }
 Check("shared disconnect releases the second controller", "network_io_assign", sharedDisconnect, rows => { rows[3]["network"]["connectors"][1]["system"] = new JObject { ["state"] = "notAssigned" }; rows[1]["addresses"][0]["owners"] = new JArray(); }, true, SharedOwned);
 Check("shared disconnect keeping its owner rejected", "network_io_assign", sharedDisconnect, rows => rows[3]["network"]["connectors"][1]["system"] = new JObject { ["state"] = "notAssigned" }, false, SharedOwned);
+// V21 fails the compile of a submodule left assigned to the leaving PLC (rd1), so a shared disconnect names the leaving PLC's items
+// (sharedSubmodules) and they go to the one remaining PLC: owner and assignment target, with a start in its address space.
+var sharedGiveBack = (JObject)sharedDisconnect.DeepClone(); sharedGiveBack["sharedSubmodules"] = new JArray(module);
+void SharedHeld(JArray rows) { SharedOwned(rows); rows[1]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu2"; }
+void GivenBack(JArray rows) { rows[3]["network"]["connectors"][1]["system"] = new JObject { ["state"] = "notAssigned" }; rows[1]["addresses"][0]["owners"] = new JArray("/cpu1"); rows[1]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu1"; }
+Check("shared disconnect gives its submodule to the remaining PLC", "network_io_assign", sharedGiveBack, GivenBack, true, SharedHeld);
+Check("given-back submodule takes a start of the remaining PLC", "network_io_assign", sharedGiveBack, rows => { GivenBack(rows); rows[1]["addresses"][0]["startAddress"] = 6; }, true, SharedHeld);
+Check("given-back submodule keeping the leaving target rejected", "network_io_assign", sharedGiveBack, rows => { GivenBack(rows); rows[1]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu2"; }, false, SharedHeld);
+Check("given-back address left with the leaving PLC rejected", "network_io_assign", sharedGiveBack, rows => { GivenBack(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }, false, SharedHeld);
+Check("given-back address resized rejected", "network_io_assign", sharedGiveBack, rows => { GivenBack(rows); rows[1]["addresses"][0]["lengthBits"] = 8; }, false, SharedHeld);
+var giveBackTwoPeers = (JObject)sharedGiveBack.DeepClone(); giveBackTwoPeers["sharedAddressControllerOwnerPaths"] = new JArray("/cpu1", "/cpu3");
+Check("shared disconnect with two remaining PLCs rejected", "network_io_assign", giveBackTwoPeers, GivenBack, false, SharedHeld);
 // MRP: the selected interface's one instance takes the requested role and domain; its name, ring ports and every other interface stay.
 JArray Mrp(string role, string domain, string ring = "/P1") => new JArray(new JObject { ["name"] = "MRP1", ["domain"] = domain, ["role"] = role, ["ringPorts"] = new JArray(ring, "/P2") });
 void MrpCaptured(JArray rows) { rows[2]["mrp"] = Mrp("NotInRing", "mrpdomain-1"); rows[3]["mrp"] = Mrp("NotInRing", "mrpdomain-1"); }
@@ -516,6 +528,24 @@ var gsdProfiles = new[] { new JObject { ["typeIdentifier"] = "GSD:F/D", ["firmwa
 HardwareEngineeringRules.RequireVersionlessMatch(gsdProfiles, "GSD:F/D", "V1.0");
 HardwareEngineeringRules.RequireVersionlessMatch(gsdProfiles, "GSD:Other/D", null);
 count += 2;
+// The catalog search names a versionless type's profiles by type alone: its entry's Version is the GSD file name, not a firmware.
+if (!HardwareEngineeringRules.HasProfiles(gsdProfiles, "GSD:F/D") || HardwareEngineeringRules.HasProfiles(gsdProfiles, "GSD:Other/D")
+    || !HardwareEngineeringRules.HasProfiles(HardwareEngineeringRules.BundledProfileList, "OrderNumber:6ES7 131-6BF00-0BA0/V1.1"))
+    throw new Exception("Catalog profile links differ.");
+count++; Console.WriteLine("PASS catalog entries name their type's profiles, versionless ones without a firmware");
+// The bundled I-device GSD head profile (captured in rd1) is selected only by its FirmwareVersion and declares Comment, not InformationText.
+const string gsdHead = "GSD:GSDML-V2.45-SIEMENS-TIAMCPIDEVICE-20261101.XML/DAP/DAP1";
+var gsdProfile = HardwareEngineeringRules.Profile(gsdHead, "V4.1");
+if (gsdProfile == null || HardwareEngineeringRules.Profile(gsdHead, null) != null || !HardwareEngineeringRules.HasProfiles(HardwareEngineeringRules.BundledProfileList, gsdHead))
+    throw new Exception("The bundled GSD head profile is not keyed by its firmware.");
+HardwareEngineeringRules.RequireProfileWritable(gsdProfile, "", null, new[] { "Comment" });
+foreach (var (label, check) in new (string, Action)[] { ("an undeclared head attribute", () => HardwareEngineeringRules.RequireProfileWritable(gsdProfile, "", null, new[] { "InformationText" })),
+    ("another firmware of the GSD head", () => HardwareEngineeringRules.RequireVersionlessMatch(HardwareEngineeringRules.BundledProfileList, gsdHead, "V4.0")) })
+{
+    try { check(); throw new Exception("Bundled GSD profile accepted " + label); }
+    catch (BridgeException error) when (error.Code == "AttributeNotWritable") { count++; Console.WriteLine("PASS bundled GSD profile refuses " + label); }
+}
+count++;
 foreach (var (label, firmware) in new[] { ("another firmware", "V2.0"), ("another firmware format", "1.0"), ("an unreadable firmware", (string)null) })
 {
     try { HardwareEngineeringRules.RequireVersionlessMatch(gsdProfiles, "GSD:F/D", firmware); throw new Exception("Versionless profile mismatch accepted: " + label); }
@@ -565,6 +595,43 @@ Disposition("differing project without outcome holds", false, 5, false, null, "d
 Disposition("differing unsaved project holds", false, -1, false, null, "differs from its checkpoint");
 try { AdmissionReconcileRules.ApplyProject(true, DateTime.SpecifyKind(archived.AddSeconds(-1), DateTimeKind.Local), archived, false, out _); throw new Exception("Local save time accepted"); }
 catch (ArgumentException) { count++; Console.WriteLine("PASS non-UTC save time refused"); }
+// Provisioning reconciliation: storage outside the card from metadata only, and the credential's write-ahead stream.
+if (AdmissionReconcileRules.SavedUtc(DateTime.SpecifyKind(archived, DateTimeKind.Unspecified)) < archived) throw new Exception("An unspecified save time released early");
+count++;
+Newtonsoft.Json.Linq.JObject Entry(string path, bool directory = false, long bytes = 1, long ticks = 10) => new() { ["path"] = path, ["directory"] = directory,
+    ["bytes"] = directory ? null : bytes, ["lastWriteUtcTicks"] = ticks, ["attributes"] = 32 };
+var storageInventory = new Newtonsoft.Json.Linq.JArray(Entry(".download.claim"), Entry("simulation-download.json"), Entry("SIMATIC_MC", true), Entry("SIMATIC_MC/S7_JOB.S7S"));
+void Storage(string name, Newtonsoft.Json.Linq.JArray current, params string[] expected)
+{
+    var differences = AdmissionReconcileRules.ProvisionStorageDifferences(storageInventory, current, "a1");
+    if (differences.Count != expected.Length || expected.Any(e => !differences.Any(d => d.Contains(e)))) throw new Exception(name + ": " + string.Join(" ", differences));
+    count++; Console.WriteLine("PASS " + name);
+}
+var attemptFiles = new[] { Entry("simulation-provision-a1.json"), Entry("simulation-provision-a1.checkpoints.jsonl"), Entry(".provision.claim"), Entry("before-provision.zap21"),
+    Entry("simulation-empty-card-a1", true), Entry("simulation-empty-card-a1/S7_JOB.S7S"), Entry("retain.pms"), Entry("sim_hwdb.ini") };
+Storage("storage with only attempt and runtime files holds", new(new[] { Entry(".download.claim"), Entry("simulation-download.json"), Entry("SIMATIC_MC", true, ticks: 99),
+    Entry("SIMATIC_MC/S7_JOB.S7S", bytes: 7) }.Concat(attemptFiles)));
+Storage("changed baseline file is a difference", new(Entry(".download.claim", ticks: 11), Entry("simulation-download.json")), ".download.claim changed");
+Storage("resized baseline file is a difference", new(Entry(".download.claim", bytes: 2), Entry("simulation-download.json")), ".download.claim changed");
+Storage("missing baseline file is a difference", new(Entry(".download.claim")), "Missing baseline entry simulation-download.json");
+Storage("another attempt's file is a difference", new(Entry(".download.claim"), Entry("simulation-download.json"), Entry("simulation-provision-b2.json")), "simulation-provision-b2.json");
+Storage("a staged protected card left behind is a difference", new(Entry(".download.claim"), Entry("simulation-download.json"), Entry("simulation-protected-card-a1", true)), "simulation-protected-card-a1");
+Storage("a nested runtime-file path is a difference", new(Entry(".download.claim"), Entry("simulation-download.json"), Entry("retain.pms", true), Entry("retain.pms/x")), "retain.pms/x");
+string Record(string phase, bool opened = false, bool armed = false) => new Newtonsoft.Json.Linq.JObject { ["phase"] = phase, ["credentialOpened"] = opened,
+    ["credentialSubmissionAttempted"] = armed, ["credentialSubmissionMayHaveOccurred"] = armed }.ToString(Newtonsoft.Json.Formatting.None);
+void Credential(string name, string[] lines, string expected)
+{
+    string refusal = AdmissionReconcileRules.ProvisionCredentialRefusal(lines);
+    if (expected == null ? refusal != null : refusal?.Contains(expected) != true) throw new Exception(name + ": " + refusal);
+    count++; Console.WriteLine("PASS " + name);
+}
+Credential("never-armed stream proves no credential", new[] { Record("attemptPrepared"), Record("afterPowerOff"), Record("attemptFinalized") }, null);
+Credential("truncated never-armed stream still proves it", new[] { Record("attemptPrepared"), Record("beforeEmptyPowerOn") }, null);
+Credential("armed submission holds", new[] { Record("attemptPrepared"), Record("beforeSetPlcMasterSecret", true, true) }, "credentialOpened");
+Credential("opened credential holds", new[] { Record("attemptPrepared"), Record("openValidatedScratchCredential", true) }, "credentialOpened");
+Credential("torn record holds", new[] { Record("attemptPrepared"), "{\"phase\":\"beforeSetPl" }, "unreadable");
+Credential("empty stream holds", new string[0], "missing");
+Credential("missing flag holds", new[] { Record("attemptPrepared"), "{\"phase\":\"x\"}" }, "credentialOpened");
 foreach (var kind in new[] { "hmi_engineering", "hmi_text_list_import", "hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create", "hmi_dynamization_create", "hardware_attributes", "tag_set", "constant_set", "to_create", "to_parameters", "to_delete" })
     if (AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Target kind treated as recomputable: " + kind); else count++;
 foreach (var kind in new[] { "source_upsert", "hardware_plug", "network_configure", "tag_delete", "constant_delete", "plc_compile", "project_simulation_enable" })

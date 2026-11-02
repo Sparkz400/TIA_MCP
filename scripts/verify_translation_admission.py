@@ -12,7 +12,7 @@ import sys
 from qualify_translation_category_probe import require, scan_store, WindowsFiles
 from qualify_translation_import import FAILURE_CASES, STALE_CODES
 from verify_translation_import import MAIN_COMMENT_VIEWS, accepted_return, workbook, peer
-from verify_watch_workflow import canonical_sha
+from verify_watch_workflow import canonical_sha, rfc8785, sha
 
 
 def load(path): return json.loads(Path(path).read_text(encoding='utf-8-sig'))
@@ -22,12 +22,20 @@ def decoded(call):
     return value.get('structuredContent') or json.loads('\n'.join(c['text'] for c in value['content'] if c['type'] == 'text'))
 
 
+# The packet's Host hashes every record in one form: RFC 8785 since 1 November 2026, the earlier form before.
+# verify() picks it from the forward key; a whole-project or failure packet without one uses the current form.
+FORM = {'hash': lambda value: sha(rfc8785(value).encode('utf-8'))}
+
+
+def form_sha(value): return FORM['hash'](value)
+
+
 def text_sha(value):
-    return canonical_sha({'state': 'empty' if value == '' else 'text', 'text': value, 'richText': False})
+    return form_sha({'state': 'empty' if value == '' else 'text', 'text': value, 'richText': False})
 
 
 def content_sha(rows):
-    return canonical_sha({'targetCulture': 'en-GB', 'rows': {key: {
+    return form_sha({'targetCulture': 'en-GB', 'rows': {key: {
         'worksheet': 'User Texts' if row[0].endswith('sheet1.xml') else 'System Texts',
         'category': row[1], 'viewPath': row[2], 'substitutions': row[4],
         'sourceCulture': 'de-DE', 'sourceSha256': text_sha(row[5]),
@@ -208,7 +216,9 @@ def verify(root):
     require(all(c in FAILURE_CASES for c in cases) and [t['name'] for t in result['trials']] == cases, 'Exact bounded ordered case list required')
     oracle = Oracle(root); checks = [oracle.operation(t) for t in result['trials']]
     if same:
-        key = load(root / 'forward-instance-key.json'); require(key['sha256'] == canonical_sha(key['key']) == result['forwardKeySha256'], 'Exact key digest differs')
+        key = load(root / 'forward-instance-key.json')
+        if key['sha256'] == canonical_sha(key['key']): FORM['hash'] = canonical_sha
+        require(key['sha256'] == form_sha(key['key']) == result['forwardKeySha256'], 'Exact key digest differs')
         preparations = [decoded(load(p)) for p in sorted(root.glob('*-qualification_translation_prepare.json'))]
         by_id = {p['operation']['id']: p for p in preparations}; require(len(by_id) == len(preparations), 'Duplicate prepared operation')
         forward_ids = [t['id'] for t in result['trials']] + [result['finalPreparedOperation']]

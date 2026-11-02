@@ -308,8 +308,7 @@ class FakeClient:
     def prepare(self, kind, payload):
         host = self.host
         # The three profiles are production-admitted for the 1 November kinds; a qualification Host does not change that.
-        # hmi_screen_create has no production profile yet: only a qualification Host of the fixture's profile admits it.
-        admission = "qualification" if kind in ("hmi_screen_create", "hmi_dynamization_create") else "production"
+        admission = route.ADMISSION.get(kind, "production")  # hmi_engineering is refused by check() before admission matters
         code = host.check(kind, payload, admission == "production" or self.admitted == host.profile)
         gate = {"available": code is None, "admission": admission if code is None else None, "targetProfile": host.profile, "reasonCode": code}
         if code:
@@ -453,8 +452,8 @@ class GateRouteRunTests(unittest.TestCase):
                 self.assertEqual("hmi_screen_create", report["kind"])
                 self.assertEqual(9, sum(c.startswith("Refused before any write") for c in report["checks"]))
                 self.assertEqual(3, sum(c.startswith("Independent readback") for c in report["checks"]))
-                self.assertEqual(3, sum(c.startswith("Gate admits this kind and profile (qualification)") for c in report["checks"]))
-                self.assertIn("A production Host refuses the kind before its production admission", report["checks"])
+                self.assertEqual(3, sum(c.startswith("Gate admits this kind and profile (production)") for c in report["checks"]))
+                self.assertIn("A production Host admits the kind with admission production", report["checks"])
 
     def test_binding_route_creates_its_items_then_binds_three_tags(self):
         for profile, errors in (("unified-comfort", 0), ("unified-pc", 2)):

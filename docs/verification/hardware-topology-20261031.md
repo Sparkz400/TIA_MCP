@@ -160,7 +160,9 @@ address-change or GSD step has run natively yet.
 
 - I-devices under a higher-level controller; HMI and drive devices (D10).
 - Absolute `%I`/`%Q` accesses in program code on a replaced module's addresses (only tags are checked).
-- A second project's controller for `OutsideOfProject`; MRP domain attributes, MRP interconnection and MRPD.
+- MRP domain attributes, MRP interconnection and MRPD. A second project's controller for `OutsideOfProject`, the `sharedDevice`
+  disconnect, the port-link and PLC-to-PLC refusals and the channel and versionless profile refusals ran natively on
+  2 November ([record](hardware-refusals-20261102.md)).
 - Profiles of types the run does not create, and of HSP modules not installed here.
 - Native check for the discovery run: every type the run creates is an `OrderNumber:` identifier; a versionless (`System:`,
   `GSD:`) profile (the installed I-device GSD) keys on the item's own `FirmwareVersion` value, and a write whose firmware matches

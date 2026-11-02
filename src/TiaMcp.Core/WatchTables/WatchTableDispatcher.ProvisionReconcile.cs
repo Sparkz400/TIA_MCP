@@ -19,7 +19,7 @@ public sealed partial class WatchTableDispatcher
         var reasons = plan.Refusals(verification);
         if (reasons.Count > 0)
             return new { released = false, held = true, reasons, evidence = observed, admission = record, automaticReplay = false };
-        var dispositions = plan.Dispositions((role, basis) =>
+        var dispositions = plan.Dispositions(verification, (role, basis) =>
             Save(directory, attempt + "-" + role + ".json", new { admissionId = record.Id, role, basis, observation = observed }));
         var completed = admissions.Reconcile(record.Id, record.Revision, dispositions);
         return new { released = true, held = false, admission = completed, evidence = observed, automaticReplay = false };

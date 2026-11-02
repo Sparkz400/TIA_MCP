@@ -1,0 +1,75 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.screen-create.interruption.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T05:10:35+00:00",
+  "source": {
+    "commit": "201f846caa84cc88cf319babd668637888711d20",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Build hbf2 = 201f846c. scripts/qualify_interruption.py sc-* (a new screen on HMI_RT_1) on the desk-configured MTP700 Unified Comfort pair and the seeded WinCC Unified PC RT baseline: worker loss at the checkpoint (held), during the baseline compile, the native write and the compile (released, project unchanged) and after the save (held, persisted); Host loss at the checkpoint, the write and the save (held, journal ends applied with every stage). Reconciliation without replay; 8/8 cases per profile.",
+  "limitations": [
+    "A new screen on one HMI only; item creation shares the apply boundaries but was not interrupted separately; two profiles."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "666b44be760ee6b1aece928d09bc692fdb91fc3ca4777330d0fa2623d5789e1f"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "6419f2aa845b42b7ab70da45764a160f2653655df301c7a0dfff8d2d388ec264"
+    }
+  ],
+  "runs": [
+    {
+      "report": "hk1-report.json",
+      "sha256": "ae789015a2c3607594b1375da3851476397a20308d2f59b922658478d20e38a0",
+      "bytes": 3458161,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "change_prepare",
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "hmi_inspect",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "project_retrieve"
+      ]
+    },
+    {
+      "report": "hk2-report.json",
+      "sha256": "7dd60b8eac9d8838331748410fb5b04d012e5946968ccc24a3eec08049ce50bb",
+      "bytes": 3421261,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "change_prepare",
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "hmi_inspect",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "project_retrieve"
+      ]
+    }
+  ]
+}
