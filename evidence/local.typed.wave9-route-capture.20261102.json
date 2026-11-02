@@ -1,0 +1,123 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.wave9-route-capture.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T11:05:23+00:00",
+  "source": {
+    "commit": "4640a41f6daf0de25f2018bf7399e0673b8dd39d",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/capture_typed_routes_owned.py from frozen commit b2640c66: the 126 independently authored wave 9 route references of route-capture-wave9-packet.v1.json in four runs, each in its own owned TIA V21 project retrieved from the SHA-bound software-unit baseline (sha256 39cea56a...), unit TiaMcp_UnitA: DInt/Real eq..ge and MOVE Int/DInt/Real (runs w9ua, w9na: 30 each), then the TONR storage DB, ADD/SUB/MUL/DIV Int/DInt/Real, TONR local and existing global and R_TRIG/F_TRIG (runs w9ub, w9nb: 33 each), LAD and FBD, in the default unit namespace and in TiaMcp_UnitA.Alternate. Compare, MOVE and arithmetic are SIMATIC SD programs; TONR and R_TRIG/F_TRIG are native derivations of the captured standard references. Each input compiled clean, saved and added exactly its declared blocks while every existing object's XML stayed unchanged; each final snapshot matched a fresh-process reopen; owned cleanup passed. 120 profiles staged, audited (fixtures/typed-graphical/wave9-route-candidates-20261102.audit.json, no findings) and promoted.",
+  "limitations": [
+    "Native reference capture only; builder engineering is recorded separately and runtime is not run.",
+    "No R_TRIG/F_TRIG global storage: V21 marks an edge instance DB know-how protected (local.typed.edge-global-storage.20261030). No created TONR/edge storage on the routes: no route IEC effect members for TONR_TIME, R_TRIG or F_TRIG were captured.",
+    "A first w9ua attempt with its output inside the frozen tree was refused before any engineering change (RecoveryPathTooLong); it is retained at artifacts/et1/artifacts/w9ua and not part of this evidence."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "ff17660e56b9911ea7f7d6023650616eb1b335059b86634a914614294bd47ac1"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "a2140f10b9c5887b64acd3560069b3a93605642a980479ae19c5b6fff5a89c41"
+    }
+  ],
+  "runs": [
+    {
+      "report": "capture.json",
+      "sha256": "a33f753c80026bad412961a24b7747317f074ed5dd65a6b62a68a3eca076a733",
+      "bytes": 74219883,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "capture.json",
+      "sha256": "0ed42e89def6468222fe2f649406b1033e55bab0bb00708968f6403f5ba336b9",
+      "bytes": 88287148,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "capture.json",
+      "sha256": "732a6f54ded89582789845e70f9d7893f375dfbc2532583d4816fcfe2d7e2521",
+      "bytes": 74461307,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "capture.json",
+      "sha256": "208760bcb1d4ccb2464c5c36d23af376a9ece36897bcd3bce99c21983aa2a0d6",
+      "bytes": 88579852,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
