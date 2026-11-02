@@ -8,7 +8,7 @@ static class GateAdmissionTests
     static readonly string[] AllProfiles = { "classic-comfort", "classic-rt-advanced", "classic-basic", "classic-rt-professional", "unified-comfort", "unified-pc" };
     static readonly string[] Kinds = { "hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create", "hmi_dynamization_create", "hmi_event_handler_create" };
     // Kinds with no production profile before their native qualification, and their operations.
-    static readonly Dictionary<string, string[]> Unqualified = new Dictionary<string, string[]> { ["hmi_screen_create"] = new[] { "screen_create", "item_create" }, ["hmi_dynamization_create"] = new[] { "dynamization_set" }, ["hmi_event_handler_create"] = new[] { "event_handler_set" } };
+    static readonly Dictionary<string, string[]> Unqualified = new Dictionary<string, string[]> { ["hmi_dynamization_create"] = new[] { "dynamization_set" }, ["hmi_event_handler_create"] = new[] { "event_handler_set" } };
     const string Screen = "Siemens.Engineering.Hmi.Screen.Screen", TagTable = "Siemens.Engineering.Hmi.Tag.TagTable";
     static string Family(string profile) => profile.StartsWith("classic-", StringComparison.Ordinal) ? "classic" : "unified";
     static void Assert(bool value, string label) { if (!value) throw new Exception(label); }
@@ -16,6 +16,7 @@ static class GateAdmissionTests
     static bool Qualified(string kind, string profile, string operation, string type)
         => kind == "hmi_classic_import" ? profile == "classic-comfort" && (operation == "scalar_property_set" || operation == "classic_xml_import" && (type == Screen || type == TagTable))
             : kind == "hmi_external_tag_create" ? profile is "unified-comfort" or "unified-pc" && operation == "external_tag_create"
+            : kind == "hmi_screen_create" ? profile is "unified-comfort" or "unified-pc" && operation is "screen_create" or "item_create" // 2 November 2026
             : false; // Unqualified kinds: no production profile before their native qualification.
     static bool Open(string kind, string profile, string operation, string type, string qualification)
     {
@@ -40,7 +41,7 @@ static class GateAdmissionTests
                             Assert(open || HmiEngineeringRules.KindGate(kind, Family(profile), profile, operation, type).Value<string>("reasonCode") == "HmiPreservationUnavailable", "reason code");
                             opened += open ? 1 : 0;
                         }
-            Assert(opened == 3 + 2 + 2 * 3, "classic-comfort BackColor (three types), screen and tag-table import; external_tag_create on two profiles (three types each): " + opened);
+            Assert(opened == 3 + 2 + 2 * 3 + 2 * 2 * 3, "classic-comfort BackColor (three types), screen and tag-table import; external_tag_create on two profiles (three types each); screen_create and item_create on two profiles (three types each): " + opened);
             foreach (string kind in new[] { "hmi_engineering", "hmi_text_list_import", "invented", null })
                 Reject(() => HmiEngineeringRules.KindGate(kind, "classic", "classic-comfort", "classic_xml_import", Screen), "unknown kind " + kind);
         });
@@ -76,7 +77,7 @@ static class GateAdmissionTests
                         Assert(gate.Value<bool>("available") == expected && gate.Value<string>("admission") == (expected ? "qualification" : null)
                             && gate.Value<string>("nativeQualification") == "unverified" && gate.Value<string>("reasonCode") == (expected ? null : "HmiPreservationUnavailable"), kind + ": " + gate);
                     }
-            Assert(HmiEngineeringRules.KindGate("hmi_screen_create", "unified", "unified-pc", "screen_create", null).Value<string>("reason").Contains("no profile yet"), "no production profile yet");
+            Assert(HmiEngineeringRules.KindGate("hmi_dynamization_create", "unified", "unified-pc", "dynamization_set", null).Value<string>("reason").Contains("no profile yet"), "no production profile yet");
         });
         check("Classic import opens only for screens and tag tables", () => {
             foreach (string type in new[] { "Siemens.Engineering.Hmi.Screen.ScreenTemplate", "Siemens.Engineering.Hmi.Screen.ScreenPopup", "Siemens.Engineering.Hmi.Screen.ScreenSlidein",
@@ -128,6 +129,15 @@ static class GateAdmissionTests
             Assert(HmiEngineeringRules.Gate("unified", "unified-pc", "event_handler_set").Value<string>("reason").Contains("Change kind hmi_event_handler_create"), "the Unified event-handler kind");
             foreach (var (family, operation) in new[] { ("unified", "scalar_property_set"), ("unified", "classic_xml_import"), ("unified", "tag_create"), ("classic", "external_tag_create"), ("classic", "screen_create"), ("unified", "explicit_binding_set"), ("unified", "object_create") })
                 Assert(!HmiEngineeringRules.Gate(family, "x", operation).Value<string>("reason").Contains("Change kind"), "no kind for " + family + " " + operation);
+        });
+        check("Event-handler scripts are written with CRLF line ends, as V21 stores them; a lone CR refuses", () => {
+            Assert(HmiEngineeringRules.NativeScriptText("a\nb\n") == "a\r\nb\r\n" && HmiEngineeringRules.NativeScriptText("a\r\nb") == "a\r\nb"
+                && HmiEngineeringRules.NativeScriptText("a\r\n\nb") == "a\r\n\r\nb" && HmiEngineeringRules.NativeScriptText("x") == "x", "CRLF form");
+            JObject Handler(string script) => new JObject { ["schemaVersion"] = 1, ["operation"] = "event_handler_set", ["eventType"] = "Tapped", ["script"] = script, ["expectedContentHash"] = new string('a', 64),
+                ["target"] = new JObject { ["family"] = "unified", ["projectCopyId"] = "c", ["sessionGeneration"] = "g", ["hmiPath"] = "/h", ["objectPath"] = "/h/screens/S" } };
+            HmiEngineeringRules.RequireRequest(Handler("// a\nb();\r\n"));
+            Reject(() => HmiEngineeringRules.RequireRequest(Handler("// a\rb();")), "a lone CR");
+            Reject(() => HmiEngineeringRules.RequireRequest(Handler(new string('/', HmiEngineeringRules.MaxScriptLength - 1) + "\n")), "the CRLF form over the bound");
         });
         check("Standing notes only: exactly the kind's notes of one family, no failure, a valid hash", () => {
             JObject Manifest(string family, int targets, params string[] notes) => new JObject { ["family"] = family, ["nativeFailure"] = null, ["observedArtifactsHash"] = new string('e', 64),

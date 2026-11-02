@@ -1,0 +1,102 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.screen-create.route.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T05:10:35+00:00",
+  "source": {
+    "commit": "201f846caa84cc88cf319babd668637888711d20",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Build hbf2 = 201f846c. scripts/qualify_hmi_gate_route.py --kind hmi_screen_create --profile unified-comfort (desk-configured MTP700 Unified Comfort pair) and --profile unified-pc (seeded WinCC Unified PC RT baseline with its two transfer-password errors), each retrieved into an owned project with a Host started --hmi-change-qualification <profile>: refusals before any write (hmi_engineering kind, another operation, existing screen and item names, a size no screen has, a screen property other than Width/Height, a rectangle outside the screen, an item type outside the allowlist, a Classic target); a screen on HMI_RT_1 sized like Overview_A, an HmiIOField on it and an HmiButton on HMI_RT_2's seeded Overview_B, each with every apply stage, compiler problem rows unchanged, compiler scope the owning device only, the created screen or item read back (name, size or rectangle, native type), hmi_inspect of both HMIs and the typed model unchanged outside the created node, same-key replay and other-key RecoveryRequired; checkpoint restore; normal lifecycle of both Hosts and an immediate read-write reopen by a new TIA process, whose production Host still refused the kind (no production profile then). 49/49 checks per profile.",
+  "limitations": [
+    "Two profiles (MTP700 Unified Comfort, WinCC Unified PC RT); screens sized like an existing screen and the allowlisted item types only; texts, styling, screen groups, faceplates and nested containers are not offered.",
+    "Unified preservation compares the tag-table exports and the typed object model; payloads without a public getter stay uncompared (the standing notes). The screens' appearance and runtime behavior are not verified (needs the desk)."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "666b44be760ee6b1aece928d09bc692fdb91fc3ca4777330d0fa2623d5789e1f"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "6419f2aa845b42b7ab70da45764a160f2653655df301c7a0dfff8d2d388ec264"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "d713d635148821195057bfc284343a73e3d99e1a1dd69e9969d146142f78e382",
+      "bytes": 79459,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_retrieve fixture",
+        "change_prepare stale probe",
+        "change_prepare screen on HMI_RT_1",
+        "change_apply screen on HMI_RT_1",
+        "change_prepare HmiIOField on HMI_RT_1 QualificationScreen",
+        "change_apply HmiIOField on HMI_RT_1 QualificationScreen",
+        "change_prepare HmiButton on HMI_RT_2 Overview_B",
+        "change_apply HmiButton on HMI_RT_2 Overview_B",
+        "change_restore HmiButton on HMI_RT_2 Overview_B",
+        "fresh tia_start",
+        "project_open saved original"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hmi_inspect",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    },
+    {
+      "report": "report.json",
+      "sha256": "8a96271faba3b2180e51e62a8fc8388ae308ca0fcd731ec22ad5ac8b02906bff",
+      "bytes": 88181,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_retrieve fixture",
+        "change_prepare stale probe",
+        "change_prepare screen on HMI_RT_1",
+        "change_apply screen on HMI_RT_1",
+        "change_prepare HmiIOField on HMI_RT_1 QualificationScreen",
+        "change_apply HmiIOField on HMI_RT_1 QualificationScreen",
+        "change_prepare HmiButton on HMI_RT_2 Overview_B",
+        "change_apply HmiButton on HMI_RT_2 Overview_B",
+        "change_restore HmiButton on HMI_RT_2 Overview_B",
+        "fresh tia_start",
+        "project_open saved original"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hmi_inspect",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

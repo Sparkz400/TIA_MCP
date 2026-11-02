@@ -1,0 +1,68 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.translation.restricted.empty.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T03:37:47+00:00",
+  "source": {
+    "commit": "1f9e4859a4010028905ac8e6e89d34828418889c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "qualify_translation_import.py --restricted-lifecycle --empty-restricted (run bpem) in an explicit --translation-qualification session on the 1f9e4859 Debug build (artifacts/ap2): a fresh owned scratch; category probes and the Host-filtered captures (5, 1 and 0 of 6 rows); a no-op import of the filtered BlockCommentCategoryData capture; the empty (header-only) Host-filtered AlarmClassDisplayNameCategory capture, keeping no row and listing all 6 native rows as excluded, prepared as a no-op without an admission key (TranslationAdmissionScopeUnqualified) and imported with checkpoint, compile, save and fresh reopen, recovered to a new directory and reconciled; then the Main edit of the block-comment scope with a lost restore reply, reconciled. A scratch-only change_prepare (hardware_add with configureScratchSecurity) passed after the fixture stage and after the no-op import's reopen: the fixture keeps its scratch status (31 October audit).",
+  "limitations": [
+    "One scratch, one PLC, de-DE/en-GB; the empty capture is the fixture's AlarmClassDisplayNameCategory, which no other category scope was exercised as.",
+    "A qualification-mode import: no production admission exists for an empty or alarm-class scope.",
+    "The first attempt on bc162ad2 (run apem) read the prepare's omitted admissionKey and stopped before the empty import; its no-op import and both scratch probes had passed."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 30,
+      "sha256": "1c275ce40cb006c670f4e68601a1ff8c471190939247fe2393fba26a879b3225"
+    },
+    {
+      "name": "net48",
+      "files": 10,
+      "sha256": "7c83b02244cd67d80658167866882392acc24accd98f116f5963f52acdacbfe5"
+    }
+  ],
+  "runs": [
+    {
+      "report": "bp-empty-restricted.json",
+      "sha256": "86420fe033d5d45359ccfbb2d777fcf0b3053bb0aa940e3b2f66abc130a2a46a",
+      "bytes": 14228,
+      "completed": true,
+      "steps": [
+        "bpem: noop",
+        "bpem: empty",
+        "bpem: edit",
+        "bpem: scratchProbes",
+        "bpem: emptyCapture"
+      ],
+      "toolsPassed": [
+        "change_prepare",
+        "project_open",
+        "qualification_translation_apply",
+        "qualification_translation_capture",
+        "qualification_translation_categories",
+        "qualification_translation_fixture",
+        "qualification_translation_prepare",
+        "qualification_translation_reconcile",
+        "qualification_translation_recover",
+        "qualification_translation_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "qualification_translation_apply",
+        "qualification_translation_recover"
+      ]
+    }
+  ]
+}

@@ -62,7 +62,8 @@ BACKCOLOR, ALTERNATE, ADDED_TAG, EXTERNAL = "200, 210, 220", "210, 220, 230", "S
 SCREEN, FIELD, BUTTON = "QualificationScreen", "QualificationField", "QualificationButton"
 # The profiles production admits per kind (HmiEngineeringRules Kinds); the gate reports "production" there and "qualification" on
 # a qualification Host elsewhere (the qualifying runs of local.hmi.*.route.20261101 saw "qualification").
-PRODUCTION = {"hmi_classic_import": ("classic-comfort",), "hmi_external_tag_create": ("unified-comfort", "unified-pc")}
+PRODUCTION = {"hmi_classic_import": ("classic-comfort",), "hmi_external_tag_create": ("unified-comfort", "unified-pc"),
+              "hmi_screen_create": ("unified-comfort", "unified-pc")}
 
 
 def admission(kind, profile):
@@ -135,11 +136,39 @@ def outside(found, family, roots):
     return [row for row in found if not intended(row)]
 
 
+def without(row, keys):
+    """A copy of row without the given dotted keys (a.b removes b inside a)."""
+    row = dict(row)
+    for key in keys:
+        head, _, rest = key.partition(".")
+        if rest and isinstance(row.get(head), dict):
+            row[head] = without(row[head], [rest])
+        else:
+            row.pop(head, None)
+    return row
+
+
 def masked(snapshot, fields):
-    """The snapshot without the row fields an intended change may write (objectPath -> top-level row field), such as the
-    dynamizations metadata hmi_inspect attaches to an item row; every other field of that row stays compared."""
-    return {label: {**section, "rows": {path: ({k: v for k, v in row.items() if k != fields[path]} if path in fields else row) for path, row in section["rows"].items()}}
+    """The snapshot without the row fields an intended change may write (objectPath -> dotted row keys): the behavior rows
+    hmi_inspect attaches to an item and that composition's count in its behaviorCoverage; every other field stays compared."""
+    return {label: {**section, "rows": {path: (without(row, fields[path]) if path in fields else row) for path, row in section["rows"].items()}}
             for label, section in snapshot.items()}
+
+
+def behavior_fields(composition):
+    """The item-row keys a new dynamization or event handler changes (OpennessSession.HmiBehaviors.cs HmiUnifiedBehaviors)."""
+    return (composition, "behaviorCoverage." + composition)
+
+
+def references(client, device, screen_path=None):
+    """Every hmi_references edge of one HMI, page by page (200 per page); item edges only with the screen's screenPath (run hb5)."""
+    edges, offset = [], 0
+    scope = {"screenPath": screen_path} if screen_path else {}
+    while offset is not None:
+        page = client.tool("hmi_references", {"request": {"schemaVersion": 1, "target": device["identity"], "limit": 200, "offset": offset, "maxVisited": 50000, **scope}})
+        edges += page["relationships"]
+        offset = page.get("nextOffset")
+    return edges
 
 
 def unintended(before, after, family, hmi_path=None, roots=(), fields=None):
@@ -319,7 +348,7 @@ def unified_fixture(client, hmis):
         connections = [r["identity"] for r in rows(client, device, "connections").values() if r["name"] == connection]
         table = tags[signal["identity"]["objectPath"].rsplit("/tags/", 1)[0]]["identity"]
         require(len(connections) == 1 and table["kind"] == "hmiTagTable", name + " has no unique connection " + connection + " or LinkedSignal table")
-        edges = client.tool("hmi_references", {"request": {"schemaVersion": 1, "target": device["identity"], "limit": 200, "maxVisited": 50000}})["relationships"]
+        edges = references(client, device)
 
         def declaration(tag):
             found = [e["target"] for e in edges if e.get("relation") == "hmiPlcDeclaration" and e.get("sourcePath") == tag["identity"]["objectPath"] and e.get("resolution") == "resolved"]
@@ -519,7 +548,7 @@ def binding_cases(fx):
                 row = bound_item(client, hmis, fx, hmi, screen, name)
                 found = [d for d in row.get("dynamizations") or [] if d.get("property") == "ProcessValue"]
                 values = (found[0].get("properties") or {}) if len(found) == 1 else {}
-                edges = client.tool("hmi_references", {"request": {"schemaVersion": 1, "target": hmis[hmi]["identity"], "limit": 200, "maxVisited": 50000}})["relationships"]
+                edges = references(client, hmis[hmi], path.rsplit("/items/", 1)[0])
                 chain = [(e.get("resolution"), (e.get("target") or {}).get("objectPath")) for e in edges
                          if e.get("relation") == "hmiScreenItemTag" and e.get("sourcePath") == path and e.get("sourceProperty") == "Dynamizations/ProcessValue/Tag"]
                 plc = sum(e.get("relation") == "hmiPlcDeclaration" and e.get("sourcePath") == tag_path and e.get("resolution") == "resolved" for e in edges)
@@ -527,7 +556,7 @@ def binding_cases(fx):
                 expected = {"tag": tag_name, "type": "Tag", "indirect": False, "chain": [("resolved", tag_path)], "plcDeclarations": 1 if tag_name != "SharedValue" else 0}
                 return observed == expected, None if observed == expected else {"expected": expected, "observed": observed}
             return {"label": "ProcessValue of %s %s on %s <- %s" % (item_type, name, hmi, tag_name), "hmi": hmi, "payload": binding_payload(item, tag),
-                    "roots": [path + "/dynamizations/ProcessValue"], "fields": {path: "dynamizations"}, "verify": verify}
+                    "roots": [path + "/dynamizations/ProcessValue"], "fields": {path: behavior_fields("dynamizations")}, "verify": verify}
         return build
     return [bound(*row) for row in BOUND if row[4]]
 
@@ -540,6 +569,7 @@ def binding_reopen(client, hmis, fx):
 
 # Untrusted script text, stored verbatim and never executed, evaluated or syntax-checked (HmiEngineeringRules.MaxScriptLength).
 SCRIPT = "// TIA MCP qualification: stored verbatim, never executed.\nHMIRuntime.Trace('qualification');\n"
+STORED_SCRIPT = SCRIPT.replace("\n", "\r\n")  # V21 keeps ScriptCode with CRLF line ends (run hn1); the worker writes this form.
 PREFERRED_EVENTS = ("Loaded", "Tapped", "Activated", "Up")
 UNDOCUMENTED_EVENT = "QualificationUndocumented"
 
@@ -616,12 +646,12 @@ def handler_cases(fx):
                 found = [h for h in handler_row(client, hmis[hmi], owner).get("eventHandlers") or [] if (h.get("properties") or {}).get("EventType") == event]
                 script = (found[0].get("script") or {}) if len(found) == 1 else {}
                 observed = {"handlers": len(found), "scriptCode": script.get("scriptCode"), "sha256": script.get("scriptCodeSha256"), "executed": script.get("scriptsExecuted")}
-                expected = {"handlers": 1, "scriptCode": SCRIPT, "sha256": digest(SCRIPT.encode("utf-8")), "executed": False}
+                expected = {"handlers": 1, "scriptCode": STORED_SCRIPT, "sha256": digest(STORED_SCRIPT.encode("utf-8")), "executed": False}
                 return observed == expected, None if observed == expected else {"expected": expected, "observed": observed}
             case = {"label": "%s handler of %s %s on %s" % (event, role, owner["name"], hmi), "hmi": hmi, "payload": handler_payload(owner, event),
                     "roots": [path + "/eventHandlers/" + event], "verify": verify}
             if role == "item":
-                case["fields"] = {path: "eventHandlers"}
+                case["fields"] = {path: behavior_fields("eventHandlers")}
             return case
         return build
     return [handled(index) for index in range(3)]

@@ -244,10 +244,12 @@ def prepare_dynamization(scenario, client):
 
 
 def dynamization_present(client):
-    from qualify_hmi_gate_route import BOUND, binding_fixture, bound_item, devices
+    """The ProcessValue binding of the setup IOField; absent too while the item itself does not exist (before the setup, run hd1)."""
+    from qualify_hmi_gate_route import BOUND, binding_fixture, devices, rows
     hmis = devices(client, "unified")
     hmi, screen, item, _, tag = BOUND[0]
-    row = bound_item(client, hmis, binding_fixture(client, hmis), hmi, screen, item)
+    screen_path = binding_fixture(client, hmis)[hmi]["screens"][screen]["identity"]["objectPath"]
+    row = rows(client, hmis[hmi], "items", screenPath=screen_path).get(screen_path + "/items/" + item) or {}
     return any(d.get("property") == "ProcessValue" and (d.get("properties") or {}).get("Tag") == tag for d in row.get("dynamizations") or [])
 
 
@@ -260,11 +262,11 @@ def prepare_event_handler(scenario, client):
 
 
 def event_handler_present(client):
-    from qualify_hmi_gate_route import SCRIPT, devices, rows, screen_fixture
+    from qualify_hmi_gate_route import STORED_SCRIPT, devices, rows, screen_fixture
     device = devices(client, "unified")["HMI_RT_1"]
     path = screen_fixture(client, {"HMI_RT_1": device})["HMI_RT_1"]["screens"]["Overview_A"]["identity"]["objectPath"]
     row = rows(client, device, "screens", objectPath=path).get(path) or {}
-    return any((h.get("script") or {}).get("scriptCode") == SCRIPT for h in row.get("eventHandlers") or [])
+    return any((h.get("script") or {}).get("scriptCode") == STORED_SCRIPT for h in row.get("eventHandlers") or [])
 
 
 def prepare_text_list(scenario, client):

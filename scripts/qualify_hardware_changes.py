@@ -34,6 +34,10 @@ instead of failing: a key-discovery pass that fixes the expectations, never evid
 search names a profile; a write the profile does not declare is refused) and a checkpoint restore of each topology change the
 full run applied without one (the shared-device assignment, OutsideOfProject, the createDomain manager, the IM 155-5 client).
 --slice gsd runs only the installed I-device GSD device and what it needs (see gsd_slice).
+--slice delete-rule plugs one DI module and checks that hardware_delete refuses compile=false (see delete_rule_slice).
+--slice refusals runs the native refusals and paths the full run lacks (see refusal_slice): the MRP port-link rule both ways, a
+PLC-to-PLC shared-device access, channel and versionless capability-profile refusals, the sharedDevice disconnect, an address change
+that moves the start address, and a second owned scratch whose CPU takes the module the first project set OutsideOfProject.
 """
 from __future__ import annotations
 
@@ -72,6 +76,8 @@ IM_SP, SERVER = "OrderNumber:6ES7 155-6AU02-0BN0/V6.4", "OrderNumber:6ES7 193-6P
 SP = Station("HwSp", None, "HwPeer", "HwPeerCpu", "HwSpHead~", ("HwSpHead", "items", "PROFINET%20interface"))
 SP_DI, WIDE_DI = ("DI 8x24VDC ST", "6ES7 131-6BF"), ("DI 32x24VDC HF", "6ES7 521-1BL")
 SHARED_IO, RING = "HwScratchIo", "HwRing"
+# The same ET 200SP station in a second project, assigned to that project's own scratch CPU (refusal slice).
+SP2, OTHER_IO = SP._replace(plc_device="ScratchStation", plc="ScratchPLC"), "HwOtherIo"
 GSD_DESIGNATION = "TiaMcpIDevice"  # The I-device designation scripts/qualify_gsd_export.py exports; an operator installs that GSD in TIA.
 DEVICES = (CPU, S7_1200, IM, IM_SP)  # Types the run creates with hardware_add; every other profiled type is plugged or generated.
 # An IO controller's cyclic IO bandwidth is computed at the device compile and not saved (a fresh open reads 0), so it is not compared.
@@ -116,12 +122,33 @@ SLICE_LIMITATIONS = [
     "creating domain HwRing and the IM 155-5 PN ST joining it as client; the members' ports stay unlinked, so no ring is closed.",
     "Engineering only; nothing is downloaded and no physical topology is observed.",
 ]
+DELETE_SLICE_LIMITATIONS = [
+    "--slice delete-rule: one owned scratch CPU 1511-1 PN V4.1 with one DI 16x24VDC HF (6ES7 521-1BH00-0AB0) plugged at slot 2. hardware_delete of it "
+    "refuses compile=false (InvalidRequest, the delete and rename rule of the 31 October audit) before its checkpoint, then applies with compile and "
+    "save; no reopen and no restore.",
+    "Engineering only; nothing is downloaded and no physical topology is observed.",
+]
 GSD_SLICE_LIMITATIONS = [
     "--slice gsd: one owned scratch CPU 1511-1 PN V4.1 and an added CPU 1511-1 PN V4.1 (configureScratchSecurity) on HwNet with an ET 200MP IM 155-5 PN ST V4.1 "
     "station, whose assignment creates the IO system HwPeerIo; the scratch CPU stays off HwNet; no S7-1200, ET 200SP, port links or reopen.",
     "GSD device: the I-device GSD that scripts/qualify_gsd_export.py exports (designation TiaMcpIDevice), installed by an operator in TIA (V21 Openness has no GSD "
     "installation API); added and put on HwNet with checkpoint but without compile (an unassigned IO device fails the device compile), then assigned to HwPeerIo "
     "with compile and save, that assignment restored once and applied again. No modules are plugged into the GSD device; nothing is downloaded.",
+]
+REFUSAL_LIMITATIONS = [
+    "--slice refusals: one owned scratch CPU 1511-1 PN V4.1 and an added CPU 1511-1 PN V4.1 (configureScratchSecurity) on HwNet, two DI 16x24VDC HF in the scratch "
+    "rack, one ET 200SP IM 155-6 PN ST V6.4 station whose assignment creates HwPeerIo, with three catalog-selected DI 8x24VDC ST, and the operator-installed "
+    "I-device GSD device on HwPeerIo; no S7-1200, ET 200MP or reopen.",
+    "Refusals: the MRP port-link rule both ways (Manager on the scratch CPU while its Port_2 links HwPeerCpu's non-ring Port_2; NotInRing on HwPeerCpu while that "
+    "link joins two ring ports), a direct PLC-to-PLC shared-device access (SpDi from HwPeerCpu to the scratch CPU), a channel write the DI 8x24VDC ST profile "
+    "declares read-only (InputDelay) and a write the GSD head's versionless profile, keyed by its FirmwareVersion, does not declare (InformationText). A firmware "
+    "matching no versionless profile stays offline: the installed GSD has one DAP with one firmware.",
+    "Applied and restored: the sharedDevice disconnect of the scratch CPU's connector, and HwDi replaced by a catalog-selected DI 32x24VDC HF whose wider input "
+    "range moves its start past HwDi2 (acceptAddressChange with one acknowledged tag, whose absolute address is not rewritten).",
+    "Second project: a second owned scratch whose CPU 1511-1 PN V4.1 assigns the same ET 200SP station (same device name and address) with the same DI modules; "
+    "SpDi4, outside the first project, is its own, SpDi3 and SpDi are OutsideOfProject with two external IO controllers. Head, interface, ports and server "
+    "module stay assigned in both projects; V21 checks nothing across projects, so the runner compares the two stations.",
+    "Engineering only; nothing is downloaded and no physical topology is observed.",
 ]
 PROFILE_LINK = "contracts/hardware-catalog-profiles.v1.json#"  # hardware_catalog_search's profile reference: the contract path, #, the typeIdentifier.
 
@@ -202,7 +229,9 @@ class Run(StateRun):
                 self.profiled[identifier]["items"] = hardware_profiles.merge(self.profiled[identifier]["items"], rows)
             else:
                 firmware = next((a.get("value") for a in self.raw[path].get("attributes") or [] if a["name"] == "FirmwareVersion" and isinstance(a.get("value"), str)), None)
-                self.profiled[identifier] = {"path": path, "kind": "device" if identifier in DEVICES else "module", "items": rows, "firmware": firmware}
+                # A GSD device's head (its DAP) is added with hardware_add, like the IM heads.
+                kind = "device" if identifier in DEVICES or identifier.startswith("GSD:") else "module"
+                self.profiled[identifier] = {"path": path, "kind": kind, "items": rows, "firmware": firmware}
 
     def state(self):
         state = self.domains()
@@ -362,30 +391,35 @@ def head_items(run, device, head):
     return lambda applied, state: [key for key in under(run.path(device, "items", head))(applied, state) if key.startswith("hw:")]
 
 
-def sp_station(run):
-    """The ET 200SP head joins HwPeerIo (no new IO system) with its declared generated server module, which then moves to slot 4 to
-    free the DI slots, as in the remote-I/O runner. Returns the station with its rack."""
+def sp_station(run, station=SP, io_system=None):
+    """The ET 200SP head joins the IO system of its station's PLC (HwPeerIo, or io_system, which the assignment creates) with its
+    declared generated server module, which then moves to slot 4 to free the DI slots, as in the remote-I/O runner. Returns the
+    station with its rack."""
+    SP = station  # The station's device, head and interface names; its PLC owns the controller.
     run.apply("add ET 200SP station " + SP.device, "hardware_add", {"typeIdentifier": IM_SP, "deviceName": SP.device, "itemName": "HwSpHead"},
               {"effects": [{"createDevice": SP.device, "typeIdentifier": IM_SP}]}, added=under(run.path(SP.device)),
               rows={run.hw(SP.device, "items", "HwSpHead"): {"typeIdentifier": IM_SP}}, deferred=True)
     node(run, SP.device, SP.interface, "192.168.0.5", deferred=True)
     station_ = SP._replace(rack=rack(run, SP.device, "HwSpHead"))
-    device, controller = run.path(SP.device, "items", *SP.interface), run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET%20interface_1")
+    owner = run.path(SP.plc_device, "items", SP.plc)
+    device, controller = run.path(SP.device, "items", *SP.interface), owner + "/items/PROFINET%20interface_1"
     view = run.current["view"]
     name = SERVER_MODULE_NAMES.get(view["hw:" + device]["name"])
     require(name, "No captured server-module name for the interface name %r" % view["hw:" + device]["name"])
     rail, server = run.path(SP.device, "items", station_.rack), run.path(SP.device, "items", quote(name, safe=""))
     author = view[run.hw(SP.device, "items", "HwSpHead")]["attributes"]["Author"]
-    payload = {"hardwarePath": device, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0,
+    payload = {"hardwarePath": device, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0, **({"createIoSystemName": io_system} if io_system else {}),
                "expectedServerModule": {"name": name, "typeIdentifier": SERVER, "containerHardwarePath": rail, "positionNumber": 1,
                                         "attributes": {"AdditionalInformation": "", "Author": author, "Comment": "", "LocationIdentifier": "", "Name": name, "PlantDesignation": ""}}}
-    generated = lambda applied, state: [key for key in state if key.startswith(constant(run, SP, SP.prefix))] + under(server)(applied, state)
+    # A created IO system adds its system constant (Local~<name>) to the PLC's default tag table, as the ET 200MP assignment does.
+    prefixes = (constant(run, SP, SP.prefix),) + ((constant(run, SP, "Local~" + io_system),) if io_system else ())
+    generated = lambda applied, state: [key for key in state if key.startswith(prefixes)] + under(server)(applied, state)
     # The ports of the head's interface sit on the BusAdapter beside it (observed hw2); they take SharedDeviceAccessType PLC as well.
     adapter = [key for key in run.current["view"] if key.startswith(run.hw(SP.device, "items", "")) and "/items/Port_" in key and "/HwSpHead/" not in key]
     # The second effect is the declared generated server contract.
-    run.apply("assign %s to HwPeerCpu" % SP.device, "network_io_assign", payload,
-              {"effects": [{"hardwarePath": device, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False, "sharedDevice": False}, {}]},
-              shown={**payload, "addressControllerOwnerPath": run.path("HwPeer", "items", "HwPeerCpu")},
+    run.apply("assign %s to %s" % (SP.device, SP.plc), "network_io_assign", payload,
+              {"effects": [{"hardwarePath": device, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": io_system or IO_SYSTEM, "disconnect": False, "sharedDevice": False}, {}]},
+              shown={**payload, "addressControllerOwnerPath": owner}, plc=owner + "/plc/" + SP.plc,
               changed=lambda applied, state: head_items(run, SP.device, "HwSpHead")(applied, state) + adapter + ["hw:" + controller], added=generated)
     run.apply("move %s's server module to slot 4" % SP.device, "hardware_move", {"hardwarePath": server, "positionNumber": 4},
               {"effects": [{"hardwarePath": server, "positionBefore": 1, "positionAfter": 4}]}, changed=["hw:" + server, "inv:" + server],
@@ -434,20 +468,21 @@ def shared_device(run, restore=False):
                      added=generated, restore=restore, boundary=True) is not None
 
 
-def shared_access(run, name, access, shared, external=None, target=None, restore=False):
+def shared_access(run, name, access, shared, external=None, target=None, restore=False, station=SP):
     """One ET 200SP module's shared-device access: OutsideOfProject, or PLC with the PLC item target. The worker records the PLCs of the
-    station's IO systems (HwPeerCpu, and ScratchPLC while the station is shared) as its address owners. external also sets
+    station's IO systems (its own PLC, HwPeerCpu, and ScratchPLC while the station is shared) as its address owners. external also sets
     NumberOfExternalIoControllers of the station's interface, which TIA may require once a module is accessed outside the project.
     True when applied."""
-    module, interface = run.path(SP.device, "items", name), run.path(SP.device, "items", *SP.interface)
+    SP = station  # The station's device and interface names; its PLC owns the first IO system.
+    module, interface, own = run.path(SP.device, "items", name), run.path(SP.device, "items", *SP.interface), run.path(SP.plc_device, "items", SP.plc)
     payload = {"hardwarePath": module, "accessType": access, **({"assignmentTargetPath": target} if target else {}), **({"externalIoControllers": external} if external else {})}
-    owners = sorted([run.path("HwPeer", "items", "HwPeerCpu")] + ([run.path("ScratchStation", "items", "ScratchPLC")] if shared else []))
+    owners = sorted([own] + ([run.path("ScratchStation", "items", "ScratchPLC")] if shared else []))
     shown = {**payload, "addressControllerOwnerPaths": owners, **({"ioDeviceInterfacePath": interface} if external else {})}
     return run.apply("set %s's shared-device access %s%s" % (name, access, " with %d external controller(s)" % external if external else ""), "hardware_shared_device_access", payload,
                      {"effects": [{"hardwarePath": module, "accessAfter": access}]}, shown=shown,
                      changed=lambda applied, state: hw_under(run, module, state) + (["hw:" + interface] if external else []), rows={"hw:" + module: {"attributes": {"SharedDeviceAccessType": access}}},
                      removed=[constant(run, SP, SP.prefix + name)] if access == "OutsideOfProject" else (),
-                     added=[constant(run, SP, SP.prefix + name)] if access == "PLC" and target == run.path("HwPeer", "items", "HwPeerCpu") else (),
+                     added=[constant(run, SP, SP.prefix + name)] if access == "PLC" and target == own else (),
                      restore=restore, boundary=True) is not None
 
 
@@ -530,10 +565,10 @@ def topology_refusals(run):
     run.refuse("hardware_shared_device_access", "a module of a CPU station", {"hardwarePath": module, "accessType": "OutsideOfProject"}, "UnsupportedCapability")
 
 
-def address_change(run):
+def address_change(run, moved=False):
     """A tag on HwDi's first input bit, then HwDi replaced by a catalog-selected DI 32x24VDC HF with acceptAddressChange: refused until
     the tag is acknowledged, then applied and restored. The new module's input range is four bytes instead of two, so the tagged
-    range changes whether TIA keeps or moves its start."""
+    range changes whether TIA keeps or moves its start; moved requires the start to move (HwDi2 holds the bytes after HwDi's)."""
     module, view = run.path("ScratchStation", "items", "HwDi"), run.current["view"]
     start = min(a["startAddress"] for key, row in view.items() if key == "hw:" + module or key.startswith("hw:" + module + "/")
                 for a in row["addresses"] or [] if a["ioType"] == "Input" and a.get("length", 0) > 0)
@@ -552,6 +587,10 @@ def address_change(run):
         rows = [row for row in applied["readbacks"] if row.get("role") == "hardware-replace-inventory"]
         require(len(rows) == 1 and any(entry["changed"] for entry in rows[0]["addressMap"]) and [t["path"] for t in rows[0]["changedReferencedTags"]] == [tag],
                 "The replacement's address map or tag impact differs: %s" % rows)
+        tagged = rows[0]["changedReferencedTags"][0]
+        after = (tagged.get("rangeAfter") or {}).get("startAddress")
+        run.h.report.setdefault("selected", {})["addressStart"] = {"before": tagged["startAddress"], "after": after}
+        require(not moved or after not in (None, tagged["startAddress"]), "The replacement did not move the tagged range's start: %s" % tagged)
     run.b0 = run.current
     run.apply("replace HwDi with %s moving its address" % wide, "hardware_replace", {**payload, "acknowledgedTags": [tag]},
               {"effects": [{"hardwarePath": module, "typeIdentifierAfter": wide, "acceptAddressChange": True}], "addressImpact": {"referencedTags": [{"path": tag}]}},
@@ -772,9 +811,10 @@ def phase_b(run):
     address_change(run)
 
 
-def profiles(run):
-    """Module capability profiles of every type the run's snapshots showed: its catalog entry and the CanPlugNew outcome at slots 1-4
-    of one rack per rack type in the final configuration (prepare only, nothing applied), written to profiles.json."""
+def profiles(run, only=None):
+    """Module capability profiles of every type the run's snapshots showed (only: of these type identifiers): its catalog entry and the
+    CanPlugNew outcome at slots 1-4 of one rack per rack type in the final configuration (prepare only, nothing applied), written to
+    profiles.json."""
     def capture():
         racks = {}
         for path, item in run.raw.items():
@@ -783,7 +823,7 @@ def profiles(run):
                 racks.setdefault(item.get("typeIdentifier") or item["name"], path)
         occupied = {(path[len(run.base):].split("/items/")[0], run.raw[path]["positionNumber"]): run.raw[path]["typeIdentifier"] for path in run.modules()}
         rows = []
-        for identifier, captured in sorted(run.profiled.items()):
+        for identifier, captured in sorted(item for item in run.profiled.items() if only is None or item[0] in only):
             article = identifier.split(":", 1)[-1].split("/", 1)[0]
             entry = next((e for e in run.h.tool("hardware_catalog_search", {"filter": article, "maxItems": 500})["entries"] if e["typeIdentifier"] == identifier), None)
             rules = []
@@ -851,6 +891,27 @@ def restore_slice(run):
     run.expect(not missing and run.coverage.get("hardware_attributes", {}).get("refused"), "coverage", "Slice kinds without a restore or the profile refusal: %s" % missing)
 
 
+def delete_rule_slice(run):
+    """--slice delete-rule: HwDi in the scratch rack; hardware_delete with compile=false is refused before the checkpoint, then applies compiled."""
+    plug(run, "HwDi", 2)
+    module = run.hw(SCRATCH.device, "items", "HwDi")
+    prepared = run.prepare("delete HwDi", "hardware_delete", {"hardwarePath": module[3:]},
+                           {"effects": [{"deleteHardwarePath": module[3:], "positionNumber": int(run.current["view"][module]["positionNumber"])}]})
+
+    def refused():
+        before = run.state()
+        error = run.h.call_error("change_apply", {**run.h.apply_args(prepared), "compile": False, "save": False})
+        require(error.get("code") == "InvalidRequest" and "compile=true" in (error.get("message") or ""),
+                "Expected the compile=true refusal, observed %s: %s" % (error.get("code"), error.get("message")))
+        status = run.h.tool("change_status", {"changeId": prepared["changeId"]})
+        require(status["state"] == "prepared" and not status["stages"] and not status["recoveryArchive"] and run.state() == before,
+                "The refused delete changed the change state or the project")
+        return {"error": error, "state": status["state"]}
+    run.h.stage("refuse apply hardware_delete: compile=false", refused)
+    run.mark("hardware_delete", "refused", "InvalidRequest")
+    run.finish("delete HwDi", "hardware_delete", prepared, removed=under(module[3:], constant(run, SCRATCH, SCRATCH.prefix + "HwDi"))(None, run.current["view"]))
+
+
 def gsd_slice(run):
     """--slice gsd: the GSD catalog search first; with an installed I-device GSD, only what gsd_device needs (the added CPU HwPeer on
     HwNet and its IO system HwPeerIo, which the ET 200MP assignment creates), then the GSD device added and put on HwNet without
@@ -870,12 +931,161 @@ def gsd_slice(run):
                    "The GSD slice qualifies only when the GSD device's assignment applied and restored.")
 
 
+def message(run, label, error, *parts):
+    """The refusal's message names every part (the rule that refused, not another check with the same code)."""
+    text = error.get("message") or ""
+    run.expect(all(part in text for part in parts), label, "The refusal message lacks %s: %s" % ([part for part in parts if part not in text], text))
+
+
+def channel_gate(run, identifier):
+    """A channel write SpDi3's capability profile declares read-only (InputDelay of a DI 8x24VDC ST channel) is refused by the profile."""
+    channel = {"hardwarePath": run.path(SP.device, "items", "SpDi3", "items", "SpDi3"), "channelNumber": 0, "channelType": "Digital", "channelIoType": "Input",
+               "attributes": {"InputDelay": 3}}
+    error = run.refuse("hardware_channel_attributes", "a channel write the module's capability profile declares read-only", channel, "AttributeNotWritable")
+    message(run, "profiles", error, "capability profile of " + identifier, "InputDelay", "this channel")
+
+
+def versionless_gate(run, identifier):
+    """The I-device GSD's bundled profile, keyed by its head's FirmwareVersion (a GSD: identifier names no firmware): the catalog search
+    names it, and a write it does not declare (InformationText on the head) is refused by it."""
+    entry = (run.h.report.get("gsdCatalog") or [{}])[0]
+    run.expect(entry.get("profile") == PROFILE_LINK + identifier, "profiles", "hardware_catalog_search does not name the profile of %s: %s" % (identifier, entry))
+    error = run.refuse("hardware_attributes", "a write the GSD head's versionless profile does not declare",
+                       {"hardwarePath": run.path("HwGsd", "items", "HwGsdHead"), "attributes": {"InformationText": "HwText"}}, "AttributeNotWritable")
+    message(run, "profiles", error, "capability profile of " + identifier)
+
+
+def shared_refusal(run):
+    """A module of HwPeerCpu straight to the shared device's other PLC: the worker covers only the route through OutsideOfProject."""
+    payload = {"hardwarePath": run.path(SP.device, "items", "SpDi"), "accessType": "PLC", "assignmentTargetPath": run.path("ScratchStation", "items", "ScratchPLC")}
+    error = run.refuse("hardware_shared_device_access", "a direct move between the station's two PLCs", payload, "UnsupportedCapability")
+    message(run, "shared access", error, "direct move between two PLCs")
+
+
+def shared_disconnect(run):
+    """The ET 200SP interface's connector 1 leaves the scratch CPU's IO system (sharedDevice disconnect) and gives SpDi3 back to
+    HwPeerCpu in the same change: V21 fails the compile of a submodule left assigned to the leaving PLC (rd1). Applied and restored.
+    True when applied."""
+    device, owner, peer = run.path(SP.device, "items", *SP.interface), run.path("ScratchStation", "items", "ScratchPLC"), run.path("HwPeer", "items", "HwPeerCpu")
+    module = run.path(SP.device, "items", "SpDi3")
+    payload = {"hardwarePath": device, "connectorIndex": 1, "disconnect": True, "sharedDevice": True, "sharedSubmodules": [module]}
+    run.b0 = run.current
+    # The inverse of the shared assignment's constants: the scratch CPU's station constants go, SpDi3's returns to HwPeerCpu; the
+    # emptied IO system HwScratchIo stays with its constant. The scratch CPU's interface lists no assigned connector (and TIA
+    # clears its LoadLimitation, rq1).
+    gone = [key for key in run.current["view"] if key.startswith(constant(run, SCRATCH, SP.prefix))]
+    controller = owner + "/items/PROFINET%20interface_1"
+    return run.apply("disconnect %s's shared connector, restored" % SP.device, "network_io_assign", payload,
+                     {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": SHARED_IO, "afterIoSystem": None, "disconnect": True, "sharedDevice": True,
+                                   "sharedSubmodules": [{"hardwarePath": module, "assignmentTargetBefore": owner, "assignmentTargetAfter": peer}]}]},
+                     shown={**payload, "addressControllerOwnerPath": owner, "sharedAddressControllerOwnerPaths": [peer]}, plc=scratch_plc(run),
+                     changed=["hw:" + device, "hw:" + controller, "hw:" + module + "/items/SpDi3"], removed=gone, added=[constant(run, SP, SP.prefix + "SpDi3")],
+                     restore=True, boundary=True) is not None
+
+
+def link_refusals(run):
+    """The MRP port-link rule both ways, natively: with the two CPUs' Port_2 linked as plain ports a ring role is refused, and once both
+    hold ring roles (set while unlinked) and are linked again, NotInRing on one of them is refused."""
+    manager, client = interfaces(run)[:2]
+    link(run, "hardware_port_connect", 2)
+    error = run.refuse("network_mrp_set", "a ring role on a port linked to a non-ring port", {"hardwarePath": manager, "role": "Manager", "domainName": RING, "createDomain": True},
+                       "NetworkPrerequisite")
+    message(run, "ring links", error, "would be a ring port while linked to", "which is not a ring port")
+    link(run, "hardware_port_disconnect", 2)
+    if mrp(run, manager, "Manager", RING, create=True) and mrp(run, client, "Client", RING):
+        link(run, "hardware_port_connect", 2, label="Port_2 between ring members")
+        error = run.refuse("network_mrp_set", "NotInRing on a port linked to a ring port", {"hardwarePath": client, "role": "NotInRing"}, "NetworkPrerequisite")
+        message(run, "ring links", error, "would leave the ring while linked to", ", a ring port")
+
+
+def complementary(run, first):
+    """The two projects' ET 200SP stations: the same DI modules at the same slots, each owned (SharedDeviceAccessType PLC) in exactly
+    one project, and each interface counting the other project's IO controllers of the station as external."""
+    def rows(base, view):
+        prefix = "hw:" + base + SP.device + "/items/"
+        return {key[len(prefix):]: row for key, row in view.items() if key.startswith(prefix)}
+    def check():
+        stations, modules = (rows(*first), rows(run.base, run.current["view"])), {}
+        for name in ("SpDi3", "SpDi", "SpDi4"):
+            modules[name] = [{"typeIdentifier": row["typeIdentifier"], "positionNumber": row["positionNumber"], "access": row["attributes"].get("SharedDeviceAccessType")}
+                             for row in (station_[name] for station_ in stations)]
+            first_, second = modules[name]
+            require({**first_, "access": None} == {**second, "access": None} and sorted((first_["access"], second["access"])) == ["OutsideOfProject", "PLC"],
+                    "The two projects' %s differ or share an owner: %s" % (name, modules[name]))
+        interface = "/".join(SP.interface)
+        counts = [station_[interface]["attributes"].get("NumberOfExternalIoControllers") for station_ in stations]
+        # The first project's two PLCs (HwPeerCpu and the scratch CPU) are outside the second; the second's CPU is outside the first.
+        require(counts == [1, 2], "External IO controller counts differ: %s" % counts)
+        run.h.report["secondProject"] = {"modules": modules, "externalIoControllers": counts}
+        return run.h.report["secondProject"]
+    run.h.stage("the two projects share the ET 200SP station complementarily", check)
+
+
+def second_project(run, module, first):
+    """A second owned scratch: its own CPU on HwNet (192.168.0.6) takes the same ET 200SP station into a new IO system HwOtherIo, with
+    the same DI modules; SpDi4, which the first project set OutsideOfProject, stays its own, SpDi3 and SpDi go OutsideOfProject with
+    the first project's two PLCs as external IO controllers. first: the first project's (base, final view)."""
+    h = run.h
+    h.stage("close the first project", lambda: h.tool("tia_detach"))
+    h.owned_scratch("second project")
+    status = h.tool("tia_session_status")["projects"][0]
+    run.project, run.base = status["path"], "/projects/%s/devices/" % status["name"]
+    run.plc = scratch_plc(run)
+    run.current = run.snap("second project baseline")
+    node(run, "ScratchStation", ("ScratchPLC", "items", "PROFINET%20interface_1"), "192.168.0.6")
+    station_ = sp_station(run, SP2, OTHER_IO)
+    plug(run, "SpDi3", 1, station_, module, changed=["hw:" + run.path(SP.device, "items", *SP.interface)])
+    for name, slot in (("SpDi", 2), ("SpDi4", 3)):
+        plug(run, name, slot, station_, module)
+    shared_access(run, "SpDi3", "OutsideOfProject", False, external=2, station=SP2)
+    shared_access(run, "SpDi", "OutsideOfProject", False, station=SP2)
+    complementary(run, first)
+
+
+def refusal_slice(run):
+    """--slice refusals: the native refusals and paths the full run lacks, in one owned scratch, then a second owned scratch.
+    HwDi and HwDi2 fill the scratch rack's first input bytes, so HwDi's wider replacement moves its start; the ET 200SP station's
+    assignment creates HwPeerIo, which the GSD device joins; the shared device then gives SpDi3 to the scratch CPU."""
+    add_cpu(run, "add CPU HwPeer", "HwPeer")
+    network(run)
+    plug(run, "HwDi", 2)
+    plug(run, "HwDi2", 3)
+    address_change(run, moved=True)
+    sp = sp_station(run, io_system=IO_SYSTEM)
+    older, _ = sp_modules(run, sp)
+    plug(run, "SpDi3", 1, sp, older, changed=["hw:" + run.path(SP.device, "items", *SP.interface)])
+    plug(run, "SpDi", 2, sp, older)
+    plug(run, "SpDi4", 3, sp, older)
+    channel_gate(run, older)
+    rows = gsd_entries(run)
+    gsd_device(run, rows)
+    if "gsdDevice" in run.h.report:
+        versionless_gate(run, rows[0]["typeIdentifier"])
+        profiles(run, only={rows[0]["typeIdentifier"]})
+    if shared_device(run):
+        shared_refusal(run)
+        shared_access(run, "SpDi4", "OutsideOfProject", True, external=1)
+        shared_disconnect(run)
+    link_refusals(run)
+    first = (run.base, run.current["view"])
+    if run.coverage.get("hardware_shared_device_access", {}).get("applied"):
+        second_project(run, older, first)
+    wanted = {"network_mrp_set": "refused", "hardware_shared_device_access": "refused", "hardware_channel_attributes": "refused", "hardware_attributes": "refused",
+              "network_io_assign": "restored", "hardware_replace": "restored"}
+    missing = [kind for kind, need in wanted.items() if not run.coverage.get(kind, {}).get(need)] + [key for key in ("gsdDevice", "secondProject") if key not in run.h.report]
+    run.expect(not missing and len(run.coverage["network_mrp_set"]["refused"]) == 2, "coverage", "Refusal slice gaps: %s" % missing)
+
+
 def heading(args):
     """The report title and limitations of the full run or the selected slice."""
     title = {"restores": "X10 topology restores and capability-profile gates in one owned scratch CPU 1511-1 PN with ET 200MP and ET 200SP stations",
              "gsd": "X10 GSD device: the project's own I-device GSD as an IO device of an added CPU 1511-1 PN in one owned scratch",
+             "delete-rule": "X10 hardware_delete compile rule: one DI module in one owned scratch CPU 1511-1 PN",
+             "refusals": "X10 hardware refusals and topology paths natively: MRP port links, PLC-to-PLC shared access, channel and versionless profiles, the sharedDevice "
+                         "disconnect, a start-moving address change and a second project's controller, in two owned scratches",
              None: "X10 hardware changes in one owned scratch CPU 1511-1 PN with S7-1200, ET 200MP and ET 200SP families, a shared device and an MRP ring"}[args.slice]
-    return title + (" (key discovery, not evidence)" if args.discover else ""), {"restores": SLICE_LIMITATIONS, "gsd": GSD_SLICE_LIMITATIONS, None: LIMITATIONS}[args.slice]
+    return title + (" (key discovery, not evidence)" if args.discover else ""), {"restores": SLICE_LIMITATIONS, "gsd": GSD_SLICE_LIMITATIONS, "refusals": REFUSAL_LIMITATIONS,
+                                                                                "delete-rule": DELETE_SLICE_LIMITATIONS, None: LIMITATIONS}[args.slice]
 
 
 def body(h):
@@ -887,7 +1097,7 @@ def body(h):
     run.current = run.snap("baseline")
     sliced = getattr(getattr(h, "args", None), "slice", None)
     if sliced:
-        {"restores": restore_slice, "gsd": gsd_slice}[sliced](run)
+        {"restores": restore_slice, "gsd": gsd_slice, "refusals": refusal_slice, "delete-rule": delete_rule_slice}[sliced](run)
         return
     phase_a(run)
     reopen(run)
@@ -905,8 +1115,9 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
     parser.add_argument("--discover", action="store_true", help="Record unexpected state differences, previews and refusals instead of failing (not evidence).")
-    parser.add_argument("--slice", choices=("restores", "gsd"), help="restores: only the profile gates and the topology restores the full run lacks; "
-                        "gsd: only the installed I-device GSD device and what it needs.")
+    parser.add_argument("--slice", choices=("restores", "gsd", "refusals", "delete-rule"), help="restores: only the profile gates and the topology restores the full run lacks; "
+                        "gsd: only the installed I-device GSD device and what it needs; refusals: the native refusals and topology paths the full run lacks, "
+                        "with a second owned scratch; delete-rule: hardware_delete's compile=false refusal on one DI module.")
     args = parser.parse_args()
     args.runner = __file__
     title, limitations = heading(args)

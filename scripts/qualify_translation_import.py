@@ -2,6 +2,12 @@
 
 Never adopts wt02, changes production gates, retries imports, or uses old admission.
 Original process handles and foreign-store locks remain held through terminal proof.
+
+Outside --same-instance, a scratch probe (change_prepare of hardware_add with configureScratchSecurity, which only the
+worker's own scratch passes) shows after the fixture stage and after the no-op import's reopen that the fixture keeps its
+scratch status (31 October audit). --empty-restricted adds a no-op import of the empty (header-only) Host-filtered
+AlarmClassDisplayNameCategory capture to the restricted lifecycle. A --resume-root continuation of a closed fixture
+must have its capture refused in the fresh worker (ProjectIsolationRequired): it never adopts a fixture it did not create.
 """
 import argparse
 from contextlib import ExitStack
@@ -10,13 +16,14 @@ import os
 from pathlib import Path
 import shutil
 import sys
+import time
 
 from exact_qualification_client import ExactClient
 from qualify_exact_worker_startup import emit, package, check_sources
 from qualify_translation_category_probe import StoreExclusiveWindow, ref, require
 from component_window_lifetime import scan_component_reservations
 from verify_translation_populated_category_probe import decode, compare, populated_control
-from verify_watch_workflow import canonical_sha
+from verify_watch_workflow import canonical_matches
 
 REPO = Path(__file__).resolve().parents[1]
 # The export sorts rows by source text, so a changed source can also move its row: the profile check then refuses first.
@@ -26,6 +33,12 @@ FAILURE_CASES = ('before-dispatch', 'source-drift', 'import-reply', 'compile-rep
 RESTRICTED = {'BlockCommentCategoryData': 5, 'HwcnCommentTextCategoryData': 1, 'AlarmClassDisplayNameCategory': 0}
 # TranslationProductionAdmission.RestrictedContract: the Host-filtered block-comment scope of one PLC.
 RESTRICTED_CONTRACT = 'translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1'
+EMPTY_CATEGORY = 'AlarmClassDisplayNameCategory'
+# The worker's ProjectIsolationRequired refusal in TranslationOwned (OpennessSession.TranslationImport.cs).
+OWNERSHIP_REFUSAL = 'Exact saved worker-owned translation fixture required.'
+# Only the worker's current scratch may configure generated CPU security (EnsureCurrentScratchProject); prepare writes nothing.
+SCRATCH_PROBE = {'kind': 'hardware_add', 'payload': {'typeIdentifier': 'OrderNumber:6ES7 511-1AL03-0AB0/V4.1', 'deviceName': 'TrScratchProbe',
+                                                     'itemName': 'TrScratchProbeCpu', 'configureScratchSecurity': True}}
 
 
 def portal_check(before, after, owned):
@@ -110,7 +123,9 @@ class Run:
         self.before_checkpoint = getattr(args, 'interrupt_before_checkpoint', False)
         self.stop_after_noop = getattr(args, 'stop_after_noop', False)
         self.restricted = getattr(args, 'restricted_lifecycle', False)
+        self.empty_restricted = getattr(args, 'empty_restricted', False)
         self.forward_key = None
+        require(not self.empty_restricted or self.restricted and not self.same_instance, '--empty-restricted extends the fresh-fixture restricted lifecycle')
         require(not self.restricted or not (self.failure_case or self.before_checkpoint or args.resume_root),
                 'The restricted lifecycle runs on its own fresh fixture, alone or with --same-instance')
         require(not self.before_checkpoint or not (self.same_instance or self.failure_case or args.resume_root or self.stop_after_noop),
@@ -137,6 +152,7 @@ class Run:
             'interruptBeforeCheckpoint': self.before_checkpoint,
             'stopAfterNoop': self.stop_after_noop,
             'restrictedLifecycle': self.restricted,
+            'emptyRestricted': self.empty_restricted,
             'effects': ('One newly owned offline bilingual scratch; ' + ('category probes, Host-filtered category captures and, on the filtered BlockCommentCategoryData capture, ' if self.restricted else '') +
                 'seven exact forward cases on the same full instance key, at most five explicitly reviewed reverse Main target operations, at most ten imports and twelve distinct checkpoint restorations, read-only reconciliation and exact cleanup.') if self.same_instance else
                 ('One newly owned offline bilingual scratch; one reviewed Main comment operation interrupted at ' + self.failure_case +
@@ -151,7 +167,7 @@ class Run:
         """Exactly one unattempted operation; a failed/unknown response never triggers replay."""
         prepared = self.call('qualification_translation_prepare', {**selector, 'idempotencyKey': 'failure-' + self.root.name + '-' + self.failure_case, **edit})
         if getattr(self, 'same_instance', False):
-            require(prepared['admissionKeySha256'] == canonical_sha(prepared['admissionKey']), 'Admission key digest differs')
+            require(canonical_matches(prepared['admissionKeySha256'], prepared['admissionKey']), 'Admission key digest differs')
             require(not getattr(self, 'restricted', False) or prepared['admissionKey']['contract'] == RESTRICTED_CONTRACT, 'The restricted packet must carry the restricted admission contract')
             if self.forward_key is None:
                 self.forward_key = prepared['admissionKey']; self.save('forward-instance-key', {'key': self.forward_key, 'sha256': prepared['admissionKeySha256']})
@@ -223,6 +239,13 @@ class Run:
     def save(self, name, value):
         emit(self.root / (name + '.json'), value)
         return value
+
+    def scratch_probe(self, report, label):
+        """The fixture is still the worker's scratch: a scratch-only preparation passes (nothing is applied)."""
+        prepared = self.call('change_prepare', SCRATCH_PROBE)
+        require(prepared['state'] == 'prepared' and any('configureNewCpuSecurity' in e for e in prepared['preview']['effects']),
+                'The scratch-only preparation did not pass after ' + label)
+        report.setdefault('scratchProbes', []).append({'after': label, 'changeId': prepared['changeId'], 'state': prepared['state']})
 
     def call(self, name, args=None, expect_error=False):
         check_sources(self.sources)
@@ -296,9 +319,26 @@ class Run:
                     plc = scratch['exports'][0]['block']['plcPath']
                     selector = {'projectPath': project, 'plcPath': plc}
                     self.call('qualification_translation_fixture', selector)
+                    if not self.same_instance: self.scratch_probe(report, 'fixture')
                 require(Path(project).is_relative_to(self.artifacts), 'Scratch escaped admitted workspace')
+                if self.args.resume_root and report.get('resumeObservation') is not None:
+                    # The fresh worker reopens the closed fixture but never adopts it: watch ownership stays with the worker that created it.
+                    opened = [p['path'] for p in self.call('tia_session_status')['projects']]
+                    if not any(Path(path) == Path(project) for path in opened):
+                        require(not opened, 'Only the closed fixture may be open'); self.call('project_open', {'path': project})
+                    # Qualification tools return MCP's generic error text; the Host log carries the worker's refusal.
+                    logged = lambda: sum(OWNERSHIP_REFUSAL in line for line in self.client.errors)
+                    seen = logged()  # not `before`: that is the opening tia_discover
+                    self.call('qualification_translation_capture', selector, expect_error=True)
+                    for _ in range(50):  # stderr is read on its own thread
+                        if logged() > seen: break
+                        time.sleep(0.1)
+                    require(logged() == seen + 1, 'A fresh worker must refuse a fixture it did not create (' + OWNERSHIP_REFUSAL + ')')
+                    report['adoptionRefused'] = {'tool': 'qualification_translation_capture', 'code': 'ProjectIsolationRequired', 'workerMessage': OWNERSHIP_REFUSAL,
+                                                 'hostDiagnostics': f'{self.counter:03}-host-diagnostics.json'}
                 self.save('fixture-identity', {**selector, 'processId': started['processId']})
-                if not self.failure_case and (not self.same_instance or self.restricted):
+                if report.get('adoptionRefused'): pass
+                elif not self.failure_case and (not self.same_instance or self.restricted):
                     categories = self.call('qualification_translation_categories', selector)
                     verdict = category_verdict(categories)
                     if self.restricted:
@@ -307,25 +347,40 @@ class Run:
                         # Every following capture, plan, apply, recovery and reconciliation uses the Host-filtered block-comment scope.
                         selector = {**selector, 'categoryIds': ['BlockCommentCategoryData']}
                     self.save('category-verification', verdict)
-                capture = self.call('qualification_translation_capture', selector)
-                rows = [r for r in capture['rows'] if r['source']['text'] == 'Prueftext Main {0}' and r['target']['state'] == 'text' and r['target']['text'] == 'Verification text Main {0}']
-                require(len(rows) == 1, 'Exactly one actual populated seeded Main comment required')
-                edit = {'nativeKey': rows[0]['nativeKey'], 'replacement': 'Verified translation Main {0} — Ω'}
-                self.save('edit-oracle', {'original': rows[0], 'requested': edit, 'scope': 'one existing nonempty en-GB target'})
+                if report.get('adoptionRefused'): selector = None
+                else:
+                    capture = self.call('qualification_translation_capture', selector)
+                    rows = [r for r in capture['rows'] if r['source']['text'] == 'Prueftext Main {0}' and r['target']['state'] == 'text' and r['target']['text'] == 'Verification text Main {0}']
+                    require(len(rows) == 1, 'Exactly one actual populated seeded Main comment required')
+                    edit = {'nativeKey': rows[0]['nativeKey'], 'replacement': 'Verified translation Main {0} — Ω'}
+                    self.save('edit-oracle', {'original': rows[0], 'requested': edit, 'scope': 'one existing nonempty en-GB target'})
                 if self.same_instance: self.same_instance_trials(selector, edit, project, rows[0]['target']['text'], report)
                 elif self.failure_case: self.failure_trial(selector, edit, project, report)
                 elif self.before_checkpoint: self.before_checkpoint_trial(selector, report)
-                for label, change in ([] if self.failure_case or self.same_instance or self.before_checkpoint else [('noop', {}), ('edit', edit)]):
+                empty = {**(selector or {}), 'categoryIds': [EMPTY_CATEGORY]}
+                trials = [] if self.failure_case or self.same_instance or self.before_checkpoint or selector is None else \
+                    [('noop', {}, selector)] + ([('empty', {}, empty)] if self.empty_restricted else []) + [('edit', edit, selector)]
+                for label, change, scope in trials:
                     if any(t['name'] == label for t in report['trials']): continue
                     if label == 'edit' and self.stop_after_noop: break
-                    prepared = self.call('qualification_translation_prepare', {**selector, 'idempotencyKey': 'translation-' + self.root.name + '-' + label, **change})
-                    require(not self.restricted or (prepared['admissionKey'] or {}).get('contract') == RESTRICTED_CONTRACT, 'A restricted plan must carry the restricted admission contract')
+                    if label == 'empty':
+                        # The Host keeps no row of this category, so the candidate workbook holds headers only.
+                        captured = self.call('qualification_translation_capture', scope)
+                        require(captured['rows'] == [] and captured['excludedRows'] and captured['scope']['categoryIds'] == [EMPTY_CATEGORY],
+                                'The empty restricted capture must keep no row and exclude every native row')
+                        report['emptyCapture'] = {'keptRows': 0, 'excludedRows': len(captured['excludedRows'])}
+                    prepared = self.call('qualification_translation_prepare', {**scope, 'idempotencyKey': 'translation-' + self.root.name + '-' + label, **change})
+                    if label == 'empty':
+                        require(prepared.get('admissionKey') is None and prepared.get('admissionRefusal'), 'Only the block-comment scope has an admission contract')
+                    else:
+                        require(not self.restricted or (prepared['admissionKey'] or {}).get('contract') == RESTRICTED_CONTRACT, 'A restricted plan must carry the restricted admission contract')
                     op = prepared['operation']
                     request = {'operationId': op['id'], 'planSha256': op['planSha256'], 'revision': op['revision']}
                     self.call('qualification_translation_apply', {**request, 'planSha256': '0' * 64}, expect_error=True)
                     self.call('qualification_translation_apply', {**request, 'revision': op['revision'] + 1}, expect_error=True)
                     applied = self.call('qualification_translation_apply', request)
                     require(applied['state'] == 'succeeded', 'Full native lifecycle failed')
+                    if label == 'noop': self.scratch_probe(report, 'noop import reopen')
                     self.call('qualification_translation_apply', {**request, 'revision': applied['revision']}, expect_error=True)
                     destination = self.artifacts / ('recovery-' + self.root.name + '-' + label) / Path(project).parent.name / Path(project).name
                     recovery_request = {**request, 'revision': applied['revision'], 'newProjectPath': str(destination), 'loseRestoreReply': label == 'edit'}
@@ -338,7 +393,7 @@ class Run:
                         'restorationReplyLost': label == 'edit', 'recoveryPath': str(destination)})
                     # Reconciliation closes both read locations. Reopen the original
                     # through the owned worker; a new capture is required for next trial.
-                    if label == 'noop': self.call('project_open', {'path': project})
+                    if label != 'edit': self.call('project_open', {'path': project})
                 self.call('tia_detach')
                 after = self.call('tia_discover')
                 report.update(portal_check(before, after, started['processId']))
@@ -373,6 +428,8 @@ def main():
     parser.add_argument('--restricted-lifecycle', action='store_true',
                         help='Fresh fixture: check the Host-filtered category captures (5, 1 and 0 rows), then run the no-op and Main edit, or with --same-instance its '
                              'seven forward cases, on the filtered BlockCommentCategoryData capture')
+    parser.add_argument('--empty-restricted', action='store_true',
+                        help='With --restricted-lifecycle: also import the empty (header-only) Host-filtered ' + EMPTY_CATEGORY + ' capture as a no-op')
     parser.add_argument('--execute', action='store_true')
     args = parser.parse_args()
     require(args.execute, 'Explicit coordinator execution required')

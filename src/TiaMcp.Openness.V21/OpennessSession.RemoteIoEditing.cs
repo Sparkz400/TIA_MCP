@@ -173,8 +173,11 @@ namespace TiaMcp.Openness.V21
             var peers = others.Select(other => OwningPlcItem(other.ConnectedToIoSystem.Parent, plcItems) ?? throw new BridgeException("UnresolvedIoOwnership", "Another connector's I/O system resolves to no PLC of the project.")).ToArray();
             var allowed = new[] { plc.Software }.Concat(peers.Select(peer => (PlcSoftware)peer.Item.GetService<SoftwareContainer>().Software)).ToArray();
             if (allowed.Skip(1).Any(software => software.Equals(plc.Software))) throw new BridgeException("InvalidRequest", "The selected PLC already controls this IO device through another connector of the interface.");
-            if (shared) payload["sharedAddressControllerOwnerPaths"] = new JArray(peers.Select(peer => peer.Path).Distinct().OrderBy(path => path, StringComparer.Ordinal));
-            sharedItems = SharedSubmodules(project, payload, station, shared && !disconnect, hardware);
+            var peerPaths = peers.Select(peer => peer.Path).Distinct().OrderBy(path => path, StringComparer.Ordinal).ToArray();
+            if (shared) payload["sharedAddressControllerOwnerPaths"] = new JArray(peerPaths);
+            // A disconnect's items go to the one remaining PLC; the connection's go to the selected one.
+            string newOwner = disconnect ? (peerPaths.Length == 1 ? peerPaths[0] : null) : payload.Value<string>("addressControllerOwnerPath");
+            sharedItems = SharedSubmodules(project, payload, station, shared, disconnect, hardware, newOwner);
             foreach (var peer in hardware.Where(row => row.Path.StartsWith(station + "/items/", StringComparison.Ordinal)))
             {
                 var peerNetwork = peer.Item.GetService<NetworkInterface>();
@@ -216,7 +219,7 @@ namespace TiaMcp.Openness.V21
                 ["controllerHardwarePath"] = payload["controllerHardwarePath"]?.DeepClone(), ["controllerIndex"] = payload["controllerIndex"]?.DeepClone(),
                 ["afterIoSystem"] = controller?.IoSystem?.Name ?? payload.Value<string>("createIoSystemName"), ["disconnect"] = disconnect, ["sharedDevice"] = shared,
                 ["sharedSubmodules"] = sharedItems.Length == 0 ? null : new JArray(sharedItems.Select(entry => new JObject { ["hardwarePath"] = entry.Path,
-                    ["assignmentTargetBefore"] = SharedTargetPath(entry.Item, hardware), ["assignmentTargetAfter"] = payload["addressControllerOwnerPath"].DeepClone() })) });
+                    ["assignmentTargetBefore"] = SharedTargetPath(entry.Item, hardware), ["assignmentTargetAfter"] = newOwner })) });
             ValidateExpectedServerModule(change, project, item, preview);
             return connector;
         }
@@ -248,19 +251,24 @@ namespace TiaMcp.Openness.V21
         // V21 compiles a further IO controller of a shared device only with at least one submodule assigned to it ("Connected PLCs must
         // have at least one assigned submodule as a shared device", discovery hw3), so a sharedDevice connection names 1 to 64 items of
         // the station (sharedSubmodules) whose SharedDeviceAssignmentTarget becomes the selected PLC item in the same change. Each must own
-        // I/O addresses (itself or through a subitem) and not be assigned to that PLC yet.
-        private HardwareEntry[] SharedSubmodules(Project project, JObject payload, string station, bool required, HardwareEntry[] hardware)
+        // I/O addresses (itself or through a subitem) and not be assigned to that PLC yet. A sharedDevice disconnect fails the device
+        // compile while an item stays assigned to the leaving PLC ("An attempt was made to compile a submodule that is not assigned",
+        // discovery rd1), so it names every such item, and they go to the one remaining PLC (newOwner) in the same change.
+        private HardwareEntry[] SharedSubmodules(Project project, JObject payload, string station, bool shared, bool disconnect, HardwareEntry[] hardware, string newOwner)
         {
             var list = payload["sharedSubmodules"];
-            if (!required)
+            string owner = payload.Value<string>("addressControllerOwnerPath");
+            var leaving = shared && disconnect ? hardware.Where(row => row.Path.StartsWith(station + "/items/", StringComparison.Ordinal) && SharedTargetPath(row.Item, hardware) == owner).ToArray() : new HardwareEntry[0];
+            if (!shared || disconnect && leaving.Length == 0)
             {
-                if (list != null) throw new BridgeException("InvalidRequest", "sharedSubmodules applies only to a sharedDevice connection.");
+                if (list != null) throw new BridgeException("InvalidRequest", "sharedSubmodules applies only to a sharedDevice connection, or to its disconnect while items are assigned to the leaving PLC.");
                 return new HardwareEntry[0];
             }
+            if (disconnect && newOwner == null) throw new BridgeException("UnsupportedCapability", "A shared connector leaves with its PLC's items only while exactly one other PLC controls the device to take them.");
             if (!(list is JArray paths) || paths.Count == 0 || paths.Count > 64 || paths.Any(path => path.Type != JTokenType.String) || paths.Select(path => path.Value<string>()).Distinct(StringComparer.Ordinal).Count() != paths.Count)
-                throw new BridgeException("InvalidRequest", "A sharedDevice connection needs sharedSubmodules: 1 to 64 distinct exact hardware paths of the station's items to assign to the selected PLC.");
-            string owner = payload.Value<string>("addressControllerOwnerPath");
-            return paths.Select(path =>
+                throw new BridgeException("InvalidRequest", disconnect ? "A shared disconnect needs sharedSubmodules: the 1 to 64 exact hardware paths of the items assigned to the leaving PLC, which go to " + newOwner + "."
+                    : "A sharedDevice connection needs sharedSubmodules: 1 to 64 distinct exact hardware paths of the station's items to assign to the selected PLC.");
+            var named = paths.Select(path =>
             {
                 if (!path.Value<string>().StartsWith(station + "/items/", StringComparison.Ordinal)) throw new BridgeException("InvalidRequest", "Every sharedSubmodules path must belong to the selected IO device's station.");
                 var entry = ChangeHardware(project, new JObject { ["hardwarePath"] = path.DeepClone() });
@@ -268,17 +276,33 @@ namespace TiaMcp.Openness.V21
                 HardwareEngineeringRules.RequireProfileWritable(ItemProfile(entry.Item, out string profilePath), profilePath, null, new[] { SharedTarget });
                 if (!hardware.Any(row => (row.Path == entry.Path || row.Path.StartsWith(entry.Path + "/", StringComparison.Ordinal)) && row.Item.Addresses.Any(address => address.Length > 0)))
                     throw new BridgeException("InvalidRequest", "A sharedSubmodules item must own I/O addresses itself or through a subitem: " + entry.Path);
-                if (SharedTargetPath(entry.Item, hardware) == owner) throw new BridgeException("InvalidRequest", "A sharedSubmodules item is already assigned to the selected PLC: " + entry.Path);
+                if (!disconnect && SharedTargetPath(entry.Item, hardware) == owner) throw new BridgeException("InvalidRequest", "A sharedSubmodules item is already assigned to the selected PLC: " + entry.Path);
+                if (disconnect && SharedTargetPath(entry.Item, hardware) != owner) throw new BridgeException("InvalidRequest", "A shared disconnect names only items assigned to the leaving PLC: " + entry.Path);
                 return entry;
             }).ToArray();
+            var missing = leaving.Where(row => !named.Any(entry => row.Path == entry.Path || row.Path.StartsWith(entry.Path + "/", StringComparison.Ordinal))).Select(row => row.Path).ToArray();
+            if (missing.Length != 0) throw new BridgeException("InvalidRequest", "A shared disconnect names every item assigned to the leaving PLC in sharedSubmodules; missing: " + string.Join(", ", missing.Take(8)) + ".");
+            return named;
         }
 
         private void ApplyIoAssignment(EngineeringChange change, Project project)
         {
             var connector = PrepareIoAssignment(change, project, null, out var controller, out var sharedItems);
             var previous = connector.ConnectedToIoSystem;
+            void Assign(JToken cpuPath)
+            {
+                var cpu = ChangeHardware(project, new JObject { ["hardwarePath"] = cpuPath.DeepClone() }).Item;
+                foreach (var entry in sharedItems)
+                {
+                    var item = ChangeHardware(project, new JObject { ["hardwarePath"] = entry.Path }).Item;
+                    item.SetAttribute(SharedTarget, cpu);
+                    if (!Equals(item.GetAttribute(SharedTarget), cpu)) throw new BridgeException("MutationVerificationFailed", "A shared submodule does not read back its new PLC as its assignment target.");
+                }
+            }
             if (change.Payload.Value<bool?>("disconnect") == true)
             {
+                // The leaving PLC's items go to the remaining PLC while the connector still holds both, then the connector leaves.
+                if (sharedItems.Length != 0) Assign(change.Payload["sharedAddressControllerOwnerPaths"][0]);
                 connector.DisconnectFromIoSystem();
                 if (connector.ConnectedToIoSystem != null) throw new BridgeException("MutationVerificationFailed", "Connector disconnect did not persist.");
             }
@@ -289,16 +313,7 @@ namespace TiaMcp.Openness.V21
                 connector.ConnectToIoSystem(system);
                 if (!Equals(connector.ConnectedToIoSystem, system) || !system.ConnectedIoDevices.Any(candidate => Equals(candidate, connector)))
                     throw new BridgeException("MutationVerificationFailed", "Native forward/reverse I/O-system readback differs from the selected association.");
-                if (sharedItems.Length != 0)
-                {
-                    var cpu = ChangeHardware(project, new JObject { ["hardwarePath"] = change.Payload["addressControllerOwnerPath"].DeepClone() }).Item;
-                    foreach (var entry in sharedItems)
-                    {
-                        var item = ChangeHardware(project, new JObject { ["hardwarePath"] = entry.Path }).Item;
-                        item.SetAttribute(SharedTarget, cpu);
-                        if (!Equals(item.GetAttribute(SharedTarget), cpu)) throw new BridgeException("MutationVerificationFailed", "A shared submodule does not read back the selected PLC as its assignment target.");
-                    }
-                }
+                if (sharedItems.Length != 0) Assign(change.Payload["addressControllerOwnerPath"]);
             }
             if (previous != null && !Equals(previous, connector.ConnectedToIoSystem) && previous.ConnectedIoDevices.Any(candidate => Equals(candidate, connector)))
                 throw new BridgeException("MutationVerificationFailed", "The previous I/O system still contains the moved or disconnected connector.");

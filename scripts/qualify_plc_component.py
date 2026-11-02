@@ -307,8 +307,9 @@ def verify_standalone_caller(xml, manifest):
     require(len(list(blocks[0].iter("SW.Blocks.CompileUnit"))) == 1, "Standalone caller must contain exactly one network.")
 
 
-def verify_preserved_installation(before, after, caller, added, added_member=None, after_network=None):
-    """after_network: index of the original network the new one must directly follow (negative from the end); None accepts any."""
+def verify_preserved_installation(before, after, caller, added, added_member=None, after_network=None, dependents=()):
+    """after_network: index of the original network the new one must directly follow (negative from the end); None accepts any.
+    dependents: block paths besides the caller that the change may alter; the caller of this check verifies them itself."""
     require(set(after["objects"]) - set(before["objects"]) == set(added)
             and not set(before["objects"]) - set(after["objects"]), "Installed object inventory differs from exact fixture additions.")
     reduced = {"objects": {k: v for k, v in after["objects"].items() if k in before["objects"]}}
@@ -316,7 +317,7 @@ def verify_preserved_installation(before, after, caller, added, added_member=Non
         require("block:" + caller in added, "Standalone caller must be an exact new fixture addition.")
         assert_snapshot(before, reduced)
         return
-    assert_snapshot(before, reduced, except_paths=[caller])
+    assert_snapshot(before, reduced, except_paths=[caller, *dependents])
     # Read and hash one bounded snapshot, including the caller excluded from
     # the unchanged-object comparison above. Never compare unpinned replacement
     # bytes or discard comments, processing instructions or QName bindings.

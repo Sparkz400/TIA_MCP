@@ -58,6 +58,19 @@ Reject(() => store.Acquire(f.Manifest with { Id = new('f', 32) }), "ComponentRes
 Reject(() => store.Resume(r.Id, r.Revision, new('0', 64)), "ComponentOwnerMismatch");
 Reject(() => store.Resume(r.Id, r.Revision, token), "ComponentFreshHostRequired");
 Check(ComponentQualificationWindowStore.NativeHash(new JsonObject { ["b"] = @"D:\路径", ["a"] = "Ω+<>&'\"" }) == Digest("{\"a\":\"Ω+<>&'\\\"\",\"b\":\"D:\\\\路径\"}"), "Native manifest/request hashing retains Unicode with Newtonsoft-compatible escaping");
+{
+    // A source directory hashes in both forms the worker pins (TiaMcp.ComponentQualification.Boundary.Tests pins the same digests),
+    // and a reservation pinned in either form keeps both its snapshot and original checked in that form.
+    string snapshot = Path.Combine(basis, "source-snapshot"), original = Path.Combine(basis, "source-original"), other = Path.Combine(basis, "source-other");
+    foreach (string d in new[] { snapshot, original, other }) { Directory.CreateDirectory(d); File.WriteAllText(Path.Combine(d, "a\u2028b.txt"), d == other ? "y" : "x"); }
+    string current = "e4f64a84bafa84cdeb6ec6cd81717ac1eeac986031c74385de61526088fa5e8f", earlier = "978da03ddf2a095d1b12614996a298a621b0d5c27fb2ea3cbc69ab41c47d3a63";
+    Check(ComponentWindowEvidence.SourceHashes(snapshot, true).SequenceEqual(new[] { current, earlier }), "Directory hashes are RFC 8785, then the earlier worker form");
+    var pinned = f.Manifest with { SourceSnapshotPath = snapshot, SourceSnapshotIsDirectory = true, OriginalSourcePath = original, OriginalSourceIsDirectory = true };
+    Check(ComponentWindowEvidence.PinnedSource(pinned with { SourceSnapshotSha256 = earlier }) == (true, true), "A pre-upgrade pin of the earlier worker form is accepted");
+    Check(ComponentWindowEvidence.PinnedSource(pinned with { SourceSnapshotSha256 = current }) == (true, true), "A current pin is accepted");
+    Check(ComponentWindowEvidence.PinnedSource(pinned with { SourceSnapshotSha256 = earlier, OriginalSourcePath = other }) == (true, false), "A changed original is refused in the pinned form");
+    Check(ComponentWindowEvidence.PinnedSource(pinned with { SourceSnapshotSha256 = new string('0', 64) }).Snapshot == false, "Another pin is refused");
+}
 Check(Child("resume", f.Root, r.Id, "0", token) == "ResourceBusy", "Exact live Host owner cannot be stolen even with retained capability");
 Check(Child("compete", f.Root, f.Manifest.ProjectPath) == "ResourceBusy", "Independent ordinary admission is blocked by parent");
 Check(Child("compete", f.Root, Path.Combine(f.Manifest.Workspace, "changes", "future", "journal.json")) == "ResourceBusy", "Uncreated future descendant remains reserved");

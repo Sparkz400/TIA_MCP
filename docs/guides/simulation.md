@@ -300,6 +300,14 @@ explicitly leaves complete storage-byte preservation and independent after-state
 verification false. Archive creation alone does not establish successful retrieval,
 project preservation, recovery or permission to release an uncertain admission.
 
+A failed attempt leaves its admission `outcomeUnknown`. `simulation_provision_reconcile`, run
+in a fresh empty owned Portal, releases it only when the retrieved archive and the project have
+the same fingerprint and the project was last saved before the archive was written, the card
+matches its manifest, the rest of the storage matches the baseline inventory by metadata (only
+the attempt's own files and PLCSIM's runtime files are new), the checkpoint stream never opened
+or armed the credential, and an observer project is absent or empty; otherwise it stays held
+([rule and evidence](../verification/provision-release-20261102.md)).
+
 ## Licensing
 
 The adapter does not activate a trial or confirm an Automation License Manager dialog. The V8 API's `LicenseStatus` describes current license use; it does not establish that a floating license is available for a powered-off instance. An explicit bounded `PowerOn` call supplies Siemens' documented licensing result. A license error is returned as a prerequisite failure. Trial or Test Suite-only warnings are rejected; an adapter-owned instance is powered off when a returned warning prevents continued operation. No automatic license purchase, install or activation is attempted.

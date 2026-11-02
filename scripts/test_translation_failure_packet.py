@@ -7,6 +7,12 @@ import unittest
 import qualify_translation_import as controller
 import verify_translation_failure as verifier
 import verify_translation_admission as admission_verifier
+from verify_watch_workflow import rfc8785, sha
+
+
+def host_sha(value):
+    """The Host's key hash since 1 November 2026 (RFC 8785)."""
+    return sha(rfc8785(value).encode('utf-8'))
 
 
 class FailurePacketChecks(unittest.TestCase):
@@ -20,7 +26,7 @@ class FailurePacketChecks(unittest.TestCase):
                     calls.append(name)
                     self.assertTrue(name.endswith('_prepare'))
                     changed = {field: 'changed'}
-                    return {'admissionKey': changed, 'admissionKeySha256': controller.canonical_sha(changed)}
+                    return {'admissionKey': changed, 'admissionKeySha256': host_sha(changed)}
                 run.call = call
                 with self.assertRaisesRegex(ValueError, 'instance drift'):
                     run.failure_trial({}, {}, str(run.root/'original'/'Fixture.ap21'), {'trials': []})
@@ -29,14 +35,14 @@ class FailurePacketChecks(unittest.TestCase):
     def test_same_instance_only_reverses_independently_verified_applied_cases(self):
         with tempfile.TemporaryDirectory() as directory:
             run = controller.Run.__new__(controller.Run); run.root = run.artifacts = Path(directory)
-            run.same_instance = True; run.forward_key = {'exact': 'instance'}; calls = []
+            run.same_instance = True; run.forward_key = {'exact': 'instance — Ω'}; calls = []  # non-ASCII: the two hash forms differ
             op = {'id': 'a'*32, 'planSha256': 'b'*64, 'revision': 0}
             def trial(selector, edit, project, report):
                 report['trials'].append({'name': run.failure_case, 'originalDisposition': 'verifiedApplied' if run.failure_case in ('save-reply', 'reopen-reply', 'restore-reply') else 'unchanged'})
             def call(name, args=None, expect_error=False):
                 calls.append((name, args))
                 if name == 'project_open': return {}
-                if name.endswith('_prepare'): return {'operation': op, 'admissionKey': run.forward_key, 'admissionKeySha256': controller.canonical_sha(run.forward_key)}
+                if name.endswith('_prepare'): return {'operation': op, 'admissionKey': run.forward_key, 'admissionKeySha256': host_sha(run.forward_key)}
                 if name.endswith('_apply'): return {**op, 'state': 'succeeded', 'revision': 10}
                 if name.endswith('_recover'): return {**op, 'state': 'recoveryIntent', 'revision': 11}
                 if name.endswith('_reconcile'): return {**op, 'state': 'reconciled', 'revision': 12, 'reconciliation': [{'disposition': 'verifiedApplied'}], 'recoveryResolutions': [{'disposition': 'verifiedRestored'}]}

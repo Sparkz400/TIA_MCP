@@ -121,7 +121,8 @@ class FakeHost:
         else:
             exact = request.get("objectPath") if section == "screens" else None
             items = [dict(self.row(hmi, path, row["kind"], row["name"], row["properties"]), **{k: row[k] for k in ("nativeType", "dynamizations") if k in row},
-                          **({"eventHandlers": row.get("eventHandlers", [])} if section == "items" or path == exact else {}))
+                          **({"eventHandlers": row.get("eventHandlers", [])} if section == "items" or path == exact else {}),
+                          **({"behaviorCoverage": {c: {"status": "observed", "count": len(row.get(c, []))} for c in ("dynamizations", "eventHandlers")}} if section == "items" else {}))
                      for path, row in self.world()[hmi].get(section, {}).items() if section != "items" or row["screen"] == request.get("screenPath")]
         if request.get("objectPath") and section != "items":
             items = [r for r in items if r["identity"]["objectPath"] == request["objectPath"]]
@@ -139,10 +140,16 @@ class FakeHost:
         return {"path": str(file), "sha256": hashlib.sha256(file.read_bytes()).hexdigest()}
 
     def references(self, request):
+        edges = self.edges(request)
+        offset, limit = request.get("offset", 0), request.get("limit", 100)
+        return {"relationships": edges[offset:offset + limit], "nextOffset": offset + limit if offset + limit < len(edges) else None}
+
+    def edges(self, request):
         hmi = request["target"]["hmiPath"]
         plc, table = self.world()[hmi]["plc"], hmi + "/tagTables/Default%20tag%20table"
         base = {"projectPath": self.active, "plcPath": plc, "scopePath": plc}
-        return {"relationships": [
+        # 199 unrelated edges first, so the item edges land on the second page as on the native fixture (run hb3).
+        return [{"relation": "hmiNativePayload", "sourcePath": hmi + "/filler/%d" % i, "resolution": "unresolved"} for i in range(199)] + [
             {"relation": "hmiPlcDeclaration", "sourcePath": table + "/tags/LinkedSignal", "resolution": "resolved",
              "target": {**base, "kind": "tag", "objectPath": plc + "/tags/QualificationTags/tags/SharedSignal", "name": "SharedSignal", "dataType": "Int"}},
             {"relation": "hmiPlcDeclaration", "sourcePath": table + "/tags/LinkedDbValue", "resolution": "resolved",
@@ -150,7 +157,7 @@ class FakeHost:
                         "blockPath": plc + "/blocks/QualificationDB", "pathComponents": ["Value"], "xmlLine": 7}}] + [
             {"relation": "hmiScreenItemTag", "sourcePath": path, "sourceProperty": "Dynamizations/%s/Tag" % d["property"], "resolution": "resolved",
              "target": {"objectPath": table + "/tags/" + d["properties"]["Tag"]}}
-            for path, row in self.world()[hmi].get("items", {}).items() for d in row.get("dynamizations", [])]}
+            for path, row in self.world()[hmi].get("items", {}).items() for d in row.get("dynamizations", []) if row["screen"] == request.get("screenPath")]
 
     # The worker's refusals, in its order: request rules, kind, body, gate, StaleRevision.
     def check(self, kind, payload, admitted):
@@ -258,7 +265,7 @@ class FakeHost:
         elif operation == "event_handler_set":
             owner = world[hmi]["screens"].get(path) or world[hmi]["items"][path]
             owner.setdefault("eventHandlers", []).append({"properties": {"EventType": payload["eventType"]}, "script": {
-                "scriptCode": payload["script"], "scriptCodeSha256": hashlib.sha256(payload["script"].encode("utf-8")).hexdigest(), "scriptsExecuted": False}})
+                "scriptCode": payload["script"].replace("\r\n", "\n").replace("\n", "\r\n"), "scriptCodeSha256": hashlib.sha256(payload["script"].replace("\r\n", "\n").replace("\n", "\r\n").encode("utf-8")).hexdigest(), "scriptsExecuted": False}})
             world[hmi]["model"][path + "/eventHandlers/" + payload["eventType"]] = {"kind": "hmiModelNode", "name": payload["eventType"], "properties": {}}
         elif operation == "dynamization_set":
             binding = payload["bindings"][0]
@@ -330,7 +337,6 @@ class FakeClient:
     def prepare(self, kind, payload):
         host = self.host
         # The three profiles are production-admitted for the 1 November kinds; a qualification Host does not change that.
-        # hmi_screen_create has no production profile yet: only a qualification Host of the fixture's profile admits it.
         admission = route.admission(kind, host.profile)
         code = host.check(kind, payload, admission == "production" or self.admitted == host.profile)
         gate = {"available": code is None, "admission": admission if code is None else None, "targetProfile": host.profile, "reasonCode": code}
@@ -486,8 +492,8 @@ class GateRouteRunTests(unittest.TestCase):
                 self.assertEqual("hmi_screen_create", report["kind"])
                 self.assertEqual(9, sum(c.startswith("Refused before any write") for c in report["checks"]))
                 self.assertEqual(3, sum(c.startswith("Independent readback") for c in report["checks"]))
-                self.assertEqual(3, sum(c.startswith("Gate admits this kind and profile (qualification)") for c in report["checks"]))
-                self.assertIn("A production Host refuses the kind before its production admission", report["checks"])
+                self.assertEqual(3, sum(c.startswith("Gate admits this kind and profile (production)") for c in report["checks"]))
+                self.assertIn("A production Host admits the kind with admission production", report["checks"])
 
     def test_binding_route_creates_its_items_then_binds_three_tags(self):
         for profile, errors in (("unified-comfort", 0), ("unified-pc", 2)):

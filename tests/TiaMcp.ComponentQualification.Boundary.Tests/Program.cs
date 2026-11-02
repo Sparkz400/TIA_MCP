@@ -19,6 +19,7 @@ internal static class Program
         int passed = CanonicalVectors(Assembly.Load("TiaMcp.Openness.V21"));
         var type = Assembly.Load("TiaMcp.Openness.V21").GetType("TiaMcp.Openness.V21.OpennessSession", true);
         var execute = type.GetMethod("Execute", BindingFlags.Instance | BindingFlags.NonPublic);
+        passed += SourceDirectoryForms(type);
         void Reject(bool enabled, string operation, JObject arguments, string expected)
         {
             var session = Activator.CreateInstance(type, BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { api, enabled }, null);
@@ -82,6 +83,25 @@ internal static class Program
         return 0;
     }
 
+    // A source directory hashes to the same two forms the Host's ComponentWindowEvidence.SourceHashes expects (TiaMcp.ComponentWindow.Tests
+    // pins the same digests): RFC 8785, then the earlier worker's compact Newtonsoft JSON, which escapes U+2028.
+    private static int SourceDirectoryForms(Type session)
+    {
+        string directory = Path.Combine(Path.GetTempPath(), "canonical-source-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        try
+        {
+            File.WriteAllText(Path.Combine(directory, "a\u2028b.txt"), "x");
+            var hashes = (string[])session.GetMethod("LibraryDirectoryHashes", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, new object[] { directory });
+            if (hashes.Length != 2 || hashes[0] != "e4f64a84bafa84cdeb6ec6cd81717ac1eeac986031c74385de61526088fa5e8f" ||
+                hashes[1] != "978da03ddf2a095d1b12614996a298a621b0d5c27fb2ea3cbc69ab41c47d3a63")
+                throw new Exception("Worker source directory hashes differ from the Host's pinned forms: " + string.Join(",", hashes));
+        }
+        finally { Directory.Delete(directory, true); }
+        Console.WriteLine("PASS worker source directory hashes match the Host's two forms");
+        return 1;
+    }
+
     // The worker's component manifest and request hashes must equal the Host's byte for byte (shared RFC 8785 vectors).
     private static int CanonicalVectors(Assembly worker)
     {
@@ -97,21 +117,21 @@ internal static class Program
         foreach (JObject vector in vectors["cases"])
         {
             string name = (string)vector["name"];
-            JToken input;
-            if (vector["utf16"] is JArray units)
-            {
-                string text = new string(units.Select(u => (char)(int)u).ToArray());
-                input = (string)vector["as"] == "key" ? new JObject { [text] = 1 } : (JToken)new JValue(text);
-            }
-            else // Read with the worker's own request reader (Program.cs), with a deeper bound so the depth cases reach the canonical limit.
-                using (var reader = (JsonTextReader)Activator.CreateInstance(worker.GetType("TiaMcp.Openness.V21.ExactNumberReader", true),
-                    BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { (string)vector["input"] }, null))
-                {
-                    reader.MaxDepth = 256; reader.DateParseHandling = DateParseHandling.None;
-                    input = JToken.ReadFrom(reader);
-                }
             try
             {
+                JToken input;
+                if (vector["utf16"] is JArray units)
+                {
+                    string text16 = new string(units.Select(u => (char)(int)u).ToArray());
+                    input = (string)vector["as"] == "key" ? new JObject { [text16] = 1 } : (JToken)new JValue(text16);
+                }
+                else // The worker's own request reader (Program.cs), with a deeper bound so the depth cases reach the canonical limit.
+                    using (var reader = (JsonTextReader)Activator.CreateInstance(worker.GetType("TiaMcp.Openness.V21.ExactNumberReader", true),
+                        BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { (string)vector["input"] }, null))
+                    {
+                        reader.MaxDepth = 256; reader.DateParseHandling = DateParseHandling.None;
+                        input = JToken.ReadFrom(reader);
+                    }
                 string text = (string)serialize.Invoke(null, new object[] { input }), digest = (string)sha256.Invoke(null, new object[] { input });
                 if (vector["refusal"] != null) throw new Exception("Expected " + vector["refusal"] + " for vector: " + name);
                 if (text != (string)vector["canonical"] || digest != (string)vector["sha256"]) throw new Exception("Worker canonical JSON differs from the shared vector: " + name);

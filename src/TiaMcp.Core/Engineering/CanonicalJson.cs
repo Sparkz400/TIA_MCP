@@ -39,7 +39,7 @@ public static class CanonicalJson
     {
         if (stored is null) return false;
         try { if (stored == Hex(Rfc8785(node))) return true; }
-        catch (BridgeException) { } // an earlier build also hashed lone surrogates; its value is checked below
+        catch (BridgeException) { } // e.g. a number beyond the double range, whose text the earlier form kept; a lone surrogate is refused below
         return stored == LegacySha256(node);
     }
 
@@ -165,13 +165,23 @@ public static class CanonicalJson
             case JsonObject obj:
                 writer.WriteStartObject();
                 foreach (var pair in obj.OrderBy(p => p.Key, StringComparer.Ordinal))
-                { writer.WritePropertyName(pair.Key); WriteLegacy(writer, pair.Value, depth + 1); }
+                { WellFormed(pair.Key); writer.WritePropertyName(pair.Key); WriteLegacy(writer, pair.Value, depth + 1); }
                 writer.WriteEndObject(); break;
             case JsonArray array:
                 writer.WriteStartArray();
                 foreach (var value in array) WriteLegacy(writer, value, depth + 1);
                 writer.WriteEndArray(); break;
-            default: node.WriteTo(writer); break;
+            default:
+                if (node.GetValueKind() == JsonValueKind.String) WellFormed(Text(node.AsValue()));
+                node.WriteTo(writer); break;
         }
+    }
+
+    // The earlier writer replaced a lone surrogate, so such text could match a hash taken over the replacement.
+    private static void WellFormed(string value)
+    {
+        for (int i = 0; i < value.Length; i++)
+            if (char.IsHighSurrogate(value[i]) && i + 1 < value.Length && char.IsLowSurrogate(value[i + 1])) i++;
+            else if (char.IsSurrogate(value[i])) throw Invalid("Canonical JSON refuses a lone surrogate.");
     }
 }

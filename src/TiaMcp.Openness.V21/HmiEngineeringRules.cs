@@ -29,14 +29,14 @@ namespace TiaMcp.Model
         private static readonly string[] PrimitiveTypes = { "Bool", "Byte", "Word", "DWord", "LWord", "SInt", "USInt", "Int", "UInt", "DInt", "UDInt", "LInt", "ULInt", "Real", "LReal" };
         // Kinds that carry named operations past the closed gate (text-list precedent): family, operations, production profiles (those
         // whose native qualification passed: local.hmi.classic-import.*.20261101, local.hmi.external-tag.*.20261101) and the profiles a
-        // qualification Host may admit in a project its own worker retrieved or created.
+        // qualification Host may admit in a project its own worker retrieved or created. hmi_screen_create: local.hmi.screen-create.*.20261102.
         private static readonly Dictionary<string, (string Family, string[] Operations, string[] Profiles, string[] QualificationProfiles)> Kinds =
             new Dictionary<string, (string, string[], string[], string[])>(StringComparer.Ordinal)
         {
             ["hmi_classic_import"] = ("classic", new[] { "classic_xml_import", "scalar_property_set" }, new[] { "classic-comfort" }, new[] { "classic-comfort", "classic-rt-advanced", "classic-basic" }),
             ["hmi_external_tag_create"] = ("unified", new[] { "external_tag_create" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" }),
             // Graphics: a new screen (size copied from an existing one) and allowlisted items within a screen's rectangle.
-            ["hmi_screen_create"] = ("unified", new[] { "screen_create", "item_create" }, new string[0], new[] { "unified-comfort", "unified-pc" }),
+            ["hmi_screen_create"] = ("unified", new[] { "screen_create", "item_create" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" }),
             // Binding: one new tag dynamization of an item property (ProcessValue, or Visible/Enabled by a Bool tag); PLC-backed tags need the proven owner.
             ["hmi_dynamization_create"] = ("unified", new[] { "dynamization_set" }, new string[0], new[] { "unified-comfort", "unified-pc" }),
             // Scripts: one new event handler of a screen or item, its untrusted script stored verbatim and never executed.
@@ -152,8 +152,9 @@ namespace TiaMcp.Model
                 // Untrusted script text: bounded and stored verbatim, never executed, evaluated or syntax-checked.
                 if (payload["script"]?.Type != JTokenType.String) throw new ArgumentException("script must be an explicit string.");
                 string script = (string)payload["script"];
-                if (script.Trim().Length == 0 || script.Length > MaxScriptLength || script.Any(c => char.IsControl(c) && c != '\t' && c != '\r' && c != '\n'))
-                    throw new ArgumentException("script must be 1 to " + MaxScriptLength + " characters without control characters other than tab, CR and LF.");
+                if (script.Trim().Length == 0 || NativeScriptText(script).Length > MaxScriptLength || script.Any(c => char.IsControl(c) && c != '\t' && c != '\r' && c != '\n'))
+                    throw new ArgumentException("script must be 1 to " + MaxScriptLength + " characters (CRLF line ends) without control characters other than tab, CR and LF.");
+                if (script.Replace("\r\n", "").IndexOf('\r') >= 0) throw new ArgumentException("script may contain CR only as part of a CRLF line end.");
                 RejectFields(payload, "name", "properties", "dataType", "placement", "bindings", "connection", "plcTag");
             }
             else if (operation == "scalar_property_set" || operation == "item_properties_set")
@@ -354,6 +355,10 @@ namespace TiaMcp.Model
             }
             return gates;
         }
+
+        /// <summary>The script text V21 stores: every line ends with CRLF (run hn1, 2 November 2026: ScriptCode read back an LF
+        /// script with CRLF). The bridge writes this form, so the exact readback compares like with like.</summary>
+        internal static string NativeScriptText(string script) => script.Replace("\r\n", "\n").Replace("\n", "\r\n");
 
         internal static string Text(JObject value, string key, int max = 256)
         {
