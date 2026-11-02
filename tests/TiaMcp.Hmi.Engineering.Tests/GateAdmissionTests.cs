@@ -90,14 +90,15 @@ static class GateAdmissionTests
             Assert(HmiEngineeringRules.IsAdmittedKind("hmi_classic_import") && HmiEngineeringRules.IsAdmittedKind("hmi_external_tag_create") && HmiEngineeringRules.IsAdmittedKind("hmi_screen_create") && !HmiEngineeringRules.IsAdmittedKind("hmi_engineering")
                 && !HmiEngineeringRules.IsAdmittedKind("hmi_text_list_import") && !HmiEngineeringRules.IsAdmittedKind(null), "admitted kinds");
         });
-        check("The hmi_engineering gate names the kind that carries its three admitted operations", () => {
+        check("The hmi_engineering gate names the qualified kind and exact profile scope", () => {
             Assert(HmiEngineeringRules.Gate("classic", "classic-comfort", "scalar_property_set").Value<string>("reason").Contains("hmi_classic_import"), "Classic BackColor");
             Assert(HmiEngineeringRules.Gate("classic", "classic-comfort", "classic_xml_import").Value<string>("reason").Contains("hmi_classic_import"), "Classic import");
             Assert(HmiEngineeringRules.Gate("unified", "unified-pc", "external_tag_create").Value<string>("reason").Contains("hmi_external_tag_create"), "Unified external tag");
             string scalarReason = HmiEngineeringRules.Gate("classic", "classic-basic", "scalar_property_set").Value<string>("reason");
             string importReason = HmiEngineeringRules.Gate("classic", "classic-basic", "classic_xml_import").Value<string>("reason");
-            Assert(scalarReason.Contains("only on classic-comfort") && !scalarReason.Contains("screen or tag table"), "the Classic scalar names its profile scope");
-            Assert(importReason.Contains("only on classic-comfort and only for a screen or tag table"), "the Classic import names its profile and type scope");
+            const string classicProfiles = "only on classic-comfort or classic-rt-advanced or classic-basic";
+            Assert(scalarReason.Contains(classicProfiles) && !scalarReason.Contains("screen or tag table"), "the Classic scalar names its profile scope");
+            Assert(importReason.Contains(classicProfiles + " and only for a screen or tag table"), "the Classic import names its profile and type scope");
             Assert(HmiEngineeringRules.Gate("unified", "unified-pc", "external_tag_create").Value<string>("reason").Contains("only on unified-comfort or unified-pc"), "the Unified kind names its profiles");
             Assert(new[] { "screen_create", "item_create" }.All(o => HmiEngineeringRules.Gate("unified", "unified-pc", o).Value<string>("reason").Contains("Change kind hmi_screen_create")), "the Unified screen kind");
             Assert(HmiEngineeringRules.Gate("unified", "unified-pc", "dynamization_set").Value<string>("reason").Contains("Change kind hmi_dynamization_create"), "the Unified dynamization kind");
