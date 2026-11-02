@@ -2342,8 +2342,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/CanonicalJson.cs",
-      "sha256": "c3b5dd456de11fa5bf1f0c9609c2a01ff6d118ed102107e9a0bda3250ef53fd6",
-      "bytes": 7295
+      "sha256": "52bdbc0b5b2f227fa138cd918d7518f1a0bc65f2bce091cd5d17180eb52e77a8",
+      "bytes": 7598
     },
     {
       "path": "src/TiaMcp.Openness.V21/CapabilityRules.cs",
@@ -3112,8 +3112,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/Program.cs",
-      "sha256": "f586701d2602c1d0d854fe611a162630a425bf289289a4ab58624618ecb2ae21",
-      "bytes": 15696
+      "sha256": "95442f59d2be16470bcf75b548eb0028f082896476ab988158b23a5ab1a5fb0e",
+      "bytes": 15849
     },
     {
       "path": "src/TiaMcp.Openness.V21/ProjectIndexStore.cs",

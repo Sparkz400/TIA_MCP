@@ -87,7 +87,11 @@ namespace TiaMcp.Openness.V21
     {
         private readonly Queue<double> _floats;
         internal ExactNumberReader(string line) : this(Scan(line)) { }
-        private ExactNumberReader(Tuple<string, Queue<double>> scanned) : base(new StringReader(scanned.Item1)) { _floats = scanned.Item2; }
+        private ExactNumberReader(Tuple<string, Queue<double>, bool> scanned) : base(new StringReader(scanned.Item1)) { _floats = scanned.Item2; OutOfRange = scanned.Item3; }
+
+        // A literal beyond the double range, read as 0. The request loop refuses the request once its id is read, so the
+        // error response keeps the id; refused here, it went back without one and the Host faulted the bridge.
+        internal bool OutOfRange { get; }
 
         public override bool Read()
         {
@@ -101,10 +105,10 @@ namespace TiaMcp.Openness.V21
             return read;
         }
 
-        private static Tuple<string, Queue<double>> Scan(string line)
+        private static Tuple<string, Queue<double>, bool> Scan(string line)
         {
             var text = new StringBuilder(line.Length); var floats = new Queue<double>();
-            bool inString = false;
+            bool inString = false, outOfRange = false;
             for (int i = 0; i < line.Length; i++)
             {
                 char c = line[i];
@@ -124,10 +128,11 @@ namespace TiaMcp.Openness.V21
                 double? exact;
                 try { exact = CanonicalJsonText.ParseNumber(literal); }
                 catch (FormatException) { text.Append(literal); continue; } // not a number; Newtonsoft refuses it
-                floats.Enqueue(exact ?? throw new BridgeException("InvalidRequest", "A request number is outside the double range."));
+                outOfRange |= exact == null;
+                floats.Enqueue(exact ?? 0);
                 text.Append("0.0");
             }
-            return Tuple.Create(text.ToString(), floats);
+            return Tuple.Create(text.ToString(), floats, outOfRange);
         }
     }
 }

@@ -213,6 +213,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- A request number beyond the double range (such as `1.8e308`) broke the worker connection: the
+  worker refused it before reading the request id, so the Host reported `ProtocolMismatch` and
+  refused every later call until it was restarted. The worker now refuses such a request with
+  `InvalidRequest` and the connection stays usable (native recheck pending).
 - No `sharedDevice` disconnect could compile: V21 fails a submodule left assigned to the leaving
   PLC. The disconnect now names that PLC's items in `sharedSubmodules`, and they go to the one
   remaining PLC in the same change (`local.hardware_changes.refusals.20261102`).

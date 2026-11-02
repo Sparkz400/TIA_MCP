@@ -131,6 +131,12 @@ internal static class Program
                     {
                         reader.MaxDepth = 256; reader.DateParseHandling = DateParseHandling.None;
                         input = JToken.ReadFrom(reader);
+                        // Program.cs refuses such a request with InvalidRequest after reading its id.
+                        if ((bool)reader.GetType().GetProperty("OutOfRange", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(reader))
+                        {
+                            if ((string)vector["refusal"] != "InvalidRequest") throw new Exception("Unexpected range refusal for vector: " + name);
+                            passed++; continue;
+                        }
                     }
                 string text = (string)serialize.Invoke(null, new object[] { input }), digest = (string)sha256.Invoke(null, new object[] { input });
                 if (vector["refusal"] != null) throw new Exception("Expected " + vector["refusal"] + " for vector: " + name);
