@@ -65,9 +65,9 @@ END_ORGANIZATION_BLOCK
 '''
 # number -> block name, Openness SecondaryType, GapDb counter, informative S7-1500 start information.
 OBS = {
-    55: ("GapStatus", "StatusInterrupt", "Ob55", []),
-    56: ("GapUpdate", "UpdateInterrupt", "Ob56", []),
-    57: ("GapProfile", "ProfileInterrupt", "Ob57", []),
+    55: ("GapStatus", None, "Ob55", []),
+    56: ("GapUpdate", None, "Ob56", []),
+    57: ("GapProfile", None, "Ob57", []),
     40: ("GapHardwareInterrupt", "HardwareInterrupt", "Ob40", [("LADDR", "HW_IO"), ("USI", "Word"), ("IChannel", "USInt"), ("EventType", "Byte")]),
     82: ("GapDiagnosticError", "DiagnosticErrorInterrupt", "Ob82", [("IO_State", "Word"), ("LADDR", "HW_ANY"), ("Channel", "UInt"), ("MultiError", "Bool")]),
     83: ("GapPullOrPlug", "PullOrPlugOfModules", "Ob83", [("LADDR", "HW_IO"), ("Event_Class", "Byte"), ("Fault_ID", "Byte")]),
@@ -98,8 +98,8 @@ def ob_xml(number):
             '<AutoNumber>false</AutoNumber><Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">'
             '<Section Name="Input">' + members + '</Section><Section Name="Temp" /><Section Name="Constant" /></Sections></Interface>'
             '<MemoryLayout>Optimized</MemoryLayout><Name>' + escape(name) + '</Name><Namespace /><Number>%d</Number><ProgrammingLanguage>SCL</ProgrammingLanguage>'
-            '<SecondaryType>%s</SecondaryType></AttributeList><ObjectList><SW.Blocks.CompileUnit ID="3" CompositionName="CompileUnits"><AttributeList><NetworkSource>'
-            '<StructuredText xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v4">' % (number, secondary) + body +
+            '%s</AttributeList><ObjectList><SW.Blocks.CompileUnit ID="3" CompositionName="CompileUnits"><AttributeList><NetworkSource>'
+            '<StructuredText xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v4">' % (number, '<SecondaryType>%s</SecondaryType>' % secondary if secondary else '') + body +
             '</StructuredText></NetworkSource><ProgrammingLanguage>SCL</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit></ObjectList></SW.Blocks.OB></Document>')
 
 
@@ -114,6 +114,8 @@ def plant(h, plc, obs):
     h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": DB_SOURCE % "", "expectedBlockNames": [DB]})
     for number in obs:
         h.apply("block_import_xml", {"scopePath": plc, "xml": ob_xml(number), "expectedBlockNames": [OBS[number][0]]})
+        if number in (55, 56, 57):
+            h.report.setdefault("extendedObExports", {})[str(number)] = h.tool("block_read", {"plcPath": plc, "blockName": OBS[number][0]})
     h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": MAIN_SOURCE % 1, "expectedBlockNames": ["Main"]})
 
 

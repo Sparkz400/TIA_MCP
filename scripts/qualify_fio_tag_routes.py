@@ -48,8 +48,8 @@ WORKSPACE = "FioVci"
 LIMITATIONS = [
     "One owned scratch with a standard CPU 1511-1 PN V4.1 and a CPU 1511F-1 PN whose ET 200SP station carries two F-DI 8x24VDC HF; "
     "addresses in the first F-DI's input range only. F-output, ET 200MP and other F-module ranges are not exercised.",
-    "vci_conflict_resolve runs take=remote only, against a local bare Git remote; take=merged and block or SCL imports with absolute operands are not exercised.",
-    "software_unit_create_from copies an empty unit (its default tag table only) within the project library; unit master copies holding tags are not exercised.",
+    "vci_conflict_resolve runs take=remote and take=merged against a local bare Git remote. A separate end-of-run probe records standard SCL/XML absolute F-input reads; it is not safety-program qualification.",
+    "software_unit_create_from copies a unit with one memory tag within the project library; F-output ranges and external vendor unit archives are not exercised.",
     "The F-CPU's generated scratch user holds Full access including fail-safe (owned scratch only); no safety login, password or download.",
 ]
 
@@ -133,6 +133,22 @@ def body(h):
     if vci:
         for fmt in (x for x in vci["formats"] if x != "SimaticML"):
             probe(h, "project-ward synchronization of a %s tag-table package" % fmt, lambda fmt=fmt: other_format(h, standard, empty, vci, fmt))
+    probe(h, "standard SCL and XML blocks reading an absolute F-input", lambda: absolute_block_read(h, plc, fio, f))
+
+
+def absolute_block_read(h, plc, fio, scope):
+    """Record whether native compilation permits a standard direct read without creating a safety tag."""
+    before = tables(h)
+    source = 'FUNCTION "FioReadProbe" : Bool\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\nBEGIN\n#FioReadProbe := %s;\nEND_FUNCTION\n' % fio
+    scl = attempt(h, "source_upsert", {"language": "SCL", "source": source, "expectedBlockNames": ["FioReadProbe"]}, scope)
+    require(tables(h) == before, "The standard block import changed a tag table")
+    if not scl["prepared"]:
+        return {"scl": scl}
+    exported = h.tool("block_read", {"plcPath": plc, "blockName": "FioReadProbe"})
+    xml = artifact_bytes(h.tool, exported["artifact"]).decode("utf-8-sig")
+    imported = attempt(h, "block_import_xml", {"xml": xml, "expectedBlockNames": ["FioReadProbe"]}, scope)
+    require(tables(h) == before, "The standard XML block import changed a tag table")
+    return {"scl": scl, "xml": imported, "tagTablesUnchanged": True}
 
 
 def vci_routes(h, plc, table, fio, f):
@@ -230,12 +246,22 @@ def conflict_route(h, plc, table, fio, f, vci):
     h.report["vciConflictCheckout"] = h.stage("check the fetched package out into the workspace", checkout)
     refuse(h, "a reviewed remote side with %s on the F-DI input" % PROBE_TAG, "vci_conflict_resolve",
            {"workspacePath": workspace, "objectPath": table, "comparisonRef": comparison["recordRef"], "packageId": FIO_TABLE, "take": "remote"}, f, address=fio)
+    merged_address = fio[:-1] + "1"
+    require(sum(data.count(fio.encode()) for data in remote.values()) == 1, "Expected one F-I/O operand in the remote package")
+    merged_files = {name: data.replace(fio.encode(), merged_address.encode()) for name, data in remote.items()}
+    merged = prepare_files(run, "Reviewed merged F-I/O tag", merged_files, parent=fetched["recordRef"])
+    refuse(h, "a reviewed merged side with %s on the F-DI input" % PROBE_TAG, "vci_conflict_resolve",
+           {"workspacePath": workspace, "objectPath": table, "comparisonRef": comparison["recordRef"], "packageId": FIO_TABLE,
+            "take": "merged", "mergedRecordRef": merged["recordRef"]}, f, address=merged_address)
 
 
 def unit_routes(h, plc, standard, s):
-    """software_unit_create_from brings a unit's tag tables unread: refused while the PLC owns an F-I/O range, applied otherwise."""
+    """A unit's tag-bearing master copy is refused on an F-I/O owner and applied on the standard PLC."""
     unit = standard + "/units/" + UNIT
     change(h, "software_unit_create", {"name": UNIT}, s)
+    change(h, "tag_table_create", {"scopePath": unit, "tagTableName": "UnitTags"}, s)
+    unit_table = unit + "/tags/UnitTags"
+    change(h, "tag_create", {"tagTablePath": unit_table, "name": "UnitMarker", "dataTypeName": "Bool", "logicalAddress": "%M61.0"}, s)
     library = h.project_library()
     change(h, "library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library, "target": {"plcPath": standard},
                                              "object": {"kind": "softwareUnit", "objectPath": unit}}, {})
