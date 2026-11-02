@@ -14,13 +14,16 @@ frozen Debug builds (`git archive`; Host and Openness worker):
 | --- | --- | --- |
 | `artifacts/ap1` | `bc162ad2` | the runner steps of this round |
 | `artifacts/ap2` | `1f9e4859` | `ap1` plus the RFC 8785 fix of the translation admission scripts (below) |
-| `artifacts/ap3` | `22880f21` | `ap2` plus the X11 runner fix (below) |
+| `artifacts/ap3` | `22880f21` | `ap2` plus the X11 runner fix (built, not run) |
+| `artifacts/ap4` | `bba756d3` | `ap3` plus the resumed-fixture runner fix: the X11 rerun and the adoption pair |
 
 | Evidence | Runner | Result |
 | --- | --- | --- |
 | `local.technology.to-delete-compile.20261102` | `scripts/qualify_first_motion.py` (`ap1`) | 14/14 steps (`fm_867b1e6d`) |
 | `local.hardware_changes.delete-rule.20261102` | `scripts/qualify_hardware_changes.py --slice delete-rule` (`ap1`) | 14/14 steps (`hw_49bbccb6`) |
 | `local.read_contracts.20261102` | `scripts/qualify_read_contracts.py` (`ap1`) | 164/164 steps (`rc_8b7611cf`) |
+| `local.plc_object_mutations.audit.20261102` | `scripts/qualify_plc_object_mutations.py` (`ap4`) | 374/374 steps (`x11_0029c327`) |
+| `local.translation.adoption-refusal.20261102` | `scripts/qualify_translation_import.py` `--stop-after-noop`, then `--resume-root` (`ap4`) | both passed (`dpa1`, `dpa2`) |
 
 ## Delete and rename need compile
 
@@ -33,6 +36,7 @@ the state the runner compares was unchanged:
 - `hardware_delete` of a DI 16x24VDC HF at slot 2 of the scratch CPU's rack; the same prepared change then applied with
   checkpoint, device compile and save and removed exactly the module, its submodule, their inventory rows and its
   system constant.
+- `block_rename` and `block_delete` in the X11 rerun ([below](#change-prepare-and-apply-after-a-failed-change)).
 
 ## Generated-source reads and isModified
 
@@ -110,24 +114,31 @@ The first attempt on `ap1` (run `apem`) read the prepare's omitted `admissionKey
 `scripts/qualify_plc_object_mutations.py` now prepares `block_rename` and `block_delete`, refuses each with
 `compile=false` before applying it, checks `isModified` in every preview, and after its closing partial failure (a tag
 readdressed beyond the bit memory, `CompileFailed`, `recovery_required`) asks for another change and applies one it
-prepared before the failure. The first run on `ap1` (`x11_38dc79d7`, 372 of 373 steps) is not evidence, but it
-observed every new step: both `compile=false` refusals (`InvalidRequest`), and `change_prepare` refused with
-`RecoveryRequired` naming the failed change. The change prepared before the failure was refused before its checkpoint
-with `FingerprintUnavailable` (the failed compile leaves `X11Reader` inconsistent), which the runner did not accept, so
-the run stopped there. The apply-side guard is therefore not reached sequentially: a failed apply changes the project,
-so the fingerprint check refuses an earlier preview first; the guard covers a change still checkpointing, applying or
-restoring. `22880f21` accepts that refusal; the rerun on `ap4` (`bba756d3`) is queued.
+prepared before the failure. On `ap4` (`x11_0029c327`, 374/374, `local.plc_object_mutations.audit.20261102`):
+
+- `block_rename` of `X11Edit` and `block_delete` of `X11Drop` refused `compile=false` with `InvalidRequest` before
+  their checkpoint, then applied from the same prepared change with checkpoint, compile and save.
+- `change_prepare` of another change refused with `RecoveryRequired` naming the failed change.
+- `change_apply` of the change prepared before the failure refused before its checkpoint with `FingerprintUnavailable`:
+  the failed compile leaves `X11Reader` inconsistent. That change stayed `prepared` with no stage and no
+  `before.zap21`, and the failed change stayed `recovery_required`.
+
+The apply-side guard is therefore not reached sequentially: a failed apply changes the project, so the fingerprint
+check refuses an earlier preview first (`StaleRevision`, or `FingerprintUnavailable` as here); the guard covers a change
+still checkpointing, applying or restoring. The first run on `ap1` (`x11_38dc79d7`, 372 of 373 steps) observed the same
+and stopped because its runner did not accept `FingerprintUnavailable` (fixed in `22880f21`).
 
 ## Cross-worker adoption
 
-No adoption route is built: a fresh worker would have to grant watch ownership of a fixture it did not create, which
-the 31 October rule forbids, and no open item needs it. `qualify_translation_import.py --resume-root` now expects the
-refusal. On `ap1` the first pair (`apa1` with `--stop-after-noop`, then `apa2`) showed it: the fresh worker reopened the
-closed fixture through `qualification_translation_resume_closed_fixture`, and its next capture was refused by the
-worker's ownership check (`ProjectIsolationRequired`, "Exact saved worker-owned translation fixture required."; the
-qualification tool returns MCP's generic error text, the Host log names the refusal). That run stopped in the runner
-itself; the repeat on `ap2` (`bpa2`) observed the same refusal and stopped on a variable the check overwrote, fixed in
-`bba756d3`. The pair is queued on `ap4`.
+Closed as a boundary: no adoption route is built. A fresh worker would have to grant watch ownership of a fixture it did
+not create, which the 31 October rule forbids, and no open item needs it. `qualify_translation_import.py --resume-root`
+now expects the refusal. On `ap4` (`local.translation.adoption-refusal.20261102`) `dpa1` (`--stop-after-noop`) created
+a fresh fixture, passed the scratch probe after the fixture stage and the no-op import's reopen, and closed with exact
+process-tree proof; `dpa2` resumed it in a new Host and worker (`qualification_translation_resume_closed_fixture`
+reopened and observed it without replay), and its next capture was refused by the worker's ownership check
+(`ProjectIsolationRequired`, "Exact saved worker-owned translation fixture required."; the qualification tool returns
+MCP's generic error text, the Host log names the refusal). The earlier pairs stopped in their runner after the same
+refusal (`apa2` on `ap1`, `bpa2` on `ap2`; fixed in `bba756d3`).
 
 ## VCI remote bound
 
