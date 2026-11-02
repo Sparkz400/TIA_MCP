@@ -2,6 +2,820 @@
   "schemaVersion": 1,
   "profiles": [
     {
+      "typeIdentifier": "GSD:GSDML-V2.45-SIEMENS-TIAMCPIDEVICE-20261101.XML/DAP/DAP1",
+      "orderNumber": "6ES7 511-1AL03-0AB0",
+      "firmwareVersion": "V4.1",
+      "typeName": "TiaMcpIDevice",
+      "catalogPath": "Root\\Other field devices\\PROFINET IO\\PLCs & CPs\\Siemens Aktiengesellschaft\\CPU 1511-1 PN\\Head module\\TiaMcpIDevice",
+      "moduleKind": "device",
+      "items": [
+        {
+          "relativePath": "",
+          "name": "HwGsdHead",
+          "typeIdentifier": "GSD:GSDML-V2.45-SIEMENS-TIAMCPIDEVICE-20261101.XML/DAP/DAP1",
+          "positionNumber": 1,
+          "isBuiltIn": false,
+          "classification": "HM",
+          "attributes": [
+            {
+              "name": "Author",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "Classification",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemClassifications"
+            },
+            {
+              "name": "Comment",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "CommentML",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.MultilingualText"
+            },
+            {
+              "name": "Container",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemImpl"
+            },
+            {
+              "name": "DCPReadOnlyActive",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "DCPSynchronizeActive",
+              "accessMode": "ReadWrite",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "FirmwareVersion",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdId",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdName",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdType",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "IsBuiltIn",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsPlugged",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsProfibus",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsProfinet",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "Items",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemAssociation"
+            },
+            {
+              "name": "Name",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "OrderNumber",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "PositionNumber",
+              "accessMode": "Read",
+              "type": "System.Int32"
+            },
+            {
+              "name": "ShortDesignation",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeIdentifier",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeIdentifierNormalized",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeName",
+              "accessMode": "Read",
+              "type": "System.String"
+            }
+          ],
+          "addresses": [],
+          "channels": [],
+          "interface": null
+        },
+        {
+          "relativePath": "items/Interface",
+          "name": "Interface",
+          "typeIdentifier": "GSD:GSDML-V2.45-SIEMENS-TIAMCPIDEVICE-20261101.XML/SM/Interface",
+          "positionNumber": 2,
+          "isBuiltIn": true,
+          "classification": "None",
+          "attributes": [
+            {
+              "name": "Author",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "Classification",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemClassifications"
+            },
+            {
+              "name": "Comment",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "CommentML",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.MultilingualText"
+            },
+            {
+              "name": "Container",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemImpl"
+            },
+            {
+              "name": "GsdId",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdName",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdType",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "InterfaceOperatingMode",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.InterfaceOperatingModes"
+            },
+            {
+              "name": "InterfaceType",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.NetType"
+            },
+            {
+              "name": "IsBuiltIn",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsPlugged",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsProfibus",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsProfinet",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "Items",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemAssociation"
+            },
+            {
+              "name": "Label",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "Name",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "PnSubslotNumber",
+              "accessMode": "Read",
+              "type": "System.Int32"
+            },
+            {
+              "name": "PositionNumber",
+              "accessMode": "Read",
+              "type": "System.Int32"
+            },
+            {
+              "name": "ShortDesignation",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeIdentifier",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeIdentifierNormalized",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeName",
+              "accessMode": "Read",
+              "type": "System.String"
+            }
+          ],
+          "addresses": [],
+          "channels": [],
+          "interface": {
+            "interfaceType": "Ethernet",
+            "nodes": [
+              "IE1"
+            ],
+            "ports": [
+              "items/Interface/items/Port%201",
+              "items/Interface/items/Port%202"
+            ]
+          }
+        },
+        {
+          "relativePath": "items/Interface/items/Port%201",
+          "name": "Port 1",
+          "typeIdentifier": "GSD:GSDML-V2.45-SIEMENS-TIAMCPIDEVICE-20261101.XML/SM/Port_1",
+          "positionNumber": 1,
+          "isBuiltIn": true,
+          "classification": "None",
+          "attributes": [
+            {
+              "name": "Author",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "Classification",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemClassifications"
+            },
+            {
+              "name": "Comment",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "CommentML",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.MultilingualText"
+            },
+            {
+              "name": "Container",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemImpl"
+            },
+            {
+              "name": "FirmwareVersion",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdId",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdName",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdType",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "IsBuiltIn",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsPlugged",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsProfibus",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsProfinet",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "Items",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemAssociation"
+            },
+            {
+              "name": "Label",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "Name",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "OrderNumber",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "PnSubslotNumber",
+              "accessMode": "Read",
+              "type": "System.Int32"
+            },
+            {
+              "name": "PositionNumber",
+              "accessMode": "Read",
+              "type": "System.Int32"
+            },
+            {
+              "name": "ShortDesignation",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeIdentifier",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeIdentifierNormalized",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeName",
+              "accessMode": "Read",
+              "type": "System.String"
+            }
+          ],
+          "addresses": [],
+          "channels": [],
+          "interface": null
+        },
+        {
+          "relativePath": "items/Interface/items/Port%202",
+          "name": "Port 2",
+          "typeIdentifier": "GSD:GSDML-V2.45-SIEMENS-TIAMCPIDEVICE-20261101.XML/SM/Port_2",
+          "positionNumber": 2,
+          "isBuiltIn": true,
+          "classification": "None",
+          "attributes": [
+            {
+              "name": "Author",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "Classification",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemClassifications"
+            },
+            {
+              "name": "Comment",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "CommentML",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.MultilingualText"
+            },
+            {
+              "name": "Container",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemImpl"
+            },
+            {
+              "name": "FirmwareVersion",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdId",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdName",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdType",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "IsBuiltIn",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsPlugged",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsProfibus",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsProfinet",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "Items",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemAssociation"
+            },
+            {
+              "name": "Label",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "Name",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "OrderNumber",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "PnSubslotNumber",
+              "accessMode": "Read",
+              "type": "System.Int32"
+            },
+            {
+              "name": "PositionNumber",
+              "accessMode": "Read",
+              "type": "System.Int32"
+            },
+            {
+              "name": "ShortDesignation",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeIdentifier",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeIdentifierNormalized",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeName",
+              "accessMode": "Read",
+              "type": "System.String"
+            }
+          ],
+          "addresses": [],
+          "channels": [],
+          "interface": null
+        },
+        {
+          "relativePath": "items/TiaMcpArea",
+          "name": "TiaMcpArea",
+          "typeIdentifier": "GSD:GSDML-V2.45-SIEMENS-TIAMCPIDEVICE-20261101.XML/SM/VSM_2_1000",
+          "positionNumber": 0,
+          "isBuiltIn": true,
+          "classification": "None",
+          "attributes": [
+            {
+              "name": "AdditionalInformation",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "Author",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "Classification",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemClassifications"
+            },
+            {
+              "name": "Comment",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "CommentML",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.MultilingualText"
+            },
+            {
+              "name": "Container",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemImpl"
+            },
+            {
+              "name": "FirmwareVersion",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdId",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdName",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdType",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "InstallationDate",
+              "accessMode": "ReadWrite",
+              "type": "System.DateTime"
+            },
+            {
+              "name": "IsBuiltIn",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsPlugged",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsProfibus",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsProfinet",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "Items",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemAssociation"
+            },
+            {
+              "name": "LocationIdentifier",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "Name",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "OrderNumber",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "PlantDesignation",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "PnSubslotNumber",
+              "accessMode": "Read",
+              "type": "System.Int32"
+            },
+            {
+              "name": "PositionNumber",
+              "accessMode": "Read",
+              "type": "System.Int32"
+            },
+            {
+              "name": "ShortDesignation",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeIdentifier",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeIdentifierNormalized",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeName",
+              "accessMode": "Read",
+              "type": "System.String"
+            }
+          ],
+          "addresses": [
+            {
+              "ioType": "Input",
+              "lengthBits": 8
+            }
+          ],
+          "channels": [],
+          "interface": null
+        },
+        {
+          "relativePath": "items/TiaMcpSpare",
+          "name": "TiaMcpSpare",
+          "typeIdentifier": "GSD:GSDML-V2.45-SIEMENS-TIAMCPIDEVICE-20261101.XML/SM/VSM_2_1001",
+          "positionNumber": 1,
+          "isBuiltIn": true,
+          "classification": "None",
+          "attributes": [
+            {
+              "name": "Author",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "Classification",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemClassifications"
+            },
+            {
+              "name": "Comment",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "CommentML",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.MultilingualText"
+            },
+            {
+              "name": "Container",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemImpl"
+            },
+            {
+              "name": "FirmwareVersion",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdId",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdName",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "GsdType",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "IsBuiltIn",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsPlugged",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsProfibus",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "IsProfinet",
+              "accessMode": "Read",
+              "type": "System.Boolean"
+            },
+            {
+              "name": "Items",
+              "accessMode": "Read",
+              "type": "Siemens.Engineering.HW.DeviceItemAssociation"
+            },
+            {
+              "name": "Name",
+              "accessMode": "ReadWrite",
+              "type": "System.String"
+            },
+            {
+              "name": "OrderNumber",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "PnSubslotNumber",
+              "accessMode": "Read",
+              "type": "System.Int32"
+            },
+            {
+              "name": "PositionNumber",
+              "accessMode": "Read",
+              "type": "System.Int32"
+            },
+            {
+              "name": "ShortDesignation",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeIdentifier",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeIdentifierNormalized",
+              "accessMode": "Read",
+              "type": "System.String"
+            },
+            {
+              "name": "TypeName",
+              "accessMode": "Read",
+              "type": "System.String"
+            }
+          ],
+          "addresses": [
+            {
+              "ioType": "Input",
+              "lengthBits": 8
+            }
+          ],
+          "channels": [],
+          "interface": null
+        }
+      ],
+      "plugRules": [],
+      "evidenceId": null,
+      "capture": {
+        "tiaVersion": "V21",
+        "runner": "scripts/qualify_hardware_changes.py",
+        "report": "hw_f82e1c2e/qualification.json"
+      }
+    },
+    {
       "typeIdentifier": "OrderNumber:6ES7 131-6BF00-0BA0/V1.1",
       "orderNumber": "6ES7 131-6BF00-0BA0",
       "firmwareVersion": "V1.1",
