@@ -56,9 +56,11 @@ namespace TiaMcp.Openness.V21
                             if (part == null || !part.CanRead || part.GetIndexParameters().Length != 0) continue;
                             if (!capture.Budget.Take()) break;
                             var value = part.GetValue(native, null);
-                            if (value is IEngineeringObject engineering) row[partName.ToLowerInvariant()] = HmiProperties(engineering, capture);
-                            else if (value != null) row[partName.ToLowerInvariant()] = HmiScalar(value);
+                            // A script part is its snapshot only: its generic property read added nothing the snapshot kept and marked the
+                            // capture unavailable once an item had a handler (run he7, 2 November 2026).
                             if (value is Siemens.Engineering.HmiUnified.UI.Dynamization.Script.IHmiScript script) row["script"] = HmiScriptSnapshot(script);
+                            else if (value is IEngineeringObject engineering) row[partName.ToLowerInvariant()] = HmiProperties(engineering, capture);
+                            else if (value != null) row[partName.ToLowerInvariant()] = HmiScalar(value);
                         }
                         if (native is Siemens.Engineering.HmiUnified.UI.Dynamization.Script.IHmiScript ownScript) row["script"] = HmiScriptSnapshot(ownScript);
                         int length = Encoding.UTF8.GetByteCount(row.ToString(Formatting.None));
