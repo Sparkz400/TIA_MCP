@@ -472,6 +472,7 @@ namespace TiaMcp.Openness.V21
             var order = LibraryDependencyCapture.InstantiationOrder(change.Versions.Select(v => v.Guid.ToString("D")), closure);
             var ordered = order.Select(id => change.Versions.Single(v => v.Guid.ToString("D") == id)).ToArray();
             change.Preview["instantiationOrder"] = new JArray(order);
+            change.Preview["dependencyPathPolicy"] = "keepExistingPathsInTarget";
             change.Versions.Clear(); change.Versions.AddRange(ordered);
             foreach (var master in change.Masters)
             {
@@ -1109,8 +1110,8 @@ namespace TiaMcp.Openness.V21
                     foreach (var version in change.Versions)
                     {
                         LibraryJournal(change, "instantiate_" + version.Guid, "dispatching"); object created;
-                        if (version is CodeBlockLibraryTypeVersion block) created = scope.Blocks.Blocks.CreateFrom(block, UpdatePathsMode.ThrowIfPathsConflict);
-                        else created = scope.Types.Types.CreateFrom((PlcTypeLibraryTypeVersion)version, UpdatePathsMode.ThrowIfPathsConflict);
+                        if (version is CodeBlockLibraryTypeVersion block) created = scope.Blocks.Blocks.CreateFrom(block, UpdatePathsMode.KeepExistingPathsInTarget);
+                        else created = scope.Types.Types.CreateFrom((PlcTypeLibraryTypeVersion)version, UpdatePathsMode.KeepExistingPathsInTarget);
                         if (nameSpace != null) { if (created is PlcBlock createdBlock) createdBlock.Namespace = nameSpace; else ((PlcType)created).Namespace = nameSpace; }
                         var installed = change.Project.ProjectLibrary.FindVersion(version.Guid) ?? throw new BridgeException("VersionSelectionUnsupported", "Selected version GUID was not copied into the project library.");
                         var uses = installed.FindInstances(plc.Software).ToList();
