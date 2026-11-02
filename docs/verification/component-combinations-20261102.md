@@ -56,6 +56,17 @@ was refused before admission, with no admission record, the plan prepared and th
 The verifying change lists the four `dependentInstanceDb` shapes and the 14 combinations in `VerifiedShapes` and deploys
 the component pair without `qualificationOnly`. Every native process the runs started had exited afterwards.
 
+## Rerun at the verifying build
+
+At d1037e6b (frozen `artifacts/pc3`), the build that lists the 23 shapes:
+
+- `--candidates` (`artifacts/q3c/i1f342c`, `local.library_integrate.candidate_shapes.verified.20261102`): all 27 cases
+  passed. The 26 install cases (the seven earlier ones and the 19 of `COMBINATIONS`) previewed no candidate feature, so
+  each runs in production, and installed with every gate; `multiInstanceParent` was refused before admission.
+- The verified-flow regression without `--candidates` (`artifacts/q3r/i8fc58c`,
+  `local.library_integrate.combined_apply.regression.20261102`): the standalone and existing FBD FC installs, the OB and
+  fresh-import multi-instance refusals before admission, and the Host without the former flag.
+
 ## Still open
 
 - Software units: plan-only (unit tags are a V21 boundary, component readback covers the standard scope).
