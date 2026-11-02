@@ -172,7 +172,9 @@ def unintended(before, after, family, hmi_path=None, roots=(), fields=None):
         rows_ = differences(old, new)
         extra = outside(rows_, family, roots) if path == hmi_path else rows_
         if extra:
-            found[path] = extra[:20]
+            # A whole section differs when its coverage changed: name both statuses (run he7).
+            found[path] = [row + " (coverage %s -> %s)" % ((old.get(row) or {}).get("coverage"), (new.get(row) or {}).get("coverage"))
+                           if row in old or row in new else row for row in extra[:20]]
     return found
 
 
