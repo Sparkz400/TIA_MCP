@@ -112,6 +112,7 @@ worker and Simulator worker), each in owned scratch projects the runner created 
 | `local.library.tag-collision.20261101` | `scripts/qualify_master_copy_tag_collision.py` | 41/41 steps (`tc_531cbab9`) |
 | `local.sim.output-refusal-2.20261101` | `scripts/qualify_plcsim_signals.py`, `scripts/qualify_plcsim_diagnostics.py` | 95/95 (`ps_95b2f7f7`) and 60/60 steps (`ps_6b3362fe`) |
 | `local.component.canonical-hash.20261101` | `scripts/qualify_plc_component.py --canonical-hash-probe` | passed (`artifacts/od`); the first attempt stopped in the runner, below |
+| `local.component.canonical-hash.20261102` | the same, with PR 190 and `1.8e308` refused | passed (`artifacts/hz4`, 2 November), [below](#canonical-hash-live-with-pr-190-2-november) |
 
 ### F-I/O routes: conflict resolution and unit copies
 
@@ -179,3 +180,26 @@ refuses a child whose RFC 8785 request hash differs from the worker's, so every 
 separate Python RFC 8785 recomputation of the `verifyImport` request after the run (`1000`, `2.2250738585072014e-308`)
 reproduced the Host's recorded `requestSha256`. The earlier-form acceptance of PR 186 is not exercised by this fresh
 store.
+
+### Canonical hash, live, with PR 190 (2 November)
+
+`local.component.canonical-hash.20261102`: the same runner on a frozen Debug build of `4b970cc9` (`artifacts/hz3`;
+main with PR 190's exact reading of request floats and its range refusal), passed in one owned run (`artifacts/hz4`).
+
+- Preparing the run found a worker bug. A request number beyond the double range was refused before the worker read
+  the request id, so the error went back without one: the Host reported `ProtocolMismatch` and its bridge refused
+  every later call until a restart. The worker now refuses such a request with `InvalidRequest` after reading its id
+  (PR 199).
+- Before the first advance, the same advance request with `1.8e308` added was refused with `InvalidRequest`
+  ("A request number is outside the double range.", from the worker's request reader). The window kept its revision,
+  state and children (`start`, `applyLibrary`), and the `verifyImport` advance that followed dispatched on the same
+  Host session.
+- Each of the three advance requests carried the probe of 1 November plus `1.7976931348623158e308`; every child
+  dispatched, and the window completed with preservation, fresh reopen and first-checkpoint recovery as before.
+- A separate Python RFC 8785 recomputation of all three advance requests (`1000`, `2.2250738585072014e-308`,
+  `1.7976931348623157e+308`, which is double.MaxValue) reproduced the Host's recorded hashes `c857106f`, `340dd121`
+  and `c5e740ce`.
+
+The worker reads a component-window request before the Host hashes it, so the Host's own range refusal is covered by
+the shared vectors offline only. The earlier stored forms (PR 186, and PR 190's source-snapshot form) are not
+exercised by this fresh store.

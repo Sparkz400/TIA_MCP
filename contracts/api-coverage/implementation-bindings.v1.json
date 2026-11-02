@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "133311642c1fbbbebca6041dca65858650c85e5754be4e1c87b33ff66d137ff2",
-      "bytes": 1690842
+      "sha256": "570bcd2476546efac8523bb54b0c4cc82a9c836a0a3b61d9cb3fa9b0d82ba668",
+      "bytes": 1694039
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -120203,6 +120203,13 @@
           "artifacts": [
             "evidence/local.component.canonical-hash.20261101.json"
           ]
+        },
+        {
+          "id": "local.component.canonical-hash.20261102",
+          "profileSha256": "35abfa7123cda7612f0e1c9d25fa05c6e70a0c284c450ff52b602119bea482e8",
+          "artifacts": [
+            "evidence/local.component.canonical-hash.20261102.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -132244,6 +132251,11 @@
       "sha256": "155bd8f63eccae7370eceee45b8c7371843ce19acb69c6c19d805ee614db52fa"
     },
     {
+      "path": "evidence/local.component.canonical-hash.20261102.json",
+      "state": "observed",
+      "sha256": "ba454547e957dc07827a7ba3b3e8127bc11c75237da540c098885d67a5ce20ca"
+    },
+    {
       "path": "evidence/local.composite_capture.20261028.json",
       "state": "observed",
       "sha256": "e79b6dd5975c6160b7226f361c188a34f93d82e1403537b779c814396389fb30"
@@ -133418,6 +133430,10 @@
     {
       "id": "local.component.canonical-hash.20261101",
       "profileSha256": "2b228e53930d011cd8622ba80e02b51ce2dc64ff2e4038036be6cc7a980132b3"
+    },
+    {
+      "id": "local.component.canonical-hash.20261102",
+      "profileSha256": "35abfa7123cda7612f0e1c9d25fa05c6e70a0c284c450ff52b602119bea482e8"
     },
     {
       "id": "local.composite_capture.20261028",
