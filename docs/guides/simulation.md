@@ -155,6 +155,9 @@ selected instance. None of them touches the machine-wide network mode, adapters 
   instance in RUN. Hardware IDs come from the PLC's system constants. The runtime's acceptance and sequence
   number are reported; whether the OB ran is shown only by program values, for example an OB counter read
   with `sim_read`.
+  The 2 November owned ET 200SP fixture observed OB55/56/57 counter increases for all three extended
+  event kinds on six distributed hardware identities, with invalid targets refused
+  (`local.plcsim.extended-events.20261102`; [scope and limits](../verification/local-completion-20261102.md#simulator-and-release-controls)).
 - **Memory reset.** `sim_state` `memoryReset` calls `MemoryReset` and requires STOP or RUN afterwards.
 - **Storage.** `sim_storage` needs the owned instance powered off. `archive` writes
   `<instance>-<guid>.zip` and a receipt with its SHA-256 to the Host's `simulation-archives` directory;

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.127",
+  "catalogVersion": "0.4.128",
   "targetTiaVersions": [
     21
   ],
@@ -4810,6 +4810,22 @@
       "limitations": [
         "One owned PLCSIM Advanced V8 CPU1511 instance; shared credential-vault route, not physical PLC or Test Suite system execution."
       ]
+    },
+    {
+      "id": "local.plcsim.extended-events.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "d414f669fc629b5fb85a2e5214b1f20e2836c290",
+        "passedScope": "Owned CPU1511 Softbus: status/update/profile events execute OB55/56/57, each counter increases on six distributed ET200SP hardware IDs; IODevice identity and central-module refusals retained; channel interrupt configuration restored; owned instance released."
+      },
+      "artifacts": [
+        "evidence/local.plcsim.extended-events.20261102.json"
+      ],
+      "limitations": [
+        "58 stages, selected distributed event specifiers and hardware IDs only. No physical I/O, configuration-change delivery, other data-record/cycle modes or full runtime qualification; raw broad runtimeVerified remains false."
+      ]
     }
   ],
   "features": [
@@ -7499,7 +7515,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.plcsim_gaps.20261029",
-          "local.plcsim_gaps.ob40.20261030"
+          "local.plcsim_gaps.ob40.20261030",
+          "local.plcsim.extended-events.20261102"
         ]
       },
       "availability": {

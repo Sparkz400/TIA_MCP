@@ -46,6 +46,10 @@
     {
       "id": "local.library.dmc-vendor-compile-boundary.20261102",
       "reason": "The first 100 selected DMC blocks instantiated, but vendor protection/dependency and CPU-family compiler errors stopped the all-default qualification. Separate dependency-order regression passed."
+    },
+    {
+      "id": "local.safety.fio-xml-fixture-refusal.20261102",
+      "reason": "The F-input source guard passed; the standard-CPU XML positive fixture failed compile after namespace reserialization. A namespace-preserving fixture correction is rerun separately."
     }
   ]
 }
