@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "builderUsed": false,
+  "nativeImportCompileVerified": true,
+  "engineeringVerified": false,
+  "preservationVerified": false,
+  "persistenceVerified": false,
+  "recoveryVerified": false,
+  "runtimeVerified": false,
+  "tiaVersion": "V21",
+  "route": "standard",
+  "changedFb": "Tgp_NestEffect",
+  "chain": [
+    {
+      "fb": "Tgp_NestEffect"
+    },
+    {
+      "fb": "Tgp_NestParent",
+      "member": "Inner"
+    },
+    {
+      "fb": "Tgp_NestGrand",
+      "member": "Middle"
+    }
+  ],
+  "cpuFamily": "OrderNumber:6ES7 513-1AM03-0AB0/V4.1",
+  "artifacts": {
+    "before:Tgp_NestEffect": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive.6es7-513-1am03-0ab0-v4-1/before-Tgp_NestEffect.xml",
+      "sha256": "17e91f05434433f2ff1b2c98ba0afdbbf476bf43d2586839735e56a19460c8c3",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "before:Tgp_NestEffect_DB": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive.6es7-513-1am03-0ab0-v4-1/before-Tgp_NestEffect_DB.xml",
+      "sha256": "387b1ba1ec8e67ce447c884d0bed5eff2279d1388a9f2a4fedbeab6e392d8f37",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "before:Tgp_NestGrand": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive.6es7-513-1am03-0ab0-v4-1/before-Tgp_NestGrand.xml",
+      "sha256": "dd3b6658367726ed6f71071a4c36c3d5793dc42e8b4bfa966e64cba949e0f60e",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "before:Tgp_NestGrand_DB": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive.6es7-513-1am03-0ab0-v4-1/before-Tgp_NestGrand_DB.xml",
+      "sha256": "e1343dc89e8f4a0c75c476e708118a57e63441a90688c7bfad9bd8e99dfb5f32",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "before:Tgp_NestParent": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive.6es7-513-1am03-0ab0-v4-1/before-Tgp_NestParent.xml",
+      "sha256": "21291306d573ba7088152b3bf431528d80a47cbf956e14afc935773fb1c2271b",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "before:Tgp_NestParent_DB": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive.6es7-513-1am03-0ab0-v4-1/before-Tgp_NestParent_DB.xml",
+      "sha256": "974fe173bcd6b0b81e9b62d8a1144e935f81f6a1581e8bf2b53a9f48a602417e",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "after:Tgp_NestEffect": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive.6es7-513-1am03-0ab0-v4-1/after-Tgp_NestEffect.xml",
+      "sha256": "2f4ecf5bd6911d9b9cc8c7fa8a32b27ff0d73ab548af18d2a692f1e3bb097e19",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "after:Tgp_NestEffect_DB": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive.6es7-513-1am03-0ab0-v4-1/after-Tgp_NestEffect_DB.xml",
+      "sha256": "14bcce685a9c333cb6d1a9935d72521807977f71bc3b318b28fa25d238e7f56d",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "after:Tgp_NestGrand": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive.6es7-513-1am03-0ab0-v4-1/after-Tgp_NestGrand.xml",
+      "sha256": "4c9ddb9dc4006c7f30231e5e8e61950291e2ac739a3ca660aa8a164c0aa1d174",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "after:Tgp_NestGrand_DB": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive.6es7-513-1am03-0ab0-v4-1/after-Tgp_NestGrand_DB.xml",
+      "sha256": "55fc1671e84ef8b7adc5d7359c3a369088991f300d5b37f2ca762d6d1759eabb",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "after:Tgp_NestParent": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive.6es7-513-1am03-0ab0-v4-1/after-Tgp_NestParent.xml",
+      "sha256": "63c152885e5d74efdfb70332728bc9008b245acdf0eba3e7b4b99be17d216bb3",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "after:Tgp_NestParent_DB": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive.6es7-513-1am03-0ab0-v4-1/after-Tgp_NestParent_DB.xml",
+      "sha256": "cf2a40518ded471e5dc02917676acf035555f4fecb3ea04f9d817cdca858d36a",
+      "captureReport": "artifacts/c2d/capture.json"
+    }
+  },
+  "sources": {
+    "before": {
+      "path": "fixtures/typed-graphical/sources/transitive-effect-before.scl",
+      "sha256": "e1216e18cf2b20cab1b2adf5da717e3860af20fcc7ddaf9439297f13f82f392c",
+      "transportSha256": "e1216e18cf2b20cab1b2adf5da717e3860af20fcc7ddaf9439297f13f82f392c",
+      "changeId": "b083f0e5951747c4a456f1586adcc33e"
+    },
+    "after": {
+      "path": "fixtures/typed-graphical/sources/transitive-effect-after.scl",
+      "sha256": "a386707c119f4039286f41c3f76d439a7abbb109fe043116e98b400e7e8a124d",
+      "transportSha256": "a386707c119f4039286f41c3f76d439a7abbb109fe043116e98b400e7e8a124d",
+      "changeId": "dc2cae920b564305864d23baa6141e76"
+    }
+  },
+  "nativeObservedEffect": {
+    "appendedMembers": [
+      {
+        "name": "Child",
+        "datatype": "\"TiaMcp_EnableGate\""
+      },
+      {
+        "name": "Timer_TON",
+        "datatype": "TON_TIME"
+      },
+      {
+        "name": "Timer_TOF",
+        "datatype": "TOF_TIME"
+      },
+      {
+        "name": "Timer_TP",
+        "datatype": "TP_TIME"
+      },
+      {
+        "name": "Counter_CTU",
+        "datatype": "CTU_INT"
+      },
+      {
+        "name": "Counter_CTD",
+        "datatype": "CTD_INT"
+      },
+      {
+        "name": "Counter_CTUD",
+        "datatype": "CTUD_INT"
+      }
+    ],
+    "nestedHostsPerDependent": {
+      "Tgp_NestParent": 1,
+      "Tgp_NestGrand": 1,
+      "Tgp_NestParent_DB": 1,
+      "Tgp_NestGrand_DB": 1
+    },
+    "rule": "Each member typed as the changed FB, at any depth of a parent FB or instance DB, appends every new member to its nested Static section in the direct instance-DB shape without the top-level AttributeList, Remanence and Accessibility.",
+    "existingFullPayloadPreserved": true
+  }
+}

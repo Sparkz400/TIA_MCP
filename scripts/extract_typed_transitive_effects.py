@@ -97,7 +97,9 @@ def extract(capture_path, route="standard"):
               "artifacts": {}, "sources": {}}
     documents = {}
     for phase, entry in zip(("before", "after"), fixtures):
-        source = ROOT / entry["sourcePath"]
+        # A capture from a frozen build names its own copy of the committed source; only identical text stands in.
+        source = ROOT / report_name(Path(entry["sourcePath"]))
+        assert hashlib.sha256(source.read_text(encoding="utf-8-sig").encode()).hexdigest() == entry["sha256"], "Authored source changed since capture."
         result["sources"][phase] = {"path": source.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
                                     "transportSha256": entry["sha256"], "changeId": entry["changeId"]}
         for export in entry["exports"]:
