@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.113",
+  "catalogVersion": "0.4.114",
   "targetTiaVersions": [
     21
   ],
@@ -4261,6 +4261,130 @@
         "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1, standard PLC scope.",
         "A --component-qualification Host; production admission follows from the empty candidateFeatures, which the production gate computes the same way."
       ]
+    },
+    {
+      "id": "local.read_contracts.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "bc162ad24797efa34d3c82f87202b2b018c7c160",
+        "passedScope": "Rerun of local.read_contracts.20261028 with two additions: scripts/qualify_read_contracts.py on a frozen Debug build of bc162ad2 (artifacts/ap1, git archive), 164/164 steps in owned scratch projects; identity, typed refusal and completeness per feature for the same 34 read features. New: a VCI workspace RcVci (SimaticML, outside the project) mapping the SCL blocks RcCaller and RcFb by export; vci_workspace_inspect named both mappings with a 64-hex contentSha256 each, distinct, equal on a second read, truncated at maxItems 2, and after block_attributes_set of RcFb's HeaderFamily only RcFb's hash changed. block_read and type_read with format generatedSource reported projectModifiedBefore and projectModifiedAfter (both false on the saved scratch) with no external source left; every change preview reported isModified (false)."
+      },
+      "artifacts": [
+        "evidence/local.read_contracts.20261102.json"
+      ],
+      "limitations": [
+        "One owned scratch project: CPU 1511-1 PN V4.1 with one software unit, plus CPU 1518-4 PN/DP added by hardware_add, and one VCI workspace mapping two SCL blocks; families absent from it (safety, technology objects, HMI, connections, PLC documents, protection) were observed only as empty, complete results.",
+        "contentSha256 is checked as distinct, stable and content-tracking, not recomputed independently: no other tool exports a block without document info.",
+        "The generatedSource offline-project refusal and exclusive access are not observable here: the scratch is offline and no other client contends.",
+        "Engineering reads only; no runtime, online or physical-device observation."
+      ]
+    },
+    {
+      "id": "local.technology.to-delete-compile.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "bc162ad24797efa34d3c82f87202b2b018c7c160",
+        "passedScope": "scripts/qualify_first_motion.py on a frozen Debug build of bc162ad2 (artifacts/ap1, git archive), 14/14 steps, in one owned scratch CPU 1511-1 PN V4.1: the first-motion steps of local.technology.first-motion.20261101 again (TO_PositioningAxis 10.0 refused compile=false with CompileRequired before the checkpoint, the virtual axis applied compiled, TO_ExternalEncoder 10.0 applied uncompiled and change_restore brought back the project with the axis only), then in that restored project change_apply of to_delete of the axis with compile=false refused with InvalidRequest (requires compile=true, the 31 October delete and rename rule): change_status stayed prepared with no stage, no before.zap21 was written and technology_read and the program inventory were unchanged."
+      },
+      "artifacts": [
+        "evidence/local.technology.to-delete-compile.20261102.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1; only the compile=false refusal of to_delete is new here, the delete itself is qualified by local.technology_changes.20261028.",
+        "Engineering only: nothing is downloaded, no axis moves and the encoder stays unconnected."
+      ]
+    },
+    {
+      "id": "local.hardware_changes.delete-rule.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "bc162ad24797efa34d3c82f87202b2b018c7c160",
+        "passedScope": "scripts/qualify_hardware_changes.py --slice delete-rule on a frozen Debug build of bc162ad2 (artifacts/ap1, git archive), 14/14 steps, in one owned scratch CPU 1511-1 PN V4.1: a DI 16x24VDC HF (6ES7 521-1BH00-0AB0) plugged at slot 2 with checkpoint, compile and save; change_apply of hardware_delete of it with compile=false refused with InvalidRequest (requires compile=true, the 31 October delete and rename rule) before its checkpoint, change_status prepared with no stage or recovery archive and the complete hardware, inventory and program state unchanged; the same prepared change then applied with checkpoint, device compile and save and removed exactly the module, its built-in submodule, their inventory rows and its system constant."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.delete-rule.20261102.json"
+      ],
+      "limitations": [
+        "One module in the scratch CPU's rack; no reopen and no restore here (both are qualified by local.hardware_changes.20261028).",
+        "Engineering only; nothing is downloaded and no physical topology is observed."
+      ]
+    },
+    {
+      "id": "local.translation.restricted.qualification.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1f9e4859a4010028905ac8e6e89d34828418889c",
+        "passedScope": "Rerun of local.translation.restricted.qualification.20261031 on current main with the RFC 8785 fix of the admission scripts: the qualification_translation_* tools in an explicit --translation-qualification session on a frozen Debug build of 1f9e4859 (artifacts/ap2, git archive) under TIA Portal V21 Update 3, English UI, qualify_translation_import.py --same-instance --restricted-lifecycle (run bpsi). Category probes with the conclusive populated-Main control; Host-filtered PLC captures keeping exactly 5, 1 and 0 of 6 native rows for BlockCommentCategoryData, HwcnCommentTextCategoryData and AlarmClassDisplayNameCategory; on the filtered block-comment scope the seven forward cases (before-dispatch, source drift, lost import, compile, save, reopen and restore replies; the last three verifiedApplied), three reviewed reverse edits, 8 imports and 10 distinct restorations, all reconciled, and the final unattempted plan with the same restricted-contract key, whose Host hash is now RFC 8785 (8e2b8644...). The independent verify_translation_admission.py of 1f9e4859 passed (bpsi-verification.json)."
+      },
+      "artifacts": [
+        "evidence/local.translation.restricted.qualification.20261102.json"
+      ],
+      "limitations": [
+        "One owned scratch, one PLC, de-DE/en-GB, target-only text; only the BlockCommentCategoryData restriction is imported in this packet.",
+        "The first attempt on bc162ad2 (run apsi) stopped before its first case: the runner compared the Host's RFC 8785 key hash with the earlier form (fixed in 1f9e4859).",
+        "The read-only warning is matched in its English wording only."
+      ]
+    },
+    {
+      "id": "local.translation.restricted.empty.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1f9e4859a4010028905ac8e6e89d34828418889c",
+        "passedScope": "qualify_translation_import.py --restricted-lifecycle --empty-restricted (run bpem) in an explicit --translation-qualification session on the 1f9e4859 Debug build (artifacts/ap2): a fresh owned scratch; category probes and the Host-filtered captures (5, 1 and 0 of 6 rows); a no-op import of the filtered BlockCommentCategoryData capture; the empty (header-only) Host-filtered AlarmClassDisplayNameCategory capture, keeping no row and listing all 6 native rows as excluded, prepared as a no-op without an admission key (TranslationAdmissionScopeUnqualified) and imported with checkpoint, compile, save and fresh reopen, recovered to a new directory and reconciled; then the Main edit of the block-comment scope with a lost restore reply, reconciled. A scratch-only change_prepare (hardware_add with configureScratchSecurity) passed after the fixture stage and after the no-op import's reopen: the fixture keeps its scratch status (31 October audit)."
+      },
+      "artifacts": [
+        "evidence/local.translation.restricted.empty.20261102.json"
+      ],
+      "limitations": [
+        "One scratch, one PLC, de-DE/en-GB; the empty capture is the fixture's AlarmClassDisplayNameCategory, which no other category scope was exercised as.",
+        "A qualification-mode import: no production admission exists for an empty or alarm-class scope.",
+        "The first attempt on bc162ad2 (run apem) read the prepare's omitted admissionKey and stopped before the empty import; its no-op import and both scratch probes had passed."
+      ]
+    },
+    {
+      "id": "local.translation.restricted.native.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1f9e4859a4010028905ac8e6e89d34828418889c",
+        "passedScope": "The six translation_native_* tools in default mode on the 1f9e4859 Debug build (artifacts/ap2) with the provisional restricted registry (translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1, profile ap2-restricted, 21 proofs) that build_translation_admission.py built from local.translation.restricted.qualification.20261102 with proofs in the Host's RFC 8785 key hash: qualify_translation_native.py --interrupt worker:checkpointIntent --interrupt worker:dispatchIntent --interrupt host:dispatchIntent (run bppd). Each interruption reconciled unchanged with the replay refused (RecoveryRequired); the clean lifecycle refused a forged plan, a stale revision, a replay, an existing recovery destination and the changed baseline, imported once, recovered to a new directory and reconciled verifiedApplied/verifiedRestored. Right after the import's fresh reopen of the admitted (not scratch) project, a scratch-only change_prepare (hardware_add with configureScratchSecurity) was refused with ScratchIsolationRequired: the reopen stage did not grant scratch status (31 October audit). build_translation_admission.py --finalize then produced the 25-proof final entry."
+      },
+      "artifacts": [
+        "evidence/local.translation.restricted.native.20261102.json"
+      ],
+      "limitations": [
+        "One scratch instance; the admitted project is the qualification packet's fixture opened with project_open, so it is admitted, not the worker's scratch.",
+        "Watch ownership after the reopen is not observed separately; the scratch probe observes the scratch reference.",
+        "Interruption is process termination of the worker with its owned TIA or of the Host; power loss and remote transport are not exercised."
+      ]
+    },
+    {
+      "id": "local.translation.restricted.finalized.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1f9e4859a4010028905ac8e6e89d34828418889c",
+        "passedScope": "The worker side of a finalized restricted entry: qualify_translation_native.py --finalized-capture (run bpfc) in default mode on the 1f9e4859 Debug build (artifacts/ap2) with the 25-proof final registry (no deployment binding) that build_translation_admission.py --finalize built from local.translation.restricted.native.20261102. An uninstalled profile was refused (TranslationImportProfileUnqualified); translation_native_capture of the admitted project passed through the Host and the worker loaders of the final entry and kept the installed category scope (5 BlockCommentCategoryData rows) with the Main OB1 comment at the replacement the finalizing packet imported; a reviewed reverse edit of it was refused at translation_native_prepare with TranslationAdmissionMismatch, because the admitted baseline was spent by that packet."
+      },
+      "artifacts": [
+        "evidence/local.translation.restricted.finalized.20261102.json"
+      ],
+      "limitations": [
+        "No import through the final entry: the default-mode packet that finalizes an entry imports its one admitted edit, so the entry's baseline is spent before it is installed; an import through a final entry needs a scratch whose baseline a new packet admits.",
+        "One scratch instance, one PLC, de-DE/en-GB."
+      ]
     }
   ],
   "features": [
@@ -5121,7 +5245,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.read_contracts.20261028"
+          "local.read_contracts.20261028",
+          "local.read_contracts.20261102"
         ]
       },
       "availability": {
@@ -5977,7 +6102,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.read_contracts.20261028"
+          "local.read_contracts.20261028",
+          "local.read_contracts.20261102"
         ]
       },
       "availability": {
@@ -8251,7 +8377,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): the last DI module of the CPU rack removed with its system constant; CPUs and built-in ports refused; reopen and checkpoint restore. A deletion that leaves a gap in an S7-1500 rack fails the device compile.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): the last DI module of the CPU rack removed with its system constant; CPUs and built-in ports refused; reopen and checkpoint restore. A deletion that leaves a gap in an S7-1500 rack fails the device compile. compile=false is refused before the checkpoint (local.hardware_changes.delete-rule.20261102).",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
@@ -8261,7 +8387,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.hardware_changes.20261028",
-          "local.hardware_changes.families.20261029"
+          "local.hardware_changes.families.20261029",
+          "local.hardware_changes.delete-rule.20261102"
         ]
       },
       "availability": {
@@ -8534,7 +8661,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): PID_Compact objects deleted; missing objects refused; reopen and checkpoint restore.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): PID_Compact objects deleted; missing objects refused; reopen and checkpoint restore. compile=false is refused before the checkpoint (local.technology.to-delete-compile.20261102).",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "A virtual TO_PositioningAxis10.0 initial-parameter fixture passed on CPU1511 firmware4.1; external encoder compilation failed without telegram connections and recovered. This does not qualify connected motion hardware.",
           "The 17 October selection repair bounds technology identity scans to 50,000 objects/groups and 64 group levels. Existing-object previews bind an exact technologyPath; legacy names must be unique, path/name contradictions refuse, and apply never falls back to a name. Creation remains root-group-only with a repeated collision check; deletion verifies selected-path absence without replay. Path/type/version metadata fingerprints are revision evidence, not durable native identity or whole-object preservation. Linked-routine synthetic checks do not qualify the Siemens SDK or native lifecycle.",
@@ -8545,7 +8672,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.technology_changes.20261028"
+          "local.technology_changes.20261028",
+          "local.technology.to-delete-compile.20261102"
         ]
       },
       "availability": {
@@ -17502,7 +17630,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.qualification.20261028",
-          "local.translation.restricted.qualification.20261031"
+          "local.translation.restricted.qualification.20261031",
+          "local.translation.restricted.qualification.20261102"
         ]
       },
       "availability": {
@@ -17549,7 +17678,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.qualification.20261028",
-          "local.translation.restricted.qualification.20261031"
+          "local.translation.restricted.qualification.20261031",
+          "local.translation.restricted.qualification.20261102"
         ]
       },
       "availability": {
@@ -17596,7 +17726,9 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.qualification.20261028",
-          "local.translation.restricted.qualification.20261031"
+          "local.translation.restricted.qualification.20261031",
+          "local.translation.restricted.qualification.20261102",
+          "local.translation.restricted.empty.20261102"
         ]
       },
       "availability": {
@@ -17643,7 +17775,9 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.qualification.20261028",
-          "local.translation.restricted.qualification.20261031"
+          "local.translation.restricted.qualification.20261031",
+          "local.translation.restricted.qualification.20261102",
+          "local.translation.restricted.empty.20261102"
         ]
       },
       "availability": {
@@ -17690,7 +17824,9 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.qualification.20261028",
-          "local.translation.restricted.qualification.20261031"
+          "local.translation.restricted.qualification.20261031",
+          "local.translation.restricted.qualification.20261102",
+          "local.translation.restricted.empty.20261102"
         ]
       },
       "availability": {
@@ -17737,7 +17873,9 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.qualification.20261028",
-          "local.translation.restricted.qualification.20261031"
+          "local.translation.restricted.qualification.20261031",
+          "local.translation.restricted.qualification.20261102",
+          "local.translation.restricted.empty.20261102"
         ]
       },
       "availability": {
@@ -17784,7 +17922,9 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.qualification.20261028",
-          "local.translation.restricted.qualification.20261031"
+          "local.translation.restricted.qualification.20261031",
+          "local.translation.restricted.qualification.20261102",
+          "local.translation.restricted.empty.20261102"
         ]
       },
       "availability": {
@@ -17831,7 +17971,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.qualification.20261028",
-          "local.translation.restricted.qualification.20261031"
+          "local.translation.restricted.qualification.20261031",
+          "local.translation.restricted.qualification.20261102"
         ]
       },
       "availability": {
@@ -18491,7 +18632,7 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Native category filtering still leaks under V21 Update 3. One restricted profile is qualified instead: the Host-filtered BlockCommentCategoryData capture of one PLC (contract translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1), natively qualified by local.translation.restricted.qualification.20261031 and local.translation.restricted.native.20261031 including the default-mode interruptions. A restricted registry built from the qualification packet alone is provisional and refused outside its qualification deployment until build_translation_admission.py --finalize adds the default-mode packet. Other categories, several PLCs and block selections stay unqualified. Broad translation support is not qualified.",
+          "Native category filtering still leaks under V21 Update 3. One restricted profile is qualified instead: the Host-filtered BlockCommentCategoryData capture of one PLC (contract translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1), natively qualified by local.translation.restricted.qualification.20261031 and local.translation.restricted.native.20261031 including the default-mode interruptions, and again on current main by local.translation.restricted.qualification.20261102 and local.translation.restricted.native.20261102; local.translation.restricted.finalized.20261102 captures through a finalized entry, whose baseline its finalizing default-mode packet already imported, so no import through a final entry is exercised. A restricted registry built from the qualification packet alone is provisional and refused outside its qualification deployment until build_translation_admission.py --finalize adds the default-mode packet. Other categories, several PLCs and block selections stay unqualified. Broad translation support is not qualified.",
           "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; installed admission contracts stay de-DE/en-GB, one PLC and target-only, with the whole-project export or the one-PLC block-comment restriction.",
           "Natively qualified by local.translation.native.20261028 with a registry that scripts/build_translation_admission.py built from the verified same-instance packet and installed only into a byte-identical copy of the frozen test binaries. That registry admits exactly one scratch project and one Main OB1 comment edit; no shipped package contains a registry, so production import stays unavailable until an operator installs a reviewed one.",
           "Default-mode interruption: worker loss at checkpoint intent and during the import, and Host loss during the import, each reconciled from a fresh Host without replay."
@@ -18501,7 +18642,9 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.native.20261028",
-          "local.translation.restricted.native.20261031"
+          "local.translation.restricted.native.20261031",
+          "local.translation.restricted.native.20261102",
+          "local.translation.restricted.finalized.20261102"
         ]
       },
       "availability": {
@@ -18553,7 +18696,9 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.native.20261028",
-          "local.translation.restricted.native.20261031"
+          "local.translation.restricted.native.20261031",
+          "local.translation.restricted.native.20261102",
+          "local.translation.restricted.finalized.20261102"
         ]
       },
       "availability": {
@@ -18605,7 +18750,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.native.20261028",
-          "local.translation.restricted.native.20261031"
+          "local.translation.restricted.native.20261031",
+          "local.translation.restricted.native.20261102"
         ]
       },
       "availability": {
@@ -18657,7 +18803,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.native.20261028",
-          "local.translation.restricted.native.20261031"
+          "local.translation.restricted.native.20261031",
+          "local.translation.restricted.native.20261102"
         ]
       },
       "availability": {
@@ -18709,7 +18856,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.native.20261028",
-          "local.translation.restricted.native.20261031"
+          "local.translation.restricted.native.20261031",
+          "local.translation.restricted.native.20261102"
         ]
       },
       "availability": {
@@ -18761,7 +18909,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.translation.native.20261028",
-          "local.translation.restricted.native.20261031"
+          "local.translation.restricted.native.20261031",
+          "local.translation.restricted.native.20261102"
         ]
       },
       "availability": {
@@ -19753,7 +19902,7 @@
         "limitations": [
           "Read-only bounded traversal (maxItems shared by groups, workspaces, mapped objects and supported formats; group depth 32) with explicit truncation and per-workspace/per-mapping warnings.",
           "Mapped-object identity is the native ancestor type/Name/Number chain, not a stable GUID. CompareState, IndividualObjectCompareDetails and child MappingState are native observations, not preservation, import or synchronization qualification.",
-          "Each mapped object also reports contentSha256: the SHA-256 of its SimaticML export without document info (null with a warning when V21 refuses the export). It is the native-side hash a vci_conflict_resolve plan supplies and the worker rechecks; this field is not covered by local.read_contracts.20261028.",
+          "Each mapped object also reports contentSha256: the SHA-256 of its SimaticML export without document info (null with a warning when V21 refuses the export). It is the native-side hash a vci_conflict_resolve plan supplies and the worker rechecks; local.read_contracts.20261102 covers it natively: two mapped SCL blocks report distinct hashes, equal on a second read, and only the edited block's hash changed.",
           "No export tool: V21 Workspace.ExportObject creates a MappedObject in the project and writes below the workspace RootPath, and MappedObject.Synchronize writes the user's workspace; neither is a project-neutral export into a worker-owned directory. Workspace creation/deletion, mapping add/remove and directed synchronization are separate prepared change kinds (change.vci_*), not part of this read-only tool.",
           "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results."
         ]
@@ -19761,7 +19910,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.read_contracts.20261028"
+          "local.read_contracts.20261028",
+          "local.read_contracts.20261102"
         ]
       },
       "availability": {
