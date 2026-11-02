@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
+from extract_typed_graphical_profiles import cpu_slug, effect_name, report_cpu
 from smoke_mcp import ROOT
 
 
@@ -33,19 +34,19 @@ COMPONENT_FB, COMPONENT_MEMBER = "TiaMcpComponentGate", "Gate"
 
 
 def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace="", iec=False, component=False):
-    suffix = "" if route == "standard" else "-" + route
     assert not (iec and component) and (not component or route == "standard"), "The component pair is one standard-route capture."
     stem, effect, appended = (("instance-effects-iec", "IecEffect", STANDARD_IEC_MEMBERS if route == "standard" else IEC_MEMBERS) if iec
                               else ("instance-effects-component", "ComponentEffect", (COMPONENT_MEMBER,)) if component
                               else ("instance-effects", "InstanceEffect", ("Child",)))
     member_name = COMPONENT_MEMBER if component else "Child"
-    manifest = ROOT / ("fixtures/typed-graphical/" + stem + suffix + ".v1.json")
+    cpu = report_cpu(json.loads(before_path.read_text(encoding="utf-8")))
+    manifest = ROOT / ("fixtures/typed-graphical/" + effect_name(stem, route, cpu) + ".v1.json")
     # A recapture that adds members must reproduce every deployed member exactly, so qualified types keep their effect.
     deployed = json.loads(manifest.read_text(encoding="utf-8")) if iec and manifest.exists() else None
     if deployed:
         deployed = {kind: (ET.fromstring((ROOT / deployed["artifacts"]["after" + kind]["path"]).read_bytes()), list(deployed["members"].values()))
                     for kind in ("Caller", "Instance")}
-    directory = ROOT / ("fixtures/typed-graphical/native/" + stem + suffix)
+    directory = ROOT / ("fixtures/typed-graphical/native/" + effect_name(stem, route, cpu))
     directory.mkdir(exist_ok=True)
     result = {"schemaVersion": 1, "builderUsed": False, "nativeImportCompileVerified": True,
               "engineeringVerified": False, "preservationVerified": False, "persistenceVerified": False,
@@ -68,11 +69,8 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
         result["sources"][phase] = {"path": authored_path.relative_to(ROOT).as_posix(),
             "sha256": hashlib.sha256(authored_path.read_bytes()).hexdigest(),
             "transportSha256": reference["sha256"], "changeId": reference["changeId"]}
-        if "scratch" in report:
-            result["cpuFamily"] = report["scratch"]["selectedCpu"]["typeIdentifier"]
-        else:
-            cpu = next(item for item in report["hardware"]["items"] if item.get("classification") == "CPU")
-            result["cpuFamily"] = next(a["value"] for a in cpu["attributes"] if a["name"] == "TypeIdentifier")
+        result["cpuFamily"] = report_cpu(report)
+        assert result["cpuFamily"] == cpu, "Both effect phases must come from one CPU."
         applied_index = next(i for i, c in enumerate(report["calls"]) if c["tool"] == "change_apply" and
                              c.get("status") == "passed" and c["arguments"]["changeId"] == reference["changeId"])
         for kind, name in (("caller", prefix + effect), ("instance", prefix + effect + "_DB")):
@@ -124,7 +122,7 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
             assert len(state) == 1 and state[0].attrib.get("Datatype") == '"TiaMcpComponentState"' and \
                 any(e.attrib.get("Name") == "Active" for e in state[0].iter()), "The " + kind + " member does not nest the component UDT."
     else:
-        callee = ROOT / ("fixtures/typed-graphical/native/" + prefix + "TemplateFB_LAD.xml")
+        callee = ROOT / "fixtures/typed-graphical/native" / cpu_slug(cpu) / (prefix + "TemplateFB_LAD.xml")
         result["referenceCallee"] = {"path": callee.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(callee.read_bytes()).hexdigest()}
     manifest.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     return result

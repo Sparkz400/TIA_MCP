@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import json
 import pathlib
+import re
 from xml.dom import minidom
 
 from engineering_preservation import native_payload_hash
@@ -27,6 +28,32 @@ CROSS_SCOPE_CALLEE = "TiaMcp_UnitA.TgpUnit_NumericFC"
 # The unit instance template is emitted only into --stage-output candidates, qualificationOnly; the multi-instance one is verified.
 COMPONENT_TEMPLATES = {"Tgp_ComponentHost_FBD": ("multi", "TiaMcpComponentGate", "Gate"),
                        "Tgp_ComponentGate_DB": ("global", "Tgp_ComponentGate", None)}
+
+
+# The first typed target keeps its deployed ids and effect-manifest names; every other CPU names its order number and firmware.
+BASE_CPU = "OrderNumber:6ES7 511-1AL03-0AB0/V4.1"
+
+
+def cpu_slug(cpu):
+    """'' for the first target, else e.g. 6es7-511-1al03-0ab0-v4-0; TypedGraphicalMultiInstanceTemplate.CpuSlug mirrors it."""
+    return "" if cpu == BASE_CPU else re.sub(r"[^0-9a-z]+", "-", cpu.removeprefix("OrderNumber:").lower()).strip("-")
+
+
+def profile_prefix(cpu):
+    return "v21." + (cpu_slug(cpu) or "fw41") + "."
+
+
+def effect_name(stem, route, cpu):
+    """instance-effects[-iec|-transitive][-route][.cpu]: the deployed manifest's stem and its native folder."""
+    return stem + ("" if route == "standard" else "-" + route) + ("." + cpu_slug(cpu) if cpu_slug(cpu) else "")
+
+
+def report_cpu(report):
+    """The captured CPU: the owned scratch's selection, else the retrieved archive's own hardware."""
+    if "scratch" in report:
+        return report["scratch"]["selectedCpu"]["typeIdentifier"]
+    return next(a["value"] for item in report["hardware"]["items"] if item.get("classification") == "CPU"
+                for a in item["attributes"] if a["name"] == "TypeIdentifier")
 
 
 def report_name(path):
@@ -71,7 +98,7 @@ def extract(reports, route="standard", *, stage_output=None):
     loaded = [(path, json.loads(path.read_text(encoding="utf-8"))) for path in reports]
     archive_cpu = {}
     for _, item in loaded:
-        if "hardware" in item:
+        if "hardware" in item and "sourceArchive" in item:  # an owned scratch capture names its CPU in scratch
             cpus = [value for value in item["hardware"]["items"] if value.get("classification") == "CPU"]
             assert len(cpus) == 1
             cpu_type = next(a["value"] for a in cpus[0]["attributes"] if a["name"] == "TypeIdentifier")
@@ -106,9 +133,11 @@ def extract(reports, route="standard", *, stage_output=None):
                 record = records[0]
                 raw = pathlib.Path(record["artifact"]["path"]).read_bytes()
                 assert hashlib.sha256(raw).hexdigest() == record["artifact"]["sha256"]
-                target = native / (exported["name"] + ".xml")
+                folder = native / cpu_slug(cpu)  # another CPU's references never share a file name with the first target's
+                folder.mkdir(exist_ok=True)
+                target = folder / (exported["name"] + ".xml")
                 if stage_output is not None and (any(c in exported["name"] for c in ("/", "\\", ":"))
-                        or target.parent.resolve() != native.resolve()):
+                        or target.parent.resolve() != folder.resolve()):
                     raise ValueError("Candidate native filename must remain directly inside staging/native.")
                 if stage_output is not None and target.exists():
                     # A source admitted again in a later capture run only confirms the first capture: same authored
@@ -171,7 +200,7 @@ def extract(reports, route="standard", *, stage_output=None):
         wired = {con.getAttribute("Name") for con in document.getElementsByTagName("NameCon") if con.getAttribute("UId") == part.getAttribute("UId")}
         if pins and kind != "call" and not {item["name"] for item in pins if item["required"]} <= wired <= {item["name"] for item in pins}:
             raise ValueError("Reviewed pin contract differs from the pins wired in " + block + ": " + ", ".join(sorted(wired)))
-        profile = {"id": "v21.fw41." + (route + "." if route != "standard" else "") + language.lower() + "." + kind + ("." + instruction if instruction else "") +
+        profile = {"id": profile_prefix(cpu) + (route + "." if route != "standard" else "") + language.lower() + "." + kind + ("." + instruction if instruction else "") +
                    ("." + data_type.lower() if data_type else "") + ".v1", "version": 1,
             "language": language, "kind": kind, "instruction": instruction, "dataType": data_type,
             "tiaVersion": "V21", "cpuFamily": cpu, "route": route, "nativeName": native_name,
@@ -280,7 +309,7 @@ def extract(reports, route="standard", *, stage_output=None):
     for block, (document, target, source_hash, cpu) in observed.items():
         if block.startswith("Tgp_Template"):
             block_type, language = block[len("Tgp_Template"):].split("_")
-            creation_templates.append({"id": "v21.fw41." + (route + "." if route != "standard" else "") + language.lower() + "." + block_type.lower() + ".creation.v1",
+            creation_templates.append({"id": profile_prefix(cpu) + (route + "." if route != "standard" else "") + language.lower() + "." + block_type.lower() + ".creation.v1",
                 "tiaVersion": "V21", "cpuFamily": cpu, "route": route, "language": language, "blockType": block_type,
                 "path": target.relative_to(template_root).as_posix(), "sha256": source_hash})
         if block.startswith("Tgp_GlobalTemplateFB_"):
@@ -290,7 +319,7 @@ def extract(reports, route="standard", *, stage_output=None):
                 unresolved_templates.append({"block": block, "missingReference": reference_name, "route": route})
                 continue
             _, reference_path, reference_hash, _ = observed[reference_name]
-            global_instance_templates.append({"id": "v21.fw41." + (route + "." if route != "standard" else "") + language.lower() + ".global-instance.v1",
+            global_instance_templates.append({"id": profile_prefix(cpu) + (route + "." if route != "standard" else "") + language.lower() + ".global-instance.v1",
                 "tiaVersion": "V21", "cpuFamily": cpu, "route": route, "blockType": "InstanceDB",
                 "path": target.relative_to(template_root).as_posix(), "sha256": source_hash,
                 "referenceCalleePath": reference_path.relative_to(template_root).as_posix(),
@@ -301,7 +330,7 @@ def extract(reports, route="standard", *, stage_output=None):
                 unresolved_templates.append({"block": block, "missingReference": "Tgp_TemplateFB_" + language, "route": route})
                 continue
             _, reference_path, reference_hash, _ = observed["Tgp_TemplateFB_" + language]
-            multi_instance_templates.append({"id": "v21.fw41." + (route + "." if route != "standard" else "") + language.lower() + ".multi-instance.v1",
+            multi_instance_templates.append({"id": profile_prefix(cpu) + (route + "." if route != "standard" else "") + language.lower() + ".multi-instance.v1",
                 "tiaVersion": "V21", "cpuFamily": cpu, "route": route, "memberName": "Child",
                 "path": target.relative_to(template_root).as_posix(), "sha256": source_hash,
                 "referenceCalleePath": reference_path.relative_to(template_root).as_posix(),
@@ -315,7 +344,7 @@ def extract(reports, route="standard", *, stage_output=None):
                 continue
             _, reference_path, reference_hash, _ = observed[reference_name]
             (multi_instance_templates if member else global_instance_templates).append({
-                "id": "v21.fw41." + (route + "." if route != "standard" else "") + "component-gate." + kind + "-instance.v1",
+                "id": profile_prefix(cpu) + (route + "." if route != "standard" else "") + "component-gate." + kind + "-instance.v1",
                 "tiaVersion": "V21", "cpuFamily": cpu, "route": route, **({"memberName": member} if member else {"blockType": "InstanceDB"}),
                 "path": target.relative_to(template_root).as_posix(), "sha256": source_hash,
                 "referenceCalleePath": reference_path.relative_to(template_root).as_posix(), "referenceCalleeSha256": reference_hash,

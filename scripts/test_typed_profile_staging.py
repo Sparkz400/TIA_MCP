@@ -57,7 +57,7 @@ class CandidateTests(unittest.TestCase):
             '</SW.Blocks.FB></Document>', encoding="utf-8")
         self.report_path = captured / "capture.json"
         self.report = {"origin": "independently_authored_native_references", "builderUsed": False,
-            "scratch": {"selectedCpu": {"typeIdentifier": "CpuFixture"}},
+            "scratch": {"selectedCpu": {"typeIdentifier": extractor.BASE_CPU}},
             "fixtures": [{"engineeringVerified": True, "sourcePath": str(self.source), "changeId": "fixture",
                 "sha256": hashlib.sha256(self.source.read_text().encode()).hexdigest(),
                 "exports": [{"name": "Tgp_TON_LAD"}]}],
@@ -132,6 +132,21 @@ class CandidateTests(unittest.TestCase):
         for profile in profiles.values():
             for key in ("engineeringVerified", "preservationVerified", "persistenceVerified", "recoveryVerified", "runtimeVerified"):
                 self.assertFalse(profile[key])
+        self.unchanged()
+
+    def test_another_cpu_names_its_own_ids_native_folder_and_effect_manifests(self):
+        second = "OrderNumber:6ES7 513-1AM03-0AB0/V4.1"
+        self.report["scratch"]["selectedCpu"]["typeIdentifier"] = second
+        self.capture(self.wave9())
+        result, _ = extractor.extract_catalog([self.report_path], stage_output=self.stage)
+        self.assertIn("v21.6es7-513-1am03-0ab0-v4-1.lad.timer.TONR.time.v1", {profile["id"] for profile in result["profiles"]})
+        self.assertTrue(all(profile["id"].startswith("v21.6es7-513-1am03-0ab0-v4-1.") and profile["cpuFamily"] == second
+                            for profile in result["profiles"]))
+        self.assertTrue(all(source["path"].startswith("artifacts/candidates/native/6es7-513-1am03-0ab0-v4-1/") for source in result["sources"]))
+        # The worker's TypedGraphicalMultiInstanceTemplate.EffectManifestName builds the same names.
+        self.assertEqual("instance-effects-iec-softwareUnit.6es7-513-1am03-0ab0-v4-1", extractor.effect_name("instance-effects-iec", "softwareUnit", second))
+        self.assertEqual("instance-effects-transitive", extractor.effect_name("instance-effects-transitive", "standard", extractor.BASE_CPU))
+        self.assertEqual("v21.fw41.", extractor.profile_prefix(extractor.BASE_CPU))
         self.unchanged()
 
     def test_pin_contract_mismatch_or_wrong_global_storage_type_stops_extraction(self):

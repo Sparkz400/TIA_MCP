@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "builderUsed": false,
+  "nativeImportCompileVerified": true,
+  "engineeringVerified": false,
+  "preservationVerified": false,
+  "persistenceVerified": false,
+  "recoveryVerified": false,
+  "runtimeVerified": false,
+  "memberName": "Child",
+  "tiaVersion": "V21",
+  "route": "standard",
+  "artifacts": {
+    "beforeCaller": {
+      "path": "fixtures/typed-graphical/native/instance-effects.6es7-513-1am03-0ab0-v4-1/before-caller.xml",
+      "sha256": "6035353364c8268514872a549a2caeff5f5b5d9936d6a5f6cd5eb4a95aa01574",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "beforeInstance": {
+      "path": "fixtures/typed-graphical/native/instance-effects.6es7-513-1am03-0ab0-v4-1/before-instance.xml",
+      "sha256": "bb5d0698ac0dc599509a7c208bfefd9a20fe36763277f950d932d091bdbbb23b",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "afterCaller": {
+      "path": "fixtures/typed-graphical/native/instance-effects.6es7-513-1am03-0ab0-v4-1/after-caller.xml",
+      "sha256": "dbe60a58dd305fd62153911dd6a73c95134e1394120ac1b02e93da95e0f6055f",
+      "captureReport": "artifacts/c2d/capture.json"
+    },
+    "afterInstance": {
+      "path": "fixtures/typed-graphical/native/instance-effects.6es7-513-1am03-0ab0-v4-1/after-instance.xml",
+      "sha256": "d6115f368daf3a979260a8adf1cd605e35a3614460d539abfa02621e0144506c",
+      "captureReport": "artifacts/c2d/capture.json"
+    }
+  },
+  "sources": {
+    "before": {
+      "path": "fixtures/typed-graphical/sources/instance-effect-before.scl",
+      "sha256": "c7535f0a8765984c1b68bfecc259b1f3c1310f66a43679686720dc2ab4896c07",
+      "transportSha256": "c7535f0a8765984c1b68bfecc259b1f3c1310f66a43679686720dc2ab4896c07",
+      "changeId": "9764ba5c65dc49cbaecb6f6772de81b2"
+    },
+    "after": {
+      "path": "fixtures/typed-graphical/sources/instance-effect-after.scl",
+      "sha256": "7ea256e1b65bcbacaa2017c5b263d9307063de8c14f0cb26ceee43be4cb9ebb9",
+      "transportSha256": "7ea256e1b65bcbacaa2017c5b263d9307063de8c14f0cb26ceee43be4cb9ebb9",
+      "changeId": "d4bb9509e8e94c34aff5ee1845797eb5"
+    }
+  },
+  "cpuFamily": "OrderNumber:6ES7 513-1AM03-0AB0/V4.1",
+  "nativeObservedEffect": {
+    "appendedStaticMember": "Child",
+    "existingFullDbPayloadPreserved": true,
+    "explicitStartValuePreserved": {
+      "RetainedMarker": "42"
+    }
+  },
+  "referenceCallee": {
+    "path": "fixtures/typed-graphical/native/6es7-513-1am03-0ab0-v4-1/Tgp_TemplateFB_LAD.xml",
+    "sha256": "69768ad31c214b26c24c1c20ffc7826763bcab098966f0119be2b65628ef9a74"
+  }
+}
