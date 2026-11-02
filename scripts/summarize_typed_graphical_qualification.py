@@ -19,7 +19,9 @@ GATES = ("engineeringVerified", "preservationVerified", "persistenceVerified", "
 
 
 def relative(path):
-    return str(path.resolve().relative_to(ROOT)).replace("\\", "/")
+    """A run may sit in a frozen build's artifacts tree; name it relative to the checkout that holds it."""
+    path = path.resolve()
+    return str(path.relative_to(next((p for p in path.parents if (p / "TiaMcp.slnx").exists()), ROOT))).replace("\\", "/")
 
 
 def attempt(path):

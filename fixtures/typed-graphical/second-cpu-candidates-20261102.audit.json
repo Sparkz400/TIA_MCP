@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "catalog": "artifacts/c2s/profiles.candidate.v1.json",
+  "catalogSha256": "4cb5d88d72b2bb8c7e8776603fd0b43ac37bf318e3f35451585a0b01bfbf301f",
+  "captures": [
+    {
+      "capture": "artifacts/c2a/capture.json",
+      "captureSha256": "f4749d0c1b28ea8c56665274af461ca9976e8e8af3e230495f77e9c2674600fb"
+    },
+    {
+      "capture": "artifacts/c2b/capture.json",
+      "captureSha256": "49dffa725f93db67751946f0e57c59088cfd1724c6bd7f314b7ff42786144326"
+    },
+    {
+      "capture": "artifacts/c2c/capture.json",
+      "captureSha256": "70e1828ada2120df15fd6462ce3daa7a1d8222313187404dd5856b8b140dd389"
+    }
+  ],
+  "counts": {
+    "sources": 63,
+    "profiles": 36,
+    "templates": 8
+  },
+  "prerequisiteEquivalence": [],
+  "findings": [],
+  "passed": true
+}

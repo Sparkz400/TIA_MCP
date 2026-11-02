@@ -1,0 +1,75 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.classic-import.profiles.interruption.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T06:04:47+00:00",
+  "source": {
+    "commit": "750121ea23f34b439d7501396ebf3e9c651dc777",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Build hbf5 = 750121ea. scripts/qualify_interruption.py ci-* (BackColor of HMI_RT_1/Overview_A) on the seeded WinCC RT Advanced and KTP700 Basic PN baselines: worker loss at the checkpoint (held), during the baseline compile, the native write and the compile (released, project unchanged) and after the save (held, persisted); Host loss at the checkpoint, the write and the save (held, journal ends applied with every stage). Reconciliation without replay; 8/8 cases per profile.",
+  "limitations": [
+    "BackColor on one HMI only; two seeded profiles."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "f2164e4228d3ad147fcf24cc212bd70d1e329ca298d23cf31acf6f5ee2891b96"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "9c574535c945de85f229a9c8dd6445f910a75e31f96a88af20ca7c807b254bed"
+    }
+  ],
+  "runs": [
+    {
+      "report": "hj1-report.json",
+      "sha256": "2e50621850d2a51b1bd404b921fbef46cf72eb7042bfe23b66151d4e24ed866e",
+      "bytes": 2633476,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "change_prepare",
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "hmi_inspect",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "project_retrieve"
+      ]
+    },
+    {
+      "report": "hj2-report.json",
+      "sha256": "f3b0134491583b39a533f353498dc48a68974c12023b6c2e5d2bef2d19895a5a",
+      "bytes": 2318900,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "change_prepare",
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "hmi_inspect",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "project_retrieve"
+      ]
+    }
+  ]
+}

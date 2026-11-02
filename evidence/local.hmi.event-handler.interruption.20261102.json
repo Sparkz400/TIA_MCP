@@ -1,0 +1,76 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.event-handler.interruption.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T17:56:49+00:00",
+  "source": {
+    "commit": "5f715cdc717d0b083e5edacff3e2f687f57b5c76",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Unified Comfort and Unified PC: 8/8 interruption cases each for a screen event handler; worker loss at checkpoint, baseline compile, write, compile and save; Host loss at checkpoint, write and save; reconciliation without replay.",
+  "limitations": [
+    "Only the two owned fixtures and exact frozen binaries; qualification-only admission during the original runs.",
+    "Unified preservation has the documented standing export/typed-model limits; runtime, appearance, PLC communication and physical devices were not qualified."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "e81609c08db8e09722aa6483673600df4bf8638d3b599342e6138d7ac7c37188"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "b55b7bd4d76b8e0b96738e2396f4123b03280ee7455f400def1304c338fdd7dc"
+    }
+  ],
+  "runs": [
+    {
+      "report": "hn3-report.json",
+      "sha256": "ed2694299be8300d3ab15ab6997b1bd39f58df7f143a8372074fc4eae9db880a",
+      "bytes": 3475579,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "change_prepare",
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "hmi_inspect",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "project_retrieve"
+      ]
+    },
+    {
+      "report": "hn4-report.json",
+      "sha256": "4f53e6d2b9be5c4f51efa676d20692ff7dfd36ef16f8914afd290ddbde57fa7f",
+      "bytes": 3438570,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "change_prepare",
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "hmi_inspect",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "project_retrieve"
+      ]
+    }
+  ]
+}

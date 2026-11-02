@@ -32,6 +32,8 @@ var tests = new (string Name, Action Test)[] {
     ("Translated internal label not substituted", () => Reject(() => HmiRecipeRules.RequireNewInternalTagDefault("<Interne Variable>","<Internal tag>","",false))),
     ("Configured connection cannot masquerade as internal label", () => Reject(() => HmiRecipeRules.RequireNewInternalTagDefault("<Interne Variable>","<Interne Variable>","",true))),
     ("New internal tag cannot silently acquire PLC binding", () => Reject(() => HmiRecipeRules.RequireNewInternalTagDefault("<Internal tag>","<Internal tag>","Motor.Status",false))),
+    ("A localized pseudo-connection without PLC tag or address is internal", () => { if (!HmiRecipeRules.IsInternalTag("", "", false) || !HmiRecipeRules.IsInternalTag(null, null, false)) throw new Exception("internal tag"); }),
+    ("A real connection, a PLC tag or an address must prove its PLC owner", () => { if (HmiRecipeRules.IsInternalTag("", "", true) || HmiRecipeRules.IsInternalTag("SharedSignal", "", false) || HmiRecipeRules.IsInternalTag("", "%MW0", false)) throw new Exception("PLC-backed tag treated as internal"); }),
 };
 int failures=0;
 foreach(var test in tests) { try { test.Test(); Console.WriteLine("PASS "+test.Name); } catch(Exception ex) { failures++; Console.Error.WriteLine("FAIL "+test.Name+": "+ex.Message); } }

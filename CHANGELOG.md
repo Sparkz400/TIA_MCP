@@ -13,6 +13,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Added
 
+- **Typed LAD/FBD coverage:** CPU 1513-1 PN V4.1 base families (102 engineering cases), and 120 wave 9 software-unit/namespace profiles on CPU 1511 V4.1 (124 engineering cases), with retained exact-build evidence and explicit runtime limits.
+- **Classic import on more panels:** `hmi_classic_import` is qualified and admitted on WinCC RT Advanced and KTP700 Basic PN as well ([record](docs/verification/hmi-classic-profiles-20261101.md)).
+- **Unified event handlers:** change kind `hmi_event_handler_create` (Unified script event handlers of screens and screen items (the script stored with CRLF line ends, never executed)) past the HMI preservation gate; qualified natively and admitted on Unified Comfort and Unified PC ([record](docs/verification/hmi-unified-authoring-20261102.md)).
+- **Unified tag dynamizations:** change kind `hmi_dynamization_create` (Unified tag dynamizations (ProcessValue bound to a PLC tag, a global DB member or an internal tag)) past the HMI preservation gate; qualified natively and admitted on Unified Comfort and Unified PC ([record](docs/verification/hmi-unified-authoring-20261102.md)).
 - **Unified screens and items:** change kind `hmi_screen_create` creates a Unified screen (sized like an existing one) or an
   allowlisted screen item past the HMI preservation gate; qualified natively and admitted on Unified Comfort and Unified PC
   ([record](docs/verification/hmi-unified-authoring-20261102.md)).
@@ -213,6 +217,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- **VCI interruption check:** accept exact verified-callback reconciliation when Git finishes verification before the interrupted Host exits; earlier callbacks still require recovery.
 - A request number beyond the double range (such as `1.8e308`) broke the worker connection: the
   worker refused it before reading the request id, so the Host reported `ProtocolMismatch` and
   refused every later call until it was restarted. The worker now refuses such a request with

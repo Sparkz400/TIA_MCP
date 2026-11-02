@@ -29,14 +29,18 @@ namespace TiaMcp.Model
         private static readonly string[] PrimitiveTypes = { "Bool", "Byte", "Word", "DWord", "LWord", "SInt", "USInt", "Int", "UInt", "DInt", "UDInt", "LInt", "ULInt", "Real", "LReal" };
         // Kinds that carry named operations past the closed gate (text-list precedent): family, operations, production profiles (those
         // whose native qualification passed: local.hmi.classic-import.*.20261101, local.hmi.external-tag.*.20261101) and the profiles a
-        // qualification Host may admit in a project its own worker retrieved or created. hmi_screen_create: local.hmi.screen-create.*.20261102.
+        // qualification Host may admit in a project its own worker retrieved or created. hmi_screen_create: local.hmi.screen-create.*.20261102; hmi_dynamization_create: local.hmi.dynamization.*.20261102.
         private static readonly Dictionary<string, (string Family, string[] Operations, string[] Profiles, string[] QualificationProfiles)> Kinds =
             new Dictionary<string, (string, string[], string[], string[])>(StringComparer.Ordinal)
         {
-            ["hmi_classic_import"] = ("classic", new[] { "classic_xml_import", "scalar_property_set" }, new[] { "classic-comfort" }, new[] { "classic-comfort" }),
+            ["hmi_classic_import"] = ("classic", new[] { "classic_xml_import", "scalar_property_set" }, new[] { "classic-comfort", "classic-rt-advanced", "classic-basic" }, new[] { "classic-comfort", "classic-rt-advanced", "classic-basic" }),
             ["hmi_external_tag_create"] = ("unified", new[] { "external_tag_create" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" }),
             // Graphics: a new screen (size copied from an existing one) and allowlisted items within a screen's rectangle.
-            ["hmi_screen_create"] = ("unified", new[] { "screen_create", "item_create" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" })
+            ["hmi_screen_create"] = ("unified", new[] { "screen_create", "item_create" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" }),
+            // Binding: one new tag dynamization of an item property (ProcessValue, or Visible/Enabled by a Bool tag); PLC-backed tags need the proven owner.
+            ["hmi_dynamization_create"] = ("unified", new[] { "dynamization_set" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" }),
+            // Scripts: one new event handler of a screen or item, its untrusted script stored with CRLF line ends and never executed.
+            ["hmi_event_handler_create"] = ("unified", new[] { "event_handler_set" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" })
         };
         // The profiles --hmi-change-qualification may name; each kind admits only its own.
         internal static readonly string[] QualificationProfiles = Kinds.Values.SelectMany(k => k.QualificationProfiles).Distinct().ToArray();
@@ -145,11 +149,12 @@ namespace TiaMcp.Model
             {
                 string eventType = Text(payload, "eventType", 64);
                 if (eventType == "None" || !UnquotedComponent(eventType)) throw new ArgumentException("eventType must name one documented native event type, such as Tapped or Loaded.");
-                // Untrusted script text: bounded and stored verbatim, never executed, evaluated or syntax-checked.
+                // Untrusted script text: bounded and stored with CRLF line ends, never executed, evaluated or syntax-checked.
                 if (payload["script"]?.Type != JTokenType.String) throw new ArgumentException("script must be an explicit string.");
                 string script = (string)payload["script"];
-                if (script.Trim().Length == 0 || script.Length > MaxScriptLength || script.Any(c => char.IsControl(c) && c != '\t' && c != '\r' && c != '\n'))
-                    throw new ArgumentException("script must be 1 to " + MaxScriptLength + " characters without control characters other than tab, CR and LF.");
+                if (script.Trim().Length == 0 || NativeScriptText(script).Length > MaxScriptLength || script.Any(c => char.IsControl(c) && c != '\t' && c != '\r' && c != '\n'))
+                    throw new ArgumentException("script must be 1 to " + MaxScriptLength + " characters (CRLF line ends) without control characters other than tab, CR and LF.");
+                if (script.Replace("\r\n", "").IndexOf('\r') >= 0) throw new ArgumentException("script may contain CR only as part of a CRLF line end.");
                 RejectFields(payload, "name", "properties", "dataType", "placement", "bindings", "connection", "plcTag");
             }
             else if (operation == "scalar_property_set" || operation == "item_properties_set")
@@ -237,7 +242,7 @@ namespace TiaMcp.Model
                 : family != "unified" && (operation == "connection_create" || operation == "object_create" || operation == "object_properties_set" || ScreenOperations.Contains(operation))
                 ? "Unified-only operation: the inspected Classic V21 surface has no typed connection, alarm, log, runtime-settings, screen, screen-item, dynamization or event-handler creation/setter route; Classic objects use the preserving classic_xml_import."
                 : ScreenOperations.Contains(operation)
-                ? "HmiScreenComposition.Create(name), HmiScreenItemBaseComposition.Create<T>(name), DynamizationBaseComposition.Create<TagDynamization>(propertyName) and the object's EventHandlers Create(eventType) are documented. Bodies create one new screen (size copied from an existing screen), allowlisted item (rectangle within the screen), tag dynamization or event handler (script stored verbatim, never executed) with exact typed readback, and may add only that object's own typed-readback subtree. Created-subtree readback, unrelated-content preservation, compile, save/reopen, archive-recovery and visual gates have not passed for this exact device/runtime profile."
+                ? "HmiScreenComposition.Create(name), HmiScreenItemBaseComposition.Create<T>(name), DynamizationBaseComposition.Create<TagDynamization>(propertyName) and the object's EventHandlers Create(eventType) are documented. Bodies create one new screen (size copied from an existing screen), allowlisted item (rectangle within the screen), tag dynamization or event handler (script stored with CRLF line ends, never executed) with exact typed readback, and may add only that object's own typed-readback subtree. Created-subtree readback, unrelated-content preservation, compile, save/reopen, archive-recovery and visual gates have not passed for this exact device/runtime profile."
                 : operation == "connection_create"
                 ? "HmiConnectionComposition.Create(name) is documented, but Partner/Station/Node are read-only. The body creates only the software connection of one valid native CommunicationManagement endpoint pair of that name with exactly one partner PLC, then verifies the derived Partner and a driver. That derivation, unrelated-content preservation, compile, save/reopen and archive-recovery gates have not passed for this exact device/runtime profile."
                 : operation == "object_create" || operation == "object_properties_set"
@@ -250,7 +255,7 @@ namespace TiaMcp.Model
                         ? "Classic screen export is documented. Exact BackColor property readback, full export/dependency coverage, unrelated-content preservation, compile, save/reopen and recovered-project equality have not passed for this exact device/runtime profile."
                         : "Classic has no typed screen-item or primitive tag Create route in the inspected V21 assembly; a family-specific preserving XML creation/binding adapter and its dependency closure remain required.";
             var carrier = Kinds.FirstOrDefault(k => k.Value.Family == family && k.Value.Operations.Contains(operation, StringComparer.Ordinal));
-            if (carrier.Key != null) reason += " Change kind " + carrier.Key + " admits this operation only on " + string.Join(" or ", carrier.Value.QualificationProfiles)
+            if (carrier.Key != null) reason += " Change kind " + carrier.Key + " admits this operation only on " + (carrier.Value.Profiles.Length == 0 ? "a qualification Host (no production profile yet)" : string.Join(" or ", carrier.Value.Profiles))
                 + (operation == "classic_xml_import" ? " and only for a screen or tag table" : "") + ", under its own qualification gate; hmi_engineering never does.";
             return new JObject { ["family"] = family, ["targetProfile"] = profile ?? "unknown", ["operation"] = operation,
                 ["apiAvailability"] = body ? "available" : family == "unified" ? "unavailable" : "partial",
@@ -350,6 +355,10 @@ namespace TiaMcp.Model
             }
             return gates;
         }
+
+        /// <summary>The script text V21 stores: every line ends with CRLF (run hn1, 2 November 2026: ScriptCode read back an LF
+        /// script with CRLF). The bridge writes this form, so the exact readback compares like with like.</summary>
+        internal static string NativeScriptText(string script) => script.Replace("\r\n", "\n").Replace("\n", "\r\n");
 
         internal static string Text(JObject value, string key, int max = 256)
         {

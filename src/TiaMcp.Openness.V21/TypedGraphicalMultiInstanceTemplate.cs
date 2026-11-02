@@ -14,10 +14,16 @@ namespace TiaMcp.Openness.V21
         // Each route carries its own independently captured dependent-instance effect pair;
         // IEC instance members have their own captured pair because their native shape differs.
         internal static readonly string[] SystemInstanceTypes = { "TON_TIME", "TOF_TIME", "TP_TIME", "CTU_INT", "CTD_INT", "CTUD_INT", "TONR_TIME", "R_TRIG", "F_TRIG" };
-        internal static string EffectManifestName(string route, bool systemType = false) =>
-            (systemType ? "instance-effects-iec" : "instance-effects") + (route == "standard" ? "" : "-" + route) + ".v1.json";
-        internal static string TransitiveManifestName(string route) =>
-            "instance-effects-transitive" + (route == "standard" ? "" : "-" + route) + ".v1.json";
+        // The first typed target keeps its deployed manifest names; every other CPU appends its order number and firmware
+        // (cpu_slug in scripts/extract_typed_graphical_profiles.py), so captures of two CPUs never share a file.
+        internal const string BaseCpu = "OrderNumber:6ES7 511-1AL03-0AB0/V4.1";
+        internal static string CpuSlug(string cpu) => cpu == BaseCpu ? "" :
+            Regex.Replace((cpu.StartsWith("OrderNumber:", StringComparison.Ordinal) ? cpu.Substring("OrderNumber:".Length) : cpu).ToLowerInvariant(), "[^0-9a-z]+", "-").Trim('-');
+        private static string ManifestName(string stem, string route, string cpu) =>
+            stem + (route == "standard" ? "" : "-" + route) + (CpuSlug(cpu).Length == 0 ? "" : "." + CpuSlug(cpu)) + ".v1.json";
+        internal static string EffectManifestName(string route, bool systemType = false, string cpu = BaseCpu) =>
+            ManifestName(systemType ? "instance-effects-iec" : "instance-effects", route, cpu);
+        internal static string TransitiveManifestName(string route, string cpu = BaseCpu) => ManifestName("instance-effects-transitive", route, cpu);
 
         // An IEC instance member has a fixed native shape: the new declaration must equal the captured
         // caller member exactly (name aside), and the dependent DB receives the captured DB member.

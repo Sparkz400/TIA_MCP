@@ -531,10 +531,10 @@ Test("CLI native disabling preserves normal defaults and refuses qualification m
         throw new Exception("CLI accepted " + string.Join(" ", refused));
     }
     // hmi_classic_import and hmi_external_tag_create admit one named profile on their own native Host.
-    foreach (var profile in new[] { "classic-comfort", "unified-comfort", "unified-pc" })
+    foreach (var profile in new[] { "classic-comfort", "classic-rt-advanced", "classic-basic", "unified-comfort", "unified-pc" })
         Equal(profile, HostOptions.Parse(["--hmi-change-qualification", profile]).HmiChangeQualificationProfile);
     Equal(null, HostOptions.Parse([]).HmiChangeQualificationProfile);
-    foreach (var refused in new[] { new[] { "--hmi-change-qualification", "classic-comfort", "--no-native-workers" }, new[] { "--hmi-change-qualification", "classic-basic" },
+    foreach (var refused in new[] { new[] { "--hmi-change-qualification", "classic-comfort", "--no-native-workers" }, new[] { "--hmi-change-qualification", "classic-rt-professional" },
         new[] { "--hmi-change-qualification", "unified-pc", "--hmi-text-list-qualification", "unified-pc" }, new[] { "--hmi-text-list-qualification", "unified-pc", "--hmi-change-qualification", "unified-pc" },
         new[] { "--hmi-change-qualification", "classic-comfort", "--translation-qualification" }, new[] { "--hmi-change-qualification", "classic-comfort", "--component-qualification" },
         new[] { "--hmi-change-qualification", "unified-pc", "--hmi-change-qualification", "unified-pc" }, new[] { "--hmi-change-qualification" } })

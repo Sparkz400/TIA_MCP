@@ -1,0 +1,122 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.second-cpu-capture.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T11:05:36+00:00",
+  "source": {
+    "commit": "0a9c1fef135d7c151d357ef7a583e27e207578ef",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/capture_typed_routes_owned.py --cpu-type-identifier 'OrderNumber:6ES7 513-1AM03-0AB0/V4.1' --unit '' from frozen commit 8e9ed202: the 69 unchanged standard-route references of second-cpu-capture-packet.v1.json in four runs, each in a new owned TIA V21 scratch of CPU 1513-1 PN V4.1: Boolean, Int compare and FC/FB calls (c2a, 28), creation and instance templates (c2b, 8), TON/TOF/TP and CTU/CTD/CTUD with existing global storage (c2c, 26), and the FB, IEC and transitive dependent-effect pairs (c2d, 7), LAD and FBD. Each input compiled clean, saved and added exactly its declared blocks (the after phases changed exactly the declared dependents) while every other object's XML stayed unchanged; each final snapshot matched a fresh-process reopen; owned cleanup passed. 36 profiles and 8 templates staged, audited (fixtures/typed-graphical/second-cpu-candidates-20261102.audit.json, no findings) and promoted; the effect manifests are instance-effects*.6es7-513-1am03-0ab0-v4-1.v1.json.",
+  "limitations": [
+    "Native reference capture only; builder engineering is recorded separately and runtime is not run.",
+    "Standard route and the base families only: no wave 9 family, software-unit or namespace route, cross-scope call or network-free insertion probe was captured on this CPU."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "61e5176fc540a948506e010e2aff97ea18932f46bb16f80aff67b3134c43f31c"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "08fa8da78524c7c5d28778978e9ebde69097461452f039fcc5e2e855fdd29d18"
+    }
+  ],
+  "runs": [
+    {
+      "report": "capture.json",
+      "sha256": "f4749d0c1b28ea8c56665274af461ca9976e8e8af3e230495f77e9c2674600fb",
+      "bytes": 58171013,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "capture.json",
+      "sha256": "49dffa725f93db67751946f0e57c59088cfd1724c6bd7f314b7ff42786144326",
+      "bytes": 16144242,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "capture.json",
+      "sha256": "70e1828ada2120df15fd6462ce3daa7a1d8222313187404dd5856b8b140dd389",
+      "bytes": 57249289,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "capture.json",
+      "sha256": "3d7907477a332f5e0e96e8fc73618de5fca7a35b3feef81b796f0f63b4eab4da",
+      "bytes": 12895237,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

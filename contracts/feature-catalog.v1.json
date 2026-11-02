@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.118",
+  "catalogVersion": "0.4.121",
   "targetTiaVersions": [
     21
   ],
@@ -758,6 +758,41 @@
       ]
     },
     {
+      "id": "local.hmi.classic-import.profiles.route.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "WinCC RT Advanced and KTP700 Basic PN (seeded HmiSeeder baselines without a start screen)",
+        "sourceCommit": "750121ea23f34b439d7501396ebf3e9c651dc777",
+        "passedScope": "Build hbf5 = 750121ea. scripts/qualify_hmi_gate_route.py (hmi_classic_import) on classic-rt-advanced (72/72) and classic-basic (71/71, no popup): refusals before any write; BackColor on both HMIs, no-op and GridColor imports, a no-op import of the other screen and a tag-table import adding one tag, each with every apply stage, the start-screen compile error and every other compiler row unchanged, compile scope the target HmiTarget, the target read back, hmi_inspect unchanged outside the target, same-key replay and other-key RecoveryRequired; checkpoint restore; normal Host lifecycle and an immediate read-write reopen."
+      },
+      "artifacts": [
+        "evidence/local.hmi.classic-import.profiles.route.20261101.json"
+      ],
+      "limitations": [
+        "Two seeded fixtures whose HMIs have no start screen, so the compile is not clean; screens and tag tables only.",
+        "Classic HMI alarms have no public composition and stay uncompared (the standing Classic note); runtime and appearance are not verified."
+      ]
+    },
+    {
+      "id": "local.hmi.classic-import.profiles.interruption.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "WinCC RT Advanced and KTP700 Basic PN (seeded HmiSeeder baselines without a start screen)",
+        "sourceCommit": "750121ea23f34b439d7501396ebf3e9c651dc777",
+        "passedScope": "Build hbf5 = 750121ea. scripts/qualify_interruption.py ci-* (BackColor of HMI_RT_1/Overview_A): worker loss at the checkpoint (held), during the baseline compile, the native write and the compile (released, project unchanged) and after the save (held, persisted); Host loss at the checkpoint, the write and the save (held, journal ends applied with every stage). Reconciliation without replay; 8/8 cases per profile."
+      },
+      "artifacts": [
+        "evidence/local.hmi.classic-import.profiles.interruption.20261102.json"
+      ],
+      "limitations": [
+        "BackColor on one HMI only; two seeded profiles."
+      ]
+    },
+    {
       "id": "local.hmi.external-tag.route.20261101",
       "status": "passed",
       "profile": {
@@ -843,6 +878,76 @@
       ],
       "limitations": [
         "A new screen on one HMI only; two profiles."
+      ]
+    },
+    {
+      "id": "local.hmi.dynamization.route.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "MTP700 Unified Comfort (desk-configured pair) and WinCC Unified PC RT 21.0.1.0 (seeded baseline)",
+        "sourceCommit": "ebe8ba131a41cb56a0b9343a76efed71ff2bce68",
+        "passedScope": "Build hbfc = ebe8ba13. scripts/qualify_hmi_gate_route.py --kind hmi_dynamization_create on unified-comfort (48/48) and unified-pc (48/48): refusals before any write; the route bound ProcessValue of an HmiIOField to LinkedSignal (a root PLC tag), of an HmiBar to LinkedDbValue (a global DB member) and of an HmiIOField on HMI_RT_2 to SharedValue (an internal tag), the items created first through hmi_screen_create; each dynamization read back (tag, type Tag, no indirect addressing) with the hmi_references chain item -> HMI tag resolved and, for the PLC-backed tags, their resolved PLC declaration; every apply stage, compiler rows unchanged, compile scope the owning device, hmi_inspect and the typed model unchanged outside the new node, same-key replay and other-key RecoveryRequired; checkpoint restore; normal Host lifecycle and lock release."
+      },
+      "artifacts": [
+        "evidence/local.hmi.dynamization.route.20261102.json"
+      ],
+      "limitations": [
+        "Two profiles; the allowlisted tag dynamizations only.",
+        "Unified preservation compares the tag-table exports and the typed object model; payloads without a public getter stay uncompared (the standing notes). Runtime behavior is not verified."
+      ]
+    },
+    {
+      "id": "local.hmi.dynamization.interruption.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "MTP700 Unified Comfort (desk-configured pair) and WinCC Unified PC RT 21.0.1.0 (seeded baseline)",
+        "sourceCommit": "754068ce19f0efb9155f30059315fb86a2f1d0de",
+        "passedScope": "Build hbfd = 754068ce. scripts/qualify_interruption.py dy-* (the ProcessValue binding of a new IOField to LinkedSignal): worker loss at the checkpoint (held), during the baseline compile, the native write and the compile (released, project unchanged) and after the save (held, persisted); Host loss at the checkpoint, the write and the save (held, journal ends applied with every stage). Reconciliation without replay; 8/8 cases per profile."
+      },
+      "artifacts": [
+        "evidence/local.hmi.dynamization.interruption.20261102.json"
+      ],
+      "limitations": [
+        "One tag dynamization on one HMI only; two profiles."
+      ]
+    },
+    {
+      "id": "local.hmi.event-handler.route.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "MTP700 Unified Comfort (desk-configured pair) and WinCC Unified PC RT 21.0.1.0 (seeded baseline)",
+        "sourceCommit": "f5c4efe1d90c1a836c9e384bf6042462c4ba157a",
+        "passedScope": "Build hbfe = f5c4efe1. scripts/qualify_hmi_gate_route.py --kind hmi_event_handler_create on unified-comfort (47/47) and unified-pc (47/47): refusals before any write; the route added a script handler to the screen Overview_A (an event without a handler: the seeded Overview_A already handles Loaded, which refused HmiNameConflict), to a seeded rectangle and to a button created first through hmi_screen_create; each handler read back with its exact script text and SHA-256; every apply stage, compiler rows unchanged, compile scope the owning device, hmi_inspect and the typed model unchanged outside the new node, same-key replay and other-key RecoveryRequired; checkpoint restore; normal Host lifecycle and lock release."
+      },
+      "artifacts": [
+        "evidence/local.hmi.event-handler.route.20261102.json"
+      ],
+      "limitations": [
+        "Two profiles; the allowlisted event handlers only.",
+        "Unified preservation compares the tag-table exports and the typed object model; payloads without a public getter stay uncompared (the standing notes). Runtime behavior is not verified."
+      ]
+    },
+    {
+      "id": "local.hmi.event-handler.interruption.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "MTP700 Unified Comfort (desk-configured pair) and WinCC Unified PC RT 21.0.1.0 (seeded baseline)",
+        "sourceCommit": "5f715cdc717d0b083e5edacff3e2f687f57b5c76",
+        "passedScope": "Build hbfb = 5f715cdc. scripts/qualify_interruption.py eh-* (a script handler of the screen Overview_A on HMI_RT_1): worker loss at the checkpoint (held), during the baseline compile, the native write and the compile (released, project unchanged) and after the save (held, persisted); Host loss at the checkpoint, the write and the save (held, journal ends applied with every stage). Reconciliation without replay; 8/8 cases per profile."
+      },
+      "artifacts": [
+        "evidence/local.hmi.event-handler.interruption.20261102.json"
+      ],
+      "limitations": [
+        "One event handler on one HMI only; two profiles."
       ]
     },
     {
@@ -4475,6 +4580,75 @@
         "No adoption route exists by decision (31 October rule: a reopen keeps, never grants); only its refusal is qualified.",
         "The refusal code is read from the Host log, not from the MCP response.",
         "One owned whole-project de-DE/en-GB fixture."
+      ]
+    },
+    {
+      "id": "local.typed.wave9-route-capture.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4640a41f6daf0de25f2018bf7399e0673b8dd39d",
+        "passedScope": "scripts/capture_typed_routes_owned.py from frozen commit b2640c66: the 126 independently authored wave 9 route references of route-capture-wave9-packet.v1.json in four runs, each in its own owned TIA V21 project retrieved from the SHA-bound software-unit baseline (sha256 39cea56a...), unit TiaMcp_UnitA: DInt/Real eq..ge and MOVE Int/DInt/Real (runs w9ua, w9na: 30 each), then the TONR storage DB, ADD/SUB/MUL/DIV Int/DInt/Real, TONR local and existing global and R_TRIG/F_TRIG (runs w9ub, w9nb: 33 each), LAD and FBD, in the default unit namespace and in TiaMcp_UnitA.Alternate. Compare, MOVE and arithmetic are SIMATIC SD programs; TONR and R_TRIG/F_TRIG are native derivations of the captured standard references. Each input compiled clean, saved and added exactly its declared blocks while every existing object's XML stayed unchanged; each final snapshot matched a fresh-process reopen; owned cleanup passed. 120 profiles staged, audited (fixtures/typed-graphical/wave9-route-candidates-20261102.audit.json, no findings) and promoted."
+      },
+      "artifacts": [
+        "evidence/local.typed.wave9-route-capture.20261102.json"
+      ],
+      "limitations": [
+        "Native reference capture only; builder engineering is recorded separately and runtime is not run.",
+        "No R_TRIG/F_TRIG global storage: V21 marks an edge instance DB know-how protected (local.typed.edge-global-storage.20261030). No created TONR/edge storage on the routes: no route IEC effect members for TONR_TIME, R_TRIG or F_TRIG were captured.",
+        "A first w9ua attempt with its output inside the frozen tree was refused before any engineering change (RecoveryPathTooLong); it is retained at artifacts/et1/artifacts/w9ua and not part of this evidence."
+      ]
+    },
+    {
+      "id": "local.typed.wave9-routes.engineering.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4640a41f6daf0de25f2018bf7399e0673b8dd39d",
+        "passedScope": "Frozen build et4; 124/124 exact typed LAD/FBD cases passed import/compile, complete XML preservation, save/reopen and checkpoint recovery/reopen. CPU 1511-1 PN V4.1 wave 9 software-unit and namespace routes, local storage and existing global TONR."
+      },
+      "artifacts": [
+        "evidence/local.typed.wave9-routes.engineering.20261102.json"
+      ],
+      "limitations": [
+        "Engineering only: no runtime or physical PLC validation.",
+        "Exact historical frozen binaries and fixtures only; this does not certify the final integrated release or other CPU, firmware, storage and route combinations."
+      ]
+    },
+    {
+      "id": "local.typed.second-cpu-capture.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "0a9c1fef135d7c151d357ef7a583e27e207578ef",
+        "passedScope": "scripts/capture_typed_routes_owned.py --cpu-type-identifier 'OrderNumber:6ES7 513-1AM03-0AB0/V4.1' --unit '' from frozen commit 8e9ed202: the 69 unchanged standard-route references of second-cpu-capture-packet.v1.json in four runs, each in a new owned TIA V21 scratch of CPU 1513-1 PN V4.1: Boolean, Int compare and FC/FB calls (c2a, 28), creation and instance templates (c2b, 8), TON/TOF/TP and CTU/CTD/CTUD with existing global storage (c2c, 26), and the FB, IEC and transitive dependent-effect pairs (c2d, 7), LAD and FBD. Each input compiled clean, saved and added exactly its declared blocks (the after phases changed exactly the declared dependents) while every other object's XML stayed unchanged; each final snapshot matched a fresh-process reopen; owned cleanup passed. 36 profiles and 8 templates staged, audited (fixtures/typed-graphical/second-cpu-candidates-20261102.audit.json, no findings) and promoted; the effect manifests are instance-effects*.6es7-513-1am03-0ab0-v4-1.v1.json."
+      },
+      "artifacts": [
+        "evidence/local.typed.second-cpu-capture.20261102.json"
+      ],
+      "limitations": [
+        "Native reference capture only; builder engineering is recorded separately and runtime is not run.",
+        "Standard route and the base families only: no wave 9 family, software-unit or namespace route, cross-scope call or network-free insertion probe was captured on this CPU."
+      ]
+    },
+    {
+      "id": "local.typed.second-cpu.engineering.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "0a9c1fef135d7c151d357ef7a583e27e207578ef",
+        "passedScope": "Frozen build et3; 102/102 exact typed LAD/FBD cases passed import/compile, complete XML preservation, save/reopen and checkpoint recovery/reopen. CPU 1513-1 PN V4.1 base families on the standard route, including local, existing and created storage."
+      },
+      "artifacts": [
+        "evidence/local.typed.second-cpu.engineering.20261102.json"
+      ],
+      "limitations": [
+        "Engineering only: no runtime or physical PLC validation.",
+        "Exact historical frozen binaries and fixtures only; this does not certify the final integrated release or other CPU, firmware, storage and route combinations."
       ]
     }
   ],
@@ -9805,7 +9979,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Delivered through hmi_inspect, hmi_references and hmi_capabilities (read-only inspection, relationships and module diagnostics on HmiSeeder fixtures for TP700 Comfort, WinCC RT Advanced, KTP700 Basic PN, MTP700 Unified Comfort and WinCC Unified PC RT), hmi_text_list_author, hmi_text_list_generate_set and change.hmi_text_list_import (Unified text lists on MTP700 Unified Comfort and WinCC Unified PC RT 21.0.1.0), change.hmi_classic_import (Classic screen and tag-table import and screen BackColor on TP700 Comfort), change.hmi_external_tag_create (PLC-backed Unified tags on MTP700 Unified Comfort and WinCC Unified PC RT), change.hmi_screen_create (Unified screens and screen items on the same two profiles) and change.hmi_compile (one HMI target per change, on desk-configured TP700 Comfort and MTP700 Unified Comfort fixtures). Each feature's own limitations bound its claim.",
+          "Delivered through hmi_inspect, hmi_references and hmi_capabilities (read-only inspection, relationships and module diagnostics on HmiSeeder fixtures for TP700 Comfort, WinCC RT Advanced, KTP700 Basic PN, MTP700 Unified Comfort and WinCC Unified PC RT), hmi_text_list_author, hmi_text_list_generate_set and change.hmi_text_list_import (Unified text lists on MTP700 Unified Comfort and WinCC Unified PC RT 21.0.1.0), change.hmi_classic_import (Classic screen and tag-table import and screen BackColor on TP700 Comfort, WinCC RT Advanced and KTP700 Basic PN), change.hmi_external_tag_create (PLC-backed Unified tags on MTP700 Unified Comfort and WinCC Unified PC RT), change.hmi_screen_create (Unified screens and screen items on the same two profiles), change.hmi_dynamization_create (Unified tag dynamizations (ProcessValue bound to a PLC tag, a global DB member or an internal tag)), change.hmi_event_handler_create (Unified script event handlers of screens and screen items (the script stored with CRLF line ends, never executed)) and change.hmi_compile (one HMI target per change, on desk-configured TP700 Comfort and MTP700 Unified Comfort fixtures). Each feature's own limitations bound its claim.",
           "Not delivered: other HMI content writes (change.hmi_engineering stays behind the closed HMI preservation gate), Classic PLC declaration mapping and visual or runtime acceptance. WinCC RT Professional is not exposed by V21 Openness (1 November 2026: a station created in the TIA UI shows no HMI software through Openness). See the exact-profile evidence ledger; broad H0-H5 acceptance is not claimed.",
           "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source."
         ]
@@ -13849,7 +14023,7 @@
         "status": "partial",
         "limitations": [
           "Classic BackColor scalar and whole-object XML import and Unified tag/external-tag/connection/alarm/log/runtime-settings/screen/item/dynamization/event-handler/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate.",
-          "1 November: the separate change kinds hmi_classic_import (Classic classic_xml_import of a screen or tag table, and the screen BackColor scalar_property_set) and hmi_external_tag_create (Unified external_tag_create) carry these three operations; both passed native qualification and production admits them on classic-comfort, and on unified-comfort and unified-pc (change.hmi_classic_import, change.hmi_external_tag_create). On 2 November change kind hmi_screen_create followed for Unified screen_create and item_create on unified-comfort and unified-pc (change.hmi_screen_create). Under kind hmi_engineering every operation stays refused with HmiPreservationUnavailable.",
+          "1 November: the separate change kinds hmi_classic_import (Classic classic_xml_import of a screen or tag table, and the screen BackColor scalar_property_set) and hmi_external_tag_create (Unified external_tag_create) carry these three operations; both passed native qualification and production admits them on classic-comfort, and on unified-comfort and unified-pc (change.hmi_classic_import, change.hmi_external_tag_create). On 2 November change kind hmi_screen_create followed for Unified screen_create and item_create on unified-comfort and unified-pc (change.hmi_screen_create). Change kind hmi_dynamization_create followed for Unified dynamization_set on unified-comfort and unified-pc (change.hmi_dynamization_create). Change kind hmi_event_handler_create followed for Unified event_handler_set on unified-comfort and unified-pc (change.hmi_event_handler_create). Under kind hmi_engineering every operation stays refused with HmiPreservationUnavailable.",
           "Unified external_tag_create (26 October): exact same-HMI connection and root PLC tag identities; prepare proves the PLC owner from native CommunicationManagement endpoints and the exact scalar type, apply sets Connection then PlcTag and verifies the natively derived name/type/symbolic access/PLC name. The prepare-only native probe passed on Unified Comfort (local.hmi.external-tag-prepare.20261026): owner/tag/type proof reached the closed gate and name, type and foreign-PLC requests were refused. Apply stays behind the closed Unified preservation gate and is unqualified; Unified PC, arrays, whole UDT values, software-unit tags and Classic external tags are not covered; global DB members and connection creation follow (27 October).",
           "Unified HMI writes beyond screens (27 October): external_tag_create also accepts an exact root global DB identity (kind block) plus an unquoted memberPath; prepare exports the DB and requires exactly one declared member with no array on its path and an exactly matching scalar type, then writes the natively observed dotted spelling (DB.Member, as in the HmiSeeder LinkedDbValue fixture). Struct/UDT sub-members qualify only when the DB export declares them; arrays, quoted or indexed names, instance/array DBs and software-unit DBs are refused. connection_create (target the HMI as kind hmiDevice) calls HmiSoftware.Connections.Create(name) only when exactly one valid native CommunicationManagement HMI endpoint pair of that LocalConnectionName has exactly one partner PLC; Partner/Station/Node are read-only in V21, so apply requires the readback Partner to equal the proven PLC software name and a nonempty CommunicationDriver. Whether Create derives the partner from an existing endpoint pair (or the HMI already lists that connection) is unobserved; the Partner-to-PLC-name mapping is an assumption that fails closed. object_create (DiscreteAlarms, AnalogAlarms, DataLogs, AlarmLogs) uses the composition's Create(name) and object_properties_set edits an exact alarm (hmiAlarm), log or runtime settings (hmiModelNode at its hmi_inspect section=model path); both use per-family allowlists of documented typed setters (alarms: RaisedStateTag, RaisedStateTagBitNumber, TriggerMode, Condition, AlarmClass, Priority, Origin, Area; logs: Settings.LogMaxSize, Settings.StorageFolder; runtime settings: StartScreen, ScreenResolution) with exact typed readback, and require RaisedStateTag, AlarmClass and StartScreen to name an existing tag, alarm class or top-level screen of the same HMI. Faceplate explicit/existing_binding_set now also binds a PLC-backed HMI tag when its connection owner, SymbolicAccess, exact root tag or global DB member declaration and type are proven natively; other nonempty connections stay refused. The existing whole-HMI typed capture already covers connections, alarms, logs and runtime settings; creates may add only the created object's own subtree, edits only the target node. Gaps: text/graphic lists and script modules have no Create or writable typed property in V21, only paired-file directory Import/Export; text lists import through the separate change kind hmi_text_list_import, graphic lists and script modules get no write; AnalogAlarm.ConditionValue (System.Object), MultilingualText event/info texts, parameter tags and trigger addresses are not settable here; connection driver/InitialAddress authoring for non-integrated connections is not offered. All new operations sit behind the same closed Unified preservation gate. Compiled against the V21 PublicAPI only; not natively qualified.",
           "Classic classic_xml_import (27 October): imports a supplied or edited native export of one exact Classic object with ImportOptions.Override through its owning composition: ScreenComposition, ScreenTemplateComposition, ScreenPopupComposition, ScreenSlideinComposition, HmiTarget.ImportScreenGlobalElements/ImportScreenOverview, TagTableComposition, TextListComposition, GraphicListComposition, VBScriptComposition, CycleComposition and ConnectionComposition. Prepare requires one exported Hmi.* root of the same native type and Name, refuses library-linked screens/scripts and retains the current export as backup; apply re-exports the re-found object and requires equality with the supplied document apart from DocumentInfo/formatting, then the whole-HMI preservation check requires every other export unchanged. Cycles have no inspection kind and are addressed as kind hmiCycle by their preservation-capture path; the capture now keys slide-ins by SlideinType, matching inventory paths. The operation has its own unverified gate and stays refused for every profile. Compiled against the V21 PublicAPI only; not natively qualified.",
@@ -13915,9 +14089,11 @@
           "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. V21 keeps fully qualified names unique per CPU: a second DB with an existing qualified name is refused on every route (local.typed.resolution-stale.20261029), as are duplicate tag names (local.typed.native-boundaries.rerun.20261029), so these ambiguity guards are defensive and covered offline only. The stale tag address and duplicate-tag setup guard pass natively in LAD and FBD.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
-          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028), and all 60 harnessed cells pass runtime on the standard route (local.typed.wave9.runtime.20261029). R_TRIG/F_TRIG global storage, existing or created, is refused: TIA deletes an edge instance DB that no call references at compile, and with a call in the same compile V21 marks the DB know-how protected, so no storage document can be exported (local.typed.edge-global-storage.20261030). SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. createMulti for TONR, R_TRIG and F_TRIG (also nested two levels deep) and createGlobal for TONR pass the four engineering gates in LAD and FBD (local.typed.wave9-created-storage.engineering.20261029), using the recaptured standard IEC effect (local.typed.iec-effect-standard-wave9.20261029); their runtime passes as well (local.typed.wave9-created-storage.runtime.20261029). Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests.",
+          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028), and all 60 harnessed cells pass runtime on the standard route (local.typed.wave9.runtime.20261029). R_TRIG/F_TRIG global storage, existing or created, is refused: TIA deletes an edge instance DB that no call references at compile, and with a call in the same compile V21 marks the DB know-how protected, so no storage document can be exported (local.typed.edge-global-storage.20261030). SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. createMulti for TONR, R_TRIG and F_TRIG (also nested two levels deep) and createGlobal for TONR pass the four engineering gates in LAD and FBD (local.typed.wave9-created-storage.engineering.20261029), using the recaptured standard IEC effect (local.typed.iec-effect-standard-wave9.20261029); their runtime passes as well (local.typed.wave9-created-storage.runtime.20261029). Profiles are keyed by the exact CPU TypeIdentifier; the wave 9 profiles exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1.",
           "Created wave 9 storage at runtime (29 October 2026, local.typed.wave9-created-storage.runtime.20261029): a new TONR_TIME, R_TRIG or F_TRIG multi-instance member and a new IEC_TIMER global DB pass all five gates, runtime behavior included, in LAD and FBD on the standard route; created R_TRIG/F_TRIG global storage stays refused.",
-          "Verification scope (maintainer decision, 30 October 2026): the qualified profile is CPU 1511-1 PN V4.1 on the standard, software-unit and namespace routes with the audited profile set; a second CPU and the wave 9 software-unit/namespace route profiles are separate work, runtime acceptance covers every cell with a runtime harness (cells that are engineering-only by design are not runtime-gated), and the VMware guest deployment is tracked with deployment.vm_qualification."
+          "Verification scope (maintainer decision, 30 October 2026): the qualified profile is CPU 1511-1 PN V4.1 on the standard, software-unit and namespace routes with the audited profile set; a second CPU is qualified separately (2 November), and the wave 9 software-unit/namespace route profiles are qualified separately (2 November), runtime acceptance covers every cell with a runtime harness (cells that are engineering-only by design are not runtime-gated), and the VMware guest deployment is tracked with deployment.vm_qualification.",
+          "Wave 9 on the software-unit and namespace routes (2 November 2026): 120 audited profiles for DInt/Real compare, MOVE, ADD/SUB/MUL/DIV on Int/DInt/Real, TONR and R_TRIG/F_TRIG, LAD and FBD, captured from the software-unit baseline (local.typed.wave9-route-capture.20261102); all 124 route cases with local storage and existing global TONR storage pass the four engineering gates (local.typed.wave9-routes.engineering.20261102). Created TONR/R_TRIG/F_TRIG storage on the routes is refused (no route IEC effect members for those types), edge global storage stays refused, and the route cells have no runtime evidence. CPU 1511-1 PN V4.1 only.",
+          "Second CPU (2 November 2026): CPU 1513-1 PN OrderNumber:6ES7 513-1AM03-0AB0/V4.1 has 36 audited profiles, 8 creation/instance templates and its own FB, IEC and transitive dependent-effect manifests for Boolean, Int compare, FC/FB calls, TON/TOF/TP and CTU/CTD/CTUD on the standard route (local.typed.second-cpu-capture.20261102); 102 cases, local, existing and created storage included, pass the four engineering gates (local.typed.second-cpu.engineering.20261102). Ids, native folder and manifest names carry the order number and firmware (v21.6es7-513-1am03-0ab0-v4-1.*). The wave 9 families, software-unit/namespace routes, cross-scope calls, insert-first and runtime have no evidence on that CPU; other CPUs and firmware need their own capture."
         ]
       },
       "qualification": {
@@ -13958,7 +14134,11 @@
           "local.typed.iec-effect-standard-wave9.20261029",
           "local.typed.wave9-created-storage.engineering.20261029",
           "local.typed.wave9-created-storage.runtime.20261029",
-          "local.typed.edge-global-storage.20261030"
+          "local.typed.edge-global-storage.20261030",
+          "local.typed.wave9-route-capture.20261102",
+          "local.typed.wave9-routes.engineering.20261102",
+          "local.typed.second-cpu-capture.20261102",
+          "local.typed.second-cpu.engineering.20261102"
         ]
       },
       "availability": {
@@ -27705,10 +27885,11 @@
           "payload: the hmi_engineering payload (contracts/hmi-engineering.v1.schema.json) of operation classic_xml_import (target an exact Classic screen or tag table from hmi_inspect; xml the complete supplied or edited native export of that one object) or scalar_property_set (target an exact Classic screen; properties {BackColor: canonical \"R, G, B\"}). Another operation or a Unified target refuses with InvalidRequest; the same payload under kind hmi_engineering stays refused with HmiPreservationUnavailable.",
           "Prepare captures every Classic HMI of the project (every exposed screen, template, popup, slide-in, global-elements, overview, tag-table, connection, cycle, script and text/graphic-list export). The capture is accepted only with the standing Classic export note (no public alarm composition; dependency closure and export stability unqualified); a capture failure, any other note or a Unified HMI in the project refuses with HmiPreservationUnavailable, and the content hash is the observed-artifacts hash. expectedContentHash must equal it; a StaleRevision refusal returns it. classic_xml_import admits only screens and tag tables (templates, popups, slide-ins, global elements, overview, scripts, lists, cycles and connections refuse with HmiPreservationUnavailable), requires one exported Hmi.* root of the same native type and Name (XmlScopeMismatch) and refuses library-linked screens; BackColor patches the exact exported scalar of the screen's own export.",
           "Apply requires compile=true and save=true. After the checkpoint it compiles the HmiTarget and captures the compiled state (stage hmi_baseline_compiled), then (stage hmi_native_write_started) imports with ImportOptions.Override through the owning composition and re-exports the re-found object: BackColor must read back as the prepared patched document apart from DocumentInfo/Created, an XML import as the supplied document apart from DocumentInfo, export-local object IDs and formatting. Every other export of the compiled capture must stay identical with the same artifact set, only the target's own export may differ, and the HMI's compiler errors and warnings must be unchanged by the write, compared with the compile after the checkpoint by state, text and path (CompileProblemsUnchanged, the hmi_text_list_import rule; Information rows are ignored); then the project is saved. change_restore retrieves the checkpoint into a new directory and requires the pre-change content hash.",
-          "Gate: this kind only, for these two operations; production admits classic-comfort, the profile whose native qualification passed (1 November 2026), in any owned project whose HMIs are all Classic. Every other profile, operation and Classic object type stays behind the closed preservation gate, and hmi_engineering stays closed for every operation. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
+          "Gate: this kind only, for these two operations; production admits classic-comfort, classic-rt-advanced and classic-basic, the profiles whose native qualification passed (1 and 2 November 2026), in any owned project whose HMIs are all Classic. Every other profile, operation and Classic object type stays behind the closed preservation gate, and hmi_engineering stays closed for every operation. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
           "Native, 1 November (build 10763a35): the route passed on the desk-configured TP700 Comfort pair (local.hmi.classic-import.route.20261101, 63/63 checks): every refusal before any write; BackColor on both HMIs' Overview_A (identity separation), a no-op and a GridColor import of Overview_B, a no-op import of the start screen and a QualificationTags import adding one internal tag, each with every stage, no compiler problems, the target's independent re-export carrying exactly the intended delta, every other export unchanged, same-key replay and another key refused RecoveryRequired; a stale preview refused; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay (local.hmi.classic-import.interruption.20261101, 8/8).",
           "Qualified on one desk-configured TP700 Comfort fixture (start screen set in the editor). Import(Override) of the start screen kept it natively, but the start-screen setting has no public getter, so the compile rule is its only guard. Other Classic devices, object types, customer projects, runtime and visual behavior are not covered.",
-          "Lifecycle, 1 November (build 2431ccf9): on the same TP700 Comfort pair both compiles of every apply named only the target HmiTarget, both Host lifetimes ended normally (Host and worker exit 0, owned TIA process exited) and a new TIA process then reopened the saved project read-write at once (local.hmi.lifecycle.20261101, 72/72)."
+          "Lifecycle, 1 November (build 2431ccf9): on the same TP700 Comfort pair both compiles of every apply named only the target HmiTarget, both Host lifetimes ended normally (Host and worker exit 0, owned TIA process exited) and a new TIA process then reopened the saved project read-write at once (local.hmi.lifecycle.20261101, 72/72).",
+          "WinCC RT Advanced and KTP700 Basic PN, 1–2 November (build 750121ea): the route passed on their seeded HmiSeeder baselines (no start screen; the compile rule kept that error unchanged after every apply) with 72/72 and 71/71 checks (local.hmi.classic-import.profiles.route.20261101; Basic has no popup), and ci-* interruption 8/8 on each (local.hmi.classic-import.profiles.interruption.20261102); production admits both profiles."
         ]
       },
       "qualification": {
@@ -27716,13 +27897,15 @@
         "evidenceIds": [
           "local.hmi.classic-import.route.20261101",
           "local.hmi.classic-import.interruption.20261101",
-          "local.hmi.lifecycle.20261101"
+          "local.hmi.lifecycle.20261101",
+          "local.hmi.classic-import.profiles.route.20261101",
+          "local.hmi.classic-import.profiles.interruption.20261102"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires an owned project whose HMIs are all Classic, the target a Classic Comfort one whose capture shows only the standing export note and that compiles without problems, and a worker-owned TIA instance for change_restore."
+          "Requires an owned project whose HMIs are all Classic, the target a TP700 Comfort, WinCC RT Advanced or KTP700 Basic PN one whose capture shows only the standing export note and whose compiler problems the write leaves unchanged, and a worker-owned TIA instance for change_restore."
         ]
       },
       "prerequisites": [
@@ -27826,6 +28009,112 @@
         "evidenceIds": [
           "local.hmi.screen-create.route.20261102",
           "local.hmi.screen-create.interruption.20261102"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an owned project whose HMIs are all Unified, the target a Unified Comfort or Unified PC one whose capture shows only the two standing notes, and a worker-owned TIA instance for change_restore."
+        ]
+      },
+      "prerequisites": [
+        "Installed TIA V21 Openness with WinCC Unified"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "change.hmi_dynamization_create",
+      "domain": "hmi",
+      "title": "Bind a Unified screen item property to an HMI tag",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "hmi_dynamization_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API (Siemens.Engineering.WinCCUnified.xml): DynamizationBaseComposition.Create<TagDynamization>(String) on a screen item's Dynamizations with TagDynamization.Tag, PropertyName, DynamizationType, DataType and UseIndirectAddressing readback; the typed item setters (ProcessValue, Visible, Enabled) to check the property; HmiTag Connection/PlcTag/Address/PlcName and native CommunicationManagement endpoints for a PLC-backed tag's owner; the typed object-model walk (hmi_inspect section=model) for readback; Device.GetService<ICompilable>()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "payload: the hmi_engineering payload (contracts/hmi-engineering.v1.schema.json) of operation dynamization_set: target an exact Unified screen item, one bindings entry with property ProcessValue (or Visible/Enabled with a Bool tag), an exact same-HMI tagIdentity and dataType equal to the tag's type. Another property, another HMI's tag, a type mismatch, another operation or a Classic target refuses with InvalidRequest; an item without a typed setter of the property refuses with HmiAttributeUnavailable; an existing dynamization of the property refuses with HmiNameConflict (create-only); the same payload under kind hmi_engineering stays refused with HmiPreservationUnavailable.",
+          "A PLC-backed tag (a PLC tag, an address or a Connection naming a connection of its HMI) is bound only when the bridge proves its integrated connection's single native endpoint owner, SymbolicAccess and the exact root tag or global DB member declaration and type; a tag with none of these is internal, whatever localized pseudo-connection V21 shows (\"<Internal tag>\"). Prepare captures the Unified scope of every HMI and accepts only the two standing Unified notes.",
+          "Apply requires compile=true and save=true: after the checkpoint it compiles the owning HMI device and captures the compiled state (hmi_baseline_compiled), then (hmi_native_write_started) creates the TagDynamization, sets Tag and requires the property, type Tag, the tag name and no indirect addressing to read back. Only the dynamization's typed node (<item>/dynamizations/<property>) may appear; the item's own node and every other node must stay identical, and the compiler's errors and warnings must be unchanged. change_restore retrieves the checkpoint into a new directory and requires the pre-change content hash.",
+          "Gate: this kind only, for this operation; production admits unified-comfort and unified-pc, the profiles whose native qualification passed (2 November 2026), in any owned project whose HMIs are all Unified. Every other profile and operation stays behind the closed preservation gate, and hmi_engineering stays closed for every operation. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
+          "Script, resource-list, flashing and expression dynamizations, replacing an existing dynamization, faceplate interface bindings, arrays, UDT members and software-unit declarations are not offered. PLC communication, runtime values and appearance are not verified: they need the desk.",
+          "Native, 2 November: on the desk-configured MTP700 Unified Comfort pair and the seeded WinCC Unified PC RT baseline (local.hmi.dynamization.route.20261102, 48/48 checks) the route bound ProcessValue of an HmiIOField to LinkedSignal (a root PLC tag), of an HmiBar to LinkedDbValue (a global DB member) and of an HmiIOField on HMI_RT_2 to SharedValue (an internal tag), the items created first through hmi_screen_create; each dynamization read back (tag, type Tag, no indirect addressing) with the hmi_references chain item -> HMI tag resolved and, for the PLC-backed tags, their resolved PLC declaration; hmi_inspect and the typed model unchanged outside the new node (the owner's row only in its dynamizations and their behaviorCoverage count), compiler rows unchanged, compile scope the owning device, same-key replay and another key refused RecoveryRequired; checkpoint restore, normal Host lifecycle and an immediate read-write reopen. dy-* interruption (the ProcessValue binding of a new IOField to LinkedSignal) at the checkpoint, the baseline compile, the native write, the compile and the save, and Host loss at the checkpoint, the write and the save, reconciled without replay on both profiles (local.hmi.dynamization.interruption.20261102, 8/8 each). Qualified on these two fixtures only."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.dynamization.route.20261102",
+          "local.hmi.dynamization.interruption.20261102"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an owned project whose HMIs are all Unified, the target a Unified Comfort or Unified PC one whose capture shows only the two standing notes, and a worker-owned TIA instance for change_restore."
+        ]
+      },
+      "prerequisites": [
+        "Installed TIA V21 Openness with WinCC Unified",
+        "For a PLC-backed tag: an integrated HMI connection to the PLC that declares it"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "change.hmi_event_handler_create",
+      "domain": "hmi",
+      "title": "Add a script event handler to a Unified screen or item",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "hmi_event_handler_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API (Siemens.Engineering.WinCCUnified.xml): the EventHandlers composition of HmiScreen and of each screen-item type, Create(<object's event-type enum>) and Find, with the handler's Script (IHmiScript.ScriptCode, Async) readback; the typed object-model walk (hmi_inspect section=model) with hashed script code for readback; Device.GetService<ICompilable>()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "payload: the hmi_engineering payload (contracts/hmi-engineering.v1.schema.json) of operation event_handler_set: target an exact Unified screen or screen item, eventType a member of that object's native event enum (an undocumented one refuses with InvalidRequest and lists the allowed ones) and script, untrusted JavaScript of 1 to 16384 characters in its stored form without control characters other than tab, CR and LF, CR only within CRLF. An event that already has a handler refuses with HmiNameConflict (create-only; existing handlers and scripts are never replaced). Another operation or a Classic target refuses with InvalidRequest; the same payload under kind hmi_engineering stays refused with HmiPreservationUnavailable.",
+          "The script is stored as Script.ScriptCode with CRLF line ends, the form V21 keeps (an LF script reads back with CRLF), and read back exactly in that form; the bridge never executes, evaluates or syntax-checks it. Prepare captures the Unified scope of every HMI and accepts only the two standing Unified notes. Apply requires compile=true and save=true: after the checkpoint it compiles the owning HMI device and captures the compiled state (hmi_baseline_compiled), then (hmi_native_write_started) creates the handler and sets its script. Only the handler's typed node (<owner>/eventHandlers/<eventType>) may appear; the owner's node and every other node must stay identical, and the compiler's errors and warnings must be unchanged. change_restore retrieves the checkpoint into a new directory and requires the pre-change content hash.",
+          "Gate: this kind only, for this operation; production admits unified-comfort and unified-pc, the profiles whose native qualification passed (2 November 2026), in any owned project whose HMIs are all Unified. Every other profile and operation stays behind the closed preservation gate, and hmi_engineering stays closed for every operation. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
+          "Property-event handlers, custom web/widget container events, global script modules and system-function lists are not offered. What the script does in runtime is not verified: it needs the desk.",
+          "Native, 2 November: on the desk-configured MTP700 Unified Comfort pair and the seeded WinCC Unified PC RT baseline (local.hmi.event-handler.route.20261102, 47/47 checks) the route added a script handler to the screen Overview_A (an event without a handler: the seeded Overview_A already handles Loaded, which refused HmiNameConflict), to a seeded rectangle and to a button created first through hmi_screen_create; each handler read back with its exact script text and SHA-256; hmi_inspect and the typed model unchanged outside the new node (the owner's row only in its eventHandlers and their behaviorCoverage count), compiler rows unchanged, compile scope the owning device, same-key replay and another key refused RecoveryRequired; checkpoint restore, normal Host lifecycle and an immediate read-write reopen. eh-* interruption (a script handler of the screen Overview_A on HMI_RT_1) at the checkpoint, the baseline compile, the native write, the compile and the save, and Host loss at the checkpoint, the write and the save, reconciled without replay on both profiles (local.hmi.event-handler.interruption.20261102, 8/8 each). Qualified on these two fixtures only."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.event-handler.route.20261102",
+          "local.hmi.event-handler.interruption.20261102"
         ]
       },
       "availability": {

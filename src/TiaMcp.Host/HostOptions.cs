@@ -116,8 +116,8 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
                         throw new ArgumentException("--hmi-text-list-qualification takes one of unified-comfort or unified-pc, once.");
                     hmiTextListQualification = args[i]; break;
                 case "--hmi-change-qualification":
-                    if (hmiChangeQualification is not null || args[i] is not ("classic-comfort" or "unified-comfort" or "unified-pc"))
-                        throw new ArgumentException("--hmi-change-qualification takes one of classic-comfort, unified-comfort or unified-pc, once.");
+                    if (hmiChangeQualification is not null || args[i] is not ("classic-comfort" or "classic-rt-advanced" or "classic-basic" or "unified-comfort" or "unified-pc"))
+                        throw new ArgumentException("--hmi-change-qualification takes one of classic-comfort, classic-rt-advanced, classic-basic, unified-comfort or unified-pc, once.");
                     hmiChangeQualification = args[i]; break;
                 case "--runtime-qualification":
                     if (runtimeQualificationPoint is not null || args[i] is not ("ua.write.afterSend" or "web.write.afterSend"))

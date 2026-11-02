@@ -25,48 +25,52 @@ def text(node, value):
     node.appendChild(node.ownerDocument.createTextNode(str(value)))
 
 
+def derive(route, namespace, language, suffix, number, storage=None):
+    """Write the route probe for the standard reference Tgp_<suffix>.xml; storage renames its global DB component."""
+    route_path = ROOT / "native" / ("Tgp" + route + "_TemplateFB_" + language + ".xml")
+    route_attributes = child(minidom.parseString(route_path.read_bytes()).getElementsByTagName("SW.Blocks.FB")[0], "AttributeList")
+    reference_path = ROOT / "native" / ("Tgp_" + suffix + ".xml")
+    document = minidom.parseString(reference_path.read_bytes())
+    attributes = child(document.getElementsByTagName("SW.Blocks.FB")[0], "AttributeList")
+    # This preserves the native unit's absence of MemoryLayout.
+    for name in ("Access", "AutoNumber", "MemoryLayout", "Namespace"):
+        old = child(attributes, name)
+        observed = child(route_attributes, name)
+        if old is not None:
+            attributes.removeChild(old)
+        if observed is not None:
+            cloned = document.importNode(observed, True)
+            # Native attributes use lexical element ordering.
+            following = next((n for n in attributes.childNodes if n.nodeType == n.ELEMENT_NODE and n.tagName > name), None)
+            attributes.insertBefore(cloned, following)
+    text(child(attributes, "Name"), "Tgp" + route + "_" + suffix)
+    text(child(attributes, "Number"), number)
+    if storage:
+        matches = [n for n in document.getElementsByTagName("Component") if n.getAttribute("Name") == storage]
+        assert len(matches) == 1
+        matches[0].setAttribute("Name", namespace + ".Tgp" + route + "_" + storage.removeprefix("Tgp_"))
+    target = ROOT / "sources" / ("route-" + route + "-native-" + suffix.lower().replace("_", "-") + ".xml")
+    target.write_bytes(document.toxml(encoding="utf-8"))
+    evidence = {"schemaVersion": 1, "builderUsed": False, "authoredFormat": "native_xml_template_derivation",
+        "requiresNativeAcceptance": True, "namespace": namespace,
+        "references": [{"path": p.relative_to(REPO).as_posix(), "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
+                       for p in (reference_path, route_path)],
+        "adaptedFields": ["Access", "AutoNumber", "MemoryLayout presence", "Namespace", "Name", "Number"] +
+                         (["GlobalVariable Component Name"] if storage else []),
+        "sourceSha256": hashlib.sha256(target.read_bytes()).hexdigest()}
+    target.with_suffix(".provenance.json").write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
+    return target
+
+
 def main():
     for route, namespace in (("Unit", "TiaMcp_UnitA"), ("Namespace", "TiaMcp_UnitA.Alternate")):
         number = 600 if route == "Unit" else 700
         for language in ("LAD", "FBD"):
-            route_path = ROOT / "native" / ("Tgp" + route + "_TemplateFB_" + language + ".xml")
-            route_doc = minidom.parseString(route_path.read_bytes())
-            route_attributes = child(route_doc.getElementsByTagName("SW.Blocks.FB")[0], "AttributeList")
             for instruction in ("TON", "TOF", "TP", "CTU", "CTD", "CTUD"):
                 for global_instance in (False, True):
-                    suffix = instruction + ("_Global" if global_instance else "") + "_" + language
-                    reference_path = ROOT / "native" / ("Tgp_" + suffix + ".xml")
-                    document = minidom.parseString(reference_path.read_bytes())
-                    attributes = child(document.getElementsByTagName("SW.Blocks.FB")[0], "AttributeList")
-                    # This preserves the native unit's absence of MemoryLayout.
-                    for name in ("Access", "AutoNumber", "MemoryLayout", "Namespace"):
-                        old = child(attributes, name)
-                        observed = child(route_attributes, name)
-                        if old is not None:
-                            attributes.removeChild(old)
-                        if observed is not None:
-                            cloned = document.importNode(observed, True)
-                            # Native attributes use lexical element ordering.
-                            following = next((n for n in attributes.childNodes if n.nodeType == n.ELEMENT_NODE and n.tagName > name), None)
-                            attributes.insertBefore(cloned, following)
-                    text(child(attributes, "Name"), "Tgp" + route + "_" + suffix)
-                    text(child(attributes, "Number"), number)
+                    storage = ("Tgp_GlobalTimer" if instruction in ("TON", "TOF", "TP") else "Tgp_GlobalCounter") if global_instance else None
+                    derive(route, namespace, language, instruction + ("_Global" if global_instance else "") + "_" + language, number, storage)
                     number += 1
-                    if global_instance:
-                        original = "Tgp_GlobalTimer" if instruction in ("TON", "TOF", "TP") else "Tgp_GlobalCounter"
-                        matches = [n for n in document.getElementsByTagName("Component") if n.getAttribute("Name") == original]
-                        assert len(matches) == 1
-                        matches[0].setAttribute("Name", namespace + ".Tgp" + route + "_" + original.removeprefix("Tgp_"))
-                    target = ROOT / "sources" / ("route-" + route + "-native-" + suffix.lower().replace("_", "-") + ".xml")
-                    target.write_bytes(document.toxml(encoding="utf-8"))
-                    evidence = {"schemaVersion": 1, "builderUsed": False, "authoredFormat": "native_xml_template_derivation",
-                        "requiresNativeAcceptance": True, "namespace": namespace,
-                        "references": [{"path": p.relative_to(REPO).as_posix(), "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
-                                       for p in (reference_path, route_path)],
-                        "adaptedFields": ["Access", "AutoNumber", "MemoryLayout presence", "Namespace", "Name", "Number"] +
-                                         (["GlobalVariable Component Name"] if global_instance else []),
-                        "sourceSha256": hashlib.sha256(target.read_bytes()).hexdigest()}
-                    target.with_suffix(".provenance.json").write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

@@ -18,6 +18,8 @@ No, it is pre-1.0. Offline tooling is validated in CI; live TIA Portal and PLCSI
 
 Ask the server: `feature_catalog` lists implementation scope, `target_capabilities` reports what the selected target supports. The [tool reference](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/tools.md) lists every tool with its support class. The [engineering coverage](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/engineering-coverage.md) reference covers native changes.
 
+Typed LAD/FBD support is tied to exact CPU, firmware and route profiles. The second CPU and wave 9 route additions have engineering evidence, with their runtime limits recorded in the [builder guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/typed-lad-fbd-builders.md). HMI admission is similarly bounded by the [qualified kinds and profiles](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md).
+
 ## What if a change fails halfway?
 
 Changes are not transactions across Siemens calls. Each applied change has a checkpoint and journal for recovery; see the [engineering workflow](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md).
