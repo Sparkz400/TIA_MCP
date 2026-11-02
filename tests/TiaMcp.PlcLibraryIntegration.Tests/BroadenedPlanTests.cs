@@ -135,21 +135,25 @@ internal static class BroadenedPlanTests
             Equal("/plc/blocks/Cycle", string.Join(",", PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, new[] { "/plc/blocks/Main_DB", "/plc/blocks/Cycle" },
                 new[] { "/plc/blocks/Main_DB" })["dependents"].Select(d => (string)d)));
         });
-        test("a multi-instance caller with its own instance DB is its own candidate combination", () => {
+        // Passed natively on 2 November (local.library_integrate.candidate_shapes.dependent_db.20261102).
+        test("a multi-instance caller with its own instance DB is its own verified combination", () => {
             var f = ReusedMulti();
-            var features = PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller, null, true);
+            var features = PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller, new string[0], true);
             Equal("dependentInstanceDb+fbCaller+multiInstance+reusedComponent", PlcComponentQualificationGate.ShapeKey(features));
-            Equal(0, PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller, new[] { "dependentInstanceDb+fbCaller+multiInstance+reusedComponent" }, true).Count);
-            Equal(true, PlcComponentQualificationGate.CombinedApplyRefusal(new JObject { ["payload"] = f.Payload, ["integrationPlan"] = f.Build() }, f.Caller, false, true) != null);
-            Equal(null, PlcComponentQualificationGate.CombinedApplyRefusal(new JObject { ["payload"] = f.Payload, ["integrationPlan"] = f.Build() }, f.Caller, true, true));
+            Equal(0, PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller, null, true).Count);
+            // The plain multi-instance key does not open its combination with the caller's own DB.
+            Equal(4, PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller, new[] { "fbCaller+multiInstance+reusedComponent" }, true).Count);
+            Equal(null, PlcComponentQualificationGate.CombinedApplyRefusal(new JObject { ["payload"] = f.Payload, ["integrationPlan"] = f.Build() }, f.Caller, false, true));
             // Only a multi-instance changes the caller's interface, so a global-DB plan never names the feature.
             Equal("", string.Join(",", PlcComponentQualificationGate.UnverifiedFeatures(ReusedRoot().Build(), ReusedRoot().Payload, ReusedRoot().Caller, null, true).Properties().Select(p => p.Name)));
         });
         test("the reused-FB multi-instance is exactly the verified combination", () => Equal("fbCaller+multiInstance+reusedComponent",
             PlcComponentQualificationGate.ShapeKey(PlcComponentQualificationGate.UnverifiedFeatures(ReusedMulti().Build(), ReusedMulti().Payload, ReusedMulti().Caller, new string[0]))));
+        // Passed natively on 2 November (local.library_integrate.candidate_shapes.combinations.20261102): the combinations run too.
+        foreach (var (name, shape) in new (string, Func<Fixture>)[] { ("LAD FB caller", ladFb), ("LAD FC with an earlier placement", ladEarlier) })
+            test("combined apply admits the verified combination " + name + " in production", () => { Equal(null, Refusal(shape())); Equal("", Features(shape())); });
         // Candidate shapes: each has a builder but no native evidence, so only a qualification Host's owned scratch admits it.
-        foreach (var (name, shape, features) in new (string, Func<Fixture>, string)[] {
-            ("multi-instance", Multi, "fbCaller,multiInstance"), ("LAD FB caller", ladFb, "ladCaller,fbCaller"), ("LAD FC with an earlier placement", ladEarlier, "ladCaller,earlierPlacement") })
+        foreach (var (name, shape, features) in new (string, Func<Fixture>, string)[] { ("multi-instance", Multi, "fbCaller,multiInstance") })
         {
             test("combined apply refuses candidate " + name + " in production", () => { if (Refusal(shape()) == null) throw new Exception("Unverified shape admitted."); });
             test("qualification Host admits candidate " + name, () => { Equal(null, Refusal(shape(), true)); Equal(features, Features(shape())); });
@@ -171,9 +175,7 @@ internal static class BroadenedPlanTests
         });
         test("verified shapes have no candidate features", () => { Equal("", Features(new Fixture())); var f = new Fixture(); f.Standalone("FBD"); Equal("", Features(f)); Equal("", Features(Titled(Unit1, 2))); });
         test("candidate refusals name the first unverified feature, else the unverified combination", () => {
-            Equal("A multi-instance is verified only for the reused installed FB in an existing FBD FB caller; other multi-instances stay plan-only.", Refusal(Multi()));
-            Equal("The combination fbCaller+ladCaller of separately verified features has no native evidence; it stays plan-only.", Refusal(ladFb()));
-            Equal("The combination earlierPlacement+ladCaller of separately verified features has no native evidence; it stays plan-only.", Refusal(ladEarlier()));
+            Equal("A multi-instance is verified only for the reused installed FB in an existing LAD or FBD FB caller; other multi-instances stay plan-only.", Refusal(Multi()));
         });
         test("combined apply refuses PLC/HMI recipes and missing plans", () => {
             var f = new Fixture(); var preview = new JObject { ["payload"] = f.Payload.DeepClone(), ["integrationPlan"] = f.Build() };

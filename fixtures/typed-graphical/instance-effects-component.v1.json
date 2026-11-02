@@ -8,7 +8,6 @@
   "recoveryVerified": false,
   "runtimeVerified": false,
   "memberName": "Gate",
-  "qualificationOnly": true,
   "tiaVersion": "V21",
   "route": "standard",
   "artifacts": {

@@ -5,6 +5,10 @@ Dated delivery notes, newest first. Until 28 October 2026 they were the body of
 banners of the [documentation index](../README.md). Each entry keeps the counts
 and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
+## 2 November 2026
+
+**Provisioning release and component combinations — 2 November 2026:** native on this PC, owned scratch projects only. `simulation_provision_reconcile` now proves the whole project (fingerprint with the project library, last saved before the pre-provision archive), the storage outside the card by its pre-attempt metadata inventory, and a write-ahead stream that never opened or armed the credential; all five unresolved provisioning admissions on this PC, `f52861ec…` from 24 October included, were released with exact process exits and a fresh-Portal reopen of each project (`local.sim.reconcile.release.20261102`, [record](../verification/provision-release-20261102.md)). Combined apply passed every remaining combination of its features in 16 cases (`local.library_integrate.candidate_shapes.combinations.20261102`); the component FB's dependent instance-DB effect was captured (`local.typed.component-effect-capture.20261102`), and a multi-instance caller with its own instance DB installed in four shapes while an embedding parent was refused before admission (`local.library_integrate.candidate_shapes.dependent_db.20261102`); `VerifiedShapes` lists 23 shapes ([record](../verification/component-combinations-20261102.md)). The native05 audit stays blocked: its artifacts are not on this PC.
+
 ## 1 November 2026
 
 This entry covers the workstreams run after the audit merge on 31 October, through the evening and night into 1 November. The maintainer delegated the open decisions ("you decide"); they are recorded as decided in the [TODO](../TODO.md#decisions-for-the-maintainer).

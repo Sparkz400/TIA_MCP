@@ -249,7 +249,7 @@ namespace TiaMcp.Openness.V21
                 ["checkpoint"] = "The first step's complete-project archive, taken before the first mutation, is this change's single recovery checkpoint.",
                 ["candidateFeatures"] = unverified,
                 ["qualification"] = unverified.Count != 0 ? "Candidate shape without native evidence, admitted only on this qualification Host's owned scratch."
-                    : "Natively qualified for the verified shapes on owned de-DE-only scratch projects (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.candidate_shapes.rerun.20261031, local.library_integrate.combined_apply.regression.20261031, local.library_integrate.candidate_shapes.multi.20261101, local.library_integrate.combined_apply.regression.20261101)." };
+                    : "Natively qualified for the verified shapes on owned de-DE-only scratch projects (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.candidate_shapes.rerun.20261031, local.library_integrate.combined_apply.regression.20261031, local.library_integrate.candidate_shapes.multi.20261101, local.library_integrate.combined_apply.regression.20261101, local.library_integrate.candidate_shapes.combinations.20261102, local.library_integrate.candidate_shapes.dependent_db.20261102)." };
             if (refusal != null) return;
             var coordinator = (JObject)change.Preview["integrationPlan"]["coordinator"];
             coordinator["publicEntryPointAvailable"] = true; coordinator["remainingBoundary"] = "Combined change_apply runs only the verified shapes; every other shape stays plan-only.";

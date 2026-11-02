@@ -37,7 +37,7 @@ COMBINED_PATH_OVERHEAD = len("/changes/c/01234567/change-lib-" + "0" * 32 + "/be
 REFUSED = "PlcIntegrationNotQualified"
 # FB callers are verified since 31 October and a multi-instance of the reused FB since 1 November; a multi-instance after a fresh
 # import is not, so the refusal cases prepare an FB caller with a multi-instance of the FB they import.
-FB_REFUSAL = "A multi-instance is verified only for the reused installed FB in an existing FBD FB caller; other multi-instances stay plan-only."
+FB_REFUSAL = "A multi-instance is verified only for the reused installed FB in an existing LAD or FBD FB caller; other multi-instances stay plan-only."
 HOST_FB = "TiaMcpComponentHost"
 # The Host FB moves off FB2, the number the component FB is imported with: the captured instance profile is bound to it
 # (31 October), and prepare now refuses an occupied number (ComponentBlockNumberOccupied).
@@ -69,35 +69,31 @@ CANDIDATES = {
 }
 REUSE_CALLER, REUSE_INSTANCE, MULTI_NAME = "TiaMcpComponentCaller2", "TiaMcpComponentGate_2", "Gate"
 # Combinations of the verified features, each in its own owned scratch: whether the plan reuses the FB that a first verified
-# standalone FBD FC install put into the project, the caller under test, and the features its preview must name (none of these
-# combinations has native evidence yet). An existing caller comes from its fixture source; "networks": 2 repeats its one network
-# through its own export, so the call goes after the first. reuseExisting is the verified reusedComponent key with an existing
-# FBD FC, a variant its evidence did not exercise.
+# standalone FBD FC install put into the project, the caller under test, and the features its preview must name (none since the
+# runs of 2 November verified each combination). An existing caller comes from its fixture source; "networks": 2 repeats its one
+# network through its own export, so the call goes after the first. reuseExisting is the reusedComponent key with an existing
+# FBD FC, a variant its first evidence did not exercise.
 COMBINATIONS = {
-    "ladEarlier": (False, {"kind": "FC", "language": "LAD", "networks": 2}, ["earlierPlacement", "ladCaller"]),
-    "fbEarlier": (False, {"kind": "FB", "language": "FBD", "networks": 2}, ["earlierPlacement", "fbCaller"]),
-    "ladFb": (False, {"kind": "FB", "language": "LAD"}, ["fbCaller", "ladCaller"]),
-    "ladFbEarlier": (False, {"kind": "FB", "language": "LAD", "networks": 2}, ["earlierPlacement", "fbCaller", "ladCaller"]),
+    "ladEarlier": (False, {"kind": "FC", "language": "LAD", "networks": 2}, []),
+    "fbEarlier": (False, {"kind": "FB", "language": "FBD", "networks": 2}, []),
+    "ladFb": (False, {"kind": "FB", "language": "LAD"}, []),
+    "ladFbEarlier": (False, {"kind": "FB", "language": "LAD", "networks": 2}, []),
     "reuseExisting": (True, {"kind": "FC", "language": "FBD"}, []),
-    "reuseLad": (True, {"kind": "FC", "language": "LAD", "new": True}, ["ladCaller", "reusedComponent"]),
-    "reuseLadExisting": (True, {"kind": "FC", "language": "LAD"}, ["ladCaller", "reusedComponent"]),
-    "reuseEarlier": (True, {"kind": "FC", "language": "FBD", "networks": 2}, ["earlierPlacement", "reusedComponent"]),
-    "reuseLadEarlier": (True, {"kind": "FC", "language": "LAD", "networks": 2}, ["earlierPlacement", "ladCaller", "reusedComponent"]),
-    "reuseFb": (True, {"kind": "FB", "language": "FBD"}, ["fbCaller", "reusedComponent"]),
-    "reuseFbEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2}, ["earlierPlacement", "fbCaller", "reusedComponent"]),
-    "reuseLadFb": (True, {"kind": "FB", "language": "LAD"}, ["fbCaller", "ladCaller", "reusedComponent"]),
-    "reuseLadFbEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2}, ["earlierPlacement", "fbCaller", "ladCaller", "reusedComponent"]),
-    "multiEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2, "multi": True}, ["earlierPlacement", "fbCaller", "multiInstance", "reusedComponent"]),
-    "multiLad": (True, {"kind": "FB", "language": "LAD", "multi": True}, ["fbCaller", "ladCaller", "multiInstance", "reusedComponent"]),
-    "multiLadEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2, "multi": True},
-                        ["earlierPlacement", "fbCaller", "ladCaller", "multiInstance", "reusedComponent"]),
+    "reuseLad": (True, {"kind": "FC", "language": "LAD", "new": True}, []),
+    "reuseLadExisting": (True, {"kind": "FC", "language": "LAD"}, []),
+    "reuseEarlier": (True, {"kind": "FC", "language": "FBD", "networks": 2}, []),
+    "reuseLadEarlier": (True, {"kind": "FC", "language": "LAD", "networks": 2}, []),
+    "reuseFb": (True, {"kind": "FB", "language": "FBD"}, []),
+    "reuseFbEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2}, []),
+    "reuseLadFb": (True, {"kind": "FB", "language": "LAD"}, []),
+    "reuseLadFbEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2}, []),
+    "multiEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2, "multi": True}, []),
+    "multiLad": (True, {"kind": "FB", "language": "LAD", "multi": True}, []),
+    "multiLadEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2, "multi": True}, []),
     # The Host FB with its own instance DB, which gains the member through the captured component effect.
-    "multiDependentsEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2, "multi": True, "dependents": True},
-                               ["dependentInstanceDb", "earlierPlacement", "fbCaller", "multiInstance", "reusedComponent"]),
-    "multiDependentsLad": (True, {"kind": "FB", "language": "LAD", "multi": True, "dependents": True},
-                           ["dependentInstanceDb", "fbCaller", "ladCaller", "multiInstance", "reusedComponent"]),
-    "multiDependentsLadEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2, "multi": True, "dependents": True},
-                                  ["dependentInstanceDb", "earlierPlacement", "fbCaller", "ladCaller", "multiInstance", "reusedComponent"]),
+    "multiDependentsEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2, "multi": True, "dependents": True}, []),
+    "multiDependentsLad": (True, {"kind": "FB", "language": "LAD", "multi": True, "dependents": True}, []),
+    "multiDependentsLadEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2, "multi": True, "dependents": True}, []),
 }
 CALLER_SOURCES = {("FB", "FBD"): "callers/TiaMcpComponentHost.s7dcl", ("FB", "LAD"): "callers/TiaMcpComponentHost.lad.s7dcl",
                   ("FC", "FBD"): "TiaMcpComponentCaller.s7dcl", ("FC", "LAD"): "callers/TiaMcpComponentCaller.lad.s7dcl"}
@@ -112,7 +108,7 @@ HOST_DB_SOURCE = 'DATA_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION 
 PARENT_FB, PARENT_FB_NUMBER = "TiaMcpComponentParent", 31
 PARENT_SOURCE = ('FUNCTION_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\nVAR\n Host : "%s";\nEND_VAR\nBEGIN\n #Host();\nEND_FUNCTION_BLOCK\n'
                  % (PARENT_FB, HOST_FB))
-DEPENDENT_DB_FEATURES = ["dependentInstanceDb", "fbCaller", "multiInstance", "reusedComponent"]
+DEPENDENT_DB_FEATURES = []  # dependentInstanceDb+fbCaller+multiInstance+reusedComponent, verified on 2 November
 COMPONENT_EFFECT = ROOT / "fixtures/typed-graphical/native/instance-effects-component/after-instance.xml"
 DEPENDENTS_REFUSED = "DependencyProfileUnavailable"
 # The worker's message for a combined apply refused while it resolves the shared-mutation scope (OpennessSession.SharedMutationAdmission).

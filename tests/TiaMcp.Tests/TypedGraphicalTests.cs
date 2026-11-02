@@ -829,7 +829,8 @@ internal static class TypedGraphicalTests
             .Element("AttributeList")!.Element("Interface")!.Elements().Single().Elements().Single(s => s.Attribute("Name")?.Value == "Static")
             .Elements().Single(m => m.Attribute("Name")?.Value == name);
         var manifest = JObject.Parse(File.ReadAllText(Path.Combine(typed, "instance-effects-component.v1.json")));
-        Check.Equal(true, manifest.Value<bool>("qualificationOnly"));
+        // Deployed without qualificationOnly since its combined-apply shapes passed (local.library_integrate.candidate_shapes.dependent_db.20261102).
+        Check.Equal(null, manifest["qualificationOnly"]);
         string Artifact(string kind) => manifest["artifacts"]![kind]!.Value<string>("path")!.Substring("fixtures/typed-graphical/".Length);
         var callee = Read("native/TiaMcpComponentGate.xml");
         var declaration = TypedGraphicalMultiInstanceTemplate.Create("Gate", "\"TiaMcpComponentGate\"", callee, callee, Static(Read("native/Tgp_ComponentHost_FBD.xml"), "Gate"));

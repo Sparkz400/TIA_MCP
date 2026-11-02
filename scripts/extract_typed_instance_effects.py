@@ -27,7 +27,8 @@ def member_shapes(document, names):
 
 
 # The PLC component pair (component-effect-*.scl): a caller FB gains the component FB, whose UDT static no scalar pair covers,
-# as the multi-instance Gate. Written qualificationOnly until a combined apply with a dependent instance DB verifies it.
+# as the multi-instance Gate. Written qualificationOnly; the change that verified it (local.library_integrate.candidate_shapes.dependent_db.20261102)
+# removed the flag from the deployed manifest.
 COMPONENT_FB, COMPONENT_MEMBER = "TiaMcpComponentGate", "Gate"
 
 

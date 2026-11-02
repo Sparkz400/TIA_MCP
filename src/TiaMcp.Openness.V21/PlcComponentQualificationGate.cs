@@ -50,7 +50,11 @@ namespace TiaMcp.Openness.V21
         // existing FBD FB caller, an existing FBD FC after an earlier network, and reuse of the installed FB with a new FBD FC caller.
         // Passed natively on 1 November (local.library_integrate.candidate_shapes.multi.20261101): a multi-instance of the reused
         // installed FB in an existing FBD FB caller, through the captured template local.typed.component-storage-capture.20261101.
-        internal static readonly string[] VerifiedShapes = { "earlierPlacement", "fbCaller", "fbCaller+multiInstance+reusedComponent", "ladCaller", "reusedComponent" };
+        // Passed natively on 2 November (local.library_integrate.candidate_shapes.combinations.20261102): every combination of
+        // ladCaller, fbCaller, earlierPlacement, reusedComponent and multiInstance a plan can have; and with the captured instance-DB
+        // effect local.typed.component-effect-capture.20261102, each multi-instance combination whose caller FB has its own instance
+        // DB (local.library_integrate.candidate_shapes.dependent_db.20261102).
+        internal static readonly string[] VerifiedShapes = { "dependentInstanceDb+earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent", "dependentInstanceDb+earlierPlacement+fbCaller+multiInstance+reusedComponent", "dependentInstanceDb+fbCaller+ladCaller+multiInstance+reusedComponent", "dependentInstanceDb+fbCaller+multiInstance+reusedComponent", "earlierPlacement", "earlierPlacement+fbCaller", "earlierPlacement+fbCaller+ladCaller", "earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent", "earlierPlacement+fbCaller+ladCaller+reusedComponent", "earlierPlacement+fbCaller+multiInstance+reusedComponent", "earlierPlacement+fbCaller+reusedComponent", "earlierPlacement+ladCaller", "earlierPlacement+ladCaller+reusedComponent", "earlierPlacement+reusedComponent", "fbCaller", "fbCaller+ladCaller", "fbCaller+ladCaller+multiInstance+reusedComponent", "fbCaller+ladCaller+reusedComponent", "fbCaller+multiInstance+reusedComponent", "fbCaller+reusedComponent", "ladCaller", "ladCaller+reusedComponent", "reusedComponent" };
         internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport, bool candidates = false, bool dependentInstanceDb = false)
         {
             var payload = preview?["payload"] as JObject; var plan = preview?["integrationPlan"] as JObject; var caller = plan?["caller"] as JObject;
@@ -83,15 +87,15 @@ namespace TiaMcp.Openness.V21
         {
             var caller = (JObject)plan["caller"]; string kind = caller.Value<string>("kind"), language = caller.Value<string>("language");
             var features = new JObject();
-            if (language == "LAD") features["ladCaller"] = "A LAD caller is verified only as a new or existing FC on its own; a LAD " + kind + " caller with further features stays plan-only.";
-            if (kind == "FB") features["fbCaller"] = "An existing FB caller is verified only on its own with a new global instance DB, or with a multi-instance of the reused FB; a " + language + " FB caller with further features stays plan-only.";
-            if (plan["multiInstance"] != null) features["multiInstance"] = "A multi-instance is verified only for the reused installed FB in an existing FBD FB caller; other multi-instances stay plan-only.";
+            if (language == "LAD") features["ladCaller"] = "A LAD caller is verified as a new or existing FC and as an existing FB, alone and in the natively run combinations; this LAD " + kind + " combination stays plan-only.";
+            if (kind == "FB") features["fbCaller"] = "An existing LAD or FBD FB caller is verified with a new global instance DB or a multi-instance of the reused FB, alone and in the natively run combinations; this " + language + " FB combination stays plan-only.";
+            if (plan["multiInstance"] != null) features["multiInstance"] = "A multi-instance is verified only for the reused installed FB in an existing LAD or FBD FB caller; other multi-instances stay plan-only.";
             if (dependentInstanceDb && plan["multiInstance"] != null)
-                features["dependentInstanceDb"] = "A multi-instance caller FB with its own instance DB is a candidate: the captured component effect has no native evidence in a combined apply yet.";
-            if (plan["fb"]?.Value<bool?>("reused") == true) features["reusedComponent"] = "Reuse of the installed FB is verified only with a new FBD FC caller and a new global instance DB, or as a multi-instance in an existing FBD FB caller; reuse with further features stays plan-only.";
+                features["dependentInstanceDb"] = "A multi-instance caller FB with its own instance DB is verified only in the natively run multi-instance combinations; this one stays plan-only.";
+            if (plan["fb"]?.Value<bool?>("reused") == true) features["reusedComponent"] = "Reuse of the installed FB is verified with a new or existing FC or an existing FB caller and a new global instance DB, or as a multi-instance in an existing FB caller; this reuse combination stays plan-only.";
             if (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(payload) &&
                 (string)callerExport?.Descendants("SW.Blocks.CompileUnit").LastOrDefault()?.Attribute("ID") != payload["integration"]["caller"].Value<string>("insertAfterNetworkId"))
-                features["earlierPlacement"] = "An earlier placement is verified only in an existing FBD FC on its own; an earlier placement with further features stays plan-only.";
+                features["earlierPlacement"] = "An earlier placement is verified in existing LAD and FBD FC and FB callers, alone and in the natively run combinations; this combination stays plan-only.";
             return features;
         }
         // Step 1 imports and saves before step 2 creates the instance DB, so what step 2 needs from the target is decided

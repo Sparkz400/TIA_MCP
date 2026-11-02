@@ -184,7 +184,7 @@ Test("combined-apply refusals precede the admission record, a stale preview stil
 // Candidate shapes stay out of production: only the exact shapes with passed native evidence are verified, and candidates
 // are admitted only on a --component-qualification worker in its own single owned scratch. Change these pins only together with native evidence.
 Test("candidate shapes run only on a qualification Host's owned scratch, and only natively passed shapes are verified", () => {
-    Equal("earlierPlacement,fbCaller,fbCaller+multiInstance+reusedComponent,ladCaller,reusedComponent", string.Join(",", PlcComponentQualificationGate.VerifiedShapes));
+    Equal("dependentInstanceDb+earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent,dependentInstanceDb+earlierPlacement+fbCaller+multiInstance+reusedComponent,dependentInstanceDb+fbCaller+ladCaller+multiInstance+reusedComponent,dependentInstanceDb+fbCaller+multiInstance+reusedComponent,earlierPlacement,earlierPlacement+fbCaller,earlierPlacement+fbCaller+ladCaller,earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent,earlierPlacement+fbCaller+ladCaller+reusedComponent,earlierPlacement+fbCaller+multiInstance+reusedComponent,earlierPlacement+fbCaller+reusedComponent,earlierPlacement+ladCaller,earlierPlacement+ladCaller+reusedComponent,earlierPlacement+reusedComponent,fbCaller,fbCaller+ladCaller,fbCaller+ladCaller+multiInstance+reusedComponent,fbCaller+ladCaller+reusedComponent,fbCaller+multiInstance+reusedComponent,fbCaller+reusedComponent,ladCaller,ladCaller+reusedComponent,reusedComponent", string.Join(",", PlcComponentQualificationGate.VerifiedShapes));
     string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
     foreach (string pinned in new[] {
         "CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change), dependentInstanceDb)",
@@ -192,9 +192,11 @@ Test("candidate shapes run only on a qualification Host's owned scratch, and onl
         if (integration.Replace("\r\n", "\n").IndexOf(pinned, StringComparison.Ordinal) < 0) throw new Exception("Candidate admission changed: " + pinned);
     if (integration.Split(new[] { "PlcComponentCandidatesAdmitted(" }, StringSplitOptions.None).Length != 3) throw new Exception("Candidate admission must have exactly one use.");
     string gate = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs"));
-    if (gate.IndexOf("internal static readonly string[] VerifiedShapes = { \"earlierPlacement\", \"fbCaller\", \"fbCaller+multiInstance+reusedComponent\", \"ladCaller\", \"reusedComponent\" };", StringComparison.Ordinal) < 0 ||
+    if (gate.IndexOf("internal static readonly string[] VerifiedShapes = { " + string.Join(", ", PlcComponentQualificationGate.VerifiedShapes.Select(s => "\"" + s + "\"")) + " };", StringComparison.Ordinal) < 0 ||
         gate.IndexOf("local.library_integrate.candidate_shapes.rerun.20261031", StringComparison.Ordinal) < 0 ||
-        gate.IndexOf("local.library_integrate.candidate_shapes.multi.20261101", StringComparison.Ordinal) < 0)
+        gate.IndexOf("local.library_integrate.candidate_shapes.multi.20261101", StringComparison.Ordinal) < 0 ||
+        gate.IndexOf("local.library_integrate.candidate_shapes.combinations.20261102", StringComparison.Ordinal) < 0 ||
+        gate.IndexOf("local.library_integrate.candidate_shapes.dependent_db.20261102", StringComparison.Ordinal) < 0)
         throw new Exception("VerifiedShapes changes only together with its cited native evidence.");
     // A failed combined apply carries the coordinator's initial checkpoint, the typed one of a reused FB included, into the change journal.
     if (integration.IndexOf("if (record?[\"initialCheckpoint\"] is JObject checkpoint && ((JArray)change.Journal[\"checkpoints\"]).Count == 0) ((JArray)change.Journal[\"checkpoints\"]).Add(checkpoint.DeepClone());", StringComparison.Ordinal) < 0)

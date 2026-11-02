@@ -5,6 +5,7 @@ Status: builders, offline tests and clean native reruns done. A first native att
 `fbCaller`, `earlierPlacement` and `reusedComponent` are verified shapes since then. Since 1 November the combination
 `fbCaller+multiInstance+reusedComponent` is verified too ([component storage capture](#component-storage-capture-and-multi-instance--1-november-2026));
 every other multi-instance and combination stays a candidate ([combined apply](../guides/plc-library-integration-recipes.md#combined-apply)).
+Since 2 November every combination and the caller's own instance DB are verified too ([combinations](component-combinations-20261102.md)).
 
 ## Component shapes
 
