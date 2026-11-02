@@ -62,6 +62,7 @@ def candidate_client(host, timeout, arguments):
 # Candidate install cases: manifest overrides and the exact unverified features the preview must name. ladCaller, fbCaller,
 # earlierPlacement and reusedComponent passed natively on 31 October and are verified shapes, so their previews name none.
 CANDIDATES = {
+    "obCaller": ({"callerMode": "existing", "caller": OB_NAME, "callerSource": None, "obCaller": True}, []),
     "ladStandalone": ({"callerMode": "createStandaloneFc", "language": "LAD"}, []),
     "ladExisting": ({"callerMode": "existing", "language": "LAD", "callerSource": "callers/TiaMcpComponentCaller.lad.s7dcl"}, []),
     "fbCaller": ({"callerMode": "existing", "caller": "TiaMcpComponentHost", "callerSource": "callers/TiaMcpComponentHost.s7dcl"}, []),
@@ -355,6 +356,11 @@ class IntegrateApplyRun(ComponentRun):
         self.use(overrides if overrides is not None else {"callerMode": name})
         out, case = self.output / name, self.case(name, True)
         scratch, opened, plc = self.stage_consumer(archive, released)
+        if self.manifest.get("obCaller"):
+            exports = [artifact_bytes(self.call, self.call("block_read", {"blockPath": plc + "/blocks/" + name})["artifact"]).decode("utf-8-sig")
+                       for name in ("Main", self.manifest["unrelatedCaller"])]
+            first, second = self.manifest["signals"]
+            self.apply("block_import_xml", {"xml": fbd_ob(*exports, first["name"], second["name"]), "expectedBlockNames": [OB_NAME]})
         if self.manifest["caller"] == HOST_FB: self.apply("block_number_set", {"blockName": HOST_FB, "number": HOST_FB_NUMBER})
         if self.manifest.get("twoNetworks"):
             peer = artifact_bytes(self.call, self.call("block_read", {"blockPath": plc + "/blocks/" + self.manifest["unrelatedCaller"]})["artifact"]).decode("utf-8-sig")
@@ -575,21 +581,14 @@ class IntegrateApplyRun(ComponentRun):
         return {"mode": "existing", "blockPath": path, "insertAfterNetworkId": network}
 
     def refusals(self, archive, released):
-        """Flag on: an FBD OB caller and an existing FBD FB caller with a multi-instance are refused at apply with no project change."""
+        """Flag on: an existing FBD FB caller with an unqualified multi-instance is refused without a project change."""
         self.use({"callerMode": "createStandaloneFc"})  # each case starts from the base manifest, no multiInstance left over
         case, out = self.case("refusals", True), self.output / "refusals"
         scratch, opened, plc = self.stage_consumer(archive, released)
-        exports = [artifact_bytes(self.call, self.call("block_read", {"blockPath": plc + "/blocks/" + name})["artifact"]).decode("utf-8-sig")
-                   for name in ("Main", self.manifest["unrelatedCaller"])]
-        first, second = self.manifest["signals"]
-        self.apply("block_import_xml", {"xml": fbd_ob(*exports, first["name"], second["name"]), "expectedBlockNames": [OB_NAME]})
         host = self.host_fb(plc)
         baseline = snapshot(self.call, out / "before")
-        ob = plc + "/blocks/" + OB_NAME
-        network, _ = terminal_network(Path(baseline["objects"]["block:" + ob]["file"]).read_text(encoding="utf-8-sig"), "FBD")
         for name, caller, caller_recipe, reason, multi in (
-                ("obCaller", ob, {"mode": "existing", "blockPath": ob, "insertAfterNetworkId": network}, "OB insertion is refused", None),
-                ("fbMultiInstance", host, self.host_fb_recipe(baseline, host), FB_REFUSAL, MULTI_NAME)):
+                ("fbMultiInstance", host, self.host_fb_recipe(baseline, host), FB_REFUSAL, MULTI_NAME),):
             self.manifest["multiInstance"] = multi
             prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
             case[name] = {"changeId": prepared["changeId"], "combinedApply": require_combined_preview(prepared["preview"], refusal=reason)}
@@ -650,6 +649,13 @@ class IntegrateApplyRun(ComponentRun):
             self.session = OwnedScratch(self.args.host, self.args.worker, self.output, self.report, self.persist,
                                         timeout=self.args.timeout, client_factory=host_client(True), extra_tools=EXTRA_TOOLS)
             archive, released = self.step("author", self.author)
+            if self.args.production_case:
+                self.session.client_factory = host_client(False)
+                name = self.args.production_case
+                self.report["productionCase"] = name
+                self.step("production:" + name, lambda: self.install(name, archive, released, *CANDIDATES[name]))
+                self.report["status"] = "passed"
+                return
             if self.args.candidates:
                 self.candidates(archive, released)
                 return
@@ -686,6 +692,7 @@ def main():
     parser.add_argument("--run-native", action="store_true")
     parser.add_argument("--candidates", action="store_true", help="Qualify the candidate shapes on a --component-qualification Host instead of the verified ones.")
     parser.add_argument("--case", action="append", help="With --candidates, run only this candidate case (repeatable).")
+    parser.add_argument("--production-case", choices=sorted(CANDIDATES), help="Run one admitted case on the normal Host without qualification flags.")
     args = parser.parse_args()
     require(5 <= args.timeout <= 900, "Timeout must be 5..900 seconds.")
     IntegrateApplyRun(args).run()

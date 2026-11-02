@@ -46,7 +46,7 @@ TAGS = {"SigInByte": ("USInt", "%IB20", "uint8"), "SigInWord": ("Int", "%IW22", 
         "SigBit": ("Bool", "%M34.5", "bool")}
 EXTRA = {"Text": "string", "Arm": "bool", "Scans": "int32"}
 UDT, STRUCT_TAG, STRUCT_TABLE = "SigOutUdt", "SigOutStruct", "SigStructTags"
-UDT_SOURCE = 'TYPE "%s"\nVERSION : 0.1\n   STRUCT\n      A : Int;\n      B : Int;\n   END_STRUCT;\n\nEND_TYPE\n\n' % UDT
+UDT_SOURCE = 'TYPE "%s"\nVERSION : 0.1\n   STRUCT\n      A : Int;\n      B : Int;\n      Values : Array[0..1] of Int;\n   END_STRUCT;\n\nEND_TYPE\n\n' % UDT
 DB_SOURCE = '''DATA_BLOCK "SigDb"
 { S7_Optimized_Access := 'TRUE' }
 VERSION : 0.1
@@ -110,7 +110,21 @@ try {
             $action, $delay = $step.Split(':')
             Start-Sleep -Milliseconds ([int]$delay)
             $started = Now
-            if ($action -eq 'Run') { $instance.Run(30000) } else { $instance.Stop(30000) }
+            if ($action -eq 'Run') { $instance.Run(30000) }
+            elseif ($action -eq 'IP') {
+                $original = $instance.ControllerIPSuite4[0]
+                $instance.Stop(30000)
+                $changed = $false
+                try {
+                    $suite = New-Object Siemens.Simatic.Simulation.Runtime.SIPSuite4('192.168.0.77','255.255.255.0','0.0.0.0')
+                    $instance.SetIPSuite(0, $suite, $false)
+                    $changed = $true
+                    Start-Sleep -Milliseconds 1500
+                } finally {
+                    if ($changed) { $instance.SetIPSuite(0, $original, $false) }
+                    $instance.Run(30000)
+                }
+            } else { $instance.Stop(30000) }
             [void]$log.Add(@{ action = $action; startedAtUtc = $started; completedAtUtc = (Now); state = "$($instance.OperatingState)" })
         }
         $instance.Dispose()
@@ -490,6 +504,15 @@ def outputs(h, lab):
     h.stage("refuse sim_write_signals: a batch with the member %s" % member,
             member_refused("sim_write_signals", [{**lab.signal("SigMarker"), "value": 4322}, {"symbol": member, "type": "int16", "value": 777}]))
     h.stage("the refused batch left SigMarker at 4321", lambda: require(lab.single("SigMarker") == {"SigMarker": 4321}, "SigMarker changed") or 4321)
+    for index in (0, 1):
+        symbol = '\"%s\".Values[%d]' % (STRUCT_TAG, index)
+        for tool in ("sim_write", "sim_write_signals"):
+            before = lab.area("output", 24, 8)
+            error = h.call_error(tool, {"instanceId": instance, "writes": [{"symbol": symbol, "type": "int16", "value": 777}]})
+            require(error.get("code") == "InvalidRequest" and (error.get("details") or {}).get("area") == "Output",
+                    "Array element was not refused as an output: %s" % error)
+            require(lab.area("output", 24, 8) == before, "Refused array-element write changed output bytes")
+            h.stage("%s refuses output array element %s" % (tool, symbol), lambda: {"error": error, "outputBytes": before})
 
 
 def states(result):
@@ -555,6 +578,13 @@ def observe(h, lab):
         require(running == "Run", "The instance did not return to RUN")
         return running
     h.stage("return to RUN after the external STOP", settled)
+    def ip_changes(outcome):
+        changes = [event for event in outcome["events"] if event["kind"] == "ipAddress"]
+        require(len(changes) >= 2 and all(event["interfaceIndex"] == 0 for event in changes),
+                "Expected IP-change and restoration events on interface 0: %s" % changes)
+        require(outcome["after"]["operatingState"] == "Run" and not outcome["truncated"], "IP observation ended unexpectedly")
+        require(changes[0]["ipSuite"] != changes[-1]["ipSuite"], "IP events lost their changed suites")
+    h.report["observeIpChanges"] = external("IP:1500", 8000, ip_changes)
     refuse(h, "windowMs 60001", "sim_observe", {"instanceId": instance, "windowMs": 60001}, ["InvalidRequest"])
     refuse(h, "maxEvents 0", "sim_observe", {"instanceId": instance, "maxEvents": 0}, ["InvalidRequest"])
     refuse(h, "an unselected instance", "sim_observe", {"instanceId": 987654}, ["SimulationNotSelected"])

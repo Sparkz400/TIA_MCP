@@ -1,5 +1,7 @@
 # TIA MCP release obligations and execution order
 
+**Current reconciliation — 2 November 2026:** The JSON now gives current matrix counts for all 44 obligations and corrects completed work previously listed as unfinished. Its `remainingWork` and `nextAction` fields are current; dated observations and the original audit counts remain historical. The second CPU/routes, external Git/conflicts, restricted translation, unit lifecycle, project upgrade, credential routes, hardware topology and local desktop roundtrip must not be scheduled again as missing implementations. No obligation is accepted.
+
 **Subsequent execution update:** This document and its JSON retain the pre-wave release audit. The user has since confirmed the old coordinator stopped; this session owns integration. Prompts 02/01/03/06 and the first AC-01 implementation slice are now delivered. Use [current handoffs](../history/active-handoffs-20261015.md) and [wave results](../verification/ac01-planning-wave-20261015.md) for those newer states.
 
 **27 October 2026 update:** Host-only runs now verify 65 offline features: VCI (D01), translation review (D03), OPC UA NodeSet (D04), AutomationML (D05), GRAPH (X06), the offline diagnostic/trace/experiment/UA-diagnostic tools (D17) and the upload tools. Their native parts remain open. Each affected obligation has an `executionNotes` entry in the JSON. The [sweep record](../verification/host-only-qualification-20261027.md) also ranks the remaining offline-reachable work.
@@ -23,6 +25,9 @@ This scope decision supersedes older wording about optional expansions, selected
 Use the [machine-readable ledger](release-obligations-20261015.json) for all **44 workstreams, 160 catalog feature records, 165 historical checklist items, 18 prompts and 11 blocker groups**. It retains implementation and qualification separately, exact source/evidence references, dependencies, next actions and proposed owner roles. The immutable audit snapshot (`artifacts/release-audit-20261015/current-results.json`) records the inspected files and hashes. Historical line references in that snapshot refer to the pre-edit document bytes.
 
 ## Current results
+
+The table below is the retained **27 October snapshot**, not today's work queue. Use the [machine-readable ledger](release-obligations-20261015.json) `remainingWork` and `nextAction`, and the [consolidated TODO](../TODO.md), for current work. Dated results retain their original limits.
+
 
 On 28 October the source contains **310 registered MCP tools, 117 prepared mutation kinds and 450 catalog features** (catalog 0.4.68); 359 features are verified and 91 unverified. The release matrix binds 1,639 cells to evidence; 398 are open and 30 deferred ([current status](../STATUS.md)).
 

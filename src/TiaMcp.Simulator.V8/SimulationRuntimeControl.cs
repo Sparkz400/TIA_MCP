@@ -71,6 +71,8 @@ namespace TiaMcp.Simulation
                     result["action"] = Text(item, "action"); result["code"] = Code(RackOrStation, item, "action");
                     allowed = new[] { "type", "hardwareId", "action" }; break;
                 case "statusEvent":
+                case "updateEvent":
+                case "profileEvent":
                     result["specifier"] = UInt16(item, "specifier", 0);
                     allowed = new[] { "type", "hardwareId", "specifier" }; break;
                 case "diagnosticAlarm":
@@ -90,7 +92,7 @@ namespace TiaMcp.Simulation
                     }));
                     allowed = new[] { "type", "hardwareId", "moduleState", "channels" }; break;
                 }
-                default: throw new ArgumentException("event.type must be hardwareInterrupt, pullOrPlug, rackOrStationFault, diagnosticAlarm or statusEvent.");
+                default: throw new ArgumentException("event.type must be hardwareInterrupt, pullOrPlug, rackOrStationFault, diagnosticAlarm, statusEvent, updateEvent or profileEvent.");
             }
             var unknown = item.Properties().Select(p => p.Name).Where(name => Array.IndexOf(allowed, name) < 0).ToArray();
             if (unknown.Length != 0) throw new ArgumentException("Unknown " + type + " field: " + unknown[0]);
@@ -99,7 +101,8 @@ namespace TiaMcp.Simulation
 
         /// <summary>The interrupt OB the event is documented to start on an S7-1500 (V8 API manual).</summary>
         public static string ExpectedOb(string type) => type == "hardwareInterrupt" ? "OB40 (hardware interrupt)" : type == "pullOrPlug" ? "OB83 (pull/plug)"
-            : type == "rackOrStationFault" ? "OB86 (rack or station failure)" : type == "diagnosticAlarm" ? "OB82 (diagnostic error)" : "OB55 (status)";
+            : type == "rackOrStationFault" ? "OB86 (rack or station failure)" : type == "diagnosticAlarm" ? "OB82 (diagnostic error)"
+            : type == "updateEvent" ? "OB56 (update)" : type == "profileEvent" ? "OB57 (profile)" : "OB55 (status)";
 
         /// <summary>A retrieve accepts only an unchanged archive this adapter wrote from the same owned instance.</summary>
         public static string ArchiveRefusal(string archivePath, string directory, JObject receipt, int instanceId, string instanceName, string actualSha256, string expectedSha256)

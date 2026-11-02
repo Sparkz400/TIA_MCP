@@ -52,7 +52,7 @@ namespace TiaMcp.Openness.V21
             if (_libraryIntegrateApplyEnabled)
             {
                 result["plcIntegration"]["applySupported"] = true;
-                result["plcIntegration"]["combinedApply"] = "Enabled on every Host for a fresh FB/dependency import with a new global instance DB and a new FBD FC caller or an existing one after its last network in the standard PLC scope; preview.combinedApply states eligibility. Since 31 October also a new or existing LAD FC caller, an existing LAD/FBD FB caller with a new global instance DB, an existing FC after an earlier network, and reuse of the installed FB, each as its exact shape (local.library_integrate.candidate_shapes.rerun.20261031). Since 1 November also a multi-instance of the reused installed FB in an existing FBD FB caller (local.library_integrate.candidate_shapes.multi.20261101). OB insertion, other multi-instances, other combinations of these features, software units, HMI targets and PLC/HMI recipes stay plan-only. Natively qualified for these shapes (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.combined_apply.regression.20261031, local.library_integrate.combined_apply.regression.20261101). Other combinations have builders without native evidence; only a --component-qualification Host runs them, in its owned scratch (preview.combinedApply.candidateFeatures).";
+                result["plcIntegration"]["combinedApply"] = "Enabled by default for the exact natively qualified combinations; preview.combinedApply states eligibility. Native evidence covers LAD/FBD FC and FB callers, earlier placement, reuse, reused-FB multi-instances and the caller FB own instance DB. The obCaller shape additionally covers a fresh component with a new global instance DB after the last network of an existing FBD OB (local.component.ob.20261102). Other OB combinations, fresh-import multi-instances, embedding-parent effects, partial reuse, reused instance DBs, software units and PLC/HMI recipes remain gated. Only an explicit --component-qualification Host can exercise unverified builders in its own scratch; no runtime behavior is implied.";
             }
             result["limitations"] = new JArray("Type authoring uses documented CreateFromDocuments; direct block-to-type creation is not exposed by the installed public API.", "PLC library_integrate prepares an explicit recipe. Combined apply runs only for the verified shapes in plcIntegration; otherwise the proposed steps require separate fresh preparation. Steps are never atomic.", "Library copy/publication can initialize a default or promote a newer source default, with exact effects pinned in preview. Arbitrary default changes and project updates require separate prepared actions.", "Full document/preservation/runtime qualification must be retained for each target profile.");
             return result;
@@ -468,6 +468,12 @@ namespace TiaMcp.Openness.V21
             change.Preview["reusedDependencies"] = reused;
             change.Preview["createdNames"] = new JArray(created.OrderBy(x => x, StringComparer.Ordinal));
             change.Preview["targetNamesBefore"] = new JArray(names.OrderBy(x => x, StringComparer.Ordinal));
+            // Create selected dependencies first; otherwise Siemens creates them in source folders before their explicit root import.
+            var order = LibraryDependencyCapture.InstantiationOrder(change.Versions.Select(v => v.Guid.ToString("D")), closure);
+            var ordered = order.Select(id => change.Versions.Single(v => v.Guid.ToString("D") == id)).ToArray();
+            change.Preview["instantiationOrder"] = new JArray(order);
+            change.Preview["dependencyPathPolicy"] = "keepExistingPathsInTarget";
+            change.Versions.Clear(); change.Versions.AddRange(ordered);
             foreach (var master in change.Masters)
             {
                 var descriptions = master.ContentDescriptions.ToList();
@@ -975,7 +981,7 @@ namespace TiaMcp.Openness.V21
                 }
                 catch (Exception exception)
                 {
-                    change.State = "recovery_required"; change.Journal["failure"] = new JObject { ["code"] = (exception as BridgeException)?.Code ?? "NativeLibraryError", ["message"] = exception.Message, ["details"] = (exception as BridgeException)?.Details };
+                    change.State = "recovery_required"; change.Journal["failure"] = new JObject { ["code"] = (exception as BridgeException)?.Code ?? "NativeLibraryError", ["message"] = exception.Message, ["details"] = (exception as BridgeException)?.Details, ["nativeExceptionChain"] = NativeFailureText.Chain(exception) };
                     LibraryJournal(change, "transaction", "failed");
                     throw new BridgeException((exception as BridgeException)?.Code ?? "NativeLibraryError", exception.Message, LibraryChangeView(change));
                 }
@@ -1104,8 +1110,8 @@ namespace TiaMcp.Openness.V21
                     foreach (var version in change.Versions)
                     {
                         LibraryJournal(change, "instantiate_" + version.Guid, "dispatching"); object created;
-                        if (version is CodeBlockLibraryTypeVersion block) created = scope.Blocks.Blocks.CreateFrom(block, UpdatePathsMode.ThrowIfPathsConflict);
-                        else created = scope.Types.Types.CreateFrom((PlcTypeLibraryTypeVersion)version, UpdatePathsMode.ThrowIfPathsConflict);
+                        if (version is CodeBlockLibraryTypeVersion block) created = scope.Blocks.Blocks.CreateFrom(block, UpdatePathsMode.KeepExistingPathsInTarget);
+                        else created = scope.Types.Types.CreateFrom((PlcTypeLibraryTypeVersion)version, UpdatePathsMode.KeepExistingPathsInTarget);
                         if (nameSpace != null) { if (created is PlcBlock createdBlock) createdBlock.Namespace = nameSpace; else ((PlcType)created).Namespace = nameSpace; }
                         var installed = change.Project.ProjectLibrary.FindVersion(version.Guid) ?? throw new BridgeException("VersionSelectionUnsupported", "Selected version GUID was not copied into the project library.");
                         var uses = installed.FindInstances(plc.Software).ToList();

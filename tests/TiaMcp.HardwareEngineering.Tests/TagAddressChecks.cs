@@ -15,6 +15,17 @@ internal static class TagAddressChecks
             Check(TagAddressRules.Io(other) == null, "not an absolute I/O address: " + (other ?? "null"));
 
         var ranges = new[] { ("Input", 0, 48, "/fdi"), ("Output", 0, 32, "/fdi"), ("Input", 10, 16, "/fdq") };
+        Check(TagAddressRules.SourceIoAddresses("#x := %I1.0; L EW 2; T QD4; // %IB5\n#QI2 := %M0.0;")
+            .SequenceEqual(new[] { "%I1.0", "EW2", "QD4", "%IB5" }), "source operands include spaced German and international addresses and conservatively include comments");
+        Check(TagAddressRules.SourceIoAddresses("input %IW5:P").Any(a => TagAddressRules.FIoOverlap(a, ranges) == "/fdi"), "peripheral access suffix does not hide a straddling F-I/O address");
+        Check(TagAddressRules.SourceIoAddresses("L PEW 4; T PQB 1; A I 2 . 1;").SequenceEqual(new[] { "%EW4", "%QB1", "I2.1" }), "peripheral STL mnemonics and spaced bit operands retain their address ranges");
+        var blockIo = TagAddressRules.BlockIoAddresses(System.Xml.Linq.XDocument.Parse("<Document><Access xmlns=\"urn:native\" Scope=\"Address\"><Address Area=\"Input\" Type=\"Word\" BitOffset=\"40\" /></Access></Document>"));
+        Check(blockIo.Length == 16 && blockIo.Any(a => TagAddressRules.FIoOverlap(a, ranges) == "/fdi"), "namespaced XML operands check their complete bit range");
+        Check(TagAddressRules.BlockIoAddresses(System.Xml.Linq.XDocument.Parse("<Document><Address Area=\"PeripheryOutput\" Type=\"Bool\" BitOffset=\"1\" /></Document>")).Single() == "%Q0.1", "XML peripheral areas use the same F-I/O ownership ranges");
+        bool refusedType = false;
+        try { TagAddressRules.BlockIoAddresses(System.Xml.Linq.XDocument.Parse("<Document><Address Area=\"Output\" Type=\"FutureType\" BitOffset=\"0\" /></Document>")); }
+        catch (BridgeException) { refusedType = true; }
+        Check(refusedType, "unknown absolute XML I/O types fail closed");
         Check(TagAddressRules.FIoOverlap("%I0.0", ranges) == "/fdi" && TagAddressRules.FIoOverlap("%I5.7", ranges) == "/fdi", "a bit inside the F-DI input range overlaps");
         Check(TagAddressRules.FIoOverlap("%IW5", ranges) == "/fdi", "a word straddling the range end overlaps");
         Check(TagAddressRules.FIoOverlap("%I6.0", ranges) == null && TagAddressRules.FIoOverlap("%IB9", ranges) == null, "addresses just outside every range do not overlap");

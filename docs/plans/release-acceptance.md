@@ -41,6 +41,15 @@ The record is stored on the obligation in the
 the record changes the ledger, so regenerate the matrix afterwards
 (`python -B scripts/release_matrix.py`), which records the new ledger hash.
 
+The 1.0 release gate validates the record, not just its approval flag. The reviewed commit must
+be an ancestor available in Git history, and its matrix bytes must match `matrixSha256`. The
+obligation's rows and accepted matrix evidence must still match, every owned blocked row must
+have a disposition, and every listed blocker needs a nonempty resolution or explanation.
+Evidence IDs must cover the owned rows and name current matrix evidence or a retained curated
+record in `evidence/`. Source, tests, contracts, scripts, evidence and build inputs must already
+be frozen: changing them after acceptance requires a new review. Ledger and matrix edits that
+record acceptance do not invalidate it. The release checkout fetches full history for this check.
+
 ## Dispositions
 
 The ledger's top-level `dispositions` holds the maintainer's decisions on rows that cannot close.
@@ -55,21 +64,19 @@ route; the maintainer decided the same day to build it for 1.0, so they count as
 The two `deferred` rows have no disposition and stay 1.0 work
 ([TODO](../TODO.md#deferred-rows)).
 
-## Candidates on 29 October (catalog `0.4.76`)
+## Current acceptance preparation — 2 November 2026
 
-No obligation meets all four conditions. With no open or deferred cell and no blocker:
+No obligation has a maintainer acceptance record. Matrix closure is only the first condition:
+remaining work outside the matrix, the current applicability of blockers and any accepted
+limitations must be reviewed on the frozen candidate too.
 
-| Obligation | What still stands |
-| --- | --- |
-| F01 API coverage, F02 shared contracts | 6 cells bound each; their `remainingWork` is the unrefreshed 15 October audit text, which the maintainer has to confirm as done or restate. |
-| D01 VCI and external Git | 81 cells bound; the external Git round trip is open. |
-| D03 Project translations | 141 cells bound; category leakage keeps restricted profiles disabled. |
+- Open or deferred matrix work: L05, L06, D06, D10, D16, X12.
+- No open or deferred matrix cell: F00, F01, F02, F03, L01, L02, L03, L04, D01, D02, D03, D04, D05, D07, D08, D09, D11, D12, D13, D14, D15, D17, X01, X02, X03, X04, X05, X06, X07, X08, X09, X10, X11, X13, C01, C02, C03, C04. This includes obligations with no rows; it does not establish their completion.
 
-22 more obligations have every row bound (D04 and X01 with dispositioned blocked rows) and are
-held only by their blockers: B01 (F03, D02, X01, L02, L03, D04, X02, D17), B02 (L02, L03),
-B03 (X04, D17), B04 (D04, D05, D08, D11, D12, X03, X06, C02), B05 (D09, D12, X03, C02, C03, C04),
-B06 (D17, C04), B07 (L04), B08 (X02) and B10 (X05, X09). Blockers were attached per obligation by
-the 15 October audit; deciding which still bind is part of each acceptance. F00 closes last.
+The old candidate list described catalog 0.4.76 and is superseded. In particular, external Git,
+restricted translation and the native desktop roundtrip are now qualified. The collector already
+exists; semantic/manual/profile review is the remaining F01 work. The current JSON ledger records
+those distinctions. F00 closes last, after the other acceptance records have been reconciled.
 
 ## TODO
 

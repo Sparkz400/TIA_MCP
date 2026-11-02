@@ -7,6 +7,7 @@ import io
 import json
 import os
 from pathlib import Path, PurePosixPath
+import shutil
 import stat
 import zipfile
 
@@ -50,7 +51,7 @@ def body(h):
     downloads = {}
     for package in receipts["packages"]:
         if package["id"].startswith("dmc-v"):
-            path = next(Path(h.args.vendor_root).glob(package["id"] + "-dl/*.zip"))
+            path = next(Path(h.args.vendor_root).resolve().glob(package["id"] + "-dl/*.zip"))
             require(sha256(path.read_bytes()) == package["sha256"], package["id"] + " download differs from its receipt")
             downloads[package["id"]] = path
     h.report["receipts"] = [p for p in receipts["packages"] if p["id"] in downloads]
@@ -69,6 +70,17 @@ def body(h):
                 if PurePosixPath(member).name in REQUIRED + OBSERVED:
                     archives[PurePosixPath(member).name] = extract(package, member, h.directory / "inputs" / PurePosixPath(member).stem.replace(" ", "_") / PurePosixPath(member).name)
     require(sorted(archives) == sorted(REQUIRED + OBSERVED), "Expected DMC archives are missing")
+    required = list(REQUIRED)
+    if h.args.v20_library:
+        receipt = next(p for p in receipts["packages"] if p["id"] == "lgf-v20")
+        original = h.args.v20_library
+        require(original.suffix.lower() == ".zal20" and sha256(original.read_bytes()) == receipt["sha256"],
+                "V20 archive differs from its intake receipt")
+        target = h.directory / "inputs" / "LGF.zal20"
+        shutil.copy2(original, target)
+        archives["LGF V20"] = target
+        required.append("LGF V20")
+        h.report["v20Intake"] = receipt
 
     def upgrade(path, expected_files=None):
         # TIA caps proxy instances per session (500000); every upgrade gets a fresh owned portal.
@@ -105,7 +117,7 @@ def body(h):
         return {k: v for k, v in outcome.items() if k != "identities"} | {"identityCount": len(identities), "archiveSha256": archive["sha256"]}
 
     results = {}
-    for name in REQUIRED:
+    for name in required:
         results[name] = h.stage("upgrade " + name, lambda n=name: required_upgrade(n, archives[n]))
     for name in OBSERVED:
         def observed(n=name):
@@ -137,12 +149,13 @@ if __name__ == "__main__":
     parser.add_argument("--artifacts", type=Path, required=True)
     parser.add_argument("--receipts", type=Path, required=True)
     parser.add_argument("--vendor-root", type=Path, required=True)
+    parser.add_argument("--v20-library", type=Path, help="LGF .zal20 matching the lgf-v20 hash in --receipts")
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
     args.runner = __file__
-    Harness(args, "uq_", "V14 SP1-V18 DMC library upgrades into V21 on owned copies", [
-        "No V20 library is available; V19 is covered by the vendor runner.",
+    Harness(args, "uq_", "V14 SP1-V18 DMC and optional V20 LGF library upgrades into V21 on owned copies", [
+        "V20 covers only the receipt-bound LGF archive when supplied; V19 is covered by the vendor runner.",
         "HMI-bearing archives are upgraded and recorded only; their content behavior belongs to lane D.",
         "Upgrade preserves native identities into a reopened V21 archive; content equality against the older format cannot be read without that older TIA version."],
         [args.receipts]).run(body)

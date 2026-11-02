@@ -37,6 +37,14 @@ internal static class SimulationRuntimeControlTests
         Check.Equal(0, SimulationRuntimeControl.Event(JObject.Parse("{\"type\":\"rackOrStationFault\",\"hardwareId\":1,\"action\":\"fault\"}")).Value<int>("code"));
         Check.Equal(1, SimulationRuntimeControl.Event(JObject.Parse("{\"type\":\"rackOrStationFault\",\"hardwareId\":1,\"action\":\"return\"}")).Value<int>("code"));
         Check.Equal(7, SimulationRuntimeControl.Event(JObject.Parse("{\"type\":\"statusEvent\",\"hardwareId\":9,\"specifier\":7}")).Value<int>("specifier"));
+        foreach (string type in new[] { "statusEvent", "updateEvent", "profileEvent" })
+        {
+            Check.Equal(65535, SimulationRuntimeControl.Event(new JObject { ["type"] = type, ["hardwareId"] = 9, ["specifier"] = 65535 }).Value<int>("specifier"));
+            Refused(() => SimulationRuntimeControl.Event(new JObject { ["type"] = type, ["hardwareId"] = 9, ["specifier"] = 65536 }));
+            Refused(() => SimulationRuntimeControl.Event(new JObject { ["type"] = type, ["hardwareId"] = 9, ["specifier"] = 1, ["extra"] = 1 }));
+        }
+        Check.Equal("OB56 (update)", SimulationRuntimeControl.ExpectedOb("updateEvent"));
+        Check.Equal("OB57 (profile)", SimulationRuntimeControl.ExpectedOb("profileEvent"));
         var alarm = SimulationRuntimeControl.Event(JObject.Parse("{\"type\":\"diagnosticAlarm\",\"hardwareId\":5,\"moduleState\":\"maintenanceRequired\",\"channels\":[{\"channel\":3,\"errorType\":1,\"severity\":\"maintenanceDemanded\",\"direction\":\"disappear\"}]}"));
         Check.Equal(4, alarm.Value<int>("moduleStateCode"));
         Check.Equal(1, alarm["channels"]![0]!.Value<int>("severityCode"));

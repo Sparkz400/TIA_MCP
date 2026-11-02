@@ -106,7 +106,14 @@ internal static class BroadenedPlanTests
         const string Unit1 = "<SW.Blocks.CompileUnit ID=\"1\"><AttributeList><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit>";
         test("combined apply admits insertion after the last network with shifted title IDs", () => Equal(null, Refusal(Titled(Unit1, 2))));
         test("combined apply admits the verified insertion before another network", () => Equal(null, Refusal(Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3))));
-        test("combined apply refuses OB insertion by name", () => Equal(true, Refusal(Ob()).StartsWith("OB insertion is refused", StringComparison.Ordinal)));
+        test("combined apply admits the natively verified FBD OB shape", () => {
+            Equal(null, Refusal(Ob())); Equal("", Features(Ob()));
+        });
+        test("an unverified LAD OB combination remains refused", () => {
+            var f = Ob(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD");
+            f.Inventory["objects"][0]["language"] = "LAD";
+            Equal(true, Refusal(f) != null); Equal(null, Refusal(f, true));
+        });
         Func<Fixture> ladExisting = () => { var f = new Fixture(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; };
         Func<Fixture> fbCaller = () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.FB"; f.Inventory["objects"][0]["kind"] = "FB"; return f; };
         Func<Fixture> ladFb = () => { var f = fbCaller(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; };
@@ -162,8 +169,7 @@ internal static class BroadenedPlanTests
             ("software unit", Unit), ("DB-member binding", DbMember), ("UDT tag member", TagMember),
             ("reused instance DB", () => { var f = ReusedRoot(); InstanceDb(f, new JArray()); return f; }),
             ("reused dependency", () => { var f = new Fixture(); f.AddDependency(); Add(f, "MotorState", "/plc/types/MotorState", "UDT"); Prove(f, 1); return f; }),
-            ("planner blocker", () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Element("ObjectList").Add(new XElement("MultilingualText", new XAttribute("ID", "9"))); return f; }),
-            ("OB caller", Ob) })
+            ("planner blocker", () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Element("ObjectList").Add(new XElement("MultilingualText", new XAttribute("ID", "9"))); return f; }) })
             test("combined apply refuses " + name + " even on a qualification Host", () => { if (Refusal(shape(), true) == null) throw new Exception("Shape without a builder admitted."); });
         // A shape opens as its exact feature combination; verified single features never open their combinations.
         test("verified shapes open exact feature combinations only", () => {

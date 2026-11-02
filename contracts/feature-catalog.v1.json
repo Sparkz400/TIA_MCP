@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.121",
+  "catalogVersion": "0.4.129",
   "targetTiaVersions": [
     21
   ],
@@ -4650,6 +4650,198 @@
         "Engineering only: no runtime or physical PLC validation.",
         "Exact historical frozen binaries and fixtures only; this does not certify the final integrated release or other CPU, firmware, storage and route combinations."
       ]
+    },
+    {
+      "id": "local.plcsim.output-arrays.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "a70d2754b4facb83208d76438dc2379f2d4332aa",
+        "passedScope": "99/99 native steps on frozen lc1. sim_write and sim_write_signals reject SigOutStruct.Values[0] and Values[1] as output addresses; eight output bytes stay unchanged. Repeats primitive batch signals, I/Q/M area bounds, state/LED observation, foreign ownership and released-instance refusals."
+      },
+      "artifacts": [
+        "evidence/local.plcsim.output-arrays.20261102.json"
+      ],
+      "limitations": [
+        "Configuration-change event delivery and other CPU models are not qualified by this run."
+      ]
+    },
+    {
+      "id": "local.library_vendor.rerun.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "a70d2754b4facb83208d76438dc2379f2d4332aa",
+        "passedScope": "Seven archive source hashes recovered; five DMC V19 library variants upgraded; PLC library archive identities retained on reopen; one dependency-free type instantiated; PAL V16 import refused unchanged."
+      },
+      "artifacts": [
+        "evidence/local.library_vendor.rerun.20261102.json"
+      ],
+      "limitations": [
+        "No vendor executables, HMI runtime, complete DMC behavior or intermediate PAL upgrade qualified."
+      ]
+    },
+    {
+      "id": "local.library_dmc_prerequisites.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e27ad29cb9ed07f97ef33b8fb1a64de1a596e937",
+        "passedScope": "DMC Open Library tag-table creation and duplicate refusal; exact CPU system/clock bytes; dependency-closure compilation and exact version identity of fbIO_DigitalInput on an owned CPU 1511 V4.1."
+      },
+      "artifacts": [
+        "evidence/local.library_dmc_prerequisites.20261102.json"
+      ],
+      "limitations": [
+        "One FB compile and readback; no vendor runtime behavior, other CPU configurations or complete DMC library qualification."
+      ]
+    },
+    {
+      "id": "local.component.ob.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "fa1c87c226e69cdbabf8b505be165ff97f68fce1",
+        "passedScope": "Fresh PLC component and global instance DB inserted after the last network of an existing FBD OB123; exact caller and unrelated-content preservation, compile, fresh reopen and checkpoint restoration."
+      },
+      "artifacts": [
+        "evidence/local.component.ob.20261102.json"
+      ],
+      "limitations": [
+        "One CPU1511 V4.1, FBD program-cycle OB and captured FB/UDT; LAD OBs, earlier placement, reused-component combinations and runtime behavior not covered."
+      ]
+    },
+    {
+      "id": "local.plcsim.signals-ip.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "77b2d23e56318de21f36fd5094ab68053f15cc36",
+        "passedScope": "100 native steps: primitive signal batch, I/Q/M guards, unchanged output-array refusals, operating-state/LED observations, owned external-client IP change and restoration events in STOP, foreign and released instance refusals."
+      },
+      "artifacts": [
+        "evidence/local.plcsim.signals-ip.20261102.json"
+      ],
+      "limitations": [
+        "One owned Softbus CPU1511 V4.1; software/hardware configuration notifications and other IP modes not qualified."
+      ]
+    },
+    {
+      "id": "local.library.dmc-order.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "026b019247a89dd0b778f0f13a194ae3d6ddc15e",
+        "passedScope": "CPU1511 V4.1: DMC system and clock memory bytes, Open Library tags, three default FBs including selected consumer fbAirlock_Motor and dependency fbMotor_Reversing; dependency-first order with existing target paths kept, successful compilation and exact native library links."
+      },
+      "artifacts": [
+        "evidence/local.library.dmc-order.20261102.json"
+      ],
+      "limitations": [
+        "One owned CPU and three default DMC V19 FBs from the retained upgraded V21 archive. Full vendor library and runtime behavior are not qualified."
+      ]
+    },
+    {
+      "id": "local.library.upgrades-v20.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "77b2d23e56318de21f36fd5094ab68053f15cc36",
+        "passedScope": "V14 SP1, V15, V16, V17 and V18 DMC PLC archives plus LGF V5.3.0 V20 upgrade to V21, archive and fresh reopen with exact complete version identities; four mixed HMI packages, V17 companion directory and read-only V16 directory observed; input hashes unchanged."
+      },
+      "artifacts": [
+        "evidence/local.library.upgrades-v20.20261102.json"
+      ],
+      "limitations": [
+        "One supplied LGF V20 archive and the recovered DMC inputs. Upgrade/open/archive identity only, not every library producer, protected source, HMI runtime or PLC runtime."
+      ]
+    },
+    {
+      "id": "local.component.ob-production.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "77b2d23e56318de21f36fd5094ab68053f15cc36",
+        "passedScope": "Normal production Host admits the existing FBD OB caller with a fresh component and new global DB; compile, preservation, reopen and checkpoint recovery passed."
+      },
+      "artifacts": [
+        "evidence/local.component.ob-production.20261102.json"
+      ],
+      "limitations": [
+        "Single obCaller shape on owned CPU1511 V4.1; other OB combinations, software units and embedding-parent effects remain gated."
+      ]
+    },
+    {
+      "id": "local.safety.fio-routes.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "77b2d23e56318de21f36fd5094ab68053f15cc36",
+        "passedScope": "87-stage offline F-I/O import-route corpus: reviewed merged Git conflict and tag-bearing software-unit master-copy refusals on F-PLC, standard-PLC positive route, preserved tag tables and existing route regressions."
+      },
+      "artifacts": [
+        "evidence/local.safety.fio-routes.20261102.json"
+      ],
+      "limitations": [
+        "Offline owned CPU1511F and standard CPU1511 with F-DI; no safety-program changes or physical safety qualification. Optional absolute-I/O source/XML probes are observations only."
+      ]
+    },
+    {
+      "id": "local.runtime.plcsim-tcpip.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "17f7ba2965f69f27e35aeb2d15984a76cbd12e5f",
+        "passedScope": "Normal owned TCP/IP runtime: provisioning, Web and OPC UA connections, reads, subscriptions, captures, stale-pin refusals and clean disconnect, power-off and release."
+      },
+      "artifacts": [
+        "evidence/local.runtime.plcsim-tcpip.20261102.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU1511 instance; shared credential-vault route, not physical PLC or Test Suite system execution."
+      ]
+    },
+    {
+      "id": "local.plcsim.extended-events.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "d414f669fc629b5fb85a2e5214b1f20e2836c290",
+        "passedScope": "Owned CPU1511 Softbus: status/update/profile events execute OB55/56/57, each counter increases on six distributed ET200SP hardware IDs; IODevice identity and central-module refusals retained; channel interrupt configuration restored; owned instance released."
+      },
+      "artifacts": [
+        "evidence/local.plcsim.extended-events.20261102.json"
+      ],
+      "limitations": [
+        "58 stages, selected distributed event specifiers and hardware IDs only. No physical I/O, configuration-change delivery, other data-record/cycle modes or full runtime qualification; raw broad runtimeVerified remains false."
+      ]
+    },
+    {
+      "id": "local.safety.fio-block-routes.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "482e546b70a9bf1c74d68dcdd6a32fb892973678",
+        "passedScope": "Full native F-I/O tag, VCI conflict, master-copy and software-unit route regression plus SCL implicit input-tag and FBD absolute-input XML import refusals; matching standard-PLC source/XML positive imports; unchanged tag-table snapshots on every refusal."
+      },
+      "artifacts": [
+        "evidence/local.safety.fio-block-routes.20261102.json"
+      ],
+      "limitations": [
+        "Owned offline CPU1511F and standard CPU1511 with F-DI in TIA V21; no physical safety qualification or safety-program mutation. The new source/XML cases cover one input bit and FBD XML, not every language or native VCI block format; broader operands and peripheral areas have managed checks."
+      ]
     }
   ],
   "features": [
@@ -7144,7 +7336,8 @@
         "status": "implemented",
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): an output tag, quoted and unquoted, refused with nothing written, and a marker, a DB member and an input still written; the member \"SigOutStruct\".A of a PLC tag of a PLC data type at %Q24.0, which PLCSIM lists as a Struct in the area Output with its members, refused the same way (local.sim.output-refusal-2.20261101)."
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): an output tag, quoted and unquoted, refused with nothing written, and a marker, a DB member and an input still written; the member \"SigOutStruct\".A of a PLC tag of a PLC data type at %Q24.0, which PLCSIM lists as a Struct in the area Output with its members, refused the same way (local.sim.output-refusal-2.20261101).",
+          "Output-array members Values[0] and Values[1] of a structured output tag are natively refused by both write routes without changing its eight bytes (local.plcsim.output-arrays.20261102); other array shapes are not qualified."
         ]
       },
       "qualification": {
@@ -7152,7 +7345,8 @@
         "evidenceIds": [
           "local.runtime.frozen.20261024",
           "local.sim.output-refusal.20261101",
-          "local.sim.output-refusal-2.20261101"
+          "local.sim.output-refusal-2.20261101",
+          "local.plcsim.output-arrays.20261102"
         ]
       },
       "availability": {
@@ -7329,14 +7523,16 @@
           "OB82 (diagnosticAlarm), OB83 (pull and plug) on a central DI 16x24VDC HF and OB86 (station fault and return) on an ET 200SP IO device each raised only their own counter. Hardware IDs come from the PLC's system constants.",
           "OB40 is verified with a hardware interrupt configured through change.hardware_channel_attributes on DI 16x24VDC HF V1.0 channel 0 (local.plcsim_gaps.ob40.20261030): PLCSIM lists the configured process event and ProcessEvent on it raises OB40 once. A rising edge written to the input tag with sim_write does not raise OB40. statusEvent on the central module is answered NotSupportedByModule (OB55 serves distributed modules).",
           "Owned instances in RUN only; one event per call, validated completely before the runtime call. Without event it only lists the configured hardware-interrupt events.",
-          "hardwareInterrupt (OB40), pullOrPlug (OB83), rackOrStationFault (OB86, distributed devices only), diagnosticAlarm (OB82) and statusEvent (OB55). The runtime's acceptance and sequence number are reported; whether the OB ran is shown only by program values."
+          "hardwareInterrupt (OB40), pullOrPlug (OB83), rackOrStationFault (OB86, distributed devices only), diagnosticAlarm (OB82) and statusEvent (OB55). The runtime's acceptance and sequence number are reported; whether the OB ran is shown only by program values.",
+          "2 November local extension: updateEvent and profileEvent use the V8 UpdateEvent/ProfileEvent public routes with bounded hardwareId/specifier. New distributed OB55/56/57 qualification is pending; prior evidence remains scoped to the existing OB40/82/83/86 routes."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.plcsim_gaps.20261029",
-          "local.plcsim_gaps.ob40.20261030"
+          "local.plcsim_gaps.ob40.20261030",
+          "local.plcsim.extended-events.20261102"
         ]
       },
       "availability": {
@@ -7605,7 +7801,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.milestones.rerun.20261028",
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.safety.fio-block-routes.20261102"
         ]
       },
       "availability": {
@@ -7709,7 +7906,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.milestones.rerun.20261028",
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.safety.fio-block-routes.20261102"
         ]
       },
       "availability": {
@@ -11971,7 +12169,9 @@
           "local.library_intake.20261024",
           "local.library_vendor.20261025",
           "local.library_upgrades.20261024",
-          "local.library_import_scale.20261027"
+          "local.library_import_scale.20261027",
+          "local.library_vendor.rerun.20261102",
+          "local.library.upgrades-v20.20261102"
         ]
       },
       "availability": {
@@ -12015,7 +12215,9 @@
           "local.library_intake.20261024",
           "local.library_vendor.20261025",
           "local.library_upgrades.20261024",
-          "local.library_import_scale.20261027"
+          "local.library_import_scale.20261027",
+          "local.library_vendor.rerun.20261102",
+          "local.library.upgrades-v20.20261102"
         ]
       },
       "availability": {
@@ -12214,7 +12416,9 @@
           "local.library_vendor.20261025",
           "local.library_preservation.20261028",
           "local.library_compatibility.rerun.20261028",
-          "local.library_formats.rerun.20261028"
+          "local.library_formats.rerun.20261028",
+          "local.library_vendor.rerun.20261102",
+          "local.library.upgrades-v20.20261102"
         ]
       },
       "availability": {
@@ -12348,7 +12552,11 @@
           "local.library_units.namespace.dependency.20261101",
           "local.safety.fio-routes.20261101",
           "local.safety.fio-routes-2.20261101",
-          "local.library.tag-collision.20261101"
+          "local.library.tag-collision.20261101",
+          "local.library_dmc_prerequisites.20261102",
+          "local.library.dmc-order.20261102",
+          "local.safety.fio-routes.20261102",
+          "local.safety.fio-block-routes.20261102"
         ]
       },
       "availability": {
@@ -12482,7 +12690,9 @@
           "local.library_integrate.candidate_shapes.combinations.20261102",
           "local.library_integrate.candidate_shapes.dependent_db.20261102",
           "local.library_integrate.combined_apply.regression.20261102",
-          "local.library_integrate.candidate_shapes.verified.20261102"
+          "local.library_integrate.candidate_shapes.verified.20261102",
+          "local.component.ob.20261102",
+          "local.component.ob-production.20261102"
         ]
       },
       "availability": {
@@ -12526,7 +12736,7 @@
         "limitations": [
           "Natively qualified as a production route on owned de-DE-only scratch projects with CPU 1511-1 PN (V21) for the captured FB/UDT component, a new or existing FBD FC caller and a new global instance DB (local.library_integrate.combined_apply.rerun.20261028, regression local.library_integrate.combined_apply.regression.20261031 after the short step workspace and the pre-claim refusals, and local.library_integrate.combined_apply.regression.20261101 after the pre-admission refusal). Since 31 October also, each as its own exact shape, a new or existing LAD FC caller, an existing FBD FB caller with a new global instance DB, an existing FBD FC after an earlier network, and reuse of the installed FB and UDT with a new FBD FC caller (local.library_integrate.candidate_shapes.rerun.20261031). Since 1 November also a multi-instance of the reused installed FB and UDT in an existing FBD FB caller without an instance DB, through the captured multi-instance template v21.fw41.component-gate.multi-instance.v1 (local.library_integrate.candidate_shapes.multi.20261101; capture local.typed.component-storage-capture.20261101). Since 2 November also every combination of these features a plan can have: LAD and FBD FC and FB callers, earlier placement, reuse with a new global DB and the reused-FB multi-instance in an existing LAD or FBD FB caller (local.library_integrate.candidate_shapes.combinations.20261102), and each multi-instance combination whose caller FB has its own instance DB, which gains the member through the captured component effect instance-effects-component.v1.json (local.library_integrate.candidate_shapes.dependent_db.20261102; capture local.typed.component-effect-capture.20261102) A rerun at the build that lists the 23 shapes passed every case with no candidate feature (local.library_integrate.candidate_shapes.verified.20261102) and the verified-flow regression (local.library_integrate.combined_apply.regression.20261102).",
           "On by default (maintainer decision of 29 October 2026): every Host executes an eligible prepared PLC library_integrate plan in change_apply, and the preview states eligibility in combinedApply. --enable-library-integrate-apply is still accepted and changes nothing.",
-          "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. The single features ladCaller, fbCaller, earlierPlacement and reusedComponent, every combination of them with multiInstance a plan can have, and each multi-instance combination with dependentInstanceDb are verified (23 shapes, PlcComponentQualificationGate.VerifiedShapes). OB insertion is refused; other multi-instances (after a fresh import), partial dependency reuse, reused instance DBs, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified, naming the first unverified feature or the unverified combination. Other combinations have builders without native evidence; only a --component-qualification Host runs them, in its owned scratch, and a shape opens in production only as its exact feature combination. Typed templates map a structured (UDT) member only onto a captured reference member with the identical nested declaration.",
+          "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. The single features ladCaller, fbCaller, earlierPlacement and reusedComponent, every combination of them with multiInstance a plan can have, and each multi-instance combination with dependentInstanceDb are verified (23 shapes, PlcComponentQualificationGate.VerifiedShapes). A fresh component and global instance DB can be inserted after the last network of an existing FBD OB (local.component.ob.20261102); other OB combinations stay gated; other multi-instances (after a fresh import), partial dependency reuse, reused instance DBs, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified, naming the first unverified feature or the unverified combination. Other combinations have builders without native evidence; only a --component-qualification Host runs them, in its owned scratch, and a shape opens in production only as its exact feature combination. Typed templates map a structured (UDT) member only onto a captured reference member with the identical nested declaration.",
           "Before any claim it also refuses with its own code: DependencyProfileUnavailable (naming the dependents) when a multi-instance's caller FB has dependents other than its own instance DBs (embedding parents and their users, from the typed route's dependent closure), because no captured transitive effect covers the component's structured member (local.library_integrate.candidate_shapes.dependents.rerun.20261101, and an embedding parent in local.library_integrate.candidate_shapes.dependent_db.20261102). The caller's own instance DBs follow the captured component effect. ComponentPathTooLong (with the computed length) when a step checkpoint archive path would exceed TIA's 143 characters; the steps live in a short workspace <Host artifact root>/changes/c/<8 hex>, so roots of up to 73 characters fit. ComponentBlockNumberOccupied (naming the conflicting block) when a block number the import would take is already used in the PLC, because the import would renumber the block; CapturedStorageProfileUnavailable when the captured instance profile binds the FB to another number.",
           "Every combined-apply refusal is decided while the worker resolves the shared-mutation scope at mutation_begin, after the scope's own offline, PreviewStale and source checks (which keep their codes), so the Host writes no admission record and nothing becomes recovery_required (local.library_integrate.combined_apply.regression.20261101). The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
           "The import step's complete-project archive (for a reused FB, the typed step's own archive), taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
@@ -12548,7 +12758,9 @@
           "local.library_integrate.candidate_shapes.dependent_db.20261102",
           "local.typed.component-effect-capture.20261102",
           "local.library_integrate.combined_apply.regression.20261102",
-          "local.library_integrate.candidate_shapes.verified.20261102"
+          "local.library_integrate.candidate_shapes.verified.20261102",
+          "local.component.ob.20261102",
+          "local.component.ob-production.20261102"
         ]
       },
       "availability": {
@@ -23240,7 +23452,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23284,7 +23497,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23328,7 +23542,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23372,7 +23587,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23416,7 +23632,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23461,7 +23678,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23505,7 +23723,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
-          "local.runtime.plcsim-tcpip.route-gate.20261101"
+          "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23551,7 +23770,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
-          "local.runtime.plcsim-tcpip.route-gate.20261101"
+          "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23595,7 +23815,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23639,7 +23860,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23689,7 +23911,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23733,7 +23956,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23778,7 +24002,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
-          "local.runtime.plcsim-tcpip.route-gate.20261101"
+          "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23821,7 +24046,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23865,7 +24091,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -23909,7 +24136,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25300,7 +25528,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25345,7 +25574,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25390,7 +25620,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25435,7 +25666,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25480,7 +25712,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25527,7 +25760,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
-          "local.runtime.plcsim-tcpip.route-gate.20261101"
+          "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25713,7 +25947,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25758,7 +25993,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25803,7 +26039,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25847,7 +26084,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25890,7 +26128,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25933,7 +26172,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -25976,7 +26216,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -26020,7 +26261,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
-          "local.runtime.plcsim-tcpip.route-gate.20261101"
+          "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -26064,7 +26306,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -26107,7 +26350,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -26150,7 +26394,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -26193,7 +26438,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.20261102"
         ]
       },
       "availability": {
@@ -27335,7 +27581,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plcsim_signals.20261030"
+          "local.plcsim_signals.20261030",
+          "local.plcsim.signals-ip.20261102"
         ]
       },
       "availability": {
@@ -27376,7 +27623,8 @@
           "1-64 distinct symbols of the sim_read_signals types; every value is validated before the call. A failed item fails the call with PartialSimulationWrite and each item's result; items not reported failed may have been written.",
           "Assignments, not forces; the program scan may overwrite them.",
           "Natively one call wrote all eleven primitive types (SInt..ULInt at their range limits, Real 1.5, LReal -2.25e300), read back by single sim_read calls. A batch with an unknown symbol threw SignalConfigurationError (PartialSimulationWrite, valid items Unknown) and its valid item was written.",
-          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): a batch of a marker, a DB member and an output tag refused whole, nothing written; so did a batch of a marker and the member \"SigOutStruct\".A of a structured output tag (local.sim.output-refusal-2.20261101)."
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): a batch of a marker, a DB member and an output tag refused whole, nothing written; so did a batch of a marker and the member \"SigOutStruct\".A of a structured output tag (local.sim.output-refusal-2.20261101).",
+          "Output-array members Values[0] and Values[1] of a structured output tag are natively refused by both write routes without changing its eight bytes (local.plcsim.output-arrays.20261102); other array shapes are not qualified."
         ]
       },
       "qualification": {
@@ -27384,7 +27632,9 @@
         "evidenceIds": [
           "local.plcsim_signals.20261030",
           "local.sim.output-refusal.20261101",
-          "local.sim.output-refusal-2.20261101"
+          "local.sim.output-refusal-2.20261101",
+          "local.plcsim.output-arrays.20261102",
+          "local.plcsim.signals-ip.20261102"
         ]
       },
       "availability": {
@@ -27428,7 +27678,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plcsim_signals.20261030"
+          "local.plcsim_signals.20261030",
+          "local.plcsim.signals-ip.20261102"
         ]
       },
       "availability": {
@@ -27474,7 +27725,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plcsim_signals.20261030"
+          "local.plcsim_signals.20261030",
+          "local.plcsim.signals-ip.20261102"
         ]
       },
       "availability": {
@@ -27513,13 +27765,15 @@
           "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_signals.20261030); other CPUs, firmware and TCP/IP instances are not qualified.",
           "A bounded window of 0-60000 ms and 1-256 events; the subscription ends with the call. Calls run one at a time, so a change made by another tool call (sim_state) never falls inside a window.",
           "V8 has no LED getter: LEDs are reported only as changes within the window. Display data is summarized (length, SHA-256) and returned as base64 only on request, up to 4 MiB; its format is not decoded.",
-          "Natively the program's STP was observed as Run to Stop with STOP, RUN and ERROR LED changes, a separate API client's Run, Stop, Run as Stop-Startup-Run-Stop-Startup-Run matching the client's log and the polled state, and maxEvents 1 ended a 15 s window after 1.5 s; a CPU 1511 display summary reported 41026 bytes."
+          "Natively the program's STP was observed as Run to Stop with STOP, RUN and ERROR LED changes, a separate API client's Run, Stop, Run as Stop-Startup-Run-Stop-Startup-Run matching the client's log and the polled state, and maxEvents 1 ended a 15 s window after 1.5 s; a CPU 1511 display summary reported 41026 bytes.",
+          "2 November local extension: bounded subscriptions also report softwareConfiguration, hardwareConfiguration and ipAddress changes. New-event native qualification is pending; prior state/LED evidence does not qualify these additions."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plcsim_signals.20261030"
+          "local.plcsim_signals.20261030",
+          "local.plcsim.signals-ip.20261102"
         ]
       },
       "availability": {
@@ -27624,7 +27878,9 @@
         "evidenceIds": [
           "local.software_units.lifecycle.20261030",
           "local.safety.fio-routes-2.20261101",
-          "local.library.tag-collision.20261101"
+          "local.library.tag-collision.20261101",
+          "local.safety.fio-routes.20261102",
+          "local.safety.fio-block-routes.20261102"
         ]
       },
       "availability": {
@@ -27781,7 +28037,9 @@
         "status": "verified",
         "evidenceIds": [
           "local.vci_git.20261031",
-          "local.safety.fio-routes-2.20261101"
+          "local.safety.fio-routes-2.20261101",
+          "local.safety.fio-routes.20261102",
+          "local.safety.fio-block-routes.20261102"
         ]
       },
       "availability": {

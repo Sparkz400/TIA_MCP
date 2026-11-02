@@ -1,10 +1,28 @@
 using Siemens.Engineering.Library.Types;
 using TiaMcp.Openness.V21;
+using Newtonsoft.Json.Linq;
 
 internal static class LibraryDependencyCaptureTests
 {
     internal static void Run(Action<string, Action> test)
     {
+        static JObject Closure(string root, params string[] versions) => new JObject {
+            ["rootVersionGuid"] = root, ["versions"] = new JArray(versions.Select(id => new JObject { ["versionGuid"] = id })) };
+        test("selected library dependencies precede their consumers, including transitive roots", () => {
+            var closures = new JArray(Closure("A", "A", "X", "B", "C"), Closure("B", "B", "C"), Closure("C", "C"), Closure("D", "D"));
+            Check(LibraryDependencyCapture.InstantiationOrder(new[] { "A", "D", "B", "C" }, closures).SequenceEqual(new[] { "D", "C", "B", "A" }));
+        });
+        test("independent selected roots keep their order and empty selections are valid", () => {
+            var closures = new JArray(Closure("B", "B"), Closure("A", "A"));
+            Check(LibraryDependencyCapture.InstantiationOrder(new[] { "B", "A" }, closures).SequenceEqual(new[] { "B", "A" }));
+            Check(LibraryDependencyCapture.InstantiationOrder(Array.Empty<string>(), new JArray()).Length == 0);
+        });
+        test("selected root cycles refuse before dispatch", () => Reject(() => LibraryDependencyCapture.InstantiationOrder(
+            new[] { "A", "B" }, new JArray(Closure("A", "A", "B"), Closure("B", "A", "B"))), "DependencyConflict"));
+        test("missing selected-root closures refuse before dispatch", () => {
+            Reject(() => LibraryDependencyCapture.InstantiationOrder(new[] { "A" }, new JArray()));
+            Reject(() => LibraryDependencyCapture.InstantiationOrder(new[] { "A" }, new JArray(Closure("A", "B"))));
+        });
         test("dependency capture retains an empty observed collection", () => {
             var owner = new LibraryTypeVersion(); var capture = LibraryDependencyCapture.Read(owner);
             Check(capture.Versions.Length == 0 && capture.VersionGuids.Length == 0 && owner.DependencyReads == 1);

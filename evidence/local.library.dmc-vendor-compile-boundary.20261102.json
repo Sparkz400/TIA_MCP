@@ -1,0 +1,71 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library.dmc-vendor-compile-boundary.20261102",
+  "outcome": "failed",
+  "recordedAtUtc": "2026-11-02T20:53:54+00:00",
+  "source": {
+    "commit": "026b019247a89dd0b778f0f13a194ae3d6ddc15e",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "All-default DMC probe: 218 selected defaults, first 100 native instantiations succeeded; compile refused protected Siwarex/version conflicts, a missing VFD dependency and S7-1200-only instructions on CPU1511.",
+  "limitations": [
+    "Failed qualification; no full-library or runtime claim. Checkpoint and diagnostics retained. The separate three-block dependency-order regression passed."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "762868c231d018d8bc43e1f2d14077cb74049776d6517d2da9c65076af0a94f9"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "060a00d1737009d19cdd81dc9ec55257d67860b1136bfed1e182ba8bc433d291"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "354bc0503af757516a100d511c7e910fdc8dddc162b3ff6a568042740b78dcfe",
+      "bytes": 4550413,
+      "completed": false,
+      "steps": [
+        "start owned TIA dmc prerequisites",
+        "create owned scratch dmc prerequisites",
+        "prepare hardware_cpu_memory_bytes",
+        "apply hardware_cpu_memory_bytes",
+        "DMC system and clock memory bytes read back",
+        "open upgraded DMC library",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "DMC tag table exists in PLC tags",
+        "refuse a second copy of the same tag table",
+        "prepare library_instantiate",
+        "apply library_instantiate"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "engineering_read",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

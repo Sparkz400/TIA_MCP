@@ -20,8 +20,10 @@ Every refusal must come from change_prepare as SafetyBoundary naming the F-DI, a
 - library_instantiate of a master copy of McTags into the F-PLC; into the standard PLC, after its own McProbe and McTags
   were deleted, it applies and McTags reads back with McProbe. (Renaming the table instead left McProbe in the PLC, and
   TIA then created the master copy's tag as McProbe(1), run fr_eeb8be6f; qualify_master_copy_tag_collision.py covers it.)
-- software_unit_create_from of a master copy of the standard PLC's empty unit FioUnit into the F-PLC; into the standard PLC,
+- software_unit_create_from of a master copy of the standard PLC's tag-bearing unit FioUnit into the F-PLC; into the standard PLC,
   after FioUnit was deleted there, it applies.
+- source_upsert of SCL that implicitly creates an input tag, and block_import_xml of a native FBD absolute input operand:
+  both refuse on the F-PLC without changing its tag tables and apply on the standard PLC.
 Last, a probe records whether a tag table mapped in each other VCI format still synchronizes project-ward after a
 bit-memory edit (the F-I/O rule reads the package as SimaticML).
 """
@@ -31,7 +33,9 @@ import argparse
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
+import xml.etree.ElementTree as ET
 from types import SimpleNamespace
 
 from library_native_harness import Harness, require
@@ -48,8 +52,8 @@ WORKSPACE = "FioVci"
 LIMITATIONS = [
     "One owned scratch with a standard CPU 1511-1 PN V4.1 and a CPU 1511F-1 PN whose ET 200SP station carries two F-DI 8x24VDC HF; "
     "addresses in the first F-DI's input range only. F-output, ET 200MP and other F-module ranges are not exercised.",
-    "vci_conflict_resolve runs take=remote only, against a local bare Git remote; take=merged and block or SCL imports with absolute operands are not exercised.",
-    "software_unit_create_from copies an empty unit (its default tag table only) within the project library; unit master copies holding tags are not exercised.",
+    "vci_conflict_resolve runs take=remote and take=merged against a local bare Git remote. A separate end-of-run probe records standard SCL/XML absolute F-input reads; it is not safety-program qualification.",
+    "software_unit_create_from copies a unit with one memory tag within the project library; F-output ranges and external vendor unit archives are not exercised.",
     "The F-CPU's generated scratch user holds Full access including fail-safe (owned scratch only); no safety login, password or download.",
 ]
 
@@ -133,6 +137,36 @@ def body(h):
     if vci:
         for fmt in (x for x in vci["formats"] if x != "SimaticML"):
             probe(h, "project-ward synchronization of a %s tag-table package" % fmt, lambda fmt=fmt: other_format(h, standard, empty, vci, fmt))
+    absolute_block_read(h, plc, standard, fio, f, s)
+
+
+def absolute_block_read(h, plc, standard, fio, scope, standard_scope):
+    """Native source generation can create an implicit safety tag; refuse it and the equivalent XML before any write."""
+    source = 'FUNCTION "FioReadProbe" : Bool\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\nBEGIN\n#FioReadProbe := %s;\nEND_FUNCTION\n' % fio
+    payload = {"language": "SCL", "source": source, "expectedBlockNames": ["FioReadProbe"]}
+    refuse(h, "source generation of an implicit F-input tag", "source_upsert", payload, scope, address=fio)
+    change(h, "source_upsert", payload, standard_scope)
+    fixture = Path(__file__).resolve().parents[1] / "fixtures/libraries/component-qualification/TiaMcpComponentCaller.s7dcl"
+    graphical = fixture.read_text(encoding="utf-8-sig").replace('"TiaMcpComponentCaller"', '"FioXmlReadProbe"')
+    change(h, "source_upsert", {"language": "SIMATIC_SD", "source": graphical, "expectedBlockNames": ["FioXmlReadProbe"]}, standard_scope)
+    exported = h.tool("block_read", {"plcPath": standard, "blockName": "FioXmlReadProbe"})
+    xml = artifact_bytes(h.tool, exported["artifact"]).decode("utf-8-sig")
+    payload = {"xml": absolute_xml(xml, fio), "expectedBlockNames": ["FioXmlReadProbe"]}
+    change(h, "block_import_xml", payload, standard_scope)
+    refuse(h, "XML block import of an absolute F-input", "block_import_xml", payload, scope, address=fio)
+
+
+def absolute_xml(xml, fio):
+    """Replace the native FBD fixture's input access, preserving all other XML and namespace spelling."""
+    byte, bit = map(int, fio.removeprefix("%I").split("."))
+    pattern = r'<Access\b(?=[^>]*Scope="LocalVariable")([^>]*)>\s*<Symbol>\s*<Component Name="PreserveInput"\s*/>\s*</Symbol>\s*</Access>'
+    def replace(match):
+        attributes = match.group(1).replace('Scope="LocalVariable"', 'Scope="Address"')
+        return '<Access%s><Address Area="Input" Type="Bool" BitOffset="%d" /></Access>' % (attributes, byte * 8 + bit)
+    updated, count = re.subn(pattern, replace, xml, flags=re.S)
+    require(count == 1, "Expected one PreserveInput access in the native FBD fixture")
+    ET.fromstring(updated)
+    return updated
 
 
 def vci_routes(h, plc, table, fio, f):
@@ -230,12 +264,22 @@ def conflict_route(h, plc, table, fio, f, vci):
     h.report["vciConflictCheckout"] = h.stage("check the fetched package out into the workspace", checkout)
     refuse(h, "a reviewed remote side with %s on the F-DI input" % PROBE_TAG, "vci_conflict_resolve",
            {"workspacePath": workspace, "objectPath": table, "comparisonRef": comparison["recordRef"], "packageId": FIO_TABLE, "take": "remote"}, f, address=fio)
+    merged_address = fio[:-1] + "1"
+    require(sum(data.count(fio.encode()) for data in remote.values()) == 1, "Expected one F-I/O operand in the remote package")
+    merged_files = {name: data.replace(fio.encode(), merged_address.encode()) for name, data in remote.items()}
+    merged = prepare_files(run, "Reviewed merged F-I/O tag", merged_files, parent=fetched["recordRef"])
+    refuse(h, "a reviewed merged side with %s on the F-DI input" % PROBE_TAG, "vci_conflict_resolve",
+           {"workspacePath": workspace, "objectPath": table, "comparisonRef": comparison["recordRef"], "packageId": FIO_TABLE,
+            "take": "merged", "mergedRecordRef": merged["recordRef"]}, f, address=merged_address)
 
 
 def unit_routes(h, plc, standard, s):
-    """software_unit_create_from brings a unit's tag tables unread: refused while the PLC owns an F-I/O range, applied otherwise."""
+    """A unit's tag-bearing master copy is refused on an F-I/O owner and applied on the standard PLC."""
     unit = standard + "/units/" + UNIT
     change(h, "software_unit_create", {"name": UNIT}, s)
+    change(h, "tag_table_create", {"scopePath": unit, "tagTableName": "UnitTags"}, s)
+    unit_table = unit + "/tags/UnitTags"
+    change(h, "tag_create", {"tagTablePath": unit_table, "name": "UnitMarker", "dataTypeName": "Bool", "logicalAddress": "%M61.0"}, s)
     library = h.project_library()
     change(h, "library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library, "target": {"plcPath": standard},
                                              "object": {"kind": "softwareUnit", "objectPath": unit}}, {})
@@ -243,12 +287,16 @@ def unit_routes(h, plc, standard, s):
     require(len(masters) == 1, "Expected one master copy %s: %s" % (UNIT, masters))
     payload = {"libraryId": library, "masterCopyPath": masters[0]["masterCopyPath"], "name": UNIT}
     refuse(h, "a unit master copy into the F-PLC", "software_unit_create_from", payload, {"plcPath": plc}, module=FDI[:-1])
+    change(h, "tag_delete", {"tagTablePath": unit_table, "memberName": "UnitMarker", "dependencyPolicy": "rejectReferenced"}, s)
+    change(h, "tag_table_delete", {"tagTablePath": unit_table}, s)
     change(h, "software_unit_delete", {"unitPath": unit, "dependencyPolicy": "rejectReferenced"}, s)
     change(h, "software_unit_create_from", payload, s)
     def created():
         scopes = [x["path"] for x in h.tool("software_inspect", {"plcPath": standard, "maxItems": 2000}).get("softwareScopes", [])]
         require(unit in scopes, "%s is not a scope of the standard PLC: %s" % (unit, scopes))
-        return scopes
+        restored = tables(h).get(unit_table)
+        require(restored == [["UnitMarker", "Bool", "%M61.0", False]], "The copied unit's tag differs: %s" % restored)
+        return {"scopes": scopes, "restoredTags": restored}
     h.stage("the created %s is a scope of the standard PLC" % UNIT, created)
 
 

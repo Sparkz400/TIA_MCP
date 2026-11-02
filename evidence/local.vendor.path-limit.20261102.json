@@ -1,0 +1,53 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.vendor.path-limit.20261102",
+  "outcome": "failed",
+  "recordedAtUtc": "2026-11-02T19:37:19+00:00",
+  "source": {
+    "commit": "a70d2754b4facb83208d76438dc2379f2d4332aa",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Vendor qualification stopped on V21 143-character retrieved-library path limit; source archives unchanged.",
+  "limitations": [
+    "Failed attempt; fresh short output directory required before another run."
+  ],
+  "binaries": [
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "3ce15fabe2c1d9232bf7483819d8101940ca07cee763181c1f9eafaa5c26341a"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "bd8f2789a6ae1f0049c3e88f75a5e4337ac16a2a8a43a0d7ec0dbf29461eb6a5",
+      "bytes": 95064,
+      "completed": false,
+      "steps": [
+        "stage and classify pal",
+        "stage and classify dmc",
+        "start owned TIA dmc upgrade",
+        "upgrade (observed) Open Library V19 Comfort.zal19",
+        "upgrade Open Library V19 PLC.zal19"
+      ],
+      "toolsPassed": [
+        "change_prepare",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_package_status",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

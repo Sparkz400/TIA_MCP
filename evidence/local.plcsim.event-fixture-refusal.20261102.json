@@ -1,0 +1,74 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.plcsim.event-fixture-refusal.20261102",
+  "outcome": "failed",
+  "recordedAtUtc": "2026-11-02T19:32:17+00:00",
+  "source": {
+    "commit": "a70d2754b4facb83208d76438dc2379f2d4332aa",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Attempted OB55/56/57 fixture; V21 refused guessed StatusInterrupt SecondaryType before runtime calls; unchanged project fingerprint, normal owned process cleanup.",
+  "limitations": [
+    "Failed fixture attempt; no event type is qualified by this report."
+  ],
+  "binaries": [
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "3ce15fabe2c1d9232bf7483819d8101940ca07cee763181c1f9eafaa5c26341a"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "3c4fef1e0cec00a451e9533c27ae4a018b5d2c5f0501720b37ecb173fede9fec"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "d8532b46a0b068d668263bd19b3d49b2dcd1d95c2007ff607894b89c03d21b52",
+      "bytes": 224872,
+      "completed": false,
+      "steps": [
+        "start owned TIA plcsim gaps",
+        "create owned scratch plcsim gaps",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "prepare hardware_plug",
+        "apply hardware_plug",
+        "ET 200SP station on the CPU's IO system",
+        "prepare hardware_add",
+        "prepare network_configure",
+        "prepare network_configure",
+        "prepare network_io_assign",
+        "apply network_io_assign",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "prepare block_import_xml",
+        "apply block_import_xml",
+        "prepare block_import_xml",
+        "apply block_import_xml"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

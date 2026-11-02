@@ -1,4 +1,4 @@
-"""Instantiate DMC's 'Open Library' tag-table master copy (a documented DMC prerequisite) from the upgraded V21 library."""
+"""Apply DMC's prerequisites, then compile representative or all default PLC code blocks with their dependency closures."""
 from __future__ import annotations
 
 import argparse
@@ -10,6 +10,7 @@ from urllib.parse import quote
 
 from library_native_harness import Harness, require
 from qualify_library_vendor import all_items
+from qualify_cpu_memory_bytes import ENABLED, memory
 
 TABLE = "Open Library"
 
@@ -26,6 +27,10 @@ def body(h):
     h.report["input"] = {"vendorReport": str(h.args.vendor_report), "archive": archive}
 
     plc = h.owned_scratch("dmc prerequisites")
+    cpu = plc.rsplit("/plc/", 1)[0]
+    h.apply("hardware_cpu_memory_bytes", {"hardwarePath": cpu, "attributes": ENABLED})
+    h.stage("DMC system and clock memory bytes read back", lambda:
+            require(memory(h, cpu)[0] == ENABLED, "The CPU memory bytes differ from the prerequisite") or ENABLED)
     library = h.stage("open upgraded DMC library", lambda: h.tool("library_open", {"request": {
         "path": str(source_archive), "expectedSha256": archive["sha256"]}}))["libraryId"]
     masters = [x for x in all_items(h, library)["items"] if x.get("kind") == "masterCopy" and x.get("name") == TABLE]
@@ -42,6 +47,30 @@ def body(h):
     h.refuse("refuse a second copy of the same tag table", "library_instantiate",
              {**payload, "source": h.source_ref(library)}, "LibraryConflict", "tag table")
 
+    versions = [x for x in all_items(h, library)["items"] if x.get("kind") == "version" and x.get("isDefault")
+                and ("CodeBlockLibraryTypeVersion" in x.get("engineeringType", "") if h.args.all_default_blocks
+                     else x.get("typeName") in ("fbIO_DigitalInput", "fbAirlock_Motor", "fbMotor_Reversing"))]
+    require(versions and sum(x["typeName"] == "fbIO_DigitalInput" for x in versions) == 1, "Default DMC code-block inventory is incomplete")
+    if not h.args.all_default_blocks:
+        require({x["typeName"] for x in versions} == {"fbIO_DigitalInput", "fbAirlock_Motor", "fbMotor_Reversing"}, "The dependency-order regression pair is missing")
+    h.report["compiledVendorBlocks"] = versions
+    # The production intake accepts at most 100 selected components per reviewed change.
+    for start in range(0, len(versions), 100):
+        installed = {x["versionGuid"] for x in all_items(h, h.project_library())["items"] if x.get("kind") == "version"}
+        batch = []
+        for version in versions[start:start + 100]:
+            if version["versionGuid"] in installed:
+                h.stage("DMC prior batch created dependency: " + version["typeName"], lambda v=version: h.verify_use(h.project_library(), v, 1))
+            else:
+                batch.append(version)
+        if batch:
+            h.apply("library_instantiate", h.selected(library, batch, target={"plcPath": plc}))
+    project_library = h.project_library()
+    for version in versions:
+        h.stage("DMC exact library link: " + version["typeName"], lambda v=version: h.verify_use(project_library, v, 1))
+    h.report["vendorFbExport"] = h.stage("read the compiled DMC FB", lambda:
+        h.tool("block_read", {"plcPath": plc, "blockName": "fbIO_DigitalInput"}))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
@@ -49,10 +78,11 @@ if __name__ == "__main__":
     parser.add_argument("--worker", type=Path, required=True)
     parser.add_argument("--artifacts", type=Path, required=True)
     parser.add_argument("--vendor-report", type=Path, required=True)
+    parser.add_argument("--all-default-blocks", action="store_true", help="Compile every default PLC code-block version instead of the three-block dependency regression")
     parser.add_argument("--timeout", type=int, default=600)
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
     args.runner = __file__
-    Harness(args, "pq_", "DMC 'Open Library' tag-table master copy instantiated from the upgraded V21 library", [
-        "CPU system and clock memory bytes, DMC's other prerequisite, remain outside the reviewed hardware write allowlist; DMC FB compilation is not claimed.",
+    Harness(args, "pq_", "DMC prerequisites and dependency compilation from the upgraded V21 library", [
+        "One owned CPU1511 V4.1; compilation and exact library identity of the selected default code-block versions, not runtime behavior, HMI content or vendor master copies.",
         "Uses the vendor run's retained upgraded archive; the upgrade itself is the vendor evidence."], [args.vendor_report]).run(body)

@@ -7,6 +7,13 @@ import qualify_fio_tag_routes as r
 
 
 class EditPackageTests(unittest.TestCase):
+    def test_absolute_operand_keeps_native_namespace_spelling_and_other_accesses(self):
+        original = '<Document><FlgNet xmlns="urn:native"><Parts><Access Scope="LocalVariable" UId="1"><Symbol><Component Name="PreserveOutput" /></Symbol></Access><Access Scope="LocalVariable" UId="2"><Symbol><Component Name="PreserveInput" /></Symbol></Access></Parts></FlgNet></Document>'
+        expected = original.replace('<Access Scope="LocalVariable" UId="2"><Symbol><Component Name="PreserveInput" /></Symbol></Access>', '<Access Scope="Address" UId="2"><Address Area="Input" Type="Bool" BitOffset="19" /></Access>')
+        self.assertEqual(expected, r.absolute_xml(original, "%I2.3"))
+        with self.assertRaises(AssertionError):
+            r.absolute_xml(original.replace('PreserveInput', 'MissingInput'), "%I2.3")
+
     def test_edits_the_one_package_file_holding_the_address(self):
         with tempfile.TemporaryDirectory() as root:
             (Path(root) / "FioTags.xml").write_bytes(b"\xef\xbb\xbf<LogicalAddress>%M40.0</LogicalAddress>")

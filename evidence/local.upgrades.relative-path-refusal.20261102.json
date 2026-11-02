@@ -1,0 +1,48 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.upgrades.relative-path-refusal.20261102",
+  "outcome": "failed",
+  "recordedAtUtc": "2026-11-02T20:13:54+00:00",
+  "source": {
+    "commit": "922a99b5fa303354175400e134b2a855815b84a7",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Archive staging refused a relative vendor-root path before any native upgrade.",
+  "limitations": [
+    "Incomplete run; corrected fixture required."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "5a4dfe24063c7b81990d690ca910802414077d765e2a2936da030e6a6a0b7a13"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "abc5ff4c1f9bfbbf5fcb507c00115db242507f85a3e98c17a445a78f1764ca8b"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "63e277929aa6a69ba3798a3e92eb438808750530717fae4e56713d9c9fe05caa",
+      "bytes": 19797,
+      "completed": false,
+      "steps": [
+        "stage and classify mixed package dmc-v14"
+      ],
+      "toolsPassed": [
+        "tia_detach"
+      ],
+      "toolsRejected": [
+        "library_package_stage"
+      ]
+    }
+  ]
+}

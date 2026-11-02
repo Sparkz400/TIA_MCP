@@ -221,7 +221,7 @@ internal static class ToolTitles
         ["sim_create"] = "Create a PLCSIM instance",
         ["sim_creation_status"] = "Show PLCSIM creation status",
         ["sim_event"] = "Inject a PLCSIM interrupt or fault",
-        ["sim_observe"] = "Observe PLCSIM operating state and LEDs",
+        ["sim_observe"] = "Observe PLCSIM state and configuration changes",
         ["sim_read"] = "Read PLCSIM tags",
         ["sim_read_signals"] = "Read PLCSIM tags in one call",
         ["sim_release"] = "Release a PLCSIM instance",

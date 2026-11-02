@@ -188,14 +188,24 @@ namespace TiaMcp.Simulator.V8
                 ["previous"] = previous.ToString(), ["current"] = current.ToString(), ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
             Delegate_II_EREC_DT_ELT_ELM led = (sender, code, time, type, mode) => Add(new JObject { ["kind"] = "led",
                 ["led"] = type.ToString(), ["mode"] = mode.ToString(), ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
+            Delegate_SoftwareConfigurationChanged software = (sender, change) => Add(new JObject { ["kind"] = "softwareConfiguration",
+                ["changeType"] = change.ChangeType.ToString(), ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(change.EventCreateTime), ["errorCode"] = change.ErrorCode.ToString() });
+            Delegate_II_EREC_DT hardware = (sender, code, time) => Add(new JObject { ["kind"] = "hardwareConfiguration",
+                ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
+            Delegate_IPAddressChanged ip = (sender, code, time, index, suite) => Add(new JObject { ["kind"] = "ipAddress",
+                ["interfaceIndex"] = index, ["ipSuite"] = JObject.FromObject(suite),
+                ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
             var clock = Stopwatch.StartNew();
             if (window > 0)
             {
-                bool states = false, leds = false;
+                bool states = false, leds = false, softwareChanges = false, hardwareChanges = false, ipChanges = false;
                 try
                 {
                     selected.Instance.OnOperatingStateChanged += state; states = true;
                     selected.Instance.OnLedChanged += led; leds = true;
+                    selected.Instance.OnSoftwareConfigurationChanged += software; softwareChanges = true;
+                    selected.Instance.OnHardwareConfigChanged += hardware; hardwareChanges = true;
+                    selected.Instance.OnIPAddressChanged += ip; ipChanges = true;
                     lock (gate)
                         while (events.Count < maximum && clock.ElapsedMilliseconds < window)
                             Monitor.Wait(gate, (int)Math.Max(1, window - clock.ElapsedMilliseconds));
@@ -204,6 +214,9 @@ namespace TiaMcp.Simulator.V8
                 {
                     if (states) selected.Instance.OnOperatingStateChanged -= state;
                     if (leds) selected.Instance.OnLedChanged -= led;
+                    if (softwareChanges) selected.Instance.OnSoftwareConfigurationChanged -= software;
+                    if (hardwareChanges) selected.Instance.OnHardwareConfigChanged -= hardware;
+                    if (ipChanges) selected.Instance.OnIPAddressChanged -= ip;
                     lock (gate) open = false;
                 }
             }
@@ -216,7 +229,7 @@ namespace TiaMcp.Simulator.V8
             result["ledModes"] = modes;
             result["after"] = ObservedState(selected);
             result["display"] = Display(selected, display);
-            result["basis"] = "Operating-state and LED changes reported by the runtime during the window (OnOperatingStateChanged, OnLedChanged). V8 has no LED getter, so ledModes lists only LEDs that changed. This bridge runs one call at a time: changes made by other tool calls cannot fall inside the window.";
+            result["basis"] = "Operating-state, LED, software-configuration, hardware-configuration and IP-address changes reported by the runtime during the window. V8 has no LED getter, so ledModes lists only LEDs that changed. This bridge runs one call at a time: changes made by other tool calls cannot fall inside the window.";
             return result;
         }
 
