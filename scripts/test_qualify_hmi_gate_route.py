@@ -151,7 +151,7 @@ class FakeHost:
                         "blockPath": plc + "/blocks/QualificationDB", "pathComponents": ["Value"], "xmlLine": 7}}] + [
             {"relation": "hmiScreenItemTag", "sourcePath": path, "sourceProperty": "Dynamizations/%s/Tag" % d["property"], "resolution": "resolved",
              "target": {"objectPath": table + "/tags/" + d["properties"]["Tag"]}}
-            for path, row in self.world()[hmi].get("items", {}).items() for d in row.get("dynamizations", [])]
+            for path, row in self.world()[hmi].get("items", {}).items() for d in row.get("dynamizations", []) if row["screen"] == request.get("screenPath")]
 
     # The worker's refusals, in its order: request rules, kind, body, gate, StaleRevision.
     def check(self, kind, payload, admitted):

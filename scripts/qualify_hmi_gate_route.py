@@ -149,11 +149,12 @@ def behavior_fields(composition):
     return (composition, "behaviorCoverage." + composition)
 
 
-def references(client, device):
-    """Every hmi_references edge of one HMI, page by page (200 per page)."""
+def references(client, device, screen_path=None):
+    """Every hmi_references edge of one HMI, page by page (200 per page); item edges only with the screen's screenPath (run hb5)."""
     edges, offset = [], 0
+    scope = {"screenPath": screen_path} if screen_path else {}
     while offset is not None:
-        page = client.tool("hmi_references", {"request": {"schemaVersion": 1, "target": device["identity"], "limit": 200, "offset": offset, "maxVisited": 50000}})
+        page = client.tool("hmi_references", {"request": {"schemaVersion": 1, "target": device["identity"], "limit": 200, "offset": offset, "maxVisited": 50000, **scope}})
         edges += page["relationships"]
         offset = page.get("nextOffset")
     return edges
@@ -533,7 +534,7 @@ def binding_cases(fx):
                 row = bound_item(client, hmis, fx, hmi, screen, name)
                 found = [d for d in row.get("dynamizations") or [] if d.get("property") == "ProcessValue"]
                 values = (found[0].get("properties") or {}) if len(found) == 1 else {}
-                edges = references(client, hmis[hmi])
+                edges = references(client, hmis[hmi], path.rsplit("/items/", 1)[0])
                 chain = [(e.get("resolution"), (e.get("target") or {}).get("objectPath")) for e in edges
                          if e.get("relation") == "hmiScreenItemTag" and e.get("sourcePath") == path and e.get("sourceProperty") == "Dynamizations/ProcessValue/Tag"]
                 plc = sum(e.get("relation") == "hmiPlcDeclaration" and e.get("sourcePath") == tag_path and e.get("resolution") == "resolved" for e in edges)
