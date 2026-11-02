@@ -70,8 +70,10 @@ baseline policy. [Verification and native limits](../verification/plc-baseline-2
 
 When a library import selects both a dependency and its consumer, `preview.instantiationOrder`
 lists the selected versions in dependency-first order. This prevents Siemens from creating the
-dependency in a source folder before its explicit import. Cyclic selected roots are refused
-during preparation; existing objects still require the normal identity and reuse checks.
+dependency in a source folder before its explicit import. `dependencyPathPolicy` keeps existing
+target paths when Siemens encounters a dependency path conflict; it never moves a reused object
+to the library's folder. Cyclic selected roots are refused during preparation; existing objects
+still require the normal identity and reuse checks.
 
 Selectors inside a payload refer to the PLC chosen by the outer `plcPath`, or to exact hardware paths returned by inventory/`engineering_read`.
 

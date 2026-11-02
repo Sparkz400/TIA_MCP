@@ -65,9 +65,9 @@ END_ORGANIZATION_BLOCK
 '''
 # number -> block name, Openness SecondaryType, GapDb counter, informative S7-1500 start information.
 OBS = {
-    55: ("GapStatus", None, "Ob55", []),
-    56: ("GapUpdate", None, "Ob56", []),
-    57: ("GapProfile", None, "Ob57", []),
+    55: ("GapStatus", "Status", "Ob55", []),
+    56: ("GapUpdate", "Update", "Ob56", []),
+    57: ("GapProfile", "Profile", "Ob57", []),
     40: ("GapHardwareInterrupt", "HardwareInterrupt", "Ob40", [("LADDR", "HW_IO"), ("USI", "Word"), ("IChannel", "USInt"), ("EventType", "Byte")]),
     82: ("GapDiagnosticError", "DiagnosticErrorInterrupt", "Ob82", [("IO_State", "Word"), ("LADDR", "HW_ANY"), ("Channel", "UInt"), ("MultiError", "Bool")]),
     83: ("GapPullOrPlug", "PullOrPlugOfModules", "Ob83", [("LADDR", "HW_IO"), ("Event_Class", "Byte"), ("Fault_ID", "Byte")]),
