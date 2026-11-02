@@ -59,9 +59,9 @@ namespace TiaMcp.Openness.V21
         {
             var payload = preview?["payload"] as JObject; var plan = preview?["integrationPlan"] as JObject; var caller = plan?["caller"] as JObject;
             if (payload == null || caller == null || PlcHmiIntegrationPlanner.IsRecipe(payload)) return "Only a prepared PLC component plan is eligible; HMI targets and PLC/HMI recipes stay plan-only.";
-            if (caller.Value<bool?>("obCallAdded") != false || caller.Value<string>("kind") == "OB") return "OB insertion is refused; add the OB call as its own reviewed change.";
-            if (!(caller.Value<string>("kind") is "FC" or "FB") || !(caller.Value<string>("language") is "FBD" or "LAD"))
-                return "Only LAD/FBD FC and FB callers have a combined apply builder.";
+            if (caller.Value<bool?>("obCallAdded") != (caller.Value<string>("kind") == "OB")) return "The caller's OB identity is inconsistent.";
+            if (!(caller.Value<string>("kind") is "FC" or "FB" or "OB") || !(caller.Value<string>("language") is "FBD" or "LAD"))
+                return "Only LAD/FBD FC, FB and OB callers have a combined apply builder.";
             bool reused = plan["fb"]?.Value<bool?>("reused") == true;
             if ((plan["reuse"]?["versions"] as JArray)?.Count != (reused ? ((JArray)plan["versions"]).Count : 0) || plan["instanceDb"]?.Value<bool?>("reused") == true)
                 return "Only a fresh FB/dependency import or the complete installed FB, each with new instance storage, has a builder; partial dependency reuse and reused instance DBs stay plan-only.";
@@ -87,6 +87,7 @@ namespace TiaMcp.Openness.V21
         {
             var caller = (JObject)plan["caller"]; string kind = caller.Value<string>("kind"), language = caller.Value<string>("language");
             var features = new JObject();
+            if (kind == "OB") features["obCaller"] = "OB insertion is refused until its exact shape passes native qualification; add the OB call as its own reviewed change.";
             if (language == "LAD") features["ladCaller"] = "A LAD caller is verified as a new or existing FC and as an existing FB, alone and in the natively run combinations; this LAD " + kind + " combination stays plan-only.";
             if (kind == "FB") features["fbCaller"] = "An existing LAD or FBD FB caller is verified with a new global instance DB or a multi-instance of the reused FB, alone and in the natively run combinations; this " + language + " FB combination stays plan-only.";
             if (plan["multiInstance"] != null) features["multiInstance"] = "A multi-instance is verified only for the reused installed FB in an existing LAD or FBD FB caller; other multi-instances stay plan-only.";

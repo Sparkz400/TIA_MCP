@@ -110,7 +110,15 @@ try {
             $action, $delay = $step.Split(':')
             Start-Sleep -Milliseconds ([int]$delay)
             $started = Now
-            if ($action -eq 'Run') { $instance.Run(30000) } else { $instance.Stop(30000) }
+            if ($action -eq 'Run') { $instance.Run(30000) }
+            elseif ($action -eq 'IP') {
+                $original = $instance.ControllerIPSuite4[0]
+                try {
+                    $suite = New-Object Siemens.Simatic.Simulation.Runtime.SIPSuite4('192.168.0.77','255.255.255.0','0.0.0.0')
+                    $instance.SetIPSuite(0, $suite, $false)
+                    Start-Sleep -Milliseconds 1500
+                } finally { $instance.SetIPSuite(0, $original, $false) }
+            } else { $instance.Stop(30000) }
             [void]$log.Add(@{ action = $action; startedAtUtc = $started; completedAtUtc = (Now); state = "$($instance.OperatingState)" })
         }
         $instance.Dispose()
@@ -564,6 +572,13 @@ def observe(h, lab):
         require(running == "Run", "The instance did not return to RUN")
         return running
     h.stage("return to RUN after the external STOP", settled)
+    def ip_changes(outcome):
+        changes = [event for event in outcome["events"] if event["kind"] == "ipAddress"]
+        require(len(changes) >= 2 and all(event["interfaceIndex"] == 0 for event in changes),
+                "Expected IP-change and restoration events on interface 0: %s" % changes)
+        require(outcome["after"]["operatingState"] == "Run" and not outcome["truncated"], "IP observation ended unexpectedly")
+        require(changes[0]["ipSuite"] != changes[-1]["ipSuite"], "IP events lost their changed suites")
+    h.report["observeIpChanges"] = external("IP:1500", 8000, ip_changes)
     refuse(h, "windowMs 60001", "sim_observe", {"instanceId": instance, "windowMs": 60001}, ["InvalidRequest"])
     refuse(h, "maxEvents 0", "sim_observe", {"instanceId": instance, "maxEvents": 0}, ["InvalidRequest"])
     refuse(h, "an unselected instance", "sim_observe", {"instanceId": 987654}, ["SimulationNotSelected"])

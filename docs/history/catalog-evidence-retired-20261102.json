@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-02",
+  "records": [],
+  "summariesNeverCataloged": [
+    {
+      "id": "local.plcsim.event-fixture-refusal.20261102",
+      "reason": "Failed discovery fixture: guessed OB SecondaryType refused before runtime. Raw report and recovery archive retained; no qualification claim."
+    },
+    {
+      "id": "local.vendor.path-limit.20261102",
+      "reason": "Vendor rerun hit V21's 143-character native output-path limit. Original source archives unchanged; rerun uses a fresh short artifact root."
+    }
+  ]
+}

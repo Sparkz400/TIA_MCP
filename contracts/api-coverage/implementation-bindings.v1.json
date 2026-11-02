@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "6c99e61fe122155bda2dc88c34431cace0222edd1f089211143dacb64b46dc9e",
-      "bytes": 1721632
+      "sha256": "6456451c904afdbd583160b488f0015df510f392c8e482bbf56cbe84b137f06c",
+      "bytes": 1722980
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -129391,6 +129391,13 @@
           "artifacts": [
             "evidence/local.sim.output-refusal-2.20261101.json"
           ]
+        },
+        {
+          "id": "local.plcsim.output-arrays.20261102",
+          "profileSha256": "72438e246f7c8692428a42633b818635ddb7e0e99a19241b44d02d48e3194fce",
+          "artifacts": [
+            "evidence/local.plcsim.output-arrays.20261102.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -129447,6 +129454,13 @@
           "profileSha256": "7140d88b7c458524fb63ef58d10f19cebb158fdcfbd37b2b18b6d145f285a5e1",
           "artifacts": [
             "evidence/local.sim.output-refusal-2.20261101.json"
+          ]
+        },
+        {
+          "id": "local.plcsim.output-arrays.20261102",
+          "profileSha256": "72438e246f7c8692428a42633b818635ddb7e0e99a19241b44d02d48e3194fce",
+          "artifacts": [
+            "evidence/local.plcsim.output-arrays.20261102.json"
           ]
         }
       ],
@@ -135464,6 +135478,11 @@
       "sha256": "6e3ec873adb7c4c2595812c2a86fefb6117bea997c4f11d40737d5937897cb59"
     },
     {
+      "path": "evidence/local.plcsim.output-arrays.20261102.json",
+      "state": "observed",
+      "sha256": "a84280e08f684e452719f3c4732dd0d5a89934b17d7f412ea4af987655adde64"
+    },
+    {
       "path": "evidence/local.plcsim_diagnostics.20261028.json",
       "state": "observed",
       "sha256": "fe47f019ee1c5f640b4f36da8b82d14b836ab636950a093dc9881259fa2ef21b"
@@ -136569,6 +136588,10 @@
     {
       "id": "local.plc_object_mutations.rerun.20261028",
       "profileSha256": "605c81f58d53968f9bf8166dcbc6cab24981367c4454265ab638712c1144bab1"
+    },
+    {
+      "id": "local.plcsim.output-arrays.20261102",
+      "profileSha256": "72438e246f7c8692428a42633b818635ddb7e0e99a19241b44d02d48e3194fce"
     },
     {
       "id": "local.plcsim_diagnostics.20261028",

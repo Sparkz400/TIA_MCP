@@ -62,6 +62,7 @@ def candidate_client(host, timeout, arguments):
 # Candidate install cases: manifest overrides and the exact unverified features the preview must name. ladCaller, fbCaller,
 # earlierPlacement and reusedComponent passed natively on 31 October and are verified shapes, so their previews name none.
 CANDIDATES = {
+    "obCaller": ({"callerMode": "existing", "caller": OB_NAME, "callerSource": None, "obCaller": True}, ["obCaller"]),
     "ladStandalone": ({"callerMode": "createStandaloneFc", "language": "LAD"}, []),
     "ladExisting": ({"callerMode": "existing", "language": "LAD", "callerSource": "callers/TiaMcpComponentCaller.lad.s7dcl"}, []),
     "fbCaller": ({"callerMode": "existing", "caller": "TiaMcpComponentHost", "callerSource": "callers/TiaMcpComponentHost.s7dcl"}, []),
@@ -355,6 +356,11 @@ class IntegrateApplyRun(ComponentRun):
         self.use(overrides if overrides is not None else {"callerMode": name})
         out, case = self.output / name, self.case(name, True)
         scratch, opened, plc = self.stage_consumer(archive, released)
+        if self.manifest.get("obCaller"):
+            exports = [artifact_bytes(self.call, self.call("block_read", {"blockPath": plc + "/blocks/" + name})["artifact"]).decode("utf-8-sig")
+                       for name in ("Main", self.manifest["unrelatedCaller"])]
+            first, second = self.manifest["signals"]
+            self.apply("block_import_xml", {"xml": fbd_ob(*exports, first["name"], second["name"]), "expectedBlockNames": [OB_NAME]})
         if self.manifest["caller"] == HOST_FB: self.apply("block_number_set", {"blockName": HOST_FB, "number": HOST_FB_NUMBER})
         if self.manifest.get("twoNetworks"):
             peer = artifact_bytes(self.call, self.call("block_read", {"blockPath": plc + "/blocks/" + self.manifest["unrelatedCaller"]})["artifact"]).decode("utf-8-sig")

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.122",
+  "catalogVersion": "0.4.123",
   "targetTiaVersions": [
     21
   ],
@@ -4650,6 +4650,22 @@
         "Engineering only: no runtime or physical PLC validation.",
         "Exact historical frozen binaries and fixtures only; this does not certify the final integrated release or other CPU, firmware, storage and route combinations."
       ]
+    },
+    {
+      "id": "local.plcsim.output-arrays.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "a70d2754b4facb83208d76438dc2379f2d4332aa",
+        "passedScope": "99/99 native steps on frozen lc1. sim_write and sim_write_signals reject SigOutStruct.Values[0] and Values[1] as output addresses; eight output bytes stay unchanged. Repeats primitive batch signals, I/Q/M area bounds, state/LED observation, foreign ownership and released-instance refusals."
+      },
+      "artifacts": [
+        "evidence/local.plcsim.output-arrays.20261102.json"
+      ],
+      "limitations": [
+        "Configuration-change event delivery and other CPU models are not qualified by this run."
+      ]
     }
   ],
   "features": [
@@ -7144,7 +7160,8 @@
         "status": "implemented",
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): an output tag, quoted and unquoted, refused with nothing written, and a marker, a DB member and an input still written; the member \"SigOutStruct\".A of a PLC tag of a PLC data type at %Q24.0, which PLCSIM lists as a Struct in the area Output with its members, refused the same way (local.sim.output-refusal-2.20261101)."
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): an output tag, quoted and unquoted, refused with nothing written, and a marker, a DB member and an input still written; the member \"SigOutStruct\".A of a PLC tag of a PLC data type at %Q24.0, which PLCSIM lists as a Struct in the area Output with its members, refused the same way (local.sim.output-refusal-2.20261101).",
+          "Output-array members Values[0] and Values[1] of a structured output tag are natively refused by both write routes without changing its eight bytes (local.plcsim.output-arrays.20261102); other array shapes are not qualified."
         ]
       },
       "qualification": {
@@ -7152,7 +7169,8 @@
         "evidenceIds": [
           "local.runtime.frozen.20261024",
           "local.sim.output-refusal.20261101",
-          "local.sim.output-refusal-2.20261101"
+          "local.sim.output-refusal-2.20261101",
+          "local.plcsim.output-arrays.20261102"
         ]
       },
       "availability": {
@@ -27377,7 +27395,8 @@
           "1-64 distinct symbols of the sim_read_signals types; every value is validated before the call. A failed item fails the call with PartialSimulationWrite and each item's result; items not reported failed may have been written.",
           "Assignments, not forces; the program scan may overwrite them.",
           "Natively one call wrote all eleven primitive types (SInt..ULInt at their range limits, Real 1.5, LReal -2.25e300), read back by single sim_read calls. A batch with an unknown symbol threw SignalConfigurationError (PartialSimulationWrite, valid items Unknown) and its valid item was written.",
-          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): a batch of a marker, a DB member and an output tag refused whole, nothing written; so did a batch of a marker and the member \"SigOutStruct\".A of a structured output tag (local.sim.output-refusal-2.20261101)."
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): a batch of a marker, a DB member and an output tag refused whole, nothing written; so did a batch of a marker and the member \"SigOutStruct\".A of a structured output tag (local.sim.output-refusal-2.20261101).",
+          "Output-array members Values[0] and Values[1] of a structured output tag are natively refused by both write routes without changing its eight bytes (local.plcsim.output-arrays.20261102); other array shapes are not qualified."
         ]
       },
       "qualification": {
@@ -27385,7 +27404,8 @@
         "evidenceIds": [
           "local.plcsim_signals.20261030",
           "local.sim.output-refusal.20261101",
-          "local.sim.output-refusal-2.20261101"
+          "local.sim.output-refusal-2.20261101",
+          "local.plcsim.output-arrays.20261102"
         ]
       },
       "availability": {
