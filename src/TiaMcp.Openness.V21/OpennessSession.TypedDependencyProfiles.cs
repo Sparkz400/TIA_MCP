@@ -57,6 +57,17 @@ namespace TiaMcp.Openness.V21
             return profile;
         }
 
+        // The direct instance-DB effect of a caller FB gaining a multi-instance of the PLC component FB (captured on the standard
+        // route, local.typed.component-effect-capture.20261102). A qualificationOnly pair serves only a --component-qualification
+        // worker's own component scratch until a combined apply verifies it.
+        internal const string ComponentEffectManifest = "instance-effects-component.v1.json";
+        private JObject TypedComponentEffect(TypedResolutionCapture capture, string catalogPath, string route)
+        {
+            if (route != "standard" || !File.Exists(Path.Combine(Path.GetDirectoryName(catalogPath), ComponentEffectManifest))) return null;
+            var profile = ReadTypedEffectManifest(capture, catalogPath, route, ComponentEffectManifest);
+            return profile.Value<bool?>("qualificationOnly") == true && !TypedQualificationScratch(capture.Plc.Project) ? null : profile;
+        }
+
         // transitive: the dependent is a parent FB or its InstanceDB that embeds the changed FB as a nested multi-instance.
         private void PrepareTypedDependentInstance(TypedResolutionCapture capture, JObject dependency, string callerName, XElement declaration, bool transitive = false)
         {
@@ -81,8 +92,20 @@ namespace TiaMcp.Openness.V21
                 member = TypedGraphicalMultiInstanceTemplate.SystemDependentMember(declaration, TypedTopStaticMember(caller, captured), TypedTopStaticMember(instance, captured));
             }
             else
-                member = TypedGraphicalMultiInstanceTemplate.DependentMember(declaration,
-                    TypedTopStaticMember(caller, profile.Value<string>("memberName")), TypedTopStaticMember(instance, profile.Value<string>("memberName")));
+            {
+                string memberName = profile.Value<string>("memberName");
+                try { member = TypedGraphicalMultiInstanceTemplate.DependentMember(declaration, TypedTopStaticMember(caller, memberName), TypedTopStaticMember(instance, memberName)); }
+                catch (BridgeException) when (!transitive)
+                {
+                    // The generic pair is scalar; the component FB's structured (UDT) member maps only onto its own captured pair.
+                    var component = TypedComponentEffect(capture, catalogPath, route);
+                    if (component == null) throw;
+                    var parts = (JObject)component["artifacts"]; memberName = component.Value<string>("memberName");
+                    member = TypedGraphicalMultiInstanceTemplate.DependentMember(declaration,
+                        TypedTopStaticMember(ReadTypedProfileResource(capture, catalogPath, parts["afterCaller"].Value<string>("path"), parts["afterCaller"].Value<string>("sha256")), memberName),
+                        TypedTopStaticMember(ReadTypedProfileResource(capture, catalogPath, parts["afterInstance"].Value<string>("path"), parts["afterInstance"].Value<string>("sha256")), memberName));
+                }
+            }
             var expected = transitive ? TypedGraphicalMultiInstanceTemplate.AppendNested(current, callerName, member)
                 : TypedGraphicalMultiInstanceTemplate.AppendDirect(current, callerName, member);
             string output = Path.Combine(capture.Change.Directory, "dependent-effect-" + Guid.NewGuid().ToString("N") + ".xml");

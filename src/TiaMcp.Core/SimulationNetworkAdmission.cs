@@ -22,6 +22,11 @@ namespace TiaMcp.Simulation
         public static string RouteRefusal(string routeAdapter) =>
             routeAdapter == null ? "RuntimeTargetRouteUnverified" : PlcsimAdapter(routeAdapter) ? null : "RuntimeTargetNotOwnedPlcsim";
 
+        // A Test Suite system test reaches its instance over OPC UA, so the route is not enough: a Softbus instance keeps its
+        // configured ControllerIP and the PLCSIM adapter can still hold that subnet with nothing listening (observed 1 November 2026).
+        public static string EndpointRefusal(string routeAdapter, string ticketInterface) =>
+            RouteRefusal(routeAdapter) ?? (ticketInterface == "TCPIP" ? null : "PlcsimEndpointUnreachable");
+
         // The one new device an owned empty startup produced qualifies for the documented bootstrap address. Softbus: only at
         // that address. TCP/IP: also without an IP, which TIA shows as no address, 0.0.0.0 or the device's MAC
         // (observed 29 October 2026: address = MAC 02-C0-A8-00-0A-00, series "S7-1500 (PLCSIM)").

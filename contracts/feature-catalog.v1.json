@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.107",
+  "catalogVersion": "0.4.113",
   "targetTiaVersions": [
     21
   ],
@@ -790,6 +790,24 @@
       ],
       "limitations": [
         "A root PLC tag on one HMI only; two profiles."
+      ]
+    },
+    {
+      "id": "local.hmi.lifecycle.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "TP700 Comfort (desk-configured pair), MTP700 Unified Comfort (desk-configured pair) and WinCC Unified PC RT 21.0.1.0 (seeded baseline)",
+        "sourceCommit": "2431ccf9b07986242b38a1e53e84e2cba78f9b89",
+        "passedScope": "Build hbf1 = 2431ccf9. scripts/qualify_hmi_gate_route.py with its compiler-scope, normal-lifecycle and lock-release gates on classic-comfort (hmi_classic_import, 72/72), unified-comfort and unified-pc (hmi_external_tag_create, 49/49 each): every apply's baseline and after compile name exactly the target HMI's scope (Classic HmiTarget, Unified owning device); each Host lifetime closes by EOF with Host exit 0, a verified worker exit 0 and the owned TIA process exited; after that exit a new TIA process opened the saved original read-write at the first attempt."
+      },
+      "artifacts": [
+        "evidence/local.hmi.lifecycle.20261101.json"
+      ],
+      "limitations": [
+        "Three profiles and their fixtures only; WinCC RT Advanced and KTP700 Basic PN are not covered.",
+        "Lock release is an immediate read-write reopen by another TIA process, not an inspection of TIA's lock files; complete content preservation stays a V21 boundary (no Classic alarm composition, no Unified Screen.Export)."
       ]
     },
     {
@@ -3569,6 +3587,26 @@
       ]
     },
     {
+      "id": "local.testsuite.job-prepare.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "4ced3b90aaacd3986efcebc333223d90cb2f4830",
+        "passedScope": "scripts/qualify_testsuite_application.py cases jobPass and jobFail on a frozen Debug build of 4ced3b90 (artifacts/tj1, git archive, TestSuiteQualification=true, Host --testsuite-qualification; reports artifacts/q/tj/tq_68318815 and tq_56f8e66f, 42 steps), each with one owned Portal, owned scratch CPU 1511-1 PN V4.1 and one owned PLCSIM Advanced V8 CPU 1511 instance on Softbus (download, generated-state save, credential provisioning, power on, RUN). After qualification_testsuite_prepare imported and scoped the TS-Q02 fixture, testsuite_application_plan_prepare reviewed the case again (externally managed, profile v21.owned-plcsim.application.qualification-v1) and retained a review byte-identical to the qualification review; testsuite_style_job_prepare queued it as a separate job (a wrong reviewed hash refused with ReviewMismatch, the repeated key returned the same job and operation, the key with a two-run review refused with IdempotencyConflict, status prepared at revision 0). qualification_testsuite_execute dispatched that job: one TestCaseExecutor.Run(TestCase) with observation, checkpoint archive, compile, preservation, fresh reopen and cleanup. jobPass: succeeded, classification passed. jobFail: assertionFailure, recoveryRequired, qualification_testsuite_recover into a new folder and qualification_testsuite_reconcile verifiedRestored. The qualification job prepared alongside stayed prepared and was never dispatched."
+      },
+      "artifacts": [
+        "evidence/local.testsuite.job-prepare.20261101.json",
+        "docs/verification/testsuite-job-prepare-20261101.md"
+      ],
+      "limitations": [
+        "One single-step application test case per Run, externally managed, on one owned PLCSIM Advanced V8 instance on Softbus, in the TS-Q02 qualification mode. Style reviews queued by testsuite_style_job_prepare have no production consumer (V21 boundary), system reviews have no qualification mode, and production admission stays closed.",
+        "The result profile matches the exact TS-Q02 fixture tree TIA V21 Update 3 wrote under its English UI; other trees fail closed. The simulator ticket expires 15 minutes after sim_create."
+      ]
+    },
+    {
       "id": "local.online.upload.tls-hardening.20261030",
       "status": "passed",
       "profile": {
@@ -4098,6 +4136,130 @@
         "One component window in owned scratch projects; the worker ignores the probe fields beyond hashing them, so the run shows Host/worker hash agreement, not the use of such values by a step.",
         "Numbers and text only in the advance requests; manifests and other worker-hashed values carried ASCII paths, and the earlier-form acceptance of PR 186 (records written before RFC 8785) is not exercised by this fresh store.",
         "Qualification-only route (--component-qualification); production combined library_integrate apply stays disabled."
+      ]
+    },
+    {
+      "id": "local.sim.reconcile.release.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b3787562c6ef834a7237daa7f2e9a460be45d6be",
+        "passedScope": "scripts/reconcile_provision.py at b3787562 (frozen artifacts/pc1) on all five unresolved provisioning admissions on this PC (two Softbus, three TCP/IP, among them f52861ec, kept since 24 October): each fresh owned TIA V21 session matched the archive hash, the archive fingerprint with the project library to the current project, the project's save time before the archive, all 86 card files, the storage outside the card by metadata and a never-armed credential stream; all five released with per-resource evidence, every Host, worker and Portal exited with code 0 under exact handle tracking, and a second fresh Portal opened each original project."
+      },
+      "artifacts": [
+        "evidence/local.sim.reconcile.release.20261102.json"
+      ],
+      "limitations": [
+        "Only the release path ran natively; the refusal paths are managed and pure-rule tests.",
+        "Opaque runtime files PLCSIM creates at power-on are bounded by metadata and the write-ahead stream, never read."
+      ]
+    },
+    {
+      "id": "local.typed.component-effect-capture.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b3787562c6ef834a7237daa7f2e9a460be45d6be",
+        "passedScope": "scripts/capture_typed_routes_owned.py at b3787562 (frozen artifacts/pc1, artifacts/cde) in one owned TIA V21 project retrieved from the SHA-bound reference archive, standard route: the component UDT TiaMcpComponentState and FB TiaMcpComponentGate, then Tgp_ComponentEffect with its instance DB (RetainedMarker start value 42), then Tgp_ComponentEffect redeclared with the multi-instance Gate : \"TiaMcpComponentGate\" and its DB observed as a native dependent. Every source compiled clean and saved, only the declared objects changed, and a fresh-process reopen equalled the saved state. The DB gained exactly Gate, nesting the UDT static State with Active; everything else, the 42 start value included, stayed equal (extract_typed_instance_effects.py --component, instance-effects-component.v1.json)."
+      },
+      "artifacts": [
+        "evidence/local.typed.component-effect-capture.20261102.json"
+      ],
+      "limitations": [
+        "Native capture of TIA's own effect, no builder. Used by the typed route only for a caller FB's direct instance DB on the standard route, CPU 1511-1 PN V4.1, de-DE.",
+        "No transitive effect of a structured member (embedding parents) was captured."
+      ]
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.combinations.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b3787562c6ef834a7237daa7f2e9a460be45d6be",
+        "passedScope": "Combined-apply combination cases (scripts/qualify_library_integrate_apply.py --candidates at b3787562, frozen artifacts/pc1, artifacts/q1) on a --component-qualification Host, each in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: LAD FC and FBD/LAD FB callers with an earlier placement and fresh import (ladEarlier, fbEarlier, ladFb, ladFbEarlier), reuse of the installed FB with a new global DB in new or existing FC and existing FB callers, after or before their last network (reuseExisting, reuseLad, reuseLadExisting, reuseEarlier, reuseLadEarlier, reuseFb, reuseFbEarlier, reuseLadFb, reuseLadFbEarlier), and the reused-FB multi-instance in an FBD FB with two networks and in a LAD FB with one or two (multiEarlier, multiLad, multiLadEarlier). All 16 installed with candidateFeatures exactly their combination, one change_apply, the exact installed-object diff, the native caller insertion proof after the selected network, the call oracle, the instance DB number, exact library versions, a fresh reopen, a 0-error compile and change_restore of the initial checkpoint into a new location."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.combinations.20261102.json"
+      ],
+      "limitations": [
+        "Engineering only (runtimeVerified false); owned de-DE-only scratch projects, the captured component FB/UDT, standard PLC scope.",
+        "Two-network callers are their fixture's one network re-imported twice from the block's own native export."
+      ]
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.dependent_db.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1f539563593cd202e221f68bc145f0a4d6353afd",
+        "passedScope": "Combined-apply dependent instance-DB cases (scripts/qualify_library_integrate_apply.py --candidates at 1f539563, frozen artifacts/pc2, artifacts/q2) on a --component-qualification Host after a verified standalone install: the reused-FB multi-instance Gate in TiaMcpComponentHost with its own instance DB TiaMcpComponentHost_DB, as FBD FB with one or two networks and as LAD FB with one or two (multiInstanceDependents, multiDependentsEarlier, multiDependentsLad, multiDependentsLadEarlier), installed with candidateFeatures exactly dependentInstanceDb plus the combination; the DB gained exactly the Gate member equal to the captured component effect's DB member and was otherwise equal to its baseline, with every check of the other candidate cases. multiInstanceParent (a parent FB embedding TiaMcpComponentHost) was refused before admission with DependencyProfileUnavailable naming the parent, no admission record, the plan prepared and the scratch unchanged."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.dependent_db.20261102.json"
+      ],
+      "limitations": [
+        "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1, standard PLC scope.",
+        "The captured effect was qualificationOnly in this build; the verifying change deployed it."
+      ]
+    },
+    {
+      "id": "local.hardware_changes.refusals.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0; ET 200SP IM 155-6 PN ST 6ES7 155-6AU02-0BN0; I-device GSD TiaMcpIDevice (GSDML V2.45)",
+        "firmware": "V4.1; V6.4; V4.1",
+        "sourceCommit": "45f7155d140929bc75bbb2a10d8d1ca8654b64a1",
+        "passedScope": "scripts/qualify_hardware_changes.py --slice refusals on a frozen Debug build of 45f7155d (artifacts/rf3, git archive), 199/199 steps, in two owned scratch projects created through the MCP Host, one owned TIA Portal V21 each. First: an owned scratch CPU 1511-1 PN V4.1 and an added CPU 1511-1 PN V4.1 on one subnet, two DI 16x24VDC HF in the scratch rack, an ET 200SP IM 155-6 PN ST V6.4 station assigned to the added CPU (creating HwPeerIo) with three DI 8x24VDC ST (6ES7 131-6BF00-0BA0 V1.1), and the operator-installed I-device GSD device on HwPeerIo. Applied with asserted preview, checkpoint, device compile, save and exact state deltas: a DI 16x24VDC HF replaced by a DI 32x24VDC HF V2.2 with acceptAddressChange and one acknowledged tag, the tagged range's start moving from byte 0 to 4 past the next module (refused as AddressReferenced first, restored after); the sharedDevice disconnect of the scratch CPU's connector with its one assigned DI module given back to the added CPU in the same change (restored after); OutsideOfProject with one external IO controller. Typed refusals, each by its exact code and rule message with the complete state unchanged: network_mrp_set Manager while the CPUs' Port_2 link joins non-ring ports and NotInRing while it joins two ring ports (NetworkPrerequisite), a direct PLC-to-PLC hardware_shared_device_access (UnsupportedCapability), a channel InputDelay write the DI 8x24VDC ST capability profile declares read-only and an InformationText write the GSD head's bundled versionless profile (keyed by FirmwareVersion V4.1) does not declare (AttributeNotWritable); hardware_catalog_search named that GSD profile. Second: a new owned scratch whose own CPU 1511-1 PN V4.1 assigns the same ET 200SP station (same device name and address) with the same modules, two of them OutsideOfProject with two external IO controllers; the runner compared both stations: each module has the same type and slot and is PLC-owned in exactly one project."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.refusals.20261102.json"
+      ],
+      "limitations": [
+        "Engineering only, offline: nothing is downloaded, no PLCSIM, no physical topology or MRP telegram is observed.",
+        "A versionless firmware matching no profile (fail closed) is not exercised natively: the installed GSD has one DAP with one firmware (offline tests cover it).",
+        "The sharedDevice disconnect with one remaining PLC and one assigned module; more remaining PLCs are refused and not exercised. The disconnect, the address change and the shared device are restored, not persisted across a reopen (the slice has no reopen).",
+        "Second project: V21 checks nothing across projects; the runner compares the two stations. Head, interface, ports and server module stay assigned in both projects, which a downloaded configuration would have to resolve; SharedDeviceCopyOfModule is not configured.",
+        "The address change rewrites no tag address and does not search absolute %I/%Q accesses in program code.",
+        "Earlier passes, not evidence: discovery rd1 (artifacts/rf1, ae11ebcb; it found the disconnect compile failure fixed in c0d006b6, and a stray second discovery pass of the same build ran from a stopped lock waiter), and rq1 (artifacts/rf2, c0d006b6; stopped on an unlisted change of the leaving CPU's interface row, fixed in the runner in 45f7155d)."
+      ]
+    },
+    {
+      "id": "local.library_integrate.combined_apply.regression.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "d1037e6ba4d8dc377d2887f765b3aab79661f8c6",
+        "passedScope": "scripts/qualify_library_integrate_apply.py without --candidates at d1037e6b (frozen artifacts/pc3, artifacts/q3r), the build listing 23 verified shapes: the standalone and existing FBD FC installs passed every gate; the FBD OB caller and the FBD FB caller with a multi-instance of a freshly imported FB were refused with PlcIntegrationNotQualified before admission, no admission record, the plan prepared; a Host without the former flag previewed the standalone plan eligible and refused the fresh-import multi-instance plan."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.combined_apply.regression.20261102.json"
+      ],
+      "limitations": [
+        "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1."
+      ]
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.verified.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "d1037e6ba4d8dc377d2887f765b3aab79661f8c6",
+        "passedScope": "scripts/qualify_library_integrate_apply.py --candidates at d1037e6b (frozen artifacts/pc3, artifacts/q3c), the build that lists 23 shapes and deploys instance-effects-component.v1.json without qualificationOnly: all 27 cases in their own owned de-DE-only CPU 1511-1 PN V4.1 scratch. The 26 install cases (the seven earlier candidate cases and the 19 combination and dependent-DB cases) installed with every gate and previewed no candidate feature; the dependent-DB cases matched the captured DB member; multiInstanceParent was refused before admission with DependencyProfileUnavailable naming the parent FB."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.verified.20261102.json"
+      ],
+      "limitations": [
+        "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1, standard PLC scope.",
+        "A --component-qualification Host; production admission follows from the empty candidateFeatures, which the production gate computes the same way."
       ]
     }
   ],
@@ -6189,14 +6351,15 @@
         "status": "implemented",
         "limitations": [
           "Only outcomeUnknown simulation_provision_scratch_credential admissions with the storage, scratch project and optional discovery observer scope.",
-          "Releases only if the current project's location-independent fingerprint equals its retrieved pre-provision archive, the card manifest equals the original and the observer project is empty; otherwise the reservation stays held.",
-          "Does not verify runtime credential state inside the simulator storage, and never powers, connects, provisions, saves or replays."
+          "Releases only if the current project's location-independent fingerprint plus project library revision equals its retrieved pre-provision archive and the project was last saved before that archive was written, the card manifest equals the original, the storage outside the card equals its pre-attempt inventory by metadata (only the attempt's own files and PLCSIM's runtime files retain.pms and sim_hwdb.ini are new), the write-ahead checkpoint stream never opened or armed the credential, and the observer project is absent or empty; otherwise the reservation stays held.",
+          "Opaque runtime files are bounded by metadata and the stream, never read or byte-compared; an attempt that may have submitted the credential stays held. Never powers, connects, provisions, saves or replays."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.sim.reconcile.20261024"
+          "local.sim.reconcile.20261024",
+          "local.sim.reconcile.release.20261102"
         ]
       },
       "availability": {
@@ -9144,18 +9307,19 @@
         "status": "partial",
         "limitations": [
           "contracts/hardware-catalog-profiles.v1.json (schema hardware-catalog-profiles.v1.schema.json) holds one profile per exact typeIdentifier (a versionless System: or GSD: identifier per typeIdentifier and firmwareVersion, recorded from the item's own FirmwareVersion attribute and applied only when it is equal; a write to such a type whose firmware matches none of its profiles or cannot be read is refused): catalog article, firmware, type name and path, module kind, every item of its subtree (row paths name the module's own segment {module}, so a profile serves every instance name) with each attribute's access mode and probed value type, address lengths, channels with their attributes, interface nodes and ports, and the CanPlugNew outcome at slots 1-4 of each probed rack type. Values are never recorded.",
-          "scripts/qualify_hardware_changes.py captures the profiles of every type its native run creates, merging every snapshot that shows a type. The contract holds the 13 profiles of local.hardware_changes.topology.20261101: CPU 1511-1 PN V4.1, CPU 1214C DC/DC/DC V4.7, IM 155-5 PN ST V4.1, IM 155-6 PN ST V6.4, BA 2xRJ45, server module V1.2, DI 16x24VDC HF V1.0 and V2.0, DI 32x24VDC HF V2.2, SM 1221 DI16 V1.0 and V2.0, DI 8x24VDC ST (6ES7 131-6BF00 V1.1, -6BF01 V0.0). Other types and HSP modules not installed on the qualification PC have no profile.",
-          "hardware_catalog_search names an entry's profile (contracts/hardware-catalog-profiles.v1.json#typeIdentifier) when one exists. change.hardware_attributes, change.hardware_channel_attributes and change.hardware_shared_device_access refuse an attribute that the profile of the nearest profiled item at or above the written one does not declare writable on that item's row (AttributeNotWritable; a channel's hardware interrupt OB link, declared only while its flag is on, keeps its native check); without a profile only native access and the bridge allowlists apply.",
+          "scripts/qualify_hardware_changes.py captures the profiles of every type its native run creates, merging every snapshot that shows a type. The contract holds the 13 profiles of local.hardware_changes.topology.20261101 and the operator-installed I-device GSD head (GSD: identifier, firmwareVersion V4.1, captured in the refusal slice's discovery pass): CPU 1511-1 PN V4.1, CPU 1214C DC/DC/DC V4.7, IM 155-5 PN ST V4.1, IM 155-6 PN ST V6.4, BA 2xRJ45, server module V1.2, DI 16x24VDC HF V1.0 and V2.0, DI 32x24VDC HF V2.2, SM 1221 DI16 V1.0 and V2.0, DI 8x24VDC ST (6ES7 131-6BF00 V1.1, -6BF01 V0.0). Other types and HSP modules not installed on the qualification PC have no profile.",
+          "hardware_catalog_search names an entry's profile (contracts/hardware-catalog-profiles.v1.json#typeIdentifier) when its type has one; a versionless entry is matched by type alone, since its catalog Version is no firmware (a GSD entry shows its file name). change.hardware_attributes, change.hardware_channel_attributes and change.hardware_shared_device_access refuse an attribute that the profile of the nearest profiled item at or above the written one does not declare writable on that item's row (AttributeNotWritable; a channel's hardware interrupt OB link, declared only while its flag is on, keeps its native check); without a profile only native access and the bridge allowlists apply.",
           "Plug rules are observations in the run's final configuration (an occupied slot names its module), not a complete placement rule set.",
           "An offline guard keeps every attribute write of the verified hardware evidence admitted by the bundled profiles.",
-          "local.hardware_changes.topology.20261101 captured the 13 profiles (its worker still bundled an empty contract); local.hardware_changes.topology_restores.20261101, on a worker bundling them, showed hardware_catalog_search naming the DI 8x24VDC ST V1.1 profile and refusing, by that profile, an InformationText write it does not declare. Channel-attribute and versionless-profile refusals are tested offline only."
+          "local.hardware_changes.topology.20261101 captured the 13 profiles (its worker still bundled an empty contract); local.hardware_changes.topology_restores.20261101, on a worker bundling them, showed hardware_catalog_search naming the DI 8x24VDC ST V1.1 profile and refusing, by that profile, an InformationText write it does not declare. local.hardware_changes.refusals.20261102 ran the channel and versionless refusals natively: InputDelay on a DI 8x24VDC ST channel, read-only in its profile, and InformationText on the GSD head, which its versionless profile (selected by the head's FirmwareVersion) does not declare, both AttributeNotWritable by the profile; the search named the GSD profile. A firmware matching no versionless profile is tested offline only (the installed GSD has one firmware)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.hardware_changes.topology.20261101",
-          "local.hardware_changes.topology_restores.20261101"
+          "local.hardware_changes.topology_restores.20261101",
+          "local.hardware_changes.refusals.20261102"
         ]
       },
       "availability": {
@@ -9198,7 +9362,8 @@
           "The aggregate distributed-I/O workflow is a sequence of reviewed changes, each with its own preview, checkpoint, device compile and preservation: add IO devices (hardware_add), connect nodes (network_configure), assign controllers (network_io_assign, with the explicit generated ET 200SP server contract), plug and move modules, share an IO device between PLCs of one project (network_io_assign sharedDevice) or hand modules to a controller outside the project (hardware_shared_device_access), link ports and configure media redundancy (network_mrp_set). There is no single-call topology import.",
           "The single-controller ET 200SP route (local.remote-io.full-route.rerun.20261028) and two controllers with S7-1200 and ET 200MP families (local.hardware_changes.families.20261029) are qualified; local.hardware_changes.topology.20261101 adds ET 200SP on the second CPU, a shared device in one project, a module outside the project and an MRP ring, in one project with four devices on one subnet.",
           "I-devices under a higher-level controller, drive devices, arbitrary module families and runtime behaviour are not covered. GSD devices: V21 Openness has no GSD installation API, so an operator installed the project's own exported I-device GSD in TIA; adding it, putting it on the subnet and assigning it to the second CPU's IO system with compile passed, with checkpoint restore (local.hardware_changes.gsd.20261101). Other GSD devices are not exercised.",
-          "The topology run applied and persisted the shared device, the module outside the project and the MRP domain; local.hardware_changes.topology_restores.20261101 restored the shared-device assignment, OutsideOfProject, the createDomain manager and the IM 155-5 PN ST client."
+          "The topology run applied and persisted the shared device, the module outside the project and the MRP domain; local.hardware_changes.topology_restores.20261101 restored the shared-device assignment, OutsideOfProject, the createDomain manager and the IM 155-5 PN ST client.",
+          "local.hardware_changes.refusals.20261102 adds the sharedDevice disconnect (its module given back to the remaining PLC), a second project whose own CPU takes the module the first set OutsideOfProject, and the MRP port-link and PLC-to-PLC refusals natively."
         ]
       },
       "qualification": {
@@ -9206,7 +9371,8 @@
         "evidenceIds": [
           "local.hardware_changes.topology.20261101",
           "local.hardware_changes.topology_restores.20261101",
-          "local.hardware_changes.gsd.20261101"
+          "local.hardware_changes.gsd.20261101",
+          "local.hardware_changes.refusals.20261102"
         ]
       },
       "availability": {
@@ -11895,7 +12061,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified only for the PLC plc_component_plan route in the verified shapes of library.integrate_combined_apply (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.candidate_shapes.rerun.20261031, local.library_integrate.combined_apply.regression.20261031, local.library_integrate.candidate_shapes.multi.20261101, local.library_integrate.combined_apply.regression.20261101), which every Host applies since the maintainer decision of 29 October 2026; other shapes refuse with PlcIntegrationNotQualified. HMI faceplate_bind and PLC/HMI recipes are not qualified by it.",
+          "Natively qualified only for the PLC plc_component_plan route in the verified shapes of library.integrate_combined_apply (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.candidate_shapes.rerun.20261031, local.library_integrate.combined_apply.regression.20261031, local.library_integrate.candidate_shapes.multi.20261101, local.library_integrate.combined_apply.regression.20261101, local.library_integrate.candidate_shapes.combinations.20261102, local.library_integrate.candidate_shapes.dependent_db.20261102, local.library_integrate.combined_apply.regression.20261102, local.library_integrate.candidate_shapes.verified.20261102), which every Host applies since the maintainer decision of 29 October 2026; other shapes refuse with PlcIntegrationNotQualified. HMI faceplate_bind and PLC/HMI recipes are not qualified by it.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
@@ -11915,7 +12081,11 @@
           "local.library_integrate.candidate_shapes.rerun.20261031",
           "local.library_integrate.combined_apply.regression.20261031",
           "local.library_integrate.combined_apply.regression.20261101",
-          "local.library_integrate.candidate_shapes.multi.20261101"
+          "local.library_integrate.candidate_shapes.multi.20261101",
+          "local.library_integrate.candidate_shapes.combinations.20261102",
+          "local.library_integrate.candidate_shapes.dependent_db.20261102",
+          "local.library_integrate.combined_apply.regression.20261102",
+          "local.library_integrate.candidate_shapes.verified.20261102"
         ]
       },
       "availability": {
@@ -11957,10 +12127,10 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified as a production route on owned de-DE-only scratch projects with CPU 1511-1 PN (V21) for the captured FB/UDT component, a new or existing FBD FC caller and a new global instance DB (local.library_integrate.combined_apply.rerun.20261028, regression local.library_integrate.combined_apply.regression.20261031 after the short step workspace and the pre-claim refusals, and local.library_integrate.combined_apply.regression.20261101 after the pre-admission refusal). Since 31 October also, each as its own exact shape, a new or existing LAD FC caller, an existing FBD FB caller with a new global instance DB, an existing FBD FC after an earlier network, and reuse of the installed FB and UDT with a new FBD FC caller (local.library_integrate.candidate_shapes.rerun.20261031). Since 1 November also a multi-instance of the reused installed FB and UDT in an existing FBD FB caller without an instance DB, through the captured multi-instance template v21.fw41.component-gate.multi-instance.v1 (local.library_integrate.candidate_shapes.multi.20261101; capture local.typed.component-storage-capture.20261101).",
+          "Natively qualified as a production route on owned de-DE-only scratch projects with CPU 1511-1 PN (V21) for the captured FB/UDT component, a new or existing FBD FC caller and a new global instance DB (local.library_integrate.combined_apply.rerun.20261028, regression local.library_integrate.combined_apply.regression.20261031 after the short step workspace and the pre-claim refusals, and local.library_integrate.combined_apply.regression.20261101 after the pre-admission refusal). Since 31 October also, each as its own exact shape, a new or existing LAD FC caller, an existing FBD FB caller with a new global instance DB, an existing FBD FC after an earlier network, and reuse of the installed FB and UDT with a new FBD FC caller (local.library_integrate.candidate_shapes.rerun.20261031). Since 1 November also a multi-instance of the reused installed FB and UDT in an existing FBD FB caller without an instance DB, through the captured multi-instance template v21.fw41.component-gate.multi-instance.v1 (local.library_integrate.candidate_shapes.multi.20261101; capture local.typed.component-storage-capture.20261101). Since 2 November also every combination of these features a plan can have: LAD and FBD FC and FB callers, earlier placement, reuse with a new global DB and the reused-FB multi-instance in an existing LAD or FBD FB caller (local.library_integrate.candidate_shapes.combinations.20261102), and each multi-instance combination whose caller FB has its own instance DB, which gains the member through the captured component effect instance-effects-component.v1.json (local.library_integrate.candidate_shapes.dependent_db.20261102; capture local.typed.component-effect-capture.20261102) A rerun at the build that lists the 23 shapes passed every case with no candidate feature (local.library_integrate.candidate_shapes.verified.20261102) and the verified-flow regression (local.library_integrate.combined_apply.regression.20261102).",
           "On by default (maintainer decision of 29 October 2026): every Host executes an eligible prepared PLC library_integrate plan in change_apply, and the preview states eligibility in combinedApply. --enable-library-integrate-apply is still accepted and changes nothing.",
-          "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. The single-feature shapes ladCaller, fbCaller, earlierPlacement and reusedComponent and the combination fbCaller+multiInstance+reusedComponent are verified (PlcComponentQualificationGate.VerifiedShapes). OB insertion is refused; combinations of these features (for example a LAD FB caller or a LAD FC with an earlier placement), other multi-instances (after a fresh import), partial dependency reuse, reused instance DBs, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified, naming the first unverified feature or the unverified combination. Other combinations have builders without native evidence; only a --component-qualification Host runs them, in its owned scratch, and a shape opens in production only as its exact feature combination. Typed templates map a structured (UDT) member only onto a captured reference member with the identical nested declaration.",
-          "Before any claim it also refuses with its own code: DependencyProfileUnavailable (naming the dependents) when a multi-instance's caller FB has dependents (its instance DBs, embedding parents and their users, the typed route's dependent closure), because no captured dependent-DB effect covers the component's structured member; capturing that effect is not done (local.library_integrate.candidate_shapes.dependents.rerun.20261101). ComponentPathTooLong (with the computed length) when a step checkpoint archive path would exceed TIA's 143 characters; the steps live in a short workspace <Host artifact root>/changes/c/<8 hex>, so roots of up to 73 characters fit. ComponentBlockNumberOccupied (naming the conflicting block) when a block number the import would take is already used in the PLC, because the import would renumber the block; CapturedStorageProfileUnavailable when the captured instance profile binds the FB to another number.",
+          "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. The single features ladCaller, fbCaller, earlierPlacement and reusedComponent, every combination of them with multiInstance a plan can have, and each multi-instance combination with dependentInstanceDb are verified (23 shapes, PlcComponentQualificationGate.VerifiedShapes). OB insertion is refused; other multi-instances (after a fresh import), partial dependency reuse, reused instance DBs, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified, naming the first unverified feature or the unverified combination. Other combinations have builders without native evidence; only a --component-qualification Host runs them, in its owned scratch, and a shape opens in production only as its exact feature combination. Typed templates map a structured (UDT) member only onto a captured reference member with the identical nested declaration.",
+          "Before any claim it also refuses with its own code: DependencyProfileUnavailable (naming the dependents) when a multi-instance's caller FB has dependents other than its own instance DBs (embedding parents and their users, from the typed route's dependent closure), because no captured transitive effect covers the component's structured member (local.library_integrate.candidate_shapes.dependents.rerun.20261101, and an embedding parent in local.library_integrate.candidate_shapes.dependent_db.20261102). The caller's own instance DBs follow the captured component effect. ComponentPathTooLong (with the computed length) when a step checkpoint archive path would exceed TIA's 143 characters; the steps live in a short workspace <Host artifact root>/changes/c/<8 hex>, so roots of up to 73 characters fit. ComponentBlockNumberOccupied (naming the conflicting block) when a block number the import would take is already used in the PLC, because the import would renumber the block; CapturedStorageProfileUnavailable when the captured instance profile binds the FB to another number.",
           "Every combined-apply refusal is decided while the worker resolves the shared-mutation scope at mutation_begin, after the scope's own offline, PreviewStale and source checks (which keep their codes), so the Host writes no admission record and nothing becomes recovery_required (local.library_integrate.combined_apply.regression.20261101). The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
           "The import step's complete-project archive (for a reused FB, the typed step's own archive), taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
           "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable.",
@@ -11976,7 +12146,12 @@
           "local.library_integrate.combined_apply.regression.20261101",
           "local.typed.component-storage-capture.20261101",
           "local.library_integrate.candidate_shapes.multi.20261101",
-          "local.library_integrate.candidate_shapes.dependents.rerun.20261101"
+          "local.library_integrate.candidate_shapes.dependents.rerun.20261101",
+          "local.library_integrate.candidate_shapes.combinations.20261102",
+          "local.library_integrate.candidate_shapes.dependent_db.20261102",
+          "local.typed.component-effect-capture.20261102",
+          "local.library_integrate.combined_apply.regression.20261102",
+          "local.library_integrate.candidate_shapes.verified.20261102"
         ]
       },
       "availability": {
@@ -14145,7 +14320,7 @@
           "One pluggable module in an existing rack; built-in and software-bearing items are refused. typeIdentifier must be an exact installed catalog identifier different from the current one.",
           "SM 1221 DI16x24VDC 6ES7 221-1BH30-0XB0 V1.0 replaced by its successor article 6ES7 221-1BH32-0XB0 V2.0 and back in a CPU 1214C rack, and DI 16x24VDC HF firmware V1.0/V2.0 in an ET 200MP rack (local.hardware_changes.families.20261029).",
           "V21 exposes no compatibility pre-check (no CanChangeType). The preview records the subtree's addresses and child items; after the write an address must keep its ioType, start, owners and at least its length, and every child path must remain. Otherwise MutationVerificationFailed requires checkpoint restore unless the payload sets acceptLoss: true.",
-          "acceptAddressChange: true (natively qualified in local.hardware_changes.topology.20261101: DI 16x24VDC HF to DI 32x24VDC HF 6ES7 521-1BL00-0AB0 V2.2, its input range growing with the start kept; refused as AddressReferenced until the tag on it was acknowledged; restored; a moved start is not exercised) admits a replacement whose addresses move or resize: each address must keep its item, I/O type and owners (an address map pairs old and new ranges per item and I/O type). Preparation lists the tags of every software scope (PLC root, software units, safety units) of the owning PLCs whose absolute address overlaps the module's ranges (preview addressImpact) and refuses with AddressReferenced unless acknowledgedTags names exactly those tag paths; the readback records the address map and the referenced tags whose range changed. Tag addresses are not rewritten, and absolute %I/%Q accesses in program code are neither searched nor flagged by the device compile.",
+          "acceptAddressChange: true (natively qualified in local.hardware_changes.topology.20261101: DI 16x24VDC HF to DI 32x24VDC HF 6ES7 521-1BL00-0AB0 V2.2, its input range growing with the start kept; refused as AddressReferenced until the tag on it was acknowledged; restored; local.hardware_changes.refusals.20261102 moved the start: with the next module holding the bytes after it, the tagged range moved from byte 0 to 4, applied and restored) admits a replacement whose addresses move or resize: each address must keep its item, I/O type and owners (an address map pairs old and new ranges per item and I/O type). Preparation lists the tags of every software scope (PLC root, software units, safety units) of the owning PLCs whose absolute address overlaps the module's ranges (preview addressImpact) and refuses with AddressReferenced unless acknowledgedTags names exactly those tag paths; the readback records the address map and the referenced tags whose range changed. Tag addresses are not rewritten, and absolute %I/%Q accesses in program code are neither searched nor flagged by the device compile.",
           "Name, slot and container must stay; the subtree's channels, attributes and children may follow the new type. Everything outside the subtree, including port interconnections, must stay exact even with acceptLoss.",
           "Siemens decides whether the replacement keeps the item name; a renamed item fails verification and requires checkpoint restore.",
           "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): DI 16x24VDC HF between firmware V1.0 and V2.0 with configured_hardware_preservation_verified and unchanged addresses; unchanged identifiers, CPUs and identifiers missing from the catalog refused; reopen and checkpoint restore. acceptLoss is not exercised.",
@@ -14157,7 +14332,8 @@
         "evidenceIds": [
           "local.hardware_changes.20261028",
           "local.hardware_changes.families.20261029",
-          "local.hardware_changes.topology.20261101"
+          "local.hardware_changes.topology.20261101",
+          "local.hardware_changes.refusals.20261102"
         ]
       },
       "availability": {
@@ -14202,15 +14378,16 @@
           "hardwarePath selects one module or submodule of an IO device whose station has at least one connector assigned to an I/O system. accessType PLC needs assignmentTargetPath, the PLC item of one of the station's I/O systems, and sets SharedDeviceAccessConfigured true and SharedDeviceAssignmentTarget to that item; OutsideOfProject clears SharedDeviceAccessConfigured. Unknown, the native unassigned state, is refused, and so is an unchanged access and target. A direct move from one PLC of the station to another is refused (UnsupportedCapability; set OutsideOfProject first): its start addresses would move unreviewed. Stations holding PLC software are refused. Both attributes must be declared readable and writable, and writable in the module's capability profile when one exists; the readback requires the derived SharedDeviceAccessType (and the target).",
           "The bridge records the PLC items of the station's I/O systems as addressControllerOwnerPaths. Preservation lets the module and its subitems take the requested access (SharedDeviceAccessType; SharedDeviceAccessConfigured and SharedDeviceAssignmentTarget, as owner path, each either unchanged or the value the access gives). Address ranges keep their I/O type, start and length with at most one owner among those PLCs, except that OutsideOfProject releases the subtree's addresses and PLC brings them back owned by the target; everything else stays exact.",
           "Optional externalIoControllers (an integer from 1 to 32, a conservative ceiling: V21 metadata states no maximum, and a shared device admits 2 to 4 IO controllers; only with OutsideOfProject) also sets NumberOfExternalIoControllers of the station's one assigned IO-device interface in the same change (recorded as ioDeviceInterfacePath); preservation then admits exactly that value there. With it, a module already OutsideOfProject may change only that count; an unchanged access and count is refused. Without it the attribute must stay.",
-          "OutsideOfProject marks a module accessed by an IO controller in another project (the shared device of several projects); it releases the module's addresses from this project and removes its system constant; without an external controller TIA warns \"The number of IO controllers outside the project ... is 0\". The other project and module copies (SharedDeviceCopyOfModule) are not configured.",
-          "Natively qualified. local.hardware_changes.topology.20261101 (460/460 steps) set an ET 200SP DI 8x24VDC ST OutsideOfProject with externalIoControllers 1 (addresses released; applied and persisted across a fresh reopen, no checkpoint restore) and back to PLC on the second CPU (addresses restored; applied and restored); refusals: the native Unknown access and a module of a CPU station. Its build allowed the PLC-to-PLC move, now refused (not natively exercised). local.hardware_changes.topology_restores.20261101 (113/113 steps) applied OutsideOfProject with externalIoControllers 1 on the current build and restored it."
+          "OutsideOfProject marks a module accessed by an IO controller in another project (the shared device of several projects); it releases the module's addresses from this project and removes its system constant; without an external controller TIA warns \"The number of IO controllers outside the project ... is 0\". Module copies (SharedDeviceCopyOfModule) are not configured. local.hardware_changes.refusals.20261102 configured the other side in a second owned scratch: its own CPU assigns the same ET 200SP station with the same modules, the first project's module outside it is its own and the other two are OutsideOfProject with two external IO controllers; V21 checks nothing across projects, so the runner compared both stations (each module PLC-owned in exactly one project); head, interface, ports and server module stay assigned in both.",
+          "Natively qualified. local.hardware_changes.topology.20261101 (460/460 steps) set an ET 200SP DI 8x24VDC ST OutsideOfProject with externalIoControllers 1 (addresses released; applied and persisted across a fresh reopen, no checkpoint restore) and back to PLC on the second CPU (addresses restored; applied and restored); refusals: the native Unknown access and a module of a CPU station. Its build allowed the PLC-to-PLC move, now refused: local.hardware_changes.refusals.20261102 refused a direct move of a DI 8x24VDC ST from the second CPU to the scratch CPU natively (UnsupportedCapability, nothing changed). local.hardware_changes.topology_restores.20261101 (113/113 steps) applied OutsideOfProject with externalIoControllers 1 on the current build and restored it."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.hardware_changes.topology.20261101",
-          "local.hardware_changes.topology_restores.20261101"
+          "local.hardware_changes.topology_restores.20261101",
+          "local.hardware_changes.refusals.20261102"
         ]
       },
       "availability": {
@@ -14360,7 +14537,7 @@
         "limitations": [
           "Qualified for one CPU 1511-1 PN controller assigning or disconnecting connector 0 of one IM 155-6 PN ST V6.4 with the explicit generated server-module contract.",
           "A second S7-1500 CPU (not the scratch CPU, selected by its plcPath) assigning an ET 200MP IM 155-5 PN ST V4.1 to a new IO system passed with exact state deltas, reopen and restore (local.hardware_changes.families.20261029); the assignment sets SharedDeviceAccessType PLC on the head's items and adds the IO-system and station system constants to the controller's PLC.",
-          "sharedDevice: true (applied and persisted in local.hardware_changes.topology.20261101: an ET 200SP IM 155-6 PN ST shared by two CPUs of one project, connector 1 joining a new IO system of the scratch CPU with one DI module assigned to it; its checkpoint restore and the current preservation rule below passed in local.hardware_changes.topology_restores.20261101, where only SpDi3's subtree changed owner and target and SpDi3 kept start address 0 in the scratch CPU's empty address space; the sharedDevice disconnect is not exercised): a further, unassigned connector of the same IO-device interface joins another PLC's I/O system while the other connectors stay assigned, one connector per PLC; disconnect: true with sharedDevice removes one again. The bridge records the other connectors' PLC items as sharedAddressControllerOwnerPaths: without sharedDevice a supplied value is refused, with it the bridge overwrites any supplied value. A sharedDevice connection names sharedSubmodules (1 to 64 exact items of the station, each owning I/O addresses itself or through a subitem, not yet assigned to the selected PLC, with SharedDeviceAssignmentTarget writable natively and in its capability profile) whose SharedDeviceAssignmentTarget becomes the selected PLC item in the same change: V21 compiles a further IO controller only with a submodule of its own (\"Connected PLCs must have at least one assigned submodule as a shared device\", discovery hw3). The preview lists each one's target before and after. Its preservation adds every item's SharedDeviceAccessType, SharedDeviceAccessConfigured and SharedDeviceAssignmentTarget: inside the sharedSubmodules subtrees every I/O address must end owned by exactly the selected PLC with its I/O type and length (its start may move into that PLC's address space, discovery hw4) and each target may only become the selected PLC; each named item must move its target and at least one address; every other row, including its owners and targets, stays exact. A disconnect keeps the earlier rule: every station address has at most one owner among the remaining PLCs. Without sharedDevice a further assigned connector is UnsupportedCapability.",
+          "sharedDevice: true (applied and persisted in local.hardware_changes.topology.20261101: an ET 200SP IM 155-6 PN ST shared by two CPUs of one project, connector 1 joining a new IO system of the scratch CPU with one DI module assigned to it; its checkpoint restore and the current preservation rule below passed in local.hardware_changes.topology_restores.20261101, where only SpDi3's subtree changed owner and target and SpDi3 kept start address 0 in the scratch CPU's empty address space; the sharedDevice disconnect below passed natively, applied and restored, in local.hardware_changes.refusals.20261102): a further, unassigned connector of the same IO-device interface joins another PLC's I/O system while the other connectors stay assigned, one connector per PLC; disconnect: true with sharedDevice removes one again: V21 fails the device compile of a submodule left assigned to the leaving PLC (\"An attempt was made to compile a submodule that is not assigned\", discovery rd1), so the disconnect names in sharedSubmodules every item assigned to that PLC (a missing or foreign item is refused at prepare) and the worker assigns them to the one remaining PLC before the connector leaves; more than one remaining PLC is UnsupportedCapability. The bridge records the other connectors' PLC items as sharedAddressControllerOwnerPaths: without sharedDevice a supplied value is refused, with it the bridge overwrites any supplied value. A sharedDevice connection names sharedSubmodules (1 to 64 exact items of the station, each owning I/O addresses itself or through a subitem, not yet assigned to the selected PLC, with SharedDeviceAssignmentTarget writable natively and in its capability profile) whose SharedDeviceAssignmentTarget becomes the selected PLC item in the same change: V21 compiles a further IO controller only with a submodule of its own (\"Connected PLCs must have at least one assigned submodule as a shared device\", discovery hw3). The preview lists each one's target before and after. Its preservation adds every item's SharedDeviceAccessType, SharedDeviceAccessConfigured and SharedDeviceAssignmentTarget: inside the sharedSubmodules subtrees every I/O address must end owned by exactly the selected PLC with its I/O type and length (its start may move into that PLC's address space, discovery hw4) and each target may only become the selected PLC; each named item must move its target and at least one address; every other row, including its owners and targets, stays exact. A disconnect's sharedSubmodules follow the same rule with the remaining PLC as the new owner (their start may move into its space); with no item assigned to the leaving PLC, sharedSubmodules is refused and every station address keeps at most one owner among the remaining PLCs. Without sharedDevice a further assigned connector is UnsupportedCapability.",
           "Exact native controller/connector indexes, selected-PLC ownership and same-subnet prerequisite. Optional explicit I/O-system creation.",
           "Preservation covers observed identities, slots, reviewed attributes, address ranges/owners and configured network associations; unexposed native data and runtime are not qualified.",
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
@@ -14378,7 +14555,8 @@
           "local.hardware_changes.families.20261029",
           "local.hardware_changes.topology.20261101",
           "local.hardware_changes.topology_restores.20261101",
-          "local.hardware_changes.gsd.20261101"
+          "local.hardware_changes.gsd.20261101",
+          "local.hardware_changes.refusals.20261102"
         ]
       },
       "availability": {
@@ -14425,14 +14603,15 @@
           "Configured-hardware preservation adds every interface's MRP instances (name, domain, MediaRedundancyRole, ring ports) and its subnet's MRP domain names to the manifest; only the selected instance's role and domain may change, and only createDomain adds its domain name. hardware_inspect lists them under network.mrp. Device compile and the whole-project checkpoint are required.",
           "Prepare refuses a role that would leave a linked port pair with one ring port and one other port (NetworkPrerequisite, named in the preview warning): after the change the interface's ports (an instance's RingPort1/RingPort2) are ring ports unless the role is NotInRing, and a partner port is one when it declares RingPort true.",
           "MRP domain attributes (IsDefault, ManagerOutsideOfProjectActive), domain deletion, MRP interconnection and MRPD are not reviewed; no MRP telegram or ring recovery is observed.",
-          "Natively qualified. local.hardware_changes.topology.20261101 (460/460 steps) created MRP domain HwRing on one subnet with the scratch CPU 1511-1 PN as manager and a second CPU 1511-1 PN and an IM 155-5 PN ST as clients (roles set while the members' ports were unlinked, then the three links closing the ring), all applied and persisted across a fresh reopen; restored were the second CPU's join and ManagerAuto, not the createDomain manager or the IM 155-5 PN ST client; typed refusals: an unknown role, a module without network interface, an absent domain without createDomain and a ring role on the single-port CPU 1214C. A role declares RingPort true on the interface's ports. local.hardware_changes.topology_restores.20261101 (113/113 steps) applied and restored the createDomain manager and the IM 155-5 PN ST client on the current build. The port-link refusal is not natively exercised."
+          "Natively qualified. local.hardware_changes.topology.20261101 (460/460 steps) created MRP domain HwRing on one subnet with the scratch CPU 1511-1 PN as manager and a second CPU 1511-1 PN and an IM 155-5 PN ST as clients (roles set while the members' ports were unlinked, then the three links closing the ring), all applied and persisted across a fresh reopen; restored were the second CPU's join and ManagerAuto, not the createDomain manager or the IM 155-5 PN ST client; typed refusals: an unknown role, a module without network interface, an absent domain without createDomain and a ring role on the single-port CPU 1214C. A role declares RingPort true on the interface's ports. local.hardware_changes.topology_restores.20261101 (113/113 steps) applied and restored the createDomain manager and the IM 155-5 PN ST client on the current build. local.hardware_changes.refusals.20261102 refused the port-link rule natively both ways (NetworkPrerequisite, nothing changed): Manager on the scratch CPU while its Port_2 linked a second CPU's non-ring Port_2, and NotInRing on that CPU once both held ring roles in HwRing and the link joined two ring ports."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.hardware_changes.topology.20261101",
-          "local.hardware_changes.topology_restores.20261101"
+          "local.hardware_changes.topology_restores.20261101",
+          "local.hardware_changes.refusals.20261102"
         ]
       },
       "availability": {
@@ -16036,14 +16215,16 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
+          "Style, TS-05 application and TS-06 system reviews. Production execution and recovery stay disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (1 November 2026): no native run has dispatched a job this tool prepared. It also queues application reviews (testsuite_application_plan_prepare), whose execution is qualified in the TS-Q02 mode, so it does not follow the style V21 boundary. The TS-Q02 pass case called it natively (local.testsuite.application.20261030), but that job was refused at the production gate and never ran; TS-Q01 (local.testsuite.style-q01.20261101) prepares its jobs inside qualification_testsuite_prepare. Verifying it needs a native run that calls it on a qualification review and dispatches that job through qualification_testsuite_execute; TS-Q02 needs no operator."
+          "Native (1 November 2026, local.testsuite.job-prepare.20261101), TS-Q02 qualification mode only: a job this tool queued from a testsuite_application_plan_prepare review (byte-identical to the qualification review) was dispatched through qualification_testsuite_execute; the passing case succeeded, the failing case was recovered and reconciled verifiedRestored. A wrong reviewed hash (ReviewMismatch) and the key bound to another review (IdempotencyConflict) refused; the repeated key returned the same job at revision 0. Style reviews it queues have no production consumer (V21 boundary), and system reviews have no qualification mode."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.testsuite.job-prepare.20261101"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20486,10 +20667,10 @@
           "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Reviews run through the testsuite_style_job_* lifecycle. Native execution and recovery stay disabled behind the same code-owned profile gate as style jobs.",
           "One native Run returns one TestResults tree. It is retained losslessly for every reviewed case, but only a single-definition run owns it; lists and groups stay inconclusive per case. Warning and Information states, including inconclusive runtime outcomes, never pass.",
-          "The owning worker verifies the sim_create downloadTicket (15-minute expiry), the registered owned instance and that serverAddress is one of its ControllerIP addresses, routed by Windows through the PLCSIM Virtual Ethernet Adapter, before SetScope and Run. Physical or unowned endpoints and a route through another network card are refused (RuntimeTargetNotOwnedPlcsim; an undetermined route RuntimeTargetRouteUnverified).",
+          "The owning worker verifies the sim_create downloadTicket (15-minute expiry), the registered owned instance, that serverAddress is one of its ControllerIP addresses, routed by Windows through the PLCSIM Virtual Ethernet Adapter, and that the instance was created for TCP/IP, before SetScope and Run. Physical or unowned endpoints and a route through another network card are refused (RuntimeTargetNotOwnedPlcsim; an undetermined route RuntimeTargetRouteUnverified), and so is a Softbus instance (PlcsimEndpointUnreachable): it keeps its configured ControllerIP, and the PLCSIM adapter can still hold that subnet with nothing listening (observed 1 November 2026).",
           "StandardSIMATIC interface only, anonymous OPC UA only. UserDefined and SiOME interfaces need SetScope(String, ServerInterfaces, DirectoryInfo) with a hash-pinned interface folder and are not offered. No credential or security-policy argument exists in the V21 API.",
           "SetScope persists the address on every reviewed case after the checkpoint. Preservation and effective scope remain unverified.",
-          "Native blocker (28 October 2026, V21 Update 3): application and system test execution (TestCaseExecutor.Run, SystemTestCaseExecutor.Run) has no qualification mode, and the production profile gate refuses it on Host and worker, so AC-native, AC-recovery, AC-runtime and AC-simulator-lifecycle have no native run. The definitions themselves are qualified (local.testsuite.definitions.20261028). Qualifying execution needs a TS-Q02 qualification mode with an owned PLCSIM Advanced instance on Softbus."
+          "Native blocker (1 November 2026, docs/verification/testsuite-system-blocker-20261101.md): system execution has no qualification mode, and the production profile gate and the TS-Q01/TS-Q02 qualification admission refuse system reviews before any native call. A TS-Q03 mode in the TS-Q02 shape is designed but not built, since it cannot run on this PC: OPC UA reaches a PLCSIM Advanced instance only in PLCSIM's TCP/IP mode, an operator setting (this PC is on Softbus); SystemTestCaseExecutor.Run and SetScope take no credential, so the scratch CPU's UMAC-protected OPC UA server would need guest access (the UMAC anonymous user holding OPCUAServerAccess), which is not settable through V21 Openness, so an operator-made seed is needed; and whether Test Suite trusts the CPU's server certificate without a UI prompt is unobserved. The definitions themselves are qualified (local.testsuite.definitions.20261028)."
         ]
       },
       "qualification": {
@@ -27279,14 +27460,16 @@
           "Apply requires compile=true and save=true. After the checkpoint it compiles the HmiTarget and captures the compiled state (stage hmi_baseline_compiled), then (stage hmi_native_write_started) imports with ImportOptions.Override through the owning composition and re-exports the re-found object: BackColor must read back as the prepared patched document apart from DocumentInfo/Created, an XML import as the supplied document apart from DocumentInfo, export-local object IDs and formatting. Every other export of the compiled capture must stay identical with the same artifact set, only the target's own export may differ, and the HMI's compiler errors and warnings must be unchanged by the write, compared with the compile after the checkpoint by state, text and path (CompileProblemsUnchanged, the hmi_text_list_import rule; Information rows are ignored); then the project is saved. change_restore retrieves the checkpoint into a new directory and requires the pre-change content hash.",
           "Gate: this kind only, for these two operations; production admits classic-comfort, the profile whose native qualification passed (1 November 2026), in any owned project whose HMIs are all Classic. Every other profile, operation and Classic object type stays behind the closed preservation gate, and hmi_engineering stays closed for every operation. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
           "Native, 1 November (build 10763a35): the route passed on the desk-configured TP700 Comfort pair (local.hmi.classic-import.route.20261101, 63/63 checks): every refusal before any write; BackColor on both HMIs' Overview_A (identity separation), a no-op and a GridColor import of Overview_B, a no-op import of the start screen and a QualificationTags import adding one internal tag, each with every stage, no compiler problems, the target's independent re-export carrying exactly the intended delta, every other export unchanged, same-key replay and another key refused RecoveryRequired; a stale preview refused; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay (local.hmi.classic-import.interruption.20261101, 8/8).",
-          "Qualified on one desk-configured TP700 Comfort fixture (start screen set in the editor). Import(Override) of the start screen kept it natively, but the start-screen setting has no public getter, so the compile rule is its only guard. Other Classic devices, object types, customer projects, runtime and visual behavior are not covered."
+          "Qualified on one desk-configured TP700 Comfort fixture (start screen set in the editor). Import(Override) of the start screen kept it natively, but the start-screen setting has no public getter, so the compile rule is its only guard. Other Classic devices, object types, customer projects, runtime and visual behavior are not covered.",
+          "Lifecycle, 1 November (build 2431ccf9): on the same TP700 Comfort pair both compiles of every apply named only the target HmiTarget, both Host lifetimes ended normally (Host and worker exit 0, owned TIA process exited) and a new TIA process then reopened the saved project read-write at once (local.hmi.lifecycle.20261101, 72/72)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.hmi.classic-import.route.20261101",
-          "local.hmi.classic-import.interruption.20261101"
+          "local.hmi.classic-import.interruption.20261101",
+          "local.hmi.lifecycle.20261101"
         ]
       },
       "availability": {
@@ -27333,14 +27516,16 @@
           "Apply requires compile=true and save=true. After the checkpoint it compiles the owning HMI device and captures the compiled state (stage hmi_baseline_compiled), then (stage hmi_native_write_started) creates the tag, sets Connection then PlcTag and requires the natively derived name, type, symbolic access, connection, PLC tag and PLC name. Outside the target table's export files and the created tag's own typed subtree (<table>/tags/<name>) the compiled capture must stay identical, and the HMI's compiler errors and warnings must be unchanged by the write, compared with the compile after the checkpoint by state, text and path (CompileProblemsUnchanged, the hmi_text_list_import rule; Information rows are ignored); then the project is saved. change_restore retrieves the checkpoint into a new directory and requires the pre-change content hash.",
           "Gate: this kind only, for this operation; production admits unified-comfort and unified-pc, the profiles whose native qualification passed (1 November 2026), in any owned project whose HMIs are all Unified. Every other profile and operation stays behind the closed preservation gate, and hmi_engineering stays closed for every operation. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
           "Arrays, strings, whole UDT/struct values, quoted or indexed member paths, software-unit declarations, non-integrated connections and Classic external tags are not mapped. On both fixtures the create left the table and connection nodes unchanged and added no compiler problem; the rules still refuse either. PLC communication, runtime and visual behavior are not verified.",
-          "Native, 1 November (build 10763a35): the route passed on the desk-configured MTP700 Unified Comfort pair and on the seeded WinCC Unified PC RT baseline with its two encrypted-transfer password errors (local.hmi.external-tag.route.20261101, 43/43 checks each): every refusal before any write; a root PLC tag and a global DB member on HMI_RT_1 and a root tag on HMI_RT_2 from its own PLC, each with the created tag read back, tags and typed model unchanged outside the new tag, compiler problem rows unchanged, same-key replay and another key refused RecoveryRequired; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay on both profiles (local.hmi.external-tag.interruption.20261101, 8/8 each). Qualified on these two fixtures only; other devices and customer projects are not covered."
+          "Native, 1 November (build 10763a35): the route passed on the desk-configured MTP700 Unified Comfort pair and on the seeded WinCC Unified PC RT baseline with its two encrypted-transfer password errors (local.hmi.external-tag.route.20261101, 43/43 checks each): every refusal before any write; a root PLC tag and a global DB member on HMI_RT_1 and a root tag on HMI_RT_2 from its own PLC, each with the created tag read back, tags and typed model unchanged outside the new tag, compiler problem rows unchanged, same-key replay and another key refused RecoveryRequired; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay on both profiles (local.hmi.external-tag.interruption.20261101, 8/8 each). Qualified on these two fixtures only; other devices and customer projects are not covered.",
+          "Lifecycle, 1 November (build 2431ccf9): on both profiles both compiles of every apply named only the target HMI's owning device, both Host lifetimes ended normally (Host and worker exit 0, owned TIA process exited) and a new TIA process then reopened the saved project read-write at once (local.hmi.lifecycle.20261101, 49/49 each)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.hmi.external-tag.route.20261101",
-          "local.hmi.external-tag.interruption.20261101"
+          "local.hmi.external-tag.interruption.20261101",
+          "local.hmi.lifecycle.20261101"
         ]
       },
       "availability": {
