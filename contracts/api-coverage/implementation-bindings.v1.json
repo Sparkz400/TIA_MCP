@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "d9ace41f9963b5b1d44542c244ec7270e9afdee129b0e57b1968754237b0209e",
-      "bytes": 1733354
+      "sha256": "aeb663f64c1bd8d47eb242f72397352639c6a4b3db0d67ff959d604a64d397ad",
+      "bytes": 1734563
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -3187,8 +3187,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TagAddressRules.cs",
-      "sha256": "e6d690be2119f3a3428441309e9d933cba895c426aacdf058d4f9b389ff08fe9",
-      "bytes": 5627
+      "sha256": "e4a1380021dc7354a566b38f5ccd89d33302349075e79c72c2efda3c70cfbd5f",
+      "bytes": 5753
     },
     {
       "path": "src/TiaMcp.Openness.V21/TagTableLifecycleRules.cs",
@@ -105797,6 +105797,13 @@
           "artifacts": [
             "evidence/local.plc_object_mutations.rerun.20261028.json"
           ]
+        },
+        {
+          "id": "local.safety.fio-block-routes.20261102",
+          "profileSha256": "014808b4e8184dbf6f1ae38731fbf88ac79d027c8c64bb94ec352b16542f03fb",
+          "artifacts": [
+            "evidence/local.safety.fio-block-routes.20261102.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -110309,6 +110316,13 @@
           "artifacts": [
             "evidence/local.safety.fio-routes.20261102.json"
           ]
+        },
+        {
+          "id": "local.safety.fio-block-routes.20261102",
+          "profileSha256": "014808b4e8184dbf6f1ae38731fbf88ac79d027c8c64bb94ec352b16542f03fb",
+          "artifacts": [
+            "evidence/local.safety.fio-block-routes.20261102.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -112573,6 +112587,13 @@
           "artifacts": [
             "evidence/local.safety.fio-routes.20261102.json"
           ]
+        },
+        {
+          "id": "local.safety.fio-block-routes.20261102",
+          "profileSha256": "014808b4e8184dbf6f1ae38731fbf88ac79d027c8c64bb94ec352b16542f03fb",
+          "artifacts": [
+            "evidence/local.safety.fio-block-routes.20261102.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -112829,6 +112850,13 @@
           "profileSha256": "605c81f58d53968f9bf8166dcbc6cab24981367c4454265ab638712c1144bab1",
           "artifacts": [
             "evidence/local.plc_object_mutations.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.safety.fio-block-routes.20261102",
+          "profileSha256": "014808b4e8184dbf6f1ae38731fbf88ac79d027c8c64bb94ec352b16542f03fb",
+          "artifacts": [
+            "evidence/local.safety.fio-block-routes.20261102.json"
           ]
         }
       ],
@@ -113937,6 +113965,13 @@
           "profileSha256": "af41aebaef1f8b04c4aceb2a7f066bb6b998f36dd763c513a008296c21664cce",
           "artifacts": [
             "evidence/local.safety.fio-routes.20261102.json"
+          ]
+        },
+        {
+          "id": "local.safety.fio-block-routes.20261102",
+          "profileSha256": "014808b4e8184dbf6f1ae38731fbf88ac79d027c8c64bb94ec352b16542f03fb",
+          "artifacts": [
+            "evidence/local.safety.fio-block-routes.20261102.json"
           ]
         }
       ],
@@ -136266,6 +136301,11 @@
       "sha256": "0dd198c55e2711a7097c52e622d1eec8c4d32adcec0213d90591e12dcb560120"
     },
     {
+      "path": "evidence/local.safety.fio-block-routes.20261102.json",
+      "state": "observed",
+      "sha256": "85d2918cbac308df7f8d0ff1de23b4a531fcaa5f38acca22632850e75d59b74a"
+    },
+    {
       "path": "evidence/local.safety.fio-routes-2.20261101.json",
       "state": "observed",
       "sha256": "fc853701016db4350460e335298a62d3b6ddb60487f58766ef4bface3e331fc3"
@@ -137392,6 +137432,10 @@
     {
       "id": "local.runtime.timers.20261029",
       "profileSha256": "619abb75a6897820c6e846289f62af816f4201c253e31585815bc0f764899ce8"
+    },
+    {
+      "id": "local.safety.fio-block-routes.20261102",
+      "profileSha256": "014808b4e8184dbf6f1ae38731fbf88ac79d027c8c64bb94ec352b16542f03fb"
     },
     {
       "id": "local.safety.fio-routes-2.20261101",

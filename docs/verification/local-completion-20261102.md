@@ -20,6 +20,8 @@ The normal TCP/IP runtime corpus passed (`local.runtime.plcsim-tcpip.20261102`):
 
 The 87-stage F-I/O tag/VCI/master-copy/unit route corpus passed (`local.safety.fio-routes.20261102`), including the added merged-conflict and unit-copy cases. Its separate absolute-source probe failed: native standard SCL generation changed a tag table. Standard source, XML/graphical and project-ward VCI block imports now check absolute I/O references against the selected PLC's F-I/O ranges at prepare and apply. Source scanning conservatively includes comments and quoted text; unknown XML I/O widths/offsets refuse on a PLC owning F-I/O. This guards implicit tag creation and is not functional-safety qualification.
 
+The corrected guard passed the complete 94-stage native regression (`local.safety.fio-block-routes.20261102`, source `482e546b`). SCL generation and native FBD absolute-input XML import both refused on the F-PLC with unchanged tag tables and applied on the standard PLC. Earlier XML fixture failures are retained: reserialization changed native namespace spelling, and a hand-authored SCL address was not accepted by TIA. The passing fixture edits the native FBD input access while preserving the remaining XML bytes. This proves one absolute input-bit route; other widths, peripheral operands and language spellings have managed checks, not an exhaustive native-language proof.
+
 Release acceptance now checks reviewer role, date, commit ancestry, matrix hash, owned-row evidence and explicit blocker dispositions. A later change to reviewed inputs invalidates acceptance. The ledger still has no accepted obligations; these checks do not turn a self-declared reviewer into an authenticated signature.
 
 ## Test Suite operator seed
@@ -32,7 +34,13 @@ The next operator action is to grant the seed CPU's anonymous user only the requ
 
 These are separate from green automated checks:
 
-- **Operator decisions:** contract-freeze policy choices and the 44 release-obligation reviews, including explicit dispositions for V21 API boundaries and incomplete preservation. No approvals are fabricated by this change.
+- **Operator decisions:** the [13 contract-freeze choices](../plans/contract-freeze-policy.md#q1-which-tools-are-frozen) cover tool scope, unschematized outputs, error codes, mutation payloads, tool groups, deprecation time, catalog versioning, support window, safety/security tightening, stored-state compatibility, MCP revisions, Host options and naming. The [44 release-obligation reviews](../plans/release-acceptance.md) also need actual reviewers and explicit dispositions for V21 API boundaries and incomplete preservation. No approvals are fabricated by this change.
 - **Supplied fixtures or access:** older TIA installations/SDKs and protected or locked V14–V20 project fixtures; the VMware guest and its account/prerequisites; nonproduction Project Server, Teamcenter and UMC endpoints/accounts; missing historical native05 and other original reports if their audits are required.
 - **Products and equipment:** optional SiVArc/CFC/DCC/AX trace products and licenses; additional HMI targets/runtime; an isolated physical PLC and I/O; drive and safety hardware with qualified commissioning personnel. Simulator or offline evidence cannot replace these.
 - **Further local development/qualification:** TS-Q03 and its result profile, broader component and HMI preservation routes, remaining simulator event/data-record/cycle modes, residual Web API routes, API semantic mapping and contract-policy closure. These are software backlog, not requests for equipment. The detailed [TODO](../TODO.md) and [release matrix](../plans/release-matrix.v1.json) remain authoritative.
+
+## Evidence retention boundary
+
+The raw reports include failed fixture attempts and their cleanup results, not only passing reruns. The final local evidence index also names frozen source archives, executed binaries, the immutable engineering package, hosted-check results and the branch/worktree cleanup receipts. These machine-local artifacts are outside the temporary curation worktree.
+
+There are still 84 historical curated reports and six older directly cited artifacts recorded as lost before the evidence store existed. This work does not recreate their original bytes or clear their historical loss entries. Their original files or an explicit reviewer disposition are needed wherever an acceptance obligation depends on them.

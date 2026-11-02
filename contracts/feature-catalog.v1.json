@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.128",
+  "catalogVersion": "0.4.129",
   "targetTiaVersions": [
     21
   ],
@@ -4826,6 +4826,22 @@
       "limitations": [
         "58 stages, selected distributed event specifiers and hardware IDs only. No physical I/O, configuration-change delivery, other data-record/cycle modes or full runtime qualification; raw broad runtimeVerified remains false."
       ]
+    },
+    {
+      "id": "local.safety.fio-block-routes.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "482e546b70a9bf1c74d68dcdd6a32fb892973678",
+        "passedScope": "Full native F-I/O tag, VCI conflict, master-copy and software-unit route regression plus SCL implicit input-tag and FBD absolute-input XML import refusals; matching standard-PLC source/XML positive imports; unchanged tag-table snapshots on every refusal."
+      },
+      "artifacts": [
+        "evidence/local.safety.fio-block-routes.20261102.json"
+      ],
+      "limitations": [
+        "Owned offline CPU1511F and standard CPU1511 with F-DI in TIA V21; no physical safety qualification or safety-program mutation. The new source/XML cases cover one input bit and FBD XML, not every language or native VCI block format; broader operands and peripheral areas have managed checks."
+      ]
     }
   ],
   "features": [
@@ -7785,7 +7801,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.milestones.rerun.20261028",
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.safety.fio-block-routes.20261102"
         ]
       },
       "availability": {
@@ -7889,7 +7906,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.milestones.rerun.20261028",
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.safety.fio-block-routes.20261102"
         ]
       },
       "availability": {
@@ -12537,7 +12555,8 @@
           "local.library.tag-collision.20261101",
           "local.library_dmc_prerequisites.20261102",
           "local.library.dmc-order.20261102",
-          "local.safety.fio-routes.20261102"
+          "local.safety.fio-routes.20261102",
+          "local.safety.fio-block-routes.20261102"
         ]
       },
       "availability": {
@@ -27860,7 +27879,8 @@
           "local.software_units.lifecycle.20261030",
           "local.safety.fio-routes-2.20261101",
           "local.library.tag-collision.20261101",
-          "local.safety.fio-routes.20261102"
+          "local.safety.fio-routes.20261102",
+          "local.safety.fio-block-routes.20261102"
         ]
       },
       "availability": {
@@ -28018,7 +28038,8 @@
         "evidenceIds": [
           "local.vci_git.20261031",
           "local.safety.fio-routes-2.20261101",
-          "local.safety.fio-routes.20261102"
+          "local.safety.fio-routes.20261102",
+          "local.safety.fio-block-routes.20261102"
         ]
       },
       "availability": {
