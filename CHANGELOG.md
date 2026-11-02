@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.109`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.111`.
 
 ### Added
 
