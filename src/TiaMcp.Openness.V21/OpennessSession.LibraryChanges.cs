@@ -468,6 +468,11 @@ namespace TiaMcp.Openness.V21
             change.Preview["reusedDependencies"] = reused;
             change.Preview["createdNames"] = new JArray(created.OrderBy(x => x, StringComparer.Ordinal));
             change.Preview["targetNamesBefore"] = new JArray(names.OrderBy(x => x, StringComparer.Ordinal));
+            // Create selected dependencies first; otherwise Siemens creates them in source folders before their explicit root import.
+            var order = LibraryDependencyCapture.InstantiationOrder(change.Versions.Select(v => v.Guid.ToString("D")), closure);
+            var ordered = order.Select(id => change.Versions.Single(v => v.Guid.ToString("D") == id)).ToArray();
+            change.Preview["instantiationOrder"] = new JArray(order);
+            change.Versions.Clear(); change.Versions.AddRange(ordered);
             foreach (var master in change.Masters)
             {
                 var descriptions = master.ContentDescriptions.ToList();

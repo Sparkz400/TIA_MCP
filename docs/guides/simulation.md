@@ -420,5 +420,8 @@ Primary references: [Siemens V21 offline Windows-folder download](https://docs.t
 
 The bounded observation window also subscribes to V8 software-configuration, hardware-configuration
 and IP-address events. It retains the native timestamp and error code, the software change type,
-and the interface index/IP suite where applicable. New event-family qualification is tracked in the
-feature catalog separately from the existing operating-state and LED evidence.
+and the interface index/IP suite where applicable. `local.plcsim.signals-ip.20261102` verifies
+IP change and restoration events on interface 0 while an independent client temporarily stops
+one owned Softbus CPU, changes its virtual address, restores it, and returns to RUN. The normal
+bridge exposes observation only. Software/hardware-configuration notification delivery still
+needs native qualification.

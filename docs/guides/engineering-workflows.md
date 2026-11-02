@@ -68,6 +68,11 @@ baseline policy. [Verification and native limits](../verification/plc-baseline-2
 
 ## Supported payloads
 
+When a library import selects both a dependency and its consumer, `preview.instantiationOrder`
+lists the selected versions in dependency-first order. This prevents Siemens from creating the
+dependency in a source folder before its explicit import. Cyclic selected roots are refused
+during preparation; existing objects still require the normal identity and reuse checks.
+
 Selectors inside a payload refer to the PLC chosen by the outer `plcPath`, or to exact hardware paths returned by inventory/`engineering_read`.
 
 Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC or software unit and an optional existing `groupPath`. Existing objects retain their parent group. Use `blockPath`, `typePath` or `tagTablePath` for an exact existing target. Rename/delete/graphical operand operations accept `blockPath` without a redundant `blockName`. A short name shared by scopes or namespaces is rejected as ambiguous. Nonempty block/type namespaces appear explicitly in canonical paths as `.../namespaces/<namespace>/<name>`. Source uses the native `NAMESPACE` / `END_NAMESPACE` wrapper; XML's namespace must agree with an exact selected path. Each import targets one scope, group and namespace. See [canonical identities and scope routing](../reference/object-model.md).

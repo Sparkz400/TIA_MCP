@@ -54,7 +54,15 @@ def body(h):
     h.report["compiledVendorBlocks"] = versions
     # The production intake accepts at most 100 selected components per reviewed change.
     for start in range(0, len(versions), 100):
-        h.apply("library_instantiate", h.selected(library, versions[start:start + 100], target={"plcPath": plc}))
+        installed = {x["versionGuid"] for x in all_items(h, h.project_library())["items"] if x.get("kind") == "version"}
+        batch = []
+        for version in versions[start:start + 100]:
+            if version["versionGuid"] in installed:
+                h.stage("DMC prior batch created dependency: " + version["typeName"], lambda v=version: h.verify_use(h.project_library(), v, 1))
+            else:
+                batch.append(version)
+        if batch:
+            h.apply("library_instantiate", h.selected(library, batch, target={"plcPath": plc}))
     project_library = h.project_library()
     for version in versions:
         h.stage("DMC exact library link: " + version["typeName"], lambda v=version: h.verify_use(project_library, v, 1))

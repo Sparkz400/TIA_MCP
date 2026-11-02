@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 using Siemens.Engineering.Library.Types;
 
 namespace TiaMcp.Openness.V21
@@ -48,6 +49,28 @@ namespace TiaMcp.Openness.V21
             var current = Read(owner);
             if (expected == null || !expected.SequenceEqual(current.VersionGuids, StringComparer.Ordinal))
                 throw new BridgeException("DependencyConflict", "Native library dependencies changed during export; prepare a fresh plan.");
+        }
+
+        internal static string[] InstantiationOrder(IEnumerable<string> selected, JArray closures)
+        {
+            var remaining = selected.ToList();
+            var dependencies = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+            foreach (string id in remaining)
+            {
+                var rows = closures.FirstOrDefault(x => x.Value<string>("rootVersionGuid") == id)?["versions"] as JArray;
+                var ids = rows?.Select(x => x.Value<string>("versionGuid")).ToHashSet(StringComparer.Ordinal);
+                if (ids == null || !ids.Contains(id) || ids.Any(string.IsNullOrEmpty))
+                    throw new BridgeException("DependencyUnresolved", "Every selected version needs its complete previewed dependency closure.");
+                ids.Remove(id); dependencies.Add(id, ids);
+            }
+            var ordered = new List<string>();
+            while (remaining.Count != 0)
+            {
+                string next = remaining.FirstOrDefault(id => !dependencies[id].Overlaps(remaining));
+                if (next == null) throw new BridgeException("DependencyConflict", "Selected library roots have a dependency cycle; no safe instantiation order is available.");
+                ordered.Add(next); remaining.Remove(next);
+            }
+            return ordered.ToArray();
         }
     }
 }

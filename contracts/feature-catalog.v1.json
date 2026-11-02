@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.125",
+  "catalogVersion": "0.4.126",
   "targetTiaVersions": [
     21
   ],
@@ -4713,6 +4713,22 @@
       ],
       "limitations": [
         "One CPU1511 V4.1, FBD program-cycle OB and captured FB/UDT; LAD OBs, earlier placement, reused-component combinations and runtime behavior not covered."
+      ]
+    },
+    {
+      "id": "local.plcsim.signals-ip.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "77b2d23e56318de21f36fd5094ab68053f15cc36",
+        "passedScope": "100 native steps: primitive signal batch, I/Q/M guards, unchanged output-array refusals, operating-state/LED observations, owned external-client IP change and restoration events in STOP, foreign and released instance refusals."
+      },
+      "artifacts": [
+        "evidence/local.plcsim.signals-ip.20261102.json"
+      ],
+      "limitations": [
+        "One owned Softbus CPU1511 V4.1; software/hardware configuration notifications and other IP modes not qualified."
       ]
     }
   ],
@@ -27408,7 +27424,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plcsim_signals.20261030"
+          "local.plcsim_signals.20261030",
+          "local.plcsim.signals-ip.20261102"
         ]
       },
       "availability": {
@@ -27459,7 +27476,8 @@
           "local.plcsim_signals.20261030",
           "local.sim.output-refusal.20261101",
           "local.sim.output-refusal-2.20261101",
-          "local.plcsim.output-arrays.20261102"
+          "local.plcsim.output-arrays.20261102",
+          "local.plcsim.signals-ip.20261102"
         ]
       },
       "availability": {
@@ -27503,7 +27521,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plcsim_signals.20261030"
+          "local.plcsim_signals.20261030",
+          "local.plcsim.signals-ip.20261102"
         ]
       },
       "availability": {
@@ -27549,7 +27568,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plcsim_signals.20261030"
+          "local.plcsim_signals.20261030",
+          "local.plcsim.signals-ip.20261102"
         ]
       },
       "availability": {
@@ -27595,7 +27615,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plcsim_signals.20261030"
+          "local.plcsim_signals.20261030",
+          "local.plcsim.signals-ip.20261102"
         ]
       },
       "availability": {

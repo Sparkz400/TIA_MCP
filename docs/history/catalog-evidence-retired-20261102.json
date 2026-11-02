@@ -38,6 +38,10 @@
     {
       "id": "local.fio.unit-policy-refusal.20261102",
       "reason": "F-I/O refusals passed; positive tag-bearing-unit fixture cleanup stopped before mutation because tag_delete requires explicit rejectReferenced policy."
+    },
+    {
+      "id": "local.dmc.bulk-path-refusal.20261102",
+      "reason": "Bulk DMC import exposed consumer-first ordering: Siemens created fbMotor_Reversing as a dependency in a different path before its explicit selected-root import; partial result and recovery checkpoint retained."
     }
   ]
 }

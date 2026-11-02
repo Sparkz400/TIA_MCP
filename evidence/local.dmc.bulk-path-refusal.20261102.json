@@ -1,0 +1,71 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.dmc.bulk-path-refusal.20261102",
+  "outcome": "failed",
+  "recordedAtUtc": "2026-11-02T20:25:00+00:00",
+  "source": {
+    "commit": "fa1c87c226e69cdbabf8b505be165ff97f68fce1",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Bulk DMC import exposed consumer-first ordering: Siemens created fbMotor_Reversing as a dependency in a different path before its explicit selected-root import; partial result and recovery checkpoint retained.",
+  "limitations": [
+    "The 218-default-block compilation run did not complete. No bulk vendor qualification claim."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "84d728d0050a47a1a2bf039fd82a6f29cc053f4f50a98cdd9ff1069536da54d6"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "6c2148a593713c3d2a92cf9b60f8043874d8a6230e960ea9d6095f6e6e71bbea"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "046d76ff7e4020b767d489eda68a3e930ca23aca6923ec1732b3db8f908fc04d",
+      "bytes": 3585659,
+      "completed": false,
+      "steps": [
+        "start owned TIA dmc prerequisites",
+        "create owned scratch dmc prerequisites",
+        "prepare hardware_cpu_memory_bytes",
+        "apply hardware_cpu_memory_bytes",
+        "DMC system and clock memory bytes read back",
+        "open upgraded DMC library",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "DMC tag table exists in PLC tags",
+        "refuse a second copy of the same tag table",
+        "prepare library_instantiate",
+        "apply library_instantiate"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "engineering_read",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}
