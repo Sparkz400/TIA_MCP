@@ -16,13 +16,14 @@ import os
 from pathlib import Path
 import shutil
 import sys
+import time
 
 from exact_qualification_client import ExactClient
 from qualify_exact_worker_startup import emit, package, check_sources
 from qualify_translation_category_probe import StoreExclusiveWindow, ref, require
 from component_window_lifetime import scan_component_reservations
 from verify_translation_populated_category_probe import decode, compare, populated_control
-from verify_watch_workflow import canonical_sha
+from verify_watch_workflow import canonical_matches
 
 REPO = Path(__file__).resolve().parents[1]
 # The export sorts rows by source text, so a changed source can also move its row: the profile check then refuses first.
@@ -33,6 +34,8 @@ RESTRICTED = {'BlockCommentCategoryData': 5, 'HwcnCommentTextCategoryData': 1, '
 # TranslationProductionAdmission.RestrictedContract: the Host-filtered block-comment scope of one PLC.
 RESTRICTED_CONTRACT = 'translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1'
 EMPTY_CATEGORY = 'AlarmClassDisplayNameCategory'
+# The worker's ProjectIsolationRequired refusal in TranslationOwned (OpennessSession.TranslationImport.cs).
+OWNERSHIP_REFUSAL = 'Exact saved worker-owned translation fixture required.'
 # Only the worker's current scratch may configure generated CPU security (EnsureCurrentScratchProject); prepare writes nothing.
 SCRATCH_PROBE = {'kind': 'hardware_add', 'payload': {'typeIdentifier': 'OrderNumber:6ES7 511-1AL03-0AB0/V4.1', 'deviceName': 'TrScratchProbe',
                                                      'itemName': 'TrScratchProbeCpu', 'configureScratchSecurity': True}}
@@ -164,7 +167,7 @@ class Run:
         """Exactly one unattempted operation; a failed/unknown response never triggers replay."""
         prepared = self.call('qualification_translation_prepare', {**selector, 'idempotencyKey': 'failure-' + self.root.name + '-' + self.failure_case, **edit})
         if getattr(self, 'same_instance', False):
-            require(prepared['admissionKeySha256'] == canonical_sha(prepared['admissionKey']), 'Admission key digest differs')
+            require(canonical_matches(prepared['admissionKeySha256'], prepared['admissionKey']), 'Admission key digest differs')
             require(not getattr(self, 'restricted', False) or prepared['admissionKey']['contract'] == RESTRICTED_CONTRACT, 'The restricted packet must carry the restricted admission contract')
             if self.forward_key is None:
                 self.forward_key = prepared['admissionKey']; self.save('forward-instance-key', {'key': self.forward_key, 'sha256': prepared['admissionKeySha256']})
@@ -323,10 +326,16 @@ class Run:
                     opened = [p['path'] for p in self.call('tia_session_status')['projects']]
                     if not any(Path(path) == Path(project) for path in opened):
                         require(not opened, 'Only the closed fixture may be open'); self.call('project_open', {'path': project})
-                    refused = self.call('qualification_translation_capture', selector, expect_error=True)
-                    code = ((refused.get('structuredContent') or {}).get('error') or {}).get('code')
-                    require(code == 'ProjectIsolationRequired', 'A fresh worker must refuse a fixture it did not create, observed ' + str(code))
-                    report['adoptionRefused'] = {'tool': 'qualification_translation_capture', 'code': code}
+                    # Qualification tools return MCP's generic error text; the Host log carries the worker's refusal.
+                    logged = lambda: sum(OWNERSHIP_REFUSAL in line for line in self.client.errors)
+                    before = logged()
+                    self.call('qualification_translation_capture', selector, expect_error=True)
+                    for _ in range(50):  # stderr is read on its own thread
+                        if logged() > before: break
+                        time.sleep(0.1)
+                    require(logged() == before + 1, 'A fresh worker must refuse a fixture it did not create (' + OWNERSHIP_REFUSAL + ')')
+                    report['adoptionRefused'] = {'tool': 'qualification_translation_capture', 'code': 'ProjectIsolationRequired', 'workerMessage': OWNERSHIP_REFUSAL,
+                                                 'hostDiagnostics': f'{self.counter:03}-host-diagnostics.json'}
                 self.save('fixture-identity', {**selector, 'processId': started['processId']})
                 if report.get('adoptionRefused'): pass
                 elif not self.failure_case and (not self.same_instance or self.restricted):
@@ -362,7 +371,7 @@ class Run:
                         report['emptyCapture'] = {'keptRows': 0, 'excludedRows': len(captured['excludedRows'])}
                     prepared = self.call('qualification_translation_prepare', {**scope, 'idempotencyKey': 'translation-' + self.root.name + '-' + label, **change})
                     if label == 'empty':
-                        require(prepared['admissionKey'] is None and prepared['admissionRefusal'], 'Only the block-comment scope has an admission contract')
+                        require(prepared.get('admissionKey') is None and prepared.get('admissionRefusal'), 'Only the block-comment scope has an admission contract')
                     else:
                         require(not self.restricted or (prepared['admissionKey'] or {}).get('contract') == RESTRICTED_CONTRACT, 'A restricted plan must carry the restricted admission contract')
                     op = prepared['operation']
