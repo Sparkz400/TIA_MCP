@@ -56,7 +56,7 @@ class Harness:
             calls = receipt.pop("toolCalls")
             self.report.setdefault("closedHosts", []).append(receipt)
         self.client = Client(self.args.host.resolve(), self.args.timeout, ["--worker", str(self.args.worker.resolve()),
-                             "--artifacts", str(self.directory), "--sim-worker", str(getattr(self.args, "sim_worker", None) or self.directory / "sim-not-used.exe"),
+                             "--artifacts", str(self.directory), "--sim-worker", str((getattr(self.args, "sim_worker", None) or self.directory / "sim-not-used.exe").resolve()),
                              *getattr(self.args, "host_args", ())])
         self.client.tool_calls = calls
         self.client.request("initialize", {"protocolVersion": "2025-11-25", "capabilities": {},

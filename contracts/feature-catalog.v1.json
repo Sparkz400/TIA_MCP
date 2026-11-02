@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.123",
+  "catalogVersion": "0.4.124",
   "targetTiaVersions": [
     21
   ],
@@ -4665,6 +4665,38 @@
       ],
       "limitations": [
         "Configuration-change event delivery and other CPU models are not qualified by this run."
+      ]
+    },
+    {
+      "id": "local.library_vendor.rerun.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "a70d2754b4facb83208d76438dc2379f2d4332aa",
+        "passedScope": "Seven archive source hashes recovered; five DMC V19 library variants upgraded; PLC library archive identities retained on reopen; one dependency-free type instantiated; PAL V16 import refused unchanged."
+      },
+      "artifacts": [
+        "evidence/local.library_vendor.rerun.20261102.json"
+      ],
+      "limitations": [
+        "No vendor executables, HMI runtime, complete DMC behavior or intermediate PAL upgrade qualified."
+      ]
+    },
+    {
+      "id": "local.library_dmc_prerequisites.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e27ad29cb9ed07f97ef33b8fb1a64de1a596e937",
+        "passedScope": "DMC Open Library tag-table creation and duplicate refusal; exact CPU system/clock bytes; dependency-closure compilation and exact version identity of fbIO_DigitalInput on an owned CPU 1511 V4.1."
+      },
+      "artifacts": [
+        "evidence/local.library_dmc_prerequisites.20261102.json"
+      ],
+      "limitations": [
+        "One FB compile and readback; no vendor runtime behavior, other CPU configurations or complete DMC library qualification."
       ]
     }
   ],
@@ -11990,7 +12022,8 @@
           "local.library_intake.20261024",
           "local.library_vendor.20261025",
           "local.library_upgrades.20261024",
-          "local.library_import_scale.20261027"
+          "local.library_import_scale.20261027",
+          "local.library_vendor.rerun.20261102"
         ]
       },
       "availability": {
@@ -12034,7 +12067,8 @@
           "local.library_intake.20261024",
           "local.library_vendor.20261025",
           "local.library_upgrades.20261024",
-          "local.library_import_scale.20261027"
+          "local.library_import_scale.20261027",
+          "local.library_vendor.rerun.20261102"
         ]
       },
       "availability": {
@@ -12233,7 +12267,8 @@
           "local.library_vendor.20261025",
           "local.library_preservation.20261028",
           "local.library_compatibility.rerun.20261028",
-          "local.library_formats.rerun.20261028"
+          "local.library_formats.rerun.20261028",
+          "local.library_vendor.rerun.20261102"
         ]
       },
       "availability": {
@@ -12367,7 +12402,8 @@
           "local.library_units.namespace.dependency.20261101",
           "local.safety.fio-routes.20261101",
           "local.safety.fio-routes-2.20261101",
-          "local.library.tag-collision.20261101"
+          "local.library.tag-collision.20261101",
+          "local.library_dmc_prerequisites.20261102"
         ]
       },
       "availability": {

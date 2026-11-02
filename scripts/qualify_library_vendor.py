@@ -119,6 +119,7 @@ def body(h):
         closure = h.query(reopened, query="dependencies", **identity(version))["items"]
         if len(closure) == 1:
             candidates.append(version)
+            break  # Only the first dependency-free type is instantiated; each native closure capture is expensive.
     require(candidates, "No dependency-free DMC PLC data type was found")
     chosen = candidates[0]
     h.report["dmcInstantiatedType"] = chosen

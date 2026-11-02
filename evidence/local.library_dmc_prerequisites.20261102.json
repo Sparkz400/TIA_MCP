@@ -1,0 +1,73 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_dmc_prerequisites.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T19:58:35+00:00",
+  "source": {
+    "commit": "e27ad29cb9ed07f97ef33b8fb1a64de1a596e937",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "DMC Open Library tag-table creation and duplicate refusal; exact CPU system/clock bytes; dependency-closure compilation and exact version identity of fbIO_DigitalInput on an owned CPU 1511 V4.1.",
+  "limitations": [
+    "One FB compile and readback; no vendor runtime behavior, other CPU configurations or complete DMC library qualification."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "b8f4eb71bbd58e99f3dea16905a93df8c05418553fe473ca697e94729ec0e8b7"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "b8b2a3ab59d1afdb7f37a6e6ebbd52c3525241b9026a22d84c7de20be02e6b62"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "a6036cfca3f370810430c80762305aef6a2daa5cb9f3b8fd8de6739f43f287cf",
+      "bytes": 268195,
+      "completed": true,
+      "steps": [
+        "start owned TIA dmc prerequisites",
+        "create owned scratch dmc prerequisites",
+        "prepare hardware_cpu_memory_bytes",
+        "apply hardware_cpu_memory_bytes",
+        "DMC system and clock memory bytes read back",
+        "open upgraded DMC library",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "DMC tag table exists in PLC tags",
+        "refuse a second copy of the same tag table",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "DMC FB exact library link in consumer",
+        "read the compiled DMC FB"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "engineering_read",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}

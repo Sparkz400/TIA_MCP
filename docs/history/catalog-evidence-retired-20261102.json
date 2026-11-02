@@ -10,6 +10,10 @@
     {
       "id": "local.vendor.path-limit.20261102",
       "reason": "Vendor rerun hit V21's 143-character native output-path limit. Original source archives unchanged; rerun uses a fresh short artifact root."
+    },
+    {
+      "id": "local.plcsim.event-missing-type.20261102",
+      "reason": "Second OB55 fixture discovery refused: SecondaryType is mandatory. Fingerprint unchanged and recovery retained; no runtime qualification."
     }
   ]
 }
