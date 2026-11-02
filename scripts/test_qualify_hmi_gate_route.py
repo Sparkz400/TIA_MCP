@@ -455,8 +455,8 @@ class GateRouteRunTests(unittest.TestCase):
                 self.assertEqual([], report["failures"])
                 self.assertEqual("seeded", report["fixture"]["mode"])
                 self.assertEqual(refusals, sum(c.startswith("Refused before any write") for c in report["checks"]))
-                self.assertEqual(6, sum(c.startswith("Gate admits this kind and profile (qualification)") for c in report["checks"]))
-                self.assertIn("A production Host refuses the kind before its production admission", report["checks"])
+                self.assertEqual(6, sum(c.startswith("Gate admits this kind and profile (production)") for c in report["checks"]))
+                self.assertIn("A production Host admits the kind with admission production", report["checks"])
 
     def test_unified_routes_pass_on_configured_and_seeded_fixtures(self):
         for profile, errors in (("unified-comfort", 0), ("unified-pc", 2)):

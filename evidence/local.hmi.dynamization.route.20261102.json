@@ -1,0 +1,112 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.dynamization.route.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T09:43:35+00:00",
+  "source": {
+    "commit": "ebe8ba131a41cb56a0b9343a76efed71ff2bce68",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Build hbfc = ebe8ba13. scripts/qualify_hmi_gate_route.py --kind hmi_dynamization_create on unified-comfort (desk-configured MTP700 Unified Comfort pair) and unified-pc (seeded WinCC Unified PC RT baseline), each retrieved into an owned project with a Host started --hmi-change-qualification <profile>: setup of two HmiIOFields, an HmiBar and an HmiGauge through hmi_screen_create; refusals before any write (hmi_engineering kind, another operation, Visible by a non-Bool tag, Left, the other HMI's tag, a dataType other than the tag's, ProcessValue of a rectangle); ProcessValue of an IOField bound to LinkedSignal (root PLC tag), of the bar to LinkedDbValue (global DB member) and of an IOField on HMI_RT_2 to SharedValue (internal tag), each with every apply stage, compiler rows unchanged, compile scope the owning device, the dynamization read back (tag, type Tag, no indirect addressing) with the hmi_references chain item -> HMI tag resolved and the PLC declarations of the PLC-backed tags, hmi_inspect and the typed model unchanged outside the dynamization node (the item row only in its dynamizations and their behaviorCoverage count), same-key replay and other-key RecoveryRequired; checkpoint restore; normal Host lifecycle and an immediate read-write reopen, whose production Host still refused the kind. 48/48 checks per profile.",
+  "limitations": [
+    "Two profiles; tag dynamizations of ProcessValue only (Visible/Enabled need a Bool tag, which the fixtures lack); script, expression and faceplate-interface bindings are not offered.",
+    "Unified preservation compares the tag-table exports and the typed object model; payloads without a public getter stay uncompared (the standing notes). Runtime values and PLC communication are not verified."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "5df7f35d87d318e87dba7622b47442b740befd78ebe866533d7b435faf6fd970"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "cc67480a5e145eb6577a40c1d92326d05839e35628948bebc58626f9115fff07"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "46de79888d44ed2906b51d9e66c2deb29122747ae5ca3a6a4b1af09cbef956c2",
+      "bytes": 114083,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_retrieve fixture",
+        "setup HmiIOField QualificationField on HMI_RT_1 Overview_A",
+        "setup HmiBar QualificationBar on HMI_RT_1 Overview_A",
+        "setup HmiIOField QualificationField on HMI_RT_2 Overview_B",
+        "setup HmiGauge QualificationGauge on HMI_RT_2 Overview_B",
+        "change_prepare stale probe",
+        "change_prepare ProcessValue of HmiIOField QualificationField on HMI_RT_1 <- LinkedSignal",
+        "change_apply ProcessValue of HmiIOField QualificationField on HMI_RT_1 <- LinkedSignal",
+        "change_prepare ProcessValue of HmiBar QualificationBar on HMI_RT_1 <- LinkedDbValue",
+        "change_apply ProcessValue of HmiBar QualificationBar on HMI_RT_1 <- LinkedDbValue",
+        "change_prepare ProcessValue of HmiIOField QualificationField on HMI_RT_2 <- SharedValue",
+        "change_apply ProcessValue of HmiIOField QualificationField on HMI_RT_2 <- SharedValue",
+        "change_restore ProcessValue of HmiIOField QualificationField on HMI_RT_2 <- SharedValue",
+        "fresh tia_start",
+        "project_open saved original"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hmi_inspect",
+        "hmi_references",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    },
+    {
+      "report": "report.json",
+      "sha256": "fd2d98da720a81daa286d141ea89805abe1514a6ba125a6e1751920971d87345",
+      "bytes": 132332,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_retrieve fixture",
+        "setup HmiIOField QualificationField on HMI_RT_1 Overview_A",
+        "setup HmiBar QualificationBar on HMI_RT_1 Overview_A",
+        "setup HmiIOField QualificationField on HMI_RT_2 Overview_B",
+        "setup HmiGauge QualificationGauge on HMI_RT_2 Overview_B",
+        "change_prepare stale probe",
+        "change_prepare ProcessValue of HmiIOField QualificationField on HMI_RT_1 <- LinkedSignal",
+        "change_apply ProcessValue of HmiIOField QualificationField on HMI_RT_1 <- LinkedSignal",
+        "change_prepare ProcessValue of HmiBar QualificationBar on HMI_RT_1 <- LinkedDbValue",
+        "change_apply ProcessValue of HmiBar QualificationBar on HMI_RT_1 <- LinkedDbValue",
+        "change_prepare ProcessValue of HmiIOField QualificationField on HMI_RT_2 <- SharedValue",
+        "change_apply ProcessValue of HmiIOField QualificationField on HMI_RT_2 <- SharedValue",
+        "change_restore ProcessValue of HmiIOField QualificationField on HMI_RT_2 <- SharedValue",
+        "fresh tia_start",
+        "project_open saved original"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hmi_inspect",
+        "hmi_references",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

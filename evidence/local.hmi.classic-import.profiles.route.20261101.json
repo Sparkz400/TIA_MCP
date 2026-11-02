@@ -1,0 +1,114 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.classic-import.profiles.route.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T06:04:47+00:00",
+  "source": {
+    "commit": "750121ea23f34b439d7501396ebf3e9c651dc777",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Build hbf5 = 750121ea. scripts/qualify_hmi_gate_route.py (hmi_classic_import) --profile classic-rt-advanced and --profile classic-basic on their seeded HmiSeeder baselines (artifacts/q/hps, the 25 October bridge fixtures), each retrieved into an owned project with a Host started --hmi-change-qualification <profile>: refusals before any write (hmi_engineering kind, wrong operation, Unified family, non-canonical color, template/popup/global-elements imports, another screen's document, another root type, a DTD, two roots; Basic has no popup); BackColor on both HMIs, no-op and GridColor imports, a no-op import of the other screen and a tag-table import adding one tag, each with every apply stage, the baseline's start-screen compile error and every other compiler row unchanged, compile scope the target HmiTarget, the target read back, hmi_inspect unchanged outside the target, same-key replay and other-key RecoveryRequired; checkpoint restore; normal lifecycle of both Hosts and an immediate read-write reopen by a new TIA process, whose production Host still refused the profile. 72/72 (RT Advanced) and 71/71 (Basic).",
+  "limitations": [
+    "Two seeded fixtures whose HMIs have no start screen, so the compile is not clean; screens and tag tables only.",
+    "Classic HMI alarms have no public composition and stay uncompared (the standing Classic note); runtime and appearance are not verified."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "f2164e4228d3ad147fcf24cc212bd70d1e329ca298d23cf31acf6f5ee2891b96"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "9c574535c945de85f229a9c8dd6445f910a75e31f96a88af20ca7c807b254bed"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "4a97e55ac693985a73717db2c362f5120c50acf4317ebe30db86d50dbd4ff900",
+      "bytes": 129229,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_retrieve fixture",
+        "change_prepare stale probe",
+        "change_prepare BackColor of HMI_RT_1 Overview_A",
+        "change_apply BackColor of HMI_RT_1 Overview_A",
+        "change_prepare BackColor of HMI_RT_2 Overview_A",
+        "change_apply BackColor of HMI_RT_2 Overview_A",
+        "change_prepare no-op import of HMI_RT_1 Overview_B",
+        "change_apply no-op import of HMI_RT_1 Overview_B",
+        "change_prepare GridColor import of HMI_RT_1 Overview_B",
+        "change_apply GridColor import of HMI_RT_1 Overview_B",
+        "change_prepare no-op import of HMI_RT_1 Overview_A",
+        "change_apply no-op import of HMI_RT_1 Overview_A",
+        "change_prepare QualificationTags import with one added internal tag",
+        "change_apply QualificationTags import with one added internal tag",
+        "change_restore QualificationTags import with one added internal tag",
+        "fresh tia_start",
+        "project_open saved original"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hmi_inspect",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    },
+    {
+      "report": "report.json",
+      "sha256": "770208aa9c078ed522d7738eb7d48dbd305bf4ba6b437a647b0760b33c08fa03",
+      "bytes": 119433,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_retrieve fixture",
+        "change_prepare stale probe",
+        "change_prepare BackColor of HMI_RT_1 Overview_A",
+        "change_apply BackColor of HMI_RT_1 Overview_A",
+        "change_prepare BackColor of HMI_RT_2 Overview_A",
+        "change_apply BackColor of HMI_RT_2 Overview_A",
+        "change_prepare no-op import of HMI_RT_1 Overview_B",
+        "change_apply no-op import of HMI_RT_1 Overview_B",
+        "change_prepare GridColor import of HMI_RT_1 Overview_B",
+        "change_apply GridColor import of HMI_RT_1 Overview_B",
+        "change_prepare no-op import of HMI_RT_1 Overview_A",
+        "change_apply no-op import of HMI_RT_1 Overview_A",
+        "change_prepare QualificationTags import with one added internal tag",
+        "change_apply QualificationTags import with one added internal tag",
+        "change_restore QualificationTags import with one added internal tag",
+        "fresh tia_start",
+        "project_open saved original"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hmi_inspect",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

@@ -59,16 +59,24 @@ and the cross-unit callers bind `v21.fw41.softwareUnit.lad.call.crossUnit.v1` an
 natively qualified for either call; its cases are in
 `fixtures/typed-graphical/crossscope-cases.v1.json`.
 
-Added 27 October 2026 and **unqualified**: the model also accepts `compare` with
+Added 27 October 2026: the model also accepts `compare` with
 `DInt` or `Real`, `move` (one exact scalar `dataType`), `math` (`ADD`/`SUB`/`MUL`/`DIV`
 with one exact numeric `dataType`), `timer` `TONR` and `edge` (`R_TRIG`/`F_TRIG`,
 explicit `instance` storage like timers and counters). Every data pin, operand and
 native template overload must carry exactly that type; other combinations fail with
 `GraphicalComparisonUnsupported`, `GraphicalArithmeticUnsupported`,
 `GraphicalMoveUnsupported`, `GraphicalInstructionUnsupported` or `OperandTypeMismatch`.
-No native reference for these families has been captured, so the shipped catalog has
-no profile for them and they return `GraphicalProfileUnavailable` until one is
-captured and qualified. Profiles exist only for the CPU 1511 V4.1 target below.
+Their profiles are captured on the standard route (engineering and runtime qualified,
+29 October) and, since 2 November, on the software-unit and namespace routes with local
+and existing global TONR storage, engineering only
+([record](../verification/typed-wave9-routes-20261102.md)). R_TRIG/F_TRIG global storage is refused on every route,
+and created TONR/edge storage only exists on the standard route.
+
+A second target, CPU 1513-1 PN V4.1 (`OrderNumber:6ES7 513-1AM03-0AB0/V4.1`), has its own
+profiles (`v21.6es7-513-1am03-0ab0-v4-1.*`) and dependent-effect manifests for the base
+families on the standard route: Boolean, Int compare, FC/FB calls, TON/TOF/TP and
+CTU/CTD/CTUD with their storage, engineering only ([record](../verification/typed-second-cpu-20261102.md)). Every other
+family, route and CPU returns `GraphicalProfileUnavailable` there.
 
 Safety, protected/generated blocks, set/reset coils, P_TRIG/N_TRIG and edge
 contacts/coils, pointers, indirect access, array indexing, symbolic array bounds and

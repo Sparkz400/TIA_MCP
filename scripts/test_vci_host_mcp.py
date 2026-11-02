@@ -279,7 +279,19 @@ def main():
         unknown = call('vci_reopen',dict(recordRef=interrupted_ref))
         check('fresh Host retains interrupted dispatch as unknown', unknown['state']=='outcomeUnknown')
         reject('vci_commit',dict(previewRef=interrupted_ref,reviewedPlanSha256=interrupted['planSha256']),'RecoveryRequired')
-        reject('vci_reconcile',dict(previewRef=interrupted_ref,expectedCallbackSha256=unknown['commitJournal']['sha256']),'RecoveryRequired')
+        journal = unknown['commitJournal']
+        report['interruptedJournal'] = journal
+        reconcile = dict(previewRef=interrupted_ref,expectedCallbackSha256=journal['sha256'])
+        # Git can verify its commit between observing dispatchPrepared and terminating the Host.
+        if journal['phase'] == 'verified':
+            recovered = call('vci_reconcile',reconcile)
+            check('verified interrupted commit reconciles exactly its retained candidate',
+                  recovered['commit']==journal['candidateCommit'] and recovered['tree']==journal['candidateTree'])
+            check('reconciliation is idempotent without mutation replay', call('vci_reconcile',reconcile)==recovered)
+        else:
+            reject('vci_reconcile',reconcile,'RecoveryRequired')
+            check('unverified interruption retains its exact callback',
+                  call('vci_reopen',dict(recordRef=interrupted_ref))['commitJournal']==journal)
         check('parent remains intact after real Host loss', download(first['recordRef'],path='PLC/Über Motor.s7dcl') == raw)
         native_store = artifacts/'engineering-operations'
         check('no Siemens worker or native operation records created', not missing.exists() and

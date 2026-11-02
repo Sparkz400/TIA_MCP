@@ -3834,6 +3834,18 @@
       "obligations": [
         "X08"
       ]
+    },
+    {
+      "featureId": "change.hmi_dynamization_create",
+      "obligations": [
+        "X08"
+      ]
+    },
+    {
+      "featureId": "change.hmi_event_handler_create",
+      "obligations": [
+        "X08"
+      ]
     }
   ],
   "manualResiduals": [

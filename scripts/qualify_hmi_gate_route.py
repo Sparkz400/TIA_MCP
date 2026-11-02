@@ -62,9 +62,10 @@ BACKCOLOR, ALTERNATE, ADDED_TAG, EXTERNAL = "200, 210, 220", "210, 220, 230", "S
 SCREEN, FIELD, BUTTON = "QualificationScreen", "QualificationField", "QualificationButton"
 # The profiles production admits per kind (HmiEngineeringRules Kinds); the gate reports "production" there and "qualification" on
 # a qualification Host elsewhere (the qualifying runs of local.hmi.*.route.20261101 saw "qualification").
-PRODUCTION = {"hmi_classic_import": ("classic-comfort",), "hmi_external_tag_create": ("unified-comfort", "unified-pc"),
+PRODUCTION = {"hmi_classic_import": ("classic-comfort", "classic-rt-advanced", "classic-basic"), "hmi_external_tag_create": ("unified-comfort", "unified-pc"),
               "hmi_screen_create": ("unified-comfort", "unified-pc"),
-              "hmi_dynamization_create": ("unified-comfort", "unified-pc")}
+              "hmi_dynamization_create": ("unified-comfort", "unified-pc"),
+              "hmi_event_handler_create": ("unified-comfort", "unified-pc")}
 
 
 def admission(kind, profile):
