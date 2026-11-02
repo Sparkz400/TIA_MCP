@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -79,23 +81,53 @@ namespace TiaMcp.Openness.V21
     }
 
     // Reads one request line. .NET Framework's double.Parse misrounds some literals (2.2250738585072012e-308, long
-    // halfway mantissas), so each float is re-read exactly from its text, as the Host reads the same literal.
+    // halfway mantissas) and accepts some beyond the double range, so it never sees a float literal: each one is read
+    // exactly from its text first, as the Host reads it, and Newtonsoft parses a placeholder in its place.
     internal sealed class ExactNumberReader : JsonTextReader
     {
-        private readonly string _line;
-        internal ExactNumberReader(string line) : base(new System.IO.StringReader(line)) { _line = line; }
+        private readonly Queue<double> _floats;
+        internal ExactNumberReader(string line) : this(Scan(line)) { }
+        private ExactNumberReader(Tuple<string, Queue<double>> scanned) : base(new StringReader(scanned.Item1)) { _floats = scanned.Item2; }
 
         public override bool Read()
         {
             bool read = base.Read();
-            if (read && TokenType == JsonToken.Float)
+            // Every finite float token is a placeholder; NaN and Infinity literals keep Newtonsoft's value.
+            if (read && TokenType == JsonToken.Float && Value is double value && !double.IsNaN(value) && !double.IsInfinity(value))
             {
-                int end = LinePosition, start = end; // one line: the position just after the literal
-                while (start > 0 && "0123456789+-.eE".IndexOf(_line[start - 1]) >= 0) start--;
-                double? exact = CanonicalJsonText.ParseNumber(_line.Substring(start, end - start));
-                if (exact.HasValue) SetToken(JsonToken.Float, exact.Value, false);
+                if (_floats.Count == 0) throw new BridgeException("InvalidRequest", "A request number could not be read exactly.");
+                SetToken(JsonToken.Float, _floats.Dequeue(), false);
             }
             return read;
+        }
+
+        private static Tuple<string, Queue<double>> Scan(string line)
+        {
+            var text = new StringBuilder(line.Length); var floats = new Queue<double>();
+            bool inString = false;
+            for (int i = 0; i < line.Length; i++)
+            {
+                char c = line[i];
+                if (inString)
+                {
+                    text.Append(c);
+                    if (c == '\\' && i + 1 < line.Length) text.Append(line[++i]);
+                    else if (c == '"') inString = false;
+                    continue;
+                }
+                if (c == '"') { inString = true; text.Append(c); continue; }
+                if (c != '-' && (c < '0' || c > '9')) { text.Append(c); continue; }
+                int start = i;
+                while (i + 1 < line.Length && "0123456789+-.eE".IndexOf(line[i + 1]) >= 0) i++;
+                string literal = line.Substring(start, i - start + 1);
+                if (literal.IndexOfAny(new[] { '.', 'e', 'E' }) < 0 || literal == "-") { text.Append(literal); continue; }
+                double? exact;
+                try { exact = CanonicalJsonText.ParseNumber(literal); }
+                catch (FormatException) { text.Append(literal); continue; } // not a number; Newtonsoft refuses it
+                floats.Enqueue(exact ?? throw new BridgeException("InvalidRequest", "A request number is outside the double range."));
+                text.Append("0.0");
+            }
+            return Tuple.Create(text.ToString(), floats);
         }
     }
 }

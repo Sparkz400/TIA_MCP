@@ -1,0 +1,71 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.candidate_shapes.dependent_db.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T00:38:10+00:00",
+  "source": {
+    "commit": "1f539563593cd202e221f68bc145f0a4d6353afd",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_integrate_apply.py --candidates at 1f539563 (frozen artifacts/pc2, --artifacts artifacts/q2) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch, after a verified standalone install: multiInstanceDependents (multi-instance Gate of the reused FB in the FBD FB TiaMcpComponentHost, which has its own instance DB TiaMcpComponentHost_DB), multiDependentsEarlier (the same with two networks, after the first), multiDependentsLad and multiDependentsLadEarlier (LAD FB host) installed with candidateFeatures exactly dependentInstanceDb plus their combination, through the captured component effect instance-effects-component.v1.json (qualificationOnly in this build): the instance DB gained exactly the Gate member equal to the captured DB member and was otherwise equal to its baseline, plus every check of the other candidate cases (caller insertion proof with the new Static member, call oracle, library versions, fresh reopen, 0-error compile, restore of the typed step's checkpoint). multiInstanceParent (a parent FB embedding TiaMcpComponentHost) previewed eligible=false with DependencyProfileUnavailable naming the parent, and change_apply was refused before admission with no admission record, the plan prepared and the scratch unchanged.",
+  "limitations": [
+    "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1, standard PLC scope.",
+    "Covers the caller FB's direct instance DB; an embedding parent and its users stay refused (no captured transitive effect for a structured member)."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "4e6bd7810f301ab20de352e47c553e5b4f5930c241ae6f27bcb37d0f8336f5c8"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "2c187a7a773926b7b1490cf500ea5ad7f95ba32078197bace9bea3914f95214e"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "eda726d6f3f8d98aad9e345e1b7622f6121cad9ec8907a0c819fbe6f29f43e95",
+      "bytes": 15411287,
+      "completed": true,
+      "steps": [
+        "author",
+        "candidate:multiInstanceDependents",
+        "candidate:multiInstanceParent",
+        "candidate:multiDependentsEarlier",
+        "candidate:multiDependentsLad",
+        "candidate:multiDependentsLadEarlier"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

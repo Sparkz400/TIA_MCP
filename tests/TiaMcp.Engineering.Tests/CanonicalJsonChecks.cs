@@ -101,6 +101,13 @@ internal static class CanonicalJsonChecks
         int Flaky() => ++calls == 1 ? throw new BridgeException("StoreBusy", "Transient.") : CanonicalJson.Sha256(plain) == plainHash ? 1 : 0;
         Reject(() => CanonicalJson.Current(Flaky, "prepare again"), "StoreBusy", "A transient failure of a current-form review keeps its code");
         calls = 0; Reject(() => CanonicalJson.Compatible(Flaky), "StoreBusy", "Compatible does not mask a transient failure as an earlier form");
+        // A lone surrogate never verifies, not even against a hash an earlier build took over its U+FFFD replacement.
+        var lone = new JsonObject { ["t"] = "a\ud800" };
+        string replaced = CanonicalJson.LegacySha256(new JsonObject { ["t"] = "a�" });
+        Reject(() => CanonicalJson.Matches(replaced, lone), "InvalidRequest", "A lone surrogate is refused before the earlier form is tried");
+        Reject(() => CanonicalJson.LegacySerialize(lone), "InvalidRequest", "The earlier form refuses a lone surrogate too");
+        Reject(() => CanonicalJson.Compatible(() => CanonicalJson.Sha256(lone) == replaced ? 1 : throw new BridgeException("ArtifactChanged", "Mismatch.")), "InvalidRequest",
+            "A legacy re-derivation never accepts a lone surrogate");
         var ascii = JsonNode.Parse("{\"b\":[1,true,null],\"a\":\"plain\"}")!;
         Check(CanonicalJson.Sha256(ascii) == CanonicalJson.LegacySha256(ascii), "Plain ASCII content keeps its hash");
         Console.WriteLine($"PASS RFC 8785 canonical JSON: {passed} checks, {vectors["cases"]!.AsArray().Count} shared vectors; no native execution.");

@@ -155,8 +155,9 @@ public static class ComponentWindowEvidence
         Need(Text(recovery, "kind") == "project" && Text(recovery, "archiveSha256") == Text(checkpoint, "sha256") && recovery["retrieved"]?.GetValue<bool>() == true &&
             Text(Object(recovery, "project"), "path") == recoveredPath, "Actual recovered project/checkpoint identity differs.");
         Need(final["sourceSnapshotSha256"]?.GetValue<string>() == r.Manifest.SourceSnapshotSha256, "Original source content drifted.");
-        Need(SourceHash(r.Manifest.SourceSnapshotPath, r.Manifest.SourceSnapshotIsDirectory) == r.Manifest.SourceSnapshotSha256, "Retained source snapshot bytes changed.");
-        Need(SourceHash(r.Manifest.OriginalSourcePath, r.Manifest.OriginalSourceIsDirectory) == r.Manifest.SourceSnapshotSha256, "Original source bytes changed.");
+        var (snapshotKept, originalKept) = PinnedSource(r.Manifest);
+        Need(snapshotKept, "Retained source snapshot bytes changed.");
+        Need(originalKept, "Original source bytes changed.");
         Need(ProjectFileHash(r.Manifest.ProjectPath) == Text(original, "projectFileSha256"), "Saved original project changed after fresh native verification.");
         Need(ProjectFileHash(recoveredPath) == Text(reopened, "projectFileSha256"), "Saved recovered project changed after fresh native verification.");
     }
@@ -200,8 +201,8 @@ public static class ComponentWindowEvidence
         }
         var resource = recovery["resources"]![0]!.AsObject(); var checkpoint = Object(recovery, "firstCheckpointEvidence");
         Need(Text(resource, "archiveSha256") == Text(checkpoint, "sha256") && resource["retrieved"]?.GetValue<bool>() == true && Text(Object(resource, "project"), "path") == Text(restored, "projectPath"), "Exact recovered checkpoint receipt differs.");
-        Need(final["sourceSnapshotSha256"]?.GetValue<string>() == r.Manifest.SourceSnapshotSha256 && SourceHash(r.Manifest.SourceSnapshotPath, r.Manifest.SourceSnapshotIsDirectory) == r.Manifest.SourceSnapshotSha256 &&
-            SourceHash(r.Manifest.OriginalSourcePath, r.Manifest.OriginalSourceIsDirectory) == r.Manifest.SourceSnapshotSha256, "Recovery-only source resources changed.");
+        var (snapshotKept, originalKept) = PinnedSource(r.Manifest);
+        Need(final["sourceSnapshotSha256"]?.GetValue<string>() == r.Manifest.SourceSnapshotSha256 && snapshotKept && originalKept, "Recovery-only source resources changed.");
         Need(ProjectFileHash(r.Manifest.ProjectPath) == Text(original, "projectFileSha256") && ProjectFileHash(Text(reopened, "projectPath")) == Text(reopened, "projectFileSha256"), "Saved original/recovered files changed after current native observation.");
     }
 
@@ -316,9 +317,19 @@ public static class ComponentWindowEvidence
                 target["state"]?.GetValue<string>() is "Success" or "Information" or "Warning" && target["messagesTruncated"]?.GetValue<bool>() == false && Messages(target["messages"] as JsonArray, 0)),
             "Actual inner compile evidence is erroneous, absent or truncated.");
     }
-    private static string SourceHash(string path, bool directory)
+    // The worker pinned the source in the form it hashed with: a window reserved before RFC 8785 holds the earlier
+    // worker's form. The snapshot and the original are both compared in the form that matches the pin.
+    internal static (bool Snapshot, bool Original) PinnedSource(ComponentWindowManifest m)
     {
-        if (!directory) return PackageStorage.FileHash(path);
+        var snapshot = SourceHashes(m.SourceSnapshotPath, m.SourceSnapshotIsDirectory); int form = Array.IndexOf(snapshot, m.SourceSnapshotSha256);
+        var original = SourceHashes(m.OriginalSourcePath, m.OriginalSourceIsDirectory);
+        return (form >= 0, original[Math.Clamp(form, 0, original.Length - 1)] == m.SourceSnapshotSha256);
+    }
+    // A file has one hash. A directory has its RFC 8785 hash (the worker's LibraryDirectoryHash) and, second, the earlier
+    // worker's compact Newtonsoft form, which for these string-only rows differs only by escaping U+0085, U+2028 and U+2029.
+    internal static string[] SourceHashes(string path, bool directory)
+    {
+        if (!directory) return [PackageStorage.FileHash(path)];
         PackageStorage.EnsureNoLinks(path); var rows = new List<JsonObject>(); long bytes = 0; var stack = new Stack<string>(); stack.Push(path);
         while (stack.TryPop(out var current))
         {
@@ -331,7 +342,10 @@ public static class ComponentWindowEvidence
                 rows.Add(new JsonObject { ["path"] = Path.GetRelativePath(path, file).Replace('\\', '/'), ["sha256"] = PackageStorage.FileHash(file) });
             }
         }
-        return ComponentQualificationWindowStore.NativeHash(new JsonArray(rows.OrderBy(r => r["path"]!.GetValue<string>(), StringComparer.Ordinal).Select(r => (JsonNode)r).ToArray()));
+        var listing = new JsonArray(rows.OrderBy(r => r["path"]!.GetValue<string>(), StringComparer.Ordinal).Select(r => (JsonNode)r).ToArray());
+        string text = CanonicalJson.Serialize(listing);
+        string earlier = text.Replace("\u0085", "\\u0085").Replace("\u2028", "\\u2028").Replace("\u2029", "\\u2029");
+        return [ComponentQualificationWindowStore.TokenHash(text), ComponentQualificationWindowStore.TokenHash(earlier)];
     }
     private static void CompareObject(JsonObject a, JsonObject b)
     { Need(Text(a, "kind") == Text(b, "kind") && Text(a, "path") == Text(b, "path"), "Native peer identity differs."); CompareArtifact(Object(a, "artifact"), Object(b, "artifact")); }

@@ -6,7 +6,7 @@ import unittest
 
 import build_translation_admission as builder
 from qualify_translation_category_probe import ref
-from verify_watch_workflow import canonical_sha
+from verify_watch_workflow import canonical_sha, rfc8785, sha
 
 EXPECTED = [('BlockCommentCategoryData', 5), ('HwcnCommentTextCategoryData', 1), ('AlarmClassDisplayNameCategory', 0)]
 
@@ -22,15 +22,16 @@ class LedgerTests(unittest.TestCase):
 
     def tearDown(self): self.folder.cleanup()
 
-    def packet(self, contract, populated=True, kept=(5, 1, 0)):
+    def packet(self, contract, populated=True, kept=(5, 1, 0), digest=canonical_sha, text=None):
         root = self.root / 'si'
         key = {'contract': contract, 'scope': {'categoryIds': ['BlockCommentCategoryData'] if contract == builder.RESTRICTED_CONTRACT else ['All']}}
-        files = {'forward-instance-key.json': {'key': key, 'sha256': canonical_sha(key)},
+        if text: key['text'] = text
+        files = {'forward-instance-key.json': {'key': key, 'sha256': digest(key)},
                  'fixture-identity.json': {'projectPath': 'C:/scratch/Fixture.ap21', 'plcPath': 'PLC'},
                  'result.json': {}, 'admission.json': {}, 'exact-close.json': {},
                  'category-verification.json': {'populatedMainControl': populated, 'restricted': {'captures': [
                      {'category': c, 'keptRows': k, 'expectedRows': e} for (c, e), k in zip(EXPECTED, kept)]}},
-                 'verification.json': {'completed': True, 'nativeExecuted': True, 'sameInstance': True, 'forwardKeySha256': canonical_sha(key),
+                 'verification.json': {'completed': True, 'nativeExecuted': True, 'sameInstance': True, 'forwardKeySha256': digest(key),
                                        'pendingResources': 0, 'checks': [{'case': c} for c in ('before-dispatch', 'source-drift', 'import-reply',
                                                                                               'compile-reply', 'save-reply', 'reopen-reply', 'restore-reply')]},
                  'portable.json': {'failed': 0, 'passed': 183}, 'manifest.json': {}}
@@ -60,6 +61,17 @@ class LedgerTests(unittest.TestCase):
         return root
 
     def cases(self, registry): return [p['case'] for p in registry['entries'][0]['profile']['proofs'] if p['mode'] == 'native']
+
+    def test_proofs_carry_the_hosts_key_hash_in_either_form(self):
+        rfc = lambda value: sha(rfc8785(value).encode('utf-8'))
+        for digest in (canonical_sha, rfc):
+            with self.subTest(form=digest.__name__):
+                registry, _ = self.packet(builder.CONTRACT, digest=digest, text='Verified translation Main {0} — Ω')
+                key = registry['entries'][0]['profile']['key']
+                self.assertNotEqual(canonical_sha(key), rfc(key))
+                self.assertEqual({p['keySha256'] for p in registry['entries'][0]['profile']['proofs']}, {digest(key)})
+        with self.assertRaisesRegex(ValueError, 'Forward key digest'):
+            self.packet(builder.CONTRACT, digest=lambda value: '0' * 64)
 
     def test_whole_project_ledger_is_unchanged(self):
         registry, _ = self.packet(builder.CONTRACT)

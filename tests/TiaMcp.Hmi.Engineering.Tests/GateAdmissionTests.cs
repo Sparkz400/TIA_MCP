@@ -7,7 +7,7 @@ static class GateAdmissionTests
     static readonly string[] AllProfiles = { "classic-comfort", "classic-rt-advanced", "classic-basic", "classic-rt-professional", "unified-comfort", "unified-pc" };
     static readonly string[] Kinds = { "hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create", "hmi_dynamization_create", "hmi_event_handler_create" };
     // Kinds with no production profile before their native qualification, and their operations.
-    static readonly Dictionary<string, string[]> Unqualified = new Dictionary<string, string[]> { ["hmi_screen_create"] = new[] { "screen_create", "item_create" }, ["hmi_dynamization_create"] = new[] { "dynamization_set" }, ["hmi_event_handler_create"] = new[] { "event_handler_set" } };
+    static readonly Dictionary<string, string[]> Unqualified = new Dictionary<string, string[]> { ["hmi_dynamization_create"] = new[] { "dynamization_set" }, ["hmi_event_handler_create"] = new[] { "event_handler_set" } };
     const string Screen = "Siemens.Engineering.Hmi.Screen.Screen", TagTable = "Siemens.Engineering.Hmi.Tag.TagTable";
     static string Family(string profile) => profile.StartsWith("classic-", StringComparison.Ordinal) ? "classic" : "unified";
     static void Assert(bool value, string label) { if (!value) throw new Exception(label); }
@@ -15,6 +15,7 @@ static class GateAdmissionTests
     static bool Qualified(string kind, string profile, string operation, string type)
         => kind == "hmi_classic_import" ? profile == "classic-comfort" && (operation == "scalar_property_set" || operation == "classic_xml_import" && (type == Screen || type == TagTable))
             : kind == "hmi_external_tag_create" ? profile is "unified-comfort" or "unified-pc" && operation == "external_tag_create"
+            : kind == "hmi_screen_create" ? profile is "unified-comfort" or "unified-pc" && operation is "screen_create" or "item_create" // 2 November 2026
             : false; // Unqualified kinds: no production profile before their native qualification.
     static bool Open(string kind, string profile, string operation, string type, string qualification)
     {
@@ -39,7 +40,7 @@ static class GateAdmissionTests
                             Assert(open || HmiEngineeringRules.KindGate(kind, Family(profile), profile, operation, type).Value<string>("reasonCode") == "HmiPreservationUnavailable", "reason code");
                             opened += open ? 1 : 0;
                         }
-            Assert(opened == 3 + 2 + 2 * 3, "classic-comfort BackColor (three types), screen and tag-table import; external_tag_create on two profiles (three types each): " + opened);
+            Assert(opened == 3 + 2 + 2 * 3 + 2 * 2 * 3, "classic-comfort BackColor (three types), screen and tag-table import; external_tag_create on two profiles (three types each); screen_create and item_create on two profiles (three types each): " + opened);
             foreach (string kind in new[] { "hmi_engineering", "hmi_text_list_import", "invented", null })
                 Reject(() => HmiEngineeringRules.KindGate(kind, "classic", "classic-comfort", "classic_xml_import", Screen), "unknown kind " + kind);
         });
@@ -66,7 +67,7 @@ static class GateAdmissionTests
                         Assert(gate.Value<bool>("available") == expected && gate.Value<string>("admission") == (expected ? "qualification" : null)
                             && gate.Value<string>("nativeQualification") == "unverified" && gate.Value<string>("reasonCode") == (expected ? null : "HmiPreservationUnavailable"), kind + ": " + gate);
                     }
-            Assert(HmiEngineeringRules.KindGate("hmi_screen_create", "unified", "unified-pc", "screen_create", null).Value<string>("reason").Contains("no profile yet"), "no production profile yet");
+            Assert(HmiEngineeringRules.KindGate("hmi_dynamization_create", "unified", "unified-pc", "dynamization_set", null).Value<string>("reason").Contains("no profile yet"), "no production profile yet");
         });
         check("Classic import opens only for screens and tag tables", () => {
             foreach (string type in new[] { "Siemens.Engineering.Hmi.Screen.ScreenTemplate", "Siemens.Engineering.Hmi.Screen.ScreenPopup", "Siemens.Engineering.Hmi.Screen.ScreenSlidein",

@@ -9,10 +9,13 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.109`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.114`.
 
 ### Added
 
+- **Unified screens and items:** change kind `hmi_screen_create` creates a Unified screen (sized like an existing one) or an
+  allowlisted screen item past the HMI preservation gate; qualified natively and admitted on Unified Comfort and Unified PC
+  ([record](docs/verification/hmi-unified-authoring-20261102.md)).
 - **HMI lifecycle gates:** the HMI gate route checks that every compile names only the target HMI's own scope, that each Host
   lifetime ends normally (Host, worker and owned TIA exits verified) and that a new TIA process then opens the saved project
   read-write at once; passed on TP700 Comfort, MTP700 Unified Comfort and WinCC Unified PC RT
@@ -98,9 +101,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   optional `externalIoControllers` count); `network_io_assign` takes `sharedDevice` with `sharedSubmodules`, and
   `hardware_replace` takes `acceptAddressChange` with `acknowledgedTags`
   (`local.hardware_changes.topology.20261101`, `local.hardware_changes.topology_restores.20261101`).
-- **Capability profiles:** 13 module capability profiles in
-  `contracts/hardware-catalog-profiles.v1.json`, linked from `hardware_catalog_search` and checked by
-  attribute writes; technology version profiles in `contracts/technology-version-profiles.v1.json`
+- **Capability profiles:** 13 module capability profiles and the operator-installed I-device GSD
+  head's versionless profile in `contracts/hardware-catalog-profiles.v1.json`, linked from
+  `hardware_catalog_search` and checked by attribute writes; technology version profiles in `contracts/technology-version-profiles.v1.json`
   (45 cells on three CPUs) that `to_create` admits or refuses by (`local.technology.version_profiles.20261031`).
 - **Restricted translation profile:** qualification captures accept `categoryIds`, and the Host
   keeps exactly the requested categories of V21's leaking category export by row identity; a
@@ -121,6 +124,11 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 - **GSD:** the I-device GSD export reran (`local.gsd_transfer_areas.20261101`). With the GSDML
   installed by an operator, the hardware runner's `--slice gsd` adds the device, puts it on the subnet and
   assigns it with compile and checkpoint restore (`local.hardware_changes.gsd.20261101`).
+- **Hardware refusals natively:** the hardware runner's `--slice refusals` runs the MRP port-link
+  refusal both ways, the PLC-to-PLC shared-access refusal, channel and versionless capability-profile
+  refusals, the `sharedDevice` disconnect, an address change that moves the start address and a
+  second owned scratch whose CPU takes the module the first project set `OutsideOfProject`
+  (`local.hardware_changes.refusals.20261102`, [record](docs/verification/hardware-refusals-20261102.md)).
 
 ### Changed
 
@@ -130,8 +138,20 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   `capabilities.experimental["tiaMcp/featureCatalog"].version`.
 - Bundles from `scripts/Package.ps1` carry the product version in their name and `manifest.json`.
 - Combined PLC library apply is on by default for the natively verified recipe shapes;
-  `--enable-library-integrate-apply` is still accepted and changes nothing.
+  `--enable-library-integrate-apply` is still accepted and changes nothing. Since 2 November these
+  are 23 shapes: every combination of LAD/FBD FC and FB callers, earlier placement, reuse and the
+  reused-FB multi-instance (`local.library_integrate.candidate_shapes.combinations.20261102`), and a
+  multi-instance caller FB with its own instance DB, which gains the member through the newly captured
+  component effect (`local.typed.component-effect-capture.20261102`,
+  `local.library_integrate.candidate_shapes.dependent_db.20261102`); an embedding parent is still
+  refused before admission with `DependencyProfileUnavailable`.
 - Production Hosts dispatch the qualified force-table document edits.
+- `simulation_provision_reconcile` also requires the project's save time before its pre-provision
+  archive (and compares the project library), the storage outside the card against its pre-attempt
+  inventory by metadata, and a write-ahead stream that never opened or armed the credential; an
+  observer that was never created is unchanged. All five retained provisioning admissions on this
+  PC were released (`local.sim.reconcile.release.20261102`); `reconcile_provision.py` tracks every
+  process exactly and proves the project lock released.
 - `plc_station_upload` can trust an owned PLCSIM instance's TLS (`trustOwnedSimulationCertificate`,
   off by default); `safety_import_xml` compiles every device; the device compile lists devices
   without a compile service as not compiled instead of refusing.
@@ -180,7 +200,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   [shared vectors](fixtures/canonical-json/vectors.v1.json) that both runtimes' tests reproduce byte for
   byte; integer literals beyond 2^53 keep their exact digits, and a lone surrogate is refused
   (`InvalidRequest`). Numbers now hash by value (`1.0` as `1`, `1e3` as `1000`), and both runtimes
-  read number literals with one exact conversion (the worker's .NET Framework parser misrounds some);
+  read number literals with one exact conversion (the worker's .NET Framework parser misrounds some and never sees them);
   review diffs still report `1` to `1.0`. Non-ASCII text and `+ < > & '` stay literal. **Upgrade:**
   journals, records, captures, completed reviews, approvals and candidates, Test Suite jobs, VCI
   manifests and revisions, capture plans and saved reviews written by earlier builds keep verifying in
@@ -193,6 +213,12 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- No `sharedDevice` disconnect could compile: V21 fails a submodule left assigned to the leaving
+  PLC. The disconnect now names that PLC's items in `sharedSubmodules`, and they go to the one
+  remaining PLC in the same change (`local.hardware_changes.refusals.20261102`).
+- `hardware_catalog_search` never named a versionless (`GSD:`, `System:`) profile, because it
+  compared the entry's catalog version, a GSD file name, with the profile's firmware; it now matches
+  the type.
 - A Test Suite system-test endpoint also needs a TCP/IP instance: a Softbus instance keeps its
   configured controller address and the PLCSIM adapter can still route to it with nothing
   listening, so it now refuses with `PlcsimEndpointUnreachable`. No build dispatches system tests
@@ -219,6 +245,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
     grants scratch rights; generated-source reads take exclusive access.
   - Change prepare and apply refuse while another change on the same project needs recovery;
     `block_delete`, `block_rename`, `to_delete` and `hardware_delete` need `compile`.
+  - Rechecked natively on 2 November ([record](docs/verification/audit-paths-20261102.md)): the
+    delete and rename compile rule for all four kinds, `change_prepare`'s `RecoveryRequired` after a
+    failed apply, generated-source reads with `projectModifiedBefore`/`After`, and translation reopen
+    keeping scratch status for the owned fixture and never granting it to an admitted project.
   - A missing or renamed old project path no longer blocks every change; store locks wait up to
     5 s; finished records archive past 1,000 (Hosts older than this change refuse new admissions
     on a store with an `.archive` folder); a clock step back no longer fails a dispatch.
@@ -263,6 +293,11 @@ Changes since the repository went public on 23 October 2026, up to feature catal
     tags' names and fails such a change with `MutationVerificationFailed`, so the checkpoint recovers
     it; `software_unit_create_from`, where TIA renamed a copy's unit tag the same way, refuses such
     tags with the renamed blocks and types (`local.library.tag-collision.20261101`).
+- The translation admission scripts compared the Host's RFC 8785 key and row hashes (PR 184) with
+  the earlier form: `qualify_translation_import.py --same-instance` stopped before its first case,
+  and `build_translation_admission.py` would have written proofs the Host loader refuses. They accept
+  either form; the restricted pipeline ran natively end to end again
+  (`local.translation.restricted.qualification.20261102`, `local.translation.restricted.native.20261102`).
 - Native runs of 31 October and 1 November ([status log](docs/history/status-log.md#1-november-2026)):
   - `project_simulation_enable` compiles every device: in a project with more than one PLC it
     refused with `AmbiguousTarget`, or with a `plcPath` left the other PLCs uncompiled so the
@@ -301,7 +336,12 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   takes no OPC UA credential, a guest-access seed made at the desk
   ([record](docs/verification/testsuite-system-blocker-20261101.md)).
 - `project_upgrade` cannot upgrade projects with device types V21 dropped (for example a TP700
-  Comfort 15.0 panel); restricted translation profiles cover one PLC's block comments only.
+  Comfort 15.0 panel); V15.1 and V17–V20 sources and UMAC-protected or locked sources are not
+  exercised, since only V21 is installed here and V21 cannot create older projects. Restricted
+  translation profiles cover one PLC's block comments only, and the default-mode run that finalizes
+  such an entry imports its one admitted edit, so a final entry cannot import on its own scratch.
+- A local Git remote with more than 100,000 entries is refused (`GitLimitExceeded`) until it is
+  repacked.
 - `library_instantiate` and `software_unit_create_from` recognize a master-copy tag TIA renamed by
   its `<name>(<n>)` form beside an existing `<name>`, so a tag that is itself named that way fails
   the change too.
