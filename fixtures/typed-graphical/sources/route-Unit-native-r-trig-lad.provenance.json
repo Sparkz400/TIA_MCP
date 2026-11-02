@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "builderUsed": false,
+  "authoredFormat": "native_xml_template_derivation",
+  "requiresNativeAcceptance": true,
+  "namespace": "TiaMcp_UnitA",
+  "references": [
+    {
+      "path": "fixtures/typed-graphical/native/Tgp_R_TRIG_LAD.xml",
+      "sha256": "37efac88d4afdee4bff61988cc468a3d2db59a44c5858653536587a010b7b0da"
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpUnit_TemplateFB_LAD.xml",
+      "sha256": "38f4b13c74ba63cddc705ac2b24ffb3e66128532571b1bba17c1d130e15c7dbc"
+    }
+  ],
+  "adaptedFields": [
+    "Access",
+    "AutoNumber",
+    "MemoryLayout presence",
+    "Namespace",
+    "Name",
+    "Number"
+  ],
+  "sourceSha256": "93251e38783016ba387c01258985c554875db412e96f4af09cc77c0577d8ce45"
+}

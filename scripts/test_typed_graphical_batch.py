@@ -609,6 +609,25 @@ class RouteCapturePacketTests(unittest.TestCase):
         self.assertLessEqual(captured, used)
         self.assertTrue(all((root / "fixtures/typed-graphical/native" / (name + ".xml")).is_file() for name in captured))
 
+    def test_wave9_route_packet_parses_exactly_and_admits_storage_before_its_callers(self):
+        root = pathlib.Path(__file__).resolve().parents[1]
+        packet = json.loads((root / "fixtures/typed-graphical/route-capture-wave9-packet.v1.json").read_bytes())
+        names = []
+        for entry in packet["sources"]:
+            observed, _, _ = authored_reference(root / entry["path"], packet["unit"])
+            for key in ("names", "namespace", "route", "authoredFormat"):
+                self.assertEqual(entry[key], observed[key], entry["path"])
+            self.assertEqual(entry["sha256"], observed["fileSha256"], entry["path"])
+            names.extend(entry["names"])
+        self.assertEqual(126, len(names))
+        self.assertEqual(len(names), len(set(names)))
+        runs = [run["argsFile"] for run in packet["runs"].values()]
+        self.assertEqual(sorted(entry["path"] for entry in packet["sources"]), sorted(path for run in runs for path in run))
+        for run in runs:
+            storage = [i for i, path in enumerate(run) if path.endswith("-global-tonr-storage.scl")]
+            callers = [i for i, path in enumerate(run) if "-tonr-global-" in path]
+            self.assertTrue(not callers or (len(storage) == 1 and storage[0] < min(callers)))
+
     def test_scoped_packet_inputs_parse_exactly_and_order_their_phases(self):
         root = pathlib.Path(__file__).resolve().parents[1]
         packet = json.loads((root / "fixtures/typed-graphical/route-capture-scoped-packet.v1.json").read_bytes())
