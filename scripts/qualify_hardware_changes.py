@@ -943,13 +943,15 @@ def shared_disconnect(run):
     payload = {"hardwarePath": device, "connectorIndex": 1, "disconnect": True, "sharedDevice": True, "sharedSubmodules": [module]}
     run.b0 = run.current
     # The inverse of the shared assignment's constants: the scratch CPU's station constants go, SpDi3's returns to HwPeerCpu; the
-    # emptied IO system HwScratchIo stays with its constant.
+    # emptied IO system HwScratchIo stays with its constant. The scratch CPU's interface lists no assigned connector (and TIA
+    # clears its LoadLimitation, rq1).
     gone = [key for key in run.current["view"] if key.startswith(constant(run, SCRATCH, SP.prefix))]
+    controller = owner + "/items/PROFINET%20interface_1"
     return run.apply("disconnect %s's shared connector, restored" % SP.device, "network_io_assign", payload,
                      {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": SHARED_IO, "afterIoSystem": None, "disconnect": True, "sharedDevice": True,
                                    "sharedSubmodules": [{"hardwarePath": module, "assignmentTargetBefore": owner, "assignmentTargetAfter": peer}]}]},
                      shown={**payload, "addressControllerOwnerPath": owner, "sharedAddressControllerOwnerPaths": [peer]}, plc=scratch_plc(run),
-                     changed=["hw:" + device, "hw:" + module + "/items/SpDi3"], removed=gone, added=[constant(run, SP, SP.prefix + "SpDi3")],
+                     changed=["hw:" + device, "hw:" + controller, "hw:" + module + "/items/SpDi3"], removed=gone, added=[constant(run, SP, SP.prefix + "SpDi3")],
                      restore=True, boundary=True) is not None
 
 

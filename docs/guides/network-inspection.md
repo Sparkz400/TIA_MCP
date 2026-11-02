@@ -212,8 +212,13 @@ restored it and `OutsideOfProject`. The `sharedDevice` disconnect is not exercis
   each target before and after. Preservation adds every item's shared-device attributes: inside those subtrees every I/O address
   ends owned by exactly the selected PLC with its I/O type and length (its start moves into that PLC's address space) and a
   target may only become the selected PLC; each named item must move its target and at least one address; every other row,
-  owners and targets included, stays exact. `disconnect: true` with `sharedDevice` removes one PLC again (each station address
-  then has at most one owner among the remaining PLCs). Without `sharedDevice`, a further assigned connector is
+  owners and targets included, stays exact. `disconnect: true` with `sharedDevice` removes one PLC again. V21 fails the
+  device compile of a submodule left assigned to the leaving PLC ("An attempt was made to compile a submodule that is not
+  assigned"), so the disconnect names in `sharedSubmodules` every item assigned to that PLC (refused when one is missing or
+  another is named) and they go to the one remaining PLC in the same change, before the connector leaves (more remaining PLCs
+  are `UnsupportedCapability`); the preview lists their targets, and preservation applies the connection's rule with the
+  remaining PLC as the new owner. With no item assigned to the leaving PLC, `sharedSubmodules` is refused and each station
+  address keeps at most one owner among the remaining PLCs. Without `sharedDevice`, a further assigned connector is
   `UnsupportedCapability`; the generated server contract (`expectedServerModule`) belongs to the first assignment only.
 - **Per-module access.** V21 keeps `SharedDeviceAccessType` (`Unknown`, `OutsideOfProject`, `PLC`) read-only and derives it
   from `SharedDeviceAccessConfigured` and the device item in `SharedDeviceAssignmentTarget`, both writable on every item of an
