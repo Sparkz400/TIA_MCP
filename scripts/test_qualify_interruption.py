@@ -6,6 +6,7 @@ import re
 import shutil
 import tempfile
 import unittest
+from unittest import mock
 
 import qualify_interruption as q
 
@@ -105,6 +106,17 @@ class InterruptionMatrixTests(unittest.TestCase):
             hit |= {p for p, (trigger, m) in q.GATE_POINTS.items() if m == "worker" and trigger(journal)}
         self.assertEqual({"mut", "wrt", "comp", "save"}, hit)
         self.assertFalse(any(trigger({"state": "applied", "stages": APPLIED_STAGES}) for trigger, _ in q.GATE_POINTS.values()))
+
+    def test_dynamization_is_absent_before_its_setup_item_exists(self):
+        # Run hd1: the presence check ran before the setup created the IOField and raised instead of reporting absent.
+        import qualify_hmi_gate_route as route
+        found = {}
+        devices = {"HMI_RT_1": {"identity": {}, "hmiPath": "/h1", "family": "unified"}}
+        fixture = {"HMI_RT_1": {"screens": {"Overview_A": {"identity": {"objectPath": "/h1/screens/Overview_A"}}}}}
+        with mock.patch.object(route, "devices", lambda client, family: devices), mock.patch.object(route, "binding_fixture", lambda client, hmis: fixture),                 mock.patch.object(route, "rows", lambda client, device, section, **request: found):
+            self.assertFalse(q.dynamization_present(None))
+            found["/h1/screens/Overview_A/items/QualificationField"] = {"dynamizations": [{"property": "ProcessValue", "properties": {"Tag": "LinkedSignal"}}]}
+            self.assertTrue(q.dynamization_present(None))
 
     def test_gate_scenarios_run_on_the_change_qualification_host(self):
         self.assertEqual(["--hmi-change-qualification", "unified-comfort"], q.gate_host_arguments())
