@@ -1,0 +1,69 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.translation.adoption-refusal.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T05:20:09+00:00",
+  "source": {
+    "commit": "bba756d31d31f7d5702c68354d37dea353172440",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "The cross-worker adoption boundary, two qualify_translation_import.py runs in explicit --translation-qualification sessions on a frozen Debug build of bba756d3 (artifacts/ap4): dpa1 (--stop-after-noop) created a fresh owned fixture, passed the scratch-only preparation after the fixture stage and after the no-op import's reopen, reconciled the no-op and closed with exact process-tree proof; dpa2 (--resume-root dpa1) in a new Host and worker resumed the closed fixture (qualification_translation_resume_closed_fixture reopened and observed it without replay), and its next qualification_translation_capture was refused by the worker's ownership check (ProjectIsolationRequired, 'Exact saved worker-owned translation fixture required.' in the Host log; the qualification tool returns MCP's generic error text): a fresh worker never adopts a fixture it did not create. Both runs closed with exact process-tree proof.",
+  "limitations": [
+    "No adoption route exists by decision (31 October rule: a reopen keeps, never grants); only its refusal is qualified.",
+    "The refusal code is read from the Host log, not from the MCP response.",
+    "One owned whole-project de-DE/en-GB fixture."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "dcd5310addfc68d4c0b2d970edcc166ee70a8aa731577b354a1aad24b08f0c09"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "1501707ea0ba8e79870a8c51106ce7ecd7e6c472701b57594d052c57236d6db9"
+    }
+  ],
+  "runs": [
+    {
+      "report": "dp-adoption-refusal.json",
+      "sha256": "20510b1af6fcf5a7fb21c502da1fb17542fdd61800ce9593731a6bdb66b182ed",
+      "bytes": 22159,
+      "completed": true,
+      "steps": [
+        "dpa1: noop",
+        "dpa1: scratchProbes",
+        "dpa2: noop",
+        "dpa2: adoptionRefused"
+      ],
+      "toolsPassed": [
+        "change_prepare",
+        "project_open",
+        "qualification_translation_apply",
+        "qualification_translation_capture",
+        "qualification_translation_categories",
+        "qualification_translation_fixture",
+        "qualification_translation_prepare",
+        "qualification_translation_reconcile",
+        "qualification_translation_recover",
+        "qualification_translation_resume_closed_fixture",
+        "qualification_translation_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "qualification_translation_apply",
+        "qualification_translation_capture"
+      ]
+    }
+  ]
+}

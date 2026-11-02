@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.115",
+  "catalogVersion": "0.4.117",
   "targetTiaVersions": [
     21
   ],
@@ -4420,6 +4420,43 @@
         "No import through the final entry: the default-mode packet that finalizes an entry imports its one admitted edit, so the entry's baseline is spent before it is installed; an import through a final entry needs a scratch whose baseline a new packet admits.",
         "One scratch instance, one PLC, de-DE/en-GB."
       ]
+    },
+    {
+      "id": "local.plc_object_mutations.audit.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "bba756d31d31f7d5702c68354d37dea353172440",
+        "passedScope": "Rerun of local.plc_object_mutations.rerun.20261028 with the 31 October audit steps: scripts/qualify_plc_object_mutations.py on a frozen Debug build of bba756d3 (artifacts/ap4, git archive) in one owned scratch CPU 1511-1 PN (V21), 374/374 steps, every X11 kind applied, persisted across a fresh reopen, refused and restored as in the 28 October run. New: every preview reported isModified; block_rename of X11Edit and block_delete of X11Drop were each refused with compile=false (InvalidRequest, requires compile=true) before their checkpoint and then applied from the same prepared change with checkpoint, compile and save; after the closing partial failure (X11Ref at %M20000.0, CompileFailed, recovery_required) change_prepare of another change on the project was refused with RecoveryRequired naming the failed change, and change_apply of a change prepared before the failure was refused before its checkpoint with FingerprintUnavailable (the failed compile leaves X11Reader inconsistent), the change still prepared with no stage or before.zap21 and the failed change still recovery_required; change_restore of the failed change was refused FingerprintUnavailable as before."
+      },
+      "artifacts": [
+        "evidence/local.plc_object_mutations.audit.20261102.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN at PLC-root scope: no software units, namespaces, safety, know-how protection or generated system-group objects.",
+        "The apply-side unresolved-change guard is not reached sequentially: a failed apply changes the project, so the fingerprint check refuses an earlier preview first; the guard covers a change still checkpointing, applying or restoring, which a sequential run cannot hold.",
+        "The first run on bc162ad2 (x11_38dc79d7, 372/373) stopped because its runner did not accept FingerprintUnavailable; fixed in 22880f21.",
+        "Engineering only; runtime behavior is not observed."
+      ]
+    },
+    {
+      "id": "local.translation.adoption-refusal.20261102",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "bba756d31d31f7d5702c68354d37dea353172440",
+        "passedScope": "The cross-worker adoption boundary, two qualify_translation_import.py runs in explicit --translation-qualification sessions on a frozen Debug build of bba756d3 (artifacts/ap4): dpa1 (--stop-after-noop) created a fresh owned fixture, passed the scratch-only preparation after the fixture stage and after the no-op import's reopen, reconciled the no-op and closed with exact process-tree proof; dpa2 (--resume-root dpa1) in a new Host and worker resumed the closed fixture (qualification_translation_resume_closed_fixture reopened and observed it without replay), and its next qualification_translation_capture was refused by the worker's ownership check (ProjectIsolationRequired, 'Exact saved worker-owned translation fixture required.' in the Host log; the qualification tool returns MCP's generic error text): a fresh worker never adopts a fixture it did not create. Both runs closed with exact process-tree proof."
+      },
+      "artifacts": [
+        "evidence/local.translation.adoption-refusal.20261102.json"
+      ],
+      "limitations": [
+        "No adoption route exists by decision (31 October rule: a reopen keeps, never grants); only its refusal is qualified.",
+        "The refusal code is read from the Host log, not from the MCP response.",
+        "One owned whole-project de-DE/en-GB fixture."
+      ]
     }
   ],
   "features": [
@@ -6138,7 +6175,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.read_contracts.20261028",
-          "local.read_contracts.20261102"
+          "local.read_contracts.20261102",
+          "local.plc_object_mutations.audit.20261102"
         ]
       },
       "availability": {
@@ -6184,7 +6222,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.read_contracts.20261028"
+          "local.read_contracts.20261028",
+          "local.plc_object_mutations.audit.20261102"
         ]
       },
       "availability": {
@@ -7823,7 +7862,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified. compile=false is refused before the checkpoint (local.plc_object_mutations.audit.20261102).",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
@@ -7832,7 +7871,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.milestones.rerun.20261028",
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.plc_object_mutations.audit.20261102"
         ]
       },
       "availability": {
@@ -8034,7 +8074,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified. compile=false is refused before the checkpoint (local.plc_object_mutations.audit.20261102).",
           "Exact standard unprotected block only. dependencyPolicy defaults to rejectReferenced; other deletion policies are not accepted.",
           "The conservative exported-XML dependency scan runs at prepare and immediately before deletion. It excludes only the exact selected declaration and rejects references or incomplete evidence; no cascade deletion or automatic reference rewriting.",
           "The dependency guard refused deleting a referenced FB natively (DependencyExists) in local.plc_object_mutations.20261028.",
@@ -8045,7 +8085,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.milestones.rerun.20261028",
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.plc_object_mutations.audit.20261102"
         ]
       },
       "availability": {
@@ -18091,13 +18132,14 @@
         "limitations": [
           "Qualification-session only: reopen an already reconciled fixture after exact prior process closure; verify current content without replaying the completed import.",
           "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
-          "Natively qualified by local.translation.qualification.20261028: Resumed a closed fixture whose no-op lifecycle and checkpoint recovery were reconciled, then ran only the remaining edit."
+          "Natively qualified by local.translation.qualification.20261028: Resumed a closed fixture whose no-op lifecycle and checkpoint recovery were reconciled, then ran only the remaining edit. Since 31 October the fresh worker only reopens and observes the fixture: its next capture is refused (ProjectIsolationRequired), natively on 2 November (local.translation.adoption-refusal.20261102); no adoption route is built."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.qualification.20261028"
+          "local.translation.qualification.20261028",
+          "local.translation.adoption-refusal.20261102"
         ]
       },
       "availability": {
