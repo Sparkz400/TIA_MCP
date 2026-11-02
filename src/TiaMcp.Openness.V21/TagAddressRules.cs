@@ -29,6 +29,8 @@ namespace TiaMcp.Openness.V21
             foreach (var address in document.Descendants().Where(e => e.Name.LocalName == "Address"))
             {
                 string area = address.Attribute("Area")?.Value;
+                if (area == "PeripheryInput") area = "Input";
+                if (area == "PeripheryOutput") area = "Output";
                 if (area != "Input" && area != "Output") continue;
                 if (!int.TryParse(address.Attribute("BitOffset")?.Value, out int offset) || offset < 0 || offset > 7999999)
                     throw new BridgeException("SafetyBoundary", "An absolute I/O operand has an unqualified bit offset on a PLC with F-I/O.");

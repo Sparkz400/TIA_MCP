@@ -21,6 +21,7 @@ internal static class TagAddressChecks
         Check(TagAddressRules.SourceIoAddresses("L PEW 4; T PQB 1; A I 2 . 1;").SequenceEqual(new[] { "%EW4", "%QB1", "I2.1" }), "peripheral STL mnemonics and spaced bit operands retain their address ranges");
         var blockIo = TagAddressRules.BlockIoAddresses(System.Xml.Linq.XDocument.Parse("<Document><Access xmlns=\"urn:native\" Scope=\"Address\"><Address Area=\"Input\" Type=\"Word\" BitOffset=\"40\" /></Access></Document>"));
         Check(blockIo.Length == 16 && blockIo.Any(a => TagAddressRules.FIoOverlap(a, ranges) == "/fdi"), "namespaced XML operands check their complete bit range");
+        Check(TagAddressRules.BlockIoAddresses(System.Xml.Linq.XDocument.Parse("<Document><Address Area=\"PeripheryOutput\" Type=\"Bool\" BitOffset=\"1\" /></Document>")).Single() == "%Q0.1", "XML peripheral areas use the same F-I/O ownership ranges");
         bool refusedType = false;
         try { TagAddressRules.BlockIoAddresses(System.Xml.Linq.XDocument.Parse("<Document><Address Area=\"Output\" Type=\"FutureType\" BitOffset=\"0\" /></Document>")); }
         catch (BridgeException) { refusedType = true; }

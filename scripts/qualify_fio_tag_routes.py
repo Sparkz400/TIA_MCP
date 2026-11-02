@@ -22,6 +22,8 @@ Every refusal must come from change_prepare as SafetyBoundary naming the F-DI, a
   TIA then created the master copy's tag as McProbe(1), run fr_eeb8be6f; qualify_master_copy_tag_collision.py covers it.)
 - software_unit_create_from of a master copy of the standard PLC's tag-bearing unit FioUnit into the F-PLC; into the standard PLC,
   after FioUnit was deleted there, it applies.
+- source_upsert of SCL that implicitly creates an input tag, and block_import_xml of a native FBD absolute input operand:
+  both refuse on the F-PLC without changing its tag tables and apply on the standard PLC.
 Last, a probe records whether a tag table mapped in each other VCI format still synchronizes project-ward after a
 bit-memory edit (the F-I/O rule reads the package as SimaticML).
 """
@@ -144,24 +146,25 @@ def absolute_block_read(h, plc, standard, fio, scope, standard_scope):
     payload = {"language": "SCL", "source": source, "expectedBlockNames": ["FioReadProbe"]}
     refuse(h, "source generation of an implicit F-input tag", "source_upsert", payload, scope, address=fio)
     change(h, "source_upsert", payload, standard_scope)
-    exported = h.tool("block_read", {"plcPath": standard, "blockName": "FioReadProbe"})
+    fixture = Path(__file__).resolve().parents[1] / "fixtures/libraries/component-qualification/TiaMcpComponentCaller.s7dcl"
+    graphical = fixture.read_text(encoding="utf-8-sig").replace('"TiaMcpComponentCaller"', '"FioXmlReadProbe"')
+    change(h, "source_upsert", {"language": "SIMATIC_SD", "source": graphical, "expectedBlockNames": ["FioXmlReadProbe"]}, standard_scope)
+    exported = h.tool("block_read", {"plcPath": standard, "blockName": "FioXmlReadProbe"})
     xml = artifact_bytes(h.tool, exported["artifact"]).decode("utf-8-sig")
-    payload = {"xml": absolute_xml(xml, fio), "expectedBlockNames": ["FioReadProbe"]}
+    payload = {"xml": absolute_xml(xml, fio), "expectedBlockNames": ["FioXmlReadProbe"]}
     change(h, "block_import_xml", payload, standard_scope)
     refuse(h, "XML block import of an absolute F-input", "block_import_xml", payload, scope, address=fio)
 
 
 def absolute_xml(xml, fio):
-    """Keep native namespace spelling: TIA can silently drop a reserialized StructuredText body."""
+    """Replace the native FBD fixture's input access, preserving all other XML and namespace spelling."""
     byte, bit = map(int, fio.removeprefix("%I").split("."))
-    pattern = r'<Access\b(?=[^>]*Scope="(?:GlobalVariable|Address)")([^>]*)>(.*?)</Access>'
+    pattern = r'<Access\b(?=[^>]*Scope="LocalVariable")([^>]*)>\s*<Symbol>\s*<Component Name="PreserveInput"\s*/>\s*</Symbol>\s*</Access>'
     def replace(match):
-        attributes = re.sub(r'Scope="[^"]+"', 'Scope="Address"', match.group(1))
-        uid = re.search(r'<(?:Symbol|Address)\b[^>]*\bUId="([^"]+)"', match.group(2))
-        require(uid is not None, "The native SCL operand must carry its own UId")
-        return '<Access%s><Address Area="Input" Type="Bool" BitOffset="%d" UId="%s" /></Access>' % (attributes, byte * 8 + bit, uid.group(1))
+        attributes = match.group(1).replace('Scope="LocalVariable"', 'Scope="Address"')
+        return '<Access%s><Address Area="Input" Type="Bool" BitOffset="%d" /></Access>' % (attributes, byte * 8 + bit)
     updated, count = re.subn(pattern, replace, xml, flags=re.S)
-    require(count == 1, "Expected one input read in the native standard source export")
+    require(count == 1, "Expected one PreserveInput access in the native FBD fixture")
     ET.fromstring(updated)
     return updated
 
