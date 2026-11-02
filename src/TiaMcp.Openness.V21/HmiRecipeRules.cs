@@ -77,6 +77,12 @@ namespace TiaMcp.Model
                 throw new ArgumentException("A newly-created internal tag unexpectedly changed connection or acquired a PLC binding.");
         }
 
+        // An internal tag has no PLC tag and no address, and its Connection names no connection of its HMI: V21 shows a localized
+        // pseudo-connection there (run hb1, 2 November 2026: "<Internal tag>"), whose text is never compared. Every other tag must
+        // prove its PLC owner before a binding to it.
+        internal static bool IsInternalTag(string plcTag, string address, bool resolvesNativeConnection)
+            => string.IsNullOrEmpty(plcTag) && string.IsNullOrEmpty(address) && !resolvesNativeConnection;
+
         internal static void RequireExternalTagReadback(string name, string dataType, string connection, string plcTag, string plcName,
             string observedName, string observedDataType, string observedConnection, string observedPlcTag, string observedAccessMode, string observedPlcName)
         {

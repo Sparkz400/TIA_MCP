@@ -410,8 +410,8 @@ namespace TiaMcp.Openness.V21
                 var tag = HmiResolveNativeObject(project, (JObject)binding["tagIdentity"]).Native as Siemens.Engineering.HmiUnified.HmiTags.HmiTag
                     ?? throw new BridgeException("DependencyUnresolved", "Dynamization target is not an exact native HMI tag.");
                 HmiRecipeRules.RequireTypeCompatibility(binding.Value<string>("dataType"), tag.DataType);
-                if (!string.IsNullOrEmpty(tag.Connection) || !string.IsNullOrEmpty(tag.PlcTag))
-                    result["plcBackedTag"] = HmiProvePlcBackedTag(project, (JObject)payload["target"], tag.DataType, tag.Connection, tag.PlcTag, tag.AccessMode.ToString(), tag.PlcName, change.Directory);
+                if (HmiInternalTag(project, (JObject)payload["target"], tag)) result["tagScope"] = new JObject { ["scope"] = "internal", ["nativeConnectionLabel"] = tag.Connection };
+                else result["plcBackedTag"] = HmiProvePlcBackedTag(project, (JObject)payload["target"], tag.DataType, tag.Connection, tag.PlcTag, tag.AccessMode.ToString(), tag.PlcName, change.Directory);
                 result["property"] = property; result["tag"] = tag.Name; result["dataType"] = tag.DataType; result["createdPath"] = HmiCreatedPath(payload);
             }
             else
@@ -437,7 +437,7 @@ namespace TiaMcp.Openness.V21
                         var tag = HmiResolveNativeObject(project, (JObject)binding["tagIdentity"]).Native as Siemens.Engineering.HmiUnified.HmiTags.HmiTag
                             ?? throw new BridgeException("DependencyUnresolved", "Binding target is not an exact native HMI tag.");
                         HmiRecipeRules.RequireTypeCompatibility(binding.Value<string>("dataType"), tag.DataType);
-                        if (!string.IsNullOrEmpty(tag.Connection) || !string.IsNullOrEmpty(tag.PlcTag))
+                        if (!HmiInternalTag(project, (JObject)payload["target"], tag))
                             plcBacked[binding.Value<string>("property")] = HmiProvePlcBackedTag(project, (JObject)payload["target"], tag.DataType, tag.Connection, tag.PlcTag, tag.AccessMode.ToString(), tag.PlcName, change.Directory);
                     }
                     result["bindings"] = payload["bindings"].DeepClone();
@@ -446,6 +446,13 @@ namespace TiaMcp.Openness.V21
                 }
             }
             return result;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private bool HmiInternalTag(Project project, JObject target, Siemens.Engineering.HmiUnified.HmiTags.HmiTag tag)
+        {
+            var hmi = (Siemens.Engineering.HmiUnified.HmiSoftware)ResolveHmiTarget(project, target).Software;
+            return HmiRecipeRules.IsInternalTag(tag.PlcTag, tag.Address, !string.IsNullOrEmpty(tag.Connection) && hmi.Connections.Find(tag.Connection) != null);
         }
 
         private void ApplyHmiEngineeringMutation(EngineeringChange change, Project project)
