@@ -2,6 +2,37 @@
 
 Siemens provides an application-specific AllowList registration method for unattended Openness startup. `Register-TiaOpennessApplication.ps1` implements that V21 method for exactly `workers/openness/TiaMcp.Openness.V21.exe` inside a verified release bundle. This concerns the Siemens application authorization prompt, not Windows network firewall rules.
 
+## Setup and approved updates
+
+Extract the verified engineering release to its **final location**, then run the trusted
+`Setup-TiaMcp.ps1` from elevated **64-bit Windows PowerShell**. This is the explicit
+setup/update authorization step; ordinary MCP startup never registers or trusts changed code.
+The output directories must already exist, and both JSON output paths must be fresh:
+
+```powershell
+.\scripts\Setup-TiaMcp.ps1 -BundlePath 'C:\TiaMcp' `
+    -ExpectedWorkerSha256 '<worker SHA256 from the verified release>' `
+    -ArtifactsDirectory 'C:\TiaMcpData' `
+    -ConfigurationPath 'C:\TiaEvidence\tia-mcp-setup.json' `
+    -ReportPath 'C:\TiaEvidence\openness-setup.json'
+```
+
+The script verifies the bundle, registers that worker identity, verifies registry readback,
+and creates an external MCP configuration pointing to that location. Import that configuration
+into the MCP client. `-InspectOnly` previews the registration and configuration without elevation,
+registry writes, file creation or starting TIA. The artifact directory is explicit so an elevated
+administrator's profile is not accidentally selected for another engineering user.
+
+With an unchanged registered worker, repeated tool calls and Host restarts should not need
+another Siemens application approval. After an explicitly approved update or relocation,
+rerun setup with the new verified release's worker hash and fresh report/configuration paths.
+It refreshes the entry for the same executable path, or creates an unused entry for a new path.
+Other installations and obsolete duplicates are retained. An already matching entry produces
+`already_registered` with no registry writes. Setup does not grant ongoing write access to the
+AllowList, install prerequisites, change client settings automatically, or copy/move the bundle.
+
+## Inspection and registration details
+
 First inspect the proposal without administrator privileges or registry changes:
 
 ```powershell
@@ -14,23 +45,51 @@ To apply it, run the same trusted script under elevated **64-bit** Windows Power
 .\scripts\Register-TiaOpennessApplication.ps1 -BundlePath 'C:\TiaMcp' -ExpectedWorkerSha256 '<worker SHA256 from the verified release>' -ReportPath 'C:\TiaEvidence\openness-registration-unique.json'
 ```
 
-The report parent must already exist and the report file must not exist. Apply mode requires an explicit report so previous registry values are saved before any change. Adding a report inside the immutable bundle would invalidate strict bundle verification and is rejected. Keep `Verify-TiaMcpBundle.ps1` beside the registration script when staging it separately; do not substitute an untrusted verifier.
+The report parent must already exist and the report file must not exist. Apply mode requires an explicit report so previous registry values are saved before any change. Adding a report inside the immutable bundle would invalidate strict bundle verification and is rejected. Keep the trusted `Verify-TiaMcpBundle.ps1` and `OpennessRegistration.Helpers.ps1` beside the registration script when staging it separately; setup additionally requires `New-McpConfiguration.ps1` and the registration script.
 
 The script requires an absolute local bundle path and rejects traversal, device/UNC paths and reparse points. It verifies every bundled file using the sibling verifier's strict mode, then hashes the worker while holding its file open against replacement/writes. The supplied expected SHA256 must match. Bundle manifest consistency alone is not publisher authentication; obtain the expected worker hash from the release whose archive was already verified.
 
 The only registry values written are `Path`, `DateModified` and `FileHash`, all strings, under:
 
 ```text
-HKEY_LOCAL_MACHINE\SOFTWARE\Siemens\Automation\Openness\AllowList\TiaMcp.Openness.V21.exe\Entry
+HKEY_LOCAL_MACHINE\SOFTWARE\Siemens\Automation\Openness\AllowList\TiaMcp.Openness.V21.exe\<selected entry>
 ```
 
-The script uses `Registry64`. `Path` is the final deployed executable path; `DateModified` uses that file's UTC modification time formatted invariantly as `yyyy/MM/dd HH:mm:ss.fff`; `FileHash` is Base64 of its raw SHA-256 digest. It reads the values back and reports success only when they match. Other entry values and other applications are preserved. The report includes the previous Entry's existence and all its value names, types and raw values for review/recovery. A failed or interrupted write must be reconciled using that report before retrying.
+The script uses `Registry64`. It searches subkeys by case-insensitive `Path`, preferring an already matching identity over stale duplicates; otherwise it refreshes a matching path or chooses an unused `Entry`, `Entry (1)`, and so on. It never overwrites another path's registration. `Path` is the final deployed executable path; `DateModified` uses that file's UTC modification time formatted invariantly as `yyyy/MM/dd HH:mm:ss.fff`; `FileHash` is Base64 of its raw SHA-256 digest. It reads the values back and reports success only when they match. Other entry values and other applications are preserved. The report names the selected key and includes its previous existence and all its value names, types and raw values for review/recovery. A failed or interrupted write must be reconciled using that report before retrying. If configuration creation fails after registration, the registration report remains the recovery record; setup does not undo an already verified registration.
 
 The format is documented in Siemens' [V21 Openness firewall documentation](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/tia-portal-openness-api/general-functions/tia-portal-openness-firewall). Register **after** deployment: changing the path, modification timestamp or file contents requires registration of the new identity. V21's AllowList is version-independent; the older versioned Whitelist path is not used. See [V21 migration changes](https://docs.tia.siemens.cloud/r/en-us/v21/readme-tia-portal-openness/major-changes-for-long-term-stability-in-tia-portal-openness-v21).
 
 This script neither changes group membership nor starts TIA. The actual worker user still needs `Siemens TIA Openness` membership and a fresh login after membership changes. Siemens' [group setup instructions](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/basics/installation/adding-users-to-the-siemens-tia-openness-user-group) and [service guidance](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/basics/installation/using-windows-service) describe these separate requirements. In a service-style session, use the intended user account and create a new TIA instance without UI. Registration does not establish SSH compatibility, license availability or successful native execution.
 
-Run the read-only guards against a release with `Test-TiaOpennessRegistration.ps1 -BundlePath '<absolute release directory>' -ReportPath '<test evidence JSON>'`. The suite never invokes apply mode and compares the application registry entry before/after. Apply-mode verification is a separate explicitly authorized guest operation.
+Run the read-only guards against a release with `Test-TiaOpennessRegistration.ps1 -BundlePath '<absolute release directory>' -ReportPath '<test evidence JSON>'`. Without `-BundlePath` it creates an inert, manifest-consistent fixture under `artifacts/`; no fixture executable is run. The suite never invokes apply mode and compares all application entry values before/after. `Test-OpennessRegistrationLogic.ps1` exercises selection, refresh, unrelated-value preservation and write/readback failures using an in-memory registry, plus setup/configuration success and failure using a stub registrar. These tests do not establish native authorization success after an actual setup write.
+
+## Why TIA still asks
+
+The Host checks the configured engineering worker at startup without loading Siemens APIs.
+A missing or stale identity produces a diagnostic on **stderr**, preserving MCP stdout. It
+does not block normal startup or suppress TIA's own approval dialog. To obtain JSON without
+starting either worker or TIA:
+
+```powershell
+.\scripts\Start-TiaMcp.ps1 -CheckOpennessRegistration
+# Or for a source build / explicit worker:
+.\host\TiaMcp.Host.exe --worker 'C:\TiaMcp\workers\openness\TiaMcp.Openness.V21.exe' --check-openness-registration
+```
+
+The report identifies the executable and matching registry entry. Status is `registered`,
+`missing`, `path_not_registered`, `stale`, `worker_missing`, `unavailable` or
+`unsupported_platform`; mismatches name `Path`, `DateModified` or `FileHash`. Exit code is
+0 for a matching identity and 2 otherwise; invalid command options still fail with code 1.
+`--diagnose` also includes this report, alongside its existing native discovery. Registration
+inspection is unavailable in offline packages or with `--no-native-workers`.
+
+All supported HMI MCP operations already use the persistent installed Openness worker.
+Separately compiled helpers have their **own** application identities: registering the worker
+does not authorize `NativeXZ.exe` or any other helper. Rebuilding those helpers changes the
+identity again. Use supported MCP operations through the installed worker; a missing adapter
+needs an implementation and its own native qualification, not an authorization workaround.
+In particular, RT Advanced screen mutation remains outside the admitted HMI change profiles;
+this setup change does not qualify it or remove its preservation/compile requirements.
 
 ## Development builds
 
