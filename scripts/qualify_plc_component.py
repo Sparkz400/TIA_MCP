@@ -33,10 +33,11 @@ FIXTURE_CALLER = json.loads((FIXTURES / "manifest.json").read_text(encoding="utf
 KIND = "library_component_qualification"
 # --canonical-hash-probe adds these to every advance request. The worker hashes the request and ignores it otherwise, so the step passes
 # only if the Host's and the worker's RFC 8785 hashes agree on a non-ASCII name and text (sent \u-escaped) and on the number literals
-# 1e3 and 2.2250738585072012e-308. json.dumps cannot spell those, so they travel as "<raw>...</raw>" strings that RawNumbers writes
-# as the literal number on the wire.
+# 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 (double.MaxValue). json.dumps cannot spell those, so they travel as
+# "<raw>...</raw>" strings that RawNumbers writes as the literal number on the wire. Before the first advance, the same request
+# with 1.8e308 added must be refused with InvalidRequest, with nothing dispatched.
 HASH_PROBE = {"reviewNote": "Pr\u00fcfung \u00c4\u00d6\u00dc \u00df \u8a66\u9a13 \U0001f600", "pr\u00fcfName\u540d\u524d": "\u00c9tape \u2116 1",
-              "reviewWeight": "<raw>1e3</raw>", "reviewTiny": "<raw>2.2250738585072012e-308</raw>"}
+              "reviewWeight": "<raw>1e3</raw>", "reviewTiny": "<raw>2.2250738585072012e-308</raw>", "reviewMax": "<raw>1.7976931348623158e308</raw>"}
 RAW_NUMBER = re.compile(r'"<raw>(-?[0-9][0-9.eE+-]*)</raw>"')
 
 
@@ -562,6 +563,23 @@ class ComponentRun:
         if tool.startswith("library_"): self.session.guard()
         return self.session.call(tool, arguments)
 
+    def refusing_call(self, tool, arguments):
+        """Before the first advance, the same request with 1.8e308 added must be refused with InvalidRequest and the window unchanged."""
+        if tool == "change_prepare" and "outOfRangeRefusal" not in self.report:
+            window = lambda: {k: v for k, v in self.lifetime.control("status").items() if k in ("revision", "state", "children")}
+            self.session.guard()
+            over = copy.deepcopy(arguments); over["payload"]["reviewOver"] = "<raw>1.8e308</raw>"
+            self.report["outOfRangeRefusal"] = row = {"literal": "1.8e308", "arguments": over, "windowBefore": window()}
+            self.persist()
+            # The client directly, not the audit: an expected refusal must not mark the owned session's close uncertain.
+            result = self.session.client.request("tools/call", {"name": tool, "arguments": over})
+            row.update(isError=bool(result.get("isError")), error=(result.get("structuredContent") or {}).get("error") or {"message": str(result.get("content"))},
+                       windowAfter=window())
+            self.persist()
+            require(row["isError"] and row["error"].get("code") == "InvalidRequest", "1.8e308 was not refused with InvalidRequest: %s" % row["error"])
+            require(row["windowBefore"] == row["windowAfter"], "The refused request changed the component window.")
+        return self.call(tool, arguments)
+
     def apply(self, kind, payload):
         prepared = self.call("change_prepare", {"kind": kind, "payload": payload})
         row = {"kind": kind, "prepared": prepared, "dispatched": True}
@@ -726,7 +744,7 @@ class ComponentRun:
             self.retain("step_reviewed", exact)
 
         probe = HASH_PROBE if getattr(self.args, "canonical_hash_probe", False) else None
-        installed = drive_component(self.call, initial, review, self.retain, probe)
+        installed = drive_component(self.refusing_call if probe else self.call, initial, review, self.retain, probe)
         self.report["installed"] = installed; self.persist()
         if probe:
             # Each child's requestSha256 is the Host's hash, which it compared with the worker's before the dispatch.
@@ -896,7 +914,7 @@ def main():
     source_mode.add_argument("--reuse-source-report", type=Path, help="Reuse only native04's exact committed archive in a new consumer; never author/reopen/resume the old attempt.")
     parser.add_argument("--reuse-source-report-sha256", help="Required exact reviewed SHA256 of --reuse-source-report.")
     parser.add_argument("--known-store-root", type=Path, action="append", default=[], help="Additional known retained engineering store; locked in canonical order for the component window.")
-    parser.add_argument("--canonical-hash-probe", action="store_true", help="Add a non-ASCII name and text and the literals 1e3 and 2.2250738585072012e-308 to every advance request (RFC 8785 Host/worker hash agreement).")
+    parser.add_argument("--canonical-hash-probe", action="store_true", help="Add a non-ASCII name and text and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 to every advance request, and expect one with 1.8e308 refused first (RFC 8785 Host/worker hash agreement).")
     args = parser.parse_args()
     require(5 <= args.timeout <= 900, "Timeout must be 5..900 seconds.")
     if args.canonical_hash_probe:

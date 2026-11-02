@@ -591,9 +591,28 @@ class ComponentDriverTests(unittest.TestCase):
         self.assertIn('"reviewTiny": 2.2250738585072012e-308', wire)
         self.assertIn('"<raw>x</raw>"', wire)
         self.assertIn("\\u00fc", wire)
+        self.assertIn('"reviewMax": 1.7976931348623158e308', wire)
         payload = json.loads(wire)["params"]["payload"]
-        self.assertEqual((1000.0, 2.2250738585072014e-308), (payload["reviewWeight"], payload["reviewTiny"]))
+        self.assertEqual((1000.0, 2.2250738585072014e-308, 1.7976931348623157e308), (payload["reviewWeight"], payload["reviewTiny"], payload["reviewMax"]))
         self.assertEqual(json.loads, RawNumbers().loads)
+
+    def test_out_of_range_advance_is_refused_once_before_the_first_advance(self):
+        run = ComponentRun.__new__(ComponentRun)
+        run.report, run.persist = {}, lambda: None
+        run.session, run.lifetime, run.call = mock.Mock(), mock.Mock(), mock.Mock(return_value="advanced")
+        run.lifetime.control.return_value = {"revision": 3, "state": "active", "children": [{"step": "start"}], "nextStep": "verifyImport"}
+        run.session.client.request.return_value = {"isError": True, "structuredContent": {"error": {"code": "InvalidRequest"}}}
+        advance = {"kind": "k", "payload": {"action": "advance", **HASH_PROBE}}
+        self.assertEqual("advanced", run.refusing_call("change_prepare", advance))
+        self.assertEqual("advanced", run.refusing_call("change_prepare", advance))
+        sent = run.session.client.request.call_args.args[1]["arguments"]["payload"]
+        self.assertEqual(1, run.session.client.request.call_count)
+        self.assertEqual(("<raw>1.8e308</raw>", None), (sent["reviewOver"], advance["payload"].get("reviewOver")))
+        self.assertEqual([mock.call("change_prepare", advance)] * 2, run.call.call_args_list)
+        run.report = {}
+        run.session.client.request.return_value = {"isError": False, "structuredContent": {"state": "import_verified"}}
+        with self.assertRaisesRegex(RuntimeError, "not refused"):
+            run.refusing_call("change_prepare", advance)
 
     def test_lost_response_never_replays_or_restores(self):
         calls = []

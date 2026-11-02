@@ -151,6 +151,7 @@ namespace TiaMcp.Openness.V21
                                 if (jsonReader.Read()) throw new BridgeException("InvalidRequest", "Only one JSON object per request is accepted.");
                                 id = request.Value<string>("id");
                                 if (string.IsNullOrWhiteSpace(id) || id.Length > 128) throw new BridgeException("InvalidRequest", "A request id of 1–128 characters is required.");
+                                if (jsonReader.OutOfRange) throw new BridgeException("InvalidRequest", "A request number is outside the double range.");
                                 if (request.Value<int?>("protocolVersion") != 1) throw new BridgeException("ProtocolVersionMismatch", "This worker accepts protocolVersion 1.");
                                 string operation = request.Value<string>("operation");
                                 if (string.IsNullOrWhiteSpace(operation)) throw new BridgeException("InvalidRequest", "operation is required.");
