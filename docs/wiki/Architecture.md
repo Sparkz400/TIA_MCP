@@ -14,6 +14,8 @@
 
 Siemens assemblies are loaded from your installed products and are never redistributed. The portable package disables native workers entirely.
 
+The engineering worker and its TIA connection are reused across tool calls. Startup checks the worker's saved application identity read-only; registration belongs to explicit setup and approved updates. Separate native helpers are separate applications. See [registration and worker boundaries](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/openness-application-registration.md#why-tia-still-asks).
+
 ## Changes are recoverable, not transactional
 
 Native changes follow **prepare → preview → checkpoint → apply → verify**. A change can partially fail across Siemens calls; recovery uses its checkpoint and journal. The public simulation workflow works only on adapter-owned simulator instances: it can download a changed program online, set virtual time and inject interrupts there, but it does not expose physical PLC download, force or CPU control.

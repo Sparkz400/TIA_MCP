@@ -12,6 +12,14 @@ try
     if (args.Length > 0 && args[0].StartsWith("--session-relay-", StringComparison.Ordinal))
         return await SessionRelay.RunAsync(args);
     var options = TiaMcp.Host.HostOptions.Parse(args);
+    var registration = options.NoNativeWorkers ? null : OpennessRegistration.Inspect(options.WorkerPath);
+    if (options.CheckOpennessRegistration)
+    {
+        Console.WriteLine(JsonSerializer.Serialize(registration, new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true }));
+        return registration?.Status == "registered" ? 0 : 2;
+    }
+    if (registration is { Status: not "registered" })
+        Console.Error.WriteLine($"OpennessRegistration [{registration.Status}]: {registration.Message}");
     var workerArguments = new List<string>();
     if (options.SimulatorApiDirectory is not null) workerArguments.AddRange(["--sim-api-dir", options.SimulatorApiDirectory]);
     if (options.ComponentQualification) workerArguments.Add("--component-qualification");
@@ -32,7 +40,7 @@ try
         {
             var info = await bridge.CallAsync("bridge_info");
             var discovery = await bridge.CallAsync("discover");
-            Console.WriteLine(JsonSerializer.Serialize(new { bridge = info, discovery }, new JsonSerializerOptions { WriteIndented = true }));
+            Console.WriteLine(JsonSerializer.Serialize(new { bridge = info, discovery, opennessRegistration = registration }, new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true }));
         }
         else
         {

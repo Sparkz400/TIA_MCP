@@ -9,6 +9,13 @@ Siemens assemblies come from the installed products; the repository does not
 redistribute them. Native operations depend on the installed options, supported
 targets, project state and usable licenses.
 
+The Host retains its engineering worker and that worker's Openness session across
+tool calls. Normal startup reads the selected executable's saved Siemens AllowList
+identity and reports missing/stale registration without changing it. Only explicit
+[setup or an approved update](openness-application-registration.md#setup-and-approved-updates)
+registers the installed executable. Separate native helper programs have separate
+identities; they are not covered by the worker's registration or capability qualification.
+
 Portable workflows inspect supplied documents and saved project reviews through
 the Host and portable libraries. The portable package disables native workers.
 The read-only Project Explorer can display an exported snapshot in a standalone

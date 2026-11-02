@@ -11,6 +11,8 @@ $result = @{status='running';nativeExecuted=$false;steps=@()}
 Start-Transcript -LiteralPath (Join-Path $output 'validation.log') | Out-Null
 try {
     & (Join-Path $PSScriptRoot 'Test-Deployment.ps1')
+    & (Join-Path $PSScriptRoot 'Test-OpennessRegistrationLogic.ps1')
+    & (Join-Path $PSScriptRoot 'Test-TiaOpennessRegistration.ps1')
     $result.steps += 'deployment guards'
     if (-not $BundlePath) { $BundlePath = & (Join-Path $PSScriptRoot 'Package.ps1') -Offline }
     $bundle = (Resolve-Path -LiteralPath $BundlePath).Path

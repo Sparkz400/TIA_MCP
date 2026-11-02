@@ -3,6 +3,7 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
 & (Join-Path $PSScriptRoot 'Test-EnvironmentDiagnostics.ps1')
 & (Join-Path $PSScriptRoot 'Test-Deployment.ps1')
+& (Join-Path $PSScriptRoot 'Test-OpennessRegistrationLogic.ps1')
 & (Join-Path $PSScriptRoot 'Test-GuestAccessStartup.ps1')
 if ($BundlePath) { & (Join-Path $PSScriptRoot 'Test-TiaOpennessRegistration.ps1') -BundlePath $BundlePath }
 else { Write-Host 'Registration inspection not run: supply -BundlePath with a verified release.' }
