@@ -62,7 +62,7 @@ SCENARIOS = {
 # Generic change_apply matrix: one fixture per reconciliation class, killed at each durable journal boundary.
 # Reconciliation depends on the kind only through its fingerprint route, so each class has one representative.
 # Kinds whose outcome fingerprint needs prepared in-memory targets (AdmissionReconcileRules.cs keeps the same set).
-TARGET_KINDS = {"hmi_engineering", "hmi_text_list_import", "hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create", "hardware_attributes", "tag_set", "constant_set",
+TARGET_KINDS = {"hmi_engineering", "hmi_text_list_import", "hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create", "hmi_dynamization_create", "hmi_event_handler_create", "hardware_attributes", "tag_set", "constant_set",
                 "block_attributes_set", "project_attributes_set", "connection_set", "software_unit_publication_set",
                 "db_snapshot_create", "db_snapshot_load_actual", "simulation_download_online", "testsuite_application_import", "testsuite_system_import",
                 "vci_workspace_create", "vci_workspace_delete", "vci_mapping_add", "vci_mapping_remove", "vci_synchronize", "vci_conflict_resolve",
@@ -110,7 +110,8 @@ TEXT_LIST_POINTS = {"ckpt": POINTS["ckpt"], "mut": (_COMPILING, "worker"), "imp"
 _WRITING = lambda j: j.get("state") == "applying" and "hmi_native_write_started" in stages(j) and "mutation_applied" not in stages(j)
 GATE_POINTS = {"ckpt": POINTS["ckpt"], "mut": (_COMPILING, "worker"), "wrt": (_WRITING, "worker"), "comp": POINTS["comp"], "save": POINTS["save"],
                "hckp": (POINTS["ckpt"][0], "host"), "hwrt": (_WRITING, "host"), "hsav": (POINTS["save"][0], "host")}
-GATE_PROFILES = {"ci": ("classic-comfort",), "et": ("unified-comfort", "unified-pc"), "sc": ("unified-comfort", "unified-pc")}  # The --hmi-fixture-profile each prefix runs on.
+GATE_PROFILES = {"ci": ("classic-comfort", "classic-rt-advanced", "classic-basic"), "et": ("unified-comfort", "unified-pc"), "sc": ("unified-comfort", "unified-pc"),
+                 "dy": ("unified-comfort", "unified-pc"), "eh": ("unified-comfort", "unified-pc")}  # The --hmi-fixture-profile each prefix runs on.
 
 
 def expected_outcome(kind, point):
@@ -164,7 +165,7 @@ def technology_present(client):
     return TO_NAME in {o["name"] for o in read["technologyObjects"]}
 
 
-HMI_FIXTURE = None  # --hmi-fixture: the HMI fixture archive of the tl-*, ci-*, et-* and sc-* scenarios.
+HMI_FIXTURE = None  # --hmi-fixture: the HMI fixture archive of the tl-*, ci-*, et-*, sc-*, dy-* and eh-* scenarios.
 HMI_FIXTURE_PROFILE = "unified-comfort"  # --hmi-fixture-profile: the fixture's profile, admitted by the qualification Host.
 TEXT_LIST = "EntryTypes"  # Created by the boundary-values candidate.
 
@@ -174,7 +175,7 @@ def setup_scratch(scenario, client):
 
 
 def setup_hmi_fixture(scenario, client):
-    require(HMI_FIXTURE is not None, "tl-*, ci-*, et-* and sc-* scenarios need --hmi-fixture")
+    require(HMI_FIXTURE is not None, "tl-*, ci-*, et-*, sc-*, dy-* and eh-* scenarios need --hmi-fixture")
     scenario.step("project_retrieve HMI fixture", client.tool("project_retrieve", {
         "archivePath": str(HMI_FIXTURE), "expectedSha256": hashlib.sha256(HMI_FIXTURE.read_bytes()).hexdigest()}))
 
@@ -185,7 +186,8 @@ def text_list_host_arguments():
 
 
 def gate_host_arguments():
-    """The qualification-only admission of the fixture's profile for the gate kinds (hmi_classic_import, hmi_external_tag_create, hmi_screen_create)."""
+    """The qualification-only admission of the fixture's profile for the gate kinds (hmi_classic_import, hmi_external_tag_create, hmi_screen_create,
+    hmi_dynamization_create, hmi_event_handler_create)."""
     return ["--hmi-change-qualification", HMI_FIXTURE_PROFILE]
 
 
@@ -227,6 +229,46 @@ def screen_present(client):
     return any(r["name"] == SCREEN for r in rows(client, devices(client, "unified")["HMI_RT_1"], "screens").values())
 
 
+def prepare_dynamization(scenario, client):
+    """ProcessValue of a new IOField on HMI_RT_1 Overview_A (created first through hmi_screen_create, applied and saved) bound to
+    LinkedSignal, a PLC-backed tag."""
+    from qualify_hmi_gate_route import BOUND, apply_arguments, binding_fixture, binding_payload, binding_setup, bound_item, devices, prepare
+    hmis = devices(client, "unified")
+    fixture = binding_fixture(client, hmis)
+    label, kind, payload = binding_setup(fixture)[0]
+    applied = scenario.step("setup " + label, client.tool("change_apply", apply_arguments(prepare(client, kind, payload))))
+    require(applied.get("state") == "applied", "The setup item was not applied: " + str(applied.get("state")))
+    hmi, screen, item, _, tag = BOUND[0]
+    payload = binding_payload(bound_item(client, hmis, fixture, hmi, screen, item), fixture[hmi]["tags"][tag])
+    return scenario.step("change_prepare hmi_dynamization_create", prepare(client, "hmi_dynamization_create", payload))
+
+
+def dynamization_present(client):
+    """The ProcessValue binding of the setup IOField; absent too while the item itself does not exist (before the setup, run hd1)."""
+    from qualify_hmi_gate_route import BOUND, binding_fixture, devices, rows
+    hmis = devices(client, "unified")
+    hmi, screen, item, _, tag = BOUND[0]
+    screen_path = binding_fixture(client, hmis)[hmi]["screens"][screen]["identity"]["objectPath"]
+    row = rows(client, hmis[hmi], "items", screenPath=screen_path).get(screen_path + "/items/" + item) or {}
+    return any(d.get("property") == "ProcessValue" and (d.get("properties") or {}).get("Tag") == tag for d in row.get("dynamizations") or [])
+
+
+def prepare_event_handler(scenario, client):
+    """A script handler of HMI_RT_1/Overview_A for one of its documented events without a handler."""
+    from qualify_hmi_gate_route import devices, event_type, handler_payload, prepare, screen_fixture
+    hmis = devices(client, "unified")
+    screen = screen_fixture(client, hmis)["HMI_RT_1"]["screens"]["Overview_A"]
+    return scenario.step("change_prepare hmi_event_handler_create", prepare(client, "hmi_event_handler_create", handler_payload(screen, event_type(client, hmis["HMI_RT_1"], screen))))
+
+
+def event_handler_present(client):
+    from qualify_hmi_gate_route import STORED_SCRIPT, devices, rows, screen_fixture
+    device = devices(client, "unified")["HMI_RT_1"]
+    path = screen_fixture(client, {"HMI_RT_1": device})["HMI_RT_1"]["screens"]["Overview_A"]["identity"]["objectPath"]
+    row = rows(client, device, "screens", objectPath=path).get(path) or {}
+    return any((h.get("script") or {}).get("scriptCode") == STORED_SCRIPT for h in row.get("eventHandlers") or [])
+
+
 def prepare_text_list(scenario, client):
     from qualify_hmi_text_list_import import boundary_requests
     from qualify_hmi_text_list_route import author, prepare, unified_device
@@ -246,7 +288,9 @@ KINDS = {"su": ("source_upsert", prepare_source, source_present, setup_scratch, 
          "tl": ("hmi_text_list_import", prepare_text_list, text_list_present, setup_hmi_fixture, TEXT_LIST_POINTS),
          "ci": ("hmi_classic_import", prepare_classic_import, classic_import_present, setup_hmi_fixture, GATE_POINTS),
          "et": ("hmi_external_tag_create", prepare_external_tag, external_tag_present, setup_hmi_fixture, GATE_POINTS),
-         "sc": ("hmi_screen_create", prepare_screen, screen_present, setup_hmi_fixture, GATE_POINTS)}
+         "sc": ("hmi_screen_create", prepare_screen, screen_present, setup_hmi_fixture, GATE_POINTS),
+         "dy": ("hmi_dynamization_create", prepare_dynamization, dynamization_present, setup_hmi_fixture, GATE_POINTS),
+         "eh": ("hmi_event_handler_create", prepare_event_handler, event_handler_present, setup_hmi_fixture, GATE_POINTS)}
 KIND_SCENARIOS = {f"{prefix}-{point}": (prefix, point) for prefix, row in KINDS.items() for point in row[4]}
 
 # project_upgrade (X01) of the two small public examples, each copied into its scenario's inputs as qualify_project_upgrade.py does.
@@ -464,6 +508,8 @@ class Scenario:
             setup(self, client)
             require(not present(client), "The fixture effect must be absent before the change")
             prepared = prepare(self, client)
+            # A setup apply (dy-*: the IOField the binding needs) is an earlier, completed admission; only later ones count.
+            earlier = {a["id"] for a in admissions(self.root, "change_apply")}
             project = pathlib.Path(prepared["preview"]["project"]["path"])
             journal = pathlib.Path(prepared["journalPath"])
             request = client.begin("tools/call", {"name": "change_apply", "arguments": self.apply_arguments(prepared)})
@@ -483,7 +529,7 @@ class Scenario:
             require(rows["checkpointMutationCompileSave"]["disposition"] == expected["project"], f"Expected project {expected['project']}")
         final = read_json(journal)
         archive, archive_hash = final.get("recoveryArchive"), final.get("recoveryArchiveSha256")
-        every = admissions(self.root, "change_apply")
+        every = [a for a in admissions(self.root, "change_apply") if a["id"] not in earlier]
         unresolved = [a["id"] for a in every if a["state"] in ("dispatchIntent", "outcomeUnknown")]
         self.step("admissions after reconcile", {"unresolved": unresolved, "total": len(every)})
         require(len(every) == 1, "Reconciliation must not dispatch another apply")
@@ -889,8 +935,8 @@ def main():
     parser.add_argument("--report", type=pathlib.Path, required=True)
     parser.add_argument("--hmi-fixture", type=pathlib.Path,
                         help="tl-*: an HmiSeeder textlist-fixture checkpoint.zap21; ci-*/et-*: a configured.zap21 (scripts/prepare_hmi_fixture_ui.py) or, "
-                             "for unified-pc, the seeded HmiSeeder baseline (artifacts/q/hps/unified-pc/baseline.zap21)")
-    parser.add_argument("--hmi-fixture-profile", choices=("classic-comfort", "unified-comfort", "unified-pc"), default="unified-comfort")
+                             "for unified-pc, classic-rt-advanced and classic-basic, the seeded HmiSeeder baseline (artifacts/q/hps/<profile>/baseline.zap21)")
+    parser.add_argument("--hmi-fixture-profile", choices=("classic-comfort", "classic-rt-advanced", "classic-basic", "unified-comfort", "unified-pc"), default="unified-comfort")
     args = parser.parse_args()
     global HMI_FIXTURE, HMI_FIXTURE_PROFILE
     HMI_FIXTURE = args.hmi_fixture.resolve(strict=True) if args.hmi_fixture else None

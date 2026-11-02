@@ -337,6 +337,8 @@ namespace TiaMcp.Openness.V21
             if (change.Kind == "hmi_classic_import") return PrepareHmiEngineeringMutation(change, project);
             if (change.Kind == "hmi_external_tag_create") return PrepareHmiEngineeringMutation(change, project);
             if (change.Kind == "hmi_screen_create") return PrepareHmiEngineeringMutation(change, project);
+            if (change.Kind == "hmi_dynamization_create") return PrepareHmiEngineeringMutation(change, project);
+            if (change.Kind == "hmi_event_handler_create") return PrepareHmiEngineeringMutation(change, project);
             if (change.Kind == "hmi_text_list_import") return PrepareHmiTextListImportMutation(change, project);
             var payload = change.Payload;
             var preview = new JObject { ["effects"] = new JArray(), ["warnings"] = new JArray() };
@@ -869,6 +871,8 @@ namespace TiaMcp.Openness.V21
             if (change.Kind == "hmi_classic_import") { ApplyHmiEngineeringMutation(change, project); return; }
             if (change.Kind == "hmi_external_tag_create") { ApplyHmiEngineeringMutation(change, project); return; }
             if (change.Kind == "hmi_screen_create") { ApplyHmiEngineeringMutation(change, project); return; }
+            if (change.Kind == "hmi_dynamization_create") { ApplyHmiEngineeringMutation(change, project); return; }
+            if (change.Kind == "hmi_event_handler_create") { ApplyHmiEngineeringMutation(change, project); return; }
             if (change.Kind == "hmi_text_list_import") { ApplyHmiTextListImportMutation(change, project); return; }
             var payload = change.Payload;
             switch (change.Kind)
