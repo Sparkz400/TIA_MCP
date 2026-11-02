@@ -120,6 +120,15 @@ static class GateAdmissionTests
             foreach (var (family, operation) in new[] { ("unified", "scalar_property_set"), ("unified", "classic_xml_import"), ("unified", "tag_create"), ("classic", "external_tag_create"), ("classic", "screen_create"), ("unified", "explicit_binding_set"), ("unified", "object_create") })
                 Assert(!HmiEngineeringRules.Gate(family, "x", operation).Value<string>("reason").Contains("Change kind"), "no kind for " + family + " " + operation);
         });
+        check("Event-handler scripts are written with CRLF line ends, as V21 stores them; a lone CR refuses", () => {
+            Assert(HmiEngineeringRules.NativeScriptText("a\nb\n") == "a\r\nb\r\n" && HmiEngineeringRules.NativeScriptText("a\r\nb") == "a\r\nb"
+                && HmiEngineeringRules.NativeScriptText("a\r\n\nb") == "a\r\n\r\nb" && HmiEngineeringRules.NativeScriptText("x") == "x", "CRLF form");
+            JObject Handler(string script) => new JObject { ["schemaVersion"] = 1, ["operation"] = "event_handler_set", ["eventType"] = "Tapped", ["script"] = script, ["expectedContentHash"] = new string('a', 64),
+                ["target"] = new JObject { ["family"] = "unified", ["projectCopyId"] = "c", ["sessionGeneration"] = "g", ["hmiPath"] = "/h", ["objectPath"] = "/h/screens/S" } };
+            HmiEngineeringRules.RequireRequest(Handler("// a\nb();\r\n"));
+            Reject(() => HmiEngineeringRules.RequireRequest(Handler("// a\rb();")), "a lone CR");
+            Reject(() => HmiEngineeringRules.RequireRequest(Handler(new string('/', HmiEngineeringRules.MaxScriptLength - 1) + "\n")), "the CRLF form over the bound");
+        });
         check("Standing notes only: exactly the kind's notes of one family, no failure, a valid hash", () => {
             JObject Manifest(string family, int targets, params string[] notes) => new JObject { ["family"] = family, ["nativeFailure"] = null, ["observedArtifactsHash"] = new string('e', 64),
                 ["targets"] = new JArray(Enumerable.Range(0, targets).Select(i => new JObject { ["family"] = family, ["hmiPath"] = "/d/hmi/H" + i })), ["missingCoverage"] = new JArray(notes) };

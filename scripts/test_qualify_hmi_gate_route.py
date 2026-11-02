@@ -264,7 +264,7 @@ class FakeHost:
         elif operation == "event_handler_set":
             owner = world[hmi]["screens"].get(path) or world[hmi]["items"][path]
             owner.setdefault("eventHandlers", []).append({"properties": {"EventType": payload["eventType"]}, "script": {
-                "scriptCode": payload["script"], "scriptCodeSha256": hashlib.sha256(payload["script"].encode("utf-8")).hexdigest(), "scriptsExecuted": False}})
+                "scriptCode": payload["script"].replace("\r\n", "\n").replace("\n", "\r\n"), "scriptCodeSha256": hashlib.sha256(payload["script"].replace("\r\n", "\n").replace("\n", "\r\n").encode("utf-8")).hexdigest(), "scriptsExecuted": False}})
             world[hmi]["model"][path + "/eventHandlers/" + payload["eventType"]] = {"kind": "hmiModelNode", "name": payload["eventType"], "properties": {}}
         elif operation == "dynamization_set":
             binding = payload["bindings"][0]

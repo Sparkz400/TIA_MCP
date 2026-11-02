@@ -384,9 +384,9 @@ namespace TiaMcp.Openness.V21
             {
                 if (HmiEventHandler(native, payload.Value<string>("eventType"), false) != null)
                     throw new BridgeException("HmiNameConflict", "The object already handles this event; existing handlers and their scripts are never replaced.");
-                string script = payload.Value<string>("script");
+                string script = HmiEngineeringRules.NativeScriptText(payload.Value<string>("script"));
                 result["eventType"] = payload["eventType"].DeepClone(); result["createdPath"] = HmiCreatedPath(payload);
-                result["script"] = new JObject { ["sha256"] = HmiPreservationRules.Hash(script), ["length"] = script.Length, ["executed"] = false };
+                result["script"] = new JObject { ["sha256"] = HmiPreservationRules.Hash(script), ["length"] = script.Length, ["lineEnds"] = "CRLF", ["executed"] = false };
                 return result;
             }
             var item = native as Siemens.Engineering.HmiUnified.UI.Base.HmiScreenItemBase ?? throw new BridgeException("HmiTargetMismatch", "The operation requires an exact native Unified screen-item identity.");
@@ -860,11 +860,11 @@ namespace TiaMcp.Openness.V21
             }
             else if (operation == "event_handler_set")
             {
-                string code = payload.Value<string>("script");
+                string code = HmiEngineeringRules.NativeScriptText(payload.Value<string>("script"));
                 object handler = HmiEventHandler(native, payload.Value<string>("eventType"), true);
                 var script = handler?.GetType().GetProperty("Script")?.GetValue(handler, null) as Siemens.Engineering.HmiUnified.UI.Dynamization.Script.IHmiScript
                     ?? throw new BridgeException("HmiAttributeUnavailable", "The created event handler exposes no script.");
-                // Untrusted text is stored verbatim; the bridge never executes, evaluates or syntax-checks it.
+                // Untrusted text is stored verbatim with CRLF line ends, as V21 keeps it; the bridge never executes, evaluates or syntax-checks it.
                 script.ScriptCode = code;
                 var readback = new JObject { ["eventType"] = Convert.ToString(handler.GetType().GetProperty("EventType")?.GetValue(handler, null)),
                     ["scriptSha256"] = HmiPreservationRules.Hash(script.ScriptCode ?? ""), ["scriptLength"] = script.ScriptCode?.Length ?? 0, ["async"] = script.Async, ["executed"] = false };

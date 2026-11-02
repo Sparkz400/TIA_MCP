@@ -262,11 +262,11 @@ def prepare_event_handler(scenario, client):
 
 
 def event_handler_present(client):
-    from qualify_hmi_gate_route import SCRIPT, devices, rows, screen_fixture
+    from qualify_hmi_gate_route import STORED_SCRIPT, devices, rows, screen_fixture
     device = devices(client, "unified")["HMI_RT_1"]
     path = screen_fixture(client, {"HMI_RT_1": device})["HMI_RT_1"]["screens"]["Overview_A"]["identity"]["objectPath"]
     row = rows(client, device, "screens", objectPath=path).get(path) or {}
-    return any((h.get("script") or {}).get("scriptCode") == SCRIPT for h in row.get("eventHandlers") or [])
+    return any((h.get("script") or {}).get("scriptCode") == STORED_SCRIPT for h in row.get("eventHandlers") or [])
 
 
 def prepare_text_list(scenario, client):

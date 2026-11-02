@@ -152,8 +152,9 @@ namespace TiaMcp.Model
                 // Untrusted script text: bounded and stored verbatim, never executed, evaluated or syntax-checked.
                 if (payload["script"]?.Type != JTokenType.String) throw new ArgumentException("script must be an explicit string.");
                 string script = (string)payload["script"];
-                if (script.Trim().Length == 0 || script.Length > MaxScriptLength || script.Any(c => char.IsControl(c) && c != '\t' && c != '\r' && c != '\n'))
-                    throw new ArgumentException("script must be 1 to " + MaxScriptLength + " characters without control characters other than tab, CR and LF.");
+                if (script.Trim().Length == 0 || NativeScriptText(script).Length > MaxScriptLength || script.Any(c => char.IsControl(c) && c != '\t' && c != '\r' && c != '\n'))
+                    throw new ArgumentException("script must be 1 to " + MaxScriptLength + " characters (CRLF line ends) without control characters other than tab, CR and LF.");
+                if (script.Replace("\r\n", "").IndexOf('\r') >= 0) throw new ArgumentException("script may contain CR only as part of a CRLF line end.");
                 RejectFields(payload, "name", "properties", "dataType", "placement", "bindings", "connection", "plcTag");
             }
             else if (operation == "scalar_property_set" || operation == "item_properties_set")
@@ -354,6 +355,10 @@ namespace TiaMcp.Model
             }
             return gates;
         }
+
+        /// <summary>The script text V21 stores: every line ends with CRLF (run hn1, 2 November 2026: ScriptCode read back an LF
+        /// script with CRLF). The bridge writes this form, so the exact readback compares like with like.</summary>
+        internal static string NativeScriptText(string script) => script.Replace("\r\n", "\n").Replace("\n", "\r\n");
 
         internal static string Text(JObject value, string key, int max = 256)
         {

@@ -556,6 +556,7 @@ def binding_reopen(client, hmis, fx):
 
 # Untrusted script text, stored verbatim and never executed, evaluated or syntax-checked (HmiEngineeringRules.MaxScriptLength).
 SCRIPT = "// TIA MCP qualification: stored verbatim, never executed.\nHMIRuntime.Trace('qualification');\n"
+STORED_SCRIPT = SCRIPT.replace("\n", "\r\n")  # V21 keeps ScriptCode with CRLF line ends (run hn1); the worker writes this form.
 PREFERRED_EVENTS = ("Loaded", "Tapped", "Activated", "Up")
 UNDOCUMENTED_EVENT = "QualificationUndocumented"
 
@@ -632,7 +633,7 @@ def handler_cases(fx):
                 found = [h for h in handler_row(client, hmis[hmi], owner).get("eventHandlers") or [] if (h.get("properties") or {}).get("EventType") == event]
                 script = (found[0].get("script") or {}) if len(found) == 1 else {}
                 observed = {"handlers": len(found), "scriptCode": script.get("scriptCode"), "sha256": script.get("scriptCodeSha256"), "executed": script.get("scriptsExecuted")}
-                expected = {"handlers": 1, "scriptCode": SCRIPT, "sha256": digest(SCRIPT.encode("utf-8")), "executed": False}
+                expected = {"handlers": 1, "scriptCode": STORED_SCRIPT, "sha256": digest(STORED_SCRIPT.encode("utf-8")), "executed": False}
                 return observed == expected, None if observed == expected else {"expected": expected, "observed": observed}
             case = {"label": "%s handler of %s %s on %s" % (event, role, owner["name"], hmi), "hmi": hmi, "payload": handler_payload(owner, event),
                     "roots": [path + "/eventHandlers/" + event], "verify": verify}
