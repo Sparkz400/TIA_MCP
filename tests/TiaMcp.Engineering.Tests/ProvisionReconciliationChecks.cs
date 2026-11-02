@@ -41,7 +41,8 @@ internal static class ProvisionReconciliationChecks
         async Task<JsonElement> Reconcile(Action<JsonObject> change)
         {
             native.Verification = new JsonObject { ["scopeSha256"] = scopeHash, ["processId"] = 456, ["nativeMutationInvoked"] = false,
-                ["archiveHashMatches"] = true, ["cardManifestMatches"] = true, ["projectFingerprintMatches"] = true, ["observerProjectEmpty"] = true };
+                ["archiveHashMatches"] = true, ["cardManifestMatches"] = true, ["projectFingerprintMatches"] = true, ["projectSavedBeforeArchive"] = true,
+                ["storageMatchesBaseline"] = true, ["credentialNeverArmed"] = true, ["observerProjectEmpty"] = true, ["observerProjectAbsent"] = false };
             change(native.Verification);
             return await dispatcher.CallAsync("simulation_provision_reconcile", new { admissionId });
         }
@@ -50,6 +51,10 @@ internal static class ProvisionReconciliationChecks
             ("card differs", v => v["cardManifestMatches"] = false),
             ("archive changed", v => v["archiveHashMatches"] = false),
             ("observer not empty", v => v["observerProjectEmpty"] = false),
+            ("saved after the archive", v => v["projectSavedBeforeArchive"] = false),
+            ("storage differs from its inventory", v => v["storageMatchesBaseline"] = false),
+            ("credential may have been submitted", v => v["credentialNeverArmed"] = false),
+            ("save time missing", v => v.Remove("projectSavedBeforeArchive")),
             ("same Portal process", v => v["processId"] = 123),
             ("other scope", v => v["scopeSha256"] = new string('9', 64)),
             ("mutation claimed", v => v["nativeMutationInvoked"] = true) })
@@ -67,11 +72,22 @@ internal static class ProvisionReconciliationChecks
         Check(released.GetProperty("released").GetBoolean(), "Full fresh match releases the admission");
         var record = store.Read(admissionId);
         Check(record.State == "reconciled" && record.Reconciliation.Count == 3 &&
-            record.Reconciliation.Single(r => r.ResourceKey == EngineeringResourceKey.ForPath("project", project)).Disposition == "unchanged", "Each resource carries its own evidence");
+            record.Reconciliation.Single(r => r.ResourceKey == EngineeringResourceKey.ForPath("project", project)).Disposition == "unchanged" &&
+            record.Reconciliation.Single(r => r.ResourceKey == EngineeringResourceKey.ForPath("project", observer)).Disposition == "verifiedApplied", "Each resource carries its own evidence");
         Check(native.Calls.Count(c => c.StartsWith("mutation_", StringComparison.Ordinal)) == 3, "Reconciliation never replays provisioning");
         var next = store.Acquire(scope with { ScopeSha256 = new('e', 64) }, new('a', 64));
         Check(next.State == "dispatchIntent", "Released resources can be admitted again");
         await Reject(() => dispatcher.CallAsync("simulation_provision_reconcile", new { admissionId }), "InvalidOperationState");
+
+        // An observer destination that was never created releases as unchanged.
+        var absent = SimulationProvisionReconciliation.Plan(root, new EngineeringMutationAdmission("y", 1, "outcomeUnknown", scope with { ScopeSha256 = scopeHash },
+            new('a', 64), [], null, DateTimeOffset.UtcNow, null, []));
+        var verification = new JsonObject { ["scopeSha256"] = scopeHash, ["processId"] = 456, ["nativeMutationInvoked"] = false, ["archiveHashMatches"] = true,
+            ["cardManifestMatches"] = true, ["projectFingerprintMatches"] = true, ["projectSavedBeforeArchive"] = true, ["storageMatchesBaseline"] = true,
+            ["credentialNeverArmed"] = true, ["observerProjectEmpty"] = false, ["observerProjectAbsent"] = true };
+        Check(absent.Refusals(verification).Count == 0, "An absent observer destination does not hold the release");
+        Check(absent.Dispositions(verification, (role, basis) => new EngineeringArtifactReference(role, new string('0', 64)))
+            .Single(r => r.ResourceKey == EngineeringResourceKey.ForPath("project", observer)).Disposition == "unchanged", "An absent observer destination is unchanged");
 
         var unsupported = scope with { ScopeSha256 = new('7', 64), Resources = [.. scope.Resources, new("library", Path.Combine(root, "lib"), "readSourceAndCompanions")] };
         await Reject(() => Task.FromResult(SimulationProvisionReconciliation.Plan(root, new EngineeringMutationAdmission("x", 1, "outcomeUnknown", unsupported,

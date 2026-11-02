@@ -334,11 +334,8 @@ namespace TiaMcp.Openness.V21
                     var project = _session._portal.Projects.Open(new FileInfo(path));
                     try
                     {
-                        // The API does not document the kind. Unspecified takes the later of its UTC and local readings,
-                        // so an ambiguous save time can only hold, never release.
                         var raw = project.LastModified;
-                        var modified = raw.Kind == DateTimeKind.Local ? raw.ToUniversalTime() : raw.Kind == DateTimeKind.Utc ? raw
-                            : new DateTime(Math.Max(DateTime.SpecifyKind(raw, DateTimeKind.Utc).Ticks, DateTime.SpecifyKind(raw, DateTimeKind.Local).ToUniversalTime().Ticks), DateTimeKind.Utc);
+                        var modified = AdmissionReconcileRules.SavedUtc(raw);
                         var observed = new JObject { ["path"] = project.Path.FullName, ["lastModifiedUtc"] = modified.ToString("O"),
                             ["lastModifiedRaw"] = raw.ToString("O"), ["lastModifiedKind"] = raw.Kind.ToString(), ["isModifiedAfterOpen"] = project.IsModified,
                             ["fingerprint"] = Fingerprint(project) };
@@ -352,11 +349,7 @@ namespace TiaMcp.Openness.V21
             }
 
             /// <summary>Location-independent project fingerprint plus the project library revision, which the engineering fingerprint omits.</summary>
-            private string Fingerprint(Project project)
-            {
-                string engineering = _session.EngineeringFingerprint(new EngineeringChange { Kind = FingerprintKind }, project, true);
-                return ChangeHash(engineering + "|" + LibraryRevision(new ManagedLibrary { Native = project.ProjectLibrary, Project = project }));
-            }
+            private string Fingerprint(Project project) => _session.ReconcileProjectFingerprint(new EngineeringChange { Kind = FingerprintKind }, project);
 
             /// <summary>Retrieves an archive into a new reconcile directory and returns its location-independent fingerprint.</summary>
             internal string ArchiveFingerprint(JObject row, string archive)

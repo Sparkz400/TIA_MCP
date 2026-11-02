@@ -1,11 +1,17 @@
 using System;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json.Linq;
+using Siemens.Engineering;
 
 namespace TiaMcp.Openness.V21
 {
     internal sealed partial class OpennessSession
     {
+        /// <summary>Location-independent project fingerprint plus the project library revision, which the engineering fingerprint omits.</summary>
+        private string ReconcileProjectFingerprint(EngineeringChange change, Project project) =>
+            ChangeHash(EngineeringFingerprint(change, project, true) + "|" + LibraryRevision(new ManagedLibrary { Native = project.ProjectLibrary, Project = project }));
+
         // Read-only evidence for releasing a failed provisioning admission. Runs in a fresh
         // empty owned Portal; it never powers, connects, provisions or saves anything.
         private JObject SimulationProvisionReconcileVerify(JObject args)
@@ -27,6 +33,7 @@ namespace TiaMcp.Openness.V21
             result["scopeSha256"] = scopeSha256;
             result["projectPath"] = projectPath;
             result["nativeMutationInvoked"] = false;
+            result["opaqueStorageContentsRead"] = false;
 
             var original = baseline["originalCardManifest"] as JArray;
             var manifest = SimulationCardFiles(Path.Combine(storage, "SIMATIC_MC"));
@@ -34,12 +41,31 @@ namespace TiaMcp.Openness.V21
             result["cardManifestMatches"] = original != null && JToken.DeepEquals(manifest, original) &&
                 SimulationProvisionManifestHash(manifest) == report.Value<string>("originalProgramRevision");
 
+            // Storage outside the card, from metadata only, against the inventory taken before this attempt wrote anything.
+            string attempt = Path.GetFileNameWithoutExtension(reportPath).Substring("simulation-provision-".Length);
+            var storageDifferences = baseline["storageMetadata"] is JArray inventory
+                ? AdmissionReconcileRules.ProvisionStorageDifferences(inventory, SimulationProvisionTreeMetadata(storage), attempt)
+                : new System.Collections.Generic.List<string> { "The recovery baseline has no storage inventory." };
+            result["storageDifferences"] = new JArray(storageDifferences);
+            result["storageMatchesBaseline"] = storageDifferences.Count == 0;
+            // The attempt's own write-ahead stream bounds what the runtime protection store can hold.
+            string stream = report.Value<string>("checkpointPath");
+            string credentialRefusal = stream == null || !SameSimulationPath(Path.GetDirectoryName(stream), storage) || !File.Exists(stream)
+                ? "The provisioning checkpoint stream is missing."
+                : new FileInfo(stream).Length > 16 * 1024 * 1024 ? "The provisioning checkpoint stream is too large to inspect."
+                : AdmissionReconcileRules.ProvisionCredentialRefusal(File.ReadAllLines(stream).Where(line => line.Length > 0));
+            if (credentialRefusal == null && (report["credentialSubmissionArmed"]?.Type != JTokenType.Boolean || report.Value<bool>("credentialSubmissionArmed")))
+                credentialRefusal = "The provisioning report does not record the credential submission as never armed.";
+            result["credentialRefusal"] = credentialRefusal;
+            result["credentialNeverArmed"] = credentialRefusal == null;
+
             var archive = baseline["projectArchive"] as JObject;
             string archivePath = archive?.Value<string>("path");
             bool archiveMatches = archive != null && SameSimulationPath(Path.GetDirectoryName(archivePath), storage) && File.Exists(archivePath) &&
                 string.Equals(ChangeFileHash(archivePath), archive.Value<string>("sha256"), StringComparison.OrdinalIgnoreCase);
             result["archiveHashMatches"] = archiveMatches;
             result["projectFingerprintMatches"] = false;
+            result["projectSavedBeforeArchive"] = false;
             if (archiveMatches)
             {
                 if (File.Exists(retrieveDirectory) || Directory.Exists(retrieveDirectory))
@@ -48,14 +74,20 @@ namespace TiaMcp.Openness.V21
                 Directory.CreateDirectory(retrieveDirectory);
                 var archived = new EngineeringChange { Kind = "simulation_provision_reconcile" };
                 var copy = _portal.Projects.Retrieve(new FileInfo(archivePath), new DirectoryInfo(retrieveDirectory));
-                try { result["archiveFingerprint"] = EngineeringFingerprint(archived, copy, true); result["archiveCopyPath"] = copy.Path.FullName; }
+                try { result["archiveFingerprint"] = ReconcileProjectFingerprint(archived, copy); result["archiveCopyPath"] = copy.Path.FullName; }
                 finally { copy.Close(); }
                 var observed = new EngineeringChange { Kind = "simulation_provision_reconcile" };
                 var current = _portal.Projects.Open(new FileInfo(projectPath));
                 try
                 {
-                    result["currentFingerprint"] = EngineeringFingerprint(observed, current, true);
+                    result["currentFingerprint"] = ReconcileProjectFingerprint(observed, current);
                     result["currentProjectModifiedAfterOpen"] = current.IsModified;
+                    // TIA persists project edits only by Save: a project last saved before the archive was written still is that archive.
+                    var saved = AdmissionReconcileRules.SavedUtc(current.LastModified);
+                    var written = File.GetLastWriteTimeUtc(archivePath);
+                    result["projectLastSavedUtc"] = saved.ToString("O");
+                    result["archiveWrittenUtc"] = written.ToString("O");
+                    result["projectSavedBeforeArchive"] = saved < written;
                 }
                 finally { current.Close(); }
                 result["fingerprintCoverage"] = observed.FingerprintCoverage;
@@ -65,6 +97,8 @@ namespace TiaMcp.Openness.V21
             {
                 string file = Path.Combine(observerPath, SimulationDiscoveryObserver.ProjectName, SimulationDiscoveryObserver.ProjectName + ".ap21");
                 result["observerProjectEmpty"] = false;
+                // The observer is a new destination: absent (never created) leaves it unchanged.
+                result["observerProjectAbsent"] = !File.Exists(observerPath) && !Directory.Exists(observerPath);
                 if (File.Exists(file))
                 {
                     var observer = _portal.Projects.Open(new FileInfo(file));

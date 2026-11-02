@@ -1,0 +1,144 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.lifecycle.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T23:05:52+00:00",
+  "source": {
+    "commit": "2431ccf9b07986242b38a1e53e84e2cba78f9b89",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Build hbf1 = 2431ccf9. scripts/qualify_hmi_gate_route.py with its compiler-scope, normal-lifecycle and lock-release gates: --profile classic-comfort (hmi_classic_import, desk-configured TP700 Comfort pair, 72/72 checks), --profile unified-comfort (hmi_external_tag_create, desk-configured MTP700 Unified Comfort pair, 49/49) and --profile unified-pc (hmi_external_tag_create, seeded WinCC Unified PC RT baseline, 49/49). Every apply's baseline and after compile name exactly the target HMI's scope (Classic HmiTarget, Unified owning device); each Host lifetime closes by EOF with Host exit 0, every bridgeWorkerExit verified with code 0 and no forced termination, and the owned TIA process (handle captured after tia_start) exited; after that exit a new TIA process opened the saved original read-write at the first attempt. The whole route (refusals, applies, replay, checkpoint restore, fresh reopen) ran as on 1 November.",
+  "limitations": [
+    "Three profiles and their fixtures only; WinCC RT Advanced and KTP700 Basic PN are not covered.",
+    "Lock release is observed as an immediate read-write reopen by another TIA process, not by inspecting TIA's lock files; complete content preservation stays a V21 boundary (no Classic alarm composition, no Unified Screen.Export)."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "f4e2521e49c22beca72d5900478527e37a21d1b809e91fa9652f04c9ddb6159e"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "72b4579e44ee56152ab65ba10aa98fbac06566b754151ee0dff14cf06688042d"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "4631bce658ce804c05df480971ef38ba6f3b94fd717d833d9f285b91a56bb97a",
+      "bytes": 124095,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_retrieve fixture",
+        "change_prepare stale probe",
+        "change_prepare BackColor of HMI_RT_1 Overview_A",
+        "change_apply BackColor of HMI_RT_1 Overview_A",
+        "change_prepare BackColor of HMI_RT_2 Overview_A",
+        "change_apply BackColor of HMI_RT_2 Overview_A",
+        "change_prepare no-op import of HMI_RT_1 Overview_B",
+        "change_apply no-op import of HMI_RT_1 Overview_B",
+        "change_prepare GridColor import of HMI_RT_1 Overview_B",
+        "change_apply GridColor import of HMI_RT_1 Overview_B",
+        "change_prepare no-op import of HMI_RT_1 Overview_A",
+        "change_apply no-op import of HMI_RT_1 Overview_A",
+        "change_prepare QualificationTags import with one added internal tag",
+        "change_apply QualificationTags import with one added internal tag",
+        "change_restore QualificationTags import with one added internal tag",
+        "fresh tia_start",
+        "project_open saved original"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hmi_inspect",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    },
+    {
+      "report": "report.json",
+      "sha256": "b9f770ec15f98c495af0d6bf1ede044f4ca7d298c6759a3dfb4d28b74952cebb",
+      "bytes": 85982,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_retrieve fixture",
+        "change_prepare stale probe",
+        "change_prepare root tag on HMI_RT_1",
+        "change_apply root tag on HMI_RT_1",
+        "change_prepare DB member on HMI_RT_1",
+        "change_apply DB member on HMI_RT_1",
+        "change_prepare root tag on HMI_RT_2 (its own PLC)",
+        "change_apply root tag on HMI_RT_2 (its own PLC)",
+        "change_restore root tag on HMI_RT_2 (its own PLC)",
+        "fresh tia_start",
+        "project_open saved original"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hmi_inspect",
+        "hmi_references",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    },
+    {
+      "report": "report.json",
+      "sha256": "c0813a96a989c568d03f29c759f97d0aa8ac2c47dc53ade4957edfebc4cad702",
+      "bytes": 94679,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_retrieve fixture",
+        "change_prepare stale probe",
+        "change_prepare root tag on HMI_RT_1",
+        "change_apply root tag on HMI_RT_1",
+        "change_prepare DB member on HMI_RT_1",
+        "change_apply DB member on HMI_RT_1",
+        "change_prepare root tag on HMI_RT_2 (its own PLC)",
+        "change_apply root tag on HMI_RT_2 (its own PLC)",
+        "change_restore root tag on HMI_RT_2 (its own PLC)",
+        "fresh tia_start",
+        "project_open saved original"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hmi_inspect",
+        "hmi_references",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

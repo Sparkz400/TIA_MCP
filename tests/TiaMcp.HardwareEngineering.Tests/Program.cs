@@ -595,6 +595,43 @@ Disposition("differing project without outcome holds", false, 5, false, null, "d
 Disposition("differing unsaved project holds", false, -1, false, null, "differs from its checkpoint");
 try { AdmissionReconcileRules.ApplyProject(true, DateTime.SpecifyKind(archived.AddSeconds(-1), DateTimeKind.Local), archived, false, out _); throw new Exception("Local save time accepted"); }
 catch (ArgumentException) { count++; Console.WriteLine("PASS non-UTC save time refused"); }
+// Provisioning reconciliation: storage outside the card from metadata only, and the credential's write-ahead stream.
+if (AdmissionReconcileRules.SavedUtc(DateTime.SpecifyKind(archived, DateTimeKind.Unspecified)) < archived) throw new Exception("An unspecified save time released early");
+count++;
+Newtonsoft.Json.Linq.JObject Entry(string path, bool directory = false, long bytes = 1, long ticks = 10) => new() { ["path"] = path, ["directory"] = directory,
+    ["bytes"] = directory ? null : bytes, ["lastWriteUtcTicks"] = ticks, ["attributes"] = 32 };
+var storageInventory = new Newtonsoft.Json.Linq.JArray(Entry(".download.claim"), Entry("simulation-download.json"), Entry("SIMATIC_MC", true), Entry("SIMATIC_MC/S7_JOB.S7S"));
+void Storage(string name, Newtonsoft.Json.Linq.JArray current, params string[] expected)
+{
+    var differences = AdmissionReconcileRules.ProvisionStorageDifferences(storageInventory, current, "a1");
+    if (differences.Count != expected.Length || expected.Any(e => !differences.Any(d => d.Contains(e)))) throw new Exception(name + ": " + string.Join(" ", differences));
+    count++; Console.WriteLine("PASS " + name);
+}
+var attemptFiles = new[] { Entry("simulation-provision-a1.json"), Entry("simulation-provision-a1.checkpoints.jsonl"), Entry(".provision.claim"), Entry("before-provision.zap21"),
+    Entry("simulation-empty-card-a1", true), Entry("simulation-empty-card-a1/S7_JOB.S7S"), Entry("retain.pms"), Entry("sim_hwdb.ini") };
+Storage("storage with only attempt and runtime files holds", new(new[] { Entry(".download.claim"), Entry("simulation-download.json"), Entry("SIMATIC_MC", true, ticks: 99),
+    Entry("SIMATIC_MC/S7_JOB.S7S", bytes: 7) }.Concat(attemptFiles)));
+Storage("changed baseline file is a difference", new(Entry(".download.claim", ticks: 11), Entry("simulation-download.json")), ".download.claim changed");
+Storage("resized baseline file is a difference", new(Entry(".download.claim", bytes: 2), Entry("simulation-download.json")), ".download.claim changed");
+Storage("missing baseline file is a difference", new(Entry(".download.claim")), "Missing baseline entry simulation-download.json");
+Storage("another attempt's file is a difference", new(Entry(".download.claim"), Entry("simulation-download.json"), Entry("simulation-provision-b2.json")), "simulation-provision-b2.json");
+Storage("a staged protected card left behind is a difference", new(Entry(".download.claim"), Entry("simulation-download.json"), Entry("simulation-protected-card-a1", true)), "simulation-protected-card-a1");
+Storage("a nested runtime-file path is a difference", new(Entry(".download.claim"), Entry("simulation-download.json"), Entry("retain.pms", true), Entry("retain.pms/x")), "retain.pms/x");
+string Record(string phase, bool opened = false, bool armed = false) => new Newtonsoft.Json.Linq.JObject { ["phase"] = phase, ["credentialOpened"] = opened,
+    ["credentialSubmissionAttempted"] = armed, ["credentialSubmissionMayHaveOccurred"] = armed }.ToString(Newtonsoft.Json.Formatting.None);
+void Credential(string name, string[] lines, string expected)
+{
+    string refusal = AdmissionReconcileRules.ProvisionCredentialRefusal(lines);
+    if (expected == null ? refusal != null : refusal?.Contains(expected) != true) throw new Exception(name + ": " + refusal);
+    count++; Console.WriteLine("PASS " + name);
+}
+Credential("never-armed stream proves no credential", new[] { Record("attemptPrepared"), Record("afterPowerOff"), Record("attemptFinalized") }, null);
+Credential("truncated never-armed stream still proves it", new[] { Record("attemptPrepared"), Record("beforeEmptyPowerOn") }, null);
+Credential("armed submission holds", new[] { Record("attemptPrepared"), Record("beforeSetPlcMasterSecret", true, true) }, "credentialOpened");
+Credential("opened credential holds", new[] { Record("attemptPrepared"), Record("openValidatedScratchCredential", true) }, "credentialOpened");
+Credential("torn record holds", new[] { Record("attemptPrepared"), "{\"phase\":\"beforeSetPl" }, "unreadable");
+Credential("empty stream holds", new string[0], "missing");
+Credential("missing flag holds", new[] { Record("attemptPrepared"), "{\"phase\":\"x\"}" }, "credentialOpened");
 foreach (var kind in new[] { "hmi_engineering", "hmi_text_list_import", "hmi_classic_import", "hmi_external_tag_create", "hardware_attributes", "tag_set", "constant_set", "to_create", "to_parameters", "to_delete" })
     if (AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Target kind treated as recomputable: " + kind); else count++;
 foreach (var kind in new[] { "source_upsert", "hardware_plug", "network_configure", "tag_delete", "constant_delete", "plc_compile", "project_simulation_enable" })

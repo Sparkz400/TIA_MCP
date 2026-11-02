@@ -171,12 +171,12 @@ class Candidates(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "exactly one network"):
             subject.two_network_fc(xml, "Thrice", 78)
 
-    def test_candidate_aggregation_accepts_installs_and_the_dependents_refusal_only(self):
-        # The captured component multi-instance template removed the former multiInstance boundary outcome; only the
-        # dependents case must end refused, and an install there would be a failure too.
-        self.assertEqual({}, subject.failed_candidates({"ladStandalone": "installed", "multiInstance": "installed", "multiInstanceDependents": "refused"}))
-        self.assertEqual({"multiInstance": "boundary", "fbCaller": "failed: x", "multiInstanceDependents": "installed"},
-                         subject.failed_candidates({"multiInstance": "boundary", "fbCaller": "failed: x", "reuse": "installed", "multiInstanceDependents": "installed"}))
+    def test_candidate_aggregation_accepts_installs_and_the_parent_refusal_only(self):
+        # The captured component effect lets the caller's own instance DB install; only the embedding parent must end refused,
+        # and an install there would be a failure too.
+        self.assertEqual({}, subject.failed_candidates({"ladStandalone": "installed", "multiInstanceDependents": "installed", "multiInstanceParent": "refused"}))
+        self.assertEqual({"multiInstanceDependents": "refused", "fbCaller": "failed: x", "multiInstanceParent": "installed"},
+                         subject.failed_candidates({"multiInstanceDependents": "refused", "fbCaller": "failed: x", "reuse": "installed", "multiInstanceParent": "installed"}))
         self.assertEqual({"reuse": "refused"}, subject.failed_candidates({"reuse": "refused"}))
 
     def test_admission_records_count_open_and_archived_records(self):
@@ -225,7 +225,23 @@ class Candidates(unittest.TestCase):
     def test_host_instance_db_source_is_one_db_of_the_host_fb(self):
         source = subject.HOST_DB_SOURCE
         self.assertEqual(['DATA_BLOCK "TiaMcpComponentHost_DB"', '"TiaMcpComponentHost"'], [line for line in source.splitlines() if '"' in line])
-        self.assertIn("multiInstanceDependents", subject.REFUSED_CASES)
+        self.assertEqual({"multiInstanceParent"}, subject.REFUSED_CASES)
+        self.assertEqual(['FUNCTION_BLOCK "TiaMcpComponentParent"', ' Host : "TiaMcpComponentHost";'], [line for line in subject.PARENT_SOURCE.splitlines() if '"' in line])
+        self.assertNotIn(subject.PARENT_FB_NUMBER, (2, subject.HOST_FB_NUMBER))
+
+    def test_dependent_db_gains_exactly_the_captured_member(self):
+        def db(*members):
+            body = "".join('<Member Name="%s" Datatype="%s"><Sections><Section Name="Static"><Member Name="State" Datatype="&quot;S&quot;" /></Section></Sections></Member>'
+                           % (name, datatype) for name, datatype in members)
+            return ('<Document><DocumentInfo><Created>%s</Created></DocumentInfo><SW.Blocks.InstanceDB ID="0"><AttributeList><Interface>'
+                    '<Sections xmlns="urn:i"><Section Name="Input" /><Section Name="Static">%s</Section></Sections></Interface>'
+                    '<Name>H_DB</Name></AttributeList></SW.Blocks.InstanceDB></Document>') % (len(members), body)
+        gate = ("Gate", "&quot;TiaMcpComponentGate&quot;")
+        subject.verify_dependent_db(db(), db(gate), db(("Marker", "Int"), gate), "Gate")
+        for name, before, after in (("other member", db(), db(("Gate", "Int"))), ("missing member", db(), db()),
+                                    ("changed baseline", db(("Marker", "Int")), db(("Marker", "Bool"), gate))):
+            with self.subTest(name=name), self.assertRaises(RuntimeError):
+                subject.verify_dependent_db(before, after, db(gate), "Gate")
 
     def test_runner_path_check_matches_the_worker_layout(self):
         # PlcComponentQualificationGate.CombinedApplyArchivePathLength: 121 characters for a 51-character root.
@@ -240,6 +256,26 @@ class Candidates(unittest.TestCase):
                 self.assertIn(overrides["callerMode"], subject.MODES)
         for path in ("callers/TiaMcpComponentCaller.lad.s7dcl", "callers/TiaMcpComponentHost.s7dcl"):
             self.assertTrue((subject.FIXTURES / path).is_file(), path)
+
+    def test_combinations_name_exactly_their_gate_features(self):
+        # PlcComponentQualificationGate.Features: LAD language, an FB caller, a multi-instance, a reused FB, an earlier network.
+        verified = {"dependentInstanceDb+earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent", "dependentInstanceDb+earlierPlacement+fbCaller+multiInstance+reusedComponent", "dependentInstanceDb+fbCaller+ladCaller+multiInstance+reusedComponent", "dependentInstanceDb+fbCaller+multiInstance+reusedComponent", "earlierPlacement", "earlierPlacement+fbCaller", "earlierPlacement+fbCaller+ladCaller", "earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent", "earlierPlacement+fbCaller+ladCaller+reusedComponent", "earlierPlacement+fbCaller+multiInstance+reusedComponent", "earlierPlacement+fbCaller+reusedComponent", "earlierPlacement+ladCaller", "earlierPlacement+ladCaller+reusedComponent", "earlierPlacement+reusedComponent", "fbCaller", "fbCaller+ladCaller", "fbCaller+ladCaller+multiInstance+reusedComponent", "fbCaller+ladCaller+reusedComponent", "fbCaller+multiInstance+reusedComponent", "fbCaller+reusedComponent", "ladCaller", "ladCaller+reusedComponent", "reusedComponent"}
+        keys = set()
+        for name, (reuse, caller, features) in subject.COMBINATIONS.items():
+            with self.subTest(name=name):
+                derived = sorted(feature for feature, present in (("ladCaller", caller["language"] == "LAD"), ("fbCaller", caller["kind"] == "FB"),
+                                 ("multiInstance", caller.get("multi")), ("reusedComponent", reuse), ("earlierPlacement", caller.get("networks") == 2),
+                                 ("dependentInstanceDb", caller.get("dependents"))) if present)
+                self.assertEqual(features, [] if "+".join(derived) in verified else derived)
+                self.assertTrue(not caller.get("multi") or reuse and caller["kind"] == "FB", "A multi-instance needs a reused FB in an FB caller")
+                self.assertTrue(not caller.get("dependents") or caller.get("multi"), "Only a multi-instance changes the caller's instance DB")
+                self.assertTrue(not caller.get("new") or caller["kind"] == "FC" and caller.get("networks", 1) == 1)
+                self.assertTrue((subject.FIXTURES / subject.CALLER_SOURCES[caller["kind"], caller["language"]]).is_file())
+                keys.add("+".join(derived))
+        self.assertFalse(set(subject.COMBINATIONS) & set(subject.CANDIDATES))
+        # Every combination of the five features that a plan can have runs once at least, and each multi-instance combination with
+        # the caller's own instance DB besides multiInstanceDependents (the plain fbCaller one); all are verified since 2 November.
+        self.assertEqual(18, len(keys)); self.assertEqual(set(), keys - verified)
 
 
 if __name__ == "__main__":

@@ -409,7 +409,7 @@
       "qualification": "native_install_runtime_combined_apply_passed",
       "releaseAccepted": false,
       "currentResult": "28 October 2026 (catalog 0.4.68): 41 release-matrix rows (11 shipped, 30 limited); 188 cells bound and 0 open. Combined apply behind --enable-library-integrate-apply passed natively for a new and an existing FBD FC caller with OB/LAD and no-flag refusals (28 October); OB insertion stays separate.",
-      "remainingWork": "OB caller insertion as its own route; the audit of native05's recovery (its artifacts are not on this PC). Combined apply is on by default for its verified shapes (decision of 29 October).",
+      "remainingWork": "OB caller insertion as its own route; software units (plan-only); an embedding parent of a multi-instance caller (no captured transitive effect of a structured member); the audit of native05's recovery (its artifacts are not on this PC). Combined apply is on by default for its 23 verified shapes (decision of 29 October; every feature combination and the caller's own instance DB since 2 November, local.library_integrate.candidate_shapes.combinations.20261102 and .dependent_db.20261102).",
       "nextAction": "Qualify OB caller insertion separately.",
       "ownerRole": "Libraries and components",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
@@ -447,8 +447,8 @@
       "qualification": "native_frozen_corpus_real_server_runtime_plcsim_gaps_passed",
       "releaseAccepted": false,
       "currentResult": "29 October 2026 (catalog 0.4.76): 24 release-matrix rows (11 shipped, 13 limited); 90 cells bound and 0 open. The runtime UA, web and capture rows passed against the OPC UA and web servers of an owned TCP/IP PLCSIM instance in all five modes (local.runtime.plcsim-tcpip.20261029), and PLCSIM virtual time, OB82/OB83/OB86 injection, memory reset, storage archive/retrieve and online downloads passed (local.plcsim_gaps.20261029, local.plcsim_gaps.recovery.20261029). OB40 has no V21 hardware-interrupt configuration route (probe in progress).",
-      "remainingWork": "No open matrix cells. Outside the matrix: the card-staging access-denied cause; complete project and opaque-storage preservation with trusted release of the retained reservation and the updated runner's end-to-end acceptance; the file-storage helper's missed exit deadline; the VM rows (not a 1.0 gate if the maintainer confirms, docs/TODO.md).",
-      "nextAction": "Diagnose the card-staging access denial and the file-storage helper deadline; prove complete project and opaque-storage preservation with trusted release of the retained reservation.",
+      "remainingWork": "No open matrix cells. Outside the matrix: the VM rows (not a 1.0 gate if the maintainer confirms, docs/TODO.md). The card-staging denial did not reproduce (1 November), the file-storage helper deadline is defined once, and trusted release of every unresolved provisioning admission on this PC passed with project and bounded opaque-storage preservation (2 November, local.sim.reconcile.release.20261102); the updated runner's checkpoint/compile/save passed in the frozen corpus.",
+      "nextAction": "Only the VM rows remain, on the VMware guest.",
       "ownerRole": "Runtime",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -908,9 +908,9 @@
       "implementation": "partial_definitions_imports_native_execution_gated",
       "qualification": "native_definitions_application_runs_and_ts_q01_style_qualification_verified_production_style_execution_v21_boundary",
       "releaseAccepted": false,
-      "currentResult": "1 November 2026 (catalog 0.4.97): 23 release-matrix rows (9 shipped, 7 limited, 2 unqualified, 5 unavailable on V21); 83 cells bound, 16 open and 35 blocked. TS-Q01 passed natively in the qualification build with operator scope and license observations (local.testsuite.style-q01.20261101): clean passed, violating assertionFailure, stop between two runs, and lost Run (beforeRun, afterRun) and restore (afterRestore) replies stayed outcomeUnknown and reconciled verifiedRestored without replay; it verifies testsuite_style_job_status, _results and _stop_request. Production style execution is a V21 boundary (maintainer decision, 1 November; five dispositions): V21 Update 3 cannot re-check a style rule's scope at execution time. Application execution passed in the TS-Q02 qualification mode (local.testsuite.application.20261030).",
-      "remainingWork": "16 cells: testsuite_style_job_prepare (it also queues application reviews; no native run has dispatched a job it prepared) and testsuite_system_plan_prepare (system execution has no qualification mode).",
-      "nextAction": "Run a TS-Q02 case that calls testsuite_style_job_prepare on a qualification review and dispatches that job through qualification_testsuite_execute; build a qualification mode for system execution.",
+      "currentResult": "1 November 2026 (catalog 0.4.109): 23 release-matrix rows (10 shipped, 7 limited, 1 unqualified, 5 unavailable on V21); 90 cells bound, 9 open and 35 blocked. TS-Q01 passed natively in the qualification build with operator scope and license observations (local.testsuite.style-q01.20261101): clean passed, violating assertionFailure, stop between two runs, and lost Run (beforeRun, afterRun) and restore (afterRestore) replies stayed outcomeUnknown and reconciled verifiedRestored without replay; it verifies testsuite_style_job_status, _results and _stop_request. Production style execution is a V21 boundary (maintainer decision, 1 November; five dispositions): V21 Update 3 cannot re-check a style rule's scope at execution time. Application execution passed in the TS-Q02 qualification mode (local.testsuite.application.20261030). Two TS-Q02 cases queued the fixture case with testsuite_style_job_prepare from a testsuite_application_plan_prepare review and dispatched that job through qualification_testsuite_execute (passed; failed, recovered and reconciled verifiedRestored), which verifies testsuite_style_job_prepare (local.testsuite.job-prepare.20261101). A system-test qualification mode (TS-Q03) is designed but cannot run on this PC: OPC UA reaches a PLCSIM instance only in PLCSIM's TCP/IP mode (this PC is on Softbus), and V21's SystemTestCaseExecutor takes no credential, so the scratch's UMAC-protected OPC UA server needs guest access, which V21 Openness cannot set.",
+      "remainingWork": "9 cells: testsuite_system_plan_prepare (system execution has no qualification mode; TS-Q03 needs PLCSIM's TCP/IP mode, an operator-made guest-access seed and possibly a certificate prompt answered at the desk).",
+      "nextAction": "A desk session: PLCSIM in TCP/IP single-adapter mode and an operator-made scratch seed whose anonymous user holds OPCUAServerAccess; then build TS-Q03 as designed, run an exploratory case for the result-tree profile, and qualify pass, fail, afterRun and released.",
       "ownerRole": "Test Suite",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -928,7 +928,9 @@
         "docs/verification/testsuite-result-review-20261016.md",
         "docs/plans/expansion-plans/native-test-suite.md",
         "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
-        "docs/verification/testsuite-style-q01-20261101.md"
+        "docs/verification/testsuite-style-q01-20261101.md",
+        "docs/verification/testsuite-job-prepare-20261101.md",
+        "docs/verification/testsuite-system-blocker-20261101.md"
       ],
       "packages": [
         "AC-17"
@@ -2316,7 +2318,7 @@
     {
       "id": "B02",
       "title": "Runtime isolation preservation and exclusive window",
-      "current": "Requested stop, card inventory and lock release are qualified on this PC and the frozen 65-case corpus passed (24 October). Open: the card-staging access-denied cause, complete project and opaque-storage preservation with trusted release of the retained reservation, and the VM's zero-address entry and post-RUN .info inventory.",
+      "current": "Requested stop, card inventory and lock release are qualified on this PC and the frozen 65-case corpus passed (24 October); the card-staging denial did not reproduce (1 November); project and bounded opaque-storage preservation with trusted release of the retained reservations passed on this PC (2 November, local.sim.reconcile.release.20261102). Open: the VM's zero-address entry and post-RUN .info inventory.",
       "resolution": "Reviewed resolving diagnostic, complete preservation/cleanup, then exclusive frozen corpus and typed/component runtime.",
       "releaseBlocking": true
     },
