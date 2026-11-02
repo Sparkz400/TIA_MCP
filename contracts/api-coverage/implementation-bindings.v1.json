@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "ae2c59eea8c2eaf0a16536185c830a76d996c20d7445e54c449b76347d12b547",
-      "bytes": 1661333
+      "sha256": "939fe3deb2756f99660338ace5f374fe285e46435ec3637531db4848b009da16",
+      "bytes": 1664381
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -106293,6 +106293,20 @@
           "artifacts": [
             "evidence/local.library_integrate.candidate_shapes.dependent_db.20261102.json"
           ]
+        },
+        {
+          "id": "local.library_integrate.combined_apply.regression.20261102",
+          "profileSha256": "5c937e73916c20920d8c720f0459ceb7c54a32204a1d1cfc60b31613fe49911e",
+          "artifacts": [
+            "evidence/local.library_integrate.combined_apply.regression.20261102.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.verified.20261102",
+          "profileSha256": "34f93690e6d49b0524ed91bb7e593726827a32a0b749273b652a57f1f74ea7a9",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.verified.20261102.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -115331,6 +115345,20 @@
           "profileSha256": "e3455e5c7c6f9a95e13f21a3e88d0cd74a20374448c473d3dab69d6e49c83056",
           "artifacts": [
             "evidence/local.typed.component-effect-capture.20261102.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.combined_apply.regression.20261102",
+          "profileSha256": "5c937e73916c20920d8c720f0459ceb7c54a32204a1d1cfc60b31613fe49911e",
+          "artifacts": [
+            "evidence/local.library_integrate.combined_apply.regression.20261102.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.verified.20261102",
+          "profileSha256": "34f93690e6d49b0524ed91bb7e593726827a32a0b749273b652a57f1f74ea7a9",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.verified.20261102.json"
           ]
         }
       ],
@@ -131151,6 +131179,11 @@
       "sha256": "5451b5f1e33757b4a837aa5a94ce55052e3348c3587a52549e2e5ca527474e71"
     },
     {
+      "path": "evidence/local.library_integrate.candidate_shapes.verified.20261102.json",
+      "state": "observed",
+      "sha256": "008afa2f6300b175789c94252e3f033c2631ee1b161d83663761a70c2fea4b13"
+    },
+    {
       "path": "evidence/local.library_integrate.combined_apply.regression.20261031.json",
       "state": "observed",
       "sha256": "8aa44c44b633c576c8b81b349cf72d803fd8a548c3b64ff582ef749a814652f1"
@@ -131159,6 +131192,11 @@
       "path": "evidence/local.library_integrate.combined_apply.regression.20261101.json",
       "state": "observed",
       "sha256": "372b93c08e5738e25830ddc9ad924e89a55af5496a57faf5b50311a84b86bb5b"
+    },
+    {
+      "path": "evidence/local.library_integrate.combined_apply.regression.20261102.json",
+      "state": "observed",
+      "sha256": "213bd2ba9f67589e10c8eeb8d6d9719bd470f3efd2ecffeffe8f6e76ad6d5a37"
     },
     {
       "path": "evidence/local.library_integrate.combined_apply.rerun.20261028.json",
@@ -132181,12 +132219,20 @@
       "profileSha256": "d449438e2829a6f1d7769c580074d63c7be2c3b78b91ae80f5e66db7297b0f8c"
     },
     {
+      "id": "local.library_integrate.candidate_shapes.verified.20261102",
+      "profileSha256": "34f93690e6d49b0524ed91bb7e593726827a32a0b749273b652a57f1f74ea7a9"
+    },
+    {
       "id": "local.library_integrate.combined_apply.regression.20261031",
       "profileSha256": "0836b1a4c42415508dd6d33c3c88330e7939cb2f12ca482b0d2a8e66bd6c13a4"
     },
     {
       "id": "local.library_integrate.combined_apply.regression.20261101",
       "profileSha256": "1528f488bb4854246a35f709198bd8bd177b7a60ba08c10b61edbe20f4662eeb"
+    },
+    {
+      "id": "local.library_integrate.combined_apply.regression.20261102",
+      "profileSha256": "5c937e73916c20920d8c720f0459ceb7c54a32204a1d1cfc60b31613fe49911e"
     },
     {
       "id": "local.library_integrate.combined_apply.rerun.20261028",
