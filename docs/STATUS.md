@@ -21,9 +21,11 @@ remain open. Earlier statements that these products are absent describe a differ
 
 ## What is open
 
-The Classic screen workflow draft adds capture, composition and bounded batch editing.
-Its 13 acceptance cells remain open. Offline regression checks do not establish native
-batch success, rollback, reconciliation or timing; see the
+The Classic screen workflow adds capture, composition and bounded batch editing.
+An owned two-screen RT Advanced fixture now passes native batch success, reverse-order
+rollback, lost-response reconciliation and fresh reopen, with local timing recorded.
+Its 13 catalog acceptance cells remain open: bounded fixture evidence does not establish
+profile-wide, visual or runtime qualification. See the
 [continuation record](verification/classic-screen-workflow-draft-20261103.md).
 
 [TODO](TODO.md) lists the open work; [open matrix rows by owner](TODO.md#open-matrix-rows-by-owner)

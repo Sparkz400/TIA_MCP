@@ -57,17 +57,17 @@ The diagram shows component boundaries, not support for every operation, target 
 Full detail: [system architecture guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/architecture.md).
 
 The [2 November local completion record](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/local-completion-20261102.md) covers dependency-ordered library imports, preserved target paths, the production FBD OB route and the remaining operator/equipment prerequisites.
-## Draft Classic screen workflow
+## Classic screen workflow
 
-The current draft adds bounded screen batching, lease-scoped observations,
-native component composition and diagnostic phase progress. Native batch
-qualification remains pending; see the
-[draft checkpoint](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/classic-screen-workflow-draft-20261103.md)
-before relying on that path. Existing single-screen evidence does not qualify
-the new batch behavior.
+The screen workflow adds bounded batching, lease-scoped observations,
+native component composition and diagnostic phase progress. The
+[verification record](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/classic-screen-workflow-draft-20261103.md)
+covers the owned two-screen RT Advanced fixture, including native rollback,
+lost-response reconciliation and fresh reopen. Profile-wide and runtime
+qualification remain unverified.
 
 Batch reconciliation now requires a receipt for every member, and captured
-artifact reads reject symbolic links and junctions. Offline checks cover these
-boundaries; the [workflow guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#draft-capture-composition-and-batching)
-keeps the exact request shape and remaining native gates.
+artifact reads reject symbolic links and junctions. The
+[workflow guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#capture-composition-and-batching)
+keeps the exact request shape and evidence limits.
 

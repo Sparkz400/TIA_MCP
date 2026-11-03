@@ -80,7 +80,7 @@ test and records remaining evidence limits.
 
 ### Preparing the screen change
 
-The draft `hmi_classic_screen_capture` tool returns the scope hash directly. The
+The `hmi_classic_screen_capture` tool returns the scope hash directly. The
 older single-screen route also supports a two-pass preparation pattern: a first
 prepare with a deliberately nonmatching 64-character hash returns `StaleRevision`
 and the captured baseline, without applying an edit. Reprepare the reviewed
@@ -90,11 +90,13 @@ from `hmi_inspect`, including project-copy and session fields.
 Local checks and native-copy evidence are tracked in the
 [3 November verification record](../verification/classic-screen-edit-20261103.md).
 
-### Draft capture, composition and batching
+### Capture, composition and batching
 
 The [workflow continuation](../verification/classic-screen-workflow-draft-20261103.md)
-tracks native qualification that is still required before this draft can merge.
-Earlier single-screen evidence does not qualify batches or establish a latency gain.
+records native two-screen success, later-member failure with reverse-order
+restoration, lost-response reconciliation in the still-open project and a fresh
+read-write reopen on an owned RT Advanced fixture. This is bounded fixture
+evidence; profile-wide, visual and runtime qualification remain unverified.
 
 1. Call `hmi_classic_screen_capture` with the exact project and HMI identity. It
    returns the regular-screen `contentHash`, native XML artifacts and a hashed
@@ -106,7 +108,9 @@ Earlier single-screen evidence does not qualify batches or establish a latency g
 3. Prepare `hmi_classic_screen_edit` with the capture hash and the usual first
    `target`/`xml`, optionally adding one to seven `additionalScreens` entries.
    Every member must be an existing regular screen of the same HMI, project copy
-   and session. Each `xml` may instead be `xmlArtifact: {path, sha256}`; the path
+   and session. Each `xml` may instead be `xmlArtifact: {path, sha256, bytes?}`,
+   including the complete artifact reference returned by composition. The optional
+   integer byte count must match the retained file. The path
    must be absolute and inside the Host artifact root. Changed bytes, malformed
    references, symbolic links and junctions refuse before native preparation.
 4. Review and apply the single prepared change. One project checkpoint and one

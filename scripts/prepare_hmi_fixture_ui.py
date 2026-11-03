@@ -24,6 +24,7 @@ from qualify_translation_category_probe import StoreExclusiveWindow, require, sa
 
 PROFILES = {
     'classic-comfort': 'configure-existing-start-screen',
+    'classic-rt-advanced': 'configure-existing-start-screen',
     'unified-comfort': 'configure-encrypted-transfer-password-and-confirmation',
     'unified-pc': 'configure-encrypted-transfer-password-and-confirmation',
 }

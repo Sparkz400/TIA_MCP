@@ -58,10 +58,11 @@ internal static class AdmissionChecks
         Root = Path.GetFullPath(args[0]); Directory.CreateDirectory(Root);
         Helper = Path.Combine(Root, "helper.bin"); File.WriteAllText(Helper, "pure helper pin");
         Check("valid-exact-reviewed-owners", _ => { }, false);
-        Check("valid-classic-start-screen", a => {
-            ChangeReference(a, "sourceReport", s => s["profiles"][0]["profile"] = "classic-comfort");
-            ChangeReference(a, "review", r => r["allowedEdit"] = "configure-existing-start-screen");
-        }, false);
+        foreach (string profile in new[] { "classic-comfort", "classic-rt-advanced" })
+            Check("valid-start-screen-" + profile, a => {
+                ChangeReference(a, "sourceReport", s => s["profiles"][0]["profile"] = profile);
+                ChangeReference(a, "review", r => r["allowedEdit"] = "configure-existing-start-screen");
+            }, false);
         Check("missing-sequential", a => a.Remove("sequentialNativeAdmission"));
         Check("runtime-denied", a => a["runtimeAllowed"] = true);
         Check("replay-denied", a => a["automaticReplay"] = true);

@@ -14,9 +14,10 @@ TIA MCP is a Windows [Model Context Protocol](https://modelcontextprotocol.io) s
 
 ## Canonical documentation
 
-The Classic screen batching draft remains unqualified. Its new acceptance cells
-are included in the current release matrix; see the
-[continuation and remaining native checks](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/classic-screen-workflow-draft-20261103.md).
+Classic screen batching now has bounded native evidence from an owned RT Advanced
+fixture. Profile-wide, visual and runtime qualification remain open in the release
+matrix; see the
+[native continuation and limits](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/classic-screen-workflow-draft-20261103.md).
 
 This wiki is an overview. Details, evidence and exact support claims live in the repository:
 

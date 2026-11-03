@@ -56,11 +56,12 @@ public sealed partial class TiaTools
         foreach (var member in members)
         {
             if (!member.ContainsKey("xmlArtifact")) continue;
-            if (member.ContainsKey("xml") || member["xmlArtifact"] is not System.Text.Json.Nodes.JsonObject artifact || artifact.Count != 2
+            if (member.ContainsKey("xml") || member["xmlArtifact"] is not System.Text.Json.Nodes.JsonObject artifact
+                || (artifact.Count != 2 && (artifact.Count != 3 || !artifact.ContainsKey("bytes")))
                 || artifact["path"] is not System.Text.Json.Nodes.JsonValue pathValue || !pathValue.TryGetValue<string>(out var inputPath)
                 || artifact["sha256"] is not System.Text.Json.Nodes.JsonValue hashValue || !hashValue.TryGetValue<string>(out var expectedHash)
                 || expectedHash.Length != 64 || !expectedHash.All(Uri.IsHexDigit))
-                throw new ArgumentException("Use xml or xmlArtifact {path,sha256}, never both; artifact paths and SHA-256 values must be strings.");
+                throw new ArgumentException("Use xml or xmlArtifact {path,sha256,bytes?}, never both; artifact paths and SHA-256 values must be strings.");
             if (!Path.IsPathFullyQualified(inputPath)) throw new ArgumentException("Screen artifact paths must be absolute.");
             string path = Path.GetFullPath(inputPath);
             if (!path.StartsWith(root, StringComparison.OrdinalIgnoreCase)) throw new ArgumentException("Screen artifacts must be retained under this Host's artifact root.");
@@ -68,6 +69,9 @@ public sealed partial class TiaTools
             new ArtifactStore(options.ArtifactsDirectory).Read(path, 0, 1); // Reuse the artifact-root and junction/symlink guard.
             using var stream = File.OpenRead(path);
             if (stream.Length > 8 * 1024 * 1024) throw new ArgumentException("Screen XML artifact exceeds its byte bound.");
+            if (artifact.ContainsKey("bytes") && (artifact["bytes"] is not System.Text.Json.Nodes.JsonValue byteValue
+                || !byteValue.TryGetValue<long>(out var expectedBytes) || expectedBytes != stream.Length))
+                throw new ArgumentException("Screen XML artifact byte count differs from its retained reference.");
             var bytes = new byte[checked((int)stream.Length)]; stream.ReadExactly(bytes);
             string hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes));
             if (!string.Equals(hash, expectedHash, StringComparison.OrdinalIgnoreCase)) throw new ArgumentException("Screen XML artifact changed since review.");

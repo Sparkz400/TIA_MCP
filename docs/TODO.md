@@ -77,11 +77,12 @@ Catalog `0.4.131`, 28 open cells, each row under its first owner (the matrix sum
 
 Classic HMI work is **unqualified**, not deferred: X07 owns the 13 open cells in
 `change.hmi_classic_screen_edit`, `hmi_classic_screen_capture` and
-`hmi_classic_screen_compose` (the two tools also list X08). Finish native batch
-success, later-member failure, verified rollback, lost-response reconciliation
-and measured timing on an owned fixture. The
+`hmi_classic_screen_compose` (the two tools also list X08). Native two-screen batch
+success, later-member failure, reverse-order rollback, lost-response reconciliation,
+fresh reopen and measured timing now pass on an owned RT Advanced fixture. The
 [3 November continuation](verification/classic-screen-workflow-draft-20261103.md)
-records offline checks and the operator access prerequisite.
+records that bounded evidence. Profile-wide acceptance, visual behavior, runtime
+behavior and wider component/target coverage remain unqualified.
 
 ### Deferred rows
 

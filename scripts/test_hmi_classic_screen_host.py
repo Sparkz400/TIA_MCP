@@ -38,6 +38,9 @@ def main():
             client.notify('notifications/initialized')
             # Valid bytes reach the absent worker; malformed or changed inputs must fail before that boundary.
             refused(dict(xmlArtifact=reference), 'WorkerNotFound')
+            refused(dict(xmlArtifact={**reference, 'bytes': len(raw)}), 'WorkerNotFound')
+            for size in (None, '12', -1, len(raw) + 1):
+                refused(dict(xmlArtifact={**reference, 'bytes': size}))
             refused(dict(xml=raw.decode()), 'WorkerNotFound')
             refused(dict(xmlArtifact=reference, additionalScreens=[dict(target={}, xmlArtifact=reference)]), 'WorkerNotFound')
             for value in (None, 'path', [], {}, dict(path=str(candidate)), dict(sha256=reference['sha256']),

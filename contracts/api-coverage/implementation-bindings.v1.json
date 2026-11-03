@@ -1947,8 +1947,8 @@
     },
     {
       "path": "src/TiaMcp.Host/HmiTools.cs",
-      "sha256": "e746f899f37fd782272dfca9e21da057277191b0be44d2897aea058a75cddaf6",
-      "bytes": 7302
+      "sha256": "cf5dd3520d0db5adc6133f7224196fe0f2dbdac0f58c8be67fce8c12203b63b6",
+      "bytes": 7727
     },
     {
       "path": "src/TiaMcp.Host/HostOptions.cs",
@@ -11092,8 +11092,8 @@
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "ClassicScreenArtifactPayload",
           "line": 43,
-          "endLine": 78,
-          "sha256": "1bd6c2ce42495ad1ce880901cdc1a9d48f87a19c2ea37a9e1c6c573cca4d978e"
+          "endLine": 82,
+          "sha256": "3334efd8f44f620fbbdbd8441dbc10656c833729a7257f80b51da4cf59c2fed1"
         },
         {
           "path": "src/TiaMcp.Host/CaxTools.cs",
@@ -11167,8 +11167,8 @@
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "ClassicScreenArtifactPayload",
           "line": 43,
-          "endLine": 78,
-          "sha256": "1bd6c2ce42495ad1ce880901cdc1a9d48f87a19c2ea37a9e1c6c573cca4d978e"
+          "endLine": 82,
+          "sha256": "3334efd8f44f620fbbdbd8441dbc10656c833729a7257f80b51da4cf59c2fed1"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.Packages.cs",

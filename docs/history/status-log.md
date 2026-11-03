@@ -15,6 +15,13 @@ Native continuation stopped before fixture creation at the Openness access promp
 and the operator requested offline-only work. See the
 [continuation record](../verification/classic-screen-workflow-draft-20261103.md).
 
+The operator later completed the owned RT Advanced start-screen prerequisite.
+The native runner passed all ten batch, rollback, lost-response reconciliation
+and fresh-reopen checks. The compose-to-prepare artifact reference mismatch is
+fixed with a byte-count regression. Warm two-screen preparation/apply measured
+6.476 seconds as a batch versus 15.666 seconds separately in one local sample;
+this does not establish a general performance claim or promote catalog qualification.
+
 Reconciled vendor/V20/OB/event backlog against the retained 2 November summaries. Read-only local inventory finds CFC/DCC V21 public APIs, documentation and V19 Portal/SDK; licenses and native workflows remain unqualified ([receipt](../verification/release-readiness-20261103.md)). TS-Q03 now has a qualification-only exploratory runner, independent Host/worker admission, exact endpoint/scope checks and durable recovery. Native fixture/result qualification remains open ([implementation](../verification/testsuite-system-q03-20261103.md)). No catalog support or release-acceptance flag changed.
 
 ## 2 November 2026
