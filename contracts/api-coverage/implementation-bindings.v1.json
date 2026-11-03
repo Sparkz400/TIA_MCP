@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "a930a5d2bd53117f22f0e0bac85a9964605b78ac72229b76a7889fd6734d3c9e",
-      "bytes": 1741707
+      "sha256": "74fcc1c83e49a4d356f8cdb89f95d26148dfa16a90edeeecc3e8cff246dafa77",
+      "bytes": 1744104
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -110344,7 +110344,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hmi.classic-screen.batch.20261103",
+          "profileSha256": "9f8a0ff4ec24ab797274937b300f7bd9da5b10d1e08c5c0ed1a5fec1c62dddca",
+          "artifacts": [
+            "evidence/local.hmi.classic-screen.batch.20261103.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -120853,7 +120861,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hmi.classic-screen.batch.20261103",
+          "profileSha256": "9f8a0ff4ec24ab797274937b300f7bd9da5b10d1e08c5c0ed1a5fec1c62dddca",
+          "artifacts": [
+            "evidence/local.hmi.classic-screen.batch.20261103.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -120878,7 +120894,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hmi.classic-screen.batch.20261103",
+          "profileSha256": "9f8a0ff4ec24ab797274937b300f7bd9da5b10d1e08c5c0ed1a5fec1c62dddca",
+          "artifacts": [
+            "evidence/local.hmi.classic-screen.batch.20261103.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -137497,6 +137521,11 @@
       "sha256": "f261ffdcc1fe96915d12329585beb993a0c8348c85e26a29ccb53103ba84340e"
     },
     {
+      "path": "evidence/local.hmi.classic-screen.batch.20261103.json",
+      "state": "observed",
+      "sha256": "6f84b97b15cf9ae8d5674031078b83eed28df1cb1d4ee05eac5ec1bd4142db4b"
+    },
+    {
       "path": "evidence/local.hmi.compile.20261101.json",
       "state": "observed",
       "sha256": "f3c05f163438e7df08e7d1c88d224f23b3cdef41c18903d7d489fa4b38681575"
@@ -138748,6 +138777,10 @@
     {
       "id": "local.hmi.classic-import.route.20261101",
       "profileSha256": "a8595d0174eb07c7f60e9298fb42c7f4e75b0c95c96144a966227071b8afe56f"
+    },
+    {
+      "id": "local.hmi.classic-screen.batch.20261103",
+      "profileSha256": "9f8a0ff4ec24ab797274937b300f7bd9da5b10d1e08c5c0ed1a5fec1c62dddca"
     },
     {
       "id": "local.hmi.compile.20261101",

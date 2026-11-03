@@ -192,3 +192,10 @@ retained reports with no new missing or changed entries; previously recorded
 historical losses remain explicit. All 737 repository links in the changed
 Markdown resolve. The release matrix is current and its 1.0 gate still refuses
 with 28 open cells, six deferred cells and 0/44 accepted obligations.
+
+CI on `f90405a4` caught an unregistered native-evidence summary. That summary
+was added after the local runner's contract stage, so the successful local run
+did not validate the final evidence inventory. Catalog `0.4.132` registers it
+and links it to screen editing, capture and composition, retaining `unverified`
+qualification for all three features. Contract checks, evidence audit, generated
+reference/matrix checks and source bindings are rerun on the complete change.

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.131",
+  "catalogVersion": "0.4.132",
   "targetTiaVersions": [
     21
   ],
@@ -4841,6 +4841,27 @@
       ],
       "limitations": [
         "Owned offline CPU1511F and standard CPU1511 with F-DI in TIA V21; no physical safety qualification or safety-program mutation. The new source/XML cases cover one input bit and FBD XML, not every language or native VCI block format; broader operands and peripheral areas have managed checks."
+      ]
+    },
+    {
+      "id": "local.hmi.classic-screen.batch.20261103",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "targetProfile": "classic-rt-advanced",
+        "sourceCommit": "0eeac2b48f6cebe137090f20b234df487a94a0e3",
+        "sourceDirty": true,
+        "passedScope": "Owned Classic RT Advanced fixture: two HMIs configured with Overview_A as start screen and compiled without errors or warnings; public MCP capture and native rectangle composition; two-screen batch import with per-member receipts and independent XML equality; same-key journal replay; later-member Siemens import rejection and verified reverse-order restoration; exact attached Host termination after first-member dispatch, worker completion, read-only admission reconciliation in the same open TIA without replay; first-attempt read-write fresh reopen and saved XML equality; ten named checks and two normal owned lifetimes. Warm prepare/apply sample: 6.476 seconds batched versus 15.666 separately. Binary trees listed in Host, V21 worker, fixture helper order."
+      },
+      "artifacts": [
+        "evidence/local.hmi.classic-screen.batch.20261103.json"
+      ],
+      "limitations": [
+        "Source is 0eeac2b4 plus the uncommitted Host artifact-byte-count and guarded RT Advanced fixture fixes recorded by this PR; dirty source is explicit. The final native runner SHA-256 and exact executable hashes are in the retained report; binary-tree hashes include managed Host dependencies.",
+        "One seeded two-screen RT Advanced scope and a rectangle clone. No eight-screen, arbitrary component, other HMI profile, shared-resource, visual or runtime qualification; no online operation. Catalog qualification and release acceptance remain unchanged.",
+        "The attached Host was deliberately terminated. Its worker completed the saved change and then exited with a broken transport; neither exit is normal-lifecycle evidence. The original owner, fresh reconciler and fresh reopen closed cleanly.",
+        "One warm timing sample per mode, singles before batch, captures excluded; compiler caches, order and workload size prevent a general speed guarantee."
       ]
     }
   ],
@@ -28211,7 +28232,9 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.hmi.classic-screen.batch.20261103"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -28470,7 +28493,9 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.hmi.classic-screen.batch.20261103"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -28510,7 +28535,9 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.hmi.classic-screen.batch.20261103"
+        ]
       },
       "availability": {
         "status": "conditional",
