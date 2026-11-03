@@ -16,6 +16,8 @@ namespace TiaMcp.Openness.V21
         private JObject AdmissionReconcileVerify(JObject args)
         {
             EnsureAttached();
+            var completedScreen = ReconcileClassicScreenInOpenProject(args);
+            if (completedScreen != null) return completedScreen;
             if (!_ownsPortal || _portal.Projects.Count != 0)
                 throw new BridgeException("ProjectIsolationRequired", "Admission reconciliation requires an empty worker-owned TIA instance started with tia_start.");
             string operation = ChangeText(args, "operation", 64), scopeSha256 = ChangeText(args, "scopeSha256", 64);

@@ -17,7 +17,7 @@ namespace TiaMcp.Openness.V21
             if (selected == null) throw new BridgeException("ObjectNotFound", "The exact source export object was not found within the bounded inspection.");
             string directory = Path.Combine(ArtifactDirectory(args), "hmi-source-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(directory);
-            if (target.Family == "classic") HmiExportClassicSource(selected.Native, directory);
+            if (target.Family == "classic") HmiExportClassicSource(selected.Native, directory, path);
             else HmiExportUnifiedSource(target, selected, directory);
             var sourceCoverage = HmiInspectionRules.SourceCoverage(target.Family, selected.Native.GetType().FullName, target.Path, path);
             var sources = new JArray(); int total = 0;
@@ -42,12 +42,12 @@ namespace TiaMcp.Openness.V21
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void HmiExportClassicSource(IEngineeringObject native, string directory)
+        private static void HmiExportClassicSource(IEngineeringObject native, string directory, string objectPath)
         {
+            HmiNativeExportSafety.RequireAllowed(native.GetType().FullName, objectPath);
             var file = new FileInfo(Path.Combine(directory, "native.xml"));
             if (native is Siemens.Engineering.Hmi.RuntimeScripting.VBScript script) script.Export(file, ExportOptions.WithDefaults);
             else if (native is Siemens.Engineering.Hmi.TextGraphicList.TextList text) text.Export(file, ExportOptions.WithDefaults);
-            else if (native is Siemens.Engineering.Hmi.TextGraphicList.GraphicList graphic) graphic.Export(file, ExportOptions.WithDefaults);
             else if (native is Siemens.Engineering.Hmi.Communication.Connection connection) connection.Export(file, ExportOptions.WithDefaults);
             else if (native is Siemens.Engineering.Hmi.Tag.TagTable table) table.Export(file, ExportOptions.WithDefaults);
             else if (native is Siemens.Engineering.Hmi.Tag.Tag tag) tag.Export(file, ExportOptions.WithDefaults);

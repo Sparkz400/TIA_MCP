@@ -89,6 +89,8 @@ internal static class ToolTitles
         ["hmi_component_review"] = "Review HMI components",
         ["hmi_component_review_page"] = "Page an HMI component review",
         ["hmi_inspect"] = "Inspect an HMI device",
+        ["hmi_classic_screen_capture"] = "Capture a Classic HMI screen baseline",
+        ["hmi_classic_screen_compose"] = "Compose Classic HMI screen components",
         ["hmi_references"] = "Read HMI references",
         ["hmi_text_list_author"] = "Author an HMI text list",
         ["hmi_text_list_generate_set"] = "Generate HMI text lists",

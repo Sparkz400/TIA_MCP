@@ -28186,6 +28186,55 @@
       ]
     },
     {
+      "featureId": "change.hmi_classic_screen_edit",
+      "domain": "hmi",
+      "title": "Edit an existing Classic RT Advanced screen with bounded screen preservation",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "hmi_classic_screen_edit",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Classic Screen.Export, owning ScreenComposition.Import(Override), Find(name), and HmiTarget ICompilable. No GraphicList.Export is dispatched."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Only classic_xml_import of an existing, unlinked regular screen on classic-rt-advanced. Every regular screen of that HMI is compared; shared resources, other screen roles and other HMIs are explicitly excluded. The scope policy is included in its content hash and cannot authorize whole-HMI imports.",
+          "Uses the existing checkpoint, precise readback, peer preservation, compile comparison, save, idempotency and archive recovery lifecycle. Recovery requires a worker-owned instance and native project authentication.",
+          "Local offline guard tests are not profile-wide native qualification. See docs/guides/hmi-engineering.md#bounded-classic-screen-editing for the exact contract and evidence limits."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Conditional on the exact regular-screen identity, classic-rt-advanced profile, complete capture of the declared screen scope, unchanged compiler diagnostics, and existing change lifecycle checks. No whole-HMI or runtime preservation claim."
+        ]
+      },
+      "prerequisites": [
+        "Installed TIA V21 Openness and WinCC RT Advanced",
+        "An exact existing regular-screen identity and reviewed native XML candidate",
+        "Explicit use of the bounded screen-edit kind and its scope-specific hash"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
       "featureId": "change.hmi_external_tag_create",
       "domain": "hmi",
       "title": "Create a PLC-backed Unified HMI tag",
@@ -28397,6 +28446,86 @@
         "AC-native",
         "AC-recovery",
         "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "hmi_classic_screen_capture",
+      "domain": "hmi",
+      "title": "Explicit bounded Classic screen baseline capture",
+      "mcpTools": [
+        "hmi_classic_screen_capture"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Classic/Unified public documentation and assembly evidence; individual operation limitations are distinct."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Classic RT Advanced regular screens only. Does not qualify runtime appearance, PLC behavior, shared resources or other HMIs. Native compile and exact readback remain required."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Exact captured native identity and bounded scope required; hashed artifact files remain local."
+        ]
+      },
+      "prerequisites": [
+        "Installed TIA V21 Openness; optional matching WinCC family module for native reads",
+        "Exact accessible project/device/runtime profile, license and protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "hmi_classic_screen_compose",
+      "domain": "hmi",
+      "title": "Compose and preflight native Classic screen components",
+      "mcpTools": [
+        "hmi_classic_screen_compose"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Classic/Unified public documentation and assembly evidence; individual operation limitations are distinct."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Classic RT Advanced regular screens only. Does not qualify runtime appearance, PLC behavior, shared resources or other HMIs. Native compile and exact readback remain required."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Exact captured native identity and bounded scope required; hashed artifact files remain local."
+        ]
+      },
+      "prerequisites": [
+        "Installed TIA V21 Openness; optional matching WinCC family module for native reads",
+        "Exact accessible project/device/runtime profile, license and protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
       ]
     }
   ]

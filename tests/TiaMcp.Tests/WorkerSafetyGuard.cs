@@ -26,7 +26,33 @@ internal static class WorkerSafetyGuard
         .Select(field => (OpCode)field.GetValue(null)!)
         .ToDictionary(code => code.Value);
 
-    internal static void Verify(string path) => Verify(path, Boundary, ProcessType, inspectOutsideBoundary: true, OwnedBoundary, PortalType);
+    internal static void Verify(string path)
+    {
+        Verify(path, Boundary, ProcessType, inspectOutsideBoundary: true, OwnedBoundary, PortalType);
+        VerifyNoExportCall(path, "Siemens.Engineering.Hmi.TextGraphicList.GraphicList");
+    }
+
+    // Metadata only: cover every compiled helper/lambda, including inspection exports.
+    // Do not load Siemens or execute a native call to prove this containment boundary.
+    private static void VerifyNoExportCall(string path, string nativeType)
+    {
+        using var stream = File.OpenRead(path);
+        using var pe = new PEReader(stream);
+        var metadata = pe.GetMetadataReader();
+        var names = new TypeNames(metadata);
+        foreach (var methodHandle in metadata.MethodDefinitions)
+        {
+            var method = metadata.GetMethodDefinition(methodHandle);
+            if (method.RelativeVirtualAddress == 0) continue;
+            foreach (var instruction in TokenInstructions(pe.GetMethodBody(method.RelativeVirtualAddress).GetILBytes() ?? []))
+            {
+                var target = names.Describe(instruction.Handle);
+                if (target.MethodName == "Export" && target.Description.StartsWith(nativeType + ".Export(", StringComparison.Ordinal))
+                    throw new InvalidOperationException("Blocked native graphic-list export is still reachable: " +
+                        names.Name(method.GetDeclaringType()) + "." + metadata.GetString(method.Name) + " -> " + target.Description);
+            }
+        }
+    }
 
     private static void Verify(string path, string boundary, string processType, bool inspectOutsideBoundary, string? ownedBoundary = null, string? portalType = null)
     {
@@ -174,11 +200,17 @@ internal static class WorkerSafetyGuard
     {
         VerifyFixture(typeof(SafetyFixtures.Safe));
         VerifyOwnedFixture(typeof(SafetyFixtures.OwnedPortal));
+        VerifyNoExportCall(Assembly.GetExecutingAssembly().Location, "Siemens.Engineering.Hmi.TextGraphicList.GraphicList");
         return Task.CompletedTask;
     }
 
     internal static async Task TestsRejectUnsafe()
     {
+        await Check.ThrowsAsync<InvalidOperationException>(() =>
+        {
+            VerifyNoExportCall(Assembly.GetExecutingAssembly().Location, typeof(SafetyFixtures.GraphicList).FullName!);
+            return Task.CompletedTask;
+        });
         foreach (var type in new[] { typeof(SafetyFixtures.ExplicitDispose), typeof(SafetyFixtures.UsingDispose), typeof(SafetyFixtures.NestedDispose), typeof(SafetyFixtures.EscapingDescriptor) })
             await Check.ThrowsAsync<InvalidOperationException>(() =>
             {
@@ -270,6 +302,12 @@ internal static class WorkerSafetyGuard
 // These synthetic classes are only read as IL by the guard's self-tests. They are never invoked.
 internal static class SafetyFixtures
 {
+    internal sealed class GraphicList
+    {
+        public void Export() => throw new InvalidOperationException("Metadata-only export fixture must never execute.");
+    }
+    internal static Action RetainedUnsafeExporter(GraphicList list) => () => list.Export();
+
     internal sealed class Portal : IDisposable
     {
         public Portal() { }

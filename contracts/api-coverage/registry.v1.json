@@ -3818,6 +3818,12 @@
       ]
     },
     {
+      "featureId": "change.hmi_classic_screen_edit",
+      "obligations": [
+        "X07"
+      ]
+    },
+    {
       "featureId": "change.hmi_classic_import",
       "obligations": [
         "X07"
@@ -3844,6 +3850,20 @@
     {
       "featureId": "change.hmi_event_handler_create",
       "obligations": [
+        "X08"
+      ]
+    },
+    {
+      "featureId": "hmi_classic_screen_capture",
+      "obligations": [
+        "X07",
+        "X08"
+      ]
+    },
+    {
+      "featureId": "hmi_classic_screen_compose",
+      "obligations": [
+        "X07",
         "X08"
       ]
     }

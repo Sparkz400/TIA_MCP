@@ -83,7 +83,8 @@ namespace TiaMcp.Openness.V21
                 change.Preview["baseFingerprint"] = change.BaseFingerprint;
                 change.Preview["fingerprintScope"] = "Project save state; hardware identities and network configuration; exposed software scopes, user-block identities/native fingerprints, type/tag-table metadata and selected mutation attributes. Protected blocks reached through native generated system groups use identity/modified/protection/consistency metadata instead of generated payload checksums; owning PLC safety signatures and runtime-group metadata are included. Unexposed vendor data and generated payload bytes are not covered.";
                 if (change.Kind.StartsWith("opcua_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " OPC UA kinds additionally cover each PLC's server interface group: user and SIMATIC interface names, enabled state and native modification time, reference namespaces, and role mappings with namespace permissions. Interface and namespace content is covered only through native modification times.";
-                if (IsHmiChangeKind(change.Kind)) change.Preview["fingerprintScope"] += " HMI engineering additionally requires a complete family-specific native content manifest across discovered project HMI targets; partial HMI export or explorer metadata hashes cannot authorize apply or recovery.";
+                if (change.Kind == "hmi_classic_screen_edit") change.Preview["fingerprintScope"] = "Project path, last save time and unsaved-state flag, plus the declared native screen scope. PLC and hardware content is not fingerprinted. " + HmiPreservationRules.ClassicScreenExportNote;
+                else if (IsHmiChangeKind(change.Kind)) change.Preview["fingerprintScope"] += " HMI engineering additionally requires a complete family-specific native content manifest across discovered project HMI targets; partial HMI export or explorer metadata hashes cannot authorize apply or recovery.";
                 if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " VCI kinds additionally cover every workspace group path, each workspace's root, language and library policy, and every mapping's native identity, directory, file name and format. Files below the workspace root are pinned separately by preview.vci.filesSha256 and rechecked before the checkpoint.";
                 if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " Certificate kinds additionally cover the selected local store (certificate Id, subject common name, validity end, private-key presence flag) and every certificate reference read on its device. Certificate bytes and key material are not fingerprinted.";
                 if (IsPlcAlarmKind(change.Kind)) change.Preview["fingerprintScope"] += " PLC alarm imports additionally hash a fresh native export of their artifact type for every PLC/software-unit owner, or the project; XLSX document properties are excluded and a nondeterministic export fails closed as StaleRevision.";
@@ -180,6 +181,7 @@ namespace TiaMcp.Openness.V21
                 WriteChangeJournal(change);
                 try
                 {
+                    InvalidateHmiObservations();
                     project.Save();
                     change.Stages.Add("prechange_project_saved");
                     change.ArchivePath = Path.Combine(change.Directory, "before.zap21");
@@ -209,9 +211,11 @@ namespace TiaMcp.Openness.V21
                                 throw new BridgeException("CompileScopeChanged", "The selected PLC changed during compilation.");
                         }
                         // A text-list import or an admitted HMI kind must leave the compiler problems as the compile before the write found them.
-                        if (change.Kind == "hmi_text_list_import" || HmiEngineeringRules.IsAdmittedKind(change.Kind) ? !HmiTextListImportRules.CompileProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
+                        if (change.Kind == "hmi_classic_screen_edit" ? !ClassicScreenCompileRules.ProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
+                            : change.Kind == "hmi_text_list_import" || HmiEngineeringRules.IsAdmittedKind(change.Kind) ? !HmiTextListImportRules.CompileProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
                             : !CompilationEvidenceRules.IsSuccessful(change.Compilation))
-                            throw new BridgeException("CompileFailed", "The change was applied but compilation failed or its diagnostic evidence is incomplete. Recovery archive and changed project state are retained.");
+                            throw new BridgeException(change.Compilation?.Value<int?>("errorCount") == 0 ? "CompileDiagnosticRegression" : "CompileFailed",
+                                "The change failed compiler verification: errors, new/changed warnings, or incomplete diagnostics. Verified screen rollback is attempted; inspect the retained outcome.");
                     }
                     if (IsHmiChangeKind(change.Kind)) VerifyHmiEngineeringPreservation(change, project);
                     if (change.Kind == "software_unit_create_from") RequireUnrenamedUnitMembers(change);
@@ -226,13 +230,16 @@ namespace TiaMcp.Openness.V21
                         change.Stages.Add("native_preservation_verified");
                     }
                     if (change.Kind == "graphical_typed_edit") VerifyTypedInstanceReadbacks(change);
-                    if (save) { project.Save(); change.Stages.Add("changed_project_saved"); WriteChangeJournal(change); }
+                    if (save) { InvalidateHmiObservations(); project.Save(); change.Stages.Add("changed_project_saved"); WriteChangeJournal(change); }
+                    if (change.Kind == "hmi_classic_screen_edit") VerifyHmiEngineeringPreservation(change, project, "after-save");
                     // A generated block can be present right after generation and gone after compile/save (R_TRIG/F_TRIG instance DBs, native probe w9p).
                     if (change.Kind == "source_upsert") { VerifyExpectedBlocksExist(change, SelectPlc(change.Selector)); change.Stages.Add("source_blocks_verified_after_save"); }
                     if (change.Kind == "certificate_create") { VerifyCreatedCertificateAfterSave(change, project); change.Stages.Add("certificate_verified_after_save"); }
                     if (change.Kind == "instance_db_create") { VerifyInstanceDb(change, SelectPlc(change.Selector)); change.Stages.Add("instance_db_verified_after_save"); }
                     if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile" || change.Kind == "safety_fparameter_set") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
-                    change.AfterFingerprint = EngineeringFingerprint(change, project);
+                    change.AfterFingerprint = change.Kind == "hmi_classic_screen_edit"
+                        ? ClassicScreenCapturedFingerprint(change, project, change.HmiEvidence["after-save"] as JObject)
+                        : EngineeringFingerprint(change, project);
                     change.State = "applied";
                     WriteChangeJournal(change);
                     return ChangeView(change);
@@ -246,7 +253,9 @@ namespace TiaMcp.Openness.V21
                     if ((ex as BridgeException)?.Details is JObject details) change.Readbacks.Add(new JObject { ["role"] = "failure-details", ["details"] = details.DeepClone() });
                     else change.Readbacks.Add(new JObject { ["role"] = "native-exception", ["chain"] = NativeFailureText.Chain(ex) });
                     CaptureTechnologyEvidence(change);
-                    try { change.AfterFingerprint = EngineeringFingerprint(change, project); } catch { }
+                    RecoverFailedClassicScreen(change, project);
+                    if (change.State != "rolled_back" && change.State != "not_applied")
+                        try { change.AfterFingerprint = EngineeringFingerprint(change, project); } catch { }
                     WriteChangeJournal(change);
                     throw new BridgeException((ex as BridgeException)?.Code ?? "EngineeringError", ex.Message, ChangeView(change));
                 }
@@ -256,19 +265,21 @@ namespace TiaMcp.Openness.V21
         private JObject ChangeStatus(JObject args)
         {
             string id = ChangeText(args, "changeId", 64);
-            if (_changes.TryGetValue(id, out var change)) return ChangeView(change);
+            if (_changes.TryGetValue(id, out var change)) return ChangeView(change, args.Value<bool?>("includeDetails") == true);
             if (!Guid.TryParseExact(id, "N", out _)) throw new BridgeException("InvalidRequest", "Persisted changeId must be a 32-character GUID.");
             string directory = ChangeText(args, "artifactDirectory", 4096);
             if (!Path.IsPathRooted(directory)) throw new BridgeException("InvalidRequest", "artifactDirectory must be absolute.");
             string journal = Path.Combine(Path.GetFullPath(directory), "change-" + id, "journal.json");
             if (!File.Exists(journal)) throw new BridgeException("ChangeNotFound", "No saved journal exists for this changeId.");
-            if (new FileInfo(journal).Length > 8 * 1024 * 1024) throw new BridgeException("ResponseTooLarge", "Journal exceeds 8 MiB.");
+            if (new FileInfo(journal).Length > 64 * 1024 * 1024) throw new BridgeException("ResponseTooLarge", "Journal exceeds 64 MiB.");
             var data = JObject.Parse(File.ReadAllText(journal));
+            if (data.Value<string>("kind") != "hmi_classic_screen_edit" && new FileInfo(journal).Length > 8 * 1024 * 1024)
+                throw new BridgeException("ResponseTooLarge", "Non-screen journal exceeds 8 MiB.");
             var result = Envelope();
             result["changeId"] = id; result["journal"] = data; result["journalPath"] = journal;
             result["recoveredFromDisk"] = true; result["automaticRetryAllowed"] = false;
             result["note"] = "Journal records the last durable observation. A crashed applying/checkpointing state has an uncertain outcome and must not be replayed.";
-            return result;
+            return data.Value<string>("kind") == "hmi_classic_screen_edit" && args.Value<bool?>("includeDetails") != true ? ClassicScreenReceipts.Compact(result) : result;
         }
 
         private JObject ChangeRestore(JObject args)
@@ -335,6 +346,7 @@ namespace TiaMcp.Openness.V21
         {
             if (change.Kind == "hmi_engineering") return PrepareHmiEngineeringMutation(change, project);
             if (change.Kind == "hmi_classic_import") return PrepareHmiEngineeringMutation(change, project);
+            if (change.Kind == "hmi_classic_screen_edit") return PrepareHmiEngineeringMutation(change, project);
             if (change.Kind == "hmi_external_tag_create") return PrepareHmiEngineeringMutation(change, project);
             if (change.Kind == "hmi_screen_create") return PrepareHmiEngineeringMutation(change, project);
             if (change.Kind == "hmi_dynamization_create") return PrepareHmiEngineeringMutation(change, project);
@@ -872,6 +884,7 @@ namespace TiaMcp.Openness.V21
         {
             if (change.Kind == "hmi_engineering") { ApplyHmiEngineeringMutation(change, project); return; }
             if (change.Kind == "hmi_classic_import") { ApplyHmiEngineeringMutation(change, project); return; }
+            if (change.Kind == "hmi_classic_screen_edit") { ApplyHmiEngineeringMutation(change, project); return; }
             if (change.Kind == "hmi_external_tag_create") { ApplyHmiEngineeringMutation(change, project); return; }
             if (change.Kind == "hmi_screen_create") { ApplyHmiEngineeringMutation(change, project); return; }
             if (change.Kind == "hmi_dynamization_create") { ApplyHmiEngineeringMutation(change, project); return; }
@@ -1331,6 +1344,17 @@ namespace TiaMcp.Openness.V21
         private string EngineeringFingerprint(EngineeringChange change, Project project, bool locationIndependent = false)
         {
             change.FingerprintCoverage = null;
+            // This named kind promises screen-scope equality, not PLC payload or hardware equality.
+            // A regular-screen import cannot write PLC blocks, and an inconsistent unrelated block
+            // must not force a PLC compile merely to edit a screen. Keep project-state stale guards.
+            if (change.Kind == "hmi_classic_screen_edit")
+            {
+                string contentHash = HmiEngineeringFingerprint(change, project);
+                change.FingerprintCoverage = new JObject { ["policyVersion"] = 1, ["complete"] = false,
+                    ["scopePolicy"] = HmiPreservationRules.ClassicScreenPolicy, ["nativeFingerprintBlocks"] = 0,
+                    ["limitations"] = new JArray(HmiPreservationRules.ClassicScreenExportNote, "PLC and hardware content is not fingerprinted; project path, last save time and unsaved-state flag are checked.") };
+                return HmiEngineeringRules.ClassicScreenFingerprint(project.Path.FullName, project.LastModified.ToString("O"), project.IsModified, contentHash, locationIndependent);
+            }
             var snapshot = new JObject { ["fingerprintPolicyVersion"] = 2, ["projectPath"] = project.Path.FullName, ["lastModified"] = project.LastModified.ToString("O"), ["isModified"] = project.IsModified,
                 ["simulationDuringBlockCompilationEnabled"] = project.GetService<PlcSimulationSettingsProvider>()?.IsSimulationDuringBlockCompilationEnabled };
             if (locationIndependent) { snapshot.Remove("projectPath"); snapshot.Remove("lastModified"); snapshot.Remove("isModified"); }
@@ -1609,8 +1633,8 @@ namespace TiaMcp.Openness.V21
                 string.Equals(x.ProjectPath, project.Path.FullName, StringComparison.OrdinalIgnoreCase) &&
                 (x.State == "recovery_required" || x.State == "checkpointing" || x.State == "applying" || x.State == "restoring"));
             if (unresolved != null)
-                throw new BridgeException("RecoveryRequired", "Change " + unresolved.Id + " on this project is " + unresolved.State + ". Run change_restore " + unresolved.Id +
-                    " (owned instance, recovery_required); otherwise tia_detach and start a new instance, or restart the worker.", ChangeView(unresolved));
+                throw new BridgeException("RecoveryRequired", "Change " + unresolved.Id + " on this project is " + unresolved.State +
+                    ". Inspect change_status and the retained recovery evidence before another edit. For recovery_required, change_restore can recover the archive in a worker-owned instance. Do not restart merely to clear an unverified change.", ChangeView(unresolved));
         }
 
         private Project ProjectForChange(EngineeringChange change)
@@ -1623,6 +1647,7 @@ namespace TiaMcp.Openness.V21
 
         private static void ValidatePreparedFiles(EngineeringChange change)
         {
+            foreach (var member in change.HmiScreenMembers) ValidatePreparedFiles(member);
             if (change.InputPath != null && (!File.Exists(change.InputPath) || ChangeFileHash(change.InputPath) != change.InputHash))
                 throw new BridgeException("ArtifactChanged", "Prepared import/source artifact changed after preview.");
             // A text-list import reads its TextLibrary file next to the configuration file.
@@ -1631,7 +1656,7 @@ namespace TiaMcp.Openness.V21
                     throw new BridgeException("ArtifactChanged", "Prepared TextLibrary candidate changed after preview.");
         }
 
-        private JObject ChangeView(EngineeringChange change)
+        private JObject ChangeView(EngineeringChange change, bool includeDetails = false)
         {
             var view = Envelope();
             view["changeId"] = change.Id; view["state"] = change.State; view["previewHash"] = change.PreviewHash;
@@ -1652,7 +1677,9 @@ namespace TiaMcp.Openness.V21
             if (change.Kind == "graphical_typed_edit") view["typedQualification"] = TypedChangeQualification(change);
             view["scratchSecurity"] = change.ScratchSecurity?.DeepClone();
             view["automaticRetryAllowed"] = false;
-            return view;
+            view["phaseTimings"] = change.PhaseTimings.DeepClone();
+            view["progressPath"] = Path.Combine(change.Directory, "progress.json");
+            return change.Kind == "hmi_classic_screen_edit" && !includeDetails ? ClassicScreenReceipts.Compact(view) : view;
         }
 
         private static void WriteChangeJournal(EngineeringChange change)
@@ -1672,6 +1699,7 @@ namespace TiaMcp.Openness.V21
                 ["recoveryDirectory"] = change.RecoveryDirectory, ["recoveredProject"] = change.RecoveredProject?.DeepClone(),
                 ["scratchSecurity"] = change.ScratchSecurity?.DeepClone(), ["safetyAfter"] = change.SafetyAfter?.DeepClone(), ["technologyAfter"] = change.TechnologyAfter?.DeepClone() };
             var temporary = change.Journal + ".new";
+            data["phaseTimings"] = change.PhaseTimings.DeepClone();
             File.WriteAllText(temporary, data.ToString(Formatting.Indented), new UTF8Encoding(false));
             if (File.Exists(change.Journal)) TiaMcp.Core.JournalFileReplacement.Replace(temporary, change.Journal); else File.Move(temporary, change.Journal);
         }
@@ -1705,6 +1733,9 @@ namespace TiaMcp.Openness.V21
         private static JObject ChangeArtifact(string path) => new JObject { ["path"] = path, ["bytes"] = new FileInfo(path).Length, ["sha256"] = ChangeFileHash(path) };
         private sealed class EngineeringChange
         {
+            internal readonly JArray PhaseTimings = new JArray();
+            internal readonly List<EngineeringChange> HmiScreenMembers = new List<EngineeringChange>();
+            internal bool HmiScreenTouched;
             internal readonly JArray TypedDependencies = new JArray();
             internal readonly JArray TypedInstanceCreations = new JArray();
             internal CapturedStorageQualification CapturedStorageQualification;

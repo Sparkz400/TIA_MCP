@@ -84,6 +84,10 @@ Configure a stdio server with your actual checkout path:
 
 Then ask the client: *Use `tia_discover` to list the available TIA Portal sessions.* For a command-line check, run `python .\scripts\smoke_mcp.py`.
 
+Large HMI screen imports can need more than five minutes. Use a longer Host and
+client timeout for that workflow; the [HMI guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#screen-failure-recovery-without-closing-tia)
+gives the settings and explains recovery without repeatedly reopening TIA.
+
 The Host advertises about 300 tools. If your client limits tools per server, add `"--toolsets", "core,simulation"` (or other groups) to `args`. The server also offers workflow prompts such as `safe_change` and `block_test`. Groups, prompts, resources, completions, logging and progress notifications are described in [MCP surface](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md).
 
 ## Next steps

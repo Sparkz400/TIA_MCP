@@ -5,8 +5,9 @@ namespace TiaMcp.Core.EngineeringJobs;
 
 /// <summary>
 /// Trusted reconciliation of an unresolved shared mutation admission. A fresh worker-owned TIA session
-/// reports one disposition per admitted resource; the admission is released only when every resource is
-/// unchanged or verified applied, the admitted TIA process is gone and nothing was mutated. Never replays.
+/// reports one disposition per admitted resource. General recovery requires the original process to exit;
+/// a terminal Classic screen journal has a stricter exclusive readback route in the still-open project.
+/// Every resource must be unchanged or verified applied, with no mutation or replay by verification.
 /// </summary>
 public sealed record AdmissionReconciliation(EngineeringMutationAdmission Record, DateTimeOffset AdmittedAt)
 {
@@ -17,7 +18,7 @@ public sealed record AdmissionReconciliation(EngineeringMutationAdmission Record
     {
         if (!Operations.Contains(record.Scope.Operation))
             throw new BridgeException("ReconciliationUnsupported", "No trusted reconciliation adapter exists for " + record.Scope.Operation + ".");
-        // A dispatchIntent is left when the Host itself died; the native check below proves its TIA process is gone.
+        // A dispatchIntent is left when the Host itself died; native verification must prove a terminal outcome.
         if (record.State is not ("outcomeUnknown" or "dispatchIntent"))
             throw new BridgeException("InvalidOperationState", "Only an unresolved (dispatchIntent or outcomeUnknown) admission can be reconciled.");
         return new(record, admittedAt);
@@ -36,10 +37,13 @@ public sealed record AdmissionReconciliation(EngineeringMutationAdmission Record
     {
         var reasons = new List<string>();
         if (Value<string>(verification, "scopeSha256") != Record.Scope.ScopeSha256) reasons.Add("Verification belongs to a different admission scope.");
-        if (Value<int>(verification, "processId") is var process && (process <= 0 || process == Record.Scope.ProcessId))
+        bool openScreen = VerifiedOpenScreen(verification);
+        if (Value<int>(verification, "processId") is var process && (process <= 0 || !openScreen && process == Record.Scope.ProcessId))
             reasons.Add("Verification did not run in a fresh TIA session.");
-        if (verification["originalProcessRunning"]?.GetValueKind() != JsonValueKind.False)
+        if (!openScreen && verification["originalProcessRunning"]?.GetValueKind() != JsonValueKind.False)
             reasons.Add("The admitted TIA process may still be running; its dispatch could still be in progress.");
+        if (verification["verificationMode"] is not null && !openScreen)
+            reasons.Add("The in-place screen outcome lacks its exact terminal, artifact, exclusive-readback and saved-state proofs.");
         if (verification["nativeMutationInvoked"]?.GetValueKind() != JsonValueKind.False) reasons.Add("Verification must not invoke native mutation.");
         var rows = verification["resources"] as JsonArray ?? [];
         if (rows.Count != Record.Scope.Resources.Count) reasons.Add("Verification reported a different resource set than the admission.");
@@ -53,6 +57,19 @@ public sealed record AdmissionReconciliation(EngineeringMutationAdmission Record
         }
         return reasons;
     }
+
+    private bool VerifiedOpenScreen(JsonObject v) => Record.Scope.Operation == "change_apply"
+        && Value<string>(v, "verificationMode") == "classic-screen-terminal-in-open-project-v1"
+        && Value<string>(v, "changeKind") == "hmi_classic_screen_edit"
+        && Value<string>(v, "terminalState") is ("applied" or "rolled_back")
+        && Value<string>(v, "scopePolicy") == "classic-regular-screens-selected-hmi-v1"
+        && new[] { "nativeExclusiveAccess", "retainedArtifactsVerified", "terminalJournalUnchanged", "savedProjectFingerprintMatches", "screenScopeMatches" }
+            .All(p => v[p]?.GetValueKind() == JsonValueKind.True)
+        && v["projectIsModified"]?.GetValueKind() == JsonValueKind.False
+        && Record.Scope.Resources.Count == 3
+        && Record.Scope.Resources.Count(r => r.Kind == "project" && r.Effect == "checkpointMutationCompileSave") == 1
+        && Record.Scope.Resources.Count(r => r.Kind == "workspace" && r.Effect == "legacyJournalCheckpointOutput") == 1
+        && Record.Scope.Resources.Count(r => r.Kind == "workspace" && r.Effect == "reviewedMutationInput") == 1;
 
     /// <summary>One disposition with its own evidence per admitted resource; call only when Refusals is empty.</summary>
     public IReadOnlyList<ResourceReconciliation> Dispositions(JsonObject verification, Func<int, EngineeringMutationResource, JsonNode, EngineeringArtifactReference> evidence)

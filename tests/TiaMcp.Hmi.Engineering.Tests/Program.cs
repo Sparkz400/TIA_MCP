@@ -2,6 +2,20 @@ using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 using TiaMcp.Model;
 
+if (args.Length == 3 && args[0] == "--compare-classic-compile")
+{
+    bool same = ClassicScreenCompileRules.ProblemsUnchanged(JObject.Parse(File.ReadAllText(args[1])), JObject.Parse(File.ReadAllText(args[2])));
+    Console.WriteLine(same ? "PASS retained native compile diagnostics match under the bounded screen comparison" : "FAIL retained native compile diagnostics differ");
+    return same ? 0 : 1;
+}
+
+if (args.Length == 2 && args[0] == "--check-screen-recovery-journal")
+{
+    var manifest = ClassicScreenRecoveryRules.TerminalManifest(JObject.Parse(File.ReadAllText(args[1])));
+    Console.WriteLine("PASS retained terminal Classic screen journal: " + ((JObject)manifest["artifacts"]).Count + " native screen records; native freshness still required.");
+    return 0;
+}
+
 int passed = 0, failed = 0;
 void Check(string name, Action action)
 {
@@ -406,5 +420,11 @@ Check("Classic XML import accepts one exact exported object and refuses other sh
 });
 TextListImportTests.Run(Check);
 GateAdmissionTests.Run(Check);
+PreservationCaptureTests.Run(Check);
+PreservationBudgetTests.Run(Check);
+ClassicScreenEditTests.Run(Check);
+ClassicScreenCompileTests.Run(Check);
+ClassicScreenRecoveryTests.Run(Check);
+ClassicScreenWorkflowTests.Run(Check);
 Console.WriteLine($"{passed} passed; {failed} failed. These are pure guard/preservation tests, not native qualification.");
 return failed == 0 ? 0 : 1;

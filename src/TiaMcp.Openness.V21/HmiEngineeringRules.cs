@@ -33,7 +33,9 @@ namespace TiaMcp.Model
         private static readonly Dictionary<string, (string Family, string[] Operations, string[] Profiles, string[] QualificationProfiles)> Kinds =
             new Dictionary<string, (string, string[], string[], string[])>(StringComparer.Ordinal)
         {
+            // Explicitly bounded screen workflow, separate from the whole-HMI import contract.
             ["hmi_classic_import"] = ("classic", new[] { "classic_xml_import", "scalar_property_set" }, new[] { "classic-comfort", "classic-rt-advanced", "classic-basic" }, new[] { "classic-comfort", "classic-rt-advanced", "classic-basic" }),
+            ["hmi_classic_screen_edit"] = ("classic", new[] { "classic_xml_import" }, new[] { "classic-rt-advanced" }, new[] { "classic-rt-advanced" }),
             ["hmi_external_tag_create"] = ("unified", new[] { "external_tag_create" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" }),
             // Graphics: a new screen (size copied from an existing one) and allowlisted items within a screen's rectangle.
             ["hmi_screen_create"] = ("unified", new[] { "screen_create", "item_create" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" }),
@@ -50,7 +52,7 @@ namespace TiaMcp.Model
         internal static void RequireRequest(JObject payload)
         {
             if (payload == null || payload.Value<int?>("schemaVersion") != 1) throw new ArgumentException("HMI engineering requires payload.schemaVersion=1.");
-            var permitted = new HashSet<string>(new[] { "schemaVersion", "operation", "target", "expectedContentHash", "properties", "name", "dataType", "placement", "bindings", "connection", "plcTag", "xml", "composition", "itemType", "eventType", "script" }, StringComparer.Ordinal);
+            var permitted = new HashSet<string>(new[] { "schemaVersion", "operation", "target", "expectedContentHash", "properties", "name", "dataType", "placement", "bindings", "connection", "plcTag", "xml", "composition", "itemType", "eventType", "script", "additionalScreens" }, StringComparer.Ordinal);
             foreach (var property in payload.Properties())
                 if (!permitted.Contains(property.Name)) throw new ArgumentException("Unsupported HMI engineering field: " + property.Name);
             string operation = Text(payload, "operation");
@@ -273,7 +275,8 @@ namespace TiaMcp.Model
             if (!Kinds.TryGetValue(kind ?? "", out var admitted)) throw new ArgumentException("Unknown HMI change kind.");
             var gate = Gate(family, profile, operation);
             bool scope = family == admitted.Family && admitted.Operations.Contains(operation, StringComparer.Ordinal)
-                && (operation != "classic_xml_import" || ClassicImportTypes.Contains(nativeType, StringComparer.Ordinal));
+                && (operation != "classic_xml_import" || ClassicImportTypes.Contains(nativeType, StringComparer.Ordinal))
+                && (kind != "hmi_classic_screen_edit" || nativeType == "Siemens.Engineering.Hmi.Screen.Screen");
             bool production = scope && admitted.Profiles.Contains(profile, StringComparer.Ordinal);
             bool qualification = !production && scope && profile != null && profile == qualificationProfile && admitted.QualificationProfiles.Contains(profile, StringComparer.Ordinal);
             bool available = production || qualification;
@@ -287,12 +290,23 @@ namespace TiaMcp.Model
                     + (admitted.Operations.Contains("classic_xml_import") ? " (classic_xml_import of a screen or tag table only)" : "") + "; this request stays behind the closed preservation gate."
                 : admitted.Profiles.Length == 0 ? "Change kind " + kind + " has passed native qualification on no profile yet (this target's profile is " + (profile ?? "unknown") + "); it stays behind the closed preservation gate outside a qualification Host."
                 : "Change kind " + kind + " passed native qualification on " + string.Join(" and ", admitted.Profiles) + " only (this target's profile is " + (profile ?? "unknown") + "); other profiles stay behind the closed preservation gate.";
+            if (kind == "hmi_classic_screen_edit")
+            {
+                gate["nativeQualification"] = "unverified";
+                gate["preservationScope"] = HmiPreservationRules.ClassicScreenPolicy;
+                gate["reason"] = available
+                    ? "Bounded Classic RT Advanced regular-screen editing. Every regular screen of the selected HMI is compared; shared resources and other HMIs are not compared. Native test evidence is separate from profile-wide qualification."
+                    : "hmi_classic_screen_edit admits only classic_xml_import of an existing regular screen on classic-rt-advanced.";
+            }
             return gate;
         }
 
         /// <summary>An admitted kind fixes the family and operations of the hmi_engineering payload; hmi_engineering itself takes every operation.</summary>
         internal static void RequireKind(string kind, JObject payload)
         {
+            if (payload?["additionalScreens"] != null && kind != "hmi_classic_screen_edit")
+                throw new ArgumentException("additionalScreens is limited to the bounded Classic screen edit kind.");
+            if (kind == "hmi_classic_screen_edit") ClassicScreenBatchRules.Members(payload);
             if (!Kinds.TryGetValue(kind ?? "", out var admitted)) return;
             if (payload?["target"]?.Value<string>("family") != admitted.Family || !admitted.Operations.Contains(payload.Value<string>("operation"), StringComparer.Ordinal))
                 throw new ArgumentException(kind + " takes the hmi_engineering payload of " + string.Join(" or ", admitted.Operations) + " on a " + admitted.Family + " HMI.");
@@ -304,7 +318,8 @@ namespace TiaMcp.Model
 
         /// <summary>The coverage notes a kind accepts in place of a complete capture; null when it requires a complete one (hmi_engineering).</summary>
         internal static string[] StandingNotes(string kind)
-            => KindFamily(kind) == "classic" ? new[] { HmiPreservationRules.ClassicExportNote }
+            => kind == "hmi_classic_screen_edit" ? new[] { HmiPreservationRules.ClassicScreenExportNote }
+            : KindFamily(kind) == "classic" ? new[] { HmiPreservationRules.ClassicExportNote }
             : KindFamily(kind) == "unified" ? new[] { HmiPreservationRules.UnifiedTagTableExportNote, HmiPreservationRules.UnifiedTypedReadbackNote }
             : null;
 
@@ -314,7 +329,36 @@ namespace TiaMcp.Model
 
         /// <summary>Whether the capture shows only the kind's standing notes, every HMI of the kind's family (StandingNotesOnly).</summary>
         internal static bool ScopeAccepted(string kind, JObject manifest)
-            => StandingNotes(kind) is string[] notes && StandingNotesOnly(manifest, KindFamily(kind), notes);
+            => StandingNotes(kind) is string[] notes && StandingNotesOnly(manifest, KindFamily(kind), notes)
+                && (kind == "hmi_classic_screen_edit" ? ClassicScreenScopeOnly(manifest) : manifest?["scopePolicy"] == null);
+
+        private static bool ClassicScreenScopeOnly(JObject manifest)
+        {
+            string hmiPath = manifest.Value<string>("hmiPath");
+            var artifacts = manifest["artifacts"] as JObject;
+            var targets = manifest["targets"] as JArray;
+            return manifest.Value<string>("scopePolicy") == HmiPreservationRules.ClassicScreenPolicy
+                && !string.IsNullOrWhiteSpace(hmiPath) && targets?.Count == 1
+                && targets[0].Value<string>("hmiPath") == hmiPath
+                && (manifest["missingCoverage"] as JArray)?.Count == 1
+                && artifacts != null && artifacts.Count > 0
+                && artifacts.Properties().All(p => p.Name.StartsWith(hmiPath + "/screens/", StringComparison.Ordinal));
+        }
+
+        internal static string ClassicScreenFingerprint(string projectPath, string lastModified, bool isModified, string contentHash, bool locationIndependent)
+        {
+            if (string.IsNullOrWhiteSpace(projectPath) || string.IsNullOrWhiteSpace(lastModified)
+                || contentHash == null || contentHash.Length != 64 || contentHash.Any(c => !Uri.IsHexDigit(c)))
+                throw new ArgumentException("A screen fingerprint requires project state and a complete declared-scope SHA-256.");
+            var snapshot = new JObject { ["policy"] = HmiPreservationRules.ClassicScreenPolicy, ["contentHash"] = contentHash };
+            if (!locationIndependent)
+            {
+                snapshot["projectPath"] = projectPath;
+                snapshot["lastModified"] = lastModified;
+                snapshot["isModified"] = isModified;
+            }
+            return HmiPreservationRules.Hash(snapshot.ToString(Newtonsoft.Json.Formatting.None));
+        }
 
         /// <summary>A capture whose only gaps are the given standing notes of one family: no native capture failure, every target of
         /// that family, every note one of them (no typed read error, no other note) and a valid observed-artifacts hash, which then

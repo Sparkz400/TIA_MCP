@@ -171,13 +171,17 @@ public sealed partial class TiaTools
         => Call("fixture_sources", new { language, blockName, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "fixtures") }, cancellationToken);
 
     [McpServerTool(Name = "change_prepare", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Prepare an offline engineering change: kind and payload, exact project/PLC targets, preview, artifact hashes and conflict checks. Returns changeId/previewHash for change_apply and the project's unsaved state (isModified). Refuses with RecoveryRequired while another change on the same project in this TIA process is unresolved (change_restore it, or start a new instance). Source/XML must explicitly describe intended objects. Kind hmi_text_list_import takes {schemaVersion:1, target, expectedContentHash, recordId, outputId?}: the Host reopens that hmi_text_list_author/generate_set record and refuses content V21's import would change. Kinds hmi_classic_import (Classic classic_xml_import of a screen or tag table, or screen BackColor scalar_property_set), hmi_external_tag_create (Unified external_tag_create), hmi_screen_create (Unified screen_create and item_create), hmi_dynamization_create (Unified dynamization_set) and hmi_event_handler_create (Unified event_handler_set) take the hmi_engineering payload of their operation. Does not change the project; writes preview artifacts.")]
+    [Description("Prepare an offline engineering change: kind and payload, exact project/PLC targets, preview, artifact hashes and conflict checks. Returns changeId/previewHash for change_apply and the project's unsaved state (isModified). Refuses with RecoveryRequired while another change on the same project in this TIA process is unresolved. First inspect change_status: a bounded Classic screen failure may already be verified rolled_back or not_applied and allow a new preparation without restarting TIA. For a lost response to a terminal Classic screen change, use engineering_admission_reconcile in the open project. An unverified recovery remains held for change_restore. Source/XML must explicitly describe intended objects. Kind hmi_text_list_import takes {schemaVersion:1, target, expectedContentHash, recordId, outputId?}: the Host reopens that hmi_text_list_author/generate_set record and refuses content V21's import would change. Kind hmi_classic_screen_edit takes classic_xml_import of an existing regular Classic RT Advanced screen; it compares all regular screens of that HMI only, explicitly excluding shared resources and other HMIs. Kinds hmi_classic_import (Classic classic_xml_import of a screen or tag table, or screen BackColor scalar_property_set), hmi_external_tag_create (Unified external_tag_create), hmi_screen_create (Unified screen_create and item_create), hmi_dynamization_create (Unified dynamization_set) and hmi_event_handler_create (Unified event_handler_set) take the hmi_engineering payload of their operation. Does not change the project; writes preview artifacts.")]
     public async Task<CallToolResult> ChangePrepare(string kind, JsonElement payload, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? scopePath = null)
     {
         object request;
         // The AML is resolved at the Host trust boundary; its refusals are typed like every other preparation refusal.
         try { request = kind == "cax_import" ? CaxImportPayload(payload) : ObjectArguments(payload); }
         catch (BridgeException error) when (kind == "cax_import") { return Failure(error); }
+        if (kind == "hmi_classic_screen_edit")
+            try { request = ClassicScreenArtifactPayload(payload); }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or ArgumentException)
+            { return Failure(new BridgeException("HmiCandidateUnavailable", error.Message)); }
         // TiaMcp.Graph targets net10 and cannot load in the net48 worker, so GRAPH documents are validated here before native preparation.
         if (kind == "graph_import")
             try { request = new GraphWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits).ImportPayload(payload); }
@@ -213,14 +217,33 @@ public sealed partial class TiaTools
     }
 
     [McpServerTool(Name = "change_apply", Destructive = true, OpenWorld = false)]
-    [Description("Apply a prepared offline change exactly once using its previewHash and unique idempotencyKey. checkpointSave explicitly saves the current in-memory project so Siemens can archive a recovery checkpoint. Refuses before the checkpoint while another change on the same project in this TIA process is unresolved. Returns compile diagnostics, verification and partial-failure journal; never downloads or changes runtime values.")]
+    [Description("Apply a prepared offline change exactly once using its previewHash and unique idempotencyKey. checkpointSave explicitly saves current edits before the recovery archive. A failed hmi_classic_screen_edit attempts one in-place restore of the original screen under the same exclusive lease: peers must be unchanged, original XML and compiler diagnostics must match, and save/readback must verify. Reports rolled_back (new preparation allowed), not_applied (failure before import, unchanged screen scope), or recovery_required (recovery unverified). Other change kinds retain their existing recovery rules. Never retries the candidate, downloads or changes runtime values. For a lost response inspect change_status; a verified terminal Classic screen admission can be reconciled in the still-open project.")]
     public Task<CallToolResult> ChangeApply(string changeId, string previewHash, string idempotencyKey, bool checkpointSave, CancellationToken cancellationToken, bool compile = true, bool save = true)
         => Call("change_apply", new { changeId, previewHash, idempotencyKey, checkpointSave, compile, save }, cancellationToken);
 
     [McpServerTool(Name = "change_status", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Inspect the journal and known outcome of a prepared/applied change. Do this after a partial failure; never automatically retry a write.")]
-    public Task<CallToolResult> ChangeStatus(string changeId, CancellationToken cancellationToken)
-        => Call("change_status", new { changeId, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes") }, cancellationToken);
+    public Task<CallToolResult> ChangeStatus(string changeId, CancellationToken cancellationToken, bool includeDetails = false, bool progressOnly = false)
+        => progressOnly ? Task.FromResult(ChangeProgress(changeId))
+            : Call("change_status", new { changeId, includeDetails, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes") }, cancellationToken);
+
+    private CallToolResult ChangeProgress(string changeId)
+    {
+        try
+        {
+            if (!Guid.TryParseExact(changeId, "N", out _)) throw new ArgumentException("progressOnly requires a 32-character changeId.");
+            string path = Path.Combine(options.ArtifactsDirectory, "changes", "change-" + changeId, "progress.json");
+            if (!File.Exists(path)) return Result(JsonSerializer.Serialize(new { changeId, progressAvailable = false, outcomeVerified = false, automaticRetryAllowed = false }), false);
+            if (new FileInfo(path).Length > 1024 * 1024) throw new IOException("Progress receipt exceeds 1 MiB.");
+            var data = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(path))!.AsObject();
+            if (data["changeId"]?.GetValue<string>() != changeId) throw new IOException("Progress receipt belongs to a different change.");
+            data["progressAvailable"] = true; data["outcomeVerified"] = false; data["automaticRetryAllowed"] = false;
+            data["note"] = "Progress is diagnostic only. Use normal change_status for the durable outcome; never replay a pending write.";
+            return Result(data.ToJsonString(), false);
+        }
+        catch (Exception error) when (error is ArgumentException or IOException or UnauthorizedAccessException or JsonException or InvalidOperationException)
+        { return Failure(new BridgeException("ChangeProgressUnavailable", error.Message)); }
+    }
 
     [McpServerTool(Name = "change_restore", Destructive = true, OpenWorld = false)]
     [Description("Recover a change checkpoint into a new project directory in a worker-owned TIA instance. Preserves the current state first; never overwrites the original archive or closes a user-owned TIA instance.")]

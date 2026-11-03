@@ -24,11 +24,28 @@ The engineering worker and its TIA connection are reused across tool calls. Star
 
 Native changes follow **prepare → preview → checkpoint → apply → verify**. A change can partially fail across Siemens calls; recovery uses its checkpoint and journal. The public simulation workflow works only on adapter-owned simulator instances: it can download a changed program online, set virtual time and inject interrupts there, but it does not expose physical PLC download, force or CPU control.
 
+HMI preservation records export progress before native dispatch and retains failures
+without rereading a lost project connection. Classic graphic-list exports are
+temporarily blocked; a preservation scope that needs them refuses the change.
+See [HMI export containment, diagnostics and disposable-copy tests](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#temporary-classic-graphic-list-export-containment).
+Capture has separate per-file and project-wide capacity bounds; the exact limits
+and outstanding native failure are documented in the
+[preservation guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#preservation).
+
+The separate `hmi_classic_screen_edit` workflow compares every regular screen of one Classic RT Advanced HMI without exporting graphic lists. It retains checkpoint, compile and exact readback checks, but explicitly excludes shared-resource, other-HMI, PLC and hardware content. This is bounded screen preservation, with profile-wide qualification still unverified. See the [screen editing contract](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#bounded-classic-screen-editing).
+
 Combined PLC component installation admits only exact combinations with native preservation, reopen and recovery evidence. The qualified FBD OB case and remaining restrictions are listed in the [component workflow](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/plc-library-integration-recipes.md#combined-apply).
 
 Library imports preview dependencies before their selected consumers and refuse cycles before writing. See the [engineering workflow](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#supported-payloads).
 
 ## Support claims
+
+Classic screen import failures have a bounded restore-and-verify path in the open
+project. A completed screen edit whose response was lost can also be reconciled
+there using independent native evidence. Other mutations retain their existing
+recovery requirements. See [screen recovery and timeout handling](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#screen-failure-recovery-without-closing-tia).
+The [local verification record](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/classic-screen-recovery-20261103.md)
+distinguishes the native lock-release test from managed recovery checks.
 
 The diagram shows component boundaries, not support for every operation, target or environment. Offline tests, native compilation and runtime qualification are separate claims. Check:
 
@@ -40,3 +57,12 @@ The diagram shows component boundaries, not support for every operation, target 
 Full detail: [system architecture guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/architecture.md).
 
 The [2 November local completion record](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/local-completion-20261102.md) covers dependency-ordered library imports, preserved target paths, the production FBD OB route and the remaining operator/equipment prerequisites.
+# Draft Classic screen workflow
+
+The current draft adds bounded screen batching, lease-scoped observations,
+native component composition and diagnostic phase progress. Native batch
+qualification remains pending; see the
+[draft checkpoint](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/classic-screen-workflow-draft-20261103.md)
+before relying on that path. Existing single-screen evidence does not qualify
+the new batch behavior.
+

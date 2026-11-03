@@ -33,10 +33,16 @@ public sealed class EngineeringMutationAdmissionStore
         scope = Freeze(scope); ValidateScope(scope); EngineeringIdentityGuard.Sha256(requestSha256, "requestSha256");
         string[] keys = ScopeKeys(scope);
         using var held = PackageStorage.Lock(lockPath);
+        var pendingAdmissions = RecordsUnderLock(artifacts).Where(r => r.State is "dispatchIntent" or "outcomeUnknown").ToArray();
         var owned = new EngineeringOperationStore(artifacts).PendingResourceKeysUnderLock()
-            .Concat(PendingResourceKeysUnderLock(artifacts));
+            .Concat(pendingAdmissions.SelectMany(r => r.ResourceKeys))
+            .Concat(ComponentQualificationWindowStore.PendingResourceKeysUnderLock(artifacts));
         if (owned.Any(a => keys.Any(b => EngineeringResourceKey.Overlaps(a, b))))
-            throw new BridgeException("ResourceBusy", "An unreconciled engineering operation or mutation admission owns a requested resource.");
+            throw new BridgeOperationException("ResourceBusy", "An unreconciled engineering operation or mutation admission owns a requested resource. Inspect and reconcile the recorded owner; do not retry the write.",
+                JsonSerializer.SerializeToElement(new {
+                    blockingAdmissionIds = pendingAdmissions.Where(r => r.ResourceKeys.Any(a => keys.Any(b => EngineeringResourceKey.Overlaps(a, b)))).Select(r => r.Id).ToArray(),
+                    statusTool = "engineering_operation_status", reconciliationTool = "engineering_admission_reconcile", automaticRetryAllowed = false
+                }, BridgeProtocol.Json));
         string id = Guid.NewGuid().ToString("N");
         var record = new EngineeringMutationAdmission(id, 0, "dispatchIntent", scope, requestSha256, keys, null, DateTimeOffset.UtcNow, null, []);
         string staging = PackageStorage.Under(directory, ".preparing-" + id);
