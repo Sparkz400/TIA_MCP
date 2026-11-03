@@ -53,6 +53,10 @@ Reports are under `artifacts/offline-backlog-*`; the final discovery snapshot is
 the initial new capture test reopened its still-owned store, and the initial syslog harness
 attempted a second session on an already-owned endpoint. Both existing ownership guards
 correctly refused; the tests now close the first owner before opening the next.
+CI also found that the independent handoff verifier's RPC allowlist lacked the new
+`Syslog.Browse` read. Its allowlist now includes that method; all eight negative controls,
+including an injected write RPC, refuse. The separate capture-sequencing verifier passes
+against the retained loopback run as well.
 
 ## Documentation and remaining work
 
