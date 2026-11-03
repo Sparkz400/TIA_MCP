@@ -47,10 +47,11 @@ public static class WebRuntimeProtocol
 {
     public const int MaximumResponseBytes = 256 * 1024;
     public const int MaximumDiagnosticEntries = 500;
+    public const int MaximumSyslogEntries = 20;
     private static readonly UTF8Encoding Utf8 = new(false, true);
     private static readonly Dictionary<string, string> DiagnosticMethods = new(StringComparer.Ordinal)
     {
-        ["languages"] = "Project.ReadLanguages", ["alarms"] = "Alarms.Browse", ["diagnosticBuffer"] = "DiagnosticBuffer.Browse",
+        ["languages"] = "Project.ReadLanguages", ["alarms"] = "Alarms.Browse", ["diagnosticBuffer"] = "DiagnosticBuffer.Browse", ["syslog"] = "Syslog.Browse",
         ["operatingMode"] = "Plc.ReadOperatingMode", ["modeSelector"] = "Plc.ReadModeSelectorState",
         ["systemTime"] = "Plc.ReadSystemTime", ["timeSettings"] = "Plc.ReadTimeSettings", ["projectInformation"] = "Project.ReadInformation"
     };
@@ -192,10 +193,15 @@ public static class WebRuntimeProtocol
     public static string DiagnosticMethod(string kind) =>
         kind is not null && DiagnosticMethods.TryGetValue(kind, out var method) ? method : throw Error("RuntimeDiagnosticKindUnsupported");
 
-    /// <summary>Only alarms/diagnosticBuffer take a language and a bounded count; acknowledgment, filters and alarm IDs are not exposed.</summary>
+    /// <summary>Localized lists require language/count; syslog takes only count. No acknowledgment or arbitrary filters.</summary>
     public static JsonElement Diagnostic(string requestId, string kind, string? language = null, int? count = null)
     {
         Id(requestId); string method = DiagnosticMethod(kind);
+        if (kind == "syslog")
+        {
+            if (language is not null || count is null or < 1 or > MaximumSyslogEntries) throw Error("RuntimeDiagnosticSelectionInvalid");
+            return Request(method, requestId, new { count = count.Value });
+        }
         bool listed = kind is "alarms" or "diagnosticBuffer";
         if (listed != language is not null || listed != count is not null) throw Error("RuntimeDiagnosticSelectionInvalid");
         if (!listed) return Request(method, requestId, null);
@@ -215,10 +221,15 @@ public static class WebRuntimeProtocol
         string requestId = id.GetString()!; string? language = null; int? count = null;
         if (request.TryGetProperty("params", out var parameters))
         {
-            if (parameters.ValueKind != JsonValueKind.Object || !parameters.TryGetProperty("language", out var tag) || tag.ValueKind != JsonValueKind.String ||
-                !parameters.TryGetProperty("count", out var limit) || limit.ValueKind != JsonValueKind.Number || !limit.TryGetInt32(out int n))
+            if (parameters.ValueKind != JsonValueKind.Object || !parameters.TryGetProperty("count", out var limit) ||
+                limit.ValueKind != JsonValueKind.Number || !limit.TryGetInt32(out int n))
                 throw Error("RuntimeRequestChanged");
-            language = tag.GetString(); count = n;
+            if (kind != "syslog")
+            {
+                if (!parameters.TryGetProperty("language", out var tag) || tag.ValueKind != JsonValueKind.String) throw Error("RuntimeRequestChanged");
+                language = tag.GetString();
+            }
+            count = n;
         }
         if (!JsonElement.DeepEquals(request, Diagnostic(requestId, kind, language, count))) throw Error("RuntimeRequestChanged");
         if (elapsed < TimeSpan.Zero || elapsed > TimeSpan.FromMinutes(1)) throw Error("RuntimeTimingInvalid");
@@ -232,6 +243,8 @@ public static class WebRuntimeProtocol
                 v.ValueKind == JsonValueKind.String && v.GetString()!.Length is >= 1 and <= 256;
             static bool Rows(JsonElement node, string name, int maximum) => node.ValueKind == JsonValueKind.Object && node.TryGetProperty(name, out var v) &&
                 v.ValueKind == JsonValueKind.Array && v.GetArrayLength() <= maximum && v.EnumerateArray().All(x => x.ValueKind == JsonValueKind.Object);
+            static bool Counter(JsonElement node, string name) => node.TryGetProperty(name, out var value) &&
+                value.ValueKind == JsonValueKind.Number && value.TryGetInt64(out long n) && n >= 0;
             // Only the documented top-level shape is required; unknown vendor fields stay in the raw value.
             bool valid = kind switch
             {
@@ -241,6 +254,9 @@ public static class WebRuntimeProtocol
                 "timeSettings" => Field(result, "current_offset") && Field(result, "utc_offset"),
                 "languages" => Rows(result, "languages", 64) && result.GetProperty("languages").EnumerateArray().All(x => Field(x, "language")),
                 "alarms" or "diagnosticBuffer" => Rows(result, "entries", count!.Value),
+                "syslog" => Rows(result, "entries", count!.Value) && Counter(result, "count_total") && Counter(result, "count_lost") &&
+                    result.GetProperty("entries").EnumerateArray().All(row => row.TryGetProperty("raw", out var raw) &&
+                        raw.ValueKind == JsonValueKind.String && raw.GetString()!.Length is > 0 and <= 65536),
                 _ => result.ValueKind == JsonValueKind.Object
             };
             if (!valid) throw Error("RuntimeResponseInvalid");
@@ -248,7 +264,8 @@ public static class WebRuntimeProtocol
             {
                 entries = result.GetProperty("entries").GetArrayLength();
                 // count_current is the CPU's current record total; absent means completeness is unknown, not complete.
-                truncated = result.TryGetProperty("count_current", out var total) && total.ValueKind == JsonValueKind.Number &&
+                // Syslog's count_total is lifetime history, not the current buffer size.
+                truncated = kind != "syslog" && result.TryGetProperty("count_current", out var total) && total.ValueKind == JsonValueKind.Number &&
                     total.TryGetInt64(out long n) ? n > entries : null;
             }
             value = result.Clone();

@@ -7,7 +7,8 @@ namespace TiaMcp.Core.PhysicalRuntime;
 
 /// <summary>Datatype is the caller's declared PLC type; it must fit the typed PLCSIM read and is what diagnostic mappings compare.</summary>
 public sealed record SimulatorCaptureSignal(string Symbol, string Type, string Datatype);
-public sealed record SimulatorCaptureSource(int InstanceId, string InstanceName, SimulatorCaptureSignal[] Signals, bool CycleSynchronous = false);
+public sealed record SimulatorCaptureSource(int InstanceId, string InstanceName, SimulatorCaptureSignal[] Signals, bool CycleSynchronous = false,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? SyncMode = null);
 public sealed record SimulatorSyncPoint(long Count, long TimeSinceSameSyncPointNanoseconds, long TimeSinceAnySyncPointNanoseconds);
 public sealed record SimulatorCaptureRead(int InstanceId, string InstanceName, string Symbol, string Type, string Status, JsonElement? Value,
     string? ProviderErrorCode, DateTimeOffset RequestStartedUtc, DateTimeOffset ResponseReceivedUtc, SimulatorSyncPoint? SyncPoint)
@@ -41,6 +42,8 @@ public static class SimulatorCaptureContracts
             source.InstanceId >= 0 && Text(source.InstanceName, 128) && source.Signals is { } signals &&
             signals.Length == request.SelectionIds.Length && signals.All(s => s is not null) &&
             signals.Select(s => s.Symbol).Distinct(StringComparer.Ordinal).Count() == signals.Length);
+        Require(source!.SyncMode is null || source.CycleSynchronous && source.SyncMode is
+            "SingleStep_C" or "SingleStep_P" or "SingleStep_CP" or "SingleStep_CT" or "SingleStep_CPT");
         foreach (var signal in source!.Signals)
             Require(Text(signal.Symbol, 512) && signal.Type is not null && Datatypes.TryGetValue(signal.Type, out var allowed) &&
                 allowed.Contains(signal.Datatype, StringComparer.OrdinalIgnoreCase));
@@ -53,6 +56,7 @@ public static class SimulatorCaptureContracts
     /// <summary>One worker argument shape for begin, sample and end.</summary>
     public static object Arguments(RuntimeCaptureRequest request) => new { instanceId = request.Simulator!.InstanceId,
         instanceName = request.Simulator.InstanceName, creationId = request.AttemptId, cycleSynchronous = request.Simulator.CycleSynchronous,
+        syncMode = request.Simulator.SyncMode,
         signals = request.Simulator.Signals.Select(s => new { symbol = s.Symbol, type = s.Type }) };
 
     public static void ValidatePlan(RuntimeCapturePlan plan) =>

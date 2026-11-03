@@ -7,6 +7,12 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 3 November 2026
 
+**Offline runtime follow-up:** catalog `0.4.133` adds bounded Web syslog reads,
+selectable PLCSIM SingleStep capture modes and a reproducible normal-Host contract
+inventory. Managed and actual-Host loopback checks pass; native qualification and
+all release counts remain unchanged. The [verification record](../verification/offline-backlog-20261103.md)
+tracks the complete regression and the remaining work. Desktop control stayed stopped.
+
 **Classic screen workflow draft:** completed the offline review of batch receipts,
 artifact paths and scalar XML preservation, with regression fixes and refreshed
 release ownership/source bindings. Catalog `0.4.131` has 487 features, 467 verified,

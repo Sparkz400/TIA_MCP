@@ -5,13 +5,17 @@ simulators you own (see the [README](../README.md)). Catalog and backlog reviewe
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.132`: 487 features, 467 verified, 20 unverified; 327 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Feature catalog | `0.4.133`: 487 features, 467 verified, 20 unverified; 327 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
 | Release matrix rows | 133 shipped, 334 limited, 6 unqualified, 12 unavailable on V21, 2 deferred |
 | Matrix cells | 2,148 bound, **28 open**, 72 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted; backlog reconciled on 3 November against catalog `0.4.130` ([ledger](plans/release-obligations-20261015.md), [acceptance rules](plans/release-acceptance.md), [review](verification/release-readiness-20261103.md)) |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
 unresolved feasibility stay release blockers ([release ledger](plans/release-obligations-20261015.md)).
+
+The [3 November offline follow-up](verification/offline-backlog-20261103.md) adds selectable
+PLCSIM SingleStep capture modes, bounded Web syslog reads and a retained MCP discovery
+candidate. These additions do not promote native qualification or release acceptance.
 
 Fresh local completion evidence: [2 November checks and exact prerequisites](verification/local-completion-20261102.md). The recovered vendor inputs, one V20 upgrade and the production FBD OB route now have fresh proof; this does not close the release ledger.
 

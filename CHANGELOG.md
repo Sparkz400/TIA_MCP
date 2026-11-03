@@ -9,10 +9,12 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.116`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.133`.
 
 ### Added
 
+- **Offline runtime extensions:** bounded `syslog` reads through `runtime_web_diagnostics`, and explicit SingleStep_C/P/CP/CT/CPT capture mode selection. Existing ownership, request bounds and restore behavior remain; these additions are not natively qualified ([record](docs/verification/offline-backlog-20261103.md)).
+- **Contract review inventory:** the actual-Host surface runner retains a hashed discovery candidate with tool schemas, annotations, prompts, resources and binary hashes. The compatibility policy remains a draft.
 - **Typed LAD/FBD coverage:** CPU 1513-1 PN V4.1 base families (102 engineering cases), and 120 wave 9 software-unit/namespace profiles on CPU 1511 V4.1 (124 engineering cases), with retained exact-build evidence and explicit runtime limits.
 - **Classic import on more panels:** `hmi_classic_import` is qualified and admitted on WinCC RT Advanced and KTP700 Basic PN as well ([record](docs/verification/hmi-classic-profiles-20261101.md)).
 - **Unified event handlers:** change kind `hmi_event_handler_create` (Unified script event handlers of screens and screen items (the script stored with CRLF line ends, never executed)) past the HMI preservation gate; qualified natively and admitted on Unified Comfort and Unified PC ([record](docs/verification/hmi-unified-authoring-20261102.md)).

@@ -134,9 +134,11 @@ def main():
         chunk = client.request('tools/call', {'name': 'artifact_read', 'arguments': {'path': stored}})['structuredContent']
         check(base64.b64decode(chunk['data']) == data, 'Upload and artifact_read results conform to their typed output schemas')
 
-        templates = {template['uriTemplate'] for template in client.request('resources/templates/list')['resourceTemplates']}
+        resource_templates = client.request('resources/templates/list')['resourceTemplates']
+        resources = client.request('resources/list')['resources']
+        templates = {template['uriTemplate'] for template in resource_templates}
         check(templates == {ARTIFACT_TEMPLATE, FEATURE_TEMPLATE, REVIEW_TEMPLATE}, 'Artifact, saved-review and feature resource templates listed')
-        check('tia://feature-catalog' in {resource['uri'] for resource in client.request('resources/list')['resources']}, 'Feature catalog summary listed as a resource')
+        check('tia://feature-catalog' in {resource['uri'] for resource in resources}, 'Feature catalog summary listed as a resource')
         summary = json.loads(client.request('resources/read', {'uri': 'tia://feature-catalog'})['contents'][0]['text'])
         check(summary['catalogVersion'] == catalog['catalogVersion'] and len(summary['features']) == len(catalog['features']), 'Catalog summary lists every feature')
         feature = json.loads(client.request('resources/read', {'uri': 'tia://feature-catalog/feature_catalog'})['contents'][0]['text'])
@@ -177,6 +179,19 @@ def main():
         check(not any(note.get('method') == 'notifications/message' for note in notes) and client.lines.empty(), 'Raised level suppresses info records')
 
         prompts = {prompt['name']: prompt for prompt in client.request('prompts/list')['prompts']}
+        # Retain the actual normal-Host contract candidate; policy and stability classifications remain undecided.
+        surface = {'schemaVersion': 1, 'compatibilityPolicyAccepted': False, 'nativeExecuted': False,
+                   'protocolVersion': initialized['protocolVersion'], 'serverInfo': initialized['serverInfo'],
+                   'capabilities': initialized['capabilities'], 'tools': [tools[n] for n in sorted(tools)],
+                   'prompts': [prompts[n] for n in sorted(prompts)], 'resources': sorted(resources, key=lambda r: r['uri']),
+                   'resourceTemplates': sorted(resource_templates, key=lambda r: r['uriTemplate']),
+                   'binaryHashes': {n: hashlib.sha256((host.parent / n).read_bytes()).hexdigest()
+                                    for n in ['TiaMcp.Host.dll', 'TiaMcp.Core.dll']}}
+        surface_path = output / 'surface.json'
+        surface_path.write_text(json.dumps(surface, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+        report['surface'] = {'path': surface_path.name, 'sha256': hashlib.sha256(surface_path.read_bytes()).hexdigest(),
+                             'tools': len(tools), 'prompts': len(prompts), 'resources': len(resources), 'resourceTemplates': len(templates)}
+        check(json.loads(surface_path.read_text(encoding='utf-8')) == surface, 'Retained complete discovery inventory matches the tested normal Host')
         check(set(prompts) == set(PROMPT_ARGUMENTS) and all(prompt.get('title') for prompt in prompts.values()), 'All workflow prompts listed with titles')
         for name, arguments in PROMPT_ARGUMENTS.items():
             text = '\n'.join(message['content']['text'] for message in client.request('prompts/get', {'name': name, 'arguments': arguments})['messages'])

@@ -64,6 +64,7 @@ def main():
                     if state['mode']=='redirect':
                         self.send_response(302);self.send_header('Location','https://127.0.0.1:1/forbidden');self.end_headers();return
                     value=[{'name':n} for n in ['Api.Login','Api.Logout','Api.GetPermissions','PlcProgram.Browse','PlcProgram.Read']]
+                    if state.get('syslog',True):value.append({'name':'Syslog.Browse'})
                     if state.get('profiles',True):value += [{'name':n} for n in ['Api.Version','Api.GetQuantityStructures','Api.GetAuthenticationMode','Api.GetSessionInfo']]
                     if state['mode']=='largeMethods':value += [{'name':str(i)+'x'*120} for i in range(600)]
                 elif method=='Api.Version':value=state.get('version',3.28)
@@ -97,6 +98,10 @@ def main():
                     value=[0,255,17] if body['params']['mode']=='raw' else state.get('symbols',{}).get(body['params']['var'],{}).get('value',18446744073709551615)
                     if state['mode']=='providerDenied':error={'code':2,'message':password,'data':token}
                     if state['mode']=='echoToken':value=token
+                elif method=='Syslog.Browse':
+                    assert body['params']=={'count':2}
+                    value={'entries':[{'raw':'<35>1 synthetic event'}],'count_total':999,'count_lost':4}
+                    if state['mode']=='syslogDenied':error={'code':2,'message':password,'data':token}
                 elif method=='Api.Logout':state['logoutCount']+=1;value=True
                 else:raise AssertionError('Unexpected RPC '+method)
                 if (method=='Api.Login' and state['mode']=='lostLogin') or (method=='Api.Logout' and state['mode']=='lostLogout'):
@@ -162,6 +167,24 @@ def main():
         count=len(state['calls']);check(call(c,'connect',dict(attemptId=attempt,login=login))==connected and len(state['calls'])==count,'Duplicate attempt never logs in again')
         altered=copy.deepcopy(login);altered['user']='other'
         call(c,'connect',dict(attemptId=attempt,login=altered),code='RuntimeCredentialContextMismatch')
+        diagnostic=call(c,'diagnostics',dict(attemptId=attempt,kind='syslog',count=2))
+        check(diagnostic['status']=='read' and diagnostic['entries']==1 and diagnostic['truncated'] is None and
+              diagnostic['value']['count_lost']==4 and diagnostic['value']['entries'][0]['raw']=='<35>1 synthetic event',
+              'Actual pinned-TLS syslog read retains raw entries and loss without claiming completeness')
+        before=state['calls'].count('Syslog.Browse')
+        call(c,'diagnostics',dict(attemptId=attempt,kind='syslog',count=21),code='RuntimeDiagnosticSelectionInvalid')
+        check(state['calls'].count('Syslog.Browse')==before,'Invalid syslog bound sends no syslog request')
+        state['mode']='syslogDenied'
+        diagnostic=call(c,'diagnostics',dict(attemptId=attempt,kind='syslog',count=2))
+        check(diagnostic['status']=='permissionDenied' and diagnostic['value'] is None,'Syslog denial stays explicit and redacted')
+        state['mode']='normal';state['syslog']=False
+        call(c,'disconnect',dict(attemptId=attempt))
+        no_syslog,_=connect(c,login);before=state['calls'].count('Syslog.Browse')
+        unsupported=call(c,'diagnostics',dict(attemptId=no_syslog,kind='syslog',count=2))
+        check(unsupported['status']=='unsupported' and unsupported['requestId'] is None and state['calls'].count('Syslog.Browse')==before,
+              'Unadvertised syslog method refuses without dispatch')
+        call(c,'disconnect',dict(attemptId=no_syslog));state['syslog']=True
+        attempt,connected=connect(c,login)
         call(c,'browse',dict(attemptId=attempt))
         selected=call(c,'browse',dict(attemptId=attempt,symbol='"MyDB".Counter',children=False));sid=selected['selectionId']
         readargs=dict(attemptId=attempt,selectionId=sid)
@@ -457,7 +480,7 @@ def main():
         check(all(state['loginCorrect']),'Every login uses exact protected password with no borrowed token')
         check(all(state['connectionClose']),'Every request avoids reuse of a stale pooled connection')
         check(all(not request['tlsSessionReused'] for request in state['requests']),'Every RPC uses a full TLS handshake rather than a resumed peer identity')
-        check(set(state['calls'])<={'Api.Browse','Api.Login','Api.Logout','Api.GetPermissions','PlcProgram.Browse','PlcProgram.Read','Api.Version','Api.GetQuantityStructures','Api.GetAuthenticationMode','Api.GetSessionInfo'},'No write, arbitrary RPC or inventory-token route')
+        check(set(state['calls'])<={'Api.Browse','Api.Login','Api.Logout','Api.GetPermissions','PlcProgram.Browse','PlcProgram.Read','Syslog.Browse','Api.Version','Api.GetQuantityStructures','Api.GetAuthenticationMode','Api.GetSessionInfo'},'No write, arbitrary RPC or inventory-token route')
         for path in (out/'store').rglob('*'):
             if path.name=='owner.lock':
                 check(path.stat().st_size==0,'Owner lock contains no data');continue

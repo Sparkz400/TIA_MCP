@@ -164,6 +164,7 @@ jobs:
             artifacts/offline-validation/*/temp/tia-handoff-*/addin-selections/*
             artifacts/offline-validation/*/*-schema.json
             artifacts/offline-validation/*/*-mcp.json
+            artifacts/offline-validation/*/mcp-surface/*.json
             artifacts/offline-validation/*/*-mcp/verification.json
             artifacts/offline-validation/*/*-mcp/result.json
             artifacts/offline-validation/*/credentials/recovery/verification.json

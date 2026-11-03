@@ -356,9 +356,10 @@ namespace TiaMcp.Simulator.V8
 
         private JObject CaptureBegin(JObject args)
         {
+            string mode = Control(() => SimulationRuntimeControl.CaptureMode(args));
             var selected = Owned(args);
             Signals(args["signals"], false);
-            bool synchronous = args.Value<bool?>("cycleSynchronous") ?? false;
+            bool synchronous = mode != null;
             var result = Envelope(selected);
             if (synchronous)
             {
@@ -370,8 +371,9 @@ namespace TiaMcp.Simulator.V8
                 selected.CaptureHeld = true;
                 try
                 {
-                    selected.Instance.OperatingMode = EOperatingMode.SingleStep_C;
-                    // The CPU now holds at its next cycle end; confirm that before the first sample steps it.
+                    selected.CaptureMode = (EOperatingMode)Enum.Parse(typeof(EOperatingMode), mode);
+                    selected.Instance.OperatingMode = selected.CaptureMode.Value;
+                    // Confirm the first selected synchronization point before sampling advances it.
                     result["syncPoint"] = SyncPoint(selected.Instance.WaitForOnSyncPointReachedEvent(SyncTimeoutMs));
                 }
                 // Keep the original failure; an unrestored mode stays recorded and blocks the next begin until release retries it.
@@ -384,10 +386,12 @@ namespace TiaMcp.Simulator.V8
 
         private JObject CaptureSample(JObject args)
         {
+            string mode = Control(() => SimulationRuntimeControl.CaptureMode(args));
             var selected = Owned(args);
             var signals = Signals(args["signals"], false);
-            bool synchronous = args.Value<bool?>("cycleSynchronous") ?? false;
-            if (synchronous != (selected.CaptureRestoreMode != null))
+            bool synchronous = mode != null;
+            if (synchronous != (selected.CaptureRestoreMode != null) ||
+                synchronous && (selected.CaptureMode?.ToString() != mode || selected.Instance.OperatingMode != selected.CaptureMode))
                 throw new SimulatorException("SimulationCaptureModeInactive", "The requested capture mode does not match this instance's capture state.");
             var result = Envelope(selected);
             if (synchronous) { selected.Instance.RunToNextSyncPoint(); result["syncPoint"] = SyncPoint(selected.Instance.WaitForOnSyncPointReachedEvent(SyncTimeoutMs)); }
@@ -418,6 +422,7 @@ namespace TiaMcp.Simulator.V8
             if (selected.Instance.OperatingMode != previous)
                 throw new SimulatorException("SimulationOperatingModeNotRestored", "The recorded operating mode " + previous + " was not observed after restore.");
             selected.CaptureRestoreMode = null;
+            selected.CaptureMode = null;
         }
 
         private const uint SyncTimeoutMs = 5000;
@@ -822,7 +827,7 @@ namespace TiaMcp.Simulator.V8
         }
 
         private sealed class Selection { internal IInstance Instance; internal int Id; internal string Name; internal bool Owned; internal string Storage;
-            internal string CreationRoot; internal JObject CreationReceipt; internal EOperatingMode? CaptureRestoreMode;
+            internal string CreationRoot; internal JObject CreationReceipt; internal EOperatingMode? CaptureRestoreMode, CaptureMode;
             internal bool CaptureHeld; }
         private sealed class Signal { internal string Symbol; internal string Type; internal JToken Value; }
     }
