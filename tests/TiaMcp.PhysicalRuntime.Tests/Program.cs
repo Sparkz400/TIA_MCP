@@ -157,6 +157,22 @@ foreach (var (kind, method) in new[] { ("alarms", "Alarms.Browse"), ("diagnostic
     foreach (var (language, count) in new (string?, int?)[] { (null, 2), ("en-US", null), ("en US", 2), ("e", 2), ("en-US", 0), ("en-US", 501) })
         Fails(() => WebRuntimeProtocol.Diagnostic(id, kind, language, count), "RuntimeDiagnosticSelectionInvalid");
 }
+var syslogBody = WebRuntimeProtocol.Diagnostic(id, "syslog", count: 2);
+Check(syslogBody.GetProperty("method").GetString() == "Syslog.Browse" && syslogBody.GetProperty("params").EnumerateObject().Count() == 1,
+    "Syslog sends only the bounded count, with no language or arbitrary parameters");
+var syslog = Diagnostic("syslog", "{\"entries\":[{\"raw\":\"<35>1 synthetic event\"}],\"count_total\":999,\"count_lost\":4}", count: 2);
+Check(syslog.Entries == 1 && syslog.Truncated is null && syslog.Value!.Value.GetProperty("count_lost").GetInt64() == 4 && !syslog.LosslessHistoryVerified,
+    "Syslog keeps raw entries and lifetime/loss counters without claiming buffer completeness");
+foreach (var count in new int?[] { null, 0, 21, -1 })
+    Fails(() => WebRuntimeProtocol.Diagnostic(id, "syslog", count: count), "RuntimeDiagnosticSelectionInvalid");
+Fails(() => WebRuntimeProtocol.Diagnostic(id, "syslog", "en-US", 2), "RuntimeDiagnosticSelectionInvalid");
+foreach (string invalid in new[] { "{\"entries\":[{}],\"count_total\":1,\"count_lost\":0}",
+    "{\"entries\":[],\"count_total\":-1,\"count_lost\":0}", "{\"entries\":[],\"count_total\":1,\"count_lost\":\"0\"}",
+    "{\"entries\":[{\"raw\":\"a\"},{\"raw\":\"b\"}],\"count_total\":2,\"count_lost\":0}", "{\"entries\":[]}" })
+    Fails(() => Diagnostic("syslog", invalid, count: 1), "RuntimeResponseInvalid");
+Fails(() => WebRuntimeProtocol.DiagnosticResult(context, "syslog",
+    Json($$$"""{"jsonrpc":"2.0","id":"{{{id}}}","method":"Syslog.Browse","params":{"count":2,"first":42}}"""),
+    Response("{}"), start, start, TimeSpan.Zero), "RuntimeRequestChanged");
 foreach (var (kind, invalid) in new[] { ("operatingMode", "{\"mode\":\"run\"}"), ("modeSelector", "\"run\""), ("systemTime", "{\"timestamp\":1}"),
     ("timeSettings", "{\"current_offset\":\"PT1H\"}"), ("languages", "{\"languages\":[{\"language\":null}]}"), ("projectInformation", "[]") })
     Fails(() => Diagnostic(kind, invalid), "RuntimeResponseInvalid");

@@ -48,6 +48,7 @@ Profile methods are optional for compatibility with older advertised method sets
 | `languages` | `Project.ReadLanguages` | none | `languages`: at most 64 objects with a `language` tag |
 | `alarms` | `Alarms.Browse` | `language`, `count` 1..500 | `entries`: at most `count` objects |
 | `diagnosticBuffer` | `DiagnosticBuffer.Browse` | `language`, `count` 1..500 | `entries`: at most `count` objects |
+| `syslog` | `Syslog.Browse` | `count` 1..20, no `language` | bounded `entries` with `raw` text; nonnegative `count_total` and `count_lost` |
 | `operatingMode` | `Plc.ReadOperatingMode` | none | a string such as `run` or `stop` |
 | `modeSelector` | `Plc.ReadModeSelectorState` | none | `mode_selector` string |
 | `systemTime` | `Plc.ReadSystemTime` | none | `timestamp` string |
@@ -58,7 +59,9 @@ Take the `language` tag from a `languages` read, for example `en-US`. The Host c
 
 The result keeps the complete bounded JSON in `value`, including vendor fields the Host does not interpret, and the host request/receive times. Alarm and diagnostic-buffer results also report `entries` and `truncated`. `truncated` compares the entries returned with the CPU's `count_current`; it is null when the CPU does not report a total. CPU times stay as the CPU's text and are not reparsed. Use the host times to bound the latency of a clock comparison.
 
-The Host does not acknowledge alarms, apply filters or alarm IDs, set the clock or change the operating mode. It does not send the R/H `redundancy_id`, so redundant systems read their default CPU only. `Plc.ReadMemoryInformation` and `Plc.ReadRuntimeInformation` are not exposed. A snapshot is not lossless alarm or event history, and project information does not prove which program is loaded. Request and result shapes come from Siemens documentation and the [Siemens Web API client](https://github.com/siemens/simatic-s7-webserver-api); only protocol-fake tests cover them, no CPU.
+Syslog retains raw entries, including any usernames or addresses the CPU recorded, and both counters. Its `truncated` is always null: `count_total` is lifetime history, not the current buffer size. The [V21 Syslog contract](https://docs.tia.siemens.cloud/r/simatic_s7_1500_et_200mp_manual_collection_enus_21/comprehensive-information/cpu-function-manuals/web-server/api-application-programming-interface/reading-diagnostics-and-service-data/syslog.browse) requires `read_syslog`. Its parameter table limits `count` to 20 despite examples showing 100; this implementation follows the table. It does not expose `first` or `redundancy_id`; R/H syslog requests requiring a redundancy ID are unsupported. Syslog has managed and loopback-TLS checks only, with no native CPU qualification.
+
+The Host does not acknowledge alarms, apply filters or alarm IDs, set the clock or change the operating mode. It does not send the R/H `redundancy_id`. `Plc.ReadMemoryInformation` and `Plc.ReadRuntimeInformation` are not exposed. A snapshot is not lossless alarm or event history, and project information does not prove which program is loaded. Request and result shapes come from Siemens documentation and the [Siemens Web API client](https://github.com/siemens/simatic-s7-webserver-api); protocol-fake tests do not qualify a CPU.
 
 ## Owned PLCSIM writes and RUN/STOP
 

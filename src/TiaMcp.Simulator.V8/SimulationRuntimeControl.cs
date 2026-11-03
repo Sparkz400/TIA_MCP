@@ -12,6 +12,19 @@ namespace TiaMcp.Simulation
     // runtime call. Event codes are the numeric values of the V8 API enums (SimulationRuntimeApi.h); the worker casts them.
     internal static class SimulationRuntimeControl
     {
+        internal static string CaptureMode(JObject args)
+        {
+            if (Given(args, "cycleSynchronous") && args["cycleSynchronous"].Type != JTokenType.Boolean)
+                throw new ArgumentException("cycleSynchronous must be a boolean.");
+            bool synchronous = args.Value<bool?>("cycleSynchronous") ?? false;
+            if (Given(args, "syncMode") && (!synchronous || args["syncMode"].Type != JTokenType.String))
+                throw new ArgumentException("syncMode requires cycleSynchronous and a documented SingleStep mode.");
+            string mode = args.Value<string>("syncMode") ?? (synchronous ? "SingleStep_C" : null);
+            if (mode != null && mode != "SingleStep_C" && mode != "SingleStep_P" && mode != "SingleStep_CP" && mode != "SingleStep_CT" && mode != "SingleStep_CPT")
+                throw new ArgumentException("syncMode must be SingleStep_C, SingleStep_P, SingleStep_CP, SingleStep_CT or SingleStep_CPT.");
+            return mode;
+        }
+
         private static readonly Dictionary<string, int> ProcessEdges = new Dictionary<string, int>(StringComparer.Ordinal)
             { ["risingEdge"] = 1, ["fallingEdge"] = 2, ["limit1Underrun"] = 3, ["limit1Overrun"] = 4, ["limit2Underrun"] = 5, ["limit2Overrun"] = 6 };
         private static readonly Dictionary<string, int> PullOrPlug = new Dictionary<string, int>(StringComparer.Ordinal)

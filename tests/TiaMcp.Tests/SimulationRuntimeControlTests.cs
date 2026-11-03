@@ -12,6 +12,20 @@ internal static class SimulationRuntimeControlTests
         throw new InvalidOperationException("Expected an ArgumentException.");
     }
 
+    internal static Task CaptureModesAreBounded()
+    {
+        Check.Equal<string?>(null, SimulationRuntimeControl.CaptureMode(new JObject()));
+        Check.Equal("SingleStep_C", SimulationRuntimeControl.CaptureMode(JObject.Parse("{cycleSynchronous:true}")));
+        foreach (string mode in new[] { "SingleStep_C", "SingleStep_P", "SingleStep_CP", "SingleStep_CT", "SingleStep_CPT" })
+            Check.Equal(mode, SimulationRuntimeControl.CaptureMode(new JObject { ["cycleSynchronous"] = true, ["syncMode"] = mode }));
+        foreach (string input in new[] { "{cycleSynchronous:'true'}", "{cycleSynchronous:true,syncMode:1}",
+            "{syncMode:'SingleStep_C'}", "{cycleSynchronous:false,syncMode:'SingleStep_C'}",
+            "{cycleSynchronous:true,syncMode:'SingleStep_Bus'}", "{cycleSynchronous:true,syncMode:'TimespanSynchronized_C'}",
+            "{cycleSynchronous:true,syncMode:'Default'}", "{cycleSynchronous:true,syncMode:'singlestep_c'}" })
+            Refused(() => SimulationRuntimeControl.CaptureMode(JObject.Parse(input)));
+        return Task.CompletedTask;
+    }
+
     internal static Task TimeBoundsAndUtc()
     {
         Check.Equal(1.0, SimulationRuntimeControl.ScaleFactor(new JValue(1)));

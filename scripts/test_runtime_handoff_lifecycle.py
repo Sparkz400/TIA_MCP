@@ -16,7 +16,7 @@ def verify(root, proof, runtime):
     assert requests and all(not r['tlsSessionReused'] for r in requests)
     assert len({r['id'] for r in requests})==len(requests)
     assert [r['method'] for r in requests]==runtime['rpcMethods']
-    assert set(runtime['rpcMethods']) <= {'Api.Browse','Api.Login','Api.Logout','Api.GetPermissions','PlcProgram.Browse','PlcProgram.Read','Api.Version','Api.GetQuantityStructures','Api.GetAuthenticationMode','Api.GetSessionInfo'}
+    assert set(runtime['rpcMethods']) <= {'Api.Browse','Api.Login','Api.Logout','Api.GetPermissions','PlcProgram.Browse','PlcProgram.Read','Syslog.Browse','Api.Version','Api.GetQuantityStructures','Api.GetAuthenticationMode','Api.GetSessionInfo'}
     expected={'lostReadResponse','inflightHostCrash','credentialRetired','credentialReplacement','certificateRotated','certificateReplacement','accountReplacement'}
     captures={case['scenario']:case for case in proof['captures']}
     assert set(captures)==expected and len(proof['captures'])==len(expected)
@@ -85,7 +85,10 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--fixture',type=Path,required=True);args=parser.parse_args()
     root=args.fixture.resolve();proof=json.loads((root/'handoff-lifecycle.json').read_bytes());runtime=json.loads((root/'verification.json').read_bytes())
     verify(root,proof,runtime)
+    def inject_write(_proof,runtime):
+        runtime['rpcMethods'][0]=runtime['rpcRequests'][0]['method']='PlcProgram.Write'
     controls={
+        'write RPC':inject_write,
         'missing capture':lambda p,r:p['captures'].pop(),
         'invented crash request':lambda p,r:p['crash']['inFlightRequest'].update(id='0'*32),
         'wrong export hash':lambda p,r:p['captures'][0]['export'].update(sha256='0'*64),
@@ -101,7 +104,7 @@ def main():
         else:raise AssertionError('Verifier accepted '+name)
     result=dict(completed=True,nativeExecuted=False,captures=7,migrations=3,mutationControls=list(controls),rpcCount=len(runtime['rpcRequests']),originalCaptureChains=True,originalHandoffInputs=True)
     (root/'handoff-lifecycle-independent.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
-    print('PASS independent bound lifecycle: seven capture chains, three original migration comparisons and seven mutation controls')
+    print(f'PASS independent bound lifecycle: seven capture chains, three original migration comparisons and {len(controls)} mutation controls')
 
 
 if __name__=='__main__':main()

@@ -4,8 +4,9 @@
 finds CFC/DCC V21 public APIs, V19 Portal/SDK and ODK 1500S installed on this PC. The table below
 retains the 1 November workstation observations; its missing-product labels are not current here.
 OB55/56/57 counter qualification has since passed. Configuration-event subscriptions exist and IP
-observation passed; hardware/software delivery remains open. Data-record responses, extra cycle
-modes and residual Web API routes remain software work. Do not repeat the completed event adapter.
+observation passed; hardware/software delivery remains open. Data-record responses, timespan/bus capture modes and residual Web API routes remain software work.
+The 3 November offline follow-up adds SingleStep_P/CP/CT/CPT capture selection and bounded
+Syslog.Browse reads; native mode/CPU qualification remains open. Do not repeat the completed event adapter.
 
 Feasibility record for the TODO box [X13 other Siemens interfaces](../TODO.md#work-outside-the-matrix)
 (ledger obligation X13, roadmap package AC-24). It gives one row per public SDK or workflow
@@ -136,13 +137,14 @@ so a foreign or released instance is refused before any API call.
    answers a pending `RDREC`/`WRREC` with a bounded payload and status. Qualify with a scratch FB
    calling `RDREC` and `WRREC` on a configured module: data and status round trip, a
    deliberate error status, and a request left unanswered until its timeout.
-4. **Row 16, unused Web API read methods.** Add `Syslog.Browse`, service-data and profiling-data
+4. **Row 16, unused Web API read methods.** `Syslog.Browse` is implemented with offline checks;
+   native qualification remains open. Add service-data and profiling-data
    downloads to `runtime_web_*`, offered only when `Api.Browse` lists them. Qualify in the
    real-server runner on the owned TCP/IP instance; record each method PLCSIM does not list as
    a B05 row. The state-changing methods (`Plc.CreateBackup`, `Alarms.Acknowledge`, setters)
    follow later behind the write gate, each with its own D16 contract.
-5. **Row 4, further cycle-control modes.** Let `cycleSynchronous` capture choose
-   `SingleStep_CP`, `_CT` or `_CPT` and the time-synchronised variants. Qualify with a step
+5. **Row 4, further cycle-control modes.** SingleStep_C/P/CP/CT/CPT selection is implemented
+   with offline checks. Time-synchronised variants remain implementation work. Qualify with a step
    count per mode on the owned instance and the previous mode restored on stop, failure and Host
    loss.
 6. **Row 25, safety compile workflow.** A second hook in the Add-In companion that hands the

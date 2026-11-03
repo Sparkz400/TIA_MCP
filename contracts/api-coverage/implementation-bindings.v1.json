@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "74fcc1c83e49a4d356f8cdb89f95d26148dfa16a90edeeecc3e8cff246dafa77",
-      "bytes": 1744104
+      "sha256": "73f23ae691cfc4f9fafda171ec9555ae7ae4c0634a6ba4109c6ff65d9f8f0291",
+      "bytes": 1744922
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -517,8 +517,8 @@
     },
     {
       "path": "contracts/runtime-capture.v1.schema.json",
-      "sha256": "ac03868a1b85806ab24ced0c26a31269dcce841cdb18e6e5889ccc8b1e2690b7",
-      "bytes": 25534
+      "sha256": "f177f0f0548cc8ba88cbd919234ae3e470438bcb80ae5bf5fac94d3659f25f5a",
+      "bytes": 25908
     },
     {
       "path": "contracts/runtime-handoff.v1.schema.json",
@@ -1417,8 +1417,8 @@
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/SimulatorCaptureContracts.cs",
-      "sha256": "01f9c363736517812dbea5cc7658952064b0a25a81a987ab3a30f3b0083dc256",
-      "bytes": 9800
+      "sha256": "4a66fb0f9d3eb599e3d63b9ec53996e62abfe1b01dc5e8515ba15025808280d1",
+      "bytes": 10143
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
@@ -1427,8 +1427,8 @@
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
-      "sha256": "0bc2c6b675feac322469758e33324b056c4ae67e5c811353f2a98c90d1c72ccf",
-      "bytes": 23132
+      "sha256": "5c647b0d2a057eb8db95f268bc15525052988ae0168f2154fe19b46742fdb2a1",
+      "bytes": 24279
     },
     {
       "path": "src/TiaMcp.Core/ProjectReviewStore.AlarmContext.cs",
@@ -2002,8 +2002,8 @@
     },
     {
       "path": "src/TiaMcp.Host/PhysicalRuntimeTools.cs",
-      "sha256": "1bfd7ffcefccfefe85fc8e5768976fa0fd54fa9354307660744f26608ad25a3f",
-      "bytes": 12011
+      "sha256": "355adbe8b886311601d1c9eeea80958718dcbff48f77eb2c15078da00a4af959",
+      "bytes": 12162
     },
     {
       "path": "src/TiaMcp.Host/PlcsimTargets.cs",
@@ -2047,8 +2047,8 @@
     },
     {
       "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
-      "sha256": "dd952ee785a2f51a5a117ff91de123ba4ba57b4cbb115574f21ab982ef17caa0",
-      "bytes": 12772
+      "sha256": "be92b2224dcc96d6faab209052cae68673e63e4a03d70be39a6e6521f7ddd449",
+      "bytes": 12994
     },
     {
       "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
@@ -3377,8 +3377,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationRuntimeControl.cs",
-      "sha256": "af12dcd8b114cfd48496011b5af43c1b261dfb7db14acd1ac98afc5abfa14181",
-      "bytes": 15221
+      "sha256": "82d1c482afa9705d7912dd3a8dff162e6a63505be93ab77fed66e1f15f4cdf02",
+      "bytes": 16217
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationTicket.cs",
@@ -3402,8 +3402,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
-      "sha256": "f69bb1d9ead4b783bbf55bb07c0264146879f0eed96d40a5294ebab8ccefb12f",
-      "bytes": 54340
+      "sha256": "5528d7a332f3f17ba407baf1e0010cf18d5fcea67f1d9fdd3bcc342ec7f4d3e2",
+      "bytes": 54722
     },
     {
       "path": "src/TiaMcp.Simulator.V8/TiaMcp.Simulator.V8.csproj",
@@ -5863,8 +5863,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Read",
-          "line": 96,
-          "endLine": 105,
+          "line": 97,
+          "endLine": 106,
           "sha256": "13a94b543d1d40911b1b39f24fabaf4eede10b7da573dd21f8e702d04f307a3d"
         },
         {
@@ -6851,8 +6851,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Write",
-          "line": 268,
-          "endLine": 274,
+          "line": 285,
+          "endLine": 291,
           "sha256": "100aae05ef6deadac076bff3e30f312f22eb1fd58f479ac274a1e051f6c13004"
         },
         {
@@ -10599,8 +10599,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Read",
-          "line": 96,
-          "endLine": 105,
+          "line": 97,
+          "endLine": 106,
           "sha256": "13a94b543d1d40911b1b39f24fabaf4eede10b7da573dd21f8e702d04f307a3d"
         },
         {
@@ -17598,8 +17598,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Read",
-          "line": 96,
-          "endLine": 105,
+          "line": 97,
+          "endLine": 106,
           "sha256": "13a94b543d1d40911b1b39f24fabaf4eede10b7da573dd21f8e702d04f307a3d"
         },
         {
@@ -17921,8 +17921,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Write",
-          "line": 268,
-          "endLine": 274,
+          "line": 285,
+          "endLine": 291,
           "sha256": "100aae05ef6deadac076bff3e30f312f22eb1fd58f479ac274a1e051f6c13004"
         },
         {
@@ -18820,9 +18820,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -18896,9 +18896,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -19034,9 +19034,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -19201,9 +19201,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -19508,9 +19508,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -20010,9 +20010,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -20085,9 +20085,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -20944,9 +20944,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -22150,8 +22150,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Read",
-          "line": 96,
-          "endLine": 105,
+          "line": 97,
+          "endLine": 106,
           "sha256": "13a94b543d1d40911b1b39f24fabaf4eede10b7da573dd21f8e702d04f307a3d"
         },
         {
@@ -22506,9 +22506,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -42795,8 +42795,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Write",
-          "line": 268,
-          "endLine": 274,
+          "line": 285,
+          "endLine": 291,
           "sha256": "100aae05ef6deadac076bff3e30f312f22eb1fd58f479ac274a1e051f6c13004"
         },
         {
@@ -43793,8 +43793,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Read",
-          "line": 96,
-          "endLine": 105,
+          "line": 97,
+          "endLine": 106,
           "sha256": "13a94b543d1d40911b1b39f24fabaf4eede10b7da573dd21f8e702d04f307a3d"
         },
         {
@@ -43968,8 +43968,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Write",
-          "line": 268,
-          "endLine": 274,
+          "line": 285,
+          "endLine": 291,
           "sha256": "100aae05ef6deadac076bff3e30f312f22eb1fd58f479ac274a1e051f6c13004"
         },
         {
@@ -45327,8 +45327,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Read",
-          "line": 96,
-          "endLine": 105,
+          "line": 97,
+          "endLine": 106,
           "sha256": "13a94b543d1d40911b1b39f24fabaf4eede10b7da573dd21f8e702d04f307a3d"
         },
         {
@@ -50318,8 +50318,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Browse",
-          "line": 107,
-          "endLine": 115,
+          "line": 108,
+          "endLine": 116,
           "sha256": "2a068eb03aa92840e5b3f5d73c70f9e1c15dc4feca55f0beb5023bc7ab34aace"
         },
         {
@@ -50837,8 +50837,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/SimulatorCaptureContracts.cs",
           "name": "Require",
-          "line": 123,
-          "endLine": 124,
+          "line": 127,
+          "endLine": 128,
           "sha256": "1cea5a47f90ef5982799edb4d94c3c2711e407c56da4b0335833faa6e4851ceb"
         },
         {
@@ -55239,8 +55239,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Read",
-          "line": 96,
-          "endLine": 105,
+          "line": 97,
+          "endLine": 106,
           "sha256": "13a94b543d1d40911b1b39f24fabaf4eede10b7da573dd21f8e702d04f307a3d"
         },
         {
@@ -58060,8 +58060,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/SimulatorCaptureContracts.cs",
           "name": "Require",
-          "line": 123,
-          "endLine": 124,
+          "line": 127,
+          "endLine": 128,
           "sha256": "1cea5a47f90ef5982799edb4d94c3c2711e407c56da4b0335833faa6e4851ceb"
         },
         {
@@ -58480,8 +58480,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Write",
-          "line": 268,
-          "endLine": 274,
+          "line": 285,
+          "endLine": 291,
           "sha256": "100aae05ef6deadac076bff3e30f312f22eb1fd58f479ac274a1e051f6c13004"
         },
         {
@@ -58673,8 +58673,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Browse",
-          "line": 107,
-          "endLine": 115,
+          "line": 108,
+          "endLine": 116,
           "sha256": "2a068eb03aa92840e5b3f5d73c70f9e1c15dc4feca55f0beb5023bc7ab34aace"
         },
         {
@@ -60357,8 +60357,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "ChangeOperatingMode",
-          "line": 276,
-          "endLine": 281,
+          "line": 293,
+          "endLine": 298,
           "sha256": "e5a08f4b94bc4a3d2c3f8d2e10292e062235684699749064328f49c211d6cf5f"
         },
         {
@@ -61844,8 +61844,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "Write",
-          "line": 268,
-          "endLine": 274,
+          "line": 285,
+          "endLine": 291,
           "sha256": "100aae05ef6deadac076bff3e30f312f22eb1fd58f479ac274a1e051f6c13004"
         },
         {
@@ -64413,8 +64413,8 @@
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Release",
-              "line": 435,
-              "endLine": 455,
+              "line": 440,
+              "endLine": 460,
               "sha256": "831b8a89b28e3f3c4626aef7ee9efd7b77e420d6f3a1662aa2ca316845b8e6a7"
             }
           ],
@@ -64962,8 +64962,8 @@
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Test",
-              "line": 457,
-              "endLine": 537,
+              "line": 462,
+              "endLine": 542,
               "sha256": "036b132bdfec578205bde06d05362fad26237c64e1384d4848f33f14f00d7e95"
             }
           ],
@@ -72961,9 +72961,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -73020,9 +73020,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -73110,9 +73110,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -73298,9 +73298,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -73374,9 +73374,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -73522,9 +73522,9 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
           "name": "DiagnosticResult",
-          "line": 208,
-          "endLine": 258,
-          "sha256": "3362a365f895fcb33141fb0039b344cced59a777c4bb515bdbffe9ac3b7ca5bb"
+          "line": 214,
+          "endLine": 275,
+          "sha256": "cdc3f6cf2c03278cfd07e4357d50b26478dd2ca056a389307b465566b581dec4"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",

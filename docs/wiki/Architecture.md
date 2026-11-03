@@ -5,6 +5,7 @@
 - **MCP client** talks to the Host over stdio.
 - **Host** (`TiaMcp.Host`, .NET 10, Windows) serves the MCP tools, portable document workflows and saved project reviews.
 - **OPC UA client** reads scalar, array and matrix values and captures events without TIA, and writes only to an owned PLCSIM server; see the [runtime workflow](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/opcua-runtime.md).
+- **Runtime diagnostics** include bounded Web syslog reads and selectable PLCSIM SingleStep capture modes. These additions have offline checks; native qualification remains open. See [CPU diagnostics](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/physical-runtime-sessions.md#cpu-diagnostics) and [capture modes](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/runtime-captures.md#cycle-synchronous-mode).
 - **Native workers** (.NET Framework 4.8) run each Siemens call in an isolated process:
   - `TiaMcp.Openness.V21` for TIA Portal V21
   - `TiaMcp.Simulator.V8` for PLCSIM Advanced V8

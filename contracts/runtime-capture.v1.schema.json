@@ -17,6 +17,7 @@
     "simulatorSource": {
       "type": "object",
       "additionalProperties": false,
+      "allOf": [{"if": {"required": ["syncMode"]}, "then": {"properties": {"cycleSynchronous": {"const": true}}}}],
       "required": [
         "instanceId",
         "instanceName",
@@ -77,6 +78,10 @@
         },
         "cycleSynchronous": {
           "type": "boolean"
+        },
+        "syncMode": {
+          "enum": ["SingleStep_C", "SingleStep_P", "SingleStep_CP", "SingleStep_CT", "SingleStep_CPT"],
+          "description": "Optional synchronization mode; requires cycleSynchronous true. Omission retains SingleStep_C."
         }
       }
     },
