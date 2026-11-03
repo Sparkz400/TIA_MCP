@@ -64,9 +64,9 @@ def main():
             refused(dict(xmlArtifact={**reference, 'path': str(outside / candidate.name)}))
             link = artifacts / 'linked'
             if os.name == 'nt':
-                subprocess.run(['powershell', '-NoProfile', '-NonInteractive', '-Command',
-                    'New-Item -ItemType Junction -Path $env:TIA_TEST_LINK -Target $env:TIA_TEST_TARGET | Out-Null'],
-                    env={**os.environ, 'TIA_TEST_LINK': str(link), 'TIA_TEST_TARGET': str(outside)}, check=True, capture_output=True)
+                subprocess.run('cmd.exe /d /v:off /c mklink /J "%TIA_TEST_LINK%" "%TIA_TEST_TARGET%"',
+                    env={**os.environ, 'TIA_TEST_LINK': str(link), 'TIA_TEST_TARGET': str(outside)},
+                    check=True, capture_output=True, stdin=subprocess.DEVNULL, timeout=30)
             else:
                 link.symlink_to(outside, target_is_directory=True)
             try:

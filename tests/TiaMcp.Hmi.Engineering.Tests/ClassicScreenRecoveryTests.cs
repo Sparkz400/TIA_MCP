@@ -63,11 +63,16 @@ static class ClassicScreenRecoveryTests
                 ClassicScreenRecoveryRules.RequireUnlinkedArtifact(file);
                 if (OperatingSystem.IsWindows())
                 {
-                    var start = new System.Diagnostics.ProcessStartInfo("powershell") { UseShellExecute = false, CreateNoWindow = true };
-                    foreach (string argument in new[] { "-NoProfile", "-NonInteractive", "-Command", "New-Item -ItemType Junction -Path $env:TIA_TEST_LINK -Target $env:TIA_TEST_TARGET | Out-Null" }) start.ArgumentList.Add(argument);
+                    var start = new System.Diagnostics.ProcessStartInfo("cmd.exe", "/d /v:off /c mklink /J \"%TIA_TEST_LINK%\" \"%TIA_TEST_TARGET%\"")
+                        { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
                     start.Environment["TIA_TEST_LINK"] = link; start.Environment["TIA_TEST_TARGET"] = outside;
                     using var process = System.Diagnostics.Process.Start(start);
-                    if (!process.WaitForExit(30000) || process.ExitCode != 0) throw new Exception("Junction fixture failed");
+                    if (!process.WaitForExit(30000))
+                    {
+                        process.Kill(entireProcessTree: true); process.WaitForExit();
+                        throw new Exception("Owned junction fixture process timed out");
+                    }
+                    if (process.ExitCode != 0) throw new Exception("Junction fixture failed: " + process.StandardError.ReadToEnd());
                 }
                 else Directory.CreateSymbolicLink(link, outside);
                 Reject(() => ClassicScreenRecoveryRules.RequireUnlinkedArtifact(Path.Combine(link, "native.xml")));

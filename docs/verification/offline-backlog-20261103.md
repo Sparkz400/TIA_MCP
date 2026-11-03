@@ -42,10 +42,11 @@ No TIA Portal, simulator instance, physical PLC or VMware guest was started. Cat
 - Contract coverage, generated matrix/reference and implementation bindings pass.
   The binding validator retains the six known unavailable VM artifact paths.
 - Python regression: 2,474 tests pass with one existing skip.
-- Full regression command: `./scripts/Test-Offline.ps1 -Suite All -OutputDirectory
-  artifacts/offline-backlog-validation`. Its result and managed-suite inventory are retained
-  in `artifacts/offline-backlog-validation/result.json`; the final outcome and current-head CI
-  checks are recorded in [PR 207](https://github.com/Sparkz400/TIA_MCP/pull/207).
+- Full regression passes: all 45 managed suites and actual-Host workflow checks, with
+  `nativeQualification: false`. Command: `./scripts/Test-Offline.ps1 -Suite All -OutputDirectory
+  artifacts/offline-backlog-validation`. Its result and suite inventory are retained in
+  `artifacts/offline-backlog-validation/result.json`; current-head CI checks are recorded in
+  [PR 207](https://github.com/Sparkz400/TIA_MCP/pull/207).
 - All 761 relative Markdown link paths in the changed documentation resolve.
 
 Reports are under `artifacts/offline-backlog-*`; the final discovery snapshot is
@@ -57,6 +58,11 @@ CI also found that the independent handoff verifier's RPC allowlist lacked the n
 `Syslog.Browse` read. Its allowlist now includes that method; all eight negative controls,
 including an injected write RPC, refuse. The separate capture-sequencing verifier passes
 against the retained loopback run as well.
+An existing HMI junction fixture also timed out starting Windows PowerShell on CI and left
+its child running. The two HMI junction fixtures now use `mklink`, as other repository tests
+do, with quoted environment paths and bounded child lifetimes. The subsequent fixture-only
+change passes all 92 HMI guard checks and 35 actual-Host input checks, both normally and with
+spaces, ampersands, exclamation marks and percent signs in the temporary directory path.
 
 ## Documentation and remaining work
 
