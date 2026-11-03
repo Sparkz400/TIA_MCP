@@ -7,6 +7,14 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 3 November 2026
 
+**Classic screen workflow draft:** completed the offline review of batch receipts,
+artifact paths and scalar XML preservation, with regression fixes and refreshed
+release ownership/source bindings. Catalog `0.4.131` has 487 features, 467 verified,
+and 28 open matrix cells; the three new screen workflow entries remain unqualified.
+Native continuation stopped before fixture creation at the Openness access prompt,
+and the operator requested offline-only work. See the
+[continuation record](../verification/classic-screen-workflow-draft-20261103.md).
+
 Reconciled vendor/V20/OB/event backlog against the retained 2 November summaries. Read-only local inventory finds CFC/DCC V21 public APIs, documentation and V19 Portal/SDK; licenses and native workflows remain unqualified ([receipt](../verification/release-readiness-20261103.md)). TS-Q03 now has a qualification-only exploratory runner, independent Host/worker admission, exact endpoint/scope checks and durable recovery. Native fixture/result qualification remains open ([implementation](../verification/testsuite-system-q03-20261103.md)). No catalog support or release-acceptance flag changed.
 
 ## 2 November 2026

@@ -80,7 +80,8 @@ test and records remaining evidence limits.
 
 ### Preparing the screen change
 
-To obtain the scope hash, use the existing two-pass preparation pattern: a first
+The draft `hmi_classic_screen_capture` tool returns the scope hash directly. The
+older single-screen route also supports a two-pass preparation pattern: a first
 prepare with a deliberately nonmatching 64-character hash returns `StaleRevision`
 and the captured baseline, without applying an edit. Reprepare the reviewed
 candidate with that baseline's `contentHash`. Use the full current screen identity
@@ -88,6 +89,43 @@ from `hmi_inspect`, including project-copy and session fields.
 
 Local checks and native-copy evidence are tracked in the
 [3 November verification record](../verification/classic-screen-edit-20261103.md).
+
+### Draft capture, composition and batching
+
+The [workflow continuation](../verification/classic-screen-workflow-draft-20261103.md)
+tracks native qualification that is still required before this draft can merge.
+Earlier single-screen evidence does not qualify batches or establish a latency gain.
+
+1. Call `hmi_classic_screen_capture` with the exact project and HMI identity. It
+   returns the regular-screen `contentHash`, native XML artifacts and a hashed
+   capture receipt. `includeTags=false` omits structured-tag exports.
+2. Optionally call `hmi_classic_screen_compose` with that receipt, `screenPath`,
+   and explicit `components`/`removeItems`. Components clone native screen items;
+   replacements are limited to existing plain scalar attributes, tag references
+   and captions. XML annotations or formatted content refuse replacement.
+3. Prepare `hmi_classic_screen_edit` with the capture hash and the usual first
+   `target`/`xml`, optionally adding one to seven `additionalScreens` entries.
+   Every member must be an existing regular screen of the same HMI, project copy
+   and session. Each `xml` may instead be `xmlArtifact: {path, sha256}`; the path
+   must be absolute and inside the Host artifact root. Changed bytes, malformed
+   references, symbolic links and junctions refuse before native preparation.
+4. Review and apply the single prepared change. One project checkpoint and one
+   baseline/final compile pair cover the batch. Each attempted member has a
+   durable dispatch and readback receipt. Failure restores the attempted prefix
+   in reverse order, then verifies the complete declared screen scope and save.
+
+Capture/composition and recovery also refuse linked retained artifacts. Terminal
+reconciliation requires every batch member receipt; removing the list cannot
+select the legacy single-screen compatibility path. A failed or incomplete
+restoration retains ownership.
+
+`change_status(progressOnly=true)` reads diagnostic phase timing without waiting
+for the worker. It always reports `outcomeVerified=false` and
+`automaticRetryAllowed=false`. Normal status is compact; use
+`includeDetails=true` for retained XML and full preservation evidence. Neither
+progress nor cached observations authorize retry. Observation reuse ends with
+the native exclusive-access lease and is invalidated by imports, compilation
+and saves.
 
 ## Temporary Classic graphic-list export containment
 

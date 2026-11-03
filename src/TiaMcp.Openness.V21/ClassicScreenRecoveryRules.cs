@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
@@ -8,6 +9,14 @@ namespace TiaMcp.Model
     internal static class ClassicScreenRecoveryRules
     {
         internal const string VerificationMode = "classic-screen-terminal-in-open-project-v1";
+
+        internal static void RequireUnlinkedArtifact(string path)
+        {
+            for (FileSystemInfo item = new FileInfo(path); item != null;
+                item = item is FileInfo file ? file.Directory : ((DirectoryInfo)item).Parent)
+                if ((File.GetAttributes(item.FullName) & FileAttributes.ReparsePoint) != 0)
+                    throw new ArgumentException("Screen artifacts cannot follow symbolic links or junctions.");
+        }
 
         internal static JObject TerminalManifest(JObject journal)
         {
@@ -24,6 +33,10 @@ namespace TiaMcp.Model
             if (required.Any(s => !stages.Contains(s)) || string.IsNullOrWhiteSpace(journal.Value<string>("afterFingerprint")))
                 throw new ArgumentException("The terminal journal lacks required native verification stages.");
             var evidence = journal["hmiEvidence"] as JObject;
+            // Legacy single-screen journals predate member receipts; a batch must never take that fallback.
+            if ((evidence?["screens"] != null || journal["preview"]["payload"]["additionalScreens"] != null
+                || evidence?["proposedEffect"]?["screenCount"] != null) && !(evidence?["screens"] is JArray))
+                throw new ArgumentException("The screen workflow requires its retained member receipts.");
             if (evidence?["screens"] is JArray members)
             {
                 var requests = ClassicScreenBatchRules.Members((JObject)journal["preview"]["payload"]);
@@ -31,8 +44,11 @@ namespace TiaMcp.Model
                 bool touched = false, untouched = false;
                 for (int i = 0; i < members.Count; i++)
                 {
-                    if (!JToken.DeepEquals(members[i]["target"], requests[i]["target"])) throw new ArgumentException("A batch receipt identifies a different screen.");
+                    if (!(members[i] is JObject) || !JToken.DeepEquals(members[i]["target"], requests[i]["target"])) throw new ArgumentException("A batch receipt identifies a different screen.");
                     string memberState = members[i].Value<string>("state");
+                    bool dispatched = stages.Contains("hmi_screen_" + i + "_import_started");
+                    if (dispatched != (memberState != "prepared"))
+                        throw new ArgumentException("A member receipt contradicts its native dispatch stage.");
                     if (state == "applied")
                     {
                         if (memberState != "readback_verified" || !stages.Contains("hmi_screen_" + i + "_readback_verified"))

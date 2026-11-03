@@ -23,9 +23,64 @@ static class ClassicScreenRecoveryTests
             : new JArray("recovery_archive_created", "hmi_precise_readback_verified", "compile_finished", "hmi_unrelated_content_preserved", "changed_project_saved", "hmi_saved_screen_content_verified"),
         ["hmiEvidence"] = new JObject { ["baselineCompile"] = Compile(), ["rollbackCompile"] = Compile(), ["after-save"] = Manifest(), ["rollback-after-save"] = Manifest() } };
 
+    static JObject BatchJournal(bool rollback = false, int attempted = 2)
+    {
+        var journal = Journal(rollback);
+        var requests = new JArray();
+        var receipts = new JArray();
+        for (int i = 0; i < 3; i++)
+        {
+            var target = new JObject { ["projectCopyId"] = "copy", ["sessionGeneration"] = "session", ["family"] = "classic",
+                ["hmiPath"] = Hmi, ["objectPath"] = Hmi + "/screens/Screen" + i, ["kind"] = "hmiScreen" };
+            requests.Add(new JObject { ["target"] = target, ["xml"] = "<Document><Hmi.Screen.Screen><AttributeList><Name>Screen" + i + "</Name></AttributeList></Hmi.Screen.Screen></Document>" });
+            string state = rollback ? i < attempted ? "rollback_readback_verified" : "prepared" : "readback_verified";
+            receipts.Add(new JObject { ["target"] = target.DeepClone(), ["state"] = state });
+            if (state != "prepared")
+            {
+                ((JArray)journal["stages"]).Add("hmi_screen_" + i + "_import_started");
+                ((JArray)journal["stages"]).Add("hmi_screen_" + i + "_" + state);
+            }
+        }
+        var payload = (JObject)journal["preview"]["payload"];
+        payload["target"] = requests[0]["target"].DeepClone(); payload["xml"] = requests[0]["xml"].DeepClone();
+        payload["additionalScreens"] = new JArray(requests.Skip(1));
+        journal["hmiEvidence"]["screens"] = receipts;
+        journal["hmiEvidence"]["proposedEffect"] = new JObject { ["screenCount"] = 3 };
+        return journal;
+    }
+
     public static void Run(Action<string, Action> check)
     {
         void Reject(Action action) { try { action(); } catch (ArgumentException) { return; } throw new Exception("Expected recovery refusal"); }
+        check("Screen recovery and composition reject file links and linked ancestors", () => {
+            string root = Path.Combine(Path.GetTempPath(), "screen-links-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(root);
+            string outside = Path.Combine(root, "outside"), link = Path.Combine(root, "linked");
+            Directory.CreateDirectory(outside);
+            string file = Path.Combine(outside, "native.xml"); File.WriteAllText(file, "retained");
+            try
+            {
+                ClassicScreenRecoveryRules.RequireUnlinkedArtifact(file);
+                if (OperatingSystem.IsWindows())
+                {
+                    var start = new System.Diagnostics.ProcessStartInfo("powershell") { UseShellExecute = false, CreateNoWindow = true };
+                    foreach (string argument in new[] { "-NoProfile", "-NonInteractive", "-Command", "New-Item -ItemType Junction -Path $env:TIA_TEST_LINK -Target $env:TIA_TEST_TARGET | Out-Null" }) start.ArgumentList.Add(argument);
+                    start.Environment["TIA_TEST_LINK"] = link; start.Environment["TIA_TEST_TARGET"] = outside;
+                    using var process = System.Diagnostics.Process.Start(start);
+                    if (!process.WaitForExit(30000) || process.ExitCode != 0) throw new Exception("Junction fixture failed");
+                }
+                else Directory.CreateSymbolicLink(link, outside);
+                Reject(() => ClassicScreenRecoveryRules.RequireUnlinkedArtifact(Path.Combine(link, "native.xml")));
+                if (!OperatingSystem.IsWindows())
+                {
+                    string fileLink = Path.Combine(root, "file.xml"); File.CreateSymbolicLink(fileLink, file);
+                    Reject(() => ClassicScreenRecoveryRules.RequireUnlinkedArtifact(fileLink));
+                }
+                Directory.Delete(link);
+                if (File.ReadAllText(file) != "retained") throw new Exception("Link target changed");
+            }
+            finally { Directory.Delete(root, true); }
+        });
         check("Classic recovery accepts only complete saved terminal outcomes, including verified rollback", () => {
             foreach (bool rollback in new[] { false, true }) {
                 var journal = Journal(rollback);
@@ -53,6 +108,38 @@ static class ClassicScreenRecoveryTests
                 if (failure == "missingTarget") compile["targets"] = new JArray();
                 Reject(() => ClassicScreenRecoveryRules.TerminalManifest(journal));
             }
+        });
+        check("Batch reconciliation requires every member receipt even when the list is removed or malformed", () => {
+            foreach (bool rollback in new[] { false, true })
+            {
+                ClassicScreenRecoveryRules.TerminalManifest(BatchJournal(rollback));
+                foreach (JToken damage in new JToken[] { null, JValue.CreateNull(), new JObject(), new JArray() })
+                {
+                    var journal = BatchJournal(rollback);
+                    if (damage == null) ((JObject)journal["hmiEvidence"]).Remove("screens");
+                    else journal["hmiEvidence"]["screens"] = damage.DeepClone();
+                    Reject(() => ClassicScreenRecoveryRules.TerminalManifest(journal));
+                }
+            }
+        });
+        check("Batch reconciliation binds receipt order, identity and each native dispatch/readback stage", () => {
+            foreach (bool rollback in new[] { false, true })
+                foreach (string damage in new[] { "identity", "state", "dispatch", "readback", "untouchedDispatch", "reordered", "scalar" })
+                {
+                    var journal = BatchJournal(rollback);
+                    var members = (JArray)journal["hmiEvidence"]["screens"];
+                    var stages = (JArray)journal["stages"];
+                    if (damage == "identity") members[0]["target"]["objectPath"] = Hmi + "/screens/Foreign";
+                    if (damage == "state") members[0]["state"] = "import_started";
+                    if (damage == "dispatch") stages.First(x => (string)x == "hmi_screen_0_import_started").Remove();
+                    if (damage == "readback") stages.First(x => (string)x == "hmi_screen_0_" + (rollback ? "rollback_" : "") + "readback_verified").Remove();
+                    if (damage == "untouchedDispatch") { members[2]["state"] = "prepared"; stages.Add("hmi_screen_2_import_started"); }
+                    if (damage == "reordered") members[0] = members[1].DeepClone();
+                    if (damage == "scalar") members[0] = "invalid";
+                    Reject(() => ClassicScreenRecoveryRules.TerminalManifest(journal));
+                }
+            Reject(() => ClassicScreenRecoveryRules.TerminalManifest(BatchJournal(true, 0)));
+            ClassicScreenRecoveryRules.TerminalManifest(BatchJournal(true, 3));
         });
         check("Rollback cannot erase changed peers and completion requires exact original content", () => {
             var before = Manifest(); var failed = Manifest('c');

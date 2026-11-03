@@ -287,7 +287,7 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "e826656b2a072f21408f3732445b7baa9428917da924baa9950e15ab4fbccb3a",
+      "sha256": "a930a5d2bd53117f22f0e0bac85a9964605b78ac72229b76a7889fd6734d3c9e",
       "bytes": 1741707
     },
     {
@@ -1932,8 +1932,8 @@
     },
     {
       "path": "src/TiaMcp.Host/EngineeringTools.cs",
-      "sha256": "a5967bfbd3c3b16c959662d9b7cc54eb3e7a3b374acbd6c60dff3affcbd6906d",
-      "bytes": 44768
+      "sha256": "6281b2d8e91f5f2911cf784059742ce0b6efa38c09a03de50f86cfaf1203b8a7",
+      "bytes": 44815
     },
     {
       "path": "src/TiaMcp.Host/GraphTools.cs",
@@ -1947,8 +1947,8 @@
     },
     {
       "path": "src/TiaMcp.Host/HmiTools.cs",
-      "sha256": "9ec025021b2cf468814c0cf445c6eda9ec6c6e5bd9396b0a392f4b1a5e56876a",
-      "bytes": 6177
+      "sha256": "e746f899f37fd782272dfca9e21da057277191b0be44d2897aea058a75cddaf6",
+      "bytes": 7302
     },
     {
       "path": "src/TiaMcp.Host/HostOptions.cs",
@@ -2382,8 +2382,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/ClassicScreenComposer.cs",
-      "sha256": "9e8f7aa6c46fc7619f81e2cd740b75412f6438d824074e0001a32bc4cfb94e3a",
-      "bytes": 6907
+      "sha256": "b1a01dda1fcc56b6bc558ff66f40d2597d2b5158e16926b8edf6f548646c6ee9",
+      "bytes": 7405
     },
     {
       "path": "src/TiaMcp.Openness.V21/ClassicScreenPreflight.cs",
@@ -2397,8 +2397,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/ClassicScreenRecoveryRules.cs",
-      "sha256": "f4cd910e6de88f997bcd8cd0177628db5c5a8ea60856d31570b14bf31aaf0759",
-      "bytes": 5613
+      "sha256": "2efca6eb658f71f04150861eef0d9a01c0d179570bda197b6579e465135b8e40",
+      "bytes": 6823
     },
     {
       "path": "src/TiaMcp.Openness.V21/CompilationEvidenceRules.cs",
@@ -2642,8 +2642,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ClassicScreenRecovery.cs",
-      "sha256": "36c47931fa5f585fe0f1004f41d1608514736657b2f5216046701332d926d79a",
-      "bytes": 15585
+      "sha256": "3fb904ee486364024d559833777cfd20791df5cbda92312ff4542c8ddd868e9a",
+      "bytes": 15889
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CompileChanges.cs",
@@ -11035,7 +11035,7 @@
         "name": "ChangePrepare",
         "line": 175,
         "endLine": 217,
-        "sha256": "2b453bc355350dfe9e30b8ada5f628b4ab46c9c97c7a96dd3143c44863026027"
+        "sha256": "5e2bfcb2a4bb8c7cc1555cecb306ce496a90924694c6b79f8085e7cce2d397ff"
       },
       "bridgeOperations": [
         "change_prepare"
@@ -11065,7 +11065,7 @@
           "name": "ChangePrepare",
           "line": 175,
           "endLine": 217,
-          "sha256": "2b453bc355350dfe9e30b8ada5f628b4ab46c9c97c7a96dd3143c44863026027"
+          "sha256": "5e2bfcb2a4bb8c7cc1555cecb306ce496a90924694c6b79f8085e7cce2d397ff"
         },
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
@@ -11091,9 +11091,9 @@
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "ClassicScreenArtifactPayload",
-          "line": 42,
-          "endLine": 65,
-          "sha256": "77b141d2564ff7fa017e61744f79e337c9728585e12721cdafcc19297ae021f6"
+          "line": 43,
+          "endLine": 78,
+          "sha256": "1bd6c2ce42495ad1ce880901cdc1a9d48f87a19c2ea37a9e1c6c573cca4d978e"
         },
         {
           "path": "src/TiaMcp.Host/CaxTools.cs",
@@ -11166,9 +11166,9 @@
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "ClassicScreenArtifactPayload",
-          "line": 42,
-          "endLine": 65,
-          "sha256": "77b141d2564ff7fa017e61744f79e337c9728585e12721cdafcc19297ae021f6"
+          "line": 43,
+          "endLine": 78,
+          "sha256": "1bd6c2ce42495ad1ce880901cdc1a9d48f87a19c2ea37a9e1c6c573cca4d978e"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.Packages.cs",
@@ -27188,8 +27188,8 @@
       "host": {
         "path": "src/TiaMcp.Host/HmiTools.cs",
         "name": "HmiCapabilities",
-        "line": 32,
-        "endLine": 33,
+        "line": 33,
+        "endLine": 34,
         "sha256": "a6f7930a2aeff41f4cc5892929ec9a522926c581e09a286bf76d87c464ad322e"
       },
       "bridgeOperations": [
@@ -27203,8 +27203,8 @@
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiCapabilities",
-          "line": 32,
-          "endLine": 33,
+          "line": 33,
+          "endLine": 34,
           "sha256": "a6f7930a2aeff41f4cc5892929ec9a522926c581e09a286bf76d87c464ad322e"
         },
         {
@@ -27293,8 +27293,8 @@
       "host": {
         "path": "src/TiaMcp.Host/HmiTools.cs",
         "name": "HmiClassicScreenCapture",
-        "line": 12,
-        "endLine": 13,
+        "line": 13,
+        "endLine": 14,
         "sha256": "49e2a902747ff3d2d0dd5f1e8fc16e9466d3b9dd2c2fb3d93ec13ea851822fa0"
       },
       "bridgeOperations": [
@@ -27308,15 +27308,15 @@
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiClassicScreenCapture",
-          "line": 12,
-          "endLine": 13,
+          "line": 13,
+          "endLine": 14,
           "sha256": "49e2a902747ff3d2d0dd5f1e8fc16e9466d3b9dd2c2fb3d93ec13ea851822fa0"
         },
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiArguments",
-          "line": 35,
-          "endLine": 40,
+          "line": 36,
+          "endLine": 41,
           "sha256": "f6c8f6764dc320459cc40a640dd16b117b7363af54d3fcd68286895ac1928aff"
         },
         {
@@ -27390,8 +27390,8 @@
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiArguments",
-          "line": 35,
-          "endLine": 40,
+          "line": 36,
+          "endLine": 41,
           "sha256": "f6c8f6764dc320459cc40a640dd16b117b7363af54d3fcd68286895ac1928aff"
         }
       ],
@@ -27405,8 +27405,8 @@
       "host": {
         "path": "src/TiaMcp.Host/HmiTools.cs",
         "name": "HmiClassicScreenCompose",
-        "line": 17,
-        "endLine": 18,
+        "line": 18,
+        "endLine": 19,
         "sha256": "4f469ff798747559c16261a216fd05090a10a20fccc8434e1cfb3436d8dc3c46"
       },
       "bridgeOperations": [
@@ -27420,15 +27420,15 @@
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiClassicScreenCompose",
-          "line": 17,
-          "endLine": 18,
+          "line": 18,
+          "endLine": 19,
           "sha256": "4f469ff798747559c16261a216fd05090a10a20fccc8434e1cfb3436d8dc3c46"
         },
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiArguments",
-          "line": 35,
-          "endLine": 40,
+          "line": 36,
+          "endLine": 41,
           "sha256": "f6c8f6764dc320459cc40a640dd16b117b7363af54d3fcd68286895ac1928aff"
         },
         {
@@ -27502,8 +27502,8 @@
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiArguments",
-          "line": 35,
-          "endLine": 40,
+          "line": 36,
+          "endLine": 41,
           "sha256": "f6c8f6764dc320459cc40a640dd16b117b7363af54d3fcd68286895ac1928aff"
         }
       ],
@@ -28498,8 +28498,8 @@
       "host": {
         "path": "src/TiaMcp.Host/HmiTools.cs",
         "name": "HmiInspect",
-        "line": 22,
-        "endLine": 23,
+        "line": 23,
+        "endLine": 24,
         "sha256": "445c4bf16ee135fa1a9e45384070993143f305e54d445718cdcc247514e1e1cf"
       },
       "bridgeOperations": [
@@ -28513,15 +28513,15 @@
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiInspect",
-          "line": 22,
-          "endLine": 23,
+          "line": 23,
+          "endLine": 24,
           "sha256": "445c4bf16ee135fa1a9e45384070993143f305e54d445718cdcc247514e1e1cf"
         },
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiArguments",
-          "line": 35,
-          "endLine": 40,
+          "line": 36,
+          "endLine": 41,
           "sha256": "f6c8f6764dc320459cc40a640dd16b117b7363af54d3fcd68286895ac1928aff"
         },
         {
@@ -28595,8 +28595,8 @@
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiArguments",
-          "line": 35,
-          "endLine": 40,
+          "line": 36,
+          "endLine": 41,
           "sha256": "f6c8f6764dc320459cc40a640dd16b117b7363af54d3fcd68286895ac1928aff"
         }
       ],
@@ -28610,8 +28610,8 @@
       "host": {
         "path": "src/TiaMcp.Host/HmiTools.cs",
         "name": "HmiReferences",
-        "line": 27,
-        "endLine": 28,
+        "line": 28,
+        "endLine": 29,
         "sha256": "d88be1c76068f4a303d04085107c4eb46bcdf5840338f531108b181e16c08a9c"
       },
       "bridgeOperations": [
@@ -28625,15 +28625,15 @@
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiReferences",
-          "line": 27,
-          "endLine": 28,
+          "line": 28,
+          "endLine": 29,
           "sha256": "d88be1c76068f4a303d04085107c4eb46bcdf5840338f531108b181e16c08a9c"
         },
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiArguments",
-          "line": 35,
-          "endLine": 40,
+          "line": 36,
+          "endLine": 41,
           "sha256": "f6c8f6764dc320459cc40a640dd16b117b7363af54d3fcd68286895ac1928aff"
         },
         {
@@ -28707,8 +28707,8 @@
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiArguments",
-          "line": 35,
-          "endLine": 40,
+          "line": 36,
+          "endLine": 41,
           "sha256": "f6c8f6764dc320459cc40a640dd16b117b7363af54d3fcd68286895ac1928aff"
         }
       ],

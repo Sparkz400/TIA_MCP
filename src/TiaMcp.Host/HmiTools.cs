@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Text.Json;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
+using TiaMcp.Core;
 
 namespace TiaMcp.Host;
 
@@ -43,21 +44,33 @@ public sealed partial class TiaTools
     {
         var result = System.Text.Json.Nodes.JsonNode.Parse(payload.GetRawText())!.AsObject();
         var members = new List<System.Text.Json.Nodes.JsonObject> { result };
-        if (result["additionalScreens"] is System.Text.Json.Nodes.JsonArray extra)
+        if (result.ContainsKey("additionalScreens"))
+        {
+            if (result["additionalScreens"] is not System.Text.Json.Nodes.JsonArray extra || extra.Count is < 1 or > 7
+                || extra.Any(x => x is not System.Text.Json.Nodes.JsonObject))
+                throw new ArgumentException("additionalScreens must contain 1 to 7 screen objects.");
             members.AddRange(extra.Select(x => x!.AsObject()));
+        }
         if (members.Count > 8) throw new ArgumentException("A screen batch is bounded to eight members.");
         string root = Path.GetFullPath(options.ArtifactsDirectory).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
         foreach (var member in members)
         {
-            if (member["xmlArtifact"] is not System.Text.Json.Nodes.JsonObject artifact) continue;
-            if (member["xml"] != null || artifact.Count != 2) throw new ArgumentException("Use xml or xmlArtifact {path,sha256}, never both.");
-            string path = Path.GetFullPath(artifact["path"]!.GetValue<string>());
+            if (!member.ContainsKey("xmlArtifact")) continue;
+            if (member.ContainsKey("xml") || member["xmlArtifact"] is not System.Text.Json.Nodes.JsonObject artifact || artifact.Count != 2
+                || artifact["path"] is not System.Text.Json.Nodes.JsonValue pathValue || !pathValue.TryGetValue<string>(out var inputPath)
+                || artifact["sha256"] is not System.Text.Json.Nodes.JsonValue hashValue || !hashValue.TryGetValue<string>(out var expectedHash)
+                || expectedHash.Length != 64 || !expectedHash.All(Uri.IsHexDigit))
+                throw new ArgumentException("Use xml or xmlArtifact {path,sha256}, never both; artifact paths and SHA-256 values must be strings.");
+            if (!Path.IsPathFullyQualified(inputPath)) throw new ArgumentException("Screen artifact paths must be absolute.");
+            string path = Path.GetFullPath(inputPath);
             if (!path.StartsWith(root, StringComparison.OrdinalIgnoreCase)) throw new ArgumentException("Screen artifacts must be retained under this Host's artifact root.");
+            if (new FileInfo(path).Length > 8 * 1024 * 1024) throw new ArgumentException("Screen XML artifact exceeds its byte bound.");
+            new ArtifactStore(options.ArtifactsDirectory).Read(path, 0, 1); // Reuse the artifact-root and junction/symlink guard.
             using var stream = File.OpenRead(path);
             if (stream.Length > 8 * 1024 * 1024) throw new ArgumentException("Screen XML artifact exceeds its byte bound.");
             var bytes = new byte[checked((int)stream.Length)]; stream.ReadExactly(bytes);
             string hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes));
-            if (!string.Equals(hash, artifact["sha256"]!.GetValue<string>(), StringComparison.OrdinalIgnoreCase)) throw new ArgumentException("Screen XML artifact changed since review.");
+            if (!string.Equals(hash, expectedHash, StringComparison.OrdinalIgnoreCase)) throw new ArgumentException("Screen XML artifact changed since review.");
             member["xml"] = new System.Text.UTF8Encoding(false, true).GetString(bytes).TrimStart('\uFEFF');
             member.Remove("xmlArtifact");
         }

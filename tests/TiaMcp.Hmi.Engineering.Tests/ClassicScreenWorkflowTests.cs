@@ -83,6 +83,21 @@ static class ClassicScreenWorkflowTests
             original.Root.Add(new XElement("Link",new XAttribute("TargetID","2")));
             Reject(()=>ClassicScreenComposer.Compose(original,new Dictionary<string,XDocument>(),new JObject()));
         });
+        check("Composer refuses scalar replacements that would erase native annotations or formatted content", () => {
+            foreach (string field in new[] { "ObjectName", "Left", "Tag", "Text" })
+                foreach (XObject damage in new XObject[] { new XComment("retained"), new XCData("retained"), new XProcessingInstruction("native", "retained"), new XAttribute("native", "retained") })
+                {
+                    var original = Screen(); var item = ClassicScreenPreflight.Items(original).Single();
+                    item.Add(new XElement("LinkList", new XElement("Tag", new XElement("Name", "Value"))));
+                    item.Element("ObjectList").Add(new XElement("MultilingualTextItem", new XElement("AttributeList", new XElement("Culture", "en-US"), new XElement("Text", "Original"))));
+                    var scalar = field == "Tag" ? item.Descendants("Tag").Single().Element("Name")
+                        : field == "Text" ? item.Descendants("Text").Single() : item.Element("AttributeList").Element(field);
+                    scalar.Add(damage);
+                    var component = new JObject { ["sourceScreenPath"] = "screen", ["sourceItem"] = "Prototype", ["name"] = "Clone",
+                        ["attributes"] = new JObject { ["Left"] = 200 }, ["tagReplacements"] = new JObject { ["Value"] = "Other" }, ["texts"] = new JObject { ["en-US"] = "Changed" } };
+                    Reject(() => ClassicScreenComposer.Compose(original, new Dictionary<string, XDocument> { ["screen"] = original }, new JObject { ["components"] = new JArray(component) }));
+                }
+        });
         check("Graphic resize preflight requires an observed native size for the same picture list", () => {
             var original=Screen();var item=ClassicScreenPreflight.Items(original).Single();item.Name="Hmi.Screen.GraphicIOField";
             item.Add(new XElement("LinkList",new XElement("PictureList",new XElement("Name","Status"))));

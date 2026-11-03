@@ -94,8 +94,11 @@ namespace TiaMcp.Openness.V21
             string path = artifact?.Value<string>("path"), hash = artifact?.Value<string>("sha256");
             string root = Path.GetFullPath(directory).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
             if (!ProjectPathIsAbsolute(path) || !Path.GetFullPath(path).StartsWith(root, StringComparison.OrdinalIgnoreCase)
-                || string.IsNullOrEmpty(hash) || !File.Exists(path) || ChangeFileHash(path) != hash)
+                || string.IsNullOrEmpty(hash) || !File.Exists(path))
                 throw new BridgeException("RecoveryEvidenceInvalid", "A retained recovery artifact is missing, outside its change directory, or changed.");
+            try { ClassicScreenRecoveryRules.RequireUnlinkedArtifact(path); }
+            catch (ArgumentException error) { throw new BridgeException("RecoveryEvidenceInvalid", error.Message); }
+            if (ChangeFileHash(path) != hash) throw new BridgeException("RecoveryEvidenceInvalid", "A retained recovery artifact changed.");
             return path;
         }
 

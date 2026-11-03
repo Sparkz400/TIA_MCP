@@ -39,7 +39,7 @@ namespace TiaMcp.Model
                 var attributes = item.Element("AttributeList");
                 string newName = component.Value<string>("name");
                 if (string.IsNullOrWhiteSpace(newName)) throw new ArgumentException("A new item name is required.");
-                attributes.SetElementValue("ObjectName", newName);
+                SetScalar(attributes.Element("ObjectName"), newName);
                 if (component["attributes"] is JObject values)
                     foreach (var value in values.Properties())
                     {
@@ -47,14 +47,14 @@ namespace TiaMcp.Model
                         var field = attributes.Element(value.Name);
                         if (field == null || field.HasElements || value.Value is JContainer || value.Name == "ObjectName")
                             throw new ArgumentException("Only existing scalar native item attributes may be set: " + value.Name);
-                        field.Value = value.Value.ToString();
+                        SetScalar(field, value.Value.ToString());
                     }
                 if (component["tagReplacements"] is JObject replacements)
                     foreach (var replacement in replacements.Properties())
                     {
                         var fields = item.Descendants("Tag").Elements("Name").Where(x => x.Value == replacement.Name).ToArray();
                         if (fields.Length == 0 || replacement.Value.Type != JTokenType.String) throw new ArgumentException("A tag replacement must match an existing native reference.");
-                        foreach (var field in fields) field.Value = (string)replacement.Value;
+                        foreach (var field in fields) SetScalar(field, (string)replacement.Value);
                     }
                 if (component["texts"] is JObject texts)
                     foreach (var text in texts.Properties())
@@ -63,7 +63,7 @@ namespace TiaMcp.Model
                             .Select(x => x.Element("AttributeList")?.Element("Text")).ToArray();
                         if (fields.Length != 1 || fields[0] == null || fields[0].HasElements || text.Value.Type != JTokenType.String)
                             throw new ArgumentException("Text replacement requires one plain native caption for culture " + text.Name + "; formatted or ambiguous text is retained.");
-                        fields[0].Value = (string)text.Value;
+                        SetScalar(fields[0], (string)text.Value);
                     }
                 int layerIndex = component.Value<int?>("layer") ?? 0;
                 var layers = result.Descendants("Hmi.Screen.ScreenLayer").ToArray();
@@ -85,6 +85,14 @@ namespace TiaMcp.Model
             int id = 0;
             foreach (var attribute in result.Descendants().Attributes("ID")) attribute.Value = (id++).ToString("X");
             return result;
+        }
+
+        private static void SetScalar(XElement field, string value)
+        {
+            // Assigning Value removes all child nodes, including comments, processing instructions and CDATA.
+            if (field == null || field.HasAttributes || field.Nodes().Any(n => n.GetType() != typeof(XText)))
+                throw new ArgumentException("Only plain native text may be replaced; annotations and formatted content must be retained.");
+            field.Value = value;
         }
     }
 }

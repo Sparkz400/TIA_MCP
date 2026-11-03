@@ -180,8 +180,8 @@ public sealed partial class TiaTools
         catch (BridgeException error) when (kind == "cax_import") { return Failure(error); }
         if (kind == "hmi_classic_screen_edit")
             try { request = ClassicScreenArtifactPayload(payload); }
-            catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or ArgumentException)
-            { return Failure(new BridgeException("HmiCandidateUnavailable", error.Message)); }
+            catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or ArgumentException)
+            { return Failure(error as BridgeException ?? new BridgeException("HmiCandidateUnavailable", error.Message)); }
         // TiaMcp.Graph targets net10 and cannot load in the net48 worker, so GRAPH documents are validated here before native preparation.
         if (kind == "graph_import")
             try { request = new GraphWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits).ImportPayload(payload); }
