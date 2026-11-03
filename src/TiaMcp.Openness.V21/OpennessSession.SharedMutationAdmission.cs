@@ -14,6 +14,7 @@ namespace TiaMcp.Openness.V21
     internal sealed partial class OpennessSession
     {
         private IDisposable _sharedMutationLease;
+        private TiaMcp.Model.HmiLeaseObservations _hmiLeaseObservations;
         private string _sharedMutationToken, _sharedMutationOperation;
         private JObject _sharedMutationArguments, _sharedMutationScope;
         private bool _sharedMutationDispatched;
@@ -38,6 +39,8 @@ namespace TiaMcp.Openness.V21
             try
             {
                 _sharedMutationLease = _portal.ExclusiveAccess("TIA MCP: shared resource admission " + operation);
+                if (operation == "change_apply" && _changes.TryGetValue(arguments.Value<string>("changeId") ?? "", out var observedChange)
+                    && observedChange.Kind == "hmi_classic_screen_edit") _hmiLeaseObservations = new TiaMcp.Model.HmiLeaseObservations();
                 _sharedMutationScope = SharedMutationResolve();
                 var begun = new JObject { ["leaseToken"] = _sharedMutationToken, ["scope"] = _sharedMutationScope.DeepClone(),
                     ["nativeDispatched"] = false, ["nativeQualified"] = false };
@@ -100,13 +103,28 @@ namespace TiaMcp.Openness.V21
         private void SharedMutationRelease()
         {
             var lease = _sharedMutationLease; _sharedMutationLease = null; _sharedMutationToken = null;
+            _hmiLeaseObservations = null;
             _sharedMutationArguments = null; _sharedMutationScope = null; _sharedMutationOperation = null;
             _sharedMutationDispatched = false; _sharedMutationDestinations.Clear(); ClearRoutedCredentials(); lease?.Dispose();
         }
         private sealed class SharedMutationNestedScope : IDisposable { public void Dispose() { } }
         // Existing mutation methods use this instead of attempting a second native ExclusiveAccess lease.
-        private IDisposable SharedMutationExclusive(string description) => _sharedMutationLease != null
-            ? (IDisposable)new SharedMutationNestedScope() : _portal.ExclusiveAccess(description);
+        private IDisposable SharedMutationExclusive(string description)
+        {
+            if (_sharedMutationLease != null) return new SharedMutationNestedScope();
+            var native = _portal.ExclusiveAccess(description);
+            _hmiLeaseObservations = null;
+            return new HmiObservationLease(this, native);
+        }
+        private sealed class HmiObservationLease : IDisposable
+        {
+            private readonly OpennessSession owner;
+            private readonly IDisposable native;
+            internal HmiObservationLease(OpennessSession owner, IDisposable native) { this.owner = owner; this.native = native; }
+            public void Dispose() { owner._hmiLeaseObservations = null; native.Dispose(); }
+        }
+        private T HmiLeaseRead<T>(string key, Func<T> read) => _hmiLeaseObservations == null ? read() : _hmiLeaseObservations.Get(key, read);
+        private void InvalidateHmiObservations() => _hmiLeaseObservations?.Invalidate();
 
         private string SharedMutationPlannedDestination(string role, Func<string> legacyFactory)
         {

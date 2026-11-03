@@ -189,15 +189,38 @@ namespace TiaMcp.Openness.V21
             capture = capture ?? new HmiCapture(50000);
             string path = args?.Value<string>("hmiPath");
             if (string.IsNullOrEmpty(path)) throw new BridgeException("InvalidRequest", "Select an exact hmiPath from hmi_inspect section=devices.");
-            var targets = HmiDiscover(project, capture);
-            if (capture.Budget.Truncated) throw new BridgeException("TraversalLimit", "HMI lookup is incomplete; target uniqueness has not been established.");
-            var target = targets.SingleOrDefault(t => t.Path == path) ?? throw new BridgeException("HmiTargetNotFound", "The exact HMI software path was not found in this project generation.");
+            var target = HmiLeaseRead("discovery:" + HmiProjectCopyId(project) + ":" + _hmiSessionGeneration + ":" + path,
+                () => HmiDiscoverExact(project, path, capture));
             if (args.Value<string>("family") is string family && target.Family != family) throw new BridgeException("TargetIncompatible", "The exact target belongs to a different HMI family.");
             if (args.Value<string>("devicePath") is string device && target.DevicePath != device) throw new BridgeException("TargetIncompatible", "The supplied hardware owner does not match the exact HMI software path.");
             if (args.Value<string>("targetProfile") is string profile && target.Profile != profile) throw new BridgeException("TargetIncompatible", "The observed target profile does not match the selected profile.");
             if (target.Family == "unknown" || target.Software == null) throw new BridgeException("HmiTargetUnavailable", "The hardware exists but supported HMI software is not accessible.", target.Diagnostic);
             capture.Status = "complete";
             return target;
+        }
+
+        private HmiDiscoveredTarget HmiDiscoverExact(Project project, string path, HmiCapture capture)
+        {
+            int separator = path.LastIndexOf("/hmi/", StringComparison.Ordinal);
+            if (separator < 0) throw new BridgeException("InvalidRequest", "Select an exact native HMI software path.");
+            string ownerPath = path.Substring(0, separator);
+            // Establish uniqueness through the bounded native hierarchy, but read software/catalog
+            // attributes only on the requested owner. Full inventory remains HmiDiscover's job.
+            var owners = DeviceItems(project, capture.Budget).Where(e => e.Path == ownerPath).Take(2).ToArray();
+            if (capture.Budget.Truncated) throw new BridgeException("TraversalLimit", "The selected hardware owner cannot be uniquely established.");
+            if (owners.Length != 1) throw new BridgeException(owners.Length == 0 ? "HmiTargetNotFound" : "AmbiguousTarget", "The exact HMI hardware owner was not found uniquely.");
+            var entry = owners[0];
+            var software = entry.Item.GetService<SoftwareContainer>()?.Software;
+            string type = software?.GetType().FullName;
+            string family = type == "Siemens.Engineering.Hmi.HmiTarget" ? "classic" : type == "Siemens.Engineering.HmiUnified.HmiSoftware" ? "unified" : null;
+            if (family == null || ownerPath + "/hmi/" + Segment(software.Name) != path)
+                throw new BridgeException("HmiTargetNotFound", "The selected owner does not expose the exact supported HMI software.");
+            var metadata = HmiHardwareMetadata(entry.Item, entry.Path, family, capture);
+            if (capture.Budget.Truncated) throw new BridgeException("TraversalLimit", "Selected HMI metadata is incomplete.");
+            return new HmiDiscoveredTarget { Software = software, Hardware = entry.Item, Family = family, DevicePath = entry.Path,
+                Name = software.Name, Path = path, CatalogIdentifier = metadata.Value<string>("catalogIdentifier"),
+                RuntimeVersion = metadata.Value<string>("runtimeVersion"), Profile = HmiInspectionRules.Profile(family, metadata.Value<string>("classification")),
+                CatalogEvidence = metadata["evidence"] as JObject };
         }
 
         private JObject HmiDeviceView(Project project, HmiDiscoveredTarget target)

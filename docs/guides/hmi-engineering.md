@@ -1,5 +1,186 @@
 # HMI engineering and preservation
 
+## Bounded Classic screen editing
+
+`change_prepare` kind `hmi_classic_screen_edit` accepts `classic_xml_import` of one
+existing, unlinked regular screen on `classic-rt-advanced`. It uses the existing
+change lifecycle and the same payload schema as `hmi_classic_import`. It does not
+create screens, edit templates, import tag tables or modify graphic lists.
+
+This is an explicit narrower contract: every regular screen of the selected HMI
+is exported before preparation, immediately before applying, after compile/save,
+and during recovery. Only the selected screen may differ. Its native readback
+must match the prepared XML under the existing Classic import comparison.
+A separate `scopePolicy` (`classic-regular-screens-selected-hmi-v1`) participates
+in the content hash, so a screen-only hash cannot stand in for a whole-HMI hash.
+A failed export or a changed/added/removed peer screen refuses verification.
+The stale-change fingerprint binds project path, last save time, unsaved-state flag
+and the declared screen hash. It does not fingerprint PLC or hardware payloads,
+so an inconsistent unrelated PLC block does not demand a PLC compile for a screen
+edit. Those contents are outside this workflow's equality claim.
+
+The preview and manifests list excluded coverage: graphic lists and image content,
+tag tables, connections, scripts, text lists, screen templates/popups/slide-ins,
+global/overview screens, alarms, libraries and other HMIs. Their references remain
+in screen XML, but their content is not compared. `complete` remains false and
+`wholeHmiPreservationVerified` is false; a successful scoped comparison is not
+whole-HMI preservation, dependency closure or runtime qualification.
+
+Preparation retains the native screen backup and candidate. Apply still requires
+`checkpointSave=true`, `compile=true`, `save=true`, the exact preview hash and an
+idempotency key. It archives the project, compiles before and after import, rejects
+changed compiler errors/warnings, and verifies the target XML and peer-screen preservation after compile and again
+after save. The Classic comparator ignores only the observed timestamp/byte-count
+header in its exact container position (the original diagnostic evidence is kept).
+Real error/warning text, full owner hierarchy and aggregate/target counters must
+match. Unknown headers, leaf diagnostics, malformed trees and truncated evidence
+remain significant or refuse comparison. Archive
+recovery remains restricted to worker-owned TIA instances; project authentication
+requirements still apply. Profile-wide native qualification is reported as
+unverified; local fixture evidence must be reported separately.
+
+### Screen failure recovery without closing TIA
+
+`hmi_classic_screen_edit` has a bounded in-place recovery path in both attached and
+worker-owned projects. After a returned import, readback or compile failure, the
+worker attempts **one restoration of the retained pre-import screen**, while it
+still holds the original native exclusive-access lease. It does not retry the
+candidate. The checkpoint and original XML hashes must match, and every peer
+screen must still equal the pre-import capture before restoration starts.
+The restored screen is re-exported, the HMI is compiled against the recorded
+baseline diagnostics, all regular screens are compared, and the restored project
+is saved and compared again. Only then does the journal report `rolled_back` and
+permit a new preparation in the same TIA process. The original failure remains in
+the response and journal. A verified failure before the import reports
+`not_applied`. Missing artifacts, changed peers, incomplete native reads or a
+failed restoration remain `recovery_required`; no unrelated edit is discarded.
+
+A client timeout is different from an import failure: TIA may finish after the
+client stops waiting. Inspect the retained change journal before taking any next
+action. For a terminal `applied` or verified `rolled_back` Classic screen change,
+`engineering_admission_reconcile` can run attached to the **still-open original
+project**. It rechecks the terminal stages and compiler evidence, retained
+checkpoint/input/export hashes, complete declared screen scope and exact project
+save fingerprint under native exclusive access. Unsaved edits, changed saved
+state, a nonterminal journal or incomplete evidence keep the lock held. The
+reconciliation performs no import, save or replay. `ResourceBusy` includes the
+blocking admission IDs and the reconciliation tool name. Other operation kinds
+retain their existing isolated recovery rules.
+
+For large screen sets, use `--timeout-seconds 900` and a client tool timeout longer
+than that (for example, Codex `tool_timeout_sec = 960`). Checkpointing, full HMI
+compilation and native preservation exports can exceed five minutes. The final
+fingerprint reuses the just-verified saved capture under the same exclusive lease;
+it does not repeat another full export with no intervening write. Longer waiting
+does not authorize a retry or weaken verification.
+
+The [recovery verification record](../verification/classic-screen-recovery-20261103.md)
+separates managed failure checks from the native still-open-project lock-release
+test and records remaining evidence limits.
+
+### Preparing the screen change
+
+The `hmi_classic_screen_capture` tool returns the scope hash directly. The
+older single-screen route also supports a two-pass preparation pattern: a first
+prepare with a deliberately nonmatching 64-character hash returns `StaleRevision`
+and the captured baseline, without applying an edit. Reprepare the reviewed
+candidate with that baseline's `contentHash`. Use the full current screen identity
+from `hmi_inspect`, including project-copy and session fields.
+
+Local checks and native-copy evidence are tracked in the
+[3 November verification record](../verification/classic-screen-edit-20261103.md).
+
+### Capture, composition and batching
+
+The [workflow continuation](../verification/classic-screen-workflow-draft-20261103.md)
+records native two-screen success, later-member failure with reverse-order
+restoration, lost-response reconciliation in the still-open project and a fresh
+read-write reopen on an owned RT Advanced fixture. This is bounded fixture
+evidence; profile-wide, visual and runtime qualification remain unverified.
+
+1. Call `hmi_classic_screen_capture` with the exact project and HMI identity. It
+   returns the regular-screen `contentHash`, native XML artifacts and a hashed
+   capture receipt. `includeTags=false` omits structured-tag exports.
+2. Optionally call `hmi_classic_screen_compose` with that receipt, `screenPath`,
+   and explicit `components`/`removeItems`. Components clone native screen items;
+   replacements are limited to existing plain scalar attributes, tag references
+   and captions. XML annotations or formatted content refuse replacement.
+3. Prepare `hmi_classic_screen_edit` with the capture hash and the usual first
+   `target`/`xml`, optionally adding one to seven `additionalScreens` entries.
+   Every member must be an existing regular screen of the same HMI, project copy
+   and session. Each `xml` may instead be `xmlArtifact: {path, sha256, bytes?}`,
+   including the complete artifact reference returned by composition. The optional
+   integer byte count must match the retained file. The path
+   must be absolute and inside the Host artifact root. Changed bytes, malformed
+   references, symbolic links and junctions refuse before native preparation.
+4. Review and apply the single prepared change. One project checkpoint and one
+   baseline/final compile pair cover the batch. Each attempted member has a
+   durable dispatch and readback receipt. Failure restores the attempted prefix
+   in reverse order, then verifies the complete declared screen scope and save.
+
+Capture/composition and recovery also refuse linked retained artifacts. Terminal
+reconciliation requires every batch member receipt; removing the list cannot
+select the legacy single-screen compatibility path. A failed or incomplete
+restoration retains ownership.
+
+`change_status(progressOnly=true)` reads diagnostic phase timing without waiting
+for the worker. It always reports `outcomeVerified=false` and
+`automaticRetryAllowed=false`. Normal status is compact; use
+`includeDetails=true` for retained XML and full preservation evidence. Neither
+progress nor cached observations authorize retry. Observation reuse ends with
+the native exclusive-access lease and is invalidated by imports, compilation
+and saves.
+
+## Temporary Classic graphic-list export containment
+
+Classic `GraphicList.Export` is temporarily blocked with `HmiNativeExportBlocked` after
+two V21 Update 3 diagnostic reports identified the same `InvalidCastException` in
+`HmiOpenLinkService.TryConvertToHmiOpenLink` during a read-only graphic-list export.
+The reference conversion attempted to cast `System.String` to `HmiOpenLink`; no
+repair or safe list-name discriminator has been natively qualified.
+
+Whole-HMI preservation checks all discovered Classic HMI targets for graphic lists before any
+preservation export. A nonempty composition refuses the capture and the change,
+including a Unified change in a mixed project. This does not skip lists or accept
+partial preservation. Classic graphic-list `hmi_inspect` source exports and the
+generic Classic object exporter are blocked too; metadata inspection and Unified
+graphic-list exports are unaffected by this particular guard. There is no caller
+override. The separate bounded screen workflow never requests graphic-list export.
+
+Each capture writes `capture-progress.jsonl` beside `manifest.json`. Start records
+are flushed before native dispatch; completion records follow successful operations.
+A missing completion identifies an operation whose result is not established, not
+permission to retry it. The manifest uses project identity cached before capture,
+retains the first exception and partial artifact set, and never grants a content
+hash after failure. Diagnostic write failures are retained separately where possible.
+Preparation refuses a failed capture before further target reads or exports.
+
+The offline regression tests cover refusal before dispatch, loss of the project
+getter, diagnostic I/O failures, partial-scope rejection and unchanged successful
+hash rules. The compiled-worker metadata guard also rejects any remaining direct
+Classic `GraphicList.Export` call without loading Siemens assemblies. These checks
+contain the known route; they do not qualify a native fix, prove other exports safe,
+or reopen this route. Any native investigation must use an explicitly authorized
+disposable fixture or project copy.
+
+On 3 November 2026, two explicitly authorized tests on a disposable project copy
+reproduced the same Siemens invalid cast using a standalone Openness program,
+without the MCP Host or worker: `WithUserInterface` with `ExportOptions.None`, and
+`WithoutUserInterface` with `ExportOptions.WithDefaults`. Both terminated only the
+test TIA instance. Both diagnostic reports recorded read-only export and
+`IsModified=False`. Excluding defaults and running headless are therefore **not
+qualified remedies**. These tests did not exercise screen import. The separate bounded screen workflow
+now has local native import, compile, save/reopen and authenticated checkpoint
+readback evidence in the verification record linked above.
+
+Offline inspection identifies a plausible converter contract violation: the
+installed library converter can return a string for a requested `HmiOpenLink`,
+while its caller casts the returned value to that reference type. This explains
+the observed exception but does not establish a supported connector workaround,
+project corruption, or a particular vendor update as a fix. Siemens binaries and
+the active connector installation were not changed. Private project data, crash
+archives and vendor implementation excerpts stay in local investigation artifacts.
+
 Classic ordinary screen inspection now uses the six public screen scopes and retains optional `screenRole` metadata (`regular`, `template`, `popup`, `slideIn`, `globalElements`, `overview`). `coverage.screenScopes` distinguishes complete, absent, unavailable and truncated scopes. Explorer nodes remain `hmiScreen`; their exact paths separate roles and folders. Additional Classic roles route details to screen metadata, while regular screens retain the existing item route. Added-role item parsing and ordinary source export remain unsupported/unqualified; these observations confer no mutation authority. See [offline verification](../verification/classic-screen-inventory-20261023.md).
 
 The `hmi_engineering` change kind uses the existing `change_prepare`, `change_apply`, `change_status` and `change_restore` lifecycle. Payloads follow [hmi-engineering.v1.schema.json](../../contracts/hmi-engineering.v1.schema.json). This implementation contains family-specific operation bodies and fail-closed preservation gates. An implemented body is not native qualification or current target availability.
@@ -42,6 +223,12 @@ No request field can override native qualification or preservation availability.
 
 Classic capture exports every exposed screen, template, popup, slide-in, global element, overview, tag table, connection, cycle, script and text/graphic list through public APIs. Slide-ins have no name and are keyed by `SlideinType`, as in inspection paths. Folder traversal, file count and bytes are bounded. Capture spans all discovered HMI targets, so another HMI with repeated member names is a separate preservation identity. Native failures retain partial artifacts, exact failure information and an incomplete/failed manifest; they never become a complete content fingerprint. Scripts are exported as content and never executed.
 
+The native-export budget is 2048 files, 64 MiB per file and 512 MiB in total across
+the project. The XML parser uses the same 64 MiB document bound. This accommodates
+the independently observed 49.79 MiB tag-table export; exceeding a bound still
+refuses the entire preservation scope. These capacity changes do not repair the
+graphic-list export failure or qualify a screen-editing workflow.
+
 Raw SHA-256 is retained for every export. The sole current Classic content normalization of the whole-HMI comparison changes `/Document/DocumentInfo/Created`, with its observed scalar timestamp shape, to a fixed export-time marker. Only the `classic_xml_import` target's own readback uses the broader import rule above. Unchanged V21 Update 2 native exports before repeated read and fresh reopen established that this field is export metadata. No GUIDs, IDs, unknown nodes, events, bindings, translations, library version references, resource content, whitespace or product metadata are removed. Nested `Created` fields remain content. Pure negative tests enforce these boundaries. An unexpected native normalization fails preservation.
 
 Unified tag tables use documented native composition export. Installed V21 metadata exposes no `HmiScreen.Export`. The Unified manifest therefore also records a SHA-256 for every node of the typed object-model walk that `hmi_inspect` `section=model` uses. The keys are the node's inspection path, and each target's `typed-model.json` is retained. The walk covers screens, items, dynamizations, events with hashed script code, parts, translations, tags, alarms, logs, audit trails, runtime settings, groups, lists and script modules. It is bounded to 45000 nodes and 64 MiB; a truncated walk fails the capture. The existing preservation rules decide what may differ:
@@ -62,7 +249,7 @@ The Classic HmiTarget surface has no public alarm composition. Full resource and
 
 Preparation validates the exact project/session/HMI/object identity, immutable expected native-content fingerprint, operation shape, dependencies and typed destination, then retains the before exports and intended full-document/scalar effect. It does not obtain write eligibility from explorer metadata. Apply requires `checkpointSave=true`, `compile=true` and `save=true`; the existing lifecycle revalidates target fingerprints and prepared file hashes, durably records the idempotency key, saves current edits and creates a hashed recovery archive before dispatching one mutation.
 
-After native mutation, precise readback, the affected HMI compiler, unrelated-content comparison and save are required. State and artifacts flow through the existing journal. Native failures retain the changed project and archive in `recovery_required`; a worker interruption has an unknown outcome and is never automatically replayed. Recovery retrieves the archive into a new owned location and compares complete recovered HMI content with its recorded baseline before reporting HMI equality. Native qualification must separately prove save/fresh-reopen, recovery/fresh-reopen and visual behavior.
+After native mutation, precise readback, the affected HMI compiler, unrelated-content comparison and save are required. State and artifacts flow through the existing journal. Native failures retain the changed project and archive in `recovery_required` unless the bounded Classic screen recovery above verifies an in-place restoration; a worker interruption has an unknown outcome and is never automatically replayed. General archive recovery retrieves the archive into a new owned location and compares complete recovered HMI content with its recorded baseline before reporting HMI equality. Native qualification must separately prove save/fresh-reopen, recovery/fresh-reopen and visual behavior.
 
 ## Library handoff
 

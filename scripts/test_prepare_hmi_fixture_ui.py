@@ -71,6 +71,15 @@ class PreparationPacketTests(unittest.TestCase):
         self.assertEqual(admission['archive'], runner.reference(self.archive))
         self.assertEqual(runner.read(self.args.output / 'result.json')['failure']['message'], 'no native helper in tests')
 
+    def test_rt_advanced_preparation_selects_only_existing_start_screen(self):
+        self.args.profile = 'classic-rt-advanced'
+        self.source_data['profiles'][0]['profile'] = self.args.profile
+        self.save()
+        self.assertEqual(runner.run(self.args), 0)
+        packet = runner.read(self.args.output / 'preparation.json')
+        self.assertEqual(packet['allowedEdit'], 'configure-existing-start-screen')
+        self.assertFalse(packet['disableSecurityAllowed'])
+
     def test_unified_preparation_selects_only_transfer_prerequisite(self):
         self.args.profile = 'unified-comfort'
         self.source_data['profiles'][0]['profile'] = self.args.profile

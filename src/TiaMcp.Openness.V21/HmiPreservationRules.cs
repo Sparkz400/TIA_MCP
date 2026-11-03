@@ -14,6 +14,9 @@ namespace TiaMcp.Model
     internal static class HmiPreservationRules
     {
         internal const int PolicyVersion = 1;
+        internal const string ClassicScreenPolicy = "classic-regular-screens-selected-hmi-v1";
+        internal const string ClassicScreenExportNote = "Only regular screens of the selected Classic HMI are exported and compared. Graphic lists, images, tag tables, connections, scripts, text lists, templates, popups, slide-ins, global/overview screens, alarms, libraries and other HMI targets are not compared. Screen references are retained in XML; their external dependency content is not verified. This is not whole-HMI preservation or runtime verification.";
+        internal const long MaxDocumentBytes = 64L * 1024 * 1024;
         // The two coverage notes every Unified capture records; hmi_text_list_import and hmi_external_tag_create accept exactly these (HmiEngineeringRules.StandingNotes).
         internal const string UnifiedTagTableExportNote = "Unified tag tables were exported using their documented native composition export. Export stability, full dependency closure and unrelated-resource preservation remain unqualified.";
         internal const string UnifiedTypedReadbackNote = "Unified typed readback compares the public V21 object model (screens, items, dynamizations, event handlers with hashed script code, parts, translations, tags, alarms, logs, audit, runtime settings, groups, lists, script modules) per node. V21 has no Screen.Export, so payloads without a public getter remain uncompared; this readback is not natively qualified.";
@@ -35,10 +38,10 @@ namespace TiaMcp.Model
 
         internal static XDocument ReadXml(string xml)
         {
-            if (xml == null || Encoding.UTF8.GetByteCount(xml) > 32 * 1024 * 1024)
-                throw new ArgumentException("HMI export exceeds the 32 MiB preservation bound.");
+            if (xml == null || Encoding.UTF8.GetByteCount(xml) > MaxDocumentBytes)
+                throw new ArgumentException("HMI export exceeds the 64 MiB preservation bound.");
             using (var reader = XmlReader.Create(new StringReader(xml), new XmlReaderSettings {
-                DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 32 * 1024 * 1024 }))
+                DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = MaxDocumentBytes }))
                 return XDocument.Load(reader, LoadOptions.PreserveWhitespace);
         }
 
@@ -135,13 +138,14 @@ namespace TiaMcp.Model
         internal static void RequireClassicDocumentPreservation(XDocument expected, XDocument actual)
             => RequireExactDocument(NormalizeClassicExport(expected), NormalizeClassicExport(actual));
 
-        internal static string ScopeHash(string family, IDictionary<string, string> nativeArtifactHashes, bool complete)
+        internal static string ScopeHash(string family, IDictionary<string, string> nativeArtifactHashes, bool complete, string scopePolicy = null)
         {
             HmiRecipeRules.RequireFamily(family);
             if (!complete) throw new ArgumentException("PreservationUnavailable: incomplete HMI exports/readback cannot establish a content fingerprint.");
             if (nativeArtifactHashes == null || nativeArtifactHashes.Count == 0 || nativeArtifactHashes.Count > 50000)
                 throw new ArgumentException("A bounded, nonempty complete native-artifact manifest is required.");
-            var text = new StringBuilder("hmi-preservation-v1\n" + family + "\n");
+            if (scopePolicy != null && scopePolicy != ClassicScreenPolicy) throw new ArgumentException("Unknown preservation scope policy.");
+            var text = new StringBuilder("hmi-preservation-v1\n" + family + "\n" + (scopePolicy == null ? "" : scopePolicy + "\n"));
             foreach (var pair in nativeArtifactHashes.OrderBy(p => p.Key, StringComparer.Ordinal))
             {
                 if (string.IsNullOrWhiteSpace(pair.Key) || pair.Key.Any(char.IsControl) || pair.Value == null || pair.Value.Length != 64

@@ -122,6 +122,8 @@ namespace TiaMcp.Openness.V21
                 case "project_properties": return ProjectProperties(arguments);
                 case "device_inventory_capture": return DeviceInventoryCapture(arguments);
                 case "hmi_inspect": return HmiInspect(arguments);
+                case "hmi_classic_screen_capture": return ClassicScreenCapture(arguments);
+                case "hmi_classic_screen_compose": return ClassicScreenCompose(arguments);
                 case "hmi_references": return HmiReferences(arguments);
                 case "hmi_capabilities": return HmiCapabilities(arguments);
                 case "project_index": return ProjectIndex(arguments);

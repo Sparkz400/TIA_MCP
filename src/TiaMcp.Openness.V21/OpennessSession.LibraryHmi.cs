@@ -129,7 +129,8 @@ namespace TiaMcp.Openness.V21
             string family = target?.Value<string>("family");
             HmiAssemblyName(family);
             string path = HmiText(target, "hmiPath", 4096);
-            var found = HmiTargets(project).SingleOrDefault(t => t.Path == path);
+            var found = HmiLeaseRead("target:" + HmiProjectCopyId(project) + ":" + _hmiSessionGeneration + ":" + path,
+                () => HmiTargets(project).SingleOrDefault(t => t.Path == path));
             if (found == null) throw new BridgeException("HmiTargetNotFound", "Choose an exact hmiPath returned by library_query hmi_targets.");
             if (found.Family != family) throw new BridgeException("TargetIncompatible", "The selected HMI target belongs to " + found.Family + ", not " + family + ".");
             RequireHmiModule(family);

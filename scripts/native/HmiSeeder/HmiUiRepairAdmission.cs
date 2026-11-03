@@ -47,7 +47,7 @@ internal static partial class Program
             string.Equals(row["archive"]?.Value<string>("path"), archive, StringComparison.OrdinalIgnoreCase) &&
             row["archive"].Value<string>("sha256") == Hash(archive));
         string selectedProfile = profile.Value<string>("profile");
-        if (!new[] { "classic-comfort", "unified-comfort", "unified-pc" }.Contains(selectedProfile, StringComparer.Ordinal) ||
+        if (!new[] { "classic-comfort", "classic-rt-advanced", "unified-comfort", "unified-pc" }.Contains(selectedProfile, StringComparer.Ordinal) ||
             source.Value<bool?>("completed") != true || profile.Value<string>("fixtureMode") != "positive" ||
             profile.Value<bool?>("archiveRetrievalVerified") != true ||
             profile.Value<bool?>("deliberateInvalidReferences") != false ||

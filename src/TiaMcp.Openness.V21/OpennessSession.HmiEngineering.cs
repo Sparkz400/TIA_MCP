@@ -34,6 +34,7 @@ namespace TiaMcp.Openness.V21
         // Siemens HMI types occur only inside family methods, never session fields.
         private JObject PrepareHmiEngineeringMutation(EngineeringChange change, Project project)
         {
+            if (change.Kind == "hmi_classic_screen_edit") _hmiLeaseObservations = new HmiLeaseObservations();
             try { HmiEngineeringRules.RequireRequest(change.Payload); HmiEngineeringRules.RequireKind(change.Kind, change.Payload); }
             catch (ArgumentException ex) { throw new BridgeException("InvalidRequest", ex.Message); }
             var identity = (JObject)change.Payload["target"];
@@ -48,21 +49,26 @@ namespace TiaMcp.Openness.V21
             gate["nativeAssembly"] = target.Software.GetType().Assembly.FullName;
             change.HmiEvidence = new JObject { ["schemaVersion"] = 1, ["target"] = identity.DeepClone(), ["operation"] = operation,
                 ["gate"] = gate, ["runtimeVerified"] = false, ["automaticRetryAllowed"] = false };
+            if (change.Kind == "hmi_classic_screen_edit") RequireHmiEngineeringGate(gate, change.HmiEvidence);
             // Capture real native artifacts before rejecting a missing qualification.
             // An incomplete export is useful evidence, never a usable mutation hash.
             change.HmiBeforeManifest = CaptureHmiEngineeringScope(change, project, "before");
             change.HmiEvidence["baseline"] = change.HmiBeforeManifest.DeepClone();
+            // Refuse a failed capture before any further native reads or target exports.
+            RequireHmiScope(change, change.HmiBeforeManifest);
+            if (change.Kind == "hmi_classic_screen_edit")
+                HmiLeaseRead("screen-content:" + change.Id, () => change.HmiBeforeManifest.Value<string>("contentHash"));
+            RequireHmiEngineeringGate(gate, change.HmiEvidence);
             var native = entry.Native as IEngineeringObject;
             if (native == null) throw new BridgeException("HmiMutationTargetUnsupported", "This HMI object is parsed export content without a qualified native mutation adapter.", change.HmiEvidence);
-            var effect = target.Family == "classic" ? PrepareClassicEngineeringBody(change, target.Software, native) : PrepareUnifiedEngineeringBody(change, project, native);
+            var effect = change.Kind == "hmi_classic_screen_edit" ? PrepareClassicScreenBatch(change, project)
+                : target.Family == "classic" ? PrepareClassicEngineeringBody(change, target.Software, native) : PrepareUnifiedEngineeringBody(change, project, native);
             change.HmiEvidence["proposedEffect"] = effect;
-            RequireHmiEngineeringGate(gate, change.HmiEvidence);
-            RequireHmiScope(change, change.HmiBeforeManifest);
             if (change.HmiBeforeManifest.Value<string>("contentHash") != change.Payload.Value<string>("expectedContentHash"))
                 throw new BridgeException("StaleRevision", "HMI native content changed since inspection; prepare from a fresh complete content capture.", change.HmiEvidence);
             return new JObject { ["effects"] = new JArray(effect), ["warnings"] = new JArray("Native compile does not qualify HMI runtime behavior."),
                 ["hmiEvidence"] = change.HmiEvidence.DeepClone(), ["compileRequired"] = true, ["saveRequired"] = true,
-                ["preservationPolicy"] = operation == "classic_xml_import"
+                ["preservationPolicy"] = change.Kind == "hmi_classic_screen_edit" ? HmiPreservationRules.ClassicScreenPolicy + "; " + HmiPreservationRules.ClassicScreenExportNote : operation == "classic_xml_import"
                     ? "hmi-family-specific-exact-v1; the target's readback ignores DocumentInfo, export-local IDs (HmiPreservationRules) and formatting; every other export Classic export-time DocumentInfo.Created only"
                     : "hmi-family-specific-exact-v1; no PLC normalization; Classic export-time DocumentInfo.Created only" };
         }
@@ -73,7 +79,13 @@ namespace TiaMcp.Openness.V21
         }
 
         private JObject CaptureHmiEngineeringScope(EngineeringChange change, Project project, string stage)
+            => MeasureChange(change, "capture-" + stage, () => CaptureHmiEngineeringScopeCore(change, project, stage));
+
+        private JObject CaptureHmiEngineeringScopeCore(EngineeringChange change, Project project, string stage)
         {
+            if (change.Kind == "hmi_classic_screen_edit") return CaptureClassicScreenEditScope(change, project, stage);
+            // Snapshot while the connection is healthy; reporting below never reads Project.
+            string projectPath = project.Path.FullName;
             var target = ResolveHmiTarget(project, (JObject)change.Payload["target"]);
             string directory = Path.Combine(change.Directory, "hmi-" + stage + "-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(directory);
@@ -81,83 +93,101 @@ namespace TiaMcp.Openness.V21
             var missing = new JArray();
             var capturedTargets = new JArray();
             var typed = new JObject();
-            JObject nativeFailure = null;
-            try
+            var capture = new HmiPreservationCapture(directory, projectPath, target.Family, target.Path, stage);
+            capture.Capture(() =>
             {
-                var targets = HmiTargets(project).ToArray();
+                HmiTargetSelection[] targets = null;
+                capture.Run("discover-targets", target.Path, null, () => targets = HmiTargets(project).ToArray());
                 if (targets.Length > 32) throw new BridgeException("TraversalLimit", "Project-wide HMI preservation capture exceeds 32 native HMI targets.");
+                // Check every target before exporting anything, including when a Unified
+                // edit shares its project with a Classic HMI containing graphic lists.
                 foreach (var current in targets)
                 {
                     capturedTargets.Add(HmiTargetView(current));
-                    string targetDirectory = Path.Combine(directory, "target-" + capturedTargets.Count);
-                    Directory.CreateDirectory(targetDirectory);
-                    if (current.Family == "classic") CaptureClassicEngineeringScope(current, targetDirectory, artifacts, missing);
-                    else CaptureUnifiedEngineeringScope(current, targetDirectory, artifacts, missing, typed);
+                    if (current.Family == "classic")
+                        capture.Run("classic-graphic-list-admission", current.Path + "/graphicLists", null,
+                            () => RequireClassicGraphicListCapture(current));
                 }
-                // Typed node hashes join after all exports so they never count against the 200-file export bound.
+                int targetIndex = 0;
+                foreach (var current in targets)
+                {
+                    string targetDirectory = Path.Combine(directory, "target-" + ++targetIndex);
+                    Directory.CreateDirectory(targetDirectory);
+                    capture.Run("capture-target", current.Path, null, () =>
+                    {
+                        if (current.Family == "classic") CaptureClassicEngineeringScope(current, targetDirectory, artifacts, missing, capture);
+                        else CaptureUnifiedEngineeringScope(current, targetDirectory, artifacts, missing, typed, capture);
+                    });
+                }
+                // Typed node hashes join after all exports so they never count against the native-file export bound.
                 foreach (var node in typed.Properties()) artifacts.Add(node.Name, node.Value);
-            }
-            catch (Exception ex)
-            {
-                nativeFailure = new JObject { ["type"] = ex.GetType().FullName, ["code"] = (ex as BridgeException)?.Code,
-                    ["message"] = ex.Message, ["stage"] = stage, ["completedArtifactCount"] = artifacts.Count };
-                missing.Add("Native preservation capture failed; already-produced artifacts are retained and cannot authorize mutation.");
-            }
-            var manifest = new JObject { ["schemaVersion"] = 1, ["policyVersion"] = HmiPreservationRules.PolicyVersion,
-                ["family"] = target.Family, ["hmiPath"] = target.Path, ["projectPath"] = project.Path.FullName,
-                ["targets"] = capturedTargets, ["scope"] = "all discovered project HMI targets; complete public export surface per family plus Unified typed object-model readback per node (target-N/typed-model.json), subject to explicit missing coverage",
-                ["complete"] = missing.Count == 0, ["artifacts"] = artifacts, ["missingCoverage"] = missing,
-                ["contentHash"] = null, ["nativeFailure"] = nativeFailure, ["status"] = nativeFailure != null ? "failed" : missing.Count == 0 ? "complete" : "incomplete",
-                ["capturedAtUtc"] = DateTime.UtcNow.ToString("O") };
-            // Partial artifact-set hashes are explicitly labelled and cannot serve as
-            // expectedContentHash or replace the existing PLC/project fingerprint.
-            var hashes = artifacts.Properties().ToDictionary(p => p.Name, p => p.Value.Value<string>("contentSha256") ?? p.Value.Value<string>("sha256"), StringComparer.Ordinal);
-            manifest["observedArtifactsHash"] = hashes.Count == 0 ? null : HmiPreservationRules.ScopeHash(target.Family, hashes, true);
-            if (missing.Count == 0) manifest["contentHash"] = manifest["observedArtifactsHash"].DeepClone();
-            // A kind with standing notes (text list, admitted kinds) accepts exactly those; its content hash is then the observed-artifacts hash.
-            else if (HmiEngineeringRules.ScopeAccepted(change.Kind, manifest))
-            {
-                manifest["contentHash"] = manifest["observedArtifactsHash"].DeepClone();
-                manifest["scopeAcceptance"] = change.Kind + (target.Family == "classic" ? ": only the standing Classic export note" : ": only the standing Unified tag-table export and typed-readback notes");
-            }
-            string path = Path.Combine(directory, "manifest.json");
-            File.WriteAllText(path, manifest.ToString(Formatting.Indented));
+            }, () => artifacts.Count);
+            var manifest = capture.Manifest(change.Kind, artifacts, missing, capturedTargets);
+            string path = capture.SaveManifest(manifest);
             change.Readbacks.Add(new JObject { ["role"] = "hmi-" + stage + "-preservation-manifest", ["artifact"] = ChangeArtifact(path) });
             return manifest;
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void CaptureClassicEngineeringScope(HmiTargetSelection target, string directory, JObject artifacts, JArray missing)
+        private JObject CaptureClassicScreenEditScope(EngineeringChange change, Project project, string stage)
+        {
+            string projectPath = project.Path.FullName;
+            var target = ResolveHmiTarget(project, (JObject)change.Payload["target"]);
+            if (target.Family != "classic") throw new BridgeException("HmiMutationTargetUnsupported", "The bounded screen workflow requires Classic.");
+            string directory = Path.Combine(change.Directory, "hmi-" + stage + "-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(directory);
+            var artifacts = new JObject();
+            var capture = new HmiPreservationCapture(directory, projectPath, target.Family, target.Path, stage);
+            capture.Capture(() =>
+            {
+                var hmi = (Siemens.Engineering.Hmi.HmiTarget)target.Software;
+                foreach (var screen in ClassicScreens(hmi.ScreenFolder.Screens, hmi.ScreenFolder.Folders, "/screens", 0))
+                    CaptureHmiArtifact(directory, target.Path + screen.Item1, artifacts, capture, f => screen.Item2.Export(f, ExportOptions.WithDefaults));
+            }, () => artifacts.Count);
+            var manifest = capture.Manifest(change.Kind, artifacts, new JArray(HmiPreservationRules.ClassicScreenExportNote), new JArray(HmiTargetView(target)));
+            string path = capture.SaveManifest(manifest);
+            change.Readbacks.Add(new JObject { ["role"] = "hmi-" + stage + "-preservation-manifest", ["artifact"] = ChangeArtifact(path) });
+            return manifest;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void RequireClassicGraphicListCapture(HmiTargetSelection target)
+        {
+            foreach (var list in ((Siemens.Engineering.Hmi.HmiTarget)target.Software).GraphicLists)
+                HmiNativeExportSafety.RequireAllowed(HmiNativeExportSafety.ClassicGraphicList, target.Path + "/graphicLists/" + Segment(list.Name));
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void CaptureClassicEngineeringScope(HmiTargetSelection target, string directory, JObject artifacts, JArray missing, HmiPreservationCapture capture)
         {
             var hmi = (Siemens.Engineering.Hmi.HmiTarget)target.Software;
             foreach (var screen in ClassicScreens(hmi.ScreenFolder.Screens, hmi.ScreenFolder.Folders, "/screens", 0))
-                CaptureHmiArtifact(directory, target.Path + screen.Item1, artifacts, f => screen.Item2.Export(f, ExportOptions.WithDefaults));
+                CaptureHmiArtifact(directory, target.Path + screen.Item1, artifacts, capture, f => screen.Item2.Export(f, ExportOptions.WithDefaults));
             foreach (var table in ClassicTagTables(hmi.TagFolder.TagTables, hmi.TagFolder.Folders, "/tagTables", 0))
-                CaptureHmiArtifact(directory, target.Path + table.Item1, artifacts, f => table.Item2.Export(f, ExportOptions.WithDefaults));
+                CaptureHmiArtifact(directory, target.Path + table.Item1, artifacts, capture, f => table.Item2.Export(f, ExportOptions.WithDefaults));
             foreach (var connection in hmi.Connections)
-                CaptureHmiArtifact(directory, target.Path + "/connections/" + Segment(connection.Name), artifacts, f => connection.Export(f, ExportOptions.WithDefaults));
-            CaptureClassicEngineeringFolder(hmi.ScreenTemplateFolder, "ScreenTemplates", target.Path + "/screenTemplates", directory, artifacts, 0);
-            CaptureClassicEngineeringFolder(hmi.ScreenPopupFolder, "ScreenPopups", target.Path + "/screenPopups", directory, artifacts, 0);
+                CaptureHmiArtifact(directory, target.Path + "/connections/" + Segment(connection.Name), artifacts, capture, f => connection.Export(f, ExportOptions.WithDefaults));
+            CaptureClassicEngineeringFolder(hmi.ScreenTemplateFolder, "ScreenTemplates", target.Path + "/screenTemplates", directory, artifacts, capture, 0);
+            CaptureClassicEngineeringFolder(hmi.ScreenPopupFolder, "ScreenPopups", target.Path + "/screenPopups", directory, artifacts, capture, 0);
             // Slide-ins have no Name or Folders; their SlideinType is the inventory path segment.
             if (hmi.ScreenSlideinFolder != null)
                 foreach (var slidein in hmi.ScreenSlideinFolder.ScreenSlideins)
-                    CaptureHmiArtifact(directory, target.Path + "/screenSlideins/" + Segment(slidein.SlideinType.ToString()), artifacts, f => slidein.Export(f, ExportOptions.WithDefaults));
-            CaptureClassicEngineeringFolder(hmi.VBScriptFolder, "VBScripts", target.Path + "/scripts", directory, artifacts, 0);
+                    CaptureHmiArtifact(directory, target.Path + "/screenSlideins/" + Segment(slidein.SlideinType.ToString()), artifacts, capture, f => slidein.Export(f, ExportOptions.WithDefaults));
+            CaptureClassicEngineeringFolder(hmi.VBScriptFolder, "VBScripts", target.Path + "/scripts", directory, artifacts, capture, 0);
             foreach (var cycle in hmi.Cycles)
-                CaptureHmiArtifact(directory, target.Path + "/cycles/" + Segment(cycle.Name), artifacts, f => cycle.Export(f, ExportOptions.WithDefaults));
-            foreach (var list in hmi.GraphicLists)
-                CaptureHmiArtifact(directory, target.Path + "/graphicLists/" + Segment(list.Name), artifacts, f => list.Export(f, ExportOptions.WithDefaults));
+                CaptureHmiArtifact(directory, target.Path + "/cycles/" + Segment(cycle.Name), artifacts, capture, f => cycle.Export(f, ExportOptions.WithDefaults));
+            RequireClassicGraphicListCapture(target); // Defence in depth; never skip graphic-list preservation.
             foreach (var list in hmi.TextLists)
-                CaptureHmiArtifact(directory, target.Path + "/textLists/" + Segment(list.Name), artifacts, f => list.Export(f, ExportOptions.WithDefaults));
+                CaptureHmiArtifact(directory, target.Path + "/textLists/" + Segment(list.Name), artifacts, capture, f => list.Export(f, ExportOptions.WithDefaults));
             if (hmi.ScreenGlobalElements != null)
-                CaptureHmiArtifact(directory, target.Path + "/screenGlobalElements", artifacts, f => hmi.ScreenGlobalElements.Export(f, ExportOptions.WithDefaults));
+                CaptureHmiArtifact(directory, target.Path + "/screenGlobalElements", artifacts, capture, f => hmi.ScreenGlobalElements.Export(f, ExportOptions.WithDefaults));
             if (hmi.ScreenOverview != null)
-                CaptureHmiArtifact(directory, target.Path + "/screenOverview", artifacts, f => hmi.ScreenOverview.Export(f, ExportOptions.WithDefaults));
+                CaptureHmiArtifact(directory, target.Path + "/screenOverview", artifacts, capture, f => hmi.ScreenOverview.Export(f, ExportOptions.WithDefaults));
             missing.Add(HmiPreservationRules.ClassicExportNote);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void CaptureClassicEngineeringFolder(IEngineeringObject folder, string composition, string prefix, string directory, JObject artifacts, int depth)
+        private static void CaptureClassicEngineeringFolder(IEngineeringObject folder, string composition, string prefix, string directory, JObject artifacts, HmiPreservationCapture capture, int depth)
         {
             if (folder == null) return;
             if (depth > 32) throw new BridgeException("TraversalLimit", "Classic preservation folder nesting exceeds 32.");
@@ -165,7 +195,7 @@ namespace TiaMcp.Openness.V21
             {
                 string name = native.GetAttribute("Name") as string;
                 if (string.IsNullOrWhiteSpace(name)) throw new BridgeException("HmiIdentityUnavailable", "A native preservation object has no exact name.");
-                CaptureHmiArtifact(directory, prefix + "/" + Segment(name), artifacts, file =>
+                CaptureHmiArtifact(directory, prefix + "/" + Segment(name), artifacts, capture, file =>
                 {
                     if (native is Siemens.Engineering.Hmi.Screen.ScreenTemplate template) template.Export(file, ExportOptions.WithDefaults);
                     else if (native is Siemens.Engineering.Hmi.Screen.ScreenPopup popup) popup.Export(file, ExportOptions.WithDefaults);
@@ -177,12 +207,12 @@ namespace TiaMcp.Openness.V21
             {
                 string name = child.GetAttribute("Name") as string;
                 if (string.IsNullOrWhiteSpace(name)) throw new BridgeException("HmiIdentityUnavailable", "A native preservation folder has no exact name.");
-                CaptureClassicEngineeringFolder(child, composition, prefix + "/folders/" + Segment(name), directory, artifacts, depth + 1);
+                CaptureClassicEngineeringFolder(child, composition, prefix + "/folders/" + Segment(name), directory, artifacts, capture, depth + 1);
             }
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void CaptureUnifiedEngineeringScope(HmiTargetSelection target, string directory, JObject artifacts, JArray missing, JObject typed)
+        private static void CaptureUnifiedEngineeringScope(HmiTargetSelection target, string directory, JObject artifacts, JArray missing, JObject typed, HmiPreservationCapture capture)
         {
             var hmi = (Siemens.Engineering.HmiUnified.HmiSoftware)target.Software;
             int count = 0;
@@ -191,7 +221,8 @@ namespace TiaMcp.Openness.V21
                 if (++count > 200) throw new BridgeException("TraversalLimit", "HMI preservation export exceeds 200 native tag tables; narrow the profile before mutation.");
                 string exported = Path.Combine(directory, "table-" + count);
                 Directory.CreateDirectory(exported);
-                table.Tags.Export(new DirectoryInfo(exported));
+                capture.Run("unified-tag-table-export", target.Path + "/tagTables/" + Segment(table.Name), exported,
+                    () => table.Tags.Export(new DirectoryInfo(exported)));
                 foreach (string path in Directory.GetFiles(exported, "*", SearchOption.AllDirectories))
                 {
                     string relative = path.Substring(exported.Length + 1).Replace('\\', '/');
@@ -203,11 +234,14 @@ namespace TiaMcp.Openness.V21
             // The complete paired text-list export; it re-exports byte-identically (local.hmi.text-list-import.20261029).
             string lists = Path.Combine(directory, "text-lists");
             Directory.CreateDirectory(lists);
-            foreach (string path in ExportUnifiedTextLists(target.Software, lists))
+            string[] listFiles = null;
+            capture.Run("unified-text-list-export", target.Path + "/textListExport", lists,
+                () => listFiles = ExportUnifiedTextLists(target.Software, lists));
+            foreach (string path in listFiles)
                 AddHmiArtifact(target.Path + "/textListExport/" + Path.GetFileName(path), path, artifacts);
             // No Screen.Export exists in V21: compare typed readback of every exposed node instead, keyed by its hmi_inspect path.
             var walk = new HmiModelWalk(new ScanBudget(Math.Max(0, 45000 - typed.Count)));
-            walk.Capture(hmi, target.Path, HmiModelRoots);
+            capture.Run("unified-model-readback", target.Path, null, () => walk.Capture(hmi, target.Path, HmiModelRoots));
             if (walk.Budget.Truncated) throw new BridgeException("TraversalLimit", "Unified typed preservation readback exceeds 45000 model nodes or 32 composition levels; no truncated scope authorizes mutation.");
             string model = Path.Combine(directory, "typed-model.json");
             File.WriteAllText(model, new JArray(walk.Nodes.Select(n => n.Row)).ToString(Formatting.None));
@@ -222,12 +256,15 @@ namespace TiaMcp.Openness.V21
             missing.Add(HmiPreservationRules.UnifiedTypedReadbackNote);
         }
 
-        private static void CaptureHmiArtifact(string directory, string identity, JObject artifacts, Action<FileInfo> exporter)
+        private static void CaptureHmiArtifact(string directory, string identity, JObject artifacts, HmiPreservationCapture capture, Action<FileInfo> exporter)
         {
-            if (artifacts.Count >= 200) throw new BridgeException("TraversalLimit", "HMI preservation exceeds its 200-artifact native export bound.");
+            if (artifacts.Count >= HmiPreservationBudget.MaxArtifacts) throw new BridgeException("TraversalLimit", HmiPreservationBudget.LimitMessage);
             string path = Path.Combine(directory, "native-" + artifacts.Count + ".xml");
-            exporter(new FileInfo(path));
-            AddHmiArtifact(identity, path, artifacts);
+            capture.Run("classic-export", identity, path, () =>
+            {
+                exporter(new FileInfo(path));
+                AddHmiArtifact(identity, path, artifacts);
+            });
         }
 
         private static void AddHmiArtifact(string identity, string path, JObject artifacts)
@@ -235,8 +272,8 @@ namespace TiaMcp.Openness.V21
             if (artifacts.Property(identity, StringComparison.Ordinal) != null) throw new BridgeException("AmbiguousTarget", "Duplicate exact HMI export identity: " + identity);
             if (!File.Exists(path)) throw new BridgeException("HmiExportUnavailable", "The native export did not create its expected artifact.");
             long bytes = new FileInfo(path).Length;
-            if (artifacts.Count >= 200 || bytes > 32 * 1024 * 1024 || artifacts.Properties().Sum(p => p.Value.Value<long>("bytes")) + bytes > 32 * 1024 * 1024)
-                throw new BridgeException("TraversalLimit", "HMI preservation exceeds 200 artifacts or 32 MiB; no truncated scope authorizes mutation.");
+            if (!HmiPreservationBudget.AllowsAddition(artifacts.Count, artifacts.Properties().Sum(p => p.Value.Value<long>("bytes")), bytes))
+                throw new BridgeException("TraversalLimit", HmiPreservationBudget.LimitMessage);
             var artifact = new JObject { ["path"] = path, ["bytes"] = bytes, ["sha256"] = ChangeFileHash(path) };
             if (path.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
             {
@@ -253,6 +290,8 @@ namespace TiaMcp.Openness.V21
         // The capture requirement of the change's kind: complete for hmi_engineering, only its standing notes (HmiEngineeringRules.StandingNotes) otherwise.
         private static void RequireHmiScope(EngineeringChange change, JObject manifest)
         {
+            if (manifest?["nativeFailure"] is JObject failure)
+                throw new BridgeException("HmiPreservationUnavailable", "HMI preservation capture failed: " + failure.Value<string>("message"), manifest);
             if (HmiEngineeringRules.StandingNotes(change.Kind) == null) { RequireHmiCompleteScope(manifest); return; }
             if (!HmiEngineeringRules.ScopeAccepted(change.Kind, manifest) || manifest.Value<string>("contentHash") != manifest.Value<string>("observedArtifactsHash"))
                 throw new BridgeException("HmiPreservationUnavailable", "The capture has coverage gaps beyond the standing notes of " + change.Kind + " (typed read errors, a capture failure or an HMI of the other family); no " + change.Kind + " change is authorized.", manifest);
@@ -468,6 +507,8 @@ namespace TiaMcp.Openness.V21
                 // As the text list: the compile before the write is the reference for unchanged compiler problems,
                 // and preservation compares with the compiled state, so compiler effects are never attributed to the write.
                 change.HmiEvidence["baselineCompile"] = CompileHmiEngineeringChange(change, project);
+                if (change.Kind == "hmi_classic_screen_edit" && change.HmiEvidence["baselineCompile"].Value<int?>("errorCount") != 0)
+                    throw new BridgeException("BaselineCompileFailed", "The screen workflow requires a zero-error baseline before importing any candidate.");
                 var compiled = CaptureHmiEngineeringScope(change, project, "pre-import");
                 RequireHmiScope(change, compiled);
                 change.HmiEvidence["preImport"] = compiled;
@@ -477,7 +518,9 @@ namespace TiaMcp.Openness.V21
                 change.Stages.Add("hmi_native_write_started");
                 WriteChangeJournal(change);
             }
-            if (target.Family == "classic") ApplyClassicEngineeringBody(change, target.Software, (IEngineeringObject)entry.Native);
+            InvalidateHmiObservations();
+            if (change.Kind == "hmi_classic_screen_edit") ApplyClassicScreenBatch(change, project);
+            else if (target.Family == "classic") ApplyClassicEngineeringBody(change, target.Software, (IEngineeringObject)entry.Native);
             else ApplyUnifiedEngineeringBody(change, project, (IEngineeringObject)entry.Native);
             change.Stages.Add("hmi_precise_readback_verified");
         }
@@ -690,12 +733,12 @@ namespace TiaMcp.Openness.V21
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Action<FileInfo> ClassicObjectExport(IEngineeringObject native)
         {
+            HmiNativeExportSafety.RequireAllowed(native.GetType().FullName, null);
             switch (native)
             {
                 case Siemens.Engineering.Hmi.Tag.TagTable x: return f => x.Export(f, ExportOptions.WithDefaults);
                 case Siemens.Engineering.Hmi.RuntimeScripting.VBScript x: return f => x.Export(f, ExportOptions.WithDefaults);
                 case Siemens.Engineering.Hmi.TextGraphicList.TextList x: return f => x.Export(f, ExportOptions.WithDefaults);
-                case Siemens.Engineering.Hmi.TextGraphicList.GraphicList x: return f => x.Export(f, ExportOptions.WithDefaults);
                 case Siemens.Engineering.Hmi.Cycle.Cycle x: return f => x.Export(f, ExportOptions.WithDefaults);
                 case Siemens.Engineering.Hmi.Communication.Connection x: return f => x.Export(f, ExportOptions.WithDefaults);
                 default: return HmiClassicScreenExport(native) ?? throw new BridgeException("HmiExportUnsupported", "The exact Classic object has no allowlisted public export: " + native.GetType().FullName);
@@ -762,7 +805,7 @@ namespace TiaMcp.Openness.V21
             change.InputHash = ChangeFileHash(change.InputPath);
             return new JObject { ["operation"] = "classic_xml_import", ["objectPath"] = change.Payload["target"]["objectPath"].DeepClone(),
                 ["nativeType"] = native.GetType().FullName, ["exportRoot"] = current.Name.LocalName, ["beforeSha256"] = ChangeFileHash(before), ["inputSha256"] = change.InputHash,
-                ["declaredDelta"] = "The exact object's native re-export must equal the supplied document apart from DocumentInfo and formatting; every other HMI export must stay identical." };
+                ["declaredDelta"] = "The exact object's native re-export must equal the supplied document apart from DocumentInfo, export-local IDs and formatting; every other export in the declared preservation scope must stay identical." };
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -901,25 +944,36 @@ namespace TiaMcp.Openness.V21
         }
 
         private JObject CompileHmiEngineeringChange(EngineeringChange change, Project project)
+            => MeasureChange(change, "compile-hmi", () => CompileHmiEngineeringChangeCore(change, project));
+
+        private JObject CompileHmiEngineeringChangeCore(EngineeringChange change, Project project)
         {
+            InvalidateHmiObservations();
             var selected = ResolveHmiTarget(project, (JObject)change.Payload["target"]);
             // Unified HmiSoftware is no IEngineeringServiceProvider; LibraryHmiCompiler compiles its owning device, Classic the HmiTarget.
             var scope = HmiTargetView(selected);
             var result = LibraryHmiCompiler(selected).Compile();
+            InvalidateHmiObservations();
             return new JObject { ["errorCount"] = result.ErrorCount, ["warningCount"] = result.WarningCount, ["targets"] = new JArray(ChangeCompilation(result, scope.Value<string>("compileScope"))),
                 ["compileScope"] = scope["compileScopeKind"].DeepClone(), ["runtimeVerified"] = false };
         }
 
         private string HmiEngineeringFingerprint(EngineeringChange change, Project project)
         {
+            if (change.Kind == "hmi_classic_screen_edit")
+                return HmiLeaseRead("screen-content:" + change.Id, () => {
+                    var captured = CaptureHmiEngineeringScope(change, project, "fingerprint");
+                    RequireHmiScope(change, captured);
+                    return captured.Value<string>("contentHash");
+                });
             var manifest = CaptureHmiEngineeringScope(change, project, "fingerprint");
             RequireHmiScope(change, manifest);
             return manifest.Value<string>("contentHash");
         }
 
-        private void VerifyHmiEngineeringPreservation(EngineeringChange change, Project project)
+        private void VerifyHmiEngineeringPreservation(EngineeringChange change, Project project, string stage = "after")
         {
-            var after = CaptureHmiEngineeringScope(change, project, "after");
+            var after = CaptureHmiEngineeringScope(change, project, stage);
             // A text-list import or an admitted kind is compared with its compiled pre-import capture; recovery still compares with the checkpoint's.
             var reference = change.HmiEvidence["preImport"] as JObject ?? change.HmiBeforeManifest;
             RequireHmiScope(change, after); RequireHmiScope(change, reference);
@@ -931,6 +985,15 @@ namespace TiaMcp.Openness.V21
             string operation = change.Payload.Value<string>("operation");
             try
             {
+                if (change.Kind == "hmi_classic_screen_edit")
+                {
+                    foreach (var member in change.HmiScreenMembers)
+                    {
+                        string exported = after["artifacts"]?[member.Payload["target"].Value<string>("objectPath")]?.Value<string>("path");
+                        if (exported == null) throw new ArgumentException("An edited screen is absent from native readback.");
+                        EngineeringSources.RequireNativePreservation(HmiPreservationRules.ReadXml(File.ReadAllText(member.InputPath)), HmiPreservationRules.ReadXml(File.ReadAllText(exported)));
+                    }
+                }
                 // A text-list import may change only the candidate lists' typed nodes and the export, which the import readback compared by meaning.
                 if (change.Kind == "hmi_text_list_import")
                     HmiPreservationRules.RequireUnrelatedPreservedOutsideSubtrees(beforeHashes, afterHashes, ((JArray)change.Payload["candidate"]["lists"]).Values<string>()
@@ -944,14 +1007,20 @@ namespace TiaMcp.Openness.V21
                 {
                     // Bindings write the container's typed faceplate interface entries.
                     var paths = new List<string> { changed };
+                    if (change.Kind == "hmi_classic_screen_edit") paths = change.HmiScreenMembers.Select(m => m.Payload["target"].Value<string>("objectPath")).ToList();
                     if (change.Payload["bindings"] is JArray bindings) paths.AddRange(bindings.Select(b => changed + "/interface/" + Segment(b.Value<string>("property"))).Where(beforeHashes.ContainsKey));
                     HmiPreservationRules.RequireUnrelatedPreserved(beforeHashes, afterHashes, paths, Array.Empty<string>());
                 }
             }
             catch (ArgumentException error) { throw new BridgeException("PreservationMismatch", error.Message, after); }
-            change.HmiEvidence["after"] = after;
+            change.HmiEvidence[stage] = after;
             change.HmiEvidence["preservationVerified"] = true;
-            change.Stages.Add("hmi_unrelated_content_preserved");
+            if (change.Kind == "hmi_classic_screen_edit")
+            {
+                change.HmiEvidence["preservationScope"] = HmiPreservationRules.ClassicScreenPolicy;
+                change.HmiEvidence["wholeHmiPreservationVerified"] = false;
+            }
+            change.Stages.Add(stage == "after-save" ? "hmi_saved_screen_content_verified" : "hmi_unrelated_content_preserved");
         }
 
         private void VerifyHmiEngineeringRecovery(EngineeringChange change, Project recovered)

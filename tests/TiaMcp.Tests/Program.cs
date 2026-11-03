@@ -20,7 +20,7 @@ internal static partial class Program
             try
             {
                 WorkerSafetyGuard.Verify(args[1]);
-                Console.WriteLine("PASS Compiled worker keeps discovery/attachment descriptors disposal-free and isolates closure of its own qualification Portal. No Siemens assembly was loaded.");
+                Console.WriteLine("PASS Compiled worker keeps discovery/attachment descriptors disposal-free, isolates closure of its own qualification Portal and contains no Classic GraphicList.Export call. No Siemens assembly was loaded.");
                 return 0;
             }
             catch (Exception exception)

@@ -1,0 +1,110 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.classic-screen.batch.20261103",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-03T18:58:14+00:00",
+  "source": {
+    "commit": "0eeac2b48f6cebe137090f20b234df487a94a0e3",
+    "dirty": true
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Owned Classic RT Advanced fixture: two HMIs configured with Overview_A as start screen and compiled without errors or warnings; public MCP capture and native rectangle composition; two-screen batch import with per-member receipts and independent XML equality; same-key journal replay; later-member Siemens import rejection and verified reverse-order restoration; exact attached Host termination after first-member dispatch, worker completion, read-only admission reconciliation in the same open TIA without replay; first-attempt read-write fresh reopen and saved XML equality; ten named checks and two normal owned lifetimes. Warm prepare/apply sample: 6.476 seconds batched versus 15.666 separately. Binary trees listed in Host, V21 worker, fixture helper order.",
+  "limitations": [
+    "Source is 0eeac2b4 plus the uncommitted Host artifact-byte-count and guarded RT Advanced fixture fixes recorded by this PR; dirty source is explicit. The final native runner SHA-256 and exact executable hashes are in the retained report; binary-tree hashes include managed Host dependencies.",
+    "One seeded two-screen RT Advanced scope and a rectangle clone. No eight-screen, arbitrary component, other HMI profile, shared-resource, visual or runtime qualification; no online operation. Catalog qualification and release acceptance remain unchanged.",
+    "The attached Host was deliberately terminated. Its worker completed the saved change and then exited with a broken transport; neither exit is normal-lifecycle evidence. The original owner, fresh reconciler and fresh reopen closed cleanly.",
+    "One warm timing sample per mode, singles before batch, captures excluded; compiler caches, order and workload size prevent a general speed guarantee."
+  ],
+  "binaries": [
+    {
+      "name": "release",
+      "files": 26,
+      "sha256": "1c4ab2e5d8eee79a2b6792bdd5e0024b91deb92261153cb049a0144509b58529"
+    },
+    {
+      "name": "release",
+      "files": 6,
+      "sha256": "e1ac716890dbff1fd348fbbab42425c71cc6de61a1fea2d313858db9ea983075"
+    },
+    {
+      "name": "release",
+      "files": 6,
+      "sha256": "08062e250434426f130906375d028f86617d14148858cab59ac005a2cd2b4ee8"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "1bda27f1499936e47c8da7946675cbb230c8c832d4dee2d69f6cafb866612b4e",
+      "bytes": 17415,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_retrieve",
+        "hmi_classic_screen_capture",
+        "hmi_classic_screen_compose",
+        "change_prepare",
+        "change_apply",
+        "change_apply",
+        "hmi_classic_screen_capture",
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "hmi_classic_screen_capture",
+        "change_prepare",
+        "hmi_classic_screen_capture",
+        "change_prepare",
+        "change_apply",
+        "hmi_classic_screen_capture",
+        "change_prepare",
+        "change_apply",
+        "hmi_classic_screen_capture",
+        "change_prepare",
+        "change_apply",
+        "tia_attach",
+        "hmi_classic_screen_capture",
+        "change_prepare",
+        "tia_attach",
+        "engineering_admission_reconcile",
+        "hmi_classic_screen_capture",
+        "tia_detach",
+        "tia_session_status",
+        "tia_detach",
+        "tia_start",
+        "project_open",
+        "hmi_classic_screen_capture",
+        "tia_detach"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_status",
+        "engineering_admission_reconcile",
+        "hmi_classic_screen_capture",
+        "hmi_classic_screen_compose",
+        "project_open",
+        "project_retrieve",
+        "tia_attach",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    },
+    {
+      "report": "result.json",
+      "sha256": "18f998c103a06d1536d36aa734949884991c662a7553d0de51e85b6d5fb5e6e1",
+      "bytes": 69362,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    }
+  ]
+}

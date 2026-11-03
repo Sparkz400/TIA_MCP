@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.130",
+  "catalogVersion": "0.4.132",
   "targetTiaVersions": [
     21
   ],
@@ -4841,6 +4841,27 @@
       ],
       "limitations": [
         "Owned offline CPU1511F and standard CPU1511 with F-DI in TIA V21; no physical safety qualification or safety-program mutation. The new source/XML cases cover one input bit and FBD XML, not every language or native VCI block format; broader operands and peripheral areas have managed checks."
+      ]
+    },
+    {
+      "id": "local.hmi.classic-screen.batch.20261103",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "targetProfile": "classic-rt-advanced",
+        "sourceCommit": "0eeac2b48f6cebe137090f20b234df487a94a0e3",
+        "sourceDirty": true,
+        "passedScope": "Owned Classic RT Advanced fixture: two HMIs configured with Overview_A as start screen and compiled without errors or warnings; public MCP capture and native rectangle composition; two-screen batch import with per-member receipts and independent XML equality; same-key journal replay; later-member Siemens import rejection and verified reverse-order restoration; exact attached Host termination after first-member dispatch, worker completion, read-only admission reconciliation in the same open TIA without replay; first-attempt read-write fresh reopen and saved XML equality; ten named checks and two normal owned lifetimes. Warm prepare/apply sample: 6.476 seconds batched versus 15.666 separately. Binary trees listed in Host, V21 worker, fixture helper order."
+      },
+      "artifacts": [
+        "evidence/local.hmi.classic-screen.batch.20261103.json"
+      ],
+      "limitations": [
+        "Source is 0eeac2b4 plus the uncommitted Host artifact-byte-count and guarded RT Advanced fixture fixes recorded by this PR; dirty source is explicit. The final native runner SHA-256 and exact executable hashes are in the retained report; binary-tree hashes include managed Host dependencies.",
+        "One seeded two-screen RT Advanced scope and a rectangle clone. No eight-screen, arbitrary component, other HMI profile, shared-resource, visual or runtime qualification; no online operation. Catalog qualification and release acceptance remain unchanged.",
+        "The attached Host was deliberately terminated. Its worker completed the saved change and then exited with a broken transport; neither exit is normal-lifecycle evidence. The original owner, fresh reconciler and fresh reopen closed cleanly.",
+        "One warm timing sample per mode, singles before batch, captures excluded; compiler caches, order and workload size prevent a general speed guarantee."
       ]
     }
   ],
@@ -28186,6 +28207,57 @@
       ]
     },
     {
+      "featureId": "change.hmi_classic_screen_edit",
+      "domain": "hmi",
+      "title": "Edit an existing Classic RT Advanced screen with bounded screen preservation",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "hmi_classic_screen_edit",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Classic Screen.Export, owning ScreenComposition.Import(Override), Find(name), and HmiTarget ICompilable. No GraphicList.Export is dispatched."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Only classic_xml_import of an existing, unlinked regular screen on classic-rt-advanced. Every regular screen of that HMI is compared; shared resources, other screen roles and other HMIs are explicitly excluded. The scope policy is included in its content hash and cannot authorize whole-HMI imports.",
+          "Uses the existing checkpoint, precise readback, peer preservation, compile comparison, save, idempotency and archive recovery lifecycle. Recovery requires a worker-owned instance and native project authentication.",
+          "Local offline guard tests are not profile-wide native qualification. See docs/guides/hmi-engineering.md#bounded-classic-screen-editing for the exact contract and evidence limits."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": [
+          "local.hmi.classic-screen.batch.20261103"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Conditional on the exact regular-screen identity, classic-rt-advanced profile, complete capture of the declared screen scope, unchanged compiler diagnostics, and existing change lifecycle checks. No whole-HMI or runtime preservation claim."
+        ]
+      },
+      "prerequisites": [
+        "Installed TIA V21 Openness and WinCC RT Advanced",
+        "An exact existing regular-screen identity and reviewed native XML candidate",
+        "Explicit use of the bounded screen-edit kind and its scope-specific hash"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
       "featureId": "change.hmi_external_tag_create",
       "domain": "hmi",
       "title": "Create a PLC-backed Unified HMI tag",
@@ -28397,6 +28469,90 @@
         "AC-native",
         "AC-recovery",
         "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "hmi_classic_screen_capture",
+      "domain": "hmi",
+      "title": "Explicit bounded Classic screen baseline capture",
+      "mcpTools": [
+        "hmi_classic_screen_capture"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Classic/Unified public documentation and assembly evidence; individual operation limitations are distinct."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Classic RT Advanced regular screens only. Does not qualify runtime appearance, PLC behavior, shared resources or other HMIs. Native compile and exact readback remain required."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": [
+          "local.hmi.classic-screen.batch.20261103"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Exact captured native identity and bounded scope required; hashed artifact files remain local."
+        ]
+      },
+      "prerequisites": [
+        "Installed TIA V21 Openness; optional matching WinCC family module for native reads",
+        "Exact accessible project/device/runtime profile, license and protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "hmi_classic_screen_compose",
+      "domain": "hmi",
+      "title": "Compose and preflight native Classic screen components",
+      "mcpTools": [
+        "hmi_classic_screen_compose"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Classic/Unified public documentation and assembly evidence; individual operation limitations are distinct."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Classic RT Advanced regular screens only. Does not qualify runtime appearance, PLC behavior, shared resources or other HMIs. Native compile and exact readback remain required."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": [
+          "local.hmi.classic-screen.batch.20261103"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Exact captured native identity and bounded scope required; hashed artifact files remain local."
+        ]
+      },
+      "prerequisites": [
+        "Installed TIA V21 Openness; optional matching WinCC family module for native reads",
+        "Exact accessible project/device/runtime profile, license and protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
       ]
     }
   ]

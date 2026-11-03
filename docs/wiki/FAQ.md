@@ -28,6 +28,23 @@ Typed LAD/FBD support is tied to exact CPU, firmware and route profiles. The sec
 
 Changes are not transactions across Siemens calls. Each applied change has a checkpoint and journal for recovery; see the [engineering workflow](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md).
 
+For bounded Classic screen imports, a verified restoration can keep the same
+project open. A completed edit with a lost response also has an evidence-based
+lock reconciliation path. Unverified recovery still holds the lock. See
+[screen recovery and long-running imports](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#screen-failure-recovery-without-closing-tia).
+
+## Why is Classic graphic-list export blocked?
+
+A native reference-conversion failure was observed during export. Until that route
+has a qualified remedy, the connector refuses source exports of Classic graphic
+lists and changes whose preservation requires them. See the
+[containment scope, offline checks and disposable-copy reproductions](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#temporary-classic-graphic-list-export-containment).
+Changing export defaults or running without the graphical editor did not resolve
+the graphic-list failure. The separate screen-only route has local copy evidence;
+its exact limits are documented in the guide.
+
+The separate `hmi_classic_screen_edit` workflow compares every regular screen of one Classic RT Advanced HMI without exporting graphic lists. It retains checkpoint, compile and exact readback checks, but explicitly excludes shared-resource, other-HMI, PLC and hardware content. This is bounded screen preservation, with profile-wide qualification still unverified. See the [screen editing contract](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#bounded-classic-screen-editing).
+
 ## The server cannot find TIA Portal or Openness
 
 Run `.\scripts\Probe-Environment.ps1` and follow [environment diagnostics](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/environment-diagnostics.md) and [Openness registration](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/openness-application-registration.md). Your Windows user needs the `Siemens TIA Openness` group, and `PlcSimUsers` for simulation.

@@ -64,7 +64,10 @@ internal static class AdmissionReconciliationChecks
         Check(DateTimeOffset.Parse(request["admittedAtUtc"]!.GetValue<string>()) == store.AdmittedAt(admissionId) &&
             store.AdmittedAt(admissionId) < store.Read(admissionId).RecordedAt, "Write-time evidence is bound to the dispatch intent, not the later unknown outcome");
         try { store.Acquire(scope with { ScopeSha256 = new('e', 64) }, new('a', 64)); throw new Exception("Expected ResourceBusy"); }
-        catch (BridgeException error) when (error.Code == "ResourceBusy") { passed++; }
+        catch (BridgeOperationException error) when (error.Code == "ResourceBusy") {
+            Check(error.Details!.Value.GetProperty("blockingAdmissionIds").EnumerateArray().Any(x => x.GetString() == admissionId), "ResourceBusy identifies the actual retained admission");
+            Check(error.Details.Value.GetProperty("automaticRetryAllowed").GetBoolean() == false, "ResourceBusy never suggests replaying the write");
+        }
 
         var released = await Reconcile(_ => { });
         Check(released.GetProperty("released").GetBoolean(), "Every resource proven releases the admission");
@@ -90,6 +93,39 @@ internal static class AdmissionReconciliationChecks
             new("project", Path.Combine(root, "s.ap21"), "simulationCompilationOrCredentialPreparation"), new("workspace", Path.Combine(root, "storage"), "ownedSimulatorStorageAndCard")] }, new('a', 64));
         await Reject(() => orphanDispatcher.CallAsync("engineering_admission_reconcile", new { admissionId = provisioning.Id }), "InvalidOperationState");
         Check(native.Calls.Count(c => c == "engineering_admission_reconcile_verify") == 13, "Unsupported and provisioning admissions never reach the generic native verifier");
+        // A completed bounded screen edit can be independently verified while the user's Portal stays open.
+        string liveRoot = Path.Combine(root, "live-screen"); Directory.CreateDirectory(liveRoot);
+        var liveStore = new EngineeringMutationAdmissionStore(liveRoot);
+        var live = liveStore.Acquire(scope, new('a', 64));
+        var livePlan = AdmissionReconciliation.Plan(live, liveStore.AdmittedAt(live.Id));
+        JsonObject OpenScreen()
+        {
+            var v = Fresh(); v["processId"] = 123; v["originalProcessRunning"] = true;
+            v["verificationMode"] = "classic-screen-terminal-in-open-project-v1";
+            v["changeKind"] = "hmi_classic_screen_edit"; v["terminalState"] = "applied";
+            v["scopePolicy"] = "classic-regular-screens-selected-hmi-v1"; v["projectIsModified"] = false;
+            foreach (string p in new[] { "nativeExclusiveAccess", "retainedArtifactsVerified", "terminalJournalUnchanged", "savedProjectFingerprintMatches", "screenScopeMatches" }) v[p] = true;
+            return v;
+        }
+        Check(livePlan.Refusals(OpenScreen()).Count == 0, "Complete independent terminal proof permits the same open TIA process");
+        foreach (string proof in new[] { "nativeExclusiveAccess", "retainedArtifactsVerified", "terminalJournalUnchanged", "savedProjectFingerprintMatches", "screenScopeMatches" })
+        {
+            var missing = OpenScreen(); missing.Remove(proof);
+            Check(livePlan.Refusals(missing).Count > 0, "Open-project release requires " + proof);
+        }
+        foreach (var (field, value) in new (string, JsonNode)[] {
+            ("projectIsModified", JsonValue.Create(true)!), ("terminalState", JsonValue.Create("applying")!),
+            ("changeKind", JsonValue.Create("source_upsert")!), ("scopePolicy", JsonValue.Create("whole-project")!),
+            ("nativeMutationInvoked", JsonValue.Create(true)!) })
+        {
+            var bad = OpenScreen(); bad[field] = value;
+            Check(livePlan.Refusals(bad).Count > 0, "Open-project proof refuses changed " + field);
+        }
+        native.Verification = OpenScreen();
+        var liveDispatcher = new WatchTableDispatcher(native, liveRoot);
+        var liveReleased = await liveDispatcher.CallAsync("engineering_admission_reconcile", new { admissionId = live.Id });
+        Check(liveReleased.GetProperty("released").GetBoolean() && liveStore.Read(live.Id).State == "reconciled", "Verified saved screen releases its real reservation without a TIA restart");
+        Check(native.Calls.Count(c => c == "mutation_dispatch") == 1, "In-place terminal reconciliation never dispatches a write");
         Console.WriteLine($"PASS Admission reconciliation: {passed} checks; releases only when every resource is proven, otherwise held; no replay.");
     }
 

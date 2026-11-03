@@ -5,9 +5,9 @@ simulators you own (see the [README](../README.md)). Catalog and backlog reviewe
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.130`: 484 features, 467 verified, 17 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 133 shipped, 334 limited, 3 unqualified, 12 unavailable on V21, 2 deferred |
-| Matrix cells | 2,148 bound, **15 open**, 72 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.4.132`: 487 features, 467 verified, 20 unverified; 327 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 133 shipped, 334 limited, 6 unqualified, 12 unavailable on V21, 2 deferred |
+| Matrix cells | 2,148 bound, **28 open**, 72 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted; backlog reconciled on 3 November against catalog `0.4.130` ([ledger](plans/release-obligations-20261015.md), [acceptance rules](plans/release-acceptance.md), [review](verification/release-readiness-20261103.md)) |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
@@ -20,6 +20,13 @@ APIs and a V19 Portal/SDK are installed here. Their license, adapter and native 
 remain open. Earlier statements that these products are absent describe a different workstation.
 
 ## What is open
+
+The Classic screen workflow adds capture, composition and bounded batch editing.
+An owned two-screen RT Advanced fixture now passes native batch success, reverse-order
+rollback, lost-response reconciliation and fresh reopen, with local timing recorded.
+Its 13 catalog acceptance cells remain open: bounded fixture evidence does not establish
+profile-wide, visual or runtime qualification. See the
+[continuation record](verification/classic-screen-workflow-draft-20261103.md).
 
 [TODO](TODO.md) lists the open work; [open matrix rows by owner](TODO.md#open-matrix-rows-by-owner)
 names every row with an open cell.

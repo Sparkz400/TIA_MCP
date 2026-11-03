@@ -6,8 +6,9 @@ It starts no process, acquires no native/store ownership and grants no admission
 It preserves the original reports and explicitly leaves HMI compile, fresh
 reopen, bridge recovery and native qualification false.
 
-Supported preparation profiles are `classic-comfort`, `unified-comfort` and
-`unified-pc`. The source must contain exactly one selected positive owned
+Supported preparation profiles are `classic-comfort`, `classic-rt-advanced`,
+`unified-comfort` and `unified-pc`. Both Classic profiles only configure an
+existing screen as the start screen. The source must contain exactly one selected positive owned
 fixture with independently observed archive retrieval, distinct HMI owners and
 an unchanged archive. A PLC recovery report is no longer required (1 November
 2026): it never established HMI archive recovery or preservation, and no current
@@ -74,6 +75,12 @@ failures without starting TIA. `TiaMcp.HmiRepairAdmission.Tests` links the exact
 native admission helper into portable tests, including changed archives,
 unsupported profiles, unreviewed owners and unheld windows.
 Neither test suite establishes successful native fixture configuration.
+
+On 3 November, the operator configured `Overview_A` as the start screen on both
+independently seeded RT Advanced HMIs. The guarded helper verified the saved
+project, zero compile errors and warnings on both targets, an immutable configured
+archive and exact owned-process cleanup. The subsequent screen workflow runner
+uses that archive; see the [native continuation record](../verification/classic-screen-workflow-draft-20261103.md).
 
 ## Compile the configured fixture through `hmi_compile`
 

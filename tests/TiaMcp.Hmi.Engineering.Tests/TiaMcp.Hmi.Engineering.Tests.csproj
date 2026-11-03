@@ -8,9 +8,20 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <Compile Include="../../src/TiaMcp.Openness.V21/HmiEngineeringRules.cs" Link="HmiEngineeringRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/HmiLeaseObservations.cs" Link="HmiLeaseObservations.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenBatchRules.cs" Link="ClassicScreenBatchRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenPreflight.cs" Link="ClassicScreenPreflight.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenComposer.cs" Link="ClassicScreenComposer.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenReceipts.cs" Link="ClassicScreenReceipts.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenCompileRules.cs" Link="ClassicScreenCompileRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenRecoveryRules.cs" Link="ClassicScreenRecoveryRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/HmiPreservationRules.cs" Link="HmiPreservationRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/HmiPreservationBudget.cs" Link="HmiPreservationBudget.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/HmiRecipeRules.cs" Link="HmiRecipeRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/HmiAssemblyIdentityRules.cs" Link="HmiAssemblyIdentityRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/HmiTextListImportRules.cs" Link="HmiTextListImportRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/HmiNativeExportSafety.cs" Link="HmiNativeExportSafety.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/HmiPreservationCapture.cs" Link="HmiPreservationCapture.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/BridgeException.cs" Link="BridgeException.cs" />
   </ItemGroup>
 </Project>

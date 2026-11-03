@@ -357,6 +357,9 @@ try {
             $result.testSuiteResultMcp = 'passed'
         }
         Invoke-CheckGroup 2 {
+            python -B scripts/test_hmi_classic_screen_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe")
+            if ($LASTEXITCODE -ne 0) { throw 'Classic screen artifact and progress MCP checks failed.' }
+            $result.hmiClassicScreenHost = 'passed'
             python -B scripts/test_software_unit_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'software-units/mcp-fixture.json') --output (Join-Path $output 'software-unit-mcp')
             if ($LASTEXITCODE -ne 0) { throw 'Software-unit MCP workflow failed.' }
             $result.softwareUnitMcp = 'passed'
