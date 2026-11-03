@@ -56,7 +56,8 @@ automatic acceptance of all clients.
 After download/provision/RUN, an independent simulator read must observe Active = TRUE. The second
 pause is for the isolated server's certificate trust in Test Suite. The operator must remain available
 for a trust prompt. Both acknowledgements are retained as operator statements, never proof that a
-security setting actually took effect. If trust cannot be prepared without a native attempt, retain
+security setting actually took effect. Console prompts use the runner's artifact root and CLI address;
+they do not render native responses carrying credential metadata. If trust cannot be prepared without a native attempt, retain
 that failure and restart with a fresh fixture; do not replay an uncertain test.
 
 The 15-minute simulator ticket deadline applies to setup and dispatch. The runner does not renew it
@@ -69,8 +70,8 @@ raw capture and recovery completed, **not** a passing system-test qualification.
 The qualification Host and worker build against the installed V21 APIs. Managed checks cover
 Host/worker admission, changed/duplicate scope fields, endpoint/path boundaries, production refusal,
 conservative results, raw retention and recovery without replay. Validation: 785 managed Test Suite checks; 142 worker fake/reflection checks; 40 focused TS-Q03
-admission/result checks after the final result-handling change; three Python runner tests (including
-four dispatch/recovery scenarios); 12 checks against the actual qualification Host with absent
+admission/result checks after the final result-handling change; six Python runner tests (including
+four dispatch/recovery scenarios, prompt isolation and operator refusal); 12 checks against the actual qualification Host with absent
 workers. Qualification Host/worker builds pass; the Host reports five existing nullable/deprecated-MCP
 warnings. No TIA project or simulator was started for these checks.
 

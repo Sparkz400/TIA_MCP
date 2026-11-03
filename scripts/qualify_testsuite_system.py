@@ -25,8 +25,17 @@ LIMITATIONS = [
 ]
 
 
-def operator_ready(h, phase, instruction):
+def operator_ready(h, phase, cpu_ip):
     # These are operator acknowledgements, not machine proof of settings or authorization for another target.
+    # Build prompts only from runner-owned paths and CLI settings, never native responses with credential metadata.
+    require(phase in ('scratch-access', 'certificate-trust'), 'Unknown operator setup phase')
+    if phase == 'scratch-access':
+        instruction = ('In ONLY the new qualification project opened by this runner under ' + str(h.directory / 'scratch') +
+            ': grant the anonymous user OPCUAServerAccess, verify the CPU address is ' + cpu_ip +
+            ', keep the four generated blocks and empty Test Suite groups, then save. Configure PLCSIM TCP/IP mode before proceeding.')
+    else:
+        instruction = ('Establish Test Suite trust for the server certificate of ONLY this owned simulator at opc.tcp://' + cpu_ip +
+            ':4840/. Keep the operator available for native certificate prompts. Do not execute or add test cases manually.')
     print(instruction, flush=True)
     require(input('Type READY after completing this step, or anything else to stop: ').strip() == 'READY', 'Operator setup not completed')
     h.report.setdefault('operatorSetup', []).append({'phase': phase, 'acknowledged': True, 'independentProof': False})
@@ -91,9 +100,7 @@ def body(h, args):
     h.apply('project_simulation_enable', {'enabled': True})
     h.apply('opcua_server_settings_set', {'serverEnabled': {'expected': False, 'value': True},
         'runtimeLicense': {'expected': 'NoLicense', 'value': 'SimaticOpcUaS71500Small'}})
-    operator_ready(h, 'scratch-access', 'In ONLY the new qualification project ' + project +
-        ': grant the anonymous user OPCUAServerAccess, verify the CPU address is ' + args.cpu_ip +
-        ', keep the four generated blocks and empty Test Suite groups, then save. Configure PLCSIM TCP/IP mode before proceeding.')
+    operator_ready(h, 'scratch-access', args.cpu_ip)
     # The worker will still verify actual scope, ownership and route. Acknowledgement does not replace those checks.
     created = h.stage('create owned TCPIP instance', lambda: h.tool('sim_create',
         {'cpuType': 'CPU1511', 'creationId': uuid.uuid4().hex, 'communicationInterface': 'TCPIP'}))
@@ -132,8 +139,7 @@ def body(h, args):
         values = h.report['gateReadback'].get('values', [])
         require(len(values) == 1 and values[0].get('value') is True, 'The independent simulator read must observe Active = TRUE')
         address = 'opc.tcp://' + args.cpu_ip + ':4840/'
-        operator_ready(h, 'certificate-trust', 'Establish Test Suite trust for the server certificate of ONLY this owned simulator at ' + address +
-            '. Keep the operator available for native certificate prompts. Do not execute or add test cases manually.')
+        operator_ready(h, 'certificate-trust', args.cpu_ip)
         fixture = 'systemFail' if args.case == 'explore-fail' else 'systemPass'
         prepared = h.stage('prepare exact system fixture', lambda: h.tool('qualification_testsuite_prepare',
             {'projectPath': project, 'fixture': fixture, 'idempotencyKey': h.directory.name, 'simulatorTicket': created['downloadTicket'], 'serverAddress': address}))

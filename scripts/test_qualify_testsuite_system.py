@@ -1,10 +1,14 @@
 """Offline TS-Q03 orchestration checks. No Siemens processes or simulator calls."""
 import json
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
+from unittest.mock import Mock, patch
 
-from qualify_testsuite_system import exercise, exploratory_result
+from qualify_testsuite_system import exercise, exploratory_result, operator_ready
 
 
 class Fake:
@@ -49,6 +53,37 @@ class Fake:
 
 
 class SystemRunnerChecks(unittest.TestCase):
+    def test_operator_prompts_do_not_render_native_responses(self):
+        native_marker = 'NATIVE_RESPONSE_MUST_STAY_OUT_OF_CONSOLE'
+        h = SimpleNamespace(directory=Path('owned-run'), report={}, persist=Mock(),
+                            scratch={'project': {'path': native_marker}, 'scratchSecurity': {'secret': native_marker}})
+        for phase in ('scratch-access', 'certificate-trust'):
+            output = StringIO()
+            with self.subTest(phase=phase), redirect_stdout(output), patch('builtins.input', return_value='READY'):
+                operator_ready(h, phase, '192.168.0.1')
+            self.assertNotIn(native_marker, output.getvalue())
+            self.assertIn('192.168.0.1', output.getvalue())
+            self.assertEqual(h.report['operatorSetup'][-1], {'phase': phase, 'acknowledged': True, 'independentProof': False})
+            if phase == 'scratch-access':
+                self.assertIn(str(h.directory / 'scratch'), output.getvalue())
+            else:
+                self.assertIn('opc.tcp://192.168.0.1:4840/', output.getvalue())
+        self.assertEqual(h.persist.call_count, 2)
+
+    def test_operator_abort_does_not_record_acknowledgement(self):
+        h = SimpleNamespace(directory=Path('owned-run'), report={}, persist=Mock())
+        with redirect_stdout(StringIO()), patch('builtins.input', return_value='STOP'), self.assertRaises(AssertionError):
+            operator_ready(h, 'scratch-access', '192.168.0.1')
+        self.assertNotIn('operatorSetup', h.report)
+        h.persist.assert_not_called()
+
+    def test_unknown_operator_phase_refuses_before_prompt(self):
+        output = StringIO()
+        with redirect_stdout(output), patch('builtins.input') as response, self.assertRaises(AssertionError):
+            operator_ready(None, 'unexpected', '192.168.0.1')
+        response.assert_not_called()
+        self.assertEqual(output.getvalue(), '')
+
     def test_unknown_native_success_never_passes(self):
         for classification in ('passed', 'assertionFailure', None):
             with self.subTest(classification=classification), self.assertRaises(AssertionError):
