@@ -41,7 +41,12 @@ No TIA Portal, simulator instance, physical PLC or VMware guest was started. Cat
   Catalog inventory additionally includes 20 hidden qualification tools.
 - Contract coverage, generated matrix/reference and implementation bindings pass.
   The binding validator retains the six known unavailable VM artifact paths.
-- Complete offline regression: pending in `artifacts/offline-backlog-validation/result.json`.
+- Python regression: 2,474 tests pass with one existing skip.
+- Full regression command: `./scripts/Test-Offline.ps1 -Suite All -OutputDirectory
+  artifacts/offline-backlog-validation`. Its result and managed-suite inventory are retained
+  in `artifacts/offline-backlog-validation/result.json`; the final outcome and current-head CI
+  checks are recorded in [PR 207](https://github.com/Sparkz400/TIA_MCP/pull/207).
+- All 761 relative Markdown link paths in the changed documentation resolve.
 
 Reports are under `artifacts/offline-backlog-*`; the final discovery snapshot is
 `artifacts/offline-backlog-surface/surface.json`. Intermediate test failures are retained:
