@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "auditDate": "2026-10-15",
   "statusRefresh": {
-    "date": "2026-11-02",
+    "date": "2026-11-03",
     "fields": [
       "blockers[].current",
       "currentChecks",
@@ -16,9 +16,10 @@
       "contracts/feature-catalog.v1.json (catalog 0.4.76)",
       "docs/plans/release-matrix.v1.json",
       "docs/history/status-log.md",
-      "docs/TODO.md"
+      "docs/TODO.md",
+      "docs/verification/release-readiness-20261103.md"
     ],
-    "note": "Each currentResult starts with counts derived from the release matrix; obligations changed since 27 October add a dated note, and their implementation/qualification labels were rewritten. remainingWork and nextAction were rewritten for every obligation except F01, F02, L06, D15, X05, X09, X12, X13, C01, C04 (and D17's nextAction), which keep the 15 October audit text. counts, dependencies and the historical sections keep the 15 October audit. The 27 October values of the refreshed fields are in commit 53d4be7, the 15 October values in commit 9c0b021. On 29 October 2026 D02, D04, D06 and X04 were refreshed against catalog 0.4.70, C03, D12 and D16 against 0.4.72 and D09 against 0.4.76; later that day F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 were refreshed against 0.4.76, B03's current text was corrected, dispositions was added for the eight maintainer-decided blocked rows, and completionCriteria and completionRules were amended (docs/plans/release-acceptance.md). On 1 November 2026 X07, X08, B03 and B04 were refreshed against catalog 0.4.92: the HMI gate kinds passed natively, and WinCC RT Professional became a recorded V21 boundary (no matrix row). Later on 1 November D06 was refreshed against catalog 0.4.97: TS-Q01 passed natively (local.testsuite.style-q01.20261101), and the maintainer recorded production style execution as a V21 boundary (five dispositions). Full current matrix counts and stale remainingWork/nextAction reconciled on 2 November against catalog 0.4.121; dated currentResult paragraphs and original audit counts are historical. No acceptance flag changed."
+    "note": "Each currentResult starts with counts derived from the release matrix; obligations changed since 27 October add a dated note, and their implementation/qualification labels were rewritten. remainingWork and nextAction were rewritten for every obligation except F01, F02, L06, D15, X05, X09, X12, X13, C01, C04 (and D17's nextAction), which keep the 15 October audit text. counts, dependencies and the historical sections keep the 15 October audit. The 27 October values of the refreshed fields are in commit 53d4be7, the 15 October values in commit 9c0b021. On 29 October 2026 D02, D04, D06 and X04 were refreshed against catalog 0.4.70, C03, D12 and D16 against 0.4.72 and D09 against 0.4.76; later that day F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 were refreshed against 0.4.76, B03's current text was corrected, dispositions was added for the eight maintainer-decided blocked rows, and completionCriteria and completionRules were amended (docs/plans/release-acceptance.md). On 1 November 2026 X07, X08, B03 and B04 were refreshed against catalog 0.4.92: the HMI gate kinds passed natively, and WinCC RT Professional became a recorded V21 boundary (no matrix row). Later on 1 November D06 was refreshed against catalog 0.4.97: TS-Q01 passed natively (local.testsuite.style-q01.20261101), and the maintainer recorded production style execution as a V21 boundary (five dispositions). Full current matrix counts and stale remainingWork/nextAction reconciled on 2 November against catalog 0.4.121; dated currentResult paragraphs and original audit counts are historical. No acceptance flag changed. On 3 November L02/L05/X02 were reconciled with completed 2 November runs and X06/X12/B04/B08/B11 with this workstation’s read-only prerequisite inventory. No acceptance or support flag changed. D06 now records exploratory TS-Q03 implementation with native qualification still open."
   },
   "release": "1.0",
   "releaseReady": false,
@@ -409,8 +410,8 @@
       "qualification": "native_install_runtime_combined_apply_passed",
       "releaseAccepted": false,
       "currentResult": "2 November 2026 current matrix (catalog 0.4.121): 41 rows; 188 bound, 0 open, 0 blocked, 0 deferred. Current remainingWork/nextAction govern; the dated observations below retain their historical scope.\n28 October 2026 (catalog 0.4.68): 41 release-matrix rows (11 shipped, 30 limited); 188 cells bound and 0 open. Combined apply behind --enable-library-integrate-apply passed natively for a new and an existing FBD FC caller with OB/LAD and no-flag refusals (28 October); OB insertion stays separate.",
-      "remainingWork": "OB caller insertion as its own route; software units (plan-only); an embedding parent of a multi-instance caller (no captured transitive effect of a structured member); the audit of native05's recovery (its artifacts are not on this PC). Combined apply is on by default for its 23 verified shapes (decision of 29 October; every feature combination and the caller's own instance DB since 2 November, local.library_integrate.candidate_shapes.combinations.20261102 and .dependent_db.20261102).",
-      "nextAction": "Qualify OB caller insertion separately.",
+      "remainingWork": "The bounded fresh-component/new-global-DB insertion after the last network of an existing FBD OB passed on 2 November. Other OB combinations, software units, embedding-parent effects and the native05 recovery audit remain open. The 23 previously verified combined-apply shapes remain qualified.",
+      "nextAction": "Extend only the remaining component shapes; recover native05 artifacts or obtain its explicit review disposition.",
       "ownerRole": "Libraries and components",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -522,8 +523,8 @@
       "qualification": "native_scoped_upgrades_vendor_scale_open",
       "releaseAccepted": false,
       "currentResult": "2 November 2026 current matrix (catalog 0.4.121): 2 rows; 3 bound, 3 open, 0 blocked, 0 deferred. Current remainingWork/nextAction govern; the dated observations below retain their historical scope.\n28 October 2026 (catalog 0.4.68): 2 release-matrix rows (1 shipped, 1 unqualified); 3 cells bound and 3 open.",
-      "remainingWork": "V20 library upgrades (no V20 input on this PC), firmware-version target mismatches, real vendor byte volumes (the vendor ZIPs are gone) and deployment.vm_qualification.",
-      "nextAction": "Obtain a V20 library and the PAL/DMC vendor ZIPs again; requalify deployment.vm_qualification on the VMware guest.",
+      "remainingWork": "One V20 LGF upgrade and V14 SP1–V18 reruns passed on 2 November; seven vendor ZIPs were recovered and intake reran. Firmware-target mismatches, real vendor workload performance and deployment.vm_qualification remain. The originating workstation retains the ignored artifacts; they are absent from this checkout.",
+      "nextAction": "Obtain the existing receipts and inputs; qualify remaining compatibility/scale cases and the VMware guest without repeating completed intake.",
       "ownerRole": "Qualification and libraries",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -909,8 +910,8 @@
       "qualification": "native_definitions_application_runs_and_ts_q01_style_qualification_verified_production_style_execution_v21_boundary",
       "releaseAccepted": false,
       "currentResult": "2 November 2026 current matrix (catalog 0.4.121): 23 rows; 90 bound, 9 open, 35 blocked, 0 deferred. Current remainingWork/nextAction govern; the dated observations below retain their historical scope.\n1 November 2026 (catalog 0.4.109): 23 release-matrix rows (10 shipped, 7 limited, 1 unqualified, 5 unavailable on V21); 90 cells bound, 9 open and 35 blocked. TS-Q01 passed natively in the qualification build with operator scope and license observations (local.testsuite.style-q01.20261101): clean passed, violating assertionFailure, stop between two runs, and lost Run (beforeRun, afterRun) and restore (afterRestore) replies stayed outcomeUnknown and reconciled verifiedRestored without replay; it verifies testsuite_style_job_status, _results and _stop_request. Production style execution is a V21 boundary (maintainer decision, 1 November; five dispositions): V21 Update 3 cannot re-check a style rule's scope at execution time. Application execution passed in the TS-Q02 qualification mode (local.testsuite.application.20261030). Two TS-Q02 cases queued the fixture case with testsuite_style_job_prepare from a testsuite_application_plan_prepare review and dispatched that job through qualification_testsuite_execute (passed; failed, recovered and reconciled verifiedRestored), which verifies testsuite_style_job_prepare (local.testsuite.job-prepare.20261101). A system-test qualification mode (TS-Q03) is designed but cannot run on this PC: OPC UA reaches a PLCSIM instance only in PLCSIM's TCP/IP mode (this PC is on Softbus), and V21's SystemTestCaseExecutor takes no credential, so the scratch's UMAC-protected OPC UA server needs guest access, which V21 Openness cannot set.",
-      "remainingWork": "9 cells: testsuite_system_plan_prepare (system execution has no qualification mode; TS-Q03 needs PLCSIM's TCP/IP mode, an operator-made guest-access seed and possibly a certificate prompt answered at the desk).",
-      "nextAction": "A desk session: PLCSIM in TCP/IP single-adapter mode and an operator-made scratch seed whose anonymous user holds OPCUAServerAccess; then build TS-Q03 as designed, run an exploratory case for the result-tree profile, and qualify pass, fail, afterRun and released.",
+      "remainingWork": "9 cells: testsuite_system_plan_prepare. TS-Q03 now has an exploratory qualification-only Host/worker route and runner. Native fixture import, scope/lifecycle, result-profile and runtime evidence remain open; no prepared anonymous-access/certificate-trust fixture exists on this workstation.",
+      "nextAction": "Run scripts/qualify_testsuite_system.py in an operator-attended isolated TCP/IP setup, retain native scope and pass/fail trees, then qualify a narrow result profile and recovery/refusal cases. Production stays closed.",
       "ownerRole": "Test Suite",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -1576,8 +1577,8 @@
       "qualification": "native_plc_library_kinds_verified_hmi_open",
       "releaseAccepted": false,
       "currentResult": "2 November 2026 current matrix (catalog 0.4.121): 40 rows; 183 bound, 0 open, 0 blocked, 0 deferred. Current remainingWork/nextAction govern; the dated observations below retain their historical scope.\n28 October 2026 (catalog 0.4.68): 40 release-matrix rows (10 shipped, 30 limited); 183 cells bound and 0 open. All 20 PLC library change kinds and library.types pass exact snapshots, reopen and checkpoint restore, and a native 1,000-node dependency chain was released (28 October). Open: HMI library lifecycles, V20 upgrades and real vendor byte volumes.",
-      "remainingWork": "HMI library lifecycles, V20 upgrades, real vendor byte volumes; V21 has no API to move library types or folders.",
-      "nextAction": "Qualify HMI library types once the HMI preservation gate opens.",
+      "remainingWork": "HMI library lifecycles and real vendor workload performance remain. One V20 library upgrade passed on 2 November; V21 has no API to move library types or folders.",
+      "nextAction": "Qualify HMI library types under their exact preservation profiles; retain the existing V20 upgrade proof.",
       "ownerRole": "Libraries",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -1760,8 +1761,8 @@
       "qualification": "native_graph_export_edit_import_verified",
       "releaseAccepted": false,
       "currentResult": "2 November 2026 current matrix (catalog 0.4.121): 9 rows; 39 bound, 0 open, 0 blocked, 0 deferred. Current remainingWork/nextAction govern; the dated observations below retain their historical scope.\n28 October 2026 (catalog 0.4.68): 9 release-matrix rows (6 shipped, 3 limited); 39 cells bound and 0 open. graph_export, graph_edit and graph_import are verified natively (28 October); CFC and DCC stay open.",
-      "remainingWork": "CFC and DCC documents; GRAPH runtime behavior.",
-      "nextAction": "Check V21 Openness support for CFC/DCC before defining profiles.",
+      "remainingWork": "CFC and DCC adapters, chart fixtures and native lifecycle qualification; GRAPH runtime behavior. CFC/DCC V21 products, public API assemblies and documentation are installed on the workstation reviewed on 3 November; license availability is not established.",
+      "nextAction": "Use the installed public service documentation for an owned no-change export/import/compile/reopen/recovery probe. Keep physical drive qualification separate.",
       "ownerRole": "Optional languages",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -2052,8 +2053,8 @@
       "qualification": "not_run",
       "releaseAccepted": false,
       "currentResult": "2 November 2026 current matrix (catalog 0.4.121): 1 rows; 0 bound, 0 open, 0 blocked, 3 deferred. Current remainingWork/nextAction govern; the dated observations below retain their historical scope.\n28 October 2026 (catalog 0.4.68): 1 release-matrix rows (1 deferred); 0 cells bound and 0 open.",
-      "remainingWork": "Public API/SDK inventory per major/update, feasibility resolution, separate workers/build/loaders and exact conversion/refusal/upgrade/qualification matrix for feasible versions.",
-      "nextAction": "Create AC-23 version matrix; identify feasible supported SDK/target combinations. Missing installation is a blocker, not an exclusion.",
+      "remainingWork": "Version-specific workers and qualification remain. V19 Portal 1900.5.101.1 and its public SDK are present on this workstation; V15.1 has an executable but no SDK in its checked root. V17 directory presence is insufficient.",
+      "nextAction": "Build an isolated V19 probe/worker from the installed SDK and create an owned V19 fixture; qualify V19-to-V21 conversion separately from native V19 support.",
       "ownerRole": "Version adapters",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -2332,7 +2333,7 @@
     {
       "id": "B04",
       "title": "Optional products licenses schemas and fixtures",
-      "current": "A STEP 7 Safety license is active (28 October). SiVArc, Test Suite execution prerequisites, the licensed AX trace package and a drive device-compile route are still absent or unobserved.",
+      "current": "On the 3 November workstation CFC/DCC V21 public APIs, Test Suite Advanced and ODK 1500S V2.5 are installed; their relevant license/native workflows remain unqualified. SiVArc, AX trace inputs and Test Suite anonymous-access/certificate prerequisites remain open.",
       "resolution": "Maintain acquisition/installation/license/schema/fixture checklist per operation; validate supplied prerequisites before qualification.",
       "releaseBlocking": true
     },
@@ -2360,7 +2361,7 @@
     {
       "id": "B08",
       "title": "Vendor compatibility and scale assets",
-      "current": "V14 SP1-V19 upgrades, vendor intake and native library scale up to 10,000 entries passed. No V20 library input exists, and the retained vendor ZIPs are no longer on this PC, so real vendor byte volumes stay open.",
+      "current": "Seven PAL/DMC vendor ZIPs were recovered and intake reran on 2 November; one V20 LGF library and the V14 SP1–V18 upgrade corpus passed. Firmware-target mismatches, full vendor dependency/protection compatibility and real vendor workload performance remain. Original missing reports are not recreated by these reruns.",
       "resolution": "Supply permitted packages with provenance and exact profiles; construct and measure required large workloads.",
       "releaseBlocking": true
     },
@@ -2381,7 +2382,7 @@
     {
       "id": "B11",
       "title": "Additional version and SDK feasibility",
-      "current": "Older installed directories and SDK names do not establish supported public interfaces or usable targets.",
+      "current": "The 3 November workstation inventory confirms V19 Portal and its public SDK. Separate version workers and native qualification remain; SDK compatibility folders do not establish other installed Portals.",
       "resolution": "Inventory official public packages/versions and supported operations; classify proven limits, missing prerequisites and unresolved routes independently.",
       "releaseBlocking": true
     }

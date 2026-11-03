@@ -18,6 +18,8 @@ public sealed class TestSuiteQualificationTools(IBridgeClient bridge, HostOption
     private ITestSuiteStyleAdapter Adapter => new TestSuiteWorkerAdapter(bridge, (context, action) => {
         if (options.TestSuiteQualification && context.ExecutionProfile == TestSuiteApplicationQualification.Profile)
         { TestSuiteApplicationQualification.Admit(context, options.ArtifactsDirectory); return; }
+        if (options.TestSuiteQualification && context.ExecutionProfile == TestSuiteSystemQualification.Profile)
+        { TestSuiteSystemQualification.Admit(context, options.ArtifactsDirectory); return; }
         if (!options.TestSuiteQualification || context.ExecutionProfile != Profile || context.Application is not null || context.Run.Definitions.Length != 1 ||
             !new[] { "TiaMcp_Q01_Clean", "TiaMcp_Q01_Violating" }.Contains(context.Run.Definitions[0].Name) ||
             !Path.GetFullPath(context.Operation.Plan.Target.ProjectFilePath).StartsWith(
@@ -25,27 +27,32 @@ public sealed class TestSuiteQualificationTools(IBridgeClient bridge, HostOption
             throw new BridgeException("TestSuiteProfileUnqualified", "Only the exact owned, UI-observed qualification fixture is admitted.");
     });
     [McpServerTool(Name = "qualification_testsuite_prepare", Destructive = true, OpenWorld = false)]
-    [Description("Qualification build only: prepare an owned fixture and retain an exact durable review. Style fixtures (clean, violating) wait for independently reviewed current scope/license evidence. Application fixtures (applicationPass, applicationFail) need simulatorTicket, the downloadTicket of an owned sim_create instance loaded and in RUN; the worker imports both cases externally managed on that instance and reads their scope back natively. No executor invocation.")]
-    public Task<CallToolResult> Prepare(string projectPath, string fixture, string idempotencyKey, int runs = 1, string? simulatorTicket = null, CancellationToken cancellationToken = default) => Typed(async () =>
+    [Description("Qualification build only: prepare an owned fixture and retain an exact durable review. Style fixtures (clean, violating) require independent scope/license observation. Application fixtures (applicationPass, applicationFail) require simulatorTicket from an owned instance loaded and in RUN. System fixtures (systemPass, systemFail) also require its canonical opc.tcp://IPv4:4840/ serverAddress, TCP/IP mode, and operator-configured anonymous access/certificate trust. System results remain exploratory. Imports both cases and verifies native scope; no executor invocation.")]
+    public Task<CallToolResult> Prepare(string projectPath, string fixture, string idempotencyKey, int runs = 1, string? simulatorTicket = null, string? serverAddress = null, CancellationToken cancellationToken = default) => Typed(async () =>
     {
         if (!options.TestSuiteQualification || runs is < 1 or > 2) throw new BridgeException("InvalidRequest", "One or two qualification runs required.");
         bool application = fixture is "applicationPass" or "applicationFail";
-        if (application != (simulatorTicket is not null)) throw new BridgeException("InvalidRequest", "Application fixtures need the simulatorTicket of an owned sim_create instance; style fixtures take none.");
-        var observed = await bridge.CallAsync("testsuite_qualification_prepare", new { projectPath, fixture, simulatorTicket, artifactRoot = options.ArtifactsDirectory }, cancellationToken);
+        bool system = fixture is "systemPass" or "systemFail";
+        if (fixture is not ("clean" or "violating" or "applicationPass" or "applicationFail" or "systemPass" or "systemFail") ||
+            (application || system) != !string.IsNullOrWhiteSpace(simulatorTicket) ||
+            (system ? !TestSuiteSystemQualification.Endpoint(serverAddress) : serverAddress is not null))
+            throw new BridgeException("InvalidRequest", "Choose an exact fixture; simulator fixtures need an owned ticket, and only system fixtures take a canonical serverAddress.");
+        var observed = await bridge.CallAsync("testsuite_qualification_prepare", new { projectPath, fixture, simulatorTicket, serverAddress, artifactRoot = options.ArtifactsDirectory }, cancellationToken);
         T Read<T>(JsonElement element) => element.Deserialize<T>(BridgeProtocol.Json) ?? throw new BridgeException("InvalidRequest", "Missing native capture.");
         var target = Read<NativeTargetObservation>(observed.GetProperty("target"));
         var d = observed.GetProperty("definition");
         string name = d.GetProperty("name").GetString()!;
-        string profile = application ? TestSuiteApplicationQualification.Profile : Profile;
-        var capture = new TestSuiteDefinitionCapture(d.GetProperty("id").GetString()!, application ? "application" : "style", name, application ? ".tat" : ".xml",
+        string profile = system ? TestSuiteSystemQualification.Profile : application ? TestSuiteApplicationQualification.Profile : Profile;
+        var capture = new TestSuiteDefinitionCapture(d.GetProperty("id").GetString()!, system ? "system" : application ? "application" : "style", name, system ? ".tst" : application ? ".tat" : ".xml",
             Read<EngineeringObjectReference>(d.GetProperty("reference")), Jobs.ReadBytes(Read<EngineeringArtifactReference>(d.GetProperty("originalArtifact"))),
             profile, Read<EngineeringObjectReference[]>(d.GetProperty("requiredScope")), [], true, true, []);
         var review = Jobs.Review([capture], Enumerable.Range(0, runs).Select(_ => new TestSuiteStyleSelection([capture.Manifest.Id], [])).ToArray(), target, profile,
-            application ? new TestSuiteApplicationBinding("externallyManaged", simulatorTicket!, false) : null);
+            system ? new TestSuiteApplicationBinding("endpoint", simulatorTicket!, false) { ServerAddress = serverAddress }
+                : application ? new TestSuiteApplicationBinding("externallyManaged", simulatorTicket!, false) : null);
         return new { observation = observed, review, status = Jobs.Prepare(review, review.Sha256, idempotencyKey) };
     });
     [McpServerTool(Name = "qualification_testsuite_execute", Destructive = true, OpenWorld = false)]
-    [Description("Qualification build only: one durable style or application dispatch with native checkpoint, raw retention, preservation and independently observed reopened scope.")]
+    [Description("Qualification build only: one durable style, application or exploratory system dispatch with native checkpoint, raw retention, preservation and independently observed reopened scope. TS-Q03 cannot report a qualified pass before its native result profile is established.")]
     public Task<CallToolResult> Execute(string jobId, string reviewedSha256, string operationId, int expectedRevision,
         string? fault = null, CancellationToken cancellationToken = default) => Typed(async () =>
     {

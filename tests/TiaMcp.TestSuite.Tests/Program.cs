@@ -7,6 +7,13 @@ using TiaMcp.Core;
 using TiaMcp.Core.Engineering;
 using TiaMcp.Core.TestSuite;
 
+if (args.SequenceEqual(new[] { "--system-qualification" }))
+{
+    int count = SystemQualificationChecks.Run(Path.Combine(Path.GetTempPath(), "TiaMcp-TestSuite-Q03-" + Guid.NewGuid().ToString("N")));
+    Console.WriteLine($"PASS TS-Q03 admission/results: {count} checks; no native execution.");
+    return;
+}
+
 int checks = 0;
 void Check(bool yes, string message) { if (!yes) throw new Exception(message); checks++; }
 void Reject(Action action, string? code = null)
@@ -157,6 +164,7 @@ checks += CasingResultProfileChecks.Run();
 checks += ApplicationRunChecks.Run(Path.Combine(Path.GetTempPath(), "TiaMcp-TestSuite-Application-" + Guid.NewGuid().ToString("N")));
 checks += SystemRunChecks.Run(Path.Combine(Path.GetTempPath(), "TiaMcp-TestSuite-System-" + Guid.NewGuid().ToString("N")));
 checks += ApplicationQualificationChecks.Run(Path.Combine(Path.GetTempPath(), "TiaMcp-TestSuite-Q02-" + Guid.NewGuid().ToString("N")));
+checks += SystemQualificationChecks.Run(Path.Combine(Path.GetTempPath(), "TiaMcp-TestSuite-Q03-" + Guid.NewGuid().ToString("N")));
 var bundleReceipt = DefinitionBundleChecks.Run();
 checks += bundleReceipt.Checks;
 checks += DurableChecks.Run(args.Length == 1 ? args[0] + "-durable" : Path.Combine(Path.GetTempPath(), "TiaMcp-TestSuite-" + Guid.NewGuid().ToString("N")));

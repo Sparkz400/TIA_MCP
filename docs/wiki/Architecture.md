@@ -14,6 +14,10 @@
 
 Siemens assemblies are loaded from your installed products and are never redistributed. The portable package disables native workers entirely.
 
+The optional Test Suite adapter also has an exploratory system-test qualification route, with
+independent Host/worker admission, owned-simulator endpoint checks and durable recovery. Production
+admission stays closed; see [TS-Q03 boundaries](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/testsuite-system-q03-20261103.md).
+
 The engineering worker and its TIA connection are reused across tool calls. Startup checks the worker's saved application identity read-only; registration belongs to explicit setup and approved updates. Separate native helpers are separate applications. See [registration and worker boundaries](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/openness-application-registration.md#why-tia-still-asks).
 
 ## Changes are recoverable, not transactional

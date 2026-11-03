@@ -52,9 +52,10 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("ProjectIsolationRequired", "The fixture must belong to this qualification artifact root.");
             _testSuiteQualificationRoot = root;
             string fixture = args.Value<string>("fixture");
+            if (fixture == "systemPass" || fixture == "systemFail") return TestSuiteQualificationSystemPrepare(args, root, fixture == "systemPass");
             if (fixture == "applicationPass" || fixture == "applicationFail") return TestSuiteQualificationApplicationPrepare(args, root, fixture == "applicationPass");
             string ruleName = fixture == "clean" ? StyleQualificationFixture.Clean : fixture == "violating" ? StyleQualificationFixture.Violating :
-                throw new BridgeException("InvalidRequest", "Choose the exact clean, violating, applicationPass or applicationFail packaged fixture.");
+                throw new BridgeException("InvalidRequest", "Choose clean, violating, applicationPass, applicationFail, systemPass or systemFail.");
             string directory = TsDirectory(root, "prepare");
             var selector = TsSelector(_scratchProject.Path.FullName, directory);
             using (_portal.ExclusiveAccess("TIA MCP: prepare owned Test Suite qualification fixture"))
@@ -136,6 +137,14 @@ namespace TiaMcp.Openness.V21
 
         private void TsRequireQualification(JObject input)
         {
+            if (input.Value<string>("executionProfile") == SystemQualificationFixture.Profile)
+            {
+                string systemRoot = Path.GetFullPath(input.Value<string>("artifactRoot") ?? "");
+                string refusal = _testSuiteQualification ? SystemQualificationFixture.Refusal(input, Path.Combine(systemRoot, "scratch")) : "TestSuiteProfileUnqualified";
+                if (refusal != null) throw new BridgeException(refusal, "Only the exact owned TS-Q03 fixture and simulator endpoint are admitted.");
+                _testSuiteQualificationRoot = systemRoot;
+                return;
+            }
             if (input["application"] is JObject)
             {
                 string scratchRoot = Path.Combine(Path.GetFullPath(input.Value<string>("artifactRoot") ?? ""), "scratch");
@@ -172,7 +181,7 @@ namespace TiaMcp.Openness.V21
             return new JObject { ["relativePath"] = path.Substring(prefix.Length).Replace('\\', '/'), ["sha256"] = ChangeFileHash(path) };
         }
 
-        private JObject TsCapture(Project project, JObject selector, string directory, bool application = false)
+        private JObject TsCapture(Project project, JObject selector, string directory, bool application = false, bool system = false)
         {
             EnsureProjectOffline(project);
             var plc = SelectPlc(selector);
@@ -180,7 +189,8 @@ namespace TiaMcp.Openness.V21
             var owners = DeviceItems(project, budget).Select(d => d.Item.GetService<SoftwareContainer>()?.Software).Where(s => s != null).ToArray();
             if (budget.Truncated || owners.Length != 1 || !owners[0].Equals(plc.Software))
                 throw new BridgeException("TestSuiteProfileUnqualified", "Exactly one PLC software owner is required.");
-            if (application) ApplicationQualificationFixture.Validate(project, plc.Software); else StyleQualificationFixture.Validate(project, plc.Software);
+            if (system) SystemQualificationFixture.Validate(project, plc.Software);
+            else if (application) ApplicationQualificationFixture.Validate(project, plc.Software); else StyleQualificationFixture.Validate(project, plc.Software);
             var scopes = SoftwareScopes(plc, budget).ToArray();
             if (budget.Truncated || scopes.Length != 1)
                 throw new BridgeException("TestSuiteProfileUnqualified", "Software-unit payloads are outside this exact root-only qualification fixture.");
@@ -193,7 +203,7 @@ namespace TiaMcp.Openness.V21
             var snapshot = WatchSnapshot(selector);
             string definitionsDirectory = Path.Combine(directory, "definitions-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(definitionsDirectory);
             var manifest = new JObject {
-                ["profile"] = application ? ApplicationQualificationFixture.Profile : TestSuiteQualificationProfile,
+                ["profile"] = system ? SystemQualificationFixture.Profile : application ? ApplicationQualificationFixture.Profile : TestSuiteQualificationProfile,
                 ["peers"] = snapshot["peers"].DeepClone(),
                 ["tables"] = new JArray(((JArray)snapshot["tables"]).Select(t => new JObject { ["kind"] = t["kind"], ["group"] = t["group"], ["name"] = t["name"], ["sha256"] = t["semanticSha256"] })),
                 ["definitions"] = StylePrerequisiteProbe.CaptureDefinitions(project, definitionsDirectory),

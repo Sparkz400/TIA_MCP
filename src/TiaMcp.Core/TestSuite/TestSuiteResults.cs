@@ -60,6 +60,12 @@ public static class TestSuiteResultNormalizer
             if (!captured.Dispatched) { outcome = "blocked"; reasons.Add("Not dispatched."); }
             else if (!captured.CollectionComplete || !captured.ScopeVerified) { outcome = "inconclusive"; reasons.Add("Result collection or effective required scope is incomplete."); }
             else if (fixtureOutcome is not null) { outcome = fixtureOutcome; reasons.Add("Exact owned casing-fixture result tree matched; original informational completion message retained."); }
+            else if (definitions[id].ProfileId == TestSuiteSystemQualification.Profile)
+            {
+                outcome = captured.State == "Error" || captured.ErrorCount > 0 || Flatten(captured.Messages).Any(m => m.State == "Error" || m.ErrorCount > 0)
+                    ? "executionError" : "inconclusive";
+                reasons.Add("TS-Q03 is exploratory until its native result tree has an independently qualified profile.");
+            }
             else if (captured.State == "Error" || captured.ErrorCount > 0 || Flatten(captured.Messages).Any(m => m.State == "Error" || m.ErrorCount > 0))
             { outcome = captured.FailureKind == "assertion" ? "assertionFailed" : "executionError"; reasons.Add("Native errors retained; assertion classification requires an explicit observed profile."); }
             else if (captured.State != "Success" || captured.WarningCount > 0 || Flatten(captured.Messages).Any(m => m.State != "Success" || m.WarningCount > 0))

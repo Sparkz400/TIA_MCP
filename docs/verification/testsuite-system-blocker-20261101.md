@@ -1,5 +1,9 @@
 # Test Suite system tests: qualification design and blocker — 1 November 2026
 
+**3 November update:** [TS-Q03 implementation and setup](testsuite-system-q03-20261103.md)
+now provides the exploratory Host/worker route and runner. Native fixture, result-profile and
+runtime qualification remain open; the earlier "designed, not built" status below is historical.
+
 D06 has one open row, `testsuite_system_plan_prepare` (9 cells). Its reviews are prepared and queued offline, but no
 build dispatches one: the production profile gate refuses on Host and worker, and the TS-Q01 and TS-Q02 qualification
 admission refuses every system review before a native call. This record designs a system-test qualification mode in
