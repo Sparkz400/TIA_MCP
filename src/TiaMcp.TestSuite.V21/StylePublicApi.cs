@@ -162,12 +162,13 @@ namespace TiaMcp.TestSuite.V21
         /// address on each reviewed case, so the owning worker checkpoints before this call. No import, retry or cancellation route.
         /// </summary>
         public byte[] RunSystemOnce(string serverAddress, string route, JArray definitions, string[] dispatchIds,
-            string verificationDirectory, string executionReturnPath, string rawResultPath)
+            string verificationDirectory, string executionReturnPath, string rawResultPath, Action verifyOwnedEndpoint)
         {
             RequireQualification();
             if (invoked) throw new InvalidOperationException("RecoveryRequired: native dispatch cannot be replayed.");
             if (string.IsNullOrWhiteSpace(serverAddress) || dispatchIds == null || dispatchIds.Length < 1)
                 throw new ArgumentException("Exact owned opc.tcp address and dispatch units required.");
+            if (verifyOwnedEndpoint == null) throw new ArgumentNullException(nameof(verifyOwnedEndpoint));
             var group = SystemTestDefinitions.Group(project);
             var casesById = new Dictionary<string, SystemTestCase>(StringComparer.Ordinal);
             Directory.CreateDirectory(verificationDirectory);
@@ -184,13 +185,24 @@ namespace TiaMcp.TestSuite.V21
             var executor = group.GetService<SystemTestCaseExecutor>() ?? throw new InvalidOperationException("TargetPrerequisiteMissing: system test executor is absent.");
             invoked = true; // Before SetScope: a partially written scope is never replayed either.
             var scopes = new JArray();
+            bool scopeVerified = independentlyObservedScope && route == "systemTestCase";
             foreach (var test in casesById.Values)
             {
                 // shortcut: StandardSIMATIC only; UserDefined/SiOME need SetScope(..., DirectoryInfo) with a hash-pinned interface folder.
+                verifyOwnedEndpoint();
                 test.SetScope(serverAddress, ServerInterfaces.StandardSIMATIC);
                 var row = new JObject { ["name"] = test.Name }; scopes.Add(row);
-                try { row["scope"] = SystemTestDefinitions.Scope(test); } catch (Exception e) { row["scopeFailure"] = e.GetType().Name + ": " + e.Message; }
+                row["scope"] = SystemTestDefinitions.Scope(test);
+                var export = SystemTestDefinitions.Export(test, Path.Combine(verificationDirectory, "scoped-" + scopes.Count + ".tst"));
+                row["exportSha256"] = export["sha256"];
+                string original = definitions.Single(d => d.Value<string>("name") == test.Name).Value<string>("originalSha256");
+                bool exact = export.Value<string>("sha256") == original &&
+                    SystemQualificationFixture.ScopeMatches((JObject)row["scope"], File.ReadAllText(export.Value<string>("path")), serverAddress);
+                row["matchesReviewedTarget"] = exact;
+                if (!exact) throw new InvalidOperationException("TestSuiteScopeIncomplete: system scope changed after SetScope; Run refused.");
+                scopeVerified &= exact;
             }
+            verifyOwnedEndpoint();
             TestResults native;
             switch (route)
             {
@@ -200,7 +212,7 @@ namespace TiaMcp.TestSuite.V21
                 default: throw new InvalidOperationException("Unknown system Run route.");
             }
             return RetainAggregate(native, new JObject { ["route"] = route, ["serverAddress"] = serverAddress, ["serverInterface"] = "StandardSIMATIC",
-                ["dispatchDefinitionIds"] = new JArray(dispatchIds), ["scopeReadback"] = scopes }, definitions, dispatchIds[0], executionReturnPath, rawResultPath, false);
+                ["dispatchDefinitionIds"] = new JArray(dispatchIds), ["scopeReadback"] = scopes }, definitions, dispatchIds[0], executionReturnPath, rawResultPath, scopeVerified);
         }
 
         // Flushes the execution return before converting the one aggregate tree, labelled with the first dispatched unit.

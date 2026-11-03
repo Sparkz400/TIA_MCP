@@ -17,20 +17,24 @@ namespace TiaMcp.Openness.V21
             private QualificationLease qualificationLease;
             private string Rule => context["run"]["definitions"][0].Value<string>("name");
             private bool Application => context["application"] is JObject;
+            private bool SystemTest => context["application"]?.Value<string>("executionMode") == "endpoint";
             private string instanceName; // The owned instance verified at observation; Verify and Reconcile read scope against it.
-            private string Profile => Application ? ApplicationQualificationFixture.Profile : TestSuiteQualificationProfile;
-            private JObject Definition(JObject manifest, JObject target, string output) => Application
+            private string Profile => SystemTest ? SystemQualificationFixture.Profile : Application ? ApplicationQualificationFixture.Profile : TestSuiteQualificationProfile;
+            private JObject Definition(JObject manifest, JObject target, string output) => SystemTest
+                ? owner.TsSystemDefinition(project, selector, Rule, context["application"].Value<string>("serverAddress"), manifest, target, output) : Application
                 ? owner.TsApplicationDefinition(project, selector, Rule, instanceName, manifest, target, output)
                 : owner.TsDefinition(project, selector, Rule, manifest, target, output);
             private JObject ObserveApplication()
             {
                 var manifest = Capture();
                 string output = NewDirectory("observation");
-                var simulator = owner.TestSuiteOwnedSimulator(context["application"].Value<string>("simulatorTicket"));
+                var simulator = SystemTest
+                    ? owner.TestSuiteOwnedEndpoint(context["application"].Value<string>("simulatorTicket"), context["application"].Value<string>("serverAddress"))
+                    : owner.TestSuiteOwnedSimulator(context["application"].Value<string>("simulatorTicket"));
                 if (instanceName != null && instanceName != simulator.Value<string>("instanceName")) throw new BridgeException("SimulationTargetMismatch", "The owned instance changed between observations.");
                 instanceName = simulator.Value<string>("instanceName");
                 var target = owner.TsTarget(project, selector, manifest, Profile);
-                var probes = owner.TsProbes(root, output, target, context["operation"]["plan"]["resources"][0].Value<string>("resourceKey"), TsApplicationProbes);
+                var probes = owner.TsProbes(root, output, target, context["operation"]["plan"]["resources"][0].Value<string>("resourceKey"), SystemTest ? TsSystemProbes : TsApplicationProbes);
                 var definition = Definition(manifest, target, output);
                 var scope = QualificationScope(definition);
                 var evidence = ScopeArtifact(scope, output);

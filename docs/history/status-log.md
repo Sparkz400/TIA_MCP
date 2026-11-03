@@ -5,6 +5,10 @@ Dated delivery notes, newest first. Until 28 October 2026 they were the body of
 banners of the [documentation index](../README.md). Each entry keeps the counts
 and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
+## 3 November 2026
+
+Reconciled vendor/V20/OB/event backlog against the retained 2 November summaries. Read-only local inventory finds CFC/DCC V21 public APIs, documentation and V19 Portal/SDK; licenses and native workflows remain unqualified ([receipt](../verification/release-readiness-20261103.md)). TS-Q03 now has a qualification-only exploratory runner, independent Host/worker admission, exact endpoint/scope checks and durable recovery. Native fixture/result qualification remains open ([implementation](../verification/testsuite-system-q03-20261103.md)). No catalog support or release-acceptance flag changed.
+
 ## 2 November 2026
 
 **Classic import on RT Advanced and Basic — 2 November 2026:** catalog 0.4.121; 484 features, 467 verified; matrix 334 limited; cells 2148 bound. `hmi_classic_import` (build `750121ea`) passed its route on the seeded WinCC RT Advanced (72/72) and KTP700 Basic PN (71/71) baselines (`local.hmi.classic-import.profiles.route.20261101`) and `ci-*` interruption 8/8 on each (`local.hmi.classic-import.profiles.interruption.20261102`); the fixtures' start-screen error stayed unchanged, and production admits both profiles. The `--hmi-change-qualification` flag takes both ([record](../verification/hmi-classic-profiles-20261101.md)).

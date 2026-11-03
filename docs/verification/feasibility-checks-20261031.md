@@ -16,6 +16,10 @@ This note holds the routes that exist.
 
 ## CFC and DCC (X06)
 
+Historical workstation observation below. On 3 November another workstation has both public
+assemblies and their help packages installed; see the [current receipt and next probes](release-readiness-20261103.md).
+This removes the missing-SDK prerequisite there without qualifying a native route.
+
 ### What V21 exposes without the optional products
 
 - `Siemens.Engineering.SW.Blocks.ProgrammingLanguage` has the members `CFC` ("Optional language CFC"),

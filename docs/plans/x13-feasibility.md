@@ -1,5 +1,12 @@
 # X13 feasibility: other Siemens interfaces
 
+**3 November workstation update:** the [current prerequisite review](../verification/release-readiness-20261103.md)
+finds CFC/DCC V21 public APIs, V19 Portal/SDK and ODK 1500S installed on this PC. The table below
+retains the 1 November workstation observations; its missing-product labels are not current here.
+OB55/56/57 counter qualification has since passed. Configuration-event subscriptions exist and IP
+observation passed; hardware/software delivery remains open. Data-record responses, extra cycle
+modes and residual Web API routes remain software work. Do not repeat the completed event adapter.
+
 Feasibility record for the TODO box [X13 other Siemens interfaces](../TODO.md#work-outside-the-matrix)
 (ledger obligation X13, roadmap package AC-24). It gives one row per public SDK or workflow
 found on this PC, including the residuals of the two closed 29 October gaps (PLCSIM V8 and the

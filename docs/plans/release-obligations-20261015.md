@@ -1,5 +1,8 @@
 # TIA MCP release obligations and execution order
 
+**3 November reconciliation:** [current workstation and results](../verification/release-readiness-20261103.md) supersede older missing-vendor/V20/CFC/DCC/V19 statements below. The JSON ledger now records the completed bounded OB route and vendor/V20 reruns. [TS-Q03](../verification/testsuite-system-q03-20261103.md) is implemented for exploration; its native result profile and all nine system-test cells remain open. No release acceptance changed.
+
+
 **Current reconciliation — 2 November 2026:** The JSON now gives current matrix counts for all 44 obligations and corrects completed work previously listed as unfinished. Its `remainingWork` and `nextAction` fields are current; dated observations and the original audit counts remain historical. The second CPU/routes, external Git/conflicts, restricted translation, unit lifecycle, project upgrade, credential routes, hardware topology and local desktop roundtrip must not be scheduled again as missing implementations. No obligation is accepted.
 
 **Subsequent execution update:** This document and its JSON retain the pre-wave release audit. The user has since confirmed the old coordinator stopped; this session owns integration. Prompts 02/01/03/06 and the first AC-01 implementation slice are now delivered. Use [current handoffs](../history/active-handoffs-20261015.md) and [wave results](../verification/ac01-planning-wave-20261015.md) for those newer states.

@@ -18,6 +18,12 @@ For a relocatable ZIP, run `./scripts/Package.ps1 -Offline`. It writes the bundl
 
 ## On an engineering workstation
 
+An installed optional API does not establish product/license or native workflow support. The
+[3 November workstation inventory](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/release-readiness-20261103.md)
+finds CFC/DCC and V19 prerequisites, while their adapters and qualification remain open.
+The qualification-only [TS-Q03 runner](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/testsuite-system-q03-20261103.md)
+needs an operator-configured isolated OPC UA fixture and does not enable production system tests.
+
 Requirements:
 
 - Windows with **TIA Portal V21** and **Openness**, configured for your user ([Openness registration](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/openness-application-registration.md))

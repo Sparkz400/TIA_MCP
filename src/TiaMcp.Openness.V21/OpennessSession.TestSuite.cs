@@ -220,7 +220,8 @@ namespace TiaMcp.Openness.V21
                     string address = application.Value<string>("serverAddress");
                     owner.TestSuiteOwnedEndpoint(application.Value<string>("simulatorTicket"), address);
                     api.RunSystemOnce(address, application.Value<string>("route"), definitions, context["run"]["dispatchDefinitionIds"].Values<string>().ToArray(),
-                        Path.Combine(directory, "dispatch-definitions"), Path.Combine(directory, "execution-return.json"), raw);
+                        Path.Combine(directory, "dispatch-definitions"), Path.Combine(directory, "execution-return.json"), raw,
+                        () => owner.TestSuiteOwnedEndpoint(application.Value<string>("simulatorTicket"), address));
                 }
                 else if (application != null)
                 {
@@ -306,7 +307,7 @@ namespace TiaMcp.Openness.V21
             private JObject Capture()
             {
 #if TESTSUITE_QUALIFICATION
-                if (owner._testSuiteQualification) return owner.TsCapture(project, selector, NewDirectory("capture"), Application);
+                if (owner._testSuiteQualification) return owner.TsCapture(project, selector, NewDirectory("capture"), Application, SystemTest);
 #endif
                 var plc = owner.SelectPlc(selector);
                 if (project == null || plc.Project.Path.FullName != project.Path.FullName) throw new BridgeException("IdentityMismatch", "Exact preservation project required.");

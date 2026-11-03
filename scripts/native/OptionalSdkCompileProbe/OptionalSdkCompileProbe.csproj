@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <ProbeVersion Condition="'$(ProbeVersion)' == ''">V21</ProbeVersion>
+    <DefineConstants Condition="'$(ProbeVersion)' == 'V19'">$(DefineConstants);PROBE_V19</DefineConstants>
+    <TiaApiDirectory Condition="'$(TiaApiDirectory)' == '' and '$(ProbeVersion)' == 'V19'">C:\Program Files\Siemens\Automation\Portal V19\PublicAPI\V19</TiaApiDirectory>
+    <TiaApiDirectory Condition="'$(TiaApiDirectory)' == ''">C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48</TiaApiDirectory>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(ProbeVersion)' == 'V19'">
+    <Reference Include="Siemens.Engineering"><HintPath>$(TiaApiDirectory)\Siemens.Engineering.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(ProbeVersion)' == 'V21'">
+    <Reference Include="Siemens.Engineering.Base"><HintPath>$(TiaApiDirectory)\Siemens.Engineering.Base.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Siemens.Engineering.CFC"><HintPath>$(TiaApiDirectory)\Siemens.Engineering.CFC.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Siemens.Engineering.DCC"><HintPath>$(TiaApiDirectory)\Siemens.Engineering.DCC.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <Target Name="ValidateProbeVersion" BeforeTargets="ResolveReferences">
+    <Error Condition="'$(ProbeVersion)' != 'V19' and '$(ProbeVersion)' != 'V21'" Text="ProbeVersion must be V19 or V21." />
+  </Target>
+</Project>

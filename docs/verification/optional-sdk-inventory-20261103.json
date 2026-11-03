@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "nativeExecuted": false,
+  "licenseValidated": false,
+  "supportQualified": false,
+  "method": "Public XML documentation and file hashes; no assembly loading.",
+  "sdks": [
+    {
+      "assembly": "PublicAPI/V21/net48/Siemens.Engineering.CFC.dll",
+      "present": true,
+      "documentationPresent": true,
+      "assemblySha256": "2857219d42e7c8da1608a2ffd2c4acc601faab97624ddd528aca0b0f2622c7f8",
+      "documentationSha256": "31725d5b281a668fbd25809eacd01f71e22fcac945c2757bbec775fd3f48e330",
+      "documentedMembers": [
+        "M:Siemens.Engineering.SW.FunctionCharts.ChartProvider.CompleteExport(System.String,System.String,System.Int64,System.Boolean)",
+        "M:Siemens.Engineering.SW.FunctionCharts.ChartProvider.Import(System.String,System.String,System.Int64,System.Boolean,System.Boolean)",
+        "M:Siemens.Engineering.SW.FunctionCharts.ChartProvider.SelectiveExport(System.String,System.String[],System.String,System.Int64,System.Boolean)"
+      ]
+    },
+    {
+      "assembly": "PublicAPI/V21/net48/Siemens.Engineering.DCC.dll",
+      "present": true,
+      "documentationPresent": true,
+      "assemblySha256": "df1ed4e5e7de9daacf6c3e6209dae8b3f90a2769524a50799345bbf915272fce",
+      "documentationSha256": "7b271a5bb25ec50a8a7593de55208c471327dd15eeed427728ec474d48770444",
+      "documentedMembers": [
+        "M:Siemens.Engineering.MC.Drives.Dcc.DccBlockComposition.Create(System.String)",
+        "M:Siemens.Engineering.MC.Drives.Dcc.DccBlockComposition.Create(System.String,System.String)",
+        "M:Siemens.Engineering.MC.Drives.Dcc.DccBlockComposition.Create(System.String,System.String,System.String)",
+        "M:Siemens.Engineering.MC.Drives.Dcc.DriveControlChart.Export(System.String)",
+        "M:Siemens.Engineering.MC.Drives.Dcc.DriveControlChartComposition.Create",
+        "M:Siemens.Engineering.MC.Drives.Dcc.DriveControlChartComposition.Create(System.String)",
+        "M:Siemens.Engineering.MC.Drives.Dcc.DriveControlChartComposition.Export(System.String)",
+        "M:Siemens.Engineering.MC.Drives.Dcc.DriveControlChartComposition.Import(System.String,Siemens.Engineering.MC.Drives.Dcc.DccImportOptions)"
+      ]
+    },
+    {
+      "assembly": "PublicAPI/V19/Siemens.Engineering.dll",
+      "present": true,
+      "documentationPresent": true,
+      "assemblySha256": "75836097a701bf9fe75014c092e230720a7bd4e80005766acf3e108541eeb4cb",
+      "documentationSha256": "5879eb8cb12daf8642ab458f0d07a5d358e71c7739fd00fdf742be3443bacfdb",
+      "documentedMembers": [
+        "M:Siemens.Engineering.Project.Archive(System.IO.DirectoryInfo,System.String,Siemens.Engineering.ProjectArchivationMode)",
+        "M:Siemens.Engineering.ProjectComposition.Create(System.IO.DirectoryInfo,System.String)",
+        "M:Siemens.Engineering.ProjectComposition.Open(System.IO.FileInfo)",
+        "M:Siemens.Engineering.ProjectComposition.Open(System.IO.FileInfo,Siemens.Engineering.UmacDelegate)",
+        "M:Siemens.Engineering.ProjectComposition.Open(System.IO.FileInfo,Siemens.Engineering.UmacDelegate,Siemens.Engineering.ProjectOpenMode)",
+        "M:Siemens.Engineering.ProjectComposition.OpenWithUpgrade(System.IO.FileInfo)",
+        "M:Siemens.Engineering.ProjectComposition.OpenWithUpgrade(System.IO.FileInfo,Siemens.Engineering.UmacDelegate)",
+        "M:Siemens.Engineering.ProjectComposition.OpenWithUpgrade(System.IO.FileInfo,Siemens.Engineering.UmacDelegate,Siemens.Engineering.ProjectOpenMode)",
+        "M:Siemens.Engineering.TiaPortal.#ctor(Siemens.Engineering.TiaPortalMode)"
+      ]
+    }
+  ]
+}
