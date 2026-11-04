@@ -47,6 +47,9 @@ loopback-only listener assertion. The HMI changes do not alter that fixture; the
 failed run is retained at `artifacts/hmi-smoothing-managed/result.json` and is not
 counted as a pass. The local Python wrapper also stops at the raw evidence-store
 audit because this checkout lacks historical workstation evidence; its contracts
-and source-binding checks passed, and Python tests are run separately. Neither
-local limitation is bypassed or counted as a complete-suite pass. Final acceptance
-is tracked by the PR checks.
+and source-binding checks passed, and Python tests are run separately. The direct
+Python run found a stale release matrix and eleven fixture failures caused by the
+workstation's short-form temporary path. The matrix was regenerated; all ten
+matrix tests and nineteen fixture-route tests pass with the normal repository
+temporary-directory setup. Neither broader local limitation is bypassed or counted
+as a complete-suite pass. Final acceptance is tracked by the PR checks.
