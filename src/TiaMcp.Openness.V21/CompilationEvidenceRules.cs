@@ -8,6 +8,34 @@ namespace TiaMcp.Openness.V21
     // summary: a zero count can coexist with Error messages after HMI retrieval.
     internal static class CompilationEvidenceRules
     {
+        // Compile-only operations report complete native diagnostics, including errors,
+        // without treating ordinary compiler findings as an unknown mutation outcome.
+        internal static bool IsCompleted(JObject compilation)
+        {
+            if (compilation?["error"] != null || !(compilation?["targets"] is JArray targets) || targets.Count == 0) return false;
+            if (targets.OfType<JObject>().Select(t => t.Value<string>("target")).Distinct(StringComparer.Ordinal).Count() != targets.Count) return false;
+            long errors = 0, warnings = 0;
+            foreach (var token in targets)
+            {
+                if (!(token is JObject target) || target["error"] != null || string.IsNullOrWhiteSpace(target.Value<string>("target"))
+                    || target["errorCount"]?.Type != JTokenType.Integer || target.Value<long>("errorCount") < 0
+                    || target["warningCount"]?.Type != JTokenType.Integer || target.Value<long>("warningCount") < 0
+                    || target["messagesTruncated"]?.Type != JTokenType.Boolean || target.Value<bool>("messagesTruncated")
+                    || !(target["messages"] is JArray messages) || !new[] { "Success", "Information", "Warning", "Error" }.Contains(target.Value<string>("state"))) return false;
+                int depth = 0;
+                foreach (var row in messages)
+                {
+                    if (!(row is JObject) || !new[] { "Success", "Information", "Warning", "Error" }.Contains(row.Value<string>("state"))
+                        || row["depth"]?.Type != JTokenType.Integer || row.Value<int>("depth") < 0 || row.Value<int>("depth") > depth || row.Value<int>("depth") > 64
+                        || row["children"] != null || (row.Value<string>("description") ?? "").StartsWith("Cannot compile.", StringComparison.Ordinal)) return false;
+                    depth = row.Value<int>("depth") + 1;
+                }
+                errors += target.Value<long>("errorCount"); warnings += target.Value<long>("warningCount");
+            }
+            return compilation["errorCount"]?.Type == JTokenType.Integer && compilation["warningCount"]?.Type == JTokenType.Integer
+                && errors == compilation.Value<long>("errorCount") && warnings == compilation.Value<long>("warningCount");
+        }
+
         internal static JObject SingleTarget(JObject diagnostics, string target)
         {
             if (diagnostics == null || string.IsNullOrWhiteSpace(target) || diagnostics["targets"] != null)

@@ -8,6 +8,16 @@ JObject Target() => new JObject { ["target"] = "/devices/HMI", ["state"] = "Succ
     ["messagesTruncated"] = false, ["messages"] = new JArray(new JObject { ["state"] = "Information", ["description"] = "Software compilation started.", ["depth"] = 0 }) };
 JObject Aggregate(params JObject[] targets) => new JObject { ["errorCount"] = 0, ["targets"] = new JArray(targets) };
 
+Check("compile-only completion reports ordinary errors without claiming compiler success", () => {
+    var target=Target(); target["errorCount"]=1; target["state"]="Error";
+    ((JArray)target["messages"]).Add(new JObject { ["state"]="Error",["description"]="Existing invalid symbol",["depth"]=0 });
+    var result=new JObject { ["errorCount"]=1,["warningCount"]=0,["targets"]=new JArray(target) };
+    Assert(CompilationEvidenceRules.IsCompleted(result) && !CompilationEvidenceRules.IsSuccessful(result));
+    target["messagesTruncated"]=true; Assert(!CompilationEvidenceRules.IsCompleted(result)); target["messagesTruncated"]=false;
+    target["messages"][1]["description"]="Cannot compile. Cannot access the project path."; Assert(!CompilationEvidenceRules.IsCompleted(result));
+    target["messages"][1]["description"]="Existing invalid symbol"; result["errorCount"]=0; Assert(!CompilationEvidenceRules.IsCompleted(result));
+});
+
 Check("scratch single-target envelope preserves flat diagnostics and independent copies", () => {
     var flat = Target(); flat.Remove("target"); var original = flat.DeepClone();
     var receipt = CompilationEvidenceRules.SingleTarget(flat, "/projects/Scratch/plc/PLC");

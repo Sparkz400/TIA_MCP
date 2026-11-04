@@ -171,7 +171,7 @@ public sealed partial class TiaTools
         => Call("fixture_sources", new { language, blockName, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "fixtures") }, cancellationToken);
 
     [McpServerTool(Name = "change_prepare", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Prepare an offline engineering change: kind and payload, exact project/PLC targets, preview, artifact hashes and conflict checks. Returns changeId/previewHash for change_apply and the project's unsaved state (isModified). Refuses with RecoveryRequired while another change on the same project in this TIA process is unresolved. First inspect change_status: a bounded Classic screen failure may already be verified rolled_back or not_applied and allow a new preparation without restarting TIA. For a lost response to a terminal Classic screen change, use engineering_admission_reconcile in the open project. An unverified recovery remains held for change_restore. Source/XML must explicitly describe intended objects. Kind hmi_text_list_import takes {schemaVersion:1, target, expectedContentHash, recordId, outputId?}: the Host reopens that hmi_text_list_author/generate_set record and refuses content V21's import would change. Kind hmi_classic_screen_edit takes classic_xml_import of an existing regular Classic RT Advanced screen; it compares all regular screens of that HMI only, explicitly excluding shared resources and other HMIs. Kinds hmi_classic_import (Classic classic_xml_import of a screen or tag table, or screen BackColor scalar_property_set), hmi_external_tag_create (Unified external_tag_create), hmi_screen_create (Unified screen_create and item_create), hmi_dynamization_create (Unified dynamization_set) and hmi_event_handler_create (Unified event_handler_set) take the hmi_engineering payload of their operation. Does not change the project; writes preview artifacts.")]
+    [Description("Prepare an offline engineering change: kind and payload, exact project/PLC targets, preview, artifact hashes and conflict checks. Returns changeId/previewHash for change_apply and the project's unsaved state (isModified). Refuses with RecoveryRequired while another change on the same project in this TIA process is unresolved. First inspect change_status: a bounded Classic screen failure may already be verified rolled_back or not_applied and allow a new preparation without restarting TIA. For a lost response to a terminal Classic screen change, use engineering_admission_reconcile in the open project. An unverified recovery remains held for change_restore. Compile-only kinds: plc_compile takes payload:{} plus exact plcPath; hmi_compile takes payload:{target}; device_compile takes payload:{devicePath}; project_compile takes payload:{}. Completed compiler findings are reported separately from execution failures. Source/XML must explicitly describe intended objects. Kind hmi_text_list_import takes {schemaVersion:1, target, expectedContentHash, recordId, outputId?}: the Host reopens that hmi_text_list_author/generate_set record and refuses content V21's import would change. Kind hmi_classic_screen_edit takes classic_xml_import of an existing regular Classic RT Advanced screen; it compares all regular screens of that HMI only, explicitly excluding shared resources and other HMIs. Kinds hmi_classic_import (Classic classic_xml_import of a screen or tag table, or screen BackColor scalar_property_set), hmi_external_tag_create (Unified external_tag_create), hmi_screen_create (Unified screen_create and item_create), hmi_dynamization_create (Unified dynamization_set) and hmi_event_handler_create (Unified event_handler_set) take the hmi_engineering payload of their operation. Does not change the project; writes preview artifacts.")]
     public async Task<CallToolResult> ChangePrepare(string kind, JsonElement payload, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? scopePath = null)
     {
         object request;
@@ -237,6 +237,20 @@ public sealed partial class TiaTools
             if (new FileInfo(path).Length > 1024 * 1024) throw new IOException("Progress receipt exceeds 1 MiB.");
             var data = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(path))!.AsObject();
             if (data["changeId"]?.GetValue<string>() != changeId) throw new IOException("Progress receipt belongs to a different change.");
+            string journal = Path.Combine(Path.GetDirectoryName(path)!, "journal.json");
+            if (File.Exists(journal) && new FileInfo(journal).Length <= 64 * 1024 * 1024)
+            {
+                var recorded = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(journal))!.AsObject();
+                if (recorded["changeId"]?.GetValue<string>() != changeId) throw new IOException("Journal belongs to a different change.");
+                var state = recorded["state"]?.GetValue<string>();
+                if (state is "applied" or "rolled_back" or "not_applied" or "recovery_required")
+                {
+                    data["state"] = state;
+                    data["stateSource"] = "journal";
+                    data["operationFinished"] = state != "recovery_required" || (recorded["stages"] is System.Text.Json.Nodes.JsonArray stages
+                        && stages.Any(s => s?.GetValue<string>() == "change_finished_with_failure"));
+                }
+            }
             data["progressAvailable"] = true; data["outcomeVerified"] = false; data["automaticRetryAllowed"] = false;
             data["note"] = "Progress is diagnostic only. Use normal change_status for the durable outcome; never replay a pending write.";
             return Result(data.ToJsonString(), false);

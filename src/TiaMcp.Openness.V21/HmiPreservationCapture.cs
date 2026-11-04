@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -46,7 +47,9 @@ namespace TiaMcp.Openness.V21
             var parent = current;
             current = new JObject { ["operation"] = operation, ["objectPath"] = identity, ["artifactPath"] = artifactPath };
             Record("started"); // Flush to disk before entering any native call.
-            action();
+            var clock = Stopwatch.StartNew();
+            try { action(); }
+            finally { current["elapsedMilliseconds"] = clock.ElapsedMilliseconds; }
             Record("completed");
             current = parent;
         }

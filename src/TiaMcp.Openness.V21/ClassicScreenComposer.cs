@@ -8,13 +8,14 @@ namespace TiaMcp.Model
 {
     // Copies native components, including their events/permissions/unknown fields.
     // Every requested replacement is explicit; there is no inferred PLC index conversion.
-    internal static class ClassicScreenComposer
+    internal static partial class ClassicScreenComposer
     {
         internal static XDocument Compose(XDocument original, IReadOnlyDictionary<string, XDocument> sources, JObject request)
         {
             if (request["components"] != null && !(request["components"] is JArray) || request["removeItems"] != null && !(request["removeItems"] is JArray))
                 throw new ArgumentException("components and removeItems must be arrays.");
             var result = new XDocument(original);
+            AddLayers(result, sources, request);
             var components = request["components"] as JArray ?? new JArray();
             if (components.Count > 256 || components.Any(x => !(x is JObject))) throw new ArgumentException("At most 256 component objects may be composed per request.");
             var remove = request["removeItems"] as JArray ?? new JArray();
@@ -27,7 +28,7 @@ namespace TiaMcp.Model
             }
             foreach (var component in components.OfType<JObject>())
             {
-                if (component.Properties().Any(p => !new[] { "sourceScreenPath", "sourceItem", "name", "layer", "attributes", "tagReplacements", "texts" }.Contains(p.Name)))
+                if (component.Properties().Any(p => !new[] { "sourceScreenPath", "sourceItem", "name", "layer", "attributes", "tagReplacements", "texts", "captions", "interfaceValues", "eventParameters", "visibility" }.Contains(p.Name)))
                     throw new ArgumentException("Unknown component field.");
                 foreach (string field in new[] { "attributes", "tagReplacements", "texts" })
                     if (component[field] != null && !(component[field] is JObject)) throw new ArgumentException(field + " must be an object.");
@@ -65,6 +66,7 @@ namespace TiaMcp.Model
                             throw new ArgumentException("Text replacement requires one plain native caption for culture " + text.Name + "; formatted or ambiguous text is retained.");
                         SetScalar(fields[0], (string)text.Value);
                     }
+                ApplyNativeProperties(item, component, sources);
                 int layerIndex = component.Value<int?>("layer") ?? 0;
                 var layers = result.Descendants("Hmi.Screen.ScreenLayer").ToArray();
                 if (layerIndex < 0 || layerIndex >= layers.Length) throw new ArgumentException("Select an existing native screen layer index.");

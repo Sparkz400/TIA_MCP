@@ -84,6 +84,7 @@ namespace TiaMcp.Openness.V21
                 change.Preview["fingerprintScope"] = "Project save state; hardware identities and network configuration; exposed software scopes, user-block identities/native fingerprints, type/tag-table metadata and selected mutation attributes. Protected blocks reached through native generated system groups use identity/modified/protection/consistency metadata instead of generated payload checksums; owning PLC safety signatures and runtime-group metadata are included. Unexposed vendor data and generated payload bytes are not covered.";
                 if (change.Kind.StartsWith("opcua_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " OPC UA kinds additionally cover each PLC's server interface group: user and SIMATIC interface names, enabled state and native modification time, reference namespaces, and role mappings with namespace permissions. Interface and namespace content is covered only through native modification times.";
                 if (change.Kind == "hmi_classic_screen_edit") change.Preview["fingerprintScope"] = "Project path, last save time and unsaved-state flag, plus the declared native screen scope. PLC and hardware content is not fingerprinted. " + HmiPreservationRules.ClassicScreenExportNote;
+                else if (IsCompileOnlyKind(change.Kind)) change.Preview["fingerprintScope"] = "Exact compiler target identity and project save state. Compiles current source without exporting inconsistent blocks; source content preservation is not claimed.";
                 else if (IsHmiChangeKind(change.Kind)) change.Preview["fingerprintScope"] += " HMI engineering additionally requires a complete family-specific native content manifest across discovered project HMI targets; partial HMI export or explorer metadata hashes cannot authorize apply or recovery.";
                 if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " VCI kinds additionally cover every workspace group path, each workspace's root, language and library policy, and every mapping's native identity, directory, file name and format. Files below the workspace root are pinned separately by preview.vci.filesSha256 and rechecked before the checkpoint.";
                 if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " Certificate kinds additionally cover the selected local store (certificate Id, subject common name, validity end, private-key presence flag) and every certificate reference read on its device. Certificate bytes and key material are not fingerprinted.";
@@ -182,10 +183,10 @@ namespace TiaMcp.Openness.V21
                 try
                 {
                     InvalidateHmiObservations();
-                    project.Save();
+                    MeasureChange(change, "checkpoint-save", () => { project.Save(); return true; });
                     change.Stages.Add("prechange_project_saved");
                     change.ArchivePath = Path.Combine(change.Directory, "before.zap21");
-                    project.Archive(new DirectoryInfo(change.Directory), "before.zap21", ProjectArchivationMode.Compressed);
+                    MeasureChange(change, "checkpoint-archive", () => { project.Archive(new DirectoryInfo(change.Directory), "before.zap21", ProjectArchivationMode.Compressed); return true; });
                     if (!File.Exists(change.ArchivePath)) throw new BridgeException("CheckpointFailed", "TIA did not produce the required recovery archive.");
                     change.ArchiveHash = ChangeFileHash(change.ArchivePath);
                     change.Stages.Add("recovery_archive_created");
@@ -211,11 +212,12 @@ namespace TiaMcp.Openness.V21
                                 throw new BridgeException("CompileScopeChanged", "The selected PLC changed during compilation.");
                         }
                         // A text-list import or an admitted HMI kind must leave the compiler problems as the compile before the write found them.
-                        if (change.Kind == "hmi_classic_screen_edit" ? !ClassicScreenCompileRules.ProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
+                        if (change.Kind == "hmi_classic_screen_edit" ? !ClassicScreenCompileRules.NoNewProblems(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
                             : change.Kind == "hmi_text_list_import" || HmiEngineeringRules.IsAdmittedKind(change.Kind) ? !HmiTextListImportRules.CompileProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
-                            : !CompilationEvidenceRules.IsSuccessful(change.Compilation))
+                            : IsCompileOnlyKind(change.Kind) ? !CompilationEvidenceRules.IsCompleted(change.Compilation) : !CompilationEvidenceRules.IsSuccessful(change.Compilation))
                             throw new BridgeException(change.Compilation?.Value<int?>("errorCount") == 0 ? "CompileDiagnosticRegression" : "CompileFailed",
                                 "The change failed compiler verification: errors, new/changed warnings, or incomplete diagnostics. Verified screen rollback is attempted; inspect the retained outcome.");
+                        if (IsCompileOnlyKind(change.Kind)) change.Compilation["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(change.Compilation);
                     }
                     if (IsHmiChangeKind(change.Kind)) VerifyHmiEngineeringPreservation(change, project);
                     if (change.Kind == "software_unit_create_from") RequireUnrenamedUnitMembers(change);
@@ -230,7 +232,7 @@ namespace TiaMcp.Openness.V21
                         change.Stages.Add("native_preservation_verified");
                     }
                     if (change.Kind == "graphical_typed_edit") VerifyTypedInstanceReadbacks(change);
-                    if (save) { InvalidateHmiObservations(); project.Save(); change.Stages.Add("changed_project_saved"); WriteChangeJournal(change); }
+                    if (save) { InvalidateHmiObservations(); MeasureChange(change, "changed-project-save", () => { project.Save(); return true; }); change.Stages.Add("changed_project_saved"); WriteChangeJournal(change); }
                     if (change.Kind == "hmi_classic_screen_edit") VerifyHmiEngineeringPreservation(change, project, "after-save");
                     // A generated block can be present right after generation and gone after compile/save (R_TRIG/F_TRIG instance DBs, native probe w9p).
                     if (change.Kind == "source_upsert") { VerifyExpectedBlocksExist(change, SelectPlc(change.Selector)); change.Stages.Add("source_blocks_verified_after_save"); }
@@ -256,6 +258,7 @@ namespace TiaMcp.Openness.V21
                     RecoverFailedClassicScreen(change, project);
                     if (change.State != "rolled_back" && change.State != "not_applied")
                         try { change.AfterFingerprint = EngineeringFingerprint(change, project); } catch { }
+                    change.Stages.Add("change_finished_with_failure");
                     WriteChangeJournal(change);
                     throw new BridgeException((ex as BridgeException)?.Code ?? "EngineeringError", ex.Message, ChangeView(change));
                 }
@@ -1344,6 +1347,17 @@ namespace TiaMcp.Openness.V21
         private string EngineeringFingerprint(EngineeringChange change, Project project, bool locationIndependent = false)
         {
             change.FingerprintCoverage = null;
+            if (IsCompileOnlyKind(change.Kind))
+            {
+                // Compilation must remain usable when inconsistent user blocks cannot
+                // be exported. It compiles the current selected scope; no source import.
+                var scope = CompileIdentityScope(change, project);
+                change.FingerprintCoverage = new JObject { ["policyVersion"] = 1, ["complete"] = false,
+                    ["scopePolicy"] = "compile-target-identity-and-project-save-state-v1", ["nativeFingerprintBlocks"] = 0,
+                    ["limitations"] = new JArray("Compiler target identities and project save state only. Compilation operates on current source; generated state and source contents are not preservation claims.") };
+                return HmiEngineeringRules.ClassicScreenFingerprint(project.Path.FullName, project.LastModified.ToString("O"), project.IsModified,
+                    ChangeHash(scope.ToString(Formatting.None)), locationIndependent);
+            }
             // This named kind promises screen-scope equality, not PLC payload or hardware equality.
             // A regular-screen import cannot write PLC blocks, and an inconsistent unrelated block
             // must not force a PLC compile merely to edit a screen. Keep project-state stale guards.
@@ -1702,6 +1716,10 @@ namespace TiaMcp.Openness.V21
             data["phaseTimings"] = change.PhaseTimings.DeepClone();
             File.WriteAllText(temporary, data.ToString(Formatting.Indented), new UTF8Encoding(false));
             if (File.Exists(change.Journal)) TiaMcp.Core.JournalFileReplacement.Replace(temporary, change.Journal); else File.Move(temporary, change.Journal);
+            // A completed phase can precede the terminal state transition. Refresh
+            // diagnostic progress after committing that transition as well.
+            if (change.Kind == "hmi_classic_screen_edit")
+                try { SaveChangeProgress(change); } catch (IOException) { /* The durable journal remains authoritative. */ }
         }
 
         private static JObject ChangeObject(JObject args, string name) => args[name] as JObject ?? throw new BridgeException("InvalidRequest", name + " must be an object.");

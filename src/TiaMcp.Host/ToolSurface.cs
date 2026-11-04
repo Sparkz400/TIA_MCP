@@ -64,6 +64,16 @@ internal static class ToolSurface
             if (!ToolGroups.Advertised(name, options.Toolsets)) { tools.Remove(tool); continue; }
             tool.ProtocolTool.Title = ToolTitles.All.TryGetValue(name, out var title) ? title
                 : throw new InvalidOperationException("Tool " + name + " has no title; add one to ToolTitles.");
+            // JsonElement has an unconstrained SDK schema. Clients must see the same
+            // object contract that ObjectArguments enforces at the Host boundary.
+            string? objectArgument = name == "change_prepare" ? "payload"
+                : new[] { "hmi_classic_screen_capture", "hmi_classic_screen_compose", "hmi_inspect", "hmi_references", "hmi_capabilities" }.Contains(name) ? "request" : null;
+            if (objectArgument is not null)
+            {
+                var input = JsonNode.Parse(tool.ProtocolTool.InputSchema.GetRawText())!.AsObject();
+                input["properties"]![objectArgument] = new JsonObject { ["type"] = "object", ["additionalProperties"] = true };
+                tool.ProtocolTool.InputSchema = JsonSerializer.SerializeToElement(input);
+            }
             if (schemas.TryGetValue(name, out var schema)) tool.ProtocolTool.OutputSchema = schema;
             // A typed result declared with OutputSchemaType describes success only; refusals carry the Host error envelope.
             else if (tool.ProtocolTool.OutputSchema is { } declared) tool.ProtocolTool.OutputSchema = WithError(declared);

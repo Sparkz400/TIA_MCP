@@ -12,6 +12,8 @@ namespace TiaMcp.Model
         internal static IEnumerable<XElement> Items(XDocument document) => document.Descendants("Hmi.Screen.ScreenLayer").Elements("ObjectList").Elements();
         internal static string Attribute(XElement item, string name) => (string)item.Element("AttributeList")?.Element(name);
         internal static HashSet<string> References(XDocument document) => new HashSet<string>(document.Descendants("Tag").Elements("Name").Select(x => x.Value), StringComparer.Ordinal);
+        internal static bool UsesRoot(string reference, string root) => new[] { root, "\"" + root + "\"" }.Any(name => reference == name
+            || reference.StartsWith(name + ".", StringComparison.Ordinal) || reference.StartsWith(name + "[", StringComparison.Ordinal));
         internal static HashSet<string> NativeTags(IEnumerable<XDocument> tables)
         {
             var result = new HashSet<string>(StringComparer.Ordinal);

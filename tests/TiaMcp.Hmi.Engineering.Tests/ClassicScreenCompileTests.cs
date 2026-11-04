@@ -14,6 +14,24 @@ static class ClassicScreenCompileTests
     public static void Run(Action<string, Action> check)
     {
         void Assert(bool value) { if (!value) throw new Exception("Classic diagnostic comparison assertion failed"); }
+        check("Completed baseline errors remain usable; new diagnostics and incomplete compiler runs refuse", () => {
+            var baseline = Fixture(); baseline["errorCount"] = 1; baseline["targets"][0]["errorCount"] = 1;
+            var rows = (JArray)baseline["targets"][0]["messages"];
+            rows.Insert(rows.Count - 1, Row("Existing unrelated error", null, "Error", 3));
+            rows.Last["description"] = "Compiling finished (errors: 1; warnings: 1)";
+            Assert(ClassicScreenCompileRules.Completed(baseline));
+            Assert(ClassicScreenCompileRules.NoNewProblems(baseline, (JObject)baseline.DeepClone()));
+            var fixedResult = (JObject)baseline.DeepClone(); var fixedRows = (JArray)fixedResult["targets"][0]["messages"];
+            fixedRows.RemoveAt(fixedRows.Count - 2); fixedResult["errorCount"] = 0; fixedResult["targets"][0]["errorCount"] = 0;
+            fixedRows.Last["description"] = "Compiling finished (errors: 0; warnings: 1)";
+            Assert(ClassicScreenCompileRules.NoNewProblems(baseline, fixedResult));
+            Assert(!ClassicScreenCompileRules.NoNewProblems(fixedResult, baseline));
+            rows[rows.Count - 2]["description"] = "Cannot compile. Cannot access the project path.";
+            Assert(ClassicScreenCompileRules.IsTransientPathFailure(baseline));
+            Assert(!ClassicScreenCompileRules.Completed(baseline));
+            Assert(!ClassicScreenCompileRules.NoNewProblems(baseline, baseline));
+            Assert(!ClassicScreenCompileRules.Completed(new JObject()));
+        });
         check("Classic timestamp/byte-count wrapper is metadata, retained warning locations are significant", () => {
             var before = Fixture(); var copy = before.DeepClone();
             Assert(ClassicScreenCompileRules.ProblemsUnchanged(before, Fixture("03.11.2026 10:10", 2883512)));

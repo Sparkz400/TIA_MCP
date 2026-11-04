@@ -11,6 +11,40 @@ static class ClassicScreenWorkflowTests
         ["target"] = new JObject { ["family"] = "classic", ["projectCopyId"] = "copy", ["sessionGeneration"] = "session", ["hmiPath"] = "/hmi", ["objectPath"] = "/hmi/screens/Main", ["kind"] = "hmiScreen" }, ["xml"] = Screen().ToString() };
     public static void Run(Action<string,Action> check)
     {
+        check("Native numeric constants retain decimal points under German Windows culture", () => {
+            var culture = System.Globalization.CultureInfo.CurrentCulture;
+            try {
+                System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
+                var source = Screen();
+                ClassicScreenPreflight.Items(source).Single().Element("ObjectList").Add(XElement.Parse("<Hmi.Screen.InterfacePropertySimple><AttributeList><Name>Factor</Name><Value Type='System.Double'>1</Value></AttributeList></Hmi.Screen.InterfacePropertySimple>"));
+                var request = new JObject { ["components"] = new JArray(new JObject { ["sourceScreenPath"] = "source", ["sourceItem"] = "Prototype", ["name"] = "Decimal", ["interfaceValues"] = new JObject { ["Factor"] = 1.25 } }) };
+                var result = ClassicScreenComposer.Compose(source, new Dictionary<string,XDocument>{{"source",source}}, request);
+                Assert(result.Descendants("Value").Last().Value == "1.25");
+            } finally { System.Globalization.CultureInfo.CurrentCulture = culture; }
+        });
+        check("Composer builds a blank screen with native formatted captions, constants, navigation and visibility", () => {
+            var source = Screen(); var item = ClassicScreenPreflight.Items(source).Single(); var objects = item.Element("ObjectList");
+            objects.Add(XElement.Parse("<MultilingualText CompositionName='Text'><ObjectList><MultilingualTextItem><AttributeList><Culture>de-DE</Culture><Text><body><p style='native'>Alt</p></body></Text></AttributeList></MultilingualTextItem></ObjectList></MultilingualText>"));
+            objects.Add(XElement.Parse("<Hmi.Screen.InterfacePropertySimple><AttributeList><Name>FunctionID</Name><Value Type='System.Int32'>1</Value></AttributeList></Hmi.Screen.InterfacePropertySimple>"));
+            objects.Add(XElement.Parse("<Hmi.Event.Event><AttributeList><Name>Press</Name></AttributeList><ObjectList><Hmi.Event.FunctionListEntry><AttributeList><Name>OpenScreen</Name><Type>VBScript</Type></AttributeList><ObjectList><Hmi.Event.FunctionListEntryParameter><AttributeList><Name>ScreenNo</Name><Value Type='System.Int32'>1</Value></AttributeList></Hmi.Event.FunctionListEntryParameter></ObjectList></Hmi.Event.FunctionListEntry></ObjectList></Hmi.Event.Event>"));
+            var visibility = new XElement(item); visibility.Element("AttributeList").SetElementValue("ObjectName", "VisibilitySource");
+            visibility.Element("ObjectList").Add(XElement.Parse("<Hmi.Dynamic.VisibilityAnimation><AttributeList><RangeStart>0</RangeStart><RangeEnd>1</RangeEnd></AttributeList><LinkList><Tag><Name>Old</Name></Tag></LinkList></Hmi.Dynamic.VisibilityAnimation>")); item.Parent.Add(visibility);
+            var blank = new XDocument(source); blank.Descendants("Hmi.Screen.ScreenLayer").Remove();
+            var component = new JObject { ["sourceScreenPath"]="source", ["sourceItem"]="Prototype", ["name"]="New",
+                ["captions"]=new JArray(new JObject { ["compositionName"]="Text", ["culture"]="de-DE", ["text"]="Neuer Text" }),
+                ["interfaceValues"]=new JObject { ["FunctionID"]=155010 },
+                ["eventParameters"]=new JArray(new JObject { ["eventName"]="Press", ["functionName"]="OpenScreen", ["parameterName"]="ScreenNo", ["value"]=3067 }),
+                ["visibility"]=new JObject { ["sourceScreenPath"]="source", ["sourceItem"]="VisibilitySource", ["tag"]="Installed", ["rangeStart"]=1, ["rangeEnd"]=1 } };
+            var request = new JObject { ["layers"]=new JArray(new JObject { ["sourceScreenPath"]="source", ["sourceLayer"]=0 }), ["components"]=new JArray(component) };
+            var documents = new Dictionary<string,XDocument>{{"source",source}};
+            string original = source.ToString(); var result = ClassicScreenComposer.Compose(blank, documents, request);
+            Assert(source.ToString() == original && ClassicScreenPreflight.Items(result).Count()==1);
+            Assert(result.Descendants("p").Single().Value=="Neuer Text" && (string)result.Descendants("p").Single().Attribute("style")=="native");
+            Assert(result.Descendants("Value").Select(v=>v.Value).SequenceEqual(new[]{"155010","3067"}));
+            Assert(result.Descendants("Tag").Single().Element("Name").Value=="Installed" && result.Descendants("Unknown").Single().Value=="preserve");
+            component["interfaceValues"]["FunctionID"]="not an integer"; Reject(()=>ClassicScreenComposer.Compose(blank, documents, request));
+            component["interfaceValues"]["FunctionID"]=1; source.Descendants("p").First().Add(new XComment("must survive")); Reject(()=>ClassicScreenComposer.Compose(blank, documents, request));
+        });
         check("Compact receipts retain proof hashes and counts without mutating the full journal", () => {
             var full=new JObject { ["preview"]=new JObject { ["payload"]=Payload() }, ["contentHash"]="hash", ["artifacts"]=new JObject { ["screen"]="retained" } };
             string before=full.ToString();var compact=ClassicScreenReceipts.Compact(full);
