@@ -73,6 +73,7 @@ namespace TiaMcp.Openness.V21
                 using (SharedMutationExclusive("TIA MCP: prepare offline change preview"))
                 {
                     change.Preview = PrepareEngineeringMutation(change, project);
+                    if (change.Kind == TagTableImportRules.Kind) PrepareScopedTagImport(change);
                     change.BaseFingerprint = EngineeringFingerprint(change, project);
                 }
                 change.Preview["changeId"] = id;
@@ -85,6 +86,7 @@ namespace TiaMcp.Openness.V21
                 if (change.Kind.StartsWith("opcua_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " OPC UA kinds additionally cover each PLC's server interface group: user and SIMATIC interface names, enabled state and native modification time, reference namespaces, and role mappings with namespace permissions. Interface and namespace content is covered only through native modification times.";
                 if (change.Kind == "hmi_classic_screen_edit") change.Preview["fingerprintScope"] = "Project path, last save time and unsaved-state flag, plus the declared native screen scope. PLC and hardware content is not fingerprinted. " + HmiPreservationRules.ClassicScreenExportNote;
                 else if (IsCompileOnlyKind(change.Kind)) change.Preview["fingerprintScope"] = "Exact compiler target identity and project save state. Compiles current source without exporting inconsistent blocks; source content preservation is not claimed.";
+                else if (change.Kind == TagTableImportRules.Kind) change.Preview["fingerprintScope"] = TagTableImportRules.Coverage;
                 else if (IsHmiChangeKind(change.Kind)) change.Preview["fingerprintScope"] += " HMI engineering additionally requires a complete family-specific native content manifest across discovered project HMI targets; partial HMI export or explorer metadata hashes cannot authorize apply or recovery.";
                 if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " VCI kinds additionally cover every workspace group path, each workspace's root, language and library policy, and every mapping's native identity, directory, file name and format. Files below the workspace root are pinned separately by preview.vci.filesSha256 and rechecked before the checkpoint.";
                 if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " Certificate kinds additionally cover the selected local store (certificate Id, subject common name, validity end, private-key presence flag) and every certificate reference read on its device. Certificate bytes and key material are not fingerprinted.";
@@ -99,6 +101,8 @@ namespace TiaMcp.Openness.V21
                 change.Preview["targetNamespace"] = change.Namespace;
                 change.Preview["checkpoint"] = "Applying requires checkpointSave=true: current in-memory project edits are saved before a compressed recovery archive is created. No mutation proceeds without that archive.";
                 change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. Save-after-change requires a successful compile. Compile does not validate machine behavior.";
+                if (change.Kind == TagTableImportRules.Kind)
+                    change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. Saving requires completed before/after compilation with no new diagnostics; existing errors may remain. Inspect compilerSucceeded. Compile does not validate machine behavior.";
                 change.Preview["backups"] = change.Backups;
                 change.PreviewHash = ChangeHash(change.Preview.ToString(Formatting.None));
                 change.State = "prepared";
@@ -192,6 +196,14 @@ namespace TiaMcp.Openness.V21
                     change.Stages.Add("recovery_archive_created");
                     change.State = "applying";
                     WriteChangeJournal(change);
+                    if (change.Kind == TagTableImportRules.Kind && compile)
+                    {
+                        change.TagTableEvidence["baselineCompile"] = CompileEngineeringChange(change, project);
+                        change.Stages.Add("tag_table_baseline_compile_finished");
+                        WriteChangeJournal(change);
+                        if (!CompilationEvidenceRules.IsCompleted((JObject)change.TagTableEvidence["baselineCompile"]))
+                            throw new BridgeException("CompileEvidenceIncomplete", "The baseline compiler did not return complete diagnostics. No tag import was dispatched.");
+                    }
                     if (!IsCompileOnlyKind(change.Kind))
                     {
                         ApplyEngineeringMutation(change, project);
@@ -214,14 +226,17 @@ namespace TiaMcp.Openness.V21
                         // A text-list import or an admitted HMI kind must leave the compiler problems as the compile before the write found them.
                         if (change.Kind == "hmi_classic_screen_edit" ? !ClassicScreenCompileRules.NoNewProblems(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
                             : change.Kind == "hmi_text_list_import" || HmiEngineeringRules.IsAdmittedKind(change.Kind) ? !HmiTextListImportRules.CompileProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
+                            : change.Kind == TagTableImportRules.Kind ? !TagTableImportRules.NoNewCompileProblems((JObject)change.TagTableEvidence["baselineCompile"], change.Compilation)
                             : IsCompileOnlyKind(change.Kind) ? !CompilationEvidenceRules.IsCompleted(change.Compilation) : !CompilationEvidenceRules.IsSuccessful(change.Compilation))
                             throw new BridgeException(change.Compilation?.Value<int?>("errorCount") == 0 ? "CompileDiagnosticRegression" : "CompileFailed",
                                 "The change failed compiler verification: errors, new/changed warnings, or incomplete diagnostics. Verified screen rollback is attempted; inspect the retained outcome.");
                         if (IsCompileOnlyKind(change.Kind)) change.Compilation["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(change.Compilation);
+                        if (change.Kind == TagTableImportRules.Kind) change.Compilation["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(change.Compilation);
                     }
                     if (IsHmiChangeKind(change.Kind)) VerifyHmiEngineeringPreservation(change, project);
                     if (change.Kind == "software_unit_create_from") RequireUnrenamedUnitMembers(change);
                     VerifyHardwarePreservation(change, project);
+                    if (change.Kind == TagTableImportRules.Kind) VerifyScopedTagImport(change);
                     if (new[] { "graphical_typed_edit", "graphical_operand_set", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "graph_import" }.Contains(change.Kind))
                     {
                         var plc = SelectPlc(change.Selector);
@@ -234,6 +249,7 @@ namespace TiaMcp.Openness.V21
                     if (change.Kind == "graphical_typed_edit") VerifyTypedInstanceReadbacks(change);
                     if (save) { InvalidateHmiObservations(); MeasureChange(change, "changed-project-save", () => { project.Save(); return true; }); change.Stages.Add("changed_project_saved"); WriteChangeJournal(change); }
                     if (change.Kind == "hmi_classic_screen_edit") VerifyHmiEngineeringPreservation(change, project, "after-save");
+                    if (change.Kind == TagTableImportRules.Kind && save) VerifyScopedTagImport(change);
                     // A generated block can be present right after generation and gone after compile/save (R_TRIG/F_TRIG instance DBs, native probe w9p).
                     if (change.Kind == "source_upsert") { VerifyExpectedBlocksExist(change, SelectPlc(change.Selector)); change.Stages.Add("source_blocks_verified_after_save"); }
                     if (change.Kind == "certificate_create") { VerifyCreatedCertificateAfterSave(change, project); change.Stages.Add("certificate_verified_after_save"); }
@@ -289,6 +305,8 @@ namespace TiaMcp.Openness.V21
         {
             var change = GetEngineeringChange(args);
             if (change.State == "restored") return ChangeView(change);
+            if (change.Kind == TagTableImportRules.Kind)
+                throw new BridgeException("ScopedRecoveryRequired", "A tag-table-scoped fingerprint cannot authorize replacing the whole project. Use the retained archive for explicit manual recovery; no project was saved or closed.", ChangeView(change));
             if (!_ownsPortal) throw new BridgeException("OwnedSessionRequired", "Automatic archive retrieval is limited to worker-owned TIA instances. The checkpoint archive is available for manual recovery in a user-owned instance.", ChangeView(change));
             if (change.State != "applied" && change.State != "recovery_required") throw new BridgeException("InvalidChangeState", "This change has no applied state to recover.");
             if (string.IsNullOrEmpty(change.ArchivePath) || !File.Exists(change.ArchivePath) || ChangeFileHash(change.ArchivePath) != change.ArchiveHash)
@@ -608,6 +626,7 @@ namespace TiaMcp.Openness.V21
                     if (types) PrepareTypeTargets(change, plc, effects);
                     else
                     {
+                        TagTableImportRules.Validate(document);
                         RejectFIoAddresses(plc, TagAddressRules.TagTableAddresses(document));
                         var allTables = AllTagTables(ResolveSoftwareScope(plc, change.ScopePath).Tags).ToArray();
                         var importedSymbols = document.Descendants().Where(element => element.Name == "SW.Tags.PlcTag" || element.Name == "SW.Tags.PlcUserConstant")
@@ -623,8 +642,12 @@ namespace TiaMcp.Openness.V21
                                     throw new BridgeException("TagScopeMismatch", "Imported tag/constant symbols collide with symbols in an unpreviewed table: " + table.Name);
                                 continue;
                             }
+                            if (table.Tags.Any(tag => tag.IsSafety))
+                                throw new BridgeException("SafetyBoundary", "Generic tag-table import cannot overwrite a table containing native safety tags: " + table.Name);
                             string path = Path.Combine(change.Directory, "before-tags-" + Guid.NewGuid().ToString("N") + ".xml");
                             table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                            TagTableImportRules.RequireExistingMembers(TagTableImportRules.Tables(EngineeringSources.ReadXml(File.ReadAllText(path))).Single(),
+                                TagTableImportRules.Tables(document).Single(t => string.Equals((string)t.Element("AttributeList").Element("Name"), table.Name, StringComparison.OrdinalIgnoreCase)));
                             change.Backups.Add(new JObject { ["tableName"] = table.Name, ["artifact"] = ChangeArtifact(path) });
                         }
                         effects.Add(new JObject { ["importTagTables"] = new JArray(change.ObjectNames) });
@@ -1347,6 +1370,7 @@ namespace TiaMcp.Openness.V21
         private string EngineeringFingerprint(EngineeringChange change, Project project, bool locationIndependent = false)
         {
             change.FingerprintCoverage = null;
+            bool tagImport = change.Kind == TagTableImportRules.Kind;
             if (IsCompileOnlyKind(change.Kind))
             {
                 // Compilation must remain usable when inconsistent user blocks cannot
@@ -1409,6 +1433,12 @@ namespace TiaMcp.Openness.V21
                         var info = new JObject { ["name"] = block.Item.Name, ["path"] = block.Path, ["number"] = block.Item.Number,
                             ["language"] = block.Item.ProgrammingLanguage.ToString(), ["modified"] = block.Item.ModifiedDate.ToString("O"),
                             ["protected"] = protectedBlock, ["consistent"] = consistentBlock, ["nativeSystemGroup"] = block.NativeSystemGroup };
+                        if (tagImport)
+                        {
+                            info["fingerprintMode"] = "tagImportBlockMetadataOnly";
+                            blockItems.Add(info);
+                            continue;
+                        }
                         var content = EngineeringFingerprintRules.ReadBlockContent(block.NativeSystemGroup, protectedBlock, consistentBlock, hasSafetySignatureCoverage, block.Path, () =>
                         {
                             var provider = block.Item.GetService<FingerprintProvider>();
@@ -1436,6 +1466,9 @@ namespace TiaMcp.Openness.V21
             snapshot["hardware"] = hardware;
             snapshot["software"] = software;
             snapshot["safety"] = safetyStates;
+            if (tagImport)
+                snapshot["tagTableContent"] = new JArray(CaptureTagImportScope(change, "fingerprint").Select(row =>
+                    new JObject { ["path"] = row["path"].DeepClone(), ["contentSha256"] = row["contentSha256"].DeepClone() }));
             if (opcUa != null) snapshot["opcUa"] = opcUa;
             if (IsHmiChangeKind(change.Kind)) snapshot["hmiContent"] = HmiEngineeringFingerprint(change, project);
             if (change.Kind == "project_languages_set") snapshot["languageSettings"] = ProjectLanguageView(project.LanguageSettings);
@@ -1486,6 +1519,8 @@ namespace TiaMcp.Openness.V21
                     ["available"] = state["safety"]["available"].DeepClone(), ["signatureCount"] = (state["safety"]["signatures"] as JArray)?.Count ?? 0 })),
                 ["limitations"] = new JArray("Generated payload bytes and unexposed vendor data are not fingerprinted; explicit covered native metadata and available safety signatures are compared.",
                     "Native fingerprint failures for user/editable blocks propagate; exclusions require protected native system-group provenance and available owning-PLC safety signatures.") };
+            if (tagImport) change.FingerprintCoverage = new JObject { ["policyVersion"] = 1, ["complete"] = false,
+                ["scopePolicy"] = TagTableImportRules.Policy, ["nativeFingerprintBlocks"] = 0, ["limitations"] = new JArray(TagTableImportRules.Coverage) };
             return ChangeHash(snapshot.ToString(Formatting.None));
         }
 
@@ -1664,6 +1699,14 @@ namespace TiaMcp.Openness.V21
             foreach (var member in change.HmiScreenMembers) ValidatePreparedFiles(member);
             if (change.InputPath != null && (!File.Exists(change.InputPath) || ChangeFileHash(change.InputPath) != change.InputHash))
                 throw new BridgeException("ArtifactChanged", "Prepared import/source artifact changed after preview.");
+            if (change.TagTableEvidence?["before"] is JArray tables)
+                foreach (var table in tables)
+                {
+                    var artifact = table["artifact"];
+                    string file = artifact.Value<string>("path");
+                    if (!File.Exists(file) || ChangeFileHash(file) != artifact.Value<string>("sha256"))
+                        throw new BridgeException("ArtifactChanged", "Captured tag-table preservation evidence changed after preview.");
+                }
             // A text-list import reads its TextLibrary file next to the configuration file.
             foreach (var file in change.Backups.OfType<JObject>().Where(b => b.Value<string>("role") == "hmi-text-list-candidate-library").Select(b => (JObject)b["artifact"]))
                 if (!File.Exists(file.Value<string>("path")) || ChangeFileHash(file.Value<string>("path")) != file.Value<string>("sha256"))
@@ -1688,6 +1731,7 @@ namespace TiaMcp.Openness.V21
             view["technologyAfter"] = change.TechnologyAfter?.DeepClone();
             view["readbacks"] = change.Readbacks.DeepClone();
             view["hmiEvidence"] = change.HmiEvidence?.DeepClone();
+            if (change.TagTableEvidence != null) view["tagTableEvidence"] = change.TagTableEvidence.DeepClone();
             if (change.Kind == "graphical_typed_edit") view["typedQualification"] = TypedChangeQualification(change);
             view["scratchSecurity"] = change.ScratchSecurity?.DeepClone();
             view["automaticRetryAllowed"] = false;
@@ -1707,6 +1751,7 @@ namespace TiaMcp.Openness.V21
                 ["previousStateArchive"] = change.RecoveryPreviousArchive, ["stages"] = change.Stages.DeepClone(),
                 ["readbacks"] = change.Readbacks.DeepClone(),
                 ["hmiEvidence"] = change.HmiEvidence?.DeepClone(),
+                ["tagTableEvidence"] = change.TagTableEvidence?.DeepClone(),
                 ["typedQualification"] = change.Kind == "graphical_typed_edit" ? TypedChangeQualification(change) : null,
                 ["compile"] = change.Compilation?.DeepClone(), ["failure"] = change.Failure,
                 ["primaryFailure"] = change.PrimaryFailure, ["recoveryFailure"] = change.RecoveryFailure,
@@ -1763,7 +1808,7 @@ namespace TiaMcp.Openness.V21
             internal string PrimaryFailure, RecoveryFailure, RecoveryDirectory, ScopePath, GroupPath, Namespace;
             internal int? PreparedProcessId;
             internal JObject Selector, Payload, Preview, Compilation, RecoveredProject, SafetyAfter, ScratchSecurity, TechnologyAfter, FingerprintCoverage;
-            internal JObject HmiEvidence, HmiBeforeManifest;
+            internal JObject HmiEvidence, HmiBeforeManifest, TagTableEvidence;
             internal JArray HardwareBeforeManifest;
             internal string[] BlockNames = Array.Empty<string>();
             internal string[] ObjectNames = Array.Empty<string>();

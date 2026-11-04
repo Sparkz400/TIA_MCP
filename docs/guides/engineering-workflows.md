@@ -31,7 +31,43 @@ The new individual type/tag/constant edits, user-group edits, graphical network 
 
 The worker checks its fingerprint and import-file hash again under exclusive TIA access before saving or changing anything. The fingerprint includes project save state, hardware identities/address ranges, network configuration, exposed standard/software-unit/safety-unit block identities and native fingerprints, type/tag paths and modification metadata, unit namespace presets and relations, and relevant selected attributes. It is explicitly scoped to exposed metadata; it is not a global revision guarantee for data the public API does not expose.
 
-Protected blocks reached through the native generated system-group API use a declared metadata-only payload exclusion when their owning PLC exposes usable safety signatures. Their identity, modification date, protection and consistency state remain in the hash, together with the owning safety signatures and runtime-group metadata. Siemens can reject generated safety checksums after a successful compile because a protected compiler DB is inconsistent. The exclusion never applies by block name, never applies to user/editable blocks, and is not used without usable owning-PLC safety signatures. User-block fingerprint errors still stop the operation. Preview and journal `fingerprintCoverage` report the exact excluded paths and mark overall coverage incomplete; generated payload bytes are not claimed as covered. Recovery still requires a captured matching post-change fingerprint, both before and after acquiring exclusive access.
+Protected blocks reached through the native generated system-group API use a declared metadata-only payload exclusion when their owning PLC exposes usable safety signatures. Their identity, modification date, protection and consistency state remain in the hash, together with the owning safety signatures and runtime-group metadata. Siemens can reject generated safety checksums after a successful compile because a protected compiler DB is inconsistent. The exclusion never applies by block name, never applies to user/editable blocks, and is not used without usable owning-PLC safety signatures. User-block fingerprint errors still stop operations using this project-wide policy. Preview and journal `fingerprintCoverage` report the exact excluded paths and mark overall coverage incomplete; generated payload bytes are not claimed as covered. Recovery still requires a captured matching post-change fingerprint, both before and after acquiring exclusive access.
+
+### Tag-table import scope
+
+`tag_table_import_xml` uses the separate `tag-table-content-and-project-metadata-v1`
+policy. It captures native contents of every tag table in the selected software
+scope, plus project save state and the existing hardware, network, block and type
+metadata. It does not request block payload fingerprints, so an unrelated
+inconsistent block does not prevent adding a declaration. Other mutation kinds
+retain their existing policies.
+
+The capture is bounded to 500 tables and 32 MiB. Before apply, the worker rechecks
+the scope fingerprint, input hash and captured preservation files. Native readback
+must contain every requested name, type, address, attribute and supplied comment;
+unrequested tables and untouched members must remain unchanged. Native override
+replaces a table. Preparation therefore requires every existing member to remain
+in the candidate with its original kind; implicit deletions and renames are
+refused before writing. Start with a fresh native export when adding members.
+Existing safety-tag tables are
+refused, F-I/O address checks still run, and a native safety tag discovered after
+import fails verification with the checkpoint retained.
+
+With `compile=true`, the checkpoint precedes a baseline compile and the import.
+Complete diagnostics are compared after import; existing errors may remain or
+disappear, but new/changed errors or warnings, changed compiler targets, and
+incomplete diagnostic evidence fail verification. Both results are retained in
+`tagTableEvidence.baselineCompile` and `compile`; `compilerSucceeded=false` still
+means the PLC is not compile-clean even when the declaration change is applied.
+With `compile=false`, no compilation or compile-success claim is made; the usual
+requirement to compile before saving through `change_apply` remains.
+
+This policy covers declarations and exposed metadata, not unrelated block
+contents. It therefore refuses `change_restore` with `ScopedRecoveryRequired`
+before saving or closing anything. The archive is retained for explicit manual
+recovery. Interrupted applies do not gain whole-project outcome verification from
+the scoped fingerprint; unresolved outcomes remain held. This limitation is
+reported in the preview and journal.
 
 A matching repeat of an already successful application returns its recorded result without applying again. An attempted change that failed or was interrupted cannot be retried automatically, even if its idempotency key is reused. Prepare another change only after reconciling the actual outcome: while a change on the same project is `recovery_required` (or still `checkpointing`, `applying` or `restoring`) in the same TIA process, `change_prepare` and `change_apply` refuse with `RecoveryRequired` and name that change, because the next checkpoint save would persist its failed edits and make it unrestorable. Run `change_restore` on it in an owned instance; otherwise `tia_detach` and start a new instance (which opens the saved files), or restart the worker. Every preview reports the project's unsaved state as `isModified`.
 

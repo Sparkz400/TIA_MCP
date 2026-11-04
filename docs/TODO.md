@@ -11,6 +11,25 @@ here that links it. Current counts are in [STATUS](STATUS.md), dated results in 
 1.0 needs every box closed except those under [Not a 1.0 gate](#not-a-10-gate);
 [release acceptance](plans/release-acceptance.md) says how an obligation is accepted.
 
+## Offline engineering session follow-ups (4 November)
+
+Every finding from the multi-drive safety engineering session has an issue below with implementation steps and acceptance criteria. P1/P2/P3 indicate relative priority. Implementation is not release evidence: the scoped standard tag-import changes are included in this change, but were not loaded by the active MCP installation during the session. The retained run passed 317 managed tests and 532 hardware-preservation checks; native qualification remains incomplete because its final negative fixture used an unused invalid-address tag that TIA accepted. The user's later zero-error PLC compile is a reported outcome, not proof of the exact brake/alarm error cause.
+
+- [ ] **P1 — Scoped tag-import preservation and delivery:** finish native qualification, correct the negative fixture, retain evidence, package and verify the actual running build. [#209](https://github.com/Sparkz400/TIA_MCP/issues/209)
+- [ ] **P1 — Native table replacement:** qualify the local omission/preservation checks; prevent implicit tag loss and keep intentional rename/delete explicit. [#210](https://github.com/Sparkz400/TIA_MCP/issues/210)
+- [ ] **P1 — Compiler baseline comparison:** qualify existing-versus-new diagnostics and expose mutation, compile and save results separately. [#211](https://github.com/Sparkz400/TIA_MCP/issues/211)
+- [ ] **P1 — Dedicated PROFIsafe tag workflow:** add explicitly authorized safety-tag preparation, native address/type validation, readback and qualification without relaxing generic safety guards. [#212](https://github.com/Sparkz400/TIA_MCP/issues/212)
+- [ ] **P1 — Complete drive inventory:** join Startdrive telegrams, PLC symbols and technology objects with provenance, ambiguity and completeness reporting. [#213](https://github.com/Sparkz400/TIA_MCP/issues/213)
+- [ ] **P2 — Coordinated servo safety edits:** plan calls, multiinstances, Watch fault bits and dependent effects together; reject duplicate control writers and preserve unrelated networks. [#214](https://github.com/Sparkz400/TIA_MCP/issues/214)
+- [ ] **P2 — Unresolved-symbol recovery:** use supported generated-source inspection and explicit symbol mappings; journal and verify temporary-alias cleanup where graphical recovery needs it. [#215](https://github.com/Sparkz400/TIA_MCP/issues/215)
+- [ ] **P2 — Evidence-backed refresh/recompile:** preserve source and block identity, capture full before/after diagnostics and avoid claiming an unproven alarm-ID root cause. [#216](https://github.com/Sparkz400/TIA_MCP/issues/216)
+- [ ] **P2 — Cancellation reconciliation:** distinguish client cancellation from native completion and reconcile exact target state before retrying a lost-response operation. [#217](https://github.com/Sparkz400/TIA_MCP/issues/217)
+- [ ] **P2 — Scoped recovery:** retain the whole-project restore refusal until sufficient preservation evidence exists; design and qualify a bounded recovery path. [#218](https://github.com/Sparkz400/TIA_MCP/issues/218)
+- [ ] **P3 — Progress and deployment clarity:** report project apply/readback/compile/save separately from MCP qualification and deployment, including active build identity. [#219](https://github.com/Sparkz400/TIA_MCP/issues/219)
+- [ ] **P3 — Confirmed machine intent:** carry task-scoped reset/interlock and mapping decisions through preparation and review; distinguish intent, observed facts and unverified safety behavior. [#220](https://github.com/Sparkz400/TIA_MCP/issues/220)
+
+Suggested sequence: finish #209 with #210, #211 and #218; use #213 as the inventory foundation for #212 and #214. Incorporate #215, #216 and #217 into the diagnostic/recovery workflow. Apply #219 and #220 across these workstreams.
+
 ## Resume and integration
 
 - [x] Independently review vendor receipts, licenses and prerequisites. All seven retained PAL/DMC ZIPs, recorded license hashes and inner-archive hashes match. Version-specific notices, older setup guides and the unreviewed toolbox dependency boundary are recorded in the [independent review](verification/vendor-intake-review-20261025.md). Native compatibility, DMC CPU setup and HMI/runtime gates remain separate.

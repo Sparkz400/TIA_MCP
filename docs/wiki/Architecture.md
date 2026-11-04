@@ -25,6 +25,13 @@ The engineering worker and its TIA connection are reused across tool calls. Star
 
 Native changes follow **prepare → preview → checkpoint → apply → verify**. A change can partially fail across Siemens calls; recovery uses its checkpoint and journal. The public simulation workflow works only on adapter-owned simulator instances: it can download a changed program online, set virtual time and inject interrupts there, but it does not expose physical PLC download, force or CPU control.
 
+Tag-table XML imports use a declaration-scoped content check so unrelated
+inconsistent PLC blocks do not prevent editing a table. Backups, safety boundaries,
+stale-preview checks and native readback remain; requested compilation compares
+existing diagnostics with the result. This scope does not authorize automatic
+whole-project recovery. See the [tag-table import scope](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#tag-table-import-scope)
+for exact coverage and recovery limits.
+
 HMI preservation records export progress before native dispatch and retains failures
 without rereading a lost project connection. Classic graphic-list exports are
 temporarily blocked; a preservation scope that needs them refuses the change.

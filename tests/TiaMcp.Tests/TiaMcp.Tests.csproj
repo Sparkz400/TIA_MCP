@@ -38,6 +38,8 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphicalInstanceTemplate.cs" Link="TypedGraphicalInstanceTemplate.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphicalMultiInstanceTemplate.cs" Link="TypedGraphicalMultiInstanceTemplate.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/EngineeringFingerprintRules.cs" Link="EngineeringFingerprintRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TagTableImportRules.cs" Link="TagTableImportRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/CompilationEvidenceRules.cs" Link="CompilationEvidenceRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/UmacRoleRules.cs" Link="UmacRoleRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/EngineeringPaths.cs" Link="EngineeringPaths.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectUpgradeRules.cs" Link="ProjectUpgradeRules.cs" />
