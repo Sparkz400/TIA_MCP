@@ -36,6 +36,11 @@ def main():
         try:
             client.request('initialize', dict(protocolVersion='2025-11-25', capabilities={}, clientInfo=dict(name='screen-input-check', version='1')))
             client.notify('notifications/initialized')
+            advertised = {t['name']: t for t in client.request('tools/list', {})['tools']}
+            for name, field in [('change_prepare', 'payload'), ('hmi_inspect', 'request'),
+                                ('hmi_classic_screen_capture', 'request'), ('hmi_classic_screen_compose', 'request')]:
+                assert advertised[name]['inputSchema']['properties'][field]['type'] == 'object'
+                checks += 1
             # Valid bytes reach the absent worker; malformed or changed inputs must fail before that boundary.
             refused(dict(xmlArtifact=reference), 'WorkerNotFound')
             refused(dict(xmlArtifact={**reference, 'bytes': len(raw)}), 'WorkerNotFound')
@@ -88,6 +93,12 @@ def main():
             progress = client.tool('change_status', dict(changeId=change_id, progressOnly=True))
             assert progress['progressAvailable'] and not progress['outcomeVerified'] and not progress['automaticRetryAllowed']
             checks += 1
+            for state in ['applied', 'not_applied', 'rolled_back', 'recovery_required']:
+                (directory / 'journal.json').write_text(json.dumps(dict(changeId=change_id, state=state)), encoding='utf-8')
+                progress = client.tool('change_status', dict(changeId=change_id, progressOnly=True))
+                assert progress['state'] == state and progress['operationFinished'] == (state != 'recovery_required') and progress['stateSource'] == 'journal'
+                assert not progress['outcomeVerified'] and not progress['automaticRetryAllowed']
+                checks += 1
         finally:
             receipt = client.close()
             assert receipt['hostExitCode'] == 0 and not receipt['workerExits'] and not receipt['forcedHostStop'], receipt

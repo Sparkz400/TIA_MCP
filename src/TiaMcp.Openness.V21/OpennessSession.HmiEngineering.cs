@@ -507,8 +507,18 @@ namespace TiaMcp.Openness.V21
                 // As the text list: the compile before the write is the reference for unchanged compiler problems,
                 // and preservation compares with the compiled state, so compiler effects are never attributed to the write.
                 change.HmiEvidence["baselineCompile"] = CompileHmiEngineeringChange(change, project);
-                if (change.Kind == "hmi_classic_screen_edit" && change.HmiEvidence["baselineCompile"].Value<int?>("errorCount") != 0)
-                    throw new BridgeException("BaselineCompileFailed", "The screen workflow requires a zero-error baseline before importing any candidate.");
+                if (change.Kind == "hmi_classic_screen_edit" && ClassicScreenCompileRules.IsTransientPathFailure(change.HmiEvidence["baselineCompile"] as JObject))
+                {
+                    // Retry compilation once only, before dispatching any screen import,
+                    // after proving that the failed compiler left the screen scope intact.
+                    var unchanged = CaptureHmiEngineeringScope(change, project, "compile-retry");
+                    ClassicScreenRecoveryRules.RequireRestoredScope(change.HmiBeforeManifest, unchanged);
+                    change.HmiEvidence["baselineCompileFirstAttempt"] = change.HmiEvidence["baselineCompile"].DeepClone();
+                    change.Stages.Add("hmi_baseline_compile_retry"); WriteChangeJournal(change);
+                    change.HmiEvidence["baselineCompile"] = CompileHmiEngineeringChange(change, project);
+                }
+                if (change.Kind == "hmi_classic_screen_edit" && !ClassicScreenCompileRules.Completed(change.HmiEvidence["baselineCompile"] as JObject))
+                    throw new BridgeException("BaselineCompileUnavailable", "The compiler did not return complete recognized diagnostics. No candidate was imported; inspect baselineCompile.");
                 var compiled = CaptureHmiEngineeringScope(change, project, "pre-import");
                 RequireHmiScope(change, compiled);
                 change.HmiEvidence["preImport"] = compiled;

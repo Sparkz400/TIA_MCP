@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Synthetic offline fixture. Native-shaped structures; not a Siemens-qualified import or a customer export. -->
+<Document><Engineering version="V21"/><Hmi.Screen.Screen ID="0"><AttributeList><Name>AreaPrototypes</Name><Width>1366</Width><Height>663</Height></AttributeList><ObjectList>
+<Hmi.Screen.ScreenLayer ID="1"><AttributeList><Name>Layer_0</Name><Number>0</Number></AttributeList><ObjectList>
+<Hmi.Screen.FaceplateContainer ID="2"><AttributeList><ObjectName>ManualSelector</ObjectName><Left>245</Left><Top>10</Top><Width>260</Width><Height>34</Height><BackColor>255, 255, 255</BackColor><ForeColor>27, 42, 56</ForeColor></AttributeList><ObjectList>
+<Hmi.Screen.InterfacePropertySimple><AttributeList><Name>FunctionID</Name><Value Type="System.Int32">100</Value></AttributeList></Hmi.Screen.InterfacePropertySimple>
+<Hmi.Screen.InterfacePropertySimple><AttributeList><Name>Operability</Name></AttributeList><LinkList><Tag TargetID="@OpenLink"><Name>Permissions.Manual</Name></Tag></LinkList></Hmi.Screen.InterfacePropertySimple>
+<Hmi.Screen.InterfacePropertySimple><AttributeList><Name>Command</Name></AttributeList><LinkList><Tag TargetID="@OpenLink"><Name>Manual.Selected</Name></Tag></LinkList></Hmi.Screen.InterfacePropertySimple>
+<MultilingualText CompositionName="Text"><ObjectList>
+<MultilingualTextItem><AttributeList><Culture>de-DE</Culture><Text><body><p style="native">Band ein</p></body></Text></AttributeList></MultilingualTextItem>
+<MultilingualTextItem><AttributeList><Culture>en-GB</Culture><Text><body><p style="native">Belt on</p></body></Text></AttributeList></MultilingualTextItem>
+<MultilingualTextItem><AttributeList><Culture>nl-NL</Culture><Text><body><p style="native">Band aan</p></body></Text></AttributeList></MultilingualTextItem>
+</ObjectList></MultilingualText><Hmi.Globalization.Font><ObjectList><Hmi.Globalization.FontItem><AttributeList><FontSize>12</FontSize></AttributeList></Hmi.Globalization.FontItem></ObjectList></Hmi.Globalization.Font>
+<VendorExtension MustPreserve="yes"><Unknown>retained</Unknown></VendorExtension>
+</ObjectList></Hmi.Screen.FaceplateContainer>
+<Hmi.Screen.IOField ID="3"><AttributeList><ObjectName>RecipeValue</ObjectName><Left>245</Left><Top>50</Top><Width>260</Width><Height>34</Height><Mode>InputOutput</Mode></AttributeList><LinkList><Tag TargetID="@OpenLink"><Name>Recipe.Real[0]</Name></Tag></LinkList><ObjectList><Hmi.Dynamic.OperabilityAnimation><LinkList><Tag TargetID="@OpenLink"><Name>Permissions.Parameters</Name></Tag></LinkList></Hmi.Dynamic.OperabilityAnimation></ObjectList></Hmi.Screen.IOField>
+<Hmi.Screen.Button ID="4"><AttributeList><ObjectName>Navigate</ObjectName><Left>245</Left><Top>600</Top><Width>260</Width><Height>34</Height></AttributeList><ObjectList><Hmi.Event.Event><AttributeList><Name>Press</Name></AttributeList><ObjectList><Hmi.Event.FunctionListEntry><AttributeList><Name>OpenScreen</Name><Type>VBScript</Type></AttributeList><ObjectList><Hmi.Event.FunctionListEntryParameter><AttributeList><Name>ScreenNo</Name><Value Type="System.Int32">1</Value></AttributeList></Hmi.Event.FunctionListEntryParameter></ObjectList></Hmi.Event.FunctionListEntry></ObjectList></Hmi.Event.Event></ObjectList></Hmi.Screen.Button>
+<Hmi.Screen.IOField ID="5"><AttributeList><ObjectName>OptionalBelt</ObjectName><Left>520</Left><Top>50</Top><Width>260</Width><Height>34</Height><Mode>Output</Mode></AttributeList><ObjectList><Hmi.Dynamic.VisibilityAnimation><AttributeList><RangeStart>1</RangeStart><RangeEnd>1</RangeEnd></AttributeList><LinkList><Tag TargetID="@OpenLink"><Name>&quot;Area.HMI&quot;.Belts[1].Installed</Name></Tag></LinkList></Hmi.Dynamic.VisibilityAnimation></ObjectList><LinkList><Tag TargetID="@OpenLink"><Name>&quot;Area.HMI&quot;.Belts[1].Speed</Name></Tag></LinkList></Hmi.Screen.IOField>
+</ObjectList></Hmi.Screen.ScreenLayer></ObjectList></Hmi.Screen.Screen></Document>

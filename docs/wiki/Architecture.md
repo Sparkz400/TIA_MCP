@@ -72,3 +72,11 @@ artifact reads reject symbolic links and junctions. The
 [workflow guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#capture-composition-and-batching)
 keeps the exact request shape and evidence limits.
 
+Area capture can bundle PLC declarations, HMI member paths and native control
+prototypes. Composition supports blank layers, typed faceplate/navigation
+constants, multilingual captions and approximate previews. Compiler diagnostics
+and terminal progress are handled separately from unknown execution outcomes.
+See the [area workflow and evidence limits](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#area-authoring-and-previews).
+The [4 November verification record](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/classic-screen-smoothing-20261104.md)
+separates synthetic/Host validation from the outstanding native regression run.
+

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.133",
+  "catalogVersion": "0.4.134",
   "targetTiaVersions": [
     21
   ],
@@ -23170,11 +23170,12 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Explicit PLC software only, empty payload and compile=true. Saves the current project and creates a checkpoint before compiler dispatch; compilation may change generated state.",
           "Native compile dispatch, persistence and checkpoint recovery are qualified on the scratch profile; safety signatures are not.",
-          "Existing engineering fingerprint coverage remains incomplete; this route does not establish whole-project preservation or PLC runtime correctness."
+          "Existing engineering fingerprint coverage remains incomplete; this route does not establish whole-project preservation or PLC runtime correctness.",
+          "4 November compile-only completion and identity/save-state fingerprint changes have offline coverage; native regression qualification of these changes remains open. Existing evidence describes the earlier policy."
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028"
         ]
@@ -23221,11 +23222,12 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
           "Qualified on the scratch station (CPU 1511-1 PN): zero errors, no mutation stage, unchanged blocks, types and tag tables, and refusals for a missing device and compile=false.",
           "Payload devicePath only; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Compilation may change generated state.",
-          "A selected device without a compiler service (for example a Startdrive drive) is refused with UnsupportedCapability."
+          "A selected device without a compiler service (for example a Startdrive drive) is refused with UnsupportedCapability.",
+          "4 November compile-only completion and identity/save-state fingerprint changes have offline coverage; native regression qualification of these changes remains open. Existing evidence describes the earlier policy."
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.engineering_gaps.20261029"
         ]
@@ -23270,11 +23272,12 @@
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
           "Qualified on a one-station project. A project whose devices do not all compile (for example an HMI panel without a start screen) fails with CompileFailed and needs checkpoint recovery.",
-          "Empty payload; compile=true. Every device with a compiler service is compiled; a device without one (a Startdrive G120C PN, local.drives.probe.20261030) is listed under notCompiled with its path and never counted as compiled, and the compile refuses when no device has a compiler service. The inventory must equal the preview at dispatch. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs."
+          "Empty payload; compile=true. Every device with a compiler service is compiled; a device without one (a Startdrive G120C PN, local.drives.probe.20261030) is listed under notCompiled with its path and never counted as compiled, and the compile refuses when no device has a compiler service. The inventory must equal the preview at dispatch. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs.",
+          "4 November compile-only completion and identity/save-state fingerprint changes have offline coverage; native regression qualification of these changes remains open. Existing evidence describes the earlier policy."
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.engineering_gaps.20261029",
           "local.drives.probe.20261030"
@@ -23321,11 +23324,12 @@
         "limitations": [
           "Natively qualified on desk-configured HmiSeeder fixtures in TIA Portal V21 (local.hmi.compile.20261101): a TP700 Comfort pair (start screen set in the editor) and an MTP700 Unified Comfort pair (encrypted-transfer password typed in the editor), two HMI targets each. Every target compiles with zero errors and zero warnings, hmi_inspect is unchanged, a fresh Host reopens the saved project and compiles again, and the last compile restores from its checkpoint. Refusals: an extra payload field and compile=false (InvalidRequest), a missing target (HmiTargetNotFound). Other devices, WinCC RT Advanced, Basic, Unified PC and projects not configured this way are not qualified.",
           "Payload target {family, hmiPath} from library_query hmi_targets; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Runtime is not verified.",
-          "Native observation (local.engineering_gaps.20261029): a TP700 Comfort and an MTP700 Unified Basic created by hardware_add are compiled on their exact targets, and TIA's errors (no start screen; the Unified panel also lacks its runtime password) return as CompileFailed and restore from the checkpoint. No compilable HMI target can be made through the public routes (screen creation stays behind the closed HMI preservation gate), so a successful compile needs a fixture configured in the editor (docs/reference/hmi-fixture-preparation.md)."
+          "Native observation (local.engineering_gaps.20261029): a TP700 Comfort and an MTP700 Unified Basic created by hardware_add are compiled on their exact targets, and TIA's errors (no start screen; the Unified panel also lacks its runtime password) return as CompileFailed and restore from the checkpoint. No compilable HMI target can be made through the public routes (screen creation stays behind the closed HMI preservation gate), so a successful compile needs a fixture configured in the editor (docs/reference/hmi-fixture-preparation.md).",
+          "4 November compile-only completion and identity/save-state fingerprint changes have offline coverage; native regression qualification of these changes remains open. Existing evidence describes the earlier policy."
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.hmi.compile.20261101"
         ]
@@ -28229,7 +28233,8 @@
         "limitations": [
           "Only classic_xml_import of an existing, unlinked regular screen on classic-rt-advanced. Every regular screen of that HMI is compared; shared resources, other screen roles and other HMIs are explicitly excluded. The scope policy is included in its content hash and cannot authorize whole-HMI imports.",
           "Uses the existing checkpoint, precise readback, peer preservation, compile comparison, save, idempotency and archive recovery lifecycle. Recovery requires a worker-owned instance and native project authentication.",
-          "Local offline guard tests are not profile-wide native qualification. See docs/guides/hmi-engineering.md#bounded-classic-screen-editing for the exact contract and evidence limits."
+          "Local offline guard tests are not profile-wide native qualification. See docs/guides/hmi-engineering.md#bounded-classic-screen-editing for the exact contract and evidence limits.",
+          "4 November area bundle, typed composition, approximate preview and diagnostic-baseline changes are covered by synthetic/Host tests; no new native, runtime or speed qualification is claimed. Full regular-screen verification boundaries remain."
         ]
       },
       "qualification": {
@@ -28490,7 +28495,8 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Classic RT Advanced regular screens only. Does not qualify runtime appearance, PLC behavior, shared resources or other HMIs. Native compile and exact readback remain required."
+          "Classic RT Advanced regular screens only. Does not qualify runtime appearance, PLC behavior, shared resources or other HMIs. Native compile and exact readback remain required.",
+          "4 November area bundle, typed composition, approximate preview and diagnostic-baseline changes are covered by synthetic/Host tests; no new native, runtime or speed qualification is claimed. Full regular-screen verification boundaries remain."
         ]
       },
       "qualification": {
@@ -28532,7 +28538,8 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Classic RT Advanced regular screens only. Does not qualify runtime appearance, PLC behavior, shared resources or other HMIs. Native compile and exact readback remain required."
+          "Classic RT Advanced regular screens only. Does not qualify runtime appearance, PLC behavior, shared resources or other HMIs. Native compile and exact readback remain required.",
+          "4 November area bundle, typed composition, approximate preview and diagnostic-baseline changes are covered by synthetic/Host tests; no new native, runtime or speed qualification is claimed. Full regular-screen verification boundaries remain."
         ]
       },
       "qualification": {

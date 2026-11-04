@@ -12,6 +12,10 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenBatchRules.cs" Link="ClassicScreenBatchRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenPreflight.cs" Link="ClassicScreenPreflight.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenComposer.cs" Link="ClassicScreenComposer.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenComposer.Properties.cs" Link="ClassicScreenComposer.Properties.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenDocumentCache.cs" Link="ClassicScreenDocumentCache.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenAreaReport.cs" Link="ClassicScreenAreaReport.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenPreview.cs" Link="ClassicScreenPreview.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenReceipts.cs" Link="ClassicScreenReceipts.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenCompileRules.cs" Link="ClassicScreenCompileRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ClassicScreenRecoveryRules.cs" Link="ClassicScreenRecoveryRules.cs" />

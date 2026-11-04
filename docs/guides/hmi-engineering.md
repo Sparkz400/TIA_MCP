@@ -29,7 +29,7 @@ whole-HMI preservation, dependency closure or runtime qualification.
 Preparation retains the native screen backup and candidate. Apply still requires
 `checkpointSave=true`, `compile=true`, `save=true`, the exact preview hash and an
 idempotency key. It archives the project, compiles before and after import, rejects
-changed compiler errors/warnings, and verifies the target XML and peer-screen preservation after compile and again
+new compiler errors/warnings, and verifies the target XML and peer-screen preservation after compile and again
 after save. The Classic comparator ignores only the observed timestamp/byte-count
 header in its exact container position (the original diagnostic evidence is kept).
 Real error/warning text, full owner hierarchy and aggregate/target counters must
@@ -103,8 +103,9 @@ evidence; profile-wide, visual and runtime qualification remain unverified.
    capture receipt. `includeTags=false` omits structured-tag exports.
 2. Optionally call `hmi_classic_screen_compose` with that receipt, `screenPath`,
    and explicit `components`/`removeItems`. Components clone native screen items;
-   replacements are limited to existing plain scalar attributes, tag references
-   and captions. XML annotations or formatted content refuse replacement.
+   replacements preserve native permissions, events and unknown content. Existing
+   scalars, tags, typed constants and explicitly selected captions are supported;
+   see the area authoring options below. Unsupported formatting/annotations refuse.
 3. Prepare `hmi_classic_screen_edit` with the capture hash and the usual first
    `target`/`xml`, optionally adding one to seven `additionalScreens` entries.
    Every member must be an existing regular screen of the same HMI, project copy
@@ -130,6 +131,93 @@ for the worker. It always reports `outcomeVerified=false` and
 progress nor cached observations authorize retry. Observation reuse ends with
 the native exclusive-access lease and is invalidated by imports, compilation
 and saves.
+
+### Area authoring and previews
+
+Both tool `request` arguments and `change_prepare.payload` are JSON **objects**,
+not JSON-encoded strings. The advertised schemas enforce that shape.
+
+Capture accepts `tagReferences: ["\"Area.HMI\".Belts[0].Ready"]` to export only
+tables containing matching native root tags. Omit it for all tables. Preparation
+automatically selects tables for newly introduced references. Member names and
+array indices always come from native exports; unresolved members still refuse.
+
+An optional `area` object bundles source review with the screen capture:
+
+```json
+{
+  "plcPath": "<exact PLC path>",
+  "blockFolderPath": "<exact PLC-root user block folder>",
+  "typePaths": ["<exact HMI UDT path>"],
+  "prototypeScreens": ["<exact existing screen path>"],
+  "hmiTagRoots": ["Area.HMI"]
+}
+```
+
+`areaPreparation.artifact` retains up to 64 area blocks/groups, selected type
+exports, declaration/call evidence, exact HMI member paths and a reusable native
+control index. Inconsistent/protected blocks are explicit findings. This is a
+review bundle: it does not infer parameter indices, manual IDs, signal meaning or
+runtime permission from names. Software-unit area folders are not yet supported.
+
+Composition adds these optional fields:
+
+- `layers: [{sourceScreenPath, sourceLayer}]` copies an empty native layer shell,
+  including its metadata, into an existing blank screen. Duplicate layers refuse.
+- `captions: [{compositionName, culture, text}]` selects one native multilingual
+  caption. Plain text and one `body/p` paragraph are supported with formatting
+  attributes retained; multi-run/unknown markup refuses.
+- `interfaceValues: {propertyName: value}` replaces existing typed constants.
+- `eventParameters: [{eventName, functionName, parameterName, value}]` replaces
+  an existing typed constant, for example `OpenScreen` / `ScreenNo`. No event or
+  script is created/executed.
+- `visibility: {sourceScreenPath, sourceItem, tag, rangeStart, rangeEnd}` clones
+  a captured visibility animation onto a prototype without an existing one.
+
+Composition returns `previewArtifact` (self-contained HTML), `layoutArtifact`
+(JSON) and `layoutWarningCount` beside the import XML. The approximate preview
+switches languages and supplied visibility values without connecting to TIA or
+executing project scripts. It reports possible text overflow, overlap, missing
+translations and operating-permission review. These are advisory; native
+faceplate internals, shared templates, graphics and font rendering are not
+reproduced. Preview is bounded to 512 items and declares truncation explicitly.
+
+The parser cache holds only hash-revalidated immutable files, returns independent
+document copies, and is bounded. Native observations never survive their lease
+or a compile/import/save boundary. All existing full regular-screen captures
+remain: removing a boundary requires separate native evidence. Per-export,
+tag-preflight, checkpoint-save/archive and final-save timings identify the next
+measured optimization opportunity.
+
+### Compiler diagnostics and completion
+
+The screen route accepts a completed baseline with existing diagnostics. The
+final compile may retain or remove them; a new diagnostic, changed ownership,
+increased count, unknown summary or truncated result refuses. Rollback must
+restore the **exact** baseline diagnostics, including pre-existing errors.
+Currently recognized screen completion summaries are the observed English
+`Compiling finished (errors: …; warnings: …)` and `Compilation completed: … errors,
+… warnings.` shapes; unknown/localized summaries refuse without importing.
+
+The exact observed `Cannot compile. Cannot access the project path.` result can
+trigger one compiler retry before any screen import, after a fresh capture
+proves the original screen scope unchanged. Both attempts are retained. A second
+failure stops with `BaselineCompileUnavailable`; no candidate is replayed.
+
+For inconsistent PLC source use `change_prepare(kind="plc_compile", payload={},
+plcPath="<exact path>")`; for one HMI use `kind="hmi_compile"` and `payload.target`.
+These checkpointed compile-only operations report completed diagnostics with
+`compilerSucceeded=false` when ordinary errors remain. Their fingerprint covers
+compiler identity/project save state, not source preservation. Native exceptions,
+incomplete results and infrastructure failures still retain recovery state.
+
+Progress is refreshed after journal state transitions. The nonblocking Host
+view overlays a recorded final state from the journal, but continues to return
+`outcomeVerified=false` and cannot authorize replay. A recovery in progress is
+not reported finished merely because its intermediate state is `recovery_required`.
+
+See the [4 November verification record](../verification/classic-screen-smoothing-20261104.md)
+for test coverage and current native qualification limits.
 
 ## Temporary Classic graphic-list export containment
 

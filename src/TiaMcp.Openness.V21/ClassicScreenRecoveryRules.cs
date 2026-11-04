@@ -65,8 +65,9 @@ namespace TiaMcp.Model
                 if (state == "rolled_back" && !touched) throw new ArgumentException("A rollback receipt must identify at least one restored attempted screen.");
             }
             var compilation = state == "applied" ? journal["compile"] as JObject : evidence?["rollbackCompile"] as JObject;
-            if (compilation?.Value<int?>("errorCount") != 0
-                || !ClassicScreenCompileRules.ProblemsUnchanged(evidence?["baselineCompile"] as JObject, compilation))
+            if (!ClassicScreenCompileRules.Completed(compilation)
+                || !(state == "applied" ? ClassicScreenCompileRules.NoNewProblems(evidence?["baselineCompile"] as JObject, compilation)
+                    : ClassicScreenCompileRules.ProblemsUnchanged(evidence?["baselineCompile"] as JObject, compilation)))
                 throw new ArgumentException("The terminal outcome lacks complete, unchanged successful compiler diagnostics.");
             var manifest = evidence?[state == "applied" ? "after-save" : "rollback-after-save"] as JObject;
             RequireManifest(manifest);

@@ -13,6 +13,13 @@ namespace TiaMcp.Openness.V21
     {
         private static bool IsCompileOnlyKind(string kind) => kind == "plc_compile" || kind == "device_compile" || kind == "project_compile" || kind == "hmi_compile";
 
+        private JObject CompileIdentityScope(EngineeringChange change, Project project)
+        {
+            if (change.Kind != "plc_compile") return CompileOnlyScope(change, project);
+            var plc = SelectPlc(change.Selector);
+            return PlcCompilation.Prepare(change.Payload, change.Selector.Value<string>("plcPath"), plc.Path, plc.Software.GetService<ICompilable>());
+        }
+
         private void PrepareCompileOnly(EngineeringChange change, Project project, JObject preview)
         {
             var effect = CompileOnlyScope(change, project);

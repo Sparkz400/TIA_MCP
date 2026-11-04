@@ -14,7 +14,7 @@ static class ClassicScreenRecoveryTests
     }
     static JObject Compile() => new() { ["errorCount"] = 0, ["warningCount"] = 0, ["targets"] = new JArray(new JObject {
         ["target"] = Hmi, ["errorCount"] = 0, ["warningCount"] = 0, ["messagesTruncated"] = false,
-        ["messages"] = new JArray(new JObject { ["description"] = "Complete", ["path"] = Hmi, ["state"] = "Information", ["depth"] = 0 }) }) };
+        ["messages"] = new JArray(new JObject { ["description"] = "Compiling finished (errors: 0; warnings: 0)", ["path"] = Hmi, ["state"] = "Information", ["depth"] = 0 }) }) };
     static JObject Journal(bool rollback = false) => new() {
         ["kind"] = "hmi_classic_screen_edit", ["state"] = rollback ? "rolled_back" : "applied", ["afterFingerprint"] = new string('a', 64),
         ["preview"] = new JObject { ["payload"] = new JObject { ["operation"] = "classic_xml_import" } },
@@ -103,7 +103,7 @@ static class ClassicScreenRecoveryTests
             other = Journal(); other["preview"]["payload"]["operation"] = "scalar_property_set"; Reject(() => ClassicScreenRecoveryRules.TerminalManifest(other));
             other = Journal(); other.Remove("afterFingerprint"); Reject(() => ClassicScreenRecoveryRules.TerminalManifest(other));
         });
-        check("Classic recovery refuses compiler errors, changed warnings and incomplete diagnostics", () => {
+        check("Classic recovery refuses new compiler errors, changed warnings and incomplete diagnostics", () => {
             foreach (string failure in new[] { "error", "warning", "truncated", "missingBaseline", "missingTarget" }) {
                 var journal = Journal(); var compile = (JObject)journal["compile"];
                 if (failure == "error") compile["errorCount"] = 1;
@@ -112,6 +112,19 @@ static class ClassicScreenRecoveryTests
                 if (failure == "missingBaseline") ((JObject)journal["hmiEvidence"]).Remove("baselineCompile");
                 if (failure == "missingTarget") compile["targets"] = new JArray();
                 Reject(() => ClassicScreenRecoveryRules.TerminalManifest(journal));
+            }
+        });
+        check("Applied and restored screen journals admit the same complete pre-existing error baseline", () => {
+            foreach(bool rollback in new[]{false,true})
+            {
+                var journal=Journal(rollback); var compile=Compile();
+                compile["errorCount"]=1;compile["targets"][0]["errorCount"]=1;
+                compile["targets"][0]["messages"]=new JArray(new JObject { ["description"]="Existing unrelated error",["path"]="Peer",["state"]="Error",["depth"]=0 },
+                    new JObject { ["description"]="Compiling finished (errors: 1; warnings: 0)",["path"]=Hmi,["state"]="Error",["depth"]=0 });
+                journal["hmiEvidence"]["baselineCompile"]=compile.DeepClone(); journal["hmiEvidence"]["rollbackCompile"]=compile.DeepClone();journal["compile"]=compile.DeepClone();
+                ClassicScreenRecoveryRules.TerminalManifest(journal);
+                (rollback?journal["hmiEvidence"]["rollbackCompile"]:journal["compile"])["targets"][0]["messages"][0]["description"]="A different error";
+                Reject(()=>ClassicScreenRecoveryRules.TerminalManifest(journal));
             }
         });
         check("Batch reconciliation requires every member receipt even when the list is removed or malformed", () => {

@@ -30,6 +30,7 @@ void Reject(Action action)
     throw new Exception("Expected a rejection.");
 }
 void Assert(bool value) { if (!value) throw new Exception("Assertion failed."); }
+ClassicScreenAreaTests.Run(Check);
 JObject Identity(string path = "/devices/HMI/hmi/Runtime/screens/Main/items/Widget") => new JObject {
     ["family"] = "unified", ["projectCopyId"] = "project-copy-a", ["sessionGeneration"] = "generation-a", ["hmiPath"] = "/devices/HMI/hmi/Runtime", ["objectPath"] = path };
 JObject Scalar() => new JObject { ["schemaVersion"] = 1, ["operation"] = "scalar_property_set", ["target"] = Identity(),

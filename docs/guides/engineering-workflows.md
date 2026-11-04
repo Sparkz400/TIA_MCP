@@ -54,10 +54,14 @@ generated state, even though no parameter write or XML import is requested.
 
 The journal records `compile_only_requested`, then `compiler_dispatching`,
 `compile_finished`, and (when requested after successful compilation)
-`changed_project_saved`; it does not claim `mutation_applied`. Compiler errors,
-incomplete diagnostics, changed target identities and uncertain outcomes retain
-recovery state. Inspect `change_status` and use explicit recovery; never replay
-an uncertain compiler call. Existing fingerprint coverage remains partial.
+`changed_project_saved`; it does not claim `mutation_applied`. Complete compiler
+findings, including errors, report `compilerSucceeded=false` without creating a
+recovery lock. Incomplete diagnostics, infrastructure failures, changed target
+identities and uncertain outcomes retain recovery state. Inspect `change_status`
+and use explicit recovery; never replay
+an uncertain compiler call. Compile-only fingerprints cover exact compiler target
+identity and project save state; they do not export inconsistent blocks or claim
+source-content preservation. Compilation operates on current source.
 
 Encoder and safety qualification compile before capturing their baseline exports.
 Recovery recompiles the restored copy through the same operation. Retained

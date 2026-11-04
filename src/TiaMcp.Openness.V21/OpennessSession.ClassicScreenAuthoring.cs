@@ -30,11 +30,15 @@ namespace TiaMcp.Openness.V21
                 var manifest = CaptureHmiEngineeringScope(change, project, "capture");
                 RequireHmiScope(change, manifest);
                 manifest["identity"] = HmiIdentity(project, discovered, "hmiDevice", discovered.Path, discovered.Name);
-                manifest["tagArtifacts"] = args.Value<bool?>("includeTags") == false ? new JArray() : CaptureClassicTagEvidence(project, identity, change.Directory);
+                var requiredTags = args["tagReferences"] == null ? null : new HashSet<string>(ChangeStringArray(args, "tagReferences", 4096, 4096), StringComparer.Ordinal);
+                manifest["tagArtifacts"] = args.Value<bool?>("includeTags") == false ? new JArray() : MeasureChange(change, "capture-tags", () => CaptureClassicTagEvidence(project, identity, change.Directory, requiredTags));
+                manifest["tagCoverage"] = requiredTags == null ? (JToken)"all tables" : new JArray(requiredTags.OrderBy(x => x, StringComparer.Ordinal));
+                if (args["area"] != null) manifest["areaPreparation"] = MeasureChange(change, "capture-area", () => CaptureClassicArea(project, args, change.Directory, manifest));
                 string path = Path.Combine(change.Directory, "capture.json");
                 File.WriteAllText(path, manifest.ToString());
                 return new JObject { ["contentHash"] = manifest["contentHash"].DeepClone(), ["capture"] = ChangeArtifact(path),
                     ["identity"] = manifest["identity"].DeepClone(), ["screens"] = manifest["artifacts"].DeepClone(),
+                    ["areaPreparation"] = manifest["areaPreparation"]?.DeepClone(),
                     ["scopePolicy"] = HmiPreservationRules.ClassicScreenPolicy, ["nativeMutationPerformed"] = false,
                     ["runtimeVerified"] = false };
             }
@@ -57,22 +61,27 @@ namespace TiaMcp.Openness.V21
                 var check = ClassicScreenPreflight.Check(composed, original, documents.Values, tags);
                 string output = Path.Combine(root, "screen-composed-" + Guid.NewGuid().ToString("N") + ".xml");
                 composed.Save(output);
+                var layout = ClassicScreenPreview.Review(composed, documents.Values.SelectMany(d => d.Descendants("MultilingualTextItem")).Select(m => ClassicScreenPreflight.Attribute(m,"Culture")));
+                string preview = Path.ChangeExtension(output, ".html"), review = Path.ChangeExtension(output, ".layout.json");
+                File.WriteAllText(preview, ClassicScreenPreview.Html(layout)); File.WriteAllText(review, layout.ToString());
                 return new JObject { ["xmlArtifact"] = ChangeArtifact(output), ["screenPath"] = targetPath,
                     ["expectedContentHash"] = manifest["contentHash"].DeepClone(), ["preflight"] = check,
+                    ["previewArtifact"] = ChangeArtifact(preview), ["layoutArtifact"] = ChangeArtifact(review), ["layoutWarningCount"] = layout["warnings"].Count(),
                     ["nativeMutationPerformed"] = false, ["nextStep"] = "Prepare hmi_classic_screen_edit with this XML and the capture hash; preparation revalidates the native state." };
             }
             catch (ArgumentException error) { throw new BridgeException("HmiPreflightFailed", error.Message); }
         }
 
-        private static Dictionary<string, XDocument> ReadClassicScreenDocuments(string directory, JObject manifest)
+        private readonly ClassicScreenDocumentCache _classicDocuments = new ClassicScreenDocumentCache();
+        private Dictionary<string, XDocument> ReadClassicScreenDocuments(string directory, JObject manifest)
             => ((JObject)manifest["artifacts"]).Properties().ToDictionary(p => p.Name,
-                p => HmiPreservationRules.ReadXml(File.ReadAllText(RequireScreenRecoveryFile(directory, (JObject)p.Value))), StringComparer.Ordinal);
+                p => _classicDocuments.Read(p.Value.Value<string>("sha256"), File.ReadAllBytes(RequireScreenRecoveryFile(directory, (JObject)p.Value))), StringComparer.Ordinal);
 
         private static HashSet<string> ReadClassicTagEvidence(string directory, JArray artifacts)
             => ClassicScreenPreflight.NativeTags(artifacts.OfType<JObject>().Select(a => HmiPreservationRules.ReadXml(File.ReadAllText(RequireScreenRecoveryFile(directory, a)))));
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private JArray CaptureClassicTagEvidence(Project project, JObject identity, string directory)
+        private JArray CaptureClassicTagEvidence(Project project, JObject identity, string directory, ISet<string> requiredReferences = null)
         {
             var target = ResolveHmiTarget(project, identity);
             var hmi = (Siemens.Engineering.Hmi.HmiTarget)target.Software;
@@ -81,7 +90,12 @@ namespace TiaMcp.Openness.V21
             var files = new JObject();
             capture.Capture(() => {
                 foreach (var table in ClassicTagTables(hmi.TagFolder.TagTables, hmi.TagFolder.Folders, "/tagTables", 0))
+                {
+                    // Native tag names select tables; the exported member paths remain
+                    // the binding authority. Unmatched references still fail preflight.
+                    if (requiredReferences != null && !table.Item2.Tags.Any(t => requiredReferences.Any(r => ClassicScreenPreflight.UsesRoot(r, t.Name)))) continue;
                     CaptureHmiArtifact(directory, target.Path + table.Item1, files, capture, f => table.Item2.Export(f, ExportOptions.WithDefaults));
+                }
             }, () => files.Count);
             if (capture.Failure != null) throw new BridgeException("HmiCaptureIncomplete", "Native tag evidence could not be captured completely.", capture.Failure);
             foreach (var file in files.Properties()) artifacts.Add(file.Value.DeepClone());
@@ -97,7 +111,8 @@ namespace TiaMcp.Openness.V21
             if (candidates.SelectMany(ClassicScreenPreflight.References).Any(r => !inherited.Contains(r)))
             {
                 string directory = Path.Combine(change.Directory, "tag-preflight"); Directory.CreateDirectory(directory);
-                var artifacts = CaptureClassicTagEvidence(project, (JObject)change.Payload["target"], directory);
+                var needed = new HashSet<string>(candidates.SelectMany(ClassicScreenPreflight.References).Where(r => !inherited.Contains(r)), StringComparer.Ordinal);
+                var artifacts = MeasureChange(change, "preflight-tags", () => CaptureClassicTagEvidence(project, (JObject)change.Payload["target"], directory, needed));
                 change.HmiEvidence["tagArtifacts"] = artifacts;
                 tags = ReadClassicTagEvidence(change.Directory, artifacts);
             }

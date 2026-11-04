@@ -65,7 +65,7 @@ namespace TiaMcp.Openness.V21
                 WriteChangeJournal(change);
                 var compilation = CompileHmiEngineeringChange(change, project);
                 change.HmiEvidence["rollbackCompile"] = compilation;
-                if (compilation.Value<int?>("errorCount") != 0 || !ClassicScreenCompileRules.ProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, compilation))
+                if (!ClassicScreenCompileRules.Completed(compilation) || !ClassicScreenCompileRules.ProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, compilation))
                     throw new BridgeException("RecoveryRequired", "Rollback compiler diagnostics do not match the successful baseline.");
                 change.Stages.Add("hmi_rollback_compiled");
                 var after = CaptureHmiEngineeringScope(change, project, "rollback");
