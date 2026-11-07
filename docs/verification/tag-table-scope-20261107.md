@@ -56,3 +56,23 @@ the Openness AllowList.
   worker passed the same 16 steps (local report `artifacts/ts209/b01`). Its preview
   reported the scope policy `tag-table-content-and-project-metadata-v1`, and its
   worker exited on its own with code 0.
+
+## Replacement and compile results
+
+Evidence: `local.tag-table.replacement-compile.20261107`
+([summary](../../evidence/local.tag-table.replacement-compile.20261107.json)), issues
+[#210](https://github.com/Sparkz400/TIA_MCP/issues/210) and
+[#211](https://github.com/Sparkz400/TIA_MCP/issues/211). The extended qualifier
+ran on Debug builds of `f1a78204` and passed 18 of 18 steps: every step above, plus
+these.
+
+| Check | Result |
+| --- | --- |
+| Fresh export of `Signals` with `Existing` renamed to `Renamed` | `TagScopeMismatch` at prepare; a second export has the same members, types and addresses (only the export's `Created` timestamp differs) |
+| Stages of the applied import | `prechange_project_saved`, `mutation_applied`, `compile_finished`, `tag_table_content_verified`, `changed_project_saved`, in that order |
+| Failed type change | `compile.compilerSucceeded=false`; `mutation_applied` and `compile_finished` without `changed_project_saved`; the message no longer mentions screen rollback |
+
+Before `f1a78204`, a failed apply threw before `compilerSucceeded` was written,
+and the failure message mentioned Classic screen rollback for every change kind.
+Explicit renames and deletions use `tag_set` and `tag_delete`, which are qualified
+in `local.plc_object_mutations.rerun.20261028`, not in this run.

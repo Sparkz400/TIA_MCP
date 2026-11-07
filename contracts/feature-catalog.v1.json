@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.136",
+  "catalogVersion": "0.4.137",
   "targetTiaVersions": [
     21
   ],
@@ -4881,6 +4881,24 @@
         "One owned scratch CPU 1511-1 PN at PLC-root scope with Bool/Int bit-memory tags and one inconsistent unrelated block; software units, namespaces, user constants, multilingual comments, F-PLCs, reopened projects and interrupted outcomes are not exercised by this run.",
         "Project lock release after the worker exit was not verified (projectLockReleaseVerified false); no packaged or installed build was run."
       ]
+    },
+    {
+      "id": "local.tag-table.replacement-compile.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "47b7510317a0f69f37ee0406ef79e5f97f724a5c",
+        "passedScope": "scripts/qualify_tag_table_scope.py on Debug builds of f1a78204 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 18/18 steps. Repeats every step of local.tag-table.scoped-import.20261107 and adds: a fresh native export of Signals with Existing renamed to Renamed is refused at prepare (TagScopeMismatch), and a second export shows the same members, types and addresses (only the export's Created timestamp differs); the applied import reports checkpoint save (prechange_project_saved), mutation_applied, compile_finished, tag_table_content_verified readback and changed_project_saved as separate stages in that order, with compilerSucceeded=false while the one pre-existing error is unchanged; the failed type-change apply reports compile.compilerSucceeded=false, mutation_applied and compile_finished without changed_project_saved, and a CompileFailed message without the Classic screen rollback wording."
+      },
+      "artifacts": [
+        "evidence/local.tag-table.replacement-compile.20261107.json"
+      ],
+      "limitations": [
+        "Source commit 47b75103 differs from the built f1a78204 only in scripts/qualify_tag_table_scope.py (member comparison after the refused rename); src and every executable run are byte-identical to f1a78204.",
+        "One owned scratch CPU 1511-1 PN at PLC-root scope with Bool/Int bit-memory tags; explicit renames and deletions use tag_set and tag_delete, which this run does not exercise (local.plc_object_mutations.rerun.20261028). User constants, software units and multilingual comments are covered by managed tests only.",
+        "Project lock release after the worker exit was not verified."
+      ]
     }
   ],
   "features": [
@@ -8097,7 +8115,8 @@
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Every imported tag whose LogicalAddress is an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses the whole import at prepare and again before the native import with SafetyBoundary (TIA would make it a safety tag); nothing is imported (1 November 2026; rechecked natively in local.safety.fio-routes.20261101).",
-          "Preparation fingerprints only tag-table contents in the selected software scope plus project/hardware/network/software/type/block metadata (tag-table-content-and-project-metadata-v1), so an unrelated inconsistent block no longer blocks it; block payloads are not covered, the change must keep every existing member (TagScopeMismatch), apply compares compiler diagnostics with a baseline compile and refuses new or changed ones, and automatic whole-project restore is refused (ScopedRecoveryRequired). Natively checked in local.tag-table.scoped-import.20261107."
+          "Preparation fingerprints only tag-table contents in the selected software scope plus project/hardware/network/software/type/block metadata (tag-table-content-and-project-metadata-v1), so an unrelated inconsistent block no longer blocks it; block payloads are not covered, the change must keep every existing member (TagScopeMismatch), apply compares compiler diagnostics with a baseline compile and refuses new or changed ones, and automatic whole-project restore is refused (ScopedRecoveryRequired). Natively checked in local.tag-table.scoped-import.20261107.",
+          "A replacement import cannot rename or delete: a candidate missing an existing member, including one renamed in place, is refused at prepare with TagScopeMismatch. Use tag_set (Name) or tag_delete/constant_delete for intended renames and deletions. Results report checkpoint save, mutation, compile, readback and final save as separate stages, and compile.compilerSucceeded is reported on failed applies too (local.tag-table.replacement-compile.20261107)."
         ]
       },
       "qualification": {
@@ -8105,7 +8124,8 @@
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
           "local.safety.fio-routes.20261101",
-          "local.tag-table.scoped-import.20261107"
+          "local.tag-table.scoped-import.20261107",
+          "local.tag-table.replacement-compile.20261107"
         ]
       },
       "availability": {

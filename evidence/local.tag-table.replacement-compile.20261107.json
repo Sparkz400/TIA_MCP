@@ -1,0 +1,81 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.tag-table.replacement-compile.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T08:02:27+00:00",
+  "source": {
+    "commit": "47b7510317a0f69f37ee0406ef79e5f97f724a5c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_tag_table_scope.py on Debug builds of f1a78204 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 18/18 steps. Repeats every step of local.tag-table.scoped-import.20261107 and adds: a fresh native export of Signals with Existing renamed to Renamed is refused at prepare (TagScopeMismatch), and a second export shows the same members, types and addresses (only the export's Created timestamp differs); the applied import reports checkpoint save (prechange_project_saved), mutation_applied, compile_finished, tag_table_content_verified readback and changed_project_saved as separate stages in that order, with compilerSucceeded=false while the one pre-existing error is unchanged; the failed type-change apply reports compile.compilerSucceeded=false, mutation_applied and compile_finished without changed_project_saved, and a CompileFailed message without the Classic screen rollback wording.",
+  "limitations": [
+    "Source commit 47b75103 differs from the built f1a78204 only in scripts/qualify_tag_table_scope.py (member comparison after the refused rename); src and every executable run are byte-identical to f1a78204.",
+    "One owned scratch CPU 1511-1 PN at PLC-root scope with Bool/Int bit-memory tags; explicit renames and deletions use tag_set and tag_delete, which this run does not exercise (local.plc_object_mutations.rerun.20261028). User constants, software units and multilingual comments are covered by managed tests only.",
+    "Project lock release after the worker exit was not verified."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "5a261d42da9e7ed14879e2462b8b0d8a8ad204540d8cf5bb2159da3171ce8a2c"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "bc5128f719baa60937763d4c683a7f676146461fcd0c9a749f354ea82cbd7f77"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "8d4b2a968d750c146738d164ac886c65f92337adcdd150d0106fa9e3c42659d8"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "a4daec07ecf391862abbdb18e27e3b36a481de746fb4072939858cdab98adc94",
+      "bytes": 140554,
+      "completed": true,
+      "steps": [
+        "owned start",
+        "owned scratch",
+        "seed inconsistent block",
+        "TagScopeMismatch",
+        "prepare despite inconsistent block",
+        "apply with existing diagnostic",
+        "native table readback",
+        "TagScopeMismatch",
+        "table after refused rename",
+        "ScopedRecoveryRequired",
+        "prepare stale candidate",
+        "external scratch tag edit",
+        "StaleRevision",
+        "native consumer diagnostic",
+        "prepare consumed type change",
+        "CompileFailed",
+        "retain regression failure",
+        "owned worker shutdown"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_status",
+        "project_inventory",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare",
+        "change_restore"
+      ]
+    }
+  ]
+}
