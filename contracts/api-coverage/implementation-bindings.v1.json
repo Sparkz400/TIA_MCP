@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "3959ff035ff99b4825e4eca00fb8db9c2044d7f9b95454d5fbb5e74f65a99d02",
-      "bytes": 1757132
+      "sha256": "3f74d5185d46d4cc6447e3c7e1f6ef73328127942cb53889fade0ac21e410e4e",
+      "bytes": 1759695
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2652,8 +2652,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
-      "sha256": "54dae5a9809e193aa79db8027009196acef26cc91b2765c6e5931fd272d53cef",
-      "bytes": 141245
+      "sha256": "30e0a6aba3934f8b50766b130e0514767d22f26eb42a12e76a4a1bb7ad00513b",
+      "bytes": 141155
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ClassicScreenArea.cs",
@@ -2987,8 +2987,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SharedMutationAdmission.cs",
-      "sha256": "958ece750f3f0216de7be2473f691010c7885f9453716e40c1a660b457656c14",
-      "bytes": 32793
+      "sha256": "6018d6e84a8ac7227863b66ca9207c36a6080c28656cdc5b7613835699903f36",
+      "bytes": 33052
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Simulation.cs",
@@ -3037,8 +3037,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableImport.cs",
-      "sha256": "9c19eaf7dc59e94bc9867e6a8eea8cb0a380b2a05e66b670c049fb4c70c05286",
-      "bytes": 5022
+      "sha256": "45928541cf1db907de71e626d034ca75ee5047ba1fad8de08546e609dcbc582b",
+      "bytes": 11891
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -114993,6 +114993,13 @@
           "artifacts": [
             "evidence/local.tag-table.replacement-compile.20261107.json"
           ]
+        },
+        {
+          "id": "local.tag-table.scoped-restore.20261107",
+          "profileSha256": "b3bcff6ec85dffdd71adf0084a27431f0c18ad66d05822ac59b8f41844e8e8d6",
+          "artifacts": [
+            "evidence/local.tag-table.scoped-restore.20261107.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -138330,6 +138337,11 @@
       "sha256": "66817352b80e790d22eb745d57d71c548c5a2e192b70d29a45945999ff8a62d0"
     },
     {
+      "path": "evidence/local.tag-table.scoped-restore.20261107.json",
+      "state": "observed",
+      "sha256": "2f80c8c479044df29d7e1a7b5d8e47039f399f48cae57ef57d4ea82b0f2a5af5"
+    },
+    {
       "path": "evidence/local.technology.first-motion.20261101.json",
       "state": "observed",
       "sha256": "ca2a57ed0dbe245ab405a3bf6c8d8ffe39466a94b2a9662d007d78e34a7ddddc"
@@ -139457,6 +139469,10 @@
     {
       "id": "local.tag-table.scoped-import.20261107",
       "profileSha256": "1e62bef73029d2f0ab16b1c19285ee1bcc4867f2c84e704d7b2454a9cb90075c"
+    },
+    {
+      "id": "local.tag-table.scoped-restore.20261107",
+      "profileSha256": "b3bcff6ec85dffdd71adf0084a27431f0c18ad66d05822ac59b8f41844e8e8d6"
     },
     {
       "id": "local.technology.first-motion.20261101",

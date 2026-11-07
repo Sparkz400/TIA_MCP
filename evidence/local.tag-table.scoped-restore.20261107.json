@@ -1,0 +1,93 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.tag-table.scoped-restore.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T09:14:19+00:00",
+  "source": {
+    "commit": "9e52a48e6dc35b22bd70e6fa14ab2c6e3bd646b3",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_tag_table_scope.py on Debug builds of e01f1ac1 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 26/26 steps. Repeats every step of local.tag-table.replacement-compile.20261107 and adds scoped recovery: after the failed type-change import (CompileFailed, recovery_required), an edit of the unrelated table Other makes change_restore refuse with StaleRevision and restore nothing; with Other returned to its recorded state, change_restore re-imports only Signals from its retained native export, verifies every captured table against the before capture, compiles like the baseline (the one pre-existing error, baselineComparison verified) and saves, ending restored with Added back as Bool %M50.1; the earlier applied change's restore refuses with StaleRevision; a new import prepares without admission cleanup; a fresh owned TIA reopens the saved project with the same Signals members and the consumer FC consistent.",
+  "limitations": [
+    "Source commit 9e52a48e differs from the built e01f1ac1 only in scripts/qualify_tag_table_scope.py (the reopen steps); src and every executable run are byte-identical to e01f1ac1.",
+    "Scoped restore covers tag_table_import_xml only, in place, without replacing the project; edits outside tag tables made after the attempt are kept and are not compared. Imports not recorded as applied (interrupted outcomes) still refuse with ScopedRecoveryRequired; whole-project restore remains refused for this kind.",
+    "One owned scratch CPU 1511-1 PN at PLC-root scope; one restored table that existed before the import. Deleting a table the import created is implemented but not exercised natively."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "5a261d42da9e7ed14879e2462b8b0d8a8ad204540d8cf5bb2159da3171ce8a2c"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "8ba4e2736a8f42f66baa5a9ad897e0d6292695380006053fa0d61ddb0141ee9c"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "72c3a975cfc820a29947672e1cde44d2e35a5bde2a6be7284734dc5657fa30d4"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "4828736714c7c3b379611a5b62b6bbe2a9112b002f9172fee172b3a3e44afd55",
+      "bytes": 219277,
+      "completed": true,
+      "steps": [
+        "owned start",
+        "owned scratch",
+        "seed inconsistent block",
+        "TagScopeMismatch",
+        "prepare despite inconsistent block",
+        "apply with existing diagnostic",
+        "native table readback",
+        "TagScopeMismatch",
+        "table after refused rename",
+        "prepare stale candidate",
+        "external scratch tag edit",
+        "StaleRevision",
+        "native consumer diagnostic",
+        "prepare consumed type change",
+        "CompileFailed",
+        "retain regression failure",
+        "edit an unrelated table after the failed attempt",
+        "StaleRevision",
+        "return the unrelated table to the recorded state",
+        "scoped restore of the failed import",
+        "StaleRevision",
+        "next import prepares without cleanup",
+        "close the restored session",
+        "reopen the restored project",
+        "reopened table and consumer equal the restore",
+        "owned worker shutdown"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "project_inventory",
+        "project_open",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "project_open"
+      ]
+    }
+  ]
+}

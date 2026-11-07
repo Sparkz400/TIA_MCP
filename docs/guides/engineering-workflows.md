@@ -69,9 +69,14 @@ With `compile=false`, no compilation or compile-success claim is made; the usual
 requirement to compile before saving through `change_apply` remains.
 
 This policy covers declarations and exposed metadata, not unrelated block
-contents. It therefore refuses `change_restore` with `ScopedRecoveryRequired`
-before saving or closing anything. The archive is retained for explicit manual
-recovery. Interrupted applies do not gain whole-project outcome verification from
+contents, so it never authorizes replacing the whole project. `change_restore`
+instead re-imports only the imported tables from their retained native exports
+(hash-checked; a table the import created is deleted), in place. It refuses with
+`StaleRevision` when any captured table differs from what the attempt left, then
+verifies every table against the before capture, compiles like the baseline and
+saves. Edits outside tag tables made after the attempt are kept. An import not
+recorded as applied still refuses with `ScopedRecoveryRequired`, and the archive
+stays available for manual recovery. Interrupted applies do not gain whole-project outcome verification from
 the scoped fingerprint; unresolved outcomes remain held. This limitation is
 reported in the preview and journal.
 

@@ -84,3 +84,23 @@ Before `f1a78204`, a failed apply threw before `compilerSucceeded` was written,
 and the failure message mentioned Classic screen rollback for every change kind.
 Explicit renames and deletions use `tag_set` and `tag_delete`, which are qualified
 in `local.plc_object_mutations.rerun.20261028`, not in this run.
+
+## Scoped restore
+
+Evidence: `local.tag-table.scoped-restore.20261107`
+([summary](../../evidence/local.tag-table.scoped-restore.20261107.json)), issue
+[#218](https://github.com/Sparkz400/TIA_MCP/issues/218). Debug builds of `e01f1ac1`
+passed 26 of 26 steps: every step above, then these.
+
+| Check | Result |
+| --- | --- |
+| Edit of the unrelated table `Other` after the failed type change, then `change_restore` | `StaleRevision`; nothing restored |
+| `Other` returned to its recorded state, then `change_restore` | `restored`: `Signals` re-imported from its retained export, every captured table equal to the before capture, the one baseline error unchanged, project saved; `Added` is Bool `%M50.1` again |
+| `change_restore` of the earlier applied import | `StaleRevision` |
+| A new import | Prepares without admission cleanup |
+| Fresh owned TIA, `project_open` | Same `Signals` members; the consumer FC is consistent |
+
+Found while qualifying: shared admission compared the project fingerprint with
+the after-change fingerprint for every restore, which a failed import does not
+have; the scoped restore is exempt and checks every table itself. Deleting a table
+the import created is implemented but was not exercised natively.
