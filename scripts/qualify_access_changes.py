@@ -247,7 +247,8 @@ class Run:
             require_plc_compile(applied["compile"], self.plc)
         else:
             require(applied["compile"].get("targetIdentityPolicy") == "device-path-v1", "Expected the all-devices compile receipt")
-            require_clean_compile(applied["compile"])
+            # A run may name devices without a compiler service (a Startdrive drive), which the device compile lists as notCompiled.
+            require_clean_compile(applied["compile"], not_compiled=getattr(self, "not_compiled", ()))
         def status():
             result = h.tool("change_status", {"changeId": prepared["changeId"]})
             require(result["state"] == "applied" and result["stages"] == applied["stages"] and result["afterFingerprint"] == applied["afterFingerprint"]

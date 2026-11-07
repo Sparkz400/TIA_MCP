@@ -667,6 +667,7 @@ def drive_device(run, restore=False):
     if not rows:
         return
     identifier, device, head = rows[0]["typeIdentifier"], "HwDrive", "HwDriveItem"
+    run.not_compiled = [run.path(device)]  # Startdrive exposes no device compile service for the drive.
     run.apply("add drive " + device, "hardware_add", {"typeIdentifier": identifier, "deviceName": device, "itemName": head},
               {"effects": [{"createDevice": device, "typeIdentifier": identifier}]}, added=under(run.path(device)), deferred=True)
     prefix = run.path(device, "items", "")
