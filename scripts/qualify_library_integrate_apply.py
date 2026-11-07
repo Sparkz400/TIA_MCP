@@ -98,14 +98,14 @@ COMBINATIONS = {
     "multiDependentsLad": (True, {"kind": "FB", "language": "LAD", "multi": True, "dependents": True}, []),
     "multiDependentsLadEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2, "multi": True, "dependents": True}, []),
     # OB callers beside the verified obCaller shape (a fresh component after the last network of an FBD OB): a LAD OB, an earlier
-    # placement and reuse of the installed FB, in every combination. Their previews name the candidate features until verified.
-    "obLad": (False, {"kind": "OB", "language": "LAD"}, ["ladCaller", "obCaller"]),
-    "obEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2}, ["earlierPlacement", "obCaller"]),
-    "obLadEarlier": (False, {"kind": "OB", "language": "LAD", "networks": 2}, ["earlierPlacement", "ladCaller", "obCaller"]),
-    "obReuse": (True, {"kind": "OB", "language": "FBD"}, ["obCaller", "reusedComponent"]),
-    "obReuseLad": (True, {"kind": "OB", "language": "LAD"}, ["ladCaller", "obCaller", "reusedComponent"]),
-    "obReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2}, ["earlierPlacement", "obCaller", "reusedComponent"]),
-    "obReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2}, ["earlierPlacement", "ladCaller", "obCaller", "reusedComponent"]),
+    # placement and reuse of the installed FB, in every combination; verified on 7 November (local.library_integrate.candidate_shapes.ob_combinations.20261107).
+    "obLad": (False, {"kind": "OB", "language": "LAD"}, []),
+    "obEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2}, []),
+    "obLadEarlier": (False, {"kind": "OB", "language": "LAD", "networks": 2}, []),
+    "obReuse": (True, {"kind": "OB", "language": "FBD"}, []),
+    "obReuseLad": (True, {"kind": "OB", "language": "LAD"}, []),
+    "obReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2}, []),
+    "obReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2}, []),
 }
 CALLER_SOURCES = {("FB", "FBD"): "callers/TiaMcpComponentHost.s7dcl", ("FB", "LAD"): "callers/TiaMcpComponentHost.lad.s7dcl",
                   ("FC", "FBD"): "TiaMcpComponentCaller.s7dcl", ("FC", "LAD"): "callers/TiaMcpComponentCaller.lad.s7dcl"}

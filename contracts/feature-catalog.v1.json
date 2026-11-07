@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.153",
+  "catalogVersion": "0.4.154",
   "targetTiaVersions": [
     21
   ],
@@ -5172,6 +5172,22 @@
       ],
       "limitations": [
         "One CPU1511 fixture whose only cyclic OB is OB1 with the automatic process image; no process image partition is configured, which SingleStep_P steps by. Signals are two Bool DB members; rows are not compared with scan counts."
+      ]
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.ob_combinations.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b9f32ecddef411b24b9664bcf400b29e7cb085ae",
+        "passedScope": "scripts/qualify_library_integrate_apply.py --candidates on a --component-qualification Host from Debug builds of b9f32ecd, seven cases each in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: the PLC component into an existing program-cycle OB caller as a LAD OB (obLad), after the first of two networks (obEarlier, obLadEarlier), reusing the FB a verified standalone install put into the project (obReuse, obReuseLad, obReuseEarlier, obReuseLadEarlier). Each preview named exactly its combination, and each install passed the exact installed-object diff, the native caller insertion proof after the selected network, the call oracle, exact library versions, a fresh reopen, a 0-error compile and change_restore of the initial checkpoint (the typed step's own archive for a reused FB) into a new location equal to the baseline."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.ob_combinations.20261107.json"
+      ],
+      "limitations": [
+        "OB fixtures are program-cycle OBs built from Main's export with the peer FC's coil network (FBD, or LAD from the LAD FC fixture); other OB event classes are not exercised. de-DE-only projects."
       ]
     }
   ],
@@ -13137,7 +13153,8 @@
           "Combined Unified recipes (27 October, plan-only): plc_hmi_component_plan adds HMI tag mappings, connection selection, screen placement and expected compiler outcomes to the PLC recipe; plc_hmi_update_plan previews every proven Unified binding through one selected UDT version and refuses breaking or unprovable bindings with HmiBindingWouldBreak/HmiImpactIncomplete and an impact report. Apply is refused; member-bound tags, screen items and the Unified preservation gate stay blocked. Classic HMIs, nested UDTs and script/alarm consumers are not analyzed. The native prepare-only probe passed on Unified Comfort (local.hmi.plc-hmi-recipe.20261027): blocked install plan with refused apply, and a Real -> LReal UDT update refused with exactly one breaking binding and its screen consumer.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
-          "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged."
+          "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
+          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these; other OB event classes are not exercised."
         ]
       },
       "qualification": {
@@ -13153,7 +13170,8 @@
           "local.library_integrate.combined_apply.regression.20261102",
           "local.library_integrate.candidate_shapes.verified.20261102",
           "local.component.ob.20261102",
-          "local.component.ob-production.20261102"
+          "local.component.ob-production.20261102",
+          "local.library_integrate.candidate_shapes.ob_combinations.20261107"
         ]
       },
       "availability": {
@@ -13202,7 +13220,8 @@
           "Every combined-apply refusal is decided while the worker resolves the shared-mutation scope at mutation_begin, after the scope's own offline, PreviewStale and source checks (which keep their codes), so the Host writes no admission record and nothing becomes recovery_required (local.library_integrate.combined_apply.regression.20261101). The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
           "The import step's complete-project archive (for a reused FB, the typed step's own archive), taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
           "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable.",
-          "Before any claim, import or save, combined apply refuses (PlcIntegrationNotQualified) unless de-DE is the project's only active, reference and editing language and an instance creation profile covers the FB (captured storage profile with its CPU and loaded API files, or a shipped global instance template matched against the planned FB export); the preview reports combinedApply.eligible=false for such projects."
+          "Before any claim, import or save, combined apply refuses (PlcIntegrationNotQualified) unless de-DE is the project's only active, reference and editing language and an instance creation profile covers the FB (captured storage profile with its CPU and loaded API files, or a shipped global instance template matched against the planned FB export); the preview reports combinedApply.eligible=false for such projects.",
+          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these; other OB event classes are not exercised."
         ]
       },
       "qualification": {
@@ -13221,7 +13240,8 @@
           "local.library_integrate.combined_apply.regression.20261102",
           "local.library_integrate.candidate_shapes.verified.20261102",
           "local.component.ob.20261102",
-          "local.component.ob-production.20261102"
+          "local.component.ob-production.20261102",
+          "local.library_integrate.candidate_shapes.ob_combinations.20261107"
         ]
       },
       "availability": {

@@ -259,7 +259,7 @@ class Candidates(unittest.TestCase):
 
     def test_combinations_name_exactly_their_gate_features(self):
         # PlcComponentQualificationGate.Features: LAD language, an FB caller, a multi-instance, a reused FB, an earlier network.
-        verified = {"dependentInstanceDb+earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent", "dependentInstanceDb+earlierPlacement+fbCaller+multiInstance+reusedComponent", "dependentInstanceDb+fbCaller+ladCaller+multiInstance+reusedComponent", "dependentInstanceDb+fbCaller+multiInstance+reusedComponent", "earlierPlacement", "earlierPlacement+fbCaller", "earlierPlacement+fbCaller+ladCaller", "earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent", "earlierPlacement+fbCaller+ladCaller+reusedComponent", "earlierPlacement+fbCaller+multiInstance+reusedComponent", "earlierPlacement+fbCaller+reusedComponent", "earlierPlacement+ladCaller", "earlierPlacement+ladCaller+reusedComponent", "earlierPlacement+reusedComponent", "fbCaller", "fbCaller+ladCaller", "fbCaller+ladCaller+multiInstance+reusedComponent", "fbCaller+ladCaller+reusedComponent", "fbCaller+multiInstance+reusedComponent", "fbCaller+reusedComponent", "ladCaller", "ladCaller+reusedComponent", "reusedComponent"}
+        verified = {"dependentInstanceDb+earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent", "dependentInstanceDb+earlierPlacement+fbCaller+multiInstance+reusedComponent", "dependentInstanceDb+fbCaller+ladCaller+multiInstance+reusedComponent", "dependentInstanceDb+fbCaller+multiInstance+reusedComponent", "earlierPlacement", "earlierPlacement+fbCaller", "earlierPlacement+fbCaller+ladCaller", "earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent", "earlierPlacement+fbCaller+ladCaller+reusedComponent", "earlierPlacement+fbCaller+multiInstance+reusedComponent", "earlierPlacement+fbCaller+reusedComponent", "earlierPlacement+ladCaller", "earlierPlacement+ladCaller+obCaller", "earlierPlacement+ladCaller+obCaller+reusedComponent", "earlierPlacement+ladCaller+reusedComponent", "earlierPlacement+obCaller", "earlierPlacement+obCaller+reusedComponent", "earlierPlacement+reusedComponent", "fbCaller", "fbCaller+ladCaller", "fbCaller+ladCaller+multiInstance+reusedComponent", "fbCaller+ladCaller+reusedComponent", "fbCaller+multiInstance+reusedComponent", "fbCaller+reusedComponent", "ladCaller", "ladCaller+obCaller", "ladCaller+obCaller+reusedComponent", "ladCaller+reusedComponent", "obCaller+reusedComponent", "reusedComponent"}
         keys = set()
         for name, (reuse, caller, features) in subject.COMBINATIONS.items():
             with self.subTest(name=name):
@@ -276,9 +276,8 @@ class Candidates(unittest.TestCase):
         self.assertFalse(set(subject.COMBINATIONS) & set(subject.CANDIDATES))
         # Every combination of the five features that a plan can have runs once at least, and each multi-instance combination with
         # the caller's own instance DB besides multiInstanceDependents (the plain fbCaller one); all are verified since 2 November.
-        # The seven OB combinations beside the verified obCaller shape are candidates until their native run.
-        ob = {k for k in keys if "obCaller" in k}
-        self.assertEqual(18, len(keys - ob)); self.assertEqual(set(), keys - ob - verified); self.assertEqual(7, len(ob - verified))
+        # The seven OB combinations beside obCaller, verified on 7 November.
+        self.assertEqual(25, len(keys)); self.assertEqual(set(), keys - verified)
 
 
 if __name__ == "__main__":
