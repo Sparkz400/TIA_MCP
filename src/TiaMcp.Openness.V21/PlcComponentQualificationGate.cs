@@ -54,10 +54,11 @@ namespace TiaMcp.Openness.V21
         // ladCaller, fbCaller, earlierPlacement, reusedComponent and multiInstance a plan can have; and with the captured instance-DB
         // effect local.typed.component-effect-capture.20261102, each multi-instance combination whose caller FB has its own instance
         // DB (local.library_integrate.candidate_shapes.dependent_db.20261102).
+        // local.library_integrate.candidate_shapes.embedding_parent.20261107: a multi-instance caller FB embedded in a parent FB, through the captured component transitive effect.
         // local.component.ob.20261102 also verifies a fresh component with a global instance DB after the last network of an FBD OB, and
         // local.library_integrate.candidate_shapes.ob_combinations.20261107 every combination of an OB caller with ladCaller, earlierPlacement and reusedComponent.
-        internal static readonly string[] VerifiedShapes = { "dependentInstanceDb+earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent", "dependentInstanceDb+earlierPlacement+fbCaller+multiInstance+reusedComponent", "dependentInstanceDb+fbCaller+ladCaller+multiInstance+reusedComponent", "dependentInstanceDb+fbCaller+multiInstance+reusedComponent", "earlierPlacement", "earlierPlacement+fbCaller", "earlierPlacement+fbCaller+ladCaller", "earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent", "earlierPlacement+fbCaller+ladCaller+reusedComponent", "earlierPlacement+fbCaller+multiInstance+reusedComponent", "earlierPlacement+fbCaller+reusedComponent", "earlierPlacement+ladCaller", "earlierPlacement+ladCaller+obCaller", "earlierPlacement+ladCaller+obCaller+reusedComponent", "earlierPlacement+ladCaller+reusedComponent", "earlierPlacement+obCaller", "earlierPlacement+obCaller+reusedComponent", "earlierPlacement+reusedComponent", "fbCaller", "fbCaller+ladCaller", "fbCaller+ladCaller+multiInstance+reusedComponent", "fbCaller+ladCaller+reusedComponent", "fbCaller+multiInstance+reusedComponent", "fbCaller+reusedComponent", "ladCaller", "ladCaller+obCaller", "ladCaller+obCaller+reusedComponent", "ladCaller+reusedComponent", "obCaller", "obCaller+reusedComponent", "reusedComponent" };
-        internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport, bool candidates = false, bool dependentInstanceDb = false)
+        internal static readonly string[] VerifiedShapes = { "dependentInstanceDb+earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent", "dependentInstanceDb+earlierPlacement+fbCaller+multiInstance+reusedComponent", "dependentInstanceDb+fbCaller+ladCaller+multiInstance+reusedComponent", "dependentInstanceDb+fbCaller+multiInstance+reusedComponent", "earlierPlacement", "earlierPlacement+fbCaller", "earlierPlacement+fbCaller+ladCaller", "earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent", "earlierPlacement+fbCaller+ladCaller+reusedComponent", "earlierPlacement+fbCaller+multiInstance+reusedComponent", "earlierPlacement+fbCaller+reusedComponent", "earlierPlacement+ladCaller", "earlierPlacement+ladCaller+obCaller", "earlierPlacement+ladCaller+obCaller+reusedComponent", "earlierPlacement+ladCaller+reusedComponent", "earlierPlacement+obCaller", "earlierPlacement+obCaller+reusedComponent", "earlierPlacement+reusedComponent", "embeddingParent+fbCaller+multiInstance+reusedComponent", "fbCaller", "fbCaller+ladCaller", "fbCaller+ladCaller+multiInstance+reusedComponent", "fbCaller+ladCaller+reusedComponent", "fbCaller+multiInstance+reusedComponent", "fbCaller+reusedComponent", "ladCaller", "ladCaller+obCaller", "ladCaller+obCaller+reusedComponent", "ladCaller+reusedComponent", "obCaller", "obCaller+reusedComponent", "reusedComponent" };
+        internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport, bool candidates = false, bool dependentInstanceDb = false, bool embeddingParent = false)
         {
             var payload = preview?["payload"] as JObject; var plan = preview?["integrationPlan"] as JObject; var caller = plan?["caller"] as JObject;
             if (payload == null || caller == null || PlcHmiIntegrationPlanner.IsRecipe(payload)) return "Only a prepared PLC component plan is eligible; HMI targets and PLC/HMI recipes stay plan-only.";
@@ -69,7 +70,7 @@ namespace TiaMcp.Openness.V21
                 return "Only a fresh FB/dependency import or the complete installed FB, each with new instance storage, has a builder; partial dependency reuse and reused instance DBs stay plan-only.";
             if (!(plan["blockers"] is JArray blockers) || blockers.Count != 0 || !(plan["steps"] is JArray steps) || steps.Any(s => s["planOnly"] != null))
                 return "Resolve every planner blocker and planOnly step first.";
-            var unverified = candidates ? new JObject() : UnverifiedFeatures(plan, payload, callerExport, null, dependentInstanceDb);
+            var unverified = candidates ? new JObject() : UnverifiedFeatures(plan, payload, callerExport, null, dependentInstanceDb, embeddingParent);
             if (unverified.Count == 0) return null;
             return (string)unverified.Properties().FirstOrDefault(p => !VerifiedShapes.Contains(p.Name, StringComparer.Ordinal))?.Value
                 ?? "The combination " + ShapeKey(unverified) + " of separately verified features has no native evidence; it stays plan-only.";
@@ -77,15 +78,16 @@ namespace TiaMcp.Openness.V21
 
         // The plan's features beyond the first verified shape, each with its refusal, when their exact combination is not verified.
         internal static JObject UnverifiedFeatures(JObject plan, JObject payload, XDocument callerExport, System.Collections.Generic.IEnumerable<string> verifiedShapes = null,
-            bool dependentInstanceDb = false)
+            bool dependentInstanceDb = false, bool embeddingParent = false)
         {
-            var features = Features(plan, payload, callerExport, dependentInstanceDb);
+            var features = Features(plan, payload, callerExport, dependentInstanceDb, embeddingParent);
             return (verifiedShapes ?? VerifiedShapes).Contains(ShapeKey(features), StringComparer.Ordinal) ? new JObject() : features;
         }
         internal static string ShapeKey(JObject features) => string.Join("+", features.Properties().Select(p => p.Name).OrderBy(n => n, StringComparer.Ordinal));
 
         // dependentInstanceDb: the multi-instance caller FB has its own instance DBs, which gain the new member (worker-observed).
-        private static JObject Features(JObject plan, JObject payload, XDocument callerExport, bool dependentInstanceDb)
+        // embeddingParent: it has dependents beyond them (parent FBs embedding it, their DBs and users), covered by the transitive effect.
+        private static JObject Features(JObject plan, JObject payload, XDocument callerExport, bool dependentInstanceDb, bool embeddingParent = false)
         {
             var caller = (JObject)plan["caller"]; string kind = caller.Value<string>("kind"), language = caller.Value<string>("language");
             var features = new JObject();
@@ -95,6 +97,8 @@ namespace TiaMcp.Openness.V21
             if (plan["multiInstance"] != null) features["multiInstance"] = "A multi-instance is verified only for the reused installed FB in an existing LAD or FBD FB caller; other multi-instances stay plan-only.";
             if (dependentInstanceDb && plan["multiInstance"] != null)
                 features["dependentInstanceDb"] = "A multi-instance caller FB with its own instance DB is verified only in the natively run multi-instance combinations; this one stays plan-only.";
+            if (embeddingParent && plan["multiInstance"] != null)
+                features["embeddingParent"] = "A multi-instance caller FB embedded in a parent FB is verified for the reused FB in an existing FBD FB caller; this combination stays plan-only.";
             if (plan["fb"]?.Value<bool?>("reused") == true) features["reusedComponent"] = "Reuse of the installed FB is verified with a new or existing FC or an existing FB caller and a new global instance DB, or as a multi-instance in an existing FB caller; this reuse combination stays plan-only.";
             if (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(payload) &&
                 (string)callerExport?.Descendants("SW.Blocks.CompileUnit").LastOrDefault()?.Attribute("ID") != payload["integration"]["caller"].Value<string>("insertAfterNetworkId"))
@@ -110,9 +114,12 @@ namespace TiaMcp.Openness.V21
         // A multi-instance changes the caller FB's interface, so the typed step also changes each dependent the typed route finds
         // (its instance DBs, embedding parents and their users). Only the caller's direct instance DBs have a captured effect for
         // the component's structured member (instance-effects-component.v1.json); any other dependent is refused before admission and claim.
+        // transitiveCovered: the component's transitive effect is installed and admitted here, so the typed preparation, which runs
+        // before any mutation, decides each embedding parent, its DBs and users itself.
         internal static JObject CombinedApplyDependentsRefusal(JObject plan, System.Collections.Generic.IEnumerable<string> dependents,
-            System.Collections.Generic.IEnumerable<string> directInstanceDbs = null)
+            System.Collections.Generic.IEnumerable<string> directInstanceDbs = null, bool transitiveCovered = false)
         {
+            if (transitiveCovered) return null;
             var covered = new System.Collections.Generic.HashSet<string>(directInstanceDbs ?? Enumerable.Empty<string>(), StringComparer.Ordinal);
             var paths = plan?["multiInstance"] == null ? new string[0] : dependents.Where(p => !covered.Contains(p)).OrderBy(p => p, StringComparer.Ordinal).ToArray();
             if (paths.Length == 0) return null;

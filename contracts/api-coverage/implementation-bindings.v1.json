@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "ad56975e805171244dd4ffd8bf93f5c3741e67f47e8cf091c50a66d0e5d4c865",
-      "bytes": 1801724
+      "sha256": "fe8a80930923124b8474bb5968f1f7f4e4756af02e6e7b3d75da50e74c85f761",
+      "bytes": 1804046
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2937,8 +2937,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs",
-      "sha256": "f50a8624e31bd8931b36b344bab7885f9a6d93aa1ada0f3d06eccf7cd0cca034",
-      "bytes": 30764
+      "sha256": "4931611c270c3c97c82dbcbc2dc9605eee0d1389120b09ecfad832deaf8c3772",
+      "bytes": 31087
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.TypedPreview.cs",
@@ -3157,8 +3157,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedDependencyProfiles.cs",
-      "sha256": "933370007198e91ee2697baf6e67acf478d7a3db1deee9d3fc0b6c121a200f9a",
-      "bytes": 9177
+      "sha256": "caf4e64f6f392e42c4557547394186d931e99bf7470b098b1d8e48eb04200409",
+      "bytes": 10911
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
@@ -3232,8 +3232,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs",
-      "sha256": "89144bc614c2a96f1da7210cb7a06cd748cf3e4f02e34dbb0100832572fbf808",
-      "bytes": 19892
+      "sha256": "4b830ec19d3244dd89d6758c6a854834533e472bc548047e9ed9a2d14872d097",
+      "bytes": 20957
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcHmiIntegrationPlanner.cs",
@@ -101642,9 +101642,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs",
               "name": "PreparePlcCombinedApply",
-              "line": 239,
-              "endLine": 260,
-              "sha256": "5944771d2efcc5e40093bb92644f69393319fe7befc313c6e5661d2992f5ba96"
+              "line": 241,
+              "endLine": 262,
+              "sha256": "adf84070e145a01486d551983a3599fca377889f2534dcb8a04586b5f1842065"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcHmiIntegration.cs",
@@ -101819,9 +101819,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs",
               "name": "PreparePlcCombinedApply",
-              "line": 239,
-              "endLine": 260,
-              "sha256": "5944771d2efcc5e40093bb92644f69393319fe7befc313c6e5661d2992f5ba96"
+              "line": 241,
+              "endLine": 262,
+              "sha256": "adf84070e145a01486d551983a3599fca377889f2534dcb8a04586b5f1842065"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcHmiIntegration.cs",
@@ -113470,6 +113470,13 @@
           "artifacts": [
             "evidence/local.library_integrate.candidate_shapes.ob_combinations.20261107.json"
           ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+          "profileSha256": "2de00642514da8d5ccaad70d9184e1782aadab75f32b993528b64b087a7c8489",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.embedding_parent.20261107.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -123067,6 +123074,13 @@
           "profileSha256": "70731cd6c2d8a5d61d990077426294cbb1d340a3f48b3e7c3bf593153128f882",
           "artifacts": [
             "evidence/local.library_integrate.candidate_shapes.ob_combinations.20261107.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+          "profileSha256": "2de00642514da8d5ccaad70d9184e1782aadab75f32b993528b64b087a7c8489",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.embedding_parent.20261107.json"
           ]
         }
       ],
@@ -139669,6 +139683,11 @@
       "sha256": "0e6495dbde32f6112b836545efa699ffdc3f016709f3530d966a3e186aa2d782"
     },
     {
+      "path": "evidence/local.library_integrate.candidate_shapes.embedding_parent.20261107.json",
+      "state": "observed",
+      "sha256": "f9fb398cd42f6ea2d42ab3fab91e191695c561334d2794bed9601478e87c3bd4"
+    },
+    {
       "path": "evidence/local.library_integrate.candidate_shapes.multi.20261101.json",
       "state": "observed",
       "sha256": "eb72b0c161721e83ab9cf46ab3a052f79e43bb0ad752eadddd05f89159774e18"
@@ -140957,6 +140976,10 @@
     {
       "id": "local.library_integrate.candidate_shapes.dependents.rerun.20261101",
       "profileSha256": "53c2896d89f1533400d5ff1d80f985256cb28a1739fa502cfba89eb385e78763"
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+      "profileSha256": "2de00642514da8d5ccaad70d9184e1782aadab75f32b993528b64b087a7c8489"
     },
     {
       "id": "local.library_integrate.candidate_shapes.multi.20261101",

@@ -1,0 +1,77 @@
+FUNCTION_BLOCK "Tgp_CompNestEffect"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+ Enable : Bool;
+END_VAR
+VAR_OUTPUT
+ Active : Bool;
+END_VAR
+VAR
+ RetainedMarker : Int := 17;
+END_VAR
+BEGIN
+ #Active := #Enable;
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK "Tgp_CompNestParent"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+ Enable : Bool;
+END_VAR
+VAR_OUTPUT
+ Active : Bool;
+END_VAR
+VAR
+ RetainedMarker : Int := 17;
+ Inner : "Tgp_CompNestEffect";
+END_VAR
+BEGIN
+ #Active := #Enable;
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK "Tgp_CompNestGrand"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+ Enable : Bool;
+END_VAR
+VAR_OUTPUT
+ Active : Bool;
+END_VAR
+VAR
+ RetainedMarker : Int := 17;
+ Middle : "Tgp_CompNestParent";
+END_VAR
+BEGIN
+ #Active := #Enable;
+END_FUNCTION_BLOCK
+
+DATA_BLOCK "Tgp_CompNestEffect_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"Tgp_CompNestEffect"
+BEGIN
+ RetainedMarker := 42;
+END_DATA_BLOCK
+
+DATA_BLOCK "Tgp_CompNestParent_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"Tgp_CompNestParent"
+BEGIN
+ RetainedMarker := 42;
+ Inner.RetainedMarker := 42;
+END_DATA_BLOCK
+
+DATA_BLOCK "Tgp_CompNestGrand_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"Tgp_CompNestGrand"
+BEGIN
+ RetainedMarker := 42;
+ Middle.RetainedMarker := 42;
+ Middle.Inner.RetainedMarker := 42;
+END_DATA_BLOCK
+

@@ -75,11 +75,13 @@ def verify(documents, appended, prefix="Tgp_", namespace=""):
     return hosts
 
 
-def extract(capture_path, route="standard"):
+def extract(capture_path, route="standard", component=False):
+    """component: the PLC component FB's structured Gate member (route-capture-transitive-effect-component-packet), standard route only."""
+    assert not component or route == "standard", "The component capture is one standard-route capture."
     report = json.loads(capture_path.read_text(encoding="utf-8"))
     assert report["completed"] and report["builderUsed"] is False
-    name = effect_name("instance-effects-transitive", route, report_cpu(report))
-    packet = json.loads((ROOT / ("fixtures/typed-graphical/route-capture-transitive-effect-" + ("standard-" if route == "standard" else "")
+    name = effect_name("instance-effects-transitive" + ("-component" if component else ""), route, report_cpu(report))
+    packet = json.loads((ROOT / ("fixtures/typed-graphical/route-capture-transitive-effect-" + ("component-" if component else "standard-" if route == "standard" else "")
                                  + "packet.v1.json")).read_text(encoding="utf-8"))
     scope = packet if route == "standard" else next(r for r in packet["routes"] if r["route"] == route)
     prefix, namespace = scope.get("prefix", "Tgp_"), scope.get("namespace", "")
@@ -91,7 +93,7 @@ def extract(capture_path, route="standard"):
     directory.mkdir(exist_ok=True)
     result = {"schemaVersion": 1, "builderUsed": False, "nativeImportCompileVerified": True, "engineeringVerified": False,
               "preservationVerified": False, "persistenceVerified": False, "recoveryVerified": False, "runtimeVerified": False,
-              "tiaVersion": "V21", "route": route, **({"namespace": namespace} if namespace else {}),
+              "tiaVersion": "V21", "route": route, **({"namespace": namespace} if namespace else {}), **({"qualificationOnly": True} if component else {}),
               "changedFb": scope["chain"][0]["fb"], "chain": scope["chain"],
               "cpuFamily": report_cpu(report),
               "artifacts": {}, "sources": {}}
@@ -125,5 +127,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("capture", type=Path, help="capture.json of the transitive effect packet")
     parser.add_argument("--route", choices=("standard", "softwareUnit", "namespace"), default="standard")
+    parser.add_argument("--component", action="store_true", help="The PLC component FB's structured Gate member (component packet).")
     args = parser.parse_args()
-    print(json.dumps(extract(args.capture.resolve(), args.route)["nativeObservedEffect"]["nestedHostsPerDependent"]))
+    print(json.dumps(extract(args.capture.resolve(), args.route, args.component)["nativeObservedEffect"]["nestedHostsPerDependent"]))

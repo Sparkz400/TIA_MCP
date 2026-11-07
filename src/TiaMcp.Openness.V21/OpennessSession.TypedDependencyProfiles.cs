@@ -68,6 +68,25 @@ namespace TiaMcp.Openness.V21
             return profile.Value<bool?>("qualificationOnly") == true && !TypedQualificationScratch(capture.Plc.Project) ? null : profile;
         }
 
+        // The same member nested in a parent FB or its instance DB at any depth (local.typed.component-transitive-capture.20261107):
+        // TIA appends it like the direct DB member without its top-level attributes, as for the scalar members; admitted since its
+        // combined apply passed (local.library_integrate.candidate_shapes.embedding_parent.20261107).
+        internal const string ComponentTransitiveManifest = "instance-effects-transitive-component.v1.json";
+        private JObject TypedComponentTransitiveEffect(TypedResolutionCapture capture, string catalogPath, string route)
+        {
+            if (route != "standard" || !File.Exists(Path.Combine(Path.GetDirectoryName(catalogPath), ComponentTransitiveManifest))) return null;
+            var profile = ReadTypedEffectManifest(capture, catalogPath, route, ComponentTransitiveManifest);
+            return profile.Value<bool?>("qualificationOnly") == true && !TypedQualificationScratch(capture.Plc.Project) ? null : profile;
+        }
+
+        // Whether a combined apply's embedding parents have a component transitive effect here (the typed preparation checks it in full).
+        private bool TypedComponentTransitiveAvailable(Siemens.Engineering.Project project)
+        {
+            string path = Path.Combine(Path.GetDirectoryName(TypedCatalogPath()), ComponentTransitiveManifest);
+            if (!File.Exists(path)) return false;
+            return JObject.Parse(File.ReadAllText(path)).Value<bool?>("qualificationOnly") != true || TypedQualificationScratch(project);
+        }
+
         // transitive: the dependent is a parent FB or its InstanceDB that embeds the changed FB as a nested multi-instance.
         private void PrepareTypedDependentInstance(TypedResolutionCapture capture, JObject dependency, string callerName, XElement declaration, bool transitive = false)
         {
@@ -96,11 +115,12 @@ namespace TiaMcp.Openness.V21
             {
                 string memberName = profile.Value<string>("memberName");
                 try { member = TypedGraphicalMultiInstanceTemplate.DependentMember(declaration, TypedTopStaticMember(caller, memberName), TypedTopStaticMember(instance, memberName)); }
-                catch (BridgeException) when (!transitive)
+                catch (BridgeException)
                 {
-                    // The generic pair is scalar; the component FB's structured (UDT) member maps only onto its own captured pair.
+                    // The generic pair is scalar; the component FB's structured (UDT) member maps only onto its own captured pair, and
+                    // nests in an embedding parent only where its own transitive capture shows it.
                     var component = TypedComponentEffect(capture, catalogPath, route);
-                    if (component == null) throw;
+                    if (component == null || transitive && TypedComponentTransitiveEffect(capture, catalogPath, route) == null) throw;
                     var parts = (JObject)component["artifacts"]; memberName = component.Value<string>("memberName");
                     member = TypedGraphicalMultiInstanceTemplate.DependentMember(declaration,
                         TypedTopStaticMember(ReadTypedProfileResource(capture, catalogPath, parts["afterCaller"].Value<string>("path"), parts["afterCaller"].Value<string>("sha256")), memberName),

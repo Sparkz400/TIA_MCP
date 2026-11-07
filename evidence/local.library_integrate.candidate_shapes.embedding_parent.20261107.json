@@ -1,0 +1,87 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T17:46:29+00:00",
+  "source": {
+    "commit": "ae6490b8c958721ab85780b7e263de6b0afef55f",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Two reports. (1) capture_typed_routes_owned.py at b766b452 in an owned CPU 1511-1 PN V4.1 scratch: Tgp_CompNestEffect gains Gate : TiaMcpComponentGate; Tgp_CompNestParent, Tgp_CompNestGrand and their DBs each append it to their nested multi-instance's Static section in the direct DB member's shape without its top-level attributes (extract_typed_transitive_effects.py --component, instance-effects-transitive-component.v1.json). (2) qualify_library_integrate_apply.py --candidates --case multiInstanceParent at ae6490b8: a reused-FB multi-instance in TiaMcpComponentHost, embedded in TiaMcpComponentParent; the preview named embeddingParent, fbCaller, multiInstance and reusedComponent; installed with the parent's nested member equal to the captured one, exact preservation otherwise, fresh reopen, 0-error compile and checkpoint restore.",
+  "limitations": [
+    "One embedding parent FB of the FBD Host FB, without its own DB or a grandparent in the combined apply; the capture covers two depths and DBs.",
+    "The capture binaries (b766b452) are not the case's; only the case's binaries are hashed here."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "f1b9b161da8b8bbb4e59f158eb5c7255a47508a8adcb6fa1c9944efa39ee90e3"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "49abd1d8931f741a42f48e85c324b9174c7f768bfeb7df451a39a245b38ac1cd"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "3fd97e60c3381e9df93791b8a275cc2b480681cda5d8c2da457c77ff0ea3ff3b",
+      "bytes": 4138826,
+      "completed": true,
+      "steps": [
+        "author",
+        "candidate:multiInstanceParent"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "capture.json",
+      "sha256": "6d10aa2ae8db0bccd26f12128e9a9deec51b8670da8a5b6e10ec0bb975e2d1e2",
+      "bytes": 5245522,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

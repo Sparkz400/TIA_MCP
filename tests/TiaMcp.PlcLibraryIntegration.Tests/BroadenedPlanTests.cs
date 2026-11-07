@@ -142,6 +142,8 @@ internal static class BroadenedPlanTests
             Equal(null, PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, new[] { "/plc/blocks/Main_DB" }, new[] { "/plc/blocks/Main_DB" }));
             Equal("/plc/blocks/Cycle", string.Join(",", PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, new[] { "/plc/blocks/Main_DB", "/plc/blocks/Cycle" },
                 new[] { "/plc/blocks/Main_DB" })["dependents"].Select(d => (string)d)));
+            // With the component transitive effect installed, the typed preparation decides embedding parents and users itself.
+            Equal(null, PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, new[] { "/plc/blocks/Main_DB", "/plc/blocks/Cycle" }, new[] { "/plc/blocks/Main_DB" }, true));
         });
         // Passed natively on 2 November (local.library_integrate.candidate_shapes.dependent_db.20261102).
         test("a multi-instance caller with its own instance DB is its own verified combination", () => {
