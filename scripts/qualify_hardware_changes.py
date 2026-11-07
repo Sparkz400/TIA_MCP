@@ -777,7 +777,9 @@ def refusals(run):
     (p1, q1), (p2, _) = ports(run, 1), ports(run, 2)
     run.refuse("hardware_add", "a device name differing only in case", {"typeIdentifier": CPU, "deviceName": "hwpeer", "itemName": "X"}, "ObjectExists")
     run.refuse("hardware_add", "an identifier missing from the catalog", {"typeIdentifier": "OrderNumber:6ES7 999-9XX99-9XX9/V9.9", "deviceName": "HwBogus", "itemName": "X"}, "CatalogItemNotFound")
-    run.refuse("hardware_attributes", "an attribute outside the allowlist", {"hardwarePath": module, "attributes": {"FirmwareVersion": "V2.0"}}, "UnsupportedAttribute")
+    # Since the bundled capability profiles (1-2 November) the profile check refuses FirmwareVersion before the allowlist does.
+    run.refuse("hardware_attributes", "an attribute the module's capability profile does not declare writable", {"hardwarePath": module, "attributes": {"FirmwareVersion": "V2.0"}},
+               "AttributeNotWritable")
     run.refuse("hardware_attributes", "an invented hardware path", {"hardwarePath": module + "X", "attributes": {"Comment": "x"}}, "HardwareNotFound")
     run.refuse("hardware_replace", "the module's current identifier", {"hardwarePath": module, "typeIdentifier": run.current["view"]["hw:" + module]["typeIdentifier"]}, "InvalidRequest")
     run.refuse("hardware_replace", "the CPU", {"hardwarePath": peer, "typeIdentifier": CPU.replace("V4.1", "V4.0")}, "SoftwareBearingHardware")
