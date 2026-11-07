@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.159",
-    "catalogSha256": "4b8a49cecd804c699333ea36a62f32aeb04be41e553d035e3fc2f31b4c2b7f5b",
+    "catalogSha256": "29f1fccb358f445dcdc4362ece10b6b903640d2a892cb4474cb0df7471c64781",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "5c4786dd1c89d694fbb8dd6cedda08b781fd52cfb05022cdeda06a2770ef8125"
   },
@@ -8919,7 +8919,8 @@
         "local.component.ob.20261102",
         "local.component.ob-production.20261102",
         "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-        "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+        "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+        "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
       ],
       "cells": [
         {
@@ -8938,7 +8939,8 @@
             "local.component.ob.20261102",
             "local.component.ob-production.20261102",
             "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-            "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+            "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+            "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
           ]
         },
         {
@@ -8957,7 +8959,8 @@
             "local.component.ob.20261102",
             "local.component.ob-production.20261102",
             "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-            "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+            "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+            "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
           ]
         },
         {
@@ -8976,7 +8979,8 @@
             "local.component.ob.20261102",
             "local.component.ob-production.20261102",
             "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-            "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+            "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+            "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
           ]
         },
         {
@@ -8995,7 +8999,8 @@
             "local.component.ob.20261102",
             "local.component.ob-production.20261102",
             "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-            "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+            "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+            "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
           ]
         },
         {
@@ -9014,7 +9019,8 @@
             "local.component.ob.20261102",
             "local.component.ob-production.20261102",
             "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-            "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+            "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+            "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
           ]
         },
         {
@@ -9033,7 +9039,8 @@
             "local.component.ob.20261102",
             "local.component.ob-production.20261102",
             "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-            "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+            "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+            "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
           ]
         }
       ]
@@ -9069,7 +9076,8 @@
         "local.component.ob.20261102",
         "local.component.ob-production.20261102",
         "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-        "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+        "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+        "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
       ],
       "cells": [
         {
@@ -9091,7 +9099,8 @@
             "local.component.ob.20261102",
             "local.component.ob-production.20261102",
             "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-            "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+            "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+            "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
           ]
         },
         {
@@ -9113,7 +9122,8 @@
             "local.component.ob.20261102",
             "local.component.ob-production.20261102",
             "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-            "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+            "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+            "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
           ]
         },
         {
@@ -9135,7 +9145,8 @@
             "local.component.ob.20261102",
             "local.component.ob-production.20261102",
             "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-            "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+            "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+            "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
           ]
         },
         {
@@ -9157,7 +9168,8 @@
             "local.component.ob.20261102",
             "local.component.ob-production.20261102",
             "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-            "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+            "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+            "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
           ]
         },
         {
@@ -9179,7 +9191,8 @@
             "local.component.ob.20261102",
             "local.component.ob-production.20261102",
             "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-            "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+            "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+            "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
           ]
         },
         {
@@ -9201,7 +9214,8 @@
             "local.component.ob.20261102",
             "local.component.ob-production.20261102",
             "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-            "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+            "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+            "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
           ]
         }
       ]
@@ -29590,6 +29604,21 @@
         {
           "path": "evidence/local.library_integrate.candidate_shapes.embedding_parent.20261107.json",
           "sha256": "f9fb398cd42f6ea2d42ab3fab91e191695c561334d2794bed9601478e87c3bd4"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "9b3e0e261936c839523efae0b96b7d97d1228220",
+      "retained": [
+        {
+          "path": "evidence/local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107.json",
+          "sha256": "97c9cea8858a5d1ed5b745de3beea7ba2a2e641ef2a101acb2c92c3754198b12"
         }
       ],
       "notRetained": []

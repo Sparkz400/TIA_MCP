@@ -5334,6 +5334,23 @@
         "Earlier pass, not evidence: artifacts/hr/hw_347798a0 stopped at a change_restore of the same build on a transient 'Access to the path ... recovery ... before was denied' file lock; the rerun passed unchanged.",
         "A rerun after the #221 baseline-compile change on the current build; it repeats, and does not widen, the scope of local.hardware_changes.refusals.20261102."
       ]
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9b3e0e261936c839523efae0b96b7d97d1228220",
+        "passedScope": "Combined-apply candidate cases (scripts/qualify_library_integrate_apply.py --candidates at 9b3e0e26, Debug build, --artifacts artifacts/pc2) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch with the authored FB/UDT global library archive. A reused-FB multi-instance Gate in the Host FB TiaMcpComponentHost, which TiaMcpComponentParent (FB31) embeds, in seven combinations beside the verified FBD one: LAD Host (parentLad), an earlier placement before an existing network (parentEarlier), both (parentLadEarlier), and each of these three plus the plain FBD one with the Host's own instance DB (parentOwnDb, parentOwnDbLad, parentOwnDbEarlier, parentOwnDbLadEarlier); every preview named exactly its candidate features. parentDeep ran the verified shape two levels deep: the parent with its own instance DB and a grandparent TiaMcpComponentGrand (FB32) with its DB. Each embedding block (parent, its DB, grandparent, its DB) gained exactly the captured nested member of instance-effects-transitive-component.v1.json, the Host's own DB its direct member, everything else was preserved, then fresh reopen, 0-error compile and change_restore of the checkpoint into a new location."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107.json"
+      ],
+      "limitations": [
+        "Standard route only; one parent chain per case, at most two embedding levels; the component is the reused FB. Software units and other routes stay plan-only.",
+        "The Host FB is FBD or LAD; an embedded caller of other languages is not exercised."
+      ]
     }
   ],
   "features": [
@@ -13311,7 +13328,7 @@
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
           "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these; other OB event classes are not exercised.",
-          "Embedding parents (local.library_integrate.candidate_shapes.embedding_parent.20261107): a multi-instance caller FB embedded in a parent FB installs through the captured component transitive effect, the parent gaining the member in its nested Static section; verified for the reused FB in an existing FBD FB caller."
+          "Embedding parents (local.library_integrate.candidate_shapes.embedding_parent.20261107): a multi-instance caller FB embedded in a parent FB installs through the captured component transitive effect, the parent gaining the member in its nested Static section; verified for the reused FB in an existing FBD FB caller. Since local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107 also with a LAD caller, an earlier placement, the caller's own instance DB and every combination of these, and two levels deep (the parent's DB, a grandparent FB and its DB each gaining the captured nested member); standard route only."
         ]
       },
       "qualification": {
@@ -13329,7 +13346,8 @@
           "local.component.ob.20261102",
           "local.component.ob-production.20261102",
           "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-          "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+          "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+          "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
         ]
       },
       "availability": {
@@ -13380,7 +13398,7 @@
           "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable.",
           "Before any claim, import or save, combined apply refuses (PlcIntegrationNotQualified) unless de-DE is the project's only active, reference and editing language and an instance creation profile covers the FB (captured storage profile with its CPU and loaded API files, or a shipped global instance template matched against the planned FB export); the preview reports combinedApply.eligible=false for such projects.",
           "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these; other OB event classes are not exercised.",
-          "Embedding parents (local.library_integrate.candidate_shapes.embedding_parent.20261107): a multi-instance caller FB embedded in a parent FB installs through the captured component transitive effect, the parent gaining the member in its nested Static section; verified for the reused FB in an existing FBD FB caller."
+          "Embedding parents (local.library_integrate.candidate_shapes.embedding_parent.20261107): a multi-instance caller FB embedded in a parent FB installs through the captured component transitive effect, the parent gaining the member in its nested Static section; verified for the reused FB in an existing FBD FB caller. Since local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107 also with a LAD caller, an earlier placement, the caller's own instance DB and every combination of these, and two levels deep (the parent's DB, a grandparent FB and its DB each gaining the captured nested member); standard route only."
         ]
       },
       "qualification": {
@@ -13401,7 +13419,8 @@
           "local.component.ob.20261102",
           "local.component.ob-production.20261102",
           "local.library_integrate.candidate_shapes.ob_combinations.20261107",
-          "local.library_integrate.candidate_shapes.embedding_parent.20261107"
+          "local.library_integrate.candidate_shapes.embedding_parent.20261107",
+          "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
         ]
       },
       "availability": {

@@ -3,6 +3,7 @@
 | Evidence | Runners | Result |
 | --- | --- | --- |
 | [`local.library_integrate.candidate_shapes.embedding_parent.20261107`](../../evidence/local.library_integrate.candidate_shapes.embedding_parent.20261107.json) | `capture_typed_routes_owned.py`, `qualify_library_integrate_apply.py --candidates` | passed |
+| [`local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107`](../../evidence/local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107.json) | `qualify_library_integrate_apply.py --candidates` | passed |
 
 A reused-FB multi-instance changes the caller FB's interface. Its own instance DBs had a captured effect since 2 November;
 a parent FB embedding the caller was refused before admission (`DependencyProfileUnavailable`), because no capture showed
@@ -29,5 +30,14 @@ only the refusal path received the feature, not the preview's `candidateFeatures
 
 The shape joins `VerifiedShapes` and the manifest loses `qualificationOnly`, as the direct effect did on 2 November.
 
-Not covered: a parent with its own DB or a grandparent in a combined apply, LAD or earlier placement with a parent, the
-caller's own DB together with a parent, other routes than standard.
+## Combinations
+
+Seven candidate cases ran the parent with the other verified features: a LAD Host FB (`parentLad`), an earlier placement
+(`parentEarlier`), both (`parentLadEarlier`), and each of these and the FBD one with the Host's own instance DB
+(`parentOwnDb`, `parentOwnDbLad`, `parentOwnDbEarlier`, `parentOwnDbLadEarlier`). `parentDeep` ran the verified shape two
+levels deep: the parent with its own DB and a grandparent FB with its DB. Every preview named exactly its features; each
+embedding block gained exactly the captured nested member (the DBs checked against the captured parent DB), the Host's own
+DB its direct member, everything else was preserved, and reopen, a 0-error compile and the checkpoint restore passed. The
+seven shapes join `VerifiedShapes`.
+
+Not covered: other routes than standard, the component other than the reused FB, embedded callers in other languages.
