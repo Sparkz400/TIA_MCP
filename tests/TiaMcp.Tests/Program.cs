@@ -587,8 +587,12 @@ internal static partial class Program
         cancellation.Cancel();
         await Check.BridgeError("CancelledOutcomeUnknown", () => slow);
         await Check.BridgeError("PreviousOperationRunning", () => fixture.Client.CallAsync("mustNotRun"));
+        // The dispatcher's lease release is held and delivered right after the late response, before the next request.
+        await Check.BridgeError("PreviousOperationRunning", () => fixture.Client.CallAsync("mutation_end", new { leaseToken = "lease" }));
         await Task.Delay(2500);
         await fixture.Client.CallAsync("echo");
+        var order = fixture.Events().Where(item => item.Kind == "request").Select(item => item.Operation).ToArray();
+        Check.Equal("echo,echo,mutation_end,echo", string.Join(",", order));
         var late = fixture.Client.LateResponses;
         Check.Equal(1, late.Count);
         Check.Equal("echo", late[0].Operation);

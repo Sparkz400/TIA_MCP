@@ -76,6 +76,33 @@ def main():
         table = client.tool('tag_table_read', {'plcPath': plc, 'tagTableName': 'Default tag table'})['xml']
         record('tag created exactly once', table.count('<Name>CancelledOnce</Name>'))
         assert table.count('<Name>CancelledOnce</Name>') == 1
+        # The cancelled dispatch left its admission outcomeUnknown; the existing fresh-instance route verifies and releases it.
+        unknown = []
+        for folder in sorted((root / 'engineering-admissions').glob('[0-9a-f]*')):
+            latest = json.loads(sorted(folder.glob('*.json'))[-1].read_text(encoding='utf-8'))
+            if latest.get('state') in ('dispatchIntent', 'outcomeUnknown'):
+                unknown.append(latest['id'])
+        record('cancelled dispatch admission held', unknown)
+        assert len(unknown) == 1, unknown
+        project = client.tool('tia_session_status')['projects'][0]['path']
+        record('close the original TIA', client.tool('tia_detach'))
+        assert client.tool('tia_start')['ownsPortalProcess'] is True
+        released = record('reconcile the admission', client.tool('engineering_admission_reconcile', {'admissionId': unknown[0]}))
+        assert released.get('released') is True and released.get('automaticReplay') is False, released
+        for attempt in range(13):
+            opened = client.request('tools/call', {'name': 'project_open', 'arguments': {'path': project}})
+            if not opened.get('isError'):
+                break
+            assert 'already been opened' in json.dumps(opened), opened
+            time.sleep(15)
+        else:
+            raise AssertionError('The project lock was not released within three minutes')
+        nxt = client.tool('change_prepare', {'kind': 'tag_create', 'plcPath': plc, 'payload': {
+            'tagTableName': 'Default tag table', 'name': 'AfterCancel', 'dataTypeName': 'Bool', 'logicalAddress': '%M80.1'}})
+        done = record('next change applies after reconciliation', client.tool('change_apply', {
+            'changeId': nxt['changeId'], 'previewHash': nxt['previewHash'], 'idempotencyKey': uuid.uuid4().hex,
+            'checkpointSave': True, 'compile': True, 'save': True}))
+        assert done['state'] == 'applied', done['state']
         report['completed'] = True
     finally:
         record('owned worker shutdown', client.close())
