@@ -8,10 +8,10 @@ from xml.etree import ElementTree as ET
 from smoke_mcp import Client, ROOT
 
 
-def candidate(address):
+def candidate(address, data_type='Bool'):
     return f'''<?xml version="1.0" encoding="utf-8"?>
 <Document><Engineering version="V21"/><SW.Tags.PlcTagTable ID="0"><AttributeList><Name>Signals</Name></AttributeList>
-<ObjectList><SW.Tags.PlcTag ID="1" CompositionName="Tags"><AttributeList><Name>Added</Name><DataTypeName>Bool</DataTypeName>
+<ObjectList><SW.Tags.PlcTag ID="1" CompositionName="Tags"><AttributeList><Name>Added</Name><DataTypeName>{data_type}</DataTypeName>
 <LogicalAddress>{address}</LogicalAddress></AttributeList></SW.Tags.PlcTag></ObjectList></SW.Tags.PlcTagTable></Document>'''
 
 
@@ -61,17 +61,18 @@ def main():
         assert any(b['name'] == 'TagScopeBroken' and b['isConsistent'] is False for b in inv['blocks'])
         selectors = dict(projectName=project['name'], plcPath=plc)
 
-        def prepare(address):
+        def prepare(address, data_type='Bool'):
             native = client.tool('tag_table_read', dict(selectors, tagTableName='Signals'))
             document = ET.fromstring(native['xml'])
             table = document.find('SW.Tags.PlcTagTable')
             objects = table.find('ObjectList')
             added = next((t for t in objects.findall('SW.Tags.PlcTag') if t.findtext('AttributeList/Name') == 'Added'), None)
             if added is None:
-                added = ET.fromstring(candidate(address)).find('SW.Tags.PlcTagTable/ObjectList/SW.Tags.PlcTag')
+                added = ET.fromstring(candidate(address, data_type)).find('SW.Tags.PlcTagTable/ObjectList/SW.Tags.PlcTag')
                 objects.append(added)
             else:
                 added.find('AttributeList/LogicalAddress').text = address
+                added.find('AttributeList/DataTypeName').text = data_type
             for index, element in enumerate(e for e in document.iter() if 'ID' in e.attrib):
                 element.set('ID', format(index, 'X'))
             return client.tool('change_prepare', dict(selectors, kind='tag_table_import_xml',
@@ -89,10 +90,13 @@ def main():
         stale = record('prepare stale candidate', prepare('%M50.2'))
         record('external scratch tag edit', subprocess.run([str(helper), 'drift', str(auth)], check=True, text=True, capture_output=True).stdout)
         refuse('change_apply', apply(stale), 'StaleRevision')
-        bad = record('prepare invalid address', prepare('%M20000.0'))
+        # An unused tag with an out-of-range address compiles; the regression needs a reader.
+        record('native consumer diagnostic', subprocess.run([str(helper), 'consume', str(auth)], check=True, text=True, capture_output=True).stdout)
+        bad = record('prepare consumed type change', prepare('%MW60', 'Int'))
         refuse('change_apply', apply(bad), 'CompileFailed')
-        outcome = record('retain regression failure', client.tool('change_status', {'changeId': bad['changeId']}))
+        outcome = record('retain regression failure', client.tool('change_status', {'changeId': bad['changeId'], 'includeDetails': True}))
         assert outcome['state'] == 'recovery_required' and Path(outcome['recoveryArchive']).is_file()
+        assert 'TagScopeConsumer' in json.dumps(outcome), 'regression must be the consumer diagnostic'
         report['completed'] = True
     finally:
         record('owned worker shutdown', client.close())

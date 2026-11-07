@@ -69,6 +69,11 @@ recovery. Interrupted applies do not gain whole-project outcome verification fro
 the scoped fingerprint; unresolved outcomes remain held. This limitation is
 reported in the preview and journal.
 
+Natively checked on one owned scratch PLC on 7 November 2026
+(`local.tag-table.scoped-import.20261107`,
+[record](../verification/tag-table-scope-20261107.md)), including a type change
+that breaks a block reading the tag, which fails as `CompileFailed`.
+
 A matching repeat of an already successful application returns its recorded result without applying again. An attempted change that failed or was interrupted cannot be retried automatically, even if its idempotency key is reused. Prepare another change only after reconciling the actual outcome: while a change on the same project is `recovery_required` (or still `checkpointing`, `applying` or `restoring`) in the same TIA process, `change_prepare` and `change_apply` refuse with `RecoveryRequired` and name that change, because the next checkpoint save would persist its failed edits and make it unrestorable. Run `change_restore` on it in an owned instance; otherwise `tia_detach` and start a new instance (which opens the saved files), or restart the worker. Every preview reports the project's unsaved state as `isModified`.
 
 The live scratch fixture `scripts/smoke_write_guards.py` qualified these guards in a newly retrieved checkpoint copy. A wrong preview hash and a stale second plan were rejected before checkpoint or block mutation; both journals remained `prepared` with no stages or archive. An exact successful replay retained the recorded result without rewriting its journal, and a different idempotency key was rejected. The applied fixture compiled and saved, and its recovery archive SHA-256 matched. Evidence: `artifacts/write-guards-final.json` (completed successfully on 2026-10-08).
