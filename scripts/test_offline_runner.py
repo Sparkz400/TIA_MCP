@@ -148,5 +148,42 @@ class WorkstationEvidenceTests(unittest.TestCase):
                 self.assertEqual('new test result', path.read_text(encoding='utf-8'))
 
 
+SHARD_PROBE = r'''
+$ErrorActionPreference = 'Stop'
+$ast = [System.Management.Automation.Language.Parser]::ParseFile($env:TIA_TEST_RUNNER, [ref]$null, [ref]$null)
+$functions = @($ast.FindAll({param($node)
+    $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Get-ShardPlan'
+}, $true))
+if ($functions.Count -ne 1) { throw 'Expected one shard planner.' }
+Invoke-Expression $functions[0].Extent.Text
+$names = @('a','b','c','d','e','f','g')
+$seconds = @{a=50; b=40; c=30; d=5; e=5}
+$groups = @(@{seconds=60; suites=@('f')}, @{seconds=10; suites=@('g','c')}, @{seconds=20; suites=@()})
+$plans = foreach ($count in 1..4) { @{count=$count; plan=(Get-ShardPlan $names $seconds 1 $groups $count)} }
+ConvertTo-Json -InputObject @($plans) -Depth 4 -Compress
+'''
+
+
+@unittest.skipUnless(PWSH, 'PowerShell 7 is required for shard planning checks')
+class ShardPlanTests(unittest.TestCase):
+    def test_every_name_and_group_lands_in_exactly_one_balanced_shard(self):
+        result = subprocess.run([PWSH, '-NoProfile', '-NonInteractive', '-Command', SHARD_PROBE],
+                                env=dict(os.environ, TIA_TEST_RUNNER=str(RUNNER)), capture_output=True, text=True, timeout=30)
+        self.assertEqual(0, result.returncode, result.stderr)
+        for entry in json.loads(result.stdout):
+            count, plan = entry['count'], entry['plan']
+            with self.subTest(count=count):
+                self.assertEqual(set('abcdefg') | {'group:0', 'group:1', 'group:2'}, set(plan))
+                self.assertTrue(all(0 <= shard < count for shard in plan.values()))
+                # Group members run in the group's shard, since its checks read their outputs.
+                self.assertEqual(plan['group:0'], plan['f'])
+                self.assertEqual(plan['group:1'], plan['g'])
+                self.assertEqual(plan['group:1'], plan['c'])
+                if count == 4:
+                    # Group 0 (61 s), a (50 s) and group 1 (41 s) are the heaviest units; least-loaded placement separates them.
+                    heavy = [plan['group:0'], plan['a'], plan['group:1']]
+                    self.assertEqual(3, len(set(heavy)))
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -23,7 +23,8 @@ concurrency:
   # Literal prefix: a called workflow sees the caller's github.workflow, so release.yml's two
   # called workflows would share one group and cancel each other.
   group: offline-${{ github.ref }}
-  cancel-in-progress: true
+  # Only superseded PR pushes are cancelled; every main push and tag finishes, so each merge gets a verdict.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # Hosted runners execute only the offline allowlist. Native Siemens builds and
 # live qualification remain explicit engineering-workstation tasks.
@@ -37,6 +38,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          filter: blob:none # git diff --name-only compares trees only
       - id: scope
         name: Detect documentation-only changes
         shell: bash
@@ -54,29 +56,51 @@ jobs:
           if [ -z "$files" ] || [ "$code" -gt 0 ]; then echo "code=true" >> "$GITHUB_OUTPUT"; else echo "code=false" >> "$GITHUB_OUTPUT"; fi
           printf 'Changed files:\n%s\n' "$files"
 
-  python:
-    name: Python contracts and harnesses
+  python-shard:
+    name: Python harnesses (shard ${{ matrix.shard }}/3)
     runs-on: windows-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        # Test-Offline.ps1 assigns every test file to exactly one shard; contract checks run in shard 0.
+        shard: [0, 1, 2]
     steps:
       - uses: actions/checkout@v7
         with:
           # test_contracts.py requires each cited evidence commit to be an ancestor of HEAD.
           fetch-depth: 0
+          # Full history, but blobs load on demand: the ancestry checks need commits, not old file contents.
+          filter: blob:none
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
+          cache: pip
+          cache-dependency-path: scripts/requirements-test.txt
       - name: Validate contracts and Python harnesses
         shell: pwsh
         run: |
           python -m pip install -r scripts/requirements-test.txt
-          ./scripts/Test-Offline.ps1 -Suite Python
+          ./scripts/Test-Offline.ps1 -Suite Python -ShardCount 3 -ShardIndex ${{ matrix.shard }}
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
-          name: python-validation
+          name: python-validation-${{ matrix.shard }}
           path: artifacts/offline-validation/
           retention-days: 14
+
+  python:
+    # Keeps the required check name stable across the shard split.
+    name: Python contracts and harnesses
+    needs: python-shard
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every Python shard to pass
+        env:
+          RESULT: ${{ needs.python-shard.result }}
+        run: |
+          test "$RESULT" = success || { echo "Python shards: $RESULT"; exit 1; }
 
   managed:
     name: .NET managed suites (shard ${{ matrix.shard }}/4)
@@ -109,6 +133,8 @@ jobs:
         if: needs.changes.outputs.code == 'true'
         with:
           python-version: '3.13'
+          cache: pip
+          cache-dependency-path: scripts/requirements-test.txt
       - name: Install schema and lifecycle dependencies
         if: needs.changes.outputs.code == 'true'
         run: python -m pip install -r scripts/requirements-test.txt
@@ -195,6 +221,8 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
+          cache: pip
+          cache-dependency-path: scripts/requirements-test.txt
       - name: Validate portable package without Siemens
         shell: pwsh
         env:
