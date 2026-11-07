@@ -10,7 +10,7 @@ Evidence: `local.tag-table.scoped-import.20261107`
 
 `scripts/qualify_tag_table_scope.py` ran on Debug builds of `e5445ef6`
 (TIA Portal V21 Update 3, PCNico). It used one scratch project with a CPU 1511-1 PN,
-created and owned by the run. 17 of 17 steps passed. The summary's source commit
+created and owned by the run. 16 of 16 steps passed. The summary's source commit
 `8c5f32f7` adds only a curator change on top of `e5445ef6`; `src` and every
 executable that ran are the same.
 
@@ -38,5 +38,21 @@ before the qualifier applies the same change through MCP.
 ## Not covered
 
 Software units, namespaces, user constants, multilingual comments, F-PLCs,
-reopened projects and interrupted outcomes. Neither was a packaged or installed
-build run, nor was project-lock release verified.
+reopened projects and interrupted outcomes. Project-lock release was not verified.
+The evidence record covers the Debug build only.
+
+## Installed bundle
+
+The engineering bundle `tia-mcp-v21-0.9.0_20261107_074331_468f5c5f` was packaged
+from main `e2bc06a0` and passed strict bundle verification. Claude Desktop's
+`tia-v21` server now starts it. That server previously ran the offline bundle of
+24 October, which starts without native workers. The bundle worker was added to
+the Openness AllowList.
+
+- The configured launch command started Host 0.9.0, advertised 307 tools including
+  `tia_start`, `change_apply` and `tag_table_read`, and reported catalog `0.4.135`
+  with `local.tag-table.scoped-import.20261107`.
+- `qualify_tag_table_scope.py --host … --worker …` with the bundle's own Host and
+  worker passed the same 16 steps (local report `artifacts/ts209/b01`). Its preview
+  reported the scope policy `tag-table-content-and-project-metadata-v1`, and its
+  worker exited on its own with code 0.

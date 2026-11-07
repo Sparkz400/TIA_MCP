@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.135",
+  "catalogVersion": "0.4.136",
   "targetTiaVersions": [
     21
   ],
@@ -4871,7 +4871,7 @@
         "tiaVersion": 21,
         "machine": "PCNico",
         "sourceCommit": "8c5f32f71b6039f83c4b664d0e4f2f80fd01e480",
-        "passedScope": "scripts/qualify_tag_table_scope.py on Debug builds of e5445ef6 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 17/17 steps: TagImportFixture seeds tables Signals (Existing %M50.0) and Other (Untouched %M51.0) and an inconsistent SCL FC TagScopeBroken; a candidate omitting Existing is refused at prepare (TagScopeMismatch); tag_table_import_xml adding Added (Bool %M50.1) prepares despite the inconsistent block with scopePolicy tag-table-content-and-project-metadata-v1, applies with checkpoint, compile and save while the PLC's single pre-existing compiler error is unchanged against the baseline compile, and reads back Added and Existing natively; change_restore is refused (ScopedRecoveryRequired); an external edit of the unrelated table Other makes a prepared candidate StaleRevision at apply. Negative case: the fixture generates a consistent SCL FC TagScopeConsumer reading Added and proves natively that Added as Int at %MW60 fails it (Data type 'Int' cannot be converted implicitly into data type 'Bool'), then restores Bool; the same type change through MCP ends CompileFailed/recovery_required with before.zap21 retained and exactly the baseline error plus the consumer error. The worker exited on its own with code 0."
+        "passedScope": "scripts/qualify_tag_table_scope.py on Debug builds of e5445ef6 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 16/16 steps: TagImportFixture seeds tables Signals (Existing %M50.0) and Other (Untouched %M51.0) and an inconsistent SCL FC TagScopeBroken; a candidate omitting Existing is refused at prepare (TagScopeMismatch); tag_table_import_xml adding Added (Bool %M50.1) prepares despite the inconsistent block with scopePolicy tag-table-content-and-project-metadata-v1, applies with checkpoint, compile and save while the PLC's single pre-existing compiler error is unchanged against the baseline compile, and reads back Added and Existing natively; change_restore is refused (ScopedRecoveryRequired); an external edit of the unrelated table Other makes a prepared candidate StaleRevision at apply. Negative case: the fixture generates a consistent SCL FC TagScopeConsumer reading Added and proves natively that Added as Int at %MW60 fails it (Data type 'Int' cannot be converted implicitly into data type 'Bool'), then restores Bool; the same type change through MCP ends CompileFailed/recovery_required with before.zap21 retained and exactly the baseline error plus the consumer error. The worker exited on its own with code 0."
       },
       "artifacts": [
         "evidence/local.tag-table.scoped-import.20261107.json"

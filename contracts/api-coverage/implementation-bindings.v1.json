@@ -287,7 +287,7 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "7061567a043844ea2a43edfabbfb7da8d474a46b1254e7b4168551b9c94a6cdd",
+      "sha256": "4922445c12291d66544aea808ea68c6ced3a9989ee0b12b17e63ac2de812fca4",
       "bytes": 1749445
     },
     {
@@ -114942,7 +114942,7 @@
         },
         {
           "id": "local.tag-table.scoped-import.20261107",
-          "profileSha256": "4ada90e4bcd00ddfe6ef1ae79c8ed5e29d818d78c9fecb9b18d23d1930566b00",
+          "profileSha256": "1e62bef73029d2f0ab16b1c19285ee1bcc4867f2c84e704d7b2454a9cb90075c",
           "artifacts": [
             "evidence/local.tag-table.scoped-import.20261107.json"
           ]
@@ -138270,7 +138270,7 @@
     {
       "path": "evidence/local.tag-table.scoped-import.20261107.json",
       "state": "observed",
-      "sha256": "8202335b1074151d778ea17382c000a71c98dcdb76982d590feae09b5e88a608"
+      "sha256": "66817352b80e790d22eb745d57d71c548c5a2e192b70d29a45945999ff8a62d0"
     },
     {
       "path": "evidence/local.technology.first-motion.20261101.json",
@@ -139391,7 +139391,7 @@
     },
     {
       "id": "local.tag-table.scoped-import.20261107",
-      "profileSha256": "4ada90e4bcd00ddfe6ef1ae79c8ed5e29d818d78c9fecb9b18d23d1930566b00"
+      "profileSha256": "1e62bef73029d2f0ab16b1c19285ee1bcc4867f2c84e704d7b2454a9cb90075c"
     },
     {
       "id": "local.technology.first-motion.20261101",
