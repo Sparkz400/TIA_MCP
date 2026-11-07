@@ -41,9 +41,17 @@ def main():
         client.process.stdin.write(json.dumps({'jsonrpc': '2.0', 'id': request_id, 'method': 'tools/call',
                                                'params': {'name': 'change_apply', 'arguments': apply}}) + '\n')
         client.process.stdin.flush()
-        time.sleep(3)
+        # Cancel as soon as the worker's journal shows native work, so the cancellation lands mid-apply.
+        journal, seen, deadline = root / 'changes' / ('change-' + prepared['changeId']) / 'journal.json', None, time.monotonic() + 120
+        while seen not in ('checkpointing', 'applying'):
+            assert time.monotonic() < deadline, 'The apply never started'
+            try:
+                seen = json.loads(journal.read_text(encoding='utf-8')).get('state')
+            except (OSError, ValueError):
+                pass
+            time.sleep(0.01)
         client.notify('notifications/cancelled', {'requestId': request_id, 'reason': 'qualification: user stop'})
-        record('cancel change_apply after 3 s', {'requestId': request_id})
+        record('cancel change_apply while native work runs', {'requestId': request_id, 'journalState': seen})
 
         refusals, started = 0, time.monotonic()
         while True:
