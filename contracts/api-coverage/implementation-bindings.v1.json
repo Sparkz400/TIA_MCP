@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "3f74d5185d46d4cc6447e3c7e1f6ef73328127942cb53889fade0ac21e410e4e",
-      "bytes": 1759695
+      "sha256": "09e01016252ecad2c8ea1ee90f3711bc1b82d831fc08355f36a62b6aecc250c7",
+      "bytes": 1762381
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -912,8 +912,8 @@
     },
     {
       "path": "src/TiaMcp.Core/BridgeClient.cs",
-      "sha256": "a89a365923d29085fbeb5a854da4103a649637b8786ecf380c17581858be0647",
-      "bytes": 10304
+      "sha256": "4debf25b60693b1cf57edffc6370f73ac1970e42bf5c20b073d7119fa83c472b",
+      "bytes": 15198
     },
     {
       "path": "src/TiaMcp.Core/BridgeProtocol.cs",
@@ -15045,9 +15045,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -17071,9 +17071,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -25336,9 +25336,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -34510,9 +34510,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -38305,9 +38305,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -39284,9 +39284,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -40729,9 +40729,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -40819,9 +40819,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -41143,9 +41143,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -41876,9 +41876,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -42462,9 +42462,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -43361,9 +43361,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -43430,9 +43430,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -45565,9 +45565,9 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 31,
-          "endLine": 79,
-          "sha256": "706d0d8e8e6f2b42e0f5858e8b6976a5da4cdc620e9cb2d30511b0cf144ab4ca"
+          "line": 42,
+          "endLine": 59,
+          "sha256": "0a6ad61d8583122efa2d1b162d56fd06e58bab7e0e126798848b4ae894cb5d65"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
@@ -114704,6 +114704,13 @@
           "artifacts": [
             "evidence/local.compile-baseline.unrelated-errors.20261107.json"
           ]
+        },
+        {
+          "id": "local.bridge.cancellation.20261107",
+          "profileSha256": "d817b47df1ee488a8dccaf0702d8ea127ed27f8e6990bcfe6b8c63521bfa8b7c",
+          "artifacts": [
+            "evidence/local.bridge.cancellation.20261107.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -119958,6 +119965,13 @@
           "profileSha256": "2325e1367deab6770037d8a7aa2494e35f787f38dc72fc96f1badda4e9626f9b",
           "artifacts": [
             "evidence/local.engineering.boundaries.rerun.20261029.json"
+          ]
+        },
+        {
+          "id": "local.bridge.cancellation.20261107",
+          "profileSha256": "d817b47df1ee488a8dccaf0702d8ea127ed27f8e6990bcfe6b8c63521bfa8b7c",
+          "artifacts": [
+            "evidence/local.bridge.cancellation.20261107.json"
           ]
         }
       ],
@@ -137407,6 +137421,11 @@
       "sha256": "b1ee502e3ef78433ab1fe7be946adf780628ebdfada63162edafcf30960b566c"
     },
     {
+      "path": "evidence/local.bridge.cancellation.20261107.json",
+      "state": "observed",
+      "sha256": "3aa2e2c4788e14ebd29c01e5cad89804c7f13cfc49083a7272b04ab285a9f57c"
+    },
+    {
       "path": "evidence/local.catalog.20261024.json",
       "state": "observed",
       "sha256": "a9fda326ba917fe5ba9f2acf6db952fec9cfb0dda5bbaf0618f492379e1bfdf6"
@@ -138725,6 +138744,10 @@
     {
       "id": "local.block_protection.rerun.20261030",
       "profileSha256": "987dafe5e165e45de7fb1c6e3e7cecfbaad1083535b022f8d24596fe0bab9767"
+    },
+    {
+      "id": "local.bridge.cancellation.20261107",
+      "profileSha256": "d817b47df1ee488a8dccaf0702d8ea127ed27f8e6990bcfe6b8c63521bfa8b7c"
     },
     {
       "id": "local.catalog.20261024",
