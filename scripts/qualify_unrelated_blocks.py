@@ -70,14 +70,14 @@ def main():
         assert delta['complete'] is True and delta['introducedErrorCount'] == 0 and delta['existingCount'] >= 1, delta
         record('an unrelated tag_create applies beside the inconsistent block', {'inconsistentBlocksMetadataOnly': bystanders, 'compilerSucceeded': applied['compile']['compilerSucceeded'],
                                                                               'existingCount': delta['existingCount']})
+        refused = error('change_restore', {'changeId': first['changeId'], 'previewHash': first['previewHash']})
+        assert refused.get('code') == 'ScopedRecoveryRequired' and refused['details']['recoveryArchive'], refused
+        record('whole-project restore of such a change is refused', refused)
         second = client.tool('change_prepare', {'kind': 'source_upsert', 'plcPath': plc, 'payload': {'language': 'SCL', 'expectedBlockNames': ['Unrelated_FC'],
                               'source': 'FUNCTION "Unrelated_FC" : Bool\nVERSION : 0.1\nBEGIN\n #Unrelated_FC := "Unrelated";\nEND_FUNCTION\n'}})
         apply(second)
         record('a second unrelated change applies in the same session', {'changeId': second['changeId']})
 
-        refused = error('change_restore', {'changeId': first['changeId'], 'previewHash': first['previewHash']})
-        assert refused.get('code') == 'ScopedRecoveryRequired' and refused['details']['recoveryArchive'], refused
-        record('whole-project restore of such a change is refused', refused)
         target = error('change_prepare', {'kind': 'source_upsert', 'plcPath': plc, 'payload': {'language': 'SCL', 'expectedBlockNames': ['TagScopeBroken'],
                        'source': 'FUNCTION "TagScopeBroken" : Bool\nVERSION : 0.1\nBEGIN\n #TagScopeBroken := FALSE;\nEND_FUNCTION\n'}})
         assert target.get('code') == 'FingerprintUnavailable', target
