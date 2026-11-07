@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "be2b100b733e9de7f901bd970f24e67f9018924aedb07ae15eca247de91adf62",
-      "bytes": 1797793
+      "sha256": "ddc70b9343d93dfd09d5a2bed960db783e94d14628c9fa1fd2ad6dbc4a8dc1a0",
+      "bytes": 1799424
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2062,8 +2062,8 @@
     },
     {
       "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
-      "sha256": "be92b2224dcc96d6faab209052cae68673e63e4a03d70be39a6e6521f7ddd449",
-      "bytes": 12994
+      "sha256": "557546c9c39ce20438b0811868d99e0dc34a6edfad66f37bf76b9a0f6e210f80",
+      "bytes": 13130
     },
     {
       "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
@@ -129060,6 +129060,13 @@
           "artifacts": [
             "evidence/local.runtime.plcsim-tcpip.20261102.json"
           ]
+        },
+        {
+          "id": "local.plcsim.capture-modes.20261107",
+          "profileSha256": "c970507fb6acca869e9210f173c7a41f93c29812e7e8b5cfdd63968a7a144845",
+          "artifacts": [
+            "evidence/local.plcsim.capture-modes.20261107.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -139828,6 +139835,11 @@
       "sha256": "6e3ec873adb7c4c2595812c2a86fefb6117bea997c4f11d40737d5937897cb59"
     },
     {
+      "path": "evidence/local.plcsim.capture-modes.20261107.json",
+      "state": "observed",
+      "sha256": "0db6c990c82a08ad9d8db4bbd25f927a0042d7f8cc0b817ba60402bea17c5608"
+    },
+    {
       "path": "evidence/local.plcsim.extended-events.20261102.json",
       "state": "observed",
       "sha256": "38a95056384361e47f597b7b0ee0b5f18576c5fa14eb1d60c106f2ce199465d9"
@@ -141070,6 +141082,10 @@
     {
       "id": "local.plc_object_mutations.rerun.20261028",
       "profileSha256": "605c81f58d53968f9bf8166dcbc6cab24981367c4454265ab638712c1144bab1"
+    },
+    {
+      "id": "local.plcsim.capture-modes.20261107",
+      "profileSha256": "c970507fb6acca869e9210f173c7a41f93c29812e7e8b5cfdd63968a7a144845"
     },
     {
       "id": "local.plcsim.extended-events.20261102",

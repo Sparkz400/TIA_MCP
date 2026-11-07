@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.153",
+  "catalogVersion": "0.4.154",
   "targetTiaVersions": [
     21
   ],
@@ -5156,6 +5156,22 @@
       ],
       "limitations": [
         "Three PLCs of one project share the station (the interface has four connectors); one disconnect gives one module to the named PLC. Runtime is not exercised."
+      ]
+    },
+    {
+      "id": "local.plcsim.capture-modes.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b5215557df725111bb320948f51ef1705fd0fe9f",
+        "passedScope": "scripts/qualify_plcsim_diagnostics.py on Debug builds of b5215557 (Host, V21 worker, PLCSIM Advanced V8 worker): the owned CPU1511 instance of the DiagGate fixture in RUN, one 2 s runtime_capture_start with source plcsim, cycleSynchronous and each syncMode in turn. SingleStep_C 40 rows, SingleStep_CP 40, SingleStep_CT 32 and SingleStep_CPT 31 completed their 2 s window (durationLimit); SingleStep_P reached its first sync point and then none within the worker's wait (sessionUnavailable after 2 rows) on this OB1-only fixture. After every capture, the stalled one included, the instance was back in operating mode Default. syncMode without cycleSynchronous was refused."
+      },
+      "artifacts": [
+        "evidence/local.plcsim.capture-modes.20261107.json"
+      ],
+      "limitations": [
+        "One CPU1511 fixture whose only cyclic OB is OB1 with the automatic process image; no process image partition is configured, which SingleStep_P steps by. Signals are two Bool DB members; rows are not compared with scan counts."
       ]
     },
     {
@@ -24388,14 +24404,15 @@
           "source plcsim polls only an exact PLCSIM Advanced V8 instance this Host created or adopted (attemptId is its creationId; ID, name and creation receipt are rechecked by the worker for every call); unowned instances are refused. Caller-declared datatypes must fit the typed read and are what diagnostic mappings compare; PLCSIM tag metadata is not read.",
           "cycleSynchronous switches the running owned instance to the optional syncMode (SingleStep_C by default, or SingleStep_P/CP/CT/CPT), steps one sync point per sample, reads every signal while the CPU holds there and restores the recorded operating mode on stop, failure or Host shutdown. A lost simulator worker or faulted bridge cannot restore it; an unconfirmed restore is reported as localFailure PlcsimOperatingModeRestoreFailed.",
           "PLCSIM rows retain per-row sync-point evidence, but capture status, analysis and diagnostic acquisition keep atomicAcrossSignals and scanSynchronized false; Project Explorer Open capture accepts Web captures only. Compiled against the installed PLCSIM Advanced V8 API only; not natively qualified.",
-          "syncMode requires cycleSynchronous; omitted mode preserves historical plan bytes. Each sample verifies the selected operating mode before advancing. CP/CT/CPT/P sync points need not be full scans; CT/CPT use the existing overwritten minimum cycle time. Bus and timespan modes are not offered. Added modes remain offline-only, with no native qualification promotion."
+          "syncMode requires cycleSynchronous; omitted mode preserves historical plan bytes. Each sample verifies the selected operating mode before advancing. CP/CT/CPT/P sync points need not be full scans; CT/CPT use the existing overwritten minimum cycle time. Bus and timespan modes are not offered. Added modes remain offline-only, with no native qualification promotion. Natively (local.plcsim.capture-modes.20261107): C, CP, CT and CPT captured a full 2 s window; P stalled after its first sync point on an OB1-only fixture without a process image partition (sessionUnavailable), and every capture, that one included, restored the previous operating mode."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
-          "local.runtime.plcsim-tcpip.20261102"
+          "local.runtime.plcsim-tcpip.20261102",
+          "local.plcsim.capture-modes.20261107"
         ]
       },
       "availability": {
