@@ -15,7 +15,9 @@ def sharing_error(code):
 
 class PendingReplaceTests(unittest.TestCase):
     def run_replace(self, outcomes, **options):
-        with tempfile.TemporaryDirectory(dir=runner.ROOT / "artifacts/block-tests/test-temp") as directory:
+        root = runner.ROOT / "artifacts/block-tests/test-temp"
+        root.mkdir(parents=True, exist_ok=True)  # Do not rely on another test module having created it.
+        with tempfile.TemporaryDirectory(dir=root) as directory:
             target = pathlib.Path(directory) / "result.json"
             pending = target.with_name(target.name + ".pending")
             target.write_bytes(b"previous report")

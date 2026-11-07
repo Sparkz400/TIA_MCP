@@ -27,83 +27,104 @@ $buildOutput = Join-Path $output 'dotnet'
 $previousTemp = $env:TEMP
 $previousTmp = $env:TMP
 $previousPythonUtf8 = $env:PYTHONUTF8
-# Measured hosted-runner seconds per managed suite (CI run 40077018589); suites missing here count as 60 s.
+# Measured hosted-runner seconds per managed suite (CI run 42374868670); suites missing here count as 60 s.
 $ManagedSuiteSeconds = @{
-    'TiaMcp.Access.Tests' = 2.7
-    'TiaMcp.AutomationMl.Tests' = 2.0
-    'TiaMcp.CapturedStorage.Tests' = 1.1
-    'TiaMcp.CompilationEvidence.Tests' = 0.7
-    'TiaMcp.ComponentWindow.Tests' = 3.4
-    'TiaMcp.CompositeEngineering.Tests' = 12.8
-    'TiaMcp.Connections.Tests' = 1.6
-    'TiaMcp.Credentials.Tests' = 4.3
-    'TiaMcp.DbSnapshots.Tests' = 1.0
+    'TiaMcp.Access.Tests' = 6.8
+    'TiaMcp.AutomationMl.Tests' = 2.1
+    'TiaMcp.CapturedStorage.Tests' = 1.3
+    'TiaMcp.CompilationEvidence.Tests' = 1.0
+    'TiaMcp.ComponentWindow.Tests' = 6.6
+    'TiaMcp.CompositeEngineering.Tests' = 13.5
+    'TiaMcp.Connections.Tests' = 1.7
+    'TiaMcp.Credentials.Tests' = 43.3
+    'TiaMcp.DbSnapshots.Tests' = 1.8
     'TiaMcp.Deployment.Tests' = 1.8
-    'TiaMcp.Diagnostics.Tests' = 24.1
-    'TiaMcp.DriveProfiles.Tests' = 2.0
-    'TiaMcp.EncoderEvidence.Tests' = 0.6
-    'TiaMcp.Engineering.Tests' = 23.7
-    'TiaMcp.Graph.Tests' = 2.1
-    'TiaMcp.Graph.Workflow.Tests' = 1.3
-    'TiaMcp.HardwareEngineering.Tests' = 0.6
-    'TiaMcp.Hmi.Engineering.Tests' = 1.1
-    'TiaMcp.Hmi.Model.Tests' = 1.0
-    'TiaMcp.Hmi.Tests' = 0.8
-    'TiaMcp.HmiComponents.Tests' = 20.9
-    'TiaMcp.HmiRepairAdmission.Tests' = 2.8
-    'TiaMcp.Inventory.Tests' = 10.1
-    'TiaMcp.Library.Tests' = 1.7
-    'TiaMcp.LibraryHmi.Tests' = 0.6
-    'TiaMcp.OpcUa.Dependencies.Tests' = 5.1
-    'TiaMcp.OpcUa.Runtime.Tests' = 26.9
-    'TiaMcp.OpcUa.Tests' = 1.6
-    'TiaMcp.OpcUa.Workflow.Tests' = 1.2
-    'TiaMcp.PhysicalRuntime.Tests' = 15.2
-    'TiaMcp.PlcLibraryIntegration.Tests' = 3.1
-    'TiaMcp.ProjectModel.Tests' = 4.3
-    'TiaMcp.PublicCertificates.Tests' = 0.7
+    'TiaMcp.Diagnostics.Tests' = 25.7
+    'TiaMcp.DriveProfiles.Tests' = 2.7
+    'TiaMcp.EncoderEvidence.Tests' = 1.1
+    'TiaMcp.Engineering.Tests' = 29.2
+    'TiaMcp.Graph.Tests' = 3.0
+    'TiaMcp.Graph.Workflow.Tests' = 2.1
+    'TiaMcp.HardwareEngineering.Tests' = 1.4
+    'TiaMcp.Hmi.Engineering.Tests' = 2.6
+    'TiaMcp.Hmi.Model.Tests' = 1.1
+    'TiaMcp.Hmi.Tests' = 1.1
+    'TiaMcp.HmiComponents.Tests' = 50.3
+    'TiaMcp.HmiRepairAdmission.Tests' = 1.3
+    'TiaMcp.Inventory.Tests' = 10.5
+    'TiaMcp.Library.Tests' = 2.9
+    'TiaMcp.LibraryHmi.Tests' = 1.2
+    'TiaMcp.OpcUa.Dependencies.Tests' = 5.0
+    'TiaMcp.OpcUa.Runtime.Tests' = 85.9
+    'TiaMcp.OpcUa.Tests' = 2.3
+    'TiaMcp.OpcUa.Workflow.Tests' = 2.3
+    'TiaMcp.PhysicalRuntime.Tests' = 17.0
+    'TiaMcp.PlcLibraryIntegration.Tests' = 8.4
+    'TiaMcp.ProjectModel.Tests' = 5.0
+    'TiaMcp.PublicCertificates.Tests' = 1.4
     'TiaMcp.SafetyEvidence.Tests' = 3.6
-    'TiaMcp.SoftwareUnits.Tests' = 1.7
-    'TiaMcp.TechnologyProfiles.Tests' = 10.7
-    'TiaMcp.TestSuite.Tests' = 28.3
-    'TiaMcp.Tests' = 36.9
-    'TiaMcp.TranslationHost.Tests' = 10.5
-    'TiaMcp.TranslationImport.Tests' = 27.8
-    'TiaMcp.Translations.Tests' = 1.0
-    'TiaMcp.VersionControl.Tests' = 97.2
-    'TiaMcp.VersionControl.Workflow.Tests' = 44.0
-    'TiaMcp.WatchTables.Tests' = 1.9
-    'TiaMcp.WebApplications.Tests' = 2.3
+    'TiaMcp.SoftwareUnits.Tests' = 1.8
+    'TiaMcp.TechnologyProfiles.Tests' = 12.4
+    'TiaMcp.TestSuite.Tests' = 32.4
+    'TiaMcp.Tests' = 54.0
+    'TiaMcp.TranslationHost.Tests' = 11.3
+    'TiaMcp.TranslationImport.Tests' = 47.2
+    'TiaMcp.Translations.Tests' = 1.9
+    'TiaMcp.VersionControl.Tests' = 98.1
+    'TiaMcp.VersionControl.Workflow.Tests' = 84.7
+    'TiaMcp.WatchTables.Tests' = 3.1
+    'TiaMcp.WebApplications.Tests' = 4.8
 }
-# Checks after the suite loop read suite outputs, so each group runs in shard (index % ShardCount)
-# together with every suite it reads from. Seconds are the measured check time (CI run 40077726200).
+# Checks after the suite loop read suite outputs, so each group runs in one shard together with every
+# suite it reads from or whose build it runs. Seconds are the measured check time (CI run 42374868670).
 $ManagedCheckGroups = @(
-    @{seconds=300; suites=@('TiaMcp.PhysicalRuntime.Tests','TiaMcp.OpcUa.Runtime.Tests','TiaMcp.Diagnostics.Tests','TiaMcp.ProjectModel.Tests')},
-    @{seconds=15; suites=@('TiaMcp.Tests','TiaMcp.TestSuite.Tests','TiaMcp.EncoderEvidence.Tests')},
-    @{seconds=160; suites=@('TiaMcp.CompositeEngineering.Tests','TiaMcp.HmiComponents.Tests','TiaMcp.SoftwareUnits.Tests','TiaMcp.Connections.Tests','TiaMcp.DbSnapshots.Tests','TiaMcp.SafetyEvidence.Tests')},
-    @{seconds=70; suites=@('TiaMcp.DriveProfiles.Tests','TiaMcp.TechnologyProfiles.Tests','TiaMcp.Access.Tests','TiaMcp.PublicCertificates.Tests','TiaMcp.WebApplications.Tests','TiaMcp.Engineering.Tests','TiaMcp.Credentials.Tests')}
+    @{seconds=135; suites=@('TiaMcp.PhysicalRuntime.Tests','TiaMcp.ProjectModel.Tests')},
+    @{seconds=50; suites=@('TiaMcp.Tests','TiaMcp.TestSuite.Tests','TiaMcp.EncoderEvidence.Tests')},
+    @{seconds=175; suites=@('TiaMcp.CompositeEngineering.Tests','TiaMcp.HmiComponents.Tests','TiaMcp.SoftwareUnits.Tests','TiaMcp.Connections.Tests','TiaMcp.DbSnapshots.Tests','TiaMcp.SafetyEvidence.Tests')},
+    @{seconds=125; suites=@('TiaMcp.DriveProfiles.Tests','TiaMcp.TechnologyProfiles.Tests','TiaMcp.Access.Tests','TiaMcp.PublicCertificates.Tests','TiaMcp.WebApplications.Tests','TiaMcp.Engineering.Tests','TiaMcp.Credentials.Tests')},
+    @{seconds=215; suites=@('TiaMcp.OpcUa.Runtime.Tests','TiaMcp.Diagnostics.Tests')}
 )
+# Seconds per Python test file (local Python run, about 1:1 with hosted runners; CI run 42379522823); others count as 0.4 s.
+# test_inventory_translation_exports.py is absent: it skips without retained native exports, as on hosted runners.
+$PythonTestSeconds = @{
+    'test_qualification_optimization.py' = 93.8
+    'test_encoder_lifecycle.py' = 41.7
+    'test_encoder_copy_admission.py' = 26.5
+    'test_encoder_hardware_preservation.py' = 20.4
+    'test_encoder_software_preservation.py' = 12.7
+    'test_qualify_runtime_plcsim_tcpip.py' = 11.6
+    'test_api_coverage_bindings.py' = 10.8
+    'test_api_coverage.py' = 6.9
+    'test_block_test_stages.py' = 6.6
+    'test_diagnostic_watch_contracts.py' = 5.0
+    'test_guest_qualification.py' = 4.9
+    'test_qualify_deployment.py' = 4.9
+    'test_library_operation_observations.py' = 4.5
+    'test_worker_scratch_ownership.py' = 4.4
+    'test_contracts.py' = 3.4
+}
+# Deterministic longest-first split: each group (with its suites) and then each remaining name goes to the
+# least-loaded shard, so every name and group runs in exactly one shard. Returns name/'group:N' -> shard.
+function Get-ShardPlan([string[]]$names, [hashtable]$seconds, [double]$defaultSeconds, [object[]]$groups, [int]$count) {
+    $weigh = { param($n) if ($seconds.ContainsKey($n)) { [double]$seconds[$n] } else { $defaultSeconds } }
+    $loads = [double[]]::new($count); $plan = @{}
+    $place = { param($w) $t = 0; for ($i = 1; $i -lt $count; $i++) { if ($loads[$i] -lt $loads[$t]) { $t = $i } }; $loads[$t] += $w; $t }
+    $groupWeight = { param($g) $groups[$g].seconds + (($groups[$g].suites | ForEach-Object { & $weigh $_ } | Measure-Object -Sum).Sum) }
+    foreach ($g in (@(0..($groups.Count - 1)) | Sort-Object @{Expression={ & $groupWeight $_ }; Descending=$true}, @{Expression={ $_ }})) {
+        $target = & $place (& $groupWeight $g); $plan["group:$g"] = $target
+        foreach ($name in $groups[$g].suites) { $plan[$name] = $target }
+    }
+    foreach ($name in ($names | Where-Object { -not $plan.ContainsKey($_) } | Sort-Object @{Expression={ & $weigh $_ }; Descending=$true}, @{Expression={ $_ }})) {
+        $plan[$name] = & $place (& $weigh $name)
+    }
+    return $plan
+}
+$ManagedPlan = @{}
 function Invoke-CheckGroup([int]$group, [scriptblock]$checks) {
-    if (($group % $ShardCount) -ne $ShardIndex) { return }
+    if ($ManagedPlan["group:$group"] -ne $ShardIndex) { return }
     $clock = [Diagnostics.Stopwatch]::StartNew()
     & $checks
     $result.managedCheckSeconds["$group"] = [math]::Round([double]$result.managedCheckSeconds["$group"] + $clock.Elapsed.TotalSeconds, 1)
-}
-# Deterministic longest-first split, so every suite runs in exactly one shard.
-function Select-ManagedShard([string[]]$names, [int]$count, [int]$index) {
-    if ($count -eq 1) { return $names }
-    $weight = { param($n) if ($ManagedSuiteSeconds.ContainsKey($n)) { [double]$ManagedSuiteSeconds[$n] } else { 60.0 } }
-    $loads = [double[]]::new($count); $assigned = @{}
-    for ($g = 0; $g -lt $ManagedCheckGroups.Count; $g++) {
-        $loads[$g % $count] += $ManagedCheckGroups[$g].seconds
-        foreach ($name in $ManagedCheckGroups[$g].suites) { $assigned[$name] = $g % $count; $loads[$g % $count] += & $weight $name }
-    }
-    foreach ($name in ($names | Where-Object { -not $assigned.ContainsKey($_) } | Sort-Object @{Expression={ & $weight $_ }; Descending=$true}, @{Expression={ $_ }})) {
-        $target = 0
-        for ($i = 1; $i -lt $count; $i++) { if ($loads[$i] -lt $loads[$target]) { $target = $i } }
-        $loads[$target] += & $weight $name; $assigned[$name] = $target
-    }
-    return @($names | Where-Object { $assigned[$_] -eq $index })
 }
 $result = @{schemaVersion=1;status='running';suite=$Suite;startedAtUtc=[DateTime]::UtcNow.ToString('O');nativeQualification=$false;managedSuites=@()}
 Push-Location $repoRoot
@@ -115,26 +136,38 @@ try {
     New-Item -ItemType Directory -Path $env:TEMP -Force | Out-Null
     Start-Transcript -Path (Join-Path $output 'validation.log') | Out-Null
     if ($Suite -in @('All','Python')) {
-        python -B scripts/test_contracts.py
-        if ($LASTEXITCODE -ne 0) { throw 'Feature contract validation failed.' }
-        $result.contracts = 'passed'
-        python -B tests/ProjectModelContracts.py
-        if ($LASTEXITCODE -ne 0) { throw 'Project model and relationship scope schema checks failed.' }
-        $result.projectModelContracts = 'passed'
-        python -B scripts/api_coverage_bindings.py validate contracts/api-coverage/implementation-bindings.v1.json --allow-missing-evidence
-        if ($LASTEXITCODE -ne 0) { throw 'Source binding validation failed.' }
-        $result.sourceBindings = 'passed'
-        python -B scripts/audit_retained_evidence.py --out (Join-Path $output 'retained-evidence.json')
-        if ($LASTEXITCODE -ne 0) { throw 'Retained evidence integrity audit failed.' }
-        $result.retainedEvidence = 'inventory-written; missing inputs remain unverified'
-        # Hosted runners have no local raw evidence store.
-        if (-not $env:GITHUB_ACTIONS) {
-            python -B scripts/audit_evidence_store.py
-            if ($LASTEXITCODE -ne 0) { throw 'Raw evidence store audit failed.' }
-            $result.evidenceStore = 'passed'
+        # Contract checks are one group; test files spread by measured time. Discovery only reads top-level scripts/test_*.py.
+        $pythonTests = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'scripts') -Filter 'test_*.py' -File | ForEach-Object Name | Sort-Object)
+        $pythonPlan = Get-ShardPlan $pythonTests $PythonTestSeconds 0.4 @(@{seconds=75; suites=@()}) $ShardCount
+        $pythonTests = @($pythonTests | Where-Object { $pythonPlan[$_] -eq $ShardIndex })
+        $result.pythonShard = @{index=$ShardIndex;count=$ShardCount;tests=$pythonTests}
+        if ($pythonPlan['group:0'] -eq $ShardIndex) {
+            python -B scripts/test_contracts.py
+            if ($LASTEXITCODE -ne 0) { throw 'Feature contract validation failed.' }
+            $result.contracts = 'passed'
+            python -B tests/ProjectModelContracts.py
+            if ($LASTEXITCODE -ne 0) { throw 'Project model and relationship scope schema checks failed.' }
+            $result.projectModelContracts = 'passed'
+            python -B scripts/api_coverage_bindings.py validate contracts/api-coverage/implementation-bindings.v1.json --allow-missing-evidence
+            if ($LASTEXITCODE -ne 0) { throw 'Source binding validation failed.' }
+            $result.sourceBindings = 'passed'
+            python -B scripts/audit_retained_evidence.py --out (Join-Path $output 'retained-evidence.json')
+            if ($LASTEXITCODE -ne 0) { throw 'Retained evidence integrity audit failed.' }
+            $result.retainedEvidence = 'inventory-written; missing inputs remain unverified'
+            # Hosted runners have no local raw evidence store.
+            if (-not $env:GITHUB_ACTIONS) {
+                python -B scripts/audit_evidence_store.py
+                if ($LASTEXITCODE -ne 0) { throw 'Raw evidence store audit failed.' }
+                $result.evidenceStore = 'passed'
+            }
         }
-        python -B -m unittest discover -s scripts -p 'test_*.py'
-        if ($LASTEXITCODE -ne 0) { throw 'Python offline tests failed.' }
+        if ($pythonTests.Count) {
+            # Same import root as discover -s scripts; an empty name list would discover from the repository root instead.
+            $previousPythonPath = $env:PYTHONPATH
+            $env:PYTHONPATH = Join-Path $repoRoot 'scripts'
+            try { python -B -m unittest @($pythonTests | ForEach-Object { [IO.Path]::GetFileNameWithoutExtension($_) }) } finally { $env:PYTHONPATH = $previousPythonPath }
+            if ($LASTEXITCODE -ne 0) { throw 'Python offline tests failed.' }
+        }
         $result.python = 'passed'
     }
     if ($Suite -eq 'All') {
@@ -162,7 +195,8 @@ try {
         'TiaMcp.CompilationEvidence.Tests', 'TiaMcp.EncoderEvidence.Tests'
     )
     if ($Suite -in @('All','Managed')) {
-        $suites = @(Select-ManagedShard $suites $ShardCount $ShardIndex)
+        $ManagedPlan = Get-ShardPlan $suites $ManagedSuiteSeconds 60 $ManagedCheckGroups $ShardCount
+        $suites = @($suites | Where-Object { $ManagedPlan[$_] -eq $ShardIndex })
         $result.managedShard = @{index=$ShardIndex;count=$ShardCount;suites=$suites}
         $result.managedSuiteSeconds = [ordered]@{}
         $result.managedCheckSeconds = [ordered]@{}
@@ -312,6 +346,8 @@ try {
             python -B scripts/test_runtime_capture_compatibility.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'runtime-capture-compatibility-mcp')
             if ($LASTEXITCODE -ne 0) { throw 'Prior runtime capture compatibility failed.' }
             $result.runtimeCaptureCompatibility = 'passed; actual prior producer bytes'
+        }
+        Invoke-CheckGroup 4 {
             python -B scripts/qualify_opcua_runtime.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --server (Join-Path $buildOutput "bin/TiaMcp.OpcUa.Runtime.Tests/$($Configuration.ToLowerInvariant())/TiaMcp.OpcUa.Runtime.Tests.dll") --output (Join-Path $output 'opcua-runtime-mcp')
             if ($LASTEXITCODE -ne 0) { throw 'Secure OPC UA local-server/MCP qualification failed.' }
             $result.opcUaRuntimeMcp = 'passed; exact Host runtime and explicit local server, no physical target qualification'
@@ -489,7 +525,7 @@ try {
             if ($LASTEXITCODE -ne 0) { throw 'Offline AutomationML MCP workflow failed.' }
             $result.automationmlMcp = 'passed'
         }
-        Invoke-CheckGroup 0 {
+        Invoke-CheckGroup 4 {
             python -B scripts/qualify_trace_diagnostics_offline.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --samples (Join-Path $output 'diagnostic-samples.json') --output (Join-Path $output 'diagnostic-mcp')
             if ($LASTEXITCODE -ne 0) { throw 'Offline review intake and diagnostic MCP workflow failed.' }
             $result.diagnosticMcp = 'passed'
