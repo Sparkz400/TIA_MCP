@@ -136,10 +136,10 @@ namespace TiaMcp.Openness.V21
         private readonly bool _libraryIntegrateApplyEnabled;
 
         // Null when combined apply may run; otherwise the refusal's code (PlcIntegrationNotQualified unless a precise one applies) and message.
-        private JObject PlcCombinedApplyRefusal(LibraryChange change) => PlcCombinedApplyRefusal(change, out _);
-        private JObject PlcCombinedApplyRefusal(LibraryChange change, out bool dependentInstanceDb)
+        private JObject PlcCombinedApplyRefusal(LibraryChange change) => PlcCombinedApplyRefusal(change, out _, out _);
+        private JObject PlcCombinedApplyRefusal(LibraryChange change, out bool dependentInstanceDb, out bool embeddingParent)
         {
-            dependentInstanceDb = false;
+            dependentInstanceDb = embeddingParent = false;
             var caller = change.Preview["integrationPlan"]?["callerArtifact"] as JObject; System.Xml.Linq.XDocument export;
             try { export = caller == null ? null : EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(caller, caller.Value<string>("sha256"))); }
             catch (PlcComponentException error) { return NotQualified("The retained caller export is unusable: " + error.Message); }
@@ -147,7 +147,7 @@ namespace TiaMcp.Openness.V21
             try { PlcCombinedApplyDependents(change, out dependents, out directInstanceDbs); }
             catch (BridgeException error) { return NotQualified(error.Message); }
             dependentInstanceDb = directInstanceDbs?.Length > 0;
-            bool embeddingParent = dependents != null && dependents.Except(directInstanceDbs ?? new string[0], StringComparer.Ordinal).Any();
+            embeddingParent = dependents != null && dependents.Except(directInstanceDbs ?? new string[0], StringComparer.Ordinal).Any();
             string shape = PlcComponentQualificationGate.CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change), dependentInstanceDb, embeddingParent) ??
                 (change.Source == null || change.Source.Project != null || string.IsNullOrEmpty(change.Source.SourcePath) || change.Source.Writable
                     ? "Only the verified read-only global source with its retained snapshot is eligible." : null);
@@ -241,10 +241,10 @@ namespace TiaMcp.Openness.V21
         private void PreparePlcCombinedApply(LibraryChange change)
         {
             if (!_libraryIntegrateApplyEnabled) return;
-            var refused = PlcCombinedApplyRefusal(change, out bool dependentInstanceDb); string refusal = refused?.Value<string>("message");
+            var refused = PlcCombinedApplyRefusal(change, out bool dependentInstanceDb, out bool embeddingParent); string refusal = refused?.Value<string>("message");
             var caller = change.Preview["integrationPlan"]["callerArtifact"] as JObject;
             var unverified = refusal != null ? new JObject() : PlcComponentQualificationGate.UnverifiedFeatures((JObject)change.Preview["integrationPlan"], change.Payload,
-                caller == null ? null : EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(caller, caller.Value<string>("sha256"))), null, dependentInstanceDb);
+                caller == null ? null : EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(caller, caller.Value<string>("sha256"))), null, dependentInstanceDb, embeddingParent);
             change.Preview["applySupported"] = refusal == null;
             change.Preview["combinedApply"] = new JObject { ["enabled"] = true, ["eligible"] = refusal == null, ["refusal"] = refusal, ["refusalCode"] = refused?["code"]?.DeepClone(), ["refusalDetails"] = refused?.DeepClone(),
                 ["sequence"] = "change_apply prepares, applies with compile and save, and reads back each step in order: library_instantiate (absent for a reused FB), then graphical_typed_edit. Not atomic.",
