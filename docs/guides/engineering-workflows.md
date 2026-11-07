@@ -27,6 +27,27 @@ Preparation returns `changeId`, `previewHash`, `preview`, `journalPath`, and `st
 
 `checkpointSave: true` **saves the entire current in-memory project**, including previously unsaved user edits, before creating `before.zap21`. Siemens requires a saved project for archiving. The worker will not apply a mutation unless that archive exists and its SHA-256 has been recorded. `save: true` after mutation requires `compile: true` and passed compile verification.
 
+### Reporting progress
+
+Every change result and `change_status` carry `progress`:
+
+- `projectEditComplete`, true once the change is applied and saved, or restored
+- `milestones`: prepared, checkpoint saved, recovery archive created, project changed, readback verified, compiled, compiler succeeded, saved; each `done`, `notReached`, `skipped`, `pending` or, for the compiler, `yes`/`no`/`unknown`
+- a one-line `summary`
+- `notCovered`, a reminder that repository work, MCP qualification and the running build are separate questions
+
+`change_status` with `progressOnly: true` reads the progress receipt while a change runs. It reports `currentPhase` with its elapsed time, and a `phaseFingerprint` that changes only when the state or a phase changes. An unchanged fingerprint means there is nothing new to tell the user.
+
+`host_build_identity` reports which build the connected Host runs: process start, product version and the SHA-256 of the Host and worker executables when the Host started and now. A rebuilt or replaced file shows as `changedOnDisk`, and `runningMatchesDisk` is false. Building or packaging a new version never updates a running Host; only a restart does, after which the report shows the new hashes.
+
+Concise reports keep these apart, for example:
+
+- "The tag import is applied and saved. The PLC still has the one compiler error it had before (`compilerSucceeded: false`)."
+- "The change failed at compile and is not saved (`recovery_required`); nothing else proceeds until it is restored or reconciled."
+- "The fix is merged and a new bundle is built, but this Host still runs the earlier build (`runningMatchesDisk` false); restart it to use the fix."
+
+Natively checked on 7 November 2026 (`local.progress.reporting.20261107`).
+
 ### Confirmed intent
 
 `change_prepare` accepts an optional `intent` with the task's confirmed machine decisions, kept apart from what was observed and what is only assumed:
