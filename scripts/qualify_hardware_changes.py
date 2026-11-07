@@ -36,6 +36,8 @@ full run applied without one (the shared-device assignment, OutsideOfProject, th
 --slice gsd runs only the installed I-device GSD device and what it needs (see gsd_slice).
 --slice drive runs a SINAMICS G120C PN as an IO device of an added CPU (see drive_slice).
 --slice delete-rule plugs one DI module and checks that hardware_delete refuses compile=false (see delete_rule_slice).
+--slice shared3 shares the ET 200SP station among three PLCs and disconnects one, naming the remaining PLC that takes its submodule
+(see shared3_slice).
 --slice refusals runs the native refusals and paths the full run lacks (see refusal_slice): the MRP port-link rule both ways, a
 PLC-to-PLC shared-device access, channel and versionless capability-profile refusals, the sharedDevice disconnect, an address change
 that moves the start address, and a second owned scratch whose CPU takes the module the first project set OutsideOfProject.
@@ -79,6 +81,8 @@ SP_DI, WIDE_DI = ("DI 8x24VDC ST", "6ES7 131-6BF"), ("DI 32x24VDC HF", "6ES7 521
 SHARED_IO, RING = "HwScratchIo", "HwRing"
 # The same ET 200SP station in a second project, assigned to that project's own scratch CPU (refusal slice).
 SP2, OTHER_IO = SP._replace(plc_device="ScratchStation", plc="ScratchPLC"), "HwOtherIo"
+# --slice shared3: the ET 200SP station's third controller, an added CPU with its own IO system.
+THIRD, THIRD_IO = SP._replace(plc_device="HwThird", plc="HwThirdCpu"), "HwThirdIo"
 GSD_DESIGNATION = "TiaMcpIDevice"  # The I-device designation scripts/qualify_gsd_export.py exports; an operator installs that GSD in TIA.
 DEVICES = (CPU, S7_1200, IM, IM_SP)  # Types the run creates with hardware_add; every other profiled type is plugged or generated.
 # An IO controller's cyclic IO bandwidth is computed at the device compile and not saved (a fresh open reads 0), so it is not compared.
@@ -135,6 +139,13 @@ DRIVE_SLICE_LIMITATIONS = [
     "Drive device: the newest installed SINAMICS G120C PN, added and put on HwNet with checkpoint but without compile, then assigned to HwPeerIo with compile "
     "and save, that assignment restored once and applied again. Startdrive drives expose no device compile service, so device compiles list the drive under "
     "notCompiled; its drive objects, parameters and telegrams are not changed here (drive_parameter_set and drive_telegram_set have their own evidence).",
+]
+SHARED3_LIMITATIONS = [
+    "--slice shared3: one owned scratch CPU 1511-1 PN V4.1 and two added CPU 1511-1 PN V4.1 (configureScratchSecurity), HwPeer and HwThird, on HwNet with "
+    "one ET 200SP IM 155-6 PN ST station assigned to HwPeerIo; its connector 1 is shared with the scratch CPU (SpDi3) and connector 2 with HwThirdCpu (SpDi).",
+    "The scratch CPU's connector then leaves with remainingOwnerPath naming HwThirdCpu, which takes SpDi3; restored once from its checkpoint. A disconnect "
+    "without remainingOwnerPath, or naming the leaving PLC, is refused at prepare. Three PLCs share the station (the interface has four connectors); runtime "
+    "is not exercised.",
 ]
 GSD_SLICE_LIMITATIONS = [
     "--slice gsd: one owned scratch CPU 1511-1 PN V4.1 and an added CPU 1511-1 PN V4.1 (configureScratchSecurity) on HwNet with an ET 200MP IM 155-5 PN ST V4.1 "
@@ -1039,6 +1050,66 @@ def shared_disconnect(run):
                      restore=True, boundary=True) is not None
 
 
+def third_share(run):
+    """The ET 200SP interface's connector 2 joins a new IO system HwThirdIo of HwThirdCpu while connectors 0 and 1 stay with HwPeerCpu and
+    the scratch CPU; SpDi goes from HwPeerCpu to HwThirdCpu in the same change. True when applied."""
+    device = run.path(SP.device, "items", *SP.interface)
+    owner = run.path(THIRD.plc_device, "items", THIRD.plc)
+    controller, module = owner + "/items/PROFINET%20interface_1", run.path(SP.device, "items", "SpDi")
+    payload = {"hardwarePath": device, "connectorIndex": 2, "controllerHardwarePath": controller, "controllerIndex": 0, "createIoSystemName": THIRD_IO, "sharedDevice": True,
+               "sharedSubmodules": [module]}
+    generated = lambda applied, state: [key for key in state if key.startswith((constant(run, THIRD, SP.prefix), constant(run, THIRD, "Local~" + THIRD_IO)))]
+    peers = sorted([run.path("HwPeer", "items", "HwPeerCpu"), run.path("ScratchStation", "items", "ScratchPLC")])
+    return run.apply("share %s with %s" % (SP.device, THIRD.plc), "network_io_assign", payload,
+                     {"effects": [{"hardwarePath": device, "connectorIndex": 2, "beforeIoSystem": None, "afterIoSystem": THIRD_IO, "disconnect": False, "sharedDevice": True,
+                                   "sharedSubmodules": [{"hardwarePath": module, "assignmentTargetBefore": run.path("HwPeer", "items", "HwPeerCpu"), "assignmentTargetAfter": owner}]}]},
+                     shown={**payload, "addressControllerOwnerPath": owner, "sharedAddressControllerOwnerPaths": peers},
+                     plc=owner + "/plc/" + THIRD.plc, changed=["hw:" + device, "hw:" + controller], removed=[constant(run, SP, SP.prefix + "SpDi")],
+                     tolerated=lambda category, key: category == "changed" and key == "hw:" + module + "/items/SpDi",
+                     added=generated, boundary=True) is not None
+
+
+def shared_disconnect_to_third(run):
+    """With HwPeerCpu and HwThirdCpu remaining, the scratch CPU's connector 1 leaves and names HwThirdCpu (remainingOwnerPath) to take
+    SpDi3. Without remainingOwnerPath, or naming the leaving PLC, preparation is refused. Applied and restored; True when applied."""
+    device, owner = run.path(SP.device, "items", *SP.interface), run.path("ScratchStation", "items", "ScratchPLC")
+    third, module = run.path(THIRD.plc_device, "items", THIRD.plc), run.path(SP.device, "items", "SpDi3")
+    payload = {"hardwarePath": device, "connectorIndex": 1, "disconnect": True, "sharedDevice": True, "sharedSubmodules": [module]}
+    error = run.refuse("network_io_assign", "a shared disconnect with two remaining PLCs and no remainingOwnerPath", payload, "InvalidRequest", plcPath=scratch_plc(run))
+    message(run, "shared3", error, "remainingOwnerPath")
+    error = run.refuse("network_io_assign", "a remainingOwnerPath naming the leaving PLC", {**payload, "remainingOwnerPath": owner}, "InvalidRequest", plcPath=scratch_plc(run))
+    message(run, "shared3", error, "remainingOwnerPath")
+    payload["remainingOwnerPath"] = third
+    run.b0 = run.current
+    gone = [key for key in run.current["view"] if key.startswith(constant(run, SCRATCH, SP.prefix))]
+    controller = owner + "/items/PROFINET%20interface_1"
+    return run.apply("disconnect %s's shared connector, SpDi3 to %s, restored" % (SP.device, THIRD.plc), "network_io_assign", payload,
+                     {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": SHARED_IO, "afterIoSystem": None, "disconnect": True, "sharedDevice": True,
+                                   "sharedSubmodules": [{"hardwarePath": module, "assignmentTargetBefore": owner, "assignmentTargetAfter": third}]}]},
+                     shown={**payload, "addressControllerOwnerPath": owner, "sharedAddressControllerOwnerPaths": sorted([run.path("HwPeer", "items", "HwPeerCpu"), third])},
+                     # SpDi3's submodule keeps its start when that address is free in HwThirdCpu's space (hw7), so it may stay unchanged.
+                     plc=scratch_plc(run), changed=["hw:" + device, "hw:" + controller], removed=gone,
+                     tolerated=lambda category, key: category == "changed" and key == "hw:" + module + "/items/SpDi3",
+                     added=[constant(run, THIRD, SP.prefix + "SpDi3")], restore=True, boundary=True) is not None
+
+
+def shared3_slice(run):
+    """--slice shared3: HwPeer and HwThird on HwNet, the ET 200SP station on HwPeerIo with SpDi3 and SpDi, shared with the scratch CPU
+    (SpDi3) and HwThirdCpu (SpDi); then the scratch CPU's connector leaves and SpDi3 goes to the named HwThirdCpu."""
+    add_cpu(run, "add CPU HwPeer", "HwPeer")
+    add_cpu(run, "add CPU HwThird", "HwThird")
+    network(run)
+    node(run, "HwThird", ("HwThirdCpu", "items", "PROFINET%20interface_1"), "192.168.0.7")
+    sp = sp_station(run, io_system=IO_SYSTEM)
+    older, _ = sp_modules(run, sp)
+    plug(run, "SpDi3", 1, sp, older, changed=["hw:" + run.path(SP.device, "items", *SP.interface)])
+    plug(run, "SpDi", 2, sp, older)
+    applied = shared_device(run) and third_share(run) and shared_disconnect_to_third(run)
+    assigned = run.coverage.get("network_io_assign", {})
+    run.expect(bool(applied) and bool(assigned.get("restored")) and len(assigned.get("refused") or []) >= 2, "shared3",
+               "The shared3 slice qualifies only when the three-PLC disconnect applied and restored after both refusals.")
+
+
 def link_refusals(run):
     """The MRP port-link rule both ways, natively: with the two CPUs' Port_2 linked as plain ports a ring role is refused, and once both
     hold ring roles (set while unlinked) and are linked again, NotInRing on one of them is refused."""
@@ -1137,11 +1208,12 @@ def heading(args):
     title = {"restores": "X10 topology restores and capability-profile gates in one owned scratch CPU 1511-1 PN with ET 200MP and ET 200SP stations",
              "gsd": "X10 GSD device: the project's own I-device GSD as an IO device of an added CPU 1511-1 PN in one owned scratch",
              "drive": "X10 drive device: a SINAMICS G120C PN as an IO device of an added CPU 1511-1 PN in one owned scratch",
+             "shared3": "X10 shared device among three PLCs: a disconnect naming the remaining PLC that takes the leaving PLC's submodule, in one owned scratch",
              "delete-rule": "X10 hardware_delete compile rule: one DI module in one owned scratch CPU 1511-1 PN",
              "refusals": "X10 hardware refusals and topology paths natively: MRP port links, PLC-to-PLC shared access, channel and versionless profiles, the sharedDevice "
                          "disconnect, a start-moving address change and a second project's controller, in two owned scratches",
              None: "X10 hardware changes in one owned scratch CPU 1511-1 PN with S7-1200, ET 200MP and ET 200SP families, a shared device and an MRP ring"}[args.slice]
-    return title + (" (key discovery, not evidence)" if args.discover else ""), {"restores": SLICE_LIMITATIONS, "gsd": GSD_SLICE_LIMITATIONS, "drive": DRIVE_SLICE_LIMITATIONS, "refusals": REFUSAL_LIMITATIONS,
+    return title + (" (key discovery, not evidence)" if args.discover else ""), {"restores": SLICE_LIMITATIONS, "gsd": GSD_SLICE_LIMITATIONS, "drive": DRIVE_SLICE_LIMITATIONS, "refusals": REFUSAL_LIMITATIONS, "shared3": SHARED3_LIMITATIONS,
                                                                                 "delete-rule": DELETE_SLICE_LIMITATIONS, None: LIMITATIONS}[args.slice]
 
 
@@ -1154,7 +1226,7 @@ def body(h):
     run.current = run.snap("baseline")
     sliced = getattr(getattr(h, "args", None), "slice", None)
     if sliced:
-        {"restores": restore_slice, "gsd": gsd_slice, "drive": drive_slice, "refusals": refusal_slice, "delete-rule": delete_rule_slice}[sliced](run)
+        {"restores": restore_slice, "gsd": gsd_slice, "drive": drive_slice, "refusals": refusal_slice, "delete-rule": delete_rule_slice, "shared3": shared3_slice}[sliced](run)
         return
     phase_a(run)
     reopen(run)
@@ -1172,7 +1244,7 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
     parser.add_argument("--discover", action="store_true", help="Record unexpected state differences, previews and refusals instead of failing (not evidence).")
-    parser.add_argument("--slice", choices=("restores", "gsd", "drive", "refusals", "delete-rule"), help="restores: only the profile gates and the topology restores the full run lacks; "
+    parser.add_argument("--slice", choices=("restores", "gsd", "drive", "refusals", "delete-rule", "shared3"), help="restores: only the profile gates and the topology restores the full run lacks; "
                         "gsd: only the installed I-device GSD device and what it needs; refusals: the native refusals and topology paths the full run lacks, "
                         "with a second owned scratch; delete-rule: hardware_delete's compile=false refusal on one DI module.")
     args = parser.parse_args()

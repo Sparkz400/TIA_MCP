@@ -217,8 +217,8 @@ second project.
   owners and targets included, stays exact. `disconnect: true` with `sharedDevice` removes one PLC again. V21 fails the
   device compile of a submodule left assigned to the leaving PLC ("An attempt was made to compile a submodule that is not
   assigned"), so the disconnect names in `sharedSubmodules` every item assigned to that PLC (refused when one is missing or
-  another is named) and they go to the one remaining PLC in the same change, before the connector leaves (more remaining PLCs
-  are `UnsupportedCapability`); the preview lists their targets, and preservation applies the connection's rule with the
+  another is named) and they go to the one remaining PLC in the same change, before the connector leaves. With several remaining PLCs,
+  `remainingOwnerPath` names the one that takes them (the PLC item of another assigned connector; refused without it); the preview lists their targets, and preservation applies the connection's rule with the
   remaining PLC as the new owner. With no item assigned to the leaving PLC, `sharedSubmodules` is refused and each station
   address keeps at most one owner among the remaining PLCs. Without `sharedDevice`, a further assigned connector is
   `UnsupportedCapability`; the generated server contract (`expectedServerModule`) belongs to the first assignment only.

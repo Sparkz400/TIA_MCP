@@ -410,6 +410,15 @@ Check("given-back address left with the leaving PLC rejected", "network_io_assig
 Check("given-back address resized rejected", "network_io_assign", sharedGiveBack, rows => { GivenBack(rows); rows[1]["addresses"][0]["lengthBits"] = 8; }, false, SharedHeld);
 var giveBackTwoPeers = (JObject)sharedGiveBack.DeepClone(); giveBackTwoPeers["sharedAddressControllerOwnerPaths"] = new JArray("/cpu1", "/cpu3");
 Check("shared disconnect with two remaining PLCs rejected", "network_io_assign", giveBackTwoPeers, GivenBack, false, SharedHeld);
+// With several remaining PLCs, remainingOwnerPath names the one that takes the leaving PLC's items.
+var giveToThird = (JObject)giveBackTwoPeers.DeepClone(); giveToThird["remainingOwnerPath"] = "/cpu3";
+void GivenToThird(JArray rows) { GivenBack(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu3"); rows[1]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu3"; }
+Check("shared disconnect gives its submodule to the named remaining PLC", "network_io_assign", giveToThird, GivenToThird, true, SharedHeld);
+Check("shared disconnect giving to another remaining PLC than named rejected", "network_io_assign", giveToThird, GivenBack, false, SharedHeld);
+var giveToStranger = (JObject)giveBackTwoPeers.DeepClone(); giveToStranger["remainingOwnerPath"] = "/cpu4";
+Check("remainingOwnerPath outside the remaining PLCs rejected", "network_io_assign", giveToStranger, GivenBack, false, SharedHeld);
+var remainingWithoutItems = (JObject)sharedDisconnect.DeepClone(); remainingWithoutItems["remainingOwnerPath"] = "/cpu1";
+Check("remainingOwnerPath without sharedSubmodules rejected", "network_io_assign", remainingWithoutItems, rows => { rows[3]["network"]["connectors"][1]["system"] = new JObject { ["state"] = "notAssigned" }; rows[1]["addresses"][0]["owners"] = new JArray(); }, false, SharedOwned);
 // MRP: the selected interface's one instance takes the requested role and domain; its name, ring ports and every other interface stay.
 JArray Mrp(string role, string domain, string ring = "/P1") => new JArray(new JObject { ["name"] = "MRP1", ["domain"] = domain, ["role"] = role, ["ringPorts"] = new JArray(ring, "/P2") });
 void MrpCaptured(JArray rows) { rows[2]["mrp"] = Mrp("NotInRing", "mrpdomain-1"); rows[3]["mrp"] = Mrp("NotInRing", "mrpdomain-1"); }
