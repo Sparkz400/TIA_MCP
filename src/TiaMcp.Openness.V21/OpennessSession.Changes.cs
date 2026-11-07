@@ -1315,6 +1315,10 @@ namespace TiaMcp.Openness.V21
                 if (block != null)
                 {
                     EnsureEditableBlock(block.Item, safety);
+                    // TIA cannot export an inconsistent block, and a target needs its native backup and full fingerprint.
+                    if (!block.Item.IsConsistent)
+                        throw new BridgeException("FingerprintUnavailable", "The target block " + name + " is inconsistent; its native backup and fingerprint cannot be established. Compile it first (plc_compile) or read its generated source. Nothing was changed.",
+                            new JObject { ["blockPath"] = block.Path, ["fallback"] = new JObject { ["tool"] = "block_read", ["format"] = "generatedSource" } });
                     string backup = Path.Combine(change.Directory, "before-" + Guid.NewGuid().ToString("N") + ".xml");
                     block.Item.Export(new FileInfo(backup), ExportOptions.WithDefaults, DocumentInfoOptions.None);
                     change.Backups.Add(new JObject { ["blockName"] = name, ["blockPath"] = block.Path, ["artifact"] = ChangeArtifact(backup) });
