@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.134",
+  "catalogVersion": "0.4.135",
   "targetTiaVersions": [
     21
   ],
@@ -4863,6 +4863,24 @@
         "The attached Host was deliberately terminated. Its worker completed the saved change and then exited with a broken transport; neither exit is normal-lifecycle evidence. The original owner, fresh reconciler and fresh reopen closed cleanly.",
         "One warm timing sample per mode, singles before batch, captures excluded; compiler caches, order and workload size prevent a general speed guarantee."
       ]
+    },
+    {
+      "id": "local.tag-table.scoped-import.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "8c5f32f71b6039f83c4b664d0e4f2f80fd01e480",
+        "passedScope": "scripts/qualify_tag_table_scope.py on Debug builds of e5445ef6 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 17/17 steps: TagImportFixture seeds tables Signals (Existing %M50.0) and Other (Untouched %M51.0) and an inconsistent SCL FC TagScopeBroken; a candidate omitting Existing is refused at prepare (TagScopeMismatch); tag_table_import_xml adding Added (Bool %M50.1) prepares despite the inconsistent block with scopePolicy tag-table-content-and-project-metadata-v1, applies with checkpoint, compile and save while the PLC's single pre-existing compiler error is unchanged against the baseline compile, and reads back Added and Existing natively; change_restore is refused (ScopedRecoveryRequired); an external edit of the unrelated table Other makes a prepared candidate StaleRevision at apply. Negative case: the fixture generates a consistent SCL FC TagScopeConsumer reading Added and proves natively that Added as Int at %MW60 fails it (Data type 'Int' cannot be converted implicitly into data type 'Bool'), then restores Bool; the same type change through MCP ends CompileFailed/recovery_required with before.zap21 retained and exactly the baseline error plus the consumer error. The worker exited on its own with code 0."
+      },
+      "artifacts": [
+        "evidence/local.tag-table.scoped-import.20261107.json"
+      ],
+      "limitations": [
+        "Source commit is the curator-only follow-up of e5445ef6; src and every executable run are byte-identical to e5445ef6, the commit that was built and run.",
+        "One owned scratch CPU 1511-1 PN at PLC-root scope with Bool/Int bit-memory tags and one inconsistent unrelated block; software units, namespaces, user constants, multilingual comments, F-PLCs, reopened projects and interrupted outcomes are not exercised by this run.",
+        "Project lock release after the worker exit was not verified (projectLockReleaseVerified false); no packaged or installed build was run."
+      ]
     }
   ],
   "features": [
@@ -8078,14 +8096,16 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Every imported tag whose LogicalAddress is an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses the whole import at prepare and again before the native import with SafetyBoundary (TIA would make it a safety tag); nothing is imported (1 November 2026; rechecked natively in local.safety.fio-routes.20261101)."
+          "Every imported tag whose LogicalAddress is an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses the whole import at prepare and again before the native import with SafetyBoundary (TIA would make it a safety tag); nothing is imported (1 November 2026; rechecked natively in local.safety.fio-routes.20261101).",
+          "Preparation fingerprints only tag-table contents in the selected software scope plus project/hardware/network/software/type/block metadata (tag-table-content-and-project-metadata-v1), so an unrelated inconsistent block no longer blocks it; block payloads are not covered, the change must keep every existing member (TagScopeMismatch), apply compares compiler diagnostics with a baseline compile and refuses new or changed ones, and automatic whole-project restore is refused (ScopedRecoveryRequired). Natively checked in local.tag-table.scoped-import.20261107."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
-          "local.safety.fio-routes.20261101"
+          "local.safety.fio-routes.20261101",
+          "local.tag-table.scoped-import.20261107"
         ]
       },
       "availability": {

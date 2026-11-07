@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "fed07ebf48ab44170b962c80e971c608da2a652eb760f62ca07e6c6e4482f7cd",
-      "bytes": 1746599
+      "sha256": "7061567a043844ea2a43edfabbfb7da8d474a46b1254e7b4168551b9c94a6cdd",
+      "bytes": 1749445
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -114939,6 +114939,13 @@
           "artifacts": [
             "evidence/local.safety.fio-routes.20261101.json"
           ]
+        },
+        {
+          "id": "local.tag-table.scoped-import.20261107",
+          "profileSha256": "4ada90e4bcd00ddfe6ef1ae79c8ed5e29d818d78c9fecb9b18d23d1930566b00",
+          "artifacts": [
+            "evidence/local.tag-table.scoped-import.20261107.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -138261,6 +138268,11 @@
       "sha256": "61bddb6880085a07d04c1832131554f4e7918952e5840fdbbcbde55be82c926f"
     },
     {
+      "path": "evidence/local.tag-table.scoped-import.20261107.json",
+      "state": "observed",
+      "sha256": "8202335b1074151d778ea17382c000a71c98dcdb76982d590feae09b5e88a608"
+    },
+    {
       "path": "evidence/local.technology.first-motion.20261101.json",
       "state": "observed",
       "sha256": "ca2a57ed0dbe245ab405a3bf6c8d8ffe39466a94b2a9662d007d78e34a7ddddc"
@@ -139376,6 +139388,10 @@
     {
       "id": "local.software_units.lifecycle.20261030",
       "profileSha256": "4e72436a83f251085ddcb8cce81e004a3cb3e80771649b9e27220cf05233e8c6"
+    },
+    {
+      "id": "local.tag-table.scoped-import.20261107",
+      "profileSha256": "4ada90e4bcd00ddfe6ef1ae79c8ed5e29d818d78c9fecb9b18d23d1930566b00"
     },
     {
       "id": "local.technology.first-motion.20261101",

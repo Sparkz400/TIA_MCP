@@ -1,0 +1,79 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.tag-table.scoped-import.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T07:09:03+00:00",
+  "source": {
+    "commit": "8c5f32f71b6039f83c4b664d0e4f2f80fd01e480",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_tag_table_scope.py on Debug builds of e5445ef6 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 17/17 steps: TagImportFixture seeds tables Signals (Existing %M50.0) and Other (Untouched %M51.0) and an inconsistent SCL FC TagScopeBroken; a candidate omitting Existing is refused at prepare (TagScopeMismatch); tag_table_import_xml adding Added (Bool %M50.1) prepares despite the inconsistent block with scopePolicy tag-table-content-and-project-metadata-v1, applies with checkpoint, compile and save while the PLC's single pre-existing compiler error is unchanged against the baseline compile, and reads back Added and Existing natively; change_restore is refused (ScopedRecoveryRequired); an external edit of the unrelated table Other makes a prepared candidate StaleRevision at apply. Negative case: the fixture generates a consistent SCL FC TagScopeConsumer reading Added and proves natively that Added as Int at %MW60 fails it (Data type 'Int' cannot be converted implicitly into data type 'Bool'), then restores Bool; the same type change through MCP ends CompileFailed/recovery_required with before.zap21 retained and exactly the baseline error plus the consumer error. The worker exited on its own with code 0.",
+  "limitations": [
+    "Source commit is the curator-only follow-up of e5445ef6; src and every executable run are byte-identical to e5445ef6, the commit that was built and run.",
+    "One owned scratch CPU 1511-1 PN at PLC-root scope with Bool/Int bit-memory tags and one inconsistent unrelated block; software units, namespaces, user constants, multilingual comments, F-PLCs, reopened projects and interrupted outcomes are not exercised by this run.",
+    "Project lock release after the worker exit was not verified (projectLockReleaseVerified false); no packaged or installed build was run."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "fb0189eb71c4ad61a56c4e3c17b7e5410917b24c0d65c7af0625b32883169c89"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "5b7d099156427a1cca64833b26f17f053ee76116e31d9bd1c4ff16d4a7138cd6"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "8d4b2a968d750c146738d164ac886c65f92337adcdd150d0106fa9e3c42659d8"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "8cfd44f62673666beb6ca67b748d56254ecf1af3b8d7886e13c9630ba0d8fccb",
+      "bytes": 135669,
+      "completed": true,
+      "steps": [
+        "owned start",
+        "owned scratch",
+        "seed inconsistent block",
+        "TagScopeMismatch",
+        "prepare despite inconsistent block",
+        "apply with existing diagnostic",
+        "native table readback",
+        "ScopedRecoveryRequired",
+        "prepare stale candidate",
+        "external scratch tag edit",
+        "StaleRevision",
+        "native consumer diagnostic",
+        "prepare consumed type change",
+        "CompileFailed",
+        "retain regression failure",
+        "owned worker shutdown"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_status",
+        "project_inventory",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare",
+        "change_restore"
+      ]
+    }
+  ]
+}
