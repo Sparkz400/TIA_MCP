@@ -254,6 +254,14 @@ public sealed partial class TiaTools
                 }
             }
             data["progressAvailable"] = true; data["outcomeVerified"] = false; data["automaticRetryAllowed"] = false;
+            // #219: equal fingerprints mean nothing new to report; elapsed time of the running phase is recomputed per poll.
+            var phases = (data["phases"] as System.Text.Json.Nodes.JsonArray ?? []).OfType<System.Text.Json.Nodes.JsonObject>().ToArray();
+            data["phaseFingerprint"] = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(
+                (data["state"]?.ToString() ?? "") + "|" + string.Join(",", phases.Select(p => p["phase"] + ":" + p["state"]))))).ToLowerInvariant()[..16];
+            var running = phases.LastOrDefault(p => p["state"]?.ToString() == "running");
+            data["currentPhase"] = running?["phase"]?.ToString();
+            if (running?["startedAtUtc"]?.ToString() is string started && DateTimeOffset.TryParse(started, out var since))
+                data["currentPhaseElapsedMilliseconds"] = (long)(DateTimeOffset.UtcNow - since).TotalMilliseconds;
             data["note"] = "Progress is diagnostic only. Use normal change_status for the durable outcome; never replay a pending write.";
             return Result(data.ToJsonString(), false);
         }

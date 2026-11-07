@@ -50,6 +50,7 @@ try
             var clientLogging = new ClientLogging();
             builder.Logging.AddProvider(clientLogging);
             builder.Services.AddSingleton(options);
+            BuildIdentity.Capture(options.WorkerPath, options.SimulatorWorkerPath);
             if (options.AddInHandoff) builder.Services.AddHostedService<AddInHandoffService>();
             builder.Services.AddSingleton<TiaMcp.Core.Inventory.InventoryStore>();
             builder.Services.AddSingleton<PhysicalRuntimeSessions>();

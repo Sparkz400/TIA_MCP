@@ -12,7 +12,7 @@ public static class ToolGroups
     private static readonly (string Prefix, string Group)[] Rules =
     [
         ("qualification_", Qualification),
-        ("feature_catalog", Base), ("artifact_", Base),
+        ("feature_catalog", Base), ("host_build_identity", Base), ("artifact_", Base),
         ("project_model", "explorer"), ("project_snapshot_", "explorer"),
         ("plc_online_compare", "simulation"), ("plc_station_upload", "simulation"), ("sim_", "simulation"), ("simulation_", "simulation"), ("db_snapshot_", "simulation"),
         ("tia_", "core"), ("project_", "core"), ("target_capabilities", "core"), ("object_resolve", "core"), ("fixture_sources", "core"),

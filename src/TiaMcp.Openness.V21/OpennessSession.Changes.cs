@@ -1777,6 +1777,7 @@ namespace TiaMcp.Openness.V21
             view["automaticRetryAllowed"] = false;
             view["phaseTimings"] = change.PhaseTimings.DeepClone();
             view["progressPath"] = Path.Combine(change.Directory, "progress.json");
+            view["progress"] = ChangeMilestoneRules.From(change.State, change.Stages, change.Compilation);
             return change.Kind == "hmi_classic_screen_edit" && !includeDetails ? ClassicScreenReceipts.Compact(view) : view;
         }
 

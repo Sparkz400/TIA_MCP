@@ -167,4 +167,21 @@ internal static class TagTableImportTests
         await Check.ThrowsAsync<TiaMcp.Openness.V21.BridgeException>(() => Task.Run(() => IntentRules.Normalize(JObject.Parse("""{"decisions":[{"id":"a","source":"u"}]}"""))));
         await Check.ThrowsAsync<TiaMcp.Openness.V21.BridgeException>(() => Task.Run(() => IntentRules.Normalize(JObject.Parse("""{"guess":"door switch is probably X1"}"""))));
     }
+
+    internal static Task ChangeMilestones()
+    {
+        static JArray Stages(params string[] s) => new(s);
+        var done = ChangeMilestoneRules.From("applied", Stages("prechange_project_saved", "recovery_archive_created", "baseline_compile_finished", "mutation_applied", "compile_finished", "changed_project_saved"),
+            new JObject { ["compilerSucceeded"] = false });
+        Check.Equal(true, done.Value<bool>("projectEditComplete"));
+        Check.Equal(true, done.Value<string>("summary")!.Contains("still has compiler errors"));
+        var failed = ChangeMilestoneRules.From("recovery_required", Stages("prechange_project_saved", "recovery_archive_created", "mutation_applied", "compile_finished", "change_finished_with_failure"),
+            new JObject { ["compilerSucceeded"] = false });
+        Check.Equal(false, failed.Value<bool>("projectEditComplete"));
+        Check.Equal("notReached", failed["milestones"]!.Single(m => m.Value<string>("milestone") == "saved")!.Value<string>("status"));
+        var prepared = ChangeMilestoneRules.From("prepared", Stages(), null);
+        Check.Equal(false, prepared.Value<bool>("projectEditComplete"));
+        Check.Equal(true, prepared.Value<string>("summary")!.StartsWith("Prepared only"));
+        return Task.CompletedTask;
+    }
 }
