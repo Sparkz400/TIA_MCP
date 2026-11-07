@@ -94,6 +94,10 @@ LIMITATIONS = [
 ]
 
 
+# Every cycle-synchronous capture mode the simulator worker offers (SimulationRuntimeControl.CaptureMode).
+CAPTURE_MODES = ("SingleStep_C", "SingleStep_P", "SingleStep_CP", "SingleStep_CT", "SingleStep_CPT")
+
+
 def symbol(h, instance_id, member):
     tags = h.tool("sim_tags", {"instanceId": instance_id, "filter": "DiagGate_DB", "maxItems": 2000})["tags"]
     found = [t["symbol"] for t in tags if t["symbol"].replace('"', "") == "DiagGate_DB." + member]
@@ -141,10 +145,12 @@ class Lab:
         require(all(v["quality"] == "good" for v in values), "Bad-quality PLCSIM read: %s" % values)
         return {v["symbol"]: v["value"] for v in values}
 
-    def capture(self, label, seconds=3):
+    def capture(self, label, seconds=3, mode=None):
+        """mode: a cycle-synchronous capture in that SingleStep mode; None polls without stepping."""
         h, selections = self.h, [uuid.uuid4().hex, uuid.uuid4().hex]
         request = {"attemptId": self.creation, "selectionIds": selections, "intervalMilliseconds": 100, "durationSeconds": seconds, "source": "plcsim",
-                   "simulator": {"instanceId": self.instance["id"], "instanceName": self.instance["name"], "cycleSynchronous": False,
+                   "simulator": {"instanceId": self.instance["id"], "instanceName": self.instance["name"], "cycleSynchronous": mode is not None,
+                                 **({"syncMode": mode} if mode else {}),
                                  "signals": [{k: s[k] for k in ("symbol", "type", "datatype")} for s in self.signals]},
                    "reviewId": self.review,
                    "association": {"caseId": self.case, "mappings": [
@@ -388,6 +394,21 @@ def body(h):
                    {"beforeAcquisitionId": first["id"], "afterAcquisitionId": first["id"], "request": {"reason": "x"}}, ["MeasurementLineageMismatch"])
         lab.refuse("fields beyond reason", "diagnostic_runtime_acquisition_compare",
                    {"beforeAcquisitionId": first["id"], "afterAcquisitionId": second["id"], "request": {"reason": "x", "verdict": "fixed"}}, ["InvalidRequest"])
+
+        # Each cycle-synchronous mode: a completed capture with rows, one sync point per sample, and the instance back in the
+        # operating mode it had before (the worker restores it at the capture's end).
+        mode_of = lambda: h.tool("sim_observe", {"instanceId": lab.instance["id"]})["after"]["operatingMode"]
+        initial = h.stage("operating mode before the cycle-synchronous captures", mode_of)
+        h.report["captureModes"] = {"initialOperatingMode": initial}
+        for mode in CAPTURE_MODES:
+            captured = lab.capture("cycle-synchronous " + mode, seconds=2, mode=mode)
+            restored = h.stage("operating mode after the %s capture" % mode, mode_of)
+            require(restored == initial, "The %s capture left operating mode %s instead of %s" % (mode, restored, initial))
+            h.report["captureModes"][mode] = {"rows": captured["progress"]["rows"], "restoredOperatingMode": restored}
+        lab.refuse("syncMode without cycleSynchronous", "runtime_capture_start", {"captureId": uuid.uuid4().hex, "request": {
+            "attemptId": lab.creation, "selectionIds": [uuid.uuid4().hex], "intervalMilliseconds": 100, "durationSeconds": 1, "source": "plcsim",
+            "simulator": {"instanceId": lab.instance["id"], "instanceName": lab.instance["name"], "cycleSynchronous": False, "syncMode": "SingleStep_P",
+                          "signals": [{k: enable[k] for k in ("symbol", "type", "datatype")}]}}}, ["InvalidRequest", "PlcsimCaptureInvalid"])
 
         capture_id = uuid.uuid4().hex
         hold = {"attemptId": lab.creation, "selectionIds": [uuid.uuid4().hex], "intervalMilliseconds": 100, "durationSeconds": 30, "source": "plcsim",
