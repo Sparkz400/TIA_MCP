@@ -17,7 +17,9 @@ namespace TiaMcp.Simulator.V8
 
         private JObject Record(JObject args)
         {
-            var selected = Owned(args);
+            var selected = Get(args);
+            RequireOwned(selected);
+            EnsureAdmitted(selected);
             string action = args["action"]?.Type == JTokenType.String ? args.Value<string>("action") : null;
             if (action != "arm" && action != "collect") throw new SimulatorException("InvalidRequest", "action must be arm or collect.");
             var result = Envelope(selected);
