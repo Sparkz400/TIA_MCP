@@ -175,7 +175,8 @@ Test("combined-apply refusals precede the admission record, a stale preview stil
     if (admission.Split(new[] { "PlcCombinedApplyRefusal(change)" }, StringSplitOptions.None).Length != 2) throw new Exception("The admission scope evaluates the combined-apply refusal once.");
     string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
     if (integration.IndexOf("dependents = TypedDependentPaths(plc, callerPath).ToArray();", StringComparison.Ordinal) < 0 ||
-        integration.IndexOf("PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, dependents, directInstanceDbs)", StringComparison.Ordinal) < 0)
+        integration.IndexOf("PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, dependents, directInstanceDbs,", StringComparison.Ordinal) < 0 ||
+        integration.IndexOf("TypedComponentTransitiveAvailable(change.Project))", StringComparison.Ordinal) < 0)
         throw new Exception("The reused-FB multi-instance target check must refuse the caller's dependents other than its direct instance DBs.");
     string typed = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs"));
     if (typed.IndexOf("foreach (string path in TypedDependentPaths(capture.Plc, capture.CallerPath))", StringComparison.Ordinal) < 0)
@@ -187,7 +188,7 @@ Test("candidate shapes run only on a qualification Host's owned scratch, and onl
     Equal("dependentInstanceDb+earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent,dependentInstanceDb+earlierPlacement+fbCaller+multiInstance+reusedComponent,dependentInstanceDb+fbCaller+ladCaller+multiInstance+reusedComponent,dependentInstanceDb+fbCaller+multiInstance+reusedComponent,earlierPlacement,earlierPlacement+fbCaller,earlierPlacement+fbCaller+ladCaller,earlierPlacement+fbCaller+ladCaller+multiInstance+reusedComponent,earlierPlacement+fbCaller+ladCaller+reusedComponent,earlierPlacement+fbCaller+multiInstance+reusedComponent,earlierPlacement+fbCaller+reusedComponent,earlierPlacement+ladCaller,earlierPlacement+ladCaller+reusedComponent,earlierPlacement+reusedComponent,fbCaller,fbCaller+ladCaller,fbCaller+ladCaller+multiInstance+reusedComponent,fbCaller+ladCaller+reusedComponent,fbCaller+multiInstance+reusedComponent,fbCaller+reusedComponent,ladCaller,ladCaller+reusedComponent,obCaller,reusedComponent", string.Join(",", PlcComponentQualificationGate.VerifiedShapes));
     string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
     foreach (string pinned in new[] {
-        "CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change), dependentInstanceDb)",
+        "CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change), dependentInstanceDb, embeddingParent)",
         "private bool PlcComponentCandidatesAdmitted(LibraryChange change) =>\n            _componentQualificationEnabled && _ownsPortal && _scratchProject != null && change.Project != null && change.Project.Equals(_scratchProject) && _portal.Projects.Count == 1;" })
         if (integration.Replace("\r\n", "\n").IndexOf(pinned, StringComparison.Ordinal) < 0) throw new Exception("Candidate admission changed: " + pinned);
     if (integration.Split(new[] { "PlcComponentCandidatesAdmitted(" }, StringSplitOptions.None).Length != 3) throw new Exception("Candidate admission must have exactly one use.");

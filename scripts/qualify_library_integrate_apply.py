@@ -102,19 +102,22 @@ CALLER_SOURCES = {("FB", "FBD"): "callers/TiaMcpComponentHost.s7dcl", ("FB", "LA
 # (route-capture-component-storage-packet.v1.json); it passed natively on 1 November, so its preview names no candidate feature.
 # multiInstanceDependents gives the Host FB its own instance DB first: the DB gains the new member through the captured component
 # effect (instance-effects-component.v1.json), which the runner checks against the captured DB member. multiInstanceParent embeds
-# the Host FB in a parent FB instead: no captured transitive effect covers it, so the plan must be refused before admission
-# (DependencyProfileUnavailable), with no admission record and the scratch unchanged.
+# the Host FB in a parent FB instead: the parent gains the member nested in its Host member through the captured component
+# transitive effect (instance-effects-transitive-component.v1.json, qualificationOnly), checked against the captured nested member.
+# A Host without that manifest still refuses the plan before admission (DependencyProfileUnavailable).
 HOST_DB = HOST_FB + "_DB"
 HOST_DB_SOURCE = 'DATA_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\n"%s"\nBEGIN\nEND_DATA_BLOCK\n' % (HOST_DB, HOST_FB)
 PARENT_FB, PARENT_FB_NUMBER = "TiaMcpComponentParent", 31
 PARENT_SOURCE = ('FUNCTION_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\nVAR\n Host : "%s";\nEND_VAR\nBEGIN\n #Host();\nEND_FUNCTION_BLOCK\n'
                  % (PARENT_FB, HOST_FB))
 DEPENDENT_DB_FEATURES = []  # dependentInstanceDb+fbCaller+multiInstance+reusedComponent, verified on 2 November
+PARENT_FEATURES = ["embeddingParent", "fbCaller", "multiInstance", "reusedComponent"]  # a candidate shape until its native run
 COMPONENT_EFFECT = ROOT / "fixtures/typed-graphical/native/instance-effects-component/after-instance.xml"
+COMPONENT_TRANSITIVE_PARENT = ROOT / "fixtures/typed-graphical/native/instance-effects-transitive-component/after-Tgp_CompNestParent.xml"
 DEPENDENTS_REFUSED = "DependencyProfileUnavailable"
 # The worker's message for a combined apply refused while it resolves the shared-mutation scope (OpennessSession.SharedMutationAdmission).
 BEFORE_ADMISSION = "Combined apply refused before admission: "
-REFUSED_CASES = {"multiInstanceParent"}
+REFUSED_CASES = set()
 
 
 def failed_candidates(outcomes):
@@ -145,6 +148,25 @@ def verify_dependent_db(before_xml, after_xml, captured_xml, member):
     require(structural(added[0]) == structural(expected[0]), "The new instance DB member differs from the captured component effect.")
     section.remove(added[0])
     require(structural(after) == structural(safe_xml(before_xml)), "The instance DB changed beyond the new member.")
+
+
+def verify_parent_fb(before_xml, after_xml, captured_xml, host_type, member):
+    """A parent FB embedding the multi-instance caller gains exactly the new member at the end of that embedded member's nested
+    Static section, equal to the captured transitive effect's nested member; with it removed, the parent equals its baseline."""
+    def nested(document, datatype):
+        hosts = [m for m in document.iter() if m.tag.rsplit("}", 1)[-1] == "Member" and m.get("Datatype") == datatype]
+        require(len(hosts) == 1, "Expected one member typed " + datatype + ".")
+        statics = [s for sections in hosts[0] if sections.tag.rsplit("}", 1)[-1] == "Sections" for s in sections if s.get("Name") == "Static"]
+        require(len(statics) == 1, "The embedded member lacks exactly one nested Static section.")
+        return statics[0]
+    after = safe_xml(after_xml)
+    section = nested(after, '"' + host_type + '"')
+    tail = [m for m in section if m.tag.rsplit("}", 1)[-1] == "Member"][-1:]
+    expected = [m for m in nested(safe_xml(captured_xml), '"Tgp_CompNestEffect"') if m.get("Name") == member]
+    require(len(tail) == 1 and tail[0].get("Name") == member and len(expected) == 1, "The parent does not append " + member + " to its embedded member.")
+    require(structural(tail[0]) == structural(expected[0]), "The parent's nested member differs from the captured transitive effect.")
+    section.remove(tail[0])
+    require(structural(after) == structural(safe_xml(before_xml)), "The parent FB changed beyond the nested member.")
 
 
 def admission_records(root):
@@ -409,9 +431,13 @@ class IntegrateApplyRun(ComponentRun):
             (["block:" + plan["instanceDb"]["path"]] if "instanceDb" in plan else []) + ([] if existing else ["block:" + plan["caller"]["blockPath"]])
         require(planned_objects(plan, existing) == {key for key in added if key.startswith("block:")}, "Installed blocks differ from the reviewed plan.")
         # The new network directly follows the selected one (the last by default); the caller's own instance DB gains the member.
-        dependent = self.manifest.get("dependentDb")
+        dependent, parent = self.manifest.get("dependentDb"), self.manifest.get("parentFb")
         verify_preserved_installation(baseline, after, caller, added, multi, self.manifest.get("insertNetworkIndex", -1) if existing else None,
-                                      [dependent] if dependent else [])
+                                      [p for p in (dependent, parent) if p])
+        if parent:
+            before_xml, after_xml = (Path(s["objects"]["block:" + parent]["file"]).read_text(encoding="utf-8-sig") for s in (baseline, after))
+            verify_parent_fb(before_xml, after_xml, COMPONENT_TRANSITIVE_PARENT.read_text(encoding="utf-8-sig"), HOST_FB, multi)
+            case["embeddingParentVerified"] = parent
         if dependent:
             before_xml, after_xml = (Path(s["objects"]["block:" + dependent]["file"]).read_text(encoding="utf-8-sig") for s in (baseline, after))
             verify_dependent_db(before_xml, after_xml, COMPONENT_EFFECT.read_text(encoding="utf-8-sig"), multi)
@@ -449,8 +475,8 @@ class IntegrateApplyRun(ComponentRun):
     def reuse(self, name, archive, released, multi=False, dependents=False, parent=False):
         """Candidate: a first verified install, then a plan that reuses the installed FB (exact proofs, no import step), either
         in a second new FBD FC with a new global DB or as a multi-instance in an existing FB caller. With dependents the FB
-        caller has its own instance DB, which gains the member too; with parent a parent FB embeds the caller, and the
-        multi-instance must be refused before admission."""
+        caller has its own instance DB, which gains the member too; with parent a parent FB embeds the caller and gains the
+        member nested in its embedded caller through the captured component transitive effect."""
         self.use({"callerMode": "createStandaloneFc"})
         case, out = self.case(name, True), self.output / name
         scratch, opened, plc = self.stage_consumer(archive, released)
@@ -468,14 +494,12 @@ class IntegrateApplyRun(ComponentRun):
             self.apply("source_upsert", {"language": "SCL", "source": PARENT_SOURCE, "expectedBlockNames": [PARENT_FB]})
             self.apply("block_number_set", {"blockName": PARENT_FB, "number": PARENT_FB_NUMBER})
         self.use({"callerMode": "existing", "caller": "TiaMcpComponentHost", "multiInstance": MULTI_NAME,
-                  **({"dependentDb": plc + "/blocks/" + HOST_DB} if dependents else {})} if multi else
+                  **({"dependentDb": plc + "/blocks/" + HOST_DB} if dependents else {}), **({"parentFb": plc + "/blocks/" + PARENT_FB} if parent else {})} if multi else
                  {"callerMode": "createStandaloneFc", "caller": REUSE_CALLER, "instance": REUSE_INSTANCE})
         baseline = snapshot(self.call, out / "before")
         caller, caller_recipe, network = self.select_caller(baseline, plc)
         prepared, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
-        if parent:
-            return self.dependents_refused(case, out, prepared, baseline, plc + "/blocks/" + PARENT_FB, opened)
-        applied, record = self.apply_combined(case, prepared, baseline, DEPENDENT_DB_FEATURES if dependents else [])
+        applied, record = self.apply_combined(case, prepared, baseline, PARENT_FEATURES if parent else DEPENDENT_DB_FEATURES if dependents else [])
         after = self.verify_installed(case, out, plan, baseline, plc, caller, network, released, record)
         self.call("library_close", {"libraryId": opened["libraryId"]})
         # The typed step's own pre-mutation archive is the recovery anchor: it holds the first installation.

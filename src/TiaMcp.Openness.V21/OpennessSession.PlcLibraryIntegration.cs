@@ -147,7 +147,8 @@ namespace TiaMcp.Openness.V21
             try { PlcCombinedApplyDependents(change, out dependents, out directInstanceDbs); }
             catch (BridgeException error) { return NotQualified(error.Message); }
             dependentInstanceDb = directInstanceDbs?.Length > 0;
-            string shape = PlcComponentQualificationGate.CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change), dependentInstanceDb) ??
+            bool embeddingParent = dependents != null && dependents.Except(directInstanceDbs ?? new string[0], StringComparer.Ordinal).Any();
+            string shape = PlcComponentQualificationGate.CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change), dependentInstanceDb, embeddingParent) ??
                 (change.Source == null || change.Source.Project != null || string.IsNullOrEmpty(change.Source.SourcePath) || change.Source.Writable
                     ? "Only the verified read-only global source with its retained snapshot is eligible." : null);
             return shape != null ? NotQualified(shape) :
@@ -196,7 +197,8 @@ namespace TiaMcp.Openness.V21
                 // caller's dependents are refused here, before admission, because no captured effect covers them. After an import it
                 // would fail only once the import is saved; a multi-instance profile needs the installed FB export, unknown before it.
                 if (plan["fb"].Value<bool>("reused"))
-                    return plan["multiInstance"] == null ? null : PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, dependents, directInstanceDbs);
+                    return plan["multiInstance"] == null ? null : PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, dependents, directInstanceDbs,
+                        TypedComponentTransitiveAvailable(change.Project));
                 if (plan["multiInstance"] != null) return NotQualified("A multi-instance profile for a newly imported FB can only be checked against its installed export, after the import is saved. Install the component first, then add the multi-instance as a reuse plan.");
                 // The same captured-storage decision step 2 makes; its content equality needs the installed export and stays there.
                 var captured = CapturedStorageContext(change, true);

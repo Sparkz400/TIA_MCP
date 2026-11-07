@@ -171,12 +171,11 @@ class Candidates(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "exactly one network"):
             subject.two_network_fc(xml, "Thrice", 78)
 
-    def test_candidate_aggregation_accepts_installs_and_the_parent_refusal_only(self):
-        # The captured component effect lets the caller's own instance DB install; only the embedding parent must end refused,
-        # and an install there would be a failure too.
-        self.assertEqual({}, subject.failed_candidates({"ladStandalone": "installed", "multiInstanceDependents": "installed", "multiInstanceParent": "refused"}))
-        self.assertEqual({"multiInstanceDependents": "refused", "fbCaller": "failed: x", "multiInstanceParent": "installed"},
-                         subject.failed_candidates({"multiInstanceDependents": "refused", "fbCaller": "failed: x", "reuse": "installed", "multiInstanceParent": "installed"}))
+    def test_candidate_aggregation_accepts_installs_only(self):
+        # The captured component effects let the caller's own instance DB and an embedding parent install; a refusal is a failure.
+        self.assertEqual({}, subject.failed_candidates({"ladStandalone": "installed", "multiInstanceDependents": "installed", "multiInstanceParent": "installed"}))
+        self.assertEqual({"multiInstanceDependents": "refused", "fbCaller": "failed: x", "multiInstanceParent": "refused"},
+                         subject.failed_candidates({"multiInstanceDependents": "refused", "fbCaller": "failed: x", "reuse": "installed", "multiInstanceParent": "refused"}))
         self.assertEqual({"reuse": "refused"}, subject.failed_candidates({"reuse": "refused"}))
 
     def test_admission_records_count_open_and_archived_records(self):
@@ -225,9 +224,19 @@ class Candidates(unittest.TestCase):
     def test_host_instance_db_source_is_one_db_of_the_host_fb(self):
         source = subject.HOST_DB_SOURCE
         self.assertEqual(['DATA_BLOCK "TiaMcpComponentHost_DB"', '"TiaMcpComponentHost"'], [line for line in source.splitlines() if '"' in line])
-        self.assertEqual({"multiInstanceParent"}, subject.REFUSED_CASES)
+        self.assertEqual(set(), subject.REFUSED_CASES)
         self.assertEqual(['FUNCTION_BLOCK "TiaMcpComponentParent"', ' Host : "TiaMcpComponentHost";'], [line for line in subject.PARENT_SOURCE.splitlines() if '"' in line])
         self.assertNotIn(subject.PARENT_FB_NUMBER, (2, subject.HOST_FB_NUMBER))
+
+    def test_parent_oracle_accepts_the_captured_parent_and_nothing_else(self):
+        folder = subject.ROOT / "fixtures/typed-graphical/native/instance-effects-transitive-component"
+        before, after = ((folder / (phase + "-Tgp_CompNestParent.xml")).read_text(encoding="utf-8-sig") for phase in ("before", "after"))
+        captured = subject.COMPONENT_TRANSITIVE_PARENT.read_text(encoding="utf-8-sig")
+        subject.verify_parent_fb(before, after, captured, "Tgp_CompNestEffect", "Gate")
+        with self.assertRaises(RuntimeError):
+            subject.verify_parent_fb(before, before, captured, "Tgp_CompNestEffect", "Gate")
+        with self.assertRaises(RuntimeError):
+            subject.verify_parent_fb(before, after.replace("RetainedMarker", "OtherMarker", 1), captured, "Tgp_CompNestEffect", "Gate")
 
     def test_dependent_db_gains_exactly_the_captured_member(self):
         def db(*members):
