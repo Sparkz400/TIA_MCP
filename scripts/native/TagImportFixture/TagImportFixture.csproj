@@ -4,5 +4,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <Reference Include="Siemens.Engineering.Base"><HintPath>$(TiaApiDirectory)\Siemens.Engineering.Base.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Siemens.Engineering.Step7"><HintPath>$(TiaApiDirectory)\Siemens.Engineering.Step7.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Siemens.Engineering.Startdrive"><HintPath>$(TiaApiDirectory)\Siemens.Engineering.Startdrive.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
 </Project>

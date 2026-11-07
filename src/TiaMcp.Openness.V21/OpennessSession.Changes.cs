@@ -265,7 +265,7 @@ namespace TiaMcp.Openness.V21
                     if (change.Kind == "source_upsert") { VerifyExpectedBlocksExist(change, SelectPlc(change.Selector)); change.Stages.Add("source_blocks_verified_after_save"); }
                     if (change.Kind == "certificate_create") { VerifyCreatedCertificateAfterSave(change, project); change.Stages.Add("certificate_verified_after_save"); }
                     if (change.Kind == "instance_db_create") { VerifyInstanceDb(change, SelectPlc(change.Selector)); change.Stages.Add("instance_db_verified_after_save"); }
-                    if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile" || change.Kind == "safety_fparameter_set") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
+                    if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_drive_tags") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
                     change.AfterFingerprint = change.Kind == "hmi_classic_screen_edit"
                         ? ClassicScreenCapturedFingerprint(change, project, change.HmiEvidence["after-save"] as JObject)
                         : EngineeringFingerprint(change, project);
@@ -731,6 +731,15 @@ namespace TiaMcp.Openness.V21
                 case "hardware_cpu_parameters":
                     PrepareCpuParameters(change, project, preview);
                     break;
+                case "safety_drive_tags":
+                {
+                    var plc = SelectPlc(change.Selector);
+                    preview["safetyDriveTags"] = Startdrive(() => SafetyDriveTagPlan(change, project));
+                    preview["safetyBefore"] = ReadSafety(plc.Software);
+                    effects.Add(new JObject { ["plcPath"] = plc.Path, ["action"] = change.Kind });
+                    ((JArray)preview["warnings"]).Add("Creates PROFIsafe safety tags, which changes the safety program signatures after the F-compile. Nothing here validates, accepts or approves the safety program or the drive's Safety Integrated configuration.");
+                    break;
+                }
                 case "safety_fparameter_set":
                 {
                     var plc = SelectPlc(change.Selector);
@@ -1009,6 +1018,9 @@ namespace TiaMcp.Openness.V21
                     TagCreate(change, plc, MutationTable(change, plc), true);
                     break;
                 }
+                case "safety_drive_tags":
+                    Startdrive(() => { ApplySafetyDriveTags(change, project); return true; });
+                    break;
                 case "block_number_set":
                 case "block_attributes_set":
                     ApplyBlockEdit(change);
@@ -1521,7 +1533,7 @@ namespace TiaMcp.Openness.V21
                 snapshot["technologyConnections"] = TechnologyConnections(entry.Item, connectionBudget, new JArray(), entry.Path, out _, new TechnologyReferenceReader(plc.Project, plc.Path));
                 if (connectionBudget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish a complete technology connection fingerprint within the scan bound.");
             }
-            if (change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set") snapshot["driveObject"] = Startdrive(() => DriveObjectFingerprint(change, project));
+            if (change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_drive_tags") snapshot["driveObject"] = Startdrive(() => DriveObjectFingerprint(change, project));
             if (change.Kind == "drive_parameter_set") snapshot["driveParameters"] = Startdrive(() => DriveParameterFingerprint(change, project));
             if (change.Kind == "drive_telegram_set") snapshot["driveTelegrams"] = Startdrive(() => DriveTelegramFingerprint(change, project));
             if (change.Kind.StartsWith("to_", StringComparison.Ordinal))

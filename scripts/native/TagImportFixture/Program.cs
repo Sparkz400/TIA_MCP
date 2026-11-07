@@ -37,7 +37,7 @@ internal static class Program
     }
     [MethodImpl(MethodImplOptions.NoInlining)] static void Run(string[] args)
     {
-        if (args.Length != 2 || !new[] { "seed", "drift", "consume" }.Contains(args[0])) throw new Exception("Expected seed|drift|consume authorization.json");
+        if (args.Length != 2 || !new[] { "seed", "drift", "consume", "safety-telegram" }.Contains(args[0])) throw new Exception("Expected seed|drift|consume|safety-telegram authorization.json");
         string receipt = Path.GetFullPath(args[1]); var auth = JObject.Parse(File.ReadAllText(receipt));
         string projectPath = Path.GetFullPath(auth.Value<string>("projectPath"));
         if (auth.Value<bool?>("ownsPortalProcess") != true || auth.Value<string>("creationTool") != "tia_create_scratch"
@@ -48,6 +48,7 @@ internal static class Program
         {
             if (portal.Projects.Count != 1 || portal.Projects[0].Path.FullName != projectPath) throw new Exception("Wrong scratch project");
             var project = portal.Projects[0];
+            if (args[0] == "safety-telegram") { SafetyTelegram(project, auth.Value<string>("driveDevice"), auth.Value<int?>("safetyTelegram") ?? 30); return; }
             var plc = project.Devices.SelectMany(d => Items(d.DeviceItems)).Select(i => i.GetService<SoftwareContainer>()?.Software as PlcSoftware).Single(p => p != null);
             if (args[0] == "drift")
             {
@@ -92,5 +93,14 @@ internal static class Program
     static CompilerResult Compile(PlcBlock block) => (block.GetService<ICompilable>() ?? throw new Exception("Block exposes no compiler")).Compile();
     static string Describe(CompilerResult r) => r.State + " " + string.Join(" | ", Flatten(r.Messages).Where(m => m.State == CompilerResultState.Error).Select(m => m.Path + ": " + m.Description));
     static IEnumerable<CompilerResultMessage> Flatten(CompilerResultMessageComposition ms) { foreach (var m in ms) { yield return m; foreach (var c in Flatten(m.Messages)) yield return c; } }
+    // #212 fixture: Startdrive Openness inserts the drive's PROFIsafe telegram; MCP's drive_telegram_set refuses safety telegrams.
+    [MethodImpl(MethodImplOptions.NoInlining)] static void SafetyTelegram(Project project, string deviceName, int number)
+    {
+        var device = project.Devices.Single(d => d.Name == deviceName);
+        var drive = Items(device.DeviceItems).Select(i => i.GetService<Siemens.Engineering.MC.Drives.DriveObjectContainer>()).First(c => c != null).DriveObjects[0];
+        if (!drive.Telegrams.CanInsertSafetyTelegram(number)) throw new Exception("Startdrive refuses safety telegram " + number + " on " + deviceName);
+        drive.Telegrams.InsertSafetyTelegram(number);
+        Console.WriteLine(string.Join("; ", drive.Telegrams.Select(t => t.Type + " " + t.TelegramNumber)));
+    }
     static IEnumerable<DeviceItem> Items(DeviceItemComposition items) { foreach (var i in items) { yield return i; foreach (var c in Items(i.DeviceItems)) yield return c; } }
 }

@@ -1,0 +1,88 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.drives.servo-calls.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T10:33:30+00:00",
+  "source": {
+    "commit": "35e39ed75921f2a9768f88df0d2546149a2b0551",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_servo_calls.py on Debug builds of 35e39ed7 in one owned TIA V21 Update 3 scratch, 30/30 steps: the scratch CPU 1511-1 PN with two SINAMICS G120C PN drives assigned to its IO system (telegram 1 at bytes 256 and 260), Word tags at each telegram's start addresses, Bool signals Reset, DoorOpen and SS1, and an SCL wrapper FB ServoWrap (inputs zsw Word, reset Bool, ss1 Bool; outputs stw Word, fault Bool). servo_call_plan with the explicit mapping status=zsw, control=stw, reset=reset, ss1=ss1, fault=fault, resetExpression \"Reset\" AND NOT \"DoorOpen\" and ss1Expression \"SS1\" was writeReady; its source_upsert applied with checkpoint, compile (compilerSucceeded) and save. The generated caller Servos holds exactly one call and one fault Bool per drive instance (Axis1, Axis2), and symbol_trace lists only Servos as writer of Drive1Item_STW1 and Drive2Item_STW1. After an FC OldWriter wrote Drive1Item_STW1, a new plan was not writeReady and named OldWriter in a duplicateControlWriter blocker.",
+  "limitations": [
+    "A synthetic SCL wrapper FB stands in for a vendor servo block; two G120C PN drives with telegram 1 only. Watch tables, instance DBs outside the caller and graphical callers are not planned.",
+    "Engineering evidence only: reset and SS1 expressions are applied as given; no safety program, machine behavior, commissioning or download is verified."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "071513737818e90336dd1ca687d2f53584ff0f50091974240987064d60a1a994"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "5e310eaaee54d5bc73a343c45ca601ac5d65ae3b3920a61e9fbc983d0a0873a1"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "e8fc33ec38206700beb78a5e61ef9d9ee41fd3f61b601b7a72a01a1d83339a7c",
+      "bytes": 288191,
+      "completed": true,
+      "steps": [
+        "start owned TIA servo calls",
+        "create owned scratch servo calls",
+        "prepare network_configure",
+        "apply network_configure",
+        "prepare hardware_add",
+        "apply hardware_add without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_io_assign",
+        "apply network_io_assign",
+        "prepare hardware_add",
+        "apply hardware_add without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_io_assign",
+        "apply network_io_assign",
+        "drive inventory",
+        "prepare tag_table_import_xml",
+        "apply tag_table_import_xml",
+        "prepare tag_table_import_xml",
+        "apply tag_table_import_xml",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "servo_call_plan is ready",
+        "prepare the planned source_upsert",
+        "apply source_upsert",
+        "each drive has one call, one instance, one fault Bool and only the caller as control writer",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "a second writer of a control tag blocks a new plan"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "drive_inventory",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "servo_call_plan",
+        "symbol_trace",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

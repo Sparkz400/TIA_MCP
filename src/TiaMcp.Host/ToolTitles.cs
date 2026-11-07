@@ -68,6 +68,7 @@ internal static class ToolTitles
         ["diagnostic_watch_plan"] = "Plan diagnostic watch rows",
         ["drive_observe"] = "Read drive objects",
         ["drive_inventory"] = "Read the joined drive inventory",
+        ["servo_call_plan"] = "Plan coordinated servo wrapper calls",
         ["drive_profile_review"] = "Review drive profiles",
         ["drive_profile_review_page"] = "Page a drive profile review",
         ["engineering_admission_reconcile"] = "Reconcile an uncertain admission",
