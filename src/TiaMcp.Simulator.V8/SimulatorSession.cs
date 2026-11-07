@@ -453,6 +453,7 @@ namespace TiaMcp.Simulator.V8
                 }
             }
             else { RequireNoCapture(selected); RestoreCaptureMode(selected); }
+            StopWatch(selected);
             selected.Instance.Dispose();
             _instances.Remove(selected.Id);
             return new JObject { ["instanceId"] = selected.Id, ["instanceName"] = selected.Name, ["unregistered"] = remove,
@@ -820,6 +821,7 @@ namespace TiaMcp.Simulator.V8
             foreach (var selected in _instances.Values)
             {
                 try { RestoreCaptureMode(selected); } catch (Exception ex) { Console.Error.WriteLine("Simulator capture mode restore: " + ex.Message); }
+                try { StopWatch(selected); } catch (Exception ex) { Console.Error.WriteLine("Simulator watch release: " + ex.Message); }
                 try { selected.Instance.Dispose(); } catch (Exception ex) { Console.Error.WriteLine("Simulator interface release: " + ex.Message); }
             }
             _instances.Clear();
@@ -828,7 +830,7 @@ namespace TiaMcp.Simulator.V8
 
         private sealed class Selection { internal IInstance Instance; internal int Id; internal string Name; internal bool Owned; internal string Storage;
             internal string CreationRoot; internal JObject CreationReceipt; internal EOperatingMode? CaptureRestoreMode, CaptureMode;
-            internal bool CaptureHeld; }
+            internal bool CaptureHeld; internal WatchBuffer Watch; }
         private sealed class Signal { internal string Symbol; internal string Type; internal JToken Value; }
     }
 }

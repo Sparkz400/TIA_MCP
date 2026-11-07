@@ -168,55 +168,74 @@ namespace TiaMcp.Simulator.V8
             return area;
         }
 
-        // Subscribes for the bounded window only and unsubscribes before returning; no thread or subscription outlives the call.
+        // Without watch, subscribes for the bounded window only and unsubscribes before returning. watch "start" keeps the five
+        // subscriptions on the selection, buffering up to maxEvents, so changes made by later tool calls (a download, an IP change)
+        // are seen; watch "collect" returns that buffer after an optional further window and unsubscribes. Release and shutdown
+        // unsubscribe too, so no subscription outlives its selection.
         private JObject Observe(JObject args)
         {
             var selected = Get(args);
             int window = OptionalInteger(args, "windowMs", 0, 0, 60000), maximum = OptionalInteger(args, "maxEvents", 64, 1, 256);
             bool display = args.Value<bool?>("includeDisplayData") ?? false;
+            string watch = args["watch"] == null ? null : args.Value<string>("watch");
+            if (watch != null && watch != "start" && watch != "collect") throw new SimulatorException("InvalidRequest", "watch must be start or collect.");
+            if (watch == "start" && window != 0) throw new SimulatorException("InvalidRequest", "watch start returns at once; windowMs applies to collect.");
+            if (watch == "start" && selected.Watch != null) throw new SimulatorException("SimulationWatchActive", "A watch already buffers this instance's changes; collect it first.");
+            if (watch == "collect" && selected.Watch == null) throw new SimulatorException("SimulationWatchInactive", "No watch was started on this instance.");
             var result = Envelope(selected);
             result["before"] = ObservedState(selected);
+            if (watch == "start")
+            {
+                var buffer = new WatchBuffer { Maximum = maximum, StartedAtUtc = DateTime.UtcNow.ToString("O") };
+                buffer.Unsubscribe = Subscribe(selected, item => { lock (buffer.Events) { if (buffer.Events.Count < buffer.Maximum) buffer.Events.Add(item); else buffer.Truncated = true; } });
+                selected.Watch = buffer;
+                result["watching"] = true;
+                result["watchStartedAtUtc"] = buffer.StartedAtUtc;
+                result["after"] = ObservedState(selected);
+                result["basis"] = "Operating-state, LED, software-configuration, hardware-configuration and IP-address changes are buffered from now on, also during other tool calls, until sim_observe with watch collect, sim_release or the worker's shutdown.";
+                return result;
+            }
+            if (watch == "collect")
+            {
+                var buffer = selected.Watch;
+                var waited = Stopwatch.StartNew();
+                if (window > 0) Thread.Sleep(window);
+                StopWatch(selected);
+                JArray buffered;
+                lock (buffer.Events) buffered = new JArray(buffer.Events.Select(e => e.DeepClone()));
+                result["watchStartedAtUtc"] = buffer.StartedAtUtc;
+                result["windowMs"] = window;
+                result["elapsedMs"] = waited.ElapsedMilliseconds;
+                result["events"] = buffered;
+                result["truncated"] = buffer.Truncated;
+                var watchedModes = new JObject();
+                foreach (var item in buffered.Where(e => e.Value<string>("kind") == "led")) watchedModes[item.Value<string>("led")] = item["mode"];
+                result["ledModes"] = watchedModes;
+                result["after"] = ObservedState(selected);
+                result["display"] = Display(selected, display);
+                result["basis"] = "Changes the runtime reported between watch start and this collect, other tool calls included, up to maxEvents of the start. V8 has no LED getter, so ledModes lists only LEDs that changed.";
+                return result;
+            }
             var events = new JArray();
             var gate = new object();
             bool open = true;
             void Add(JObject item)
             {
-                item["receivedAtUtc"] = DateTime.UtcNow.ToString("O");
                 lock (gate) { if (open && events.Count < maximum) { events.Add(item); Monitor.PulseAll(gate); } }
             }
-            Delegate_II_EREC_DT_EOS_EOS state = (sender, code, time, previous, current) => Add(new JObject { ["kind"] = "operatingState",
-                ["previous"] = previous.ToString(), ["current"] = current.ToString(), ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
-            Delegate_II_EREC_DT_ELT_ELM led = (sender, code, time, type, mode) => Add(new JObject { ["kind"] = "led",
-                ["led"] = type.ToString(), ["mode"] = mode.ToString(), ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
-            Delegate_SoftwareConfigurationChanged software = (sender, change) => Add(new JObject { ["kind"] = "softwareConfiguration",
-                ["changeType"] = change.ChangeType.ToString(), ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(change.EventCreateTime), ["errorCode"] = change.ErrorCode.ToString() });
-            Delegate_II_EREC_DT hardware = (sender, code, time) => Add(new JObject { ["kind"] = "hardwareConfiguration",
-                ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
-            Delegate_IPAddressChanged ip = (sender, code, time, index, suite) => Add(new JObject { ["kind"] = "ipAddress",
-                ["interfaceIndex"] = index, ["ipSuite"] = JObject.FromObject(suite),
-                ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
             var clock = Stopwatch.StartNew();
             if (window > 0)
             {
-                bool states = false, leds = false, softwareChanges = false, hardwareChanges = false, ipChanges = false;
+                var unsubscribe = Subscribe(selected, Add);
                 try
                 {
-                    selected.Instance.OnOperatingStateChanged += state; states = true;
-                    selected.Instance.OnLedChanged += led; leds = true;
-                    selected.Instance.OnSoftwareConfigurationChanged += software; softwareChanges = true;
-                    selected.Instance.OnHardwareConfigChanged += hardware; hardwareChanges = true;
-                    selected.Instance.OnIPAddressChanged += ip; ipChanges = true;
                     lock (gate)
                         while (events.Count < maximum && clock.ElapsedMilliseconds < window)
                             Monitor.Wait(gate, (int)Math.Max(1, window - clock.ElapsedMilliseconds));
                 }
                 finally
                 {
-                    if (states) selected.Instance.OnOperatingStateChanged -= state;
-                    if (leds) selected.Instance.OnLedChanged -= led;
-                    if (softwareChanges) selected.Instance.OnSoftwareConfigurationChanged -= software;
-                    if (hardwareChanges) selected.Instance.OnHardwareConfigChanged -= hardware;
-                    if (ipChanges) selected.Instance.OnIPAddressChanged -= ip;
+                    unsubscribe();
                     lock (gate) open = false;
                 }
             }
@@ -229,8 +248,54 @@ namespace TiaMcp.Simulator.V8
             result["ledModes"] = modes;
             result["after"] = ObservedState(selected);
             result["display"] = Display(selected, display);
-            result["basis"] = "Operating-state, LED, software-configuration, hardware-configuration and IP-address changes reported by the runtime during the window. V8 has no LED getter, so ledModes lists only LEDs that changed. This bridge runs one call at a time: changes made by other tool calls cannot fall inside the window.";
+            result["basis"] = "Operating-state, LED, software-configuration, hardware-configuration and IP-address changes reported by the runtime during the window. V8 has no LED getter, so ledModes lists only LEDs that changed. This bridge runs one call at a time: changes made by other tool calls cannot fall inside the window; use watch start and collect for those.";
             return result;
+        }
+
+        private sealed class WatchBuffer { internal readonly JArray Events = new JArray(); internal int Maximum; internal bool Truncated; internal string StartedAtUtc; internal Action Unsubscribe; }
+
+        private static void StopWatch(Selection selected)
+        {
+            var buffer = selected.Watch;
+            if (buffer == null) return;
+            selected.Watch = null;
+            buffer.Unsubscribe();
+        }
+
+        // The five change subscriptions; the returned action removes exactly the ones that were added.
+        private static Action Subscribe(Selection selected, Action<JObject> add)
+        {
+            Action<JObject> Add = item => { item["receivedAtUtc"] = DateTime.UtcNow.ToString("O"); add(item); };
+            Delegate_II_EREC_DT_EOS_EOS state = (sender, code, time, previous, current) => Add(new JObject { ["kind"] = "operatingState",
+                ["previous"] = previous.ToString(), ["current"] = current.ToString(), ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
+            Delegate_II_EREC_DT_ELT_ELM led = (sender, code, time, type, mode) => Add(new JObject { ["kind"] = "led",
+                ["led"] = type.ToString(), ["mode"] = mode.ToString(), ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
+            Delegate_SoftwareConfigurationChanged software = (sender, change) => Add(new JObject { ["kind"] = "softwareConfiguration",
+                ["changeType"] = change.ChangeType.ToString(), ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(change.EventCreateTime), ["errorCode"] = change.ErrorCode.ToString() });
+            Delegate_II_EREC_DT hardware = (sender, code, time) => Add(new JObject { ["kind"] = "hardwareConfiguration",
+                ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
+            Delegate_IPAddressChanged ip = (sender, code, time, index, suite) => Add(new JObject { ["kind"] = "ipAddress",
+                ["interfaceIndex"] = index, ["ipSuite"] = JObject.FromObject(suite),
+                ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
+            bool states = false, leds = false, softwareChanges = false, hardwareChanges = false, ipChanges = false;
+            Action remove = () =>
+            {
+                if (states) selected.Instance.OnOperatingStateChanged -= state;
+                if (leds) selected.Instance.OnLedChanged -= led;
+                if (softwareChanges) selected.Instance.OnSoftwareConfigurationChanged -= software;
+                if (hardwareChanges) selected.Instance.OnHardwareConfigChanged -= hardware;
+                if (ipChanges) selected.Instance.OnIPAddressChanged -= ip;
+            };
+            try
+            {
+                selected.Instance.OnOperatingStateChanged += state; states = true;
+                selected.Instance.OnLedChanged += led; leds = true;
+                selected.Instance.OnSoftwareConfigurationChanged += software; softwareChanges = true;
+                selected.Instance.OnHardwareConfigChanged += hardware; hardwareChanges = true;
+                selected.Instance.OnIPAddressChanged += ip; ipChanges = true;
+            }
+            catch { remove(); throw; }
+            return remove;
         }
 
         private static JObject ObservedState(Selection selected)

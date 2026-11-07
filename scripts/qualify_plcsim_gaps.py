@@ -330,10 +330,32 @@ def online_downloads(h, lab, plc, ticket, login, secret):
         require(error.get("code") == "InvalidRequest", "compile=true/save=true was not refused: %s" % error)
         return error
     h.stage("refuse an online download applied with compile and save", compile_true)
-    # 1. A code change, values kept: Version follows the new program while the counters keep their actual values.
+    # 1. A code change, values kept: Version follows the new program while the counters keep their actual values. A sim_observe
+    # watch spans the download, which runs through the engineering worker in its own tool call: the simulator worker must report
+    # the software configuration change it causes. An idle watch first shows no configuration change without a download.
+    instance = lab.instance["id"]
+    def watch_refusals():
+        inactive = h.call_error("sim_observe", {"instanceId": instance, "watch": "collect"})
+        require(inactive.get("code") == "SimulationWatchInactive", "Collect without a watch: %s" % inactive)
+        h.tool("sim_observe", {"instanceId": instance, "watch": "start"})
+        active = h.call_error("sim_observe", {"instanceId": instance, "watch": "start"})
+        require(active.get("code") == "SimulationWatchActive", "A second watch: %s" % active)
+        idle = h.tool("sim_observe", {"instanceId": instance, "watch": "collect", "windowMs": 2000})
+        changes = [e for e in idle["events"] if e["kind"] in ("softwareConfiguration", "hardwareConfiguration")]
+        require(not changes and idle["truncated"] is False, "An idle watch reported configuration changes: %s" % changes)
+        return {"idleEvents": idle["events"], "inactive": inactive.get("code"), "active": active.get("code")}
+    h.report["watchIdle"] = h.stage("sim_observe watch refusals and an idle watch", watch_refusals)
     lab.write("Ob82", "int32", 7)
     h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": MAIN_SOURCE % 2, "expectedBlockNames": ["Main"]})
+    started = h.stage("sim_observe watch start before the online download", lambda: h.tool("sim_observe", {"instanceId": instance, "watch": "start", "maxEvents": 256}))
     _, _, report = download("code change", {"softwareScope": "changes", "dataBlockValues": "keepActualValues", "allowStop": False})
+    def collected():
+        result = h.tool("sim_observe", {"instanceId": instance, "watch": "collect", "windowMs": 1000})
+        software = [e for e in result["events"] if e["kind"] == "softwareConfiguration"]
+        require(software and all(e["errorCode"] in ("OK", "0") for e in software), "The watch saw no software configuration change of the download: %s" % result["events"])
+        return {"startedAtUtc": started["watchStartedAtUtc"], "events": result["events"], "truncated": result["truncated"],
+                "softwareChanges": [e["changeType"] for e in software], "hardwareChanges": len([e for e in result["events"] if e["kind"] == "hardwareConfiguration"])}
+    h.report["watchDownload"] = h.stage("sim_observe watch collect sees the download's software configuration change", collected)
     h.report["onlineCodeChange"] = report
     values = h.stage("version 2 runs with kept values", lambda: lab.read(ProgramVersion="int16", Ob82="int32"))
     require(values == {"ProgramVersion": 2, "Ob82": 7}, "Expected Version 2 and the kept counter 7: %s" % values)
