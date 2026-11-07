@@ -3,6 +3,7 @@ import argparse
 import json
 from pathlib import Path
 import subprocess
+import time
 import uuid
 from xml.etree import ElementTree as ET
 from smoke_mcp import Client, ROOT
@@ -135,6 +136,23 @@ def main():
         assert compiled['baselineComparison']['verified'] is True and compiled['compile']['errorCount'] == 1, compiled['baselineComparison']
         refuse('change_restore', {'changeId': prepared['changeId'], 'previewHash': prepared['previewHash']}, 'StaleRevision')
         record('next import prepares without cleanup', prepare('%M50.3'))
+        # The restore saved the project: a fresh owned TIA must reopen it with the restored table.
+        record('close the restored session', client.tool('tia_detach'))
+        assert client.tool('tia_start')['ownsPortalProcess'] is True
+        for attempt in range(13):
+            opened = client.request('tools/call', {'name': 'project_open', 'arguments': {'path': project['path']}})
+            if not opened.get('isError'):
+                break
+            assert 'already been opened' in json.dumps(opened), opened
+            time.sleep(15)
+        else:
+            raise AssertionError('The project lock was not released within three minutes')
+        record('reopen the restored project', {'attempts': attempt + 1})
+        reopened = client.tool('tag_table_read', dict(selectors, tagTableName='Signals'))['xml']
+        assert members(reopened) == members(signals), (members(reopened), members(signals))
+        consumer = [b for b in client.tool('project_inventory')['blocks'] if b['name'] == 'TagScopeConsumer']
+        assert consumer and consumer[0]['isConsistent'] is True, consumer
+        record('reopened table and consumer equal the restore', members(reopened))
         report['completed'] = True
     finally:
         record('owned worker shutdown', client.close())
