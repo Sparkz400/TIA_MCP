@@ -1,0 +1,71 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T21:09:42+00:00",
+  "source": {
+    "commit": "9b3e0e261936c839523efae0b96b7d97d1228220",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Combined-apply candidate cases (scripts/qualify_library_integrate_apply.py --candidates at 9b3e0e26, Debug build, --artifacts artifacts/pc2) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch with the authored FB/UDT global library archive. A reused-FB multi-instance Gate in the Host FB TiaMcpComponentHost, which TiaMcpComponentParent (FB31) embeds, in seven combinations beside the verified FBD one: LAD Host (parentLad), an earlier placement before an existing network (parentEarlier), both (parentLadEarlier), and each of these three plus the plain FBD one with the Host's own instance DB (parentOwnDb, parentOwnDbLad, parentOwnDbEarlier, parentOwnDbLadEarlier); every preview named exactly its candidate features. parentDeep ran the verified shape two levels deep: the parent with its own instance DB and a grandparent TiaMcpComponentGrand (FB32) with its DB. Each embedding block (parent, its DB, grandparent, its DB) gained exactly the captured nested member of instance-effects-transitive-component.v1.json, the Host's own DB its direct member, everything else was preserved, then fresh reopen, 0-error compile and change_restore of the checkpoint into a new location.",
+  "limitations": [
+    "Standard route only; one parent chain per case, at most two embedding levels; the component is the reused FB. Software units and other routes stay plan-only.",
+    "The Host FB is FBD or LAD; an embedded caller of other languages is not exercised."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "2b64a354664087f6ffac9928323cffa9a9a3eb61e2b6e6aaeb5bbe4842e3258c"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "1b82bd0d1d1f026e1437b44626add7ef2e99f695a9129b59a72cc197f9b95d2c"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "32958c2334cb0bb2bac9122141c85a93cc52a522334ae16346b7146a4407a9a3",
+      "bytes": 28354739,
+      "completed": true,
+      "steps": [
+        "author",
+        "candidate:parentLad",
+        "candidate:parentEarlier",
+        "candidate:parentLadEarlier",
+        "candidate:parentOwnDb",
+        "candidate:parentOwnDbLad",
+        "candidate:parentOwnDbEarlier",
+        "candidate:parentOwnDbLadEarlier",
+        "candidate:parentDeep"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

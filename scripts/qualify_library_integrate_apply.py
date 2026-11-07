@@ -108,21 +108,21 @@ COMBINATIONS = {
     "obReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2}, []),
     # The reused-FB multi-instance in a Host FB that a parent FB embeds, beside the verified FBD one (multiInstanceParent): LAD, an
     # earlier placement and the Host's own DB in every combination, and the verified shape two levels deep with the parent's and the
-    # grandparent's DBs. Their previews name the candidate features until verified.
+    # grandparent's DBs. All verified on 7 November.
     "parentLad": (True, {"kind": "FB", "language": "LAD", "multi": True, "parent": True},
-                  ["embeddingParent", "fbCaller", "ladCaller", "multiInstance", "reusedComponent"]),
+                  []),
     "parentEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2, "multi": True, "parent": True},
-                      ["earlierPlacement", "embeddingParent", "fbCaller", "multiInstance", "reusedComponent"]),
+                      []),
     "parentLadEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2, "multi": True, "parent": True},
-                         ["earlierPlacement", "embeddingParent", "fbCaller", "ladCaller", "multiInstance", "reusedComponent"]),
+                         []),
     "parentOwnDb": (True, {"kind": "FB", "language": "FBD", "multi": True, "dependents": True, "parent": True},
-                    ["dependentInstanceDb", "embeddingParent", "fbCaller", "multiInstance", "reusedComponent"]),
+                    []),
     "parentOwnDbLad": (True, {"kind": "FB", "language": "LAD", "multi": True, "dependents": True, "parent": True},
-                       ["dependentInstanceDb", "embeddingParent", "fbCaller", "ladCaller", "multiInstance", "reusedComponent"]),
+                       []),
     "parentOwnDbEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2, "multi": True, "dependents": True, "parent": True},
-                           ["dependentInstanceDb", "earlierPlacement", "embeddingParent", "fbCaller", "multiInstance", "reusedComponent"]),
+                           []),
     "parentOwnDbLadEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2, "multi": True, "dependents": True, "parent": True},
-                              ["dependentInstanceDb", "earlierPlacement", "embeddingParent", "fbCaller", "ladCaller", "multiInstance", "reusedComponent"]),
+                              []),
     "parentDeep": (True, {"kind": "FB", "language": "FBD", "multi": True, "parent": True, "deep": True}, []),
 }
 CALLER_SOURCES = {("FB", "FBD"): "callers/TiaMcpComponentHost.s7dcl", ("FB", "LAD"): "callers/TiaMcpComponentHost.lad.s7dcl",
