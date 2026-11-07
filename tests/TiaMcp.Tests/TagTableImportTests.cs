@@ -138,4 +138,16 @@ internal static class TagTableImportTests
         Check.Equal(false, before.Formatted == spaced.Formatted);
         return Task.CompletedTask;
     }
+
+    internal static Task UnresolvedSymbols()
+    {
+        var compile = Compile("Tag \"UnresolvedFlag\" not defined.", "Data type 'Int' cannot be converted implicitly into data type 'Bool'.");
+        var symbols = UnresolvedSymbolRules.From(compile);
+        Check.Equal(1, symbols.Count);
+        Check.Equal("Tag", symbols[0]!["kind"]!.Value<string>());
+        Check.Equal("UnresolvedFlag", symbols[0]!["name"]!.Value<string>());
+        Check.Equal("UnrelatedBlock", symbols[0]!["location"]![0]!.Value<string>());
+        Check.Equal(0, UnresolvedSymbolRules.From(Compile()).Count);
+        return Task.CompletedTask;
+    }
 }

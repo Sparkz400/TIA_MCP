@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.141",
+  "catalogVersion": "0.4.142",
   "targetTiaVersions": [
     21
   ],
@@ -4969,6 +4969,23 @@
         "A stale-interface fixture could not be created through MCP: a change that leaves a block uncompiled fails its own after-change fingerprint. The 4 November alarm-ID resolution therefore remains a user-reported observation; no cause is inferred.",
         "SCL FBs on one owned scratch CPU 1511-1 PN; STL and DB sources, software units and know-how protected blocks are not exercised. An interrupted refresh is reconciled by the generic routes of local.bridge.cancellation.20261107."
       ]
+    },
+    {
+      "id": "local.unresolved-symbols.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "6b9a9c4d8ef57f7ff327fe1f26d50d9fe4c22321",
+        "passedScope": "scripts/qualify_unresolved_symbols.py on Debug builds of 6b9a9c4d in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 9/9 steps: TagImportFixture seeded the SCL FC TagScopeBroken reading the undefined tag UnresolvedFlag (isConsistent=false). block_read of its XML was refused by TIA and returned BlockExportUnavailable with programmingLanguage SCL and the generatedSource fallback; block_read format=generatedSource returned source containing \"UnresolvedFlag\" and the block stayed inconsistent. plc_compile applied and its compile.unresolvedSymbols listed kind Tag, name UnresolvedFlag at TagScopeBroken. An explicit tag_table_import_xml of table Repair with UnresolvedFlag (Bool %M90.0) applied beside the inconsistent block, resolved the finding (baselineComparison resolved, unresolvedSymbols empty), left TagScopeBroken consistent and kept its own change journal."
+      },
+      "artifacts": [
+        "evidence/local.unresolved-symbols.20261107.json"
+      ],
+      "limitations": [
+        "SCL only; graphical (LAD/FBD) blocks with deleted symbols cannot be exported as XML or generated source, and no native graphical fixture was run. The repair symbol is an ordinary journaled tag change, not a temporary alias; no alias workflow is implemented.",
+        "unresolvedSymbols parses TIA's English compiler message text (Tag/Block/Data type/Constant \"name\" not defined); other UI languages list nothing."
+      ]
     }
   ],
   "features": [
@@ -5687,14 +5704,16 @@
         "status": "implemented",
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "Optional format=simaticSd|generatedSource is a separate, unqualified feature (plc.document_formats); this evidence covers only the default SimaticML XML export."
+          "Optional format=simaticSd|generatedSource is a separate, unqualified feature (plc.document_formats); this evidence covers only the default SimaticML XML export.",
+          "Inconsistent blocks (since 7 November 2026, #215): when TIA refuses the XML export of an inconsistent block, block_read returns BlockExportUnavailable with its language and, for SCL/STL/DB, the generatedSource route, which reads it unchanged (local.unresolved-symbols.20261107)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.smoke.20261024",
-          "local.milestones.20261024"
+          "local.milestones.20261024",
+          "local.unresolved-symbols.20261107"
         ]
       },
       "availability": {
@@ -23299,13 +23318,15 @@
           "Explicit PLC software only, empty payload and compile=true. Saves the current project and creates a checkpoint before compiler dispatch; compilation may change generated state.",
           "Native compile dispatch, persistence and checkpoint recovery are qualified on the scratch profile; safety signatures are not.",
           "Existing engineering fingerprint coverage remains incomplete; this route does not establish whole-project preservation or PLC runtime correctness.",
-          "4 November compile-only completion and identity/save-state fingerprint changes have offline coverage; native regression qualification of these changes remains open. Existing evidence describes the earlier policy."
+          "4 November compile-only completion and identity/save-state fingerprint changes have offline coverage; native regression qualification of these changes remains open. Existing evidence describes the earlier policy.",
+          "Every compile result lists unresolvedSymbols (kind, name, target, location) parsed from TIA's English 'not defined' messages; nothing is resolved or guessed (local.unresolved-symbols.20261107)."
         ]
       },
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.unresolved-symbols.20261107"
         ]
       },
       "availability": {

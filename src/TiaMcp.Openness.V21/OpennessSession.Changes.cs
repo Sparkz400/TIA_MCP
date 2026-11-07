@@ -230,6 +230,7 @@ namespace TiaMcp.Openness.V21
                         if (change.Compilation != null)
                         {
                             change.Compilation["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(change.Compilation);
+                            change.Compilation["unresolvedSymbols"] = UnresolvedSymbolRules.From(change.Compilation);
                             if (change.CompileBaseline != null) change.Compilation["baselineComparison"] = CompileBaselineRules.Compare(change.CompileBaseline, change.Compilation);
                         }
                         // A text-list import or an admitted HMI kind must leave the compiler problems as the compile before the write found them.

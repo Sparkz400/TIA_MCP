@@ -386,7 +386,17 @@ namespace TiaMcp.Openness.V21
             string directory = ArtifactDirectory(args);
             string destination = Path.Combine(directory, "block-" + Guid.NewGuid().ToString("N") + ".xml");
             if (File.Exists(destination)) throw new BridgeException("ArtifactExists", "Refusing to overwrite an existing export.");
-            selected.Block.Item.Export(new FileInfo(destination), ExportOptions.WithDefaults);
+            try { selected.Block.Item.Export(new FileInfo(destination), ExportOptions.WithDefaults); }
+            catch (EngineeringException ex) when (!selected.Block.Item.IsConsistent)
+            {
+                // #215: an inconsistent block may refuse XML export; textual languages still have a generated-source route.
+                string language = selected.Block.Item.ProgrammingLanguage.ToString();
+                bool source = selected.Block.Item is DataBlock || language == "SCL" || language == "STL";
+                throw new BridgeException("BlockExportUnavailable", "TIA did not export the inconsistent block as XML: " + ex.Message +
+                    (source ? " Read its generated source with block_read format=generatedSource; that does not change it." : " Its language has no generated-source form; compile with plc_compile to list unresolved symbols."),
+                    new JObject { ["blockConsistent"] = false, ["programmingLanguage"] = language, ["generatedSourceAvailable"] = source,
+                        ["fallback"] = source ? new JObject { ["tool"] = "block_read", ["format"] = "generatedSource" } : new JObject { ["tool"] = "change_prepare", ["kind"] = "plc_compile" } });
+            }
             var file = new FileInfo(destination);
             var result = Envelope();
             result["project"] = ProjectInfo(selected.Project);
