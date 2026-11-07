@@ -66,8 +66,8 @@ def body(h):
 
     xml = h.tool("block_read", {"plcPath": fplc, "blockName": MAIN})["xml"]
     require("<Text />" in xml, "The main safety block has no empty comment text to fill")
-    applied = h.apply("safety_import_xml", {"xml": xml.replace("<Text />", "<Text>TiaMcp unrelated error</Text>", 1),
-                                            "expectedBlockNames": [MAIN], "safetyAcknowledged": True})
+    _, applied = change(h, "safety_import_xml", {"xml": xml.replace("<Text />", "<Text>TiaMcp unrelated error</Text>", 1),
+                                            "expectedBlockNames": [MAIN], "safetyAcknowledged": True}, {"plcPath": fplc})
     result = h.stage("safety import applies beside the unrelated conflict", lambda: comparison(applied, "safety_import_xml"))
     require(result["compilerSucceeded"] is False and result["existingCount"] > 0 and result["introducedErrorCount"] == 0,
             "The conflict was not reported as an existing finding: %s" % result)
@@ -80,10 +80,10 @@ def body(h):
     result = h.stage("second device-compiled edit in the same session", lambda: comparison(applied, "network_configure"))
     require(result["existingCount"] > 0, "The conflict was not reported as existing: %s" % result)
 
-    applied = h.apply("tag_create", {"tagTableName": "Default tag table", "name": "UnrelatedOk", "dataTypeName": "Bool", "logicalAddress": "%M70.0"})
+    _, applied = change(h, "tag_create", {"tagTableName": "Default tag table", "name": "UnrelatedOk", "dataTypeName": "Bool", "logicalAddress": "%M70.0"}, {"plcPath": p1})
     h.stage("PLC-scoped tag_create in the same session", lambda: comparison(applied, "tag_create"))
     source = 'FUNCTION "UnrelatedConsumer" : Bool\nVERSION : 0.1\nBEGIN\n IF "UnrelatedOk" THEN #UnrelatedConsumer := TRUE; ELSE #UnrelatedConsumer := FALSE; END_IF;\nEND_FUNCTION\n'
-    applied = h.apply("source_upsert", {"language": "SCL", "source": source, "expectedBlockNames": ["UnrelatedConsumer"]})
+    _, applied = change(h, "source_upsert", {"language": "SCL", "source": source, "expectedBlockNames": ["UnrelatedConsumer"]}, {"plcPath": p1})
     h.stage("consumer FC in the same session", lambda: comparison(applied, "source_upsert"))
 
     path, node = interface(h, devices + "Other3")
@@ -92,8 +92,8 @@ def body(h):
     result = h.stage("fixing the conflict reports resolved findings", lambda: comparison(applied, "network_configure"))
     require(result["resolvedCount"] > 0, "The fixed conflict was not reported as resolved: %s" % result)
 
-    prepared = h.prepare("tag_set", {"tagTableName": "Default tag table", "memberName": "UnrelatedOk",
-                                     "attributes": {"DataTypeName": "Int", "LogicalAddress": "%MW72"}})
+    prepared = h.stage("prepare tag_set", lambda: h.tool("change_prepare", {"kind": "tag_set", "plcPath": p1, "payload": {
+        "tagTableName": "Default tag table", "memberName": "UnrelatedOk", "attributes": {"DataTypeName": "Int", "LogicalAddress": "%MW72"}}}))
 
     def introduced():
         error = h.call_error("change_apply", h.apply_args(prepared))
