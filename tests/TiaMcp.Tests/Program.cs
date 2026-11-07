@@ -238,8 +238,9 @@ internal static partial class Program
             ("Bridge serializes overlapping callers and pairs responses", BridgeConcurrentCalls),
             ("Bridge remains usable after an operation error", BridgeOperationError),
             ("Bridge rejects invalid requests without faulting", BridgeInvalidRequest),
-            ("Bridge timeout is terminal and never replays", BridgeTimeout),
-            ("Bridge active cancellation is terminal and never replays", BridgeActiveCancellation),
+            ("Bridge timeout keeps the request in flight and never replays", BridgeTimeout),
+            ("Bridge active cancellation keeps the request in flight and never replays", BridgeActiveCancellation),
+            ("Bridge records a late response after cancellation and continues", BridgeLateCompletion),
             ("Bridge cancellation while queued leaves session usable", BridgeQueuedCancellation),
             ("Bridge pre-cancelled call never starts a worker", BridgePreCancelled),
             ("Bridge mismatched response ID is terminal", () => BridgeTerminalFault("wrongId", "ProtocolMismatch")),
@@ -560,7 +561,7 @@ internal static partial class Program
         await using var fixture = new BridgeFixture(timeoutSeconds: 5);
         await fixture.Client.CallAsync("echo");
         await Check.BridgeError("TimeoutOutcomeUnknown", () => fixture.Client.CallAsync("stall"));
-        await fixture.AssertTerminalAsync("stall");
+        await fixture.AssertInFlightAsync("stall");
     }
 
     private static async Task BridgeActiveCancellation()
@@ -572,7 +573,28 @@ internal static partial class Program
         await fixture.WaitForRequestAsync("stall");
         cancellation.Cancel();
         await Check.BridgeError("CancelledOutcomeUnknown", () => stalled);
-        await fixture.AssertTerminalAsync("stall");
+        await fixture.AssertInFlightAsync("stall");
+    }
+
+    private static async Task BridgeLateCompletion()
+    {
+        // #217: a cancelled request that the worker finishes is recorded, never replayed, and the session continues.
+        await using var fixture = new BridgeFixture();
+        await fixture.Client.CallAsync("echo");
+        using var cancellation = new CancellationTokenSource();
+        var slow = fixture.Client.CallAsync("echo", new { delayMs = 1500 }, cancellation.Token);
+        await BridgeFixture.WaitForAsync(() => fixture.Events().Count(item => item.Kind == "request" && item.Operation == "echo") == 2, "slow echo request");
+        cancellation.Cancel();
+        await Check.BridgeError("CancelledOutcomeUnknown", () => slow);
+        await Check.BridgeError("PreviousOperationRunning", () => fixture.Client.CallAsync("mustNotRun"));
+        await Task.Delay(2500);
+        await fixture.Client.CallAsync("echo");
+        var late = fixture.Client.LateResponses;
+        Check.Equal(1, late.Count);
+        Check.Equal("echo", late[0].Operation);
+        Check.Equal(true, late[0].Succeeded);
+        Check.Equal(3, fixture.Events().Count(item => item.Kind == "request" && item.Operation == "echo"));
+        Check.Equal(0, fixture.Events().Count(item => item.Operation == "mustNotRun"));
     }
 
     private static async Task BridgeQueuedCancellation()

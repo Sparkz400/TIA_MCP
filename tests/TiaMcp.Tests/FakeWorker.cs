@@ -212,6 +212,17 @@ internal sealed class BridgeFixture : IAsyncDisposable
         await WaitForAsync(() => Events().Any(item => item.Kind == "request" && item.Operation == operation), "worker request " + operation);
     }
 
+    /// <summary>An interrupted request still runs: nothing else is sent and nothing is replayed.</summary>
+    public async Task AssertInFlightAsync(string operation)
+    {
+        await Check.BridgeError("PreviousOperationRunning", () => Client.CallAsync("mustNotRun"));
+        await Check.BridgeError("PreviousOperationRunning", () => Client.CallAsync(operation));
+        var events = Events();
+        Check.Equal(1, events.Count(item => item.Kind == "started"));
+        Check.Equal(1, events.Count(item => item.Kind == "request" && item.Operation == operation));
+        Check.Equal(0, events.Count(item => item.Operation == "mustNotRun"));
+    }
+
     public async Task AssertTerminalAsync(string operation)
     {
         await Check.BridgeError("BridgeFaulted", () => Client.CallAsync("mustNotRun"));
