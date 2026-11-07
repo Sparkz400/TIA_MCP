@@ -106,6 +106,24 @@ COMBINATIONS = {
     "obReuseLad": (True, {"kind": "OB", "language": "LAD"}, []),
     "obReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2}, []),
     "obReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2}, []),
+    # The reused-FB multi-instance in a Host FB that a parent FB embeds, beside the verified FBD one (multiInstanceParent): LAD, an
+    # earlier placement and the Host's own DB in every combination, and the verified shape two levels deep with the parent's and the
+    # grandparent's DBs. Their previews name the candidate features until verified.
+    "parentLad": (True, {"kind": "FB", "language": "LAD", "multi": True, "parent": True},
+                  ["embeddingParent", "fbCaller", "ladCaller", "multiInstance", "reusedComponent"]),
+    "parentEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2, "multi": True, "parent": True},
+                      ["earlierPlacement", "embeddingParent", "fbCaller", "multiInstance", "reusedComponent"]),
+    "parentLadEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2, "multi": True, "parent": True},
+                         ["earlierPlacement", "embeddingParent", "fbCaller", "ladCaller", "multiInstance", "reusedComponent"]),
+    "parentOwnDb": (True, {"kind": "FB", "language": "FBD", "multi": True, "dependents": True, "parent": True},
+                    ["dependentInstanceDb", "embeddingParent", "fbCaller", "multiInstance", "reusedComponent"]),
+    "parentOwnDbLad": (True, {"kind": "FB", "language": "LAD", "multi": True, "dependents": True, "parent": True},
+                       ["dependentInstanceDb", "embeddingParent", "fbCaller", "ladCaller", "multiInstance", "reusedComponent"]),
+    "parentOwnDbEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2, "multi": True, "dependents": True, "parent": True},
+                           ["dependentInstanceDb", "earlierPlacement", "embeddingParent", "fbCaller", "multiInstance", "reusedComponent"]),
+    "parentOwnDbLadEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2, "multi": True, "dependents": True, "parent": True},
+                              ["dependentInstanceDb", "earlierPlacement", "embeddingParent", "fbCaller", "ladCaller", "multiInstance", "reusedComponent"]),
+    "parentDeep": (True, {"kind": "FB", "language": "FBD", "multi": True, "parent": True, "deep": True}, []),
 }
 CALLER_SOURCES = {("FB", "FBD"): "callers/TiaMcpComponentHost.s7dcl", ("FB", "LAD"): "callers/TiaMcpComponentHost.lad.s7dcl",
                   ("FC", "FBD"): "TiaMcpComponentCaller.s7dcl", ("FC", "LAD"): "callers/TiaMcpComponentCaller.lad.s7dcl"}
@@ -125,6 +143,14 @@ DEPENDENT_DB_FEATURES = []  # dependentInstanceDb+fbCaller+multiInstance+reusedC
 PARENT_FEATURES = []  # embeddingParent+fbCaller+multiInstance+reusedComponent, verified on 7 November
 COMPONENT_EFFECT = ROOT / "fixtures/typed-graphical/native/instance-effects-component/after-instance.xml"
 COMPONENT_TRANSITIVE_PARENT = ROOT / "fixtures/typed-graphical/native/instance-effects-transitive-component/after-Tgp_CompNestParent.xml"
+# The captured nested member as an instance DB holds it (the parent's DB in the same capture).
+COMPONENT_TRANSITIVE_PARENT_DB = ROOT / "fixtures/typed-graphical/native/instance-effects-transitive-component/after-Tgp_CompNestParent_DB.xml"
+# deep: the parent gets its own instance DB and a grandparent FB with its DB embeds it, so the member nests two levels deep.
+PARENT_DB, GRAND_FB, GRAND_FB_NUMBER, GRAND_DB = PARENT_FB + "_DB", "TiaMcpComponentGrand", 32, "TiaMcpComponentGrand_DB"
+PARENT_DB_SOURCE = 'DATA_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\n"%s"\nBEGIN\nEND_DATA_BLOCK\n' % (PARENT_DB, PARENT_FB)
+GRAND_SOURCE = ('FUNCTION_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\nVAR\n Middle : "%s";\nEND_VAR\nBEGIN\n #Middle();\nEND_FUNCTION_BLOCK\n'
+                % (GRAND_FB, PARENT_FB))
+GRAND_DB_SOURCE = 'DATA_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\n"%s"\nBEGIN\nEND_DATA_BLOCK\n' % (GRAND_DB, GRAND_FB)
 DEPENDENTS_REFUSED = "DependencyProfileUnavailable"
 # The worker's message for a combined apply refused while it resolves the shared-mutation scope (OpennessSession.SharedMutationAdmission).
 BEFORE_ADMISSION = "Combined apply refused before admission: "
@@ -162,6 +188,8 @@ def verify_dependent_db(before_xml, after_xml, captured_xml, member):
 
 
 def verify_parent_fb(before_xml, after_xml, captured_xml, host_type, member):
+    """Also an embedding instance DB or a grandparent (with captured_xml of the same block kind): the one member typed host_type at
+    any depth appends the new member."""
     """A parent FB embedding the multi-instance caller gains exactly the new member at the end of that embedded member's nested
     Static section, equal to the captured transitive effect's nested member; with it removed, the parent equals its baseline."""
     def nested(document, datatype):
@@ -443,12 +471,15 @@ class IntegrateApplyRun(ComponentRun):
         require(planned_objects(plan, existing) == {key for key in added if key.startswith("block:")}, "Installed blocks differ from the reviewed plan.")
         # The new network directly follows the selected one (the last by default); the caller's own instance DB gains the member.
         dependent, parent = self.manifest.get("dependentDb"), self.manifest.get("parentFb")
+        nested = ([parent] if parent else []) + list(self.manifest.get("parentDependents") or [])
         verify_preserved_installation(baseline, after, caller, added, multi, self.manifest.get("insertNetworkIndex", -1) if existing else None,
-                                      [p for p in (dependent, parent) if p])
+                                      [p for p in (dependent,) if p] + nested)
+        for path in nested:
+            before_xml, after_xml = (Path(s["objects"]["block:" + path]["file"]).read_text(encoding="utf-8-sig") for s in (baseline, after))
+            captured = COMPONENT_TRANSITIVE_PARENT_DB if path.endswith("_DB") else COMPONENT_TRANSITIVE_PARENT
+            verify_parent_fb(before_xml, after_xml, captured.read_text(encoding="utf-8-sig"), HOST_FB, multi)
         if parent:
-            before_xml, after_xml = (Path(s["objects"]["block:" + parent]["file"]).read_text(encoding="utf-8-sig") for s in (baseline, after))
-            verify_parent_fb(before_xml, after_xml, COMPONENT_TRANSITIVE_PARENT.read_text(encoding="utf-8-sig"), HOST_FB, multi)
-            case["embeddingParentVerified"] = parent
+            case["embeddingParentVerified"] = nested
         if dependent:
             before_xml, after_xml = (Path(s["objects"]["block:" + dependent]["file"]).read_text(encoding="utf-8-sig") for s in (baseline, after))
             verify_dependent_db(before_xml, after_xml, COMPONENT_EFFECT.read_text(encoding="utf-8-sig"), multi)
@@ -568,6 +599,17 @@ class IntegrateApplyRun(ComponentRun):
             first, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, first_caller, first_recipe)
             case["first"] = {}
             self.installed(case["first"], out / "first", first, plan, baseline, plc, first_caller, first_network, released)
+            if caller.get("parent"):
+                # After the first install, which imports the component FB with its own number (as in reuse(parent=True)).
+                overrides["parentFb"], overrides["parentDependents"] = plc + "/blocks/" + PARENT_FB, []
+                self.apply("source_upsert", {"language": "SCL", "source": PARENT_SOURCE, "expectedBlockNames": [PARENT_FB]})
+                self.apply("block_number_set", {"blockName": PARENT_FB, "number": PARENT_FB_NUMBER})
+                if caller.get("deep"):
+                    self.apply("source_upsert", {"language": "SCL", "source": PARENT_DB_SOURCE, "expectedBlockNames": [PARENT_DB]})
+                    self.apply("source_upsert", {"language": "SCL", "source": GRAND_SOURCE, "expectedBlockNames": [GRAND_FB]})
+                    self.apply("block_number_set", {"blockName": GRAND_FB, "number": GRAND_FB_NUMBER})
+                    self.apply("source_upsert", {"language": "SCL", "source": GRAND_DB_SOURCE, "expectedBlockNames": [GRAND_DB]})
+                    overrides["parentDependents"] = [plc + "/blocks/" + name for name in (PARENT_DB, GRAND_FB, GRAND_DB)]
             self.use(overrides)
         baseline = snapshot(self.call, out / "before")
         path, recipe, network = self.select_caller(baseline, plc)
