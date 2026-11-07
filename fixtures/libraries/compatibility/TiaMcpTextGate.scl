@@ -1,0 +1,16 @@
+FUNCTION_BLOCK "TiaMcpTextGate"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+    Enable : Bool;
+END_VAR
+VAR_OUTPUT
+    Text : WString;
+END_VAR
+BEGIN
+    IF #Enable THEN
+        #Text := WSTRING#'on';
+    ELSE
+        #Text := WSTRING#'off';
+    END_IF;
+END_FUNCTION_BLOCK

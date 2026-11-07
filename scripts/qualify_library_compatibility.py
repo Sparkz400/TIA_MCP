@@ -1,5 +1,6 @@
 """Qualify library compatibility cases: unsaved target edits, an inherited inconsistent (uncompiled) PLC data type, a native library
-older than the supported upgrade range, and library types instantiated into a different CPU family."""
+older than the supported upgrade range, and library types instantiated into a different CPU family and into the oldest catalog
+firmware of the authoring CPU type."""
 from __future__ import annotations
 
 import argparse
@@ -9,11 +10,15 @@ import shutil
 import uuid
 
 from library_native_harness import Harness, require
-from qualify_cpu_memory_bytes import add_cpu
+from qualify_cpu_memory_bytes import add_cpu, version_key
 
 ROOT = Path(__file__).resolve().parents[1]
-FB, WIDE, UNSAVED, BROKEN_TYPE = "TiaMcpLibraryGate", "TiaMcpWideGate", "TiaMcpUnsavedEdit", "TiaMcpBrokenType"
+FB, WIDE, TEXT, UNSAVED, BROKEN_TYPE = "TiaMcpLibraryGate", "TiaMcpWideGate", "TiaMcpTextGate", "TiaMcpUnsavedEdit", "TiaMcpBrokenType"
 S7_1200 = "CPU 1214C DC/DC/DC"
+# The authoring CPU type at its oldest catalog firmware; the types are authored on the scratch CPU 1511-1 PN V4.1.
+OLD_FIRMWARE_CPU = "CPU 1511-1 PN"
+# CPU firmware before V3.1 has no PLC security wizard (confidential-data password, runtime users) to configure.
+SECURITY_FIRMWARE = (3, 1)
 # Shipped with every V21 installation: a real native V13 library, below the supported V14..V20 upgrade range.
 V13_LIBRARY = Path(r"D:\Arbeit\Siemens\Portal V21\Data\Hmi\Styles\Predefined-Styles\Predefined-Styles.al13")
 UNSAVED_SOURCE = ('FUNCTION "%s" : Void\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\nVAR_TEMP\n    Scratch : Bool;\nEND_VAR\n'
@@ -60,29 +65,47 @@ def instantiate_case(h, payload, before):
     return {"outcome": "failedUnsaved", "error": {k: error.get(k) for k in ("code", "message")}, "compile": journal.get("compile")}
 
 
+def add_oldest_firmware_cpu(h, name):
+    entries = [e for e in h.tool("hardware_catalog_search", {"filter": name.replace("CPU ", ""), "maxItems": 200})["entries"] if e.get("typeName") == name]
+    require(entries, "No catalog entry for " + name)
+    selected = min(entries, key=version_key)
+    h.report.setdefault("addedCpus", []).append(selected)
+    return {"typeIdentifier": selected["typeIdentifier"], "deviceName": "StationFwOld", "itemName": "PLCFwOld",
+            "configureScratchSecurity": version_key(selected)[0] >= SECURITY_FIRMWARE}
+
+
+def added_plc(h, known):
+    added = [p["path"] for p in h.tool("project_inventory", {"maxItems": 1000})["plcs"] if p["path"] not in known]
+    require(len(added) == 1, "Expected exactly one added PLC: %s" % added)
+    return added[0]
+
+
 def body(h):
     documents = h.directory / "documents"
     shutil.copytree(ROOT / "fixtures/libraries/type-lifecycle", documents)
-    shutil.copy2(ROOT / "fixtures/libraries/compatibility" / (WIDE + ".scl"), documents)
+    for name in (WIDE, TEXT):
+        shutil.copy2(ROOT / "fixtures/libraries/compatibility" / (name + ".scl"), documents)
     findings = h.report.setdefault("findings", {})
 
-    # Authoring on the scratch CPU 1511-1 PN: a Bool-only FB type and a 64-bit-typed FB type, both released 1.0.0.
+    # Authoring on the scratch CPU 1511-1 PN: a Bool-only, a 64-bit-typed and a WString FB type, all released 1.0.0.
     plc = h.owned_scratch("authoring")
     library = h.project_library()
     fb = h.release(library, h.create_type(library, documents, FB, "blocks", plc), "1.0.0")
     wide = h.release(library, h.create_type(library, documents, WIDE, "blocks", plc), "1.0.0")
     global_library = h.apply("library_create", {"schemaVersion": 1, "name": "CompatibilityQualification"})["journal"]["result"]["library"]["libraryId"]
-    h.apply("library_publish", h.selected(library, [fb, wide], destinationLibraryId=global_library))
+    text = h.release(library, h.create_type(library, documents, TEXT, "blocks", plc), "1.0.0")
+    h.apply("library_publish", h.selected(library, [fb, wide, text], destinationLibraryId=global_library))
     archive = h.archive(global_library)
     h.tool("library_close", {"libraryId": global_library})
     h.stage("close authoring session", lambda: h.tool("tia_detach"))
 
     consumer = h.owned_scratch("consumer")
     project_path = h.tool("tia_session_status")["projects"][0]["path"]
-    # Scratch security for a new CPU needs the worker's own freshly created scratch, so the S7-1200 is added first.
+    # Scratch security for a new CPU needs the worker's own freshly created scratch, so the added CPUs come first.
     h.apply("hardware_add", add_cpu(h, S7_1200))
-    small = [p["path"] for p in h.tool("project_inventory", {"maxItems": 1000})["plcs"] if p["path"] != consumer]
-    require(len(small) == 1, "Expected one added S7-1200 PLC")
+    small = added_plc(h, {consumer})
+    h.apply("hardware_add", add_oldest_firmware_cpu(h, OLD_FIRMWARE_CPU))
+    old_firmware = added_plc(h, {consumer, small})
 
     # A real native V13 library is refused before any native call; its copy stays byte-identical.
     def v13_refusal():
@@ -155,12 +178,16 @@ def body(h):
         return {"blocks": sorted(blocks)}
     h.stage("reopened: unsaved edit and instance persisted, failed and uncompiled types absent", persisted)
 
-    # CPU family mismatch: both types were authored on an S7-1500 and are instantiated into the added S7-1200.
-    for label, version in (("control", fb), ("wide", wide)):
+    # CPU family mismatch: the types were authored on an S7-1500 V4.1 and are instantiated into the added S7-1200;
+    # firmware mismatch: the same types into the authoring CPU type at its oldest catalog firmware.
+    cases = [("s7_1200", "the S7-1200", small, label, version) for label, version in (("control", fb), ("wide", wide))]
+    cases += [("oldFirmware", "the oldest-firmware CPU 1511-1 PN", old_firmware, label, version)
+              for label, version in (("control", fb), ("wide", wide), ("text", text))]
+    for key, target_name, target, label, version in cases:
         before = h.inventory()
         source = h.open_archive(archive)
-        outcome = findings["s7_1200_" + label] = h.stage("instantiate %s type into the S7-1200" % label,
-                                                         lambda v=version, s=source: instantiate_case(h, h.selected(s, [v], target={"plcPath": small[0]}), before))
+        outcome = findings[key + "_" + label] = h.stage("instantiate %s type into %s" % (label, target_name),
+                                                        lambda v=version, s=source, t=target: instantiate_case(h, h.selected(s, [v], target={"plcPath": t}), before))
         if outcome["outcome"] == "failedUnsaved":
             h.stage("discard the failed %s change" % label, lambda: h.tool("tia_detach"))
             reopen("after the %s target failure" % label)
@@ -178,9 +205,9 @@ if __name__ == "__main__":
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
     args.runner = __file__
-    Harness(args, "co_", "V21 library compatibility: unsaved edits, inherited inconsistent types, V13 libraries and S7-1200 targets", [
+    Harness(args, "co_", "V21 library compatibility: unsaved edits, inherited inconsistent types, V13 libraries, S7-1200 and oldest-firmware targets", [
         "No V20 library input exists on this PC; V20 upgrades stay open. V14 SP1-V18 (local.library_upgrades.20261024) and V19 (local.library_vendor.20261025) are covered separately.",
         "The V13 input is TIA's own shipped HMI style library; it is refused by version before any native call.",
         "The unsaved edit is a compiled, unsaved source change; arbitrary unsaved user edits in an attached TIA UI are not reproduced.",
-        "Only CPU family is varied (S7-1500 to S7-1200, newest catalog firmware); firmware-version mismatches are not exercised.",
-        "No runtime execution."], [ROOT / "fixtures/libraries/compatibility" / (WIDE + ".scl")]).run(body)
+        "CPU family is varied once (S7-1500 to S7-1200, newest catalog firmware); firmware is varied only within CPU 1511-1 PN (V4.1 to its oldest catalog firmware).",
+        "No runtime execution."], [ROOT / "fixtures/libraries/compatibility" / (n + ".scl") for n in (WIDE, TEXT)]).run(body)
