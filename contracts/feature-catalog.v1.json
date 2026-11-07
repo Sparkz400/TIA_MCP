@@ -2861,7 +2861,7 @@
         "evidence/local.typed.crossscope.engineering.rerun.20261029.json"
       ],
       "limitations": [
-        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54\u2026.zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
+        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
         "Engineering only: the runtime gate is not run."
       ]
     },
@@ -4267,7 +4267,7 @@
         "tiaVersion": 21,
         "machine": "PCNico",
         "sourceCommit": "d57defa5b499bfe94396d6079d4af603de5403ad",
-        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of d57defa5 (artifacts/oi3, git archive; main with PR 184's RFC 8785 hashing, PR 186's exact decimal parsing of request floats and the runner scanners' RFC 8785 fix), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Each of the three advance requests (verifyImport, prepareGraphical, verifyInstallation) carried the non-ASCII key pr\u00fcfName\u540d\u524d, non-ASCII text with an astral emoji (sent as \\u escapes) and the number literals 1e3 and 2.2250738585072012e-308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of the verifyImport request (1e3 as 1000, the other as 2.2250738585072014e-308) reproduced the Host's recorded requestSha256 5d077eef."
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of d57defa5 (artifacts/oi3, git archive; main with PR 184's RFC 8785 hashing, PR 186's exact decimal parsing of request floats and the runner scanners' RFC 8785 fix), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Each of the three advance requests (verifyImport, prepareGraphical, verifyInstallation) carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the number literals 1e3 and 2.2250738585072012e-308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of the verifyImport request (1e3 as 1000, the other as 2.2250738585072014e-308) reproduced the Host's recorded requestSha256 5d077eef."
       },
       "artifacts": [
         "evidence/local.component.canonical-hash.20261101.json"
@@ -4285,7 +4285,7 @@
         "tiaVersion": 21,
         "machine": "PCNico",
         "sourceCommit": "4b970cc91fdb0532a49a0f6833f9e0cf8d664eb6",
-        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of 4b970cc9 (artifacts/hz3, git archive; main with PR 190's exact worker number reading and range refusal, and PR 199's id-keeping refusal), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Before the first advance, the same advance request with 1.8e308 added was refused with InvalidRequest ('A request number is outside the double range.', from the worker's request reader, relayed by the Host with the request id); the window's revision, state and children (start, applyLibrary) were unchanged, and the verifyImport advance that followed dispatched on the same Host session. Each of the three advance requests carried the non-ASCII key pr\u00fcfName\u540d\u524d, non-ASCII text with an astral emoji (sent as \\u escapes) and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of all three advance requests (1e3 as 1000, 2.2250738585072014e-308, 1.7976931348623157e+308, i.e. double.MaxValue) reproduced the Host's recorded hashes c857106f, 340dd121 and c5e740ce."
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of 4b970cc9 (artifacts/hz3, git archive; main with PR 190's exact worker number reading and range refusal, and PR 199's id-keeping refusal), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Before the first advance, the same advance request with 1.8e308 added was refused with InvalidRequest ('A request number is outside the double range.', from the worker's request reader, relayed by the Host with the request id); the window's revision, state and children (start, applyLibrary) were unchanged, and the verifyImport advance that followed dispatched on the same Host session. Each of the three advance requests carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of all three advance requests (1e3 as 1000, 2.2250738585072014e-308, 1.7976931348623157e+308, i.e. double.MaxValue) reproduced the Host's recorded hashes c857106f, 340dd121 and c5e740ce."
       },
       "artifacts": [
         "evidence/local.component.canonical-hash.20261102.json"
@@ -28395,7 +28395,7 @@
         "status": "partial",
         "limitations": [
           "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_signals.20261030); other CPUs, firmware and TCP/IP instances are not qualified.",
-          "A bounded window of 0-60000 ms and 1-256 events; the subscription ends with the call. Calls run one at a time, so a change made by another tool call (sim_state) never falls inside a window.",
+          "A bounded window of 0-60000 ms and 1-256 events ends its subscription with the call, so a change made by another tool call (sim_state) never falls inside it; watch start/collect keeps the subscriptions on the selection across other tool calls (one watch per instance; sim_release and shutdown end it).",
           "V8 has no LED getter: LEDs are reported only as changes within the window. Display data is summarized (length, SHA-256) and returned as base64 only on request, up to 4 MiB; its format is not decoded.",
           "Natively the program's STP was observed as Run to Stop with STOP, RUN and ERROR LED changes, a separate API client's Run, Stop, Run as Stop-Startup-Run-Stop-Startup-Run matching the client's log and the polled state, and maxEvents 1 ended a 15 s window after 1.5 s; a CPU 1511 display summary reported 41026 bytes.",
           "2 November local extension: bounded subscriptions also report softwareConfiguration, hardwareConfiguration and ipAddress changes. New-event native qualification is pending; prior state/LED evidence does not qualify these additions."
@@ -28422,6 +28422,48 @@
         "AC-identity",
         "AC-completeness",
         "AC-simulator-lifecycle",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_record",
+      "domain": "simulation",
+      "title": "Answer a program's data record requests on an owned simulated CPU",
+      "mcpTools": [
+        "sim_record"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.OnDataRecordRead, OnDataRecordWrite, ReadRecordDone and WriteRecordDone."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Owned instances only; 1-16 reviewed response rows keyed by hardware ID and record index, read payloads of 1-1024 bytes, optional status. Requests without a row are logged and not answered.",
+          "One armed table per instance; it stays subscribed across other tool calls until collect, sim_release or the worker's shutdown. The log keeps up to 256 requests.",
+          "Native qualification pending."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-runtime",
         "AC-evidence"
       ]
     },
@@ -28779,7 +28821,7 @@
           "Native, 1 November (build 10763a35): the route passed on the desk-configured TP700 Comfort pair (local.hmi.classic-import.route.20261101, 63/63 checks): every refusal before any write; BackColor on both HMIs' Overview_A (identity separation), a no-op and a GridColor import of Overview_B, a no-op import of the start screen and a QualificationTags import adding one internal tag, each with every stage, no compiler problems, the target's independent re-export carrying exactly the intended delta, every other export unchanged, same-key replay and another key refused RecoveryRequired; a stale preview refused; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay (local.hmi.classic-import.interruption.20261101, 8/8).",
           "Qualified on one desk-configured TP700 Comfort fixture (start screen set in the editor). Import(Override) of the start screen kept it natively, but the start-screen setting has no public getter, so the compile rule is its only guard. Other Classic devices, object types, customer projects, runtime and visual behavior are not covered.",
           "Lifecycle, 1 November (build 2431ccf9): on the same TP700 Comfort pair both compiles of every apply named only the target HmiTarget, both Host lifetimes ended normally (Host and worker exit 0, owned TIA process exited) and a new TIA process then reopened the saved project read-write at once (local.hmi.lifecycle.20261101, 72/72).",
-          "WinCC RT Advanced and KTP700 Basic PN, 1\u20132 November (build 750121ea): the route passed on their seeded HmiSeeder baselines (no start screen; the compile rule kept that error unchanged after every apply) with 72/72 and 71/71 checks (local.hmi.classic-import.profiles.route.20261101; Basic has no popup), and ci-* interruption 8/8 on each (local.hmi.classic-import.profiles.interruption.20261102); production admits both profiles."
+          "WinCC RT Advanced and KTP700 Basic PN, 1–2 November (build 750121ea): the route passed on their seeded HmiSeeder baselines (no start screen; the compile rule kept that error unchanged after every apply) with 72/72 and 71/71 checks (local.hmi.classic-import.profiles.route.20261101; Basic has no popup), and ci-* interruption 8/8 on each (local.hmi.classic-import.profiles.interruption.20261102); production admits both profiles."
         ]
       },
       "qualification": {

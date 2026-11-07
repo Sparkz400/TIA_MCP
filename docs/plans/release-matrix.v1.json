@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.156",
-    "catalogSha256": "fe8a80930923124b8474bb5968f1f7f4e4756af02e6e7b3d75da50e74c85f761",
+    "catalogSha256": "b849389d809b46c2266026296a092b170a4a9729e3475a48a882bc60f4246f2c",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "5c4786dd1c89d694fbb8dd6cedda08b781fd52cfb05022cdeda06a2770ef8125"
   },
@@ -12,19 +12,19 @@
     21
   ],
   "summary": {
-    "features": 491,
+    "features": 492,
     "support": {
       "deferred": 2,
       "limited": 338,
       "shipped": 133,
       "unavailable_target": 12,
-      "unqualified": 6
+      "unqualified": 7
     },
     "cells": {
       "blocked": 72,
       "bound": 2163,
       "deferred": 6,
-      "open": 28
+      "open": 31
     },
     "openCellsByOwner": {
       "D06": {
@@ -33,6 +33,10 @@
       },
       "D16": {
         "role": "Physical runtime",
+        "open": 3
+      },
+      "L03": {
+        "role": "Runtime",
         "open": 3
       },
       "L05": {
@@ -26584,6 +26588,36 @@
             "local.plcsim_signals.20261030",
             "local.plcsim.signals-ip.20261102"
           ]
+        }
+      ]
+    },
+    {
+      "featureId": "sim_record",
+      "domain": "simulation",
+      "mcpTools": [
+        "sim_record"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "L03"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-runtime",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
         }
       ]
     },
