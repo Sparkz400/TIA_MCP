@@ -3,6 +3,7 @@ import argparse
 import json
 from pathlib import Path
 import subprocess
+import time
 import uuid
 from xml.etree import ElementTree as ET
 from smoke_mcp import Client, ROOT
@@ -106,7 +107,6 @@ def main():
                           for t in ET.fromstring(xml).iter('SW.Tags.PlcTag'))
         record('table after refused rename', dict(identicalExport=reread['xml'] == table['xml'], xml=reread['xml']))
         assert members(reread['xml']) == members(table['xml']), 'refused rename changed the table'
-        refuse('change_restore', {'changeId': prepared['changeId'], 'previewHash': prepared['previewHash']}, 'ScopedRecoveryRequired')
         stale = record('prepare stale candidate', prepare('%M50.2'))
         record('external scratch tag edit', subprocess.run([str(helper), 'drift', str(auth)], check=True, text=True, capture_output=True).stdout)
         refuse('change_apply', apply(stale), 'StaleRevision')
@@ -120,6 +120,39 @@ def main():
         assert 'TagScopeConsumer' in json.dumps(outcome), 'regression must be the consumer diagnostic'
         assert outcome['compile']['compilerSucceeded'] is False and 'changed_project_saved' not in outcome['stages'], outcome['stages']
         assert 'mutation_applied' in outcome['stages'] and 'compile_finished' in outcome['stages']
+        # Scoped restore (#218): only the imported table, and only while every captured table is as the attempt left it.
+        restore_bad = {'changeId': bad['changeId'], 'previewHash': bad['previewHash']}
+        drift = lambda label: record(label, subprocess.run([str(helper), 'drift', str(auth)], check=True, text=True, capture_output=True).stdout)
+        drift('edit an unrelated table after the failed attempt')
+        refuse('change_restore', restore_bad, 'StaleRevision')
+        drift('return the unrelated table to the recorded state')
+        restored = record('scoped restore of the failed import', client.tool('change_restore', restore_bad))
+        assert restored['state'] == 'restored', restored['state']
+        assert all(s in restored['stages'] for s in ('scoped_restore_state_verified', 'scoped_tables_restored', 'scoped_restore_content_verified',
+                                                     'scoped_restore_compile_verified', 'scoped_restore_saved')), restored['stages']
+        signals = client.tool('tag_table_read', dict(selectors, tagTableName='Signals'))['xml']
+        assert ('Added', 'Bool', '%M50.1') in members(signals), members(signals)
+        compiled = next(r for r in restored['readbacks'] if r.get('role') == 'scoped-restore-compile')
+        assert compiled['baselineComparison']['verified'] is True and compiled['compile']['errorCount'] == 1, compiled['baselineComparison']
+        refuse('change_restore', {'changeId': prepared['changeId'], 'previewHash': prepared['previewHash']}, 'StaleRevision')
+        record('next import prepares without cleanup', prepare('%M50.3'))
+        # The restore saved the project: a fresh owned TIA must reopen it with the restored table.
+        record('close the restored session', client.tool('tia_detach'))
+        assert client.tool('tia_start')['ownsPortalProcess'] is True
+        for attempt in range(13):
+            opened = client.request('tools/call', {'name': 'project_open', 'arguments': {'path': project['path']}})
+            if not opened.get('isError'):
+                break
+            assert 'already been opened' in json.dumps(opened), opened
+            time.sleep(15)
+        else:
+            raise AssertionError('The project lock was not released within three minutes')
+        record('reopen the restored project', {'attempts': attempt + 1})
+        reopened = client.tool('tag_table_read', dict(selectors, tagTableName='Signals'))['xml']
+        assert members(reopened) == members(signals), (members(reopened), members(signals))
+        consumer = [b for b in client.tool('project_inventory')['blocks'] if b['name'] == 'TagScopeConsumer']
+        assert consumer and consumer[0]['isConsistent'] is True, consumer
+        record('reopened table and consumer equal the restore', members(reopened))
         report['completed'] = True
     finally:
         record('owned worker shutdown', client.close())

@@ -314,8 +314,8 @@ namespace TiaMcp.Openness.V21
         {
             var change = GetEngineeringChange(args);
             if (change.State == "restored") return ChangeView(change);
-            if (change.Kind == TagTableImportRules.Kind)
-                throw new BridgeException("ScopedRecoveryRequired", "A tag-table-scoped fingerprint cannot authorize replacing the whole project. Use the retained archive for explicit manual recovery; no project was saved or closed.", ChangeView(change));
+            // A scoped fingerprint never authorizes replacing the whole project; only the imported tables are restored.
+            if (change.Kind == TagTableImportRules.Kind) return RestoreScopedTagImport(change, args);
             if (!_ownsPortal) throw new BridgeException("OwnedSessionRequired", "Automatic archive retrieval is limited to worker-owned TIA instances. The checkpoint archive is available for manual recovery in a user-owned instance.", ChangeView(change));
             if (change.State != "applied" && change.State != "recovery_required") throw new BridgeException("InvalidChangeState", "This change has no applied state to recover.");
             if (string.IsNullOrEmpty(change.ArchivePath) || !File.Exists(change.ArchivePath) || ChangeFileHash(change.ArchivePath) != change.ArchiveHash)

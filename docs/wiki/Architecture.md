@@ -34,7 +34,7 @@ Tag-table XML imports use a declaration-scoped content check so unrelated
 inconsistent PLC blocks do not prevent editing a table. Backups, safety boundaries,
 stale-preview checks and native readback remain; requested compilation compares
 existing diagnostics with the result. This scope does not authorize automatic
-whole-project recovery. See the [tag-table import scope](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#tag-table-import-scope)
+whole-project recovery; restoring such an import re-imports only its tables. See the [tag-table import scope](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#tag-table-import-scope)
 for exact coverage and recovery limits.
 
 HMI preservation records export progress before native dispatch and retains failures

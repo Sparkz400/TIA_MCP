@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.138",
+  "catalogVersion": "0.4.139",
   "targetTiaVersions": [
     21
   ],
@@ -4917,6 +4917,24 @@
         "An inconsistent block on any PLC still stops preparation of kinds that need the full project fingerprint (FingerprintUnavailable); same-PLC unrelated block errors are therefore not covered (#218).",
         "Device compiles report shifting warning identities (introduced warnings beside zero introduced errors); outside tag-table imports new warnings are accepted, as before #221."
       ]
+    },
+    {
+      "id": "local.tag-table.scoped-restore.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9e52a48e6dc35b22bd70e6fa14ab2c6e3bd646b3",
+        "passedScope": "scripts/qualify_tag_table_scope.py on Debug builds of e01f1ac1 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 26/26 steps. Repeats every step of local.tag-table.replacement-compile.20261107 and adds scoped recovery: after the failed type-change import (CompileFailed, recovery_required), an edit of the unrelated table Other makes change_restore refuse with StaleRevision and restore nothing; with Other returned to its recorded state, change_restore re-imports only Signals from its retained native export, verifies every captured table against the before capture, compiles like the baseline (the one pre-existing error, baselineComparison verified) and saves, ending restored with Added back as Bool %M50.1; the earlier applied change's restore refuses with StaleRevision; a new import prepares without admission cleanup; a fresh owned TIA reopens the saved project with the same Signals members and the consumer FC consistent."
+      },
+      "artifacts": [
+        "evidence/local.tag-table.scoped-restore.20261107.json"
+      ],
+      "limitations": [
+        "Source commit 9e52a48e differs from the built e01f1ac1 only in scripts/qualify_tag_table_scope.py (the reopen steps); src and every executable run are byte-identical to e01f1ac1.",
+        "Scoped restore covers tag_table_import_xml only, in place, without replacing the project; edits outside tag tables made after the attempt are kept and are not compared. Imports not recorded as applied (interrupted outcomes) still refuse with ScopedRecoveryRequired; whole-project restore remains refused for this kind.",
+        "One owned scratch CPU 1511-1 PN at PLC-root scope; one restored table that existed before the import. Deleting a table the import created is implemented but not exercised natively."
+      ]
     }
   ],
   "features": [
@@ -8136,7 +8154,8 @@
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Every imported tag whose LogicalAddress is an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses the whole import at prepare and again before the native import with SafetyBoundary (TIA would make it a safety tag); nothing is imported (1 November 2026; rechecked natively in local.safety.fio-routes.20261101).",
           "Preparation fingerprints only tag-table contents in the selected software scope plus project/hardware/network/software/type/block metadata (tag-table-content-and-project-metadata-v1), so an unrelated inconsistent block no longer blocks it; block payloads are not covered, the change must keep every existing member (TagScopeMismatch), apply compares compiler diagnostics with a baseline compile and refuses new or changed ones, and automatic whole-project restore is refused (ScopedRecoveryRequired). Natively checked in local.tag-table.scoped-import.20261107.",
-          "A replacement import cannot rename or delete: a candidate missing an existing member, including one renamed in place, is refused at prepare with TagScopeMismatch. Use tag_set (Name) or tag_delete/constant_delete for intended renames and deletions. Results report checkpoint save, mutation, compile, readback and final save as separate stages, and compile.compilerSucceeded is reported on failed applies too (local.tag-table.replacement-compile.20261107)."
+          "A replacement import cannot rename or delete: a candidate missing an existing member, including one renamed in place, is refused at prepare with TagScopeMismatch. Use tag_set (Name) or tag_delete/constant_delete for intended renames and deletions. Results report checkpoint save, mutation, compile, readback and final save as separate stages, and compile.compilerSucceeded is reported on failed applies too (local.tag-table.replacement-compile.20261107).",
+          "Scoped restore (since 7 November 2026, #218): change_restore re-imports only the imported tables from their retained native exports (hash-checked), in place, while every captured table is exactly as the attempt left it (else StaleRevision), then verifies them, compiles like the baseline and saves; the project is never replaced, and an import not recorded as applied still refuses with ScopedRecoveryRequired (local.tag-table.scoped-restore.20261107)."
         ]
       },
       "qualification": {
@@ -8145,7 +8164,8 @@
           "local.plc_object_mutations.rerun.20261028",
           "local.safety.fio-routes.20261101",
           "local.tag-table.scoped-import.20261107",
-          "local.tag-table.replacement-compile.20261107"
+          "local.tag-table.replacement-compile.20261107",
+          "local.tag-table.scoped-restore.20261107"
         ]
       },
       "availability": {
