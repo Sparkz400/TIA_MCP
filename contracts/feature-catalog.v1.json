@@ -2861,7 +2861,7 @@
         "evidence/local.typed.crossscope.engineering.rerun.20261029.json"
       ],
       "limitations": [
-        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
+        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54\u2026.zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
         "Engineering only: the runtime gate is not run."
       ]
     },
@@ -4267,7 +4267,7 @@
         "tiaVersion": 21,
         "machine": "PCNico",
         "sourceCommit": "d57defa5b499bfe94396d6079d4af603de5403ad",
-        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of d57defa5 (artifacts/oi3, git archive; main with PR 184's RFC 8785 hashing, PR 186's exact decimal parsing of request floats and the runner scanners' RFC 8785 fix), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Each of the three advance requests (verifyImport, prepareGraphical, verifyInstallation) carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the number literals 1e3 and 2.2250738585072012e-308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of the verifyImport request (1e3 as 1000, the other as 2.2250738585072014e-308) reproduced the Host's recorded requestSha256 5d077eef."
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of d57defa5 (artifacts/oi3, git archive; main with PR 184's RFC 8785 hashing, PR 186's exact decimal parsing of request floats and the runner scanners' RFC 8785 fix), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Each of the three advance requests (verifyImport, prepareGraphical, verifyInstallation) carried the non-ASCII key pr\u00fcfName\u540d\u524d, non-ASCII text with an astral emoji (sent as \\u escapes) and the number literals 1e3 and 2.2250738585072012e-308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of the verifyImport request (1e3 as 1000, the other as 2.2250738585072014e-308) reproduced the Host's recorded requestSha256 5d077eef."
       },
       "artifacts": [
         "evidence/local.component.canonical-hash.20261101.json"
@@ -4285,7 +4285,7 @@
         "tiaVersion": 21,
         "machine": "PCNico",
         "sourceCommit": "4b970cc91fdb0532a49a0f6833f9e0cf8d664eb6",
-        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of 4b970cc9 (artifacts/hz3, git archive; main with PR 190's exact worker number reading and range refusal, and PR 199's id-keeping refusal), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Before the first advance, the same advance request with 1.8e308 added was refused with InvalidRequest ('A request number is outside the double range.', from the worker's request reader, relayed by the Host with the request id); the window's revision, state and children (start, applyLibrary) were unchanged, and the verifyImport advance that followed dispatched on the same Host session. Each of the three advance requests carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of all three advance requests (1e3 as 1000, 2.2250738585072014e-308, 1.7976931348623157e+308, i.e. double.MaxValue) reproduced the Host's recorded hashes c857106f, 340dd121 and c5e740ce."
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of 4b970cc9 (artifacts/hz3, git archive; main with PR 190's exact worker number reading and range refusal, and PR 199's id-keeping refusal), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Before the first advance, the same advance request with 1.8e308 added was refused with InvalidRequest ('A request number is outside the double range.', from the worker's request reader, relayed by the Host with the request id); the window's revision, state and children (start, applyLibrary) were unchanged, and the verifyImport advance that followed dispatched on the same Host session. Each of the three advance requests carried the non-ASCII key pr\u00fcfName\u540d\u524d, non-ASCII text with an astral emoji (sent as \\u escapes) and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of all three advance requests (1e3 as 1000, 2.2250738585072014e-308, 1.7976931348623157e+308, i.e. double.MaxValue) reproduced the Host's recorded hashes c857106f, 340dd121 and c5e740ce."
       },
       "artifacts": [
         "evidence/local.component.canonical-hash.20261102.json"
@@ -5258,6 +5258,81 @@
       ],
       "limitations": [
         "One parent FB without its own DB or a grandparent in the combined apply (the capture covers two depths and DBs). FBD Host FB, after its last network; LAD, earlier placement and the caller's own DB combined with a parent stay plan-only."
+      ]
+    },
+    {
+      "id": "local.hardware_changes.full.rerun.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0; CPU 1214C DC/DC/DC 6ES7 214-1AG40-0XB0; ET 200MP IM 155-5 PN ST 6ES7 155-5AA01-0AB0; ET 200SP IM 155-6 PN ST 6ES7 155-6AU02-0BN0",
+        "firmware": "V4.1; V4.7; V4.1; V6.4",
+        "sourceCommit": "90b97821115b1b30cee40be7371174839b233537",
+        "passedScope": "scripts/qualify_hardware_changes.py (no slice) on Debug builds of main c4fe913d (after #250's #221 fix: network_io_assign with expectedServerModule skips the baseline compile; every other compiling change compares against its own baseline compile) in owned scratch projects created through the MCP Host, one owned TIA Portal V21 Update 3 each. 475/475 steps with the runner of 90b97821: the full add, plug, attribute, replace, delete, port, network, IO-system, shared-device, OutsideOfProject and MRP corpus. 90b97821 changes one expectation only: a FirmwareVersion write is now refused by the module's bundled capability profile (AttributeNotWritable) before the attribute allowlist (UnsupportedAttribute), as since the profiles of 1-2 November."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.full.rerun.20261107.json"
+      ],
+      "limitations": [
+        "In-project shared device: one IO device shared by two CPUs of one project, one submodule assigned to the second; the sharedDevice disconnect is not exercised.",
+        "hardware_shared_device_access: OutsideOfProject (with NumberOfExternalIoControllers 1) and PLC back to the second CPU on one ET 200SP DI module; no second project.",
+        "MRP: one ring of three members in one created domain; ring ports are the interfaces' Port_1/Port_2; no MRP telegrams, domain attributes or MRP interconnection.",
+        "Address-changing replacement: the replaced module's input range grows (start kept); a moved start is not exercised; tag addresses are not rewritten.",
+        "Capability profiles are observations of the created types in this run's configuration; plug rules at slots 1-4 of each rack type in the final configuration.",
+        "No GSD device: V21 Openness has no GSD installation API and no operator-installed GSD was present (gsdNotInstalled).",
+        "No checkpoint restore of the shared-device assignment, the OutsideOfProject access, the createDomain MRP manager or the IM 155-5 PN ST client.",
+        "The worker bundled an empty capability-profile contract: no profile refusal and no hardware_catalog_search profile link ran.",
+        "Engineering only; nothing is downloaded and no physical topology is observed.",
+        "Earlier pass, not evidence: artifacts/hf/hw_cf50e1a4 on the same build stopped at that one stale expectation (AttributeNotWritable returned, UnsupportedAttribute expected).",
+        "A rerun after the #221 baseline-compile change on the current build; it repeats, and does not widen, the scope of local.hardware_changes.topology.20261101."
+      ]
+    },
+    {
+      "id": "local.hardware_changes.topology_restores.rerun.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0; ET 200MP IM 155-5 PN ST 6ES7 155-5AA01-0AB0; ET 200SP IM 155-6 PN ST 6ES7 155-6AU02-0BN0",
+        "firmware": "V4.1; V4.1; V6.4",
+        "sourceCommit": "90b97821115b1b30cee40be7371174839b233537",
+        "passedScope": "scripts/qualify_hardware_changes.py --slice restores on Debug builds of main c4fe913d (after #250's #221 fix: network_io_assign with expectedServerModule skips the baseline compile; every other compiling change compares against its own baseline compile) in owned scratch projects created through the MCP Host, one owned TIA Portal V21 Update 3 each. 113/113 steps: the same profile gates and topology restores as local.hardware_changes.topology_restores.20261101 (shared-device assignment, OutsideOfProject, the MRP createDomain manager and the IM 155-5 PN ST client applied and restored)."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.topology_restores.rerun.20261107.json"
+      ],
+      "limitations": [
+        "A slice: no S7-1200, no port links (no ring is closed), no fresh-Portal reopen; persistence of these kinds rests on local.hardware_changes.topology.20261101.",
+        "Profile gates on one module type (DI 8x24VDC ST 6ES7 131-6BF00-0BA0 V1.1): one catalog link and one refused undeclared item attribute; channel-attribute and versionless-profile refusals are not exercised natively.",
+        "Shared assignment with the scratch CPU's I/O address space empty: SpDi3 keeps start address 0; the start move into an occupied space is local.hardware_changes.topology.20261101. The sharedDevice disconnect is not exercised.",
+        "The network_mrp_set port-link refusal (a ring port linked to a non-ring port) and the hardware_shared_device_access PLC-to-PLC refusal are not exercised natively.",
+        "Engineering only; nothing is downloaded and no physical topology is observed.",
+        "A rerun after the #221 baseline-compile change on the current build; it repeats, and does not widen, the scope of local.hardware_changes.topology_restores.20261101."
+      ]
+    },
+    {
+      "id": "local.hardware_changes.refusals.rerun.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0; ET 200SP IM 155-6 PN ST 6ES7 155-6AU02-0BN0; I-device GSD TiaMcpIDevice (GSDML V2.45)",
+        "firmware": "V4.1; V6.4; V4.1",
+        "sourceCommit": "90b97821115b1b30cee40be7371174839b233537",
+        "passedScope": "scripts/qualify_hardware_changes.py --slice refusals on Debug builds of main c4fe913d (after #250's #221 fix: network_io_assign with expectedServerModule skips the baseline compile; every other compiling change compares against its own baseline compile) in owned scratch projects created through the MCP Host, one owned TIA Portal V21 Update 3 each. 199/199 steps: the same two-project corpus as local.hardware_changes.refusals.20261102 (address-change replacement with an acknowledged tag, sharedDevice disconnect, OutsideOfProject in both projects, MRP, PLC-to-PLC and capability-profile refusals)."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.refusals.rerun.20261107.json"
+      ],
+      "limitations": [
+        "Engineering only, offline: nothing is downloaded, no PLCSIM, no physical topology or MRP telegram is observed.",
+        "A versionless firmware matching no profile (fail closed) is not exercised natively: the installed GSD has one DAP with one firmware (offline tests cover it).",
+        "The sharedDevice disconnect with one remaining PLC and one assigned module; more remaining PLCs are refused and not exercised. The disconnect, the address change and the shared device are restored, not persisted across a reopen (the slice has no reopen).",
+        "Second project: V21 checks nothing across projects; the runner compares the two stations. Head, interface, ports and server module stay assigned in both projects, which a downloaded configuration would have to resolve; SharedDeviceCopyOfModule is not configured.",
+        "The address change rewrites no tag address and does not search absolute %I/%Q accesses in program code.",
+        "Earlier pass, not evidence: artifacts/hr/hw_347798a0 stopped at a change_restore of the same build on a transient 'Access to the path ... recovery ... before was denied' file lock; the rerun passed unchanged.",
+        "A rerun after the #221 baseline-compile change on the current build; it repeats, and does not widen, the scope of local.hardware_changes.refusals.20261102."
       ]
     }
   ],
@@ -9223,7 +9298,8 @@
           "local.hardware_changes.20261028",
           "local.hardware_changes.families.20261029",
           "local.hardware_changes.gsd.20261101",
-          "local.hardware_changes.drive.20261107"
+          "local.hardware_changes.drive.20261107",
+          "local.hardware_changes.full.rerun.20261107"
         ]
       },
       "availability": {
@@ -9278,7 +9354,8 @@
           "local.engineering.interruption-matrix.20261027",
           "local.remote-io.full-route.rerun.20261028",
           "local.remote-io.lifecycle.rerun.20261028",
-          "local.hardware_changes.families.20261029"
+          "local.hardware_changes.families.20261029",
+          "local.hardware_changes.full.rerun.20261107"
         ]
       },
       "availability": {
@@ -9331,7 +9408,8 @@
         "evidenceIds": [
           "local.hardware_changes.20261028",
           "local.hardware_changes.families.20261029",
-          "local.hardware_changes.delete-rule.20261102"
+          "local.hardware_changes.delete-rule.20261102",
+          "local.hardware_changes.full.rerun.20261107"
         ]
       },
       "availability": {
@@ -9387,7 +9465,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.hardware_changes.20261028",
-          "local.hardware_changes.families.20261029"
+          "local.hardware_changes.families.20261029",
+          "local.hardware_changes.full.rerun.20261107"
         ]
       },
       "availability": {
@@ -9445,7 +9524,8 @@
           "local.milestones.rerun.20261028",
           "local.hardware_changes.families.20261029",
           "local.compile-baseline.unrelated-errors.20261107",
-          "local.hardware_changes.drive.20261107"
+          "local.hardware_changes.drive.20261107",
+          "local.hardware_changes.full.rerun.20261107"
         ]
       },
       "availability": {
@@ -10445,7 +10525,10 @@
         "evidenceIds": [
           "local.hardware_changes.topology.20261101",
           "local.hardware_changes.topology_restores.20261101",
-          "local.hardware_changes.refusals.20261102"
+          "local.hardware_changes.refusals.20261102",
+          "local.hardware_changes.full.rerun.20261107",
+          "local.hardware_changes.topology_restores.rerun.20261107",
+          "local.hardware_changes.refusals.rerun.20261107"
         ]
       },
       "availability": {
@@ -10498,7 +10581,10 @@
           "local.hardware_changes.topology.20261101",
           "local.hardware_changes.topology_restores.20261101",
           "local.hardware_changes.gsd.20261101",
-          "local.hardware_changes.refusals.20261102"
+          "local.hardware_changes.refusals.20261102",
+          "local.hardware_changes.full.rerun.20261107",
+          "local.hardware_changes.topology_restores.rerun.20261107",
+          "local.hardware_changes.refusals.rerun.20261107"
         ]
       },
       "availability": {
@@ -15392,7 +15478,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.hardware_changes.20261028",
-          "local.hardware_changes.families.20261029"
+          "local.hardware_changes.families.20261029",
+          "local.hardware_changes.full.rerun.20261107"
         ]
       },
       "availability": {
@@ -15445,7 +15532,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.hardware_changes.20261028",
-          "local.hardware_changes.families.20261029"
+          "local.hardware_changes.families.20261029",
+          "local.hardware_changes.full.rerun.20261107"
         ]
       },
       "availability": {
@@ -15503,7 +15591,9 @@
           "local.hardware_changes.20261028",
           "local.hardware_changes.families.20261029",
           "local.hardware_changes.topology.20261101",
-          "local.hardware_changes.refusals.20261102"
+          "local.hardware_changes.refusals.20261102",
+          "local.hardware_changes.full.rerun.20261107",
+          "local.hardware_changes.refusals.rerun.20261107"
         ]
       },
       "availability": {
@@ -15557,7 +15647,10 @@
         "evidenceIds": [
           "local.hardware_changes.topology.20261101",
           "local.hardware_changes.topology_restores.20261101",
-          "local.hardware_changes.refusals.20261102"
+          "local.hardware_changes.refusals.20261102",
+          "local.hardware_changes.full.rerun.20261107",
+          "local.hardware_changes.topology_restores.rerun.20261107",
+          "local.hardware_changes.refusals.rerun.20261107"
         ]
       },
       "availability": {
@@ -15729,7 +15822,10 @@
           "local.hardware_changes.gsd.20261101",
           "local.hardware_changes.refusals.20261102",
           "local.hardware_changes.drive.20261107",
-          "local.hardware_changes.shared3.20261107"
+          "local.hardware_changes.shared3.20261107",
+          "local.hardware_changes.full.rerun.20261107",
+          "local.hardware_changes.topology_restores.rerun.20261107",
+          "local.hardware_changes.refusals.rerun.20261107"
         ]
       },
       "availability": {
@@ -15784,7 +15880,10 @@
         "evidenceIds": [
           "local.hardware_changes.topology.20261101",
           "local.hardware_changes.topology_restores.20261101",
-          "local.hardware_changes.refusals.20261102"
+          "local.hardware_changes.refusals.20261102",
+          "local.hardware_changes.full.rerun.20261107",
+          "local.hardware_changes.topology_restores.rerun.20261107",
+          "local.hardware_changes.refusals.rerun.20261107"
         ]
       },
       "availability": {
@@ -28860,7 +28959,7 @@
           "Native, 1 November (build 10763a35): the route passed on the desk-configured TP700 Comfort pair (local.hmi.classic-import.route.20261101, 63/63 checks): every refusal before any write; BackColor on both HMIs' Overview_A (identity separation), a no-op and a GridColor import of Overview_B, a no-op import of the start screen and a QualificationTags import adding one internal tag, each with every stage, no compiler problems, the target's independent re-export carrying exactly the intended delta, every other export unchanged, same-key replay and another key refused RecoveryRequired; a stale preview refused; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay (local.hmi.classic-import.interruption.20261101, 8/8).",
           "Qualified on one desk-configured TP700 Comfort fixture (start screen set in the editor). Import(Override) of the start screen kept it natively, but the start-screen setting has no public getter, so the compile rule is its only guard. Other Classic devices, object types, customer projects, runtime and visual behavior are not covered.",
           "Lifecycle, 1 November (build 2431ccf9): on the same TP700 Comfort pair both compiles of every apply named only the target HmiTarget, both Host lifetimes ended normally (Host and worker exit 0, owned TIA process exited) and a new TIA process then reopened the saved project read-write at once (local.hmi.lifecycle.20261101, 72/72).",
-          "WinCC RT Advanced and KTP700 Basic PN, 1–2 November (build 750121ea): the route passed on their seeded HmiSeeder baselines (no start screen; the compile rule kept that error unchanged after every apply) with 72/72 and 71/71 checks (local.hmi.classic-import.profiles.route.20261101; Basic has no popup), and ci-* interruption 8/8 on each (local.hmi.classic-import.profiles.interruption.20261102); production admits both profiles."
+          "WinCC RT Advanced and KTP700 Basic PN, 1\u20132 November (build 750121ea): the route passed on their seeded HmiSeeder baselines (no start screen; the compile rule kept that error unchanged after every apply) with 72/72 and 71/71 checks (local.hmi.classic-import.profiles.route.20261101; Basic has no popup), and ci-* interruption 8/8 on each (local.hmi.classic-import.profiles.interruption.20261102); production admits both profiles."
         ]
       },
       "qualification": {

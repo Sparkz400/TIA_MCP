@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.159",
-    "catalogSha256": "7e798fc856ccc7b41433911bc3bbd8c1bd7e8272cd2147615a6edf760bd8caa4",
+    "catalogSha256": "4b8a49cecd804c699333ea36a62f32aeb04be41e553d035e3fc2f31b4c2b7f5b",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "5c4786dd1c89d694fbb8dd6cedda08b781fd52cfb05022cdeda06a2770ef8125"
   },
@@ -4041,7 +4041,8 @@
         "local.hardware_changes.20261028",
         "local.hardware_changes.families.20261029",
         "local.hardware_changes.gsd.20261101",
-        "local.hardware_changes.drive.20261107"
+        "local.hardware_changes.drive.20261107",
+        "local.hardware_changes.full.rerun.20261107"
       ],
       "cells": [
         {
@@ -4051,7 +4052,8 @@
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
             "local.hardware_changes.gsd.20261101",
-            "local.hardware_changes.drive.20261107"
+            "local.hardware_changes.drive.20261107",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4061,7 +4063,8 @@
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
             "local.hardware_changes.gsd.20261101",
-            "local.hardware_changes.drive.20261107"
+            "local.hardware_changes.drive.20261107",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4071,7 +4074,8 @@
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
             "local.hardware_changes.gsd.20261101",
-            "local.hardware_changes.drive.20261107"
+            "local.hardware_changes.drive.20261107",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4081,7 +4085,8 @@
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
             "local.hardware_changes.gsd.20261101",
-            "local.hardware_changes.drive.20261107"
+            "local.hardware_changes.drive.20261107",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4091,7 +4096,8 @@
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
             "local.hardware_changes.gsd.20261101",
-            "local.hardware_changes.drive.20261107"
+            "local.hardware_changes.drive.20261107",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4101,7 +4107,8 @@
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
             "local.hardware_changes.gsd.20261101",
-            "local.hardware_changes.drive.20261107"
+            "local.hardware_changes.drive.20261107",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         }
       ]
@@ -4124,7 +4131,8 @@
         "local.engineering.interruption-matrix.20261027",
         "local.remote-io.full-route.rerun.20261028",
         "local.remote-io.lifecycle.rerun.20261028",
-        "local.hardware_changes.families.20261029"
+        "local.hardware_changes.families.20261029",
+        "local.hardware_changes.full.rerun.20261107"
       ],
       "cells": [
         {
@@ -4134,7 +4142,8 @@
             "local.engineering.interruption-matrix.20261027",
             "local.remote-io.full-route.rerun.20261028",
             "local.remote-io.lifecycle.rerun.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4144,7 +4153,8 @@
             "local.engineering.interruption-matrix.20261027",
             "local.remote-io.full-route.rerun.20261028",
             "local.remote-io.lifecycle.rerun.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4154,7 +4164,8 @@
             "local.engineering.interruption-matrix.20261027",
             "local.remote-io.full-route.rerun.20261028",
             "local.remote-io.lifecycle.rerun.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4164,7 +4175,8 @@
             "local.engineering.interruption-matrix.20261027",
             "local.remote-io.full-route.rerun.20261028",
             "local.remote-io.lifecycle.rerun.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4174,7 +4186,8 @@
             "local.engineering.interruption-matrix.20261027",
             "local.remote-io.full-route.rerun.20261028",
             "local.remote-io.lifecycle.rerun.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4184,7 +4197,8 @@
             "local.engineering.interruption-matrix.20261027",
             "local.remote-io.full-route.rerun.20261028",
             "local.remote-io.lifecycle.rerun.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         }
       ]
@@ -4206,7 +4220,8 @@
       "evidenceIds": [
         "local.hardware_changes.20261028",
         "local.hardware_changes.families.20261029",
-        "local.hardware_changes.delete-rule.20261102"
+        "local.hardware_changes.delete-rule.20261102",
+        "local.hardware_changes.full.rerun.20261107"
       ],
       "cells": [
         {
@@ -4215,7 +4230,8 @@
           "evidenceIds": [
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
-            "local.hardware_changes.delete-rule.20261102"
+            "local.hardware_changes.delete-rule.20261102",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4224,7 +4240,8 @@
           "evidenceIds": [
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
-            "local.hardware_changes.delete-rule.20261102"
+            "local.hardware_changes.delete-rule.20261102",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4233,7 +4250,8 @@
           "evidenceIds": [
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
-            "local.hardware_changes.delete-rule.20261102"
+            "local.hardware_changes.delete-rule.20261102",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4242,7 +4260,8 @@
           "evidenceIds": [
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
-            "local.hardware_changes.delete-rule.20261102"
+            "local.hardware_changes.delete-rule.20261102",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4251,7 +4270,8 @@
           "evidenceIds": [
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
-            "local.hardware_changes.delete-rule.20261102"
+            "local.hardware_changes.delete-rule.20261102",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4260,7 +4280,8 @@
           "evidenceIds": [
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
-            "local.hardware_changes.delete-rule.20261102"
+            "local.hardware_changes.delete-rule.20261102",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         }
       ]
@@ -4281,7 +4302,8 @@
       ],
       "evidenceIds": [
         "local.hardware_changes.20261028",
-        "local.hardware_changes.families.20261029"
+        "local.hardware_changes.families.20261029",
+        "local.hardware_changes.full.rerun.20261107"
       ],
       "cells": [
         {
@@ -4289,7 +4311,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4297,7 +4320,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4305,7 +4329,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4313,7 +4338,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4321,7 +4347,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4329,7 +4356,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         }
       ]
@@ -4352,7 +4380,8 @@
         "local.milestones.rerun.20261028",
         "local.hardware_changes.families.20261029",
         "local.compile-baseline.unrelated-errors.20261107",
-        "local.hardware_changes.drive.20261107"
+        "local.hardware_changes.drive.20261107",
+        "local.hardware_changes.full.rerun.20261107"
       ],
       "cells": [
         {
@@ -4362,7 +4391,8 @@
             "local.milestones.rerun.20261028",
             "local.hardware_changes.families.20261029",
             "local.compile-baseline.unrelated-errors.20261107",
-            "local.hardware_changes.drive.20261107"
+            "local.hardware_changes.drive.20261107",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4372,7 +4402,8 @@
             "local.milestones.rerun.20261028",
             "local.hardware_changes.families.20261029",
             "local.compile-baseline.unrelated-errors.20261107",
-            "local.hardware_changes.drive.20261107"
+            "local.hardware_changes.drive.20261107",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4382,7 +4413,8 @@
             "local.milestones.rerun.20261028",
             "local.hardware_changes.families.20261029",
             "local.compile-baseline.unrelated-errors.20261107",
-            "local.hardware_changes.drive.20261107"
+            "local.hardware_changes.drive.20261107",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4392,7 +4424,8 @@
             "local.milestones.rerun.20261028",
             "local.hardware_changes.families.20261029",
             "local.compile-baseline.unrelated-errors.20261107",
-            "local.hardware_changes.drive.20261107"
+            "local.hardware_changes.drive.20261107",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4402,7 +4435,8 @@
             "local.milestones.rerun.20261028",
             "local.hardware_changes.families.20261029",
             "local.compile-baseline.unrelated-errors.20261107",
-            "local.hardware_changes.drive.20261107"
+            "local.hardware_changes.drive.20261107",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -4412,7 +4446,8 @@
             "local.milestones.rerun.20261028",
             "local.hardware_changes.families.20261029",
             "local.compile-baseline.unrelated-errors.20261107",
-            "local.hardware_changes.drive.20261107"
+            "local.hardware_changes.drive.20261107",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         }
       ]
@@ -5557,7 +5592,10 @@
       "evidenceIds": [
         "local.hardware_changes.topology.20261101",
         "local.hardware_changes.topology_restores.20261101",
-        "local.hardware_changes.refusals.20261102"
+        "local.hardware_changes.refusals.20261102",
+        "local.hardware_changes.full.rerun.20261107",
+        "local.hardware_changes.topology_restores.rerun.20261107",
+        "local.hardware_changes.refusals.rerun.20261107"
       ],
       "cells": [
         {
@@ -5566,7 +5604,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -5575,7 +5616,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -5584,7 +5628,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         }
       ]
@@ -5608,7 +5655,10 @@
         "local.hardware_changes.topology.20261101",
         "local.hardware_changes.topology_restores.20261101",
         "local.hardware_changes.gsd.20261101",
-        "local.hardware_changes.refusals.20261102"
+        "local.hardware_changes.refusals.20261102",
+        "local.hardware_changes.full.rerun.20261107",
+        "local.hardware_changes.topology_restores.rerun.20261107",
+        "local.hardware_changes.refusals.rerun.20261107"
       ],
       "cells": [
         {
@@ -5618,7 +5668,10 @@
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
             "local.hardware_changes.gsd.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -5628,7 +5681,10 @@
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
             "local.hardware_changes.gsd.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -5638,7 +5694,10 @@
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
             "local.hardware_changes.gsd.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         }
       ]
@@ -11903,7 +11962,8 @@
       ],
       "evidenceIds": [
         "local.hardware_changes.20261028",
-        "local.hardware_changes.families.20261029"
+        "local.hardware_changes.families.20261029",
+        "local.hardware_changes.full.rerun.20261107"
       ],
       "cells": [
         {
@@ -11911,7 +11971,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -11919,7 +11980,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -11927,7 +11989,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -11935,7 +11998,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -11943,7 +12007,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -11951,7 +12016,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         }
       ]
@@ -11972,7 +12038,8 @@
       ],
       "evidenceIds": [
         "local.hardware_changes.20261028",
-        "local.hardware_changes.families.20261029"
+        "local.hardware_changes.families.20261029",
+        "local.hardware_changes.full.rerun.20261107"
       ],
       "cells": [
         {
@@ -11980,7 +12047,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -11988,7 +12056,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -11996,7 +12065,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -12004,7 +12074,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -12012,7 +12083,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         },
         {
@@ -12020,7 +12092,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.hardware_changes.20261028",
-            "local.hardware_changes.families.20261029"
+            "local.hardware_changes.families.20261029",
+            "local.hardware_changes.full.rerun.20261107"
           ]
         }
       ]
@@ -12043,7 +12116,9 @@
         "local.hardware_changes.20261028",
         "local.hardware_changes.families.20261029",
         "local.hardware_changes.topology.20261101",
-        "local.hardware_changes.refusals.20261102"
+        "local.hardware_changes.refusals.20261102",
+        "local.hardware_changes.full.rerun.20261107",
+        "local.hardware_changes.refusals.rerun.20261107"
       ],
       "cells": [
         {
@@ -12053,7 +12128,9 @@
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
             "local.hardware_changes.topology.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12063,7 +12140,9 @@
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
             "local.hardware_changes.topology.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12073,7 +12152,9 @@
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
             "local.hardware_changes.topology.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12083,7 +12164,9 @@
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
             "local.hardware_changes.topology.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12093,7 +12176,9 @@
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
             "local.hardware_changes.topology.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12103,7 +12188,9 @@
             "local.hardware_changes.20261028",
             "local.hardware_changes.families.20261029",
             "local.hardware_changes.topology.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         }
       ]
@@ -12125,7 +12212,10 @@
       "evidenceIds": [
         "local.hardware_changes.topology.20261101",
         "local.hardware_changes.topology_restores.20261101",
-        "local.hardware_changes.refusals.20261102"
+        "local.hardware_changes.refusals.20261102",
+        "local.hardware_changes.full.rerun.20261107",
+        "local.hardware_changes.topology_restores.rerun.20261107",
+        "local.hardware_changes.refusals.rerun.20261107"
       ],
       "cells": [
         {
@@ -12134,7 +12224,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12143,7 +12236,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12152,7 +12248,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12161,7 +12260,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12170,7 +12272,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12179,7 +12284,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         }
       ]
@@ -12345,7 +12453,10 @@
         "local.hardware_changes.gsd.20261101",
         "local.hardware_changes.refusals.20261102",
         "local.hardware_changes.drive.20261107",
-        "local.hardware_changes.shared3.20261107"
+        "local.hardware_changes.shared3.20261107",
+        "local.hardware_changes.full.rerun.20261107",
+        "local.hardware_changes.topology_restores.rerun.20261107",
+        "local.hardware_changes.refusals.rerun.20261107"
       ],
       "cells": [
         {
@@ -12360,7 +12471,10 @@
             "local.hardware_changes.gsd.20261101",
             "local.hardware_changes.refusals.20261102",
             "local.hardware_changes.drive.20261107",
-            "local.hardware_changes.shared3.20261107"
+            "local.hardware_changes.shared3.20261107",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12375,7 +12489,10 @@
             "local.hardware_changes.gsd.20261101",
             "local.hardware_changes.refusals.20261102",
             "local.hardware_changes.drive.20261107",
-            "local.hardware_changes.shared3.20261107"
+            "local.hardware_changes.shared3.20261107",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12390,7 +12507,10 @@
             "local.hardware_changes.gsd.20261101",
             "local.hardware_changes.refusals.20261102",
             "local.hardware_changes.drive.20261107",
-            "local.hardware_changes.shared3.20261107"
+            "local.hardware_changes.shared3.20261107",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12405,7 +12525,10 @@
             "local.hardware_changes.gsd.20261101",
             "local.hardware_changes.refusals.20261102",
             "local.hardware_changes.drive.20261107",
-            "local.hardware_changes.shared3.20261107"
+            "local.hardware_changes.shared3.20261107",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12420,7 +12543,10 @@
             "local.hardware_changes.gsd.20261101",
             "local.hardware_changes.refusals.20261102",
             "local.hardware_changes.drive.20261107",
-            "local.hardware_changes.shared3.20261107"
+            "local.hardware_changes.shared3.20261107",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12435,7 +12561,10 @@
             "local.hardware_changes.gsd.20261101",
             "local.hardware_changes.refusals.20261102",
             "local.hardware_changes.drive.20261107",
-            "local.hardware_changes.shared3.20261107"
+            "local.hardware_changes.shared3.20261107",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         }
       ]
@@ -12457,7 +12586,10 @@
       "evidenceIds": [
         "local.hardware_changes.topology.20261101",
         "local.hardware_changes.topology_restores.20261101",
-        "local.hardware_changes.refusals.20261102"
+        "local.hardware_changes.refusals.20261102",
+        "local.hardware_changes.full.rerun.20261107",
+        "local.hardware_changes.topology_restores.rerun.20261107",
+        "local.hardware_changes.refusals.rerun.20261107"
       ],
       "cells": [
         {
@@ -12466,7 +12598,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12475,7 +12610,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12484,7 +12622,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12493,7 +12634,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12502,7 +12646,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         },
         {
@@ -12511,7 +12658,10 @@
           "evidenceIds": [
             "local.hardware_changes.topology.20261101",
             "local.hardware_changes.topology_restores.20261101",
-            "local.hardware_changes.refusals.20261102"
+            "local.hardware_changes.refusals.20261102",
+            "local.hardware_changes.full.rerun.20261107",
+            "local.hardware_changes.topology_restores.rerun.20261107",
+            "local.hardware_changes.refusals.rerun.20261107"
           ]
         }
       ]
@@ -28341,6 +28491,23 @@
       "notRetained": []
     },
     {
+      "id": "local.hardware_changes.full.rerun.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0; CPU 1214C DC/DC/DC 6ES7 214-1AG40-0XB0; ET 200MP IM 155-5 PN ST 6ES7 155-5AA01-0AB0; ET 200SP IM 155-6 PN ST 6ES7 155-6AU02-0BN0",
+        "firmware": "V4.1; V4.7; V4.1; V6.4"
+      },
+      "sourceCommit": "90b97821115b1b30cee40be7371174839b233537",
+      "retained": [
+        {
+          "path": "evidence/local.hardware_changes.full.rerun.20261107.json",
+          "sha256": "a58e5c9493951f71dcf9ac7a41fa31391ea0d12ad2ccadbb8637d5e179663a0b"
+        }
+      ],
+      "notRetained": []
+    },
+    {
       "id": "local.hardware_changes.gsd.20261101",
       "status": "passed",
       "profile": {
@@ -28368,6 +28535,23 @@
         {
           "path": "evidence/local.hardware_changes.refusals.20261102.json",
           "sha256": "e404d4fe45073c2683357f8c69da694ddd4049ce9e1cec1d6883f95c2a3c7809"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.hardware_changes.refusals.rerun.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0; ET 200SP IM 155-6 PN ST 6ES7 155-6AU02-0BN0; I-device GSD TiaMcpIDevice (GSDML V2.45)",
+        "firmware": "V4.1; V6.4; V4.1"
+      },
+      "sourceCommit": "90b97821115b1b30cee40be7371174839b233537",
+      "retained": [
+        {
+          "path": "evidence/local.hardware_changes.refusals.rerun.20261107.json",
+          "sha256": "87a2de3d398d4e4095155af59ad3c4386f38db6d093e42834c5a11deed51838d"
         }
       ],
       "notRetained": []
@@ -28417,6 +28601,23 @@
         {
           "path": "evidence/local.hardware_changes.topology_restores.20261101.json",
           "sha256": "f7a94b5ac609c579f9e33ecd4eeeea485831f1f539165f8f5859876fc73726f8"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.hardware_changes.topology_restores.rerun.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0; ET 200MP IM 155-5 PN ST 6ES7 155-5AA01-0AB0; ET 200SP IM 155-6 PN ST 6ES7 155-6AU02-0BN0",
+        "firmware": "V4.1; V4.1; V6.4"
+      },
+      "sourceCommit": "90b97821115b1b30cee40be7371174839b233537",
+      "retained": [
+        {
+          "path": "evidence/local.hardware_changes.topology_restores.rerun.20261107.json",
+          "sha256": "2c47a8d0aaff8ce1d457cb02c5be62430ee699620507e59c9c28c56f6a61ccf7"
         }
       ],
       "notRetained": []
