@@ -143,8 +143,9 @@ so a foreign or released instance is refused before any API call.
    real-server runner on the owned TCP/IP instance; record each method PLCSIM does not list as
    a B05 row. The state-changing methods (`Plc.CreateBackup`, `Alarms.Acknowledge`, setters)
    follow later behind the write gate, each with its own D16 contract.
-5. **Row 4, further cycle-control modes.** SingleStep_C/P/CP/CT/CPT selection is implemented
-   with offline checks. Time-synchronised variants remain implementation work. Qualify with a step
+5. **Row 4, further cycle-control modes.** SingleStep_C/P/CP/CT/CPT selection is implemented and ran natively on
+   7 November (`local.plcsim.capture-modes.20261107`): C, CP, CT and CPT captured fully, P stalled after one sync point on an OB1-only
+   fixture, and every capture restored the operating mode. Time-synchronised variants remain implementation work. Qualify with a step
    count per mode on the owned instance and the previous mode restored on stop, failure and Host
    loss.
 6. **Row 25, safety compile workflow.** A second hook in the Add-In companion that hands the
