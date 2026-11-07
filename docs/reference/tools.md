@@ -104,7 +104,7 @@ option registers or admits the tool only on a qualification Host.
 | --- | --- | --- | --- | --- | --- |
 | `drive_inventory` | Read a joined drive, telegram, tag and technology-object inventory | limited | reviews |  |  |
 | `drive_observe` | Read offline SINAMICS drive objects, parameters and telegrams | limited | reviews |  |  |
-| `servo_call_plan` | Plan coordinated servo wrapper calls per drive | unqualified | reviews |  |  |
+| `servo_call_plan` | Plan coordinated servo wrapper calls per drive | limited | reviews |  |  |
 
 ## engineering
 
