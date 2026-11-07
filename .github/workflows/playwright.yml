@@ -10,7 +10,8 @@ permissions:
   contents: read
 concurrency:
   group: explorer-${{ github.ref }}
-  cancel-in-progress: true
+  # Only superseded PR pushes are cancelled; every main push finishes with a verdict.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   explorer:
     timeout-minutes: 20

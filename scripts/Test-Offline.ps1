@@ -213,78 +213,103 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'Managed suites could not be added to the build solution.' }
         dotnet build $solution --configuration $Configuration --artifacts-path $buildOutput
         if ($LASTEXITCODE -ne 0) { throw 'Managed suite build failed.' }
-        foreach ($managedSuite in $suites) {
+        # Suites are separate processes with their own output folders and GUID temp paths, so they run side by
+        # side (longest first) with output kept per suite; logs replay in suite order and every exit code is checked.
+        # ProjectModel runs alone first: it sets TIA_RELATIONSHIP_EVIDENCE process-wide, which TiaMcp.Tests also reads.
+        $suiteLogs = Join-Path $output 'managed-suite-logs'
+        New-Item -ItemType Directory -Path $suiteLogs -Force | Out-Null
+        $suiteRuns = @()
+        foreach ($batch in @(@($suites | Where-Object { $_ -eq 'TiaMcp.ProjectModel.Tests' }), @($suites | Where-Object { $_ -ne 'TiaMcp.ProjectModel.Tests' }))) {
+            if (-not $batch.Count) { continue }
+            $suiteRuns += @($batch | Sort-Object @{Expression={ if ($ManagedSuiteSeconds.ContainsKey($_)) { [double]$ManagedSuiteSeconds[$_] } else { 60.0 } }; Descending=$true} |
+                ForEach-Object -ThrottleLimit ([Environment]::ProcessorCount) -Parallel {
+            $managedSuite = $_
+            $Configuration = $using:Configuration; $buildOutput = $using:buildOutput; $output = $using:output
+            Set-Variable gitExecutable $using:gitExecutable # Not an assignment: the runner's one Git selection stays above.
+            Set-Location -LiteralPath $using:repoRoot
+            $suiteLog = Join-Path $using:suiteLogs "$managedSuite.log"
+            $global:LASTEXITCODE = $null # Runspaces are reused; a suite that never starts must not inherit a pass.
             $suiteClock = [Diagnostics.Stopwatch]::StartNew()
-            if ($managedSuite -eq 'TiaMcp.PhysicalRuntime.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'physical-runtime-results.json')
-            } elseif ($managedSuite -eq 'TiaMcp.OpcUa.Runtime.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- --output (Join-Path $output 'opcua-runtime')
-            } elseif ($managedSuite -eq 'TiaMcp.Deployment.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'project-index-store-tests.json')
-            } elseif ($managedSuite -eq 'TiaMcp.Diagnostics.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'diagnostic-samples.json')
-            } elseif ($managedSuite -eq 'TiaMcp.Credentials.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'credentials')
-            } elseif ($managedSuite -eq 'TiaMcp.Engineering.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- --external-output (Join-Path $output 'external-resources')
-            } elseif ($managedSuite -eq 'TiaMcp.WebApplications.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'web-applications')
-            } elseif ($managedSuite -eq 'TiaMcp.PublicCertificates.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'public-certificates')
-            } elseif ($managedSuite -eq 'TiaMcp.Access.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'access')
-            } elseif ($managedSuite -eq 'TiaMcp.DriveProfiles.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'drive-profiles')
-            } elseif ($managedSuite -eq 'TiaMcp.TechnologyProfiles.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'technology-profiles')
-            } elseif ($managedSuite -eq 'TiaMcp.SafetyEvidence.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'safety-evidence')
-            } elseif ($managedSuite -eq 'TiaMcp.DbSnapshots.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'db-snapshots')
-            } elseif ($managedSuite -eq 'TiaMcp.Connections.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'connections')
-            } elseif ($managedSuite -eq 'TiaMcp.CompositeEngineering.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'composite-engineering')
-            } elseif ($managedSuite -eq 'TiaMcp.HmiComponents.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'hmi-components')
-            } elseif ($managedSuite -eq 'TiaMcp.SoftwareUnits.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'software-units')
-            } elseif ($managedSuite -eq 'TiaMcp.AutomationMl.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'automationml-workflow')
-            } elseif ($managedSuite -eq 'TiaMcp.Graph.Workflow.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'graph-workflow')
-            } elseif ($managedSuite -eq 'TiaMcp.TranslationHost.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'translation-host')
-            } elseif ($managedSuite -eq 'TiaMcp.TranslationImport.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'translation-import')
-            } elseif ($managedSuite -eq 'TiaMcp.HmiRepairAdmission.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'hmi-admission')
-            } elseif ($managedSuite -eq 'TiaMcp.TestSuite.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'testsuite')
-            } elseif ($managedSuite -eq 'TiaMcp.VersionControl.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- --git-executable $gitExecutable --git-fixtures (Join-Path $output 'git')
-            } elseif ($managedSuite -eq 'TiaMcp.VersionControl.Workflow.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- $gitExecutable (Join-Path $output 'vci-workflow')
-            } elseif ($managedSuite -eq 'TiaMcp.EncoderEvidence.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'encoder-checkpoint')
-            } elseif ($managedSuite -eq 'TiaMcp.OpcUa.Dependencies.Tests') {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $buildOutput "bin/TiaMcp.OpcUa.Cli/$($Configuration.ToLowerInvariant())/TiaMcp.OpcUa.Cli.dll")
-            } elseif ($managedSuite -eq 'TiaMcp.Tests') {
-                # Transcripts can omit redirected native stdout; retain the fixture inventory explicitly.
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput 2>&1 |
-                    Tee-Object -FilePath (Join-Path $output 'general-managed.log')
-            } elseif ($managedSuite -eq 'TiaMcp.ProjectModel.Tests') {
-                $previousRelationshipEvidence = $env:TIA_RELATIONSHIP_EVIDENCE
-                try {
-                    $env:TIA_RELATIONSHIP_EVIDENCE = Join-Path $output 'relationship-scope'
+            & {
+                if ($managedSuite -eq 'TiaMcp.PhysicalRuntime.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'physical-runtime-results.json')
+                } elseif ($managedSuite -eq 'TiaMcp.OpcUa.Runtime.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- --output (Join-Path $output 'opcua-runtime')
+                } elseif ($managedSuite -eq 'TiaMcp.Deployment.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'project-index-store-tests.json')
+                } elseif ($managedSuite -eq 'TiaMcp.Diagnostics.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'diagnostic-samples.json')
+                } elseif ($managedSuite -eq 'TiaMcp.Credentials.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'credentials')
+                } elseif ($managedSuite -eq 'TiaMcp.Engineering.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- --external-output (Join-Path $output 'external-resources')
+                } elseif ($managedSuite -eq 'TiaMcp.WebApplications.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'web-applications')
+                } elseif ($managedSuite -eq 'TiaMcp.PublicCertificates.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'public-certificates')
+                } elseif ($managedSuite -eq 'TiaMcp.Access.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'access')
+                } elseif ($managedSuite -eq 'TiaMcp.DriveProfiles.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'drive-profiles')
+                } elseif ($managedSuite -eq 'TiaMcp.TechnologyProfiles.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'technology-profiles')
+                } elseif ($managedSuite -eq 'TiaMcp.SafetyEvidence.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'safety-evidence')
+                } elseif ($managedSuite -eq 'TiaMcp.DbSnapshots.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'db-snapshots')
+                } elseif ($managedSuite -eq 'TiaMcp.Connections.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'connections')
+                } elseif ($managedSuite -eq 'TiaMcp.CompositeEngineering.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'composite-engineering')
+                } elseif ($managedSuite -eq 'TiaMcp.HmiComponents.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'hmi-components')
+                } elseif ($managedSuite -eq 'TiaMcp.SoftwareUnits.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'software-units')
+                } elseif ($managedSuite -eq 'TiaMcp.AutomationMl.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'automationml-workflow')
+                } elseif ($managedSuite -eq 'TiaMcp.Graph.Workflow.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'graph-workflow')
+                } elseif ($managedSuite -eq 'TiaMcp.TranslationHost.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'translation-host')
+                } elseif ($managedSuite -eq 'TiaMcp.TranslationImport.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'translation-import')
+                } elseif ($managedSuite -eq 'TiaMcp.HmiRepairAdmission.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'hmi-admission')
+                } elseif ($managedSuite -eq 'TiaMcp.TestSuite.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'testsuite')
+                } elseif ($managedSuite -eq 'TiaMcp.VersionControl.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- --git-executable $gitExecutable --git-fixtures (Join-Path $output 'git')
+                } elseif ($managedSuite -eq 'TiaMcp.VersionControl.Workflow.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- $gitExecutable (Join-Path $output 'vci-workflow')
+                } elseif ($managedSuite -eq 'TiaMcp.EncoderEvidence.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'encoder-checkpoint')
+                } elseif ($managedSuite -eq 'TiaMcp.OpcUa.Dependencies.Tests') {
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $buildOutput "bin/TiaMcp.OpcUa.Cli/$($Configuration.ToLowerInvariant())/TiaMcp.OpcUa.Cli.dll")
+                } elseif ($managedSuite -eq 'TiaMcp.Tests') {
+                    # Transcripts can omit redirected native stdout; retain the fixture inventory explicitly.
+                    dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput 2>&1 |
+                        Tee-Object -FilePath (Join-Path $output 'general-managed.log')
+                } elseif ($managedSuite -eq 'TiaMcp.ProjectModel.Tests') {
+                    $previousRelationshipEvidence = $env:TIA_RELATIONSHIP_EVIDENCE
+                    try {
+                        $env:TIA_RELATIONSHIP_EVIDENCE = Join-Path $output 'relationship-scope'
+                        dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput
+                    } finally { $env:TIA_RELATIONSHIP_EVIDENCE = $previousRelationshipEvidence }
+                } else {
                     dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput
-                } finally { $env:TIA_RELATIONSHIP_EVIDENCE = $previousRelationshipEvidence }
-            } else {
-                dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput
-            }
+                }
+            } *> $suiteLog
+            [pscustomobject]@{suite=$managedSuite; exitCode=$global:LASTEXITCODE; seconds=[math]::Round($suiteClock.Elapsed.TotalSeconds, 1); log=$suiteLog}
+            })
+        }
+        foreach ($managedSuite in $suites) {
+            $run = @($suiteRuns | Where-Object { $_.suite -eq $managedSuite })
+            if ($run.Count -ne 1) { throw "Managed suite did not report exactly once: $managedSuite" }
+            Get-Content -LiteralPath $run[0].log
+            $LASTEXITCODE = $run[0].exitCode
             if ($LASTEXITCODE -ne 0) { throw "Managed offline tests failed: $managedSuite" }
             $result.managedSuites += $managedSuite
-            $result.managedSuiteSeconds[$managedSuite] = [math]::Round($suiteClock.Elapsed.TotalSeconds, 1)
+            $result.managedSuiteSeconds[$managedSuite] = $run[0].seconds
         }
         Invoke-CheckGroup 0 {
             if ($Suite -in @('All','Managed')) {
