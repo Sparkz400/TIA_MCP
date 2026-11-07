@@ -27210,6 +27210,49 @@
       ]
     },
     {
+      "featureId": "servo_call_plan",
+      "domain": "drives",
+      "title": "Plan coordinated servo wrapper calls per drive",
+      "mcpTools": [
+        "servo_call_plan"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Host composition of drive_inventory, block_read (wrapper interface) and symbol_trace (control-tag writers); the plan is applied through source_upsert."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Generates one new or replaced SCL caller FB; existing networks in other blocks are untouched. An existing writer of a selected control tag other than the caller blocks the plan instead of being rewritten.",
+          "Wrapper parameters are matched by the explicit mapping and the wrapper's native interface section and type; reset and SS1 are single SCL expressions applied as given.",
+          "Watch tables and instance DBs outside the caller are not planned."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SINAMICS Startdrive V21 Openness and a project with Startdrive drive devices; probe with target_capabilities on the drive hardware item."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "SINAMICS Startdrive V21 installed with its Openness assembly",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.plc_alarm_text_list_import",
       "domain": "engineering",
       "title": "Import PLC alarm user text lists from a supplied XLSX",

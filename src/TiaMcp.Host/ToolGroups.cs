@@ -24,7 +24,7 @@ public static class ToolGroups
         ("diagnostic_", "diagnostics"), ("trace_", "diagnostics"),
         ("testsuite_", "testsuite"), ("translation_", "translation"), ("opcua_", "opcua"), ("vci_", "vci"),
         ("automationml_", "cax"), ("cax_", "cax"), ("graph_", "graph"),
-        ("access_", "reviews"), ("addin_", "reviews"), ("composite_", "reviews"), ("connection_", "reviews"), ("drive_", "reviews"),
+        ("access_", "reviews"), ("addin_", "reviews"), ("composite_", "reviews"), ("connection_", "reviews"), ("drive_", "reviews"), ("servo_", "reviews"),
         ("multiuser_", "reviews"), ("public_certificate_", "reviews"), ("certificate_", "reviews"), ("safety_", "reviews"),
         ("software_unit_", "reviews"), ("technology_profile_", "reviews"), ("teamcenter_", "reviews"), ("web_", "reviews"),
     ];
