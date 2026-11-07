@@ -96,8 +96,8 @@ creating a project (`profiles` remained empty). The operator requested offline
 continuation because they could not access the prompt. The owned Portal startup
 was terminated after verifying its executable and parent process; the helper
 exited. This is an aborted prerequisite attempt, not a native qualification run.
-Local startup evidence is retained at `D:/h206s1/native-report.json` and
-`D:/h206s1/offline-continuation.json`.
+Local startup evidence is retained at `artifacts/h206/h206s1/native-report.json` and
+`artifacts/h206/h206s1/offline-continuation.json`.
 
 The offline handoff still required an operator-admitted owned fixture, native batch
 success and later-member failure, verified reverse-order restoration, lost-response
@@ -138,7 +138,7 @@ The terminal change journal and admission count remain unchanged. Independent
 exports match both candidates. The owner then closes normally; a fresh TIA
 process opens the saved project read-write on the first attempt and verifies it.
 
-The intermediate timing harness attempt at `D:/h206b2` stopped before its first
+The intermediate timing harness attempt at `artifacts/h206/h206b2` (report only) stopped before its first
 single-screen write because it supplied an empty `additionalScreens` array.
 The API correctly refused that malformed request. The runner now omits the field
 for single-screen requests, with a file-only regression. Failed-run evidence and
@@ -149,7 +149,7 @@ scripts, download equipment, verify visual appearance, cover every component or
 eight-screen batch, or establish shared-resource/other-HMI preservation.
 Catalog qualification and 1.0 release acceptance are not promoted by this record.
 
-The final run at `D:/h206b4/report.json` passed all ten named checks. Both owned
+The final run at `artifacts/h206/h206b4/report.json` passed all ten named checks. Both owned
 TIA lifetimes closed normally, as did the fresh attached reconciler. The
 deliberately terminated attached Host and its worker exited with code 1 after
 transport loss; those exits are interruption evidence, not normal cleanup.
