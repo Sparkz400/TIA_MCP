@@ -279,9 +279,14 @@ class Run:
 
     def restore(self, label, kind, prepared):
         recovered = self.h.stage("restore " + label, lambda: self.h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}))
-        require(recovered["state"] == "restored" and "checkpoint_retrieved_to_new_directory" in recovered["stages"], "Checkpoint recovery of %s was not verified" % label)
         path = recovered["recoveredProject"]["path"]
-        require(Path(path).resolve() != Path(self.project).resolve(), "Recovery reused the changed project's directory")
+        if kind == "tag_table_import_xml":
+            # Since #218 a tag-table import is restored in place from its retained table exports, never by replacing the project.
+            require(recovered["state"] == "restored" and "scoped_restore_saved" in recovered["stages"], "Scoped restore of %s was not verified" % label)
+            require(Path(path).resolve() == Path(self.project).resolve(), "A scoped restore moved the project")
+        else:
+            require(recovered["state"] == "restored" and "checkpoint_retrieved_to_new_directory" in recovered["stages"], "Checkpoint recovery of %s was not verified" % label)
+            require(Path(path).resolve() != Path(self.project).resolve(), "Recovery reused the changed project's directory")
         self.project = path
         self.current = self.snap("restored " + label)
         def equal():
