@@ -417,9 +417,11 @@ namespace TiaMcp.Openness.V21
             if (operation == "insert" ? targets.Length != 0 : targets.Length != 1)
                 throw new BridgeException("AmbiguousTarget", operation == "insert" ? "insert requires that the drive object has no " + typeName + "." : operation + " requires exactly one " + typeName + " on the drive object.");
             if (operation == "change" && targets[0].TelegramNumber == number) throw new BridgeException("InvalidRequest", "telegramNumber equals the current number; nothing would change.");
-            if (resize && targets[0].GetSize(direction) == size) throw new BridgeException("InvalidRequest", "size equals the channel's current size; nothing would change.");
+            if (resize && targets[0].GetSizeInBytes(direction) == 2 * size) throw new BridgeException("InvalidRequest", "size equals the channel's current size; nothing would change.");
             // The other channel and the telegram number must stay as they are.
-            int otherSize = resize ? targets[0].GetSize(direction == AddressIoType.Input ? AddressIoType.Output : AddressIoType.Input) : 0, resizedNumber = resize ? targets[0].TelegramNumber : 0;
+            // Sizes are PROFIdrive words: a main telegram resized to 4 reads back 8 bytes (7 November), while GetSize of an inserted
+            // additional telegram did not equal its requested size, so readback compares bytes.
+            int otherBytes = resize ? targets[0].GetSizeInBytes(direction == AddressIoType.Input ? AddressIoType.Output : AddressIoType.Input) : 0, resizedNumber = resize ? targets[0].TelegramNumber : 0;
             bool possible = operation == "erase" || (operation == "change" ? targets[0].CanChangeTelegram(number) : resize ? targets[0].CanChangeSize(direction, size, keep)
                 : sized ? composition.CanInsertAdditionalTelegram(inputSize, outputSize) : type == TelegramType.TorqueTelegram ? composition.CanInsertTorqueTelegram(number)
                 : composition.CanInsertSupplementaryTelegram(number));
@@ -445,9 +447,12 @@ namespace TiaMcp.Openness.V21
             change.Readbacks.Add(new JObject { ["role"] = "drive-telegram-readback", ["telegrams"] = readback });
             var found = composition.Where(telegram => telegram.Type == type).ToArray();
             Func<JArray, string> others = rows => string.Join("|", rows.Where(row => row.Value<string>("type") != typeName).Select(row => row.Value<string>("type") + ":" + row["number"]).OrderBy(text => text, StringComparer.Ordinal));
+            if (found.Length == 1 && (resize || sized))
+                readback["nativeSizes"] = new JObject { ["input"] = found[0].GetSize(AddressIoType.Input), ["output"] = found[0].GetSize(AddressIoType.Output),
+                    ["inputBytes"] = found[0].GetSizeInBytes(AddressIoType.Input), ["outputBytes"] = found[0].GetSizeInBytes(AddressIoType.Output) };
             bool applied = operation == "erase" ? found.Length == 0 : found.Length == 1
-                && (resize ? found[0].GetSize(direction) == size && found[0].GetSize(direction == AddressIoType.Input ? AddressIoType.Output : AddressIoType.Input) == otherSize && found[0].TelegramNumber == resizedNumber
-                    : sized ? found[0].GetSize(AddressIoType.Input) == inputSize && found[0].GetSize(AddressIoType.Output) == outputSize : found[0].TelegramNumber == number);
+                && (resize ? found[0].GetSizeInBytes(direction) == 2 * size && found[0].GetSizeInBytes(direction == AddressIoType.Input ? AddressIoType.Output : AddressIoType.Input) == otherBytes && found[0].TelegramNumber == resizedNumber
+                    : sized ? found[0].GetSizeInBytes(AddressIoType.Input) == 2 * inputSize && found[0].GetSizeInBytes(AddressIoType.Output) == 2 * outputSize : found[0].TelegramNumber == number);
             // keepOriginalAddress: the resized telegram's address ranges keep their start bytes.
             if (applied && resize && keep)
             {
