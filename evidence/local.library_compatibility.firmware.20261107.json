@@ -1,0 +1,123 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_compatibility.firmware.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T15:57:04+00:00",
+  "source": {
+    "commit": "6d81af7cb6b7a7513f783b830356ed8892f75ee0",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_compatibility.py, 56/56 steps, owned TIA V21 scratch projects: Bool-only, LInt/LWord/LTime and WString FB types authored and released 1.0.0 on a CPU 1511-1 PN V4.1 and instantiated into an added CPU 1214C DC/DC/DC V4.7 and an added CPU 1511-1 PN V1.0 (6ES7 511-1AK00-0AB0, oldest catalog firmware). On V1.0 the Bool-only and 64-bit types apply and compile with 0 errors; the WString type is checkpointed and instantiated, then fails compilation (CompileFailed, 3 errors: Data type WString is unknown), completes no save, and a fresh reopen equals the saved inventory before the attempt. The S7-1200 and V13, unsaved-edit and uncompiled-type cases repeat local.library_compatibility.rerun.20261028.",
+  "limitations": [
+    "Firmware is varied only within CPU 1511-1 PN (V4.1 to V1.0) and only for data types; firmware-gated instructions and other CPU types are not exercised.",
+    "A firmware mismatch is not refused at preparation; the mandatory compile catches it after the checkpoint.",
+    "The broken-generation type case of 27 October is no longer run: since 2 November a failed apply leaves the project recovery_required and blocks every later change.",
+    "No runtime execution."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "0a6ae76e93fec4847e9d43af0a720b9d68281436e87d490f6498a25ad94f4925"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "68119e018daa2d96f375f510796eef24c4c361f6ffe6ae059fa69c6416c43e2f"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "be08d3d0c4690f90517cc02b17cfa865fb08b01316ceffb8be8bf2d75f3f3018",
+      "bytes": 625936,
+      "completed": true,
+      "steps": [
+        "start owned TIA authoring",
+        "create owned scratch authoring",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_create",
+        "apply library_create",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_archive",
+        "apply library_archive",
+        "close authoring session",
+        "start owned TIA consumer",
+        "create owned scratch consumer",
+        "prepare hardware_add",
+        "apply hardware_add",
+        "prepare hardware_add",
+        "apply hardware_add",
+        "refuse a native V13 library upgrade",
+        "create a consistent unsaved edit",
+        "open staged archive",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "generate a PLC data type without compiling it",
+        "refuse instantiate with an inherited inconsistent PLC data type",
+        "close consumer session (discards the uncompiled type change)",
+        "start owned TIA after unsaved edit",
+        "reopen consumer after unsaved edit",
+        "reopened: unsaved edit and instance persisted, uncompiled type absent",
+        "open staged archive",
+        "instantiate control type into the S7-1200",
+        "open staged archive",
+        "instantiate wide type into the S7-1200",
+        "discard the failed wide change",
+        "start owned TIA after the wide target failure",
+        "reopen consumer after the wide target failure",
+        "reopened wide target project is unchanged",
+        "open staged archive",
+        "instantiate control type into the oldest-firmware CPU 1511-1 PN",
+        "open staged archive",
+        "instantiate wide type into the oldest-firmware CPU 1511-1 PN",
+        "open staged archive",
+        "instantiate text type into the oldest-firmware CPU 1511-1 PN",
+        "discard the failed text change",
+        "start owned TIA after the text target failure",
+        "reopen consumer after the text target failure",
+        "reopened text target project is unchanged"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "hardware_catalog_search",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_query",
+        "project_inventory",
+        "project_open",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare",
+        "project_open"
+      ]
+    }
+  ]
+}

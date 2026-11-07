@@ -4,7 +4,7 @@ import tempfile
 import unittest
 
 from library_native_harness import Harness
-from qualify_library_compatibility import BROKEN_TYPE_SOURCE, UNSAVED_SOURCE, instantiate_case, tree_hash
+from qualify_library_compatibility import UNSAVED_SOURCE, add_oldest_firmware_cpu, instantiate_case, tree_hash
 
 PREPARED = {"structuredContent": {"changeId": "lib-1", "previewHash": "x"}}
 
@@ -63,6 +63,25 @@ class InstantiateCaseTests(unittest.TestCase):
             instantiate_case(harness(FakeClient(PREPARED, error("NativeLibraryError", details)), []), {}, {})
 
 
+class OldestFirmwareTests(unittest.TestCase):
+    def catalog(self, *versions):
+        entries = [{"typeName": "CPU 1511-1 PN", "version": v, "typeIdentifier": "OrderNumber:6ES7 511-1AK0x-0AB0/" + v} for v in versions]
+        entries.append({"typeName": "CPU 1511-1 PN/DP", "version": "V1.0", "typeIdentifier": "other"})
+        h = harness(None, [])
+        h.tool = lambda name, arguments: {"entries": entries}
+        return h
+
+    def test_picks_the_oldest_firmware_of_the_exact_type(self):
+        h = self.catalog("V4.1", "V2.0", "V2.10")
+        payload = add_oldest_firmware_cpu(h, "CPU 1511-1 PN")
+        self.assertTrue(payload["typeIdentifier"].endswith("/V2.0"))
+        self.assertFalse(payload["configureScratchSecurity"])
+        self.assertEqual(h.report["addedCpus"][0]["version"], "V2.0")
+
+    def test_security_only_from_firmware_3_1(self):
+        self.assertTrue(add_oldest_firmware_cpu(self.catalog("V3.1", "V4.1"), "CPU 1511-1 PN")["configureScratchSecurity"])
+
+
 class FixtureTests(unittest.TestCase):
     def test_tree_hash_covers_names_and_bytes(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -76,7 +95,6 @@ class FixtureTests(unittest.TestCase):
 
     def test_sources_declare_exactly_one_object(self):
         self.assertEqual(UNSAVED_SOURCE.count('FUNCTION "'), 1)
-        self.assertIn('"TiaMcpMissingType"', BROKEN_TYPE_SOURCE)
 
 
 if __name__ == "__main__":

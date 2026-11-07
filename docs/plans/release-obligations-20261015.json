@@ -523,7 +523,7 @@
       "qualification": "native_scoped_upgrades_vendor_scale_open",
       "releaseAccepted": false,
       "currentResult": "2 November 2026 current matrix (catalog 0.4.121): 2 rows; 3 bound, 3 open, 0 blocked, 0 deferred. Current remainingWork/nextAction govern; the dated observations below retain their historical scope.\n28 October 2026 (catalog 0.4.68): 2 release-matrix rows (1 shipped, 1 unqualified); 3 cells bound and 3 open.",
-      "remainingWork": "One V20 LGF upgrade and V14 SP1–V18 reruns passed on 2 November; seven vendor ZIPs were recovered and intake reran. Firmware-target mismatches, real vendor workload performance and deployment.vm_qualification remain. The originating workstation retains the ignored artifacts; they are absent from this checkout.",
+      "remainingWork": "One V20 LGF upgrade and V14 SP1–V18 reruns passed on 2 November; seven vendor ZIPs were recovered and intake reran. Firmware-target mismatches passed on 7 November (local.library_compatibility.firmware.20261107). Real vendor workload performance and deployment.vm_qualification remain. The originating workstation retains the ignored artifacts; they are absent from this checkout.",
       "nextAction": "Obtain the existing receipts and inputs; qualify remaining compatibility/scale cases and the VMware guest without repeating completed intake.",
       "ownerRole": "Qualification and libraries",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
@@ -2361,7 +2361,7 @@
     {
       "id": "B08",
       "title": "Vendor compatibility and scale assets",
-      "current": "Seven PAL/DMC vendor ZIPs were recovered and intake reran on 2 November; one V20 LGF library and the V14 SP1–V18 upgrade corpus passed. Firmware-target mismatches, full vendor dependency/protection compatibility and real vendor workload performance remain. Original missing reports are not recreated by these reruns.",
+      "current": "Seven PAL/DMC vendor ZIPs were recovered and intake reran on 2 November; one V20 LGF library and the V14 SP1–V18 upgrade corpus passed. Firmware-target mismatches passed on 7 November (local.library_compatibility.firmware.20261107, data types only). Full vendor dependency/protection compatibility and real vendor workload performance remain. Original missing reports are not recreated by these reruns.",
       "resolution": "Supply permitted packages with provenance and exact profiles; construct and measure required large workloads.",
       "releaseBlocking": true
     },

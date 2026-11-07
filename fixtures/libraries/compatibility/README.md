@@ -5,5 +5,9 @@ type on the scratch CPU 1511-1 PN and then instantiated into an added S7-1200 CP
 library type whose content the target CPU family may not support. The plain `TiaMcpLibraryGate` type from
 `../type-lifecycle` is the control: it uses only `Bool`.
 
+`TiaMcpTextGate.scl` is an original FB with a `WString` output. The three types are also instantiated into an added
+CPU 1511-1 PN at its oldest catalog firmware, to observe how V21 handles a library type authored on firmware V4.1 in
+the same CPU type with older firmware.
+
 Run `scripts/qualify_library_compatibility.py --run-native` with exact `--host` and `--worker` paths and a short
 `--artifacts` directory. It uses only owned headless TIA sessions and scratch projects.
