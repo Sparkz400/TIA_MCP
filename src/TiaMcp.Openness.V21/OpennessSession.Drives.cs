@@ -419,8 +419,8 @@ namespace TiaMcp.Openness.V21
             if (operation == "change" && targets[0].TelegramNumber == number) throw new BridgeException("InvalidRequest", "telegramNumber equals the current number; nothing would change.");
             if (resize && targets[0].GetSizeInBytes(direction) == 2 * size) throw new BridgeException("InvalidRequest", "size equals the channel's current size; nothing would change.");
             // The other channel and the telegram number must stay as they are.
-            // Sizes are PROFIdrive words: a main telegram resized to 4 reads back 8 bytes (7 November), while GetSize of an inserted
-            // additional telegram did not equal its requested size, so readback compares bytes.
+            // Sizes are PROFIdrive words (a main telegram resized to 4 reads back 8 bytes, 7 November); readback compares bytes, and
+            // retains the native GetSize values beside them.
             int otherBytes = resize ? targets[0].GetSizeInBytes(direction == AddressIoType.Input ? AddressIoType.Output : AddressIoType.Input) : 0, resizedNumber = resize ? targets[0].TelegramNumber : 0;
             bool possible = operation == "erase" || (operation == "change" ? targets[0].CanChangeTelegram(number) : resize ? targets[0].CanChangeSize(direction, size, keep)
                 : sized ? composition.CanInsertAdditionalTelegram(inputSize, outputSize) : type == TelegramType.TorqueTelegram ? composition.CanInsertTorqueTelegram(number)
@@ -445,7 +445,8 @@ namespace TiaMcp.Openness.V21
             conflicts = DriveAddressConflicts(project, driveObject, driveId);
             var readback = new JObject { ["before"] = before, ["after"] = after, ["addressShift"] = DriveAddressShift(before, after), ["conflicts"] = conflicts };
             change.Readbacks.Add(new JObject { ["role"] = "drive-telegram-readback", ["telegrams"] = readback });
-            var found = composition.Where(telegram => telegram.Type == type).ToArray();
+            // A fresh read: the composition taken before an insert does not list the new telegram (native run of 7 November).
+            var found = driveObject.Telegrams.Where(telegram => telegram.Type == type).ToArray();
             Func<JArray, string> others = rows => string.Join("|", rows.Where(row => row.Value<string>("type") != typeName).Select(row => row.Value<string>("type") + ":" + row["number"]).OrderBy(text => text, StringComparer.Ordinal));
             if (found.Length == 1 && (resize || sized))
                 readback["nativeSizes"] = new JObject { ["input"] = found[0].GetSize(AddressIoType.Input), ["output"] = found[0].GetSize(AddressIoType.Output),
