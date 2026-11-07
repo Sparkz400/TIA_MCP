@@ -80,7 +80,7 @@ namespace TiaMcp.Openness.V21
         {
             if (change.State != "applied" && change.State != "recovery_required") throw new BridgeException("InvalidChangeState", "This change has no applied state to recover.");
             if (ChangeText(args, "previewHash", 64) != change.PreviewHash) throw new BridgeException("PreviewMismatch", "Wrong previewHash.");
-            if (!change.Stages.Contains("mutation_applied"))
+            if (!change.Stages.Any(s => (string)s == "mutation_applied"))
                 throw new BridgeException("ScopedRecoveryRequired", "The import is not recorded as applied, so no scoped state can be proven to restore. Use the retained archive for explicit manual recovery; nothing was changed.", ChangeView(change));
             var project = ProjectForChange(change);
             EnsureProjectOffline(project);
