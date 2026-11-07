@@ -223,15 +223,17 @@ namespace TiaMcp.Openness.V21
                             if (after.Path != compileOnlyPlc.Path || !Equals(after.Software, compileOnlyPlc.Software))
                                 throw new BridgeException("CompileScopeChanged", "The selected PLC changed during compilation.");
                         }
+                        // Set before the verdict so a failed outcome still reports the compiler result apart from the change state.
+                        if (change.Compilation != null && (IsCompileOnlyKind(change.Kind) || change.Kind == TagTableImportRules.Kind))
+                            change.Compilation["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(change.Compilation);
                         // A text-list import or an admitted HMI kind must leave the compiler problems as the compile before the write found them.
                         if (change.Kind == "hmi_classic_screen_edit" ? !ClassicScreenCompileRules.NoNewProblems(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
                             : change.Kind == "hmi_text_list_import" || HmiEngineeringRules.IsAdmittedKind(change.Kind) ? !HmiTextListImportRules.CompileProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
                             : change.Kind == TagTableImportRules.Kind ? !TagTableImportRules.NoNewCompileProblems((JObject)change.TagTableEvidence["baselineCompile"], change.Compilation)
                             : IsCompileOnlyKind(change.Kind) ? !CompilationEvidenceRules.IsCompleted(change.Compilation) : !CompilationEvidenceRules.IsSuccessful(change.Compilation))
                             throw new BridgeException(change.Compilation?.Value<int?>("errorCount") == 0 ? "CompileDiagnosticRegression" : "CompileFailed",
-                                "The change failed compiler verification: errors, new/changed warnings, or incomplete diagnostics. Verified screen rollback is attempted; inspect the retained outcome.");
-                        if (IsCompileOnlyKind(change.Kind)) change.Compilation["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(change.Compilation);
-                        if (change.Kind == TagTableImportRules.Kind) change.Compilation["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(change.Compilation);
+                                "The change failed compiler verification: errors, new/changed warnings, or incomplete diagnostics. "
+                                + (change.Kind == "hmi_classic_screen_edit" ? "Verified screen rollback is attempted; inspect the retained outcome." : "Inspect the retained outcome."));
                     }
                     if (IsHmiChangeKind(change.Kind)) VerifyHmiEngineeringPreservation(change, project);
                     if (change.Kind == "software_unit_create_from") RequireUnrenamedUnitMembers(change);
