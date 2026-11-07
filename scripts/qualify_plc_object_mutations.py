@@ -54,7 +54,7 @@ LIMITATIONS = [
     "Renamed and deleted groups were empty or held only a subgroup; groups holding blocks, types or tables are not renamed or moved.",
     "Not covered here: " + ", ".join(sorted(EXCLUDED)) + ".",
     "Engineering only; runtime behavior is not observed.",
-    "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (FingerprintUnavailable) by design and the retained checkpoint is the recovery input.",
+    "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (ScopedRecoveryRequired since #221, the block being covered by metadata only) by design and the retained checkpoint is the recovery input.",
     "The apply-side unresolved-change guard is reached only when a change prepared before the failure still matches its "
     "fingerprint; the failed apply changed the project, so that change is refused first by the fingerprint check "
     "(StaleRevision, or FingerprintUnavailable on the inconsistent block), also before the checkpoint.",
@@ -279,9 +279,14 @@ class Run:
 
     def restore(self, label, kind, prepared):
         recovered = self.h.stage("restore " + label, lambda: self.h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}))
-        require(recovered["state"] == "restored" and "checkpoint_retrieved_to_new_directory" in recovered["stages"], "Checkpoint recovery of %s was not verified" % label)
         path = recovered["recoveredProject"]["path"]
-        require(Path(path).resolve() != Path(self.project).resolve(), "Recovery reused the changed project's directory")
+        if kind == "tag_table_import_xml":
+            # Since #218 a tag-table import is restored in place from its retained table exports, never by replacing the project.
+            require(recovered["state"] == "restored" and "scoped_restore_saved" in recovered["stages"], "Scoped restore of %s was not verified" % label)
+            require(Path(path).resolve() == Path(self.project).resolve(), "A scoped restore moved the project")
+        else:
+            require(recovered["state"] == "restored" and "checkpoint_retrieved_to_new_directory" in recovered["stages"], "Checkpoint recovery of %s was not verified" % label)
+            require(Path(path).resolve() != Path(self.project).resolve(), "Recovery reused the changed project's directory")
         self.project = path
         self.current = self.snap("restored " + label)
         def equal():
@@ -553,7 +558,9 @@ def recover_each_kind(run):
     # change_restore then refuses rather than accept a weaker guard. The checkpoint stays retained (checked above).
     def refused():
         error = h.call_error("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
-        require(error.get("code") == "FingerprintUnavailable", "Expected the inconsistent-block recovery refusal: %s" % error)
+        # Since #221 the inconsistent bystander is metadata-only, so the refusal is ScopedRecoveryRequired naming the archive.
+        require(error.get("code") == "ScopedRecoveryRequired" and (error.get("details") or {}).get("recoveryArchive"),
+                "Expected the inconsistent-block recovery refusal: %s" % error)
         return error
     h.report["nativeBound"]["restoreRefusal"] = h.stage("restore " + label + " is refused on the inconsistent block", refused)
 

@@ -30,7 +30,8 @@ PARAMETERS = {"CycleMaximumCycleTime": [200], "CycleMinimumCycleTime": [5], "Cyc
               # TIA switches daylight saving off with a zone that has none (29 October 2026), so DST changes first.
               "TimeOfDayActivateDaylightSavingTime": [False], "TimeOfDayLocalTimeZone": [23, 21, 1]}
 # Applied one at a time after the reviewed set; V21 may reject them at compile (they need NTP servers or access-level passwords).
-OBSERVED = {"TimeSynchronizationNtpV2": 1, "PlcAccessControlConfiguration": "EnabledWithAccessControlViaAccessLevel"}
+# An access-level mode needs the full-access password credential since 30 October (1f11b012); the credential route qualifies it.
+OBSERVED = {"TimeSynchronizationNtpV2": 1}
 TABLE, RENAMED, RESTORED_TABLE = "TiaMcpGapTable", "TiaMcpGapRenamed", "TiaMcpGapRestore"
 POLICY = {"dependencyPolicy": "rejectReferenced"}
 # A Classic and a Unified panel, each created through hardware_add without a start screen.
@@ -274,6 +275,13 @@ def hmi_compile(h, hmi):
         outcome = h.client.request("tools/call", {"name": "change_apply", "arguments": h.apply_args(prepared)})
         content = outcome.get("structuredContent") or {}
         if not outcome.get("isError"):
+            compilation = content.get("compile") or {}
+            if compilation.get("errorCount"):
+                # Since fed08202 a compile-only change completes with TIA's diagnostics as its result.
+                errors = [m["description"] for t in compilation.get("targets", []) for m in t.get("messages", []) if m.get("state") == "Error" and m.get("description")]
+                require(compilation.get("compilerSucceeded") is False and [t.get("target") for t in compilation.get("targets", [])] == [hmi["compileScope"]] and errors,
+                        "hmi_compile completed without typed compile diagnostics: %s" % compilation)
+                return {"outcome": "appliedWithCompilerErrors", "errors": errors, "stages": content["stages"]}
             return {"outcome": "compiled", "compilation": compiled(content, [hmi["compileScope"]]), "stages": content["stages"],
                     "changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}
         error = content.get("error") or {}
