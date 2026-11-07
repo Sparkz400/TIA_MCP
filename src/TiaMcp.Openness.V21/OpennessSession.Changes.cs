@@ -1191,7 +1191,8 @@ namespace TiaMcp.Openness.V21
                     {
                         var subnet = project.Subnets.FirstOrDefault(s => string.Equals(s.Name, subnetName, StringComparison.OrdinalIgnoreCase));
                         if (subnet == null) node.CreateAndConnectToSubnet(subnetName);
-                        else node.ConnectToSubnet(subnet);
+                        // TIA refuses to reconnect a node to the subnet it is already on; the preview reports no subnet change.
+                        else if (!Equals(node.ConnectedSubnet, subnet)) node.ConnectToSubnet(subnet);
                     }
                     ApplyAttributes(node, payload["attributes"] as JObject ?? new JObject(), NetworkWriteAttributes);
                     break;
