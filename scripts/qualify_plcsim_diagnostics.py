@@ -145,8 +145,9 @@ class Lab:
         require(all(v["quality"] == "good" for v in values), "Bad-quality PLCSIM read: %s" % values)
         return {v["symbol"]: v["value"] for v in values}
 
-    def capture(self, label, seconds=3, mode=None):
-        """mode: a cycle-synchronous capture in that SingleStep mode; None polls without stepping."""
+    def capture(self, label, seconds=3, mode=None, stall=False):
+        """mode: a cycle-synchronous capture in that SingleStep mode; None polls without stepping. stall: a capture that ends
+        sessionUnavailable (no further sync point in time) is returned, not failed."""
         h, selections = self.h, [uuid.uuid4().hex, uuid.uuid4().hex]
         request = {"attemptId": self.creation, "selectionIds": selections, "intervalMilliseconds": 100, "durationSeconds": seconds, "source": "plcsim",
                    "simulator": {"instanceId": self.instance["id"], "instanceName": self.instance["name"], "cycleSynchronous": mode is not None,
@@ -168,7 +169,8 @@ class Lab:
             if status["state"] == "running":
                 status = h.tool("runtime_capture_stop", {"captureId": capture_id})
             progress = status["recordedProgress"]
-            require(progress["terminalReason"] == "durationLimit" and progress["rows"] > 0 and not status["localFailure"], "Capture %s did not complete: %s" % (label, progress))
+            stalled = stall and progress["terminalReason"] == "sessionUnavailable" and progress["rows"] > 0
+            require((progress["terminalReason"] == "durationLimit" or stalled) and progress["rows"] > 0 and not status["localFailure"], "Capture %s did not complete: %s" % (label, progress))
             return {"captureId": capture_id, "snapshotRef": status["snapshotRef"], "state": status["state"], "progress": progress}
         return h.stage("capture " + label, run)
 
@@ -395,16 +397,18 @@ def body(h):
         lab.refuse("fields beyond reason", "diagnostic_runtime_acquisition_compare",
                    {"beforeAcquisitionId": first["id"], "afterAcquisitionId": second["id"], "request": {"reason": "x", "verdict": "fixed"}}, ["InvalidRequest"])
 
-        # Each cycle-synchronous mode: a completed capture with rows, one sync point per sample, and the instance back in the
-        # operating mode it had before (the worker restores it at the capture's end).
+        # Each cycle-synchronous mode: a capture with rows and the instance back in the operating mode it had before (the worker
+        # restores it at the capture's end, also after a stall). SingleStep_C must complete; a mode whose next sync point does not
+        # come within the worker's wait ends sessionUnavailable, which is recorded (run 1: SingleStep_P on this OB1-only fixture).
         mode_of = lambda: h.tool("sim_observe", {"instanceId": lab.instance["id"]})["after"]["operatingMode"]
         initial = h.stage("operating mode before the cycle-synchronous captures", mode_of)
         h.report["captureModes"] = {"initialOperatingMode": initial}
         for mode in CAPTURE_MODES:
-            captured = lab.capture("cycle-synchronous " + mode, seconds=2, mode=mode)
+            captured = lab.capture("cycle-synchronous " + mode, seconds=2, mode=mode, stall=mode != "SingleStep_C")
             restored = h.stage("operating mode after the %s capture" % mode, mode_of)
             require(restored == initial, "The %s capture left operating mode %s instead of %s" % (mode, restored, initial))
-            h.report["captureModes"][mode] = {"rows": captured["progress"]["rows"], "restoredOperatingMode": restored}
+            h.report["captureModes"][mode] = {"rows": captured["progress"]["rows"], "terminalReason": captured["progress"]["terminalReason"],
+                                              "restoredOperatingMode": restored}
         lab.refuse("syncMode without cycleSynchronous", "runtime_capture_start", {"captureId": uuid.uuid4().hex, "request": {
             "attemptId": lab.creation, "selectionIds": [uuid.uuid4().hex], "intervalMilliseconds": 100, "durationSeconds": 1, "source": "plcsim",
             "simulator": {"instanceId": lab.instance["id"], "instanceName": lab.instance["name"], "cycleSynchronous": False, "syncMode": "SingleStep_P",
