@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "b849389d809b46c2266026296a092b170a4a9729e3475a48a882bc60f4246f2c",
-      "bytes": 1805635
+      "sha256": "7e798fc856ccc7b41433911bc3bbd8c1bd7e8272cd2147615a6edf760bd8caa4",
+      "bytes": 1809441
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -3482,8 +3482,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulatorSession.Records.cs",
-      "sha256": "1d78c4292ee965b4fc9ca4dcb346c887ec496df730f332ea951ade54cbb8fa8c",
-      "bytes": 9594
+      "sha256": "b74c2bfdb52ffcce9beff0a280c81a5ca2e3151cd86ac373f9256519bae6f07e",
+      "bytes": 9666
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulatorSession.Signals.cs",
@@ -65403,8 +65403,8 @@
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.Records.cs",
               "name": "Record",
               "line": 18,
-              "endLine": 102,
-              "sha256": "e6f09cec78e5126a8ee33104a2344b79dab14fd47a546723ff26ab381338f698"
+              "endLine": 104,
+              "sha256": "a0dc2c49062f1efb117eae56d81b82aa4217882e099026703b68ddbeb6b4c58e"
             }
           ],
           "reviewState": "static_dispatch_bound",
@@ -133309,6 +133309,13 @@
           "artifacts": [
             "evidence/local.plcsim.signals-ip.20261102.json"
           ]
+        },
+        {
+          "id": "local.plcsim.observe_watch.20261107",
+          "profileSha256": "0f6ef46672cb8ea05ca46300fa01292e42a5d94d50b77963d86e9e87ae988812",
+          "artifacts": [
+            "evidence/local.plcsim.observe_watch.20261107.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -133427,7 +133434,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.plcsim.records.20261107",
+          "profileSha256": "ac806de37e521f36e3e659792f859def78c0a289dbb537b16215e22feca86677",
+          "artifacts": [
+            "evidence/local.plcsim.records.20261107.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -140004,9 +140019,19 @@
       "sha256": "38a95056384361e47f597b7b0ee0b5f18576c5fa14eb1d60c106f2ce199465d9"
     },
     {
+      "path": "evidence/local.plcsim.observe_watch.20261107.json",
+      "state": "observed",
+      "sha256": "84af2a0ef102d82e9cfb90ae076c1cd81a811f1b0c690a60ca1c16529391faee"
+    },
+    {
       "path": "evidence/local.plcsim.output-arrays.20261102.json",
       "state": "observed",
       "sha256": "a84280e08f684e452719f3c4732dd0d5a89934b17d7f412ea4af987655adde64"
+    },
+    {
+      "path": "evidence/local.plcsim.records.20261107.json",
+      "state": "observed",
+      "sha256": "cbee09abda8bbaff24e12da82ac344303b7a1b7762d4a120c28f3a6e43482202"
     },
     {
       "path": "evidence/local.plcsim.signals-ip.20261102.json",
@@ -141259,8 +141284,16 @@
       "profileSha256": "0fa420b756bd150a4089186cfb500967819661c8bd611700f48a286726f9d83c"
     },
     {
+      "id": "local.plcsim.observe_watch.20261107",
+      "profileSha256": "0f6ef46672cb8ea05ca46300fa01292e42a5d94d50b77963d86e9e87ae988812"
+    },
+    {
       "id": "local.plcsim.output-arrays.20261102",
       "profileSha256": "72438e246f7c8692428a42633b818635ddb7e0e99a19241b44d02d48e3194fce"
+    },
+    {
+      "id": "local.plcsim.records.20261107",
+      "profileSha256": "ac806de37e521f36e3e659792f859def78c0a289dbb537b16215e22feca86677"
     },
     {
       "id": "local.plcsim.signals-ip.20261102",

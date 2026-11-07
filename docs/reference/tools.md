@@ -397,7 +397,7 @@ option registers or admits the tool only on a qualification Host.
 | `sim_observe` | Observe the operating state, LEDs and display of a simulated CPU | limited | simulation |  |  |
 | `sim_read` | Read typed simulated values | shipped | simulation |  |  |
 | `sim_read_signals` | Read several typed simulated values in one runtime call | limited | simulation |  |  |
-| `sim_record` | Answer a program's data record requests on an owned simulated CPU | unqualified | simulation |  |  |
+| `sim_record` | Answer a program's data record requests on an owned simulated CPU | limited | simulation |  |  |
 | `sim_release` | Release and optionally unregister an owned simulator | shipped | simulation |  |  |
 | `sim_select` | Select an exact existing simulator identity | shipped | simulation |  |  |
 | `sim_state` | Power and control a selected simulated CPU | shipped | simulation |  |  |

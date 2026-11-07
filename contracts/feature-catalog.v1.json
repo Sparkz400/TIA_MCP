@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.156",
+  "catalogVersion": "0.4.159",
   "targetTiaVersions": [
     21
   ],
@@ -4729,6 +4729,42 @@
       ],
       "limitations": [
         "One owned Softbus CPU1511 V4.1; software/hardware configuration notifications and other IP modes not qualified."
+      ]
+    },
+    {
+      "id": "local.plcsim.records.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "fedf1231db029c185d0b38c037ffe66f2678eb1c",
+        "passedScope": "scripts/qualify_plcsim_gaps.py --records on Debug builds of fedf1231 with one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 and one owned TIA Portal V21 Update 3. A scratch FB calls RDREC (index 2, MLEN 4) and WRREC (index 3, LEN 4) on the central DI module (hardware ID 257 from the system constants). sim_record collect without arm refused SimulationRecordsInactive and a row without read or write InvalidRequest; armed with a 4-byte read 12 34 56 78 and a write row, a second arm refused SimulationRecordsActive; the program's RDREC returned VALID with 16#12345678 and WRREC DONE, both without error, and collect logged the answered reads and the writes carrying the program's bytes 0A 0B 0C 0D. Armed with the write row only, the read was logged unanswered and the program saw no completion within 3 s."
+      },
+      "artifacts": [
+        "evidence/local.plcsim.records.20261107.json"
+      ],
+      "limitations": [
+        "One central DI module and one record index per direction with status 0; a nonzero answer status, larger records and distributed modules are not exercised.",
+        "The program holds REQ while the requests repeat, so the log shows repeated requests; the unanswered case ends with collect, not with the program's own timeout.",
+        "Earlier pass, not evidence: artifacts/rc1 on 53f9d751 stopped at the first call because sim_record used the capture gate (instanceName and creationId); fixed in fedf1231.",
+        "One owned Softbus CPU 1511 instance; other CPUs, firmware and TCP/IP instances are not qualified."
+      ]
+    },
+    {
+      "id": "local.plcsim.observe_watch.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "fedf1231db029c185d0b38c037ffe66f2678eb1c",
+        "passedScope": "scripts/qualify_plcsim_gaps.py (runtime corpus) on Debug builds of 53f9d751 (the watch; fedf1231 later changes only sim_record's ownership gate) with one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 and one owned TIA Portal V21 Update 3. Before the first code-change simulation_download_online: sim_observe watch collect without a start refused SimulationWatchInactive, a second start SimulationWatchActive, and an idle watch with a 2000 ms collect window reported no software- or hardware-configuration event; then a watch started before the download and collected after it (1000 ms window) held one softwareConfiguration event SRSCC_SOFTWARE_CHANGED_IN_STOP with errorCode OK, raised during the other tool call. The rest of the existing gaps corpus passed unchanged."
+      },
+      "artifacts": [
+        "evidence/local.plcsim.observe_watch.20261107.json"
+      ],
+      "limitations": [
+        "Software configuration only: the download changed no hardware configuration, so a hardwareConfiguration event and an IP change within a watch are not exercised natively (IP changes have local.plcsim.signals-ip.20261102 in a bounded window).",
+        "One owned Softbus CPU 1511 instance; other CPUs, firmware and TCP/IP instances are not qualified."
       ]
     },
     {
@@ -28398,14 +28434,15 @@
           "A bounded window of 0-60000 ms and 1-256 events ends its subscription with the call, so a change made by another tool call (sim_state) never falls inside it; watch start/collect keeps the subscriptions on the selection across other tool calls (one watch per instance; sim_release and shutdown end it).",
           "V8 has no LED getter: LEDs are reported only as changes within the window. Display data is summarized (length, SHA-256) and returned as base64 only on request, up to 4 MiB; its format is not decoded.",
           "Natively the program's STP was observed as Run to Stop with STOP, RUN and ERROR LED changes, a separate API client's Run, Stop, Run as Stop-Startup-Run-Stop-Startup-Run matching the client's log and the polled state, and maxEvents 1 ended a 15 s window after 1.5 s; a CPU 1511 display summary reported 41026 bytes.",
-          "2 November local extension: bounded subscriptions also report softwareConfiguration, hardwareConfiguration and ipAddress changes. New-event native qualification is pending; prior state/LED evidence does not qualify these additions."
+          "Bounded windows and watches also report softwareConfiguration, hardwareConfiguration and ipAddress changes. A watch around a simulation download reported its software-configuration change natively (local.plcsim.observe_watch.20261107); a hardware-configuration change has no native evidence."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.plcsim_signals.20261030",
-          "local.plcsim.signals-ip.20261102"
+          "local.plcsim.signals-ip.20261102",
+          "local.plcsim.observe_watch.20261107"
         ]
       },
       "availability": {
@@ -28444,12 +28481,14 @@
         "limitations": [
           "Owned instances only; 1-16 reviewed response rows keyed by hardware ID and record index, read payloads of 1-1024 bytes, optional status. Requests without a row are logged and not answered.",
           "One armed table per instance; it stays subscribed across other tool calls until collect, sim_release or the worker's shutdown. The log keeps up to 256 requests.",
-          "Native qualification pending."
+          "Natively qualified on one owned Softbus CPU 1511 instance (local.plcsim.records.20261107): RDREC and WRREC on the central DI module answered with status 0, and a read without a row left unanswered; nonzero statuses, larger records and distributed modules are not exercised."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim.records.20261107"
+        ]
       },
       "availability": {
         "status": "conditional",
