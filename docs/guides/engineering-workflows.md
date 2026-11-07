@@ -109,6 +109,12 @@ The result separates three things:
 
 A block that is already inconsistent stops `source_upsert` at prepare (`FingerprintUnavailable`); compile it first. An interrupted refresh is reconciled like any interrupted change ([prepare, apply, inspect](#prepare-apply-inspect)). Natively checked on 7 November 2026 (`local.source-refresh.20261107`).
 
+## Unresolved symbols
+
+When a block references a tag, block, data type or constant that no longer exists, TIA may refuse to export it as XML. `block_read` then returns `BlockExportUnavailable` with the block's language. SCL, STL and DB blocks can still be read with `format: "generatedSource"`, which does not change them; graphical blocks have no textual form.
+
+Every compile result lists `compile.unresolvedSymbols`: each undefined name with its kind, compile target and the location of the message. The list comes from TIA's English compiler messages, so other UI languages list nothing. The worker never picks a replacement. Map each name explicitly: for example, a door or interlock signal needs the confirmed address and type from whoever owns the machine. Then recreate the symbol through an ordinary change such as `tag_table_import_xml`, which also works beside an inconsistent block. Each repair symbol is therefore a journaled change of its own; delete it later with `tag_delete` if it was only needed to make the block editable. Natively checked on 7 November 2026 (`local.unresolved-symbols.20261107`).
+
 ## Compile an existing PLC without importing or editing
 
 Use `change_prepare` with `kind: "plc_compile"`, an empty `payload: {}` and the

@@ -1,0 +1,67 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.unresolved-symbols.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T09:46:23+00:00",
+  "source": {
+    "commit": "6b9a9c4d8ef57f7ff327fe1f26d50d9fe4c22321",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_unresolved_symbols.py on Debug builds of 6b9a9c4d in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 9/9 steps: TagImportFixture seeded the SCL FC TagScopeBroken reading the undefined tag UnresolvedFlag (isConsistent=false). block_read of its XML was refused by TIA and returned BlockExportUnavailable with programmingLanguage SCL and the generatedSource fallback; block_read format=generatedSource returned source containing \"UnresolvedFlag\" and the block stayed inconsistent. plc_compile applied and its compile.unresolvedSymbols listed kind Tag, name UnresolvedFlag at TagScopeBroken. An explicit tag_table_import_xml of table Repair with UnresolvedFlag (Bool %M90.0) applied beside the inconsistent block, resolved the finding (baselineComparison resolved, unresolvedSymbols empty), left TagScopeBroken consistent and kept its own change journal.",
+  "limitations": [
+    "SCL only; graphical (LAD/FBD) blocks with deleted symbols cannot be exported as XML or generated source, and no native graphical fixture was run. The repair symbol is an ordinary journaled tag change, not a temporary alias; no alias workflow is implemented.",
+    "unresolvedSymbols parses TIA's English compiler message text (Tag/Block/Data type/Constant \"name\" not defined); other UI languages list nothing."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "9b58509db8ea9edcfca42ac3faa8f4f6466ba7a90d92d7a7f1eac647ad0dcf80"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "95448e3891090d8278059e2b787eedc3bcb998cf8c6e188727b2518c18f25c04"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "72c3a975cfc820a29947672e1cde44d2e35a5bde2a6be7284734dc5657fa30d4"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "cbcdec1084174689e52ff123b58d98a35311ca5ec8202944775327d1a93991ab",
+      "bytes": 22716,
+      "completed": true,
+      "steps": [
+        "owned start",
+        "owned scratch",
+        "seed an SCL block using an undefined tag",
+        "XML export refused with the generated-source fallback",
+        "generated source read without changing the block",
+        "plc_compile lists the unresolved symbol",
+        "explicit tag import repairs the block",
+        "owned worker shutdown"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "block_read"
+      ]
+    }
+  ]
+}
