@@ -84,24 +84,24 @@ $ManagedCheckGroups = @(
     @{seconds=125; suites=@('TiaMcp.DriveProfiles.Tests','TiaMcp.TechnologyProfiles.Tests','TiaMcp.Access.Tests','TiaMcp.PublicCertificates.Tests','TiaMcp.WebApplications.Tests','TiaMcp.Engineering.Tests','TiaMcp.Credentials.Tests')},
     @{seconds=215; suites=@('TiaMcp.OpcUa.Runtime.Tests','TiaMcp.Diagnostics.Tests')}
 )
-# Hosted-runner seconds per Python test file (local timings scaled to CI run 42374117858); others count as 0.4 s.
+# Seconds per Python test file (local Python run, about 1:1 with hosted runners; CI run 42379522823); others count as 0.4 s.
+# test_inventory_translation_exports.py is absent: it skips without retained native exports, as on hosted runners.
 $PythonTestSeconds = @{
-    'test_inventory_translation_exports.py' = 157.0
-    'test_qualification_optimization.py' = 62.1
-    'test_encoder_lifecycle.py' = 27.6
-    'test_encoder_copy_admission.py' = 17.5
-    'test_encoder_hardware_preservation.py' = 13.5
-    'test_encoder_software_preservation.py' = 8.4
-    'test_qualify_runtime_plcsim_tcpip.py' = 7.7
-    'test_api_coverage_bindings.py' = 7.1
-    'test_api_coverage.py' = 4.6
-    'test_block_test_stages.py' = 4.4
-    'test_diagnostic_watch_contracts.py' = 3.3
-    'test_guest_qualification.py' = 3.2
-    'test_qualify_deployment.py' = 3.2
-    'test_library_operation_observations.py' = 3.0
-    'test_worker_scratch_ownership.py' = 2.9
-    'test_contracts.py' = 2.2
+    'test_qualification_optimization.py' = 93.8
+    'test_encoder_lifecycle.py' = 41.7
+    'test_encoder_copy_admission.py' = 26.5
+    'test_encoder_hardware_preservation.py' = 20.4
+    'test_encoder_software_preservation.py' = 12.7
+    'test_qualify_runtime_plcsim_tcpip.py' = 11.6
+    'test_api_coverage_bindings.py' = 10.8
+    'test_api_coverage.py' = 6.9
+    'test_block_test_stages.py' = 6.6
+    'test_diagnostic_watch_contracts.py' = 5.0
+    'test_guest_qualification.py' = 4.9
+    'test_qualify_deployment.py' = 4.9
+    'test_library_operation_observations.py' = 4.5
+    'test_worker_scratch_ownership.py' = 4.4
+    'test_contracts.py' = 3.4
 }
 # Deterministic longest-first split: each group (with its suites) and then each remaining name goes to the
 # least-loaded shard, so every name and group runs in exactly one shard. Returns name/'group:N' -> shard.
