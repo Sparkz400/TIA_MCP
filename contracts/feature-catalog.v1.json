@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.148",
+  "catalogVersion": "0.4.149",
   "targetTiaVersions": [
     21
   ],
@@ -5088,6 +5088,23 @@
       "limitations": [
         "Source commit 2e093db9 differs from the built 2e093db9 only in scripts/qualify_unrelated_blocks.py.",
         "One unrelated inconsistent SCL FC on one owned scratch PLC; inconsistent PLC data types, protected blocks and other read tools are not exercised. Changes with metadata-only bystanders can be recovered only manually from their retained archive."
+      ]
+    },
+    {
+      "id": "local.compile-only.requalify.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "d023d296f525c9062891c99c3ece8fe2d1fe5bf6",
+        "passedScope": "Native regression of the 4 November compile-only completion and identity/save-state fingerprint changes (fed08202) on Debug builds of main ef49a18c (src unchanged at d023d296), four runs in owned TIA V21 Update 3 scratch projects: scripts/qualify_engineering_gaps.py 78/78 (device_compile of the scratch CPU's device and project_compile of every device with exact targets, no block/type/tag-table change; typed CPU parameters, tag tables and other gaps; hmi_compile of a Classic TP700 Comfort and an MTP700 Unified target without start screen completing applied with compilerSucceeded=false and typed diagnostics on exactly the target scope); scripts/qualify_engineering_gaps.py --hmi-fixture on the desk-configured Classic Comfort (31/31) and Unified Comfort (31/31) fixtures of 1 November (hmi_compile clean on the exact target, saved, recovered copy equal); scripts/qualify_plc_object_mutations.py 374/374 (plc_compile and every X11 PLC object kind with preview, checkpoint, compile, save, reopen and restore, including the scoped in-place restore of tag-table imports and ScopedRecoveryRequired on the inconsistent-block restore)."
+      },
+      "artifacts": [
+        "evidence/local.compile-only.requalify.20261107.json"
+      ],
+      "limitations": [
+        "Source commit d023d296 differs from ef49a18c only in three harness updates in scripts/ (qualify_engineering_gaps.py, qualify_plc_object_mutations.py): the access-level observation the credential route owns since 1f11b012, compile-only completion with diagnostics since fed08202, and the scoped and metadata-only restores of #218/#221.",
+        "Compile scopes and profiles as in the earlier records (CPU 1511-1 PN, TP700 Comfort, MTP700 Unified); Startdrive drives remain notCompiled."
       ]
     }
   ],
@@ -23523,15 +23540,16 @@
           "Explicit PLC software only, empty payload and compile=true. Saves the current project and creates a checkpoint before compiler dispatch; compilation may change generated state.",
           "Native compile dispatch, persistence and checkpoint recovery are qualified on the scratch profile; safety signatures are not.",
           "Existing engineering fingerprint coverage remains incomplete; this route does not establish whole-project preservation or PLC runtime correctness.",
-          "4 November compile-only completion and identity/save-state fingerprint changes have offline coverage; native regression qualification of these changes remains open. Existing evidence describes the earlier policy.",
+          "4 November compile-only completion and identity/save-state fingerprint changes were requalified natively on 7 November (local.compile-only.requalify.20261107); a compile with compiler errors completes as applied with compilerSucceeded=false.",
           "Every compile result lists unresolvedSymbols (kind, name, target, location) parsed from TIA's English 'not defined' messages; nothing is resolved or guessed (local.unresolved-symbols.20261107)."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
-          "local.unresolved-symbols.20261107"
+          "local.unresolved-symbols.20261107",
+          "local.compile-only.requalify.20261107"
         ]
       },
       "availability": {
@@ -23577,13 +23595,14 @@
           "Qualified on the scratch station (CPU 1511-1 PN): zero errors, no mutation stage, unchanged blocks, types and tag tables, and refusals for a missing device and compile=false.",
           "Payload devicePath only; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Compilation may change generated state.",
           "A selected device without a compiler service (for example a Startdrive drive) is refused with UnsupportedCapability.",
-          "4 November compile-only completion and identity/save-state fingerprint changes have offline coverage; native regression qualification of these changes remains open. Existing evidence describes the earlier policy."
+          "4 November compile-only completion and identity/save-state fingerprint changes were requalified natively on 7 November (local.compile-only.requalify.20261107); a compile with compiler errors completes as applied with compilerSucceeded=false."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.engineering_gaps.20261029"
+          "local.engineering_gaps.20261029",
+          "local.compile-only.requalify.20261107"
         ]
       },
       "availability": {
@@ -23627,14 +23646,15 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
           "Qualified on a one-station project. A project whose devices do not all compile (for example an HMI panel without a start screen) fails with CompileFailed and needs checkpoint recovery.",
           "Empty payload; compile=true. Every device with a compiler service is compiled; a device without one (a Startdrive G120C PN, local.drives.probe.20261030) is listed under notCompiled with its path and never counted as compiled, and the compile refuses when no device has a compiler service. The inventory must equal the preview at dispatch. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs.",
-          "4 November compile-only completion and identity/save-state fingerprint changes have offline coverage; native regression qualification of these changes remains open. Existing evidence describes the earlier policy."
+          "4 November compile-only completion and identity/save-state fingerprint changes were requalified natively on 7 November (local.compile-only.requalify.20261107); a compile with compiler errors completes as applied with compilerSucceeded=false."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
           "local.engineering_gaps.20261029",
-          "local.drives.probe.20261030"
+          "local.drives.probe.20261030",
+          "local.compile-only.requalify.20261107"
         ]
       },
       "availability": {
@@ -23679,13 +23699,14 @@
           "Natively qualified on desk-configured HmiSeeder fixtures in TIA Portal V21 (local.hmi.compile.20261101): a TP700 Comfort pair (start screen set in the editor) and an MTP700 Unified Comfort pair (encrypted-transfer password typed in the editor), two HMI targets each. Every target compiles with zero errors and zero warnings, hmi_inspect is unchanged, a fresh Host reopens the saved project and compiles again, and the last compile restores from its checkpoint. Refusals: an extra payload field and compile=false (InvalidRequest), a missing target (HmiTargetNotFound). Other devices, WinCC RT Advanced, Basic, Unified PC and projects not configured this way are not qualified.",
           "Payload target {family, hmiPath} from library_query hmi_targets; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Runtime is not verified.",
           "Native observation (local.engineering_gaps.20261029): a TP700 Comfort and an MTP700 Unified Basic created by hardware_add are compiled on their exact targets, and TIA's errors (no start screen; the Unified panel also lacks its runtime password) return as CompileFailed and restore from the checkpoint. No compilable HMI target can be made through the public routes (screen creation stays behind the closed HMI preservation gate), so a successful compile needs a fixture configured in the editor (docs/reference/hmi-fixture-preparation.md).",
-          "4 November compile-only completion and identity/save-state fingerprint changes have offline coverage; native regression qualification of these changes remains open. Existing evidence describes the earlier policy."
+          "4 November compile-only completion and identity/save-state fingerprint changes were requalified natively on 7 November (local.compile-only.requalify.20261107); a compile with compiler errors completes as applied with compilerSucceeded=false."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hmi.compile.20261101"
+          "local.hmi.compile.20261101",
+          "local.compile-only.requalify.20261107"
         ]
       },
       "availability": {
