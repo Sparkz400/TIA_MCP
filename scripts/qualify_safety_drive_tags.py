@@ -96,6 +96,8 @@ def main():
         record('safety_drive_tags applied', {'plan': plan, 'stages': applied['stages'], 'compilerSucceeded': applied['compile']['compilerSucceeded'],
                                              'baseline': applied['compile']['baselineComparison'].get('introducedErrorCount')})
         assert 'safety_drive_tags_verified' in applied['stages'] and 'changed_project_saved' in applied['stages'], applied['stages']
+        status = record('change_status confirms the applied change', client.tool('change_status', {'changeId': applied['changeId']}))
+        assert status['state'] == 'applied' and status['stages'] == applied['stages'], status['state']
         rows = {t['name']: t for table in client.tool('software_inspect', {'plcPath': fplc, 'maxItems': 2000})['tagTables'] for t in table['tags']}
         got = {n: (rows[n]['logicalAddress'], rows[n]['dataType'], rows[n]['isSafety']) for n in tags.values()}
         record('safety tags read back', got)
