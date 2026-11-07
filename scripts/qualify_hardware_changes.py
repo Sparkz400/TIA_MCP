@@ -675,12 +675,13 @@ def drive_device(run, restore=False):
     node(run, device, tuple(interface.split("/")), deferred=True)
     path, controller = prefix + interface, run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET%20interface_1")
     payload = {"hardwarePath": path, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0}
-    items = lambda applied, state: [key for key in state if key.startswith("hw:" + run.path(device)) and key != "hw:" + run.path(device)]
+    # Observed natively (hd1): only the drive's interface changes, and the controller gains the drive's system constants.
+    generated = lambda applied, state: [key for key in state if key.startswith(constant(run, MP, head + "~"))]
     def assign(restored):
         return run.apply("assign %s to HwPeerCpu%s" % (device, ", restored" if restored else ""), "network_io_assign", payload,
                          {"effects": [{"hardwarePath": path, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False, "sharedDevice": False}]},
                          shown={**payload, "addressControllerOwnerPath": run.path("HwPeer", "items", "HwPeerCpu")},
-                         changed=lambda applied, state: items(applied, state) + ["hw:" + controller], restore=restored, boundary=True)
+                         changed=["hw:" + path, "hw:" + controller], added=generated, restore=restored, boundary=True)
     if restore:
         run.b0 = run.current
         assign(True)
