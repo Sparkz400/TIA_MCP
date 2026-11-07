@@ -245,6 +245,7 @@ namespace TiaMcp.Openness.V21
                     if (IsHmiChangeKind(change.Kind)) VerifyHmiEngineeringPreservation(change, project);
                     if (change.Kind == "software_unit_create_from") RequireUnrenamedUnitMembers(change);
                     VerifyHardwarePreservation(change, project);
+                    if (change.Kind == "source_upsert" && compile) CompareSourceRefresh(change);
                     if (change.Kind == TagTableImportRules.Kind) VerifyScopedTagImport(change);
                     if (new[] { "graphical_typed_edit", "graphical_operand_set", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "graph_import" }.Contains(change.Kind))
                     {
