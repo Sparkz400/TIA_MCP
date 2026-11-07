@@ -1,0 +1,119 @@
+{
+ "schemaVersion": 1,
+ "status": "authored-not-executed",
+ "purpose": "Native transitive dependent-instance effect of adding the PLC component FB TiaMcpComponentGate (whose static State is the PLC data type TiaMcpComponentState) to an FB embedded two levels deep as a multi-instance, in the standard PLC program scope: the structured member the component route's multi-instance adds. Unobserved until captured; enables nothing.",
+ "unit": "",
+ "prefix": "Tgp_Comp",
+ "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+ "chain": [
+  {
+   "fb": "Tgp_CompNestEffect"
+  },
+  {
+   "fb": "Tgp_CompNestParent",
+   "member": "Inner"
+  },
+  {
+   "fb": "Tgp_CompNestGrand",
+   "member": "Middle"
+  }
+ ],
+ "members": [
+  {
+   "name": "Gate",
+   "datatype": "\"TiaMcpComponentGate\""
+  }
+ ],
+ "sources": [
+  {
+   "path": "fixtures/libraries/component-qualification/TiaMcpComponentState.udt",
+   "sha256": "e9c3e7bfe6064c38089699428e5c7de278b746a5afa7922f63caa84983fee4ec",
+   "route": "standard",
+   "authoredFormat": "UDT",
+   "names": [
+    "TiaMcpComponentState"
+   ],
+   "namespace": ""
+  },
+  {
+   "path": "fixtures/libraries/component-qualification/TiaMcpComponentGate.scl",
+   "sha256": "af1c54cc68d63fd70e591e64d59024b62a04e12f7db15101a17e42c6e75f3b7b",
+   "route": "standard",
+   "authoredFormat": "SCL",
+   "names": [
+    "TiaMcpComponentGate"
+   ],
+   "namespace": ""
+  },
+  {
+   "path": "fixtures/typed-graphical/sources/component-transitive-effect-before.scl",
+   "sha256": "c9dad1b726d05c1e701a299a4b0537e5300eb6952393a91e49893ddf982258be",
+   "route": "standard",
+   "authoredFormat": "SCL",
+   "names": [
+    "Tgp_CompNestEffect",
+    "Tgp_CompNestParent",
+    "Tgp_CompNestGrand",
+    "Tgp_CompNestEffect_DB",
+    "Tgp_CompNestParent_DB",
+    "Tgp_CompNestGrand_DB"
+   ],
+   "namespace": ""
+  },
+  {
+   "path": "fixtures/typed-graphical/sources/component-transitive-effect-after.scl",
+   "sha256": "bbd25917e49b412f7d5f270a772ddf9b07d61af06bd553017014bbdd4f422eab",
+   "route": "standard",
+   "authoredFormat": "SCL",
+   "names": [
+    "Tgp_CompNestEffect"
+   ],
+   "namespace": "",
+   "modifies": [
+    "Tgp_CompNestEffect"
+   ],
+   "observes": [
+    "Tgp_CompNestParent",
+    "Tgp_CompNestGrand",
+    "Tgp_CompNestEffect_DB",
+    "Tgp_CompNestParent_DB",
+    "Tgp_CompNestGrand_DB"
+   ]
+  }
+ ],
+ "argsFile": [
+  "fixtures/libraries/component-qualification/TiaMcpComponentState.udt",
+  "fixtures/libraries/component-qualification/TiaMcpComponentGate.scl",
+  "fixtures/typed-graphical/sources/component-transitive-effect-before.scl",
+  "fixtures/typed-graphical/sources/component-transitive-effect-after.scl"
+ ],
+ "command": [
+  "python",
+  "-B",
+  "scripts/capture_typed_routes_owned.py",
+  "@artifacts/ctc.args",
+  "--host",
+  "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe",
+  "--worker",
+  "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe",
+  "--output",
+  "artifacts/ctc",
+  "--cpu-type-identifier",
+  "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+  "--unit",
+  "",
+  "--modify",
+  "component-transitive-effect-after.scl:Tgp_CompNestEffect",
+  "--observe",
+  "component-transitive-effect-after.scl:Tgp_CompNestParent",
+  "--observe",
+  "component-transitive-effect-after.scl:Tgp_CompNestGrand",
+  "--observe",
+  "component-transitive-effect-after.scl:Tgp_CompNestEffect_DB",
+  "--observe",
+  "component-transitive-effect-after.scl:Tgp_CompNestParent_DB",
+  "--observe",
+  "component-transitive-effect-after.scl:Tgp_CompNestGrand_DB"
+ ],
+ "afterCapture": "python -B scripts/extract_typed_transitive_effects.py artifacts/ctc/capture.json --component"
+}
