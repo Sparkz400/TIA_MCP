@@ -267,7 +267,9 @@ namespace TiaMcp.Openness.V21
                         add("project", project.Path.FullName, operation == "change_apply" ? "checkpointMutationCompileSave" : "preserveAndRecover");
                         observation["fingerprint"] = EngineeringFingerprint(change, project); observation["previewHash"] = change.PreviewHash; observation["idempotentReadback"] = returnedApply;
                         string expected = operation == "change_apply" ? change.BaseFingerprint : change.AfterFingerprint;
-                        if (!returnedApply && observation.Value<string>("fingerprint") != expected) throw new BridgeException("StaleRevision", "Project changed since its retained preparation or outcome.");
+                        // A scoped tag restore checks every captured table itself and never replaces the project (#218).
+                        bool scopedRestore = operation == "change_restore" && change.Kind == TagTableImportRules.Kind;
+                        if (!returnedApply && !scopedRestore && observation.Value<string>("fingerprint") != expected) throw new BridgeException("StaleRevision", "Project changed since its retained preparation or outcome.");
                         if (operation == "change_apply" && !returnedApply && (change.Kind.StartsWith("db_snapshot_", StringComparison.Ordinal) || change.Kind == "simulation_download_online"))
                         {
                             // Online simulator kinds also reserve the owned simulator and plan the observer project before dispatch.
