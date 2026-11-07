@@ -40,10 +40,11 @@ def interface(h, device):
 def comparison(applied, label):
     compile = applied.get("compile") or {}
     delta = compile.get("baselineComparison") or {}
-    require(delta.get("verified") is True and delta.get("complete") is True, "%s: baseline comparison not verified: %s" % (label, delta))
+    require(compile.get("compilerSucceeded") is True or (delta.get("complete") is True and delta.get("introducedErrorCount") == 0),
+            "%s: baseline comparison does not accept the change: %s" % (label, delta))
     require("changed_project_saved" in applied["stages"], "%s was not saved: %s" % (label, applied["stages"]))
     return {"compilerSucceeded": compile.get("compilerSucceeded"), "errorCount": compile.get("errorCount"),
-            **{k: delta.get(k) for k in ("existingCount", "resolvedCount", "introducedCount")}}
+            **{k: delta.get(k) for k in ("existingCount", "resolvedCount", "introducedCount", "introducedErrorCount")}}
 
 
 def body(h):
@@ -68,7 +69,7 @@ def body(h):
     applied = h.apply("safety_import_xml", {"xml": xml.replace("<Text />", "<Text>TiaMcp unrelated error</Text>", 1),
                                             "expectedBlockNames": [MAIN], "safetyAcknowledged": True})
     result = h.stage("safety import applies beside the unrelated conflict", lambda: comparison(applied, "safety_import_xml"))
-    require(result["compilerSucceeded"] is False and result["existingCount"] > 0 and result["introducedCount"] == 0,
+    require(result["compilerSucceeded"] is False and result["existingCount"] > 0 and result["introducedErrorCount"] == 0,
             "The conflict was not reported as an existing finding: %s" % result)
     h.stage("safety import read back", lambda: require("TiaMcp unrelated error" in h.tool("block_read", {"plcPath": fplc, "blockName": MAIN})["xml"],
                                                        "The comment is not in the export") or True)
@@ -99,9 +100,10 @@ def body(h):
         require(error.get("code") == "CompileFailed", "Expected CompileFailed, observed %s" % error)
         status = h.tool("change_status", {"changeId": prepared["changeId"], "includeDetails": True})
         delta = (status.get("compile") or {}).get("baselineComparison") or {}
-        require(status["state"] == "recovery_required" and delta.get("complete") is True and delta.get("introducedCount", 0) >= 1,
+        require(status["state"] == "recovery_required" and delta.get("complete") is True and delta.get("introducedErrorCount", 0) >= 1,
                 "Unexpected failed outcome: %s %s" % (status["state"], delta))
-        require(all("UnrelatedConsumer" in json.dumps(row) for row in delta["introduced"]), "Introduced findings are not the consumer's: %s" % delta["introduced"])
+        errors = [row for row in delta["introduced"] if row[0] == "Error"]
+        require(errors and all("UnrelatedConsumer" in json.dumps(row) for row in errors), "Introduced errors are not the consumer's: %s" % delta["introduced"])
         require("changed_project_saved" not in status["stages"], "A failed change was saved")
         return {"error": error["code"], "state": status["state"], "introduced": delta["introduced"],
                 "compilerSucceeded": status["compile"].get("compilerSucceeded")}

@@ -15,6 +15,11 @@ namespace TiaMcp.Openness.V21
 
         internal static bool NoNewProblems(JObject before, JObject after) => Compare(before, after).Value<bool>("verified");
 
+        // Kinds that passed with warnings before #221 keep doing so: a clean compile passes as it always did, and a
+        // failing one passes only when it introduced no error. Tag-table imports use the stricter NoNewProblems.
+        internal static bool Accepts(JObject before, JObject after, JObject comparison) =>
+            CompilationEvidenceRules.IsSuccessful(after) || (comparison.Value<bool>("complete") && comparison.Value<int>("introducedErrorCount") == 0);
+
         internal static JObject Compare(JObject before, JObject after)
         {
             var result = new JObject { ["verified"] = false, ["complete"] = false, ["scopeUnchanged"] = false };
@@ -36,6 +41,7 @@ namespace TiaMcp.Openness.V21
             result["complete"] = true;
             result["verified"] = introduced.Count == 0;
             result["existingCount"] = existing.Count; result["resolvedCount"] = resolved.Count; result["introducedCount"] = introduced.Count;
+            result["introducedErrorCount"] = introduced.Count(p => JArray.Parse(p)[0].Value<string>() == "Error");
             result["existing"] = Listed(existing); result["resolved"] = Listed(resolved); result["introduced"] = Listed(introduced);
             return result;
         }

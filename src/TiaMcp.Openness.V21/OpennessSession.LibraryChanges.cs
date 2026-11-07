@@ -952,8 +952,6 @@ namespace TiaMcp.Openness.V21
                         LibraryJournal(change, "baseline_compile", "dispatching");
                         baseline = LibraryCompile(change);
                         change.Journal["compileBaseline"] = baseline; LibraryJournal(change, "baseline_compile", "completed");
-                        if (!CompilationEvidenceRules.IsCompleted(baseline))
-                            throw new BridgeException("CompileEvidenceIncomplete", "The baseline compiler did not return complete diagnostics. No library action was dispatched.");
                     }
                     change.State = "applying"; LibraryJournal(change, "native_mutation", "dispatching");
                     change.Journal["result"] = ApplyLibraryAction(change);
@@ -966,8 +964,8 @@ namespace TiaMcp.Openness.V21
                         result["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(result);
                         result["baselineComparison"] = CompileBaselineRules.Compare(baseline, result);
                         change.Journal["compile"] = result; LibraryJournal(change, "compile", "completed");
-                        if (result["baselineComparison"].Value<bool>("verified") != true)
-                            throw new BridgeException("CompileFailed", "Applied library change introduced or worsened compiler findings, changed the compile scope or returned incomplete diagnostics. Checkpoint resources remain available.");
+                        if (!CompileBaselineRules.Accepts(baseline, result, (JObject)result["baselineComparison"]))
+                            throw new BridgeException("CompileFailed", "Applied library change introduced or worsened compiler errors, changed the compile scope or returned incomplete diagnostics. Checkpoint resources remain available.");
                         VerifyLibraryUpdateReadback(change, "compile", true);
                     }
                     foreach (var library in LibraryWrittenResources(change))

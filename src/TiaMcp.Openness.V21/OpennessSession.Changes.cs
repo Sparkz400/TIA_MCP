@@ -102,7 +102,7 @@ namespace TiaMcp.Openness.V21
                 change.Preview["checkpoint"] = "Applying requires checkpointSave=true: current in-memory project edits are saved before a compressed recovery archive is created. No mutation proceeds without that archive.";
                 change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. Save-after-change requires a successful compile. Compile does not validate machine behavior.";
                 if (UsesCompileBaseline(change.Kind))
-                    change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. With compile=true the same scope compiles before and after the mutation; the change fails on introduced or worsened findings, a changed compile scope or incomplete diagnostics. Unchanged findings may remain and are listed in compile.baselineComparison; inspect compilerSucceeded. Compile does not validate machine behavior.";
+                    change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. With compile=true the same scope compiles before and after the mutation; the change fails on an introduced or worsened error, a changed compile scope or incomplete diagnostics (tag-table imports also fail on new or changed warnings). Unchanged findings may remain and are listed in compile.baselineComparison; inspect compilerSucceeded. Compile does not validate machine behavior.";
                 change.Preview["backups"] = change.Backups;
                 change.PreviewHash = ChangeHash(change.Preview.ToString(Formatting.None));
                 change.State = "prepared";
@@ -203,8 +203,9 @@ namespace TiaMcp.Openness.V21
                         if (change.Kind == TagTableImportRules.Kind) change.TagTableEvidence["baselineCompile"] = change.CompileBaseline;
                         change.Stages.Add(change.Kind == TagTableImportRules.Kind ? "tag_table_baseline_compile_finished" : "baseline_compile_finished");
                         WriteChangeJournal(change);
-                        if (!CompilationEvidenceRules.IsCompleted(change.CompileBaseline))
-                            throw new BridgeException("CompileEvidenceIncomplete", "The baseline compiler did not return complete diagnostics. No mutation was dispatched.");
+                        // Without complete baseline diagnostics only a clean compile can pass; the tag import refuses outright.
+                        if (change.Kind == TagTableImportRules.Kind && !CompilationEvidenceRules.IsCompleted(change.CompileBaseline))
+                            throw new BridgeException("CompileEvidenceIncomplete", "The baseline compiler did not return complete diagnostics. No tag import was dispatched.");
                     }
                     if (!IsCompileOnlyKind(change.Kind))
                     {
@@ -234,7 +235,8 @@ namespace TiaMcp.Openness.V21
                         // A text-list import or an admitted HMI kind must leave the compiler problems as the compile before the write found them.
                         if (change.Kind == "hmi_classic_screen_edit" ? !ClassicScreenCompileRules.NoNewProblems(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
                             : change.Kind == "hmi_text_list_import" || HmiEngineeringRules.IsAdmittedKind(change.Kind) ? !HmiTextListImportRules.CompileProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
-                            : UsesCompileBaseline(change.Kind) ? change.Compilation?["baselineComparison"]?.Value<bool>("verified") != true
+                            : change.Kind == TagTableImportRules.Kind ? change.Compilation?["baselineComparison"]?.Value<bool>("verified") != true
+                            : UsesCompileBaseline(change.Kind) ? change.Compilation == null || !CompileBaselineRules.Accepts(change.CompileBaseline, change.Compilation, (JObject)change.Compilation["baselineComparison"])
                             : !CompilationEvidenceRules.IsCompleted(change.Compilation))
                             throw new BridgeException(change.Compilation?.Value<int?>("errorCount") == 0 ? "CompileDiagnosticRegression" : "CompileFailed",
                                 "The change failed compiler verification: errors, new/changed warnings, or incomplete diagnostics. "
