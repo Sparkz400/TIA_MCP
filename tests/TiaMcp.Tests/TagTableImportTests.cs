@@ -118,4 +118,24 @@ internal static class TagTableImportTests
         Check.Equal(false, CompileBaselineRules.Accepts(Compile("Duplicate IP"), Compile("Duplicate IP"), CompileBaselineRules.Compare(null, Compile("Duplicate IP"))));
         return Task.CompletedTask;
     }
+
+    internal static Task SourceRefreshParts()
+    {
+        static string Block(string number, string member, string code) =>
+            $"<Document><SW.Blocks.FC ID=\"0\"><AttributeList><Interface><Sections><Section Name=\"Input\"><Member Name=\"{member}\" Datatype=\"Bool\" /></Section></Sections></Interface>" +
+            $"<Number>{number}</Number><ProgrammingLanguage>SCL</ProgrammingLanguage></AttributeList><ObjectList><SW.Blocks.CompileUnit ID=\"3\"><AttributeList><NetworkSource>{code}</NetworkSource></AttributeList></SW.Blocks.CompileUnit></ObjectList></SW.Blocks.FC></Document>";
+        var before = SourceRefreshRules.Parts(Block("1", "a", "x"));
+        var reserialized = SourceRefreshRules.Parts(Block("1", "a", "x").Replace("ID=\"3\"", "ID=\"9\""));
+        Check.Equal(before.Interface, reserialized.Interface);
+        Check.Equal(before.Body, reserialized.Body);
+        Check.Equal("1", before.Number);
+        Check.Equal(false, before.Interface == SourceRefreshRules.Parts(Block("1", "b", "x")).Interface);
+        Check.Equal(before.Body, SourceRefreshRules.Parts(Block("1", "b", "x")).Body);
+        Check.Equal(false, before.Body == SourceRefreshRules.Parts(Block("1", "a", "y")).Body);
+        Check.Equal(false, before.Body == SourceRefreshRules.Parts(Block("2", "a", "x")).Body);
+        var spaced = SourceRefreshRules.Parts(Block("1", "a", "x").Replace("<NetworkSource>x</NetworkSource>", "<NetworkSource><Blank Num=\"2\" UId=\"7\" />x</NetworkSource>"));
+        Check.Equal(before.Body, spaced.Body);
+        Check.Equal(false, before.Formatted == spaced.Formatted);
+        return Task.CompletedTask;
+    }
 }

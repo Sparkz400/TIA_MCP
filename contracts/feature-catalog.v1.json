@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.140",
+  "catalogVersion": "0.4.141",
   "targetTiaVersions": [
     21
   ],
@@ -4952,6 +4952,23 @@
         "Source commit 131d0a7a differs from the built 4e2578e3 only in scripts/qualify_cancellation.py; src and every executable run are byte-identical to 4e2578e3.",
         "One cancellation point (during checkpoint/apply of a tag_create) on one owned scratch CPU 1511-1 PN; the Host keeps the interrupted request in flight but cannot stop native work, and the cancelled dispatch's admission still needs the existing fresh-instance reconciliation. Cancellation before dispatch, during compile or save, and a worker crash during the interrupted request are covered by managed tests only."
       ]
+    },
+    {
+      "id": "local.source-refresh.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "7f19f40665d4f008f973bbec39930ce292309ec7",
+        "passedScope": "scripts/qualify_source_refresh.py on Debug builds of 7f19f406 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 7/7 steps: source_upsert created SCL FBs RefreshCallee and RefreshCaller (multi-instance call). block_read format=generatedSource exported RefreshCaller's own source (the temporary external source removed). source_upsert of exactly that source applied with checkpoint, compile and save; its source-refresh-comparison readback reported RefreshCaller with number 3 before and after, interface and body unchanged and only layout tokens changed (logicChanged=false, interfaceChanged=false, numbersPreserved=true), beside a complete compile.baselineComparison with no existing, resolved or introduced finding. The same source with one call argument changed from TRUE to FALSE reported logicChanged=true with interface and number unchanged."
+      },
+      "artifacts": [
+        "evidence/local.source-refresh.20261107.json"
+      ],
+      "limitations": [
+        "A stale-interface fixture could not be created through MCP: a change that leaves a block uncompiled fails its own after-change fingerprint. The 4 November alarm-ID resolution therefore remains a user-reported observation; no cause is inferred.",
+        "SCL FBs on one owned scratch CPU 1511-1 PN; STL and DB sources, software units and know-how protected blocks are not exercised. An interrupted refresh is reconciled by the generic routes of local.bridge.cancellation.20261107."
+      ]
     }
   ],
   "features": [
@@ -7907,7 +7924,8 @@
           "One exact native group and namespace per change; cross-scope relocation and implicit namespace changes are rejected.",
           "SIMATIC_SD imports independently authored .s7dcl graphical reference documents through native ImportFromDocuments, mandatory compilation and checkpointing; only new exact declared names are permitted and existing blocks cannot be replaced by this route.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107)."
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107).",
+          "Refresh evidence (since 7 November 2026, #216): a compiled source_upsert compares each existing block's native export before and after and reports number, interface, body (without layout tokens) and layout per block in the source-refresh-comparison readback; it is an observation beside compile.baselineComparison and infers no cause (local.source-refresh.20261107)."
         ]
       },
       "qualification": {
@@ -7916,7 +7934,8 @@
           "local.milestones.rerun.20261028",
           "local.plc_object_mutations.rerun.20261028",
           "local.safety.fio-block-routes.20261102",
-          "local.compile-baseline.unrelated-errors.20261107"
+          "local.compile-baseline.unrelated-errors.20261107",
+          "local.source-refresh.20261107"
         ]
       },
       "availability": {
