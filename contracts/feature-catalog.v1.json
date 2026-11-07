@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.147",
+  "catalogVersion": "0.4.148",
   "targetTiaVersions": [
     21
   ],
@@ -5072,6 +5072,23 @@
         "Milestones are derived from the recorded state, stages and compile result of each change; a phase still running during a poll was not observed natively because the tag change finished too quickly.",
         "host_build_identity compares file hashes, not source revisions: builds do not embed a commit, so mapping a hash to a commit needs the build records."
       ]
+    },
+    {
+      "id": "local.compile-baseline.unrelated-blocks.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2e093db982457cca7f6e6157eb435226173eca2d",
+        "passedScope": "scripts/qualify_unrelated_blocks.py on Debug builds of 2e093db9 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 9/9 steps: TagImportFixture seeded the inconsistent SCL FC TagScopeBroken beside consistent blocks. project_inventory, software_inspect, tag_table_read and block_read of a consistent block all answered; block_read of TagScopeBroken returned BlockExportUnavailable. An unrelated tag_create prepared with TagScopeBroken listed under fingerprintCoverage.inconsistentBlocksMetadataOnly and applied with checkpoint, compile and save, its baselineComparison complete with the existing UnresolvedFlag error and no introduced error. change_restore of that change was refused with ScopedRecoveryRequired naming the retained archive. A second unrelated change (source_upsert of FC Unrelated_FC) applied in the same session. A source_upsert targeting TagScopeBroken was refused at prepare with FingerprintUnavailable."
+      },
+      "artifacts": [
+        "evidence/local.compile-baseline.unrelated-blocks.20261107.json"
+      ],
+      "limitations": [
+        "Source commit 2e093db9 differs from the built 2e093db9 only in scripts/qualify_unrelated_blocks.py.",
+        "One unrelated inconsistent SCL FC on one owned scratch PLC; inconsistent PLC data types, protected blocks and other read tools are not exercised. Changes with metadata-only bystanders can be recovered only manually from their retained archive."
+      ]
     }
   ],
   "features": [
@@ -8072,7 +8089,8 @@
           "SIMATIC_SD imports independently authored .s7dcl graphical reference documents through native ImportFromDocuments, mandatory compilation and checkpointing; only new exact declared names are permitted and existing blocks cannot be replaced by this route.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107).",
-          "Refresh evidence (since 7 November 2026, #216): a compiled source_upsert compares each existing block's native export before and after and reports number, interface, body (without layout tokens) and layout per block in the source-refresh-comparison readback; it is an observation beside compile.baselineComparison and infers no cause (local.source-refresh.20261107)."
+          "Refresh evidence (since 7 November 2026, #216): a compiled source_upsert compares each existing block's native export before and after and reports number, interface, body (without layout tokens) and layout per block in the source-refresh-comparison readback; it is an observation beside compile.baselineComparison and infers no cause (local.source-refresh.20261107).",
+          "Unrelated inconsistent blocks (since 7 November 2026, #221): an inconsistent block that is not a change target is fingerprinted by metadata only and listed in fingerprintCoverage.inconsistentBlocksMetadataOnly; change_restore of such a change refuses whole-project restore with ScopedRecoveryRequired, and an inconsistent target still refuses with FingerprintUnavailable (local.compile-baseline.unrelated-blocks.20261107)."
         ]
       },
       "qualification": {
@@ -8082,7 +8100,8 @@
           "local.plc_object_mutations.rerun.20261028",
           "local.safety.fio-block-routes.20261102",
           "local.compile-baseline.unrelated-errors.20261107",
-          "local.source-refresh.20261107"
+          "local.source-refresh.20261107",
+          "local.compile-baseline.unrelated-blocks.20261107"
         ]
       },
       "availability": {
@@ -11344,7 +11363,8 @@
           "Interrupted calls (since 7 November 2026, #217): a cancelled or timed-out request that reached the worker keeps running and is never replayed; later calls are refused with PreviousOperationRunning until it finishes, then its late response is recorded and the session continues without a Host restart (local.bridge.cancellation.20261107).",
           "A tag on a drive's PROFIsafe telegram address is refused at prepare with SafetyBoundary since 7 November 2026; earlier only modules with Failsafe_FDestinationAddress counted as F-I/O (local.safety.drive-tags.20261107).",
           "change_prepare accepts optional confirmed intent (decisions, observedFacts, assumptions), recorded in the hash-bound preview, compared with earlier applied decisions of the project (previouslyConfirmed, conflicts) and never evaluated (local.change.confirmed-intent.20261107).",
-          "Every change result and change_status carry progress (projectEditComplete, milestones, summary, notCovered); progressOnly adds phaseFingerprint, currentPhase and its elapsed time (local.progress.reporting.20261107)."
+          "Every change result and change_status carry progress (projectEditComplete, milestones, summary, notCovered); progressOnly adds phaseFingerprint, currentPhase and its elapsed time (local.progress.reporting.20261107).",
+          "Unrelated inconsistent blocks (since 7 November 2026, #221): an inconsistent block that is not a change target is fingerprinted by metadata only and listed in fingerprintCoverage.inconsistentBlocksMetadataOnly; change_restore of such a change refuses whole-project restore with ScopedRecoveryRequired, and an inconsistent target still refuses with FingerprintUnavailable (local.compile-baseline.unrelated-blocks.20261107)."
         ]
       },
       "qualification": {
@@ -11356,7 +11376,8 @@
           "local.bridge.cancellation.20261107",
           "local.safety.drive-tags.20261107",
           "local.change.confirmed-intent.20261107",
-          "local.progress.reporting.20261107"
+          "local.progress.reporting.20261107",
+          "local.compile-baseline.unrelated-blocks.20261107"
         ]
       },
       "availability": {

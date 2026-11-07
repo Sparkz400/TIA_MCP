@@ -1,0 +1,71 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.compile-baseline.unrelated-blocks.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T11:02:52+00:00",
+  "source": {
+    "commit": "2e093db982457cca7f6e6157eb435226173eca2d",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_unrelated_blocks.py on Debug builds of 2e093db9 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 9/9 steps: TagImportFixture seeded the inconsistent SCL FC TagScopeBroken beside consistent blocks. project_inventory, software_inspect, tag_table_read and block_read of a consistent block all answered; block_read of TagScopeBroken returned BlockExportUnavailable. An unrelated tag_create prepared with TagScopeBroken listed under fingerprintCoverage.inconsistentBlocksMetadataOnly and applied with checkpoint, compile and save, its baselineComparison complete with the existing UnresolvedFlag error and no introduced error. change_restore of that change was refused with ScopedRecoveryRequired naming the retained archive. A second unrelated change (source_upsert of FC Unrelated_FC) applied in the same session. A source_upsert targeting TagScopeBroken was refused at prepare with FingerprintUnavailable.",
+  "limitations": [
+    "Source commit 2e093db9 differs from the built 2e093db9 only in scripts/qualify_unrelated_blocks.py.",
+    "One unrelated inconsistent SCL FC on one owned scratch PLC; inconsistent PLC data types, protected blocks and other read tools are not exercised. Changes with metadata-only bystanders can be recovered only manually from their retained archive."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "e49b94a85c0856bd543b7aa1afdcc854989b7a105cff6a777e6f64e87c2d289a"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "7bc2d15439b9fed1d56b579b1afca8b6517270d363ddc590488986b8b36304e9"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "660957b29929a4009e937334a6e6b25c9787530dd66218b5782c0f16a2a62260"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "75ed8cd5031220686a8100564903615ba3bc6406cb074efc03288035f43f1a4a",
+      "bytes": 15769,
+      "completed": true,
+      "steps": [
+        "owned scratch",
+        "seed an unrelated inconsistent SCL block",
+        "reads beside the inconsistent block",
+        "an unrelated tag_create applies beside the inconsistent block",
+        "whole-project restore of such a change is refused",
+        "a second unrelated change applies in the same session",
+        "a change targeting the inconsistent block still refuses",
+        "owned worker shutdown"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "project_inventory",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "block_read",
+        "change_prepare",
+        "change_restore"
+      ]
+    }
+  ]
+}
