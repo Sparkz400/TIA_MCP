@@ -12,7 +12,7 @@ public static class ToolGroups
     private static readonly (string Prefix, string Group)[] Rules =
     [
         ("qualification_", Qualification),
-        ("feature_catalog", Base), ("artifact_", Base),
+        ("feature_catalog", Base), ("host_build_identity", Base), ("artifact_", Base),
         ("project_model", "explorer"), ("project_snapshot_", "explorer"),
         ("plc_online_compare", "simulation"), ("plc_station_upload", "simulation"), ("sim_", "simulation"), ("simulation_", "simulation"), ("db_snapshot_", "simulation"),
         ("tia_", "core"), ("project_", "core"), ("target_capabilities", "core"), ("object_resolve", "core"), ("fixture_sources", "core"),
@@ -24,7 +24,7 @@ public static class ToolGroups
         ("diagnostic_", "diagnostics"), ("trace_", "diagnostics"),
         ("testsuite_", "testsuite"), ("translation_", "translation"), ("opcua_", "opcua"), ("vci_", "vci"),
         ("automationml_", "cax"), ("cax_", "cax"), ("graph_", "graph"),
-        ("access_", "reviews"), ("addin_", "reviews"), ("composite_", "reviews"), ("connection_", "reviews"), ("drive_", "reviews"),
+        ("access_", "reviews"), ("addin_", "reviews"), ("composite_", "reviews"), ("connection_", "reviews"), ("drive_", "reviews"), ("servo_", "reviews"),
         ("multiuser_", "reviews"), ("public_certificate_", "reviews"), ("certificate_", "reviews"), ("safety_", "reviews"),
         ("software_unit_", "reviews"), ("technology_profile_", "reviews"), ("teamcenter_", "reviews"), ("web_", "reviews"),
     ];

@@ -998,6 +998,12 @@
       ]
     },
     {
+      "featureId": "host_build_identity",
+      "obligations": [
+        "L06"
+      ]
+    },
+    {
       "featureId": "target_capabilities",
       "obligations": [
         "F01",
@@ -1193,6 +1199,12 @@
     },
     {
       "featureId": "change.safety_fparameter_set",
+      "obligations": [
+        "D14"
+      ]
+    },
+    {
+      "featureId": "change.safety_drive_tags",
       "obligations": [
         "D14"
       ]
@@ -3662,6 +3674,12 @@
     },
     {
       "featureId": "drive_inventory",
+      "obligations": [
+        "D10"
+      ]
+    },
+    {
+      "featureId": "servo_call_plan",
       "obligations": [
         "D10"
       ]

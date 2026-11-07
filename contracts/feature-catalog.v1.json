@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.143",
+  "catalogVersion": "0.4.147",
   "targetTiaVersions": [
     21
   ],
@@ -5003,6 +5003,75 @@
         "No technology object is connected; the technology join, ambiguous tag ownership across PLCs, tags spanning telegrams, partial or unavailable Startdrive coverage and duplicate axis associations are covered by managed tests only.",
         "Two G120C PN drives with one drive object and telegram 1 each; S120/S210 multi-axis drives, supplementary or safety telegrams and nonsequential address gaps are not exercised natively."
       ]
+    },
+    {
+      "id": "local.safety.drive-tags.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "7c0d221f1ac12a1fdff72a585a081ba13261ac60",
+        "passedScope": "scripts/qualify_safety_drive_tags.py on Debug builds of 21542b8a in one owned TIA V21 Update 3 scratch, 13/13 steps: an added CPU 1511F-1 PN (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) on subnet SafeNet as IO controller of a SINAMICS G120C PN 6SL3210-1KE21-3AF1 (firmware 4.7.14) assigned with network_io_assign; the native fixture helper inserted PROFIsafe telegram 30 through Startdrive Openness; drive_inventory showed telegram 30 at input and output byte 0 (48 bits) beside main telegram 1 at byte 256 and was writeReady. A generic tag_create at %IW0 on the F-PLC was refused at prepare with SafetyBoundary naming the drive. safety_drive_tags without safetyAcknowledged was refused with InvalidRequest; with it, it planned S_ZSW1 SafeDrive_S_ZSW1 at %IW0 and S_STW1 SafeDrive_S_STW1 at %QW0 (Word) in Default tag table, applied with checkpoint, baseline and device compile and save, change_status confirmed the applied state, and software_inspect read both back as Word safety tags at those addresses. A repeat was refused with ObjectExists, and change_restore returned the checkpoint (restored)."
+      },
+      "artifacts": [
+        "evidence/local.safety.drive-tags.20261107.json"
+      ],
+      "limitations": [
+        "One SINAMICS G120C PN with PROFIsafe telegram 30 on one owned F-CPU 1511F-1 PN; other telegrams (for example 900-series), S120/S210 drives, several drive objects and user tag-table groups are refused or not exercised.",
+        "The PROFIsafe telegram was inserted by the qualification fixture, not by an MCP route. No F-destination address, Safety Integrated parameter, safety acceptance, password or download; compile success is engineering evidence, not machine safety acceptance. Interruption of this kind is covered only by the generic routes of local.bridge.cancellation.20261107.",
+        "Source commit adds only the change_status check and release owner to scripts after the built 21542b8a; src and every executable run are byte-identical to it."
+      ]
+    },
+    {
+      "id": "local.drives.servo-calls.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "35e39ed75921f2a9768f88df0d2546149a2b0551",
+        "passedScope": "scripts/qualify_servo_calls.py on Debug builds of 35e39ed7 in one owned TIA V21 Update 3 scratch, 30/30 steps: the scratch CPU 1511-1 PN with two SINAMICS G120C PN drives assigned to its IO system (telegram 1 at bytes 256 and 260), Word tags at each telegram's start addresses, Bool signals Reset, DoorOpen and SS1, and an SCL wrapper FB ServoWrap (inputs zsw Word, reset Bool, ss1 Bool; outputs stw Word, fault Bool). servo_call_plan with the explicit mapping status=zsw, control=stw, reset=reset, ss1=ss1, fault=fault, resetExpression \"Reset\" AND NOT \"DoorOpen\" and ss1Expression \"SS1\" was writeReady; its source_upsert applied with checkpoint, compile (compilerSucceeded) and save. The generated caller Servos holds exactly one call and one fault Bool per drive instance (Axis1, Axis2), and symbol_trace lists only Servos as writer of Drive1Item_STW1 and Drive2Item_STW1. After an FC OldWriter wrote Drive1Item_STW1, a new plan was not writeReady and named OldWriter in a duplicateControlWriter blocker."
+      },
+      "artifacts": [
+        "evidence/local.drives.servo-calls.20261107.json"
+      ],
+      "limitations": [
+        "A synthetic SCL wrapper FB stands in for a vendor servo block; two G120C PN drives with telegram 1 only. Watch tables, instance DBs outside the caller and graphical callers are not planned.",
+        "Engineering evidence only: reset and SS1 expressions are applied as given; no safety program, machine behavior, commissioning or download is verified."
+      ]
+    },
+    {
+      "id": "local.change.confirmed-intent.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "fc4c00cb9ed552c3868d2333088cbe3dcb5ede02",
+        "passedScope": "scripts/qualify_confirmed_intent.py on Debug builds of fc4c00cb in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 7/7 steps: change_prepare of tag_create Reset with intent (decision door-reset with source, target Servos, symbols Reset/DoorOpen, statement and meaning; one observed fact; one assumption) recorded it in preview.intent with the fixed verificationScope (machine safety behavior not verified) and no earlier decisions; after apply, change_status returned the identical intent. A second tag_create with the same decision listed it under previouslyConfirmed with the first change's id and no conflict, and applied. A third with a changed statement listed one conflict with the earlier statement and a preview warning. An intent with an unknown key (guess) was refused with InvalidRequest."
+      },
+      "artifacts": [
+        "evidence/local.change.confirmed-intent.20261107.json"
+      ],
+      "limitations": [
+        "Intent is recorded, compared by decision id and bound to the preview hash; the tool never checks an implementation against it or evaluates machine safety behavior. Decisions are compared per project path within one Host artifact directory.",
+        "Exercised with tag_create only; every change kind passes intent through the same change_prepare path."
+      ]
+    },
+    {
+      "id": "local.progress.reporting.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "d62587fa82b4c320cca639ef0120e7cfd55a3030",
+        "passedScope": "scripts/qualify_progress_reporting.py on Debug builds of d62587fa, 9/9 steps. Host A in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN): change_status of a prepared tag_create reported projectEditComplete=false with the prepared-only summary; its apply reported projectEditComplete=true with checkpointSaved, recoveryArchiveCreated, projectChanged, compiled and saved done, compilerSucceeded yes, and notCovered naming host_build_identity; two change_status progressOnly polls of the finished change returned the same phaseFingerprint, state applied and no current phase. Host B, configured with a copied engineering worker it never started: host_build_identity reported the worker hash at Host start equal to now and runningMatchesDisk=true; after one byte was appended to the copy it reported changedOnDisk=true, runningMatchesDisk=false and a note to restart the Host."
+      },
+      "artifacts": [
+        "evidence/local.progress.reporting.20261107.json"
+      ],
+      "limitations": [
+        "Milestones are derived from the recorded state, stages and compile result of each change; a phase still running during a poll was not observed natively because the tag change finished too quickly.",
+        "host_build_identity compares file hashes, not source revisions: builds do not embed a commit, so mapping a hash to a commit needs the build records."
+      ]
     }
   ],
   "features": [
@@ -7846,6 +7915,48 @@
       ]
     },
     {
+      "featureId": "host_build_identity",
+      "domain": "catalog",
+      "title": "Report the build the running Host and its workers use",
+      "mcpTools": [
+        "host_build_identity"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Host-only: SHA-256 of the Host and configured worker executables at Host start and on request; no native call."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compares file hashes, not source revisions; builds embed no commit.",
+          "A worker started after its file changed loads the new file; the report says so and asks for a Host restart."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.progress.reporting.20261107"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "Compatible .NET host runtime; native workers are not required."
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "target_capabilities",
       "domain": "catalog",
       "title": "Probe capabilities of an exact native target without mutation",
@@ -9625,6 +9736,56 @@
       ]
     },
     {
+      "featureId": "change.safety_drive_tags",
+      "domain": "safety",
+      "title": "Create a drive's PROFIsafe telegram 30 safety tags",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "safety_drive_tags",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Startdrive Openness DriveObject.Telegrams (TelegramType.SafetyTelegram, TelegramNumber, Addresses) and STEP 7 PlcTagComposition.Create with PlcTag.IsSafety readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload: hardwarePath and driveObjectNumber or driveObjectIndex of one drive object, tagTableName (a table in the PLC's root tag-table group), tags {status, control} and safetyAcknowledged: true. Creates S_ZSW1 at %IW<input start> and S_STW1 at %QW<output start> as Word, from Startdrive's addresses of PROFIsafe telegram 30 only.",
+          "Refuses without acknowledgement or writable safety administration (UnsupportedCapability), without a PROFIsafe telegram (SafetyTelegramMissing), for any telegram other than 30 (UnsupportedSafetyTelegram), for a name or overlapping address already in use (ObjectExists, AddressInUse) and for an address outside an F-I/O range of this drive that the selected F-PLC owns (SafetyBoundary). Apply re-plans, refuses StaleRevision on any difference, reads every tag back as a safety tag and compiles the device.",
+          "Generic tag routes keep refusing these addresses: shared F-I/O ranges include drives' PROFIsafe telegram addresses since 7 November 2026."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.safety.drive-tags.20261107"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 with STEP 7 Safety and an authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.project_simulation_enable",
       "domain": "simulation",
       "title": "Change project simulation compilation settings",
@@ -11180,7 +11341,10 @@
           "Safety units are rejected. An absolute input or output address (%I/%Q or %E/%A, bit to long word) inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native create with SafetyBoundary, because TIA makes such a tag a safety tag; nothing is created (1 November 2026; native run sl3 had created it first; the prepare refusal rechecked natively on an F-CPU with ET 200SP F-DI in local.safety.fio-routes.20261101). A created tag that TIA still reports as IsSafety fails verification and requires checkpoint recovery.",
           "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0).",
           "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107).",
-          "Interrupted calls (since 7 November 2026, #217): a cancelled or timed-out request that reached the worker keeps running and is never replayed; later calls are refused with PreviousOperationRunning until it finishes, then its late response is recorded and the session continues without a Host restart (local.bridge.cancellation.20261107)."
+          "Interrupted calls (since 7 November 2026, #217): a cancelled or timed-out request that reached the worker keeps running and is never replayed; later calls are refused with PreviousOperationRunning until it finishes, then its late response is recorded and the session continues without a Host restart (local.bridge.cancellation.20261107).",
+          "A tag on a drive's PROFIsafe telegram address is refused at prepare with SafetyBoundary since 7 November 2026; earlier only modules with Failsafe_FDestinationAddress counted as F-I/O (local.safety.drive-tags.20261107).",
+          "change_prepare accepts optional confirmed intent (decisions, observedFacts, assumptions), recorded in the hash-bound preview, compared with earlier applied decisions of the project (previouslyConfirmed, conflicts) and never evaluated (local.change.confirmed-intent.20261107).",
+          "Every change result and change_status carry progress (projectEditComplete, milestones, summary, notCovered); progressOnly adds phaseFingerprint, currentPhase and its elapsed time (local.progress.reporting.20261107)."
         ]
       },
       "qualification": {
@@ -11189,7 +11353,10 @@
           "local.plc_object_mutations.rerun.20261028",
           "local.safety.fio-routes.20261101",
           "local.compile-baseline.unrelated-errors.20261107",
-          "local.bridge.cancellation.20261107"
+          "local.bridge.cancellation.20261107",
+          "local.safety.drive-tags.20261107",
+          "local.change.confirmed-intent.20261107",
+          "local.progress.reporting.20261107"
         ]
       },
       "availability": {
@@ -27120,6 +27287,51 @@
         "status": "verified",
         "evidenceIds": [
           "local.drives.inventory.20261107"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SINAMICS Startdrive V21 Openness and a project with Startdrive drive devices; probe with target_capabilities on the drive hardware item."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "SINAMICS Startdrive V21 installed with its Openness assembly",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "servo_call_plan",
+      "domain": "drives",
+      "title": "Plan coordinated servo wrapper calls per drive",
+      "mcpTools": [
+        "servo_call_plan"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Host composition of drive_inventory, block_read (wrapper interface) and symbol_trace (control-tag writers); the plan is applied through source_upsert."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Generates one new or replaced SCL caller FB; existing networks in other blocks are untouched. An existing writer of a selected control tag other than the caller blocks the plan instead of being rewritten.",
+          "Wrapper parameters are matched by the explicit mapping and the wrapper's native interface section and type; reset and SS1 are single SCL expressions applied as given.",
+          "Watch tables and instance DBs outside the caller are not planned."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.drives.servo-calls.20261107"
         ]
       },
       "availability": {

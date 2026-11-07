@@ -104,6 +104,16 @@ namespace TiaMcp.Openness.V21
                 if (UsesCompileBaseline(change.Kind))
                     change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. With compile=true the same scope compiles before and after the mutation; the change fails on an introduced or worsened error, a changed compile scope or incomplete diagnostics (tag-table imports also fail on new or changed warnings). Unchanged findings may remain and are listed in compile.baselineComparison; inspect compilerSucceeded. Compile does not validate machine behavior.";
                 change.Preview["backups"] = change.Backups;
+                if (args["intent"] is JObject intent)
+                {
+                    // #220: recorded and hash-bound with the preview; compared, never evaluated.
+                    var recorded = IntentRules.Normalize(intent);
+                    IntentRules.Compare(recorded, EarlierDecisions(args, change.ProjectPath));
+                    if (recorded["conflicts"].HasValues)
+                        ((JArray)change.Preview["warnings"]).Add("Confirmed intent conflicts with a decision of an earlier applied change in this project; review intent.conflicts before applying.");
+                    change.Preview["intent"] = recorded;
+                }
+                else if (args["intent"] != null && args["intent"].Type != JTokenType.Null) throw new BridgeException("InvalidRequest", "intent must be an object.");
                 change.PreviewHash = ChangeHash(change.Preview.ToString(Formatting.None));
                 change.State = "prepared";
                 WriteChangeJournal(change);
@@ -265,12 +275,13 @@ namespace TiaMcp.Openness.V21
                     if (change.Kind == "source_upsert") { VerifyExpectedBlocksExist(change, SelectPlc(change.Selector)); change.Stages.Add("source_blocks_verified_after_save"); }
                     if (change.Kind == "certificate_create") { VerifyCreatedCertificateAfterSave(change, project); change.Stages.Add("certificate_verified_after_save"); }
                     if (change.Kind == "instance_db_create") { VerifyInstanceDb(change, SelectPlc(change.Selector)); change.Stages.Add("instance_db_verified_after_save"); }
-                    if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile" || change.Kind == "safety_fparameter_set") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
+                    if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_drive_tags") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
                     change.AfterFingerprint = change.Kind == "hmi_classic_screen_edit"
                         ? ClassicScreenCapturedFingerprint(change, project, change.HmiEvidence["after-save"] as JObject)
                         : EngineeringFingerprint(change, project);
                     change.State = "applied";
                     WriteChangeJournal(change);
+                    RecordAppliedDecisions(change);
                     return ChangeView(change);
                 }
                 catch (Exception ex)
@@ -734,6 +745,15 @@ namespace TiaMcp.Openness.V21
                 case "hardware_cpu_parameters":
                     PrepareCpuParameters(change, project, preview);
                     break;
+                case "safety_drive_tags":
+                {
+                    var plc = SelectPlc(change.Selector);
+                    preview["safetyDriveTags"] = Startdrive(() => SafetyDriveTagPlan(change, project));
+                    preview["safetyBefore"] = ReadSafety(plc.Software);
+                    effects.Add(new JObject { ["plcPath"] = plc.Path, ["action"] = change.Kind });
+                    ((JArray)preview["warnings"]).Add("Creates PROFIsafe safety tags, which changes the safety program signatures after the F-compile. Nothing here validates, accepts or approves the safety program or the drive's Safety Integrated configuration.");
+                    break;
+                }
                 case "safety_fparameter_set":
                 {
                     var plc = SelectPlc(change.Selector);
@@ -1012,6 +1032,9 @@ namespace TiaMcp.Openness.V21
                     TagCreate(change, plc, MutationTable(change, plc), true);
                     break;
                 }
+                case "safety_drive_tags":
+                    Startdrive(() => { ApplySafetyDriveTags(change, project); return true; });
+                    break;
                 case "block_number_set":
                 case "block_attributes_set":
                     ApplyBlockEdit(change);
@@ -1531,7 +1554,7 @@ namespace TiaMcp.Openness.V21
                 snapshot["technologyConnections"] = TechnologyConnections(entry.Item, connectionBudget, new JArray(), entry.Path, out _, new TechnologyReferenceReader(plc.Project, plc.Path));
                 if (connectionBudget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish a complete technology connection fingerprint within the scan bound.");
             }
-            if (change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set") snapshot["driveObject"] = Startdrive(() => DriveObjectFingerprint(change, project));
+            if (change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_drive_tags") snapshot["driveObject"] = Startdrive(() => DriveObjectFingerprint(change, project));
             if (change.Kind == "drive_parameter_set") snapshot["driveParameters"] = Startdrive(() => DriveParameterFingerprint(change, project));
             if (change.Kind == "drive_telegram_set") snapshot["driveTelegrams"] = Startdrive(() => DriveTelegramFingerprint(change, project));
             if (change.Kind.StartsWith("to_", StringComparison.Ordinal))
@@ -1765,7 +1788,25 @@ namespace TiaMcp.Openness.V21
             view["automaticRetryAllowed"] = false;
             view["phaseTimings"] = change.PhaseTimings.DeepClone();
             view["progressPath"] = Path.Combine(change.Directory, "progress.json");
+            view["progress"] = ChangeMilestoneRules.From(change.State, change.Stages, change.Compilation);
             return change.Kind == "hmi_classic_screen_edit" && !includeDetails ? ClassicScreenReceipts.Compact(view) : view;
+        }
+
+        private static string DecisionLog(string changesDirectory) => Path.Combine(changesDirectory, "intent-decisions.jsonl");
+
+        private IEnumerable<JObject> EarlierDecisions(JObject args, string projectPath)
+        {
+            string log = DecisionLog(ArtifactDirectory(args));
+            if (!File.Exists(log)) return Enumerable.Empty<JObject>();
+            return File.ReadAllLines(log).Where(l => l.Length > 0).Select(JObject.Parse)
+                .Where(d => string.Equals(d.Value<string>("projectPath"), projectPath, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        // Only decisions of applied changes become the project's confirmed record.
+        private static void RecordAppliedDecisions(EngineeringChange change)
+        {
+            if (!(change.Preview?["intent"]?["decisions"] is JArray decisions) || decisions.Count == 0) return;
+            File.AppendAllLines(DecisionLog(Path.GetDirectoryName(change.Directory)), decisions.OfType<JObject>().Select(d => IntentRules.Line(change.ProjectPath, change.Id, d)));
         }
 
         private static void WriteChangeJournal(EngineeringChange change)

@@ -343,6 +343,8 @@ internal static partial class Program
             ("Compile baselines classify existing, resolved and introduced findings", TagTableImportTests.CompileBaselineClassification),
             ("Source refresh separates number, interface and body, ignoring serialization IDs", TagTableImportTests.SourceRefreshParts),
             ("Unresolved symbols are listed from compiler messages without guessing", TagTableImportTests.UnresolvedSymbols),
+            ("Confirmed intent is recorded, compared and never evaluated", TagTableImportTests.ConfirmedIntent),
+            ("Change milestones say whether the project edit is complete", TagTableImportTests.ChangeMilestones),
             ("UMAC role changes plan exact effects and preserve administrators", UmacRoleRulesTests.PlansExactEffectsAndPreservesAdministrators),
             ("Graphical fragments use the native default namespace", EngineeringSourcesTests.GraphicalFragmentsUseNativeDefaultNamespace),
             ("Native network insertion preserves existing units and checks IDs", EngineeringSourcesTests.NativeNetworkInsertionPreservesExistingUnitsAndChecksIds),

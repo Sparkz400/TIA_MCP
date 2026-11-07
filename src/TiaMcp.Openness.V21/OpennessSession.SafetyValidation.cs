@@ -126,6 +126,9 @@ namespace TiaMcp.Openness.V21
                     foreach (var address in item.Item.Addresses)
                         if (!address.AddressControllers.Any() || address.AddressControllers.Any(controller => ControllerMatchesSelectedPlc(controller, plc.Software) != false))
                             ranges.Add((address.IoType.ToString(), address.StartAddress, address.Length, fIo.Path));
+            // A drive's PROFIsafe telegram carries no Failsafe_FDestinationAddress, so Startdrive is asked directly (#212).
+            try { ranges.AddRange(Startdrive(() => DriveSafetyTelegramRanges(plc, hardware))); }
+            catch (BridgeException error) when (error.Code == "UnsupportedCapability") { /* No Startdrive: no drive telegrams to read. */ }
             return ranges;
         }
 

@@ -27,6 +27,39 @@ Preparation returns `changeId`, `previewHash`, `preview`, `journalPath`, and `st
 
 `checkpointSave: true` **saves the entire current in-memory project**, including previously unsaved user edits, before creating `before.zap21`. Siemens requires a saved project for archiving. The worker will not apply a mutation unless that archive exists and its SHA-256 has been recorded. `save: true` after mutation requires `compile: true` and passed compile verification.
 
+### Reporting progress
+
+Every change result and `change_status` carry `progress`:
+
+- `projectEditComplete`, true once the change is applied and saved, or restored
+- `milestones`: prepared, checkpoint saved, recovery archive created, project changed, readback verified, compiled, compiler succeeded, saved; each `done`, `notReached`, `skipped`, `pending` or, for the compiler, `yes`/`no`/`unknown`
+- a one-line `summary`
+- `notCovered`, a reminder that repository work, MCP qualification and the running build are separate questions
+
+`change_status` with `progressOnly: true` reads the progress receipt while a change runs. It reports `currentPhase` with its elapsed time, and a `phaseFingerprint` that changes only when the state or a phase changes. An unchanged fingerprint means there is nothing new to tell the user.
+
+`host_build_identity` reports which build the connected Host runs: process start, product version and the SHA-256 of the Host and worker executables when the Host started and now. A rebuilt or replaced file shows as `changedOnDisk`, and `runningMatchesDisk` is false. Building or packaging a new version never updates a running Host; only a restart does, after which the report shows the new hashes.
+
+Concise reports keep these apart, for example:
+
+- "The tag import is applied and saved. The PLC still has the one compiler error it had before (`compilerSucceeded: false`)."
+- "The change failed at compile and is not saved (`recovery_required`); nothing else proceeds until it is restored or reconciled."
+- "The fix is merged and a new bundle is built, but this Host still runs the earlier build (`runningMatchesDisk` false); restart it to use the fix."
+
+Natively checked on 7 November 2026 (`local.progress.reporting.20261107`).
+
+### Confirmed intent
+
+`change_prepare` accepts an optional `intent` with the task's confirmed machine decisions, kept apart from what was observed and what is only assumed:
+
+```json
+{ "decisions": [{ "id": "door-reset", "source": "maintainer, 7 Nov", "target": "Servos", "symbols": ["Reset", "DoorOpen"],
+                  "statement": "Reset is only allowed while the door is closed.", "meaning": "reset := \"Reset\" AND NOT \"DoorOpen\"" }],
+  "observedFacts": ["Drive1 telegram 1 at byte 256"], "assumptions": ["The reset button is wired to Reset."] }
+```
+
+The intent becomes part of the preview, so `previewHash` covers it, and it stays visible in the apply result and `change_status`. Each decision is compared by `id` with the decisions of earlier applied changes in the same project. An identical decision is listed under `intent.previouslyConfirmed`, so it does not need to be asked again. A changed statement or target is listed under `intent.conflicts` and adds a preview warning. The tool never evaluates the intent and never infers machine behavior from names. `intent.verificationScope` states what is and is not proven: compile correctness is reported by the compile result; whether the edit implements the intent is recorded for review, not checked; machine safety behavior is not verified. Natively checked on 7 November 2026 (`local.change.confirmed-intent.20261107`).
+
 ### Compile verification
 
 With `compile: true`, a change compiles its compile scope (the selected PLC, or every device for hardware, network, safety and other device-wide kinds) after the checkpoint and before the mutation, and again afterwards. Apply fails with `CompileFailed` only on an introduced or worsened error, a changed compile scope or incomplete diagnostics. Findings that were already there, such as another device's address conflict, do not fail the change. `compile.baselineComparison` lists them as existing (or resolved, once fixed) next to introduced ones, and `compile.compilerSucceeded` says whether the whole scope compiled without errors. A saved change with `compilerSucceeded: false` is valid; the project still has those errors. Without complete baseline diagnostics only a clean compile passes. Tag-table imports also fail on new or changed warnings ([below](#tag-table-import-scope)); compile-only kinds report their diagnostics as the result, and HMI kinds keep their own baseline rules. An inconsistent block still stops preparation of kinds that need the full project fingerprint (`FingerprintUnavailable`). Natively checked on 7 November 2026 (`local.compile-baseline.unrelated-errors.20261107`, [record](../verification/unrelated-errors-20261107.md)).
@@ -252,6 +285,7 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `vci_conflict_resolve` | `workspacePath`, `objectPath`, `comparisonRef` (a `vci_package_compare` record), `packageId`, `take: "native"`, `"remote"` or `"merged"`; `mergedRecordRef` for `merged` | Resolves one reviewed `divergentChange` row (project side = native, workspace side = remote). The Host binds the exact remote package hashes and the bytes to write; the workspace package must equal the reviewed remote side and a fresh export of the object must hash to the reviewed native side (`contentSha256` from `vci_workspace_inspect`). `native`: `Synchronize(ProjectToWorkspace)`. `remote`/`merged`: writes the bound document, then `Synchronize(WorkspaceToProject)` with `compile=true`; a tag-table document with a tag on an F-I/O address refuses at prepare (`SafetyBoundary`). Reads back `Equal`. See [two-sided conflicts](../reference/vci-package-workflow.md#two-sided-conflict-resolution). Verified (`local.vci_git.20261031`). |
 | `safety_import_xml` | `xml`, `expectedBlockNames: [...]`, `safetyAcknowledged: true` | Dedicated import for consistent, exportable user F-blocks on a safety-enabled PLC with the required existing login state. |
 | `safety_fparameter_set` | `safetyAcknowledged: true`, `parameters: [{ hardwarePath, name, expected, value }]` (1..64) | Writes the F-parameters the [F-parameter allowlist](#f-parameter-allowlist) qualifies for the F-I/O's module type, on F-I/O owned by the selected safety PLC (its central F-source address and solely owned I/O addresses). `expected` must equal the current value; an F-destination address used or planned by another F-I/O refuses (`AddressConflict`). The safety program must already be logged in if protected. The preview shows before/after and the F-I/O `Failsafe_*Signature*` attributes; apply reads back the values and signatures, needs `compile=true` (whole-project device compile) and verifies configured-hardware preservation. It changes the safety signatures and does not validate, approve, assign PROFIsafe addresses or download. Verified for `Failsafe_FDestinationAddress` (`local.safety_changes.20261028`). |
+| `safety_drive_tags` | `safetyAcknowledged: true`, `hardwarePath`, `driveObjectNumber` or `driveObjectIndex`, `tagTableName` (root group), `tags: { status, control }` | Creates one drive object's PROFIsafe telegram 30 status (S_ZSW1, `%IW<input start>`) and control (S_STW1, `%QW<output start>`) Word tags on the owning F-PLC, at the addresses Startdrive reports (see `drive_inventory`). Refuses other telegrams, names or addresses in use and addresses outside an F-I/O range of this drive the PLC owns; reads each tag back as a safety tag and compiles the device. Generic tag routes refuse these addresses with `SafetyBoundary`. Verified (`local.safety.drive-tags.20261107`). |
 | `testsuite_application_import` | `sourcePath` (absolute `.tat` or `.ttst`), `expectedTestCaseNames: [...]` (optional for `.ttst`), `expectedTestSetNames: [...]` (`.ttst` only) | Strict Test Suite application import (`ImportOptions.None`, no `IgnoreInvalidObject`): existing names refuse, the file is copied byte-exact and the native return plus `Find` readback must match the reviewed names. Sets nothing as scope and runs nothing. See [Test Suite application tests](../reference/testsuite-production-jobs.md#ts-05-application-tests). |
 | `testsuite_system_import` | `sourcePath` (absolute `.tst`), `expectedTestCaseNames: [...]` | Strict Test Suite system-test import (`SystemTestCaseComposition.LoadFromFile`, `ImportOptions.None`, no `IgnoreInvalidObject`): existing names refuse, the file is copied byte-exact and the native return plus `Find` readback must match the reviewed names. Sets no OPC UA scope and runs nothing. See [Test Suite system tests](../reference/testsuite-production-jobs.md#ts-06-system-tests). |
 | `plc_alarm_text_list_import` | `artifactPath` (.xlsx), `expectedSha256`, `importOption: "None"` or `"Override"`, `expectedTextListNames: [...]`, optional `scopePath` | Native PLC alarm user text-list import into one PLC or software unit. See [PLC alarm and ProDiag imports](#plc-alarm-and-prodiag-imports). |
