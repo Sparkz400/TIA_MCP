@@ -318,6 +318,9 @@ namespace TiaMcp.Openness.V21
             if (change.State == "restored") return ChangeView(change);
             // A scoped fingerprint never authorizes replacing the whole project; only the imported tables are restored.
             if (change.Kind == TagTableImportRules.Kind) return RestoreScopedTagImport(change, args);
+            if (change.FingerprintCoverage?["inconsistentBlocksMetadataOnly"] is JArray bystanders && bystanders.Count > 0)
+                throw new BridgeException("ScopedRecoveryRequired", "Unrelated inconsistent blocks were covered by metadata only, so this change cannot authorize replacing the whole project. Use the retained archive for explicit manual recovery; nothing was saved or closed.",
+                    new JObject { ["inconsistentBlocksMetadataOnly"] = bystanders.DeepClone(), ["recoveryArchive"] = change.ArchivePath });
             if (!_ownsPortal) throw new BridgeException("OwnedSessionRequired", "Automatic archive retrieval is limited to worker-owned TIA instances. The checkpoint archive is available for manual recovery in a user-owned instance.", ChangeView(change));
             if (change.State != "applied" && change.State != "recovery_required") throw new BridgeException("InvalidChangeState", "This change has no applied state to recover.");
             if (string.IsNullOrEmpty(change.ArchivePath) || !File.Exists(change.ArchivePath) || ChangeFileHash(change.ArchivePath) != change.ArchiveHash)
@@ -1417,6 +1420,8 @@ namespace TiaMcp.Openness.V21
             var safetyStates = new JArray();
             var generatedExclusions = new JArray();
             var missingProviders = new JArray();
+            var inconsistentBystanders = new JArray();
+            var targets = new HashSet<string>(change.BlockNames ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
             int nativeFingerprintBlocks = 0;
             var budget = new ScanBudget(50000);
             var opcUa = change.Kind.StartsWith("opcua_", StringComparison.Ordinal) ? new JArray() : null;
@@ -1459,13 +1464,14 @@ namespace TiaMcp.Openness.V21
                         {
                             var provider = block.Item.GetService<FingerprintProvider>();
                             return provider == null ? null : new JArray(provider.GetFingerprints().OrderBy(f => f.Id).Select(f => new JObject { ["id"] = f.Id.ToString(), ["value"] = ChangeScalar(f.Value) }));
-                        });
+                        }, targets.Contains(block.Item.Name));
                         info["fingerprintMode"] = content.Mode;
                         if (content.Payload != null) { info["fingerprints"] = content.Payload; nativeFingerprintBlocks++; }
                         else if (content.Mode == "protectedGeneratedMetadata")
                             generatedExclusions.Add(new JObject { ["path"] = block.Path, ["name"] = block.Item.Name,
                                 ["mode"] = content.Mode, ["consistent"] = consistentBlock,
                                 ["reason"] = "Protected native system-group derived payload: checksum API can reject generated safety blocks after compilation; identity/modified/protection/consistency metadata remains covered." });
+                        else if (content.Mode == "inconsistentMetadataOnly") inconsistentBystanders.Add(block.Path);
                         else missingProviders.Add(block.Path);
                         blockItems.Add(info);
                     }
@@ -1531,6 +1537,7 @@ namespace TiaMcp.Openness.V21
             }
             change.FingerprintCoverage = new JObject { ["policyVersion"] = 2, ["complete"] = false, ["nativeFingerprintBlocks"] = nativeFingerprintBlocks,
                 ["protectedGeneratedPayloadExclusions"] = generatedExclusions, ["blocksWithoutNativeProvider"] = missingProviders,
+                ["inconsistentBlocksMetadataOnly"] = inconsistentBystanders,
                 ["safetyCoverage"] = new JArray(safetyStates.Select(state => new JObject { ["plcPath"] = state["plcPath"].DeepClone(),
                     ["available"] = state["safety"]["available"].DeepClone(), ["signatureCount"] = (state["safety"]["signatures"] as JArray)?.Count ?? 0 })),
                 ["limitations"] = new JArray("Generated payload bytes and unexposed vendor data are not fingerprinted; explicit covered native metadata and available safety signatures are compared.",

@@ -79,6 +79,9 @@ internal static class EngineeringFingerprintTests
         Check.Equal(false, observed.Payload == changed.Payload);
         Check.Equal("metadataNoNativeProvider", missing.Mode);
         Check.Equal<string?>(null, missing.Payload);
+        // #221: an inconsistent bystander is metadata-only and never read; an inconsistent target still refuses.
+        var bystander = EngineeringFingerprintRules.ReadBlockContent<string>(false, false, false, false, Plc + "/blocks/Broken", () => throw new InvalidOperationException("not read"), target: false);
+        Check.Equal("inconsistentMetadataOnly", bystander.Mode);
         return Task.CompletedTask;
     }
 }
