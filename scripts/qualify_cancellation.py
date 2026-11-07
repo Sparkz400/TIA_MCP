@@ -68,9 +68,12 @@ def main():
         stages = value['stages']
         record('outcome after the late completion', {'state': value['state'], 'stages': stages})
         assert value['state'] == 'applied' and stages.count('mutation_applied') == 1 and 'changed_project_saved' in stages, value['state']
-        late = [line for line in client.errors if 'bridgeLateResponse' in line and 'change_apply' in line]
-        assert len(late) == 1, late
-        record('Host recorded the late response', json.loads(late[0]))
+        # change_apply reaches the worker as the admission dispatcher's mutation_dispatch, followed by its held mutation_end.
+        late = [json.loads(line) for line in client.errors if 'bridgeLateResponse' in line]
+        cleanup = [json.loads(line) for line in client.errors if 'bridgeDeferredCleanup' in line]
+        record('Host recorded the late response and released the lease', {'late': late, 'cleanup': cleanup})
+        assert [r['bridgeLateResponse']['operation'] for r in late] == ['mutation_dispatch'] and late[0]['bridgeLateResponse']['succeeded'] is True, late
+        assert [(r['bridgeDeferredCleanup']['operation'], r['bridgeDeferredCleanup']['errorCode']) for r in cleanup] == [('mutation_end', None)], cleanup
         replay = record('same key returns the recorded result', client.tool('change_apply', apply))
         assert replay['state'] == 'applied' and replay['stages'] == stages, replay['stages']
         table = client.tool('tag_table_read', {'plcPath': plc, 'tagTableName': 'Default tag table'})['xml']
