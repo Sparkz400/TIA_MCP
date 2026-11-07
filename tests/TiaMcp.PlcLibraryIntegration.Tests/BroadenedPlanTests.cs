@@ -109,10 +109,11 @@ internal static class BroadenedPlanTests
         test("combined apply admits the natively verified FBD OB shape", () => {
             Equal(null, Refusal(Ob())); Equal("", Features(Ob()));
         });
-        test("an unverified LAD OB combination remains refused", () => {
+        // Passed natively on 7 November (local.library_integrate.candidate_shapes.ob_combinations.20261107).
+        test("combined apply admits the natively verified LAD OB combination", () => {
             var f = Ob(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD");
             f.Inventory["objects"][0]["language"] = "LAD";
-            Equal(true, Refusal(f) != null); Equal(null, Refusal(f, true));
+            Equal(null, Refusal(f)); Equal("", Features(f));
         });
         Func<Fixture> ladExisting = () => { var f = new Fixture(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; };
         Func<Fixture> fbCaller = () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.FB"; f.Inventory["objects"][0]["kind"] = "FB"; return f; };

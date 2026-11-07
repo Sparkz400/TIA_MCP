@@ -22,8 +22,10 @@ DEVICE = "TiaMcpDrive"
 LIMITATIONS = [
     "One SINAMICS G120C PN added to an owned scratch CPU 1511-1 PN V4.1, not connected to the CPU's IO system; motor, encoder, "
     "BICO and telegram addresses are recorded, not checked against Startdrive's UI.",
-    "One scalar parameter (p1120 ramp-up time, or the first scalar row of p1082) and the main telegram number are changed; "
-    "safety, commissioning, BICO, supplementary and additional telegrams are refused or not exercised.",
+    "One scalar parameter (p1120 ramp-up time, or the first scalar row of p1082) and the main telegram number are changed; then the main "
+    "telegram's input channel is resized (or Startdrive's refusal recorded), an additional telegram (2/2) is inserted, its input channel "
+    "resized to 4 keeping its start addresses, restored and erased, and a torque telegram 750 is inserted and restored (or refused). "
+    "Safety, commissioning, BICO and supplementary telegrams are refused or not exercised; Startdrive's refusals are recorded under boundaries.",
     "The drive itself is never compiled: Startdrive exposes no device compile service, so every device compile lists it under notCompiled.",
     "Offline engineering values only; no online values, upload, download or RAM-to-ROM.",
 ]
@@ -118,6 +120,7 @@ def body(h):
     h.report["driveObject"] = {"hardwarePath": path, **ref}
     parameters(h, path, ref, boundaries)
     telegrams(h, path, ref, boundaries)
+    resize_and_torque(h, path, ref, boundaries)
 
 
 def parameter_rows(h, path, ref, numbers):
@@ -189,6 +192,73 @@ def telegrams(h, path, ref, boundaries):
         return {"stages": restored["stages"]}
     h.report["telegram"] = {"before": main[0]["number"], "after": target, "readbacks": applied.get("readbacks"),
                             "restore": h.stage("restore the telegram change from its checkpoint", restore)}
+
+
+def telegram_step(h, label, payload, boundaries, key):
+    """One drive_telegram_set: a Startdrive refusal at prepare is recorded under boundaries[key] and returns None; otherwise it
+    applies and returns (prepared, applied, telegram rows after)."""
+    kind = "drive_telegram_set"
+    error, prepared = outcome(h, "change_prepare", {"kind": kind, "payload": payload})
+    if error:
+        boundaries[key] = error
+        return None
+    applied = h.apply_prepared(kind, prepared)
+    rows = h.stage("read the telegrams after " + label, lambda: telegram_rows(h, payload["hardwarePath"], {k: v for k, v in payload.items() if k.startswith("driveObject")}))
+    return prepared, applied, rows
+
+
+def restored(h, label, step, expected):
+    def check():
+        prepared = step[0]
+        result = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
+        require(result["state"] == "restored", "%s restore: %s" % (label, result["stages"]))
+        return result["stages"]
+    stages = h.stage("restore " + label + " from its checkpoint", check)
+    path, ref = step[0]["preview"]["effects"][0]["hardwarePath"], {k: v for k, v in step[0]["preview"]["effects"][0].items() if k.startswith("driveObject")}
+    back = h.stage("read the telegrams after restoring " + label, lambda: telegram_rows(h, path, ref))
+    require(back == expected, "The restored telegrams after %s differ: %s" % (label, back))
+    return stages
+
+
+def resize_and_torque(h, path, ref, boundaries):
+    """resize: the main telegram's input channel (Startdrive may refuse it; recorded), then an inserted additional telegram's
+    input channel with keepOriginalAddress, restored, then that telegram erased. Torque: one telegram inserted by number and restored, or
+    Startdrive's refusal recorded."""
+    kind, base = "drive_telegram_set", {"hardwarePath": path, **ref}
+    rows = h.stage("read the telegrams before resize", lambda: telegram_rows(h, path, ref))
+    main = [t for t in rows if t["type"] == "MainTelegram"][0]
+    resize = {**base, "operation": "resize", "direction": "input", "keepOriginalAddress": True, "expectedTelegrams": rows}
+    h.refuse("refuse a resize without keepOriginalAddress", kind, {k: v for k, v in {**resize, "telegramType": "MainTelegram", "size": 4}.items() if k != "keepOriginalAddress"}, "InvalidRequest")
+    h.refuse("refuse a resize in an unknown direction", kind, {**resize, "telegramType": "MainTelegram", "size": 4, "direction": "both"}, "InvalidRequest")
+    report = h.report["telegramResize"] = {"mainInputBytes": main["inputBytes"]}
+    step = telegram_step(h, "the main telegram resize", {**resize, "telegramType": "MainTelegram", "size": main["inputBytes"] // 2 + 2}, boundaries, "resizeMain")
+    if step:
+        report["main"] = {"after": [t for t in step[2] if t["type"] == "MainTelegram"], "restore": restored(h, "the main telegram resize", step, rows)}
+    inserted = telegram_step(h, "inserting an additional telegram", {**base, "operation": "insert", "telegramType": "AdditionalTelegram", "inputSize": 2, "outputSize": 2,
+                                                                     "expectedTelegrams": rows}, boundaries, "insertAdditional")
+    if inserted:
+        added = [t for t in inserted[2] if t["type"] == "AdditionalTelegram"]
+        require(len(added) == 1, "Expected one additional telegram: %s" % inserted[2])
+        grown = telegram_step(h, "the additional telegram resize", {**resize, "telegramType": "AdditionalTelegram", "size": 4, "expectedTelegrams": inserted[2]},
+                              boundaries, "resizeAdditional")
+        if grown:
+            after = [t for t in grown[2] if t["type"] == "AdditionalTelegram"]
+            require(len(after) == 1 and after[0]["inputBytes"] > added[0]["inputBytes"] and after[0]["outputBytes"] == added[0]["outputBytes"],
+                    "The additional telegram's input channel did not grow alone: %s -> %s" % (added, after))
+            starts = lambda t: sorted((a["id"], a["startAddress"]) for a in t["addresses"])
+            require(starts(after[0]) == starts(added[0]), "keepOriginalAddress moved the additional telegram: %s -> %s" % (added, after))
+            report["additional"] = {"inserted": added[0], "resized": after[0], "readbacks": grown[1].get("readbacks"),
+                                    "restore": restored(h, "the additional telegram resize", grown, inserted[2])}
+        # Erasing the additional telegram brings back the original rows (and exercises erase).
+        current = h.stage("read the telegrams before the erase", lambda: telegram_rows(h, path, ref))
+        erased = telegram_step(h, "erasing the additional telegram", {**base, "operation": "erase", "telegramType": "AdditionalTelegram", "expectedTelegrams": current},
+                               boundaries, "eraseAdditional")
+        require(erased is not None and erased[2] == rows, "Erasing the additional telegram did not bring back the original rows: %s" % (erased and erased[2]))
+        report["additionalErase"] = {"readbacks": erased[1].get("readbacks")}
+    torque = telegram_step(h, "inserting a torque telegram", {**base, "operation": "insert", "telegramType": "TorqueTelegram", "telegramNumber": 750, "expectedTelegrams": rows},
+                           boundaries, "insertTorque")
+    if torque:
+        report["torque"] = {"after": [t for t in torque[2] if t["type"] == "TorqueTelegram"], "restore": restored(h, "the torque telegram insert", torque, rows)}
 
 
 if __name__ == "__main__":
