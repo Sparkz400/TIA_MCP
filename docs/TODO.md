@@ -18,6 +18,7 @@ Every finding from the multi-drive safety engineering session has an issue below
 - [ ] **P1 — Scoped tag-import preservation and delivery:** finish native qualification, correct the negative fixture, retain evidence, package and verify the actual running build. [#209](https://github.com/Sparkz400/TIA_MCP/issues/209)
 - [ ] **P1 — Native table replacement:** qualify the local omission/preservation checks; prevent implicit tag loss and keep intentional rename/delete explicit. [#210](https://github.com/Sparkz400/TIA_MCP/issues/210)
 - [ ] **P1 — Compiler baseline comparison:** qualify existing-versus-new diagnostics and expose mutation, compile and save results separately. [#211](https://github.com/Sparkz400/TIA_MCP/issues/211)
+- [ ] **P1 — Unrelated project errors must not block valid operations:** across reads, preparation, mutation, compile and save, keep independently verifiable work usable when unrelated devices or blocks already have errors; report a precise native limitation only where the target really depends on them. Seen on 4 November when an unrelated SENTRON device-version error failed `safety_import_xml`'s compiler verification. [#221](https://github.com/Sparkz400/TIA_MCP/issues/221)
 - [ ] **P1 — Dedicated PROFIsafe tag workflow:** add explicitly authorized safety-tag preparation, native address/type validation, readback and qualification without relaxing generic safety guards. [#212](https://github.com/Sparkz400/TIA_MCP/issues/212)
 - [ ] **P1 — Complete drive inventory:** join Startdrive telegrams, PLC symbols and technology objects with provenance, ambiguity and completeness reporting. [#213](https://github.com/Sparkz400/TIA_MCP/issues/213)
 - [ ] **P2 — Coordinated servo safety edits:** plan calls, multiinstances, Watch fault bits and dependent effects together; reject duplicate control writers and preserve unrelated networks. [#214](https://github.com/Sparkz400/TIA_MCP/issues/214)
@@ -28,7 +29,7 @@ Every finding from the multi-drive safety engineering session has an issue below
 - [ ] **P3 — Progress and deployment clarity:** report project apply/readback/compile/save separately from MCP qualification and deployment, including active build identity. [#219](https://github.com/Sparkz400/TIA_MCP/issues/219)
 - [ ] **P3 — Confirmed machine intent:** carry task-scoped reset/interlock and mapping decisions through preparation and review; distinguish intent, observed facts and unverified safety behavior. [#220](https://github.com/Sparkz400/TIA_MCP/issues/220)
 
-Suggested sequence: finish #209 with #210, #211 and #218; use #213 as the inventory foundation for #212 and #214. Incorporate #215, #216 and #217 into the diagnostic/recovery workflow. Apply #219 and #220 across these workstreams.
+Suggested sequence: finish #209 with #210, #211 and #218, and widen #211's baseline comparison to every operation for #221; use #213 as the inventory foundation for #212 and #214. Incorporate #215, #216 and #217 into the diagnostic/recovery workflow. Apply #219 and #220 across these workstreams.
 
 ## Resume and integration
 
