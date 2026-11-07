@@ -57,6 +57,14 @@ the Openness AllowList.
   reported the scope policy `tag-table-content-and-project-metadata-v1`, and its
   worker exited on its own with code 0.
 
+That bundle predates the `compilerSucceeded` fix below. It was replaced by
+`tia-mcp-v21-0.9.0_20261107_081938_0085f546`, packaged from main `575f767d`, which
+Claude Desktop's `tia-v21` now starts instead. Its worker is in the AllowList, its
+configured launch reported catalog `0.4.137` with
+`local.tag-table.replacement-compile.20261107`, and the extended qualifier passed
+18 of 18 steps with its own Host and worker (local report `artifacts/ts210/b01`),
+including `compilerSucceeded=false` on the failed apply.
+
 ## Replacement and compile results
 
 Evidence: `local.tag-table.replacement-compile.20261107`
