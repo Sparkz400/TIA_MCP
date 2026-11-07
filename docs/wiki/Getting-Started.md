@@ -87,6 +87,9 @@ Then ask the client: *Use `tia_discover` to list the available TIA Portal sessio
 Large HMI screen imports can need more than five minutes. Use a longer Host and
 client timeout for that workflow; the [HMI guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#screen-failure-recovery-without-closing-tia)
 gives the settings and explains recovery without repeatedly reopening TIA.
+If a call is cancelled or times out anyway, TIA finishes it: later calls return
+`PreviousOperationRunning` until it does, and then the Host continues without a
+restart ([interrupted calls](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#prepare-apply-inspect)).
 
 Native HMI qualification uses independently seeded owned fixtures. Classic
 Comfort and RT Advanced preparation sets an existing start screen; Unified

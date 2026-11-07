@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.139",
+  "catalogVersion": "0.4.140",
   "targetTiaVersions": [
     21
   ],
@@ -4935,6 +4935,23 @@
         "Scoped restore covers tag_table_import_xml only, in place, without replacing the project; edits outside tag tables made after the attempt are kept and are not compared. Imports not recorded as applied (interrupted outcomes) still refuse with ScopedRecoveryRequired; whole-project restore remains refused for this kind.",
         "One owned scratch CPU 1511-1 PN at PLC-root scope; one restored table that existed before the import. Deleting a table the import created is implemented but not exercised natively."
       ]
+    },
+    {
+      "id": "local.bridge.cancellation.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "131d0a7a1ba1294c8a4f7772a6c485ad2bdcae78",
+        "passedScope": "scripts/qualify_cancellation.py on Debug builds of 4e2578e3 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 14/14 steps: change_apply of a prepared tag_create was sent and cancelled with notifications/cancelled as soon as the worker's journal showed native work. change_status was refused with PreviousOperationRunning (nothing sent) until the apply finished; then it reported applied with exactly one mutation_applied stage and a saved project, the Host logged the late mutation_dispatch response and delivered the held mutation_end lease release, and the tag existed exactly once. The same idempotency key was refused with ResourceBusy naming the cancelled dispatch's outcomeUnknown admission and engineering_admission_reconcile. After tia_detach and a fresh owned tia_start, engineering_admission_reconcile released that admission without replay, the project reopened and a further tag_create applied."
+      },
+      "artifacts": [
+        "evidence/local.bridge.cancellation.20261107.json"
+      ],
+      "limitations": [
+        "Source commit 131d0a7a differs from the built 4e2578e3 only in scripts/qualify_cancellation.py; src and every executable run are byte-identical to 4e2578e3.",
+        "One cancellation point (during checkpoint/apply of a tag_create) on one owned scratch CPU 1511-1 PN; the Host keeps the interrupted request in flight but cannot stop native work, and the cancelled dispatch's admission still needs the existing fresh-instance reconciliation. Cancellation before dispatch, during compile or save, and a worker crash during the interrupted request are covered by managed tests only."
+      ]
     }
   ],
   "features": [
@@ -7077,7 +7094,8 @@
           "Releases only when the admitted TIA process has exited and every admitted resource is proven unchanged or verifiedApplied by fresh fingerprints, library revisions, hashes or not-written-since-admission checks; otherwise the reservation stays held with reasons.",
           "An interrupted apply is proven unchanged only when its project was last saved before the checkpoint archive was written; kinds whose outcome fingerprint needs prepared in-memory targets (HMI, attribute, tag/constant set, connection set, technology) stay held after a save or transport loss; library apply outputs and partial destinations stay held.",
           "Never replays, saves, powers or downloads.",
-          "Natively qualified by process termination of the worker and its owned TIA, or of the Host, once per scenario; power loss, disk faults and remote-worker transport are not exercised."
+          "Natively qualified by process termination of the worker and its owned TIA, or of the Host, once per scenario; power loss, disk faults and remote-worker transport are not exercised.",
+          "Interrupted calls (since 7 November 2026, #217): a cancelled or timed-out request that reached the worker keeps running and is never replayed; later calls are refused with PreviousOperationRunning until it finishes, then its late response is recorded and the session continues without a Host restart (local.bridge.cancellation.20261107)."
         ]
       },
       "qualification": {
@@ -7085,7 +7103,8 @@
         "evidenceIds": [
           "local.engineering.interruption-matrix.20261027",
           "local.engineering.interruption.20261029",
-          "local.engineering.boundaries.rerun.20261029"
+          "local.engineering.boundaries.rerun.20261029",
+          "local.bridge.cancellation.20261107"
         ]
       },
       "availability": {
@@ -11105,7 +11124,8 @@
           "Exact existing table selector plus explicit name, dataTypeName and logicalAddress; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
           "Safety units are rejected. An absolute input or output address (%I/%Q or %E/%A, bit to long word) inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native create with SafetyBoundary, because TIA makes such a tag a safety tag; nothing is created (1 November 2026; native run sl3 had created it first; the prepare refusal rechecked natively on an F-CPU with ET 200SP F-DI in local.safety.fio-routes.20261101). A created tag that TIA still reports as IsSafety fails verification and requires checkpoint recovery.",
           "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0).",
-          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107)."
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107).",
+          "Interrupted calls (since 7 November 2026, #217): a cancelled or timed-out request that reached the worker keeps running and is never replayed; later calls are refused with PreviousOperationRunning until it finishes, then its late response is recorded and the session continues without a Host restart (local.bridge.cancellation.20261107)."
         ]
       },
       "qualification": {
@@ -11113,7 +11133,8 @@
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
           "local.safety.fio-routes.20261101",
-          "local.compile-baseline.unrelated-errors.20261107"
+          "local.compile-baseline.unrelated-errors.20261107",
+          "local.bridge.cancellation.20261107"
         ]
       },
       "availability": {
