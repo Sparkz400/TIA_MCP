@@ -133,6 +133,9 @@ internal static class TagTableImportTests
         Check.Equal(before.Body, SourceRefreshRules.Parts(Block("1", "b", "x")).Body);
         Check.Equal(false, before.Body == SourceRefreshRules.Parts(Block("1", "a", "y")).Body);
         Check.Equal(false, before.Body == SourceRefreshRules.Parts(Block("2", "a", "x")).Body);
+        var spaced = SourceRefreshRules.Parts(Block("1", "a", "x").Replace("<NetworkSource>x</NetworkSource>", "<NetworkSource><Blank Num=\"2\" UId=\"7\" />x</NetworkSource>"));
+        Check.Equal(before.Body, spaced.Body);
+        Check.Equal(false, before.Formatted == spaced.Formatted);
         return Task.CompletedTask;
     }
 }
