@@ -591,8 +591,12 @@ internal static partial class Program
         await Check.BridgeError("PreviousOperationRunning", () => fixture.Client.CallAsync("mustNotRun"));
         // The dispatcher's lease release is held and delivered right after the late response, before the next request.
         await Check.BridgeError("PreviousOperationRunning", () => fixture.Client.CallAsync("mutation_end", new { leaseToken = "lease" }));
-        await Task.Delay(2500);
-        await fixture.Client.CallAsync("echo");
+        // The slow echo needs 1.5 s; under parallel CI load poll instead of assuming it finished.
+        for (int attempt = 0; ; attempt++)
+        {
+            try { await fixture.Client.CallAsync("echo"); break; }
+            catch (BridgeException error) when (error.Code == "PreviousOperationRunning" && attempt < 120) { await Task.Delay(250); }
+        }
         var order = fixture.Events().Where(item => item.Kind == "request").Select(item => item.Operation).ToArray();
         Check.Equal("echo,echo,mutation_end,echo", string.Join(",", order));
         var late = fixture.Client.LateResponses;
