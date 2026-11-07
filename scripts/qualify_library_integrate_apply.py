@@ -103,7 +103,7 @@ CALLER_SOURCES = {("FB", "FBD"): "callers/TiaMcpComponentHost.s7dcl", ("FB", "LA
 # multiInstanceDependents gives the Host FB its own instance DB first: the DB gains the new member through the captured component
 # effect (instance-effects-component.v1.json), which the runner checks against the captured DB member. multiInstanceParent embeds
 # the Host FB in a parent FB instead: the parent gains the member nested in its Host member through the captured component
-# transitive effect (instance-effects-transitive-component.v1.json, qualificationOnly), checked against the captured nested member.
+# transitive effect (instance-effects-transitive-component.v1.json), checked against the captured nested member.
 # A Host without that manifest still refuses the plan before admission (DependencyProfileUnavailable).
 HOST_DB = HOST_FB + "_DB"
 HOST_DB_SOURCE = 'DATA_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\n"%s"\nBEGIN\nEND_DATA_BLOCK\n' % (HOST_DB, HOST_FB)
@@ -111,7 +111,7 @@ PARENT_FB, PARENT_FB_NUMBER = "TiaMcpComponentParent", 31
 PARENT_SOURCE = ('FUNCTION_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\nVAR\n Host : "%s";\nEND_VAR\nBEGIN\n #Host();\nEND_FUNCTION_BLOCK\n'
                  % (PARENT_FB, HOST_FB))
 DEPENDENT_DB_FEATURES = []  # dependentInstanceDb+fbCaller+multiInstance+reusedComponent, verified on 2 November
-PARENT_FEATURES = ["embeddingParent", "fbCaller", "multiInstance", "reusedComponent"]  # a candidate shape until its native run
+PARENT_FEATURES = []  # embeddingParent+fbCaller+multiInstance+reusedComponent, verified on 7 November
 COMPONENT_EFFECT = ROOT / "fixtures/typed-graphical/native/instance-effects-component/after-instance.xml"
 COMPONENT_TRANSITIVE_PARENT = ROOT / "fixtures/typed-graphical/native/instance-effects-transitive-component/after-Tgp_CompNestParent.xml"
 DEPENDENTS_REFUSED = "DependencyProfileUnavailable"

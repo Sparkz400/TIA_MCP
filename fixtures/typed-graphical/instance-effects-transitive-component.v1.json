@@ -9,7 +9,6 @@
   "runtimeVerified": false,
   "tiaVersion": "V21",
   "route": "standard",
-  "qualificationOnly": true,
   "changedFb": "Tgp_CompNestEffect",
   "chain": [
     {

@@ -69,7 +69,8 @@ namespace TiaMcp.Openness.V21
         }
 
         // The same member nested in a parent FB or its instance DB at any depth (local.typed.component-transitive-capture.20261107):
-        // TIA appends it like the direct DB member without its top-level attributes, as for the scalar members. qualificationOnly as above.
+        // TIA appends it like the direct DB member without its top-level attributes, as for the scalar members; admitted since its
+        // combined apply passed (local.library_integrate.candidate_shapes.embedding_parent.20261107).
         internal const string ComponentTransitiveManifest = "instance-effects-transitive-component.v1.json";
         private JObject TypedComponentTransitiveEffect(TypedResolutionCapture capture, string catalogPath, string route)
         {
