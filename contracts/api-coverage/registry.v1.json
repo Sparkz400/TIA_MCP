@@ -3661,6 +3661,12 @@
       ]
     },
     {
+      "featureId": "drive_inventory",
+      "obligations": [
+        "D10"
+      ]
+    },
+    {
       "featureId": "plc.document_formats",
       "obligations": [
         "X11"
