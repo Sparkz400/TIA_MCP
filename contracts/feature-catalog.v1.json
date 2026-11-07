@@ -27078,6 +27078,49 @@
       ]
     },
     {
+      "featureId": "drive_inventory",
+      "domain": "drives",
+      "title": "Read a joined drive, telegram, tag and technology-object inventory",
+      "mcpTools": [
+        "drive_inventory"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Host composition of drive_observe, project_inventory, software_inspect and technology_read; no new native call."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Startdrive reports no owning PLC for a telegram, so tags join a telegram range by address overlap in every PLC; matches in several PLCs are reported as ambiguous and block dependent writes.",
+          "Technology objects join a drive when a resolved hardware or channel reference of their connections equals the drive's hardware path, lies below it, or is its parent; a parent link that reaches several drives is ambiguous.",
+          "Tag addresses are parsed from %I/%E/%Q/%A bit, byte, word and double-word forms (optional :P); memory, DB and symbolic-only tags are not matched."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SINAMICS Startdrive V21 Openness and a project with Startdrive drive devices; probe with target_capabilities on the drive hardware item."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "SINAMICS Startdrive V21 installed with its Openness assembly",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.plc_alarm_text_list_import",
       "domain": "engineering",
       "title": "Import PLC alarm user text lists from a supplied XLSX",
