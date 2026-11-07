@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "1f490bafdcad29ed4b33eaa76724e9cd05e28ee90170506cec61365a44a2a8ba",
-      "bytes": 1789183
+      "sha256": "5443a21001a850757eeef39e8513e28823592f4499914f58f7747d8c42453328",
+      "bytes": 1790930
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -110602,6 +110602,13 @@
           "artifacts": [
             "evidence/local.hardware_changes.gsd.20261101.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.drive.20261107",
+          "profileSha256": "66226b6d1d87a810a1eae0e5d79366dc899be6f1d4b9969f1b1d90ca86ed30ad",
+          "artifacts": [
+            "evidence/local.hardware_changes.drive.20261107.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -114232,6 +114239,13 @@
           "artifacts": [
             "evidence/local.compile-baseline.unrelated-errors.20261107.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.drive.20261107",
+          "profileSha256": "66226b6d1d87a810a1eae0e5d79366dc899be6f1d4b9969f1b1d90ca86ed30ad",
+          "artifacts": [
+            "evidence/local.hardware_changes.drive.20261107.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -114323,6 +114337,13 @@
           "profileSha256": "51f583864c85edc57ee925c55066a6cf4539dbbad085ce8880cbac742987b141",
           "artifacts": [
             "evidence/local.hardware_changes.refusals.20261102.json"
+          ]
+        },
+        {
+          "id": "local.hardware_changes.drive.20261107",
+          "profileSha256": "66226b6d1d87a810a1eae0e5d79366dc899be6f1d4b9969f1b1d90ca86ed30ad",
+          "artifacts": [
+            "evidence/local.hardware_changes.drive.20261107.json"
           ]
         }
       ],
@@ -139244,6 +139265,11 @@
       "sha256": "99cc103429fb91fdfdc90820b06022e4532280b7f82a1056b8a3183eed36f663"
     },
     {
+      "path": "evidence/local.hardware_changes.drive.20261107.json",
+      "state": "observed",
+      "sha256": "590d84fcadb1d60cc85e19655a5e7e7644307c25eae96394a745db90f8af4281"
+    },
+    {
       "path": "evidence/local.hardware_changes.families.20261029.json",
       "state": "observed",
       "sha256": "b30600658a303e425604a9771f01c34a9df2c2752855a95cd6af513fc1e7dc42"
@@ -140573,6 +140599,10 @@
     {
       "id": "local.hardware_changes.delete-rule.20261102",
       "profileSha256": "f34136f1372879d321de1e6506d0e27dbfcbf21fb074886feb10ab7d5d1db8e3"
+    },
+    {
+      "id": "local.hardware_changes.drive.20261107",
+      "profileSha256": "66226b6d1d87a810a1eae0e5d79366dc899be6f1d4b9969f1b1d90ca86ed30ad"
     },
     {
       "id": "local.hardware_changes.families.20261029",

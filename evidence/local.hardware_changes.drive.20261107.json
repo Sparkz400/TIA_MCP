@@ -1,0 +1,112 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hardware_changes.drive.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T13:36:48+00:00",
+  "source": {
+    "commit": "414fc15a390543f582fbf09c557ffc0a0b69c995",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_hardware_changes.py --slice drive on Debug builds of main (src unchanged at 414fc15a) in one owned TIA V21 Update 3 scratch, 52/52 steps: an added CPU 1511-1 PN V4.1 (HwPeer) on HwNet with an ET 200MP IM 155-5 PN ST station whose assignment creates HwPeerIo; then the newest installed SINAMICS G120C PN (HwDrive) added and put on HwNet with checkpoint but without compile, and assigned to HwPeerIo with network_io_assign (device compile and save, the drive listed under notCompiled because Startdrive exposes no device compile service). The complete hardware/software snapshot differed in exactly the drive's PROFINET interface, the controller interface and the drive's added system constants in HwPeerCpu's default tag table; the assignment was restored once from its checkpoint into a new directory equal to the pre-change snapshot and then applied again.",
+  "limitations": [
+    "One SINAMICS G120C PN (one drive object, telegram 1); drive objects, parameters and telegrams are not changed here. HMI devices: a freshly added panel never compiles clean (no start screen), so its hardware_add with compile is an introduced compile error by design (#221); HMI hardware stays covered by the HMI routes."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "39bb9857fc31ebc8a2afe178ea3a4d6697c155856cd1c49e156a55ed992fd33f"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "538927f7b9d258b493783ba80da8f9814c23d87e53de9f3448e2a4131dbc81a5"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "1c316e6ed0d3b06433833763fc68a726fa7b292c173ed4653e413e82c574662c",
+      "bytes": 630250,
+      "completed": true,
+      "steps": [
+        "start owned TIA hardware changes",
+        "create owned scratch hardware changes",
+        "snapshot baseline",
+        "prepare add CPU HwPeer",
+        "apply hardware_add",
+        "change_status add CPU HwPeer",
+        "snapshot add CPU HwPeer",
+        "verify add CPU HwPeer",
+        "prepare put HwPeerCpu on HwNet",
+        "apply network_configure",
+        "change_status put HwPeerCpu on HwNet",
+        "snapshot put HwPeerCpu on HwNet",
+        "verify put HwPeerCpu on HwNet",
+        "prepare add ET 200MP station HwMp",
+        "apply hardware_add",
+        "change_status add ET 200MP station HwMp",
+        "snapshot add ET 200MP station HwMp",
+        "verify add ET 200MP station HwMp",
+        "prepare put HwMp on HwNet",
+        "apply network_configure",
+        "change_status put HwMp on HwNet",
+        "snapshot put HwMp on HwNet",
+        "verify put HwMp on HwNet",
+        "prepare assign HwMp to HwPeerCpu",
+        "apply network_io_assign",
+        "change_status assign HwMp to HwPeerCpu",
+        "snapshot assign HwMp to HwPeerCpu",
+        "verify assign HwMp to HwPeerCpu",
+        "search the catalog for a SINAMICS G120C PN",
+        "prepare add drive HwDrive",
+        "apply hardware_add",
+        "change_status add drive HwDrive",
+        "snapshot add drive HwDrive",
+        "verify add drive HwDrive",
+        "prepare put HwDrive on HwNet",
+        "apply network_configure",
+        "change_status put HwDrive on HwNet",
+        "snapshot put HwDrive on HwNet",
+        "verify put HwDrive on HwNet",
+        "prepare assign HwDrive to HwPeerCpu, restored",
+        "apply network_io_assign",
+        "change_status assign HwDrive to HwPeerCpu, restored",
+        "snapshot assign HwDrive to HwPeerCpu, restored",
+        "verify assign HwDrive to HwPeerCpu, restored",
+        "restore assign HwDrive to HwPeerCpu, restored",
+        "snapshot restored assign HwDrive to HwPeerCpu, restored",
+        "restored assign HwDrive to HwPeerCpu, restored equals the pre-change state",
+        "prepare assign HwDrive to HwPeerCpu",
+        "apply network_io_assign",
+        "change_status assign HwDrive to HwPeerCpu",
+        "snapshot assign HwDrive to HwPeerCpu",
+        "verify assign HwDrive to HwPeerCpu"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "device_inventory",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

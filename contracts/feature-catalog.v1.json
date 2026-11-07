@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.149",
+  "catalogVersion": "0.4.150",
   "targetTiaVersions": [
     21
   ],
@@ -5106,6 +5106,22 @@
         "Source commit d023d296 differs from ef49a18c only in three harness updates in scripts/ (qualify_engineering_gaps.py, qualify_plc_object_mutations.py): the access-level observation the credential route owns since 1f11b012, compile-only completion with diagnostics since fed08202, and the scoped and metadata-only restores of #218/#221.",
         "Compile scopes and profiles as in the earlier records (CPU 1511-1 PN, TP700 Comfort, MTP700 Unified); Startdrive drives remain notCompiled."
       ]
+    },
+    {
+      "id": "local.hardware_changes.drive.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "414fc15a390543f582fbf09c557ffc0a0b69c995",
+        "passedScope": "scripts/qualify_hardware_changes.py --slice drive on Debug builds of main (src unchanged at 414fc15a) in one owned TIA V21 Update 3 scratch, 52/52 steps: an added CPU 1511-1 PN V4.1 (HwPeer) on HwNet with an ET 200MP IM 155-5 PN ST station whose assignment creates HwPeerIo; then the newest installed SINAMICS G120C PN (HwDrive) added and put on HwNet with checkpoint but without compile, and assigned to HwPeerIo with network_io_assign (device compile and save, the drive listed under notCompiled because Startdrive exposes no device compile service). The complete hardware/software snapshot differed in exactly the drive's PROFINET interface, the controller interface and the drive's added system constants in HwPeerCpu's default tag table; the assignment was restored once from its checkpoint into a new directory equal to the pre-change snapshot and then applied again."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.drive.20261107.json"
+      ],
+      "limitations": [
+        "One SINAMICS G120C PN (one drive object, telegram 1); drive objects, parameters and telegrams are not changed here. HMI devices: a freshly added panel never compiles clean (no start screen), so its hardware_add with compile is an introduced compile error by design (#221); HMI hardware stays covered by the HMI routes."
+      ]
     }
   ],
   "features": [
@@ -9069,7 +9085,8 @@
         "evidenceIds": [
           "local.hardware_changes.20261028",
           "local.hardware_changes.families.20261029",
-          "local.hardware_changes.gsd.20261101"
+          "local.hardware_changes.gsd.20261101",
+          "local.hardware_changes.drive.20261107"
         ]
       },
       "availability": {
@@ -9290,7 +9307,8 @@
         "evidenceIds": [
           "local.milestones.rerun.20261028",
           "local.hardware_changes.families.20261029",
-          "local.compile-baseline.unrelated-errors.20261107"
+          "local.compile-baseline.unrelated-errors.20261107",
+          "local.hardware_changes.drive.20261107"
         ]
       },
       "availability": {
@@ -15561,7 +15579,8 @@
           "local.hardware_changes.topology.20261101",
           "local.hardware_changes.topology_restores.20261101",
           "local.hardware_changes.gsd.20261101",
-          "local.hardware_changes.refusals.20261102"
+          "local.hardware_changes.refusals.20261102",
+          "local.hardware_changes.drive.20261107"
         ]
       },
       "availability": {
