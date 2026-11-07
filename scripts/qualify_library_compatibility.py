@@ -13,7 +13,7 @@ from library_native_harness import Harness, require
 from qualify_cpu_memory_bytes import add_cpu, version_key
 
 ROOT = Path(__file__).resolve().parents[1]
-FB, WIDE, TEXT, UNSAVED, BROKEN_TYPE = "TiaMcpLibraryGate", "TiaMcpWideGate", "TiaMcpTextGate", "TiaMcpUnsavedEdit", "TiaMcpBrokenType"
+FB, WIDE, TEXT, UNSAVED = "TiaMcpLibraryGate", "TiaMcpWideGate", "TiaMcpTextGate", "TiaMcpUnsavedEdit"
 S7_1200 = "CPU 1214C DC/DC/DC"
 # The authoring CPU type at its oldest catalog firmware; the types are authored on the scratch CPU 1511-1 PN V4.1.
 OLD_FIRMWARE_CPU = "CPU 1511-1 PN"
@@ -23,7 +23,6 @@ SECURITY_FIRMWARE = (3, 1)
 V13_LIBRARY = Path(r"D:\Arbeit\Siemens\Portal V21\Data\Hmi\Styles\Predefined-Styles\Predefined-Styles.al13")
 UNSAVED_SOURCE = ('FUNCTION "%s" : Void\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\nVAR_TEMP\n    Scratch : Bool;\nEND_VAR\n'
                   'BEGIN\n    #Scratch := TRUE;\nEND_FUNCTION\n') % UNSAVED
-BROKEN_TYPE_SOURCE = 'TYPE "%s"\nVERSION : 0.1\n   STRUCT\n      Value : "TiaMcpMissingType";\n   END_STRUCT;\nEND_TYPE\n' % BROKEN_TYPE
 UNCOMPILED_TYPE = "TiaMcpUncompiledType"
 UNCOMPILED_TYPE_SOURCE = 'TYPE "%s"\nVERSION : 0.1\n   STRUCT\n      Value : Bool;\n   END_STRUCT;\nEND_TYPE\n' % UNCOMPILED_TYPE
 # Typed outcomes for a library type in a CPU family it was not authored for; anything else fails the run.
@@ -137,19 +136,8 @@ def body(h):
     names = [b["name"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"]]
     require(UNSAVED in names and FB in names, "Unsaved edit or library instance missing after apply")
 
-    # Inherited inconsistent PLC data type (from a failed type change): refused before checkpoint or write.
-    def broken_type():
-        prepared = h.tool("change_prepare", {"kind": "type_source_upsert", "payload": {"scopePath": consumer, "source": BROKEN_TYPE_SOURCE,
-                          "expectedTypeNames": [BROKEN_TYPE]}})
-        error = h.call_error("change_apply", h.apply_args(prepared))
-        types = [t["name"] for t in h.tool("software_inspect", {"plcPath": consumer, "maxItems": 2000})["types"]]
-        return {"error": {k: error.get(k) for k in ("code", "message")}, "inconsistentTypeInMemory": BROKEN_TYPE in types}
-    broken = findings["inheritedType"] = h.stage("create an inherited inconsistent PLC data type", broken_type)
-    if broken["inconsistentTypeInMemory"]:
-        broken["refusal"] = h.refuse("refuse instantiate with an inherited inconsistent PLC data type", "library_instantiate",
-                                     h.selected(source, [wide], target={"plcPath": consumer}), "InheritedDiagnostics", BROKEN_TYPE)
-
-    # TIA discards a type whose generation fails, so the inherited inconsistency is a valid type generated without compile.
+    # TIA discards a type whose generation fails (27 October), and since 2 November that failed apply blocks every later change
+    # on the project (RecoveryRequired), so the inherited inconsistency is a valid type generated without compile.
     def uncompiled_type():
         prepared = h.tool("change_prepare", {"kind": "type_source_upsert", "payload": {"scopePath": consumer, "source": UNCOMPILED_TYPE_SOURCE,
                           "expectedTypeNames": [UNCOMPILED_TYPE]}})
@@ -162,7 +150,7 @@ def body(h):
     require(uncompiled["isConsistent"] is False, "TIA reports the uncompiled type as consistent; no inherited inconsistency to refuse")
     uncompiled["refusal"] = h.refuse("refuse instantiate with an inherited inconsistent PLC data type", "library_instantiate",
                                      h.selected(source, [wide], target={"plcPath": consumer}), "InheritedDiagnostics", UNCOMPILED_TYPE)
-    h.stage("close consumer session (discards the failed and uncompiled type changes)", lambda: h.tool("tia_detach"))
+    h.stage("close consumer session (discards the uncompiled type change)", lambda: h.tool("tia_detach"))
 
     def reopen(label):
         h.owned_portal(label)
@@ -174,9 +162,9 @@ def body(h):
     def persisted():
         blocks = [b["name"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"]]
         types = [t["name"] for t in h.tool("software_inspect", {"plcPath": consumer, "maxItems": 2000})["types"]]
-        require(UNSAVED in blocks and FB in blocks and BROKEN_TYPE not in types and UNCOMPILED_TYPE not in types, "Reopened project differs: %s %s" % (blocks, types))
+        require(UNSAVED in blocks and FB in blocks and UNCOMPILED_TYPE not in types, "Reopened project differs: %s %s" % (blocks, types))
         return {"blocks": sorted(blocks)}
-    h.stage("reopened: unsaved edit and instance persisted, failed and uncompiled types absent", persisted)
+    h.stage("reopened: unsaved edit and instance persisted, uncompiled type absent", persisted)
 
     # CPU family mismatch: the types were authored on an S7-1500 V4.1 and are instantiated into the added S7-1200;
     # firmware mismatch: the same types into the authoring CPU type at its oldest catalog firmware.

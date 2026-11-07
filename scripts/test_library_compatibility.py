@@ -4,7 +4,7 @@ import tempfile
 import unittest
 
 from library_native_harness import Harness
-from qualify_library_compatibility import BROKEN_TYPE_SOURCE, UNSAVED_SOURCE, add_oldest_firmware_cpu, instantiate_case, tree_hash
+from qualify_library_compatibility import UNSAVED_SOURCE, add_oldest_firmware_cpu, instantiate_case, tree_hash
 
 PREPARED = {"structuredContent": {"changeId": "lib-1", "previewHash": "x"}}
 
@@ -95,7 +95,6 @@ class FixtureTests(unittest.TestCase):
 
     def test_sources_declare_exactly_one_object(self):
         self.assertEqual(UNSAVED_SOURCE.count('FUNCTION "'), 1)
-        self.assertIn('"TiaMcpMissingType"', BROKEN_TYPE_SOURCE)
 
 
 if __name__ == "__main__":
