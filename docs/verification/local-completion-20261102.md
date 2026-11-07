@@ -1,6 +1,6 @@
 # Local completion checks — 2 November 2026
 
-This record separates completed work on this PC from vendor, operator and equipment prerequisites. It does not approve a 1.0 release or qualify a physical installation. Raw reports, logs, frozen source archives and binaries are retained under `artifacts/local-completion-20261102/`, `artifacts/evidence/` and the short native-run root `D:/tq1102/`.
+This record separates completed work on this PC from vendor, operator and equipment prerequisites. It does not approve a 1.0 release or qualify a physical installation. Raw reports, logs, frozen source archives and binaries are retained under `artifacts/local-completion-20261102/`, `artifacts/evidence/` and the native-run root `artifacts/tq1102/` (until 7 November 2026 at `D:/tq1102/`).
 
 ## Library and component checks
 
@@ -26,7 +26,7 @@ Release acceptance now checks reviewer role, date, commit ancestry, matrix hash,
 
 ## Test Suite operator seed
 
-With the user's approval, an owned copy of the scratch project was opened in the TIA V21 interface and a minimal system test was created and saved at `D:/tq1102/ui-seed/TiaMcpScratch_20261102_201944_5eab6efb.ap21`. It reads `TiaMcp_EnableGate_DB.Active` and asserts FALSE. The source scratch was left intact and the UI session was closed after saving. The seed is exploratory: its endpoint scope, anonymous access, certificate trust and execution are not qualified.
+With the user's approval, an owned copy of the scratch project was opened in the TIA V21 interface and a minimal system test was created and saved at `artifacts/tq1102/ui-seed/TiaMcpScratch_20261102_201944_5eab6efb.ap21` (moved there from `D:/tq1102/ui-seed` on 7 November 2026). It reads `TiaMcp_EnableGate_DB.Active` and asserts FALSE. The source scratch was left intact and the UI session was closed after saving. The seed is exploratory: its endpoint scope, anonymous access, certificate trust and execution are not qualified.
 
 The next operator action is to grant the seed CPU's anonymous user only the required `OPCUAServerAccess` right in TIA and establish Test Suite's server-certificate trust in an isolated simulator setup. The computer-use skill forbids automating in-app security settings. The system-test qualification mode TS-Q03 also remains software work; creating the seed does not implement or validate it. See the [system-test design and boundary](testsuite-system-blocker-20261101.md).
 
