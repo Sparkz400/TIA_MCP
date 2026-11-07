@@ -223,7 +223,7 @@ def main():
     client, initialized = start('--toolsets', 'opcua')
     try:
         names = {tool['name'] for tool in client.request('tools/list')['tools']}
-        check(names and all(name == 'feature_catalog' or name.startswith(('artifact_', 'opcua_')) for name in names)
+        check(names and all(name in ('feature_catalog', 'host_build_identity') or name.startswith(('artifact_', 'opcua_')) for name in names)
               and 'artifact_upload_begin' in names and 'opcua_inspect' in names, 'Selected toolset plus base tools only')
         check('toolsets opcua' in initialized['instructions'], 'Instructions name the restricted toolsets')
         check(client.request('prompts/list')['prompts'] == [], 'Prompts whose tools are hidden are not listed')
