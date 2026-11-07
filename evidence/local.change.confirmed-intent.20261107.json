@@ -1,0 +1,59 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.change.confirmed-intent.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T10:45:14+00:00",
+  "source": {
+    "commit": "fc4c00cb9ed552c3868d2333088cbe3dcb5ede02",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_confirmed_intent.py on Debug builds of fc4c00cb in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 7/7 steps: change_prepare of tag_create Reset with intent (decision door-reset with source, target Servos, symbols Reset/DoorOpen, statement and meaning; one observed fact; one assumption) recorded it in preview.intent with the fixed verificationScope (machine safety behavior not verified) and no earlier decisions; after apply, change_status returned the identical intent. A second tag_create with the same decision listed it under previouslyConfirmed with the first change's id and no conflict, and applied. A third with a changed statement listed one conflict with the earlier statement and a preview warning. An intent with an unknown key (guess) was refused with InvalidRequest.",
+  "limitations": [
+    "Intent is recorded, compared by decision id and bound to the preview hash; the tool never checks an implementation against it or evaluates machine safety behavior. Decisions are compared per project path within one Host artifact directory.",
+    "Exercised with tag_create only; every change kind passes intent through the same change_prepare path."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "38c46426e2330a71cfff61996fc9c1f2ed6376240080329025c2b13a261f4d95"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "b1ff7768592df350d0782f43514dcea57379611a6c4b6e8a5f2379fae7296ad0"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "7ca58df4aee172fa77a372656f4fff3a595673c727d477912e2b976fb6695efd",
+      "bytes": 15213,
+      "completed": true,
+      "steps": [
+        "owned scratch",
+        "intent recorded in the applied change and its status",
+        "the same decision is recognized as previously confirmed",
+        "a changed decision is flagged as a conflict",
+        "an unstructured guess is refused",
+        "owned worker shutdown"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_status",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}

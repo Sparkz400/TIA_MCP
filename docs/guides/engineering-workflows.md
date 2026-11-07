@@ -27,6 +27,18 @@ Preparation returns `changeId`, `previewHash`, `preview`, `journalPath`, and `st
 
 `checkpointSave: true` **saves the entire current in-memory project**, including previously unsaved user edits, before creating `before.zap21`. Siemens requires a saved project for archiving. The worker will not apply a mutation unless that archive exists and its SHA-256 has been recorded. `save: true` after mutation requires `compile: true` and passed compile verification.
 
+### Confirmed intent
+
+`change_prepare` accepts an optional `intent` with the task's confirmed machine decisions, kept apart from what was observed and what is only assumed:
+
+```json
+{ "decisions": [{ "id": "door-reset", "source": "maintainer, 7 Nov", "target": "Servos", "symbols": ["Reset", "DoorOpen"],
+                  "statement": "Reset is only allowed while the door is closed.", "meaning": "reset := \"Reset\" AND NOT \"DoorOpen\"" }],
+  "observedFacts": ["Drive1 telegram 1 at byte 256"], "assumptions": ["The reset button is wired to Reset."] }
+```
+
+The intent becomes part of the preview, so `previewHash` covers it, and it stays visible in the apply result and `change_status`. Each decision is compared by `id` with the decisions of earlier applied changes in the same project. An identical decision is listed under `intent.previouslyConfirmed`, so it does not need to be asked again. A changed statement or target is listed under `intent.conflicts` and adds a preview warning. The tool never evaluates the intent and never infers machine behavior from names. `intent.verificationScope` states what is and is not proven: compile correctness is reported by the compile result; whether the edit implements the intent is recorded for review, not checked; machine safety behavior is not verified. Natively checked on 7 November 2026 (`local.change.confirmed-intent.20261107`).
+
 ### Compile verification
 
 With `compile: true`, a change compiles its compile scope (the selected PLC, or every device for hardware, network, safety and other device-wide kinds) after the checkpoint and before the mutation, and again afterwards. Apply fails with `CompileFailed` only on an introduced or worsened error, a changed compile scope or incomplete diagnostics. Findings that were already there, such as another device's address conflict, do not fail the change. `compile.baselineComparison` lists them as existing (or resolved, once fixed) next to introduced ones, and `compile.compilerSucceeded` says whether the whole scope compiled without errors. A saved change with `compilerSucceeded: false` is valid; the project still has those errors. Without complete baseline diagnostics only a clean compile passes. Tag-table imports also fail on new or changed warnings ([below](#tag-table-import-scope)); compile-only kinds report their diagnostics as the result, and HMI kinds keep their own baseline rules. An inconsistent block still stops preparation of kinds that need the full project fingerprint (`FingerprintUnavailable`). Natively checked on 7 November 2026 (`local.compile-baseline.unrelated-errors.20261107`, [record](../verification/unrelated-errors-20261107.md)).

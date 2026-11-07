@@ -150,4 +150,21 @@ internal static class TagTableImportTests
         Check.Equal(0, UnresolvedSymbolRules.From(Compile()).Count);
         return Task.CompletedTask;
     }
+
+    internal static async Task ConfirmedIntent()
+    {
+        var intent = JObject.Parse("""{"decisions":[{"id":"door-reset","source":"user, 7 Nov","statement":"Reset is only allowed with the door closed.","target":"Servos","symbols":["Reset","DoorOpen"]}],"observedFacts":["Drive1 telegram 1 at byte 256"],"assumptions":["SS1 ramp time is set in the drive"]}""");
+        var recorded = IntentRules.Normalize(intent);
+        Check.Equal("door-reset", recorded["decisions"]![0]!["id"]!.Value<string>());
+        Check.Equal(true, recorded["verificationScope"]!["machineSafetyBehavior"]!.Value<string>()!.StartsWith("Not verified"));
+        var earlier = new[] { JObject.Parse("""{"id":"door-reset","changeId":"c1","statement":"Reset is only allowed with the door closed.","target":"Servos"}""") };
+        IntentRules.Compare(recorded, earlier);
+        Check.Equal(1, ((JArray)recorded["previouslyConfirmed"]!).Count);
+        Check.Equal(0, ((JArray)recorded["conflicts"]!).Count);
+        var changed = IntentRules.Normalize(JObject.Parse("""{"decisions":[{"id":"door-reset","source":"user","statement":"Reset is always allowed.","target":"Servos"}]}"""));
+        IntentRules.Compare(changed, earlier);
+        Check.Equal("c1", changed["conflicts"]![0]!["earlierChangeId"]!.Value<string>());
+        await Check.ThrowsAsync<TiaMcp.Openness.V21.BridgeException>(() => Task.Run(() => IntentRules.Normalize(JObject.Parse("""{"decisions":[{"id":"a","source":"u"}]}"""))));
+        await Check.ThrowsAsync<TiaMcp.Openness.V21.BridgeException>(() => Task.Run(() => IntentRules.Normalize(JObject.Parse("""{"guess":"door switch is probably X1"}"""))));
+    }
 }

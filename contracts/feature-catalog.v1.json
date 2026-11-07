@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.145",
+  "catalogVersion": "0.4.146",
   "targetTiaVersions": [
     21
   ],
@@ -5037,6 +5037,23 @@
       "limitations": [
         "A synthetic SCL wrapper FB stands in for a vendor servo block; two G120C PN drives with telegram 1 only. Watch tables, instance DBs outside the caller and graphical callers are not planned.",
         "Engineering evidence only: reset and SS1 expressions are applied as given; no safety program, machine behavior, commissioning or download is verified."
+      ]
+    },
+    {
+      "id": "local.change.confirmed-intent.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "fc4c00cb9ed552c3868d2333088cbe3dcb5ede02",
+        "passedScope": "scripts/qualify_confirmed_intent.py on Debug builds of fc4c00cb in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 7/7 steps: change_prepare of tag_create Reset with intent (decision door-reset with source, target Servos, symbols Reset/DoorOpen, statement and meaning; one observed fact; one assumption) recorded it in preview.intent with the fixed verificationScope (machine safety behavior not verified) and no earlier decisions; after apply, change_status returned the identical intent. A second tag_create with the same decision listed it under previouslyConfirmed with the first change's id and no conflict, and applied. A third with a changed statement listed one conflict with the earlier statement and a preview warning. An intent with an unknown key (guess) was refused with InvalidRequest."
+      },
+      "artifacts": [
+        "evidence/local.change.confirmed-intent.20261107.json"
+      ],
+      "limitations": [
+        "Intent is recorded, compared by decision id and bound to the preview hash; the tool never checks an implementation against it or evaluates machine safety behavior. Decisions are compared per project path within one Host artifact directory.",
+        "Exercised with tag_create only; every change kind passes intent through the same change_prepare path."
       ]
     }
   ],
@@ -11266,7 +11283,8 @@
           "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0).",
           "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107).",
           "Interrupted calls (since 7 November 2026, #217): a cancelled or timed-out request that reached the worker keeps running and is never replayed; later calls are refused with PreviousOperationRunning until it finishes, then its late response is recorded and the session continues without a Host restart (local.bridge.cancellation.20261107).",
-          "A tag on a drive's PROFIsafe telegram address is refused at prepare with SafetyBoundary since 7 November 2026; earlier only modules with Failsafe_FDestinationAddress counted as F-I/O (local.safety.drive-tags.20261107)."
+          "A tag on a drive's PROFIsafe telegram address is refused at prepare with SafetyBoundary since 7 November 2026; earlier only modules with Failsafe_FDestinationAddress counted as F-I/O (local.safety.drive-tags.20261107).",
+          "change_prepare accepts optional confirmed intent (decisions, observedFacts, assumptions), recorded in the hash-bound preview, compared with earlier applied decisions of the project (previouslyConfirmed, conflicts) and never evaluated (local.change.confirmed-intent.20261107)."
         ]
       },
       "qualification": {
@@ -11276,7 +11294,8 @@
           "local.safety.fio-routes.20261101",
           "local.compile-baseline.unrelated-errors.20261107",
           "local.bridge.cancellation.20261107",
-          "local.safety.drive-tags.20261107"
+          "local.safety.drive-tags.20261107",
+          "local.change.confirmed-intent.20261107"
         ]
       },
       "availability": {
