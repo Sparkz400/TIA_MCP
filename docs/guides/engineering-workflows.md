@@ -48,7 +48,9 @@ must contain every requested name, type, address, attribute and supplied comment
 unrequested tables and untouched members must remain unchanged. Native override
 replaces a table. Preparation therefore requires every existing member to remain
 in the candidate with its original kind; implicit deletions and renames are
-refused before writing. Start with a fresh native export when adding members.
+refused before writing; a member renamed inside the candidate counts as a deletion.
+Use `tag_set` (`Name`) or `tag_delete`/`constant_delete` to rename or delete on
+purpose. Start with a fresh native export when adding members.
 Existing safety-tag tables are
 refused, F-I/O address checks still run, and a native safety tag discovered after
 import fails verification with the checkpoint retained.
@@ -72,7 +74,11 @@ reported in the preview and journal.
 Natively checked on one owned scratch PLC on 7 November 2026
 (`local.tag-table.scoped-import.20261107`,
 [record](../verification/tag-table-scope-20261107.md)), including a type change
-that breaks a block reading the tag, which fails as `CompileFailed`.
+that breaks a block reading the tag, which fails as `CompileFailed`. A second run
+(`local.tag-table.replacement-compile.20261107`) adds the refused in-place rename
+and checks that the result's `stages` list checkpoint save, mutation, compile,
+readback and final save separately, and that a failed apply still reports
+`compile.compilerSucceeded`.
 
 A matching repeat of an already successful application returns its recorded result without applying again. An attempted change that failed or was interrupted cannot be retried automatically, even if its idempotency key is reused. Prepare another change only after reconciling the actual outcome: while a change on the same project is `recovery_required` (or still `checkpointing`, `applying` or `restoring`) in the same TIA process, `change_prepare` and `change_apply` refuse with `RecoveryRequired` and name that change, because the next checkpoint save would persist its failed edits and make it unrestorable. Run `change_restore` on it in an owned instance; otherwise `tia_detach` and start a new instance (which opens the saved files), or restart the worker. Every preview reports the project's unsaved state as `isModified`.
 

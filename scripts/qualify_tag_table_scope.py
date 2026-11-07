@@ -39,7 +39,7 @@ def main():
         result = client.request('tools/call', {'name': name, 'arguments': arguments})
         value = result.get('structuredContent') or json.loads(result['content'][0]['text'])
         assert result.get('isError') and value['error']['code'] == code, value
-        record(code, value)
+        return record(code, value)
 
     def apply(prepared):
         return dict(changeId=prepared['changeId'], previewHash=prepared['previewHash'], checkpointSave=True,
@@ -63,11 +63,19 @@ def main():
         assert any(b['name'] == 'TagScopeBroken' and b['isConsistent'] is False for b in inv['blocks'])
         selectors = dict(projectName=project['name'], plcPath=plc)
 
-        def prepare(address, data_type='Bool'):
+        def export():
             native = client.tool('tag_table_read', dict(selectors, tagTableName='Signals'))
             document = ET.fromstring(native['xml'])
-            table = document.find('SW.Tags.PlcTagTable')
-            objects = table.find('ObjectList')
+            return document, document.find('SW.Tags.PlcTagTable/ObjectList')
+
+        def payload(document):
+            for index, element in enumerate(e for e in document.iter() if 'ID' in e.attrib):
+                element.set('ID', format(index, 'X'))
+            return dict(selectors, kind='tag_table_import_xml',
+                        payload={'xml': ET.tostring(document, encoding='unicode'), 'expectedTableNames': ['Signals']})
+
+        def prepare(address, data_type='Bool'):
+            document, objects = export()
             added = next((t for t in objects.findall('SW.Tags.PlcTag') if t.findtext('AttributeList/Name') == 'Added'), None)
             if added is None:
                 added = ET.fromstring(candidate(address, data_type)).find('SW.Tags.PlcTagTable/ObjectList/SW.Tags.PlcTag')
@@ -75,10 +83,7 @@ def main():
             else:
                 added.find('AttributeList/LogicalAddress').text = address
                 added.find('AttributeList/DataTypeName').text = data_type
-            for index, element in enumerate(e for e in document.iter() if 'ID' in e.attrib):
-                element.set('ID', format(index, 'X'))
-            return client.tool('change_prepare', dict(selectors, kind='tag_table_import_xml',
-                payload={'xml': ET.tostring(document, encoding='unicode'), 'expectedTableNames': ['Signals']}))
+            return client.tool('change_prepare', payload(document))
 
         refuse('change_prepare', dict(selectors, kind='tag_table_import_xml', payload={'xml': candidate('%M50.1'), 'expectedTableNames': ['Signals']}), 'TagScopeMismatch')
         prepared = record('prepare despite inconsistent block', prepare('%M50.1'))
@@ -86,8 +91,21 @@ def main():
         applied = record('apply with existing diagnostic', client.tool('change_apply', apply(prepared)))
         assert applied['state'] == 'applied' and applied['compile']['compilerSucceeded'] is False
         assert applied['tagTableEvidence']['baselineCompile']['errorCount'] == applied['compile']['errorCount'] > 0
+        # Checkpoint save, mutation, compile, readback and final save are separate milestones (#211).
+        milestones = ['prechange_project_saved', 'mutation_applied', 'compile_finished', 'tag_table_content_verified', 'changed_project_saved']
+        assert [m for m in applied['stages'] if m in milestones][:len(milestones)] == milestones, applied['stages']
         table = record('native table readback', client.tool('tag_table_read', dict(selectors, tagTableName='Signals')))
         assert '<Name>Added</Name>' in table['xml'] and '<Name>Existing</Name>' in table['xml']
+        # A rename inside a replacement import is refused; renames go through tag_set (#210).
+        document, objects = export()
+        next(t for t in objects.findall('SW.Tags.PlcTag') if t.findtext('AttributeList/Name') == 'Existing').find('AttributeList/Name').text = 'Renamed'
+        refuse('change_prepare', payload(document), 'TagScopeMismatch')
+        reread = client.tool('tag_table_read', dict(selectors, tagTableName='Signals'))
+        def members(xml):
+            return sorted(tuple(t.findtext('AttributeList/' + f) for f in ('Name', 'DataTypeName', 'LogicalAddress'))
+                          for t in ET.fromstring(xml).iter('SW.Tags.PlcTag'))
+        record('table after refused rename', dict(identicalExport=reread['xml'] == table['xml'], xml=reread['xml']))
+        assert members(reread['xml']) == members(table['xml']), 'refused rename changed the table'
         refuse('change_restore', {'changeId': prepared['changeId'], 'previewHash': prepared['previewHash']}, 'ScopedRecoveryRequired')
         stale = record('prepare stale candidate', prepare('%M50.2'))
         record('external scratch tag edit', subprocess.run([str(helper), 'drift', str(auth)], check=True, text=True, capture_output=True).stdout)
@@ -95,10 +113,13 @@ def main():
         # An unused tag with an out-of-range address compiles; the regression needs a reader.
         record('native consumer diagnostic', subprocess.run([str(helper), 'consume', str(auth)], check=True, text=True, capture_output=True).stdout)
         bad = record('prepare consumed type change', prepare('%MW60', 'Int'))
-        refuse('change_apply', apply(bad), 'CompileFailed')
+        failed = refuse('change_apply', apply(bad), 'CompileFailed')
+        assert 'screen' not in failed['error']['message'], failed['error']['message']
         outcome = record('retain regression failure', client.tool('change_status', {'changeId': bad['changeId'], 'includeDetails': True}))
         assert outcome['state'] == 'recovery_required' and Path(outcome['recoveryArchive']).is_file()
         assert 'TagScopeConsumer' in json.dumps(outcome), 'regression must be the consumer diagnostic'
+        assert outcome['compile']['compilerSucceeded'] is False and 'changed_project_saved' not in outcome['stages'], outcome['stages']
+        assert 'mutation_applied' in outcome['stages'] and 'compile_finished' in outcome['stages']
         report['completed'] = True
     finally:
         record('owned worker shutdown', client.close())
