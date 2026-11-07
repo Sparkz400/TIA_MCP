@@ -45,6 +45,8 @@ HOST_FB_NUMBER = 30
 MODES = ("createStandaloneFc", "existing")
 EXTRA_TOOLS = ("library_open", "library_close", "library_list", "library_query", "library_capabilities")
 OB_NAME, OB_NUMBER = "TiaMcpComponentOb", 123
+# A LAD OB takes its coil network from the LAD FC caller fixture, imported under this name before the baseline.
+LAD_PEER = "TiaMcpLadPeer"
 HARNESS = ("qualify_plc_component.py", "qualification_owned_scratch.py", "compilation_evidence.py", "smoke_mcp.py",
            "block_test_runtime.py", "run_block_tests.py", "typed_graphical_transport.py")
 
@@ -95,6 +97,15 @@ COMBINATIONS = {
     "multiDependentsEarlier": (True, {"kind": "FB", "language": "FBD", "networks": 2, "multi": True, "dependents": True}, []),
     "multiDependentsLad": (True, {"kind": "FB", "language": "LAD", "multi": True, "dependents": True}, []),
     "multiDependentsLadEarlier": (True, {"kind": "FB", "language": "LAD", "networks": 2, "multi": True, "dependents": True}, []),
+    # OB callers beside the verified obCaller shape (a fresh component after the last network of an FBD OB): a LAD OB, an earlier
+    # placement and reuse of the installed FB, in every combination. Their previews name the candidate features until verified.
+    "obLad": (False, {"kind": "OB", "language": "LAD"}, ["ladCaller", "obCaller"]),
+    "obEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2}, ["earlierPlacement", "obCaller"]),
+    "obLadEarlier": (False, {"kind": "OB", "language": "LAD", "networks": 2}, ["earlierPlacement", "ladCaller", "obCaller"]),
+    "obReuse": (True, {"kind": "OB", "language": "FBD"}, ["obCaller", "reusedComponent"]),
+    "obReuseLad": (True, {"kind": "OB", "language": "LAD"}, ["ladCaller", "obCaller", "reusedComponent"]),
+    "obReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2}, ["earlierPlacement", "obCaller", "reusedComponent"]),
+    "obReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2}, ["earlierPlacement", "ladCaller", "obCaller", "reusedComponent"]),
 }
 CALLER_SOURCES = {("FB", "FBD"): "callers/TiaMcpComponentHost.s7dcl", ("FB", "LAD"): "callers/TiaMcpComponentHost.lad.s7dcl",
                   ("FC", "FBD"): "TiaMcpComponentCaller.s7dcl", ("FC", "LAD"): "callers/TiaMcpComponentCaller.lad.s7dcl"}
@@ -243,9 +254,9 @@ def verify_instance_db(xml, manifest, number):
         "Installed instance DB identity or first available number differs.")
 
 
-def fbd_ob(main_xml, peer_xml, source_tag, target_tag):
-    """FBD program-cycle OB fixture from two native exports: Main's OB envelope with the peer FBD FC's coil network,
-    rebound from the peer's locals to two global tags."""
+def fbd_ob(main_xml, peer_xml, source_tag, target_tag, language="FBD"):
+    """FBD (or LAD) program-cycle OB fixture from two native exports: Main's OB envelope with the peer FC's coil network in that
+    language, rebound from the peer's locals to two global tags."""
     networks = re.findall(r"<NetworkSource>.*?</NetworkSource>", peer_xml, re.S)
     require(len(networks) == 1, "Peer caller must export exactly one network.")
     body = networks[0]
@@ -259,7 +270,7 @@ def fbd_ob(main_xml, peer_xml, source_tag, target_tag):
         require(xml.count(old) == 1, "Main export lacks exactly one " + old)
         xml = xml.replace(old, new)
     require(xml.count("<ProgrammingLanguage>SCL</ProgrammingLanguage>") == 2, "Main must be one SCL block with one SCL network.")
-    return xml.replace("<ProgrammingLanguage>SCL</ProgrammingLanguage>", "<ProgrammingLanguage>FBD</ProgrammingLanguage>")
+    return xml.replace("<ProgrammingLanguage>SCL</ProgrammingLanguage>", "<ProgrammingLanguage>" + language + "</ProgrammingLanguage>")
 
 
 class IntegrateApplyRun(ComponentRun):
@@ -496,18 +507,34 @@ class IntegrateApplyRun(ComponentRun):
             number = int(re.search(r"<Number>(\d+)</Number>", xml).group(1))
             self.apply("block_import_xml", {"xml": two_network_fc(xml, name, number), "expectedBlockNames": [name]})
 
+    def ob_fixture(self, plc, language, networks=1):
+        """The OB caller before the baseline: Main's envelope with the peer FBD FC's network, or for LAD the LAD FC fixture's network
+        (imported as LAD_PEER); with two networks its one network twice, re-imported over itself from its own native export."""
+        peer = self.manifest["unrelatedCaller"]
+        if language == "LAD":
+            source = (self.native / "documents" / CALLER_SOURCES["FC", "LAD"]).read_text(encoding="utf-8-sig")
+            self.apply("source_upsert", {"language": "SIMATIC_SD", "source": source.replace('"' + self.base["caller"] + '"', '"' + LAD_PEER + '"'),
+                                         "expectedBlockNames": [LAD_PEER]})
+            peer = LAD_PEER
+        export = lambda name: artifact_bytes(self.call, self.call("block_read", {"blockPath": plc + "/blocks/" + name})["artifact"]).decode("utf-8-sig")
+        first, second = self.manifest["signals"]
+        self.apply("block_import_xml", {"xml": fbd_ob(export("Main"), export(peer), first["name"], second["name"], language), "expectedBlockNames": [OB_NAME]})
+        if networks == 2:
+            self.apply("block_import_xml", {"xml": two_network_fc(export(OB_NAME), OB_NAME, OB_NUMBER), "expectedBlockNames": [OB_NAME]})
+
     def combination(self, name, archive, released, reuse, caller, features):
         """One combination of verified features. A reuse plan first installs the verified standalone FBD FC, so the plan under test
         reuses the installed FB with a new global DB or, with "multi", a multi-instance; otherwise the plan imports it fresh."""
         existing = not caller.get("new")
-        target = HOST_FB if caller["kind"] == "FB" else REUSE_CALLER if reuse else self.base["caller"]
+        target = HOST_FB if caller["kind"] == "FB" else OB_NAME if caller["kind"] == "OB" else REUSE_CALLER if reuse else self.base["caller"]
         overrides = {"callerMode": "existing" if existing else "createStandaloneFc", "caller": target, "language": caller["language"],
                      "callerSource": None, "insertNetworkIndex": 0 if caller.get("networks") == 2 else -1,
                      "multiInstance": MULTI_NAME if caller.get("multi") else None, **({"instance": REUSE_INSTANCE} if reuse else {})}
         case, out = self.case(name, True), self.output / name
         self.use({"callerMode": "createStandaloneFc"} if reuse else overrides)
         scratch, opened, plc = self.stage_consumer(archive, released)
-        if existing: self.caller_fixture(plc, target, caller["kind"], caller["language"], caller.get("networks", 1))
+        if caller["kind"] == "OB": self.ob_fixture(plc, caller["language"], caller.get("networks", 1))
+        elif existing: self.caller_fixture(plc, target, caller["kind"], caller["language"], caller.get("networks", 1))
         if caller.get("dependents"):
             self.apply("source_upsert", {"language": "SCL", "source": HOST_DB_SOURCE, "expectedBlockNames": [HOST_DB]})
             overrides["dependentDb"] = plc + "/blocks/" + HOST_DB

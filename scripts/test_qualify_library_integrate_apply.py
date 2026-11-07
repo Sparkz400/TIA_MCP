@@ -265,17 +265,20 @@ class Candidates(unittest.TestCase):
             with self.subTest(name=name):
                 derived = sorted(feature for feature, present in (("ladCaller", caller["language"] == "LAD"), ("fbCaller", caller["kind"] == "FB"),
                                  ("multiInstance", caller.get("multi")), ("reusedComponent", reuse), ("earlierPlacement", caller.get("networks") == 2),
-                                 ("dependentInstanceDb", caller.get("dependents"))) if present)
+                                 ("dependentInstanceDb", caller.get("dependents")), ("obCaller", caller["kind"] == "OB")) if present)
                 self.assertEqual(features, [] if "+".join(derived) in verified else derived)
                 self.assertTrue(not caller.get("multi") or reuse and caller["kind"] == "FB", "A multi-instance needs a reused FB in an FB caller")
                 self.assertTrue(not caller.get("dependents") or caller.get("multi"), "Only a multi-instance changes the caller's instance DB")
                 self.assertTrue(not caller.get("new") or caller["kind"] == "FC" and caller.get("networks", 1) == 1)
-                self.assertTrue((subject.FIXTURES / subject.CALLER_SOURCES[caller["kind"], caller["language"]]).is_file())
+                # An OB caller is built from Main's envelope and an FC caller fixture's network.
+                self.assertTrue((subject.FIXTURES / subject.CALLER_SOURCES["FC" if caller["kind"] == "OB" else caller["kind"], caller["language"]]).is_file())
                 keys.add("+".join(derived))
         self.assertFalse(set(subject.COMBINATIONS) & set(subject.CANDIDATES))
         # Every combination of the five features that a plan can have runs once at least, and each multi-instance combination with
         # the caller's own instance DB besides multiInstanceDependents (the plain fbCaller one); all are verified since 2 November.
-        self.assertEqual(18, len(keys)); self.assertEqual(set(), keys - verified)
+        # The seven OB combinations beside the verified obCaller shape are candidates until their native run.
+        ob = {k for k in keys if "obCaller" in k}
+        self.assertEqual(18, len(keys - ob)); self.assertEqual(set(), keys - ob - verified); self.assertEqual(7, len(ob - verified))
 
 
 if __name__ == "__main__":
