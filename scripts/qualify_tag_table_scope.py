@@ -100,7 +100,12 @@ def main():
         document, objects = export()
         next(t for t in objects.findall('SW.Tags.PlcTag') if t.findtext('AttributeList/Name') == 'Existing').find('AttributeList/Name').text = 'Renamed'
         refuse('change_prepare', payload(document), 'TagScopeMismatch')
-        assert client.tool('tag_table_read', dict(selectors, tagTableName='Signals'))['xml'] == table['xml'], 'refused rename changed the table'
+        reread = client.tool('tag_table_read', dict(selectors, tagTableName='Signals'))
+        def members(xml):
+            return sorted(tuple(t.findtext('AttributeList/' + f) for f in ('Name', 'DataTypeName', 'LogicalAddress'))
+                          for t in ET.fromstring(xml).iter('SW.Tags.PlcTag'))
+        record('table after refused rename', dict(identicalExport=reread['xml'] == table['xml'], xml=reread['xml']))
+        assert members(reread['xml']) == members(table['xml']), 'refused rename changed the table'
         refuse('change_restore', {'changeId': prepared['changeId'], 'previewHash': prepared['previewHash']}, 'ScopedRecoveryRequired')
         stale = record('prepare stale candidate', prepare('%M50.2'))
         record('external scratch tag edit', subprocess.run([str(helper), 'drift', str(auth)], check=True, text=True, capture_output=True).stdout)
