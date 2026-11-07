@@ -17,7 +17,7 @@ groups a task needs:
 
 The value is a comma-separated list of group names, or `all` (the default). Unknown names stop
 the Host at startup with the list of valid groups. Hidden tools cannot be called, and the server
-instructions tell the client which groups are advertised. The `base` tools (`feature_catalog`
+instructions tell the client which groups are advertised. The `base` tools (`feature_catalog`, `host_build_identity`
 and the `artifact_*` upload and download tools) are always advertised, and `qualification_*`
 tools stay governed by their own qualification flags. A bundled installation passes the same
 value with `New-McpConfiguration.ps1 -Toolsets core,simulation` (or `Start-TiaMcp.ps1 -Toolsets`).

@@ -43,6 +43,10 @@ public sealed class CompositeEngineeringTools(IBridgeClient bridge, HostOptions 
         return Result(result, failed);
     }
 
+    [McpServerTool(Name = "host_build_identity", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Report which build this Host is running: its process start time, product version, the SHA-256 of the Host and configured worker executables when the Host started and now, and the bundle manifest hash when it runs from a package. changedOnDisk marks a binary replaced or rebuilt after start; runningMatchesDisk is false then, and a newly built or packaged binary must never be described as loaded until the Host was restarted and reports it. Starts no worker and changes nothing.")]
+    public CallToolResult HostBuildIdentity() => Result(BuildIdentity.Report(options.WorkerPath, options.SimulatorWorkerPath), false);
+
     [McpServerTool(Name = "composite_engineering_rebind_plan", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Plan, never apply, technology-object hardware rebinds for a revalidated composite handle: each before-phase declared TO hardware connection that is missing, disconnected, unknown or unresolved after, whose target has one declared replacement (model correspondence, or AML correspondence through declared hardware mappings in both phases), becomes a to_connect change payload (technologyPath, role, sensorIndex, hardwarePath and carried-over channel selector). Payloads appear only when this build's catalog has the to_connect change kind; otherwise entries say changeKindUnavailable. At most 200 entries. Each change still needs change_prepare/apply with its own preview, checkpoint and compile.")]
     public CallToolResult RebindPlan(string recordRef) => Run(s => s.RebindPlan(recordRef, ToConnect.Value));

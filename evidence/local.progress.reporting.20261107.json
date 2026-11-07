@@ -1,0 +1,60 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.progress.reporting.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T10:52:28+00:00",
+  "source": {
+    "commit": "d62587fa82b4c320cca639ef0120e7cfd55a3030",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_progress_reporting.py on Debug builds of d62587fa, 9/9 steps. Host A in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN): change_status of a prepared tag_create reported projectEditComplete=false with the prepared-only summary; its apply reported projectEditComplete=true with checkpointSaved, recoveryArchiveCreated, projectChanged, compiled and saved done, compilerSucceeded yes, and notCovered naming host_build_identity; two change_status progressOnly polls of the finished change returned the same phaseFingerprint, state applied and no current phase. Host B, configured with a copied engineering worker it never started: host_build_identity reported the worker hash at Host start equal to now and runningMatchesDisk=true; after one byte was appended to the copy it reported changedOnDisk=true, runningMatchesDisk=false and a note to restart the Host.",
+  "limitations": [
+    "Milestones are derived from the recorded state, stages and compile result of each change; a phase still running during a poll was not observed natively because the tag change finished too quickly.",
+    "host_build_identity compares file hashes, not source revisions: builds do not embed a commit, so mapping a hash to a commit needs the build records."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "3220b7003cc26daff2c673cc9640020b1cf82e460db79dd7e81e4ff744d38ce7"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "96ae381fbfd53fcd8edefc31e583e974f6b5d3136127881345175aded7cb00fd"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "4fa2009059645b166771dab22705d99300bc22329151dd54d19a16d9fea631d1",
+      "bytes": 20344,
+      "completed": true,
+      "steps": [
+        "owned scratch",
+        "a prepared-only change reports nothing changed",
+        "the applied change reports a complete, saved and compiled edit",
+        "repeated progress polls of a finished change are unchanged",
+        "owned worker shutdown",
+        "identity matches disk at start",
+        "a worker replaced after Host start is reported as changed on disk",
+        "identity host shutdown"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_status",
+        "host_build_identity",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

@@ -998,6 +998,12 @@
       ]
     },
     {
+      "featureId": "host_build_identity",
+      "obligations": [
+        "L06"
+      ]
+    },
+    {
       "featureId": "target_capabilities",
       "obligations": [
         "F01",

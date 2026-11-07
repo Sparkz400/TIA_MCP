@@ -36,6 +36,29 @@ every device compile while every block stays consistent, so it stands in for the
   them.
 - Only the kinds listed ran. HMI kinds keep their own baseline rules, and library
   transactions use the shared comparison without a native run here.
-- An inconsistent block on any PLC still stops preparation of kinds that need the
-  full project fingerprint, so same-PLC block errors are not covered (#218).
-- Read and export behaviour with unrelated inconsistent objects was not changed.
+- Same-PLC block errors are covered by the second run below.
+
+## Unrelated inconsistent blocks
+
+Evidence: `local.compile-baseline.unrelated-blocks.20261107`
+([summary](../../evidence/local.compile-baseline.unrelated-blocks.20261107.json)).
+Before, an inconsistent block anywhere stopped the preparation of every change that
+needs the full project fingerprint. Now an inconsistent block that is not a target is
+fingerprinted by its metadata (identity, number, language, modification date,
+consistency). The change lists it in `fingerprintCoverage.inconsistentBlocksMetadataOnly`,
+and its automatic whole-project restore is refused.
+
+`scripts/qualify_unrelated_blocks.py` seeded an inconsistent SCL FC in an owned scratch
+and passed 9 of 9 steps:
+
+| Check | Result |
+| --- | --- |
+| `project_inventory`, `software_inspect`, `tag_table_read`, `block_read` of a consistent block | All answered |
+| `block_read` of the inconsistent block | `BlockExportUnavailable` with the generated-source fallback |
+| Unrelated `tag_create` | Prepared with the block listed as metadata-only; applied and saved, the existing error unchanged |
+| `change_restore` of it | `ScopedRecoveryRequired`, naming the retained archive |
+| Second unrelated change (`source_upsert` of a new FC) | Applied in the same session |
+| `source_upsert` of the inconsistent block itself | `FingerprintUnavailable` at prepare |
+
+A target that is inconsistent used to fail with TIA's raw export error; it now refuses
+with a typed `FingerprintUnavailable` that names the generated-source fallback.

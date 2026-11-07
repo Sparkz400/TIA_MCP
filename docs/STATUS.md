@@ -5,9 +5,9 @@ simulators you own (see the [README](../README.md)). Catalog and backlog reviewe
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.146`: 490 features, 470 verified, 20 unverified; 329 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 133 shipped, 333 limited, 10 unqualified, 12 unavailable on V21, 2 deferred |
-| Matrix cells | 2,136 bound, **52 open**, 72 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.4.148`: 491 features, 471 verified, 20 unverified; 330 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 133 shipped, 334 limited, 10 unqualified, 12 unavailable on V21, 2 deferred |
+| Matrix cells | 2,139 bound, **52 open**, 72 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted; backlog reconciled on 3 November against catalog `0.4.130` ([ledger](plans/release-obligations-20261015.md), [acceptance rules](plans/release-acceptance.md), [review](verification/release-readiness-20261103.md)) |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and

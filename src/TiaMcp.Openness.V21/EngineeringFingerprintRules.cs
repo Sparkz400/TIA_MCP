@@ -10,7 +10,7 @@ namespace TiaMcp.Openness.V21
         // name or a caller-supplied path. Protected derived blocks have no editable
         // source here; their generated payload checksums may be unavailable after
         // a successful safety compile. Never apply this exclusion to user blocks.
-        internal static Content<T> ReadBlockContent<T>(bool nativeSystemGroup, bool knowHowProtected, bool consistent, bool hasSafetySignatureCoverage, string path, Func<T> readNativeFingerprints) where T : class
+        internal static Content<T> ReadBlockContent<T>(bool nativeSystemGroup, bool knowHowProtected, bool consistent, bool hasSafetySignatureCoverage, string path, Func<T> readNativeFingerprints, bool target = true) where T : class
         {
             if (nativeSystemGroup && knowHowProtected && hasSafetySignatureCoverage)
             {
@@ -20,7 +20,11 @@ namespace TiaMcp.Openness.V21
                 return new Content<T> { Mode = "protectedGeneratedMetadata", Payload = null };
             }
             // Native errors for editable/user blocks intentionally propagate. An
-            // inconsistent source block must not acquire a weaker recovery guard.
+            // inconsistent source block must not acquire a weaker recovery guard:
+            // an inconsistent target refuses, and an inconsistent bystander (#221) is
+            // covered by its metadata only, which the change's coverage lists and which
+            // refuses automatic whole-project restore of that change.
+            if (!consistent && !target) return new Content<T> { Mode = "inconsistentMetadataOnly", Payload = null };
             if (!consistent) throw new BridgeException("FingerprintUnavailable", "An editable/user block is inconsistent; a reliable native payload fingerprint cannot be established: " + path);
             T payload = readNativeFingerprints();
             return new Content<T> { Mode = payload == null ? "metadataNoNativeProvider" : "nativeFingerprints", Payload = payload };

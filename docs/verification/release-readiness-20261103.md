@@ -46,6 +46,8 @@ locations are absent here. The operator confirmed there is no prepared system-te
 Recover the evidence/fixtures from their origin or create independent replacements; do not treat
 this checkout's missing ignored artifacts as loss of the originals.
 
+Update on 7 November 2026: on the maintainer's workstation the operator seed and the 2 November native runs exist; they moved from `D:/tq1102` to `artifacts/tq1102` (seed: `artifacts/tq1102/ui-seed/TiaMcpScratch_20261102_201944_5eab6efb.ap21`).
+
 ## Remaining release work
 
 TS-Q03 native system-test qualification, physical runtime, VMware deployment, broader

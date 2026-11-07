@@ -27,6 +27,27 @@ Preparation returns `changeId`, `previewHash`, `preview`, `journalPath`, and `st
 
 `checkpointSave: true` **saves the entire current in-memory project**, including previously unsaved user edits, before creating `before.zap21`. Siemens requires a saved project for archiving. The worker will not apply a mutation unless that archive exists and its SHA-256 has been recorded. `save: true` after mutation requires `compile: true` and passed compile verification.
 
+### Reporting progress
+
+Every change result and `change_status` carry `progress`:
+
+- `projectEditComplete`, true once the change is applied and saved, or restored
+- `milestones`: prepared, checkpoint saved, recovery archive created, project changed, readback verified, compiled, compiler succeeded, saved; each `done`, `notReached`, `skipped`, `pending` or, for the compiler, `yes`/`no`/`unknown`
+- a one-line `summary`
+- `notCovered`, a reminder that repository work, MCP qualification and the running build are separate questions
+
+`change_status` with `progressOnly: true` reads the progress receipt while a change runs. It reports `currentPhase` with its elapsed time, and a `phaseFingerprint` that changes only when the state or a phase changes. An unchanged fingerprint means there is nothing new to tell the user.
+
+`host_build_identity` reports which build the connected Host runs: process start, product version and the SHA-256 of the Host and worker executables when the Host started and now. A rebuilt or replaced file shows as `changedOnDisk`, and `runningMatchesDisk` is false. Building or packaging a new version never updates a running Host; only a restart does, after which the report shows the new hashes.
+
+Concise reports keep these apart, for example:
+
+- "The tag import is applied and saved. The PLC still has the one compiler error it had before (`compilerSucceeded: false`)."
+- "The change failed at compile and is not saved (`recovery_required`); nothing else proceeds until it is restored or reconciled."
+- "The fix is merged and a new bundle is built, but this Host still runs the earlier build (`runningMatchesDisk` false); restart it to use the fix."
+
+Natively checked on 7 November 2026 (`local.progress.reporting.20261107`).
+
 ### Confirmed intent
 
 `change_prepare` accepts an optional `intent` with the task's confirmed machine decisions, kept apart from what was observed and what is only assumed:
@@ -41,7 +62,7 @@ The intent becomes part of the preview, so `previewHash` covers it, and it stays
 
 ### Compile verification
 
-With `compile: true`, a change compiles its compile scope (the selected PLC, or every device for hardware, network, safety and other device-wide kinds) after the checkpoint and before the mutation, and again afterwards. Apply fails with `CompileFailed` only on an introduced or worsened error, a changed compile scope or incomplete diagnostics. Findings that were already there, such as another device's address conflict, do not fail the change. `compile.baselineComparison` lists them as existing (or resolved, once fixed) next to introduced ones, and `compile.compilerSucceeded` says whether the whole scope compiled without errors. A saved change with `compilerSucceeded: false` is valid; the project still has those errors. Without complete baseline diagnostics only a clean compile passes. Tag-table imports also fail on new or changed warnings ([below](#tag-table-import-scope)); compile-only kinds report their diagnostics as the result, and HMI kinds keep their own baseline rules. An inconsistent block still stops preparation of kinds that need the full project fingerprint (`FingerprintUnavailable`). Natively checked on 7 November 2026 (`local.compile-baseline.unrelated-errors.20261107`, [record](../verification/unrelated-errors-20261107.md)).
+With `compile: true`, a change compiles its compile scope (the selected PLC, or every device for hardware, network, safety and other device-wide kinds) after the checkpoint and before the mutation, and again afterwards. Apply fails with `CompileFailed` only on an introduced or worsened error, a changed compile scope or incomplete diagnostics. Findings that were already there, such as another device's address conflict, do not fail the change. `compile.baselineComparison` lists them as existing (or resolved, once fixed) next to introduced ones, and `compile.compilerSucceeded` says whether the whole scope compiled without errors. A saved change with `compilerSucceeded: false` is valid; the project still has those errors. Without complete baseline diagnostics only a clean compile passes. Tag-table imports also fail on new or changed warnings ([below](#tag-table-import-scope)); compile-only kinds report their diagnostics as the result, and HMI kinds keep their own baseline rules. An inconsistent block that is not a target of the change is fingerprinted by its metadata only and listed in `fingerprintCoverage.inconsistentBlocksMetadataOnly`; because that is weaker, `change_restore` of such a change refuses whole-project restore with `ScopedRecoveryRequired` and names the retained archive. An inconsistent target still refuses with `FingerprintUnavailable`; compile it first or read its generated source. Natively checked on 7 November 2026 (`local.compile-baseline.unrelated-errors.20261107`, [record](../verification/unrelated-errors-20261107.md)).
 
 The new individual type/tag/constant edits, user-group edits, graphical network patches/inserts, call-argument edits, hardware-address edits, block renames and deletions, technology-object deletions and hardware deletions require `compile: true` even when `save` is false. Their native mutation routes are implemented; the pure regression tests do not establish qualification on a particular CPU, software-unit configuration or hardware family.
 
