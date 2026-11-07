@@ -219,3 +219,27 @@ Not covered:
 - Inconsistent object kinds other than an uncompiled PLC data type.
 - Unsaved edits made in an attached TIA UI.
 - Runtime behavior.
+
+## Firmware-target mismatch — 7 November 2026
+
+| Evidence | Runner | Result |
+| --- | --- | --- |
+| [`local.library_compatibility.firmware.20261107`](../../evidence/local.library_compatibility.firmware.20261107.json) | `qualify_library_compatibility.py` | 56/56 steps |
+
+The runner now also adds a CPU 1511-1 PN at its oldest catalog firmware, V1.0 (6ES7 511-1AK00-0AB0), next to the
+S7-1200. Firmware before V3.1 has no PLC security wizard, so that CPU is added without scratch security. The three
+types are authored and released on the scratch CPU 1511-1 PN V4.1; the new one is
+[`TiaMcpTextGate`](../../fixtures/libraries/compatibility/TiaMcpTextGate.scl), an FB with a `WString` output.
+
+- Into V1.0, the Bool-only type and the `LInt`/`LWord`/`LTime` type apply and compile with 0 errors.
+- The `WString` type is checkpointed and instantiated, then fails compilation (`CompileFailed`, 3 errors:
+  `Data type WString is unknown`). No save completes, and a fresh reopen equals the saved inventory before the attempt.
+- A firmware mismatch therefore behaves like the CPU-family mismatch: it is not refused at preparation, and the
+  mandatory compile catches it.
+- The S7-1200, V13, unsaved-edit and uncompiled-type cases repeat with the 28 October outcomes.
+
+The broken-generation type case is no longer run. Since 2 November a failed apply leaves the project
+`recovery_required`, so every later change on it is refused; the first attempt (`fw1-r01`) stopped there. TIA's
+discarding of such a type stays recorded above.
+
+Not covered: firmware-gated instructions, other CPU types and runtime behavior.

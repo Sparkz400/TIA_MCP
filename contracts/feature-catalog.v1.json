@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.150",
+  "catalogVersion": "0.4.151",
   "targetTiaVersions": [
     21
   ],
@@ -2861,7 +2861,7 @@
         "evidence/local.typed.crossscope.engineering.rerun.20261029.json"
       ],
       "limitations": [
-        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
+        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54\u2026.zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
         "Engineering only: the runtime gate is not run."
       ]
     },
@@ -4267,7 +4267,7 @@
         "tiaVersion": 21,
         "machine": "PCNico",
         "sourceCommit": "d57defa5b499bfe94396d6079d4af603de5403ad",
-        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of d57defa5 (artifacts/oi3, git archive; main with PR 184's RFC 8785 hashing, PR 186's exact decimal parsing of request floats and the runner scanners' RFC 8785 fix), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Each of the three advance requests (verifyImport, prepareGraphical, verifyInstallation) carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the number literals 1e3 and 2.2250738585072012e-308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of the verifyImport request (1e3 as 1000, the other as 2.2250738585072014e-308) reproduced the Host's recorded requestSha256 5d077eef."
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of d57defa5 (artifacts/oi3, git archive; main with PR 184's RFC 8785 hashing, PR 186's exact decimal parsing of request floats and the runner scanners' RFC 8785 fix), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Each of the three advance requests (verifyImport, prepareGraphical, verifyInstallation) carried the non-ASCII key pr\u00fcfName\u540d\u524d, non-ASCII text with an astral emoji (sent as \\u escapes) and the number literals 1e3 and 2.2250738585072012e-308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of the verifyImport request (1e3 as 1000, the other as 2.2250738585072014e-308) reproduced the Host's recorded requestSha256 5d077eef."
       },
       "artifacts": [
         "evidence/local.component.canonical-hash.20261101.json"
@@ -4285,7 +4285,7 @@
         "tiaVersion": 21,
         "machine": "PCNico",
         "sourceCommit": "4b970cc91fdb0532a49a0f6833f9e0cf8d664eb6",
-        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of 4b970cc9 (artifacts/hz3, git archive; main with PR 190's exact worker number reading and range refusal, and PR 199's id-keeping refusal), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Before the first advance, the same advance request with 1.8e308 added was refused with InvalidRequest ('A request number is outside the double range.', from the worker's request reader, relayed by the Host with the request id); the window's revision, state and children (start, applyLibrary) were unchanged, and the verifyImport advance that followed dispatched on the same Host session. Each of the three advance requests carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of all three advance requests (1e3 as 1000, 2.2250738585072014e-308, 1.7976931348623157e+308, i.e. double.MaxValue) reproduced the Host's recorded hashes c857106f, 340dd121 and c5e740ce."
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of 4b970cc9 (artifacts/hz3, git archive; main with PR 190's exact worker number reading and range refusal, and PR 199's id-keeping refusal), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Before the first advance, the same advance request with 1.8e308 added was refused with InvalidRequest ('A request number is outside the double range.', from the worker's request reader, relayed by the Host with the request id); the window's revision, state and children (start, applyLibrary) were unchanged, and the verifyImport advance that followed dispatched on the same Host session. Each of the three advance requests carried the non-ASCII key pr\u00fcfName\u540d\u524d, non-ASCII text with an astral emoji (sent as \\u escapes) and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of all three advance requests (1e3 as 1000, 2.2250738585072014e-308, 1.7976931348623157e+308, i.e. double.MaxValue) reproduced the Host's recorded hashes c857106f, 340dd121 and c5e740ce."
       },
       "artifacts": [
         "evidence/local.component.canonical-hash.20261102.json"
@@ -5121,6 +5121,25 @@
       ],
       "limitations": [
         "One SINAMICS G120C PN (one drive object, telegram 1); drive objects, parameters and telegrams are not changed here. HMI devices: a freshly added panel never compiles clean (no start screen), so its hardware_add with compile is an introduced compile error by design (#221); HMI hardware stays covered by the HMI routes."
+      ]
+    },
+    {
+      "id": "local.library_compatibility.firmware.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "6d81af7cb6b7a7513f783b830356ed8892f75ee0",
+        "passedScope": "scripts/qualify_library_compatibility.py on Debug builds of 6d81af7c (src unchanged from main 57dac10c), 56/56 steps, owned TIA V21 Update 3 scratch projects: a Bool-only, an LInt/LWord/LTime and a WString FB type are authored and released 1.0.0 on a CPU 1511-1 PN V4.1 and archived in a global library. A consumer scratch adds a CPU 1214C DC/DC/DC V4.7 and a CPU 1511-1 PN V1.0 (6ES7 511-1AK00-0AB0, the oldest catalog firmware of the authoring CPU type, without scratch security, which firmware before V3.1 lacks). Into V1.0 the Bool-only and the 64-bit types instantiate and compile with 0 errors; the WString type is checkpointed and instantiated but fails compilation (CompileFailed, 3 errors: Data type WString is unknown), completes no save, and a fresh reopen equals the saved inventory before the attempt. The V13 refusal, unsaved-edit, uncompiled-type and S7-1200 cases repeat local.library_compatibility.rerun.20261028 with the same outcomes (S7-1200: Bool-only applies, the 64-bit type fails compilation with 8 errors, unsaved)."
+      },
+      "artifacts": [
+        "evidence/local.library_compatibility.firmware.20261107.json"
+      ],
+      "limitations": [
+        "Firmware is varied only within CPU 1511-1 PN (V4.1 to V1.0) and only by data type; firmware-gated instructions and other CPU types are not exercised.",
+        "A firmware mismatch is not refused at preparation; the mandatory compile catches it after the checkpoint.",
+        "The broken-generation type case of 27 October is no longer run: since 2 November a failed apply leaves the project recovery_required, which refuses every later change on it.",
+        "No runtime execution."
       ]
     }
   ],
@@ -12826,7 +12845,8 @@
           "local.library_compatibility.rerun.20261028",
           "local.library_formats.rerun.20261028",
           "local.library_vendor.rerun.20261102",
-          "local.library.upgrades-v20.20261102"
+          "local.library.upgrades-v20.20261102",
+          "local.library_compatibility.firmware.20261107"
         ]
       },
       "availability": {
@@ -12937,7 +12957,7 @@
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source.",
-          "Target state (local.library_compatibility.20261027): unsaved target edits are reported in the preview (unsavedTargetEdits) and saved into the checkpoint baseline; an inherited inconsistent PLC data type is refused before any checkpoint (InheritedDiagnostics). A type using data types the target CPU family lacks (LInt/LWord/LTime on an S7-1200) fails compilation after checkpoint without saving (CompileFailed); it is not refused at preparation. Firmware-version mismatches are not exercised."
+          "Target state (local.library_compatibility.20261027): unsaved target edits are reported in the preview (unsavedTargetEdits) and saved into the checkpoint baseline; an inherited inconsistent PLC data type is refused before any checkpoint (InheritedDiagnostics). A type using data types the target CPU family lacks (LInt/LWord/LTime on an S7-1200) fails compilation after checkpoint without saving (CompileFailed); it is not refused at preparation. A firmware mismatch fails the same way (local.library_compatibility.firmware.20261107): a WString FB type authored on a CPU 1511-1 PN V4.1 fails compilation in a CPU 1511-1 PN V1.0 (Data type WString is unknown) without saving, while Bool and 64-bit types apply there; only data types are varied, not firmware-gated instructions."
         ]
       },
       "qualification": {
@@ -12964,7 +12984,8 @@
           "local.library_dmc_prerequisites.20261102",
           "local.library.dmc-order.20261102",
           "local.safety.fio-routes.20261102",
-          "local.safety.fio-block-routes.20261102"
+          "local.safety.fio-block-routes.20261102",
+          "local.library_compatibility.firmware.20261107"
         ]
       },
       "availability": {
@@ -28663,7 +28684,7 @@
           "Native, 1 November (build 10763a35): the route passed on the desk-configured TP700 Comfort pair (local.hmi.classic-import.route.20261101, 63/63 checks): every refusal before any write; BackColor on both HMIs' Overview_A (identity separation), a no-op and a GridColor import of Overview_B, a no-op import of the start screen and a QualificationTags import adding one internal tag, each with every stage, no compiler problems, the target's independent re-export carrying exactly the intended delta, every other export unchanged, same-key replay and another key refused RecoveryRequired; a stale preview refused; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay (local.hmi.classic-import.interruption.20261101, 8/8).",
           "Qualified on one desk-configured TP700 Comfort fixture (start screen set in the editor). Import(Override) of the start screen kept it natively, but the start-screen setting has no public getter, so the compile rule is its only guard. Other Classic devices, object types, customer projects, runtime and visual behavior are not covered.",
           "Lifecycle, 1 November (build 2431ccf9): on the same TP700 Comfort pair both compiles of every apply named only the target HmiTarget, both Host lifetimes ended normally (Host and worker exit 0, owned TIA process exited) and a new TIA process then reopened the saved project read-write at once (local.hmi.lifecycle.20261101, 72/72).",
-          "WinCC RT Advanced and KTP700 Basic PN, 1–2 November (build 750121ea): the route passed on their seeded HmiSeeder baselines (no start screen; the compile rule kept that error unchanged after every apply) with 72/72 and 71/71 checks (local.hmi.classic-import.profiles.route.20261101; Basic has no popup), and ci-* interruption 8/8 on each (local.hmi.classic-import.profiles.interruption.20261102); production admits both profiles."
+          "WinCC RT Advanced and KTP700 Basic PN, 1\u20132 November (build 750121ea): the route passed on their seeded HmiSeeder baselines (no start screen; the compile rule kept that error unchanged after every apply) with 72/72 and 71/71 checks (local.hmi.classic-import.profiles.route.20261101; Basic has no popup), and ci-* interruption 8/8 on each (local.hmi.classic-import.profiles.interruption.20261102); production admits both profiles."
         ]
       },
       "qualification": {

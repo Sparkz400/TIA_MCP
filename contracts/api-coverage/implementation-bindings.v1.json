@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "5443a21001a850757eeef39e8513e28823592f4499914f58f7747d8c42453328",
-      "bytes": 1790930
+      "sha256": "0cb62451369542580023e753020476ead2bd4db4ed433349352790b45a67f1eb",
+      "bytes": 1793300
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -113321,6 +113321,13 @@
           "artifacts": [
             "evidence/local.safety.fio-block-routes.20261102.json"
           ]
+        },
+        {
+          "id": "local.library_compatibility.firmware.20261107",
+          "profileSha256": "6a80aa03391a5bfd70663544a94b01a767b77a6b0d17014f03cdcd93f917585c",
+          "artifacts": [
+            "evidence/local.library_compatibility.firmware.20261107.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -114171,6 +114178,13 @@
           "profileSha256": "36cdea5fc377c22d69a253bd795972af8caedb40bbaef6275073b380cd8c9609",
           "artifacts": [
             "evidence/local.library.upgrades-v20.20261102.json"
+          ]
+        },
+        {
+          "id": "local.library_compatibility.firmware.20261107",
+          "profileSha256": "6a80aa03391a5bfd70663544a94b01a767b77a6b0d17014f03cdcd93f917585c",
+          "artifacts": [
+            "evidence/local.library_compatibility.firmware.20261107.json"
           ]
         }
       ],
@@ -139555,6 +139569,11 @@
       "sha256": "ae9bea81b23e345005eb834fc97c0473849f5ac084103d9fcc71df328d623f9d"
     },
     {
+      "path": "evidence/local.library_compatibility.firmware.20261107.json",
+      "state": "observed",
+      "sha256": "86713e7963c70ce7aa7eb8ef43686bac0a578959616a26b867c633563d78ea1e"
+    },
+    {
       "path": "evidence/local.library_compatibility.rerun.20261028.json",
       "state": "observed",
       "sha256": "3630ac3504703fde35c12723a153bbab699bef8c7d57c09263c4ddc5c0507fc8"
@@ -140831,6 +140850,10 @@
     {
       "id": "local.library.upgrades-v20.20261102",
       "profileSha256": "36cdea5fc377c22d69a253bd795972af8caedb40bbaef6275073b380cd8c9609"
+    },
+    {
+      "id": "local.library_compatibility.firmware.20261107",
+      "profileSha256": "6a80aa03391a5bfd70663544a94b01a767b77a6b0d17014f03cdcd93f917585c"
     },
     {
       "id": "local.library_compatibility.rerun.20261028",
