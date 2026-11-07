@@ -1087,7 +1087,9 @@ def shared_disconnect_to_third(run):
                      {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": SHARED_IO, "afterIoSystem": None, "disconnect": True, "sharedDevice": True,
                                    "sharedSubmodules": [{"hardwarePath": module, "assignmentTargetBefore": owner, "assignmentTargetAfter": third}]}]},
                      shown={**payload, "addressControllerOwnerPath": owner, "sharedAddressControllerOwnerPaths": sorted([run.path("HwPeer", "items", "HwPeerCpu"), third])},
-                     plc=scratch_plc(run), changed=["hw:" + device, "hw:" + controller, "hw:" + module + "/items/SpDi3"], removed=gone,
+                     # SpDi3's submodule keeps its start when that address is free in HwThirdCpu's space (hw7), so it may stay unchanged.
+                     plc=scratch_plc(run), changed=["hw:" + device, "hw:" + controller], removed=gone,
+                     tolerated=lambda category, key: category == "changed" and key == "hw:" + module + "/items/SpDi3",
                      added=[constant(run, THIRD, SP.prefix + "SpDi3")], restore=True, boundary=True) is not None
 
 
