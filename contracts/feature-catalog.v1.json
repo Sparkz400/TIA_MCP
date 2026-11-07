@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.144",
+  "catalogVersion": "0.4.145",
   "targetTiaVersions": [
     21
   ],
@@ -5020,6 +5020,23 @@
         "One SINAMICS G120C PN with PROFIsafe telegram 30 on one owned F-CPU 1511F-1 PN; other telegrams (for example 900-series), S120/S210 drives, several drive objects and user tag-table groups are refused or not exercised.",
         "The PROFIsafe telegram was inserted by the qualification fixture, not by an MCP route. No F-destination address, Safety Integrated parameter, safety acceptance, password or download; compile success is engineering evidence, not machine safety acceptance. Interruption of this kind is covered only by the generic routes of local.bridge.cancellation.20261107.",
         "Source commit adds only the change_status check and release owner to scripts after the built 21542b8a; src and every executable run are byte-identical to it."
+      ]
+    },
+    {
+      "id": "local.drives.servo-calls.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "35e39ed75921f2a9768f88df0d2546149a2b0551",
+        "passedScope": "scripts/qualify_servo_calls.py on Debug builds of 35e39ed7 in one owned TIA V21 Update 3 scratch, 30/30 steps: the scratch CPU 1511-1 PN with two SINAMICS G120C PN drives assigned to its IO system (telegram 1 at bytes 256 and 260), Word tags at each telegram's start addresses, Bool signals Reset, DoorOpen and SS1, and an SCL wrapper FB ServoWrap (inputs zsw Word, reset Bool, ss1 Bool; outputs stw Word, fault Bool). servo_call_plan with the explicit mapping status=zsw, control=stw, reset=reset, ss1=ss1, fault=fault, resetExpression \"Reset\" AND NOT \"DoorOpen\" and ss1Expression \"SS1\" was writeReady; its source_upsert applied with checkpoint, compile (compilerSucceeded) and save. The generated caller Servos holds exactly one call and one fault Bool per drive instance (Axis1, Axis2), and symbol_trace lists only Servos as writer of Drive1Item_STW1 and Drive2Item_STW1. After an FC OldWriter wrote Drive1Item_STW1, a new plan was not writeReady and named OldWriter in a duplicateControlWriter blocker."
+      },
+      "artifacts": [
+        "evidence/local.drives.servo-calls.20261107.json"
+      ],
+      "limitations": [
+        "A synthetic SCL wrapper FB stands in for a vendor servo block; two G120C PN drives with telegram 1 only. Watch tables, instance DBs outside the caller and graphical callers are not planned.",
+        "Engineering evidence only: reset and SS1 expressions are applied as given; no safety program, machine behavior, commissioning or download is verified."
       ]
     }
   ],
@@ -27232,8 +27249,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.drives.servo-calls.20261107"
+        ]
       },
       "availability": {
         "status": "conditional",

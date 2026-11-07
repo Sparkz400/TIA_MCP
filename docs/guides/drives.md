@@ -67,6 +67,10 @@ To compare two states, put one snapshot in `before` and another in `after` of a
 
 Names are never used to join. `coverage` reports each source separately. `noDrivesConfirmed` is true only when Startdrive read the whole project and found no drive. An unavailable, truncated or partial read is never reported as "no drives". `reconciliation` lists telegram ranges without tags, drives without a technology object, technology objects without a discovered drive and duplicate display names. `blockers` lists every gap or ambiguity that a dependent write (safety tags, servo calls) must not proceed through; `writeReady` is false while any exists. A drive whose drive object numbers Startdrive cannot read uses index handles (`DO@<index>`) and still counts as complete. Natively checked with two G120C PN drives on a CPU's IO system (`local.drives.inventory.20261107`).
 
+## Plan servo calls: `servo_call_plan`
+
+`servo_call_plan` plans, never applies, one caller FB that calls an existing servo wrapper FB once per reviewed drive: one multi-instance and one fault Bool output per drive, wired to that drive's status and control tags from `drive_inventory`. Name the wrapper's own parameters in `parameters` (`status`, `control`, `reset`, `ss1`, `fault`); each is checked against the wrapper's native interface section and type, and nothing is guessed from names. `resetExpression` and `ss1Expression` are applied exactly as given, as confirmed design. The plan is blocked by any `drive_inventory` blocker, a missing or mistyped parameter, not exactly one status and one control tag per drive, a drive or name listed twice, and any other block that already writes a selected drive's control tag. Remove or replace that write explicitly first. When `writeReady`, `change` holds the `source_upsert` payload for `change_prepare`; apply it with `compile: true`. Natively checked with two G120C PN drives and a synthetic wrapper (`local.drives.servo-calls.20261107`). A clean compile is engineering evidence, not machine safety acceptance.
+
 ## Write parameters: `drive_parameter_set`
 
 A prepared change (`change_prepare` → `change_apply` → `change_status` /
