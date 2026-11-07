@@ -88,6 +88,8 @@ namespace TiaMcp.Openness.V21
             var requested = RequestedScopedTables(change);
             using (SharedMutationExclusive("TIA MCP: scoped tag-table restore"))
             {
+                // The retained exports are re-imported, so they must still hash as captured.
+                ValidatePreparedFiles(change);
                 var current = ByPath(CaptureTagImportScope(change, "pre-restore-scope"));
                 try
                 {
@@ -121,6 +123,9 @@ namespace TiaMcp.Openness.V21
                     if (!new System.Collections.Generic.HashSet<string>(before.Keys, StringComparer.Ordinal).SetEquals(restored.Keys)
                         || before.Any(r => r.Value.Value<string>("contentSha256") != restored[r.Key].Value<string>("contentSha256")))
                         throw new BridgeException("RecoveryVerificationFailed", "Restored tag tables differ from their retained exports.");
+                    foreach (var table in MutationTagGroup(change, SelectPlc(change.Selector)).TagTables.Where(t => change.ObjectNames.Contains(t.Name)))
+                        if (table.Tags.Any(t => t.IsSafety))
+                            throw new BridgeException("SafetyBoundary", "The restored table holds a safety tag; generic tag-table restores do not authorize safety-tag editing.");
                     change.Stages.Add("scoped_restore_content_verified");
                     var compilation = CompileEngineeringChange(change, project);
                     var comparison = change.CompileBaseline != null ? CompileBaselineRules.Compare(change.CompileBaseline, compilation) : null;
