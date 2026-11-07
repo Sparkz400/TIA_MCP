@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.142",
+  "catalogVersion": "0.4.143",
   "targetTiaVersions": [
     21
   ],
@@ -4985,6 +4985,23 @@
       "limitations": [
         "SCL only; graphical (LAD/FBD) blocks with deleted symbols cannot be exported as XML or generated source, and no native graphical fixture was run. The repair symbol is an ordinary journaled tag change, not a temporary alias; no alias workflow is implemented.",
         "unresolvedSymbols parses TIA's English compiler message text (Tag/Block/Data type/Constant \"name\" not defined); other UI languages list nothing."
+      ]
+    },
+    {
+      "id": "local.drives.inventory.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "effde68b27d8b526e84346f68b62637bcf4803f1",
+        "passedScope": "scripts/qualify_drive_inventory.py on Debug builds of effde68b in one owned TIA V21 Update 3 scratch, 20/20 steps: the scratch CPU 1511-1 PN on subnet DriveNet (192.0.2.10) and two added SINAMICS G120C PN drives (Drive1, Drive2) on that subnet, each assigned to the CPU's new IO system DriveIoSystem with network_io_assign (compile and save). drive_inventory reported drive coverage complete (both drives in driveObjectIndex mode because Startdrive cannot read their drive object numbers), two drives, noDrivesConfirmed=false, and each drive's main telegram 1 with 4 input and 4 output bytes at native addresses (Drive1 input/output byte 256, Drive2 260). tag_table_import_xml added Word tags at exactly those start addresses except Drive2's output; drive_inventory then joined Drive1Item_ZSW1 %IW256, Drive1Item_STW1 %QW256 and Drive2Item_ZSW1 %IW260 to their telegram ranges by address, listed Drive2's output range as the only telegram range without tags and both drives as without technology object, and was writeReady with no blockers."
+      },
+      "artifacts": [
+        "evidence/local.drives.inventory.20261107.json"
+      ],
+      "limitations": [
+        "No technology object is connected; the technology join, ambiguous tag ownership across PLCs, tags spanning telegrams, partial or unavailable Startdrive coverage and duplicate axis associations are covered by managed tests only.",
+        "Two G120C PN drives with one drive object and telegram 1 each; S120/S210 multi-axis drives, supplementary or safety telegrams and nonsequential address gaps are not exercised natively."
       ]
     }
   ],
@@ -27058,6 +27075,51 @@
         "evidenceIds": [
           "local.drives.index.20261101",
           "local.drives.index-status.20261101"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SINAMICS Startdrive V21 Openness and a project with Startdrive drive devices; probe with target_capabilities on the drive hardware item."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "SINAMICS Startdrive V21 installed with its Openness assembly",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "drive_inventory",
+      "domain": "drives",
+      "title": "Read a joined drive, telegram, tag and technology-object inventory",
+      "mcpTools": [
+        "drive_inventory"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Host composition of drive_observe, project_inventory, software_inspect and technology_read; no new native call."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Startdrive reports no owning PLC for a telegram, so tags join a telegram range by address overlap in every PLC; matches in several PLCs are reported as ambiguous and block dependent writes.",
+          "Technology objects join a drive when a resolved hardware or channel reference of their connections equals the drive's hardware path, lies below it, or is its parent; a parent link that reaches several drives is ambiguous.",
+          "Tag addresses are parsed from %I/%E/%Q/%A bit, byte, word and double-word forms (optional :P); memory, DB and symbolic-only tags are not matched."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.drives.inventory.20261107"
         ]
       },
       "availability": {

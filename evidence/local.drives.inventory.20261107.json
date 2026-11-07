@@ -1,0 +1,75 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.drives.inventory.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T10:00:42+00:00",
+  "source": {
+    "commit": "effde68b27d8b526e84346f68b62637bcf4803f1",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_drive_inventory.py on Debug builds of effde68b in one owned TIA V21 Update 3 scratch, 20/20 steps: the scratch CPU 1511-1 PN on subnet DriveNet (192.0.2.10) and two added SINAMICS G120C PN drives (Drive1, Drive2) on that subnet, each assigned to the CPU's new IO system DriveIoSystem with network_io_assign (compile and save). drive_inventory reported drive coverage complete (both drives in driveObjectIndex mode because Startdrive cannot read their drive object numbers), two drives, noDrivesConfirmed=false, and each drive's main telegram 1 with 4 input and 4 output bytes at native addresses (Drive1 input/output byte 256, Drive2 260). tag_table_import_xml added Word tags at exactly those start addresses except Drive2's output; drive_inventory then joined Drive1Item_ZSW1 %IW256, Drive1Item_STW1 %QW256 and Drive2Item_ZSW1 %IW260 to their telegram ranges by address, listed Drive2's output range as the only telegram range without tags and both drives as without technology object, and was writeReady with no blockers.",
+  "limitations": [
+    "No technology object is connected; the technology join, ambiguous tag ownership across PLCs, tags spanning telegrams, partial or unavailable Startdrive coverage and duplicate axis associations are covered by managed tests only.",
+    "Two G120C PN drives with one drive object and telegram 1 each; S120/S210 multi-axis drives, supplementary or safety telegrams and nonsequential address gaps are not exercised natively."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "2725ad1aa770f3bdb08bb7bfd1688770e8773252003bb9700e538ed2ae0aaf4d"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "95448e3891090d8278059e2b787eedc3bcb998cf8c6e188727b2518c18f25c04"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "d78820ebd2afa0a90563393efa7569a3191dba71059dffe1a03be038243034e8",
+      "bytes": 202504,
+      "completed": true,
+      "steps": [
+        "start owned TIA drive inventory",
+        "create owned scratch drive inventory",
+        "prepare network_configure",
+        "apply network_configure",
+        "prepare hardware_add",
+        "apply hardware_add without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_io_assign",
+        "apply network_io_assign",
+        "prepare hardware_add",
+        "apply hardware_add without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_io_assign",
+        "apply network_io_assign",
+        "drive inventory before tags",
+        "prepare tag_table_import_xml",
+        "apply tag_table_import_xml",
+        "drive inventory joins every imported tag by address"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "drive_inventory",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

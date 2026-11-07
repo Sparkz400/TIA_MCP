@@ -23,6 +23,16 @@ public sealed class CompositeEngineeringTools(IBridgeClient bridge, HostOptions 
         return Result(result, failed);
     }
 
+    [McpServerTool(Name = "drive_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("One read-only drive inventory of the open project: every SINAMICS drive object with its telegrams (number, input/output byte ranges), the PLC tags whose addresses overlap each telegram range, and the technology objects whose resolved hardware connections reach the drive. Joins use native paths and addresses, never names. coverage reports drives, tags and technology objects per source; noDrivesConfirmed is true only for a complete Startdrive read with no drive. blockers lists every gap or ambiguity (partial or unavailable coverage, tags in several PLCs on one telegram, a tag spanning telegrams, a technology object resolving to several drives, several technology objects on one drive); dependent writes must not proceed while writeReady is false. Read-only; changes nothing.")]
+    public async Task<CallToolResult> DriveInventoryRead(CancellationToken cancellationToken, string? projectName = null)
+    {
+        object result; bool failed = false;
+        try { result = await DriveInventory.Capture(bridge, projectName, cancellationToken); }
+        catch (BridgeException e) { failed = true; result = new { error = new { code = e.Code, message = e.Message } }; }
+        return Result(result, failed);
+    }
+
     [McpServerTool(Name = "composite_engineering_rebind_plan", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Plan, never apply, technology-object hardware rebinds for a revalidated composite handle: each before-phase declared TO hardware connection that is missing, disconnected, unknown or unresolved after, whose target has one declared replacement (model correspondence, or AML correspondence through declared hardware mappings in both phases), becomes a to_connect change payload (technologyPath, role, sensorIndex, hardwarePath and carried-over channel selector). Payloads appear only when this build's catalog has the to_connect change kind; otherwise entries say changeKindUnavailable. At most 200 entries. Each change still needs change_prepare/apply with its own preview, checkpoint and compile.")]
     public CallToolResult RebindPlan(string recordRef) => Run(s => s.RebindPlan(recordRef, ToConnect.Value));

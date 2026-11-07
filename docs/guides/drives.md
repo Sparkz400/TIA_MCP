@@ -57,6 +57,16 @@ To compare two states, put one snapshot in `before` and another in `after` of a
 `drive-profile-review-request.v2` with the same `hardwarePath`, upload it and call
 `drive_profile_review`.
 
+## Drive inventory: `drive_inventory`
+
+`drive_inventory` joins what several reads report into one view of the open project, and changes nothing:
+
+- every drive object from `drive_observe`, with each telegram's number and input/output byte ranges
+- the PLC tags whose addresses overlap each range (`software_inspect` of every PLC); Startdrive does not say which PLC owns a telegram, so a match in several PLCs is ambiguous
+- the technology objects whose resolved hardware references reach the drive (`technology_read`)
+
+Names are never used to join. `coverage` reports each source separately. `noDrivesConfirmed` is true only when Startdrive read the whole project and found no drive. An unavailable, truncated or partial read is never reported as "no drives". `reconciliation` lists telegram ranges without tags, drives without a technology object, technology objects without a discovered drive and duplicate display names. `blockers` lists every gap or ambiguity that a dependent write (safety tags, servo calls) must not proceed through; `writeReady` is false while any exists. A drive whose drive object numbers Startdrive cannot read uses index handles (`DO@<index>`) and still counts as complete. Natively checked with two G120C PN drives on a CPU's IO system (`local.drives.inventory.20261107`).
+
 ## Write parameters: `drive_parameter_set`
 
 A prepared change (`change_prepare` → `change_apply` → `change_status` /
