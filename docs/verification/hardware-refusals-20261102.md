@@ -92,4 +92,4 @@ now names a type's profiles by type; a write still selects one by the item's `Fi
 - A versionless firmware matching no profile (fail closed) stays offline: the installed GSD has one DAP with one firmware.
 - The second project shows the complementary configuration in two projects; no cross-project consistency check exists in
   V21, and head, interface, ports and server module are not handed between the projects.
-- A disconnect with two or more remaining PLCs is refused rather than offered a choice of PLC.
+- A disconnect with two or more remaining PLCs is refused rather than offered a choice of PLC (since 7 November it names the PLC in `remainingOwnerPath`: [record](hardware-shared3-20261107.md)).
