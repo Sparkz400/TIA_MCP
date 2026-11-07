@@ -34,6 +34,7 @@ instead of failing: a key-discovery pass that fixes the expectations, never evid
 search names a profile; a write the profile does not declare is refused) and a checkpoint restore of each topology change the
 full run applied without one (the shared-device assignment, OutsideOfProject, the createDomain manager, the IM 155-5 client).
 --slice gsd runs only the installed I-device GSD device and what it needs (see gsd_slice).
+--slice drive runs a SINAMICS G120C PN as an IO device of an added CPU (see drive_slice).
 --slice delete-rule plugs one DI module and checks that hardware_delete refuses compile=false (see delete_rule_slice).
 --slice refusals runs the native refusals and paths the full run lacks (see refusal_slice): the MRP port-link rule both ways, a
 PLC-to-PLC shared-device access, channel and versionless capability-profile refusals, the sharedDevice disconnect, an address change
@@ -127,6 +128,13 @@ DELETE_SLICE_LIMITATIONS = [
     "refuses compile=false (InvalidRequest, the delete and rename rule of the 31 October audit) before its checkpoint, then applies with compile and "
     "save; no reopen and no restore.",
     "Engineering only; nothing is downloaded and no physical topology is observed.",
+]
+DRIVE_SLICE_LIMITATIONS = [
+    "--slice drive: one owned scratch CPU 1511-1 PN V4.1 and an added CPU 1511-1 PN V4.1 (configureScratchSecurity) on HwNet with an ET 200MP IM 155-5 PN ST V4.1 "
+    "station, whose assignment creates the IO system HwPeerIo; the scratch CPU stays off HwNet.",
+    "Drive device: the newest installed SINAMICS G120C PN, added and put on HwNet with checkpoint but without compile, then assigned to HwPeerIo with compile "
+    "and save, that assignment restored once and applied again. Startdrive drives expose no device compile service, so device compiles list the drive under "
+    "notCompiled; its drive objects, parameters and telegrams are not changed here (drive_parameter_set and drive_telegram_set have their own evidence).",
 ]
 GSD_SLICE_LIMITATIONS = [
     "--slice gsd: one owned scratch CPU 1511-1 PN V4.1 and an added CPU 1511-1 PN V4.1 (configureScratchSecurity) on HwNet with an ET 200MP IM 155-5 PN ST V4.1 "
@@ -644,6 +652,54 @@ def gsd_device(run, rows=None, restore=False):
     run.h.report["gsdDevice"] = {"typeIdentifier": identifier, "hardwarePath": path}
 
 
+def drive_device(run, restore=False):
+    """The newest installed SINAMICS G120C PN as an IO device of HwPeerCpu, following gsd_device: added and put on HwNet without compile
+    (an unassigned IO device fails the device compile), then assigned with compile, restored once and applied again."""
+    def search():
+        rows = [e for e in run.h.tool("hardware_catalog_search", {"filter": "G120C PN", "maxItems": 200})["entries"]
+                if "G120C PN" in (e.get("typeName") or "") and (e.get("typeIdentifier") or "").startswith("OrderNumber:")]
+        rows.sort(key=lambda e: [int(x) for x in e["typeIdentifier"].rsplit("/", 1)[1].split(".") if x.isdigit()])
+        run.h.report["driveCatalog"] = rows[-1:] if rows else []
+        return {"entries": len(rows)}
+    run.h.stage("search the catalog for a SINAMICS G120C PN", search)
+    rows = run.h.report["driveCatalog"]
+    run.expect(len(rows) == 1, "drive", "No SINAMICS G120C PN is installed in the catalog")
+    if not rows:
+        return
+    identifier, device, head = rows[0]["typeIdentifier"], "HwDrive", "HwDriveItem"
+    run.not_compiled = [run.path(device)]  # Startdrive exposes no device compile service for the drive.
+    run.apply("add drive " + device, "hardware_add", {"typeIdentifier": identifier, "deviceName": device, "itemName": head},
+              {"effects": [{"createDevice": device, "typeIdentifier": identifier}]}, added=under(run.path(device)), deferred=True)
+    prefix = run.path(device, "items", "")
+    interface = next(key[3 + len(prefix):] for key, row in sorted(run.current["view"].items()) if key.startswith("hw:" + prefix) and (row.get("network") or {}).get("ioConnectors"))
+    node(run, device, tuple(interface.split("/")), deferred=True)
+    path, controller = prefix + interface, run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET%20interface_1")
+    payload = {"hardwarePath": path, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0}
+    # Observed natively (hd1): only the drive's interface changes, and the controller gains the drive's system constants.
+    generated = lambda applied, state: [key for key in state if key.startswith(constant(run, MP, head + "~"))]
+    def assign(restored):
+        return run.apply("assign %s to HwPeerCpu%s" % (device, ", restored" if restored else ""), "network_io_assign", payload,
+                         {"effects": [{"hardwarePath": path, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False, "sharedDevice": False}]},
+                         shown={**payload, "addressControllerOwnerPath": run.path("HwPeer", "items", "HwPeerCpu")},
+                         changed=["hw:" + path, "hw:" + controller], added=generated, restore=restored, boundary=True)
+    if restore:
+        run.b0 = run.current
+        assign(True)
+    assign(False)
+    run.h.report["driveDevice"] = {"typeIdentifier": identifier, "hardwarePath": path}
+
+
+def drive_slice(run):
+    """--slice drive: the added CPU HwPeer on HwNet with its IO system HwPeerIo (created by the ET 200MP assignment), then a G120C PN
+    added, put on HwNet and assigned, the assignment restored once and applied again."""
+    add_cpu(run, "add CPU HwPeer", "HwPeer")
+    network(run, scratch=False)
+    station(run)
+    drive_device(run, restore=True)
+    run.expect(bool(run.coverage.get("network_io_assign", {}).get("restored")) and "driveDevice" in run.h.report, "drive",
+               "The drive slice qualifies only when the drive's assignment applied and restored.")
+
+
 def network(run, scratch=True):
     """HwPeerCpu (readdressed; its change creates HwNet) and the scratch CPU on HwNet; scratch=False leaves the scratch CPU off it."""
     for device, cpu, extra in (("HwPeer", "HwPeerCpu", {"attributes": {"Address": "192.168.0.2"}}), ("ScratchStation", "ScratchPLC", {}))[:2 if scratch else 1]:
@@ -1080,11 +1136,12 @@ def heading(args):
     """The report title and limitations of the full run or the selected slice."""
     title = {"restores": "X10 topology restores and capability-profile gates in one owned scratch CPU 1511-1 PN with ET 200MP and ET 200SP stations",
              "gsd": "X10 GSD device: the project's own I-device GSD as an IO device of an added CPU 1511-1 PN in one owned scratch",
+             "drive": "X10 drive device: a SINAMICS G120C PN as an IO device of an added CPU 1511-1 PN in one owned scratch",
              "delete-rule": "X10 hardware_delete compile rule: one DI module in one owned scratch CPU 1511-1 PN",
              "refusals": "X10 hardware refusals and topology paths natively: MRP port links, PLC-to-PLC shared access, channel and versionless profiles, the sharedDevice "
                          "disconnect, a start-moving address change and a second project's controller, in two owned scratches",
              None: "X10 hardware changes in one owned scratch CPU 1511-1 PN with S7-1200, ET 200MP and ET 200SP families, a shared device and an MRP ring"}[args.slice]
-    return title + (" (key discovery, not evidence)" if args.discover else ""), {"restores": SLICE_LIMITATIONS, "gsd": GSD_SLICE_LIMITATIONS, "refusals": REFUSAL_LIMITATIONS,
+    return title + (" (key discovery, not evidence)" if args.discover else ""), {"restores": SLICE_LIMITATIONS, "gsd": GSD_SLICE_LIMITATIONS, "drive": DRIVE_SLICE_LIMITATIONS, "refusals": REFUSAL_LIMITATIONS,
                                                                                 "delete-rule": DELETE_SLICE_LIMITATIONS, None: LIMITATIONS}[args.slice]
 
 
@@ -1097,7 +1154,7 @@ def body(h):
     run.current = run.snap("baseline")
     sliced = getattr(getattr(h, "args", None), "slice", None)
     if sliced:
-        {"restores": restore_slice, "gsd": gsd_slice, "refusals": refusal_slice, "delete-rule": delete_rule_slice}[sliced](run)
+        {"restores": restore_slice, "gsd": gsd_slice, "drive": drive_slice, "refusals": refusal_slice, "delete-rule": delete_rule_slice}[sliced](run)
         return
     phase_a(run)
     reopen(run)
@@ -1115,7 +1172,7 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
     parser.add_argument("--discover", action="store_true", help="Record unexpected state differences, previews and refusals instead of failing (not evidence).")
-    parser.add_argument("--slice", choices=("restores", "gsd", "refusals", "delete-rule"), help="restores: only the profile gates and the topology restores the full run lacks; "
+    parser.add_argument("--slice", choices=("restores", "gsd", "drive", "refusals", "delete-rule"), help="restores: only the profile gates and the topology restores the full run lacks; "
                         "gsd: only the installed I-device GSD device and what it needs; refusals: the native refusals and topology paths the full run lacks, "
                         "with a second owned scratch; delete-rule: hardware_delete's compile=false refusal on one DI module.")
     args = parser.parse_args()
