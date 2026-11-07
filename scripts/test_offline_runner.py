@@ -63,7 +63,7 @@ CAPTURE_PROBE = r'''
 $ErrorActionPreference = 'Stop'
 $ast = [System.Management.Automation.Language.Parser]::ParseFile($env:TIA_TEST_RUNNER, [ref]$null, [ref]$null)
 $pipelines = @($ast.FindAll({param($node)
-    $node -is [System.Management.Automation.Language.PipelineAst] -and
+    $node -is [System.Management.Automation.Language.PipelineAst] -and $node.PipelineElements.Count -eq 2 -and
     $node.Extent.Text.Contains('Tee-Object') -and $node.Extent.Text.Contains('general-managed.log')
 }, $true))
 if ($pipelines.Count -ne 1) { throw 'Expected one explicit general-suite capture pipeline.' }
