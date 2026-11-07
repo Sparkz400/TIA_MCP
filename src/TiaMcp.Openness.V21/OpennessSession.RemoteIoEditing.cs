@@ -175,8 +175,11 @@ namespace TiaMcp.Openness.V21
             if (allowed.Skip(1).Any(software => software.Equals(plc.Software))) throw new BridgeException("InvalidRequest", "The selected PLC already controls this IO device through another connector of the interface.");
             var peerPaths = peers.Select(peer => peer.Path).Distinct().OrderBy(path => path, StringComparer.Ordinal).ToArray();
             if (shared) payload["sharedAddressControllerOwnerPaths"] = new JArray(peerPaths);
-            // A disconnect's items go to the one remaining PLC; the connection's go to the selected one.
-            string newOwner = disconnect ? (peerPaths.Length == 1 ? peerPaths[0] : null) : payload.Value<string>("addressControllerOwnerPath");
+            // A disconnect's items go to the remaining PLC (the only one, or remainingOwnerPath); the connection's go to the selected one.
+            string remaining = payload["remainingOwnerPath"] == null ? null : ChangeText(payload, "remainingOwnerPath", 4096);
+            if (remaining != null && !(shared && disconnect && peerPaths.Contains(remaining, StringComparer.Ordinal)))
+                throw new BridgeException("InvalidRequest", "remainingOwnerPath names the PLC item of another connector that stays assigned, for a sharedDevice disconnect only: " + string.Join(", ", peerPaths) + ".");
+            string newOwner = disconnect ? remaining ?? (peerPaths.Length == 1 ? peerPaths[0] : null) : payload.Value<string>("addressControllerOwnerPath");
             sharedItems = SharedSubmodules(project, payload, station, shared, disconnect, hardware, newOwner);
             foreach (var peer in hardware.Where(row => row.Path.StartsWith(station + "/items/", StringComparison.Ordinal)))
             {
@@ -261,10 +264,10 @@ namespace TiaMcp.Openness.V21
             var leaving = shared && disconnect ? hardware.Where(row => row.Path.StartsWith(station + "/items/", StringComparison.Ordinal) && SharedTargetPath(row.Item, hardware) == owner).ToArray() : new HardwareEntry[0];
             if (!shared || disconnect && leaving.Length == 0)
             {
-                if (list != null) throw new BridgeException("InvalidRequest", "sharedSubmodules applies only to a sharedDevice connection, or to its disconnect while items are assigned to the leaving PLC.");
+                if (list != null || payload["remainingOwnerPath"] != null) throw new BridgeException("InvalidRequest", "sharedSubmodules and remainingOwnerPath apply only to a sharedDevice connection, or to its disconnect while items are assigned to the leaving PLC.");
                 return new HardwareEntry[0];
             }
-            if (disconnect && newOwner == null) throw new BridgeException("UnsupportedCapability", "A shared connector leaves with its PLC's items only while exactly one other PLC controls the device to take them.");
+            if (disconnect && newOwner == null) throw new BridgeException("InvalidRequest", "Several other PLCs control the device; name the one that takes the leaving PLC's items in remainingOwnerPath.");
             if (!(list is JArray paths) || paths.Count == 0 || paths.Count > 64 || paths.Any(path => path.Type != JTokenType.String) || paths.Select(path => path.Value<string>()).Distinct(StringComparer.Ordinal).Count() != paths.Count)
                 throw new BridgeException("InvalidRequest", disconnect ? "A shared disconnect needs sharedSubmodules: the 1 to 64 exact hardware paths of the items assigned to the leaving PLC, which go to " + newOwner + "."
                     : "A sharedDevice connection needs sharedSubmodules: 1 to 64 distinct exact hardware paths of the station's items to assign to the selected PLC.");
@@ -302,7 +305,7 @@ namespace TiaMcp.Openness.V21
             if (change.Payload.Value<bool?>("disconnect") == true)
             {
                 // The leaving PLC's items go to the remaining PLC while the connector still holds both, then the connector leaves.
-                if (sharedItems.Length != 0) Assign(change.Payload["sharedAddressControllerOwnerPaths"][0]);
+                if (sharedItems.Length != 0) Assign(change.Payload["remainingOwnerPath"] ?? change.Payload["sharedAddressControllerOwnerPaths"][0]);
                 connector.DisconnectFromIoSystem();
                 if (connector.ConnectedToIoSystem != null) throw new BridgeException("MutationVerificationFailed", "Connector disconnect did not persist.");
             }

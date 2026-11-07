@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.152",
+  "catalogVersion": "0.4.154",
   "targetTiaVersions": [
     21
   ],
@@ -5140,6 +5140,38 @@
         "A firmware mismatch is not refused at preparation; the mandatory compile catches it after the checkpoint.",
         "The broken-generation type case of 27 October is no longer run: since 2 November a failed apply leaves the project recovery_required, which refuses every later change on it.",
         "No runtime execution."
+      ]
+    },
+    {
+      "id": "local.hardware_changes.shared3.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "0f746f14eb55e4a3dcb62bd5f562dfa2cc98e373",
+        "passedScope": "scripts/qualify_hardware_changes.py --slice shared3 on Debug builds of 0f746f14 in one owned TIA V21 Update 3 scratch, 79/79 steps: two added CPU 1511-1 PN V4.1 (HwPeer, HwThird) and the scratch CPU on HwNet, an ET 200SP IM 155-6 PN ST station assigned to HwPeerIo with its declared server module, SpDi3 and SpDi plugged; connector 1 shared with the scratch CPU (SpDi3) and connector 2 with HwThirdCpu through a new IO system HwThirdIo (SpDi). The scratch CPU's shared disconnect was refused at prepare without remainingOwnerPath and with remainingOwnerPath naming the leaving PLC (InvalidRequest, nothing changed), then applied with remainingOwnerPath HwThirdCpu: SpDi3's assignment target and I/O address went to HwThirdCpu, the scratch CPU's station constants went and HwThirdCpu gained SpDi3's, with device compile and save; restored once from its checkpoint into a new directory equal to the pre-change snapshot. The station's first assignment ran with the clean-compile rule restored by this change (the #221 baseline compile had generated its server module and refused the assignment)."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.shared3.20261107.json"
+      ],
+      "limitations": [
+        "Three PLCs of one project share the station (the interface has four connectors); one disconnect gives one module to the named PLC. Runtime is not exercised."
+      ]
+    },
+    {
+      "id": "local.plcsim.capture-modes.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b5215557df725111bb320948f51ef1705fd0fe9f",
+        "passedScope": "scripts/qualify_plcsim_diagnostics.py on Debug builds of b5215557 (Host, V21 worker, PLCSIM Advanced V8 worker): the owned CPU1511 instance of the DiagGate fixture in RUN, one 2 s runtime_capture_start with source plcsim, cycleSynchronous and each syncMode in turn. SingleStep_C 40 rows, SingleStep_CP 40, SingleStep_CT 32 and SingleStep_CPT 31 completed their 2 s window (durationLimit); SingleStep_P reached its first sync point and then none within the worker's wait (sessionUnavailable after 2 rows) on this OB1-only fixture. After every capture, the stalled one included, the instance was back in operating mode Default. syncMode without cycleSynchronous was refused."
+      },
+      "artifacts": [
+        "evidence/local.plcsim.capture-modes.20261107.json"
+      ],
+      "limitations": [
+        "One CPU1511 fixture whose only cyclic OB is OB1 with the automatic process image; no process image partition is configured, which SingleStep_P steps by. Signals are two Bool DB members; rows are not compared with scan counts."
       ]
     },
     {
@@ -15608,7 +15640,8 @@
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "The ET 200SP IM 155-6 PN ST V6.4 also passed on the second CPU's existing IO system with the generated server module (local.hardware_changes.topology.20261101), and its BusAdapter ports take SharedDeviceAccessType PLC with the head's items.",
-          "An installed I-device GSD (two transfer areas, start -1 and no owner until assigned) joined the second CPU's IO system with compile and save, each transfer area taking a start address owned by that PLC, and restored from its checkpoint (local.hardware_changes.gsd.20261101). Only a range without a start and owner may take one, and only from the assigned PLC."
+          "An installed I-device GSD (two transfer areas, start -1 and no owner until assigned) joined the second CPU's IO system with compile and save, each transfer area taking a start address owned by that PLC, and restored from its checkpoint (local.hardware_changes.gsd.20261101). Only a range without a start and owner may take one, and only from the assigned PLC.",
+          "A sharedDevice disconnect with several remaining PLCs names the one that takes the leaving PLC's sharedSubmodules in remainingOwnerPath (refused without it, or when it names a PLC that is not another assigned connector's); with one remaining PLC it may be omitted. Natively qualified with three PLCs (local.hardware_changes.shared3.20261107). A first assignment that declares expectedServerModule keeps the clean-compile rule: a baseline compile before it would generate that server module."
         ]
       },
       "qualification": {
@@ -15621,7 +15654,8 @@
           "local.hardware_changes.topology_restores.20261101",
           "local.hardware_changes.gsd.20261101",
           "local.hardware_changes.refusals.20261102",
-          "local.hardware_changes.drive.20261107"
+          "local.hardware_changes.drive.20261107",
+          "local.hardware_changes.shared3.20261107"
         ]
       },
       "availability": {
@@ -24372,14 +24406,15 @@
           "source plcsim polls only an exact PLCSIM Advanced V8 instance this Host created or adopted (attemptId is its creationId; ID, name and creation receipt are rechecked by the worker for every call); unowned instances are refused. Caller-declared datatypes must fit the typed read and are what diagnostic mappings compare; PLCSIM tag metadata is not read.",
           "cycleSynchronous switches the running owned instance to the optional syncMode (SingleStep_C by default, or SingleStep_P/CP/CT/CPT), steps one sync point per sample, reads every signal while the CPU holds there and restores the recorded operating mode on stop, failure or Host shutdown. A lost simulator worker or faulted bridge cannot restore it; an unconfirmed restore is reported as localFailure PlcsimOperatingModeRestoreFailed.",
           "PLCSIM rows retain per-row sync-point evidence, but capture status, analysis and diagnostic acquisition keep atomicAcrossSignals and scanSynchronized false; Project Explorer Open capture accepts Web captures only. Compiled against the installed PLCSIM Advanced V8 API only; not natively qualified.",
-          "syncMode requires cycleSynchronous; omitted mode preserves historical plan bytes. Each sample verifies the selected operating mode before advancing. CP/CT/CPT/P sync points need not be full scans; CT/CPT use the existing overwritten minimum cycle time. Bus and timespan modes are not offered. Added modes remain offline-only, with no native qualification promotion."
+          "syncMode requires cycleSynchronous; omitted mode preserves historical plan bytes. Each sample verifies the selected operating mode before advancing. CP/CT/CPT/P sync points need not be full scans; CT/CPT use the existing overwritten minimum cycle time. Bus and timespan modes are not offered. Added modes remain offline-only, with no native qualification promotion. Natively (local.plcsim.capture-modes.20261107): C, CP, CT and CPT captured a full 2 s window; P stalled after its first sync point on an OB1-only fixture without a process image partition (sessionUnavailable), and every capture, that one included, restored the previous operating mode."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
-          "local.runtime.plcsim-tcpip.20261102"
+          "local.runtime.plcsim-tcpip.20261102",
+          "local.plcsim.capture-modes.20261107"
         ]
       },
       "availability": {
