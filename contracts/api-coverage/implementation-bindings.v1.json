@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "bde5615352f03f80fc44f7ea4cd7667994a2ef13b6dfe07a122408bbe933db04",
-      "bytes": 1799443
+      "sha256": "ad56975e805171244dd4ffd8bf93f5c3741e67f47e8cf091c50a66d0e5d4c865",
+      "bytes": 1801724
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2652,8 +2652,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Capabilities.cs",
-      "sha256": "fcca661ca32da971c2da4bd3499c9f2a4746adb176727e6f1b7bf09a70fcf98b",
-      "bytes": 59935
+      "sha256": "28b77df8fd3da3dae344139129feef53b09f88be8695f1383f5eb062114973a1",
+      "bytes": 60067
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CapturedStorage.cs",
@@ -2762,8 +2762,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
-      "sha256": "b001cfc4eb5c84c53da5c7ba51a6468f7a0b7c614fec154c2f63b1d593f268be",
-      "bytes": 37584
+      "sha256": "5dd98601519fce6cd7e6b66509b79d679bc172b0a02500571ff5e2eda5a95257",
+      "bytes": 41541
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Engineering.cs",
@@ -89510,8 +89510,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             }
           ]
         },
@@ -89530,8 +89530,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             }
           ]
         }
@@ -91418,8 +91418,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DeviceCompilation.cs",
@@ -92299,8 +92299,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -92603,8 +92603,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DeviceCompilation.cs",
@@ -93484,8 +93484,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -93819,8 +93819,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DeviceCompilation.cs",
@@ -94700,8 +94700,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -95004,8 +95004,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DeviceCompilation.cs",
@@ -95885,8 +95885,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -96189,8 +96189,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DeviceCompilation.cs",
@@ -97070,8 +97070,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -97374,8 +97374,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DeviceCompilation.cs",
@@ -98255,8 +98255,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -98559,8 +98559,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DeviceCompilation.cs",
@@ -99440,8 +99440,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -99744,8 +99744,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DeviceCompilation.cs",
@@ -100625,8 +100625,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
               "name": "DriveTelegramSet",
               "line": 382,
-              "endLine": 431,
-              "sha256": "10bf495c9d80a4246801a8ea67f02d9bc4e787b9b71420d7c2da94e4fec7aa2c"
+              "endLine": 469,
+              "sha256": "8e04d7412cfc682f25977c4faf6cc345ade2ef35822a735326e76fc28e1be9b6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -109838,6 +109838,13 @@
           "profileSha256": "fef70d86cde0839f73671072eed174ae96dbe221051d18aa69b597a3f15d1c77",
           "artifacts": [
             "evidence/local.drives.index-status.20261101.json"
+          ]
+        },
+        {
+          "id": "local.drives.telegram-resize.20261107",
+          "profileSha256": "44551743fd648094ab8c8cd134d83408523d2305122bfeafc87e92728af98e96",
+          "artifacts": [
+            "evidence/local.drives.telegram-resize.20261107.json"
           ]
         }
       ],
@@ -139222,6 +139229,11 @@
       "sha256": "830754d4c26498a5b872f6562ce89b5e068d48922725cf2b15ae287c16fc34e3"
     },
     {
+      "path": "evidence/local.drives.telegram-resize.20261107.json",
+      "state": "observed",
+      "sha256": "ac7ddc3718478524ea5b045f2d13bfbfe0f88de2283e79d0d877208745947eeb"
+    },
+    {
       "path": "evidence/local.engineering.boundaries.rerun.20261029.json",
       "state": "observed",
       "sha256": "3b2d9965af507bc1877821593def7a55734ced0b8e541fea945c17c7a9f65c02"
@@ -140593,6 +140605,10 @@
     {
       "id": "local.drives.servo-calls.20261107",
       "profileSha256": "b8b139cfc6acfc651ac9ad9dc01f0182f430791ee662f9e9735d02429441dbbf"
+    },
+    {
+      "id": "local.drives.telegram-resize.20261107",
+      "profileSha256": "44551743fd648094ab8c8cd134d83408523d2305122bfeafc87e92728af98e96"
     },
     {
       "id": "local.engineering.boundaries.rerun.20261029",

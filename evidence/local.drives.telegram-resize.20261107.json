@@ -1,0 +1,103 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.drives.telegram-resize.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T17:15:04+00:00",
+  "source": {
+    "commit": "d62670e9b9f94ca3197a7f562b847ab121f64d6c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_drives.py, 44 steps: one G120C PN in an owned scratch; besides the parameter and main telegram number changes, the main telegram's input channel resized to 4 words and restored, an additional telegram inserted (2/2 words), its input channel resized to 4 words with keepOriginalAddress, restored and erased; a torque telegram 750 refused by Startdrive.",
+  "limitations": [
+    "The drive is on no IO system, so its telegrams have no start addresses and keepOriginalAddress is not observable here.",
+    "Torque telegrams are refused by Startdrive on the G120C PN; no drive that accepts one was available."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "965d0222c0a00106d2e119d794e760b00d2bd1267591caaeff2e59b7fcc64daa"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "440d7c22c208712e5c361dde27b0e2f523042f2d9a53eb10c602f1544d868e35"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "33f7bb3ad20e369867938095b3d93c2d0d4009f9d1dda80b0841e2d63b9fddc7",
+      "bytes": 6513204,
+      "completed": true,
+      "steps": [
+        "start owned TIA drives",
+        "create owned scratch drives",
+        "prepare hardware_add",
+        "apply hardware_add without compile or save",
+        "drive_observe of the new unsaved drive",
+        "prepare project_compile",
+        "apply project_compile",
+        "project_compile lists the drive as not compiled",
+        "drive_observe after compile and save",
+        "list the drive objects",
+        "read p1120/p1082",
+        "refuse a stale expected value",
+        "refuse an unknown parameter",
+        "refuse the other drive object handle",
+        "refuse the save parameter p971",
+        "apply drive_parameter_set",
+        "drive_parameter_set compile lists the drive as not compiled",
+        "change_status reports the applied parameter change",
+        "read back the parameter",
+        "restore the parameter change from its checkpoint",
+        "read the telegrams",
+        "refuse a safety telegram",
+        "refuse stale expected telegrams",
+        "apply drive_telegram_set",
+        "drive_telegram_set compile lists the drive as not compiled",
+        "change_status reports the applied telegram change",
+        "read back the main telegram",
+        "restore the telegram change from its checkpoint",
+        "read the telegrams before resize",
+        "refuse a resize without keepOriginalAddress",
+        "refuse a resize in an unknown direction",
+        "apply drive_telegram_set",
+        "read the telegrams after the main telegram resize",
+        "restore the main telegram resize from its checkpoint",
+        "read the telegrams after restoring the main telegram resize",
+        "apply drive_telegram_set",
+        "read the telegrams after inserting an additional telegram",
+        "apply drive_telegram_set",
+        "read the telegrams after the additional telegram resize",
+        "restore the additional telegram resize from its checkpoint",
+        "read the telegrams after restoring the additional telegram resize",
+        "read the telegrams before the erase",
+        "apply drive_telegram_set",
+        "read the telegrams after erasing the additional telegram"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "drive_observe",
+        "hardware_catalog_search",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}

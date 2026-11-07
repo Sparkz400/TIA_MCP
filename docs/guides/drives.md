@@ -10,9 +10,14 @@ starts and every other tool works; these routes return `UnsupportedCapability`.
 `drive_observe`, `drive_parameter_set` and `drive_telegram_set` (the main
 telegram number change) are natively qualified on one SINAMICS G120C PN
 (6SL3210-1KE21-3AF1, firmware 4.7.14) in an owned scratch, offline values only
-([record](../verification/drives-index-20261101.md)). The
+([record](../verification/drives-index-20261101.md)). `drive_telegram_set` also resizes one channel of the main,
+supplementary or additional telegram (`operation: resize`, `direction`, `size` in
+PROFIdrive words, `keepOriginalAddress`) and inserts or erases a torque telegram; resizes,
+the additional insert and erase passed natively on the same drive, which refuses torque
+telegrams ([record](../verification/drives-telegram-resize-20261107.md)). PKW has no
+Openness setter; it follows the telegram number. The
 [Startdrive plan](../plans/expansion-plans/startdrive.md) lists the remaining
-work (telegram size and PKW edits, TO connection, DRIVE-CLiQ, online access,
+work (PKW edits, TO connection, DRIVE-CLiQ, online access,
 download, activation, security, safety).
 
 ## Observe drives: `drive_observe`

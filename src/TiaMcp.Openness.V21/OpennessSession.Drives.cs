@@ -385,17 +385,30 @@ namespace TiaMcp.Openness.V21
             var driveObject = ChangeDriveObject(project, payload, out var identity);
             string driveId = identity.Value<string>("driveId");
             string operation = ChangeText(payload, "operation", 16), typeName = ChangeText(payload, "telegramType", 32);
-            if (Array.IndexOf(new[] { "change", "insert", "erase" }, operation) < 0) throw new BridgeException("InvalidRequest", "operation must be change, insert or erase.");
+            if (Array.IndexOf(new[] { "change", "insert", "erase", "resize" }, operation) < 0) throw new BridgeException("InvalidRequest", "operation must be change, insert, erase or resize.");
             if (typeName == "SafetyTelegram") throw new BridgeException("SafetyBoundary", "Safety telegrams require a dedicated safety workflow.");
-            var allowed = operation == "change" ? new[] { "MainTelegram", "SupplementaryTelegram" } : new[] { "SupplementaryTelegram", "AdditionalTelegram" };
+            // resize changes one channel's size through Startdrive's ChangeSize; a torque telegram is inserted by number and erased like the others.
+            var allowed = operation == "change" ? new[] { "MainTelegram", "SupplementaryTelegram" } : operation == "resize" ? new[] { "MainTelegram", "SupplementaryTelegram", "AdditionalTelegram" }
+                : new[] { "SupplementaryTelegram", "AdditionalTelegram", "TorqueTelegram" };
             if (Array.IndexOf(allowed, typeName) < 0) throw new BridgeException("UnsupportedCapability", operation + " supports telegramType " + string.Join(" or ", allowed) + ".");
             var type = (TelegramType)Enum.Parse(typeof(TelegramType), typeName);
-            bool sized = type == TelegramType.AdditionalTelegram;
+            bool resize = operation == "resize", sized = !resize && type == TelegramType.AdditionalTelegram;
             var keys = new List<string> { "hardwarePath", DriveObjectRules.Handle(payload), "operation", "telegramType", "expectedTelegrams" };
-            if (operation != "erase") keys.AddRange(sized ? new[] { "inputSize", "outputSize" } : new[] { "telegramNumber" });
+            if (resize) keys.AddRange(new[] { "direction", "size", "keepOriginalAddress" });
+            else if (operation != "erase") keys.AddRange(sized ? new[] { "inputSize", "outputSize" } : new[] { "telegramNumber" });
             if (payload.Count != keys.Count || keys.Any(key => payload[key] == null)) throw new BridgeException("InvalidRequest", operation + " " + typeName + " needs exactly: " + string.Join(", ", keys) + ".");
             int number = keys.Contains("telegramNumber") ? DriveTelegramInteger(payload, "telegramNumber") : 0;
             int inputSize = sized && operation == "insert" ? DriveTelegramInteger(payload, "inputSize") : 0, outputSize = sized && operation == "insert" ? DriveTelegramInteger(payload, "outputSize") : 0;
+            var direction = AddressIoType.Input; int size = 0; bool keep = false;
+            if (resize)
+            {
+                string channel = ChangeText(payload, "direction", 8);
+                if (channel != "input" && channel != "output") throw new BridgeException("InvalidRequest", "direction must be input or output.");
+                direction = channel == "input" ? AddressIoType.Input : AddressIoType.Output;
+                size = DriveTelegramInteger(payload, "size");
+                if (payload["keepOriginalAddress"].Type != JTokenType.Boolean) throw new BridgeException("InvalidRequest", "keepOriginalAddress must be true or false.");
+                keep = payload.Value<bool>("keepOriginalAddress");
+            }
             var before = DriveTelegramRows(driveObject);
             if (!JToken.DeepEquals(before, payload["expectedTelegrams"]))
                 throw new BridgeException(write ? "PreviewStale" : "ExpectedValueMismatch", "The drive object's telegram rows differ from expectedTelegrams; nothing was written.", new JObject { ["current"] = before });
@@ -404,8 +417,14 @@ namespace TiaMcp.Openness.V21
             if (operation == "insert" ? targets.Length != 0 : targets.Length != 1)
                 throw new BridgeException("AmbiguousTarget", operation == "insert" ? "insert requires that the drive object has no " + typeName + "." : operation + " requires exactly one " + typeName + " on the drive object.");
             if (operation == "change" && targets[0].TelegramNumber == number) throw new BridgeException("InvalidRequest", "telegramNumber equals the current number; nothing would change.");
-            bool possible = operation == "erase" || (operation == "change" ? targets[0].CanChangeTelegram(number)
-                : sized ? composition.CanInsertAdditionalTelegram(inputSize, outputSize) : composition.CanInsertSupplementaryTelegram(number));
+            if (resize && targets[0].GetSizeInBytes(direction) == 2 * size) throw new BridgeException("InvalidRequest", "size equals the channel's current size; nothing would change.");
+            // The other channel and the telegram number must stay as they are.
+            // Sizes are PROFIdrive words (a main telegram resized to 4 reads back 8 bytes, 7 November); readback compares bytes, and
+            // retains the native GetSize values beside them.
+            int otherBytes = resize ? targets[0].GetSizeInBytes(direction == AddressIoType.Input ? AddressIoType.Output : AddressIoType.Input) : 0, resizedNumber = resize ? targets[0].TelegramNumber : 0;
+            bool possible = operation == "erase" || (operation == "change" ? targets[0].CanChangeTelegram(number) : resize ? targets[0].CanChangeSize(direction, size, keep)
+                : sized ? composition.CanInsertAdditionalTelegram(inputSize, outputSize) : type == TelegramType.TorqueTelegram ? composition.CanInsertTorqueTelegram(number)
+                : composition.CanInsertSupplementaryTelegram(number));
             if (!possible) throw new BridgeException("TelegramChangeRefused", "Startdrive reports that this telegram " + operation + " is not possible on the drive object; nothing was written.");
             // Existing overlaps refuse before the checkpoint; the same check after the write then attributes any overlap to this change.
             var conflicts = DriveAddressConflicts(project, driveObject, driveId);
@@ -413,17 +432,36 @@ namespace TiaMcp.Openness.V21
             if (!write) return new JObject { ["before"] = before, ["after"] = null,
                 ["afterReason"] = "Startdrive assigns telegram addresses during the write; apply reads back every telegram row of the drive object and reports the address shift." };
             if (operation == "change") targets[0].TelegramNumber = number;
+            else if (resize)
+            {
+                if (!targets[0].ChangeSize(direction, size, keep))
+                    throw new BridgeException("MutationVerificationFailed", "Startdrive reported that ChangeSize did not complete after CanChangeSize allowed it. Restore the checkpoint before further changes.");
+            }
             else if (operation == "erase") composition.EraseTelegram(type);
             else if (sized) composition.InsertAdditionalTelegram(inputSize, outputSize);
+            else if (type == TelegramType.TorqueTelegram) composition.InsertTorqueTelegram(number);
             else composition.InsertSupplementaryTelegram(number);
             var after = DriveTelegramRows(driveObject);
             conflicts = DriveAddressConflicts(project, driveObject, driveId);
             var readback = new JObject { ["before"] = before, ["after"] = after, ["addressShift"] = DriveAddressShift(before, after), ["conflicts"] = conflicts };
             change.Readbacks.Add(new JObject { ["role"] = "drive-telegram-readback", ["telegrams"] = readback });
-            var found = composition.Where(telegram => telegram.Type == type).ToArray();
+            // A fresh read: the composition taken before an insert does not list the new telegram (native run of 7 November).
+            var found = driveObject.Telegrams.Where(telegram => telegram.Type == type).ToArray();
             Func<JArray, string> others = rows => string.Join("|", rows.Where(row => row.Value<string>("type") != typeName).Select(row => row.Value<string>("type") + ":" + row["number"]).OrderBy(text => text, StringComparer.Ordinal));
+            if (found.Length == 1 && (resize || sized))
+                readback["nativeSizes"] = new JObject { ["input"] = found[0].GetSize(AddressIoType.Input), ["output"] = found[0].GetSize(AddressIoType.Output),
+                    ["inputBytes"] = found[0].GetSizeInBytes(AddressIoType.Input), ["outputBytes"] = found[0].GetSizeInBytes(AddressIoType.Output) };
             bool applied = operation == "erase" ? found.Length == 0 : found.Length == 1
-                && (sized ? found[0].GetSize(AddressIoType.Input) == inputSize && found[0].GetSize(AddressIoType.Output) == outputSize : found[0].TelegramNumber == number);
+                && (resize ? found[0].GetSizeInBytes(direction) == 2 * size && found[0].GetSizeInBytes(direction == AddressIoType.Input ? AddressIoType.Output : AddressIoType.Input) == otherBytes && found[0].TelegramNumber == resizedNumber
+                    : sized ? found[0].GetSizeInBytes(AddressIoType.Input) == 2 * inputSize && found[0].GetSizeInBytes(AddressIoType.Output) == 2 * outputSize : found[0].TelegramNumber == number);
+            // keepOriginalAddress: the resized telegram's address ranges keep their start bytes.
+            if (applied && resize && keep)
+            {
+                Func<JArray, string> starts = rows => string.Join("|", rows.Where(row => row.Value<string>("type") == typeName).SelectMany(row => row["addresses"])
+                    .Select(address => address.Value<string>("id") + ":" + address["startAddress"]).OrderBy(text => text, StringComparer.Ordinal));
+                if (starts(before) != starts(after))
+                    throw new BridgeException("MutationVerificationFailed", "keepOriginalAddress was requested, but the resized telegram's start addresses moved. Restore the checkpoint before further changes.");
+            }
             if (!applied || others(before) != others(after))
                 throw new BridgeException("MutationVerificationFailed", "Telegram readback differs from the request or another telegram changed type or number. Restore the checkpoint before further changes.");
             if (conflicts.Count != 0) throw new BridgeException("AddressConflict", "The changed telegram addresses overlap configured I/O. Restore the checkpoint before further changes.");
