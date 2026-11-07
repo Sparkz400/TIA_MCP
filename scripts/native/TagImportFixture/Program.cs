@@ -51,8 +51,10 @@ internal static class Program
             var plc = project.Devices.SelectMany(d => Items(d.DeviceItems)).Select(i => i.GetService<SoftwareContainer>()?.Software as PlcSoftware).Single(p => p != null);
             if (args[0] == "drift")
             {
-                plc.TagTableGroup.TagTables.Find("Other").Tags.Find("Untouched").LogicalAddress = "%M51.1";
-                Console.WriteLine("Drifted one unrelated scratch tag for stale-preview verification."); return;
+                // A toggle, so a later call can return the unrelated table to the state a change recorded.
+                var untouched = plc.TagTableGroup.TagTables.Find("Other").Tags.Find("Untouched");
+                untouched.LogicalAddress = untouched.LogicalAddress == "%M51.1" ? "%M51.0" : "%M51.1";
+                Console.WriteLine("Moved one unrelated scratch tag to " + untouched.LogicalAddress + " for stale-state verification."); return;
             }
             if (args[0] == "consume") { Consume(plc, Path.GetDirectoryName(receipt)); return; }
             var signals = plc.TagTableGroup.TagTables.Create("Signals"); signals.Tags.Create("Existing", "Bool", "%M50.0");
