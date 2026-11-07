@@ -56,7 +56,7 @@ def body(h):
                                "configureScratchSecurity": True, "failsafeRuntimeAccess": True}, {})
     for n in (2, 3):
         change(h, "hardware_add", {"typeIdentifier": h.scratch_cpu, "deviceName": "Other%d" % n, "itemName": "OtherPlc%d" % n,
-                                   "configureScratchSecurity": True}, {}, compile=False)
+                                   "configureScratchSecurity": True}, {})
     plcs = {p["path"].split("/items/")[0]: p["path"] for p in h.tool("project_inventory", {"maxItems": 2000})["plcs"]}
     fplc = plcs[devices + "FStation"]
     for n in (2, 3):
