@@ -97,6 +97,18 @@ The live scratch fixture `scripts/smoke_write_guards.py` qualified these guards 
 
 `change_status` returns the recorded state, stage list, compile diagnostics and recovery archive. The host also supplies `artifactDirectory` so a strict GUID `changeId` can read its saved journal after a host restart. A journal left at `applying`, `checkpointing` or `restoring` records an uncertain outcome; it does not prove that the last native operation completed.
 
+## Refresh from unchanged source
+
+To check whether regenerating a block clears compiler findings, start with `plc_compile`; it reports diagnostics without editing anything. If a refresh is still warranted, read the block's own source with `block_read` and `format: "generatedSource"` (the temporary external source is removed again), and apply exactly that text with `source_upsert`, `compile: true`.
+
+The result separates three things:
+
+- **What changed in the block.** The `source-refresh-comparison` readback lists each existing block with its number before and after and whether its interface, body and layout are unchanged, and summarizes `logicChanged`, `interfaceChanged` and `numbersPreserved`. The body comparison ignores serialization IDs, token UIds and `NewLine`/`Blank` layout tokens, which TIA re-flows when it generates source; `layoutUnchanged` reports those separately.
+- **What the compiler now reports.** `compile.baselineComparison` lists findings that already existed, were resolved or were introduced ([compile verification](#compile-verification)).
+- **What is not proven.** Neither result names a cause. A finding that disappeared after a refresh is an observation, not proof that the refresh fixed a particular defect; report it that way, and keep anything only a user saw separate from what the result confirms.
+
+A block that is already inconsistent stops `source_upsert` at prepare (`FingerprintUnavailable`); compile it first. An interrupted refresh is reconciled like any interrupted change ([prepare, apply, inspect](#prepare-apply-inspect)). Natively checked on 7 November 2026 (`local.source-refresh.20261107`).
+
 ## Compile an existing PLC without importing or editing
 
 Use `change_prepare` with `kind: "plc_compile"`, an empty `payload: {}` and the
