@@ -1,0 +1,69 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.candidate_shapes.ob_combinations.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T17:37:07+00:00",
+  "source": {
+    "commit": "b9f32ecddef411b24b9664bcf400b29e7cb085ae",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_integrate_apply.py --candidates, 7 cases, each in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: a PLC component installed into an OB caller as a LAD OB, after an earlier network, reusing the installed FB, and every combination of these, with the exact installed-object diff, the native caller insertion proof, the call oracle, a fresh reopen, a 0-error compile and change_restore of the initial checkpoint into a new location.",
+  "limitations": [
+    "Program-cycle OB fixtures built from Main's envelope; other OB types are not exercised."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "3d15c615322e8e1da15ae336fe7b3f23807180e9dec58127756676fb1c1fd1cc"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "ea0bdd656f9285c6a09e5ea2f723acf900b30795fa5b17e58d6d19be6ec42b80"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "3afac1b344f52432782a14f67efdf181b90284d3caf0c257ed74a8d4cc6e41e8",
+      "bytes": 19847729,
+      "completed": true,
+      "steps": [
+        "author",
+        "candidate:obLad",
+        "candidate:obEarlier",
+        "candidate:obLadEarlier",
+        "candidate:obReuse",
+        "candidate:obReuseLad",
+        "candidate:obReuseEarlier",
+        "candidate:obReuseLadEarlier"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
