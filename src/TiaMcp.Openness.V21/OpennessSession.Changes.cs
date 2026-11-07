@@ -104,6 +104,16 @@ namespace TiaMcp.Openness.V21
                 if (UsesCompileBaseline(change.Kind))
                     change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. With compile=true the same scope compiles before and after the mutation; the change fails on an introduced or worsened error, a changed compile scope or incomplete diagnostics (tag-table imports also fail on new or changed warnings). Unchanged findings may remain and are listed in compile.baselineComparison; inspect compilerSucceeded. Compile does not validate machine behavior.";
                 change.Preview["backups"] = change.Backups;
+                if (args["intent"] is JObject intent)
+                {
+                    // #220: recorded and hash-bound with the preview; compared, never evaluated.
+                    var recorded = IntentRules.Normalize(intent);
+                    IntentRules.Compare(recorded, EarlierDecisions(args, change.ProjectPath));
+                    if (recorded["conflicts"].HasValues)
+                        ((JArray)change.Preview["warnings"]).Add("Confirmed intent conflicts with a decision of an earlier applied change in this project; review intent.conflicts before applying.");
+                    change.Preview["intent"] = recorded;
+                }
+                else if (args["intent"] != null && args["intent"].Type != JTokenType.Null) throw new BridgeException("InvalidRequest", "intent must be an object.");
                 change.PreviewHash = ChangeHash(change.Preview.ToString(Formatting.None));
                 change.State = "prepared";
                 WriteChangeJournal(change);
@@ -271,6 +281,7 @@ namespace TiaMcp.Openness.V21
                         : EngineeringFingerprint(change, project);
                     change.State = "applied";
                     WriteChangeJournal(change);
+                    RecordAppliedDecisions(change);
                     return ChangeView(change);
                 }
                 catch (Exception ex)
@@ -1767,6 +1778,23 @@ namespace TiaMcp.Openness.V21
             view["phaseTimings"] = change.PhaseTimings.DeepClone();
             view["progressPath"] = Path.Combine(change.Directory, "progress.json");
             return change.Kind == "hmi_classic_screen_edit" && !includeDetails ? ClassicScreenReceipts.Compact(view) : view;
+        }
+
+        private static string DecisionLog(string changesDirectory) => Path.Combine(changesDirectory, "intent-decisions.jsonl");
+
+        private IEnumerable<JObject> EarlierDecisions(JObject args, string projectPath)
+        {
+            string log = DecisionLog(ArtifactDirectory(args));
+            if (!File.Exists(log)) return Enumerable.Empty<JObject>();
+            return File.ReadAllLines(log).Where(l => l.Length > 0).Select(JObject.Parse)
+                .Where(d => string.Equals(d.Value<string>("projectPath"), projectPath, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        // Only decisions of applied changes become the project's confirmed record.
+        private static void RecordAppliedDecisions(EngineeringChange change)
+        {
+            if (!(change.Preview?["intent"]?["decisions"] is JArray decisions) || decisions.Count == 0) return;
+            File.AppendAllLines(DecisionLog(Path.GetDirectoryName(change.Directory)), decisions.OfType<JObject>().Select(d => IntentRules.Line(change.ProjectPath, change.Id, d)));
         }
 
         private static void WriteChangeJournal(EngineeringChange change)
