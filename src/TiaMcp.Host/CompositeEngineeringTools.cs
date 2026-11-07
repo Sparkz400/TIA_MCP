@@ -23,6 +23,26 @@ public sealed class CompositeEngineeringTools(IBridgeClient bridge, HostOptions 
         return Result(result, failed);
     }
 
+    [McpServerTool(Name = "drive_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("One read-only drive inventory of the open project: every SINAMICS drive object with its telegrams (number, input/output byte ranges), the PLC tags whose addresses overlap each telegram range, and the technology objects whose resolved hardware connections reach the drive. Joins use native paths and addresses, never names. coverage reports drives, tags and technology objects per source; noDrivesConfirmed is true only for a complete Startdrive read with no drive. blockers lists every gap or ambiguity (partial or unavailable coverage, tags in several PLCs on one telegram, a tag spanning telegrams, a technology object resolving to several drives, several technology objects on one drive); dependent writes must not proceed while writeReady is false. Read-only; changes nothing.")]
+    public async Task<CallToolResult> DriveInventoryRead(CancellationToken cancellationToken, string? projectName = null)
+    {
+        object result; bool failed = false;
+        try { result = await DriveInventory.Capture(bridge, projectName, cancellationToken); }
+        catch (BridgeException e) { failed = true; result = new { error = new { code = e.Code, message = e.Message } }; }
+        return Result(result, failed);
+    }
+
+    [McpServerTool(Name = "servo_call_plan", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Plan, never apply, one caller FB that calls an existing servo wrapper FB once per reviewed drive: one multi-instance and one fault Bool output per drive, wired to the drive's own status and control tags from drive_inventory. request: plcPath, callerName, wrapperName, parameters {status, control, reset, ss1, fault} naming the wrapper's own parameters (checked against its native interface; nothing is guessed from names), resetExpression and ss1Expression (one SCL expression each, applied as confirmed design), optional faultNaming containing {instance}, drives [{hardwarePath, instanceName}]. blockers lists every gap: drive_inventory blockers, missing or mistyped wrapper parameters, not exactly one status/control tag per drive, duplicate drives or names, and any other block already writing a selected drive's control tag (symbol_trace). When writeReady, change holds the source_upsert payload to prepare and apply with compile=true.")]
+    public async Task<CallToolResult> ServoCallPlanRead(JsonElement request, CancellationToken cancellationToken)
+    {
+        object result; bool failed = false;
+        try { result = await ServoCallPlan.Plan(bridge, System.Text.Json.Nodes.JsonNode.Parse(request.GetRawText())?.AsObject() ?? throw new BridgeException("InvalidRequest", "request must be an object."), Path.Combine(options.ArtifactsDirectory, "exports"), cancellationToken); }
+        catch (BridgeException e) { failed = true; result = new { error = new { code = e.Code, message = e.Message } }; }
+        return Result(result, failed);
+    }
+
     [McpServerTool(Name = "composite_engineering_rebind_plan", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Plan, never apply, technology-object hardware rebinds for a revalidated composite handle: each before-phase declared TO hardware connection that is missing, disconnected, unknown or unresolved after, whose target has one declared replacement (model correspondence, or AML correspondence through declared hardware mappings in both phases), becomes a to_connect change payload (technologyPath, role, sensorIndex, hardwarePath and carried-over channel selector). Payloads appear only when this build's catalog has the to_connect change kind; otherwise entries say changeKindUnavailable. At most 200 entries. Each change still needs change_prepare/apply with its own preview, checkpoint and compile.")]
     public CallToolResult RebindPlan(string recordRef) => Run(s => s.RebindPlan(recordRef, ToConnect.Value));

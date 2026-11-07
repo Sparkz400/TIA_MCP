@@ -25,7 +25,23 @@ Preparation returns `changeId`, `previewHash`, `preview`, `journalPath`, and `st
 }
 ```
 
-`checkpointSave: true` **saves the entire current in-memory project**, including previously unsaved user edits, before creating `before.zap21`. Siemens requires a saved project for archiving. The worker will not apply a mutation unless that archive exists and its SHA-256 has been recorded. `save: true` after mutation requires `compile: true` and a successful compile.
+`checkpointSave: true` **saves the entire current in-memory project**, including previously unsaved user edits, before creating `before.zap21`. Siemens requires a saved project for archiving. The worker will not apply a mutation unless that archive exists and its SHA-256 has been recorded. `save: true` after mutation requires `compile: true` and passed compile verification.
+
+### Confirmed intent
+
+`change_prepare` accepts an optional `intent` with the task's confirmed machine decisions, kept apart from what was observed and what is only assumed:
+
+```json
+{ "decisions": [{ "id": "door-reset", "source": "maintainer, 7 Nov", "target": "Servos", "symbols": ["Reset", "DoorOpen"],
+                  "statement": "Reset is only allowed while the door is closed.", "meaning": "reset := \"Reset\" AND NOT \"DoorOpen\"" }],
+  "observedFacts": ["Drive1 telegram 1 at byte 256"], "assumptions": ["The reset button is wired to Reset."] }
+```
+
+The intent becomes part of the preview, so `previewHash` covers it, and it stays visible in the apply result and `change_status`. Each decision is compared by `id` with the decisions of earlier applied changes in the same project. An identical decision is listed under `intent.previouslyConfirmed`, so it does not need to be asked again. A changed statement or target is listed under `intent.conflicts` and adds a preview warning. The tool never evaluates the intent and never infers machine behavior from names. `intent.verificationScope` states what is and is not proven: compile correctness is reported by the compile result; whether the edit implements the intent is recorded for review, not checked; machine safety behavior is not verified. Natively checked on 7 November 2026 (`local.change.confirmed-intent.20261107`).
+
+### Compile verification
+
+With `compile: true`, a change compiles its compile scope (the selected PLC, or every device for hardware, network, safety and other device-wide kinds) after the checkpoint and before the mutation, and again afterwards. Apply fails with `CompileFailed` only on an introduced or worsened error, a changed compile scope or incomplete diagnostics. Findings that were already there, such as another device's address conflict, do not fail the change. `compile.baselineComparison` lists them as existing (or resolved, once fixed) next to introduced ones, and `compile.compilerSucceeded` says whether the whole scope compiled without errors. A saved change with `compilerSucceeded: false` is valid; the project still has those errors. Without complete baseline diagnostics only a clean compile passes. Tag-table imports also fail on new or changed warnings ([below](#tag-table-import-scope)); compile-only kinds report their diagnostics as the result, and HMI kinds keep their own baseline rules. An inconsistent block still stops preparation of kinds that need the full project fingerprint (`FingerprintUnavailable`). Natively checked on 7 November 2026 (`local.compile-baseline.unrelated-errors.20261107`, [record](../verification/unrelated-errors-20261107.md)).
 
 The new individual type/tag/constant edits, user-group edits, graphical network patches/inserts, call-argument edits, hardware-address edits, block renames and deletions, technology-object deletions and hardware deletions require `compile: true` even when `save` is false. Their native mutation routes are implemented; the pure regression tests do not establish qualification on a particular CPU, software-unit configuration or hardware family.
 
@@ -48,7 +64,9 @@ must contain every requested name, type, address, attribute and supplied comment
 unrequested tables and untouched members must remain unchanged. Native override
 replaces a table. Preparation therefore requires every existing member to remain
 in the candidate with its original kind; implicit deletions and renames are
-refused before writing. Start with a fresh native export when adding members.
+refused before writing; a member renamed inside the candidate counts as a deletion.
+Use `tag_set` (`Name`) or `tag_delete`/`constant_delete` to rename or delete on
+purpose. Start with a fresh native export when adding members.
 Existing safety-tag tables are
 refused, F-I/O address checks still run, and a native safety tag discovered after
 import fails verification with the checkpoint retained.
@@ -63,17 +81,51 @@ With `compile=false`, no compilation or compile-success claim is made; the usual
 requirement to compile before saving through `change_apply` remains.
 
 This policy covers declarations and exposed metadata, not unrelated block
-contents. It therefore refuses `change_restore` with `ScopedRecoveryRequired`
-before saving or closing anything. The archive is retained for explicit manual
-recovery. Interrupted applies do not gain whole-project outcome verification from
+contents, so it never authorizes replacing the whole project. `change_restore`
+instead re-imports only the imported tables from their retained native exports
+(hash-checked; a table the import created is deleted), in place. It refuses with
+`StaleRevision` when any captured table differs from what the attempt left, then
+verifies every table against the before capture, compiles like the baseline and
+saves. Edits outside tag tables made after the attempt are kept. An import not
+recorded as applied still refuses with `ScopedRecoveryRequired`, and the archive
+stays available for manual recovery. Interrupted applies do not gain whole-project outcome verification from
 the scoped fingerprint; unresolved outcomes remain held. This limitation is
 reported in the preview and journal.
+
+Natively checked on one owned scratch PLC on 7 November 2026
+(`local.tag-table.scoped-import.20261107`,
+[record](../verification/tag-table-scope-20261107.md)), including a type change
+that breaks a block reading the tag, which fails as `CompileFailed`. A second run
+(`local.tag-table.replacement-compile.20261107`) adds the refused in-place rename
+and checks that the result's `stages` list checkpoint save, mutation, compile,
+readback and final save separately, and that a failed apply still reports
+`compile.compilerSucceeded`.
+
+If the client cancels a call or the bridge times out after the request reached the worker, the operation keeps running in TIA: native Openness calls cannot be stopped, and the Host never terminates TIA for it. The call returns `CancelledOutcomeUnknown` or `TimeoutOutcomeUnknown`. Later calls are refused with `PreviousOperationRunning`, and nothing is sent until the operation finishes; then the Host records its late response and continues, and `change_status` shows the real outcome. A cancelled `change_apply` keeps its mutation admission `outcomeUnknown` until `engineering_admission_reconcile` verifies it; until then the same key is refused with `ResourceBusy`. Natively checked on 7 November 2026 (`local.bridge.cancellation.20261107`, [record](../verification/cancellation-20261107.md)).
 
 A matching repeat of an already successful application returns its recorded result without applying again. An attempted change that failed or was interrupted cannot be retried automatically, even if its idempotency key is reused. Prepare another change only after reconciling the actual outcome: while a change on the same project is `recovery_required` (or still `checkpointing`, `applying` or `restoring`) in the same TIA process, `change_prepare` and `change_apply` refuse with `RecoveryRequired` and name that change, because the next checkpoint save would persist its failed edits and make it unrestorable. Run `change_restore` on it in an owned instance; otherwise `tia_detach` and start a new instance (which opens the saved files), or restart the worker. Every preview reports the project's unsaved state as `isModified`.
 
 The live scratch fixture `scripts/smoke_write_guards.py` qualified these guards in a newly retrieved checkpoint copy. A wrong preview hash and a stale second plan were rejected before checkpoint or block mutation; both journals remained `prepared` with no stages or archive. An exact successful replay retained the recorded result without rewriting its journal, and a different idempotency key was rejected. The applied fixture compiled and saved, and its recovery archive SHA-256 matched. Evidence: `artifacts/write-guards-final.json` (completed successfully on 2026-10-08).
 
 `change_status` returns the recorded state, stage list, compile diagnostics and recovery archive. The host also supplies `artifactDirectory` so a strict GUID `changeId` can read its saved journal after a host restart. A journal left at `applying`, `checkpointing` or `restoring` records an uncertain outcome; it does not prove that the last native operation completed.
+
+## Refresh from unchanged source
+
+To check whether regenerating a block clears compiler findings, start with `plc_compile`; it reports diagnostics without editing anything. If a refresh is still warranted, read the block's own source with `block_read` and `format: "generatedSource"` (the temporary external source is removed again), and apply exactly that text with `source_upsert`, `compile: true`.
+
+The result separates three things:
+
+- **What changed in the block.** The `source-refresh-comparison` readback lists each existing block with its number before and after and whether its interface, body and layout are unchanged, and summarizes `logicChanged`, `interfaceChanged` and `numbersPreserved`. The body comparison ignores serialization IDs, token UIds and `NewLine`/`Blank` layout tokens, which TIA re-flows when it generates source; `layoutUnchanged` reports those separately.
+- **What the compiler now reports.** `compile.baselineComparison` lists findings that already existed, were resolved or were introduced ([compile verification](#compile-verification)).
+- **What is not proven.** Neither result names a cause. A finding that disappeared after a refresh is an observation, not proof that the refresh fixed a particular defect; report it that way, and keep anything only a user saw separate from what the result confirms.
+
+A block that is already inconsistent stops `source_upsert` at prepare (`FingerprintUnavailable`); compile it first. An interrupted refresh is reconciled like any interrupted change ([prepare, apply, inspect](#prepare-apply-inspect)). Natively checked on 7 November 2026 (`local.source-refresh.20261107`).
+
+## Unresolved symbols
+
+When a block references a tag, block, data type or constant that no longer exists, TIA may refuse to export it as XML. `block_read` then returns `BlockExportUnavailable` with the block's language. SCL, STL and DB blocks can still be read with `format: "generatedSource"`, which does not change them; graphical blocks have no textual form.
+
+Every compile result lists `compile.unresolvedSymbols`: each undefined name with its kind, compile target and the location of the message. The list comes from TIA's English compiler messages, so other UI languages list nothing. The worker never picks a replacement. Map each name explicitly: for example, a door or interlock signal needs the confirmed address and type from whoever owns the machine. Then recreate the symbol through an ordinary change such as `tag_table_import_xml`, which also works beside an inconsistent block. Each repair symbol is therefore a journaled change of its own; delete it later with `tag_delete` if it was only needed to make the block editable. Natively checked on 7 November 2026 (`local.unresolved-symbols.20261107`).
 
 ## Compile an existing PLC without importing or editing
 
@@ -212,6 +264,7 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `vci_conflict_resolve` | `workspacePath`, `objectPath`, `comparisonRef` (a `vci_package_compare` record), `packageId`, `take: "native"`, `"remote"` or `"merged"`; `mergedRecordRef` for `merged` | Resolves one reviewed `divergentChange` row (project side = native, workspace side = remote). The Host binds the exact remote package hashes and the bytes to write; the workspace package must equal the reviewed remote side and a fresh export of the object must hash to the reviewed native side (`contentSha256` from `vci_workspace_inspect`). `native`: `Synchronize(ProjectToWorkspace)`. `remote`/`merged`: writes the bound document, then `Synchronize(WorkspaceToProject)` with `compile=true`; a tag-table document with a tag on an F-I/O address refuses at prepare (`SafetyBoundary`). Reads back `Equal`. See [two-sided conflicts](../reference/vci-package-workflow.md#two-sided-conflict-resolution). Verified (`local.vci_git.20261031`). |
 | `safety_import_xml` | `xml`, `expectedBlockNames: [...]`, `safetyAcknowledged: true` | Dedicated import for consistent, exportable user F-blocks on a safety-enabled PLC with the required existing login state. |
 | `safety_fparameter_set` | `safetyAcknowledged: true`, `parameters: [{ hardwarePath, name, expected, value }]` (1..64) | Writes the F-parameters the [F-parameter allowlist](#f-parameter-allowlist) qualifies for the F-I/O's module type, on F-I/O owned by the selected safety PLC (its central F-source address and solely owned I/O addresses). `expected` must equal the current value; an F-destination address used or planned by another F-I/O refuses (`AddressConflict`). The safety program must already be logged in if protected. The preview shows before/after and the F-I/O `Failsafe_*Signature*` attributes; apply reads back the values and signatures, needs `compile=true` (whole-project device compile) and verifies configured-hardware preservation. It changes the safety signatures and does not validate, approve, assign PROFIsafe addresses or download. Verified for `Failsafe_FDestinationAddress` (`local.safety_changes.20261028`). |
+| `safety_drive_tags` | `safetyAcknowledged: true`, `hardwarePath`, `driveObjectNumber` or `driveObjectIndex`, `tagTableName` (root group), `tags: { status, control }` | Creates one drive object's PROFIsafe telegram 30 status (S_ZSW1, `%IW<input start>`) and control (S_STW1, `%QW<output start>`) Word tags on the owning F-PLC, at the addresses Startdrive reports (see `drive_inventory`). Refuses other telegrams, names or addresses in use and addresses outside an F-I/O range of this drive the PLC owns; reads each tag back as a safety tag and compiles the device. Generic tag routes refuse these addresses with `SafetyBoundary`. Verified (`local.safety.drive-tags.20261107`). |
 | `testsuite_application_import` | `sourcePath` (absolute `.tat` or `.ttst`), `expectedTestCaseNames: [...]` (optional for `.ttst`), `expectedTestSetNames: [...]` (`.ttst` only) | Strict Test Suite application import (`ImportOptions.None`, no `IgnoreInvalidObject`): existing names refuse, the file is copied byte-exact and the native return plus `Find` readback must match the reviewed names. Sets nothing as scope and runs nothing. See [Test Suite application tests](../reference/testsuite-production-jobs.md#ts-05-application-tests). |
 | `testsuite_system_import` | `sourcePath` (absolute `.tst`), `expectedTestCaseNames: [...]` | Strict Test Suite system-test import (`SystemTestCaseComposition.LoadFromFile`, `ImportOptions.None`, no `IgnoreInvalidObject`): existing names refuse, the file is copied byte-exact and the native return plus `Find` readback must match the reviewed names. Sets no OPC UA scope and runs nothing. See [Test Suite system tests](../reference/testsuite-production-jobs.md#ts-06-system-tests). |
 | `plc_alarm_text_list_import` | `artifactPath` (.xlsx), `expectedSha256`, `importOption: "None"` or `"Override"`, `expectedTextListNames: [...]`, optional `scopePath` | Native PLC alarm user text-list import into one PLC or software unit. See [PLC alarm and ProDiag imports](#plc-alarm-and-prodiag-imports). |

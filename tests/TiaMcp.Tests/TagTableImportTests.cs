@@ -84,4 +84,87 @@ internal static class TagTableImportTests
         Check.Equal(false, TagTableImportRules.NoNewCompileProblems(Compile("Existing error"), otherTarget));
         return Task.CompletedTask;
     }
+
+    internal static Task CompileBaselineClassification()
+    {
+        var unchanged = CompileBaselineRules.Compare(Compile("Duplicate IP", "Other device"), Compile("Duplicate IP", "Other device"));
+        Check.Equal(true, unchanged.Value<bool>("verified"));
+        Check.Equal(2, unchanged.Value<int>("existingCount"));
+        var resolved = CompileBaselineRules.Compare(Compile("Duplicate IP", "Other device"), Compile("Duplicate IP"));
+        Check.Equal(true, resolved.Value<bool>("verified"));
+        Check.Equal(1, resolved.Value<int>("resolvedCount"));
+        Check.Equal("Other device", resolved["resolved"]![0]![1]!.Value<string>());
+        var introduced = CompileBaselineRules.Compare(Compile("Duplicate IP"), Compile("Duplicate IP", "Target error"));
+        Check.Equal(false, introduced.Value<bool>("verified"));
+        Check.Equal(true, introduced.Value<bool>("complete"));
+        Check.Equal("Target error", introduced["introduced"]![0]![1]!.Value<string>());
+        var worsened = CompileBaselineRules.Compare(Compile("Duplicate IP"), Compile("Duplicate IP", "Duplicate IP"));
+        Check.Equal(1, worsened.Value<int>("introducedCount"));
+        var otherTarget = Compile("Duplicate IP"); otherTarget["targets"]![0]!["target"] = "/plc/Other";
+        var scope = CompileBaselineRules.Compare(Compile("Duplicate IP"), otherTarget);
+        Check.Equal(false, scope.Value<bool>("scopeUnchanged"));
+        Check.Equal(false, scope.Value<bool>("verified"));
+        // Accepts: a new error fails, a clean compile passes, and a new warning beside an unchanged error passes.
+        Check.Equal(false, CompileBaselineRules.Accepts(Compile("Duplicate IP"), Compile("Duplicate IP", "Target error"), introduced));
+        Check.Equal(true, CompileBaselineRules.Accepts(Compile("Duplicate IP"), Compile(), CompileBaselineRules.Compare(Compile("Duplicate IP"), Compile())));
+        var warned = Compile("Duplicate IP", "New warning");
+        warned["targets"]![0]!["messages"]![2]!["state"] = "Warning";
+        foreach (var node in new[] { warned, (JObject)warned["targets"]![0]! }) { node["errorCount"] = 1; node["warningCount"] = 1; }
+        warned["targets"]![0]!["messages"]!.Last!["description"] = "Compiling finished (errors: 1; warnings: 1)";
+        var warning = CompileBaselineRules.Compare(Compile("Duplicate IP"), warned);
+        Check.Equal(false, warning.Value<bool>("verified"));
+        Check.Equal(0, warning.Value<int>("introducedErrorCount"));
+        Check.Equal(true, CompileBaselineRules.Accepts(Compile("Duplicate IP"), warned, warning));
+        Check.Equal(false, CompileBaselineRules.Accepts(Compile("Duplicate IP"), Compile("Duplicate IP"), CompileBaselineRules.Compare(null, Compile("Duplicate IP"))));
+        return Task.CompletedTask;
+    }
+
+    internal static Task SourceRefreshParts()
+    {
+        static string Block(string number, string member, string code) =>
+            $"<Document><SW.Blocks.FC ID=\"0\"><AttributeList><Interface><Sections><Section Name=\"Input\"><Member Name=\"{member}\" Datatype=\"Bool\" /></Section></Sections></Interface>" +
+            $"<Number>{number}</Number><ProgrammingLanguage>SCL</ProgrammingLanguage></AttributeList><ObjectList><SW.Blocks.CompileUnit ID=\"3\"><AttributeList><NetworkSource>{code}</NetworkSource></AttributeList></SW.Blocks.CompileUnit></ObjectList></SW.Blocks.FC></Document>";
+        var before = SourceRefreshRules.Parts(Block("1", "a", "x"));
+        var reserialized = SourceRefreshRules.Parts(Block("1", "a", "x").Replace("ID=\"3\"", "ID=\"9\""));
+        Check.Equal(before.Interface, reserialized.Interface);
+        Check.Equal(before.Body, reserialized.Body);
+        Check.Equal("1", before.Number);
+        Check.Equal(false, before.Interface == SourceRefreshRules.Parts(Block("1", "b", "x")).Interface);
+        Check.Equal(before.Body, SourceRefreshRules.Parts(Block("1", "b", "x")).Body);
+        Check.Equal(false, before.Body == SourceRefreshRules.Parts(Block("1", "a", "y")).Body);
+        Check.Equal(false, before.Body == SourceRefreshRules.Parts(Block("2", "a", "x")).Body);
+        var spaced = SourceRefreshRules.Parts(Block("1", "a", "x").Replace("<NetworkSource>x</NetworkSource>", "<NetworkSource><Blank Num=\"2\" UId=\"7\" />x</NetworkSource>"));
+        Check.Equal(before.Body, spaced.Body);
+        Check.Equal(false, before.Formatted == spaced.Formatted);
+        return Task.CompletedTask;
+    }
+
+    internal static Task UnresolvedSymbols()
+    {
+        var compile = Compile("Tag \"UnresolvedFlag\" not defined.", "Data type 'Int' cannot be converted implicitly into data type 'Bool'.");
+        var symbols = UnresolvedSymbolRules.From(compile);
+        Check.Equal(1, symbols.Count);
+        Check.Equal("Tag", symbols[0]!["kind"]!.Value<string>());
+        Check.Equal("UnresolvedFlag", symbols[0]!["name"]!.Value<string>());
+        Check.Equal("UnrelatedBlock", symbols[0]!["location"]![0]!.Value<string>());
+        Check.Equal(0, UnresolvedSymbolRules.From(Compile()).Count);
+        return Task.CompletedTask;
+    }
+
+    internal static async Task ConfirmedIntent()
+    {
+        var intent = JObject.Parse("""{"decisions":[{"id":"door-reset","source":"user, 7 Nov","statement":"Reset is only allowed with the door closed.","target":"Servos","symbols":["Reset","DoorOpen"]}],"observedFacts":["Drive1 telegram 1 at byte 256"],"assumptions":["SS1 ramp time is set in the drive"]}""");
+        var recorded = IntentRules.Normalize(intent);
+        Check.Equal("door-reset", recorded["decisions"]![0]!["id"]!.Value<string>());
+        Check.Equal(true, recorded["verificationScope"]!["machineSafetyBehavior"]!.Value<string>()!.StartsWith("Not verified"));
+        var earlier = new[] { JObject.Parse("""{"id":"door-reset","changeId":"c1","statement":"Reset is only allowed with the door closed.","target":"Servos"}""") };
+        IntentRules.Compare(recorded, earlier);
+        Check.Equal(1, ((JArray)recorded["previouslyConfirmed"]!).Count);
+        Check.Equal(0, ((JArray)recorded["conflicts"]!).Count);
+        var changed = IntentRules.Normalize(JObject.Parse("""{"decisions":[{"id":"door-reset","source":"user","statement":"Reset is always allowed.","target":"Servos"}]}"""));
+        IntentRules.Compare(changed, earlier);
+        Check.Equal("c1", changed["conflicts"]![0]!["earlierChangeId"]!.Value<string>());
+        await Check.ThrowsAsync<TiaMcp.Openness.V21.BridgeException>(() => Task.Run(() => IntentRules.Normalize(JObject.Parse("""{"decisions":[{"id":"a","source":"u"}]}"""))));
+        await Check.ThrowsAsync<TiaMcp.Openness.V21.BridgeException>(() => Task.Run(() => IntentRules.Normalize(JObject.Parse("""{"guess":"door switch is probably X1"}"""))));
+    }
 }

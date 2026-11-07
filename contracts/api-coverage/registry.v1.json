@@ -1198,6 +1198,12 @@
       ]
     },
     {
+      "featureId": "change.safety_drive_tags",
+      "obligations": [
+        "D14"
+      ]
+    },
+    {
       "featureId": "change.project_simulation_enable",
       "obligations": [
         "L03"
@@ -3656,6 +3662,18 @@
     },
     {
       "featureId": "drive_observe",
+      "obligations": [
+        "D10"
+      ]
+    },
+    {
+      "featureId": "drive_inventory",
+      "obligations": [
+        "D10"
+      ]
+    },
+    {
+      "featureId": "servo_call_plan",
       "obligations": [
         "D10"
       ]

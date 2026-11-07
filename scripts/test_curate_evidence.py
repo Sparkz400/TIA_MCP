@@ -69,6 +69,16 @@ class CurateEvidenceTests(unittest.TestCase):
             summary = run(path)
         self.assertEqual((["change_apply"], ["change_apply"]), (summary["toolsPassed"], summary["toolsRejected"]))
 
+    def test_run_reads_tool_outcomes_from_a_close_receipt_step(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory, "report.json")
+            path.write_text(json.dumps({"completed": True, "steps": [{"name": "owned start", "result": {"processId": 1}},
+                {"name": "owned worker shutdown", "result": {"toolCalls": [{"name": "change_apply", "isError": False},
+                                                                            {"name": "change_restore", "isError": True}]}}]}), encoding="utf-8")
+            summary = run(path)
+        self.assertEqual(["owned start", "owned worker shutdown"], summary["steps"])
+        self.assertEqual((["change_apply"], ["change_restore"]), (summary["toolsPassed"], summary["toolsRejected"]))
+
     def test_run_reads_tool_outcomes_from_wire_steps(self):
         with tempfile.TemporaryDirectory() as directory:
             path = pathlib.Path(directory, "report.json")

@@ -224,3 +224,5 @@ CompositeWorkflowTests.Run(root);
 CompositeConsumerTests.Run(root);
 CompositeTypedTests.Run(root, request, typedDrive, encoderProfile);
 CompositeCaptureTests.Run(root);
+DriveInventoryTests.Run((ok, label) => { if (!ok) throw new Exception(label); Console.WriteLine("PASS " + label); });
+ServoCallPlanTests.Run((ok, label) => { if (!ok) throw new Exception(label); Console.WriteLine("PASS " + label); });

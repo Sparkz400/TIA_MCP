@@ -101,9 +101,19 @@ namespace TiaMcp.Openness.V21
                 change.Preview["targetNamespace"] = change.Namespace;
                 change.Preview["checkpoint"] = "Applying requires checkpointSave=true: current in-memory project edits are saved before a compressed recovery archive is created. No mutation proceeds without that archive.";
                 change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. Save-after-change requires a successful compile. Compile does not validate machine behavior.";
-                if (change.Kind == TagTableImportRules.Kind)
-                    change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. Saving requires completed before/after compilation with no new diagnostics; existing errors may remain. Inspect compilerSucceeded. Compile does not validate machine behavior.";
+                if (UsesCompileBaseline(change.Kind))
+                    change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. With compile=true the same scope compiles before and after the mutation; the change fails on an introduced or worsened error, a changed compile scope or incomplete diagnostics (tag-table imports also fail on new or changed warnings). Unchanged findings may remain and are listed in compile.baselineComparison; inspect compilerSucceeded. Compile does not validate machine behavior.";
                 change.Preview["backups"] = change.Backups;
+                if (args["intent"] is JObject intent)
+                {
+                    // #220: recorded and hash-bound with the preview; compared, never evaluated.
+                    var recorded = IntentRules.Normalize(intent);
+                    IntentRules.Compare(recorded, EarlierDecisions(args, change.ProjectPath));
+                    if (recorded["conflicts"].HasValues)
+                        ((JArray)change.Preview["warnings"]).Add("Confirmed intent conflicts with a decision of an earlier applied change in this project; review intent.conflicts before applying.");
+                    change.Preview["intent"] = recorded;
+                }
+                else if (args["intent"] != null && args["intent"].Type != JTokenType.Null) throw new BridgeException("InvalidRequest", "intent must be an object.");
                 change.PreviewHash = ChangeHash(change.Preview.ToString(Formatting.None));
                 change.State = "prepared";
                 WriteChangeJournal(change);
@@ -196,12 +206,15 @@ namespace TiaMcp.Openness.V21
                     change.Stages.Add("recovery_archive_created");
                     change.State = "applying";
                     WriteChangeJournal(change);
-                    if (change.Kind == TagTableImportRules.Kind && compile)
+                    if (compile && UsesCompileBaseline(change.Kind))
                     {
-                        change.TagTableEvidence["baselineCompile"] = CompileEngineeringChange(change, project);
-                        change.Stages.Add("tag_table_baseline_compile_finished");
+                        // The same scope compiles before and after, so unchanged unrelated findings do not fail the change (#221).
+                        change.CompileBaseline = CompileEngineeringChange(change, project);
+                        if (change.Kind == TagTableImportRules.Kind) change.TagTableEvidence["baselineCompile"] = change.CompileBaseline;
+                        change.Stages.Add(change.Kind == TagTableImportRules.Kind ? "tag_table_baseline_compile_finished" : "baseline_compile_finished");
                         WriteChangeJournal(change);
-                        if (!CompilationEvidenceRules.IsCompleted((JObject)change.TagTableEvidence["baselineCompile"]))
+                        // Without complete baseline diagnostics only a clean compile can pass; the tag import refuses outright.
+                        if (change.Kind == TagTableImportRules.Kind && !CompilationEvidenceRules.IsCompleted(change.CompileBaseline))
                             throw new BridgeException("CompileEvidenceIncomplete", "The baseline compiler did not return complete diagnostics. No tag import was dispatched.");
                     }
                     if (!IsCompileOnlyKind(change.Kind))
@@ -223,19 +236,27 @@ namespace TiaMcp.Openness.V21
                             if (after.Path != compileOnlyPlc.Path || !Equals(after.Software, compileOnlyPlc.Software))
                                 throw new BridgeException("CompileScopeChanged", "The selected PLC changed during compilation.");
                         }
+                        // Set before the verdict so a failed outcome still reports the compiler result apart from the change state.
+                        if (change.Compilation != null)
+                        {
+                            change.Compilation["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(change.Compilation);
+                            change.Compilation["unresolvedSymbols"] = UnresolvedSymbolRules.From(change.Compilation);
+                            if (change.CompileBaseline != null) change.Compilation["baselineComparison"] = CompileBaselineRules.Compare(change.CompileBaseline, change.Compilation);
+                        }
                         // A text-list import or an admitted HMI kind must leave the compiler problems as the compile before the write found them.
                         if (change.Kind == "hmi_classic_screen_edit" ? !ClassicScreenCompileRules.NoNewProblems(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
                             : change.Kind == "hmi_text_list_import" || HmiEngineeringRules.IsAdmittedKind(change.Kind) ? !HmiTextListImportRules.CompileProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
-                            : change.Kind == TagTableImportRules.Kind ? !TagTableImportRules.NoNewCompileProblems((JObject)change.TagTableEvidence["baselineCompile"], change.Compilation)
-                            : IsCompileOnlyKind(change.Kind) ? !CompilationEvidenceRules.IsCompleted(change.Compilation) : !CompilationEvidenceRules.IsSuccessful(change.Compilation))
+                            : change.Kind == TagTableImportRules.Kind ? change.Compilation?["baselineComparison"]?.Value<bool>("verified") != true
+                            : UsesCompileBaseline(change.Kind) ? change.Compilation == null || !CompileBaselineRules.Accepts(change.CompileBaseline, change.Compilation, (JObject)change.Compilation["baselineComparison"])
+                            : !CompilationEvidenceRules.IsCompleted(change.Compilation))
                             throw new BridgeException(change.Compilation?.Value<int?>("errorCount") == 0 ? "CompileDiagnosticRegression" : "CompileFailed",
-                                "The change failed compiler verification: errors, new/changed warnings, or incomplete diagnostics. Verified screen rollback is attempted; inspect the retained outcome.");
-                        if (IsCompileOnlyKind(change.Kind)) change.Compilation["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(change.Compilation);
-                        if (change.Kind == TagTableImportRules.Kind) change.Compilation["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(change.Compilation);
+                                "The change failed compiler verification: errors, new/changed warnings, or incomplete diagnostics. "
+                                + (change.Kind == "hmi_classic_screen_edit" ? "Verified screen rollback is attempted; inspect the retained outcome." : "Inspect the retained outcome."));
                     }
                     if (IsHmiChangeKind(change.Kind)) VerifyHmiEngineeringPreservation(change, project);
                     if (change.Kind == "software_unit_create_from") RequireUnrenamedUnitMembers(change);
                     VerifyHardwarePreservation(change, project);
+                    if (change.Kind == "source_upsert" && compile) CompareSourceRefresh(change);
                     if (change.Kind == TagTableImportRules.Kind) VerifyScopedTagImport(change);
                     if (new[] { "graphical_typed_edit", "graphical_operand_set", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "graph_import" }.Contains(change.Kind))
                     {
@@ -254,12 +275,13 @@ namespace TiaMcp.Openness.V21
                     if (change.Kind == "source_upsert") { VerifyExpectedBlocksExist(change, SelectPlc(change.Selector)); change.Stages.Add("source_blocks_verified_after_save"); }
                     if (change.Kind == "certificate_create") { VerifyCreatedCertificateAfterSave(change, project); change.Stages.Add("certificate_verified_after_save"); }
                     if (change.Kind == "instance_db_create") { VerifyInstanceDb(change, SelectPlc(change.Selector)); change.Stages.Add("instance_db_verified_after_save"); }
-                    if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile" || change.Kind == "safety_fparameter_set") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
+                    if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_drive_tags") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
                     change.AfterFingerprint = change.Kind == "hmi_classic_screen_edit"
                         ? ClassicScreenCapturedFingerprint(change, project, change.HmiEvidence["after-save"] as JObject)
                         : EngineeringFingerprint(change, project);
                     change.State = "applied";
                     WriteChangeJournal(change);
+                    RecordAppliedDecisions(change);
                     return ChangeView(change);
                 }
                 catch (Exception ex)
@@ -305,8 +327,8 @@ namespace TiaMcp.Openness.V21
         {
             var change = GetEngineeringChange(args);
             if (change.State == "restored") return ChangeView(change);
-            if (change.Kind == TagTableImportRules.Kind)
-                throw new BridgeException("ScopedRecoveryRequired", "A tag-table-scoped fingerprint cannot authorize replacing the whole project. Use the retained archive for explicit manual recovery; no project was saved or closed.", ChangeView(change));
+            // A scoped fingerprint never authorizes replacing the whole project; only the imported tables are restored.
+            if (change.Kind == TagTableImportRules.Kind) return RestoreScopedTagImport(change, args);
             if (!_ownsPortal) throw new BridgeException("OwnedSessionRequired", "Automatic archive retrieval is limited to worker-owned TIA instances. The checkpoint archive is available for manual recovery in a user-owned instance.", ChangeView(change));
             if (change.State != "applied" && change.State != "recovery_required") throw new BridgeException("InvalidChangeState", "This change has no applied state to recover.");
             if (string.IsNullOrEmpty(change.ArchivePath) || !File.Exists(change.ArchivePath) || ChangeFileHash(change.ArchivePath) != change.ArchiveHash)
@@ -720,6 +742,15 @@ namespace TiaMcp.Openness.V21
                 case "hardware_cpu_parameters":
                     PrepareCpuParameters(change, project, preview);
                     break;
+                case "safety_drive_tags":
+                {
+                    var plc = SelectPlc(change.Selector);
+                    preview["safetyDriveTags"] = Startdrive(() => SafetyDriveTagPlan(change, project));
+                    preview["safetyBefore"] = ReadSafety(plc.Software);
+                    effects.Add(new JObject { ["plcPath"] = plc.Path, ["action"] = change.Kind });
+                    ((JArray)preview["warnings"]).Add("Creates PROFIsafe safety tags, which changes the safety program signatures after the F-compile. Nothing here validates, accepts or approves the safety program or the drive's Safety Integrated configuration.");
+                    break;
+                }
                 case "safety_fparameter_set":
                 {
                     var plc = SelectPlc(change.Selector);
@@ -998,6 +1029,9 @@ namespace TiaMcp.Openness.V21
                     TagCreate(change, plc, MutationTable(change, plc), true);
                     break;
                 }
+                case "safety_drive_tags":
+                    Startdrive(() => { ApplySafetyDriveTags(change, project); return true; });
+                    break;
                 case "block_number_set":
                 case "block_attributes_set":
                     ApplyBlockEdit(change);
@@ -1182,7 +1216,8 @@ namespace TiaMcp.Openness.V21
                     {
                         var subnet = project.Subnets.FirstOrDefault(s => string.Equals(s.Name, subnetName, StringComparison.OrdinalIgnoreCase));
                         if (subnet == null) node.CreateAndConnectToSubnet(subnetName);
-                        else node.ConnectToSubnet(subnet);
+                        // TIA refuses to reconnect a node to the subnet it is already on; the preview reports no subnet change.
+                        else if (!Equals(node.ConnectedSubnet, subnet)) node.ConnectToSubnet(subnet);
                     }
                     ApplyAttributes(node, payload["attributes"] as JObject ?? new JObject(), NetworkWriteAttributes);
                     break;
@@ -1271,6 +1306,10 @@ namespace TiaMcp.Openness.V21
             }
             catch (Exception error) { change.TechnologyAfter = new JObject { ["unresolved"] = true, ["reason"] = error.Message }; }
         }
+
+        // Compile-only kinds report diagnostics as their result; HMI kinds keep their own baseline rules.
+        private static bool UsesCompileBaseline(string kind) =>
+            !IsCompileOnlyKind(kind) && kind != "hmi_classic_screen_edit" && !IsHmiChangeKind(kind);
 
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
@@ -1505,7 +1544,7 @@ namespace TiaMcp.Openness.V21
                 snapshot["technologyConnections"] = TechnologyConnections(entry.Item, connectionBudget, new JArray(), entry.Path, out _, new TechnologyReferenceReader(plc.Project, plc.Path));
                 if (connectionBudget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish a complete technology connection fingerprint within the scan bound.");
             }
-            if (change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set") snapshot["driveObject"] = Startdrive(() => DriveObjectFingerprint(change, project));
+            if (change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_drive_tags") snapshot["driveObject"] = Startdrive(() => DriveObjectFingerprint(change, project));
             if (change.Kind == "drive_parameter_set") snapshot["driveParameters"] = Startdrive(() => DriveParameterFingerprint(change, project));
             if (change.Kind == "drive_telegram_set") snapshot["driveTelegrams"] = Startdrive(() => DriveTelegramFingerprint(change, project));
             if (change.Kind.StartsWith("to_", StringComparison.Ordinal))
@@ -1732,12 +1771,30 @@ namespace TiaMcp.Openness.V21
             view["readbacks"] = change.Readbacks.DeepClone();
             view["hmiEvidence"] = change.HmiEvidence?.DeepClone();
             if (change.TagTableEvidence != null) view["tagTableEvidence"] = change.TagTableEvidence.DeepClone();
+            if (change.CompileBaseline != null) view["compileBaseline"] = change.CompileBaseline.DeepClone();
             if (change.Kind == "graphical_typed_edit") view["typedQualification"] = TypedChangeQualification(change);
             view["scratchSecurity"] = change.ScratchSecurity?.DeepClone();
             view["automaticRetryAllowed"] = false;
             view["phaseTimings"] = change.PhaseTimings.DeepClone();
             view["progressPath"] = Path.Combine(change.Directory, "progress.json");
             return change.Kind == "hmi_classic_screen_edit" && !includeDetails ? ClassicScreenReceipts.Compact(view) : view;
+        }
+
+        private static string DecisionLog(string changesDirectory) => Path.Combine(changesDirectory, "intent-decisions.jsonl");
+
+        private IEnumerable<JObject> EarlierDecisions(JObject args, string projectPath)
+        {
+            string log = DecisionLog(ArtifactDirectory(args));
+            if (!File.Exists(log)) return Enumerable.Empty<JObject>();
+            return File.ReadAllLines(log).Where(l => l.Length > 0).Select(JObject.Parse)
+                .Where(d => string.Equals(d.Value<string>("projectPath"), projectPath, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        // Only decisions of applied changes become the project's confirmed record.
+        private static void RecordAppliedDecisions(EngineeringChange change)
+        {
+            if (!(change.Preview?["intent"]?["decisions"] is JArray decisions) || decisions.Count == 0) return;
+            File.AppendAllLines(DecisionLog(Path.GetDirectoryName(change.Directory)), decisions.OfType<JObject>().Select(d => IntentRules.Line(change.ProjectPath, change.Id, d)));
         }
 
         private static void WriteChangeJournal(EngineeringChange change)
@@ -1752,6 +1809,7 @@ namespace TiaMcp.Openness.V21
                 ["readbacks"] = change.Readbacks.DeepClone(),
                 ["hmiEvidence"] = change.HmiEvidence?.DeepClone(),
                 ["tagTableEvidence"] = change.TagTableEvidence?.DeepClone(),
+                ["compileBaseline"] = change.CompileBaseline?.DeepClone(),
                 ["typedQualification"] = change.Kind == "graphical_typed_edit" ? TypedChangeQualification(change) : null,
                 ["compile"] = change.Compilation?.DeepClone(), ["failure"] = change.Failure,
                 ["primaryFailure"] = change.PrimaryFailure, ["recoveryFailure"] = change.RecoveryFailure,
@@ -1808,7 +1866,7 @@ namespace TiaMcp.Openness.V21
             internal string PrimaryFailure, RecoveryFailure, RecoveryDirectory, ScopePath, GroupPath, Namespace;
             internal int? PreparedProcessId;
             internal JObject Selector, Payload, Preview, Compilation, RecoveredProject, SafetyAfter, ScratchSecurity, TechnologyAfter, FingerprintCoverage;
-            internal JObject HmiEvidence, HmiBeforeManifest, TagTableEvidence;
+            internal JObject HmiEvidence, HmiBeforeManifest, TagTableEvidence, CompileBaseline;
             internal JArray HardwareBeforeManifest;
             internal string[] BlockNames = Array.Empty<string>();
             internal string[] ObjectNames = Array.Empty<string>();

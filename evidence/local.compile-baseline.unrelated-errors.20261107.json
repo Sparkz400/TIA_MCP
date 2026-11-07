@@ -1,0 +1,89 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.compile-baseline.unrelated-errors.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T08:59:12+00:00",
+  "source": {
+    "commit": "5a215447f2389e3a3318a052c74eb846fdea8e69",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_unrelated_errors.py on Debug builds of 5a215447 in one owned TIA V21 Update 3 scratch, 30/30 steps: the scratch CPU 1511-1 PN, an added CPU 1511F-1 PN (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) and two more standard CPUs whose interfaces share subnet Conflict and address 192.0.2.10, so every device compile reports errors while every block stays consistent. safety_import_xml re-imported Main_Safety_RTG1 with a comment: applied, saved and read back with compilerSucceeded=false and errorCount 2, the baseline comparison complete with 26 existing findings and no introduced error. In the same session, without restart or admission cleanup: network_configure of the F-CPU interface (device compile, the conflict still existing), tag_create of UnrelatedOk and source_upsert of an SCL FC UnrelatedConsumer reading it (PLC compiles clean). network_configure moving one conflicting CPU to 192.0.2.11 applied with 12 resolved findings and a clean compile. Negative: tag_set making UnrelatedOk an Int ended CompileFailed/recovery_required, unsaved, with the consumer's Data type 'Int' cannot be converted implicitly into data type 'Bool' as the only introduced error.",
+  "limitations": [
+    "One owned scratch; the unrelated finding is a duplicate IP address between two empty standard CPUs, standing in for the 4 November SENTRON device error. Representative kinds only: safety_import_xml, network_configure, tag_create, source_upsert and tag_set; HMI kinds keep their own baseline rules, and library transactions use the shared comparison but are not exercised here.",
+    "An inconsistent block on any PLC still stops preparation of kinds that need the full project fingerprint (FingerprintUnavailable); same-PLC unrelated block errors are therefore not covered (#218).",
+    "Device compiles report shifting warning identities (introduced warnings beside zero introduced errors); outside tag-table imports new warnings are accepted, as before #221."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "5a261d42da9e7ed14879e2462b8b0d8a8ad204540d8cf5bb2159da3171ce8a2c"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "933ae1e4374caf8670940f392e5c4fed27f4447166812f1c98e4fae84518beb2"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "2b9b16aecbecfa1aa9652639217489f69a0c777e1bb6f69a084863c44aaac58f",
+      "bytes": 856917,
+      "completed": true,
+      "steps": [
+        "start owned TIA unrelated errors",
+        "create owned scratch unrelated errors",
+        "prepare hardware_add",
+        "apply hardware_add",
+        "prepare hardware_add",
+        "apply hardware_add",
+        "prepare hardware_add",
+        "apply hardware_add",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare safety_import_xml",
+        "apply safety_import_xml",
+        "safety import applies beside the unrelated conflict",
+        "safety import read back",
+        "prepare network_configure",
+        "apply network_configure",
+        "second device-compiled edit in the same session",
+        "prepare tag_create",
+        "apply tag_create",
+        "PLC-scoped tag_create in the same session",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "consumer FC in the same session",
+        "prepare network_configure",
+        "apply network_configure",
+        "fixing the conflict reports resolved findings",
+        "prepare tag_set",
+        "an introduced finding still fails the change"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_status",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

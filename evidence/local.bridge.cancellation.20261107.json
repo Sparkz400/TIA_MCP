@@ -1,0 +1,73 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.bridge.cancellation.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T09:31:00+00:00",
+  "source": {
+    "commit": "131d0a7a1ba1294c8a4f7772a6c485ad2bdcae78",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_cancellation.py on Debug builds of 4e2578e3 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 14/14 steps: change_apply of a prepared tag_create was sent and cancelled with notifications/cancelled as soon as the worker's journal showed native work. change_status was refused with PreviousOperationRunning (nothing sent) until the apply finished; then it reported applied with exactly one mutation_applied stage and a saved project, the Host logged the late mutation_dispatch response and delivered the held mutation_end lease release, and the tag existed exactly once. The same idempotency key was refused with ResourceBusy naming the cancelled dispatch's outcomeUnknown admission and engineering_admission_reconcile. After tia_detach and a fresh owned tia_start, engineering_admission_reconcile released that admission without replay, the project reopened and a further tag_create applied.",
+  "limitations": [
+    "Source commit 131d0a7a differs from the built 4e2578e3 only in scripts/qualify_cancellation.py; src and every executable run are byte-identical to 4e2578e3.",
+    "One cancellation point (during checkpoint/apply of a tag_create) on one owned scratch CPU 1511-1 PN; the Host keeps the interrupted request in flight but cannot stop native work, and the cancelled dispatch's admission still needs the existing fresh-instance reconciliation. Cancellation before dispatch, during compile or save, and a worker crash during the interrupted request are covered by managed tests only."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "c141448480d77949b22350bc85c1766a29fdc59a0794fb2577c0739f2b839750"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "56e855fb4e4169bf99db23fcbf871eba54da440d8640efc2392354930e1fbe87"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "b3155f03d0ed46681ef5b7bd0380bcba1e2e709a52e0bc39bc8bf0218b62016f",
+      "bytes": 51662,
+      "completed": true,
+      "steps": [
+        "owned start",
+        "owned scratch",
+        "prepare tag_create",
+        "cancel change_apply while native work runs",
+        "status refused while the apply ran",
+        "outcome after the late completion",
+        "Host recorded the late response and released the lease",
+        "same key refused until reconciliation",
+        "tag created exactly once",
+        "cancelled dispatch admission held",
+        "close the original TIA",
+        "reconcile the admission",
+        "next change applies after reconciliation",
+        "owned worker shutdown"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_status",
+        "engineering_admission_reconcile",
+        "project_inventory",
+        "project_open",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_status"
+      ]
+    }
+  ]
+}

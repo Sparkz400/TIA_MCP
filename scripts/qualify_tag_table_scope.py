@@ -3,26 +3,29 @@ import argparse
 import json
 from pathlib import Path
 import subprocess
+import time
 import uuid
 from xml.etree import ElementTree as ET
 from smoke_mcp import Client, ROOT
 
 
-def candidate(address):
+def candidate(address, data_type='Bool'):
     return f'''<?xml version="1.0" encoding="utf-8"?>
 <Document><Engineering version="V21"/><SW.Tags.PlcTagTable ID="0"><AttributeList><Name>Signals</Name></AttributeList>
-<ObjectList><SW.Tags.PlcTag ID="1" CompositionName="Tags"><AttributeList><Name>Added</Name><DataTypeName>Bool</DataTypeName>
+<ObjectList><SW.Tags.PlcTag ID="1" CompositionName="Tags"><AttributeList><Name>Added</Name><DataTypeName>{data_type}</DataTypeName>
 <LogicalAddress>{address}</LogicalAddress></AttributeList></SW.Tags.PlcTag></ObjectList></SW.Tags.PlcTagTable></Document>'''
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--artifacts', type=Path, required=True)
+    # A packaged bundle passes host/TiaMcp.Host.exe and workers/openness/TiaMcp.Openness.V21.exe.
+    parser.add_argument('--host', type=Path, default=ROOT / 'src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe')
+    parser.add_argument('--worker', type=Path, default=ROOT / 'src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe')
     args = parser.parse_args()
     root = args.artifacts.resolve()
     root.mkdir(parents=True, exist_ok=False)
-    host = ROOT / 'src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe'
-    worker = ROOT / 'src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe'
+    host, worker = args.host.resolve(), args.worker.resolve()
     helper = ROOT / 'scripts/native/TagImportFixture/bin/Debug/net48/TagImportFixture.exe'
     client = Client(host, 180, ['--worker', str(worker), '--artifacts', str(root)])
     report = {'completed': False, 'steps': []}
@@ -37,7 +40,7 @@ def main():
         result = client.request('tools/call', {'name': name, 'arguments': arguments})
         value = result.get('structuredContent') or json.loads(result['content'][0]['text'])
         assert result.get('isError') and value['error']['code'] == code, value
-        record(code, value)
+        return record(code, value)
 
     def apply(prepared):
         return dict(changeId=prepared['changeId'], previewHash=prepared['previewHash'], checkpointSave=True,
@@ -61,21 +64,27 @@ def main():
         assert any(b['name'] == 'TagScopeBroken' and b['isConsistent'] is False for b in inv['blocks'])
         selectors = dict(projectName=project['name'], plcPath=plc)
 
-        def prepare(address):
+        def export():
             native = client.tool('tag_table_read', dict(selectors, tagTableName='Signals'))
             document = ET.fromstring(native['xml'])
-            table = document.find('SW.Tags.PlcTagTable')
-            objects = table.find('ObjectList')
+            return document, document.find('SW.Tags.PlcTagTable/ObjectList')
+
+        def payload(document):
+            for index, element in enumerate(e for e in document.iter() if 'ID' in e.attrib):
+                element.set('ID', format(index, 'X'))
+            return dict(selectors, kind='tag_table_import_xml',
+                        payload={'xml': ET.tostring(document, encoding='unicode'), 'expectedTableNames': ['Signals']})
+
+        def prepare(address, data_type='Bool'):
+            document, objects = export()
             added = next((t for t in objects.findall('SW.Tags.PlcTag') if t.findtext('AttributeList/Name') == 'Added'), None)
             if added is None:
-                added = ET.fromstring(candidate(address)).find('SW.Tags.PlcTagTable/ObjectList/SW.Tags.PlcTag')
+                added = ET.fromstring(candidate(address, data_type)).find('SW.Tags.PlcTagTable/ObjectList/SW.Tags.PlcTag')
                 objects.append(added)
             else:
                 added.find('AttributeList/LogicalAddress').text = address
-            for index, element in enumerate(e for e in document.iter() if 'ID' in e.attrib):
-                element.set('ID', format(index, 'X'))
-            return client.tool('change_prepare', dict(selectors, kind='tag_table_import_xml',
-                payload={'xml': ET.tostring(document, encoding='unicode'), 'expectedTableNames': ['Signals']}))
+                added.find('AttributeList/DataTypeName').text = data_type
+            return client.tool('change_prepare', payload(document))
 
         refuse('change_prepare', dict(selectors, kind='tag_table_import_xml', payload={'xml': candidate('%M50.1'), 'expectedTableNames': ['Signals']}), 'TagScopeMismatch')
         prepared = record('prepare despite inconsistent block', prepare('%M50.1'))
@@ -83,16 +92,67 @@ def main():
         applied = record('apply with existing diagnostic', client.tool('change_apply', apply(prepared)))
         assert applied['state'] == 'applied' and applied['compile']['compilerSucceeded'] is False
         assert applied['tagTableEvidence']['baselineCompile']['errorCount'] == applied['compile']['errorCount'] > 0
+        # Checkpoint save, mutation, compile, readback and final save are separate milestones (#211).
+        milestones = ['prechange_project_saved', 'mutation_applied', 'compile_finished', 'tag_table_content_verified', 'changed_project_saved']
+        assert [m for m in applied['stages'] if m in milestones][:len(milestones)] == milestones, applied['stages']
         table = record('native table readback', client.tool('tag_table_read', dict(selectors, tagTableName='Signals')))
         assert '<Name>Added</Name>' in table['xml'] and '<Name>Existing</Name>' in table['xml']
-        refuse('change_restore', {'changeId': prepared['changeId'], 'previewHash': prepared['previewHash']}, 'ScopedRecoveryRequired')
+        # A rename inside a replacement import is refused; renames go through tag_set (#210).
+        document, objects = export()
+        next(t for t in objects.findall('SW.Tags.PlcTag') if t.findtext('AttributeList/Name') == 'Existing').find('AttributeList/Name').text = 'Renamed'
+        refuse('change_prepare', payload(document), 'TagScopeMismatch')
+        reread = client.tool('tag_table_read', dict(selectors, tagTableName='Signals'))
+        def members(xml):
+            return sorted(tuple(t.findtext('AttributeList/' + f) for f in ('Name', 'DataTypeName', 'LogicalAddress'))
+                          for t in ET.fromstring(xml).iter('SW.Tags.PlcTag'))
+        record('table after refused rename', dict(identicalExport=reread['xml'] == table['xml'], xml=reread['xml']))
+        assert members(reread['xml']) == members(table['xml']), 'refused rename changed the table'
         stale = record('prepare stale candidate', prepare('%M50.2'))
         record('external scratch tag edit', subprocess.run([str(helper), 'drift', str(auth)], check=True, text=True, capture_output=True).stdout)
         refuse('change_apply', apply(stale), 'StaleRevision')
-        bad = record('prepare invalid address', prepare('%M20000.0'))
-        refuse('change_apply', apply(bad), 'CompileFailed')
-        outcome = record('retain regression failure', client.tool('change_status', {'changeId': bad['changeId']}))
+        # An unused tag with an out-of-range address compiles; the regression needs a reader.
+        record('native consumer diagnostic', subprocess.run([str(helper), 'consume', str(auth)], check=True, text=True, capture_output=True).stdout)
+        bad = record('prepare consumed type change', prepare('%MW60', 'Int'))
+        failed = refuse('change_apply', apply(bad), 'CompileFailed')
+        assert 'screen' not in failed['error']['message'], failed['error']['message']
+        outcome = record('retain regression failure', client.tool('change_status', {'changeId': bad['changeId'], 'includeDetails': True}))
         assert outcome['state'] == 'recovery_required' and Path(outcome['recoveryArchive']).is_file()
+        assert 'TagScopeConsumer' in json.dumps(outcome), 'regression must be the consumer diagnostic'
+        assert outcome['compile']['compilerSucceeded'] is False and 'changed_project_saved' not in outcome['stages'], outcome['stages']
+        assert 'mutation_applied' in outcome['stages'] and 'compile_finished' in outcome['stages']
+        # Scoped restore (#218): only the imported table, and only while every captured table is as the attempt left it.
+        restore_bad = {'changeId': bad['changeId'], 'previewHash': bad['previewHash']}
+        drift = lambda label: record(label, subprocess.run([str(helper), 'drift', str(auth)], check=True, text=True, capture_output=True).stdout)
+        drift('edit an unrelated table after the failed attempt')
+        refuse('change_restore', restore_bad, 'StaleRevision')
+        drift('return the unrelated table to the recorded state')
+        restored = record('scoped restore of the failed import', client.tool('change_restore', restore_bad))
+        assert restored['state'] == 'restored', restored['state']
+        assert all(s in restored['stages'] for s in ('scoped_restore_state_verified', 'scoped_tables_restored', 'scoped_restore_content_verified',
+                                                     'scoped_restore_compile_verified', 'scoped_restore_saved')), restored['stages']
+        signals = client.tool('tag_table_read', dict(selectors, tagTableName='Signals'))['xml']
+        assert ('Added', 'Bool', '%M50.1') in members(signals), members(signals)
+        compiled = next(r for r in restored['readbacks'] if r.get('role') == 'scoped-restore-compile')
+        assert compiled['baselineComparison']['verified'] is True and compiled['compile']['errorCount'] == 1, compiled['baselineComparison']
+        refuse('change_restore', {'changeId': prepared['changeId'], 'previewHash': prepared['previewHash']}, 'StaleRevision')
+        record('next import prepares without cleanup', prepare('%M50.3'))
+        # The restore saved the project: a fresh owned TIA must reopen it with the restored table.
+        record('close the restored session', client.tool('tia_detach'))
+        assert client.tool('tia_start')['ownsPortalProcess'] is True
+        for attempt in range(13):
+            opened = client.request('tools/call', {'name': 'project_open', 'arguments': {'path': project['path']}})
+            if not opened.get('isError'):
+                break
+            assert 'already been opened' in json.dumps(opened), opened
+            time.sleep(15)
+        else:
+            raise AssertionError('The project lock was not released within three minutes')
+        record('reopen the restored project', {'attempts': attempt + 1})
+        reopened = client.tool('tag_table_read', dict(selectors, tagTableName='Signals'))['xml']
+        assert members(reopened) == members(signals), (members(reopened), members(signals))
+        consumer = [b for b in client.tool('project_inventory')['blocks'] if b['name'] == 'TagScopeConsumer']
+        assert consumer and consumer[0]['isConsistent'] is True, consumer
+        record('reopened table and consumer equal the restore', members(reopened))
         report['completed'] = True
     finally:
         record('owned worker shutdown', client.close())

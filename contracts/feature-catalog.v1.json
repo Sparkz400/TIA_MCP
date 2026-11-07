@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.134",
+  "catalogVersion": "0.4.146",
   "targetTiaVersions": [
     21
   ],
@@ -4863,6 +4863,198 @@
         "The attached Host was deliberately terminated. Its worker completed the saved change and then exited with a broken transport; neither exit is normal-lifecycle evidence. The original owner, fresh reconciler and fresh reopen closed cleanly.",
         "One warm timing sample per mode, singles before batch, captures excluded; compiler caches, order and workload size prevent a general speed guarantee."
       ]
+    },
+    {
+      "id": "local.tag-table.scoped-import.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "8c5f32f71b6039f83c4b664d0e4f2f80fd01e480",
+        "passedScope": "scripts/qualify_tag_table_scope.py on Debug builds of e5445ef6 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 16/16 steps: TagImportFixture seeds tables Signals (Existing %M50.0) and Other (Untouched %M51.0) and an inconsistent SCL FC TagScopeBroken; a candidate omitting Existing is refused at prepare (TagScopeMismatch); tag_table_import_xml adding Added (Bool %M50.1) prepares despite the inconsistent block with scopePolicy tag-table-content-and-project-metadata-v1, applies with checkpoint, compile and save while the PLC's single pre-existing compiler error is unchanged against the baseline compile, and reads back Added and Existing natively; change_restore is refused (ScopedRecoveryRequired); an external edit of the unrelated table Other makes a prepared candidate StaleRevision at apply. Negative case: the fixture generates a consistent SCL FC TagScopeConsumer reading Added and proves natively that Added as Int at %MW60 fails it (Data type 'Int' cannot be converted implicitly into data type 'Bool'), then restores Bool; the same type change through MCP ends CompileFailed/recovery_required with before.zap21 retained and exactly the baseline error plus the consumer error. The worker exited on its own with code 0."
+      },
+      "artifacts": [
+        "evidence/local.tag-table.scoped-import.20261107.json"
+      ],
+      "limitations": [
+        "Source commit is the curator-only follow-up of e5445ef6; src and every executable run are byte-identical to e5445ef6, the commit that was built and run.",
+        "One owned scratch CPU 1511-1 PN at PLC-root scope with Bool/Int bit-memory tags and one inconsistent unrelated block; software units, namespaces, user constants, multilingual comments, F-PLCs, reopened projects and interrupted outcomes are not exercised by this run.",
+        "Project lock release after the worker exit was not verified (projectLockReleaseVerified false); no packaged or installed build was run."
+      ]
+    },
+    {
+      "id": "local.tag-table.replacement-compile.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "47b7510317a0f69f37ee0406ef79e5f97f724a5c",
+        "passedScope": "scripts/qualify_tag_table_scope.py on Debug builds of f1a78204 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 18/18 steps. Repeats every step of local.tag-table.scoped-import.20261107 and adds: a fresh native export of Signals with Existing renamed to Renamed is refused at prepare (TagScopeMismatch), and a second export shows the same members, types and addresses (only the export's Created timestamp differs); the applied import reports checkpoint save (prechange_project_saved), mutation_applied, compile_finished, tag_table_content_verified readback and changed_project_saved as separate stages in that order, with compilerSucceeded=false while the one pre-existing error is unchanged; the failed type-change apply reports compile.compilerSucceeded=false, mutation_applied and compile_finished without changed_project_saved, and a CompileFailed message without the Classic screen rollback wording."
+      },
+      "artifacts": [
+        "evidence/local.tag-table.replacement-compile.20261107.json"
+      ],
+      "limitations": [
+        "Source commit 47b75103 differs from the built f1a78204 only in scripts/qualify_tag_table_scope.py (member comparison after the refused rename); src and every executable run are byte-identical to f1a78204.",
+        "One owned scratch CPU 1511-1 PN at PLC-root scope with Bool/Int bit-memory tags; explicit renames and deletions use tag_set and tag_delete, which this run does not exercise (local.plc_object_mutations.rerun.20261028). User constants, software units and multilingual comments are covered by managed tests only.",
+        "Project lock release after the worker exit was not verified."
+      ]
+    },
+    {
+      "id": "local.compile-baseline.unrelated-errors.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "5a215447f2389e3a3318a052c74eb846fdea8e69",
+        "passedScope": "scripts/qualify_unrelated_errors.py on Debug builds of 5a215447 in one owned TIA V21 Update 3 scratch, 30/30 steps: the scratch CPU 1511-1 PN, an added CPU 1511F-1 PN (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) and two more standard CPUs whose interfaces share subnet Conflict and address 192.0.2.10, so every device compile reports errors while every block stays consistent. safety_import_xml re-imported Main_Safety_RTG1 with a comment: applied, saved and read back with compilerSucceeded=false and errorCount 2, the baseline comparison complete with 26 existing findings and no introduced error. In the same session, without restart or admission cleanup: network_configure of the F-CPU interface (device compile, the conflict still existing), tag_create of UnrelatedOk and source_upsert of an SCL FC UnrelatedConsumer reading it (PLC compiles clean). network_configure moving one conflicting CPU to 192.0.2.11 applied with 12 resolved findings and a clean compile. Negative: tag_set making UnrelatedOk an Int ended CompileFailed/recovery_required, unsaved, with the consumer's Data type 'Int' cannot be converted implicitly into data type 'Bool' as the only introduced error."
+      },
+      "artifacts": [
+        "evidence/local.compile-baseline.unrelated-errors.20261107.json"
+      ],
+      "limitations": [
+        "One owned scratch; the unrelated finding is a duplicate IP address between two empty standard CPUs, standing in for the 4 November SENTRON device error. Representative kinds only: safety_import_xml, network_configure, tag_create, source_upsert and tag_set; HMI kinds keep their own baseline rules, and library transactions use the shared comparison but are not exercised here.",
+        "An inconsistent block on any PLC still stops preparation of kinds that need the full project fingerprint (FingerprintUnavailable); same-PLC unrelated block errors are therefore not covered (#218).",
+        "Device compiles report shifting warning identities (introduced warnings beside zero introduced errors); outside tag-table imports new warnings are accepted, as before #221."
+      ]
+    },
+    {
+      "id": "local.tag-table.scoped-restore.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9e52a48e6dc35b22bd70e6fa14ab2c6e3bd646b3",
+        "passedScope": "scripts/qualify_tag_table_scope.py on Debug builds of e01f1ac1 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 26/26 steps. Repeats every step of local.tag-table.replacement-compile.20261107 and adds scoped recovery: after the failed type-change import (CompileFailed, recovery_required), an edit of the unrelated table Other makes change_restore refuse with StaleRevision and restore nothing; with Other returned to its recorded state, change_restore re-imports only Signals from its retained native export, verifies every captured table against the before capture, compiles like the baseline (the one pre-existing error, baselineComparison verified) and saves, ending restored with Added back as Bool %M50.1; the earlier applied change's restore refuses with StaleRevision; a new import prepares without admission cleanup; a fresh owned TIA reopens the saved project with the same Signals members and the consumer FC consistent."
+      },
+      "artifacts": [
+        "evidence/local.tag-table.scoped-restore.20261107.json"
+      ],
+      "limitations": [
+        "Source commit 9e52a48e differs from the built e01f1ac1 only in scripts/qualify_tag_table_scope.py (the reopen steps); src and every executable run are byte-identical to e01f1ac1.",
+        "Scoped restore covers tag_table_import_xml only, in place, without replacing the project; edits outside tag tables made after the attempt are kept and are not compared. Imports not recorded as applied (interrupted outcomes) still refuse with ScopedRecoveryRequired; whole-project restore remains refused for this kind.",
+        "One owned scratch CPU 1511-1 PN at PLC-root scope; one restored table that existed before the import. Deleting a table the import created is implemented but not exercised natively."
+      ]
+    },
+    {
+      "id": "local.bridge.cancellation.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "131d0a7a1ba1294c8a4f7772a6c485ad2bdcae78",
+        "passedScope": "scripts/qualify_cancellation.py on Debug builds of 4e2578e3 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 14/14 steps: change_apply of a prepared tag_create was sent and cancelled with notifications/cancelled as soon as the worker's journal showed native work. change_status was refused with PreviousOperationRunning (nothing sent) until the apply finished; then it reported applied with exactly one mutation_applied stage and a saved project, the Host logged the late mutation_dispatch response and delivered the held mutation_end lease release, and the tag existed exactly once. The same idempotency key was refused with ResourceBusy naming the cancelled dispatch's outcomeUnknown admission and engineering_admission_reconcile. After tia_detach and a fresh owned tia_start, engineering_admission_reconcile released that admission without replay, the project reopened and a further tag_create applied."
+      },
+      "artifacts": [
+        "evidence/local.bridge.cancellation.20261107.json"
+      ],
+      "limitations": [
+        "Source commit 131d0a7a differs from the built 4e2578e3 only in scripts/qualify_cancellation.py; src and every executable run are byte-identical to 4e2578e3.",
+        "One cancellation point (during checkpoint/apply of a tag_create) on one owned scratch CPU 1511-1 PN; the Host keeps the interrupted request in flight but cannot stop native work, and the cancelled dispatch's admission still needs the existing fresh-instance reconciliation. Cancellation before dispatch, during compile or save, and a worker crash during the interrupted request are covered by managed tests only."
+      ]
+    },
+    {
+      "id": "local.source-refresh.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "7f19f40665d4f008f973bbec39930ce292309ec7",
+        "passedScope": "scripts/qualify_source_refresh.py on Debug builds of 7f19f406 in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 7/7 steps: source_upsert created SCL FBs RefreshCallee and RefreshCaller (multi-instance call). block_read format=generatedSource exported RefreshCaller's own source (the temporary external source removed). source_upsert of exactly that source applied with checkpoint, compile and save; its source-refresh-comparison readback reported RefreshCaller with number 3 before and after, interface and body unchanged and only layout tokens changed (logicChanged=false, interfaceChanged=false, numbersPreserved=true), beside a complete compile.baselineComparison with no existing, resolved or introduced finding. The same source with one call argument changed from TRUE to FALSE reported logicChanged=true with interface and number unchanged."
+      },
+      "artifacts": [
+        "evidence/local.source-refresh.20261107.json"
+      ],
+      "limitations": [
+        "A stale-interface fixture could not be created through MCP: a change that leaves a block uncompiled fails its own after-change fingerprint. The 4 November alarm-ID resolution therefore remains a user-reported observation; no cause is inferred.",
+        "SCL FBs on one owned scratch CPU 1511-1 PN; STL and DB sources, software units and know-how protected blocks are not exercised. An interrupted refresh is reconciled by the generic routes of local.bridge.cancellation.20261107."
+      ]
+    },
+    {
+      "id": "local.unresolved-symbols.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "6b9a9c4d8ef57f7ff327fe1f26d50d9fe4c22321",
+        "passedScope": "scripts/qualify_unresolved_symbols.py on Debug builds of 6b9a9c4d in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 9/9 steps: TagImportFixture seeded the SCL FC TagScopeBroken reading the undefined tag UnresolvedFlag (isConsistent=false). block_read of its XML was refused by TIA and returned BlockExportUnavailable with programmingLanguage SCL and the generatedSource fallback; block_read format=generatedSource returned source containing \"UnresolvedFlag\" and the block stayed inconsistent. plc_compile applied and its compile.unresolvedSymbols listed kind Tag, name UnresolvedFlag at TagScopeBroken. An explicit tag_table_import_xml of table Repair with UnresolvedFlag (Bool %M90.0) applied beside the inconsistent block, resolved the finding (baselineComparison resolved, unresolvedSymbols empty), left TagScopeBroken consistent and kept its own change journal."
+      },
+      "artifacts": [
+        "evidence/local.unresolved-symbols.20261107.json"
+      ],
+      "limitations": [
+        "SCL only; graphical (LAD/FBD) blocks with deleted symbols cannot be exported as XML or generated source, and no native graphical fixture was run. The repair symbol is an ordinary journaled tag change, not a temporary alias; no alias workflow is implemented.",
+        "unresolvedSymbols parses TIA's English compiler message text (Tag/Block/Data type/Constant \"name\" not defined); other UI languages list nothing."
+      ]
+    },
+    {
+      "id": "local.drives.inventory.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "effde68b27d8b526e84346f68b62637bcf4803f1",
+        "passedScope": "scripts/qualify_drive_inventory.py on Debug builds of effde68b in one owned TIA V21 Update 3 scratch, 20/20 steps: the scratch CPU 1511-1 PN on subnet DriveNet (192.0.2.10) and two added SINAMICS G120C PN drives (Drive1, Drive2) on that subnet, each assigned to the CPU's new IO system DriveIoSystem with network_io_assign (compile and save). drive_inventory reported drive coverage complete (both drives in driveObjectIndex mode because Startdrive cannot read their drive object numbers), two drives, noDrivesConfirmed=false, and each drive's main telegram 1 with 4 input and 4 output bytes at native addresses (Drive1 input/output byte 256, Drive2 260). tag_table_import_xml added Word tags at exactly those start addresses except Drive2's output; drive_inventory then joined Drive1Item_ZSW1 %IW256, Drive1Item_STW1 %QW256 and Drive2Item_ZSW1 %IW260 to their telegram ranges by address, listed Drive2's output range as the only telegram range without tags and both drives as without technology object, and was writeReady with no blockers."
+      },
+      "artifacts": [
+        "evidence/local.drives.inventory.20261107.json"
+      ],
+      "limitations": [
+        "No technology object is connected; the technology join, ambiguous tag ownership across PLCs, tags spanning telegrams, partial or unavailable Startdrive coverage and duplicate axis associations are covered by managed tests only.",
+        "Two G120C PN drives with one drive object and telegram 1 each; S120/S210 multi-axis drives, supplementary or safety telegrams and nonsequential address gaps are not exercised natively."
+      ]
+    },
+    {
+      "id": "local.safety.drive-tags.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "7c0d221f1ac12a1fdff72a585a081ba13261ac60",
+        "passedScope": "scripts/qualify_safety_drive_tags.py on Debug builds of 21542b8a in one owned TIA V21 Update 3 scratch, 13/13 steps: an added CPU 1511F-1 PN (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) on subnet SafeNet as IO controller of a SINAMICS G120C PN 6SL3210-1KE21-3AF1 (firmware 4.7.14) assigned with network_io_assign; the native fixture helper inserted PROFIsafe telegram 30 through Startdrive Openness; drive_inventory showed telegram 30 at input and output byte 0 (48 bits) beside main telegram 1 at byte 256 and was writeReady. A generic tag_create at %IW0 on the F-PLC was refused at prepare with SafetyBoundary naming the drive. safety_drive_tags without safetyAcknowledged was refused with InvalidRequest; with it, it planned S_ZSW1 SafeDrive_S_ZSW1 at %IW0 and S_STW1 SafeDrive_S_STW1 at %QW0 (Word) in Default tag table, applied with checkpoint, baseline and device compile and save, change_status confirmed the applied state, and software_inspect read both back as Word safety tags at those addresses. A repeat was refused with ObjectExists, and change_restore returned the checkpoint (restored)."
+      },
+      "artifacts": [
+        "evidence/local.safety.drive-tags.20261107.json"
+      ],
+      "limitations": [
+        "One SINAMICS G120C PN with PROFIsafe telegram 30 on one owned F-CPU 1511F-1 PN; other telegrams (for example 900-series), S120/S210 drives, several drive objects and user tag-table groups are refused or not exercised.",
+        "The PROFIsafe telegram was inserted by the qualification fixture, not by an MCP route. No F-destination address, Safety Integrated parameter, safety acceptance, password or download; compile success is engineering evidence, not machine safety acceptance. Interruption of this kind is covered only by the generic routes of local.bridge.cancellation.20261107.",
+        "Source commit adds only the change_status check and release owner to scripts after the built 21542b8a; src and every executable run are byte-identical to it."
+      ]
+    },
+    {
+      "id": "local.drives.servo-calls.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "35e39ed75921f2a9768f88df0d2546149a2b0551",
+        "passedScope": "scripts/qualify_servo_calls.py on Debug builds of 35e39ed7 in one owned TIA V21 Update 3 scratch, 30/30 steps: the scratch CPU 1511-1 PN with two SINAMICS G120C PN drives assigned to its IO system (telegram 1 at bytes 256 and 260), Word tags at each telegram's start addresses, Bool signals Reset, DoorOpen and SS1, and an SCL wrapper FB ServoWrap (inputs zsw Word, reset Bool, ss1 Bool; outputs stw Word, fault Bool). servo_call_plan with the explicit mapping status=zsw, control=stw, reset=reset, ss1=ss1, fault=fault, resetExpression \"Reset\" AND NOT \"DoorOpen\" and ss1Expression \"SS1\" was writeReady; its source_upsert applied with checkpoint, compile (compilerSucceeded) and save. The generated caller Servos holds exactly one call and one fault Bool per drive instance (Axis1, Axis2), and symbol_trace lists only Servos as writer of Drive1Item_STW1 and Drive2Item_STW1. After an FC OldWriter wrote Drive1Item_STW1, a new plan was not writeReady and named OldWriter in a duplicateControlWriter blocker."
+      },
+      "artifacts": [
+        "evidence/local.drives.servo-calls.20261107.json"
+      ],
+      "limitations": [
+        "A synthetic SCL wrapper FB stands in for a vendor servo block; two G120C PN drives with telegram 1 only. Watch tables, instance DBs outside the caller and graphical callers are not planned.",
+        "Engineering evidence only: reset and SS1 expressions are applied as given; no safety program, machine behavior, commissioning or download is verified."
+      ]
+    },
+    {
+      "id": "local.change.confirmed-intent.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "fc4c00cb9ed552c3868d2333088cbe3dcb5ede02",
+        "passedScope": "scripts/qualify_confirmed_intent.py on Debug builds of fc4c00cb in one owned TIA V21 Update 3 scratch (CPU 1511-1 PN), 7/7 steps: change_prepare of tag_create Reset with intent (decision door-reset with source, target Servos, symbols Reset/DoorOpen, statement and meaning; one observed fact; one assumption) recorded it in preview.intent with the fixed verificationScope (machine safety behavior not verified) and no earlier decisions; after apply, change_status returned the identical intent. A second tag_create with the same decision listed it under previouslyConfirmed with the first change's id and no conflict, and applied. A third with a changed statement listed one conflict with the earlier statement and a preview warning. An intent with an unknown key (guess) was refused with InvalidRequest."
+      },
+      "artifacts": [
+        "evidence/local.change.confirmed-intent.20261107.json"
+      ],
+      "limitations": [
+        "Intent is recorded, compared by decision id and bound to the preview hash; the tool never checks an implementation against it or evaluates machine safety behavior. Decisions are compared per project path within one Host artifact directory.",
+        "Exercised with tag_create only; every change kind passes intent through the same change_prepare path."
+      ]
     }
   ],
   "features": [
@@ -5581,14 +5773,16 @@
         "status": "implemented",
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "Optional format=simaticSd|generatedSource is a separate, unqualified feature (plc.document_formats); this evidence covers only the default SimaticML XML export."
+          "Optional format=simaticSd|generatedSource is a separate, unqualified feature (plc.document_formats); this evidence covers only the default SimaticML XML export.",
+          "Inconsistent blocks (since 7 November 2026, #215): when TIA refuses the XML export of an inconsistent block, block_read returns BlockExportUnavailable with its language and, for SCL/STL/DB, the generatedSource route, which reads it unchanged (local.unresolved-symbols.20261107)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.smoke.20261024",
-          "local.milestones.20261024"
+          "local.milestones.20261024",
+          "local.unresolved-symbols.20261107"
         ]
       },
       "availability": {
@@ -7005,7 +7199,8 @@
           "Releases only when the admitted TIA process has exited and every admitted resource is proven unchanged or verifiedApplied by fresh fingerprints, library revisions, hashes or not-written-since-admission checks; otherwise the reservation stays held with reasons.",
           "An interrupted apply is proven unchanged only when its project was last saved before the checkpoint archive was written; kinds whose outcome fingerprint needs prepared in-memory targets (HMI, attribute, tag/constant set, connection set, technology) stay held after a save or transport loss; library apply outputs and partial destinations stay held.",
           "Never replays, saves, powers or downloads.",
-          "Natively qualified by process termination of the worker and its owned TIA, or of the Host, once per scenario; power loss, disk faults and remote-worker transport are not exercised."
+          "Natively qualified by process termination of the worker and its owned TIA, or of the Host, once per scenario; power loss, disk faults and remote-worker transport are not exercised.",
+          "Interrupted calls (since 7 November 2026, #217): a cancelled or timed-out request that reached the worker keeps running and is never replayed; later calls are refused with PreviousOperationRunning until it finishes, then its late response is recorded and the session continues without a Host restart (local.bridge.cancellation.20261107)."
         ]
       },
       "qualification": {
@@ -7013,7 +7208,8 @@
         "evidenceIds": [
           "local.engineering.interruption-matrix.20261027",
           "local.engineering.interruption.20261029",
-          "local.engineering.boundaries.rerun.20261029"
+          "local.engineering.boundaries.rerun.20261029",
+          "local.bridge.cancellation.20261107"
         ]
       },
       "availability": {
@@ -7815,7 +8011,9 @@
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "One exact native group and namespace per change; cross-scope relocation and implicit namespace changes are rejected.",
           "SIMATIC_SD imports independently authored .s7dcl graphical reference documents through native ImportFromDocuments, mandatory compilation and checkpointing; only new exact declared names are permitted and existing blocks cannot be replaced by this route.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107).",
+          "Refresh evidence (since 7 November 2026, #216): a compiled source_upsert compares each existing block's native export before and after and reports number, interface, body (without layout tokens) and layout per block in the source-refresh-comparison readback; it is an observation beside compile.baselineComparison and infers no cause (local.source-refresh.20261107)."
         ]
       },
       "qualification": {
@@ -7823,7 +8021,9 @@
         "evidenceIds": [
           "local.milestones.rerun.20261028",
           "local.plc_object_mutations.rerun.20261028",
-          "local.safety.fio-block-routes.20261102"
+          "local.safety.fio-block-routes.20261102",
+          "local.compile-baseline.unrelated-errors.20261107",
+          "local.source-refresh.20261107"
         ]
       },
       "availability": {
@@ -8078,14 +8278,20 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Every imported tag whose LogicalAddress is an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses the whole import at prepare and again before the native import with SafetyBoundary (TIA would make it a safety tag); nothing is imported (1 November 2026; rechecked natively in local.safety.fio-routes.20261101)."
+          "Every imported tag whose LogicalAddress is an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses the whole import at prepare and again before the native import with SafetyBoundary (TIA would make it a safety tag); nothing is imported (1 November 2026; rechecked natively in local.safety.fio-routes.20261101).",
+          "Preparation fingerprints only tag-table contents in the selected software scope plus project/hardware/network/software/type/block metadata (tag-table-content-and-project-metadata-v1), so an unrelated inconsistent block no longer blocks it; block payloads are not covered, the change must keep every existing member (TagScopeMismatch), apply compares compiler diagnostics with a baseline compile and refuses new or changed ones, and automatic whole-project restore is refused (ScopedRecoveryRequired). Natively checked in local.tag-table.scoped-import.20261107.",
+          "A replacement import cannot rename or delete: a candidate missing an existing member, including one renamed in place, is refused at prepare with TagScopeMismatch. Use tag_set (Name) or tag_delete/constant_delete for intended renames and deletions. Results report checkpoint save, mutation, compile, readback and final save as separate stages, and compile.compilerSucceeded is reported on failed applies too (local.tag-table.replacement-compile.20261107).",
+          "Scoped restore (since 7 November 2026, #218): change_restore re-imports only the imported tables from their retained native exports (hash-checked), in place, while every captured table is exactly as the attempt left it (else StaleRevision), then verifies them, compiles like the baseline and saves; the project is never replaced, and an import not recorded as applied still refuses with ScopedRecoveryRequired (local.tag-table.scoped-restore.20261107)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
-          "local.safety.fio-routes.20261101"
+          "local.safety.fio-routes.20261101",
+          "local.tag-table.scoped-import.20261107",
+          "local.tag-table.replacement-compile.20261107",
+          "local.tag-table.scoped-restore.20261107"
         ]
       },
       "availability": {
@@ -8980,14 +9186,16 @@
           "Attribute preflight precedes subnet changes, but subsequent metadata/type changes or native failures can leave partial effects requiring checkpoint recovery.",
           "Apply runs the worker's configured-hardware preservation stage, also with compile=false: only the selected node's requested allowlisted attributes and requested subnet may change. Any other node, attribute, address, I/O-system or connector change refuses, including one TIA couples to the request (for example an address reassigned on a subnet connect), and change_restore compares the retrieved hardware with the prechange manifest. An interrupted apply reconciles on the configured-hardware route.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
+          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.milestones.rerun.20261028",
-          "local.hardware_changes.families.20261029"
+          "local.hardware_changes.families.20261029",
+          "local.compile-baseline.unrelated-errors.20261107"
         ]
       },
       "availability": {
@@ -9377,14 +9585,16 @@
           "Fingerprint coverage remains explicitly incomplete: protected native system-group generated payload checksums are excluded only with available owning-PLC safety signatures; identity, modification, protection, consistency and exposed safety metadata remain covered. User/editable fingerprint failures still fail closed.",
           "No changed F-logic behavior, safety-unit, F-I/O, commissioning or arbitrary safety-target qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "2026-10-28: the import compiles every device, not only the PLC software; a PLC-only compile had left the F-compiler block DB1_C inconsistent until the next device compile (local.safety_import.20261028). Natively qualified with the device compile under an activated STEP 7 Safety license on a CPU 1511F-1 PN in an owned scratch (local.safety_import.device-compile.20261028): the generated F-FBD block Main_Safety_RTG1 re-imported with a comment change, every F-PLC block including DB1_C consistent right after the import, exact diff, fresh reopen, checkpoint restore and refusals for a missing acknowledgement, a scope mismatch, a standard block and a wrong previewHash. A project with a device that cannot be compiled (for example a Startdrive drive) cannot apply it."
+          "2026-10-28: the import compiles every device, not only the PLC software; a PLC-only compile had left the F-compiler block DB1_C inconsistent until the next device compile (local.safety_import.20261028). Natively qualified with the device compile under an activated STEP 7 Safety license on a CPU 1511F-1 PN in an owned scratch (local.safety_import.device-compile.20261028): the generated F-FBD block Main_Safety_RTG1 re-imported with a comment change, every F-PLC block including DB1_C consistent right after the import, exact diff, fresh reopen, checkpoint restore and refusals for a missing acknowledgement, a scope mismatch, a standard block and a wrong previewHash. A project with a device that cannot be compiled (for example a Startdrive drive) cannot apply it.",
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.safety_import.device-compile.20261028",
-          "local.safety_changes.allowlist.20261031"
+          "local.safety_changes.allowlist.20261031",
+          "local.compile-baseline.unrelated-errors.20261107"
         ]
       },
       "availability": {
@@ -9445,6 +9655,56 @@
           "local.safety_changes.20261028",
           "local.safety.fparameter_discovery.20261031",
           "local.safety_changes.allowlist.20261031"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 with STEP 7 Safety and an authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.safety_drive_tags",
+      "domain": "safety",
+      "title": "Create a drive's PROFIsafe telegram 30 safety tags",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "safety_drive_tags",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Startdrive Openness DriveObject.Telegrams (TelegramType.SafetyTelegram, TelegramNumber, Addresses) and STEP 7 PlcTagComposition.Create with PlcTag.IsSafety readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload: hardwarePath and driveObjectNumber or driveObjectIndex of one drive object, tagTableName (a table in the PLC's root tag-table group), tags {status, control} and safetyAcknowledged: true. Creates S_ZSW1 at %IW<input start> and S_STW1 at %QW<output start> as Word, from Startdrive's addresses of PROFIsafe telegram 30 only.",
+          "Refuses without acknowledgement or writable safety administration (UnsupportedCapability), without a PROFIsafe telegram (SafetyTelegramMissing), for any telegram other than 30 (UnsupportedSafetyTelegram), for a name or overlapping address already in use (ObjectExists, AddressInUse) and for an address outside an F-I/O range of this drive that the selected F-PLC owns (SafetyBoundary). Apply re-plans, refuses StaleRevision on any difference, reads every tag back as a safety tag and compiles the device.",
+          "Generic tag routes keep refusing these addresses: shared F-I/O ranges include drives' PROFIsafe telegram addresses since 7 November 2026."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.safety.drive-tags.20261107"
         ]
       },
       "availability": {
@@ -10803,14 +11063,16 @@
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
           "A preceding write that changes another requested attribute type causes refusal before that later setter; split dependent edits into separately reviewed changes. Earlier setters can already have taken effect.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "A LogicalAddress change to an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native write with SafetyBoundary (TIA would make the tag a safety tag); nothing is written (1 November 2026; rechecked natively in local.safety.fio-routes.20261101)."
+          "A LogicalAddress change to an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native write with SafetyBoundary (TIA would make the tag a safety tag); nothing is written (1 November 2026; rechecked natively in local.safety.fio-routes.20261101).",
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
-          "local.safety.fio-routes.20261101"
+          "local.safety.fio-routes.20261101",
+          "local.compile-baseline.unrelated-errors.20261107"
         ]
       },
       "availability": {
@@ -11018,14 +11280,22 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact existing table selector plus explicit name, dataTypeName and logicalAddress; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
           "Safety units are rejected. An absolute input or output address (%I/%Q or %E/%A, bit to long word) inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native create with SafetyBoundary, because TIA makes such a tag a safety tag; nothing is created (1 November 2026; native run sl3 had created it first; the prepare refusal rechecked natively on an F-CPU with ET 200SP F-DI in local.safety.fio-routes.20261101). A created tag that TIA still reports as IsSafety fails verification and requires checkpoint recovery.",
-          "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0)."
+          "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0).",
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107).",
+          "Interrupted calls (since 7 November 2026, #217): a cancelled or timed-out request that reached the worker keeps running and is never replayed; later calls are refused with PreviousOperationRunning until it finishes, then its late response is recorded and the session continues without a Host restart (local.bridge.cancellation.20261107).",
+          "A tag on a drive's PROFIsafe telegram address is refused at prepare with SafetyBoundary since 7 November 2026; earlier only modules with Failsafe_FDestinationAddress counted as F-I/O (local.safety.drive-tags.20261107).",
+          "change_prepare accepts optional confirmed intent (decisions, observedFacts, assumptions), recorded in the hash-bound preview, compared with earlier applied decisions of the project (previouslyConfirmed, conflicts) and never evaluated (local.change.confirmed-intent.20261107)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
-          "local.safety.fio-routes.20261101"
+          "local.safety.fio-routes.20261101",
+          "local.compile-baseline.unrelated-errors.20261107",
+          "local.bridge.cancellation.20261107",
+          "local.safety.drive-tags.20261107",
+          "local.change.confirmed-intent.20261107"
         ]
       },
       "availability": {
@@ -23171,13 +23441,15 @@
           "Explicit PLC software only, empty payload and compile=true. Saves the current project and creates a checkpoint before compiler dispatch; compilation may change generated state.",
           "Native compile dispatch, persistence and checkpoint recovery are qualified on the scratch profile; safety signatures are not.",
           "Existing engineering fingerprint coverage remains incomplete; this route does not establish whole-project preservation or PLC runtime correctness.",
-          "4 November compile-only completion and identity/save-state fingerprint changes have offline coverage; native regression qualification of these changes remains open. Existing evidence describes the earlier policy."
+          "4 November compile-only completion and identity/save-state fingerprint changes have offline coverage; native regression qualification of these changes remains open. Existing evidence describes the earlier policy.",
+          "Every compile result lists unresolvedSymbols (kind, name, target, location) parsed from TIA's English 'not defined' messages; nothing is resolved or guessed (local.unresolved-symbols.20261107)."
         ]
       },
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.unresolved-symbols.20261107"
         ]
       },
       "availability": {
@@ -26909,6 +27181,96 @@
         "evidenceIds": [
           "local.drives.index.20261101",
           "local.drives.index-status.20261101"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SINAMICS Startdrive V21 Openness and a project with Startdrive drive devices; probe with target_capabilities on the drive hardware item."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "SINAMICS Startdrive V21 installed with its Openness assembly",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "drive_inventory",
+      "domain": "drives",
+      "title": "Read a joined drive, telegram, tag and technology-object inventory",
+      "mcpTools": [
+        "drive_inventory"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Host composition of drive_observe, project_inventory, software_inspect and technology_read; no new native call."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Startdrive reports no owning PLC for a telegram, so tags join a telegram range by address overlap in every PLC; matches in several PLCs are reported as ambiguous and block dependent writes.",
+          "Technology objects join a drive when a resolved hardware or channel reference of their connections equals the drive's hardware path, lies below it, or is its parent; a parent link that reaches several drives is ambiguous.",
+          "Tag addresses are parsed from %I/%E/%Q/%A bit, byte, word and double-word forms (optional :P); memory, DB and symbolic-only tags are not matched."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.drives.inventory.20261107"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SINAMICS Startdrive V21 Openness and a project with Startdrive drive devices; probe with target_capabilities on the drive hardware item."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "SINAMICS Startdrive V21 installed with its Openness assembly",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "servo_call_plan",
+      "domain": "drives",
+      "title": "Plan coordinated servo wrapper calls per drive",
+      "mcpTools": [
+        "servo_call_plan"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Host composition of drive_inventory, block_read (wrapper interface) and symbol_trace (control-tag writers); the plan is applied through source_upsert."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Generates one new or replaced SCL caller FB; existing networks in other blocks are untouched. An existing writer of a selected control tag other than the caller blocks the plan instead of being rewritten.",
+          "Wrapper parameters are matched by the explicit mapping and the wrapper's native interface section and type; reset and SS1 are single SCL expressions applied as given.",
+          "Watch tables and instance DBs outside the caller are not planned."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.drives.servo-calls.20261107"
         ]
       },
       "availability": {
