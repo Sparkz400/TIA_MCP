@@ -44,6 +44,7 @@ namespace TiaMcp.Simulator.V8
                 case "sim_write_owned": return WriteOwned(args);
                 case "sim_time": return Time(args);
                 case "sim_event": return Event(args);
+                case "sim_record": return Record(args);
                 case "sim_storage": return Storage(args);
                 case "sim_read_signals": return SignalsRead(args);
                 case "sim_write_signals": return SignalsWrite(args);
@@ -453,6 +454,8 @@ namespace TiaMcp.Simulator.V8
                 }
             }
             else { RequireNoCapture(selected); RestoreCaptureMode(selected); }
+            StopWatch(selected);
+            StopRecords(selected);
             selected.Instance.Dispose();
             _instances.Remove(selected.Id);
             return new JObject { ["instanceId"] = selected.Id, ["instanceName"] = selected.Name, ["unregistered"] = remove,
@@ -820,6 +823,8 @@ namespace TiaMcp.Simulator.V8
             foreach (var selected in _instances.Values)
             {
                 try { RestoreCaptureMode(selected); } catch (Exception ex) { Console.Error.WriteLine("Simulator capture mode restore: " + ex.Message); }
+                try { StopWatch(selected); } catch (Exception ex) { Console.Error.WriteLine("Simulator watch release: " + ex.Message); }
+                try { StopRecords(selected); } catch (Exception ex) { Console.Error.WriteLine("Simulator data record release: " + ex.Message); }
                 try { selected.Instance.Dispose(); } catch (Exception ex) { Console.Error.WriteLine("Simulator interface release: " + ex.Message); }
             }
             _instances.Clear();
@@ -828,7 +833,7 @@ namespace TiaMcp.Simulator.V8
 
         private sealed class Selection { internal IInstance Instance; internal int Id; internal string Name; internal bool Owned; internal string Storage;
             internal string CreationRoot; internal JObject CreationReceipt; internal EOperatingMode? CaptureRestoreMode, CaptureMode;
-            internal bool CaptureHeld; }
+            internal bool CaptureHeld; internal WatchBuffer Watch; internal RecordArm Records; }
         private sealed class Signal { internal string Symbol; internal string Type; internal JToken Value; }
     }
 }

@@ -51,14 +51,15 @@ The simulator MCP tool names match the `sim_*` bridge operations below. Engineer
 | `sim_write_signals` | `instanceId`, `writes` array of 1–64 `{symbol,type,value}` with distinct symbols. Owned instances only; output tags are refused; one `WriteSignals` call. |
 | `sim_area_read` | `instanceId`, `area` (`input`, `output`, `marker`), `offset`, optional `length` (1–1024, default 1) or `bit` (0–7). Reads process-image bytes or one bit by address. |
 | `sim_area_write` | `instanceId`, `area` (`input`, `marker`), `offset`, then `bytes` (1–1024 values 0–255) or `bit` with a boolean `value`. Owned instances only. |
-| `sim_observe` | `instanceId`, optional `windowMs` (0–60000, default 0), `maxEvents` (1–256, default 64) and `includeDisplayData`. Operating state, mode and display data, plus bounded operating-state, LED, IP-address and configuration-change notifications within the window. State, LED and IP notifications have native evidence; software/hardware configuration delivery remains unqualified. |
+| `sim_observe` | `instanceId`, optional `windowMs` (0–60000, default 0), `maxEvents` (1–256, default 64) and `includeDisplayData`. Operating state, mode and display data, plus bounded operating-state, LED, IP-address and configuration-change notifications within the window. State, LED and IP notifications have native evidence, and a `watch` around a download its software-configuration change; hardware-configuration delivery remains unqualified. `watch` (`start`/`collect`) buffers changes across other tool calls. |
 | `sim_test` | `instanceId`, `artifactDirectory`, `signals`, `steps`, optional `intervalMs` and `virtualTime`. Applies timed stimuli, captures values, evaluates assertions, and retains a JSON report. Steps with `writes` and `virtualTime: true` need an owned instance; a step write to an output tag refuses the scenario before it starts. `virtualTime: true` steps virtual time; see [Virtual time, events and storage](#virtual-time-events-and-storage). |
 | `sim_time` | `instanceId`, optional `scaleFactor` and `systemTimeUtc`. Reads, or on an owned instance sets and reads back, the virtual clock. |
 | `sim_event` | `instanceId`, optional `event`. Lists the configured hardware-interrupt events and injects one interrupt or fault into an owned instance in RUN. |
+| `sim_record` | `instanceId`, `action` (`arm` with `responses`, or `collect` with optional `windowMs`). Answers the program's `RDREC`/`WRREC` on an owned instance from a reviewed response table and logs every request. |
 | `sim_storage` | `instanceId`, `artifactDirectory`, `action` (`archive`, `retrieve`), and for retrieve `archivePath` and `expectedSha256`. Archives or restores an owned, powered-off instance's virtual memory card. |
 | `sim_release` | `instanceId`, optional `deleteOwned`. Releases the worker's interface; without `deleteOwned` it is refused with `SimulationCaptureModeActive` while a cycle-synchronous capture holds the instance, and otherwise retries a capture-mode restore that failed. Explicit `deleteOwned:true` powers off and unregisters only an instance created by this worker. Storage files are retained. |
 
-Runtime action calls require an instance created or explicitly selected by the current worker. Reads and observation (`sim_read`, `sim_read_signals`, `sim_tags`, `sim_area_read`, `sim_observe`, reading `sim_time`) work on any selected instance. Everything that writes or changes the instance (`sim_state`, `sim_write`, `sim_write_signals`, `sim_area_write`, scenario writes and `virtualTime` in `sim_test`, setting `sim_time`, `sim_event`, `sim_storage`) needs one this worker created or adopted with its `creationId`; otherwise it fails with `OwnedInstanceRequired`.
+Runtime action calls require an instance created or explicitly selected by the current worker. Reads and observation (`sim_read`, `sim_read_signals`, `sim_tags`, `sim_area_read`, `sim_observe`, reading `sim_time`) work on any selected instance. Everything that writes or changes the instance (`sim_state`, `sim_write`, `sim_write_signals`, `sim_area_write`, scenario writes and `virtualTime` in `sim_test`, setting `sim_time`, `sim_event`, `sim_record`, `sim_storage`) needs one this worker created or adopted with its `creationId`; otherwise it fails with `OwnedInstanceRequired`.
 
 A simulator call still running when the Host's bridge timeout (`--timeout-seconds`, default 120) expires faults the simulator bridge until the Host restarts, so the Host refuses waits that cannot end 5 s before it with `InvalidRequest`: the `sim_observe` window, the `sim_state` `timeoutMs` (twice it for `powerOn`, whose failure is followed by a power-off) and `sim_test`, whose 90 s execution cap needs `--timeout-seconds` of at least 105. Cancelling a tool call does not interrupt the simulator call; it runs to completion. The worker verifies that the recorded ID/name still exists; it does not substitute another instance if an ID is reused. Power-on, RUN, writes, scenarios and `sim_identity` require the network mode that matches the interface recorded at creation: Softbus instances need existing local `Softbus` mode and a Softbus interface (otherwise `SoftbusRequired`); `TCPIP` instances need existing TCP/IP single-adapter mode and a TCP/IP interface (otherwise `TcpIpModeRequired`, also when the operator switches back to Softbus mid-window). PLCSIM V8 derives an instance's interface from the machine-wide mode, so the worker only compares it. Selections without a creation receipt stay Softbus-only. This adapter never changes shared adapter bindings/network mode or IP addresses and never uses remote instance discovery or an online physical-PLC download API. Engineering-side provisioning (`simulation_download`, credential provisioning) admits the network mode recorded in the ticket, Softbus or TCP/IP; only the discovery before `sim_create` requires Softbus.
 
@@ -158,6 +159,16 @@ selected instance. None of them touches the machine-wide network mode, adapters 
   The 2 November owned ET 200SP fixture observed OB55/56/57 counter increases for all three extended
   event kinds on six distributed hardware identities, with invalid targets refused
   (`local.plcsim.extended-events.20261102`; [scope and limits](../verification/local-completion-20261102.md#simulator-and-release-controls)).
+- **Data records.** `sim_record` `arm` takes 1-16 response rows, each `hardwareId` (1-65535) and
+  `recordIndex` (0-65535) once, with `read: {bytes (1-1024), status?}` and/or `write: {status?}`, and
+  subscribes `OnDataRecordRead`/`OnDataRecordWrite` on the owned instance. A program's `RDREC` (SFB 52) or
+  `WRREC` (SFB 53) whose hardware ID and index match a row is answered with `ReadRecordDone`/`WriteRecordDone`
+  while later tool calls run; a request without a row is logged and left unanswered, so the program sees its
+  own timeout. `collect` returns the log (kind, hardware ID, index, size, written bytes, whether and how it
+  was answered; up to 256 requests) and unsubscribes. A second `arm` is `SimulationRecordsActive`, a
+  `collect` without one `SimulationRecordsInactive`; `sim_release` and the worker's shutdown unsubscribe.
+  Natively a program's `RDREC`/`WRREC` on a central DI module round-tripped four bytes each way, and a read
+  without a row stayed unanswered (`local.plcsim.records.20261107`).
 - **Memory reset.** `sim_state` `memoryReset` calls `MemoryReset` and requires STOP or RUN afterwards.
 - **Storage.** `sim_storage` needs the owned instance powered off. `archive` writes
   `<instance>-<guid>.zip` and a receipt with its SHA-256 to the Host's `simulation-archives` directory;
@@ -199,6 +210,11 @@ otherwise), and are refused before any runtime call when a value or bound is inv
   the program (for example `STP`, a cycle-time error), the PLCSIM control panel, TIA Portal or other API
   clients; a `sim_state` change is never inside it. A STOP to RUN arrives as `Stop`→`Startup` and
   `Startup`→`Run`, with the RUN and STOP LEDs flashing in between.
+  `watch: "start"` (with `windowMs` 0) instead keeps the subscriptions, software- and hardware-configuration
+  and IP-address changes included, on the selection and buffers up to `maxEvents` changes, also those made
+  by later tool calls such as a `simulation_download_online`; `watch: "collect"` returns them after an
+  optional further `windowMs` and unsubscribes. A second start is `SimulationWatchActive`, a collect
+  without a start `SimulationWatchInactive`; `sim_release` and the worker's shutdown end a watch.
 
 All five were verified natively on one owned Softbus CPU 1511 instance against single `sim_read` calls,
 PLC tags at the addressed bytes, the polled operating state and a separate PLCSIM API client's own log

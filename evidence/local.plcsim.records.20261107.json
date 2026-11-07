@@ -1,0 +1,130 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.plcsim.records.20261107",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-07T21:22:44+00:00",
+  "source": {
+    "commit": "fedf1231db029c185d0b38c037ffe66f2678eb1c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_plcsim_gaps.py --records on Debug builds of fedf1231 with one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 and one owned TIA Portal V21 Update 3. A scratch FB calls RDREC (index 2, MLEN 4) and WRREC (index 3, LEN 4) on the central DI module (hardware ID 257 from the system constants). sim_record collect without arm refused SimulationRecordsInactive and a row without read or write InvalidRequest; armed with a 4-byte read 12 34 56 78 and a write row, a second arm refused SimulationRecordsActive; the program's RDREC returned VALID with 16#12345678 and WRREC DONE, both without error, and collect logged the answered reads and the writes carrying the program's bytes 0A 0B 0C 0D. Armed with the write row only, the read was logged unanswered and the program saw no completion within 3 s.",
+  "limitations": [
+    "One central DI module and one record index per direction with status 0; a nonzero answer status, larger records and distributed modules are not exercised.",
+    "The program holds REQ while the requests repeat, so the log shows repeated requests; the unanswered case ends with collect, not with the program's own timeout.",
+    "Earlier pass, not evidence: artifacts/rc1 on 53f9d751 stopped at the first call because sim_record used the capture gate (instanceName and creationId); fixed in fedf1231.",
+    "One owned Softbus CPU 1511 instance; other CPUs, firmware and TCP/IP instances are not qualified."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "e4f67978d171d2c87784e2a12d08549bb81c7da216121b610ebce8faecf7ac46"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "92fa910bf21d1a9343f3a6422edad2ce6e72c6ae719678f92cdd39ff124700f3"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "6a3cca640666eaad65f87881fbd50356bec156a2818bac3471c488e1e142865b"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "2db618c7a549d497e0ad83f602c874fa699f04e78eb134ebf9cb04108fd834c5",
+      "bytes": 1251752,
+      "completed": true,
+      "steps": [
+        "start owned TIA plcsim gaps",
+        "create owned scratch plcsim gaps",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "prepare hardware_plug",
+        "apply hardware_plug",
+        "ET 200SP station on the CPU's IO system",
+        "prepare hardware_add",
+        "prepare network_configure",
+        "prepare network_configure",
+        "prepare network_io_assign",
+        "apply network_io_assign",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "prepare block_import_xml",
+        "apply block_import_xml",
+        "prepare block_import_xml",
+        "apply block_import_xml",
+        "prepare block_import_xml",
+        "apply block_import_xml",
+        "prepare block_import_xml",
+        "apply block_import_xml",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "inspect the DI channel 0 interrupt attributes",
+        "prepare hardware_channel_attributes",
+        "refuse an OB link to a diagnostic error OB",
+        "refuse an OB link to a missing block",
+        "refuse a non-string OB link",
+        "refuse enabling the interrupt without its OB",
+        "apply hardware_channel_attributes",
+        "read back the DI channel 0 interrupt",
+        "prepare tag_create",
+        "apply tag_create",
+        "discovery baseline",
+        "sim_create",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "power on",
+        "run",
+        "resolve GapDb in PLCSIM",
+        "program version 1 runs",
+        "sim_record refusals",
+        "sim_record answers the program's RDREC and WRREC",
+        "sim_record leaves a request without a row unanswered",
+        "sim_release",
+        "enable, disable and restore channel 1's hardware interrupt",
+        "prepare hardware_channel_attributes",
+        "apply hardware_channel_attributes",
+        "refuse disabling the interrupt with an OB link",
+        "prepare hardware_channel_attributes",
+        "apply hardware_channel_attributes"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "sim_create",
+        "sim_read",
+        "sim_record",
+        "sim_release",
+        "sim_state",
+        "sim_tags",
+        "sim_write",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "sim_record"
+      ]
+    }
+  ]
+}
