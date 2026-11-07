@@ -43,6 +43,9 @@ def run(path):
              # The TS-Q01 runner (qualify_testsuite_native.py) keeps each call as {name, wire: raw tools/call result}.
              or [{"name": st["name"], "isError": st["wire"].get("isError") is True}
                  for st in report.get("steps", []) if isinstance(st, dict) and "name" in st and isinstance(st.get("wire"), dict)]
+             # Step-recording runners (qualify_tag_table_scope.py) keep the Host close receipt as a step result.
+             or [c for st in report.get("steps", []) if isinstance(st, dict) and isinstance(st.get("result"), dict)
+                 for c in st["result"].get("toolCalls", [])]
              # Owned-session runners keep each lifetime's audited calls as {tool, status}.
              or [{"name": call["tool"], "isError": call.get("status") != "passed"}
                  for session in report.get("sessions", []) if isinstance(session, dict) for call in session.get("calls", [])])
