@@ -18,11 +18,13 @@ def candidate(address, data_type='Bool'):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--artifacts', type=Path, required=True)
+    # A packaged bundle passes host/TiaMcp.Host.exe and workers/openness/TiaMcp.Openness.V21.exe.
+    parser.add_argument('--host', type=Path, default=ROOT / 'src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe')
+    parser.add_argument('--worker', type=Path, default=ROOT / 'src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe')
     args = parser.parse_args()
     root = args.artifacts.resolve()
     root.mkdir(parents=True, exist_ok=False)
-    host = ROOT / 'src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe'
-    worker = ROOT / 'src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe'
+    host, worker = args.host.resolve(), args.worker.resolve()
     helper = ROOT / 'scripts/native/TagImportFixture/bin/Debug/net48/TagImportFixture.exe'
     client = Client(host, 180, ['--worker', str(worker), '--artifacts', str(root)])
     report = {'completed': False, 'steps': []}
