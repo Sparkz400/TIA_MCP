@@ -63,6 +63,55 @@ BEGIN
 END_ORGANIZATION_BLOCK
 
 '''
+# --records: RDREC (index 2, 4 bytes) and WRREC (index 3, 4 bytes) on the central DI module, latched into GapDb; sim_record answers them.
+RECORD_FIELDS = """
+      RecReq : Bool;
+      RecReadValue : DInt;
+      RecReadDone : Bool;
+      RecReadError : Bool;
+      RecReadStatus : DInt;
+      RecWriteValue : DInt;
+      RecWriteDone : Bool;
+      RecWriteError : Bool;
+      RecWriteStatus : DInt;"""
+RECORD_FB = '''FUNCTION_BLOCK "GapRecords"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR
+      Rd : RDREC;
+      Wr : WRREC;
+   END_VAR
+
+BEGIN
+    #Rd(REQ := "GapDb".RecReq, ID := "Local~GapDI", INDEX := 2, MLEN := 4, RECORD := "GapDb".RecReadValue);
+    IF #Rd.VALID THEN
+        "GapDb".RecReadDone := TRUE;
+    END_IF;
+    IF #Rd.ERROR THEN
+        "GapDb".RecReadError := TRUE;
+        "GapDb".RecReadStatus := DWORD_TO_DINT(#Rd.STATUS);
+    END_IF;
+    #Wr(REQ := "GapDb".RecReq, ID := "Local~GapDI", INDEX := 3, LEN := 4, RECORD := "GapDb".RecWriteValue);
+    IF #Wr.DONE THEN
+        "GapDb".RecWriteDone := TRUE;
+    END_IF;
+    IF #Wr.ERROR THEN
+        "GapDb".RecWriteError := TRUE;
+        "GapDb".RecWriteStatus := DWORD_TO_DINT(#Wr.STATUS);
+    END_IF;
+END_FUNCTION_BLOCK
+
+DATA_BLOCK "GapRecords_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"GapRecords"
+
+BEGIN
+
+END_DATA_BLOCK
+
+'''
+RECORD_SIGNALS = ["RecReq", "RecReadValue", "RecReadDone", "RecReadError", "RecReadStatus", "RecWriteValue", "RecWriteDone", "RecWriteError", "RecWriteStatus"]
 # number -> block name, Openness SecondaryType, GapDb counter, informative S7-1500 start information.
 OBS = {
     55: ("GapStatus", "Status", "Ob55", []),
@@ -109,14 +158,77 @@ def latest(entries, article):
     return rows[0]
 
 
-def plant(h, plc, obs):
-    """GapDb, Main and the interrupt OBs whose fixture exists, each with checkpoint, compile and save."""
-    h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": DB_SOURCE % "", "expectedBlockNames": [DB]})
+def plant(h, plc, obs, records=False):
+    """GapDb, Main and the interrupt OBs whose fixture exists, each with checkpoint, compile and save; records adds the
+    RDREC/WRREC fields, GapRecords and its call in Main."""
+    h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": DB_SOURCE % (RECORD_FIELDS if records else ""), "expectedBlockNames": [DB]})
+    if records:
+        h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": RECORD_FB, "expectedBlockNames": ["GapRecords", "GapRecords_DB"]})
     for number in obs:
         h.apply("block_import_xml", {"scopePath": plc, "xml": ob_xml(number), "expectedBlockNames": [OBS[number][0]]})
         if number in (55, 56, 57):
             h.report.setdefault("extendedObExports", {})[str(number)] = h.tool("block_read", {"plcPath": plc, "blockName": OBS[number][0]})
-    h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": MAIN_SOURCE % 1, "expectedBlockNames": ["Main"]})
+    main = MAIN_SOURCE % 1
+    if records:
+        main = main.replace('    "GapDb".ProgramVersion := 1;\n', '    "GapDb".ProgramVersion := 1;\n    "GapRecords_DB"();\n')
+        require("GapRecords_DB" in main, "Main lacks the GapRecords call")
+    h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": main, "expectedBlockNames": ["Main"]})
+
+
+def records(h, lab, ids):
+    """sim_record answers RDREC (index 2) with four bytes and WRREC (index 3) with status 0; the program latches the read value and
+    both completions, and collect logs both requests with the written bytes. Then an armed table without a row for index 2 leaves
+    that read unanswered: it is logged, and the program reports no completion within the window."""
+    instance, hardware = lab.instance["id"], ids["Local~GapDI"]
+    def until(names, seconds=10):
+        deadline = time.monotonic() + seconds
+        while time.monotonic() < deadline:
+            values = lab.read(**{n: "bool" for n in names})
+            if all(values.values()):
+                return values
+            time.sleep(0.2)
+        return lab.read(**{n: "bool" for n in names})
+    def refusals():
+        inactive = h.call_error("sim_record", {"instanceId": instance, "action": "collect"})
+        require(inactive.get("code") == "SimulationRecordsInactive", "collect without arm: %s" % inactive)
+        bad = h.call_error("sim_record", {"instanceId": instance, "action": "arm", "responses": [{"hardwareId": hardware, "recordIndex": 2}]})
+        require(bad.get("code") == "InvalidRequest", "A row without read or write: %s" % bad)
+        return {"inactive": inactive.get("code"), "rowWithoutAnswer": bad.get("code")}
+    h.report["recordRefusals"] = h.stage("sim_record refusals", refusals)
+    def answered():
+        armed = h.tool("sim_record", {"instanceId": instance, "action": "arm", "responses": [
+            {"hardwareId": hardware, "recordIndex": 2, "read": {"bytes": [0x12, 0x34, 0x56, 0x78]}},
+            {"hardwareId": hardware, "recordIndex": 3, "write": {}}]})
+        again = h.call_error("sim_record", {"instanceId": instance, "action": "arm", "responses": armed["responses"]})
+        require(again.get("code") == "SimulationRecordsActive", "A second arm: %s" % again)
+        lab.write("RecWriteValue", "int32", 0x0A0B0C0D)
+        lab.write("RecReq", "bool", True)
+        done = until(["RecReadDone", "RecWriteDone"])
+        lab.write("RecReq", "bool", False)
+        values = lab.read(RecReadValue="int32", RecReadError="bool", RecReadStatus="int32", RecWriteError="bool", RecWriteStatus="int32")
+        log = h.tool("sim_record", {"instanceId": instance, "action": "collect", "windowMs": 500})
+        reads = [r for r in log["requests"] if r["kind"] == "read" and r["recordIndex"] == 2]
+        writes = [r for r in log["requests"] if r["kind"] == "write" and r["recordIndex"] == 3]
+        outcome = {"done": done, "values": values, "requests": log["requests"]}
+        require(done == {"RecReadDone": True, "RecWriteDone": True}, "RDREC/WRREC did not complete: %s" % outcome)
+        require(values["RecReadValue"] == 0x12345678 and not values["RecReadError"] and not values["RecWriteError"], "The program read %s" % outcome)
+        require(reads and all(r["answered"] and r["hardwareId"] == hardware for r in reads), "No answered read request: %s" % outcome)
+        require(writes and writes[0]["answered"] and writes[0]["data"][:4] == [0x0A, 0x0B, 0x0C, 0x0D], "The write request lacks the program's bytes: %s" % outcome)
+        return outcome
+    h.report["recordAnswered"] = h.stage("sim_record answers the program's RDREC and WRREC", answered)
+    def unanswered():
+        for name in ("RecReadDone", "RecWriteDone"):
+            lab.write(name, "bool", False)
+        h.tool("sim_record", {"instanceId": instance, "action": "arm", "responses": [{"hardwareId": hardware, "recordIndex": 3, "write": {}}]})
+        lab.write("RecReq", "bool", True)
+        observed = until(["RecReadDone"], seconds=3)
+        lab.write("RecReq", "bool", False)
+        log = h.tool("sim_record", {"instanceId": instance, "action": "collect", "windowMs": 500})
+        reads = [r for r in log["requests"] if r["kind"] == "read" and r["recordIndex"] == 2]
+        outcome = {"readDone": observed, "requests": log["requests"]}
+        require(reads and not any(r["answered"] for r in reads) and observed == {"RecReadDone": False}, "An unmatched read was answered: %s" % outcome)
+        return outcome
+    h.report["recordUnanswered"] = h.stage("sim_record leaves a request without a row unanswered", unanswered)
 
 
 def rack(h, device):
@@ -192,7 +304,7 @@ def body(h):
         require(station is not None, "The extended event fixture needs the distributed ET 200SP station")
         obs.extend([55, 56, 57])
     h.report["boundaries"] = boundaries
-    plant(h, plc, sorted(obs))
+    plant(h, plc, sorted(obs), records=getattr(h.args, "records", False))
     lab.interrupt = configure_interrupt(h, plc, module)
     ids = hardware_ids(h, plc)
     h.report["hardwareIds"] = ids
@@ -216,7 +328,10 @@ def body(h):
         h.stage("resolve GapDb in PLCSIM", lambda: lab.resolve(["Start", "TimerDone", "ProgramVersion", "Ob40", "Ob82", "Ob83", "Ob86", "Year"]))
         require(h.stage("program version 1 runs", lambda: lab.read(ProgramVersion="int16"))["ProgramVersion"] == 1, "Version 1 is not running")
 
-        if getattr(h.args, "event_extension", False):
+        if getattr(h.args, "records", False):
+            lab.resolve(RECORD_SIGNALS)
+            records(h, lab, ids)
+        elif getattr(h.args, "event_extension", False):
             lab.resolve(["Ob55", "Ob56", "Ob57"])
             extended_events(h, lab, ids)
         else:
@@ -626,6 +741,7 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
     parser.add_argument("--event-extension", action="store_true", help="Qualify distributed status/update/profile events instead of the existing runtime corpus")
+    parser.add_argument("--records", action="store_true", help="Qualify sim_record (RDREC/WRREC on the central DI module) instead of the existing runtime corpus")
     args = parser.parse_args()
     args.runner = __file__
     Harness(args, "pg_", "PLCSIM gaps on one owned PLCSIM Advanced V8 instance: online download, virtual time, events, memory reset and storage", LIMITATIONS, []).run(body)
