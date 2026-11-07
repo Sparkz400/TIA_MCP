@@ -125,41 +125,6 @@ namespace TiaMcp.Openness.V21
             }
         }
 
-        internal static bool NoNewCompileProblems(JObject before, JObject after)
-        {
-            if (!CompilationEvidenceRules.IsCompleted(before) || !CompilationEvidenceRules.IsCompleted(after)) return false;
-            var old = ((JArray)before["targets"]).OfType<JObject>().ToDictionary(t => t.Value<string>("target"), StringComparer.Ordinal);
-            if (old.Count != after["targets"].Count()) return false;
-            foreach (JObject target in after["targets"])
-            {
-                if (!old.TryGetValue(target.Value<string>("target"), out var prior) || target.Value<int>("errorCount") > prior.Value<int>("errorCount")
-                    || target.Value<int>("warningCount") > prior.Value<int>("warningCount")) return false;
-                var available = Problems(prior); var current = Problems(target);
-                if (available == null || current == null || current.Any(p => !available.Remove(p))) return false;
-            }
-            return true;
-        }
-
-        private static List<string> Problems(JObject target)
-        {
-            var rows = (JArray)target["messages"];
-            var result = new List<string>(); var parents = new List<string>();
-            for (int i = 0; i < rows.Count; i++)
-            {
-                var row = rows[i]; int depth = row.Value<int>("depth");
-                if (parents.Count > depth) parents.RemoveRange(depth, parents.Count - depth);
-                parents.Add(row.Value<string>("path"));
-                string state = row.Value<string>("state"), description = row.Value<string>("description");
-                if (state != "Error" && state != "Warning") continue;
-                if (i + 1 < rows.Count && rows[i + 1].Value<int>("depth") > depth && string.IsNullOrEmpty(description)) continue;
-                string summary = "Compiling finished (errors: " + target.Value<int>("errorCount") + "; warnings: " + target.Value<int>("warningCount") + ")";
-                if (i == rows.Count - 1 && depth == 0 && string.IsNullOrEmpty(row.Value<string>("path")) && description == summary) continue;
-                if (string.IsNullOrEmpty(description)) return null;
-                result.Add(new JArray(state, description, new JArray(parents)).ToString(Formatting.None));
-            }
-            // Missing diagnostics must not make a nonzero error count look unchanged.
-            if (result.Count < target.Value<long>("errorCount") + target.Value<long>("warningCount")) return null;
-            return result;
-        }
+        internal static bool NoNewCompileProblems(JObject before, JObject after) => CompileBaselineRules.NoNewProblems(before, after);
     }
 }

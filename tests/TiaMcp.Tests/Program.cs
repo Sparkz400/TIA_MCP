@@ -339,6 +339,7 @@ internal static partial class Program
             ("Tag imports verify supplied values and preserve untouched members", TagTableImportTests.ReadbackAndPreservation),
             ("Tag import fingerprints ignore serialization but retain declaration changes", TagTableImportTests.ContentFingerprint),
             ("Tag import compilation tolerates only existing complete diagnostics", TagTableImportTests.CompileDelta),
+            ("Compile baselines classify existing, resolved and introduced findings", TagTableImportTests.CompileBaselineClassification),
             ("UMAC role changes plan exact effects and preserve administrators", UmacRoleRulesTests.PlansExactEffectsAndPreservesAdministrators),
             ("Graphical fragments use the native default namespace", EngineeringSourcesTests.GraphicalFragmentsUseNativeDefaultNamespace),
             ("Native network insertion preserves existing units and checks IDs", EngineeringSourcesTests.NativeNetworkInsertionPreservesExistingUnitsAndChecksIds),

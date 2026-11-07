@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.137",
+  "catalogVersion": "0.4.138",
   "targetTiaVersions": [
     21
   ],
@@ -4899,6 +4899,24 @@
         "One owned scratch CPU 1511-1 PN at PLC-root scope with Bool/Int bit-memory tags; explicit renames and deletions use tag_set and tag_delete, which this run does not exercise (local.plc_object_mutations.rerun.20261028). User constants, software units and multilingual comments are covered by managed tests only.",
         "Project lock release after the worker exit was not verified."
       ]
+    },
+    {
+      "id": "local.compile-baseline.unrelated-errors.20261107",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "5a215447f2389e3a3318a052c74eb846fdea8e69",
+        "passedScope": "scripts/qualify_unrelated_errors.py on Debug builds of 5a215447 in one owned TIA V21 Update 3 scratch, 30/30 steps: the scratch CPU 1511-1 PN, an added CPU 1511F-1 PN (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) and two more standard CPUs whose interfaces share subnet Conflict and address 192.0.2.10, so every device compile reports errors while every block stays consistent. safety_import_xml re-imported Main_Safety_RTG1 with a comment: applied, saved and read back with compilerSucceeded=false and errorCount 2, the baseline comparison complete with 26 existing findings and no introduced error. In the same session, without restart or admission cleanup: network_configure of the F-CPU interface (device compile, the conflict still existing), tag_create of UnrelatedOk and source_upsert of an SCL FC UnrelatedConsumer reading it (PLC compiles clean). network_configure moving one conflicting CPU to 192.0.2.11 applied with 12 resolved findings and a clean compile. Negative: tag_set making UnrelatedOk an Int ended CompileFailed/recovery_required, unsaved, with the consumer's Data type 'Int' cannot be converted implicitly into data type 'Bool' as the only introduced error."
+      },
+      "artifacts": [
+        "evidence/local.compile-baseline.unrelated-errors.20261107.json"
+      ],
+      "limitations": [
+        "One owned scratch; the unrelated finding is a duplicate IP address between two empty standard CPUs, standing in for the 4 November SENTRON device error. Representative kinds only: safety_import_xml, network_configure, tag_create, source_upsert and tag_set; HMI kinds keep their own baseline rules, and library transactions use the shared comparison but are not exercised here.",
+        "An inconsistent block on any PLC still stops preparation of kinds that need the full project fingerprint (FingerprintUnavailable); same-PLC unrelated block errors are therefore not covered (#218).",
+        "Device compiles report shifting warning identities (introduced warnings beside zero introduced errors); outside tag-table imports new warnings are accepted, as before #221."
+      ]
     }
   ],
   "features": [
@@ -7851,7 +7869,8 @@
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "One exact native group and namespace per change; cross-scope relocation and implicit namespace changes are rejected.",
           "SIMATIC_SD imports independently authored .s7dcl graphical reference documents through native ImportFromDocuments, mandatory compilation and checkpointing; only new exact declared names are permitted and existing blocks cannot be replaced by this route.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107)."
         ]
       },
       "qualification": {
@@ -7859,7 +7878,8 @@
         "evidenceIds": [
           "local.milestones.rerun.20261028",
           "local.plc_object_mutations.rerun.20261028",
-          "local.safety.fio-block-routes.20261102"
+          "local.safety.fio-block-routes.20261102",
+          "local.compile-baseline.unrelated-errors.20261107"
         ]
       },
       "availability": {
@@ -9020,14 +9040,16 @@
           "Attribute preflight precedes subnet changes, but subsequent metadata/type changes or native failures can leave partial effects requiring checkpoint recovery.",
           "Apply runs the worker's configured-hardware preservation stage, also with compile=false: only the selected node's requested allowlisted attributes and requested subnet may change. Any other node, attribute, address, I/O-system or connector change refuses, including one TIA couples to the request (for example an address reassigned on a subnet connect), and change_restore compares the retrieved hardware with the prechange manifest. An interrupted apply reconciles on the configured-hardware route.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
+          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.milestones.rerun.20261028",
-          "local.hardware_changes.families.20261029"
+          "local.hardware_changes.families.20261029",
+          "local.compile-baseline.unrelated-errors.20261107"
         ]
       },
       "availability": {
@@ -9417,14 +9439,16 @@
           "Fingerprint coverage remains explicitly incomplete: protected native system-group generated payload checksums are excluded only with available owning-PLC safety signatures; identity, modification, protection, consistency and exposed safety metadata remain covered. User/editable fingerprint failures still fail closed.",
           "No changed F-logic behavior, safety-unit, F-I/O, commissioning or arbitrary safety-target qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "2026-10-28: the import compiles every device, not only the PLC software; a PLC-only compile had left the F-compiler block DB1_C inconsistent until the next device compile (local.safety_import.20261028). Natively qualified with the device compile under an activated STEP 7 Safety license on a CPU 1511F-1 PN in an owned scratch (local.safety_import.device-compile.20261028): the generated F-FBD block Main_Safety_RTG1 re-imported with a comment change, every F-PLC block including DB1_C consistent right after the import, exact diff, fresh reopen, checkpoint restore and refusals for a missing acknowledgement, a scope mismatch, a standard block and a wrong previewHash. A project with a device that cannot be compiled (for example a Startdrive drive) cannot apply it."
+          "2026-10-28: the import compiles every device, not only the PLC software; a PLC-only compile had left the F-compiler block DB1_C inconsistent until the next device compile (local.safety_import.20261028). Natively qualified with the device compile under an activated STEP 7 Safety license on a CPU 1511F-1 PN in an owned scratch (local.safety_import.device-compile.20261028): the generated F-FBD block Main_Safety_RTG1 re-imported with a comment change, every F-PLC block including DB1_C consistent right after the import, exact diff, fresh reopen, checkpoint restore and refusals for a missing acknowledgement, a scope mismatch, a standard block and a wrong previewHash. A project with a device that cannot be compiled (for example a Startdrive drive) cannot apply it.",
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.safety_import.device-compile.20261028",
-          "local.safety_changes.allowlist.20261031"
+          "local.safety_changes.allowlist.20261031",
+          "local.compile-baseline.unrelated-errors.20261107"
         ]
       },
       "availability": {
@@ -10843,14 +10867,16 @@
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
           "A preceding write that changes another requested attribute type causes refusal before that later setter; split dependent edits into separately reviewed changes. Earlier setters can already have taken effect.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "A LogicalAddress change to an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native write with SafetyBoundary (TIA would make the tag a safety tag); nothing is written (1 November 2026; rechecked natively in local.safety.fio-routes.20261101)."
+          "A LogicalAddress change to an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native write with SafetyBoundary (TIA would make the tag a safety tag); nothing is written (1 November 2026; rechecked natively in local.safety.fio-routes.20261101).",
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
-          "local.safety.fio-routes.20261101"
+          "local.safety.fio-routes.20261101",
+          "local.compile-baseline.unrelated-errors.20261107"
         ]
       },
       "availability": {
@@ -11058,14 +11084,16 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact existing table selector plus explicit name, dataTypeName and logicalAddress; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
           "Safety units are rejected. An absolute input or output address (%I/%Q or %E/%A, bit to long word) inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native create with SafetyBoundary, because TIA makes such a tag a safety tag; nothing is created (1 November 2026; native run sl3 had created it first; the prepare refusal rechecked natively on an F-CPU with ET 200SP F-DI in local.safety.fio-routes.20261101). A created tag that TIA still reports as IsSafety fails verification and requires checkpoint recovery.",
-          "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0)."
+          "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0).",
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
-          "local.safety.fio-routes.20261101"
+          "local.safety.fio-routes.20261101",
+          "local.compile-baseline.unrelated-errors.20261107"
         ]
       },
       "availability": {

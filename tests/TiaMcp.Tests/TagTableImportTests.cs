@@ -84,4 +84,38 @@ internal static class TagTableImportTests
         Check.Equal(false, TagTableImportRules.NoNewCompileProblems(Compile("Existing error"), otherTarget));
         return Task.CompletedTask;
     }
+
+    internal static Task CompileBaselineClassification()
+    {
+        var unchanged = CompileBaselineRules.Compare(Compile("Duplicate IP", "Other device"), Compile("Duplicate IP", "Other device"));
+        Check.Equal(true, unchanged.Value<bool>("verified"));
+        Check.Equal(2, unchanged.Value<int>("existingCount"));
+        var resolved = CompileBaselineRules.Compare(Compile("Duplicate IP", "Other device"), Compile("Duplicate IP"));
+        Check.Equal(true, resolved.Value<bool>("verified"));
+        Check.Equal(1, resolved.Value<int>("resolvedCount"));
+        Check.Equal("Other device", resolved["resolved"]![0]![1]!.Value<string>());
+        var introduced = CompileBaselineRules.Compare(Compile("Duplicate IP"), Compile("Duplicate IP", "Target error"));
+        Check.Equal(false, introduced.Value<bool>("verified"));
+        Check.Equal(true, introduced.Value<bool>("complete"));
+        Check.Equal("Target error", introduced["introduced"]![0]![1]!.Value<string>());
+        var worsened = CompileBaselineRules.Compare(Compile("Duplicate IP"), Compile("Duplicate IP", "Duplicate IP"));
+        Check.Equal(1, worsened.Value<int>("introducedCount"));
+        var otherTarget = Compile("Duplicate IP"); otherTarget["targets"]![0]!["target"] = "/plc/Other";
+        var scope = CompileBaselineRules.Compare(Compile("Duplicate IP"), otherTarget);
+        Check.Equal(false, scope.Value<bool>("scopeUnchanged"));
+        Check.Equal(false, scope.Value<bool>("verified"));
+        // Accepts: a new error fails, a clean compile passes, and a new warning beside an unchanged error passes.
+        Check.Equal(false, CompileBaselineRules.Accepts(Compile("Duplicate IP"), Compile("Duplicate IP", "Target error"), introduced));
+        Check.Equal(true, CompileBaselineRules.Accepts(Compile("Duplicate IP"), Compile(), CompileBaselineRules.Compare(Compile("Duplicate IP"), Compile())));
+        var warned = Compile("Duplicate IP", "New warning");
+        warned["targets"]![0]!["messages"]![2]!["state"] = "Warning";
+        foreach (var node in new[] { warned, (JObject)warned["targets"]![0]! }) { node["errorCount"] = 1; node["warningCount"] = 1; }
+        warned["targets"]![0]!["messages"]!.Last!["description"] = "Compiling finished (errors: 1; warnings: 1)";
+        var warning = CompileBaselineRules.Compare(Compile("Duplicate IP"), warned);
+        Check.Equal(false, warning.Value<bool>("verified"));
+        Check.Equal(0, warning.Value<int>("introducedErrorCount"));
+        Check.Equal(true, CompileBaselineRules.Accepts(Compile("Duplicate IP"), warned, warning));
+        Check.Equal(false, CompileBaselineRules.Accepts(Compile("Duplicate IP"), Compile("Duplicate IP"), CompileBaselineRules.Compare(null, Compile("Duplicate IP"))));
+        return Task.CompletedTask;
+    }
 }

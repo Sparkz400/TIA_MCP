@@ -25,6 +25,11 @@ The engineering worker and its TIA connection are reused across tool calls. Star
 
 Native changes follow **prepare → preview → checkpoint → apply → verify**. A change can partially fail across Siemens calls; recovery uses its checkpoint and journal. The public simulation workflow works only on adapter-owned simulator instances: it can download a changed program online, set virtual time and inject interrupts there, but it does not expose physical PLC download, force or CPU control.
 
+A requested compile runs before and after the mutation over the same scope, so
+findings that were already in the project, such as another device's errors, are
+reported but do not fail a valid change; introduced errors still do. See
+[compile verification](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#compile-verification).
+
 Tag-table XML imports use a declaration-scoped content check so unrelated
 inconsistent PLC blocks do not prevent editing a table. Backups, safety boundaries,
 stale-preview checks and native readback remain; requested compilation compares
