@@ -945,6 +945,16 @@ namespace TiaMcp.Openness.V21
                     change.State = "checkpointing"; LibraryJournal(change, "claim", "completed");
                     CheckpointLibraryResources(change);
                     VerifyLibraryUpdateReadback(change, "checkpoint", false);
+                    JObject baseline = null;
+                    if (change.Project != null)
+                    {
+                        // Same scope before and after: unchanged unrelated findings do not fail the change (#221).
+                        LibraryJournal(change, "baseline_compile", "dispatching");
+                        baseline = LibraryCompile(change);
+                        change.Journal["compileBaseline"] = baseline; LibraryJournal(change, "baseline_compile", "completed");
+                        if (!CompilationEvidenceRules.IsCompleted(baseline))
+                            throw new BridgeException("CompileEvidenceIncomplete", "The baseline compiler did not return complete diagnostics. No library action was dispatched.");
+                    }
                     change.State = "applying"; LibraryJournal(change, "native_mutation", "dispatching");
                     change.Journal["result"] = ApplyLibraryAction(change);
                     LibraryJournal(change, "native_mutation", "completed");
@@ -952,9 +962,12 @@ namespace TiaMcp.Openness.V21
                     if (change.Project != null)
                     {
                         LibraryJournal(change, "compile", "dispatching");
-                        var result = IsHmiLibraryTarget(change.Payload) ? CompileLibraryHmiTarget(change.Project, (JObject)change.Payload["target"]) : CompileLibraryProject(change);
+                        var result = LibraryCompile(change);
+                        result["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(result);
+                        result["baselineComparison"] = CompileBaselineRules.Compare(baseline, result);
                         change.Journal["compile"] = result; LibraryJournal(change, "compile", "completed");
-                        if (!CompilationEvidenceRules.IsSuccessful(result)) throw new BridgeException("CompileFailed", "Applied library change has compiler errors or incomplete diagnostic evidence. Checkpoint resources remain available.");
+                        if (result["baselineComparison"].Value<bool>("verified") != true)
+                            throw new BridgeException("CompileFailed", "Applied library change introduced or worsened compiler findings, changed the compile scope or returned incomplete diagnostics. Checkpoint resources remain available.");
                         VerifyLibraryUpdateReadback(change, "compile", true);
                     }
                     foreach (var library in LibraryWrittenResources(change))
@@ -993,6 +1006,9 @@ namespace TiaMcp.Openness.V21
             if (change.Destination != null) yield return change.Destination;
             if (IsLibraryMaintenance(change.Kind) && change.Source != null && change.Source != change.Destination) yield return change.Source;
         }
+
+        private JObject LibraryCompile(LibraryChange change) =>
+            IsHmiLibraryTarget(change.Payload) ? CompileLibraryHmiTarget(change.Project, (JObject)change.Payload["target"]) : CompileLibraryProject(change);
 
         private JObject CompileLibraryProject(LibraryChange change)
         {

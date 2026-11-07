@@ -101,8 +101,8 @@ namespace TiaMcp.Openness.V21
                 change.Preview["targetNamespace"] = change.Namespace;
                 change.Preview["checkpoint"] = "Applying requires checkpointSave=true: current in-memory project edits are saved before a compressed recovery archive is created. No mutation proceeds without that archive.";
                 change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. Save-after-change requires a successful compile. Compile does not validate machine behavior.";
-                if (change.Kind == TagTableImportRules.Kind)
-                    change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. Saving requires completed before/after compilation with no new diagnostics; existing errors may remain. Inspect compilerSucceeded. Compile does not validate machine behavior.";
+                if (UsesCompileBaseline(change.Kind))
+                    change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. With compile=true the same scope compiles before and after the mutation; the change fails on introduced or worsened findings, a changed compile scope or incomplete diagnostics. Unchanged findings may remain and are listed in compile.baselineComparison; inspect compilerSucceeded. Compile does not validate machine behavior.";
                 change.Preview["backups"] = change.Backups;
                 change.PreviewHash = ChangeHash(change.Preview.ToString(Formatting.None));
                 change.State = "prepared";
@@ -196,13 +196,15 @@ namespace TiaMcp.Openness.V21
                     change.Stages.Add("recovery_archive_created");
                     change.State = "applying";
                     WriteChangeJournal(change);
-                    if (change.Kind == TagTableImportRules.Kind && compile)
+                    if (compile && UsesCompileBaseline(change.Kind))
                     {
-                        change.TagTableEvidence["baselineCompile"] = CompileEngineeringChange(change, project);
-                        change.Stages.Add("tag_table_baseline_compile_finished");
+                        // The same scope compiles before and after, so unchanged unrelated findings do not fail the change (#221).
+                        change.CompileBaseline = CompileEngineeringChange(change, project);
+                        if (change.Kind == TagTableImportRules.Kind) change.TagTableEvidence["baselineCompile"] = change.CompileBaseline;
+                        change.Stages.Add(change.Kind == TagTableImportRules.Kind ? "tag_table_baseline_compile_finished" : "baseline_compile_finished");
                         WriteChangeJournal(change);
-                        if (!CompilationEvidenceRules.IsCompleted((JObject)change.TagTableEvidence["baselineCompile"]))
-                            throw new BridgeException("CompileEvidenceIncomplete", "The baseline compiler did not return complete diagnostics. No tag import was dispatched.");
+                        if (!CompilationEvidenceRules.IsCompleted(change.CompileBaseline))
+                            throw new BridgeException("CompileEvidenceIncomplete", "The baseline compiler did not return complete diagnostics. No mutation was dispatched.");
                     }
                     if (!IsCompileOnlyKind(change.Kind))
                     {
@@ -224,13 +226,16 @@ namespace TiaMcp.Openness.V21
                                 throw new BridgeException("CompileScopeChanged", "The selected PLC changed during compilation.");
                         }
                         // Set before the verdict so a failed outcome still reports the compiler result apart from the change state.
-                        if (change.Compilation != null && (IsCompileOnlyKind(change.Kind) || change.Kind == TagTableImportRules.Kind))
+                        if (change.Compilation != null)
+                        {
                             change.Compilation["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(change.Compilation);
+                            if (change.CompileBaseline != null) change.Compilation["baselineComparison"] = CompileBaselineRules.Compare(change.CompileBaseline, change.Compilation);
+                        }
                         // A text-list import or an admitted HMI kind must leave the compiler problems as the compile before the write found them.
                         if (change.Kind == "hmi_classic_screen_edit" ? !ClassicScreenCompileRules.NoNewProblems(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
                             : change.Kind == "hmi_text_list_import" || HmiEngineeringRules.IsAdmittedKind(change.Kind) ? !HmiTextListImportRules.CompileProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
-                            : change.Kind == TagTableImportRules.Kind ? !TagTableImportRules.NoNewCompileProblems((JObject)change.TagTableEvidence["baselineCompile"], change.Compilation)
-                            : IsCompileOnlyKind(change.Kind) ? !CompilationEvidenceRules.IsCompleted(change.Compilation) : !CompilationEvidenceRules.IsSuccessful(change.Compilation))
+                            : UsesCompileBaseline(change.Kind) ? change.Compilation?["baselineComparison"]?.Value<bool>("verified") != true
+                            : !CompilationEvidenceRules.IsCompleted(change.Compilation))
                             throw new BridgeException(change.Compilation?.Value<int?>("errorCount") == 0 ? "CompileDiagnosticRegression" : "CompileFailed",
                                 "The change failed compiler verification: errors, new/changed warnings, or incomplete diagnostics. "
                                 + (change.Kind == "hmi_classic_screen_edit" ? "Verified screen rollback is attempted; inspect the retained outcome." : "Inspect the retained outcome."));
@@ -1274,6 +1279,10 @@ namespace TiaMcp.Openness.V21
             catch (Exception error) { change.TechnologyAfter = new JObject { ["unresolved"] = true, ["reason"] = error.Message }; }
         }
 
+        // Compile-only kinds report diagnostics as their result; HMI kinds keep their own baseline rules.
+        private static bool UsesCompileBaseline(string kind) =>
+            !IsCompileOnlyKind(kind) && kind != "hmi_classic_screen_edit" && !IsHmiChangeKind(kind);
+
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering" || HmiEngineeringRules.IsAdmittedKind(change.Kind)) return CompileHmiEngineeringChange(change, project);
@@ -1734,6 +1743,7 @@ namespace TiaMcp.Openness.V21
             view["readbacks"] = change.Readbacks.DeepClone();
             view["hmiEvidence"] = change.HmiEvidence?.DeepClone();
             if (change.TagTableEvidence != null) view["tagTableEvidence"] = change.TagTableEvidence.DeepClone();
+            if (change.CompileBaseline != null) view["compileBaseline"] = change.CompileBaseline.DeepClone();
             if (change.Kind == "graphical_typed_edit") view["typedQualification"] = TypedChangeQualification(change);
             view["scratchSecurity"] = change.ScratchSecurity?.DeepClone();
             view["automaticRetryAllowed"] = false;
@@ -1754,6 +1764,7 @@ namespace TiaMcp.Openness.V21
                 ["readbacks"] = change.Readbacks.DeepClone(),
                 ["hmiEvidence"] = change.HmiEvidence?.DeepClone(),
                 ["tagTableEvidence"] = change.TagTableEvidence?.DeepClone(),
+                ["compileBaseline"] = change.CompileBaseline?.DeepClone(),
                 ["typedQualification"] = change.Kind == "graphical_typed_edit" ? TypedChangeQualification(change) : null,
                 ["compile"] = change.Compilation?.DeepClone(), ["failure"] = change.Failure,
                 ["primaryFailure"] = change.PrimaryFailure, ["recoveryFailure"] = change.RecoveryFailure,
@@ -1810,7 +1821,7 @@ namespace TiaMcp.Openness.V21
             internal string PrimaryFailure, RecoveryFailure, RecoveryDirectory, ScopePath, GroupPath, Namespace;
             internal int? PreparedProcessId;
             internal JObject Selector, Payload, Preview, Compilation, RecoveredProject, SafetyAfter, ScratchSecurity, TechnologyAfter, FingerprintCoverage;
-            internal JObject HmiEvidence, HmiBeforeManifest, TagTableEvidence;
+            internal JObject HmiEvidence, HmiBeforeManifest, TagTableEvidence, CompileBaseline;
             internal JArray HardwareBeforeManifest;
             internal string[] BlockNames = Array.Empty<string>();
             internal string[] ObjectNames = Array.Empty<string>();
