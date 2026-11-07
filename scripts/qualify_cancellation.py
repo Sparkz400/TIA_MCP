@@ -74,8 +74,11 @@ def main():
         record('Host recorded the late response and released the lease', {'late': late, 'cleanup': cleanup})
         assert [r['bridgeLateResponse']['operation'] for r in late] == ['mutation_dispatch'] and late[0]['bridgeLateResponse']['succeeded'] is True, late
         assert [(r['bridgeDeferredCleanup']['operation'], r['bridgeDeferredCleanup']['errorCode']) for r in cleanup] == [('mutation_end', None)], cleanup
-        replay = record('same key returns the recorded result', client.tool('change_apply', apply))
-        assert replay['state'] == 'applied' and replay['stages'] == stages, replay['stages']
+        # Until its admission is reconciled, the same key is refused and names the owner; nothing is replayed.
+        result = client.request('tools/call', {'name': 'change_apply', 'arguments': apply})
+        refused = (result.get('structuredContent') or {}).get('error') or {}
+        record('same key refused until reconciliation', refused)
+        assert result.get('isError') and refused.get('code') == 'ResourceBusy' and refused['details']['reconciliationTool'] == 'engineering_admission_reconcile', refused
         table = client.tool('tag_table_read', {'plcPath': plc, 'tagTableName': 'Default tag table'})['xml']
         record('tag created exactly once', table.count('<Name>CancelledOnce</Name>'))
         assert table.count('<Name>CancelledOnce</Name>') == 1
@@ -86,7 +89,7 @@ def main():
             if latest.get('state') in ('dispatchIntent', 'outcomeUnknown'):
                 unknown.append(latest['id'])
         record('cancelled dispatch admission held', unknown)
-        assert len(unknown) == 1, unknown
+        assert unknown == refused['details']['blockingAdmissionIds'], (unknown, refused)
         project = client.tool('tia_session_status')['projects'][0]['path']
         record('close the original TIA', client.tool('tia_detach'))
         assert client.tool('tia_start')['ownsPortalProcess'] is True
