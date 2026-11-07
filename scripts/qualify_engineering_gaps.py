@@ -275,6 +275,13 @@ def hmi_compile(h, hmi):
         outcome = h.client.request("tools/call", {"name": "change_apply", "arguments": h.apply_args(prepared)})
         content = outcome.get("structuredContent") or {}
         if not outcome.get("isError"):
+            compilation = content.get("compile") or {}
+            if compilation.get("errorCount"):
+                # Since fed08202 a compile-only change completes with TIA's diagnostics as its result.
+                errors = [m["description"] for t in compilation.get("targets", []) for m in t.get("messages", []) if m.get("state") == "Error" and m.get("description")]
+                require(compilation.get("compilerSucceeded") is False and [t.get("target") for t in compilation.get("targets", [])] == [hmi["compileScope"]] and errors,
+                        "hmi_compile completed without typed compile diagnostics: %s" % compilation)
+                return {"outcome": "appliedWithCompilerErrors", "errors": errors, "stages": content["stages"]}
             return {"outcome": "compiled", "compilation": compiled(content, [hmi["compileScope"]]), "stages": content["stages"],
                     "changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}
         error = content.get("error") or {}
