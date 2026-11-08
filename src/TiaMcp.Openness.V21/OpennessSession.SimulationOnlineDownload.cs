@@ -40,9 +40,10 @@ namespace TiaMcp.Openness.V21
             var credential = ValidateSimulationCredential(change.Payload, plc.Project, hardware);
             if (login != null) preview["login"] = login.Evidence;
             if (credential != null) preview["credential"] = credential.Evidence;
-            ((JArray)preview["effects"]).Add(new JObject { ["action"] = "downloadSoftwareToOwnedSimulation", ["instanceId"] = marker["instanceId"].DeepClone(),
+            bool withHardware = options.Value<bool?>("hardware") == true;
+            ((JArray)preview["effects"]).Add(new JObject { ["action"] = withHardware ? "downloadHardwareAndSoftwareToOwnedSimulation" : "downloadSoftwareToOwnedSimulation", ["instanceId"] = marker["instanceId"].DeepClone(),
                 ["instanceName"] = marker["instanceName"].DeepClone(), ["plcPath"] = plc.Path, ["options"] = options });
-            ((JArray)preview["warnings"]).Add("Compiles the PLC software, then downloads it online to the ticket-bound owned PLCSIM instance. This is a CPU write: the project checkpoint cannot undo it. " +
+            ((JArray)preview["warnings"]).Add("Compiles the PLC software, then downloads it " + (withHardware ? "with the hardware configuration " : "") + "online to the ticket-bound owned PLCSIM instance. This is a CPU write: the project checkpoint cannot undo it. " +
                 (options.Value<bool>("allowStop") ? "TIA may stop the CPU for the download; a CPU found in RUN is restarted afterwards." : "A download that needs the CPU stopped is refused."));
         }
 
@@ -183,7 +184,8 @@ namespace TiaMcp.Openness.V21
                 };
                 report["stage"] = "download";
                 report["downloadAttempted"] = true;
-                var result = provider.Download(targets[0], Answer(true), Answer(false), options.Value<string>("softwareScope") == "changes" ? DownloadOptions.SoftwareOnlyChanges : DownloadOptions.Software);
+                var result = provider.Download(targets[0], Answer(true), Answer(false), options.Value<bool?>("hardware") == true ? DownloadOptions.Hardware | DownloadOptions.Software
+                    : options.Value<string>("softwareScope") == "changes" ? DownloadOptions.SoftwareOnlyChanges : DownloadOptions.Software);
                 var messages = new JArray(); var budget = new ScanBudget(2000);
                 SimulationDownloadMessages(result.Messages, messages, budget, 0);
                 report["download"] = new JObject { ["state"] = result.State.ToString(), ["errors"] = result.ErrorCount, ["warnings"] = result.WarningCount, ["messages"] = messages, ["truncated"] = budget.Truncated };
