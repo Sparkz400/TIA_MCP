@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.168",
+  "catalogVersion": "0.4.169",
   "targetTiaVersions": [
     21
   ],
@@ -3363,6 +3363,23 @@
       "limitations": [
         "The refusal of a session opened through another network card is covered offline only; this PC has no second route to the CPU address.",
         "One PLCSIM instance and CPU; physical PLCs stay out of scope."
+      ]
+    },
+    {
+      "id": "local.runtime.plcsim-tcpip.syslog.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "a0f1a549e797d199d9a40b9547ce9e8cb90120bf",
+        "passedScope": "scripts/qualify_runtime_plcsim_tcpip.py --mode normal on an owned PLCSIM Advanced V8 TCP/IP instance (scratch CPU 1511-1 PN V4.1 at 192.168.0.1) from Debug builds of the frozen commit: the complete normal-mode flow and its independent verification passed again, and runtime_web_diagnostics kind syslog read Syslog.Browse with count 5 through the owned Web API session: status read, five raw RFC 5424 entries (web server login, OPC UA server events) with the lifetime and loss counters; count 21 was refused with RuntimeDiagnosticSelectionInvalid before any request. Syslog.Browse needs the device function right WebReadSyslog ('Read syslog buffer of the CPU'); without it the first run of the day answered permissionDenied (provider error 2), so the runner now discovers the right from the refused grant's availableRights list and grants it."
+      },
+      "artifacts": [
+        "evidence/local.runtime.plcsim-tcpip.syslog.20261108.json"
+      ],
+      "limitations": [
+        "PLCSIM Advanced V8 (firmware R41.24.7), not a physical CPU; five entries only, so lifetime counters and loss were observed but not exercised at the 20-entry bound.",
+        "Truncation stays unknown by design: Syslog.Browse reports no current count."
       ]
     },
     {
@@ -24510,14 +24527,15 @@
         "limitations": [
           "Bounded raw JSON per kind with only the documented top-level shape checked; alarms and diagnostic buffer take a language and count 1..500 and report truncation against count_current. No alarm acknowledgment, filters, alarm IDs, R/H redundancy_id, clock setting or mode change; Plc.ReadMemoryInformation and Plc.ReadRuntimeInformation are not exposed.",
           "Request/response shapes come from Siemens documentation and the Siemens Web API client; protocol-fake tests only. No CPU/firmware qualification, lossless alarm/event history or program-identity claim from project information.",
-          "Syslog reads count 1..20 without language, first or redundancy_id; raw entries and nonnegative lifetime/loss counters are retained with truncation unknown. R/H requests needing redundancy_id are unsupported. The syslog addition has managed and actual-Host loopback TLS coverage only; existing native evidence does not qualify this kind."
+          "Syslog reads count 1..20 without language, first or redundancy_id; raw entries and nonnegative lifetime/loss counters are retained with truncation unknown. R/H requests needing redundancy_id are unsupported. Natively qualified on PLCSIM Advanced V8 over TCP/IP (local.runtime.plcsim-tcpip.syslog.20261108): five raw entries with both counters, and count 21 refused before any request. Syslog.Browse needs the device function right WebReadSyslog; without it the CPU answers permissionDenied."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
-          "local.runtime.plcsim-tcpip.20261102"
+          "local.runtime.plcsim-tcpip.20261102",
+          "local.runtime.plcsim-tcpip.syslog.20261108"
         ]
       },
       "availability": {
