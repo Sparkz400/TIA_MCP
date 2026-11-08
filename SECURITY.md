@@ -16,7 +16,8 @@ currently published.
 
 TIA MCP is pre-1.0. Only the latest `main` revision and the newest release are
 supported; fixes land on `main` and ship in the next release, never as backports
-to older 0.x releases. There is no LTS policy.
+to older 0.x releases. There is no LTS policy, and 1.x keeps the same rule
+([contract freeze policy](docs/plans/contract-freeze-policy.md), Q8).
 
 | Version | Supported |
 | --- | --- |

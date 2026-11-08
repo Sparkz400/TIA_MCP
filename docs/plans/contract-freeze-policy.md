@@ -1,18 +1,18 @@
-# Contract freeze policy (draft)
+# Contract freeze policy
 
-> **Draft, 1 November 2026. Not in force.** A proposal for the maintainer to decide on, for the
-> TODO box [Contract freeze](../TODO.md#release-mechanics-and-policy): which tool names,
-> input and output schemas and error codes 1.0 freezes, and how they may change afterwards. Every
-> choice that is not settled is listed under [open decisions](#open-decisions) with options and a
-> recommendation. Until it is accepted, the CHANGELOG rule stands: before 1.0 any release may
-> change the tool surface.
+> **Accepted on 8 November 2026; in force from 1.0.** The maintainer accepted every
+> recommendation under [decisions](#decisions) for the TODO box
+> [Contract freeze](../TODO.md#release-mechanics-and-policy): which tool names, input and output
+> schemas and error codes 1.0 freezes, and how they may change afterwards. Until 1.0 the
+> CHANGELOG rule stands: any 0.x release may change the tool surface. The surface baseline, the
+> error registry and the release gate under [enforcement](#enforcement) are not built yet.
 
 ## The surface today
 
 Normal Host recounted on 3 November 2026 on the offline-follow-up source based on
 `30967af7`, product version `0.9.0`, catalog `0.4.133`. The retained discovery is
 `artifacts/offline-backlog-surface/surface.json`, pinned by that run's `report.json`.
-This is a candidate inventory, not acceptance of the freeze or its thirteen policy decisions.
+This is a candidate inventory; the baseline is cut on the release candidate.
 The error-code count below is the historical 1 November manual inventory, not a fresh exhaustive scan.
 
 | Element | Today | Where it is defined |
@@ -152,7 +152,10 @@ Still proposed, not enforced:
 - **Release gate.** `release.yml` runs the surface test for `v1.x` tags next to the existing
   ledger and matrix gate.
 
-## Open decisions
+## Decisions
+
+Accepted on 8 November 2026: the recommendation of each question below, as written.
+
 
 ### Q1. Which tools are frozen?
 
@@ -164,7 +167,7 @@ At 1.0 every open matrix cell is closed or dispositioned, but tools whose rows V
   rest are marked experimental in the catalog and the tool reference.
 - (c) Only `shipped` tools.
 
-**Recommendation: (b).** A name with no qualifying evidence should not be promised; (c) would
+**Decided (recommendation): (b).** A name with no qualifying evidence should not be promised; (c) would
 leave most of the surface unfrozen, since most tools are `limited` by design.
 
 ### Q2. Outputs without a declared schema
@@ -176,7 +179,7 @@ leave most of the surface unfrozen, since most tools are `limited` by design.
 - (b) Give every frozen tool a schema before 1.0.
 - (c) Freeze the fields the reference pages document, schema or not.
 
-**Recommendation: (a) with (c)'s floor:** a field documented in `docs/reference/` is not removed
+**Decided (recommendation): (a) with (c)'s floor:** a field documented in `docs/reference/` is not removed
 in 1.x without deprecation. (b) is a large job, and some contracts cannot be advertised yet
 (cross-file references, `prefixItems`).
 
@@ -189,7 +192,7 @@ in 1.x without deprecation. (b) is a large job, and some contracts cannot be adv
   the rest are detail codes that may change in a minor release.
 - (c) The envelope only.
 
-**Recommendation: (b).** Clients branch on the outcome and gate codes; freezing all 395
+**Decided (recommendation): (b).** Clients branch on the outcome and gate codes; freezing all 395
 worker-only codes would freeze internals.
 
 ### Q4. Change-kind payloads and free-form JSON inputs
@@ -198,7 +201,7 @@ worker-only codes would freeze internals.
 - (b) Also publish a JSON Schema per kind and per free-form parameter before 1.0.
 - (c) Freeze kind names only.
 
-**Recommendation: (a) for 1.0**, adding per-kind schemas in 1.x minors.
+**Decided (recommendation): (a) for 1.0**, adding per-kind schemas in 1.x minors.
 
 ### Q5. Tool groups
 
@@ -206,7 +209,7 @@ worker-only codes would freeze internals.
 - (b) Stable names; tools may join a group but never move between groups.
 - (c) Experimental in 1.x.
 
-**Recommendation: (c)**, with `all` and `base` stable. Client tool limits are still being learned,
+**Decided (recommendation): (c)**, with `all` and `base` stable. Client tool limits are still being learned,
 so groups may need splitting.
 
 ### Q6. Deprecation window
@@ -215,7 +218,7 @@ so groups may need splitting.
 - (b) At least six months.
 - (c) Both.
 
-**Recommendation: (a) plus at least 90 days**, which suits a project without LTS.
+**Decided (recommendation): (a) plus at least 90 days**, which suits a project without LTS.
 
 ### Q7. Catalog version
 
@@ -224,7 +227,7 @@ so groups may need splitting.
   its major moves only with the product's major (when `schemaVersion` changes).
 - (c) The catalog version equals the product version.
 
-**Recommendation: (b).** It keeps catalog edits free of product releases and still tells a
+**Decided (recommendation): (b).** It keeps catalog edits free of product releases and still tells a
 reader which product line a catalog belongs to. (c) would force a release for every evidence
 update.
 
@@ -234,7 +237,7 @@ update.
 - (b) Security fixes for the previous minor for a fixed time.
 - (c) A 1.0 LTS line.
 
-**Recommendation: (a) for now**, revisited when there are outside users.
+**Decided (recommendation): (a) for now**, revisited when there are outside users.
 
 ### Q9. Safety and security tightening
 
@@ -244,7 +247,7 @@ data loss, an unsafe target action or a security issue?
 - (a) Yes, with a typed code and a `Security` or `Changed` CHANGELOG entry.
 - (b) Only in a major release.
 
-**Recommendation: (a).** The F-I/O address refusal added to `tag_create` before 1.0 is the
+**Decided (recommendation): (a).** The F-I/O address refusal added to `tag_create` before 1.0 is the
 pattern.
 
 ### Q10. Persisted state
@@ -253,7 +256,7 @@ pattern.
 - (b) It reads it or refuses with a typed code and migration notes.
 - (c) No promise; upgrade instructions say to finish or restore open changes first.
 
-**Recommendation: (b)**, and the release candidate's upgrade, recovery and rollback instructions
+**Decided (recommendation): (b)**, and the release candidate's upgrade, recovery and rollback instructions
 ([TODO](../TODO.md#release-mechanics-and-policy)) also say to resolve open admissions before an
 upgrade.
 
@@ -262,7 +265,7 @@ upgrade.
 - (a) 1.0 records the revisions the pinned SDK negotiates; dropping one is a major change.
 - (b) No promise; the Host follows the SDK.
 
-**Recommendation: (a).** A client that worked with 1.0 should keep working through 1.x.
+**Decided (recommendation): (a).** A client that worked with 1.0 should keep working through 1.x.
 
 ### Q12. Host options
 
@@ -270,7 +273,7 @@ upgrade.
 - (b) Freeze only the options the launcher scripts pass; the direct-launch options
   (`--addin-handoff`, `--git-remote`, `--library-limits-file`, ...) stay experimental.
 
-**Recommendation: (a).** Users put these options in client configurations.
+**Decided (recommendation): (a).** Users put these options in client configurations.
 
 ### Q13. A naming pass before the freeze
 
@@ -278,12 +281,14 @@ upgrade.
 - (b) One review of tool and change-kind names before the release candidate, with renames
   shipped as deprecations.
 
-**Recommendation: (a)**, unless that review finds a concrete clash.
+**Decided (recommendation): (a)**, unless that review finds a concrete clash.
 
-## When this is accepted
+## Following from the acceptance
 
-- Replace the pre-1.0 sentence in `CHANGELOG.md`'s preamble with a link to the accepted policy.
-- Add the policy to [releasing](../guides/releasing.md), [SECURITY.md](../../SECURITY.md) and the
-  [MCP surface](../reference/mcp-surface.md) page, and the `deprecation` field to the catalog
-  schema.
-- Build the surface baseline, the error registry and the release gate, then tick the TODO box.
+- Done on 8 November: `CHANGELOG.md`'s preamble, [releasing](../guides/releasing.md),
+  [SECURITY.md](../../SECURITY.md) and the [MCP surface](../reference/mcp-surface.md) page link
+  this policy.
+- Open: the catalog schema's `deprecation` field, the experimental marking of tools outside Q1,
+  the surface baseline, the error registry and the release gate, then the TODO box is ticked.
+- At the release: the catalog version moves to `1.0.0` (Q7) and `manifest.json` gains
+  `catalogVersion`.
