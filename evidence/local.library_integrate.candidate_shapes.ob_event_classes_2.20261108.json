@@ -1,0 +1,71 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.candidate_shapes.ob_event_classes_2.20261108",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-08T09:31:27+00:00",
+  "source": {
+    "commit": "c9fc8ca358094a06fdf071f2102bc94f2adc7b94",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_integrate_apply.py --candidates on a --component-qualification Host from Debug builds of c9fc8ca3, seven cases each in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: a fresh PLC component after the last network of an existing FBD time-of-day OB (OB10), time-delay interrupt OB (OB20), hardware interrupt OB (OB40) and diagnostic error interrupt OB (OB82); and in a cyclic-interrupt OB (OB30) as a LAD OB, after the first of two networks, and reusing the FB a verified standalone install put into the project. Each preview named exactly obCaller, its obEventClass feature and its combination, and each install passed the exact installed-object diff, the native caller insertion proof, the call oracle, a fresh reopen, a 0-error compile and change_restore of the initial checkpoint into a new location.",
+  "limitations": [
+    "OB fixtures are Main's envelope with the event class, number and informative inputs replaced; OB attributes and event attachments keep V21's defaults (the hardware interrupt OB is attached to no channel).",
+    "Only these seven shapes; other combinations of event classes with LAD, earlier placement or reuse, and event classes not named here, stay plan-only.",
+    "Engineering only; no OB runs."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "c5492a176b25aad3a37fa9e58a68978d60b163f310482dff896b6ed21b91a8f8"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "42cd28761ffa513f4f9c109f6c2c20a8d5ee4fdd95198085f059cb6acd93b89d"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "346e4ac6f570e1dec43315b706beed848123609d64dc38600c1b6a64a3bd496b",
+      "bytes": 15588991,
+      "completed": true,
+      "steps": [
+        "author",
+        "candidate:obTimeOfDay",
+        "candidate:obTimeDelay",
+        "candidate:obHardware",
+        "candidate:obDiagnostic",
+        "candidate:obCyclicLad",
+        "candidate:obCyclicEarlier",
+        "candidate:obCyclicReuse"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

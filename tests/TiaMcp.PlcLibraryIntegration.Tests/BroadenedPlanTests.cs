@@ -111,8 +111,9 @@ internal static class BroadenedPlanTests
             Equal(null, Refusal(Ob())); Equal("", Features(Ob()));
             // Startup and cyclic-interrupt OBs passed natively on 8 November (local.library_integrate.candidate_shapes.ob_event_classes.20261108).
             Equal(null, Refusal(Ob("Startup"))); Equal(null, Refusal(Ob("CyclicInterrupt"))); Equal("", Features(Ob("CyclicInterrupt")));
-            Equal("obCaller,obEventClass.TimeOfDay", Features(Ob("TimeOfDay"))); Equal("obCaller,obEventClass.Unknown", Features(Ob(null)));
-            Equal("Only program-cycle OB callers are verified; this TimeOfDay OB stays plan-only.", Refusal(Ob("TimeOfDay")));
+            Equal(null, Refusal(Ob("TimeOfDay"))); Equal("", Features(Ob("HardwareInterrupt")));
+            Equal("obCaller,obEventClass.ProgrammingError", Features(Ob("ProgrammingError"))); Equal("obCaller,obEventClass.Unknown", Features(Ob(null)));
+            Equal("Only program-cycle OB callers are verified; this ProgrammingError OB stays plan-only.", Refusal(Ob("ProgrammingError")));
             var lad = Ob("Startup"); lad.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); lad.Inventory["objects"][0]["language"] = "LAD";
             Equal("obCaller,obEventClass.Startup,ladCaller", Features(lad));
         });
