@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "008d10729b5cb85c541c9e73310c4b47ec6a81cfe056e6f1a0884e9a9b1ce96e",
-      "bytes": 1838077
+      "sha256": "fd3d6b2fe976ffd9b756618a6d0effd8b929ea4ce5a9094de4ee9ce9f304a9a1",
+      "bytes": 1846140
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2762,8 +2762,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
-      "sha256": "0ee793cd0496bf6a95e76d0150d7e7b1f65cccbcb3e06c98443cd5b9aef94adc",
-      "bytes": 8303
+      "sha256": "f2deb32d92577f16d4cf6dcaa39979f46a094660b0e218d457f99ea44f4ac69b",
+      "bytes": 8893
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -3242,8 +3242,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs",
-      "sha256": "9e9317be201b15ae6208fec62b9fad0e7c9b12fafe1a4cb2dfcb6ed09b291594",
-      "bytes": 22924
+      "sha256": "f7c9f931d21d5494559196353416747005328f6dfc15ff22c91d96861adde6fe",
+      "bytes": 23965
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcHmiIntegrationPlanner.cs",
@@ -89537,8 +89537,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             }
           ]
         },
@@ -89571,8 +89571,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             }
           ]
         }
@@ -91596,8 +91596,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -92484,8 +92484,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -92795,8 +92795,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -93683,8 +93683,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -94025,8 +94025,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -94913,8 +94913,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -95224,8 +95224,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -96112,8 +96112,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -96423,8 +96423,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -97311,8 +97311,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -97622,8 +97622,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -98510,8 +98510,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -98821,8 +98821,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -99709,8 +99709,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -100020,8 +100020,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -100908,8 +100908,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DriveMotor.cs",
               "name": "DriveMotorConfigure",
               "line": 23,
-              "endLine": 75,
-              "sha256": "93cd278258791f4e7387aa949c1b596526be09263c824576bcbe4fc50f1130bb"
+              "endLine": 79,
+              "sha256": "cf76851d5892854cc2378b234a27184083fd81749f576e8d2f57097848116962"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -110063,7 +110063,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.drives.motor-configure.20261108",
+          "profileSha256": "249462062ad3652d719d542deb5b0b068811748d68f0c2537bf7d1fd24f906f3",
+          "artifacts": [
+            "evidence/local.drives.motor-configure.20261108.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -113761,6 +113769,13 @@
           "artifacts": [
             "evidence/local.library_compatibility.firmware.20261107.json"
           ]
+        },
+        {
+          "id": "local.library.vendor-compile.20261108",
+          "profileSha256": "54fe3dc5225681f044f9f7f1505212e6ef2c9eac340ccae5ed0e783268ec6c95",
+          "artifacts": [
+            "evidence/local.library.vendor-compile.20261108.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -113909,6 +113924,13 @@
           "profileSha256": "c5f3444f38209fad224217797d4803b97df92ebf3f34cc842bdf563237d9b203",
           "artifacts": [
             "evidence/local.library_integrate.candidate_shapes.ob_event_classes_2.20261108.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
+          "profileSha256": "52420ea08e28057520dd481bbbaa9f21584590124416a6a0aed46b92afcab0f4",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.ob_combinations_2.20261108.json"
           ]
         },
         {
@@ -114660,6 +114682,20 @@
           "profileSha256": "8b084a0612905b5180460cbc36ba60b998afe8b6b2a4ff5d2a163f752df44d55",
           "artifacts": [
             "evidence/local.library.vendor-workload.20261108.json"
+          ]
+        },
+        {
+          "id": "local.library.vendor-workload-all.20261108",
+          "profileSha256": "971b5bf0d4ce3472492e2c780ac00e93de29621db6607d1ccfcb3671ef945dc4",
+          "artifacts": [
+            "evidence/local.library.vendor-workload-all.20261108.json"
+          ]
+        },
+        {
+          "id": "local.library.vendor-compile.20261108",
+          "profileSha256": "54fe3dc5225681f044f9f7f1505212e6ef2c9eac340ccae5ed0e783268ec6c95",
+          "artifacts": [
+            "evidence/local.library.vendor-compile.20261108.json"
           ]
         }
       ],
@@ -123650,6 +123686,13 @@
           ]
         },
         {
+          "id": "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
+          "profileSha256": "52420ea08e28057520dd481bbbaa9f21584590124416a6a0aed46b92afcab0f4",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.ob_combinations_2.20261108.json"
+          ]
+        },
+        {
           "id": "local.library_integrate.candidate_shapes.embedding_parent.20261107",
           "profileSha256": "2de00642514da8d5ccaad70d9184e1782aadab75f32b993528b64b087a7c8489",
           "artifacts": [
@@ -124333,6 +124376,13 @@
           "profileSha256": "8b084a0612905b5180460cbc36ba60b998afe8b6b2a4ff5d2a163f752df44d55",
           "artifacts": [
             "evidence/local.library.vendor-workload.20261108.json"
+          ]
+        },
+        {
+          "id": "local.library.vendor-workload-all.20261108",
+          "profileSha256": "971b5bf0d4ce3472492e2c780ac00e93de29621db6607d1ccfcb3671ef945dc4",
+          "artifacts": [
+            "evidence/local.library.vendor-workload-all.20261108.json"
           ]
         }
       ],
@@ -139881,6 +139931,11 @@
       "sha256": "d815b91166303c0d6b45fee24007bf0c36da7c8fd2b01f620e182d9c8a3a1da7"
     },
     {
+      "path": "evidence/local.drives.motor-configure.20261108.json",
+      "state": "observed",
+      "sha256": "c73662fa68715e7ba37543a77d726dea679dfe56e6e269e314ecef449773560d"
+    },
+    {
       "path": "evidence/local.drives.probe.20261030.json",
       "state": "observed",
       "sha256": "04ecd11b7a9581451818e1f08ec50bf0ff2bed78e49c78ef09b43ba9fe0ad232"
@@ -140291,6 +140346,16 @@
       "sha256": "ae9bea81b23e345005eb834fc97c0473849f5ac084103d9fcc71df328d623f9d"
     },
     {
+      "path": "evidence/local.library.vendor-compile.20261108.json",
+      "state": "observed",
+      "sha256": "6c0ccf8c3873cee9a6d7408f750c66550cfffff64fd7366da2a9e9bec7683889"
+    },
+    {
+      "path": "evidence/local.library.vendor-workload-all.20261108.json",
+      "state": "observed",
+      "sha256": "d3f0f7a98a769c58a485cbce02bc0b63f37527ee77db61ebe199c604e1f836be"
+    },
+    {
       "path": "evidence/local.library.vendor-workload.20261108.json",
       "state": "observed",
       "sha256": "7a8cea2b1b3aa7070661c3642d22b78c1d3f0804524eb121f805de2673e3ed6b"
@@ -140369,6 +140434,11 @@
       "path": "evidence/local.library_integrate.candidate_shapes.ob_combinations.20261107.json",
       "state": "observed",
       "sha256": "4b7b8af5add39cb12a1a6c23868d06e05156af973994601cc9ec410d1c7001a8"
+    },
+    {
+      "path": "evidence/local.library_integrate.candidate_shapes.ob_combinations_2.20261108.json",
+      "state": "observed",
+      "sha256": "b04fd1df872345ad136497aa71a9191e96b331746182b93cb33e3db5e889b76d"
     },
     {
       "path": "evidence/local.library_integrate.candidate_shapes.ob_event_classes.20261108.json",
@@ -141326,6 +141396,10 @@
       "profileSha256": "a5a479c67570d5866ab02fb2fab94e4ba1c17096f9372a0a7ef5cd6bd2e50519"
     },
     {
+      "id": "local.drives.motor-configure.20261108",
+      "profileSha256": "249462062ad3652d719d542deb5b0b068811748d68f0c2537bf7d1fd24f906f3"
+    },
+    {
       "id": "local.drives.probe.20261030",
       "profileSha256": "13897a38fa6cd81281613af53057718e5e035aadb29ccacde7de54be03adc466"
     },
@@ -141654,6 +141728,14 @@
       "profileSha256": "36cdea5fc377c22d69a253bd795972af8caedb40bbaef6275073b380cd8c9609"
     },
     {
+      "id": "local.library.vendor-compile.20261108",
+      "profileSha256": "54fe3dc5225681f044f9f7f1505212e6ef2c9eac340ccae5ed0e783268ec6c95"
+    },
+    {
+      "id": "local.library.vendor-workload-all.20261108",
+      "profileSha256": "971b5bf0d4ce3472492e2c780ac00e93de29621db6607d1ccfcb3671ef945dc4"
+    },
+    {
       "id": "local.library.vendor-workload.20261108",
       "profileSha256": "8b084a0612905b5180460cbc36ba60b998afe8b6b2a4ff5d2a163f752df44d55"
     },
@@ -141716,6 +141798,10 @@
     {
       "id": "local.library_integrate.candidate_shapes.ob_combinations.20261107",
       "profileSha256": "70731cd6c2d8a5d61d990077426294cbb1d340a3f48b3e7c3bf593153128f882"
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
+      "profileSha256": "52420ea08e28057520dd481bbbaa9f21584590124416a6a0aed46b92afcab0f4"
     },
     {
       "id": "local.library_integrate.candidate_shapes.ob_event_classes.20261108",

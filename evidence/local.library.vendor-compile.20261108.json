@@ -1,0 +1,74 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library.vendor-compile.20261108",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-08T11:46:37+00:00",
+  "source": {
+    "commit": "110bd62ead5ce131b4645121e3cc762f191cc8c5",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_vendor_workload.py --compile 'Open Library V19 PLC.zal19' --exclude Siwarex --exclude Modbus --exclude MB_ --exclude VFD_V20 on Debug builds of the frozen commit, one owned TIA Portal V21 Update 3 on PCNico, artifact root directly under the checkout's artifacts folder. The real DMC V19 PLC archive (hash-checked download) upgraded into V21 (277 types, 41 s) with an owned scratch CPU 1511-1 PN V4.1 open; hardware_cpu_memory_bytes set DMC's system and clock memory bytes, library_instantiate created the 'Open Library' tag table, and 180 of the library's 218 default code-block versions (all but 38 Modbus, SIWAREX and fbVFD_V20 types) were instantiated with their dependency closures in two library_instantiate changes of 100 and 80 versions, each with checkpoint, a PLC compile that had to pass and save: 60 s and 48 s. The Portal working set peaked at 3,327 MiB.",
+  "limitations": [
+    "Excluded by name: the Modbus family (S7-1200 MB_COMM_LOAD/MB_MASTER on this S7-1500), SIWAREX (vendor know-how protection) and fbVFD_V20 (missing fcSetHMIStatusSimulation_1), as diagnosed on 2 November; they are not qualified.",
+    "One CPU 1511-1 PN V4.1; compile only, no download or runtime behavior of the vendor blocks."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "179701d5e792a071389e5415815427cf249f4e75d7b647d88d546339eb1cfa6e"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "53a78af51572d6db4571f9e1b74b6a83505778567f7cf7f543929d580c35ec0b"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "465fe711fe719b2a2e94e13791d670169248f3b72c559792b5e7068a9eca010c",
+      "bytes": 116056,
+      "completed": true,
+      "steps": [
+        "stage and classify pal-e46b222.zip",
+        "stage and classify Siemens-Open-Library-V19.zip",
+        "stage and classify Siemens-Open-Library-V18.zip",
+        "stage and classify Siemens-Open-Library-V17-V5.0.zip",
+        "stage and classify Siemens-Open-Library-V16-V4.1.zip",
+        "stage and classify Siemens-Open-Library-V15-V4.0.zip",
+        "stage and classify Siemens-Open-Library-V14SP1-V3.0.zip",
+        "start owned TIA vendor workload",
+        "create owned scratch vendor workload",
+        "upgrade Siemens-Open-Library-V19.zip Open Library V19 PLC.zal19",
+        "prepare hardware_cpu_memory_bytes",
+        "apply hardware_cpu_memory_bytes",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "instantiate and compile DMC default blocks 1-100",
+        "instantiate and compile DMC default blocks 101-180"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "library_list",
+        "library_open",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_package_status",
+        "library_query",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

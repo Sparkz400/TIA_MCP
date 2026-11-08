@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.166",
+  "catalogVersion": "0.4.168",
   "targetTiaVersions": [
     21
   ],
@@ -369,6 +369,40 @@
         "Observations on this host, not budgets; one Portal for all upgrades, so memory accumulates across them.",
         "Upgrade and listing only; the upgraded types are not instantiated or compiled here (DMC compilation has its own record), and PAL's V16 SimaticML still needs an intermediate TIA version.",
         "Four archive names need an artifact root at least one character shorter than 52 characters."
+      ]
+    },
+    {
+      "id": "local.library.vendor-workload-all.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "fcf65a335e04cfed21ff5f41017f2e6308819385",
+        "passedScope": "scripts/qualify_vendor_workload.py on the same Debug builds as local.library.vendor-workload.20261108, with the Host artifact root directly under the checkout's artifacts folder (39 characters, the Host default here), one owned TIA Portal V21 Update 3 on PCNico. The seven PAL/DMC downloads (467,587,713 bytes, hash-checked) were staged and classified in 5.8 s, and all 22 DMC global-library archives (V14 SP1 to V19) upgraded into V21 through library_upgrade: 7,726 types and 7,802 versions in 1,116 s together, including the four names that a 52-character root had refused with LibraryPathTooLong (31-77 s each). Every upgraded library was listed completely and closed; the Portal working set grew from 1,156 MiB to 4,841 MiB. Source archives were unchanged."
+      },
+      "artifacts": [
+        "evidence/local.library.vendor-workload-all.20261108.json"
+      ],
+      "limitations": [
+        "Observations on this host, not budgets; one Portal for all upgrades, so memory accumulates across them.",
+        "Upgrade and listing only; instantiation and compilation of the upgraded types are a separate record."
+      ]
+    },
+    {
+      "id": "local.library.vendor-compile.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "110bd62ead5ce131b4645121e3cc762f191cc8c5",
+        "passedScope": "scripts/qualify_vendor_workload.py --compile 'Open Library V19 PLC.zal19' --exclude Siwarex --exclude Modbus --exclude MB_ --exclude VFD_V20 on Debug builds of the frozen commit, one owned TIA Portal V21 Update 3 on PCNico, artifact root directly under the checkout's artifacts folder. The real DMC V19 PLC archive (hash-checked download) upgraded into V21 (277 types, 41 s) with an owned scratch CPU 1511-1 PN V4.1 open; hardware_cpu_memory_bytes set DMC's system and clock memory bytes, library_instantiate created the 'Open Library' tag table, and 180 of the library's 218 default code-block versions (all but 38 Modbus, SIWAREX and fbVFD_V20 types) were instantiated with their dependency closures in two library_instantiate changes of 100 and 80 versions, each with checkpoint, a PLC compile that had to pass and save: 60 s and 48 s. The Portal working set peaked at 3,327 MiB."
+      },
+      "artifacts": [
+        "evidence/local.library.vendor-compile.20261108.json"
+      ],
+      "limitations": [
+        "Excluded by name: the Modbus family (S7-1200 MB_COMM_LOAD/MB_MASTER on this S7-1500), SIWAREX (vendor know-how protection) and fbVFD_V20 (missing fcSetHMIStatusSimulation_1), as diagnosed on 2 November; they are not qualified.",
+        "One CPU 1511-1 PN V4.1; compile only, no download or runtime behavior of the vendor blocks."
       ]
     },
     {
@@ -5334,6 +5368,24 @@
       ]
     },
     {
+      "id": "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9542a1ca5681eb4178343c6958554aad96730d77",
+        "passedScope": "scripts/qualify_library_integrate_apply.py --candidates on a --component-qualification Host from Debug builds of the frozen commit, fifteen cases each in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: the PLC component in an existing startup (OB100), time-of-day (OB10), time-delay interrupt (OB20), hardware interrupt (OB40) and diagnostic error interrupt (OB82) OB, each as a LAD OB, after the first of two networks, and reusing the FB a verified standalone install put into the project. Each preview named exactly its features, and each install passed the exact installed-object diff, the native caller insertion proof, the call oracle, a fresh reopen, a 0-error compile and change_restore of the initial checkpoint into a new location."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.ob_combinations_2.20261108.json"
+      ],
+      "limitations": [
+        "OB fixtures are Main's envelope with the event class, number and informative inputs replaced; OB attributes and event attachments keep V21's defaults.",
+        "Pairs of these features with an event class (LAD with an earlier placement, and so on) and event classes not named here stay plan-only.",
+        "Engineering only; no OB runs."
+      ]
+    },
+    {
       "id": "local.drives.telegram-resize.20261107",
       "status": "passed",
       "profile": {
@@ -5349,6 +5401,23 @@
         "The drive is on no IO system, so its telegrams have no start addresses and keepOriginalAddress is not observable here.",
         "Torque telegrams: Startdrive refuses them on the G120C PN; no drive accepting one was available.",
         "Earlier attempts found two worker defects, fixed before this run: the readback used the telegram composition taken before an insert, which does not list the new telegram, and sizes are now compared in bytes (2 per PROFIdrive word)."
+      ]
+    },
+    {
+      "id": "local.drives.motor-configure.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "5738e7c855a03a3d6f850edf313a1730d447d4e5",
+        "passedScope": "scripts/qualify_drive_motor.py on Debug builds of the frozen commit (artifacts/dm5, git archive), one owned scratch CPU 1511-1 PN V4.1 with a SINAMICS G220 (OrderNumber:6SL41xx-2xxxx-xxFx/V6.7) added through hardware_add and compiled with save. drive_observe read motor data set 0 on the drive object of its \"Drive control\" item (13 required and 6 optional entries). drive_motor_configure projected a 400 V / 2.6 A / 1.1 kW / 50 Hz / 1440 rpm / cos phi 0.82 induction motor nameplate (p304, p305, p307, p310, p311, p308, each with its expected current value) through GetCurrentMotorConfiguration and ProjectMotorConfiguration, applied with checkpoint, device compile and save, confirmed by change_status and read back through the change and through drive_observe; change_restore of its checkpoint then showed the original entries again. Typed refusals left the motor data set unchanged: a stale expected value (ExpectedValueMismatch), an unknown entry (ParameterNotFound), a number for a text entry (InvalidRequest), a Siemens code-number motor type (UnsupportedCapability) and the other drive object handle (DriveObjectHandleMismatch). With motorType InductionMotor the G220 refused SetMotorType at apply (\"use PlugNew to create the motor first\": its motor is a plugged hardware item); the failed apply was restored from its checkpoint and the data set was unchanged."
+      },
+      "artifacts": [
+        "evidence/local.drives.motor-configure.20261108.json"
+      ],
+      "limitations": [
+        "One G220 (V6.7), motor data set 0, nameplate entries only; SetMotorType is refused on this drive, whose motor is a plugged item, so the motor type is not exercised.",
+        "Encoder projection, motor identification, online access and download are not part of this kind; a G120C exposes no readable HardwareProjection."
       ]
     },
     {
@@ -12929,7 +12998,8 @@
           "local.library_import_scale.20261027",
           "local.library_vendor.rerun.20261102",
           "local.library.upgrades-v20.20261102",
-          "local.library.vendor-workload.20261108"
+          "local.library.vendor-workload.20261108",
+          "local.library.vendor-workload-all.20261108"
         ]
       },
       "availability": {
@@ -13165,7 +13235,7 @@
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "Native V13 libraries are refused before any native call (LibraryVersionUnsupported, local.library_compatibility.20261027). V14 SP1-V18 (local.library_upgrades.20261024) and V19 (local.library_vendor.20261025) upgrades are qualified; V20 upgrades stay open because no V20 library input is available.",
-          "TIA retrieves an upgraded library into <work>\\<name> and opens <work>\\<name>_V21 and refuses a path over 143 characters; the output folders are one letter each, and prepare refuses a library whose directory still would not fit with LibraryPathTooLong before any copy (local.library.vendor-workload.20261108: 18 of 22 DMC archives upgraded, four names one character over a 52-character artifact root were refused)."
+          "TIA retrieves an upgraded library into <work>\\<name> and opens <work>\\<name>_V21 and refuses a path over 143 characters; the output folders are one letter each, and prepare refuses a library whose directory still would not fit with LibraryPathTooLong before any copy (local.library.vendor-workload.20261108: 18 of 22 DMC archives upgraded, four names one character over a 52-character artifact root were refused); under the Host's default 39-character root all 22 upgraded (local.library.vendor-workload-all.20261108)."
         ]
       },
       "qualification": {
@@ -13179,7 +13249,9 @@
           "local.library_vendor.rerun.20261102",
           "local.library.upgrades-v20.20261102",
           "local.library_compatibility.firmware.20261107",
-          "local.library.vendor-workload.20261108"
+          "local.library.vendor-workload.20261108",
+          "local.library.vendor-workload-all.20261108",
+          "local.library.vendor-compile.20261108"
         ]
       },
       "availability": {
@@ -13318,7 +13390,8 @@
           "local.library.dmc-order.20261102",
           "local.safety.fio-routes.20261102",
           "local.safety.fio-block-routes.20261102",
-          "local.library_compatibility.firmware.20261107"
+          "local.library_compatibility.firmware.20261107",
+          "local.library.vendor-compile.20261108"
         ]
       },
       "availability": {
@@ -13439,7 +13512,7 @@
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
-          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs. A fresh component after the last network of an existing FBD startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB passed on 8 November, and so did a cyclic-interrupt OB as LAD, after an earlier network and with reuse (local.library_integrate.candidate_shapes.ob_event_classes.20261108, local.library_integrate.candidate_shapes.ob_event_classes_2.20261108); every other event class, and every other combination of an event class with another feature, stays plan-only.",
+          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs. A fresh component after the last network of an existing FBD startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB passed on 8 November, and so did each of these OBs as LAD, after an earlier network and with reuse (local.library_integrate.candidate_shapes.ob_event_classes.20261108, local.library_integrate.candidate_shapes.ob_event_classes_2.20261108, local.library_integrate.candidate_shapes.ob_combinations_2.20261108); every other event class, and every other combination of an event class with another feature, stays plan-only.",
           "Embedding parents (local.library_integrate.candidate_shapes.embedding_parent.20261107): a multi-instance caller FB embedded in a parent FB installs through the captured component transitive effect, the parent gaining the member in its nested Static section; verified for the reused FB in an existing FBD FB caller. Since local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107 also with a LAD caller, an earlier placement, the caller's own instance DB and every combination of these, and two levels deep (the parent's DB, a grandparent FB and its DB each gaining the captured nested member); standard route only."
         ]
       },
@@ -13460,6 +13533,7 @@
           "local.library_integrate.candidate_shapes.ob_combinations.20261107",
           "local.library_integrate.candidate_shapes.ob_event_classes.20261108",
           "local.library_integrate.candidate_shapes.ob_event_classes_2.20261108",
+          "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
           "local.library_integrate.candidate_shapes.embedding_parent.20261107",
           "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
         ]
@@ -13511,7 +13585,7 @@
           "The import step's complete-project archive (for a reused FB, the typed step's own archive), taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
           "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable.",
           "Before any claim, import or save, combined apply refuses (PlcIntegrationNotQualified) unless de-DE is the project's only active, reference and editing language and an instance creation profile covers the FB (captured storage profile with its CPU and loaded API files, or a shipped global instance template matched against the planned FB export); the preview reports combinedApply.eligible=false for such projects.",
-          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs. A fresh component after the last network of an existing FBD startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB passed on 8 November, and so did a cyclic-interrupt OB as LAD, after an earlier network and with reuse (local.library_integrate.candidate_shapes.ob_event_classes.20261108, local.library_integrate.candidate_shapes.ob_event_classes_2.20261108); every other event class, and every other combination of an event class with another feature, stays plan-only.",
+          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs. A fresh component after the last network of an existing FBD startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB passed on 8 November, and so did each of these OBs as LAD, after an earlier network and with reuse (local.library_integrate.candidate_shapes.ob_event_classes.20261108, local.library_integrate.candidate_shapes.ob_event_classes_2.20261108, local.library_integrate.candidate_shapes.ob_combinations_2.20261108); every other event class, and every other combination of an event class with another feature, stays plan-only.",
           "Embedding parents (local.library_integrate.candidate_shapes.embedding_parent.20261107): a multi-instance caller FB embedded in a parent FB installs through the captured component transitive effect, the parent gaining the member in its nested Static section; verified for the reused FB in an existing FBD FB caller. Since local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107 also with a LAD caller, an earlier placement, the caller's own instance DB and every combination of these, and two levels deep (the parent's DB, a grandparent FB and its DB each gaining the captured nested member); standard route only."
         ]
       },
@@ -13535,6 +13609,7 @@
           "local.library_integrate.candidate_shapes.ob_combinations.20261107",
           "local.library_integrate.candidate_shapes.ob_event_classes.20261108",
           "local.library_integrate.candidate_shapes.ob_event_classes_2.20261108",
+          "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
           "local.library_integrate.candidate_shapes.embedding_parent.20261107",
           "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
         ]
@@ -27564,15 +27639,19 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one SINAMICS G220 (V6.7) in an owned scratch CPU 1511-1 PN V4.1 (local.drives.motor-configure.20261108): a six-entry induction motor nameplate on motor data set 0, applied with checkpoint, device compile and save, read back and restored from its checkpoint; stale, unknown, mistyped, code-number-type and wrong-handle requests refused. The G220 refuses SetMotorType at apply (its motor is a plugged hardware item: 'use PlugNew to create the motor first'), so motorType is not exercised; omit it on such a drive.",
           "One exact hardwarePath and drive object handle as drive_observe reports it; driveDataSet 0..31; optional motorType InductionMotor or SynchronousMotor (no Siemens code-number motors); 1..64 entries by exact name (such as p304, p305), each with its expected current value as text exactly as drive_observe motorConfigurations reports it.",
           "Apply sets the motor type, then the entries of GetCurrentMotorConfiguration, then ProjectMotorConfiguration, and reads every listed entry back; the drive object and the data set's motor entries are part of the change fingerprint. Startdrive recalculates dependent parameters; readback covers only the listed entries.",
           "A drive whose HardwareProjection cannot be read refuses with UnsupportedCapability: natively a SINAMICS G120C PN answers every motor read with EngineeringTargetInvocationException, a G220 answers (8 November 2026). Encoder projection, motor identification, online access, download and RAM-to-ROM are not part of this kind.",
-          "compile=true compiles every project device that has a compiler service; the drive itself is listed under notCompiled."
+          "compile=true compiles every project device that has a compiler service; the drive itself is listed under notCompiled.",
+          "Entry values are text as drive_observe reports them; a value of another JSON type than the entry's native type refuses at prepare. Every entry passes drive_parameter_set's SafetyBoundary rule."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.drives.motor-configure.20261108"
+        ]
       },
       "availability": {
         "status": "conditional",
