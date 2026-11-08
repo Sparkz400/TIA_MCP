@@ -95,7 +95,9 @@ LIMITATIONS = [
 
 
 # Every cycle-synchronous capture mode the simulator worker offers (SimulationRuntimeControl.CaptureMode).
-CAPTURE_MODES = ("SingleStep_C", "SingleStep_P", "SingleStep_CP", "SingleStep_CT", "SingleStep_CPT")
+CAPTURE_MODES = ("SingleStep_C", "SingleStep_P", "SingleStep_CP", "SingleStep_CT", "SingleStep_CPT",
+                 "TimespanSynchronized_C", "TimespanSynchronized_P", "TimespanSynchronized_CP")
+SPAN_MS = 10  # CPU time each time-synchronised sample processes
 
 
 def symbol(h, instance_id, member):
@@ -152,6 +154,7 @@ class Lab:
         request = {"attemptId": self.creation, "selectionIds": selections, "intervalMilliseconds": 100, "durationSeconds": seconds, "source": "plcsim",
                    "simulator": {"instanceId": self.instance["id"], "instanceName": self.instance["name"], "cycleSynchronous": mode is not None,
                                  **({"syncMode": mode} if mode else {}),
+                                 **({"spanMilliseconds": SPAN_MS} if mode and mode.startswith("TimespanSynchronized_") else {}),
                                  "signals": [{k: s[k] for k in ("symbol", "type", "datatype")} for s in self.signals]},
                    "reviewId": self.review,
                    "association": {"caseId": self.case, "mappings": [
@@ -404,11 +407,15 @@ def body(h):
         initial = h.stage("operating mode before the cycle-synchronous captures", mode_of)
         h.report["captureModes"] = {"initialOperatingMode": initial}
         for mode in CAPTURE_MODES:
-            captured = lab.capture("cycle-synchronous " + mode, seconds=2, mode=mode, stall=mode != "SingleStep_C")
+            captured = lab.capture("cycle-synchronous " + mode, seconds=2, mode=mode, stall=mode not in ("SingleStep_C", "TimespanSynchronized_C"))
             restored = h.stage("operating mode after the %s capture" % mode, mode_of)
             require(restored == initial, "The %s capture left operating mode %s instead of %s" % (mode, restored, initial))
             h.report["captureModes"][mode] = {"rows": captured["progress"]["rows"], "terminalReason": captured["progress"]["terminalReason"],
                                               "restoredOperatingMode": restored}
+        lab.refuse("a time-synchronised mode without spanMilliseconds", "runtime_capture_start", {"captureId": uuid.uuid4().hex, "request": {
+            "attemptId": lab.creation, "selectionIds": [uuid.uuid4().hex], "intervalMilliseconds": 100, "durationSeconds": 1, "source": "plcsim",
+            "simulator": {"instanceId": lab.instance["id"], "instanceName": lab.instance["name"], "cycleSynchronous": True, "syncMode": "TimespanSynchronized_C",
+                          "signals": [{k: enable[k] for k in ("symbol", "type", "datatype")}]}}}, ["InvalidRequest", "PlcsimCaptureInvalid"])
         lab.refuse("syncMode without cycleSynchronous", "runtime_capture_start", {"captureId": uuid.uuid4().hex, "request": {
             "attemptId": lab.creation, "selectionIds": [uuid.uuid4().hex], "intervalMilliseconds": 100, "durationSeconds": 1, "source": "plcsim",
             "simulator": {"instanceId": lab.instance["id"], "instanceName": lab.instance["name"], "cycleSynchronous": False, "syncMode": "SingleStep_P",

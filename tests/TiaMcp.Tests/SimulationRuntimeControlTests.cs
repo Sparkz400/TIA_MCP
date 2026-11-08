@@ -18,9 +18,19 @@ internal static class SimulationRuntimeControlTests
         Check.Equal("SingleStep_C", SimulationRuntimeControl.CaptureMode(JObject.Parse("{cycleSynchronous:true}")));
         foreach (string mode in new[] { "SingleStep_C", "SingleStep_P", "SingleStep_CP", "SingleStep_CT", "SingleStep_CPT" })
             Check.Equal(mode, SimulationRuntimeControl.CaptureMode(new JObject { ["cycleSynchronous"] = true, ["syncMode"] = mode }));
+        foreach (string mode in new[] { "TimespanSynchronized_C", "TimespanSynchronized_P", "TimespanSynchronized_CP" })
+        {
+            var timespan = new JObject { ["cycleSynchronous"] = true, ["syncMode"] = mode, ["spanMilliseconds"] = 10 };
+            Check.Equal(mode, SimulationRuntimeControl.CaptureMode(timespan));
+            Check.Equal<long?>(10000000L, SimulationRuntimeControl.CaptureSpanNanoseconds(timespan));
+        }
+        Check.Equal<long?>(null, SimulationRuntimeControl.CaptureSpanNanoseconds(JObject.Parse("{cycleSynchronous:true,syncMode:'SingleStep_CP'}")));
         foreach (string input in new[] { "{cycleSynchronous:'true'}", "{cycleSynchronous:true,syncMode:1}",
             "{syncMode:'SingleStep_C'}", "{cycleSynchronous:false,syncMode:'SingleStep_C'}",
             "{cycleSynchronous:true,syncMode:'SingleStep_Bus'}", "{cycleSynchronous:true,syncMode:'TimespanSynchronized_C'}",
+            "{cycleSynchronous:true,syncMode:'TimespanSynchronized_C',spanMilliseconds:0}", "{cycleSynchronous:true,syncMode:'TimespanSynchronized_P',spanMilliseconds:60001}",
+            "{cycleSynchronous:true,syncMode:'TimespanSynchronized_CP',spanMilliseconds:1.5}", "{cycleSynchronous:true,syncMode:'SingleStep_C',spanMilliseconds:10}",
+            "{cycleSynchronous:true,spanMilliseconds:10}", "{cycleSynchronous:true,syncMode:'TimespanSynchronized_CT',spanMilliseconds:10}",
             "{cycleSynchronous:true,syncMode:'Default'}", "{cycleSynchronous:true,syncMode:'singlestep_c'}" })
             Refused(() => SimulationRuntimeControl.CaptureMode(JObject.Parse(input)));
         return Task.CompletedTask;
