@@ -141,4 +141,5 @@ the result, and a failed notification never changes the outcome of the call.
 is `TIA MCP`. The bundled feature catalog version, the data contract version that `feature_catalog`
 also returns, is advertised as `capabilities.experimental["tiaMcp/featureCatalog"].version`
 (for example `0.4.86`). Release bundles record the product version in `manifest.json`
-([releasing](../guides/releasing.md)).
+([releasing](../guides/releasing.md)). From 1.0 the [contract freeze policy](../plans/contract-freeze-policy.md)
+says which parts of this surface are frozen.
