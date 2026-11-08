@@ -120,7 +120,7 @@ if __name__ == "__main__":
     parser.add_argument("--artifacts", type=Path, required=True)
     parser.add_argument("--receipt", type=Path, required=True)
     parser.add_argument("--vendor-dir", type=Path, required=True)
-    parser.add_argument("--timeout", type=int, default=1800)
+    parser.add_argument("--timeout", type=int, default=900)  # the Host accepts 5..900
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
     args.runner = __file__
