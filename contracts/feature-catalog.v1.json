@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.165",
+  "catalogVersion": "0.4.166",
   "targetTiaVersions": [
     21
   ],
@@ -27541,6 +27541,57 @@
         "AC-identity",
         "AC-completeness",
         "AC-native",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.drive_motor_configure",
+      "domain": "drives",
+      "title": "Project a motor without a Siemens code number into one drive data set",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "drive_motor_configure",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Startdrive Openness: DriveFunctionInterface.HardwareProjection with SetMotorType(MotorType, UInt16), GetCurrentMotorConfiguration(UInt16), ConfigurationEntry.Value and ProjectMotorConfiguration(MotorConfiguration, UInt16)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "One exact hardwarePath and drive object handle as drive_observe reports it; driveDataSet 0..31; optional motorType InductionMotor or SynchronousMotor (no Siemens code-number motors); 1..64 entries by exact name (such as p304, p305), each with its expected current value as text exactly as drive_observe motorConfigurations reports it.",
+          "Apply sets the motor type, then the entries of GetCurrentMotorConfiguration, then ProjectMotorConfiguration, and reads every listed entry back; the drive object and the data set's motor entries are part of the change fingerprint. Startdrive recalculates dependent parameters; readback covers only the listed entries.",
+          "A drive whose HardwareProjection cannot be read refuses with UnsupportedCapability: natively a SINAMICS G120C PN answers every motor read with EngineeringTargetInvocationException, a G220 answers (8 November 2026). Encoder projection, motor identification, online access, download and RAM-to-ROM are not part of this kind.",
+          "compile=true compiles every project device that has a compiler service; the drive itself is listed under notCompiled."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SINAMICS Startdrive V21 Openness, an offline project and a drive object whose HardwareProjection answers (a third-generation drive such as the G220)."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "SINAMICS Startdrive V21 installed with its Openness assembly",
+        "Applicable native services and project protection state",
+        "A verified recovery checkpoint; compile=true to save"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
         "AC-evidence"
       ]
     },
