@@ -109,8 +109,12 @@ internal static class BroadenedPlanTests
         test("combined apply admits the verified insertion before another network", () => Equal(null, Refusal(Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3))));
         test("combined apply admits the natively verified FBD OB shape", () => {
             Equal(null, Refusal(Ob())); Equal("", Features(Ob()));
-            Equal("obCaller,obEventClass.Startup", Features(Ob("Startup"))); Equal("obCaller,obEventClass.Unknown", Features(Ob(null)));
-            Equal("Only program-cycle OB callers are verified; this CyclicInterrupt OB stays plan-only.", Refusal(Ob("CyclicInterrupt")));
+            // Startup and cyclic-interrupt OBs passed natively on 8 November (local.library_integrate.candidate_shapes.ob_event_classes.20261108).
+            Equal(null, Refusal(Ob("Startup"))); Equal(null, Refusal(Ob("CyclicInterrupt"))); Equal("", Features(Ob("CyclicInterrupt")));
+            Equal("obCaller,obEventClass.TimeOfDay", Features(Ob("TimeOfDay"))); Equal("obCaller,obEventClass.Unknown", Features(Ob(null)));
+            Equal("Only program-cycle OB callers are verified; this TimeOfDay OB stays plan-only.", Refusal(Ob("TimeOfDay")));
+            var lad = Ob("Startup"); lad.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); lad.Inventory["objects"][0]["language"] = "LAD";
+            Equal("obCaller,obEventClass.Startup,ladCaller", Features(lad));
         });
         // Passed natively on 7 November (local.library_integrate.candidate_shapes.ob_combinations.20261107).
         test("combined apply admits the natively verified LAD OB combination", () => {

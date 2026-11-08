@@ -38,7 +38,7 @@ and the corresponding `ProbeVersion=V19`/`artifacts/sdk-probe-v19`. Assemblies a
 | Other products | Test Suite Advanced V21, PLCSIM Advanced V8 Update 1 and ODK 1500S V2.5 installed. | Product installation does not establish license availability or successful native operations. |
 
 CFC/DCC and V19 are no longer classified as missing installation/SDK prerequisites **on this
-workstation**. Their adapters and native qualification remain open; advertised support is unchanged.
+workstation** (the maintainer's second one; on 8 November PCNico had neither CFC/DCC assemblies nor a V19 Portal). Their adapters and native qualification remain open; advertised support is unchanged.
 The old workstation's absence observations remain historical evidence.
 
 The documented `D:/tq1102/ui-seed` and `artifacts/local-completion-20261102`/`artifacts/evidence`

@@ -1,0 +1,66 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.candidate_shapes.ob_event_classes.20261108",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-08T08:06:11+00:00",
+  "source": {
+    "commit": "7204a545f69066ca484e515362f7ef70f5c16991",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_integrate_apply.py --candidates --case obStartup --case obCyclic on a --component-qualification Host from Debug builds of 7204a545, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: a fresh PLC component installed after the last network of an existing FBD startup OB (OB100, SecondaryType Startup) and of an existing FBD cyclic-interrupt OB (OB30, SecondaryType CyclicInterrupt), each preview naming exactly obCaller and its obEventClass feature, with the exact installed-object diff, the native caller insertion proof, the call oracle, a fresh reopen, a 0-error compile and change_restore of the initial checkpoint into a new location.",
+  "limitations": [
+    "OB fixtures are Main's envelope with the event class, number and informative inputs replaced; the OB's own attributes (cyclic time, phase shift) keep V21's defaults.",
+    "Only these two single shapes; event classes combined with LAD, an earlier placement or reuse, and other event classes (time-of-day, hardware interrupt, diagnostic error and others), stay plan-only.",
+    "Engineering only; no OB runs."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "18df37f3b0a54fa12e6c70e535fb0e1163c86164c19ae9acb7db287bb9854ec2"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "97f7d9f5bcd2aa6aad7e43fc6a615f13f30d5abdd3ed97967398a17e9d66b3dd"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "1a8ea31f33732ad347f21e0e6a3f6f8b61808ccf38c15d761eb0ad8fc25fb03e",
+      "bytes": 4759840,
+      "completed": true,
+      "steps": [
+        "author",
+        "candidate:obStartup",
+        "candidate:obCyclic"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

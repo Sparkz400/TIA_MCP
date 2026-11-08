@@ -219,6 +219,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- **Component installs into OBs of other event classes:** combined apply admitted any existing OB caller, though its evidence covered program-cycle OBs only. Another event class now stays plan-only until verified; startup and cyclic-interrupt OBs passed natively and run in production ([record](docs/verification/component-ob-event-classes-20261108.md)).
 - **VCI interruption check:** accept exact verified-callback reconciliation when Git finishes verification before the interrupted Host exits; earlier callbacks still require recovery.
 - A request number beyond the double range (such as `1.8e308`) broke the worker connection: the
   worker refused it before reading the request id, so the Host reported `ProtocolMismatch` and

@@ -110,9 +110,10 @@ COMBINATIONS = {
     "obReuseLad": (True, {"kind": "OB", "language": "LAD"}, []),
     "obReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2}, []),
     "obReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2}, []),
-    # A startup and a cyclic-interrupt OB caller: the OB evidence above ran on program-cycle OBs only.
-    "obStartup": (False, {"kind": "OB", "language": "FBD", "eventClass": "Startup"}, ["obCaller", "obEventClass.Startup"]),
-    "obCyclic": (False, {"kind": "OB", "language": "FBD", "eventClass": "CyclicInterrupt"}, ["obCaller", "obEventClass.CyclicInterrupt"]),
+    # A startup and a cyclic-interrupt OB caller beside the program-cycle ones; verified on 8 November
+    # (local.library_integrate.candidate_shapes.ob_event_classes.20261108).
+    "obStartup": (False, {"kind": "OB", "language": "FBD", "eventClass": "Startup"}, []),
+    "obCyclic": (False, {"kind": "OB", "language": "FBD", "eventClass": "CyclicInterrupt"}, []),
     # The reused-FB multi-instance in a Host FB that a parent FB embeds, beside the verified FBD one (multiInstanceParent): LAD, an
     # earlier placement and the Host's own DB in every combination, and the verified shape two levels deep with the parent's and the
     # grandparent's DBs. All verified on 7 November.
