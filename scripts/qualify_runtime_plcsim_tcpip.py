@@ -420,7 +420,17 @@ def setup(r):
     umac = r.stage("access_inspect", lambda: t("access_inspect", {"maxItems": 2000}))["projectUmac"]
     roles, scopes = [n for n in umac["roleNames"].values() if n.startswith("TiaMcpRuntime_")], umac["deviceRightScopes"]
     require(len(roles) == 1 and len(scopes) == 1, "Expected one scratch runtime role and one UMAC device: %s %s" % (roles, scopes))
-    change(r, "umac_role_set", {"action": "grant", "roleName": roles[0], "deviceRights": [{"device": scopes[0], "identifier": i} for i in RIGHTS]}, plc=False)
+    # Syslog.Browse needs its own device function right, whose identifier V21 does not document: a grant of an unknown
+    # identifier is refused with every available right listed, and the ones naming the syslog are granted too.
+    def available():
+        error = r.call_error("change_prepare", {"kind": "umac_role_set", "payload": {"action": "grant", "roleName": roles[0],
+                                                "deviceRights": [{"device": scopes[0], "identifier": "TiaMcpUnknownRight"}]}})
+        require(error.get("code") == "ObjectNotFound", "An unknown right was not refused: %s" % error)
+        return (error.get("details") or {}).get("availableRights") or []
+    rights = r.stage("umac_role_set lists the available device rights", available)
+    r.report["availableDeviceRights"] = rights
+    r.syslog_rights = [x["identifier"] for x in rights if "syslog" in (x["identifier"] + " " + (x.get("name") or "")).lower()]
+    change(r, "umac_role_set", {"action": "grant", "roleName": roles[0], "deviceRights": [{"device": scopes[0], "identifier": i} for i in RIGHTS + tuple(r.syslog_rights)]}, plc=False)
 
     r.before_servers = certificates(r, "certificate_inspect before the servers")
     # V21 turns the system pages on with the server (29 October 2026); activation alone fails its readback, so both are named.
@@ -661,6 +671,7 @@ def normal(r):
     syslog = r.stage("runtime_web_diagnostics syslog", lambda: t("runtime_web_diagnostics", {"attemptId": web, "kind": "syslog", "count": 5}))
     r.report["syslog"] = syslog
     require(isinstance(syslog.get("status"), str), "Syslog returned no status: %s" % syslog)
+    r.report["syslogRights"] = r.syslog_rights
     if syslog["status"] == "read":
         require(syslog["entries"] <= 5, "Syslog returned more entries than requested: %s" % syslog["entries"])
     refused(r, "runtime_web_diagnostics syslog with count 21", "runtime_web_diagnostics", {"attemptId": web, "kind": "syslog", "count": 21}, "RuntimeDiagnosticSelectionInvalid")

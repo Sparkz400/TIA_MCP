@@ -322,6 +322,8 @@ class Host:
         if tool == "runtime_web_browse":
             p.live(a["attemptId"])
             return {"selectionId": a["symbol"], "metadata": []} if a.get("children") is False else {"metadata": []}
+        if tool == "change_prepare" and "TiaMcpUnknownRight" in json.dumps(a):
+            raise Fail("ObjectNotFound")
         if tool == "runtime_web_diagnostics":
             if a["kind"] == "syslog":
                 if not 1 <= a["count"] <= 20:
