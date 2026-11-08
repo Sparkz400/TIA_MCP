@@ -8,6 +8,12 @@ JObject Target() => new JObject { ["target"] = "/devices/HMI", ["state"] = "Succ
     ["messagesTruncated"] = false, ["messages"] = new JArray(new JObject { ["state"] = "Information", ["description"] = "Software compilation started.", ["depth"] = 0 }) };
 JObject Aggregate(params JObject[] targets) => new JObject { ["errorCount"] = 0, ["targets"] = new JArray(targets) };
 
+Check("a 1,000-block compile with counted success rows stays complete and successful", () => {
+    var target=Target(); target["omittedSuccessRows"]=520;
+    var result=new JObject { ["errorCount"]=0,["warningCount"]=0,["targets"]=new JArray(target) };
+    Assert(CompilationEvidenceRules.IsCompleted(result) && CompilationEvidenceRules.IsSuccessful(result));
+});
+
 Check("compile-only completion reports ordinary errors without claiming compiler success", () => {
     var target=Target(); target["errorCount"]=1; target["state"]="Error";
     ((JArray)target["messages"]).Add(new JObject { ["state"]="Error",["description"]="Existing invalid symbol",["depth"]=0 });
