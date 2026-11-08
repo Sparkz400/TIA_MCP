@@ -11,10 +11,15 @@ namespace TiaMcp.Openness.V21
     /// <summary>Siemens-independent write-ahead records. No method replays native work.</summary>
     internal static class LibraryJournalStore
     {
+        // A 1,000-version publish journal holds its closure twice (dependencies and type synchronization) plus the result: about 6 MB.
+        internal const int MaxBytes = 32 * 1024 * 1024;
+
+        internal static int Size(JObject record) => Encoding.UTF8.GetByteCount(record.ToString(Formatting.None));
+
         internal static void Write(string path, JObject record)
         {
-            var bytes = Encoding.UTF8.GetBytes(record.ToString(Formatting.Indented));
-            if (bytes.Length > 8 * 1024 * 1024) throw new InvalidDataException("Library journal exceeds 8 MiB.");
+            var bytes = Encoding.UTF8.GetBytes(record.ToString(Formatting.None));
+            if (bytes.Length > MaxBytes) throw new InvalidDataException("Library journal exceeds 32 MiB.");
             string temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
             using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
             { stream.Write(bytes, 0, bytes.Length); stream.Flush(true); }
@@ -24,7 +29,7 @@ namespace TiaMcp.Openness.V21
 
         internal static JObject Read(string path, string expectedId)
         {
-            if (!File.Exists(path) || new FileInfo(path).Length > 8 * 1024 * 1024) throw new InvalidDataException("Library journal is absent or oversized.");
+            if (!File.Exists(path) || new FileInfo(path).Length > MaxBytes) throw new InvalidDataException("Library journal is absent or oversized.");
             // Keep native timestamps as written; date parsing reserializes them and breaks the preview hash.
             JObject result;
             using (var reader = new JsonTextReader(new StringReader(File.ReadAllText(path))) { DateParseHandling = DateParseHandling.None, MaxDepth = 128 })

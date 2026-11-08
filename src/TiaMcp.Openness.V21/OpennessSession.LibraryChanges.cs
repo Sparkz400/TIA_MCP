@@ -184,6 +184,9 @@ namespace TiaMcp.Openness.V21
             change.PreviewHash = ChangeHash(preview.ToString(Formatting.None));
             change.State = "prepared";
             change.Journal = new JObject { ["schemaVersion"] = 1, ["changeId"] = change.Id, ["kind"] = kind, ["sessionGeneration"] = _libraryGeneration, ["previewHash"] = change.PreviewHash, ["preview"] = preview.DeepClone(), ["checkpoints"] = new JArray(), ["outputs"] = new JArray(), ["events"] = new JArray(), ["automaticRetryAllowed"] = false };
+            // Apply adds events, checkpoints and its result; refuse here so the journal can never overflow after a native change.
+            if (LibraryJournalStore.Size(change.Journal) > LibraryJournalStore.MaxBytes / 2)
+                throw new BridgeException("LibraryLimitExceeded", "The prepared change journal exceeds 16 MiB; select fewer types or a smaller dependency closure.");
             LibraryJournal(change, "prepared", "completed");
             _libraryChanges.Add(change.Id, change);
             return LibraryChangeView(change);
