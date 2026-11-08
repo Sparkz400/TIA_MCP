@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "8e2148648711496d2e454d9af344eb8d6c9b495fc74daa15ca214dece491913e",
-      "bytes": 1848020
+      "sha256": "2450e78eb5ca9520d384790ce4cf859db0e2f4a2490d2da3445ceb433e744907",
+      "bytes": 1849801
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -110075,6 +110075,13 @@
           "artifacts": [
             "evidence/local.drives.motor-configure.20261108.json"
           ]
+        },
+        {
+          "id": "local.drives.encoder-boundary.20261108",
+          "profileSha256": "945d2aa11757b626b5bae5eae5ae61e6756449c8e3d16ec7c24e77076f681c69",
+          "artifacts": [
+            "evidence/local.drives.encoder-boundary.20261108.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -139935,6 +139942,11 @@
       "sha256": "c78df72164b0b37f319cffb33ca1080eae2762838a325846b1e5fc0cf1123a9e"
     },
     {
+      "path": "evidence/local.drives.encoder-boundary.20261108.json",
+      "state": "observed",
+      "sha256": "2364c0c5c34146a9e4eb3c990b0afbb0b2d74da77c7f8f13501ab23337f38799"
+    },
+    {
       "path": "evidence/local.drives.index-status.20261101.json",
       "state": "observed",
       "sha256": "c4ffc8df75cfcc4f76fa36e8644072b3248ed54f362f0b6cc6dfcd9ceb391c6d"
@@ -141406,6 +141418,10 @@
     {
       "id": "local.device_inventory.online.20261101",
       "profileSha256": "1e1b311952239cdd5847dac2d0f08bd2fde8dda902e0b2d6fcc475c8183a5863"
+    },
+    {
+      "id": "local.drives.encoder-boundary.20261108",
+      "profileSha256": "945d2aa11757b626b5bae5eae5ae61e6756449c8e3d16ec7c24e77076f681c69"
     },
     {
       "id": "local.drives.index-status.20261101",
