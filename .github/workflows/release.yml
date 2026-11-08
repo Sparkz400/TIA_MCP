@@ -49,6 +49,13 @@ jobs:
           # From 1.0 on the ledger must be release-ready with no open or deferred cell.
           python -B scripts/release_matrix.py --release-gate $version
           if ($LASTEXITCODE -ne 0) { throw "Release gate refused $version." }
+          # From 1.0 on the bundle's Host must keep the frozen surface of contracts/mcp-surface.v1.json (contract freeze policy).
+          python -m pip install -r scripts/requirements-test.txt
+          $surface = Join-Path $env:RUNNER_TEMP 'mcp-surface'
+          python -B scripts/test_mcp_surface_host.py --host (Join-Path $bundle 'host/TiaMcp.Host.exe') --output $surface
+          if ($LASTEXITCODE -ne 0) { throw 'MCP surface discovery of the bundled Host failed.' }
+          python -B scripts/mcp_surface.py check --surface (Join-Path $surface 'surface.json')
+          if ($LASTEXITCODE -ne 0) { throw "Surface gate refused $version." }
           $section = [regex]::Match((Get-Content -LiteralPath CHANGELOG.md -Raw), '(?ms)^## \[' + [regex]::Escape($version) + '\][^\n]*\n(.*?)(?=^## \[|\z)')
           if (-not $section.Success) { throw "CHANGELOG.md has no [$version] section." }
           $stage = Join-Path $env:RUNNER_TEMP 'release-files'

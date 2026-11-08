@@ -26,8 +26,19 @@ class ToolReferenceTests(unittest.TestCase):
 
     def test_shared_tools_list_their_other_features(self):
         page = render({"features": [feature("a", ["a"]), feature("b", ["b", "a"], "hardware")]}, [], [("", "core")])
-        self.assertIn("| `a` | a | shipped | core |  | `b` |", page)
+        self.assertIn("| `a` | a | shipped | core | frozen |  | `b` |", page)
         self.assertLess(page.index("## hardware"), page.index("## session"))
+
+    def test_contract_column_follows_the_freeze_policy(self):
+        unverified = feature("u", ["u"])
+        unverified["qualification"]["status"] = "unverified"
+        deprecated = feature("d", ["d"])
+        deprecated["deprecation"] = {"since": "1.2", "replacement": "a", "removalNotBefore": "2027-06-01"}
+        page = render({"features": [unverified, deprecated, feature("qualification_x", ["qualification_x"])]}, [],
+                      [("qualification_", "qualification"), ("", "core")])
+        self.assertIn("| `u` | u | unqualified | core | experimental |", page)
+        self.assertIn("| `d` | d | shipped | core | deprecated since 1.2; use `a` |", page)
+        self.assertIn("| `qualification_x` | qualification_x | shipped | qualification | experimental |", page)
 
     def test_groups_follow_the_host_prefix_table(self):
         rules = group_rules()
