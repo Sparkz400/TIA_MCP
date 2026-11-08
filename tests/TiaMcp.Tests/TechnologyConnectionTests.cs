@@ -180,6 +180,8 @@ namespace TiaMcp.Tests
                 // A telegram needs the drive's hardwarePath and never combines with a channel selector or another target.
                 ("actor", "{telegramType:'MainTelegram'}", "InvalidRequest"), ("actor", "{hardwarePath:'/d',telegramType:'MainTelegram',channelIndex:1}", "InvalidRequest"),
                 ("actor", "{hardwarePath:'/d',telegramType:'MainTelegram',tagName:'T'}", "InvalidRequest"),
+                ("actor", "{hardwarePath:'/d',telegramType:'SafetyTelegram'}", "SafetyBoundary"), ("torque", "{hardwarePath:'/d',telegramType:'SafetyTelegram'}", "SafetyBoundary"),
+                ("actor", "{hardwarePath:'/d',telegramType:'AdditionalTelegram'}", "InvalidRequest"), ("actor", "{hardwarePath:'/d',telegramType:'Main'}", "InvalidRequest"),
             })
             {
                 var refused = await Check.ThrowsAsync<BridgeException>(() => { OpennessSession.TechnologyTargetForm(role, P(json)); return Task.CompletedTask; });

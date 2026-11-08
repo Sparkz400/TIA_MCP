@@ -84,6 +84,11 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "Select exactly one target: hardwarePath, hardwarePath with channelNumber/channelType/channelIoType, hardwarePath with channelIndex, a drive's hardwarePath with telegramType, tagName, "
                     + "inputHardwarePath with outputHardwarePath, dbMemberPath, or inputAddress/outputAddress.");
             string form = forms[0];
+            // As drive_telegram_set: a PROFIsafe telegram belongs to the safety workflow, and only these telegrams carry axis setpoints and actual values.
+            if (form == "telegram" && (string)payload["telegramType"] == "SafetyTelegram")
+                throw new BridgeException("SafetyBoundary", "Safety telegrams require a dedicated safety workflow; a technology object never connects to one.");
+            if (form == "telegram" && Array.IndexOf(new[] { "MainTelegram", "SupplementaryTelegram", "TorqueTelegram" }, (string)payload["telegramType"]) < 0)
+                throw new BridgeException("InvalidRequest", "telegramType must be MainTelegram, SupplementaryTelegram or TorqueTelegram.");
             if (!supported.Contains(form)) throw new BridgeException("UnsupportedTarget", "The " + role + " role has no V21 Connect overload for a " + form + " target.");
             // Axis, encoder and torque address overloads take both addresses; a measuring input takes an input and an output cam an output address.
             if (form == "addresses" && ((payload["inputAddress"] != null) != (family != "outputCam") || (payload["outputAddress"] != null) != (family != "measuringInput")))

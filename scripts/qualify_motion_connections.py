@@ -255,7 +255,8 @@ def drive_telegram(run):
     run.refuse("actor on the other drive object handle", path, "actor", {"hardwarePath": ref["hardwarePath"], **other_handle(ref), "telegramType": "MainTelegram"},
                "DriveObjectHandleMismatch")
     run.refuse("actor on a telegram with a channel index", path, "actor", {**main, "channelIndex": 0}, "InvalidRequest")
-    missing = next((t for t in ("TorqueTelegram", "SupplementaryTelegram", "SafetyTelegram") if t not in types), None)
+    run.refuse("actor on the safety telegram", path, "actor", {**ref, "telegramType": "SafetyTelegram"}, "SafetyBoundary")
+    missing = next((t for t in ("TorqueTelegram", "SupplementaryTelegram") if t not in types), None)
     if missing:
         run.refuse("actor on the absent " + missing, path, "actor", {**ref, "telegramType": missing}, "TelegramNotFound")
     run.connect("connect MoSdr actor to the drive's main telegram", path, "actor", main)

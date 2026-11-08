@@ -580,7 +580,8 @@ complete/readable flags; older observations cannot silently qualify a fresh run.
 | drive `hardwarePath` + `driveObjectNumber`/`driveObjectIndex` + `telegramType` (+ `connectOption`) | Startdrive `AxisEncoderHardwareConnectionSDRInterface.Connect(Telegram[, ConnectOption])` | Startdrive `TorqueHardwareConnectionSDRInterface.Connect(Telegram[, ConnectOption])` | refused | refused |
 
 The telegram target needs SINAMICS Startdrive: the drive object is selected by the handle `drive_observe` reports, and
-`telegramType` is its Startdrive name (`MainTelegram`, ...); a missing telegram answers `TelegramNotFound`. The drive object
+`telegramType` is `MainTelegram`, `SupplementaryTelegram` or `TorqueTelegram`; `SafetyTelegram` answers `SafetyBoundary`, as in
+`drive_telegram_set`, and a telegram the drive object lacks answers `TelegramNotFound`. The drive object
 and its telegrams join the change fingerprint, and apply reads back `IsConnected` with the telegram's input and output start
 addresses as the slot's `InputAddress`/`OutputAddress`.
 
