@@ -14,6 +14,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Added
 
+- **OB callers in every combination:** a PLC component installs into a startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB with LAD, an earlier placement and reuse in every combination; 24 more shapes passed natively and run in production ([record](docs/verification/component-ob-event-classes-20261108.md#fourth-run)).
 - **Drive motor projection:** change kind `drive_motor_configure` writes a motor's nameplate into one drive data set through Startdrive's `HardwareProjection`, with exact expected values, readback and checkpoint restore; qualified natively on a SINAMICS G220 ([record](docs/verification/drive-motor-configure-20261108.md)).
 - **Time-synchronised PLCSIM captures:** `runtime_capture`'s simulator source takes `TimespanSynchronized_C`, `_P` and `_CP` with `spanMilliseconds`; each sample processes exactly that CPU time before reading at the next sync point ([record](docs/verification/plcsim-timespan-capture-20261108.md)).
 - **Hardware download to an owned simulator:** `simulation_download_online` takes `hardware: true` (with `softwareScope: all` and `allowStop: true`) to download the hardware configuration too; a `sim_observe` watch reported the resulting hardware-configuration event natively ([record](docs/verification/plcsim-hardware-download-20261108.md)).
