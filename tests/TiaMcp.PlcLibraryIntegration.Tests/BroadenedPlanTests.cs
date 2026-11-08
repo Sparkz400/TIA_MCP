@@ -100,7 +100,8 @@ internal static class BroadenedPlanTests
         static string Refusal(Fixture f, bool candidates = false) => PlcComponentQualificationGate.CombinedApplyRefusal(new JObject { ["payload"] = f.Payload, ["integrationPlan"] = f.Build() }, f.Caller, candidates);
         static string Features(Fixture f) => string.Join(",", PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller).Properties().Select(p => p.Name));
         static Fixture Titled(string networks, int title) { var f = new Fixture(); f.Caller = XDocument.Parse("<Document><SW.Blocks.FC ID=\"0\"><AttributeList><Name>Main</Name><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList><ObjectList>" + networks + "<MultilingualText ID=\"" + title + "\" CompositionName=\"Title\" /></ObjectList></SW.Blocks.FC></Document>"); f.Payload["integration"]["caller"]["insertAfterNetworkId"] = "1"; return f; }
-        static Fixture Ob() { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.OB"; f.Inventory["objects"][0]["kind"] = "OB"; return f; }
+        static Fixture Ob(string eventClass = "ProgramCycle") { var f = new Fixture(); var ob = f.Caller.Root.Element("SW.Blocks.FC"); ob.Name = "SW.Blocks.OB"; f.Inventory["objects"][0]["kind"] = "OB";
+            if (eventClass != null) ob.Element("AttributeList").Add(new XElement("SecondaryType", eventClass)); return f; }
         test("combined apply admits the verified existing FBD FC caller", () => Equal(null, Refusal(new Fixture())));
         test("combined apply admits the verified standalone FBD FC", () => { var f = new Fixture(); f.Standalone("FBD"); Equal(null, Refusal(f)); });
         const string Unit1 = "<SW.Blocks.CompileUnit ID=\"1\"><AttributeList><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit>";
@@ -108,6 +109,8 @@ internal static class BroadenedPlanTests
         test("combined apply admits the verified insertion before another network", () => Equal(null, Refusal(Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3))));
         test("combined apply admits the natively verified FBD OB shape", () => {
             Equal(null, Refusal(Ob())); Equal("", Features(Ob()));
+            Equal("obCaller,obEventClass.Startup", Features(Ob("Startup"))); Equal("obCaller,obEventClass.Unknown", Features(Ob(null)));
+            Equal("Only program-cycle OB callers are verified; this CyclicInterrupt OB stays plan-only.", Refusal(Ob("CyclicInterrupt")));
         });
         // Passed natively on 7 November (local.library_integrate.candidate_shapes.ob_combinations.20261107).
         test("combined apply admits the natively verified LAD OB combination", () => {

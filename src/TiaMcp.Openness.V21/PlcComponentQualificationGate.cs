@@ -92,6 +92,10 @@ namespace TiaMcp.Openness.V21
             var caller = (JObject)plan["caller"]; string kind = caller.Value<string>("kind"), language = caller.Value<string>("language");
             var features = new JObject();
             if (kind == "OB") features["obCaller"] = "OB insertion is refused until its exact shape passes native qualification; add the OB call as its own reviewed change.";
+            // The OB evidence ran on program-cycle OBs; each other event class (or a missing one) is its own feature until it has its own run.
+            string eventClass = kind == "OB" ? callerExport?.Descendants("SW.Blocks.OB").FirstOrDefault()?.Element("AttributeList")?.Element("SecondaryType")?.Value : null;
+            if (kind == "OB" && eventClass != "ProgramCycle")
+                features["obEventClass." + (eventClass ?? "Unknown")] = "Only program-cycle OB callers are verified; this " + (eventClass ?? "unknown") + " OB stays plan-only.";
             if (language == "LAD") features["ladCaller"] = "A LAD caller is verified as a new or existing FC and as an existing FB, alone and in the natively run combinations; this LAD " + kind + " combination stays plan-only.";
             if (kind == "FB") features["fbCaller"] = "An existing LAD or FBD FB caller is verified with a new global instance DB or a multi-instance of the reused FB, alone and in the natively run combinations; this " + language + " FB combination stays plan-only.";
             if (plan["multiInstance"] != null) features["multiInstance"] = "A multi-instance is verified only for the reused installed FB in an existing LAD or FBD FB caller; other multi-instances stay plan-only.";

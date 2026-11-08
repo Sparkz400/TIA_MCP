@@ -275,7 +275,7 @@ class Candidates(unittest.TestCase):
                 derived = sorted(feature for feature, present in (("ladCaller", caller["language"] == "LAD"), ("fbCaller", caller["kind"] == "FB"),
                                  ("multiInstance", caller.get("multi")), ("reusedComponent", reuse), ("earlierPlacement", caller.get("networks") == 2),
                                  ("dependentInstanceDb", caller.get("dependents")), ("obCaller", caller["kind"] == "OB"),
-                                 ("embeddingParent", caller.get("parent"))) if present)
+                                 ("embeddingParent", caller.get("parent")), ("obEventClass." + str(caller.get("eventClass")), caller.get("eventClass"))) if present)
                 self.assertEqual(features, [] if "+".join(derived) in verified else derived)
                 self.assertTrue(not caller.get("multi") or reuse and caller["kind"] == "FB", "A multi-instance needs a reused FB in an FB caller")
                 self.assertTrue(not caller.get("dependents") or caller.get("multi"), "Only a multi-instance changes the caller's instance DB")
@@ -289,7 +289,10 @@ class Candidates(unittest.TestCase):
         # The seven OB combinations beside obCaller, verified on 7 November.
         # The embedded-caller combinations beside the verified FBD one, verified on 7 November (parentDeep is that shape, deeper).
         parent = {k for k in keys if "embeddingParent" in k}
-        self.assertEqual(25, len(keys - parent)); self.assertEqual(set(), keys - parent - verified)
+        # The startup and cyclic-interrupt OB callers are candidates until their native run.
+        event = {k for k in keys if "obEventClass" in k}
+        self.assertEqual(2, len(event)); parent -= event
+        self.assertEqual(25, len(keys - parent - event)); self.assertEqual(set(), keys - parent - event - verified)
         self.assertEqual(8, len(parent)); self.assertEqual(set(), parent - verified)
 
 
