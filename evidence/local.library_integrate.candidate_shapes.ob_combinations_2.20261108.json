@@ -1,0 +1,79 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-08T11:46:40+00:00",
+  "source": {
+    "commit": "9542a1ca5681eb4178343c6958554aad96730d77",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_integrate_apply.py --candidates on a --component-qualification Host from Debug builds of the frozen commit, fifteen cases each in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: the PLC component in an existing startup (OB100), time-of-day (OB10), time-delay interrupt (OB20), hardware interrupt (OB40) and diagnostic error interrupt (OB82) OB, each as a LAD OB, after the first of two networks, and reusing the FB a verified standalone install put into the project. Each preview named exactly its features, and each install passed the exact installed-object diff, the native caller insertion proof, the call oracle, a fresh reopen, a 0-error compile and change_restore of the initial checkpoint into a new location.",
+  "limitations": [
+    "OB fixtures are Main's envelope with the event class, number and informative inputs replaced; OB attributes and event attachments keep V21's defaults.",
+    "Pairs of these features with an event class (LAD with an earlier placement, and so on) and event classes not named here stay plan-only.",
+    "Engineering only; no OB runs."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "c53e701f16bea0e0baf71fb18a94dfd01c767aa074268566585c3e403a5b9863"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "84969d42d5cb7e6cc4a414745aab6bbab78a5f25358cfa35f90034b77e6670b3"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "12342d01b82b074c848047a296406f236a9f0dcf14e27a1883966fdf8cce47c4",
+      "bytes": 36232375,
+      "completed": true,
+      "steps": [
+        "author",
+        "candidate:obStartupLad",
+        "candidate:obStartupEarlier",
+        "candidate:obStartupReuse",
+        "candidate:obTimeOfDayLad",
+        "candidate:obTimeOfDayEarlier",
+        "candidate:obTimeOfDayReuse",
+        "candidate:obTimeDelayLad",
+        "candidate:obTimeDelayEarlier",
+        "candidate:obTimeDelayReuse",
+        "candidate:obHardwareLad",
+        "candidate:obHardwareEarlier",
+        "candidate:obHardwareReuse",
+        "candidate:obDiagnosticLad",
+        "candidate:obDiagnosticEarlier",
+        "candidate:obDiagnosticReuse"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
