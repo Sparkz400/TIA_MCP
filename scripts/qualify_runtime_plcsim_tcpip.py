@@ -656,6 +656,14 @@ def normal(r):
     compare(r, "web", "Marker read through the Web API", web, "Marker")
     mode = r.stage("runtime_web_diagnostics operatingMode", lambda: t("runtime_web_diagnostics", {"attemptId": web, "kind": "operatingMode"}))
     require(mode["status"] == "read" and mode["value"] == "run", "The Web API does not read RUN: %s" % mode)
+    # Syslog.Browse (added offline on 3 November): five raw entries with the lifetime and loss counters, or the session's
+    # explicit unsupported or provider status (such as permissionDenied), recorded as found; count 21 is refused before any request.
+    syslog = r.stage("runtime_web_diagnostics syslog", lambda: t("runtime_web_diagnostics", {"attemptId": web, "kind": "syslog", "count": 5}))
+    r.report["syslog"] = syslog
+    require(isinstance(syslog.get("status"), str), "Syslog returned no status: %s" % syslog)
+    if syslog["status"] == "read":
+        require(syslog["entries"] <= 5, "Syslog returned more entries than requested: %s" % syslog["entries"])
+    refused(r, "runtime_web_diagnostics syslog with count 21", "runtime_web_diagnostics", {"attemptId": web, "kind": "syslog", "count": 21}, "RuntimeDiagnosticSelectionInvalid")
     require(r.stage("runtime_web_status", lambda: t("runtime_web_status", {"attemptId": web}))["state"] == "connected", "The web session is not connected")
     compare(r, "web", "Enable before the web write", web, "Enable")
     written = r.stage(oracle.WEB_WRITE, lambda: t("runtime_web_write", {"attemptId": web, "bindingSha256": r.binding,
