@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.162",
+  "catalogVersion": "0.4.163",
   "targetTiaVersions": [
     21
   ],
@@ -5244,6 +5244,23 @@
       ],
       "limitations": [
         "One CPU1511 fixture whose only cyclic OB is OB1 with the automatic process image; no process image partition is configured, which SingleStep_P steps by. Signals are two Bool DB members; rows are not compared with scan counts."
+      ]
+    },
+    {
+      "id": "local.plcsim.timespan-capture.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4f4c3cdca4b039aef562a00c1d6c1029d324ee20",
+        "passedScope": "scripts/qualify_plcsim_diagnostics.py on Debug builds of 4f4c3cdc (artifacts/ts1, git archive) with one owned PLCSIM Advanced V8 CPU1511 instance on Softbus and one owned TIA Portal V21. runtime_capture with source plcsim, cycleSynchronous and each syncMode, two signals, 100 ms interval, 2 s duration: the new TimespanSynchronized_C and TimespanSynchronized_CP (spanMilliseconds 10, each sample StartProcessing of 10 ms CPU time to the next sync point) captured 40 rows to their duration limit; TimespanSynchronized_P captured 2 rows and ended sessionUnavailable, as SingleStep_P does on this OB1-only fixture without a process-image partition. SingleStep_C/CP/CT/CPT reran (40/40/30/31 rows) and SingleStep_P stalled after 2. Every capture restored the previous operating mode Default. A time-synchronised mode without spanMilliseconds was refused before any capture intent. The rest of the PLCSIM diagnostics corpus passed unchanged."
+      },
+      "artifacts": [
+        "evidence/local.plcsim.timespan-capture.20261108.json"
+      ],
+      "limitations": [
+        "One CPU1511 fixture whose only cyclic OB is OB1 with the automatic process image; the P modes stall without a process-image partition. Rows are not compared with CPU time or scan counts.",
+        "One span (10 ms); other spans and scale factors are not exercised."
       ]
     },
     {
@@ -24655,9 +24672,9 @@
           "Optional explicit diagnostic-case mappings retain re-resolved source declarations and observed types; online address equivalence and running-program identity remain unverified.",
           "Optional retained handoff binding checks original evidence and owned session context before reads; historical export remains available. Identity, effective rights and operation/assertion admission remain unverified.",
           "source plcsim polls only an exact PLCSIM Advanced V8 instance this Host created or adopted (attemptId is its creationId; ID, name and creation receipt are rechecked by the worker for every call); unowned instances are refused. Caller-declared datatypes must fit the typed read and are what diagnostic mappings compare; PLCSIM tag metadata is not read.",
-          "cycleSynchronous switches the running owned instance to the optional syncMode (SingleStep_C by default, or SingleStep_P/CP/CT/CPT), steps one sync point per sample, reads every signal while the CPU holds there and restores the recorded operating mode on stop, failure or Host shutdown. A lost simulator worker or faulted bridge cannot restore it; an unconfirmed restore is reported as localFailure PlcsimOperatingModeRestoreFailed.",
+          "cycleSynchronous switches the running owned instance to the optional syncMode (SingleStep_C by default, or SingleStep_P/CP/CT/CPT, or TimespanSynchronized_C/P/CP with spanMilliseconds of CPU time per sample), steps to one sync point per sample, reads every signal while the CPU holds there and restores the recorded operating mode on stop, failure or Host shutdown. A lost simulator worker or faulted bridge cannot restore it; an unconfirmed restore is reported as localFailure PlcsimOperatingModeRestoreFailed.",
           "PLCSIM rows retain per-row sync-point evidence, but capture status, analysis and diagnostic acquisition keep atomicAcrossSignals and scanSynchronized false; Project Explorer Open capture accepts Web captures only. Compiled against the installed PLCSIM Advanced V8 API only; not natively qualified.",
-          "syncMode requires cycleSynchronous; omitted mode preserves historical plan bytes. Each sample verifies the selected operating mode before advancing. CP/CT/CPT/P sync points need not be full scans; CT/CPT use the existing overwritten minimum cycle time. Bus and timespan modes are not offered. Added modes remain offline-only, with no native qualification promotion. Natively (local.plcsim.capture-modes.20261107): C, CP, CT and CPT captured a full 2 s window; P stalled after its first sync point on an OB1-only fixture without a process image partition (sessionUnavailable), and every capture, that one included, restored the previous operating mode."
+          "syncMode requires cycleSynchronous; omitted mode preserves historical plan bytes. Each sample verifies the selected operating mode before advancing. CP/CT/CPT/P sync points need not be full scans; CT/CPT use the existing overwritten minimum cycle time. Bus modes are not offered. Natively (local.plcsim.capture-modes.20261107): C, CP, CT and CPT captured a full 2 s window; P stalled after its first sync point on an OB1-only fixture without a process image partition (sessionUnavailable), and every capture, that one included, restored the previous operating mode. The time-synchronised modes ran natively (local.plcsim.timespan-capture.20261108): C and CP captured a full 2 s window with a 10 ms span, P stalled like SingleStep_P on the same fixture, and each restored the operating mode."
         ]
       },
       "qualification": {
@@ -24665,7 +24682,8 @@
         "evidenceIds": [
           "local.runtime.plcsim-tcpip.20261029",
           "local.runtime.plcsim-tcpip.20261102",
-          "local.plcsim.capture-modes.20261107"
+          "local.plcsim.capture-modes.20261107",
+          "local.plcsim.timespan-capture.20261108"
         ]
       },
       "availability": {
