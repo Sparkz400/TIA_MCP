@@ -1,0 +1,132 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.plcsim.hardware_download_watch.20261108",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-08T08:30:01+00:00",
+  "source": {
+    "commit": "4f4f73383beca2a3b5590a8743b7392c3ba56d7e",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_plcsim_gaps.py --hardware-download on Debug builds of 4f4f7338 (artifacts/hw1, git archive) with one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 and one owned TIA Portal V21 Update 3. simulation_download_online refused hardware: true without allowStop and with softwareScope changes (InvalidRequest). After hardware_cpu_memory_bytes enabled the system and clock memory bytes, a sim_observe watch started, and simulation_download_online with hardware: true (DownloadOptions.Hardware | Software, keepActualValues, allowStop) answered StopModules StopAll, ConsistentBlocksDownload, UserManagementDownload KeepOnlineUserManagementData, AlarmTextLibrariesDownload and StartModules StartModule; TIA reported Success with 0 errors, the hardware configuration loaded and the CPU in RUN before and after. The watch collected one hardwareConfiguration event (errorCode OK) beside an ipAddress, two softwareConfiguration and operating-state/LED events. Non-retained DB values restarted from their start values (Ob82 7 -> 0), as after any stop.",
+  "limitations": [
+    "One owned Softbus CPU 1511 instance; the hardware change is the CPU's system and clock memory bytes. Module changes, other CPUs and TCP/IP instances are not exercised.",
+    "keepActualValues keeps no non-retained value across a hardware download: the CPU stops and restarts.",
+    "Only the hardware-download mode ran; the rest of the PLCSIM gaps corpus was not rerun on this build."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "ad722f9f80c7711831f217a1ef31730b039dff429903b3d34adc39c5cc57039b"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "60323da9bfbb19fde6c671a2ae9a2ce3f38e223b9baf88625c6998bd3669df68"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "738b567fbfd59ebf117370971f4d3c9ae50a510137227722294c0fdeca4031e4"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "40f6ce827aaff50218d5aa6662f0f691e4507cad4584f78f421f62ac41e60620",
+      "bytes": 926189,
+      "completed": true,
+      "steps": [
+        "start owned TIA plcsim gaps",
+        "create owned scratch plcsim gaps",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "prepare hardware_plug",
+        "apply hardware_plug",
+        "ET 200SP station on the CPU's IO system",
+        "prepare hardware_add",
+        "prepare network_configure",
+        "prepare network_configure",
+        "prepare network_io_assign",
+        "apply network_io_assign",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "prepare block_import_xml",
+        "apply block_import_xml",
+        "prepare block_import_xml",
+        "apply block_import_xml",
+        "prepare block_import_xml",
+        "apply block_import_xml",
+        "prepare block_import_xml",
+        "apply block_import_xml",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "inspect the DI channel 0 interrupt attributes",
+        "prepare hardware_channel_attributes",
+        "refuse an OB link to a diagnostic error OB",
+        "refuse an OB link to a missing block",
+        "refuse a non-string OB link",
+        "refuse enabling the interrupt without its OB",
+        "apply hardware_channel_attributes",
+        "read back the DI channel 0 interrupt",
+        "prepare tag_create",
+        "apply tag_create",
+        "discovery baseline",
+        "sim_create",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "power on",
+        "run",
+        "resolve GapDb in PLCSIM",
+        "program version 1 runs",
+        "refuse a hardware download without allowStop",
+        "refuse a hardware download of changes only",
+        "prepare hardware_cpu_memory_bytes",
+        "apply hardware_cpu_memory_bytes",
+        "sim_observe watch start before the hardware download",
+        "simulation_download_online with hardware",
+        "sim_observe watch collect after the hardware download",
+        "the CPU runs after the hardware download",
+        "values after the hardware download",
+        "sim_release",
+        "enable, disable and restore channel 1's hardware interrupt",
+        "prepare hardware_channel_attributes",
+        "apply hardware_channel_attributes",
+        "refuse disabling the interrupt with an OB link",
+        "prepare hardware_channel_attributes",
+        "apply hardware_channel_attributes"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "sim_create",
+        "sim_observe",
+        "sim_read",
+        "sim_release",
+        "sim_state",
+        "sim_tags",
+        "sim_write",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}

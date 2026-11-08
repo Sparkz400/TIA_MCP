@@ -73,6 +73,13 @@ internal static class RuntimeRouteChecks
             && Code(() => SimulationOnlineDownloadRules.Options(new JObject { ["softwareScope"] = "all", ["dataBlockValues"] = "keepActualValues" })) == "ArgumentException"
             && Code(() => SimulationOnlineDownloadRules.Options(new JObject { ["softwareScope"] = "hardware", ["dataBlockValues"] = "keepActualValues", ["allowStop"] = false })) == "ArgumentException"
             && Code(() => SimulationOnlineDownloadRules.Options(new JObject { ["softwareScope"] = "all", ["dataBlockValues"] = "reinitialize", ["allowStop"] = false })) == "ArgumentException");
+        // A hardware download is opt-in, complete and allowed to stop the CPU; without it the options keep their earlier shape.
+        var withHardware = new JObject { ["softwareScope"] = "all", ["dataBlockValues"] = "keepActualValues", ["allowStop"] = true, ["hardware"] = true };
+        Pass("hardware download needs softwareScope all and allowStop", SimulationOnlineDownloadRules.Options(withHardware).Value<bool>("hardware")
+            && SimulationOnlineDownloadRules.Options(keep)["hardware"] == null
+            && Code(() => SimulationOnlineDownloadRules.Options(new JObject { ["softwareScope"] = "changes", ["dataBlockValues"] = "keepActualValues", ["allowStop"] = true, ["hardware"] = true })) == "ArgumentException"
+            && Code(() => SimulationOnlineDownloadRules.Options(new JObject { ["softwareScope"] = "all", ["dataBlockValues"] = "keepActualValues", ["allowStop"] = false, ["hardware"] = true })) == "ArgumentException"
+            && Code(() => SimulationOnlineDownloadRules.Options(new JObject { ["softwareScope"] = "all", ["dataBlockValues"] = "keepActualValues", ["allowStop"] = true, ["hardware"] = "yes" })) == "ArgumentException");
         Pass("online download target needs a successful card from this PLC", SimulationOnlineDownloadRules.TargetRefusal(true, true, true) == null
             && SimulationOnlineDownloadRules.TargetRefusal(false, false, false).Contains("no successful generated memory card")
             && SimulationOnlineDownloadRules.TargetRefusal(true, false, true).Contains("another project or PLC")
