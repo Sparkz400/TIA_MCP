@@ -26,14 +26,19 @@ def add_g220(h):
     h.apply("hardware_add", {"typeIdentifier": row["typeIdentifier"], "deviceName": DEVICE, "itemName": DEVICE + "Item"})
 
 
+def configurations(drive_object):
+    """drive_observe reports motorConfigurations on the drive object row, beside its snapshot."""
+    return drive_object.get("motorConfigurations") or drive_object["snapshot"].get("motorConfigurations") or []
+
+
 def motor(h):
     # A G220 lists several items with a drive container ("Drive control" and the power unit); the motor lives on one of them.
     drives = observe(h, motorDataSets=[0], parameterNumbers=[1])["drives"]
-    found = [(d, o) for d in drives for o in d["driveObjects"] if any(c["status"] == "observed" for c in o["snapshot"].get("motorConfigurations", []))]
+    found = [(d, o) for d in drives for o in d["driveObjects"] if any(c["status"] == "observed" for c in configurations(o))]
     require(len(found) == 1, "Expected exactly one drive object that reads motor data set 0: %s" % [(d["hardwarePath"], len(d["driveObjects"])) for d in drives])
     drive, obj = found[0]
     ref = {"hardwarePath": drive["hardwarePath"], **({"driveObjectIndex": obj["driveObjectIndex"]} if "driveObjectIndex" in obj else {"driveObjectNumber": obj["driveObjectNumber"]})}
-    config = next(c for c in obj["snapshot"]["motorConfigurations"] if c["number"] == 0)
+    config = next(c for c in configurations(obj) if c["number"] == 0)
     return ref, {e["name"]: e["value"] for e in config["entries"]}
 
 
