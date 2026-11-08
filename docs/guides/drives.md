@@ -15,7 +15,16 @@ supplementary or additional telegram (`operation: resize`, `direction`, `size` i
 PROFIdrive words, `keepOriginalAddress`) and inserts or erases a torque telegram; resizes,
 the additional insert and erase passed natively on the same drive, which refuses torque
 telegrams ([record](../verification/drives-telegram-resize-20261107.md)). PKW has no
-Openness setter; it follows the telegram number. The
+Openness setter; it follows the telegram number.
+
+`drive_motor_configure` projects a motor without a Siemens code number into one drive data set through Startdrive's
+`HardwareProjection`: payload `hardwarePath`, the drive object handle, `driveDataSet`, an optional `motorType`
+(`InductionMotor` or `SynchronousMotor`) and 1–64 `entries` (`name`, `expected`, `value`), all as text exactly as
+`drive_observe` `motorDataSets` reports them. Apply sets the motor type, then the entries, then
+`ProjectMotorConfiguration`, and reads every entry back. It passed natively on a G220 with a six-entry nameplate
+([record](../verification/drive-motor-configure-20261108.md)). The G220 refuses `SetMotorType` because its motor is a
+plugged hardware item, so omit `motorType` there; a G120C exposes no readable `HardwareProjection` and refuses with
+`UnsupportedCapability`. The
 [Startdrive plan](../plans/expansion-plans/startdrive.md) lists the remaining
 work (PKW edits, TO connection, DRIVE-CLiQ, online access,
 download, activation, security, safety).
