@@ -289,9 +289,10 @@ class Candidates(unittest.TestCase):
         # The seven OB combinations beside obCaller, verified on 7 November.
         # The embedded-caller combinations beside the verified FBD one, verified on 7 November (parentDeep is that shape, deeper).
         parent = {k for k in keys if "embeddingParent" in k}
-        # The startup and cyclic-interrupt OB callers, verified on 8 November.
+        # The startup and cyclic-interrupt OB callers, verified on 8 November; the further classes and cyclic combinations are candidates.
         event = {k for k in keys if "obEventClass" in k}
-        self.assertEqual(2, len(event)); parent -= event; self.assertEqual(set(), event - verified)
+        self.assertEqual(9, len(event)); parent -= event
+        self.assertEqual({"obCaller+obEventClass.CyclicInterrupt", "obCaller+obEventClass.Startup"}, event & verified)
         self.assertEqual(25, len(keys - parent - event)); self.assertEqual(set(), keys - parent - event - verified)
         self.assertEqual(8, len(parent)); self.assertEqual(set(), parent - verified)
 

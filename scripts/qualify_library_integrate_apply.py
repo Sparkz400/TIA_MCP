@@ -48,7 +48,11 @@ OB_NAME, OB_NUMBER = "TiaMcpComponentOb", 123
 # OB event classes beside program cycle: the number and the informative start information V21 gives each class on S7-1500.
 EVENT_CLASSES = {"ProgramCycle": (OB_NUMBER, None),
                  "Startup": (100, (("LostRetentive", "Bool"), ("LostRTC", "Bool"))),
-                 "CyclicInterrupt": (30, (("Initial_Call", "Bool"), ("Event_Count", "Int")))}
+                 "CyclicInterrupt": (30, (("Initial_Call", "Bool"), ("Event_Count", "Int"))),
+                 "TimeOfDay": (10, (("CaughtUp", "Bool"), ("SecondTimeInterval", "Bool"))),
+                 "TimeDelayInterrupt": (20, (("Sign", "Word"),)),
+                 "HardwareInterrupt": (40, (("LADDR", "HW_IO"), ("USI", "Word"), ("IChannel", "USInt"), ("EventType", "Byte"))),
+                 "DiagnosticErrorInterrupt": (82, (("IO_State", "Word"), ("LADDR", "HW_ANY"), ("Channel", "UInt"), ("MultiError", "Bool")))}
 # A LAD OB takes its coil network from the LAD FC caller fixture, imported under this name before the baseline.
 LAD_PEER = "TiaMcpLadPeer"
 HARNESS = ("qualify_plc_component.py", "qualification_owned_scratch.py", "compilation_evidence.py", "smoke_mcp.py",
@@ -114,6 +118,15 @@ COMBINATIONS = {
     # (local.library_integrate.candidate_shapes.ob_event_classes.20261108).
     "obStartup": (False, {"kind": "OB", "language": "FBD", "eventClass": "Startup"}, []),
     "obCyclic": (False, {"kind": "OB", "language": "FBD", "eventClass": "CyclicInterrupt"}, []),
+    # Four further event classes, and the cyclic-interrupt OB with LAD, an earlier placement and reuse: candidates until their run.
+    "obTimeOfDay": (False, {"kind": "OB", "language": "FBD", "eventClass": "TimeOfDay"}, ["obCaller", "obEventClass.TimeOfDay"]),
+    "obTimeDelay": (False, {"kind": "OB", "language": "FBD", "eventClass": "TimeDelayInterrupt"}, ["obCaller", "obEventClass.TimeDelayInterrupt"]),
+    "obHardware": (False, {"kind": "OB", "language": "FBD", "eventClass": "HardwareInterrupt"}, ["obCaller", "obEventClass.HardwareInterrupt"]),
+    "obDiagnostic": (False, {"kind": "OB", "language": "FBD", "eventClass": "DiagnosticErrorInterrupt"}, ["obCaller", "obEventClass.DiagnosticErrorInterrupt"]),
+    "obCyclicLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "CyclicInterrupt"}, ["ladCaller", "obCaller", "obEventClass.CyclicInterrupt"]),
+    "obCyclicEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "CyclicInterrupt"},
+                        ["earlierPlacement", "obCaller", "obEventClass.CyclicInterrupt"]),
+    "obCyclicReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "CyclicInterrupt"}, ["obCaller", "obEventClass.CyclicInterrupt", "reusedComponent"]),
     # The reused-FB multi-instance in a Host FB that a parent FB embeds, beside the verified FBD one (multiInstanceParent): LAD, an
     # earlier placement and the Host's own DB in every combination, and the verified shape two levels deep with the parent's and the
     # grandparent's DBs. All verified on 7 November.
