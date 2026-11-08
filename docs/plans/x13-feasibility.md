@@ -4,7 +4,8 @@
 finds CFC/DCC V21 public APIs, V19 Portal/SDK and ODK 1500S installed on the maintainer's second workstation (not on PCNico, 8 November). The table below
 retains the 1 November workstation observations; its missing-product labels are not current here.
 OB55/56/57 counter qualification has since passed. Configuration-event subscriptions exist and IP
-observation passed; hardware/software delivery remains open. Data-record responses, timespan/bus capture modes and residual Web API routes remain software work.
+observation passed; software delivery passed on 7 November and hardware delivery on 8 November through the new
+hardware download ([record](../verification/plcsim-hardware-download-20261108.md)). Data-record responses, timespan/bus capture modes and residual Web API routes remain software work.
 The 3 November offline follow-up adds SingleStep_P/CP/CT/CPT capture selection and bounded
 Syslog.Browse reads; native mode/CPU qualification remains open. Do not repeat the completed event adapter.
 

@@ -328,7 +328,9 @@ def body(h):
         h.stage("resolve GapDb in PLCSIM", lambda: lab.resolve(["Start", "TimerDone", "ProgramVersion", "Ob40", "Ob82", "Ob83", "Ob86", "Year"]))
         require(h.stage("program version 1 runs", lambda: lab.read(ProgramVersion="int16"))["ProgramVersion"] == 1, "Version 1 is not running")
 
-        if getattr(h.args, "records", False):
+        if getattr(h.args, "hardware_download", False):
+            hardware_download(h, lab, plc, cpu, ticket, login, secret)
+        elif getattr(h.args, "records", False):
             lab.resolve(RECORD_SIGNALS)
             records(h, lab, ids)
         elif getattr(h.args, "event_extension", False):
@@ -527,6 +529,51 @@ def online_downloads(h, lab, plc, ticket, login, secret):
         h.report["compareAfterRecovery"] = {"truncated": compare["compareTruncated"], "root": compare["compare"]["state"]}
     else:
         h.report["compareAfterRecovery"] = "skipped: the download ticket expires before another online session"
+
+
+def hardware_download(h, lab, plc, cpu, ticket, login, secret):
+    """simulation_download_online with hardware: true inside a sim_observe watch. A changed CPU attribute (system and clock
+    memory bytes) is downloaded with the program; the watch must report the hardware configuration change, and the CPU,
+    which the download may stop, must be back in RUN. A download configuration the rules do not know is refused typed and
+    recorded with the configurations TIA raised."""
+    from qualify_cpu_memory_bytes import ENABLED
+    base = {"downloadTicket": ticket, "runtimeCredentialMetadataPath": login, "credentialMetadataPath": secret}
+    instance = lab.instance["id"]
+    h.refuse("refuse a hardware download without allowStop", "simulation_download_online",
+             {**base, "softwareScope": "all", "dataBlockValues": "keepActualValues", "allowStop": False, "hardware": True}, "InvalidRequest")
+    h.refuse("refuse a hardware download of changes only", "simulation_download_online",
+             {**base, "softwareScope": "changes", "dataBlockValues": "keepActualValues", "allowStop": True, "hardware": True}, "InvalidRequest")
+    lab.write("Ob82", "int32", 7)
+    h.apply("hardware_cpu_memory_bytes", {"hardwarePath": cpu, "attributes": ENABLED})
+    started = h.stage("sim_observe watch start before the hardware download", lambda: h.tool("sim_observe", {"instanceId": instance, "watch": "start", "maxEvents": 256}))
+    def download():
+        require(time.monotonic() < lab.deadline, "The download ticket is about to expire")
+        payload = {**base, "softwareScope": "all", "dataBlockValues": "keepActualValues", "allowStop": True, "hardware": True}
+        prepared = h.tool("change_prepare", {"kind": "simulation_download_online", "plcPath": plc, "payload": payload})
+        effect = prepared["preview"]["effects"][0]["action"] if "preview" in prepared else None
+        h.report["mutations"].append({"kind": "simulation_download_online", "changeId": prepared["changeId"], "previewHash": prepared["previewHash"], "state": "dispatching"})
+        outcome = h.client.request("tools/call", {"name": "change_apply", "arguments": {**h.apply_args(prepared), "compile": False, "save": False}})
+        content = outcome.get("structuredContent") or {}
+        readbacks = content.get("readbacks") or ((content.get("error") or {}).get("details") or {}).get("readbacks") or []
+        report = next((r["report"] for r in readbacks if r.get("role") == "owned-simulation-download"), {})
+        h.report["mutations"][-1]["state"] = "failed" if outcome.get("isError") else "applied"
+        return {"isError": bool(outcome.get("isError")), "error": content.get("error"), "effect": effect, "options": report.get("options"),
+                "configurations": report.get("downloadConfigurations"), "download": report.get("download"),
+                "operatingStateBefore": report.get("operatingStateBefore"), "operatingStateAfter": report.get("operatingStateAfter")}
+    result = h.stage("simulation_download_online with hardware", download)
+    h.report["hardwareDownload"] = result
+    def collected():
+        events = h.tool("sim_observe", {"instanceId": instance, "watch": "collect", "windowMs": 2000})
+        kinds = [e["kind"] for e in events["events"]]
+        hardware = [e for e in events["events"] if e["kind"] == "hardwareConfiguration"]
+        if not result["isError"]:
+            require(hardware, "The watch saw no hardware configuration change of the hardware download: %s" % events["events"])
+        return {"startedAtUtc": started["watchStartedAtUtc"], "kinds": kinds, "hardware": hardware, "events": events["events"], "truncated": events["truncated"]}
+    h.report["watchHardwareDownload"] = h.stage("sim_observe watch collect after the hardware download", collected)
+    require(not result["isError"], "The hardware download was refused or failed: %s" % {k: result[k] for k in ("error", "configurations")})
+    lab.refresh()
+    require(h.stage("the CPU runs after the hardware download", lambda: lab.state("run", 30000)) == "Run", "The instance did not return to RUN")
+    h.report["hardwareDownloadValues"] = h.stage("values after the hardware download", lambda: lab.read(ProgramVersion="int16", Ob82="int32"))
 
 
 def virtual_time(h, lab):
@@ -741,6 +788,7 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
     parser.add_argument("--event-extension", action="store_true", help="Qualify distributed status/update/profile events instead of the existing runtime corpus")
+    parser.add_argument("--hardware-download", action="store_true", help="Qualify simulation_download_online with hardware inside a sim_observe watch instead of the existing runtime corpus")
     parser.add_argument("--records", action="store_true", help="Qualify sim_record (RDREC/WRREC on the central DI module) instead of the existing runtime corpus")
     args = parser.parse_args()
     args.runner = __file__

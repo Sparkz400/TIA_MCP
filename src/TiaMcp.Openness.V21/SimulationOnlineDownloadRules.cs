@@ -17,7 +17,14 @@ namespace TiaMcp.Openness.V21
             if (payload["allowStop"]?.Type != JTokenType.Boolean) throw new ArgumentException("allowStop must be an explicit boolean.");
             if (values == "reinitialize" && payload.Value<bool>("allowStop") != true)
                 throw new ArgumentException("Reinitializing data blocks stops the CPU; set allowStop to true.");
-            return new JObject { ["softwareScope"] = scope, ["dataBlockValues"] = values, ["allowStop"] = payload.Value<bool>("allowStop") };
+            // hardware adds DownloadOptions.Hardware to a complete software download; a hardware download stops the CPU.
+            if (payload["hardware"] != null && payload["hardware"].Type != JTokenType.Boolean) throw new ArgumentException("hardware must be a boolean.");
+            bool hardware = payload.Value<bool?>("hardware") == true;
+            if (hardware && (scope != "all" || payload.Value<bool>("allowStop") != true))
+                throw new ArgumentException("A hardware download needs softwareScope all and allowStop true.");
+            var options = new JObject { ["softwareScope"] = scope, ["dataBlockValues"] = values, ["allowStop"] = payload.Value<bool>("allowStop") };
+            if (hardware) options["hardware"] = true;
+            return options;
         }
 
         /// <summary>Why an owned instance cannot take this PLC's online download, or null. The route needs the instance's successful
