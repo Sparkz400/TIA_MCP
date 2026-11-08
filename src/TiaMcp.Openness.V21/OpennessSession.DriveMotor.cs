@@ -41,6 +41,8 @@ namespace TiaMcp.Openness.V21
                 string name = ChangeText(row, "name", 64);
                 if (!names.Add(name)) throw new BridgeException("InvalidRequest", "Duplicate motor configuration entry: " + name);
                 if (!before.TryGetValue(name, out var entry)) throw new BridgeException("ParameterNotFound", "The motor configuration of data set " + dataSet + " has no entry " + name + ".");
+                // As drive_parameter_set: Safety Integrated and commissioning/reset/identification parameters need their own workflows.
+                if (DriveParameterProtected((int)entry.Number)) throw new BridgeException("SafetyBoundary", "Safety Integrated, commissioning, reset, save and motor identification parameters require dedicated workflows: " + name);
                 string current = DriveText(entry.Value);
                 if (row["expected"].Type != JTokenType.String || row.Value<string>("expected") != current)
                     throw new BridgeException(write ? "PreviewStale" : "ExpectedValueMismatch", "The current value of " + name + " differs from expected; nothing was written.",
