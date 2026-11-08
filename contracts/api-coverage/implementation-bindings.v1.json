@@ -282,8 +282,8 @@
     },
     {
       "path": "contracts/feature-catalog.schema.json",
-      "sha256": "45bdb20bb5c2e9853ec9d64bd66e9754b9d5609707673688144d84544726cb34",
-      "bytes": 1707
+      "sha256": "a2afcf65348b0b089a44e75b78353c9779222daf1631a81aa687ce61f690ce6e",
+      "bytes": 2010
     },
     {
       "path": "contracts/feature-catalog.v1.json",
@@ -424,6 +424,11 @@
       "path": "contracts/library-update-analysis.v1.schema.json",
       "sha256": "b5619061b75a1474da794adefd940aa715cdcecca6c35e426687ed7fcd530032",
       "bytes": 11102
+    },
+    {
+      "path": "contracts/mcp-surface.v1.json",
+      "sha256": "61958d7f5a9a33e3f059d61ad948149e435bb624ece2cf5358c83ad2c91d181c",
+      "bytes": 1101007
     },
     {
       "path": "contracts/multiuser-observations.v1.schema.json",

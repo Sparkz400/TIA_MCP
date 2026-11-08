@@ -40,6 +40,15 @@ def named_flags(feature, flags):
     return [flag for flag in flags if re.search(r"(?<![\w-])" + re.escape(flag) + r"(?![\w-])", text)]
 
 
+def contract(feature, group):
+    """Contract freeze policy Q1 and its deprecation rule."""
+    deprecation = feature.get("deprecation")
+    if deprecation:
+        replacement = f"; use `{deprecation['replacement']}`" if deprecation["replacement"] else ""
+        return f"deprecated since {deprecation['since']}{replacement}"
+    return "frozen" if group != "qualification" and support(feature) in ("shipped", "limited") else "experimental"
+
+
 def render(catalog, flags, rules):
     users = collections.defaultdict(list)
     for feature in catalog["features"]:
@@ -69,19 +78,24 @@ def render(catalog, flags, rules):
         "`base` and `qualification` tools are never hidden by `--toolsets`.",
         "**Host option** lists the Host launch options the feature's catalog entry names; a qualification",
         "option registers or admits the tool only on a qualification Host.",
+        "**1.0 contract** follows the [contract freeze policy](../plans/contract-freeze-policy.md#q1-which-tools-are-frozen):",
+        "a normally advertised `shipped` or `limited` tool is `frozen` from 1.0 (its name, inputs, annotations and declared",
+        "output schema change only in a major release); every other tool is `experimental` and may change in a minor",
+        "release. A deprecated tool names the release that deprecated it and its replacement.",
         "**Also in** lists the other catalog features that use the tool.",
         "",
     ]
     for domain in sorted(domains):
-        lines += [f"## {domain}", "", "| Tool | Feature | Support | Toolset | Host option | Also in |",
-                  "| --- | --- | --- | --- | --- | --- |"]
+        lines += [f"## {domain}", "", "| Tool | Feature | Support | Toolset | 1.0 contract | Host option | Also in |",
+                  "| --- | --- | --- | --- | --- | --- | --- |"]
         for tool in domains[domain]:
             feature = own[tool]
             others = [f for f in users[tool] if f != tool]
             also = f"{len(others)} features" if len(others) > 5 else ", ".join(f"`{f}`" for f in others)
             option = ", ".join(f"`{flag}`" for flag in named_flags(feature, flags))
             title = feature["title"].replace("|", "\\|")
-            lines.append(f"| `{tool}` | {title} | {support(feature)} | {group_of(tool, rules)} | {option} | {also} |")
+            group = group_of(tool, rules)
+            lines.append(f"| `{tool}` | {title} | {support(feature)} | {group} | {contract(feature, group)} | {option} | {also} |")
         lines.append("")
     return "\n".join(lines)
 

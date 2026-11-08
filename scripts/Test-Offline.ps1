@@ -396,7 +396,9 @@ try {
             $result.addInReceiverHost = 'passed; default Host refuses enrollment, explicit enrollment keeps challenge checks, no worker launched'
             python -B scripts/test_mcp_surface_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'mcp-surface')
             if ($LASTEXITCODE -ne 0) { throw 'MCP surface (identity, titles, output schemas, prompts, resources, completions, logging, progress, toolsets) failed.' }
-            $result.mcpSurface = 'passed; actual stdio Host without native workers'
+            python -B scripts/mcp_surface.py check --surface (Join-Path $output 'mcp-surface/surface.json')
+            if ($LASTEXITCODE -ne 0) { throw 'Frozen MCP surface gate (contracts/mcp-surface.v1.json) failed.' }
+            $result.mcpSurface = 'passed; actual stdio Host without native workers, compared with the frozen surface baseline'
             python -B scripts/test_encoder_checkpoint.py --fixture (Join-Path $output 'encoder-checkpoint/fixture.json')
             if ($LASTEXITCODE -ne 0) { throw 'C# encoder checkpoint receipt failed independent Python verification.' }
             $result.encoderCheckpointReceipt = 'passed'

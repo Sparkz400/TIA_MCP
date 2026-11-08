@@ -142,4 +142,6 @@ is `TIA MCP`. The bundled feature catalog version, the data contract version tha
 also returns, is advertised as `capabilities.experimental["tiaMcp/featureCatalog"].version`
 (for example `0.4.86`). Release bundles record the product version in `manifest.json`
 ([releasing](../guides/releasing.md)). From 1.0 the [contract freeze policy](../plans/contract-freeze-policy.md)
-says which parts of this surface are frozen.
+says which parts of this surface are frozen; the frozen part is recorded in
+[`contracts/mcp-surface.v1.json`](../../contracts/mcp-surface.v1.json) and every error code with its class in
+[error codes](error-codes.md).
