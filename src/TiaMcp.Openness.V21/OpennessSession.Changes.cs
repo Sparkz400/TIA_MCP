@@ -93,7 +93,7 @@ namespace TiaMcp.Openness.V21
                 if (IsPlcAlarmKind(change.Kind)) change.Preview["fingerprintScope"] += " PLC alarm imports additionally hash a fresh native export of their artifact type for every PLC/software-unit owner, or the project; XLSX document properties are excluded and a nondeterministic export fails closed as StaleRevision.";
                 if (change.Kind == "opcua_server_settings_set") change.Preview["fingerprintScope"] += " OPC UA server settings additionally cover every device item's pinned OPC UA server attribute values (server, port, automatic certificate acceptance, purchased license, alarms and conditions).";
                 if (change.Kind == "webserver_page_set") change.Preview["fingerprintScope"] += " Web page settings additionally cover every web-capable CPU's WebserverActivate value, system web page flag and web application names, types and default flags.";
-                if (change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "drive_motor_configure") change.Preview["fingerprintScope"] += " Drive kinds additionally cover the selected drive object's identity (hardware path, driveId, drive object count of its container, order number, firmware and parameter count) and the listed parameter values, the drive object's telegram rows or the data set's motor configuration entries.";
+                if (change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "drive_motor_configure" || change.Kind == "drive_encoder_configure") change.Preview["fingerprintScope"] += " Drive kinds additionally cover the selected drive object's identity (hardware path, driveId, drive object count of its container, order number, firmware and parameter count) and the listed parameter values, the drive object's telegram rows, the data set's motor configuration entries or the encoder's configuration entries (or that it has none).";
                 if (change.Kind == "umac_role_set") change.Preview["fingerprintScope"] += " UMAC role changes additionally cover all custom and system roles with engineering and device function rights, and the role assignments and activation state of project, anonymous and UMC principals.";
                 change.Preview["fingerprintCoverage"] = change.FingerprintCoverage?.DeepClone();
                 change.Preview["targetScopePath"] = change.ScopePath;
@@ -928,6 +928,12 @@ namespace TiaMcp.Openness.V21
                         ["driveDataSet"] = payload["driveDataSet"].DeepClone(), ["action"] = change.Kind });
                     ((JArray)preview["warnings"]).Add("Projects a motor without a Siemens code number into one drive data set through Startdrive's HardwareProjection: an optional motor type, then the listed nameplate entries, then ProjectMotorConfiguration. Startdrive recalculates dependent parameters; readback covers only the listed entries. Offline project only: no motor identification, online write, download or RAM-to-ROM.");
                     break;
+                case "drive_encoder_configure":
+                    preview["encoderChange"] = Startdrive(() => DriveEncoderConfigure(change, project, false));
+                    effects.Add(new JObject { ["hardwarePath"] = payload["hardwarePath"].DeepClone(), [DriveObjectRules.Handle(payload)] = payload[DriveObjectRules.Handle(payload)].DeepClone(),
+                        ["encoderNumber"] = payload["encoderNumber"].DeepClone(), ["action"] = change.Kind });
+                    ((JArray)preview["warnings"]).Add("Sets one encoder (SetEncoder) or changes the listed entries of an existing encoder configuration (ProjectEncoderConfiguration) through Startdrive's HardwareProjection. Startdrive recalculates dependent parameters; readback covers only the listed entries. Offline project only: no online write, download or RAM-to-ROM.");
+                    break;
                 case "drive_telegram_set":
                     preview["telegramChange"] = Startdrive(() => DriveTelegramSet(change, project, false));
                     effects.Add(new JObject { ["hardwarePath"] = payload["hardwarePath"].DeepClone(), [DriveObjectRules.Handle(payload)] = payload[DriveObjectRules.Handle(payload)].DeepClone(),
@@ -1265,6 +1271,9 @@ namespace TiaMcp.Openness.V21
                 case "drive_telegram_set":
                     Startdrive(() => DriveTelegramSet(change, project, true));
                     break;
+                case "drive_encoder_configure":
+                    change.Readbacks.Add(new JObject { ["role"] = "drive-encoder-readback", ["encoder"] = Startdrive(() => DriveEncoderConfigure(change, project, true)) });
+                    break;
                 case "drive_motor_configure":
                     change.Readbacks.Add(new JObject { ["role"] = "drive-motor-readback", ["motor"] = Startdrive(() => DriveMotorConfigure(change, project, true)) });
                     break;
@@ -1568,7 +1577,8 @@ namespace TiaMcp.Openness.V21
                 if (connectionBudget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish a complete technology connection fingerprint within the scan bound.");
             }
             if (change.Kind == "drive_motor_configure") snapshot["driveMotor"] = Startdrive(() => DriveMotorFingerprint(change, project));
-            if (change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "drive_motor_configure" || change.Kind == "safety_drive_tags") snapshot["driveObject"] = Startdrive(() => DriveObjectFingerprint(change, project));
+            if (change.Kind == "drive_encoder_configure") snapshot["driveEncoder"] = Startdrive(() => DriveEncoderFingerprint(change, project));
+            if (change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "drive_motor_configure" || change.Kind == "drive_encoder_configure" || change.Kind == "safety_drive_tags") snapshot["driveObject"] = Startdrive(() => DriveObjectFingerprint(change, project));
             if (change.Kind == "drive_parameter_set") snapshot["driveParameters"] = Startdrive(() => DriveParameterFingerprint(change, project));
             if (change.Kind == "drive_telegram_set") snapshot["driveTelegrams"] = Startdrive(() => DriveTelegramFingerprint(change, project));
             // to_connect's telegram form connects to a drive's telegram, so the drive object and its telegrams join the fingerprint.

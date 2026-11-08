@@ -25,7 +25,7 @@ namespace TiaMcp.Openness.V21
 
         // Kinds whose apply compiles every device of the project, hardware and software, instead of one selected PLC.
         // project_simulation_enable is a project-wide setting that changes how every PLC compiles, so it compiles them all.
-        private static readonly string[] DeviceCompiledKinds = { "cax_import", "network_configure", "network_io_assign", "drive_parameter_set", "drive_telegram_set", "drive_motor_configure", "safety_drive_tags",
+        private static readonly string[] DeviceCompiledKinds = { "cax_import", "network_configure", "network_io_assign", "drive_parameter_set", "drive_telegram_set", "drive_motor_configure", "drive_encoder_configure", "safety_drive_tags",
             "safety_fparameter_set", "safety_import_xml", "webserver_page_set", "umac_role_set", "opcua_server_settings_set", "project_simulation_enable", "network_mrp_set" };
 
         internal static bool CompilesEveryDevice(string kind) =>
