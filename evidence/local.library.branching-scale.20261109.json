@@ -1,0 +1,118 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library.branching-scale.20261109",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-08T23:56:22+00:00",
+  "source": {
+    "commit": "c6af289ebbc2f9e60f321c81df531baf9303fe22",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Owned TIA Portal V21 scratch (CPU 1511-1 PN V4.1): a binary tree of 1,000 FC types Tree_0000..Tree_0999, each calling its two children (heap order), created through library_create_type in 10 changes of 100 (15-92 s apply per change, growing with library size) and released through library_release_version in 10 changes of 100 (346-365 s apply each). library_query dependencies from the root Tree_0999 captured all 1,000 versions with the authored edges in the project library (140.5 s) and, after library_publish of the root with its closure into a new global library (103 s apply), in the global library (111.0 s). A fresh consumer scratch instantiated the root with its closure from the archived global library and compiled cleanly (118.8 s apply, 1,000 Tree blocks in the inventory). Peak Portal working set 4.8 GB.",
+  "limitations": [
+    "Observed timings on one Windows host (PCNico); not cross-machine budgets.",
+    "One FC tree with two callees per node; FB, UDT and diamond-shaped sharing are not part of the graph.",
+    "Dependency closures are bounded at 1,000 versions: a 1,023-node tree released completely but reported scopeComplete=false at the closure query (run lb_572a17e7).",
+    "The run needed two fixes in its source commit: compact library journals with a 32 MiB bound and a 16 MiB prepare refusal (an earlier 1,000-node publish overflowed the 8 MiB journal after its native change), and counted surplus compiler success rows (1,000 success rows exceeded the 500-row budget)."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "650a00e7d5e11f728ac7c20ac64cc3193f488a3898c2b3a3e9a3bf5b7e90a46a"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "fbca9fb4aee1036bf61694509d96c1f9a8155eb2652495f8fbf2061b18448fda"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "03f6871651bfb5a2c0ade8c66668a37933c6708cf6f2c1c464de6029cee4e0f2",
+      "bytes": 22492152,
+      "completed": true,
+      "steps": [
+        "start owned TIA branching scale",
+        "create owned scratch branching scale",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "project library closure of the root",
+        "prepare library_create",
+        "apply library_create",
+        "prepare library_publish",
+        "apply library_publish",
+        "global library closure of the root",
+        "prepare library_archive",
+        "apply library_archive",
+        "close the authoring session",
+        "start owned TIA branching consumer",
+        "create owned scratch branching consumer",
+        "open staged archive",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "consumer inventory"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_query",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
