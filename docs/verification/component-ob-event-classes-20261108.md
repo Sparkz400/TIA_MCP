@@ -47,6 +47,14 @@ The startup, time-of-day, time-delay, hardware and diagnostic error interrupt OB
 cyclic-interrupt OB had passed: as a LAD OB, after the first of two networks, and reusing the installed FB (15 cases, all
 installed and joined `VerifiedShapes`).
 
-Not covered: pairs of these combinations with an event class (LAD with an earlier placement, and so on); event classes
+## Fourth run
+
+All six event classes (startup, cyclic-interrupt, time-of-day, time-delay, hardware and diagnostic error interrupt) then ran
+with two or three of the features: a LAD OB after the first of two networks, a LAD OB reusing the installed FB, an FBD OB
+reusing it after the first of two networks, and a LAD OB reusing it after the first of two networks (24 cases,
+`local.library_integrate.candidate_shapes.ob_combinations_3.20261108`). All 24 installed and joined `VerifiedShapes`, so every combination of LAD, an earlier placement and
+reuse now runs in production for each of the six classes.
+
+Not covered: an event-class OB with a multi-instance or an embedding parent; event classes
 not named here (programming and I/O access errors, time error, rack failure, synchronous cycle and the rest); OB
 attributes and event attachments beyond V21's defaults; other languages than de-DE; runtime.
