@@ -1561,6 +1561,12 @@ namespace TiaMcp.Openness.V21
             if (change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_drive_tags") snapshot["driveObject"] = Startdrive(() => DriveObjectFingerprint(change, project));
             if (change.Kind == "drive_parameter_set") snapshot["driveParameters"] = Startdrive(() => DriveParameterFingerprint(change, project));
             if (change.Kind == "drive_telegram_set") snapshot["driveTelegrams"] = Startdrive(() => DriveTelegramFingerprint(change, project));
+            // to_connect's telegram form connects to a drive's telegram, so the drive object and its telegrams join the fingerprint.
+            if (change.Kind == "to_connect" && change.Payload["telegramType"] != null)
+            {
+                snapshot["driveObject"] = Startdrive(() => DriveObjectFingerprint(change, project));
+                snapshot["driveTelegrams"] = Startdrive(() => DriveTelegramFingerprint(change, project));
+            }
             if (change.Kind.StartsWith("to_", StringComparison.Ordinal))
             {
                 var plc = SelectPlc(change.Selector);

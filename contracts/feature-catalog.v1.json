@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.160",
+  "catalogVersion": "0.4.161",
   "targetTiaVersions": [
     21
   ],
@@ -3800,6 +3800,24 @@
         "One owned scratch CPU 1511-1 PN V4.1; TO_PositioningAxis (virtual), TO_SpeedAxis (virtual, analog actor), TO_ExternalEncoder and TO_MeasuringInput 10.0. Only the encoder role connected; actor, torque and measuring input were refused by V21 or unreachable on this fixture.",
         "The G120C PN added through Openness exposes no telegram device item even on the IO system (same root as the D10 DriveObjectNumber blocker), so drive telegram targets are not qualified.",
         "Engineering only; nothing is downloaded and no axis moves; the drive is never compiled (no compiler service)."
+      ]
+    },
+    {
+      "id": "local.technology.drive_telegram.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "a1c00283dceafa8d9c3f6e5c77f35855660d36fb",
+        "passedScope": "scripts/qualify_motion_connections.py on Debug builds of a1c00283 (artifacts/dt2, git archive) in an owned scratch CPU 1511-1 PN V4.1 with a TM PosInput 2 V2.0, an AQ 2xU/I ST and a SINAMICS G120C PN on the CPU's IO system. New: to_connect's Startdrive telegram target. A real TO_SpeedAxis 10.0 actor connected to the G120C drive object's MainTelegram (telegram 1, byte 256 in and out) through AxisEncoderHardwareConnectionSDRInterface.Connect(Telegram), then replaced through Connect(Telegram, ConnectOption.Default); each apply checkpointed, PLC-compiled and saved, read back IsConnected with InputAddress/OutputAddress 2048 (bits), and equal after a fresh Portal reopen. Typed refusals left the slot unchanged: an unknown telegramType and a channel index (InvalidRequest), SafetyTelegram (SafetyBoundary). V21 refused the virtual TO_PositioningAxis torque interface on telegram 1 (Target not available for input=2048 and output=2048); the failed apply was restored from its checkpoint. The earlier encoder, measuring-input and analog-actor cases reran unchanged."
+      },
+      "artifacts": [
+        "evidence/local.technology.drive_telegram.20261108.json"
+      ],
+      "limitations": [
+        "One G120C PN (not commissioned in Startdrive) with only its main telegram 1, addressed by driveObjectIndex; supplementary and torque telegrams, other drives and S120 drive objects are not exercised.",
+        "Torque on a drive telegram stays unverified: V21 refused it on telegram 1, and Startdrive refuses a torque telegram on the G120C.",
+        "Engineering only; nothing is downloaded and no axis moves; the drive is never compiled."
       ]
     },
     {
@@ -9785,7 +9803,7 @@
           "compile=true is mandatory; interrupted changes stay held for admission reconciliation like other to_ kinds.",
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 with a TM PosInput 2 V2.0, an AQ 2xU/I ST and a SINAMICS G120C PN on the IO system of the CPU (local.technology.motion_connections.20261030): a TO_ExternalEncoder 10.0 encoder on the TM PosInput item (Connect(DeviceItem)), then replaced through Connect(DeviceItem, DeviceItem, ConnectOption.Default) and Connect(Int32, Int32, ConnectOption.Default), each compiled, saved, read back and equal after a fresh Portal reopen; a channel replacement restored from its checkpoint. Typed refusals: measuring input on a tag, actor with connectOption on one module or with channelIndex (UnsupportedTarget); measuring input with an output address, actor with one address, encoder with only an input address (InvalidRequest).",
           "V21 refused on this fixture (failed applies restored): TO_MeasuringInput 10.0 on the TM PosInput item with channelIndex 0 and on its channel (\"Target not available for input=0 and output=-1\"); TO_SpeedAxis 10.0 actor on an AQ 2xU/I ST channel with the default and with Actor.Type 0 (\"Target not available for input=-1 and output=-1\"); encoder on a global DB member of type PD_TEL83 (\"No valid assignment for Encoder(MoEncoder)\"); Connect on a connected slot (\"Already connected\"), which to_connect now handles by disconnecting first within one checkpoint (replacesConnection).",
-          "Drive telegram targets stay open: a G120C PN added through Openness and assigned to the IO system exposes no telegram device item (no item carries I/O addresses); actor and torque on a telegram were not reached.",
+          "Drive telegrams: a G120C PN added through Openness exposes no telegram device item, so the DeviceItem target cannot reach it; the Startdrive telegram target (hardwarePath, driveObjectNumber/driveObjectIndex, telegramType) connects through the Startdrive SDR Connect(Telegram) overloads instead. A real TO_SpeedAxis actor on the G120C main telegram, with replacement, passed natively (local.technology.drive_telegram.20261108); torque on telegram 1 is refused by V21, and other telegrams, drives and roles are not exercised. SafetyTelegram is refused with SafetyBoundary.",
           "V21 cannot export an inconsistent technology object, so the to_ kinds skip the XML backup for one (preview warning; the project checkpoint is the recovery). The first motion object adds MC_Servo and MC_Interpolator, which stay inconsistent without compile, so to_create refuses it with compile=false (CompileRequired, nothing written): create a compiled motion object before any created with compile=false."
         ]
       },
@@ -9794,7 +9812,8 @@
         "evidenceIds": [
           "local.technology_changes.20261028",
           "local.composite_rebind.20261028",
-          "local.technology.motion_connections.20261030"
+          "local.technology.motion_connections.20261030",
+          "local.technology.drive_telegram.20261108"
         ]
       },
       "availability": {
@@ -10658,14 +10677,15 @@
           "Siemens decides whether a target suits the object (telegram, module operating mode, DB member type); the qualified pairs and the pairs V21 refused on the fixture are listed below. Drive-side configuration (telegram choice, commissioning) is not part of this route.",
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 with a TM PosInput 2 V2.0, an AQ 2xU/I ST and a SINAMICS G120C PN on the IO system of the CPU (local.technology.motion_connections.20261030): a TO_ExternalEncoder 10.0 encoder on the TM PosInput item (Connect(DeviceItem)), then replaced through Connect(DeviceItem, DeviceItem, ConnectOption.Default) and Connect(Int32, Int32, ConnectOption.Default), each compiled, saved, read back and equal after a fresh Portal reopen; a channel replacement restored from its checkpoint. Typed refusals: measuring input on a tag, actor with connectOption on one module or with channelIndex (UnsupportedTarget); measuring input with an output address, actor with one address, encoder with only an input address (InvalidRequest).",
           "V21 refused on this fixture (failed applies restored): TO_MeasuringInput 10.0 on the TM PosInput item with channelIndex 0 and on its channel (\"Target not available for input=0 and output=-1\"); TO_SpeedAxis 10.0 actor on an AQ 2xU/I ST channel with the default and with Actor.Type 0 (\"Target not available for input=-1 and output=-1\"); encoder on a global DB member of type PD_TEL83 (\"No valid assignment for Encoder(MoEncoder)\"); Connect on a connected slot (\"Already connected\"), which to_connect now handles by disconnecting first within one checkpoint (replacesConnection).",
-          "Drive telegram targets stay open: a G120C PN added through Openness and assigned to the IO system exposes no telegram device item (no item carries I/O addresses); actor and torque on a telegram were not reached.",
+          "Drive telegrams: a G120C PN added through Openness exposes no telegram device item, so the DeviceItem target cannot reach it; the Startdrive telegram target (hardwarePath, driveObjectNumber/driveObjectIndex, telegramType) connects through the Startdrive SDR Connect(Telegram) overloads instead. A real TO_SpeedAxis actor on the G120C main telegram, with replacement, passed natively (local.technology.drive_telegram.20261108); torque on telegram 1 is refused by V21, and other telegrams, drives and roles are not exercised. SafetyTelegram is refused with SafetyBoundary.",
           "V21 cannot export an inconsistent technology object, so the to_ kinds skip the XML backup for one (preview warning; the project checkpoint is the recovery). The first motion object adds MC_Servo and MC_Interpolator, which stay inconsistent without compile, so to_create refuses it with compile=false (CompileRequired, nothing written): create a compiled motion object before any created with compile=false."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.technology.motion_connections.20261030"
+          "local.technology.motion_connections.20261030",
+          "local.technology.drive_telegram.20261108"
         ]
       },
       "availability": {
