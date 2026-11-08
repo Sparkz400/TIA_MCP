@@ -1,7 +1,8 @@
 # Releasing
 
 TIA MCP stays pre-1.0 until the [TODO](../TODO.md) is closed; until then every release is a
-0.x pre-release. A version tag builds a **draft** GitHub release; only the maintainer publishes it.
+0.x pre-release. From 1.0 the [contract freeze policy](../plans/contract-freeze-policy.md) decides
+whether a change needs a major, minor or patch release. A version tag builds a **draft** GitHub release; only the maintainer publishes it.
 
 ## Versions
 

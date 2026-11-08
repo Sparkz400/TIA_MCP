@@ -59,8 +59,8 @@ names every row with an open cell.
 - **Deferred rows:** two `not_implemented` rows (6 cells) are not open cells but stay 1.0
   work ([TODO](TODO.md#deferred-rows)).
 - **Release mechanics:** product version 0.9.0 from one source, a CHANGELOG, a draft-only
-  release workflow and the 30 October security review are in place; a contract freeze policy,
-  the engineering package and the release itself remain ([TODO](TODO.md#release-mechanics-and-policy)).
+  release workflow and the 30 October security review are in place, and the contract freeze policy was accepted on 8 November;
+  its enforcement, the engineering package and the release itself remain ([TODO](TODO.md#release-mechanics-and-policy)).
 
 ## Where the evidence is
 

@@ -2,7 +2,8 @@
 
 Notable changes to TIA MCP, in the style of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow [Semantic Versioning](https://semver.org/); before 1.0 any release may change the
-tool surface. The product version is set once in [`Directory.Build.props`](Directory.Build.props);
+tool surface; from 1.0 the [contract freeze policy](docs/plans/contract-freeze-policy.md) says what
+may change in a major, minor or patch release. The product version is set once in [`Directory.Build.props`](Directory.Build.props);
 the feature catalog keeps its own data contract version. Dated detail and evidence are in the
 [status log](docs/history/status-log.md); [STATUS](docs/STATUS.md) has the current counts, and the
 [tool reference](docs/reference/tools.md) gives each tool's support class.
@@ -14,7 +15,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 ### Added
 
 - **Offline runtime extensions:** bounded `syslog` reads through `runtime_web_diagnostics`, and explicit SingleStep_C/P/CP/CT/CPT capture mode selection. Existing ownership, request bounds and restore behavior remain; these additions are not natively qualified ([record](docs/verification/offline-backlog-20261103.md)).
-- **Contract review inventory:** the actual-Host surface runner retains a hashed discovery candidate with tool schemas, annotations, prompts, resources and binary hashes. The compatibility policy remains a draft.
+- **Contract review inventory:** the actual-Host surface runner retains a hashed discovery candidate with tool schemas, annotations, prompts, resources and binary hashes. The [contract freeze policy](docs/plans/contract-freeze-policy.md) was accepted on 8 November and takes effect at 1.0.
 - **Typed LAD/FBD coverage:** CPU 1513-1 PN V4.1 base families (102 engineering cases), and 120 wave 9 software-unit/namespace profiles on CPU 1511 V4.1 (124 engineering cases), with retained exact-build evidence and explicit runtime limits.
 - **Classic import on more panels:** `hmi_classic_import` is qualified and admitted on WinCC RT Advanced and KTP700 Basic PN as well ([record](docs/verification/hmi-classic-profiles-20261101.md)).
 - **Unified event handlers:** change kind `hmi_event_handler_create` (Unified script event handlers of screens and screen items (the script stored with CRLF line ends, never executed)) past the HMI preservation gate; qualified natively and admitted on Unified Comfort and Unified PC ([record](docs/verification/hmi-unified-authoring-20261102.md)).
