@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.171",
+  "catalogVersion": "0.4.172",
   "targetTiaVersions": [
     21
   ],
@@ -1072,6 +1072,25 @@
         "Observed timing on one Windows host (PCNico); not a cross-machine latency guarantee.",
         "One linear FB call chain in a project library; no global library, branching graphs or UDT dependencies at this scale. Versions 0..883 were released by earlier runs of the same project (pinned in the verification doc); TIA records library dependencies only between released versions.",
         "Creation of the chain and the releases of Chain_0000..Chain_0883 (four earlier runs, single and batched releases) are measurements pinned in docs/verification/library-native-scale-20261027.md, not evidence records."
+      ]
+    },
+    {
+      "id": "local.library.branching-scale.20261109",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "c6af289ebbc2f9e60f321c81df531baf9303fe22",
+        "passedScope": "Owned TIA Portal V21 scratch (CPU 1511-1 PN V4.1): a binary tree of 1,000 FC types Tree_0000..Tree_0999, each calling its two children (heap order), created through library_create_type in 10 changes of 100 (15-92 s apply per change, growing with library size) and released through library_release_version in 10 changes of 100 (346-365 s apply each). library_query dependencies from the root Tree_0999 captured all 1,000 versions with the authored edges in the project library (140.5 s) and, after library_publish of the root with its closure into a new global library (103 s apply), in the global library (111.0 s). A fresh consumer scratch instantiated the root with its closure from the archived global library and compiled cleanly (118.8 s apply, 1,000 Tree blocks in the inventory). Peak Portal working set 4.8 GB."
+      },
+      "artifacts": [
+        "evidence/local.library.branching-scale.20261109.json"
+      ],
+      "limitations": [
+        "Observed timings on one Windows host (PCNico); not cross-machine budgets.",
+        "One FC tree with two callees per node; FB, UDT and diamond-shaped sharing are not part of the graph.",
+        "Dependency closures are bounded at 1,000 versions: a 1,023-node tree released completely but reported scopeComplete=false at the closure query (run lb_572a17e7).",
+        "The run needed two fixes in its source commit: compact library journals with a 32 MiB bound and a 16 MiB prepare refusal (an earlier 1,000-node publish overflowed the 8 MiB journal after its native change), and counted surplus compiler success rows (1,000 success rows exceeded the 500-row budget)."
       ]
     },
     {
@@ -12568,7 +12587,8 @@
           "local.library_formats.rerun.20261028",
           "local.library_releases.rerun.20261028",
           "local.library_unit_relations.rerun.20261029",
-          "local.library_protected.rerun.20261029"
+          "local.library_protected.rerun.20261029",
+          "local.library.branching-scale.20261109"
         ]
       },
       "availability": {
@@ -13442,7 +13462,8 @@
           "local.safety.fio-routes.20261102",
           "local.safety.fio-block-routes.20261102",
           "local.library_compatibility.firmware.20261107",
-          "local.library.vendor-compile.20261108"
+          "local.library.vendor-compile.20261108",
+          "local.library.branching-scale.20261109"
         ]
       },
       "availability": {
@@ -13911,7 +13932,8 @@
           "local.library_lifecycle.rerun.20261028",
           "local.library_releases.rerun.20261028",
           "local.library_unit_relations.rerun.20261029",
-          "local.library_protected.rerun.20261029"
+          "local.library_protected.rerun.20261029",
+          "local.library.branching-scale.20261109"
         ]
       },
       "availability": {
@@ -14361,7 +14383,8 @@
           "local.library_lifecycle.rerun.20261028",
           "local.library_releases.rerun.20261028",
           "local.library_unit_relations.rerun.20261029",
-          "local.library_protected.rerun.20261029"
+          "local.library_protected.rerun.20261029",
+          "local.library.branching-scale.20261109"
         ]
       },
       "availability": {

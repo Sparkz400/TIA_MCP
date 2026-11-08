@@ -114,6 +114,33 @@ complete and untruncated, in about the same time regardless of size:
 | `Chain_0883` | 884 | 23.0 |
 | `Chain_0999` | 1,000 | 22.8 |
 
+## 1,000-node branching tree (9 November 2026)
+
+`local.library.branching-scale.20261109` (`scripts/qualify_library_branching_scale.py --nodes 1000`): a binary tree
+of 1,000 FC types `Tree_0000`..`Tree_0999`, each calling its two children, in an owned scratch project library.
+
+| Step | Changes | Apply seconds per change |
+| --- | ---: | ---: |
+| Create, 100 types each | 10 | 15 → 92 |
+| Release, 100 versions each | 10 | 346–365 |
+| Publish the root with its closure into a new global library | 1 | 103 |
+| Instantiate the root with its closure into a fresh PLC and compile | 1 | 119 |
+
+The dependency closure from `Tree_0999` held all 1,000 versions with exactly the authored edges, in the project
+library (140.5 s) and in the global library (111.0 s); the consumer PLC compiled cleanly with 1,000 tree blocks.
+Portal peaked at 4.8 GB.
+
+Three earlier attempts each stopped one step further and left a bound or fix:
+
+- 1,023 nodes released completely, but the closure query reported `scopeComplete=false`: closures are bounded
+  at 1,000 versions.
+- The publish of 1,000 versions completed natively, then its next journal write passed the 8 MiB journal bound
+  and left the change `applying` in its scratch. Library journals are now compact with a 32 MiB bound, and
+  prepare refuses with `LibraryLimitExceeded` when the prepared journal exceeds 16 MiB.
+- The consumer compile succeeded, but 1,000 "Block was successfully compiled." rows exceeded the 500-row
+  diagnostic budget, so the truncated result refused the change. Past the budget, childless Success and
+  Information rows are now counted in `omittedSuccessRows`; any other row still truncates.
+
 ## Run 2: 3,900 FB types, before the query fix
 
 | Types after batch | Prepare | Apply | Checkpoint archive |
@@ -152,4 +179,5 @@ truncated query is reported, never silently shortened.
 
 - Real vendor byte volumes. The 100-component import and a generated 150 MB vendor-sized package
   passed separately ([import scale](library-import-scale-20261027.md)).
-- Global libraries, branching dependency graphs and component apply at this scale.
+- Component apply at this scale. Global libraries and a 1,000-node branching graph passed on 9 November
+  ([branching tree](#1000-node-branching-tree-9-november-2026)); FB, UDT and diamond-shaped sharing were not part of it.
