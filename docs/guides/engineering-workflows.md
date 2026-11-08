@@ -583,7 +583,7 @@ The telegram target needs SINAMICS Startdrive: the drive object is selected by t
 `telegramType` is `MainTelegram`, `SupplementaryTelegram` or `TorqueTelegram`; `SafetyTelegram` answers `SafetyBoundary`, as in
 `drive_telegram_set`, and a telegram the drive object lacks answers `TelegramNotFound`. The drive object
 and its telegrams join the change fingerprint, and apply reads back `IsConnected` with the telegram's input and output start
-addresses as the slot's `InputAddress`/`OutputAddress`.
+addresses as the slot's `InputAddress`/`OutputAddress`, which hold bit addresses (telegram byte 256 reads back as 2048).
 
 V21 refuses `Connect` on a connected slot ("Already connected"), and a real axis or encoder does not compile disconnected,
 so on a connected slot `to_connect` disconnects and connects within one checkpoint and compile; the preview reports
