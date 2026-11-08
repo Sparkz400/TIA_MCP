@@ -149,12 +149,12 @@ namespace TiaMcp.Tests
             {
                 ["hardware"] = "{hardwarePath:'/d'}", ["channel"] = "{hardwarePath:'/d',channelType:'Technology',channelIoType:'Complex',channelNumber:0}",
                 ["channelIndex"] = "{hardwarePath:'/d',channelIndex:1}", ["tag"] = "{tagName:'T'}", ["modules"] = "{inputHardwarePath:'/i',outputHardwarePath:'/o'}",
-                ["dbMember"] = "{dbMemberPath:'DB.Tel'}",
+                ["dbMember"] = "{dbMemberPath:'DB.Tel'}", ["telegram"] = "{hardwarePath:'/g120c',driveObjectNumber:1,telegramType:'MainTelegram'}",
             };
             var accepted = new Dictionary<string, string[]>
             {
-                ["actor"] = ["hardware", "channel", "tag", "modules", "dbMember"], ["sensor"] = ["hardware", "channel", "tag", "modules", "dbMember"],
-                ["encoder"] = ["hardware", "channel", "tag", "modules", "dbMember"], ["torque"] = ["hardware", "modules", "dbMember"],
+                ["actor"] = ["hardware", "channel", "tag", "modules", "dbMember", "telegram"], ["sensor"] = ["hardware", "channel", "tag", "modules", "dbMember", "telegram"],
+                ["encoder"] = ["hardware", "channel", "tag", "modules", "dbMember", "telegram"], ["torque"] = ["hardware", "modules", "dbMember", "telegram"],
                 ["measuringInput"] = ["channel", "channelIndex"], ["outputCam"] = ["channel", "tag"],
             };
             foreach (var role in accepted)
@@ -169,6 +169,7 @@ namespace TiaMcp.Tests
             Check.Equal("addresses", OpennessSession.TechnologyTargetForm("measuringInput", P("{inputAddress:8}")));
             Check.Equal("addresses", OpennessSession.TechnologyTargetForm("outputCam", P("{outputAddress:8}")));
             Check.Equal("modules", OpennessSession.TechnologyTargetForm("torque", P("{inputHardwarePath:'/i',outputHardwarePath:'/o',connectOption:'Default'}")));
+            Check.Equal("telegram", OpennessSession.TechnologyTargetForm("torque", P("{hardwarePath:'/d',driveObjectNumber:1,telegramType:'MainTelegram',connectOption:'Default'}")));
             foreach (var (role, json, code) in new[]
             {
                 ("actor", "{inputAddress:256}", "InvalidRequest"), ("measuringInput", "{inputAddress:8,outputAddress:8}", "InvalidRequest"), ("outputCam", "{inputAddress:8}", "InvalidRequest"),
@@ -176,6 +177,9 @@ namespace TiaMcp.Tests
                 ("actor", "{channelNumber:0}", "InvalidRequest"), ("measuringInput", "{hardwarePath:'/d',channelNumber:0,channelIndex:1}", "InvalidRequest"),
                 ("actor", "{hardwarePath:'/d',connectOption:'AllowAllModules'}", "UnsupportedTarget"), ("outputCam", "{outputAddress:8,connectOption:'Default'}", "UnsupportedTarget"),
                 ("cam", "{tagName:'T'}", "InvalidRequest"),
+                // A telegram needs the drive's hardwarePath and never combines with a channel selector or another target.
+                ("actor", "{telegramType:'MainTelegram'}", "InvalidRequest"), ("actor", "{hardwarePath:'/d',telegramType:'MainTelegram',channelIndex:1}", "InvalidRequest"),
+                ("actor", "{hardwarePath:'/d',telegramType:'MainTelegram',tagName:'T'}", "InvalidRequest"),
             })
             {
                 var refused = await Check.ThrowsAsync<BridgeException>(() => { OpennessSession.TechnologyTargetForm(role, P(json)); return Task.CompletedTask; });
