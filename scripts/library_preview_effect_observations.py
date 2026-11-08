@@ -191,7 +191,11 @@ def check_preview_effects(plan, same):
     if kind in ('library_create','library_upgrade','library_archive'):
         require('outputAbsent' in plan, 'recorded output destination')
         windows_path(plan['outputAbsent'])
-        same(ntpath.basename(plan['outputAbsent']), {'library_create':'created','library_upgrade':'upgraded','library_archive':'published.zal21'}[kind], 'output name')
+        # library_upgrade wrote to "upgraded" until 8 November 2026 and to "u" since, to fit TIA's 143-character path limit.
+        name = ntpath.basename(plan['outputAbsent'])
+        if kind == 'library_upgrade' and name == 'u':
+            name = 'upgraded'
+        same(name, {'library_create':'created','library_upgrade':'upgraded','library_archive':'published.zal21'}[kind], 'output name')
     if kind == 'library_upgrade':
         archive = ntpath.splitext(payload['path'])[1].lower().startswith('.zal')
         require('upgradeSourceHash' in plan and 'upgradeSourceHashScope' in plan, 'upgrade source capture')

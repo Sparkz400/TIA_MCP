@@ -216,7 +216,13 @@ namespace TiaMcp.Openness.V21
                     if (!archive && payload["expectedFiles"] is JArray expectedFiles) VerifyLibraryExpectedFiles(Path.GetDirectoryName(path), expectedFiles);
                     change.Preview["upgradeSourceHash"] = archive ? hash.ToLowerInvariant() : LibraryDirectoryHash(Path.GetDirectoryName(path));
                     change.Preview["upgradeSourceHashScope"] = archive ? "Complete original archive bytes" : "Sorted SHA-256 manifest of every relative companion file; bound to the approved preview hash";
-                    change.Preview["outputAbsent"] = Path.Combine(change.Directory, "upgraded");
+                    // TIA retrieves into <work>\<library name> or <library name>_V21 and refuses a path over 143 characters, so the
+                    // output folders are one letter each and a name that still does not fit is refused here, before any copy.
+                    change.Preview["outputAbsent"] = Path.Combine(change.Directory, "u");
+                    string upgradeTarget = EngineeringPaths.LibraryUpgradeTarget(Path.Combine(change.Directory, "u", "w"), Path.GetFileNameWithoutExtension(path));
+                    if (upgradeTarget.Length > EngineeringPaths.MaximumProjectDirectoryLength)
+                        throw new BridgeException("LibraryPathTooLong", "TIA limits the upgraded library directory to 143 characters; " + upgradeTarget + " has " + upgradeTarget.Length
+                            + ". Configure a shorter artifacts directory or a shorter library file name; nothing was copied or upgraded.");
                     break;
                 }
                 case "library_copy_elements": case "library_publish":
@@ -1076,7 +1082,9 @@ namespace TiaMcp.Openness.V21
                 case "library_upgrade":
                 {
                     string path = Path.GetFullPath(payload.Value<string>("path")), root = change.Preview.Value<string>("outputAbsent");
-                    string snapshot = Path.Combine(root, "source"), directory = Path.Combine(root, "work"), expected = change.Preview.Value<string>("upgradeSourceHash");
+                    // A change prepared before the one-letter folders kept "upgraded" with "source" and "work" below it.
+                    bool shortLayout = Path.GetFileName(root) == "u";
+                    string snapshot = Path.Combine(root, shortLayout ? "s" : "source"), directory = Path.Combine(root, shortLayout ? "w" : "work"), expected = change.Preview.Value<string>("upgradeSourceHash");
                     string snapshotPath = Path.Combine(snapshot, Path.GetFileName(path));
                     if ((File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0) throw new BridgeException("PackageChanged", "Upgrade input became a reparse point after preparation.");
                     Directory.CreateDirectory(snapshot); Directory.CreateDirectory(directory);

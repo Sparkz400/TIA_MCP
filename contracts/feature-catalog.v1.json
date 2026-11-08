@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.164",
+  "catalogVersion": "0.4.165",
   "targetTiaVersions": [
     21
   ],
@@ -351,6 +351,24 @@
         "PAL native import needs an intermediate TIA V17-V20 installation that is not on this PC.",
         "DMC CPU clock-memory prerequisite is outside current MCP routes; complete DMC PLC block compilation is not claimed.",
         "DMC HMI faceplates and SiVArc content are upgraded and listed only; their behavior belongs to lane D."
+      ]
+    },
+    {
+      "id": "local.library.vendor-workload.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "fcf65a335e04cfed21ff5f41017f2e6308819385",
+        "passedScope": "scripts/qualify_vendor_workload.py on Debug builds of fcf65a33 (artifacts/vw3, git archive) with one owned TIA Portal V21 Update 3 on PCNico. The seven retained PAL/DMC downloads (467,587,713 bytes; each checked against docs/verification/vendor-intake-review-20261025.json) were staged and classified through the Host in 6.0 s in total: 55 PAL XML sources, 22 DMC global-library archives and one example project archive. Every DMC archive (V14 SP1 to V19) went through library_upgrade in one owned Portal: 18 upgraded into V21 (6,346 types, 6,364 versions, 31-76 s each, 871 s together), each listed completely and closed; the Portal's working set grew from 1,251 MiB to 4,590 MiB. The other four (V17, V18 and V19 Professional, V14 SP1 (S7-300)) were refused at prepare with LibraryPathTooLong, nothing copied, because their upgraded directory would be 144 characters under this 52-character artifact root. Source archives were unchanged after every upgrade."
+      },
+      "artifacts": [
+        "evidence/local.library.vendor-workload.20261108.json"
+      ],
+      "limitations": [
+        "Observations on this host, not budgets; one Portal for all upgrades, so memory accumulates across them.",
+        "Upgrade and listing only; the upgraded types are not instantiated or compiled here (DMC compilation has its own record), and PAL's V16 SimaticML still needs an intermediate TIA version.",
+        "Four archive names need an artifact root at least one character shorter than 52 characters."
       ]
     },
     {
@@ -12910,7 +12928,8 @@
           "local.library_upgrades.20261024",
           "local.library_import_scale.20261027",
           "local.library_vendor.rerun.20261102",
-          "local.library.upgrades-v20.20261102"
+          "local.library.upgrades-v20.20261102",
+          "local.library.vendor-workload.20261108"
         ]
       },
       "availability": {
@@ -13145,7 +13164,8 @@
           "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
-          "Native V13 libraries are refused before any native call (LibraryVersionUnsupported, local.library_compatibility.20261027). V14 SP1-V18 (local.library_upgrades.20261024) and V19 (local.library_vendor.20261025) upgrades are qualified; V20 upgrades stay open because no V20 library input is available."
+          "Native V13 libraries are refused before any native call (LibraryVersionUnsupported, local.library_compatibility.20261027). V14 SP1-V18 (local.library_upgrades.20261024) and V19 (local.library_vendor.20261025) upgrades are qualified; V20 upgrades stay open because no V20 library input is available.",
+          "TIA retrieves an upgraded library into <work>\\<name> and opens <work>\\<name>_V21 and refuses a path over 143 characters; the output folders are one letter each, and prepare refuses a library whose directory still would not fit with LibraryPathTooLong before any copy (local.library.vendor-workload.20261108: 18 of 22 DMC archives upgraded, four names one character over a 52-character artifact root were refused)."
         ]
       },
       "qualification": {
@@ -13158,7 +13178,8 @@
           "local.library_formats.rerun.20261028",
           "local.library_vendor.rerun.20261102",
           "local.library.upgrades-v20.20261102",
-          "local.library_compatibility.firmware.20261107"
+          "local.library_compatibility.firmware.20261107",
+          "local.library.vendor-workload.20261108"
         ]
       },
       "availability": {
