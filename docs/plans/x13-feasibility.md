@@ -146,7 +146,7 @@ so a foreign or released instance is refused before any API call.
    follow later behind the write gate, each with its own D16 contract.
 5. **Row 4, further cycle-control modes.** SingleStep_C/P/CP/CT/CPT selection is implemented and ran natively on
    7 November (`local.plcsim.capture-modes.20261107`): C, CP, CT and CPT captured fully, P stalled after one sync point on an OB1-only
-   fixture, and every capture restored the operating mode. Time-synchronised variants remain implementation work. Qualify with a step
+   fixture, and every capture restored the operating mode. TimespanSynchronized_C/P/CP ran natively on 8 November (`local.plcsim.timespan-capture.20261108`, [record](../verification/plcsim-timespan-capture-20261108.md)): C and CP captured fully with a 10 ms span, P stalled like SingleStep_P. Qualify with a step
    count per mode on the owned instance and the previous mode restored on stop, failure and Host
    loss.
 6. **Row 25, safety compile workflow.** A second hook in the Add-In companion that hands the
