@@ -88,7 +88,13 @@ def body(h):
 
                 def upgrade(target=target):
                     before = sha256(target)
-                    prepared = h.tool("change_prepare", {"kind": "library_upgrade", "payload": {"schemaVersion": 1, "path": str(target), "expectedSha256": before}})
+                    asked = h.client.request("tools/call", {"name": "change_prepare", "arguments": {"kind": "library_upgrade",
+                                             "payload": {"schemaVersion": 1, "path": str(target), "expectedSha256": before}}})
+                    if asked.get("isError"):  # a typed refusal before any copy, such as LibraryPathTooLong
+                        error = (asked.get("structuredContent") or {}).get("error") or {}
+                        return {"archiveBytes": target.stat().st_size, "applySeconds": 0.0, "portalMemoryMiB": portal_memory(), "upgraded": False,
+                                "refusedAtPrepare": True, "error": {k: error.get(k) for k in ("code", "message")}}
+                    prepared = asked["structuredContent"]
                     result, seconds = timed(lambda: h.client.request("tools/call", {"name": "change_apply", "arguments": h.apply_args(prepared)}))
                     content = result.get("structuredContent") or {}
                     require(sha256(target) == before, "The source archive changed")
