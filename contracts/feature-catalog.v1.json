@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.159",
+  "catalogVersion": "0.4.160",
   "targetTiaVersions": [
     21
   ],
@@ -2861,7 +2861,7 @@
         "evidence/local.typed.crossscope.engineering.rerun.20261029.json"
       ],
       "limitations": [
-        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54\u2026.zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
+        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
         "Engineering only: the runtime gate is not run."
       ]
     },
@@ -4267,7 +4267,7 @@
         "tiaVersion": 21,
         "machine": "PCNico",
         "sourceCommit": "d57defa5b499bfe94396d6079d4af603de5403ad",
-        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of d57defa5 (artifacts/oi3, git archive; main with PR 184's RFC 8785 hashing, PR 186's exact decimal parsing of request floats and the runner scanners' RFC 8785 fix), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Each of the three advance requests (verifyImport, prepareGraphical, verifyInstallation) carried the non-ASCII key pr\u00fcfName\u540d\u524d, non-ASCII text with an astral emoji (sent as \\u escapes) and the number literals 1e3 and 2.2250738585072012e-308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of the verifyImport request (1e3 as 1000, the other as 2.2250738585072014e-308) reproduced the Host's recorded requestSha256 5d077eef."
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of d57defa5 (artifacts/oi3, git archive; main with PR 184's RFC 8785 hashing, PR 186's exact decimal parsing of request floats and the runner scanners' RFC 8785 fix), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Each of the three advance requests (verifyImport, prepareGraphical, verifyInstallation) carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the number literals 1e3 and 2.2250738585072012e-308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of the verifyImport request (1e3 as 1000, the other as 2.2250738585072014e-308) reproduced the Host's recorded requestSha256 5d077eef."
       },
       "artifacts": [
         "evidence/local.component.canonical-hash.20261101.json"
@@ -4285,7 +4285,7 @@
         "tiaVersion": 21,
         "machine": "PCNico",
         "sourceCommit": "4b970cc91fdb0532a49a0f6833f9e0cf8d664eb6",
-        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of 4b970cc9 (artifacts/hz3, git archive; main with PR 190's exact worker number reading and range refusal, and PR 199's id-keeping refusal), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Before the first advance, the same advance request with 1.8e308 added was refused with InvalidRequest ('A request number is outside the double range.', from the worker's request reader, relayed by the Host with the request id); the window's revision, state and children (start, applyLibrary) were unchanged, and the verifyImport advance that followed dispatched on the same Host session. Each of the three advance requests carried the non-ASCII key pr\u00fcfName\u540d\u524d, non-ASCII text with an astral emoji (sent as \\u escapes) and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of all three advance requests (1e3 as 1000, 2.2250738585072014e-308, 1.7976931348623157e+308, i.e. double.MaxValue) reproduced the Host's recorded hashes c857106f, 340dd121 and c5e740ce."
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of 4b970cc9 (artifacts/hz3, git archive; main with PR 190's exact worker number reading and range refusal, and PR 199's id-keeping refusal), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Before the first advance, the same advance request with 1.8e308 added was refused with InvalidRequest ('A request number is outside the double range.', from the worker's request reader, relayed by the Host with the request id); the window's revision, state and children (start, applyLibrary) were unchanged, and the verifyImport advance that followed dispatched on the same Host session. Each of the three advance requests carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of all three advance requests (1e3 as 1000, 2.2250738585072014e-308, 1.7976931348623157e+308, i.e. double.MaxValue) reproduced the Host's recorded hashes c857106f, 340dd121 and c5e740ce."
       },
       "artifacts": [
         "evidence/local.component.canonical-hash.20261102.json"
@@ -5224,6 +5224,24 @@
       ],
       "limitations": [
         "OB fixtures are program-cycle OBs built from Main's export with the peer FC's coil network (FBD, or LAD from the LAD FC fixture); other OB event classes are not exercised. de-DE-only projects."
+      ]
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.ob_event_classes.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "7204a545f69066ca484e515362f7ef70f5c16991",
+        "passedScope": "scripts/qualify_library_integrate_apply.py --candidates --case obStartup --case obCyclic on a --component-qualification Host from Debug builds of 7204a545, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: a fresh PLC component installed after the last network of an existing FBD startup OB (OB100, SecondaryType Startup) and of an existing FBD cyclic-interrupt OB (OB30, SecondaryType CyclicInterrupt), each preview naming exactly obCaller and its obEventClass feature, with the exact installed-object diff, the native caller insertion proof, the call oracle, a fresh reopen, a 0-error compile and change_restore of the initial checkpoint into a new location."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.ob_event_classes.20261108.json"
+      ],
+      "limitations": [
+        "OB fixtures are Main's envelope with the event class, number and informative inputs replaced; the OB's own attributes (cyclic time, phase shift) keep V21's defaults.",
+        "Only these two single shapes; event classes combined with LAD, an earlier placement or reuse, and other event classes (time-of-day, hardware interrupt, diagnostic error and others), stay plan-only.",
+        "Engineering only; no OB runs."
       ]
     },
     {
@@ -13327,7 +13345,7 @@
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
-          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these; other OB event classes are not exercised.",
+          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs; a fresh component after the last network of an existing FBD startup or cyclic-interrupt OB passed on 8 November (local.library_integrate.candidate_shapes.ob_event_classes.20261108), and every other event class, or one of these two combined with another feature, stays plan-only.",
           "Embedding parents (local.library_integrate.candidate_shapes.embedding_parent.20261107): a multi-instance caller FB embedded in a parent FB installs through the captured component transitive effect, the parent gaining the member in its nested Static section; verified for the reused FB in an existing FBD FB caller. Since local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107 also with a LAD caller, an earlier placement, the caller's own instance DB and every combination of these, and two levels deep (the parent's DB, a grandparent FB and its DB each gaining the captured nested member); standard route only."
         ]
       },
@@ -13346,6 +13364,7 @@
           "local.component.ob.20261102",
           "local.component.ob-production.20261102",
           "local.library_integrate.candidate_shapes.ob_combinations.20261107",
+          "local.library_integrate.candidate_shapes.ob_event_classes.20261108",
           "local.library_integrate.candidate_shapes.embedding_parent.20261107",
           "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
         ]
@@ -13397,7 +13416,7 @@
           "The import step's complete-project archive (for a reused FB, the typed step's own archive), taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
           "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable.",
           "Before any claim, import or save, combined apply refuses (PlcIntegrationNotQualified) unless de-DE is the project's only active, reference and editing language and an instance creation profile covers the FB (captured storage profile with its CPU and loaded API files, or a shipped global instance template matched against the planned FB export); the preview reports combinedApply.eligible=false for such projects.",
-          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these; other OB event classes are not exercised.",
+          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs; a fresh component after the last network of an existing FBD startup or cyclic-interrupt OB passed on 8 November (local.library_integrate.candidate_shapes.ob_event_classes.20261108), and every other event class, or one of these two combined with another feature, stays plan-only.",
           "Embedding parents (local.library_integrate.candidate_shapes.embedding_parent.20261107): a multi-instance caller FB embedded in a parent FB installs through the captured component transitive effect, the parent gaining the member in its nested Static section; verified for the reused FB in an existing FBD FB caller. Since local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107 also with a LAD caller, an earlier placement, the caller's own instance DB and every combination of these, and two levels deep (the parent's DB, a grandparent FB and its DB each gaining the captured nested member); standard route only."
         ]
       },
@@ -13419,6 +13438,7 @@
           "local.component.ob.20261102",
           "local.component.ob-production.20261102",
           "local.library_integrate.candidate_shapes.ob_combinations.20261107",
+          "local.library_integrate.candidate_shapes.ob_event_classes.20261108",
           "local.library_integrate.candidate_shapes.embedding_parent.20261107",
           "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
         ]
@@ -28978,7 +28998,7 @@
           "Native, 1 November (build 10763a35): the route passed on the desk-configured TP700 Comfort pair (local.hmi.classic-import.route.20261101, 63/63 checks): every refusal before any write; BackColor on both HMIs' Overview_A (identity separation), a no-op and a GridColor import of Overview_B, a no-op import of the start screen and a QualificationTags import adding one internal tag, each with every stage, no compiler problems, the target's independent re-export carrying exactly the intended delta, every other export unchanged, same-key replay and another key refused RecoveryRequired; a stale preview refused; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay (local.hmi.classic-import.interruption.20261101, 8/8).",
           "Qualified on one desk-configured TP700 Comfort fixture (start screen set in the editor). Import(Override) of the start screen kept it natively, but the start-screen setting has no public getter, so the compile rule is its only guard. Other Classic devices, object types, customer projects, runtime and visual behavior are not covered.",
           "Lifecycle, 1 November (build 2431ccf9): on the same TP700 Comfort pair both compiles of every apply named only the target HmiTarget, both Host lifetimes ended normally (Host and worker exit 0, owned TIA process exited) and a new TIA process then reopened the saved project read-write at once (local.hmi.lifecycle.20261101, 72/72).",
-          "WinCC RT Advanced and KTP700 Basic PN, 1\u20132 November (build 750121ea): the route passed on their seeded HmiSeeder baselines (no start screen; the compile rule kept that error unchanged after every apply) with 72/72 and 71/71 checks (local.hmi.classic-import.profiles.route.20261101; Basic has no popup), and ci-* interruption 8/8 on each (local.hmi.classic-import.profiles.interruption.20261102); production admits both profiles."
+          "WinCC RT Advanced and KTP700 Basic PN, 1–2 November (build 750121ea): the route passed on their seeded HmiSeeder baselines (no start screen; the compile rule kept that error unchanged after every apply) with 72/72 and 71/71 checks (local.hmi.classic-import.profiles.route.20261101; Basic has no popup), and ci-* interruption 8/8 on each (local.hmi.classic-import.profiles.interruption.20261102); production admits both profiles."
         ]
       },
       "qualification": {
