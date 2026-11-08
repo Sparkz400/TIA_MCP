@@ -112,7 +112,8 @@ generated runtime-user login answered. The PLC must be the one whose generated c
 (as for an F-CPU), refuses with `SimulationTargetMismatch`.
 
 `DownloadProvider.Download` runs with `DownloadOptions.Software` (`softwareScope: "all"`) or
-`SoftwareOnlyChanges` (`"changes"`), never with hardware. Every download configuration is answered from the
+`SoftwareOnlyChanges` (`"changes"`). The optional `hardware: true` adds `DownloadOptions.Hardware` to a complete
+software download; it needs `softwareScope: "all"` and `allowStop: true`, since a hardware download stops the CPU. Every download configuration is answered from the
 reviewed options or refused:
 
 | Configuration | Answer |
