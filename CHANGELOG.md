@@ -15,6 +15,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 ### Added
 
 - **Hardware download to an owned simulator:** `simulation_download_online` takes `hardware: true` (with `softwareScope: all` and `allowStop: true`) to download the hardware configuration too; a `sim_observe` watch reported the resulting hardware-configuration event natively ([record](docs/verification/plcsim-hardware-download-20261108.md)).
+- **Motion TOs on drive telegrams:** `to_connect` takes a SINAMICS drive's telegram (`hardwarePath`, drive-object handle, `telegramType`) through Startdrive's `Connect(Telegram)`, which reaches the G120C telegram that plain Openness does not expose; a real speed axis actor passed natively, and `SafetyTelegram` is refused with `SafetyBoundary` ([record](docs/verification/drive-telegram-connect-20261108.md)).
 - **Offline runtime extensions:** bounded `syslog` reads through `runtime_web_diagnostics`, and explicit SingleStep_C/P/CP/CT/CPT capture mode selection. Existing ownership, request bounds and restore behavior remain; these additions are not natively qualified ([record](docs/verification/offline-backlog-20261103.md)).
 - **Contract review inventory:** the actual-Host surface runner retains a hashed discovery candidate with tool schemas, annotations, prompts, resources and binary hashes. The [contract freeze policy](docs/plans/contract-freeze-policy.md) was accepted on 8 November and takes effect at 1.0.
 - **Typed LAD/FBD coverage:** CPU 1513-1 PN V4.1 base families (102 engineering cases), and 120 wave 9 software-unit/namespace profiles on CPU 1511 V4.1 (124 engineering cases), with retained exact-build evidence and explicit runtime limits.
@@ -221,6 +222,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- **Component installs into OBs of other event classes:** combined apply admitted any existing OB caller, though its evidence covered program-cycle OBs only. Another event class now stays plan-only until verified; startup and cyclic-interrupt OBs passed natively and run in production ([record](docs/verification/component-ob-event-classes-20261108.md)).
 - **VCI interruption check:** accept exact verified-callback reconciliation when Git finishes verification before the interrupted Host exits; earlier callbacks still require recovery.
 - A request number beyond the double range (such as `1.8e308`) broke the worker connection: the
   worker refused it before reading the request id, so the Host reported `ProtocolMismatch` and

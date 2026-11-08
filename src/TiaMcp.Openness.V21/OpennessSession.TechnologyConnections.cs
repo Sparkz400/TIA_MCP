@@ -55,8 +55,9 @@ namespace TiaMcp.Openness.V21
         // The V21 Connect overloads per slot type (PublicAPI V21, SW.TechnologicalObjects.Motion); actor, sensor and encoder share one interface type.
         private static readonly Dictionary<string, string[]> TechnologyConnectForms = new Dictionary<string, string[]>(StringComparer.Ordinal)
         {
-            ["actor"] = new[] { "hardware", "channel", "tag", "modules", "dbMember", "addresses" },
-            ["torque"] = new[] { "hardware", "modules", "dbMember", "addresses" },
+            // telegram: Startdrive's AxisEncoderHardwareConnectionSDRInterface/TorqueHardwareConnectionSDRInterface.Connect(Telegram).
+            ["actor"] = new[] { "hardware", "channel", "tag", "modules", "dbMember", "addresses", "telegram" },
+            ["torque"] = new[] { "hardware", "modules", "dbMember", "addresses", "telegram" },
             ["measuringInput"] = new[] { "channel", "channelIndex", "addresses" },
             ["outputCam"] = new[] { "channel", "tag", "addresses" },
         };
@@ -68,26 +69,32 @@ namespace TiaMcp.Openness.V21
             if (!TechnologyConnectForms.TryGetValue(family, out var supported))
                 throw new BridgeException("InvalidRequest", "role must be actor, sensor, torque, encoder, measuringInput or outputCam.");
             bool channel = new[] { "channelNumber", "channelType", "channelIoType" }.Any(field => payload[field] != null), index = payload["channelIndex"] != null;
+            bool telegram = payload["telegramType"] != null;
             var forms = new[]
             {
-                payload["hardwarePath"] != null ? channel ? "channel" : index ? "channelIndex" : "hardware" : null,
+                payload["hardwarePath"] != null ? telegram ? "telegram" : channel ? "channel" : index ? "channelIndex" : "hardware" : null,
                 payload["tagName"] != null ? "tag" : null,
                 payload["inputHardwarePath"] != null || payload["outputHardwarePath"] != null ? "modules" : null,
                 payload["dbMemberPath"] != null ? "dbMember" : null,
                 payload["inputAddress"] != null || payload["outputAddress"] != null ? "addresses" : null,
             }.Where(form => form != null).ToArray();
             // Any channel field selects the channel overload, so a partial selector never falls back to the whole module.
-            if (forms.Length != 1 || channel && index || (channel || index) && forms[0] != "channel" && forms[0] != "channelIndex"
+            if (forms.Length != 1 || channel && index || telegram && (channel || index || forms[0] != "telegram") || (channel || index) && forms[0] != "channel" && forms[0] != "channelIndex"
                 || forms[0] == "modules" && (payload["inputHardwarePath"] == null || payload["outputHardwarePath"] == null))
-                throw new BridgeException("InvalidRequest", "Select exactly one target: hardwarePath, hardwarePath with channelNumber/channelType/channelIoType, hardwarePath with channelIndex, tagName, "
+                throw new BridgeException("InvalidRequest", "Select exactly one target: hardwarePath, hardwarePath with channelNumber/channelType/channelIoType, hardwarePath with channelIndex, a drive's hardwarePath with telegramType, tagName, "
                     + "inputHardwarePath with outputHardwarePath, dbMemberPath, or inputAddress/outputAddress.");
             string form = forms[0];
+            // As drive_telegram_set: a PROFIsafe telegram belongs to the safety workflow, and only these telegrams carry axis setpoints and actual values.
+            if (form == "telegram" && (string)payload["telegramType"] == "SafetyTelegram")
+                throw new BridgeException("SafetyBoundary", "Safety telegrams require a dedicated safety workflow; a technology object never connects to one.");
+            if (form == "telegram" && Array.IndexOf(new[] { "MainTelegram", "SupplementaryTelegram", "TorqueTelegram" }, (string)payload["telegramType"]) < 0)
+                throw new BridgeException("InvalidRequest", "telegramType must be MainTelegram, SupplementaryTelegram or TorqueTelegram.");
             if (!supported.Contains(form)) throw new BridgeException("UnsupportedTarget", "The " + role + " role has no V21 Connect overload for a " + form + " target.");
             // Axis, encoder and torque address overloads take both addresses; a measuring input takes an input and an output cam an output address.
             if (form == "addresses" && ((payload["inputAddress"] != null) != (family != "outputCam") || (payload["outputAddress"] != null) != (family != "measuringInput")))
                 throw new BridgeException("InvalidRequest", family == "measuringInput" ? "A measuring input connects to inputAddress only." : family == "outputCam" ? "An output cam connects to outputAddress only." : "The " + role + " role connects to inputAddress and outputAddress together.");
-            if (payload["connectOption"] != null && (family != "actor" && family != "torque" || form != "modules" && form != "addresses"))
-                throw new BridgeException("UnsupportedTarget", "connectOption exists only on the V21 two-module and address overloads of actor, sensor, encoder and torque connections.");
+            if (payload["connectOption"] != null && (family != "actor" && family != "torque" || form != "modules" && form != "addresses" && form != "telegram"))
+                throw new BridgeException("UnsupportedTarget", "connectOption exists only on the V21 two-module, address and drive-telegram overloads of actor, sensor, encoder and torque connections.");
             return form;
         }
 

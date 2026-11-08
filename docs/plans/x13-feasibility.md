@@ -1,7 +1,7 @@
 # X13 feasibility: other Siemens interfaces
 
 **3 November workstation update:** the [current prerequisite review](../verification/release-readiness-20261103.md)
-finds CFC/DCC V21 public APIs, V19 Portal/SDK and ODK 1500S installed on this PC. The table below
+finds CFC/DCC V21 public APIs, V19 Portal/SDK and ODK 1500S installed on the maintainer's second workstation (not on PCNico, 8 November). The table below
 retains the 1 November workstation observations; its missing-product labels are not current here.
 OB55/56/57 counter qualification has since passed. Configuration-event subscriptions exist and IP
 observation passed; software delivery passed on 7 November and hardware delivery on 8 November through the new

@@ -17,7 +17,7 @@ import argparse
 from pathlib import Path
 
 from library_native_harness import Harness, require
-from qualify_drives import DEVICE, add_drive, outcome
+from qualify_drives import DEVICE, add_drive, handle, observe, other_handle, outcome
 from qualify_hardware_changes import devices
 from qualify_technology_changes import portable
 
@@ -41,7 +41,7 @@ END_DATA_BLOCK
 AQ = "6ES7 532-5NB00-0AB0"  # AQ 2xU/I ST for an analog drive connection
 LIMITATIONS = [
     "One owned scratch CPU 1511-1 PN V4.1 with one TM PosInput 2 V2.0, one AQ 2xU/I ST and one SINAMICS G120C PN (not commissioned in Startdrive); TO_SpeedAxis, "
-    "TO_PositioningAxis (virtual), TO_ExternalEncoder and TO_MeasuringInput 10.0. Other CPUs, TO versions, drives, telegrams and modules are not exercised.",
+    "TO_PositioningAxis (virtual), TO_ExternalEncoder and TO_MeasuringInput 10.0; Startdrive telegram targets on the G120C's main telegram only. Other CPUs, TO versions, drives, telegrams and modules are not exercised.",
     "Outcomes are what V21 does on this fixture: a role/target pair recorded under boundaries is refused by Siemens here, not proven impossible elsewhere.",
     "The drive itself is never compiled (no compiler service); PLC compiles validate the connections, not motion behavior.",
     "Engineering only; nothing is downloaded and no axis moves.",
@@ -237,6 +237,34 @@ def axis(run):
     run.unless_connected(path)
 
 
+def drive_telegram(run):
+    """Startdrive's Connect(Telegram): a real TO_SpeedAxis actor on the G120C's main telegram, replaced through the
+    connectOption overload, and the positioning axis's torque interface on the same telegram; typed refusals change nothing."""
+    h = run.h
+    drives = h.stage("observe the drive for its telegrams", lambda: observe(h, parameterNumbers=[922])["drives"])
+    require(len(drives) == 1 and drives[0]["driveObjects"], "Expected one observed G120C with drive objects: %s" % drives)
+    obj = drives[0]["driveObjects"][0]
+    ref = {"hardwarePath": drives[0]["hardwarePath"], **handle(obj)}
+    types = [t["type"] for t in obj["snapshot"]["telegrams"]]
+    h.report["driveTelegram"] = {**ref, "telegrams": obj["snapshot"]["telegrams"]}
+    require("MainTelegram" in types, "The drive object has no main telegram: %s" % types)
+    run.create("MoSdr", SPEED)
+    path = run.to("MoSdr")
+    main = {**ref, "telegramType": "MainTelegram"}
+    run.refuse("actor on an unknown telegram type", path, "actor", {**ref, "telegramType": "Main"}, "InvalidRequest")
+    run.refuse("actor on the other drive object handle", path, "actor", {"hardwarePath": ref["hardwarePath"], **other_handle(ref), "telegramType": "MainTelegram"},
+               "DriveObjectHandleMismatch")
+    run.refuse("actor on a telegram with a channel index", path, "actor", {**main, "channelIndex": 0}, "InvalidRequest")
+    run.refuse("actor on the safety telegram", path, "actor", {**ref, "telegramType": "SafetyTelegram"}, "SafetyBoundary")
+    missing = next((t for t in ("TorqueTelegram", "SupplementaryTelegram") if t not in types), None)
+    if missing:
+        run.refuse("actor on the absent " + missing, path, "actor", {**ref, "telegramType": missing}, "TelegramNotFound")
+    run.connect("connect MoSdr actor to the drive's main telegram", path, "actor", main)
+    run.connect("replace MoSdr actor on the main telegram with connectOption Default", path, "actor", {**main, "connectOption": "Default"})
+    run.unless_connected(path)
+    run.connect("connect MoAxis torque to the drive's main telegram", run.to("MoAxis"), "torque", main)
+
+
 def encoder(run):
     """A TO_ExternalEncoder on the TM PosInput item (module target), connected again through the two-module and address
     overloads and to a DB member, then on its channel; the channel change is restored."""
@@ -290,6 +318,7 @@ def body(h):
     # created without compile.
     axis(run)
     actor(run)
+    drive_telegram(run)
     encoder(run)
     reopen(run)
 

@@ -45,6 +45,10 @@ HOST_FB_NUMBER = 30
 MODES = ("createStandaloneFc", "existing")
 EXTRA_TOOLS = ("library_open", "library_close", "library_list", "library_query", "library_capabilities")
 OB_NAME, OB_NUMBER = "TiaMcpComponentOb", 123
+# OB event classes beside program cycle: the number and the informative start information V21 gives each class on S7-1500.
+EVENT_CLASSES = {"ProgramCycle": (OB_NUMBER, None),
+                 "Startup": (100, (("LostRetentive", "Bool"), ("LostRTC", "Bool"))),
+                 "CyclicInterrupt": (30, (("Initial_Call", "Bool"), ("Event_Count", "Int")))}
 # A LAD OB takes its coil network from the LAD FC caller fixture, imported under this name before the baseline.
 LAD_PEER = "TiaMcpLadPeer"
 HARNESS = ("qualify_plc_component.py", "qualification_owned_scratch.py", "compilation_evidence.py", "smoke_mcp.py",
@@ -106,6 +110,10 @@ COMBINATIONS = {
     "obReuseLad": (True, {"kind": "OB", "language": "LAD"}, []),
     "obReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2}, []),
     "obReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2}, []),
+    # A startup and a cyclic-interrupt OB caller beside the program-cycle ones; verified on 8 November
+    # (local.library_integrate.candidate_shapes.ob_event_classes.20261108).
+    "obStartup": (False, {"kind": "OB", "language": "FBD", "eventClass": "Startup"}, []),
+    "obCyclic": (False, {"kind": "OB", "language": "FBD", "eventClass": "CyclicInterrupt"}, []),
     # The reused-FB multi-instance in a Host FB that a parent FB embeds, beside the verified FBD one (multiInstanceParent): LAD, an
     # earlier placement and the Host's own DB in every combination, and the verified shape two levels deep with the parent's and the
     # grandparent's DBs. All verified on 7 November.
@@ -304,9 +312,9 @@ def verify_instance_db(xml, manifest, number):
         "Installed instance DB identity or first available number differs.")
 
 
-def fbd_ob(main_xml, peer_xml, source_tag, target_tag, language="FBD"):
-    """FBD (or LAD) program-cycle OB fixture from two native exports: Main's OB envelope with the peer FC's coil network in that
-    language, rebound from the peer's locals to two global tags."""
+def fbd_ob(main_xml, peer_xml, source_tag, target_tag, language="FBD", event_class="ProgramCycle"):
+    """FBD (or LAD) OB fixture from two native exports: Main's OB envelope with the peer FC's coil network in that language,
+    rebound from the peer's locals to two global tags. Another event class takes its number and informative inputs."""
     networks = re.findall(r"<NetworkSource>.*?</NetworkSource>", peer_xml, re.S)
     require(len(networks) == 1, "Peer caller must export exactly one network.")
     body = networks[0]
@@ -316,7 +324,15 @@ def fbd_ob(main_xml, peer_xml, source_tag, target_tag, language="FBD"):
         require(count == 1, "Peer network must access " + local + " exactly once.")
     xml, count = re.subn(r"<NetworkSource>.*?</NetworkSource>", lambda _: body, main_xml, flags=re.S)
     require(count == 1, "Main must export exactly one network.")
-    for old, new in (("<Name>Main</Name>", "<Name>" + OB_NAME + "</Name>"), ("<Number>1</Number>", "<Number>" + str(OB_NUMBER) + "</Number>")):
+    number, inputs = EVENT_CLASSES[event_class]
+    if inputs:
+        section = '<Section Name="Input">' + "".join('<Member Name="%s" Datatype="%s" Accessibility="Public" Informative="true" />' % member
+                                                    for member in inputs) + "</Section>"
+        xml, count = re.subn(r'<Section Name="Input">.*?</Section>', lambda _: section, xml, flags=re.S)
+        require(count == 1, "Main must export one Input section.")
+        require(xml.count("<SecondaryType>ProgramCycle</SecondaryType>") == 1, "Main must be a program-cycle OB.")
+        xml = xml.replace("<SecondaryType>ProgramCycle</SecondaryType>", "<SecondaryType>" + event_class + "</SecondaryType>")
+    for old, new in (("<Name>Main</Name>", "<Name>" + OB_NAME + "</Name>"), ("<Number>1</Number>", "<Number>" + str(number) + "</Number>")):
         require(xml.count(old) == 1, "Main export lacks exactly one " + old)
         xml = xml.replace(old, new)
     require(xml.count("<ProgrammingLanguage>SCL</ProgrammingLanguage>") == 2, "Main must be one SCL block with one SCL network.")
@@ -562,7 +578,7 @@ class IntegrateApplyRun(ComponentRun):
             number = int(re.search(r"<Number>(\d+)</Number>", xml).group(1))
             self.apply("block_import_xml", {"xml": two_network_fc(xml, name, number), "expectedBlockNames": [name]})
 
-    def ob_fixture(self, plc, language, networks=1):
+    def ob_fixture(self, plc, language, networks=1, event_class="ProgramCycle"):
         """The OB caller before the baseline: Main's envelope with the peer FBD FC's network, or for LAD the LAD FC fixture's network
         (imported as LAD_PEER); with two networks its one network twice, re-imported over itself from its own native export."""
         peer = self.manifest["unrelatedCaller"]
@@ -573,9 +589,10 @@ class IntegrateApplyRun(ComponentRun):
             peer = LAD_PEER
         export = lambda name: artifact_bytes(self.call, self.call("block_read", {"blockPath": plc + "/blocks/" + name})["artifact"]).decode("utf-8-sig")
         first, second = self.manifest["signals"]
-        self.apply("block_import_xml", {"xml": fbd_ob(export("Main"), export(peer), first["name"], second["name"], language), "expectedBlockNames": [OB_NAME]})
+        self.apply("block_import_xml", {"xml": fbd_ob(export("Main"), export(peer), first["name"], second["name"], language, event_class),
+                                        "expectedBlockNames": [OB_NAME]})
         if networks == 2:
-            self.apply("block_import_xml", {"xml": two_network_fc(export(OB_NAME), OB_NAME, OB_NUMBER), "expectedBlockNames": [OB_NAME]})
+            self.apply("block_import_xml", {"xml": two_network_fc(export(OB_NAME), OB_NAME, EVENT_CLASSES[event_class][0]), "expectedBlockNames": [OB_NAME]})
 
     def combination(self, name, archive, released, reuse, caller, features):
         """One combination of verified features. A reuse plan first installs the verified standalone FBD FC, so the plan under test
@@ -588,7 +605,7 @@ class IntegrateApplyRun(ComponentRun):
         case, out = self.case(name, True), self.output / name
         self.use({"callerMode": "createStandaloneFc"} if reuse else overrides)
         scratch, opened, plc = self.stage_consumer(archive, released)
-        if caller["kind"] == "OB": self.ob_fixture(plc, caller["language"], caller.get("networks", 1))
+        if caller["kind"] == "OB": self.ob_fixture(plc, caller["language"], caller.get("networks", 1), caller.get("eventClass", "ProgramCycle"))
         elif existing: self.caller_fixture(plc, target, caller["kind"], caller["language"], caller.get("networks", 1))
         if caller.get("dependents"):
             self.apply("source_upsert", {"language": "SCL", "source": HOST_DB_SOURCE, "expectedBlockNames": [HOST_DB]})

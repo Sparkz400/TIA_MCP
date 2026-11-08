@@ -1,0 +1,121 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.technology.drive_telegram.20261108",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-08T08:20:03+00:00",
+  "source": {
+    "commit": "a1c00283dceafa8d9c3f6e5c77f35855660d36fb",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_motion_connections.py on Debug builds of a1c00283 (artifacts/dt2, git archive) in an owned scratch CPU 1511-1 PN V4.1 with a TM PosInput 2 V2.0, an AQ 2xU/I ST and a SINAMICS G120C PN on the CPU's IO system. New: to_connect's Startdrive telegram target. A real TO_SpeedAxis 10.0 actor connected to the G120C drive object's MainTelegram (telegram 1, byte 256 in and out) through AxisEncoderHardwareConnectionSDRInterface.Connect(Telegram), then replaced through Connect(Telegram, ConnectOption.Default); each apply checkpointed, PLC-compiled and saved, read back IsConnected with InputAddress/OutputAddress 2048 (bits), and equal after a fresh Portal reopen. Typed refusals left the slot unchanged: an unknown telegramType and a channel index (InvalidRequest), SafetyTelegram (SafetyBoundary). V21 refused the virtual TO_PositioningAxis torque interface on telegram 1 (Target not available for input=2048 and output=2048); the failed apply was restored from its checkpoint. The earlier encoder, measuring-input and analog-actor cases reran unchanged.",
+  "limitations": [
+    "One G120C PN (not commissioned in Startdrive) with only its main telegram 1, addressed by driveObjectIndex; supplementary and torque telegrams, other drives and S120 drive objects are not exercised.",
+    "Torque on a drive telegram stays unverified: V21 refused it on telegram 1, and Startdrive refuses a torque telegram on the G120C.",
+    "Engineering only; nothing is downloaded and no axis moves; the drive is never compiled."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "312f441364cae3e19af5da7be42ca9a3577cdeec3fc00f30dce99589a45329e1"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "9d263768e4b9b4471bd7e0ab67d824cff2c80b2e1340fc1e7ae1eb1d849eeef5"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "6e7e55338f98082330c7f2da18ac7a2589835f8215c8af6419580897f4b13c39",
+      "bytes": 359250,
+      "completed": true,
+      "steps": [
+        "start owned TIA motion connections",
+        "create owned scratch motion connections",
+        "prepare hardware_plug",
+        "apply hardware_plug",
+        "prepare hardware_channel_attributes",
+        "apply hardware_channel_attributes",
+        "prepare hardware_add",
+        "apply hardware_add without compile or save",
+        "put the CPU on MotionNet",
+        "put the drive on MotionNet",
+        "assign the drive to MotionIo",
+        "plug the AQ 2xU/I ST MoAq",
+        "create TO_PositioningAxis 10.0 MoAxis",
+        "create measuring input MoProbe under MoAxis",
+        "refuse measuring input on a tag",
+        "refuse measuring input on an output address",
+        "connect MoProbe to MoEnc by channel index 0",
+        "connect MoProbe to the MoEnc channel",
+        "delete the unconnected MoProbe",
+        "create virtual TO_SpeedAxis MoSpeed with an analog actor",
+        "refuse actor with connectOption on a single module",
+        "refuse actor with a measuring-input channel index",
+        "refuse actor with one address",
+        "connect MoSpeed actor to the MoAq analog output channel",
+        "delete the unconnected MoSpeed",
+        "observe the drive for its telegrams",
+        "create TO_SpeedAxis 10.0 MoSdr",
+        "refuse actor on an unknown telegram type",
+        "refuse actor on the other drive object handle",
+        "refuse actor on a telegram with a channel index",
+        "refuse actor on the safety telegram",
+        "refuse actor on the absent TorqueTelegram",
+        "connect MoSdr actor to the drive's main telegram",
+        "read back connect MoSdr actor to the drive's main telegram",
+        "replace MoSdr actor on the main telegram with connectOption Default",
+        "read back replace MoSdr actor on the main telegram with connectOption Default",
+        "connect MoAxis torque to the drive's main telegram",
+        "create TO_ExternalEncoder 10.0 MoEncoder",
+        "refuse encoder with a channel index",
+        "refuse encoder with only an input address",
+        "connect MoEncoder to the MoEnc module",
+        "read back connect MoEncoder to the MoEnc module",
+        "connect MoEncoder to MoEnc as input and output module",
+        "read back connect MoEncoder to MoEnc as input and output module",
+        "connect MoEncoder to the MoEnc addresses",
+        "read back connect MoEncoder to the MoEnc addresses",
+        "create the encoder telegram DB MoEncDb",
+        "connect MoEncoder to the DB member MoEncDb.Tel",
+        "read MoEncoder before the last connection",
+        "connect MoEncoder to the MoEnc channel",
+        "read back connect MoEncoder to the MoEnc channel",
+        "restore the last connection from its checkpoint",
+        "close the changed session",
+        "start owned TIA reopen",
+        "reopen the saved project",
+        "reopened connections equal the saved ones"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "device_inventory",
+        "drive_observe",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "project_open",
+        "technology_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare",
+        "project_open"
+      ]
+    }
+  ]
+}

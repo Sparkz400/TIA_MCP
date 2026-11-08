@@ -16,7 +16,7 @@ namespace TiaMcp.Openness.V21
         private void PrepareTechnologyConnection(EngineeringChange change, Project project, PlcSelection plc, TechnologyEntry entry, JObject preview)
         {
             var slot = TechnologyConnectionSlot(entry.Item, change.Payload);
-            if (change.Kind == "to_connect") ConnectTechnologySlot(slot, project, plc, change.Payload, false);
+            if (change.Kind == "to_connect") ConnectTechnologySlot(entry.Item, slot, project, plc, change.Payload, false);
             else if (!TechnologySlotConnected(slot)) throw new BridgeException("NotConnected", "The selected technology connection is not connected.");
             if (change.Kind == "to_connect") preview["replacesConnection"] = TechnologySlotConnected(slot);
             var warnings = new JArray();
@@ -27,16 +27,17 @@ namespace TiaMcp.Openness.V21
         private void ApplyTechnologyConnection(EngineeringChange change, Project project)
         {
             var plc = SelectPlc(change.Selector);
-            var slot = TechnologyConnectionSlot(RequiredTechnologyObject(plc, change.Payload), change.Payload);
+            var technology = RequiredTechnologyObject(plc, change.Payload);
+            var slot = TechnologyConnectionSlot(technology, change.Payload);
             // V21 refuses Connect on a connected slot ("Already connected", native 30 October 2026), and a real axis or encoder
             // does not compile disconnected, so to_connect replaces a previewed connection within one checkpoint and compile.
-            if (change.Kind == "to_connect" && !change.Preview.Value<bool>("replacesConnection")) { ConnectTechnologySlot(slot, project, plc, change.Payload, true); return; }
+            if (change.Kind == "to_connect" && !change.Preview.Value<bool>("replacesConnection")) { ConnectTechnologySlot(technology, slot, project, plc, change.Payload, true); return; }
             if (slot is AxisEncoderHardwareConnectionInterface axis) axis.Disconnect();
             else if (slot is TorqueHardwareConnectionInterface torque) torque.Disconnect();
             else if (slot is MeasuringInputHardwareConnectionProvider measuring) measuring.Disconnect();
             else ((OutputCamHardwareConnectionProvider)slot).Disconnect();
             if (TechnologySlotConnected(slot)) throw new BridgeException("MutationVerificationFailed", "The technology connection still reports connected; checkpoint recovery is required.");
-            if (change.Kind == "to_connect") ConnectTechnologySlot(slot, project, plc, change.Payload, true);
+            if (change.Kind == "to_connect") ConnectTechnologySlot(technology, slot, project, plc, change.Payload, true);
         }
 
         // Role names match the technology_read hardwareConnections rows.
@@ -65,9 +66,16 @@ namespace TiaMcp.Openness.V21
         }
 
         // Resolves the exact target and the matching V21 Connect overload; apply=false only validates the pair.
-        private void ConnectTechnologySlot(object slot, Project project, PlcSelection plc, JObject payload, bool apply)
+        private void ConnectTechnologySlot(TechnologicalInstanceDB technology, object slot, Project project, PlcSelection plc, JObject payload, bool apply)
         {
             string form = TechnologyTargetForm(ChangeText(payload, "role", 32), payload);
+            if (form == "telegram")
+            {
+                ConnectOption? telegramOption = payload["connectOption"] == null ? (ConnectOption?)null : (ConnectOption)Enum.Parse(typeof(ConnectOption), ChangeText(payload, "connectOption", 32) is "Default" or "AllowAllModules" ? (string)payload["connectOption"]
+                    : throw new BridgeException("InvalidRequest", "connectOption must be Default or AllowAllModules."));
+                ConnectTechnologyTelegram(technology, slot, project, payload, telegramOption, apply);
+                return;
+            }
             object target = form == "tag" ? TechnologyConnectionTag(plc, payload) : form == "channel" ? HardwareChannel(project, payload)
                 : form == "hardware" || form == "channelIndex" ? ChangeHardware(project, payload).Item : null;
             DeviceItem input = form == "modules" ? ChangeHardware(project, payload, "inputHardwarePath").Item : null;
