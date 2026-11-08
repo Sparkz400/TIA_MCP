@@ -60,6 +60,24 @@ def body(h):
              {**{k: v for k, v in payload.items() if k not in ("driveObjectIndex", "driveObjectNumber")}, **other}, "DriveObjectHandleMismatch")
     require(h.stage("motor data set 0 unchanged by the refusals", lambda: motor(h))[1] == before, "A refusal changed the motor configuration")
 
+    # Natively (8 November 2026) the G220 refuses SetMotorType at apply: its motor is a plugged hardware item ("Use PlugNew
+    # to create the motor first"). The failed apply is restored from its checkpoint and recorded as a boundary.
+    def typed():
+        prepared = h.tool("change_prepare", {"kind": "drive_motor_configure", "payload": payload})
+        result = h.client.request("tools/call", {"name": "change_apply", "arguments": h.apply_args(prepared)})
+        error = ((result.get("structuredContent") or {}).get("error") or {})
+        if not result.get("isError"):
+            return {"applied": True}
+        restored = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
+        return {"applied": False, "error": {k: error.get(k) for k in ("code", "message")}, "restored": restored["state"]}
+    h.report["motorTypeBoundary"] = h.stage("drive_motor_configure with a motor type", typed)
+    if not h.report["motorTypeBoundary"]["applied"]:
+        require(h.stage("motor data set 0 unchanged after the restored motor type", lambda: motor(h))[1] == before, "The restore left a changed motor configuration")
+        payload = {k: v for k, v in payload.items() if k != "motorType"}
+    else:
+        before = h.stage("read motor data set 0 after the motor type", lambda: motor(h))[1]
+        payload["entries"] = [{**e, "expected": before[e["name"]]} for e in entries]
+        payload.pop("motorType")
     prepared = h.prepare("drive_motor_configure", payload)
     applied = h.apply_prepared("drive_motor_configure", prepared)
     status = h.tool("change_status", {"changeId": prepared["changeId"]})
