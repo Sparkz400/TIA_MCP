@@ -357,6 +357,7 @@ internal static partial class Program
             ("Recovery preflight enforces TIA project-directory boundary without creating files", EngineeringPathsTests.LengthBoundaryIsPure),
             ("Recovery preflight rejects invalid project components and relative roots", EngineeringPathsTests.InvalidPathsRejected),
             ("Archive staging preflight enforces the native 143-character boundary", EngineeringPathsTests.ArchiveStagingBoundaryIsPure),
+            ("Library upgrade preflight measures the longer retrieved directory", EngineeringPathsTests.LibraryUpgradeTargetIsTheLongerDirectory),
             ("Archive staging preflight rejects invalid paths", EngineeringPathsTests.ArchivePathsRejectInvalidComponents),
             ("Recovery archives retain unique short names within the native path limit", EngineeringPathsTests.RecoveryArchiveUsesShortName),
             ("Project upgrade accepts V14-V20 projects and archives and refuses V13 and older and V21 and newer before any read", ProjectUpgradeRulesTests.VersionsAndRefusals),

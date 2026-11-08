@@ -11,6 +11,16 @@ internal static class EngineeringPathsTests
     private static string PureFixtureRoot(string prefix) =>
         Path.Combine(Path.GetPathRoot(AppContext.BaseDirectory)!, prefix + "-" + Guid.NewGuid().ToString("N"));
 
+    // Natively RetrieveWithUpgrade created <work>\<name> and <work>\<name>_V21; the preflight measures the longer one.
+    internal static Task LibraryUpgradeTargetIsTheLongerDirectory()
+    {
+        string work = Path.Combine(PureFixtureRoot("tia-library"), "u", "w");
+        string target = EngineeringPaths.LibraryUpgradeTarget(work, "Open Library V14 SP1 (S7-300)");
+        Check.Equal(Path.Combine(work, "Open Library V14 SP1 (S7-300)_V21"), target);
+        Check.Equal(false, Directory.Exists(work));
+        return Task.CompletedTask;
+    }
+
     internal static async Task ArchiveStagingBoundaryIsPure()
     {
         string root = PureFixtureRoot("tia-archive");

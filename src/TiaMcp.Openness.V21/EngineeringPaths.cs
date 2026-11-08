@@ -8,6 +8,11 @@ namespace TiaMcp.Openness.V21
     {
         internal const int MaximumProjectDirectoryLength = 143;
 
+        // The longer of the two directories RetrieveWithUpgrade was seen to create for a library archive (8 November 2026):
+        // <work>\<name> and <work>\<name>_V21. shortcut: the archive's file name stands in for its internal library name;
+        // a library whose internal name is longer than its file name is still refused by TIA itself, with NativeLibraryError.
+        internal static string LibraryUpgradeTarget(string work, string libraryName) => Path.Combine(work, libraryName + "_V21");
+
         // TIA first creates an unpacked project directory named after the archive
         // (without .zap21), even when the final compressed file path is valid.
         internal static void ValidateProjectArchivePath(string directory, string archiveName)
