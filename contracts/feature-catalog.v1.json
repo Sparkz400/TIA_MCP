@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.166",
+  "catalogVersion": "0.4.167",
   "targetTiaVersions": [
     21
   ],
@@ -369,6 +369,40 @@
         "Observations on this host, not budgets; one Portal for all upgrades, so memory accumulates across them.",
         "Upgrade and listing only; the upgraded types are not instantiated or compiled here (DMC compilation has its own record), and PAL's V16 SimaticML still needs an intermediate TIA version.",
         "Four archive names need an artifact root at least one character shorter than 52 characters."
+      ]
+    },
+    {
+      "id": "local.library.vendor-workload-all.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "fcf65a335e04cfed21ff5f41017f2e6308819385",
+        "passedScope": "scripts/qualify_vendor_workload.py on the same Debug builds as local.library.vendor-workload.20261108, with the Host artifact root directly under the checkout's artifacts folder (39 characters, the Host default here), one owned TIA Portal V21 Update 3 on PCNico. The seven PAL/DMC downloads (467,587,713 bytes, hash-checked) were staged and classified in 5.8 s, and all 22 DMC global-library archives (V14 SP1 to V19) upgraded into V21 through library_upgrade: 7,726 types and 7,802 versions in 1,116 s together, including the four names that a 52-character root had refused with LibraryPathTooLong (31-77 s each). Every upgraded library was listed completely and closed; the Portal working set grew from 1,156 MiB to 4,841 MiB. Source archives were unchanged."
+      },
+      "artifacts": [
+        "evidence/local.library.vendor-workload-all.20261108.json"
+      ],
+      "limitations": [
+        "Observations on this host, not budgets; one Portal for all upgrades, so memory accumulates across them.",
+        "Upgrade and listing only; instantiation and compilation of the upgraded types are a separate record."
+      ]
+    },
+    {
+      "id": "local.library.vendor-compile.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "110bd62ead5ce131b4645121e3cc762f191cc8c5",
+        "passedScope": "scripts/qualify_vendor_workload.py --compile 'Open Library V19 PLC.zal19' --exclude Siwarex --exclude Modbus --exclude MB_ --exclude VFD_V20 on Debug builds of the frozen commit, one owned TIA Portal V21 Update 3 on PCNico, artifact root directly under the checkout's artifacts folder. The real DMC V19 PLC archive (hash-checked download) upgraded into V21 (277 types, 41 s) with an owned scratch CPU 1511-1 PN V4.1 open; hardware_cpu_memory_bytes set DMC's system and clock memory bytes, library_instantiate created the 'Open Library' tag table, and 180 of the library's 218 default code-block versions (all but 38 Modbus, SIWAREX and fbVFD_V20 types) were instantiated with their dependency closures in two library_instantiate changes of 100 and 80 versions, each with checkpoint, a PLC compile that had to pass and save: 60 s and 48 s. The Portal working set peaked at 3,327 MiB."
+      },
+      "artifacts": [
+        "evidence/local.library.vendor-compile.20261108.json"
+      ],
+      "limitations": [
+        "Excluded by name: the Modbus family (S7-1200 MB_COMM_LOAD/MB_MASTER on this S7-1500), SIWAREX (vendor know-how protection) and fbVFD_V20 (missing fcSetHMIStatusSimulation_1), as diagnosed on 2 November; they are not qualified.",
+        "One CPU 1511-1 PN V4.1; compile only, no download or runtime behavior of the vendor blocks."
       ]
     },
     {
@@ -12947,7 +12981,8 @@
           "local.library_import_scale.20261027",
           "local.library_vendor.rerun.20261102",
           "local.library.upgrades-v20.20261102",
-          "local.library.vendor-workload.20261108"
+          "local.library.vendor-workload.20261108",
+          "local.library.vendor-workload-all.20261108"
         ]
       },
       "availability": {
@@ -13183,7 +13218,7 @@
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "Native V13 libraries are refused before any native call (LibraryVersionUnsupported, local.library_compatibility.20261027). V14 SP1-V18 (local.library_upgrades.20261024) and V19 (local.library_vendor.20261025) upgrades are qualified; V20 upgrades stay open because no V20 library input is available.",
-          "TIA retrieves an upgraded library into <work>\\<name> and opens <work>\\<name>_V21 and refuses a path over 143 characters; the output folders are one letter each, and prepare refuses a library whose directory still would not fit with LibraryPathTooLong before any copy (local.library.vendor-workload.20261108: 18 of 22 DMC archives upgraded, four names one character over a 52-character artifact root were refused)."
+          "TIA retrieves an upgraded library into <work>\\<name> and opens <work>\\<name>_V21 and refuses a path over 143 characters; the output folders are one letter each, and prepare refuses a library whose directory still would not fit with LibraryPathTooLong before any copy (local.library.vendor-workload.20261108: 18 of 22 DMC archives upgraded, four names one character over a 52-character artifact root were refused); under the Host's default 39-character root all 22 upgraded (local.library.vendor-workload-all.20261108)."
         ]
       },
       "qualification": {
@@ -13197,7 +13232,9 @@
           "local.library_vendor.rerun.20261102",
           "local.library.upgrades-v20.20261102",
           "local.library_compatibility.firmware.20261107",
-          "local.library.vendor-workload.20261108"
+          "local.library.vendor-workload.20261108",
+          "local.library.vendor-workload-all.20261108",
+          "local.library.vendor-compile.20261108"
         ]
       },
       "availability": {
@@ -13336,7 +13373,8 @@
           "local.library.dmc-order.20261102",
           "local.safety.fio-routes.20261102",
           "local.safety.fio-block-routes.20261102",
-          "local.library_compatibility.firmware.20261107"
+          "local.library_compatibility.firmware.20261107",
+          "local.library.vendor-compile.20261108"
         ]
       },
       "availability": {
