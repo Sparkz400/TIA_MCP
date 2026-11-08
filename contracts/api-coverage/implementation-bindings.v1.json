@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "bd81043a963102f470e232f03948dd3b58d8012d409b37abfea9c1a6d7bae9c0",
-      "bytes": 1835320
+      "sha256": "8e1ce9310c17536b267b2a383611c22d28a4076a3e3e14924fa8cc07efb2d9f5",
+      "bytes": 1837158
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -3237,8 +3237,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs",
-      "sha256": "9e9317be201b15ae6208fec62b9fad0e7c9b12fafe1a4cb2dfcb6ed09b291594",
-      "bytes": 22924
+      "sha256": "f7c9f931d21d5494559196353416747005328f6dfc15ff22c91d96861adde6fe",
+      "bytes": 23965
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcHmiIntegrationPlanner.cs",
@@ -113664,6 +113664,13 @@
           ]
         },
         {
+          "id": "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
+          "profileSha256": "52420ea08e28057520dd481bbbaa9f21584590124416a6a0aed46b92afcab0f4",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.ob_combinations_2.20261108.json"
+          ]
+        },
+        {
           "id": "local.library_integrate.candidate_shapes.embedding_parent.20261107",
           "profileSha256": "2de00642514da8d5ccaad70d9184e1782aadab75f32b993528b64b087a7c8489",
           "artifacts": [
@@ -123399,6 +123406,13 @@
           "profileSha256": "c5f3444f38209fad224217797d4803b97df92ebf3f34cc842bdf563237d9b203",
           "artifacts": [
             "evidence/local.library_integrate.candidate_shapes.ob_event_classes_2.20261108.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
+          "profileSha256": "52420ea08e28057520dd481bbbaa9f21584590124416a6a0aed46b92afcab0f4",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.ob_combinations_2.20261108.json"
           ]
         },
         {
@@ -140123,6 +140137,11 @@
       "sha256": "4b7b8af5add39cb12a1a6c23868d06e05156af973994601cc9ec410d1c7001a8"
     },
     {
+      "path": "evidence/local.library_integrate.candidate_shapes.ob_combinations_2.20261108.json",
+      "state": "observed",
+      "sha256": "b04fd1df872345ad136497aa71a9191e96b331746182b93cb33e3db5e889b76d"
+    },
+    {
       "path": "evidence/local.library_integrate.candidate_shapes.ob_event_classes.20261108.json",
       "state": "observed",
       "sha256": "3e0b8126266a108640b4ad41e94bc287ca39c5e2fe7d3d8b4ea22bd13cfab5d0"
@@ -141468,6 +141487,10 @@
     {
       "id": "local.library_integrate.candidate_shapes.ob_combinations.20261107",
       "profileSha256": "70731cd6c2d8a5d61d990077426294cbb1d340a3f48b3e7c3bf593153128f882"
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
+      "profileSha256": "52420ea08e28057520dd481bbbaa9f21584590124416a6a0aed46b92afcab0f4"
     },
     {
       "id": "local.library_integrate.candidate_shapes.ob_event_classes.20261108",
