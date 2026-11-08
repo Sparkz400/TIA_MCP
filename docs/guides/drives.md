@@ -24,7 +24,8 @@ Openness setter; it follows the telegram number.
 `ProjectMotorConfiguration`, and reads every entry back. It passed natively on a G220 with a six-entry nameplate
 ([record](../verification/drive-motor-configure-20261108.md)). The G220 refuses `SetMotorType` because its motor is a
 plugged hardware item, so omit `motorType` there; a G120C exposes no readable `HardwareProjection` and refuses with
-`UnsupportedCapability`. The
+`UnsupportedCapability`. There is no encoder change kind: the G220 refuses `SetEncoder` the same way
+([encoder projection](../verification/drive-motor-configure-20261108.md#encoder-projection)). The
 [Startdrive plan](../plans/expansion-plans/startdrive.md) lists the remaining
 work (PKW edits, TO connection, DRIVE-CLiQ, online access,
 download, activation, security, safety).
