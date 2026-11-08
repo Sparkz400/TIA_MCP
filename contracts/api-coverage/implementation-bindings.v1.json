@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "a8318b1d7081bdd3d1d62bd6c5b0966b6b1177bd4a491fd1284cd7287a7169f3",
-      "bytes": 1828824
+      "sha256": "3ab96af78334e662df783f6a4e4ea707e9fdeac78c56d7c27139dcec437a8407",
+      "bytes": 1830700
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1427,8 +1427,8 @@
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/SimulatorCaptureContracts.cs",
-      "sha256": "4a66fb0f9d3eb599e3d63b9ec53996e62abfe1b01dc5e8515ba15025808280d1",
-      "bytes": 10143
+      "sha256": "5a34a70e6ea8b073b917d64bc0d33a9f152ff993c896a74387225e6a84f6f80f",
+      "bytes": 10739
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
@@ -2062,8 +2062,8 @@
     },
     {
       "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
-      "sha256": "557546c9c39ce20438b0811868d99e0dc34a6edfad66f37bf76b9a0f6e210f80",
-      "bytes": 13130
+      "sha256": "9e9197a38142cb60f68f5459673601f9604568a279250590e696c0c55e65a20f",
+      "bytes": 13235
     },
     {
       "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
@@ -3467,8 +3467,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationRuntimeControl.cs",
-      "sha256": "82d1c482afa9705d7912dd3a8dff162e6a63505be93ab77fed66e1f15f4cdf02",
-      "bytes": 16217
+      "sha256": "453017472e50b8d5c92517d1b359c70de329ab5abe7b4f5a30fb3661222a686c",
+      "bytes": 17323
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationTicket.cs",
@@ -3497,8 +3497,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
-      "sha256": "adbbc0ddabf82b0af9af848b6ca86734b36648650b146d94d2724ccfa1790da2",
-      "bytes": 55184
+      "sha256": "b6caaa5e2473c97ecd9480fc931ad896137b81b0a43e5438330523bb32f754d6",
+      "bytes": 56118
     },
     {
       "path": "src/TiaMcp.Simulator.V8/TiaMcp.Simulator.V8.csproj",
@@ -51493,8 +51493,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/SimulatorCaptureContracts.cs",
           "name": "Require",
-          "line": 127,
-          "endLine": 128,
+          "line": 132,
+          "endLine": 133,
           "sha256": "1cea5a47f90ef5982799edb4d94c3c2711e407c56da4b0335833faa6e4851ceb"
         },
         {
@@ -58716,8 +58716,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/SimulatorCaptureContracts.cs",
           "name": "Require",
-          "line": 127,
-          "endLine": 128,
+          "line": 132,
+          "endLine": 133,
           "sha256": "1cea5a47f90ef5982799edb4d94c3c2711e407c56da4b0335833faa6e4851ceb"
         },
         {
@@ -65498,8 +65498,8 @@
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Release",
-              "line": 441,
-              "endLine": 463,
+              "line": 455,
+              "endLine": 477,
               "sha256": "69051374514233288d71a55341a73c31b6373d46f8a2dbc3a082298c9c4f4b3e"
             }
           ],
@@ -66047,8 +66047,8 @@
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Test",
-              "line": 465,
-              "endLine": 545,
+              "line": 479,
+              "endLine": 559,
               "sha256": "036b132bdfec578205bde06d05362fad26237c64e1384d4848f33f14f00d7e95"
             }
           ],
@@ -129406,6 +129406,13 @@
           "artifacts": [
             "evidence/local.plcsim.capture-modes.20261107.json"
           ]
+        },
+        {
+          "id": "local.plcsim.timespan-capture.20261108",
+          "profileSha256": "9a7b850b6b32a8eff4e6345f0b7900d9e03b92c237d031ef6c9abb41860e4443",
+          "artifacts": [
+            "evidence/local.plcsim.timespan-capture.20261108.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -140298,6 +140305,11 @@
       "sha256": "15ac8f8fcf85d6c2034ad48ff76b25a342eecc90a8bd72990576cd7e526e8124"
     },
     {
+      "path": "evidence/local.plcsim.timespan-capture.20261108.json",
+      "state": "observed",
+      "sha256": "386d432888d258c8a61c2458420fb0a148881207c60fecf1540cb3dc40436bb5"
+    },
+    {
       "path": "evidence/local.plcsim_diagnostics.20261028.json",
       "state": "observed",
       "sha256": "fe47f019ee1c5f640b4f36da8b82d14b836ab636950a093dc9881259fa2ef21b"
@@ -141586,6 +141598,10 @@
     {
       "id": "local.plcsim.signals-ip.20261102",
       "profileSha256": "e841cce49f70cd4c818a14481693c794911d090d700c7f4cae8a6dbedcdfb9e6"
+    },
+    {
+      "id": "local.plcsim.timespan-capture.20261108",
+      "profileSha256": "9a7b850b6b32a8eff4e6345f0b7900d9e03b92c237d031ef6c9abb41860e4443"
     },
     {
       "id": "local.plcsim_diagnostics.20261028",

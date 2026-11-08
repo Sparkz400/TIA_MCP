@@ -374,8 +374,16 @@ namespace TiaMcp.Simulator.V8
                 {
                     selected.CaptureMode = (EOperatingMode)Enum.Parse(typeof(EOperatingMode), mode);
                     selected.Instance.OperatingMode = selected.CaptureMode.Value;
-                    // Confirm the first selected synchronization point before sampling advances it.
-                    result["syncPoint"] = SyncPoint(selected.Instance.WaitForOnSyncPointReachedEvent(SyncTimeoutMs));
+                    // Confirm the first selected synchronization point before sampling advances it. A time-synchronised mode,
+                    // like virtual time, may report none on entry; one minimal span then reaches it.
+                    var entered = selected.Instance.WaitForOnSyncPointReachedEvent(SyncTimeoutMs);
+                    if (entered.ErrorCode != ERuntimeErrorCode.OK && mode.StartsWith("TimespanSynchronized_", StringComparison.Ordinal))
+                    {
+                        selected.Instance.StartProcessing(1000000);
+                        entered = selected.Instance.WaitForOnSyncPointReachedEvent(SyncTimeoutMs);
+                        result["entryRequiredStartProcessing"] = true;
+                    }
+                    result["syncPoint"] = SyncPoint(entered);
                 }
                 // Keep the original failure; an unrestored mode stays recorded and blocks the next begin until release retries it.
                 catch { try { RestoreCaptureMode(selected); } catch { } throw; }
@@ -395,7 +403,13 @@ namespace TiaMcp.Simulator.V8
                 synchronous && (selected.CaptureMode?.ToString() != mode || selected.Instance.OperatingMode != selected.CaptureMode))
                 throw new SimulatorException("SimulationCaptureModeInactive", "The requested capture mode does not match this instance's capture state.");
             var result = Envelope(selected);
-            if (synchronous) { selected.Instance.RunToNextSyncPoint(); result["syncPoint"] = SyncPoint(selected.Instance.WaitForOnSyncPointReachedEvent(SyncTimeoutMs)); }
+            long? span = Control(() => SimulationRuntimeControl.CaptureSpanNanoseconds(args));
+            if (synchronous)
+            {
+                // A time-synchronised sample processes exactly the requested CPU time, then holds at the next sync point.
+                if (span != null) selected.Instance.StartProcessing(span.Value); else selected.Instance.RunToNextSyncPoint();
+                result["syncPoint"] = SyncPoint(selected.Instance.WaitForOnSyncPointReachedEvent(SyncTimeoutMs));
+            }
             else result["syncPoint"] = null;
             // In single-step mode the CPU holds at the reached sync point while every signal is read.
             result["values"] = Capture(selected, signals);
