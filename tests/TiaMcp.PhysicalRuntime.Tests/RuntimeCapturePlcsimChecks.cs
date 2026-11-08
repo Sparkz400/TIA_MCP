@@ -114,8 +114,11 @@ internal static class RuntimeCapturePlcsimChecks
             await Fails(()=>f.Captures.Start(f.Id,Request(true),CancellationToken.None),"SimulationOwnershipUnverified");
             Check(!Directory.Exists(Path.Combine(f.Root,"runtime-captures",f.Id)),"An unowned or mismatched instance is refused before capture intent exists");
             var plain=Request(false);
-            foreach(string mode in new[]{"SingleStep_Bus","TimespanSynchronized_C","Default","","singlestep_c"})
+            foreach(string mode in new[]{"SingleStep_Bus","TimespanSynchronized_C","TimespanSynchronized_CT","Default","","singlestep_c"})
                 await Fails(()=>f.Captures.Start(f.Id,plain with{Simulator=plain.Simulator! with{CycleSynchronous=true,SyncMode=mode}},CancellationToken.None),"PlcsimCaptureInvalid");
+            // A time-synchronised mode needs a span of 1..60000 ms, and no other mode takes one.
+            foreach(var (mode,span) in new (string?,int?)[]{("TimespanSynchronized_P",0),("TimespanSynchronized_CP",60001),("SingleStep_C",10),(null,10)})
+                await Fails(()=>f.Captures.Start(f.Id,plain with{Simulator=plain.Simulator! with{CycleSynchronous=true,SyncMode=mode,SpanMilliseconds=span}},CancellationToken.None),"PlcsimCaptureInvalid");
             await Fails(()=>f.Captures.Start(f.Id,plain with{Simulator=plain.Simulator! with{SyncMode="SingleStep_CP"}},CancellationToken.None),"PlcsimCaptureInvalid");
             await Fails(()=>f.Captures.Start(f.Id,plain with{Representation="raw"},CancellationToken.None),"PlcsimCaptureInvalid");
             await Fails(()=>f.Captures.Start(f.Id,plain with{Simulator=null},CancellationToken.None),"PlcsimCaptureInvalid");

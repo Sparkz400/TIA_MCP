@@ -20,10 +20,22 @@ namespace TiaMcp.Simulation
             if (Given(args, "syncMode") && (!synchronous || args["syncMode"].Type != JTokenType.String))
                 throw new ArgumentException("syncMode requires cycleSynchronous and a documented SingleStep mode.");
             string mode = args.Value<string>("syncMode") ?? (synchronous ? "SingleStep_C" : null);
-            if (mode != null && mode != "SingleStep_C" && mode != "SingleStep_P" && mode != "SingleStep_CP" && mode != "SingleStep_CT" && mode != "SingleStep_CPT")
-                throw new ArgumentException("syncMode must be SingleStep_C, SingleStep_P, SingleStep_CP, SingleStep_CT or SingleStep_CPT.");
+            if (mode != null && Array.IndexOf(CaptureModes, mode) < 0)
+                throw new ArgumentException("syncMode must be " + string.Join(", ", CaptureModes) + ".");
+            bool timespan = mode != null && mode.StartsWith("TimespanSynchronized_", StringComparison.Ordinal);
+            bool span = Given(args, "spanMilliseconds");
+            if (timespan != span) throw new ArgumentException(timespan ? "A TimespanSynchronized mode needs spanMilliseconds." : "spanMilliseconds applies only to a TimespanSynchronized mode.");
+            if (span && (args["spanMilliseconds"].Type != JTokenType.Integer || args.Value<long>("spanMilliseconds") < 1 || args.Value<long>("spanMilliseconds") > 60000))
+                throw new ArgumentException("spanMilliseconds must be an integer from 1 to 60000.");
             return mode;
         }
+
+        private static readonly string[] CaptureModes = { "SingleStep_C", "SingleStep_P", "SingleStep_CP", "SingleStep_CT", "SingleStep_CPT",
+            "TimespanSynchronized_C", "TimespanSynchronized_P", "TimespanSynchronized_CP" };
+
+        /// <summary>The CPU time one time-synchronised sample advances, in nanoseconds; null for the other modes.</summary>
+        internal static long? CaptureSpanNanoseconds(JObject args) =>
+            CaptureMode(args)?.StartsWith("TimespanSynchronized_", StringComparison.Ordinal) == true ? args.Value<long>("spanMilliseconds") * 1000000L : (long?)null;
 
         private static readonly Dictionary<string, int> ProcessEdges = new Dictionary<string, int>(StringComparer.Ordinal)
             { ["risingEdge"] = 1, ["fallingEdge"] = 2, ["limit1Underrun"] = 3, ["limit1Overrun"] = 4, ["limit2Underrun"] = 5, ["limit2Overrun"] = 6 };

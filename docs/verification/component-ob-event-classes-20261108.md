@@ -3,6 +3,7 @@
 | Evidence | Runner | Result |
 | --- | --- | --- |
 | [`local.library_integrate.candidate_shapes.ob_event_classes.20261108`](../../evidence/local.library_integrate.candidate_shapes.ob_event_classes.20261108.json) | `qualify_library_integrate_apply.py --candidates --case obStartup --case obCyclic` | 2/2 installed |
+| [`local.library_integrate.candidate_shapes.ob_event_classes_2.20261108`](../../evidence/local.library_integrate.candidate_shapes.ob_event_classes_2.20261108.json) | the same, seven further cases | 7/7 installed |
 
 The OB caller evidence of [2](component-ob-combinations-20261107.md) and 7 November ran on program-cycle OBs only, but the
 combined-apply gate admitted any existing OB as `obCaller`. The gate now reads the caller export's `SecondaryType`: any
@@ -23,5 +24,22 @@ the call oracle, a fresh reopen, a 0-error compile and `change_restore` of the i
 `PlcComponentQualificationGate.VerifiedShapes` now lists `obCaller+obEventClass.Startup` and
 `obCaller+obEventClass.CyclicInterrupt`, so production runs them.
 
-Not covered: these classes combined with LAD, an earlier placement or reuse; other event classes (time-of-day, time delay,
-hardware interrupt, diagnostic error and the rest); OB attributes beyond V21's defaults; other languages than de-DE; runtime.
+## Second run
+
+The same runner then covered four further event classes and the cyclic-interrupt OB in combination:
+
+| Case | OB | Features |
+| --- | --- | --- |
+| obTimeOfDay | OB10, `TimeOfDay` | obCaller, obEventClass.TimeOfDay |
+| obTimeDelay | OB20, `TimeDelayInterrupt` | obCaller, obEventClass.TimeDelayInterrupt |
+| obHardware | OB40, `HardwareInterrupt` (attached to no channel) | obCaller, obEventClass.HardwareInterrupt |
+| obDiagnostic | OB82, `DiagnosticErrorInterrupt` | obCaller, obEventClass.DiagnosticErrorInterrupt |
+| obCyclicLad | OB30, LAD | ladCaller, obCaller, obEventClass.CyclicInterrupt |
+| obCyclicEarlier | OB30, after the first of two networks | earlierPlacement, obCaller, obEventClass.CyclicInterrupt |
+| obCyclicReuse | OB30, reusing the installed FB | obCaller, obEventClass.CyclicInterrupt, reusedComponent |
+
+All seven passed the same gates and joined `VerifiedShapes`.
+
+Not covered: other combinations of an event class with LAD, an earlier placement or reuse; event classes not named here
+(programming and I/O access errors, time error, rack failure, synchronous cycle and the rest); OB attributes and event
+attachments beyond V21's defaults; other languages than de-DE; runtime.

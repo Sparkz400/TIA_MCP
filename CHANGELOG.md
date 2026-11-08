@@ -14,6 +14,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Added
 
+- **Time-synchronised PLCSIM captures:** `runtime_capture`'s simulator source takes `TimespanSynchronized_C`, `_P` and `_CP` with `spanMilliseconds`; each sample processes exactly that CPU time before reading at the next sync point ([record](docs/verification/plcsim-timespan-capture-20261108.md)).
 - **Hardware download to an owned simulator:** `simulation_download_online` takes `hardware: true` (with `softwareScope: all` and `allowStop: true`) to download the hardware configuration too; a `sim_observe` watch reported the resulting hardware-configuration event natively ([record](docs/verification/plcsim-hardware-download-20261108.md)).
 - **Motion TOs on drive telegrams:** `to_connect` takes a SINAMICS drive's telegram (`hardwarePath`, drive-object handle, `telegramType`) through Startdrive's `Connect(Telegram)`, which reaches the G120C telegram that plain Openness does not expose; a real speed axis actor passed natively, and `SafetyTelegram` is refused with `SafetyBoundary` ([record](docs/verification/drive-telegram-connect-20261108.md)).
 - **Offline runtime extensions:** bounded `syslog` reads through `runtime_web_diagnostics`, and explicit SingleStep_C/P/CP/CT/CPT capture mode selection. Existing ownership, request bounds and restore behavior remain; these additions are not natively qualified ([record](docs/verification/offline-backlog-20261103.md)).
