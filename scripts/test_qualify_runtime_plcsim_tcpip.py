@@ -322,7 +322,13 @@ class Host:
         if tool == "runtime_web_browse":
             p.live(a["attemptId"])
             return {"selectionId": a["symbol"], "metadata": []} if a.get("children") is False else {"metadata": []}
+        if tool == "change_prepare" and "TiaMcpUnknownRight" in json.dumps(a):
+            raise Fail("ObjectNotFound")
         if tool == "runtime_web_diagnostics":
+            if a["kind"] == "syslog":
+                if not 1 <= a["count"] <= 20:
+                    raise Fail("RuntimeDiagnosticSelectionInvalid")
+                return {"status": "read", "entries": 2, "value": {"entries": [{"raw": "a"}, {"raw": "b"}], "count_total": 2, "count_lost": 0}}
             return {"status": "read", "value": "run" if p.state == "Run" else "stop"}
         if tool == "runtime_web_operating_mode":
             p.state = {"stop": "Stop", "run": "Run"}[a["mode"]]

@@ -22,3 +22,13 @@ The new change kind `drive_motor_configure` takes the drive, its drive object ha
 
 Not covered: the motor type on a drive that accepts it, other data sets, encoder projection, motor identification,
 online access and download.
+
+## Encoder projection
+
+On the same day a candidate kind `drive_encoder_configure` ran on a fresh G220 (`local.drives.encoder-boundary.20261108`). Encoder 0 read no
+configuration (`EngineeringTargetInvocationException`, as for encoders 1..3 in a probe). The kind's typed refusals held
+and changed nothing. Startdrive then refused `HardwareProjection.SetEncoder` for four encoders (HTL/HTL, Terminal/HTLTTL,
+DSub/HTLTTL, SSI/SSIProtocoll) with "Please use PlugNew to create the motor first", the answer `SetMotorType` gives; each
+failed apply was restored from its checkpoint and encoder 0 stayed without a configuration. On the G220 the motor and
+encoder are plugged hardware items, so encoder projection is a V21 boundary there, and the candidate kind was removed
+instead of shipped unverified. The runner and kind are in the evidence's source commit.

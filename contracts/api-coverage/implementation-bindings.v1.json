@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "8e2148648711496d2e454d9af344eb8d6c9b495fc74daa15ca214dece491913e",
-      "bytes": 1848020
+      "sha256": "4115a3327ee5eaca3ceea5fa58c957307fbca84ff23898253160bd2ffec40d74",
+      "bytes": 1851515
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -110075,6 +110075,13 @@
           "artifacts": [
             "evidence/local.drives.motor-configure.20261108.json"
           ]
+        },
+        {
+          "id": "local.drives.encoder-boundary.20261108",
+          "profileSha256": "945d2aa11757b626b5bae5eae5ae61e6756449c8e3d16ec7c24e77076f681c69",
+          "artifacts": [
+            "evidence/local.drives.encoder-boundary.20261108.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -132834,6 +132841,13 @@
           "artifacts": [
             "evidence/local.runtime.plcsim-tcpip.20261102.json"
           ]
+        },
+        {
+          "id": "local.runtime.plcsim-tcpip.syslog.20261108",
+          "profileSha256": "4223a6b4b7688503ebe14858b5554fe23391fa6ffc015f8406619efe8272da5b",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-tcpip.syslog.20261108.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -139935,6 +139949,11 @@
       "sha256": "c78df72164b0b37f319cffb33ca1080eae2762838a325846b1e5fc0cf1123a9e"
     },
     {
+      "path": "evidence/local.drives.encoder-boundary.20261108.json",
+      "state": "observed",
+      "sha256": "2364c0c5c34146a9e4eb3c990b0afbb0b2d74da77c7f8f13501ab23337f38799"
+    },
+    {
       "path": "evidence/local.drives.index-status.20261101.json",
       "state": "observed",
       "sha256": "c4ffc8df75cfcc4f76fa36e8644072b3248ed54f362f0b6cc6dfcd9ceb391c6d"
@@ -140810,6 +140829,11 @@
       "sha256": "97f4a1963ce37719139324aa91099ccb9b53f08ba5c9378c717cbe9dd3263db2"
     },
     {
+      "path": "evidence/local.runtime.plcsim-tcpip.syslog.20261108.json",
+      "state": "observed",
+      "sha256": "3b8a924b48907f3297580255e17c9ff16407831ff8ee01d680a3b20e3e9cfbf5"
+    },
+    {
       "path": "evidence/local.runtime.plcsim-ua-services.20261031.json",
       "state": "observed",
       "sha256": "fada8ebdec9415ffe67f6c3683f4236294a8769851d888aaf112a1cdb45687f4"
@@ -141406,6 +141430,10 @@
     {
       "id": "local.device_inventory.online.20261101",
       "profileSha256": "1e1b311952239cdd5847dac2d0f08bd2fde8dda902e0b2d6fcc475c8183a5863"
+    },
+    {
+      "id": "local.drives.encoder-boundary.20261108",
+      "profileSha256": "945d2aa11757b626b5bae5eae5ae61e6756449c8e3d16ec7c24e77076f681c69"
     },
     {
       "id": "local.drives.index-status.20261101",
@@ -142106,6 +142134,10 @@
     {
       "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
       "profileSha256": "d47e11160233073eee85508c796cc658343305890f5c039b3e1bd0f4e58c0441"
+    },
+    {
+      "id": "local.runtime.plcsim-tcpip.syslog.20261108",
+      "profileSha256": "4223a6b4b7688503ebe14858b5554fe23391fa6ffc015f8406619efe8272da5b"
     },
     {
       "id": "local.runtime.plcsim-ua-services.20261031",

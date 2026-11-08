@@ -1,0 +1,78 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.drives.encoder-boundary.20261108",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-08T16:18:33+00:00",
+  "source": {
+    "commit": "dd3a56288cd72e3d61d93fcfe7e4217deadb3555",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_drive_encoder.py on a Debug build of the frozen commit, in one owned scratch CPU 1511-1 PN with the newest installed SINAMICS G220: drive_observe read no configuration for encoder 0 (EngineeringTargetInvocationException); the kind's typed refusals (encoder and entries together, a DRIVE-CLiQ encoder, an unknown type, entries on an encoder without a configuration) changed nothing; HardwareProjection.SetEncoder was refused by Startdrive for HTL/HTL, Terminal/HTLTTL, DSub/HTLTTL and SSI/SSIProtocoll ('This action is not exsist on this drive. Please use PlugNew to create the motor first.'), and each failed apply was restored from its checkpoint with encoder 0 unchanged.",
+  "limitations": [
+    "A boundary record: no encoder was projected. On the G220 the encoder, like the motor, is a plugged hardware item; HardwareProjection set methods are refused.",
+    "Encoder numbers 1..3 and drive families other than the G220 (G120C answers no HardwareProjection read at all) were not tried with SetEncoder."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "7b3134596b447df48764d229e05a2fcb24e240a2e58490d4daad4e43edab8600"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "5c1b35feba3d04983e7c34142e09c569abadd5c95037c795c485769e15155960"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "613d9b77c1e79c143b9888b73f1f70e54603927803c8620d7f3ce08066da7bb8",
+      "bytes": 97563,
+      "completed": true,
+      "steps": [
+        "start owned TIA drive encoder",
+        "create owned scratch drive encoder",
+        "prepare hardware_add",
+        "apply hardware_add",
+        "prepare project_compile",
+        "apply project_compile",
+        "read encoder 0",
+        "refuse encoder and entries together",
+        "refuse a DRIVE-CLiQ encoder",
+        "refuse an unknown encoder type",
+        "refuse entries on an encoder without a configuration",
+        "set encoder HTL/HTL",
+        "encoder 0 unchanged after the restore",
+        "set encoder Terminal/HTLTTL",
+        "encoder 0 unchanged after the restore",
+        "set encoder DSub/HTLTTL",
+        "encoder 0 unchanged after the restore",
+        "set encoder SSI/SSIProtocoll",
+        "encoder 0 unchanged after the restore"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "drive_observe",
+        "hardware_catalog_search",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}
