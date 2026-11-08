@@ -3661,12 +3661,6 @@
       ]
     },
     {
-      "featureId": "change.drive_encoder_configure",
-      "obligations": [
-        "D10"
-      ]
-    },
-    {
       "featureId": "change.drive_motor_configure",
       "obligations": [
         "D10"

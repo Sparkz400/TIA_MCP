@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.169",
+  "catalogVersion": "0.4.168",
   "targetTiaVersions": [
     21
   ],
@@ -27616,57 +27616,6 @@
         "AC-identity",
         "AC-completeness",
         "AC-native",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "change.drive_encoder_configure",
-      "domain": "drives",
-      "title": "Set or configure one encoder of a drive object",
-      "mcpTools": [
-        "change_prepare",
-        "change_apply",
-        "change_status",
-        "change_restore"
-      ],
-      "changeKind": "drive_encoder_configure",
-      "api": {
-        "status": "available",
-        "reasons": [
-          "V21 Startdrive Openness: DriveFunctionInterface.HardwareProjection with SetEncoder(EncoderInterface, EncoderType, AbsoluteIncrementalFlag, RotaryLinearFlag, UInt16), GetCurrentEncoderConfiguration(UInt16), ConfigurationEntry.Value and ProjectEncoderConfiguration(EncoderConfiguration, UInt16)."
-        ]
-      },
-      "implementation": {
-        "status": "partial",
-        "limitations": [
-          "One exact hardwarePath and drive object handle as drive_observe reports it and encoderNumber 0..15; exactly one of encoder (interface Terminal, DSub, HTL or SSI with a type other than NoEncoder or DriveCliQ, absoluteIncremental and rotaryLinear) or 1..64 entries by exact name, each with its expected current value as text exactly as drive_observe encoderConfigurations reports it.",
-          "Setting an encoder reads the new configuration back; changing entries projects them with ProjectEncoderConfiguration and reads every listed entry back. The drive object and the encoder's entries (or that it has none) are part of the change fingerprint. Startdrive recalculates dependent parameters.",
-          "DRIVE-CLiQ encoders are plugged hardware items and removing an encoder is not supported. A drive object whose HardwareProjection cannot be read refuses with UnsupportedCapability; natively a G220 without an encoder answers every encoder read with EngineeringTargetInvocationException (8 November 2026). Online access, download and RAM-to-ROM are not part of this kind.",
-          "compile=true compiles every project device that has a compiler service; the drive itself is listed under notCompiled."
-        ]
-      },
-      "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Requires SINAMICS Startdrive V21 Openness, an offline project and a drive object whose HardwareProjection takes an encoder (a third-generation drive such as the G220)."
-        ]
-      },
-      "prerequisites": [
-        "TIA V21 and authorized Windows user for native operations",
-        "SINAMICS Startdrive V21 installed with its Openness assembly",
-        "Applicable native services and project protection state",
-        "A verified recovery checkpoint; compile=true to save"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-preserve",
-        "AC-preview",
-        "AC-native",
-        "AC-recovery",
         "AC-evidence"
       ]
     },
