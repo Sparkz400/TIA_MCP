@@ -15,7 +15,8 @@ from pathlib import Path
 from library_native_harness import Harness, require
 from qualify_drives import DEVICE, observe
 
-NAMEPLATE = {"p304": 400, "p305": 2.6, "p307": 1.1, "p310": 50, "p311": 1440, "p308": 0.82}
+# Startdrive holds the entries as text (drive_observe reports them so), so the values are text too.
+NAMEPLATE = {"p304": "400", "p305": "2.6", "p307": "1.1", "p310": "50", "p311": "1440", "p308": "0.82"}
 
 
 def add_g220(h):
@@ -54,6 +55,7 @@ def body(h):
 
     h.refuse("refuse a stale expected value", "drive_motor_configure", {**payload, "entries": [{**entries[0], "expected": "999"}]}, "ExpectedValueMismatch")
     h.refuse("refuse an unknown entry", "drive_motor_configure", {**payload, "entries": [{"name": "p9999", "expected": "0", "value": 1}]}, "ParameterNotFound")
+    h.refuse("refuse a number for a text entry", "drive_motor_configure", {**payload, "entries": [{**entries[0], "value": 400}]}, "InvalidRequest")
     h.refuse("refuse a Siemens code-number motor type", "drive_motor_configure", {**payload, "motorType": "InductionMotor1LE1"}, "UnsupportedCapability")
     other = {"driveObjectNumber": 1} if "driveObjectIndex" in ref else {"driveObjectIndex": 0}
     h.refuse("refuse the other drive object handle", "drive_motor_configure",

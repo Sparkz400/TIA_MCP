@@ -47,6 +47,8 @@ namespace TiaMcp.Openness.V21
                 if (row["expected"].Type != JTokenType.String || row.Value<string>("expected") != current)
                     throw new BridgeException(write ? "PreviewStale" : "ExpectedValueMismatch", "The current value of " + name + " differs from expected; nothing was written.",
                         new JObject { ["name"] = name, ["current"] = current });
+                // The value is converted to the entry's native type here, so a type mismatch refuses before anything is written.
+                ConvertChangeValue(row["value"], entry.Value?.GetType() ?? typeof(string));
                 ((JArray)result["entries"]).Add(new JObject { ["name"] = name, ["number"] = entry.Number, ["unit"] = entry.Unit, ["before"] = current, ["after"] = row["value"].DeepClone() });
             }
             if (!write) return result;
