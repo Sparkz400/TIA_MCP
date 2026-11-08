@@ -1,0 +1,88 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library.vendor-workload.20261108",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-08T10:07:30+00:00",
+  "source": {
+    "commit": "fcf65a335e04cfed21ff5f41017f2e6308819385",
+    "dirty": true
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_vendor_workload.py on Debug builds of fcf65a33 (artifacts/vw3, git archive) with one owned TIA Portal V21 Update 3 on PCNico. The seven retained PAL/DMC downloads (467,587,713 bytes; each checked against docs/verification/vendor-intake-review-20261025.json) were staged and classified through the Host in 6.0 s in total: 55 PAL XML sources, 22 DMC global-library archives and one example project archive. Every DMC archive (V14 SP1 to V19) went through library_upgrade in one owned Portal: 18 upgraded into V21 (6,346 types, 6,364 versions, 31-76 s each, 871 s together), each listed completely and closed; the Portal's working set grew from 1,251 MiB to 4,590 MiB. The other four (V17, V18 and V19 Professional, V14 SP1 (S7-300)) were refused at prepare with LibraryPathTooLong, nothing copied, because their upgraded directory would be 144 characters under this 52-character artifact root. Source archives were unchanged after every upgrade.",
+  "limitations": [
+    "Observations on this host, not budgets; one Portal for all upgrades, so memory accumulates across them.",
+    "Upgrade and listing only; the upgraded types are not instantiated or compiled here (DMC compilation has its own record), and PAL's V16 SimaticML still needs an intermediate TIA version.",
+    "Four archive names need an artifact root at least one character shorter than 52 characters."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "12d314677003dce6233af0dd7a6414cc7747b914bc7b3ea23cd5e67e891d0379"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "104551c531850e72cf625fe1e845f0214173fa7ad30f916baf4009b1fe76b614"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "466d18853523f73540f12ce3f8d43c4a9b2ea9283af8a743711d6570a4805f50",
+      "bytes": 137064,
+      "completed": true,
+      "steps": [
+        "stage and classify pal-e46b222.zip",
+        "stage and classify Siemens-Open-Library-V19.zip",
+        "stage and classify Siemens-Open-Library-V18.zip",
+        "stage and classify Siemens-Open-Library-V17-V5.0.zip",
+        "stage and classify Siemens-Open-Library-V16-V4.1.zip",
+        "stage and classify Siemens-Open-Library-V15-V4.0.zip",
+        "stage and classify Siemens-Open-Library-V14SP1-V3.0.zip",
+        "start owned TIA vendor workload",
+        "upgrade Siemens-Open-Library-V19.zip Open Library V19 Comfort.zal19",
+        "upgrade Siemens-Open-Library-V19.zip Open Library V19 PLC.zal19",
+        "upgrade Siemens-Open-Library-V19.zip Open Library V19 Professional.zal19",
+        "upgrade Siemens-Open-Library-V19.zip Open Library V19 Unified.zal19",
+        "upgrade Siemens-Open-Library-V19.zip Open Library V19.zal19",
+        "upgrade Siemens-Open-Library-V18.zip Open Library V18 Comfort.zal18",
+        "upgrade Siemens-Open-Library-V18.zip Open Library V18 PLC.zal18",
+        "upgrade Siemens-Open-Library-V18.zip Open Library V18 Professional.zal18",
+        "upgrade Siemens-Open-Library-V18.zip Open Library V18 Unified.zal18",
+        "upgrade Siemens-Open-Library-V17-V5.0.zip Open Library V17 Comfort.zal17",
+        "upgrade Siemens-Open-Library-V17-V5.0.zip Open Library V17 PLC.zal17",
+        "upgrade Siemens-Open-Library-V17-V5.0.zip Open Library V17 Professional.zal17",
+        "upgrade Siemens-Open-Library-V17-V5.0.zip Open Library V17 Unified.zal17",
+        "upgrade Siemens-Open-Library-V17-V5.0.zip Open Library V17.zal17",
+        "upgrade Siemens-Open-Library-V16-V4.1.zip Open Library V16 Comfort.zal16",
+        "upgrade Siemens-Open-Library-V16-V4.1.zip Open Library V16 PLC.zal16",
+        "upgrade Siemens-Open-Library-V16-V4.1.zip Open Library V16.zal16",
+        "upgrade Siemens-Open-Library-V15-V4.0.zip Open Library V15 Comfort.zal15",
+        "upgrade Siemens-Open-Library-V15-V4.0.zip Open Library V15 PLC.zal15",
+        "upgrade Siemens-Open-Library-V15-V4.0.zip Open Library V15.zal15",
+        "upgrade Siemens-Open-Library-V14SP1-V3.0.zip Open Library V14 SP1 (S7-300).zal14",
+        "upgrade Siemens-Open-Library-V14SP1-V3.0.zip Open Library V14 SP1.zal14"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "library_close",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_package_status",
+        "library_query",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}
