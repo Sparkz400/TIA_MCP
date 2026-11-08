@@ -2,10 +2,10 @@
   "schema": "tia-mcp.evidence-summary.v1",
   "evidenceId": "local.library.vendor-workload.20261108",
   "outcome": "passed",
-  "recordedAtUtc": "2026-11-08T10:07:30+00:00",
+  "recordedAtUtc": "2026-11-08T10:19:04+00:00",
   "source": {
     "commit": "fcf65a335e04cfed21ff5f41017f2e6308819385",
-    "dirty": true
+    "dirty": false
   },
   "environment": {
     "machine": "PCNico",

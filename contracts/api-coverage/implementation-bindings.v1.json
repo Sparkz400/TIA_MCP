@@ -140045,7 +140045,7 @@
     {
       "path": "evidence/local.library.vendor-workload.20261108.json",
       "state": "observed",
-      "sha256": "c9d01c3bc9ca765a217c8a649549d692064b0223adc18ecee7a132447dbb1c9f"
+      "sha256": "7a8cea2b1b3aa7070661c3642d22b78c1d3f0804524eb121f805de2673e3ed6b"
     },
     {
       "path": "evidence/local.library_compatibility.firmware.20261107.json",
