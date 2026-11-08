@@ -14,6 +14,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Added
 
+- **Drive motor projection:** change kind `drive_motor_configure` writes a motor's nameplate into one drive data set through Startdrive's `HardwareProjection`, with exact expected values, readback and checkpoint restore; qualified natively on a SINAMICS G220 ([record](docs/verification/drive-motor-configure-20261108.md)).
 - **Time-synchronised PLCSIM captures:** `runtime_capture`'s simulator source takes `TimespanSynchronized_C`, `_P` and `_CP` with `spanMilliseconds`; each sample processes exactly that CPU time before reading at the next sync point ([record](docs/verification/plcsim-timespan-capture-20261108.md)).
 - **Hardware download to an owned simulator:** `simulation_download_online` takes `hardware: true` (with `softwareScope: all` and `allowStop: true`) to download the hardware configuration too; a `sim_observe` watch reported the resulting hardware-configuration event natively ([record](docs/verification/plcsim-hardware-download-20261108.md)).
 - **Motion TOs on drive telegrams:** `to_connect` takes a SINAMICS drive's telegram (`hardwarePath`, drive-object handle, `telegramType`) through Startdrive's `Connect(Telegram)`, which reaches the G120C telegram that plain Openness does not expose; a real speed axis actor passed natively, and `SafetyTelegram` is refused with `SafetyBoundary` ([record](docs/verification/drive-telegram-connect-20261108.md)).

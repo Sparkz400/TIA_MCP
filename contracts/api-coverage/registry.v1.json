@@ -3661,6 +3661,12 @@
       ]
     },
     {
+      "featureId": "change.drive_motor_configure",
+      "obligations": [
+        "D10"
+      ]
+    },
+    {
       "featureId": "change.drive_telegram_set",
       "obligations": [
         "D10"

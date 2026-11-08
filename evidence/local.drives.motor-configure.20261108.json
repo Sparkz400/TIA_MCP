@@ -1,0 +1,80 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.drives.motor-configure.20261108",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-08T12:08:16+00:00",
+  "source": {
+    "commit": "5738e7c855a03a3d6f850edf313a1730d447d4e5",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_drive_motor.py on Debug builds of the frozen commit (artifacts/dm5, git archive), one owned scratch CPU 1511-1 PN V4.1 with a SINAMICS G220 (OrderNumber:6SL41xx-2xxxx-xxFx/V6.7) added through hardware_add and compiled with save. drive_observe read motor data set 0 on the drive object of its \"Drive control\" item (13 required and 6 optional entries). drive_motor_configure projected a 400 V / 2.6 A / 1.1 kW / 50 Hz / 1440 rpm / cos phi 0.82 induction motor nameplate (p304, p305, p307, p310, p311, p308, each with its expected current value) through GetCurrentMotorConfiguration and ProjectMotorConfiguration, applied with checkpoint, device compile and save, confirmed by change_status and read back through the change and through drive_observe; change_restore of its checkpoint then showed the original entries again. Typed refusals left the motor data set unchanged: a stale expected value (ExpectedValueMismatch), an unknown entry (ParameterNotFound), a number for a text entry (InvalidRequest), a Siemens code-number motor type (UnsupportedCapability) and the other drive object handle (DriveObjectHandleMismatch). With motorType InductionMotor the G220 refused SetMotorType at apply (\"use PlugNew to create the motor first\": its motor is a plugged hardware item); the failed apply was restored from its checkpoint and the data set was unchanged.",
+  "limitations": [
+    "One G220 (V6.7), motor data set 0, nameplate entries only; SetMotorType is refused on this drive, whose motor is a plugged item, so the motor type is not exercised.",
+    "Encoder projection, motor identification, online access and download are not part of this kind; a G120C exposes no readable HardwareProjection."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "b017842b78c22839d50aa80ae460f826909b1b7b196d7559095a44c1ecf66fc0"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "b579d1e9b9e18b88049c8bc7e60bcdaa1058582b2719c322c907147260565570"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "532e9ef5bfa3cfa16af74066edbc1c4c438021ff5157622771989be21365f610",
+      "bytes": 152762,
+      "completed": true,
+      "steps": [
+        "start owned TIA drive motor",
+        "create owned scratch drive motor",
+        "prepare hardware_add",
+        "apply hardware_add",
+        "prepare project_compile",
+        "apply project_compile",
+        "read motor data set 0",
+        "refuse a stale expected value",
+        "refuse an unknown entry",
+        "refuse a number for a text entry",
+        "refuse a Siemens code-number motor type",
+        "refuse the other drive object handle",
+        "motor data set 0 unchanged by the refusals",
+        "drive_motor_configure with a motor type",
+        "motor data set 0 unchanged after the restored motor type",
+        "prepare drive_motor_configure",
+        "apply drive_motor_configure",
+        "drive_observe shows the projected motor",
+        "restore the motor change from its checkpoint",
+        "drive_observe after restore"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "drive_observe",
+        "hardware_catalog_search",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.167",
+  "catalogVersion": "0.4.168",
   "targetTiaVersions": [
     21
   ],
@@ -5401,6 +5401,23 @@
         "The drive is on no IO system, so its telegrams have no start addresses and keepOriginalAddress is not observable here.",
         "Torque telegrams: Startdrive refuses them on the G120C PN; no drive accepting one was available.",
         "Earlier attempts found two worker defects, fixed before this run: the readback used the telegram composition taken before an insert, which does not list the new telegram, and sizes are now compared in bytes (2 per PROFIdrive word)."
+      ]
+    },
+    {
+      "id": "local.drives.motor-configure.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "5738e7c855a03a3d6f850edf313a1730d447d4e5",
+        "passedScope": "scripts/qualify_drive_motor.py on Debug builds of the frozen commit (artifacts/dm5, git archive), one owned scratch CPU 1511-1 PN V4.1 with a SINAMICS G220 (OrderNumber:6SL41xx-2xxxx-xxFx/V6.7) added through hardware_add and compiled with save. drive_observe read motor data set 0 on the drive object of its \"Drive control\" item (13 required and 6 optional entries). drive_motor_configure projected a 400 V / 2.6 A / 1.1 kW / 50 Hz / 1440 rpm / cos phi 0.82 induction motor nameplate (p304, p305, p307, p310, p311, p308, each with its expected current value) through GetCurrentMotorConfiguration and ProjectMotorConfiguration, applied with checkpoint, device compile and save, confirmed by change_status and read back through the change and through drive_observe; change_restore of its checkpoint then showed the original entries again. Typed refusals left the motor data set unchanged: a stale expected value (ExpectedValueMismatch), an unknown entry (ParameterNotFound), a number for a text entry (InvalidRequest), a Siemens code-number motor type (UnsupportedCapability) and the other drive object handle (DriveObjectHandleMismatch). With motorType InductionMotor the G220 refused SetMotorType at apply (\"use PlugNew to create the motor first\": its motor is a plugged hardware item); the failed apply was restored from its checkpoint and the data set was unchanged."
+      },
+      "artifacts": [
+        "evidence/local.drives.motor-configure.20261108.json"
+      ],
+      "limitations": [
+        "One G220 (V6.7), motor data set 0, nameplate entries only; SetMotorType is refused on this drive, whose motor is a plugged item, so the motor type is not exercised.",
+        "Encoder projection, motor identification, online access and download are not part of this kind; a G120C exposes no readable HardwareProjection."
       ]
     },
     {
@@ -27599,6 +27616,61 @@
         "AC-identity",
         "AC-completeness",
         "AC-native",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.drive_motor_configure",
+      "domain": "drives",
+      "title": "Project a motor without a Siemens code number into one drive data set",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "drive_motor_configure",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Startdrive Openness: DriveFunctionInterface.HardwareProjection with SetMotorType(MotorType, UInt16), GetCurrentMotorConfiguration(UInt16), ConfigurationEntry.Value and ProjectMotorConfiguration(MotorConfiguration, UInt16)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one SINAMICS G220 (V6.7) in an owned scratch CPU 1511-1 PN V4.1 (local.drives.motor-configure.20261108): a six-entry induction motor nameplate on motor data set 0, applied with checkpoint, device compile and save, read back and restored from its checkpoint; stale, unknown, mistyped, code-number-type and wrong-handle requests refused. The G220 refuses SetMotorType at apply (its motor is a plugged hardware item: 'use PlugNew to create the motor first'), so motorType is not exercised; omit it on such a drive.",
+          "One exact hardwarePath and drive object handle as drive_observe reports it; driveDataSet 0..31; optional motorType InductionMotor or SynchronousMotor (no Siemens code-number motors); 1..64 entries by exact name (such as p304, p305), each with its expected current value as text exactly as drive_observe motorConfigurations reports it.",
+          "Apply sets the motor type, then the entries of GetCurrentMotorConfiguration, then ProjectMotorConfiguration, and reads every listed entry back; the drive object and the data set's motor entries are part of the change fingerprint. Startdrive recalculates dependent parameters; readback covers only the listed entries.",
+          "A drive whose HardwareProjection cannot be read refuses with UnsupportedCapability: natively a SINAMICS G120C PN answers every motor read with EngineeringTargetInvocationException, a G220 answers (8 November 2026). Encoder projection, motor identification, online access, download and RAM-to-ROM are not part of this kind.",
+          "compile=true compiles every project device that has a compiler service; the drive itself is listed under notCompiled.",
+          "Entry values are text as drive_observe reports them; a value of another JSON type than the entry's native type refuses at prepare. Every entry passes drive_parameter_set's SafetyBoundary rule."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.drives.motor-configure.20261108"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SINAMICS Startdrive V21 Openness, an offline project and a drive object whose HardwareProjection answers (a third-generation drive such as the G220)."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "SINAMICS Startdrive V21 installed with its Openness assembly",
+        "Applicable native services and project protection state",
+        "A verified recovery checkpoint; compile=true to save"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
         "AC-evidence"
       ]
     },
