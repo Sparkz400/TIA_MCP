@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.171",
-    "catalogSha256": "2597e892bf589bfad7a7c91dd5fb5c0119c8e93065a6b8fefb05dea0d1c630e9",
+    "catalogSha256": "4115a3327ee5eaca3ceea5fa58c957307fbca84ff23898253160bd2ffec40d74",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "5c4786dd1c89d694fbb8dd6cedda08b781fd52cfb05022cdeda06a2770ef8125"
   },
@@ -25667,49 +25667,56 @@
         "D10"
       ],
       "evidenceIds": [
-        "local.drives.motor-configure.20261108"
+        "local.drives.motor-configure.20261108",
+        "local.drives.encoder-boundary.20261108"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.drives.motor-configure.20261108"
+            "local.drives.motor-configure.20261108",
+            "local.drives.encoder-boundary.20261108"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.drives.motor-configure.20261108"
+            "local.drives.motor-configure.20261108",
+            "local.drives.encoder-boundary.20261108"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.drives.motor-configure.20261108"
+            "local.drives.motor-configure.20261108",
+            "local.drives.encoder-boundary.20261108"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.drives.motor-configure.20261108"
+            "local.drives.motor-configure.20261108",
+            "local.drives.encoder-boundary.20261108"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.drives.motor-configure.20261108"
+            "local.drives.motor-configure.20261108",
+            "local.drives.encoder-boundary.20261108"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.drives.motor-configure.20261108"
+            "local.drives.motor-configure.20261108",
+            "local.drives.encoder-boundary.20261108"
           ]
         }
       ]
@@ -28297,6 +28304,21 @@
         {
           "path": "evidence/local.device_inventory.online.20261101.json",
           "sha256": "c78df72164b0b37f319cffb33ca1080eae2762838a325846b1e5fc0cf1123a9e"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.drives.encoder-boundary.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "dd3a56288cd72e3d61d93fcfe7e4217deadb3555",
+      "retained": [
+        {
+          "path": "evidence/local.drives.encoder-boundary.20261108.json",
+          "sha256": "2364c0c5c34146a9e4eb3c990b0afbb0b2d74da77c7f8f13501ab23337f38799"
         }
       ],
       "notRetained": []

@@ -5455,6 +5455,23 @@
       ]
     },
     {
+      "id": "local.drives.encoder-boundary.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "dd3a56288cd72e3d61d93fcfe7e4217deadb3555",
+        "passedScope": "scripts/qualify_drive_encoder.py on a Debug build of the frozen commit, in one owned scratch CPU 1511-1 PN with the newest installed SINAMICS G220: drive_observe read no configuration for encoder 0 (EngineeringTargetInvocationException); the kind's typed refusals (encoder and entries together, a DRIVE-CLiQ encoder, an unknown type, entries on an encoder without a configuration) changed nothing; HardwareProjection.SetEncoder was refused by Startdrive for HTL/HTL, Terminal/HTLTTL, DSub/HTLTTL and SSI/SSIProtocoll ('This action is not exsist on this drive. Please use PlugNew to create the motor first.'), and each failed apply was restored from its checkpoint with encoder 0 unchanged."
+      },
+      "artifacts": [
+        "evidence/local.drives.encoder-boundary.20261108.json"
+      ],
+      "limitations": [
+        "A boundary record: no encoder was projected. On the G220 the encoder, like the motor, is a plugged hardware item; HardwareProjection set methods are refused.",
+        "Encoder numbers 1..3 and drive families other than the G220 (G120C answers no HardwareProjection read at all) were not tried with SetEncoder."
+      ]
+    },
+    {
       "id": "local.library_integrate.candidate_shapes.embedding_parent.20261107",
       "status": "passed",
       "profile": {
@@ -27681,13 +27698,15 @@
           "Apply sets the motor type, then the entries of GetCurrentMotorConfiguration, then ProjectMotorConfiguration, and reads every listed entry back; the drive object and the data set's motor entries are part of the change fingerprint. Startdrive recalculates dependent parameters; readback covers only the listed entries.",
           "A drive whose HardwareProjection cannot be read refuses with UnsupportedCapability: natively a SINAMICS G120C PN answers every motor read with EngineeringTargetInvocationException, a G220 answers (8 November 2026). Encoder projection, motor identification, online access, download and RAM-to-ROM are not part of this kind.",
           "compile=true compiles every project device that has a compiler service; the drive itself is listed under notCompiled.",
-          "Entry values are text as drive_observe reports them; a value of another JSON type than the entry's native type refuses at prepare. Every entry passes drive_parameter_set's SafetyBoundary rule."
+          "Entry values are text as drive_observe reports them; a value of another JSON type than the entry's native type refuses at prepare. Every entry passes drive_parameter_set's SafetyBoundary rule.",
+          "Encoder projection is a V21 boundary on the G220: HardwareProjection.SetEncoder was refused for HTL, terminal, D-Sub and SSI encoders ('use PlugNew'), as SetMotorType is, because the G220's motor and encoder are plugged hardware items (local.drives.encoder-boundary.20261108). No encoder change kind is offered."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.drives.motor-configure.20261108"
+          "local.drives.motor-configure.20261108",
+          "local.drives.encoder-boundary.20261108"
         ]
       },
       "availability": {
