@@ -127,6 +127,22 @@ COMBINATIONS = {
     "obCyclicLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "CyclicInterrupt"}, []),
     "obCyclicEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "CyclicInterrupt"}, []),
     "obCyclicReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "CyclicInterrupt"}, []),
+    # Every other verified event class with LAD, an earlier placement and reuse; verified on 8 November (local.library_integrate.candidate_shapes.ob_combinations_2.20261108).
+    "obStartupLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "Startup"}, []),
+    "obStartupEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "Startup"}, []),
+    "obStartupReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "Startup"}, []),
+    "obTimeOfDayLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "TimeOfDay"}, []),
+    "obTimeOfDayEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "TimeOfDay"}, []),
+    "obTimeOfDayReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "TimeOfDay"}, []),
+    "obTimeDelayLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "TimeDelayInterrupt"}, []),
+    "obTimeDelayEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "TimeDelayInterrupt"}, []),
+    "obTimeDelayReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "TimeDelayInterrupt"}, []),
+    "obHardwareLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "HardwareInterrupt"}, []),
+    "obHardwareEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "HardwareInterrupt"}, []),
+    "obHardwareReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "HardwareInterrupt"}, []),
+    "obDiagnosticLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "DiagnosticErrorInterrupt"}, []),
+    "obDiagnosticEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "DiagnosticErrorInterrupt"}, []),
+    "obDiagnosticReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "DiagnosticErrorInterrupt"}, []),
     # The reused-FB multi-instance in a Host FB that a parent FB embeds, beside the verified FBD one (multiInstanceParent): LAD, an
     # earlier placement and the Host's own DB in every combination, and the verified shape two levels deep with the parent's and the
     # grandparent's DBs. All verified on 7 November.

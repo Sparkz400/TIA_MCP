@@ -4,6 +4,7 @@
 | --- | --- | --- |
 | [`local.library_integrate.candidate_shapes.ob_event_classes.20261108`](../../evidence/local.library_integrate.candidate_shapes.ob_event_classes.20261108.json) | `qualify_library_integrate_apply.py --candidates --case obStartup --case obCyclic` | 2/2 installed |
 | [`local.library_integrate.candidate_shapes.ob_event_classes_2.20261108`](../../evidence/local.library_integrate.candidate_shapes.ob_event_classes_2.20261108.json) | the same, seven further cases | 7/7 installed |
+| [`local.library_integrate.candidate_shapes.ob_combinations_2.20261108`](../../evidence/local.library_integrate.candidate_shapes.ob_combinations_2.20261108.json) | the same, fifteen combinations | 15/15 installed |
 
 The OB caller evidence of [2](component-ob-combinations-20261107.md) and 7 November ran on program-cycle OBs only, but the
 combined-apply gate admitted any existing OB as `obCaller`. The gate now reads the caller export's `SecondaryType`: any
@@ -40,6 +41,12 @@ The same runner then covered four further event classes and the cyclic-interrupt
 
 All seven passed the same gates and joined `VerifiedShapes`.
 
-Not covered: other combinations of an event class with LAD, an earlier placement or reuse; event classes not named here
-(programming and I/O access errors, time error, rack failure, synchronous cycle and the rest); OB attributes and event
-attachments beyond V21's defaults; other languages than de-DE; runtime.
+## Third run
+
+The startup, time-of-day, time-delay, hardware and diagnostic error interrupt OBs then ran in the three combinations the
+cyclic-interrupt OB had passed: as a LAD OB, after the first of two networks, and reusing the installed FB (15 cases, all
+installed and joined `VerifiedShapes`).
+
+Not covered: pairs of these combinations with an event class (LAD with an earlier placement, and so on); event classes
+not named here (programming and I/O access errors, time error, rack failure, synchronous cycle and the rest); OB
+attributes and event attachments beyond V21's defaults; other languages than de-DE; runtime.

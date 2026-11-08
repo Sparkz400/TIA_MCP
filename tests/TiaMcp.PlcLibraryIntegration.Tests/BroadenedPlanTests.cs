@@ -115,7 +115,7 @@ internal static class BroadenedPlanTests
             Equal("obCaller,obEventClass.ProgrammingError", Features(Ob("ProgrammingError"))); Equal("obCaller,obEventClass.Unknown", Features(Ob(null)));
             Equal("Only program-cycle OB callers are verified; this ProgrammingError OB stays plan-only.", Refusal(Ob("ProgrammingError")));
             var lad = Ob("Startup"); lad.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); lad.Inventory["objects"][0]["language"] = "LAD";
-            Equal("obCaller,obEventClass.Startup,ladCaller", Features(lad));
+            Equal("", Features(lad)); // LAD startup OB, verified on 8 November (ob_combinations_2)
         });
         // Passed natively on 7 November (local.library_integrate.candidate_shapes.ob_combinations.20261107).
         test("combined apply admits the natively verified LAD OB combination", () => {

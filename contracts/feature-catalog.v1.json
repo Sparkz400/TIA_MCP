@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.165",
+  "catalogVersion": "0.4.166",
   "targetTiaVersions": [
     21
   ],
@@ -5330,6 +5330,24 @@
       "limitations": [
         "OB fixtures are Main's envelope with the event class, number and informative inputs replaced; OB attributes and event attachments keep V21's defaults (the hardware interrupt OB is attached to no channel).",
         "Only these seven shapes; other combinations of event classes with LAD, earlier placement or reuse, and event classes not named here, stay plan-only.",
+        "Engineering only; no OB runs."
+      ]
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9542a1ca5681eb4178343c6958554aad96730d77",
+        "passedScope": "scripts/qualify_library_integrate_apply.py --candidates on a --component-qualification Host from Debug builds of the frozen commit, fifteen cases each in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: the PLC component in an existing startup (OB100), time-of-day (OB10), time-delay interrupt (OB20), hardware interrupt (OB40) and diagnostic error interrupt (OB82) OB, each as a LAD OB, after the first of two networks, and reusing the FB a verified standalone install put into the project. Each preview named exactly its features, and each install passed the exact installed-object diff, the native caller insertion proof, the call oracle, a fresh reopen, a 0-error compile and change_restore of the initial checkpoint into a new location."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.ob_combinations_2.20261108.json"
+      ],
+      "limitations": [
+        "OB fixtures are Main's envelope with the event class, number and informative inputs replaced; OB attributes and event attachments keep V21's defaults.",
+        "Pairs of these features with an event class (LAD with an earlier placement, and so on) and event classes not named here stay plan-only.",
         "Engineering only; no OB runs."
       ]
     },
@@ -13439,7 +13457,7 @@
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
-          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs. A fresh component after the last network of an existing FBD startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB passed on 8 November, and so did a cyclic-interrupt OB as LAD, after an earlier network and with reuse (local.library_integrate.candidate_shapes.ob_event_classes.20261108, local.library_integrate.candidate_shapes.ob_event_classes_2.20261108); every other event class, and every other combination of an event class with another feature, stays plan-only.",
+          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs. A fresh component after the last network of an existing FBD startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB passed on 8 November, and so did each of these OBs as LAD, after an earlier network and with reuse (local.library_integrate.candidate_shapes.ob_event_classes.20261108, local.library_integrate.candidate_shapes.ob_event_classes_2.20261108, local.library_integrate.candidate_shapes.ob_combinations_2.20261108); every other event class, and every other combination of an event class with another feature, stays plan-only.",
           "Embedding parents (local.library_integrate.candidate_shapes.embedding_parent.20261107): a multi-instance caller FB embedded in a parent FB installs through the captured component transitive effect, the parent gaining the member in its nested Static section; verified for the reused FB in an existing FBD FB caller. Since local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107 also with a LAD caller, an earlier placement, the caller's own instance DB and every combination of these, and two levels deep (the parent's DB, a grandparent FB and its DB each gaining the captured nested member); standard route only."
         ]
       },
@@ -13460,6 +13478,7 @@
           "local.library_integrate.candidate_shapes.ob_combinations.20261107",
           "local.library_integrate.candidate_shapes.ob_event_classes.20261108",
           "local.library_integrate.candidate_shapes.ob_event_classes_2.20261108",
+          "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
           "local.library_integrate.candidate_shapes.embedding_parent.20261107",
           "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
         ]
@@ -13511,7 +13530,7 @@
           "The import step's complete-project archive (for a reused FB, the typed step's own archive), taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
           "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable.",
           "Before any claim, import or save, combined apply refuses (PlcIntegrationNotQualified) unless de-DE is the project's only active, reference and editing language and an instance creation profile covers the FB (captured storage profile with its CPU and loaded API files, or a shipped global instance template matched against the planned FB export); the preview reports combinedApply.eligible=false for such projects.",
-          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs. A fresh component after the last network of an existing FBD startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB passed on 8 November, and so did a cyclic-interrupt OB as LAD, after an earlier network and with reuse (local.library_integrate.candidate_shapes.ob_event_classes.20261108, local.library_integrate.candidate_shapes.ob_event_classes_2.20261108); every other event class, and every other combination of an event class with another feature, stays plan-only.",
+          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs. A fresh component after the last network of an existing FBD startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB passed on 8 November, and so did each of these OBs as LAD, after an earlier network and with reuse (local.library_integrate.candidate_shapes.ob_event_classes.20261108, local.library_integrate.candidate_shapes.ob_event_classes_2.20261108, local.library_integrate.candidate_shapes.ob_combinations_2.20261108); every other event class, and every other combination of an event class with another feature, stays plan-only.",
           "Embedding parents (local.library_integrate.candidate_shapes.embedding_parent.20261107): a multi-instance caller FB embedded in a parent FB installs through the captured component transitive effect, the parent gaining the member in its nested Static section; verified for the reused FB in an existing FBD FB caller. Since local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107 also with a LAD caller, an earlier placement, the caller's own instance DB and every combination of these, and two levels deep (the parent's DB, a grandparent FB and its DB each gaining the captured nested member); standard route only."
         ]
       },
@@ -13535,6 +13554,7 @@
           "local.library_integrate.candidate_shapes.ob_combinations.20261107",
           "local.library_integrate.candidate_shapes.ob_event_classes.20261108",
           "local.library_integrate.candidate_shapes.ob_event_classes_2.20261108",
+          "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
           "local.library_integrate.candidate_shapes.embedding_parent.20261107",
           "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
         ]
