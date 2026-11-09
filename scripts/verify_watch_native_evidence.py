@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from datetime import datetime, timezone
-import hashlib
 import json
 from pathlib import Path
 import sys
@@ -35,8 +34,7 @@ def require(condition, message):
         raise EvidenceMismatch(message)
 
 
-def sha256(data):
-    return hashlib.sha256(data).hexdigest()
+from evidence_hash import sha256
 
 
 def read_bounded(path):

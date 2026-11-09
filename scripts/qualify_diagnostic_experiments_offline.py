@@ -255,7 +255,7 @@ def run(host, output, samples_path):
             close()
         except Exception as error:
             report["status"], report["shutdownError"] = "failed", str(error)
-        (output / "result.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+        (output / "result.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     assert report["status"] == "passed", report
     print("PASS diagnostic experiments:", len(report["steps"]), "MCP checks; no native qualification")
 

@@ -5,12 +5,15 @@ if (-not $SkipBuild) { & (Join-Path $PSScriptRoot 'Build.ps1') -Configuration $C
 Push-Location $repoRoot
 $previousTemp = $env:TEMP
 $previousTmp = $env:TMP
+$previousPythonUtf8 = $env:PYTHONUTF8
 try {
     # Keep test scratch paths short and writable, including restricted build agents.
     $testTemp = if ($TestTempDirectory) { [IO.Path]::GetFullPath($TestTempDirectory) } else { Join-Path $repoRoot 'artifacts/test-temp' }
     New-Item -ItemType Directory -Path $testTemp -Force | Out-Null
     $env:TEMP = $testTemp
     $env:TMP = $testTemp
+    # Python must read the repository's UTF-8 files the same way on a German (cp1252) Windows as on CI.
+    $env:PYTHONUTF8 = '1'
     & (Join-Path $PSScriptRoot 'Test-Deployment.ps1')
     & (Join-Path $PSScriptRoot 'Test-OpennessRegistrationLogic.ps1')
     & (Join-Path $PSScriptRoot 'Test-TiaOpennessRegistration.ps1')
@@ -91,8 +94,11 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Project model and portable explorer tests failed.' }
     node --test ui/project-explorer/tests/model.test.cjs ui/project-explorer/tests/client.test.cjs
     if ($LASTEXITCODE -ne 0) { throw 'Explorer model/client checks failed.' }
-    dotnet "tests/TiaMcp.Tests/bin/$Configuration/net10.0/TiaMcp.Tests.dll" --verify-worker "src/TiaMcp.Openness.V21/bin/$Configuration/net48/TiaMcp.Openness.V21.exe"
-    if ($LASTEXITCODE -ne 0) { throw 'Worker lifecycle regression check failed.' }
+    # Build.ps1 already ran this check unless the build was skipped.
+    if ($SkipBuild) {
+        dotnet "tests/TiaMcp.Tests/bin/$Configuration/net10.0/TiaMcp.Tests.dll" --verify-worker "src/TiaMcp.Openness.V21/bin/$Configuration/net48/TiaMcp.Openness.V21.exe"
+        if ($LASTEXITCODE -ne 0) { throw 'Worker lifecycle regression check failed.' }
+    }
     python -B (Join-Path $PSScriptRoot 'verify_worker_probe_arguments.py') --worker "src/TiaMcp.Openness.V21/bin/$Configuration/net48/TiaMcp.Openness.V21.exe"
     if ($LASTEXITCODE -ne 0) { throw 'Worker discovery probe argument checks failed.' }
     & "tests/TiaMcp.WatchAdapter.Boundary.Tests/bin/$Configuration/net48/TiaMcp.WatchAdapter.Boundary.Tests.exe"
@@ -112,5 +118,6 @@ try {
 } finally {
     $env:TEMP = $previousTemp
     $env:TMP = $previousTmp
+    $env:PYTHONUTF8 = $previousPythonUtf8
     Pop-Location
 }

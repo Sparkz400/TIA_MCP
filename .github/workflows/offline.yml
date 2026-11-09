@@ -9,8 +9,6 @@ on:
     # Nightly full run, including every packaged workflow stage.
     - cron: '0 3 * * *'
   workflow_dispatch:
-  # release.yml reruns these checks for a version tag.
-  workflow_call:
 
 permissions:
   contents: read
@@ -20,8 +18,6 @@ env:
   PYTHONUTF8: '1'
 
 concurrency:
-  # Literal prefix: a called workflow sees the caller's github.workflow, so release.yml's two
-  # called workflows would share one group and cancel each other.
   group: offline-${{ github.ref }}
   # Only superseded PR pushes are cancelled; every main push and tag finishes, so each merge gets a verdict.
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -58,6 +54,9 @@ jobs:
 
   python-shard:
     name: Python harnesses (shard ${{ matrix.shard }}/3)
+    needs: changes
+    # Only the aggregate `python` check is required, so docs-only changes may skip the whole matrix.
+    if: needs.changes.outputs.code == 'true'
     runs-on: windows-latest
     timeout-minutes: 20
     strategy:
@@ -92,15 +91,17 @@ jobs:
   python:
     # Keeps the required check name stable across the shard split.
     name: Python contracts and harnesses
-    needs: python-shard
+    needs: [changes, python-shard]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
       - name: Require every Python shard to pass
         env:
           RESULT: ${{ needs.python-shard.result }}
+          CODE: ${{ needs.changes.outputs.code }}
         run: |
-          test "$RESULT" = success || { echo "Python shards: $RESULT"; exit 1; }
+          # Skipped counts only when the scope job decided docs-only, not when it failed.
+          test "$RESULT" = success || { test "$RESULT" = skipped && test "$CODE" = false; } || { echo "Python shards: $RESULT (code=$CODE)"; exit 1; }
 
   managed:
     name: .NET managed suites (shard ${{ matrix.shard }}/4)
@@ -204,7 +205,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.code == 'true'
     runs-on: windows-latest
-    # Full hosted runs take 17-20 minutes; 20 cancelled them at the limit.
+    # Full hosted runs took 17-20 minutes before the fixture suites were built once; 20 cancelled them at the limit.
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7

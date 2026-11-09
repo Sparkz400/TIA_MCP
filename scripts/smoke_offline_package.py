@@ -1,7 +1,6 @@
 """Validate a portable bundle, its external configuration and native refusal over real MCP."""
 import argparse
 import base64
-import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -12,8 +11,7 @@ from smoke_mcp import Client
 from smoke_package import verify_catalog
 
 
-def digest(data):
-    return hashlib.sha256(data).hexdigest()
+from evidence_hash import sha256 as digest
 
 
 def verify_explorer_assets(bundle):

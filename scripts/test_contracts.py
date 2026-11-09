@@ -2,6 +2,7 @@
 
 These checks complement JSON Schema documents; they are not a general JSON Schema implementation.
 """
+import ast
 import functools
 import json
 import pathlib
@@ -9,6 +10,7 @@ import re
 import subprocess
 import tempfile
 import unittest
+import warnings
 
 from generate_conformance import build_manifest, load_specifications, validate_manifest
 from api_coverage import validate_feature_obligations
@@ -170,7 +172,27 @@ def check_contracts():
         manifest = build_manifest(specification)
         validate_manifest(manifest)
         assert set(manifest["featureIds"]) <= features.keys(), manifest["fixtureId"]
+    assert not (unrun := unrun_test_scripts()), "Harnesses no runner invokes: " + ", ".join(unrun)
     print(f"PASS Contract coverage: {len(tools)} MCP tools, {len(kinds)} mutation kinds, {len(features)} feature entries; evidence/criteria references valid.")
+
+
+# Harnesses that need a special build, so no offline runner can invoke them.
+MANUAL_HARNESSES = {"test_testsuite_system_host.py"}  # Host built with TestSuiteQualification=true
+
+
+def unrun_test_scripts(root=ROOT):
+    """scripts/test_*.py files Test-Offline.ps1 would load but never exercise: no unittest case and named by no runner."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", SyntaxWarning)
+        trees = {p.name: ast.parse(p.read_text(encoding="utf-8")) for p in sorted((root / "scripts").glob("test_*.py"))}
+    classes = [c for tree in trees.values() for c in ast.walk(tree) if isinstance(c, ast.ClassDef)]
+    cases = {"TestCase", "IsolatedAsyncioTestCase"}
+    while grown := {c.name for c in classes if {getattr(b, "attr", getattr(b, "id", None)) for b in c.bases} & cases} - cases:
+        cases |= grown  # test classes may extend a case imported from another test file
+    runners = "".join(p.read_text(encoding="utf-8") for p in [*root.glob("scripts/**/*.ps1"), *root.glob(".github/workflows/*.yml")])
+    return [name for name, tree in trees.items() if name not in MANUAL_HARNESSES
+            and not any(isinstance(c, ast.ClassDef) and c.name in cases for c in ast.walk(tree))
+            and not re.search(r"(?<![\w])" + re.escape(name), runners)]
 
 
 class ClaimErrorTests(unittest.TestCase):

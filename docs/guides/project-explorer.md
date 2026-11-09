@@ -116,8 +116,7 @@ runner resolves the project-local Playwright package and prefers its installed
 Chromium; `EXPLORER_BROWSER` can select another explicit executable. It writes
 new run directories beneath `artifacts/project-explorer/runs/` and
 `output/playwright/project-explorer/`. Optional `--output` and `--screenshots`
-arguments must name fresh directories. The generated `e2e/example.spec.js`
-tests Playwright's documentation site and is separate from these explorer checks.
+arguments must name fresh directories.
 
 The schema test requires `jsonschema>=4.18`; its optional workspace test-only installation is `artifacts/project-model-schema-deps`. Browser test dependency setup and recorded browser version are documented in the UI package. Neither dependency is required by the delivered viewer.
 

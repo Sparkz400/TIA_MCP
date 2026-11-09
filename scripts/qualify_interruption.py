@@ -32,7 +32,7 @@ from qualify_project_upgrade import EXAMPLES as UPGRADE_PINS, fingerprint, guard
 from qualify_reliability import ReliabilityClient, decoded, require, terminate_owned_test_worker
 from smoke_mcp import ROOT
 
-TIA_EXE = pathlib.Path(r"D:\Arbeit\Siemens\Portal V21\Bin\Siemens.Automation.Portal.exe")
+TIA_EXE = pathlib.Path(os.environ.get("TIA_MCP_PORTAL_EXE") or r"D:\Arbeit\Siemens\Portal V21\Bin\Siemens.Automation.Portal.exe")
 def probe(name="LaneEProbe"):
     return f"FUNCTION \"{name}\" : Int\n{{ S7_Optimized_Access := 'TRUE' }}\nVERSION : 0.1\nBEGIN\n    #{name} := 7;\nEND_FUNCTION\n"
 # name: (operation, interruption, journal trigger, expected outcome or None when evidence decides)

@@ -1,7 +1,6 @@
 """Actual stdio OPC UA artifact workflow; deliberately nonexistent native workers, no TIA."""
 import argparse
 import base64
-import hashlib
 import json
 import pathlib
 import time
@@ -25,8 +24,7 @@ def require(condition, message):
         raise RuntimeError(message)
 
 
-def digest(data):
-    return hashlib.sha256(data).hexdigest()
+from evidence_hash import sha256 as digest
 
 
 def main():

@@ -11,7 +11,6 @@ the native exports with the candidates; phase 4 reopens every record on a fresh 
 import argparse
 import base64
 import copy
-import hashlib
 import json
 import subprocess
 from pathlib import Path
@@ -48,8 +47,7 @@ def load_library(raw):
 PLACEHOLDER = chr(0xE000)
 
 
-def digest(raw):
-    return hashlib.sha256(raw).hexdigest()
+from evidence_hash import sha256 as digest
 
 
 def canonical(value):
