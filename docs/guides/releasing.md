@@ -22,15 +22,15 @@ whether a change needs a major, minor or patch release. A version tag builds a *
 2. In [CHANGELOG.md](../../CHANGELOG.md), rename `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD`,
    state the exact limitations, and open a new empty `## [Unreleased]` above it.
 3. Merge the pull request into `main` with the offline checks green.
-4. Tag that `main` commit and push the tag:
+4. Once the offline and Explorer workflows have passed on that `main` commit, tag it and push the tag:
 
    ```powershell
    git tag -a vX.Y.Z -m "TIA MCP X.Y.Z"
    git push origin vX.Y.Z
    ```
 
-5. [`release.yml`](../../.github/workflows/release.yml) reruns the offline and Explorer
-   workflows, then a read-only `build` job builds the offline bundle with
+5. [`release.yml`](../../.github/workflows/release.yml) refuses a tag whose commit has no
+   successful offline and Explorer workflow run, then a read-only `build` job builds the offline bundle with
    `scripts/Package.ps1 -Offline`, verifies it with `scripts/Verify-TiaMcpBundle.ps1 -Strict`,
    refuses a tag that differs from the bundle's `productVersion` or a CHANGELOG without its
    section, and, from 1.0 on, refuses unless the release ledger says `releaseReady`, every release obligation in it is
