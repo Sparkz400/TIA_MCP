@@ -80,7 +80,7 @@ namespace TiaMcp.Openness.V21
                 change.Preview["kind"] = kind;
                 change.Preview["project"] = ProjectInfo(project);
                 change.Preview["isModified"] = project.IsModified;
-                change.Preview["payload"] = change.Payload.DeepClone();
+                change.Preview["payload"] = PreviewPayload(change);
                 change.Preview["baseFingerprint"] = change.BaseFingerprint;
                 change.Preview["fingerprintScope"] = "Project save state; hardware identities and network configuration; exposed software scopes, user-block identities/native fingerprints, type/tag-table metadata and selected mutation attributes. Protected blocks reached through native generated system groups use identity/modified/protection/consistency metadata instead of generated payload checksums; owning PLC safety signatures and runtime-group metadata are included. Unexposed vendor data and generated payload bytes are not covered.";
                 if (change.Kind.StartsWith("opcua_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " OPC UA kinds additionally cover each PLC's server interface group: user and SIMATIC interface names, enabled state and native modification time, reference namespaces, and role mappings with namespace permissions. Interface and namespace content is covered only through native modification times.";
@@ -126,6 +126,10 @@ namespace TiaMcp.Openness.V21
                 change.Failure = ex.Message;
                 change.PrimaryFailure = ex.Message;
                 WriteChangeJournal(change);
+                // Nothing reads a failed preparation's inputs or backups; only its journal is kept.
+                foreach (var pattern in new[] { "before-*.xml", "requested*" })
+                    foreach (var file in Directory.EnumerateFiles(directory, pattern))
+                        try { File.Delete(file); } catch (IOException) { } catch (UnauthorizedAccessException) { }
                 throw;
             }
         }
@@ -142,7 +146,7 @@ namespace TiaMcp.Openness.V21
             if (change.IdempotencyKey != null)
             {
                 if (change.IdempotencyKey != key) throw new BridgeException("IdempotencyConflict", "The change already has a different idempotency key.");
-                if (change.State == "applied") return ChangeView(change);
+                if (ChangeMilestoneRules.IsResolvedOutcome(change.State)) return ChangeView(change);
                 throw new BridgeException("RecoveryRequired", "This change was already attempted and cannot be retried. Inspect its journal and recover explicitly.", ChangeView(change));
             }
             if (change.State != "prepared") throw new BridgeException("InvalidChangeState", "Only a prepared change can be applied.");
@@ -193,9 +197,10 @@ namespace TiaMcp.Openness.V21
                 change.IdempotencyKey = key;
                 _changeKeys[key] = change.Id;
                 change.State = "checkpointing";
-                WriteChangeJournal(change);
                 try
                 {
+                    // Inside the try: a failed journal write must still end in a resolvable state.
+                    WriteChangeJournal(change);
                     InvalidateHmiObservations();
                     MeasureChange(change, "checkpoint-save", () => { project.Save(); return true; });
                     change.Stages.Add("prechange_project_saved");
@@ -282,26 +287,35 @@ namespace TiaMcp.Openness.V21
                         : EngineeringFingerprint(change, project);
                     change.State = "applied";
                     WriteChangeJournal(change);
-                    RecordAppliedDecisions(change);
-                    return ChangeView(change);
                 }
                 catch (Exception ex)
                 {
-                    change.State = "recovery_required";
+                    // Until the state leaves checkpointing only the project save and the archive ran; nothing was mutated.
+                    bool mutationReached = change.State != "checkpointing";
+                    change.State = mutationReached ? "recovery_required" : "not_applied";
                     change.Failure = ex.Message;
                     change.PrimaryFailure = ex.Message;
                     // The failure's own evidence (for example the rows a preservation check found changed) is journaled with the change.
                     if ((ex as BridgeException)?.Details is JObject details) change.Readbacks.Add(new JObject { ["role"] = "failure-details", ["details"] = details.DeepClone() });
                     else change.Readbacks.Add(new JObject { ["role"] = "native-exception", ["chain"] = NativeFailureText.Chain(ex) });
                     CaptureTechnologyEvidence(change);
-                    RecoverFailedClassicScreen(change, project);
+                    if (mutationReached) RecoverFailedClassicScreen(change, project);
                     if (change.State != "rolled_back" && change.State != "not_applied")
                         try { change.AfterFingerprint = EngineeringFingerprint(change, project); } catch { }
+                    else change.AttributeTarget = null;
                     change.Stages.Add("change_finished_with_failure");
                     WriteChangeJournal(change);
                     throw new BridgeException((ex as BridgeException)?.Code ?? "EngineeringError", ex.Message, ChangeView(change));
                 }
             }
+            // The decision log records the applied change but is not part of it: a failed append must not undo "applied".
+            try { RecordAppliedDecisions(change); }
+            catch (IOException ex)
+            {
+                change.Readbacks.Add(new JObject { ["role"] = "intent-log-write-failure", ["message"] = ex.Message });
+                try { WriteChangeJournal(change); } catch (IOException) { /* The applied journal is already durable. */ }
+            }
+            return ChangeView(change);
         }
 
         private JObject ChangeStatus(JObject args)
@@ -327,17 +341,14 @@ namespace TiaMcp.Openness.V21
         private JObject ChangeRestore(JObject args)
         {
             var change = GetEngineeringChange(args);
-            if (change.State == "restored") return ChangeView(change);
+            if (ChangeMilestoneRules.RestoreAlreadyDone(change.State, ChangeText(args, "previewHash", 64), change.PreviewHash)) return ChangeView(change);
             // A scoped fingerprint never authorizes replacing the whole project; only the imported tables are restored.
             if (change.Kind == TagTableImportRules.Kind) return RestoreScopedTagImport(change, args);
             if (change.FingerprintCoverage?["inconsistentBlocksMetadataOnly"] is JArray bystanders && bystanders.Count > 0)
                 throw new BridgeException("ScopedRecoveryRequired", "Unrelated inconsistent blocks were covered by metadata only, so this change cannot authorize replacing the whole project. Use the retained archive for explicit manual recovery; nothing was saved or closed.",
                     new JObject { ["inconsistentBlocksMetadataOnly"] = bystanders.DeepClone(), ["recoveryArchive"] = change.ArchivePath });
-            if (!_ownsPortal) throw new BridgeException("OwnedSessionRequired", "Automatic archive retrieval is limited to worker-owned TIA instances. The checkpoint archive is available for manual recovery in a user-owned instance.", ChangeView(change));
-            if (change.State != "applied" && change.State != "recovery_required") throw new BridgeException("InvalidChangeState", "This change has no applied state to recover.");
-            if (string.IsNullOrEmpty(change.ArchivePath) || !File.Exists(change.ArchivePath) || ChangeFileHash(change.ArchivePath) != change.ArchiveHash)
-                throw new BridgeException("CheckpointInvalid", "The recorded recovery archive is missing or its hash has changed.");
-            if (ChangeText(args, "previewHash", 64) != change.PreviewHash) throw new BridgeException("PreviewMismatch", "Wrong previewHash.");
+            ChangeMilestoneRules.RequireRestorable(change.State, _ownsPortal,
+                () => !string.IsNullOrEmpty(change.ArchivePath) && File.Exists(change.ArchivePath) && ChangeFileHash(change.ArchivePath) == change.ArchiveHash, () => ChangeView(change));
             var project = ProjectForChange(change);
             EnsureProjectOffline(project);
             if (change.AfterFingerprint == null || EngineeringFingerprint(change, project) != change.AfterFingerprint)
@@ -376,6 +387,7 @@ namespace TiaMcp.Openness.V21
                 if (IsHmiChangeKind(change.Kind)) VerifyHmiEngineeringRecovery(change, restored);
                 VerifyHardwareRecovery(change, restored);
                 change.State = "restored";
+                change.AttributeTarget = null;
                 change.Stages.Add("checkpoint_retrieved_to_new_directory");
                 WriteChangeJournal(change);
                 return ChangeView(change);
@@ -464,9 +476,10 @@ namespace TiaMcp.Openness.V21
                     PrepareMutationScope(change, plc, "block", change.BlockNames);
                     PrepareBlockTargets(change, plc, false, false, effects);
                     string nativeLanguage = language == "AWL" ? "STL" : language;
+                    var findOld = BlockLookup(plc, change);
                     foreach (var name in expected)
                     {
-                        var old = FindBlockByName(plc, name, false, change);
+                        var old = findOld(name, false);
                         if (language == "SIMATIC_SD" && old != null)
                             throw new BridgeException("TargetAlreadyExists", "SIMATIC_SD source import is limited to explicitly new blocks; use typed edits for existing graphical blocks.");
                         if (old != null && !(old.Item is DataBlock) && old.Item.ProgrammingLanguage.ToString() != nativeLanguage)
@@ -499,9 +512,10 @@ namespace TiaMcp.Openness.V21
                     change.Namespace = ImportNamespace(document);
                     PrepareMutationScope(change, plc, "block", change.BlockNames);
                     PrepareBlockTargets(change, plc, safety, false, effects);
+                    var findOld = BlockLookup(plc, change);
                     foreach (var target in targets)
                     {
-                        var old = FindBlockByName(plc, target.Name, false, change);
+                        var old = findOld(target.Name, false);
                         if (old != null && old.Item.ProgrammingLanguage.ToString() != target.Language)
                             throw new BridgeException("LanguageConversionNotSupported", "XML update must retain the existing block language: " + target.Name);
                     }
@@ -1356,9 +1370,10 @@ namespace TiaMcp.Openness.V21
 
         private void PrepareBlockTargets(EngineeringChange change, PlcSelection plc, bool safety, bool mustExist, JArray effects)
         {
+            var find = BlockLookup(plc, change);
             foreach (var name in change.BlockNames)
             {
-                var block = FindBlockByName(plc, name, mustExist, change);
+                var block = find(name, mustExist);
                 if (block != null)
                 {
                     EnsureEditableBlock(block.Item, safety);
@@ -1377,16 +1392,18 @@ namespace TiaMcp.Openness.V21
 
         private void VerifyBlockTargets(EngineeringChange change, PlcSelection plc, bool safety)
         {
+            var find = BlockLookup(plc, change);
             foreach (var name in change.BlockNames)
             {
-                var block = FindBlockByName(plc, name, false, change);
+                var block = find(name, false);
                 if (block != null) EnsureEditableBlock(block.Item, safety);
             }
         }
 
         private void VerifyExpectedBlocksExist(EngineeringChange change, PlcSelection plc)
         {
-            foreach (var name in change.BlockNames) FindBlockByName(plc, name, true, change);
+            var find = BlockLookup(plc, change);
+            foreach (var name in change.BlockNames) find(name, true);
         }
 
         private void ValidateXmlBlockNumbers(XDocument document, PlcSelection plc, EngineeringChange change)
@@ -1424,16 +1441,24 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("UnsupportedSafetyBlock", "Only consistent exportable user safety blocks are eligible; generated F-system blocks are excluded.");
         }
 
-        private BlockEntry FindBlockByName(PlcSelection plc, string name, bool required, EngineeringChange change, bool exactGroup = true)
+        private BlockEntry FindBlockByName(PlcSelection plc, string name, bool required, EngineeringChange change, bool exactGroup = true) =>
+            BlockLookup(plc, change, exactGroup)(name, required);
+
+        // One walk of the change's software scope; each lookup then refuses an ambiguous or (if required) missing name as a single walk would.
+        private Func<string, bool, BlockEntry> BlockLookup(PlcSelection plc, EngineeringChange change, bool exactGroup = true)
         {
             var budget = new ScanBudget(50000);
-            var blocks = ScopeBlocks(ResolveSoftwareScope(plc, change.ScopePath), budget)
-                .Where(b => string.Equals(b.Item.Name, name, StringComparison.OrdinalIgnoreCase) && (b.Item.Namespace ?? "") == change.Namespace &&
-                    (!exactGroup || ObjectIdentity.ParentPath(b.Path) == change.GroupPath)).ToArray();
+            var byName = ScopeBlocks(ResolveSoftwareScope(plc, change.ScopePath), budget)
+                .Where(b => (b.Item.Namespace ?? "") == change.Namespace && (!exactGroup || ObjectIdentity.ParentPath(b.Path) == change.GroupPath))
+                .ToLookup(b => b.Item.Name, StringComparer.OrdinalIgnoreCase);
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Block lookup was incomplete.");
-            if (blocks.Length > 1) throw new BridgeException("AmbiguousTarget", "Multiple blocks have name: " + name);
-            if (blocks.Length == 0 && required) throw new BridgeException("BlockNotFound", "Block not found: " + name);
-            return blocks.FirstOrDefault();
+            return (name, required) =>
+            {
+                var blocks = byName[name].ToArray();
+                if (blocks.Length > 1) throw new BridgeException("AmbiguousTarget", "Multiple blocks have name: " + name);
+                if (blocks.Length == 0 && required) throw new BridgeException("BlockNotFound", "Block not found: " + name);
+                return blocks.FirstOrDefault();
+            };
         }
 
         // locationIndependent omits only the project location and save state, to compare a retrieved archive copy with its original.
@@ -1640,8 +1665,7 @@ namespace TiaMcp.Openness.V21
             foreach (var entry in DeviceItems(project, budget))
             {
                 var provider = entry.Item.GetService<OnlineProvider>();
-                if (provider != null && provider.State != OnlineState.Offline)
-                    throw new BridgeException("OfflineRequired", "Offline engineering changes require the target to be offline. No disconnect or CPU action was performed: " + entry.Path);
+                if (provider != null) ChangeMilestoneRules.RequireOffline(entry.Path, provider.State == OnlineState.Offline);
             }
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish complete offline state.");
         }
@@ -1748,6 +1772,31 @@ namespace TiaMcp.Openness.V21
                     ["maximumCycleTime"] = ChangeScalar(g.MaximumCycleTime), ["warnCycleTime"] = ChangeScalar(g.WarnCycleTime) })) };
         }
 
+        private static readonly string[] PersistedTextFields = { "xml", "source" };
+        // Source/XML persisted as the prepared input file appears in the preview by length and hash only; the hash binds the preview to the content.
+        private static JObject PreviewPayload(EngineeringChange change)
+        {
+            var payload = (JObject)change.Payload.DeepClone();
+            // A Classic screen reconciliation re-reads its exact request from the journal preview.
+            if (change.InputPath == null || change.Kind == "hmi_classic_screen_edit") return payload;
+            foreach (var name in PersistedTextFields)
+                if (payload[name]?.Type == JTokenType.String)
+                {
+                    var bytes = Encoding.UTF8.GetBytes(payload.Value<string>(name));
+                    using (var sha = SHA256.Create())
+                        payload[name] = new JObject { ["bytes"] = bytes.Length, ["sha256"] = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant() };
+                }
+            return payload;
+        }
+
+        // Called on detach. Unresolved changes stay: if the same TIA process is attached again they still block a checkpoint save.
+        // The rest stay readable from their journals through change_status.
+        private void ReleaseResolvedChanges()
+        {
+            foreach (var id in _changes.Where(p => !ChangeMilestoneRules.IsUnresolved(p.Value.State)).Select(p => p.Key).ToList()) _changes.Remove(id);
+            foreach (var key in _changeKeys.Where(p => !_changes.ContainsKey(p.Value)).Select(p => p.Key).ToList()) _changeKeys.Remove(key);
+        }
+
         private EngineeringChange GetEngineeringChange(JObject args)
         {
             string id = ChangeText(args, "changeId", 64);
@@ -1761,7 +1810,7 @@ namespace TiaMcp.Openness.V21
         {
             var unresolved = _changes.Values.FirstOrDefault(x => x.Id != exceptId && x.PreparedProcessId == _processId &&
                 string.Equals(x.ProjectPath, project.Path.FullName, StringComparison.OrdinalIgnoreCase) &&
-                (x.State == "recovery_required" || x.State == "checkpointing" || x.State == "applying" || x.State == "restoring"));
+                ChangeMilestoneRules.IsUnresolved(x.State));
             if (unresolved != null)
                 throw new BridgeException("RecoveryRequired", "Change " + unresolved.Id + " on this project is " + unresolved.State +
                     ". Inspect change_status and the retained recovery evidence before another edit. For recovery_required, change_restore can recover the archive in a worker-owned instance. Do not restart merely to clear an unverified change.", ChangeView(unresolved));
@@ -1769,9 +1818,9 @@ namespace TiaMcp.Openness.V21
 
         private Project ProjectForChange(EngineeringChange change)
         {
-            if (change.PreparedProcessId != _processId) throw new BridgeException("SessionChanged", "Change belongs to a different TIA attachment.");
+            ChangeMilestoneRules.RequireSameAttachment(change.PreparedProcessId, _processId);
             var project = SelectProject(change.Selector);
-            if (!string.Equals(project.Path.FullName, change.ProjectPath, StringComparison.OrdinalIgnoreCase)) throw new BridgeException("ProjectChanged", "Change belongs to a different project file.");
+            ChangeMilestoneRules.RequireSameProject(project.Path.FullName, change.ProjectPath);
             return project;
         }
 
@@ -1829,8 +1878,7 @@ namespace TiaMcp.Openness.V21
         {
             string log = DecisionLog(ArtifactDirectory(args));
             if (!File.Exists(log)) return Enumerable.Empty<JObject>();
-            return File.ReadAllLines(log).Where(l => l.Length > 0).Select(JObject.Parse)
-                .Where(d => string.Equals(d.Value<string>("projectPath"), projectPath, StringComparison.OrdinalIgnoreCase)).ToList();
+            return IntentRules.DecisionsOf(File.ReadAllLines(log), projectPath);
         }
 
         // Only decisions of applied changes become the project's confirmed record.
