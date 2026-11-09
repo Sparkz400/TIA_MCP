@@ -15,10 +15,13 @@ public sealed record OpennessRegistrationReport(string Status, string WorkerPath
 public static class OpennessRegistration
 {
     public const string AllowListPath = @"SOFTWARE\Siemens\Automation\Openness\AllowList";
+    // TIA V19 keeps its approved applications under its own version key (same Entry format); V21 reads the shared AllowList.
+    public const string V19AllowListPath = @"SOFTWARE\Siemens\Automation\Openness\19.0\Whitelist";
+    public static string AllowListPathFor(int tiaVersion) => tiaVersion == 19 ? V19AllowListPath : AllowListPath;
     private const string Action = "Run scripts/Setup-TiaMcp.ps1 for a verified bundle at its final path, with the approved release hash; " +
         "for a source build, explicitly register that build or approve it in TIA. Runtime startup does not change trust.";
 
-    public static OpennessRegistrationReport Inspect(string workerPath)
+    public static OpennessRegistrationReport Inspect(string workerPath, int tiaVersion = 21)
     {
         if (!OperatingSystem.IsWindows())
             return new("unsupported_platform", workerPath, null, [], "Openness registration inspection requires Windows.");
@@ -30,7 +33,7 @@ public static class OpennessRegistration
             var identity = new OpennessWorkerIdentity(path,
                 File.GetLastWriteTimeUtc(path).ToString("yyyy/MM/dd HH:mm:ss.fff", CultureInfo.InvariantCulture),
                 Convert.ToBase64String(SHA256.HashData(stream)));
-            return Evaluate(identity, ReadEntries(path));
+            return Evaluate(identity, ReadEntries(path, AllowListPathFor(tiaVersion)), AllowListPathFor(tiaVersion));
         }
         catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException)
         {
@@ -43,10 +46,10 @@ public static class OpennessRegistration
     }
 
     [SupportedOSPlatform("windows")]
-    private static IReadOnlyList<OpennessAllowListEntry> ReadEntries(string workerPath)
+    private static IReadOnlyList<OpennessAllowListEntry> ReadEntries(string workerPath, string allowListPath)
     {
         using var machine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-        using var app = machine.OpenSubKey(AllowListPath + @"\" + System.IO.Path.GetFileName(workerPath), writable: false);
+        using var app = machine.OpenSubKey(allowListPath + @"\" + System.IO.Path.GetFileName(workerPath), writable: false);
         if (app is null) return [];
         var result = new List<OpennessAllowListEntry>();
         foreach (var name in app.GetSubKeyNames().Order(StringComparer.Ordinal))
@@ -61,7 +64,7 @@ public static class OpennessRegistration
     }
 
     // Pure comparison also covers duplicate saved identities and malformed/non-string values.
-    public static OpennessRegistrationReport Evaluate(OpennessWorkerIdentity worker, IReadOnlyList<OpennessAllowListEntry> entries)
+    public static OpennessRegistrationReport Evaluate(OpennessWorkerIdentity worker, IReadOnlyList<OpennessAllowListEntry> entries, string allowListPath = AllowListPath)
     {
         var matchingPath = entries.Where(entry => string.Equals(entry.Path, worker.Path, StringComparison.OrdinalIgnoreCase)).ToArray();
         if (matchingPath.Length == 0)
@@ -73,7 +76,7 @@ public static class OpennessRegistration
             var mismatches = new List<string>();
             if (!string.Equals(entry.DateModified, worker.DateModified, StringComparison.Ordinal)) mismatches.Add("DateModified");
             if (!string.Equals(entry.FileHash, worker.FileHash, StringComparison.Ordinal)) mismatches.Add("FileHash");
-            var key = @"HKEY_LOCAL_MACHINE\" + AllowListPath + @"\" + System.IO.Path.GetFileName(worker.Path) + @"\" + entry.Name;
+            var key = @"HKEY_LOCAL_MACHINE\" + allowListPath + @"\" + System.IO.Path.GetFileName(worker.Path) + @"\" + entry.Name;
             if (mismatches.Count == 0)
                 return new("registered", worker.Path, key, [], $"Saved Openness identity matches {worker.Path}; path, UTC modification time and SHA-256 agree. Group membership and TIA access remain separate prerequisites.");
             var report = new OpennessRegistrationReport("stale", worker.Path, key, mismatches,

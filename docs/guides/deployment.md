@@ -57,6 +57,7 @@ Every MCP client connection owns separate workers and session state. Do not poin
 | Option | Default | Effect | Launcher parameter |
 | --- | --- | --- | --- |
 | `--worker <exe>` | Bundle: `workers/openness/TiaMcp.Openness.V21.exe`; checkout: the worker's Debug `net48` build | Engineering (TIA Openness V21) worker | Set from the bundle |
+| `--tia-version <19\|21>` | `21` | `19` runs the read-only [TIA V19 adapter](../reference/tia-v19-adapter.md): the default worker becomes `TiaMcp.Openness.V19.exe` (checkout: its Debug `net48` build; release bundles do not contain it yet), only the base tools and the twelve V19 read tools are advertised and no prompts. Not with qualification modes, `--addin-handoff` or the library apply options; once | None |
 | `--sim-worker <exe>` | Bundle: `workers/simulator/TiaMcp.Simulator.V8.exe`; checkout: the worker's Debug `net48` build | PLCSIM Advanced V8 worker | Set from the bundle |
 | `--artifacts <dir>` | `artifacts` below the checkout or bundle root | Artifact store: projects, checkpoints, uploads, reports and journals | `-ArtifactsDirectory` |
 | `--api-dir <dir>` | The V21 PublicAPI path Siemens registers, else the setup default below `C:\Program Files` | TIA Openness PublicAPI directory for the engineering worker and native translation import | `-TiaApiDirectory` |

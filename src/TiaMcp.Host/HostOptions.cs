@@ -31,14 +31,16 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
     public string? RuntimeQualificationPoint { get; init; }
     public string? HmiTextListQualificationProfile { get; init; }
     public string? HmiChangeQualificationProfile { get; init; }
+    // --tia-version: 21 (default) runs the full V21 worker; 19 runs the read-only V19 adapter (X12) and advertises only its tools.
+    public int TiaVersion { get; init; } = 21;
 
     public static HostOptions Parse(string[] args)
     {
         var root = FindRoot();
         var packaged = Directory.Exists(Path.Combine(root, "workers"));
-        var worker = packaged
-            ? Path.Combine(root, "workers", "openness", "TiaMcp.Openness.V21.exe")
-            : Path.Combine(root, "src", "TiaMcp.Openness.V21", "bin", "Debug", "net48", "TiaMcp.Openness.V21.exe");
+        string? worker = null;
+        var tiaVersion = 21;
+        var tiaVersionGiven = false;
         var artifacts = Path.Combine(root, "artifacts");
         var simulator = packaged
             ? Path.Combine(root, "workers", "simulator", "TiaMcp.Simulator.V8.exe")
@@ -97,6 +99,9 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             switch (option)
             {
                 case "--worker": worker = Path.GetFullPath(args[i]); break;
+                case "--tia-version":
+                    if (tiaVersionGiven || args[i] is not ("19" or "21")) throw new ArgumentException("--tia-version takes 19 or 21, once.");
+                    tiaVersion = int.Parse(args[i], System.Globalization.CultureInfo.InvariantCulture); tiaVersionGiven = true; break;
                 case "--git-executable":
                     if (!Path.IsPathFullyQualified(args[i])) throw new ArgumentException("--git-executable requires an absolute local executable path.");
                     gitExecutable = Path.GetFullPath(args[i]); break;
@@ -166,6 +171,11 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         if (addInEnrollment is not null && !addInHandoff) throw new ArgumentException("--addin-enrollment requires --addin-handoff.");
         if (enableLibraryIntegrateApplyGiven && !libraryIntegrateApply)
             throw new ArgumentException("--enable-library-integrate-apply and --disable-library-integrate-apply exclude each other.");
+        if (tiaVersion == 19 && (componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || safetyFParameterDiscovery ||
+            watchQualificationPoint is not null || runtimeQualificationPoint is not null || hmiTextListQualification is not null || hmiChangeQualification is not null ||
+            addInHandoff || enableLibraryIntegrateApplyGiven || !libraryIntegrateApply))
+            throw new ArgumentException("--tia-version 19 runs the read-only V19 adapter; qualification modes, Add-In handoff and library apply options are V21-only.");
+        worker ??= TiaWorkerPath(root, packaged, tiaVersion);
         if (gitAllowNetworkRemote && gitRemote is null) throw new ArgumentException("--git-allow-network-remote requires --git-remote.");
         TiaMcp.Core.VersionControl.GitRemote? remote = null;
         if (gitRemote is not null)
@@ -174,7 +184,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             try { remote = TiaMcp.Core.VersionControl.GitRemote.Parse(gitRemote, gitAllowNetworkRemote); }
             catch (BridgeException error) { throw new ArgumentException("--git-remote: " + error.Message); }
         }
-        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { CheckOpennessRegistration = checkOpennessRegistration, UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, GitRemote = remote, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, SafetyFParameterDiscovery = safetyFParameterDiscovery, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint, HmiTextListQualificationProfile = hmiTextListQualification, HmiChangeQualificationProfile = hmiChangeQualification };
+        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { CheckOpennessRegistration = checkOpennessRegistration, UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, GitRemote = remote, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, SafetyFParameterDiscovery = safetyFParameterDiscovery, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint, HmiTextListQualificationProfile = hmiTextListQualification, HmiChangeQualificationProfile = hmiChangeQualification, TiaVersion = tiaVersion };
     }
 
     private static PackageIntakeLimits ReadLibraryLimits(string path)
@@ -197,6 +207,15 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         limits.Validate();
         return limits;
     }
+
+    // The bundled or source-built worker for one TIA version; --worker overrides it.
+    internal static string TiaWorkerPath(string root, bool packaged, int tiaVersion) => (packaged, tiaVersion) switch
+    {
+        (true, 19) => Path.Combine(root, "workers", "openness-v19", "TiaMcp.Openness.V19.exe"),
+        (true, _) => Path.Combine(root, "workers", "openness", "TiaMcp.Openness.V21.exe"),
+        (false, 19) => Path.Combine(root, "src", "TiaMcp.Openness.V19", "bin", "Debug", "net48", "TiaMcp.Openness.V19.exe"),
+        (false, _) => Path.Combine(root, "src", "TiaMcp.Openness.V21", "bin", "Debug", "net48", "TiaMcp.Openness.V21.exe"),
+    };
 
     private static string FindRoot()
     {

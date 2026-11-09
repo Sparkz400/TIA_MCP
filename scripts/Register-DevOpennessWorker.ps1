@@ -1,17 +1,20 @@
 <#
 .SYNOPSIS
-Keep Debug-built V21 workers in Siemens' Openness AllowList so TIA stops prompting after every build.
+Keep Debug-built V21 and V19 workers in Siemens' Openness AllowList so TIA stops prompting after every build.
 
 .DESCRIPTION
-Default mode, run by every Debug build of TiaMcp.Openness.V21: writes Path, DateModified and FileHash
-for -WorkerPath, using Siemens' documented V21 format. TIA keeps one subkey per allowed path under the
+Default mode, run by every Debug build of TiaMcp.Openness.V21 and TiaMcp.Openness.V19: writes Path, DateModified and FileHash
+for -WorkerPath, using Siemens' documented format. TIA V21 reads HKLM\SOFTWARE\Siemens\Automation\Openness\AllowList;
+TIA V19 reads its own HKLM\SOFTWARE\Siemens\Automation\Openness\19.0\Whitelist with the same entries
+(-TiaVersion 19, which the V19 worker and V19 tool builds pass). TIA keeps one subkey per allowed path under the
 TiaMcp.Openness.V21.exe application key ("Entry", "Entry (1)", ...), so the checkout and each worktree
 keep their own entry: the subkey with the same Path is updated, otherwise a new one is added.
 Exits 1 without changes when the current user cannot write there.
 
 -Grant, run once in an elevated PowerShell: creates the application key and lets -User read, create and
 set values in its subkeys. Nothing outside that key is changed. -AllNativeTools also grants a key for each
-repository tool under scripts/native that references Siemens.Engineering (fixture seeders and probes),
+repository tool under scripts/native that references Siemens.Engineering (fixture seeders and probes; a tool that
+references the single V19 assembly Siemens.Engineering, not Siemens.Engineering.Base, is granted under the V19 key),
 so their builds can be registered later without elevation. Registration uses the key named after the
 executable's file name. Release bundles keep using
 Register-TiaOpennessApplication.ps1.
@@ -20,24 +23,27 @@ param(
     [string]$WorkerPath,
     [switch]$Grant,
     [switch]$AllNativeTools,
+    [ValidateSet('19', '21')][string]$TiaVersion = '21',
     [string]$User = "$env:USERDOMAIN\$env:USERNAME"
 )
 $ErrorActionPreference = 'Stop'
-$allowList = 'SOFTWARE\Siemens\Automation\Openness\AllowList'
+$allowLists = @{ '21' = 'SOFTWARE\Siemens\Automation\Openness\AllowList'; '19' = 'SOFTWARE\Siemens\Automation\Openness\19.0\Whitelist' }
+$allowList = $allowLists[$TiaVersion]
 $hklm = [Microsoft.Win32.RegistryKey]::OpenBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine, [Microsoft.Win32.RegistryView]::Registry64)
 
 if ($Grant) {
-    $apps = @('TiaMcp.Openness.V21.exe')
+    $apps = @(@{ name = 'TiaMcp.Openness.V21.exe'; version = '21' }, @{ name = 'TiaMcp.Openness.V19.exe'; version = '19' })
     if ($AllNativeTools) {
         foreach ($project in Get-ChildItem -Path (Join-Path $PSScriptRoot 'native') -Filter *.csproj -Recurse) {
             $text = Get-Content -LiteralPath $project.FullName -Raw
             if ($text -notmatch 'Siemens\.Engineering') { continue }
             $assembly = if ($text -match '<AssemblyName>([^<]+)</AssemblyName>') { $Matches[1] } else { $project.BaseName }
-            $apps += "$assembly.exe"
+            $apps += @{ name = "$assembly.exe"; version = $(if ($text -match 'Include="Siemens\.Engineering"') { '19' } else { '21' }) }
         }
     }
-    foreach ($app in $apps | Sort-Object -Unique) {
-        $key = $hklm.CreateSubKey("$allowList\$app")
+    foreach ($entry in $apps) {
+        $app = $entry.name
+        $key = $hklm.CreateSubKey("$($allowLists[$entry.version])\$app")
         try {
             $acl = $key.GetAccessControl()
             # Inherited, so entries TIA adds itself after "Yes to all" stay updatable too.
@@ -45,7 +51,7 @@ if ($Grant) {
                 [Security.AccessControl.InheritanceFlags]::ContainerInherit, [Security.AccessControl.PropagationFlags]::None, 'Allow'))
             $key.SetAccessControl($acl)
         } finally { $key.Dispose() }
-        "Granted $User permission to maintain entries under HKLM\$allowList\$app"
+        "Granted $User permission to maintain entries under HKLM\$($allowLists[$entry.version])\$app"
     }
     return
 }

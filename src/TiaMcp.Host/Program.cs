@@ -12,7 +12,7 @@ try
     if (args.Length > 0 && args[0].StartsWith("--session-relay-", StringComparison.Ordinal))
         return await SessionRelay.RunAsync(args);
     var options = TiaMcp.Host.HostOptions.Parse(args);
-    var registration = options.NoNativeWorkers ? null : OpennessRegistration.Inspect(options.WorkerPath);
+    var registration = options.NoNativeWorkers ? null : OpennessRegistration.Inspect(options.WorkerPath, options.TiaVersion);
     if (options.CheckOpennessRegistration)
     {
         Console.WriteLine(JsonSerializer.Serialize(registration, new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true }));
@@ -21,13 +21,14 @@ try
     if (registration is { Status: not "registered" })
         Console.Error.WriteLine($"OpennessRegistration [{registration.Status}]: {registration.Message}");
     var workerArguments = new List<string>();
-    if (options.SimulatorApiDirectory is not null) workerArguments.AddRange(["--sim-api-dir", options.SimulatorApiDirectory]);
+    // The V19 adapter takes no V21 worker options (HostOptions refuses the qualification and library ones for it).
+    if (options.TiaVersion == 21 && options.SimulatorApiDirectory is not null) workerArguments.AddRange(["--sim-api-dir", options.SimulatorApiDirectory]);
     if (options.ComponentQualification) workerArguments.Add("--component-qualification");
     if (options.TestSuiteScopeProbe) workerArguments.Add("--testsuite-scope-probe");
     if (options.TranslationQualification) workerArguments.Add("--translation-qualification");
     if (options.HmiTextListQualificationProfile is { } profile) workerArguments.AddRange(["--hmi-text-list-qualification", profile]);
     if (options.HmiChangeQualificationProfile is { } changeProfile) workerArguments.AddRange(["--hmi-change-qualification", changeProfile]);
-    if (options.LibraryIntegrateApply) workerArguments.Add("--enable-library-integrate-apply");
+    if (options.TiaVersion == 21 && options.LibraryIntegrateApply) workerArguments.Add("--enable-library-integrate-apply");
 #if TESTSUITE_QUALIFICATION
     if (options.TestSuiteQualification) workerArguments.Add("--testsuite-qualification");
 #endif
@@ -63,7 +64,7 @@ try
             builder.Services.AddSingleton(simulator);
             builder.Services.AddSingleton<PlcsimTargets>();
             builder.Services.PostConfigure<ModelContextProtocol.Server.McpServerOptions>(server => ToolSurface.Apply(server, options));
-            var mcp = builder.Services.AddMcpServer(server => server.ServerInstructions = AuthenticationInstructions.Text +
+            var mcp = builder.Services.AddMcpServer(server => server.ServerInstructions = AuthenticationInstructions.Text + TiaVersionSurface.Instructions(options) +
                 (options.NoNativeWorkers ? "\nThis Host has native workers disabled. Use supplied-document workflows; native engineering and simulator calls return NativeWorkersDisabled without launching a worker. Network inventory, runtime Web API and OPC UA tools remain separate and require an explicitly selected endpoint and authentication/trust prerequisites." : "") +
                 (options.Toolsets is { } toolsets ? "\nThis Host advertises only the base tools and the toolsets " + string.Join(", ", toolsets.Order(StringComparer.Ordinal)) + ". Other tools are hidden; a user restarts the Host with a wider --toolsets value to use them." : ""))
                 .WithStdioServerTransport().WithPrompts<TiaPrompts>().WithRequestFilters(ToolSurface.Configure).WithTools<TiaTools>().WithTools<ArtifactTools>().WithTools<LibraryPackageTools>().WithTools<SimulatorTools>()
