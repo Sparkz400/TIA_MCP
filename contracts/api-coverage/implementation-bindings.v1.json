@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "c054928f768231fc91f3b374e2dde00f1d7d96c90147f33b362981633f516a80",
-      "bytes": 1853614
+      "sha256": "0a0f3f8afbef538b9d6ce33b2548e556958da15486146f508bb260167cb712e9",
+      "bytes": 1860091
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -127170,6 +127170,13 @@
           "artifacts": [
             "evidence/local.project_upgrade.interruption.20261101.json"
           ]
+        },
+        {
+          "id": "local.tia.v19-adapter.20261109",
+          "profileSha256": "20d609b3ca464cd313e0643ad590285423af4ef9c51887343fc8e980b461b07b",
+          "artifacts": [
+            "evidence/local.tia.v19-adapter.20261109.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -136438,7 +136445,15 @@
       "sourceDependencies": [],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.tia.v19-adapter.20261109",
+          "profileSha256": "20d609b3ca464cd313e0643ad590285423af4ef9c51887343fc8e980b461b07b",
+          "artifacts": [
+            "evidence/local.tia.v19-adapter.20261109.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -141077,6 +141092,11 @@
       "sha256": "424a86424ece9926c16e9a8fb3a2d5aa854dd49e6716573dffc49bfedf47c01f"
     },
     {
+      "path": "evidence/local.tia.v19-adapter.20261109.json",
+      "state": "observed",
+      "sha256": "c7ea08a11afaaa4ed883b873289ea70ec3ab4cc13e48208f98ab4a6121d7c85e"
+    },
+    {
       "path": "evidence/local.translation.adoption-refusal.20261102.json",
       "state": "observed",
       "sha256": "d984a4630157e91a2f3ccff5158e339d874d80e3b0b2a3ccdc063f4484a64d12"
@@ -142347,6 +142367,10 @@
     {
       "id": "local.testsuite.style-q01.20261101",
       "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9"
+    },
+    {
+      "id": "local.tia.v19-adapter.20261109",
+      "profileSha256": "20d609b3ca464cd313e0643ad590285423af4ef9c51887343fc8e980b461b07b"
     },
     {
       "id": "local.translation.adoption-refusal.20261102",
