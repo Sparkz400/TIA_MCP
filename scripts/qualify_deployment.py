@@ -169,7 +169,7 @@ class McpClient:
                 if response["id"] != self.sequence:
                     raise ProtocolFailure("Unexpected JSON-RPC response ID; no response was reused.")
                 if "error" in response:
-                    raise ProtocolFailure("JSON-RPC request error: " + json.dumps(response["error"])[:2000])
+                    raise ProtocolFailure("JSON-RPC request error: " + json.dumps(response["error"], ensure_ascii=False)[:2000])
                 if "result" not in response:
                     raise ProtocolFailure("JSON-RPC response omitted result.")
                 return response["result"]
@@ -483,7 +483,7 @@ def main():
             except (OSError, json.JSONDecodeError):
                 pass
         report.update(schemaVersion=1, completed=False, status="failed", failure=f"{type(error).__name__}: {error}", executionAttempted=execution_attempted)
-        args.report.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        args.report.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
         print("FAIL " + str(error))
         return 1
 
