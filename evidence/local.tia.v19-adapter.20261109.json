@@ -1,0 +1,131 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.tia.v19-adapter.20261109",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-09T07:55:20+00:00",
+  "source": {
+    "commit": "9db55f90c006ff3251892abee81a103ea991a2a0",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "LT-PRG2024-03",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "TIA Portal V19 Update 5 (Openness 19.0.0.0) and V21 Update 3 on LT-PRG2024-03. V19ProjectSeeder created an owned V19 fixture in its own V19 instance (CPU 1511-1 PN V3.1; tag table TiaMcp_Tags with three tags and a constant; UDT TiaMcp_Motor; FC, FB, global DB, instance DB and OB Main; software unit TiaMcp_Conveyor with UDT, FB, instance DB and tag table; all from SCL/UDT sources), compiled it (0 errors, 1 warning), saved, archived (.zap19) and closed it. A Host with --tia-version 19 advertised exactly the base tools and the twelve V19 read tools and no prompts; change_prepare, project_upgrade, tia_create_scratch and library_list were unknown tools; tia_capabilities named API 19.0.0.0, readOnly. In owned V19 instances project_open refused an .ap21 path (ProjectVersionUnsupported), a missing .ap19 (ProjectNotFound) and a second open (ProjectIsolationRequired), opened the fixture, and project_inventory, software_inspect, block_read, type_read and tag_table_read returned all 11 seeded objects at canonical paths with V19 SimaticML; simaticSd/generatedSource were refused (UnsupportedOnTiaVersion). readOnly opened a secondary project with the same inventory and block_read refused with ReadOnlyProject. A V19 Portal the seeder held the fixture open in was discovered, attached, read and left running after tia_detach. Every owned V19 Portal exited after detach. With a V21 Host, project_upgrade refused the held fixture with SourceLocked; it upgraded the project folder and the archive (conversion logs succeeded, 0 errors, 0 warnings; source unchanged); each upgraded copy reopened with the V19 inventory below the project segment, its four code blocks inconsistent until a checkpointed plc_compile change compiled it (0 errors, 1 warning, every block consistent), and then every seeded block, UDT and tag table equalled its V19 export in the compared content. Opening the fixture in V19 rewrote only TIA's search index (IM/SearchIndex: 7 files on the primary open, 0 on the read-only open, 5 in the held Portal); the .ap19 file, every other project file and the archive stayed byte-identical.",
+  "limitations": [
+    "One synthetic V19 fixture (CPU 1511-1 PN V3.1, SCL blocks generated from source, one software unit); LAD/FBD/GRAPH, HMI, drives, safety, technology objects, libraries, namespaces and know-how protection are not part of it.",
+    "The V19 adapter is read-only (discover, attach, start, status, detach, project_open, project_inventory, software_inspect, native-XML block_read/type_read/tag_table_read); no change, compile, save or archive route exists for V19.",
+    "Upgrade content comparison covers block attributes (name, number, language, memory layout) and interface members (name, data type, start value), UDT members, tags (name, data type, address) and constants (name, data type, value); network code is not compared.",
+    "Only TIA V19 Update 5 on one workstation (LT-PRG2024-03); V15.1, V17, V18 and V20 have no adapter and their sources are not exercised. The summary's environment.tiaVersion is the curation default 21; the run used both V19 and V21.",
+    "Opening a V19 project (primary, or in another Portal) lets TIA's background indexer rewrite IM/SearchIndex files; the adapter itself never saves."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "0402e0550839e772bc1c3ddc028a87ba2f8b96735f4fc91bf52da40c08125dd6"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "750bea1910e21412a96a0b2e1dcc9ee446883571a70d92d30d5c4cbf63736965"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "3fac2ecbce2db9c5e7d25b9723e340f1fa1a0a55c93b83822188990814c72fd7"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "380107938b23ac5a683b93d867c852c66cec098445b07cc7dd3115678901c720"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "36cc90a4f8766d804f27e08769ed59aaecda71e3228c4ff30c116d32da4ef24c",
+      "bytes": 261178,
+      "completed": true,
+      "steps": [
+        "seed the V19 fixture",
+        "the V19 Host advertises only the base and V19 read tools",
+        "tia_capabilities names the V19 adapter",
+        "start owned TIA V19 read",
+        "project_open refuses ProjectVersionUnsupported",
+        "project_open refuses ProjectNotFound",
+        "open the V19 fixture",
+        "project_open refuses ProjectIsolationRequired",
+        "inventory and software scopes of the V19 fixture",
+        "read every seeded block, type and tag table as V19 XML",
+        "the V19 adapter refuses the V21 export formats",
+        "detach V19 read",
+        "the owned TIA of V19 read exits",
+        "the primary open changed no project file outside TIA's search index",
+        "start owned TIA V19 read-only",
+        "open the V19 fixture read-only",
+        "block_read on the read-only project is refused with ReadOnlyProject",
+        "detach V19 read-only",
+        "the owned TIA of V19 read-only exits",
+        "the read-only open changed no project file outside TIA's search index",
+        "the seeder holds the fixture open in its own V19 Portal",
+        "discover, attach, read and detach the held V19 Portal",
+        "project_upgrade while V19 holds the fixture open",
+        "start owned TIA locked-source upgrade",
+        "detach locked-source upgrade",
+        "the owned TIA of locked-source upgrade exits",
+        "release the held fixture",
+        "the held open changed no project file outside TIA's search index",
+        "start owned TIA upgrade projectFolder",
+        "project_upgrade the V19 projectFolder",
+        "detach upgrade projectFolder",
+        "the owned TIA of upgrade projectFolder exits",
+        "start owned TIA reopen projectFolder",
+        "reopen the upgraded projectFolder",
+        "the reopened projectFolder has the V19 inventory below the project",
+        "compile the upgraded projectFolder in V21",
+        "apply plc_compile",
+        "the upgraded projectFolder equals the V19 fixture",
+        "detach reopen projectFolder",
+        "the owned TIA of reopen projectFolder exits",
+        "start owned TIA upgrade archive",
+        "project_upgrade the V19 archive",
+        "detach upgrade archive",
+        "the owned TIA of upgrade archive exits",
+        "start owned TIA reopen archive",
+        "reopen the upgraded archive",
+        "the reopened archive has the V19 inventory below the project",
+        "compile the upgraded archive in V21",
+        "apply plc_compile",
+        "the upgraded archive equals the V19 fixture",
+        "detach reopen archive",
+        "the owned TIA of reopen archive exits",
+        "the fixture's archive and every project file outside TIA's search index are unchanged"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "project_inventory",
+        "project_open",
+        "project_upgrade",
+        "software_inspect",
+        "tag_table_read",
+        "tia_attach",
+        "tia_capabilities",
+        "tia_detach",
+        "tia_discover",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": [
+        "block_read",
+        "project_open",
+        "project_upgrade",
+        "type_read"
+      ]
+    }
+  ]
+}

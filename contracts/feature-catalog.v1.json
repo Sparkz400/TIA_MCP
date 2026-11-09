@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.172",
+  "catalogVersion": "0.4.173",
   "targetTiaVersions": [
     21
   ],
@@ -1072,6 +1072,26 @@
         "Observed timing on one Windows host (PCNico); not a cross-machine latency guarantee.",
         "One linear FB call chain in a project library; no global library, branching graphs or UDT dependencies at this scale. Versions 0..883 were released by earlier runs of the same project (pinned in the verification doc); TIA records library dependencies only between released versions.",
         "Creation of the chain and the releases of Chain_0000..Chain_0883 (four earlier runs, single and batched releases) are measurements pinned in docs/verification/library-native-scale-20261027.md, not evidence records."
+      ]
+    },
+    {
+      "id": "local.tia.v19-adapter.20261109",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 19,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "9db55f90c006ff3251892abee81a103ea991a2a0",
+        "passedScope": "TIA Portal V19 Update 5 (Openness 19.0.0.0) and V21 Update 3 on LT-PRG2024-03. V19ProjectSeeder created an owned V19 fixture in its own V19 instance (CPU 1511-1 PN V3.1; tag table TiaMcp_Tags with three tags and a constant; UDT TiaMcp_Motor; FC, FB, global DB, instance DB and OB Main; software unit TiaMcp_Conveyor with UDT, FB, instance DB and tag table; all from SCL/UDT sources), compiled it (0 errors, 1 warning), saved, archived (.zap19) and closed it. A Host with --tia-version 19 advertised exactly the base tools and the twelve V19 read tools and no prompts; change_prepare, project_upgrade, tia_create_scratch and library_list were unknown tools; tia_capabilities named API 19.0.0.0, readOnly. In owned V19 instances project_open refused an .ap21 path (ProjectVersionUnsupported), a missing .ap19 (ProjectNotFound) and a second open (ProjectIsolationRequired), opened the fixture, and project_inventory, software_inspect, block_read, type_read and tag_table_read returned all 11 seeded objects at canonical paths with V19 SimaticML; simaticSd/generatedSource were refused (UnsupportedOnTiaVersion). readOnly opened a secondary project with the same inventory and block_read refused with ReadOnlyProject. A V19 Portal the seeder held the fixture open in was discovered, attached, read and left running after tia_detach. Every owned V19 Portal exited after detach. With a V21 Host, project_upgrade refused the held fixture with SourceLocked; it upgraded the project folder and the archive (conversion logs succeeded, 0 errors, 0 warnings; source unchanged); each upgraded copy reopened with the V19 inventory below the project segment, its four code blocks inconsistent until a checkpointed plc_compile change compiled it (0 errors, 1 warning, every block consistent), and then every seeded block, UDT and tag table equalled its V19 export in the compared content. Opening the fixture in V19 rewrote only TIA's search index (IM/SearchIndex: 7 files on the primary open, 0 on the read-only open, 5 in the held Portal); the .ap19 file, every other project file and the archive stayed byte-identical."
+      },
+      "artifacts": [
+        "evidence/local.tia.v19-adapter.20261109.json"
+      ],
+      "limitations": [
+        "One synthetic V19 fixture (CPU 1511-1 PN V3.1, SCL blocks generated from source, one software unit); LAD/FBD/GRAPH, HMI, drives, safety, technology objects, libraries, namespaces and know-how protection are not part of it.",
+        "The V19 adapter is read-only (discover, attach, start, status, detach, project_open, project_inventory, software_inspect, native-XML block_read/type_read/tag_table_read); no change, compile, save or archive route exists for V19.",
+        "Upgrade content comparison covers block attributes (name, number, language, memory layout) and interface members (name, data type, start value), UDT members, tags (name, data type, address) and constants (name, data type, value); network code is not compared.",
+        "Only TIA V19 Update 5 on one workstation (LT-PRG2024-03); V15.1, V17, V18 and V20 have no adapter and their sources are not exercised. The summary's environment.tiaVersion is the curation default 21; the run used both V19 and V21.",
+        "Opening a V19 project (primary, or in another Portal) lets TIA's background indexer rewrite IM/SearchIndex files; the adapter itself never saves."
       ]
     },
     {
@@ -6095,14 +6115,15 @@
           "The source is never opened or written: the project file's whole folder (at most 20000 files and 4 GiB) is copied under its own name, or the archive (at most 1 GiB) byte for byte, into a new owned directory under the host's upgrades artifacts, and only that copy is upgraded. The source hash (the archive bytes, or a sorted manifest of every file in the folder) is checked before and after the copy and after the upgrade (sourceUnchanged). The upgraded project must be where V21 saves it: <destination>/<folder>_V21/<folder>_V21.ap21 for a project folder, <destination>/w/<project>_V21/<project>_V21.ap21 for an archive (UpgradeVerificationFailed otherwise).",
           "Nothing is compiled or saved beyond what TIA's upgrade does. The upgraded project stays open with its isModified flag reported; TIA's ConversionLog_*_to_21 files are returned with their project success marker and error and warning counts; collecting that evidence never replaces TIA's outcome (evidenceFailure). Block consistency (the compile state) is read with project_inventory.",
           "Runs through shared mutation admission: the source and the new destination are reserved. A structured failure is a returned outcome that keeps the owned copy for inspection; a lost reply is reconciled by engineering_admission_reconcile: the source hash must be unchanged and the destination absent, empty or holding the one V21 project at the observed location that its completed upgrade receipt names (bound to the recomputed source hash). A partial copy or an unfinished upgrade stays held, with the source reserved, and is never opened.",
-          "Natively qualified (local.project_upgrade.20261031): V14 SP1 archive, V15 and V16 project folders upgraded at the observed location with a successful conversion log and reopened in a fresh owned Portal with their pinned inventory; a V16 project with a TP700 Comfort 15.0.0.0 panel is refused by V21 (MissingProductsException) with its source unchanged; a V13 archive and the same archive renamed to .zap14 are refused before the upgrade. Interruption and reconciliation are qualified (local.project_upgrade.interruption.20261101): worker loss after dispatch intent, during the copy, during the native upgrade and after the upgraded .ap21 exists, and Host loss before dispatch, during the copy and the upgrade and after the native reply, for the V15 folder and the V14 SP1 archive, each reconciled once without replay. Protected (UMAC) projects, V15.1 and V17-V20 sources and locked sources are not exercised natively."
+          "Natively qualified (local.project_upgrade.20261031): V14 SP1 archive, V15 and V16 project folders upgraded at the observed location with a successful conversion log and reopened in a fresh owned Portal with their pinned inventory; a V16 project with a TP700 Comfort 15.0.0.0 panel is refused by V21 (MissingProductsException) with its source unchanged; a V13 archive and the same archive renamed to .zap14 are refused before the upgrade. Interruption and reconciliation are qualified (local.project_upgrade.interruption.20261101): worker loss after dispatch intent, during the copy, during the native upgrade and after the upgraded .ap21 exists, and Host loss before dispatch, during the copy and the upgrade and after the native reply, for the V15 folder and the V14 SP1 archive, each reconciled once without replay. A V19 source is qualified natively (local.tia.v19-adapter.20261109): an owned V19 fixture's project folder and its .zap19 archive upgraded with successful conversion logs and an unchanged source, reopened with the V19 inventory below the project segment, compiled cleanly with plc_compile and then equal to their V19 exports in block attributes and interfaces, UDT members, tags and constants; the same folder held open in a V19 Portal is refused with SourceLocked and left unchanged. Protected (UMAC) projects and V15.1, V17, V18 and V20 sources are not exercised natively."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.project_upgrade.20261031",
-          "local.project_upgrade.interruption.20261101"
+          "local.project_upgrade.interruption.20261101",
+          "local.tia.v19-adapter.20261109"
         ]
       },
       "availability": {
@@ -11288,30 +11309,39 @@
       "mcpTools": [],
       "changeKind": null,
       "api": {
-        "status": "unknown",
+        "status": "available",
         "reasons": [
-          "Vendor exposure and object-specific prerequisites require a documented adapter review."
+          "V19 Openness (Siemens.Engineering 19.0.0.0) exposes Portal discovery, attach and start, Projects.Open with ProjectOpenMode.Secondary, device/software/unit traversal and SimaticML export of blocks, PLC data types and tag tables, which the read-only V19 adapter uses.",
+          "Each other TIA version needs its own installation, Openness SDK and API review; V15.1 (no SDK found on this workstation), V17, V18 and V20 are not reviewed."
         ]
       },
       "implementation": {
-        "status": "not_implemented",
+        "status": "partial",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "One adapter: TiaMcp.Openness.V19, a separate net48 worker built against the installed V19 Openness SDK and kept out of TiaMcp.slnx; release bundles do not contain it. A Host started with --tia-version 19 uses it and advertises only the base tools and twelve read tools (tia_discover, tia_capabilities, tia_attach, tia_session_status, tia_start, tia_detach, project_open, project_inventory, software_inspect, block_read, type_read, tag_table_read) with V19 descriptions, and no prompts; every other tool is neither listed nor callable.",
+          "Read-only: no change, compile, save or archive route. project_open accepts only .ap19 (ProjectVersionUnsupported otherwise, never an upgrade); readOnly opens a secondary project, on which TIA refuses exports (ReadOnlyProject). block_read, type_read and tag_table_read return unchanged V19 SimaticML; their format options are refused (UnsupportedOnTiaVersion). software_inspect returns the V21 shape without technology objects, group paths and unit relations.",
+          "Object paths come from the V21 worker's ObjectIdentity, so a V19 path and the path of the same object after project_upgrade differ only in the /projects/<name> segment. Native XML is version-specific.",
+          "TIA V19 reads approved Openness applications from HKLM\\SOFTWARE\\Siemens\\Automation\\Openness\\19.0\\Whitelist, not the shared AllowList; V19 Debug builds register there (Register-DevOpennessWorker.ps1 -TiaVersion 19), and the Host's registration check follows --tia-version.",
+          "Opening a V19 project lets TIA's background indexer rewrite IM/SearchIndex files of the project; the adapter never saves.",
+          "V15.1, V17, V18 and V20 have no adapter."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.tia.v19-adapter.20261109"
+        ]
       },
       "availability": {
-        "status": "unsupported",
+        "status": "conditional",
         "reasons": [
-          "No implemented adapter."
+          "Needs TIA V19 with its Openness SDK and licenses, a source build of the V19 worker and a Host started with --tia-version 19; catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
-        "TIA V21 and authorized Windows user for native operations",
-        "Applicable native services and project protection state"
+        "TIA V19 with its Openness SDK and an authorized Windows user (Siemens TIA Openness group)",
+        "The V19 worker built from source and approved under TIA V19's own Openness key",
+        "A Host started with --tia-version 19"
       ],
       "acceptanceCriteria": [
         "AC-identity",

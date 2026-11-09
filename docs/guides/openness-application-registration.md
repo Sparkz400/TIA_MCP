@@ -102,3 +102,13 @@ Writing those HKLM entries needs permission. Grant it once, from an elevated Pow
 ```
 
 This creates only the `TiaMcp.Openness.V21.exe` application key and lets the current user read, create and set values in its subkeys, including entries TIA adds after "Yes to all". Any process running as that user can then allow its own executable under this name without a prompt, so do not grant it on shared or production engineering machines. Without the grant the build still succeeds and prints a warning. Release builds are not registered. A Debug build only replaces a bundle registration made by the script above if both resolve to the same worker path. Entries for deleted worktrees remain until an administrator removes them.
+
+### TIA V19 builds
+
+TIA V19 does not read the shared `AllowList` key. It keeps approved applications under its own version key,
+`HKEY_LOCAL_MACHINE\SOFTWARE\Siemens\Automation\Openness\19.0\Whitelist\<exe>\<entry>`, with the same `Path`,
+`DateModified` and `FileHash` values (observed on V19 Update 5, 9 November 2026: an entry under `AllowList` that
+matched the file still raised TIA's "Openness access" dialog, and "Yes to all" wrote the version key). Debug builds of
+the [read-only V19 adapter](../reference/tia-v19-adapter.md) (`TiaMcp.Openness.V19`) and of `scripts/native` tools that
+reference the single V19 assembly `Siemens.Engineering` therefore register with `-TiaVersion 19`.
+`-Grant` grants `TiaMcp.Openness.V19.exe` under the V19 key, and `-AllNativeTools` grants each V19 tool there too.

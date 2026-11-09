@@ -5,6 +5,8 @@
 The MCP client sends requests to the Windows .NET 10 Host over stdio. The Host
 routes supported native operations to isolated .NET Framework 4.8 workers:
 `TiaMcp.Openness.V21` for TIA Portal and `TiaMcp.Simulator.V8` for PLCSIM Advanced.
+A Host started with `--tia-version 19` runs the read-only `TiaMcp.Openness.V19` instead of the V21 worker and
+advertises only its read tools ([V19 adapter](../reference/tia-v19-adapter.md)); one Host serves one TIA version.
 Siemens assemblies come from the installed products; the repository does not
 redistribute them. Native operations depend on the installed options, supported
 targets, project state and usable licenses.

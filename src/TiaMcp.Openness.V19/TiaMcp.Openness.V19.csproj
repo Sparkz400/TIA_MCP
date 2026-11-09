@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Read-only TIA Portal V19 adapter (X12). Kept out of TiaMcp.slnx: it builds only where the V19 Openness SDK is
+       installed, while the solution must keep building on V21-only workstations. Build it explicitly:
+       dotnet build src/TiaMcp.Openness.V19/TiaMcp.Openness.V19.csproj -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
+    <TiaApiDirectory Condition="'$(TiaApiDirectory)' == ''">C:\Program Files\Siemens\Automation\Portal V19\PublicAPI\V19</TiaApiDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Protocol pieces shared with the V21 worker, compiled unchanged so both workers frame and refuse requests alike. -->
+    <Compile Include="../TiaMcp.Core/WorkerPipeWriter.cs" Link="Shared/WorkerPipeWriter.cs" />
+    <Compile Include="../TiaMcp.Core/Engineering/CanonicalJsonText.cs" Link="Shared/CanonicalJsonText.cs" />
+    <Compile Include="../TiaMcp.Openness.V21/CanonicalJson.cs" Link="Shared/CanonicalJson.cs" />
+    <Compile Include="../TiaMcp.Openness.V21/BridgeException.cs" Link="Shared/BridgeException.cs" />
+    <!-- Canonical object paths: a V19 path names the same object as the V21 path after an upgrade. -->
+    <Compile Include="../TiaMcp.Openness.V21/ObjectIdentity.cs" Link="Shared/ObjectIdentity.cs" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <Reference Include="Siemens.Engineering">
+      <HintPath>$(TiaApiDirectory)\Siemens.Engineering.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="CheckTiaApi" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(TiaApiDirectory)\Siemens.Engineering.dll')" Text="TIA V19 Openness is required. Set TiaApiDirectory to the installed PublicAPI\V19 directory. Siemens assemblies are never bundled." />
+  </Target>
+  <!-- Every rebuild changes the exe's hash and timestamp, which TIA treats as a new Openness application. -->
+  <Target Name="RegisterDevOpennessWorker" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+    <Exec Command="&quot;$(SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\..\..\scripts\Register-DevOpennessWorker.ps1&quot; -TiaVersion 19 -WorkerPath &quot;$(TargetPath)&quot;" IgnoreExitCode="true" StandardOutputImportance="low">
+      <Output TaskParameter="ExitCode" PropertyName="OpennessAllowListExitCode" />
+    </Exec>
+    <Warning Condition="'$(OpennessAllowListExitCode)' != '0'" Text="TIA will ask to allow this worker build. To stop that, run once in an elevated PowerShell: scripts\Register-DevOpennessWorker.ps1 -Grant" />
+  </Target>
+</Project>

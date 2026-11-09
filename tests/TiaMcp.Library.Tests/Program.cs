@@ -595,6 +595,25 @@ Test("CLI toolsets select named groups and refuse unknown, empty or repeated val
     try { ToolGroups.Advertised("unmapped_tool", null); throw new Exception("An unmapped tool was advertised."); }
     catch (InvalidOperationException error) when (error.Message.Contains("belongs to no --toolsets group")) { }
 });
+Test("CLI --tia-version 19 selects the read-only V19 worker and surface and refuses V21-only options", work =>
+{
+    Equal(21, HostOptions.Parse([]).TiaVersion);
+    Equal(true, HostOptions.Parse([]).WorkerPath.EndsWith("TiaMcp.Openness.V21.exe", StringComparison.Ordinal));
+    var v19 = HostOptions.Parse(["--tia-version", "19"]);
+    Equal(19, v19.TiaVersion); Equal(true, v19.WorkerPath.EndsWith("TiaMcp.Openness.V19.exe", StringComparison.Ordinal));
+    Equal(Path.GetFullPath(Path.Combine(work, "w.exe")), HostOptions.Parse(["--tia-version", "19", "--worker", Path.Combine(work, "w.exe")]).WorkerPath);
+    Equal(true, TiaVersionSurface.Advertised("block_read", v19) && TiaVersionSurface.Advertised("artifact_read", v19) && TiaVersionSurface.Advertised("feature_catalog", v19));
+    Equal(false, TiaVersionSurface.Advertised("change_prepare", v19) || TiaVersionSurface.Advertised("project_upgrade", v19) || TiaVersionSurface.Advertised("tia_create_scratch", v19));
+    Equal(true, TiaVersionSurface.Advertised("change_prepare", HostOptions.Parse([])));
+    Equal(12, TiaVersionSurface.V19Tools.Count);
+    foreach (var arguments in new[] { new[] { "--tia-version", "20" }, ["--tia-version", "19", "--tia-version", "19"], ["--tia-version", "19", "--component-qualification"],
+        ["--tia-version", "19", "--disable-library-integrate-apply"], ["--tia-version", "19", "--addin-handoff"], ["--tia-version", "19", "--translation-qualification"] })
+    {
+        try { HostOptions.Parse(arguments); }
+        catch (ArgumentException error) when (error.Message.Contains("--tia-version")) { continue; }
+        throw new Exception("Accepted " + string.Join(' ', arguments));
+    }
+});
 Test("CLI combined library_integrate apply is on by default, the old flag is a no-op and the opt-out turns it off", work =>
 {
     Equal(true, HostOptions.Parse([]).LibraryIntegrateApply);

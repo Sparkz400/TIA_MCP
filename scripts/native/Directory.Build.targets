@@ -1,9 +1,14 @@
 <Project>
   <!-- Fixture seeders and probes attach to TIA through Openness. An unregistered build makes TIA ask for access,
-       and an unattended run then waits forever (LibraryUnitSeeder, 28 October 2026). Register each Debug build like the worker. -->
+       and an unattended run then waits forever (LibraryUnitSeeder, 28 October 2026). Register each Debug build like the worker.
+       A tool that references the single V19 assembly (Siemens.Engineering) is registered under TIA V19's own key. -->
   <Target Name="RegisterDevOpennessTool" AfterTargets="Build"
-          Condition="'$(Configuration)' == 'Debug' and '$(OutputType)' == 'Exe' and '@(Reference->AnyHaveMetadataValue('Identity', 'Siemens.Engineering.Base'))' == 'true'">
-    <Exec Command="&quot;$(SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)..\Register-DevOpennessWorker.ps1&quot; -WorkerPath &quot;$(TargetPath)&quot;" IgnoreExitCode="true" StandardOutputImportance="low">
+          Condition="'$(Configuration)' == 'Debug' and '$(OutputType)' == 'Exe' and ('@(Reference->AnyHaveMetadataValue('Identity', 'Siemens.Engineering.Base'))' == 'true' or '@(Reference->AnyHaveMetadataValue('Identity', 'Siemens.Engineering'))' == 'true')">
+    <PropertyGroup>
+      <OpennessToolTiaVersion>21</OpennessToolTiaVersion>
+      <OpennessToolTiaVersion Condition="'@(Reference->AnyHaveMetadataValue('Identity', 'Siemens.Engineering'))' == 'true'">19</OpennessToolTiaVersion>
+    </PropertyGroup>
+    <Exec Command="&quot;$(SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)..\Register-DevOpennessWorker.ps1&quot; -TiaVersion $(OpennessToolTiaVersion) -WorkerPath &quot;$(TargetPath)&quot;" IgnoreExitCode="true" StandardOutputImportance="low">
       <Output TaskParameter="ExitCode" PropertyName="OpennessAllowListExitCode" />
     </Exec>
     <Warning Condition="'$(OpennessAllowListExitCode)' != '0'" Text="TIA will ask to allow $(TargetFileName), and an unattended run waits for that answer. Run once in an elevated PowerShell: scripts\Register-DevOpennessWorker.ps1 -Grant -AllNativeTools" />

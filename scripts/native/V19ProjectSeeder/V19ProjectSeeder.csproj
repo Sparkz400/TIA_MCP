@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Creates owned TIA V19 fixture projects for the V19 adapter and V19-to-V21 upgrade qualification. Needs TIA V19 and its Openness SDK. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net48</TargetFramework><PlatformTarget>x64</PlatformTarget>
+    <Nullable>disable</Nullable><ImplicitUsings>disable</ImplicitUsings><LangVersion>latest</LangVersion>
+    <TiaApiDirectory Condition="'$(TiaApiDirectory)' == ''">C:\Program Files\Siemens\Automation\Portal V19\PublicAPI\V19</TiaApiDirectory>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <Reference Include="Siemens.Engineering"><HintPath>$(TiaApiDirectory)\Siemens.Engineering.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

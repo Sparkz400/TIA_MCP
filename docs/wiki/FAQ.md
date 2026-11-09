@@ -4,11 +4,13 @@ Only for native work: opening projects, fresh exports, compiling, applying chang
 
 ## Which versions are supported?
 
-TIA Portal **V21** with Openness and PLCSIM Advanced **V8**. Other versions are not supported. Older projects (V14–V20) can be upgraded to V21 on an owned copy with `project_upgrade`; the source is never opened, V13 and older are refused, and projects with device types V21 no longer supports fail the upgrade ([project upgrades](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#project-copies-upgrades-read-only-open-and-plc-compare)).
+TIA Portal **V21** with Openness and PLCSIM Advanced **V8**. Older projects (V14–V20) can be upgraded to V21 on an owned copy with `project_upgrade`; the source is never opened, V13 and older are refused, and projects with device types V21 no longer supports fail the upgrade ([project upgrades](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#project-copies-upgrades-read-only-open-and-plc-compare)).
+
+TIA Portal **V19** has a separate read-only adapter: a Host started with `--tia-version 19` opens `.ap19` projects or attaches to a running V19 Portal and reads inventory, blocks, data types and tag tables, but never changes them. It is built from source and not part of the release bundles ([V19 adapter](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/tia-v19-adapter.md)). Other versions have no adapter.
 
 Installed SDKs alone do not extend these support claims. The
 [workstation inventory](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/release-readiness-20261103.md)
-records available CFC/DCC and V19 prerequisites and the native qualification still needed.
+records the available CFC/DCC prerequisites and the native qualification still needed.
 
 ## Can I use it on a production PLC or plant?
 

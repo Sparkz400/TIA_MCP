@@ -61,9 +61,10 @@ internal static class ToolSurface
         foreach (var tool in tools.ToArray())
         {
             var name = tool.ProtocolTool.Name;
-            if (!ToolGroups.Advertised(name, options.Toolsets)) { tools.Remove(tool); continue; }
+            if (!ToolGroups.Advertised(name, options.Toolsets) || !TiaVersionSurface.Advertised(name, options)) { tools.Remove(tool); continue; }
             tool.ProtocolTool.Title = ToolTitles.All.TryGetValue(name, out var title) ? title
                 : throw new InvalidOperationException("Tool " + name + " has no title; add one to ToolTitles.");
+            if (TiaVersionSurface.Description(name, options) is { } description) tool.ProtocolTool.Description = description;
             // JsonElement has an unconstrained SDK schema. Clients must see the same
             // object contract that ObjectArguments enforces at the Host boundary.
             string? objectArgument = name == "change_prepare" ? "payload"
@@ -80,7 +81,8 @@ internal static class ToolSurface
         }
         var prompts = server.PromptCollection!;
         foreach (var prompt in prompts.ToArray())
-            if (options.Toolsets is { } selected && !TiaPrompts.Groups[prompt.ProtocolPrompt.Name].All(group => selected.Contains(group)))
+            // The prompts guide V21 workflows (changes, libraries, runtime); a V19 Host has none.
+            if (options.TiaVersion == 19 || options.Toolsets is { } selected && !TiaPrompts.Groups[prompt.ProtocolPrompt.Name].All(group => selected.Contains(group)))
                 prompts.Remove(prompt);
     }
 

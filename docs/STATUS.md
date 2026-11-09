@@ -1,13 +1,13 @@
 # Current status
 
 TIA MCP is pre-1.0; use it only with offline projects, copies, scratch projects and
-simulators you own (see the [README](../README.md)). Catalog and backlog reviewed on 3 November 2026:
+simulators you own (see the [README](../README.md)). Counts from catalog `0.4.173` (9 November 2026); backlog reviewed on 3 November:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.159`: 492 features, 476 verified, 16 unverified; 331 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 133 shipped, 339 limited, 6 unqualified, 12 unavailable on V21, 2 deferred |
-| Matrix cells | 2,166 bound, **28 open**, 72 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.4.173` (9 November): 493 features, 474 verified, 19 unverified; 331 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 133 shipped, 341 limited, 6 unqualified, 12 unavailable on V21, 1 deferred |
+| Matrix cells | 2,175 bound, **28 open**, 72 blocked, 3 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted; backlog reconciled on 3 November against catalog `0.4.130` ([ledger](plans/release-obligations-20261015.md), [acceptance rules](plans/release-acceptance.md), [review](verification/release-readiness-20261103.md)) |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
@@ -20,8 +20,10 @@ candidate. These additions do not promote native qualification or release accept
 Fresh local completion evidence: [2 November checks and exact prerequisites](verification/local-completion-20261102.md). The recovered vendor inputs, one V20 upgrade and the production FBD OB route now have fresh proof; this does not close the release ledger.
 
 [3 November workstation review](verification/release-readiness-20261103.md): CFC/DCC V21 public
-APIs and a V19 Portal/SDK are installed here. Their license, adapter and native qualification gates
-remain open. Earlier statements that these products are absent describe a different workstation.
+APIs and a V19 Portal/SDK are installed on the maintainer's second workstation. Since 9 November a
+read-only V19 adapter (Host `--tia-version 19`) and V19-to-V21 upgrades are qualified there
+([record](verification/tia-v19-adapter-20261109.md)); the CFC/DCC adapters and qualification remain open.
+Earlier statements that these products are absent describe a different workstation.
 
 ## What is open
 
@@ -38,7 +40,7 @@ names every row with an open cell.
 - **External prerequisites:** the VMware guest, other HMI targets, a physical PLC (B05), optional products and licenses such
   as SiVArc, Test Suite execution prerequisites and the licensed AX
   trace package (B04), a native trace route (B06), nonproduction Project Server, Teamcenter and
-  UMC endpoints (B10), and installations and SDKs of other TIA versions (B11).
+  UMC endpoints (B10), and installations and SDKs of other TIA versions (B11; V19 has a read-only adapter).
 - **Recorded V21 boundaries:** no public API forces a value (only the TIA Portal UI does), the
   station upload's TLS challenges offer no certificate (trusted unauthenticated for owned PLCSIM only), an OPC UA reference-namespace import crashes TIA,
   force-table rows can only be authored in the
@@ -56,7 +58,7 @@ names every row with an open cell.
   rows) are blocked and do not count toward 1.0 (decision
   of 29 October, the last seven on 1 November; each row's disposition is in the ledger). The three block-protection kinds
   left the blocked set: their credential route was built and verified on 30 October.
-- **Deferred rows:** two `not_implemented` rows (6 cells) are not open cells but stay 1.0
+- **Deferred rows:** one `not_implemented` row (`drives.engineering`, 3 cells) is not an open cell but stays 1.0
   work ([TODO](TODO.md#deferred-rows)).
 - **Release mechanics:** product version 0.9.0 from one source, a CHANGELOG, a draft-only
   release workflow and the 30 October security review are in place, and the contract freeze policy was accepted on 8 November;
