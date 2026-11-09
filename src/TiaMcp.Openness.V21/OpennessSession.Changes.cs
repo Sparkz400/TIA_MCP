@@ -537,7 +537,17 @@ namespace TiaMcp.Openness.V21
                             if (change.Kind == "graphical_operand_set")
                                 EngineeringSources.SetGraphicalOperand(document, networkId, ChangeText(payload, "accessUid", 32), ChangeStringArray(payload, "components", 128, 128));
                             else if (change.Kind == "graphical_network_patch")
+                            {
+                                var originalUids = new HashSet<string>(document.Descendants("SW.Blocks.CompileUnit").Where(e => (string)e.Attribute("ID") == networkId)
+                                    .Descendants().Where(e => e.Name.LocalName != "IdentCon" && e.Name.LocalName != "NameCon").Attributes("UId").Select(a => a.Value), StringComparer.Ordinal);
                                 EngineeringSources.PatchGraphicalNetwork(document, networkId, ChangeStringArray(payload, "upsertXml", 500, 1024 * 1024, true), ChangeStringArray(payload, "removeUids", 500, 32, true));
+                                // Opt-in: predict V21's renumbering so added/removed nodes can read back exactly; the readback check is unchanged.
+                                if (payload.Value<bool?>("renumberUids") == true)
+                                {
+                                    preview["uidRenumbering"] = GraphicalUidRenumbering.Predict(document, networkId, originalUids);
+                                    ((JArray)preview["warnings"]).Add("renumberUids applied V21's predicted UId renumbering (uidRenumbering). It is not natively qualified for patches: a wrong prediction fails closed with NativePreservationMismatch after apply and needs checkpoint recovery. Try it on a project_copy first.");
+                                }
+                            }
                             else if (change.Kind == "call_parameter_set")
                                 EngineeringSources.SetCallParameterOperand(document, networkId, ChangeText(payload, "callUid", 32), ChangeText(payload, "parameterName", 128), ChangeStringArray(payload, "components", 128, 128));
                             else EngineeringSources.SetGraphicalCallConnection(document, networkId, ChangeText(payload, "callUid", 32), ChangeText(payload, "parameterName", 128), ChangeText(payload, "targetAccessUid", 32));

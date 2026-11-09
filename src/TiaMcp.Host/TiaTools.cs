@@ -44,9 +44,9 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
     public Task<CallToolResult> Detach(CancellationToken cancellationToken) => Call("detach", null, cancellationToken);
 
     [McpServerTool(Name = "project_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Inspect the attached offline project: PLCs, blocks and hardware. Returns bounded results and explicit completeness. Does not connect to a PLC.")]
-    public Task<CallToolResult> Inventory(CancellationToken cancellationToken, string? projectName = null, int maxItems = 200)
-        => Call("project_inventory", new { projectName, maxItems = Limit(maxItems) }, cancellationToken);
+    [Description("Inspect the attached offline project: PLCs, blocks and hardware. Returns bounded results and explicit completeness. Does not connect to a PLC. Filters for large projects: groupPath (block group names from the top, e.g. \"Station 3000/Downholder\", or a group path from software_inspect) and namePrefix (case-insensitive block name prefix) select blocks; includeHardware=false omits device rows, which otherwise also count. With a filter only matching rows count against maxItems.")]
+    public Task<CallToolResult> Inventory(CancellationToken cancellationToken, string? projectName = null, int maxItems = 200, string? groupPath = null, string? namePrefix = null, bool includeHardware = true)
+        => Call("project_inventory", new { projectName, maxItems = Limit(maxItems), groupPath, namePrefix, includeHardware }, cancellationToken);
 
     [McpServerTool(Name = "project_properties", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Read the open project's metadata (author, comment, copyright, family, version, times, size, modified/primary state), used products, history entries, language settings (supported, active, reference, editing) and text categories. Each list is bounded by maxItems with explicit truncation. Change attributes and languages with change_prepare kinds project_attributes_set and project_languages_set.")]
@@ -54,22 +54,39 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
         => Call("project_properties", new { projectName, maxItems = Limit(maxItems) }, cancellationToken);
 
     [McpServerTool(Name = "block_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Export an offline block as original Siemens XML and inspect its metadata. Use qualified paths from project_inventory when names are ambiguous. Optional format: simaticSd exports native SIMATIC SD documents; generatedSource generates its SCL/STL/DB external source file without dependencies and needs a writable offline project, because any external source the generation leaves is deleted. Writes uniquely named, SHA-256 hashed local artifacts only; no project changes.")]
-    public Task<CallToolResult> BlockRead(CancellationToken cancellationToken, string? blockPath = null, string? blockName = null,
-        string? plcPath = null, string? projectName = null, string? scopePath = null, string? format = null)
+    [Description("Export an offline block as original Siemens XML and inspect its metadata. Use qualified paths from project_inventory when names are ambiguous. Optional format: simaticSd exports native SIMATIC SD documents; generatedSource generates its SCL/STL/DB external source file without dependencies and needs a writable offline project, because any external source the generation leaves is deleted. Writes uniquely named, SHA-256 hashed local artifacts only; no project changes. render=text adds each network as readable text (networks[], text): LAD/FBD contacts and boxes as Boolean expressions, coils, instructions and calls with pin bindings; optional culture picks title/comment language. Inline xml is returned up to 64 KiB and never with render=text, unless includeXml=true (up to 512 KiB); the artifact always holds the full export.")]
+    public async Task<CallToolResult> BlockRead(CancellationToken cancellationToken, string? blockPath = null, string? blockName = null,
+        string? plcPath = null, string? projectName = null, string? scopePath = null, string? format = null, string? render = null, string? culture = null, bool includeXml = false)
     {
         RequireBlock(blockPath, blockName);
-        return Call("block_read", new { projectName, plcPath, blockPath, blockName, scopePath, format,
+        if (render is not (null or "text")) throw new McpException("render accepts only text.");
+        var result = await Call("block_read", new { projectName, plcPath, blockPath, blockName, scopePath, format, render, culture,
             artifactDirectory = Path.Combine(options.ArtifactsDirectory, "exports") }, cancellationToken);
+        return includeXml ? result : WithoutLargeXml(result, render == "text");
+    }
+
+    /// <summary>Inline XML is a large, hard-to-read duplicate of the export artifact; keep it only when small and no text rendering was asked for.</summary>
+    internal const int InlineXmlLimit = 64 * 1024;
+    private static CallToolResult WithoutLargeXml(CallToolResult result, bool rendered)
+    {
+        if (result.IsError == true || result.StructuredContent is not JsonElement content || content.ValueKind != JsonValueKind.Object
+            || !content.TryGetProperty("xml", out var xml) || xml.ValueKind != JsonValueKind.String) return result;
+        int characters = xml.GetString()!.Length;
+        if (!rendered && characters <= InlineXmlLimit) return result;
+        var node = System.Text.Json.Nodes.JsonNode.Parse(content.GetRawText())!.AsObject();
+        node.Remove("xml");
+        node["xmlOmitted"] = new System.Text.Json.Nodes.JsonObject { ["characters"] = characters,
+            ["reason"] = rendered ? "render=text" : "larger than 64 KiB", ["read"] = "artifact.path with artifact_read, or block_read includeXml=true" };
+        return Result(node.ToJsonString(BridgeProtocol.Json), false);
     }
 
     [McpServerTool(Name = "xref_query", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Read native TIA cross-references for an offline block, including call/read/write locations where supplied by Siemens. Member references may have text only; unresolved coverage is reported.")]
+    [Description("Read native TIA cross-references for an offline block, including call/read/write locations where supplied by Siemens. Member references may have text only; unresolved coverage is reported. memberPath (relative to the block, e.g. Real[210], Real[200..220] or Station.Downholder.Enable) returns only locations of those members or elements, each with memberMatch: exact (member or constant index in range), indirect (variable index), wholeArray (array used without index) or container (containing structure or the whole block used); only matches take maxItems, and complete=true with no exact rows means no constant-index use.")]
     public Task<CallToolResult> CrossReferences(CancellationToken cancellationToken, string? blockPath = null, string? blockName = null,
-        string? plcPath = null, string? projectName = null, int maxItems = 200, string? scopePath = null)
+        string? plcPath = null, string? projectName = null, int maxItems = 200, string? scopePath = null, string? memberPath = null)
     {
         RequireBlock(blockPath, blockName);
-        return Call("xref_query", new { projectName, plcPath, blockPath, blockName, scopePath, maxItems = Limit(maxItems) }, cancellationToken);
+        return Call("xref_query", new { projectName, plcPath, blockPath, blockName, scopePath, memberPath, maxItems = Limit(maxItems) }, cancellationToken);
     }
 
     [McpServerTool(Name = "tia_create_scratch", Destructive = false, OpenWorld = false)]

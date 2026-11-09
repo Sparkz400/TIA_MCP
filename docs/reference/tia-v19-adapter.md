@@ -51,9 +51,9 @@ V19 descriptions; every other tool is neither listed nor callable, and no prompt
 | `tia_start` | A worker-owned V19 instance without UI; detaching disposes it without saving. |
 | `tia_capabilities` | `tiaVersion: 19`, the API assembly version, `readOnly: true` and the implemented `operations`. |
 | `project_open` | An existing `.ap19` file in an empty worker-owned instance. Any other extension is `ProjectVersionUnsupported`; there is no upgrade. `readOnly: true` opens a secondary project, on which TIA also refuses exports. |
-| `project_inventory` | Devices with address ranges, PLCs and blocks, including software and safety units and generated system groups. |
-| `software_inspect` | The V21 shape (`softwareScopes`, `blocks`, `tagTables` with tags and constants, `types`) without technology objects, group paths and unit relations. |
-| `block_read`, `type_read`, `tag_table_read` | Unchanged native SimaticML export with SHA-256 (V19 schema). The `format` options (`simaticSd`, `generatedSource`) are refused with `UnsupportedOnTiaVersion`. |
+| `project_inventory` | Devices with address ranges, PLCs and blocks, including software and safety units and generated system groups. The V21 filters `groupPath`, `namePrefix` and `includeHardware: false` are refused with `UnsupportedOnTiaVersion`. |
+| `software_inspect` | The V21 shape (`softwareScopes`, `blocks`, `tagTables` with tags and constants, `types`) without technology objects, group paths and unit relations. The V21 filters `groupPath` and `namePrefix` are refused with `UnsupportedOnTiaVersion`. |
+| `block_read`, `type_read`, `tag_table_read` | Unchanged native SimaticML export with SHA-256 (V19 schema). The `format` options (`simaticSd`, `generatedSource`) and the text rendering options `render` and `culture` are refused with `UnsupportedOnTiaVersion`. |
 
 A worker operation the adapter does not implement is refused with `UnsupportedOnTiaVersion` before any native call.
 
