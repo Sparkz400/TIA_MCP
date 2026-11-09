@@ -5,12 +5,15 @@ if (-not $SkipBuild) { & (Join-Path $PSScriptRoot 'Build.ps1') -Configuration $C
 Push-Location $repoRoot
 $previousTemp = $env:TEMP
 $previousTmp = $env:TMP
+$previousPythonUtf8 = $env:PYTHONUTF8
 try {
     # Keep test scratch paths short and writable, including restricted build agents.
     $testTemp = if ($TestTempDirectory) { [IO.Path]::GetFullPath($TestTempDirectory) } else { Join-Path $repoRoot 'artifacts/test-temp' }
     New-Item -ItemType Directory -Path $testTemp -Force | Out-Null
     $env:TEMP = $testTemp
     $env:TMP = $testTemp
+    # Python must read the repository's UTF-8 files the same way on a German (cp1252) Windows as on CI.
+    $env:PYTHONUTF8 = '1'
     & (Join-Path $PSScriptRoot 'Test-Deployment.ps1')
     & (Join-Path $PSScriptRoot 'Test-OpennessRegistrationLogic.ps1')
     & (Join-Path $PSScriptRoot 'Test-TiaOpennessRegistration.ps1')
@@ -112,5 +115,6 @@ try {
 } finally {
     $env:TEMP = $previousTemp
     $env:TMP = $previousTmp
+    $env:PYTHONUTF8 = $previousPythonUtf8
     Pop-Location
 }
