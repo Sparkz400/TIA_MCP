@@ -138,7 +138,12 @@ internal static class PackageStorage
         if (!OperatingSystem.IsWindows())
         { if (Directory.Exists(source)) Directory.Move(source, destination); else File.Move(source, destination, replace); return; }
         if (!MoveFileEx(@"\\?\" + Path.GetFullPath(source), @"\\?\" + Path.GetFullPath(destination), (replace ? 1u : 0u) | 8u))
-            throw new IOException("The path could not be renamed.", Marshal.GetHRForLastWin32Error());
+        {
+            int result = Marshal.GetHRForLastWin32Error();
+            // Access denied keeps File.Move's exception type, so callers see the same failure on either rename.
+            throw result == unchecked((int)0x80070005) ? new UnauthorizedAccessException("The path could not be renamed.") { HResult = result }
+                : new IOException("The path could not be renamed.", result);
+        }
     }
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, EntryPoint = "MoveFileExW", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
