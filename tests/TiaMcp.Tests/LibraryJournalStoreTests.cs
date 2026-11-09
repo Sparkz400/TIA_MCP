@@ -32,6 +32,18 @@ internal static class LibraryJournalStoreTests
         await Check.ThrowsAsync<InvalidDataException>(() => Task.FromResult(LibraryJournalStore.Read(files.Journal, "lib-fixture")));
     }
 
+    internal static async Task LargeClosureJournalFits()
+    {
+        using var files = new Fixture();
+        // A 1,000-version publish wrote 8.07 MB indented and then overflowed the old 8 MiB bound after its native change.
+        var record = Record(); record["result"] = new string('x', 10 * 1024 * 1024);
+        LibraryJournalStore.Write(files.Journal, record);
+        Check.Equal(record.ToString(Formatting.None), LibraryJournalStore.Read(files.Journal, "lib-fixture").ToString(Formatting.None));
+        Check.Equal(true, LibraryJournalStore.Size(record) <= LibraryJournalStore.MaxBytes / 2 + 1024);
+        record["result"] = new string('x', LibraryJournalStore.MaxBytes);
+        await Check.ThrowsAsync<InvalidDataException>(() => { LibraryJournalStore.Write(files.Journal, record); return Task.CompletedTask; });
+    }
+
     internal static async Task DurableClaimNoReplay()
     {
         using var files = new Fixture();

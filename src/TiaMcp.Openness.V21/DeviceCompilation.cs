@@ -76,12 +76,15 @@ namespace TiaMcp.Openness.V21
 
         internal static JObject Describe(CompilerResult result, string target)
         {
-            var messages = new JArray(); bool truncated = false; int visited = 0;
+            var messages = new JArray(); bool truncated = false; int visited = 0, omitted = 0;
             Action<IEnumerable<CompilerResultMessage>, int> collect = null;
             collect = (items, depth) => {
                 if (depth > 64) { truncated = true; return; }
                 foreach (var item in items)
                 {
+                    // One "Block was successfully compiled." row per block: past the budget, childless Success and Information rows
+                    // are counted, not listed; any other row past it still truncates, so a 1,000-block compile is complete only without findings there.
+                    if (visited >= 500 && (item.State.ToString() == "Success" || item.State.ToString() == "Information") && !item.Messages.Any()) { omitted++; continue; }
                     if (visited++ >= 500) { truncated = true; return; }
                     messages.Add(new JObject { ["description"] = item.Description, ["path"] = item.Path, ["state"] = item.State.ToString(), ["depth"] = depth });
                     collect(item.Messages, depth + 1);
@@ -90,7 +93,7 @@ namespace TiaMcp.Openness.V21
             };
             collect(result.Messages, 0);
             return new JObject { ["target"] = target, ["state"] = result.State.ToString(), ["errorCount"] = result.ErrorCount,
-                ["warningCount"] = result.WarningCount, ["messages"] = messages, ["messagesTruncated"] = truncated };
+                ["warningCount"] = result.WarningCount, ["messages"] = messages, ["messagesTruncated"] = truncated, ["omittedSuccessRows"] = omitted };
         }
 
         internal static void RequireTargets(Project project, IEnumerable<string> expected) => RequireTargets(Entries(project), expected);

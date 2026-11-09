@@ -174,7 +174,7 @@ internal static partial class Program
         var path = Path.Combine(root, "journal.json");
         var records = new[] { new Newtonsoft.Json.Linq.JObject { ["data"] = new string('a', 4096) },
             new Newtonsoft.Json.Linq.JObject { ["data"] = new string('b', 8192) } };
-        var versions = records.Select(record => record.ToString(Newtonsoft.Json.Formatting.Indented)).ToArray();
+        var versions = records.Select(record => record.ToString(Newtonsoft.Json.Formatting.None)).ToArray();
         File.WriteAllText(path, versions[0]);
         Task writer = Task.CompletedTask;
         try

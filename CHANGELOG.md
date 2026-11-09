@@ -14,6 +14,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Added
 
+- **1,000-node library branching tree:** a tree of 1,000 FC types was released, its complete closure queried in a project and a global library, published and instantiated with a clean compile ([record](docs/verification/library-native-scale-20261027.md#1000-node-branching-tree-9-november-2026)).
 - **OB callers in every combination:** a PLC component installs into a startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB with LAD, an earlier placement and reuse in every combination; 24 more shapes passed natively and run in production ([record](docs/verification/component-ob-event-classes-20261108.md#fourth-run)).
 - **Drive motor projection:** change kind `drive_motor_configure` writes a motor's nameplate into one drive data set through Startdrive's `HardwareProjection`, with exact expected values, readback and checkpoint restore; qualified natively on a SINAMICS G220 ([record](docs/verification/drive-motor-configure-20261108.md)).
 - **Time-synchronised PLCSIM captures:** `runtime_capture`'s simulator source takes `TimespanSynchronized_C`, `_P` and `_CP` with `spanMilliseconds`; each sample processes exactly that CPU time before reading at the next sync point ([record](docs/verification/plcsim-timespan-capture-20261108.md)).
@@ -226,6 +227,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- **Large library publishes and compiles:** publishing a 1,000-version closure completed in TIA and then failed its next journal write at 8 MiB, leaving the change in `applying`. Library journals are now compact with a 32 MiB bound, and prepare refuses an oversized journal with `LibraryLimitExceeded` before any native change. A clean 1,000-block compile was refused because its success rows exceeded the 500-row diagnostic budget; surplus success rows are now counted in `omittedSuccessRows` ([record](docs/verification/library-native-scale-20261027.md#1000-node-branching-tree-9-november-2026)).
 - **Library upgrades hit TIA's path limit:** `library_upgrade` failed with `NativeLibraryError` for 18 of 22 DMC vendor archives because TIA refuses an upgraded library folder over 143 characters. The upgrade folders are shorter now, and prepare refuses a library that still would not fit with `LibraryPathTooLong`, before any copy ([record](docs/verification/library-vendor-workload-20261108.md)).
 - **Component installs into OBs of other event classes:** combined apply admitted any existing OB caller, though its evidence covered program-cycle OBs only. Another event class now stays plan-only until verified; startup and cyclic-interrupt OBs passed natively and run in production ([record](docs/verification/component-ob-event-classes-20261108.md)).
 - **VCI interruption check:** accept exact verified-callback reconciliation when Git finishes verification before the interrupted Host exits; earlier callbacks still require recovery.

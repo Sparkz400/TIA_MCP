@@ -82,6 +82,11 @@
         },
         "messagesTruncated": {
           "type": "boolean"
+        },
+        "omittedSuccessRows": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Childless Success and Information rows counted but not listed once 500 rows are listed; Error, Warning and parent rows are always listed."
         }
       },
       "required": [
@@ -127,6 +132,11 @@
         },
         "messagesTruncated": {
           "type": "boolean"
+        },
+        "omittedSuccessRows": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Childless Success and Information rows counted but not listed once 500 rows are listed; Error, Warning and parent rows are always listed."
         },
         "targetPath": {
           "type": "string",

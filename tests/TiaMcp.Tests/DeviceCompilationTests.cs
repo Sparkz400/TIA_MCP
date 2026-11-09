@@ -68,11 +68,19 @@ namespace TiaMcp.Tests
             Check.Equal(false, (bool)described["messagesTruncated"]!);
             foreach (int count in new[] { 500, 501 })
             {
-                result.Messages = Enumerable.Range(0, count).Select(_ => new CompilerResultMessage());
+                result.Messages = Enumerable.Range(0, count).Select(_ => new CompilerResultMessage { State = "Warning" });
                 described = DeviceCompilation.Describe(result, "/selected");
                 Check.Equal(500, ((JArray)described["messages"]!).Count);
                 Check.Equal(count > 500, (bool)described["messagesTruncated"]!);
             }
+            // 1,000 compiled blocks: success rows past 500 are counted, not listed; a finding past 500 still truncates.
+            result.Messages = Enumerable.Range(0, 1000).Select(_ => new CompilerResultMessage { State = "Success" });
+            described = DeviceCompilation.Describe(result, "/selected");
+            Check.Equal(500, ((JArray)described["messages"]!).Count);
+            Check.Equal(500, (int)described["omittedSuccessRows"]!);
+            Check.Equal(false, (bool)described["messagesTruncated"]!);
+            result.Messages = Enumerable.Range(0, 1000).Select(_ => new CompilerResultMessage { State = "Success" }).Append(new CompilerResultMessage { State = "Error" });
+            Check.Equal(true, (bool)DeviceCompilation.Describe(result, "/selected")["messagesTruncated"]!);
             var root = new CompilerResultMessage(); var last = root; result.Messages = [root];
             for (int i = 0; i < 66; i++) { var child = new CompilerResultMessage(); last.Messages = [child]; last = child; }
             described = DeviceCompilation.Describe(result, "/selected");
