@@ -351,6 +351,8 @@ internal static partial class Program
             ("Resolved change outcomes replay and unresolved ones block preparation", TagTableImportTests.ChangeLifecycleRules),
             ("Change restore refuses each pre-check before any native call", TagTableImportTests.RestorePreChecks),
             ("Intent decision log skips a half-written line", TagTableImportTests.DecisionLogSkipsTornLines),
+            ("Worker errors map only the exact Siemens security and license types", WorkerLoopTests.ErrorCodesMatchExactSiemensTypes),
+            ("Worker request lines refuse a partial frame at EOF", WorkerLoopTests.BoundedLineRefusesPartialFrames),
             ("UMAC role changes plan exact effects and preserve administrators", UmacRoleRulesTests.PlansExactEffectsAndPreservesAdministrators),
             ("Graphical fragments use the native default namespace", EngineeringSourcesTests.GraphicalFragmentsUseNativeDefaultNamespace),
             ("Native network insertion preserves existing units and checks IDs", EngineeringSourcesTests.NativeNetworkInsertionPreservesExistingUnitsAndChecksIds),

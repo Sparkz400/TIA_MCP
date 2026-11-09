@@ -17,7 +17,7 @@ using Siemens.Engineering.SW.Blocks;
 namespace TiaMcp.Openness.V21
 {
     /// <summary>All methods execute serially on the worker's STA thread. Online credential provisioning is restricted to verified owned local PLCSIM targets.</summary>
-    internal sealed partial class OpennessSession : IDisposable
+    internal sealed partial class OpennessSession : OpennessTraversal, IDisposable
     {
         private readonly string _apiDirectory;
         private TiaPortal _portal;
@@ -705,102 +705,18 @@ namespace TiaMcp.Openness.V21
         private Project SelectProject(JObject args)
         {
             EnsureAttached();
-            string name = args.Value<string>("projectName");
-            var matches = _portal.Projects.Where(p => string.IsNullOrWhiteSpace(name) || string.Equals(p.Name, name, StringComparison.Ordinal)).Take(2).ToList();
-            if (matches.Count == 0) throw new BridgeException("ProjectNotFound", "No matching open project was found.");
-            if (matches.Count != 1) throw new BridgeException("AmbiguousTarget", "More than one open project matches; specify projectName.");
-            return matches[0];
+            return SelectProject(_portal, args);
         }
 
-        private PlcSelection SelectPlc(JObject args)
-        {
-            var project = SelectProject(args);
-            string wanted = args.Value<string>("plcPath");
-            var budget = new ScanBudget(50000);
-            var matches = new List<PlcSelection>();
-            foreach (var entry in DeviceItems(project, budget))
-            {
-                var software = entry.Item.GetService<SoftwareContainer>()?.Software as PlcSoftware;
-                if (software == null) continue;
-                string path = entry.Path + "/plc/" + Segment(software.Name);
-                if (string.IsNullOrWhiteSpace(wanted) || string.Equals(path, wanted, StringComparison.Ordinal))
-                    matches.Add(new PlcSelection { Project = project, Software = software, Path = path });
-            }
-            if (budget.Truncated) throw new BridgeException("TraversalLimit", "PLC lookup reached its traversal limit; completeness cannot be established.");
-            if (matches.Count == 0) throw new BridgeException("PlcNotFound", "No matching PLC software was found.");
-            if (matches.Count != 1) throw new BridgeException("AmbiguousTarget", "More than one PLC matches; specify an exact plcPath from project_inventory.");
-            return matches[0];
-        }
+        private PlcSelection SelectPlc(JObject args) => SelectPlc(SelectProject(args), args);
 
         private BlockSelection SelectBlock(JObject args)
         {
             return CanonicalSelectBlock(args);
         }
 
-        private static IEnumerable<HardwareEntry> DeviceItems(Project project, ScanBudget budget)
-        {
-            string root = "/projects/" + Segment(project.Name);
-            foreach (var entry in Devices(project.Devices, root + "/devices", budget)) yield return entry;
-            foreach (var entry in Devices(project.UngroupedDevicesGroup.Devices, root + "/ungrouped", budget)) yield return entry;
-            foreach (var entry in DeviceGroups(project.DeviceGroups, root + "/groups", budget, 0)) yield return entry;
-        }
-
-        private static IEnumerable<HardwareEntry> DeviceGroups(IEnumerable<DeviceUserGroup> groups, string root, ScanBudget budget, int depth)
-        {
-            if (depth > 64) { budget.Truncated = true; yield break; }
-            foreach (var group in groups)
-            {
-                if (!budget.Take()) yield break;
-                string path = root + "/" + Segment(group.Name);
-                foreach (var entry in Devices(group.Devices, path + "/devices", budget)) yield return entry;
-                foreach (var entry in DeviceGroups(group.Groups, path + "/groups", budget, depth + 1)) yield return entry;
-            }
-        }
-
-        private static IEnumerable<HardwareEntry> Devices(IEnumerable<Device> devices, string root, ScanBudget budget)
-        {
-            foreach (var device in devices)
-            {
-                if (!budget.Take()) yield break;
-                foreach (var entry in Items(device.DeviceItems, root + "/" + Segment(device.Name), budget, 0)) yield return entry;
-            }
-        }
-
-        private static IEnumerable<HardwareEntry> Items(IEnumerable<DeviceItem> items, string root, ScanBudget budget, int depth)
-        {
-            if (depth > 64) { budget.Truncated = true; yield break; }
-            foreach (var item in items)
-            {
-                if (!budget.Take()) yield break;
-                string path = root + "/items/" + Segment(item.Name);
-                yield return new HardwareEntry { Item = item, Path = path };
-                foreach (var entry in Items(item.DeviceItems, path, budget, depth + 1)) yield return entry;
-            }
-        }
-
-        private static IEnumerable<BlockEntry> Blocks(PlcBlockGroup group, string root, ScanBudget budget, int depth = 0)
-        {
-            if (depth > 64) { budget.Truncated = true; yield break; }
-            foreach (var block in group.Blocks)
-            {
-                if (!budget.Take()) yield break;
-                yield return new BlockEntry { Item = block, Path = BlockObjectPath(root, block) };
-            }
-            foreach (var child in group.Groups)
-            {
-                if (!budget.Take()) yield break;
-                foreach (var block in Blocks(child, root + "/groups/" + Segment(child.Name), budget, depth + 1)) yield return block;
-            }
-        }
-
-        private static JObject BlockInfo(BlockEntry block, string plcPath) => new JObject { ["path"] = block.Path, ["plcPath"] = plcPath,
-            ["name"] = block.Item.Name, ["number"] = block.Item.Number, ["kind"] = block.Item.GetType().Name,
-            ["programmingLanguage"] = block.Item.ProgrammingLanguage.ToString(), ["isConsistent"] = block.Item.IsConsistent,
-            ["isKnowHowProtected"] = block.Item.IsKnowHowProtected };
-
         private static JObject ProjectInfo(Project project) => new JObject { ["name"] = project.Name, ["path"] = project.Path?.FullName };
         private JObject Envelope() => new JObject { ["origin"] = "TIA Portal V21 Openness/offline", ["observedAtUtc"] = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture), ["processId"] = _processId };
-        private static string Segment(string value) => Uri.EscapeDataString(value ?? "");
         private static Version ParseVersion(string version)
         {
             Version parsed;
@@ -808,21 +724,6 @@ namespace TiaMcp.Openness.V21
         }
         private void EnsureAttached() { if (_portal == null) throw new BridgeException("NotAttached", "Attach to or explicitly start a TIA V21 instance first."); }
         private void EnsureDetached() { if (_portal != null) throw new BridgeException("AlreadyAttached", "Detach the current session before attaching to or starting another instance."); }
-
-        private static int RequiredInteger(JObject args, string name)
-        {
-            if (args[name]?.Type != JTokenType.Integer || args.Value<long>(name) < 1 || args.Value<long>(name) > int.MaxValue)
-                throw new BridgeException("InvalidRequest", name + " must be a positive integer.");
-            return args.Value<int>(name);
-        }
-
-        private static int Limit(JObject args, int defaultValue)
-        {
-            if (args["maxItems"] == null) return defaultValue;
-            int value = RequiredInteger(args, "maxItems");
-            if (value > 2000) throw new BridgeException("InvalidRequest", "maxItems must be between 1 and 2000.");
-            return value;
-        }
 
         private static string ArtifactDirectory(JObject args)
         {
@@ -833,17 +734,6 @@ namespace TiaMcp.Openness.V21
             return path;
         }
 
-        private static JObject FileArtifact(FileInfo file, string mediaType = "application/xml")
-        {
-            string hash;
-            using (var stream = file.OpenRead())
-            using (var sha = SHA256.Create()) hash = BitConverter.ToString(sha.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
-            return new JObject { ["path"] = file.FullName, ["bytes"] = file.Length, ["sha256"] = hash, ["mediaType"] = mediaType };
-        }
-
-        private sealed class HardwareEntry { internal DeviceItem Item; internal string Path; }
-        private sealed class BlockEntry { internal PlcBlock Item; internal string Path; internal bool NativeSystemGroup; }
-        private sealed class PlcSelection { internal Project Project; internal PlcSoftware Software; internal string Path; }
         private sealed class BlockSelection { internal Project Project; internal string PlcPath; internal BlockEntry Block; }
     }
 }

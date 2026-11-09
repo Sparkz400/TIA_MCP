@@ -122,10 +122,5 @@ namespace TiaMcp.Openness.V21
             result["sourceSaved"] = false;
             return result;
         }
-
-        private static bool ProjectPathIsAbsolute(string path) => !string.IsNullOrWhiteSpace(path) &&
-            (Regex.IsMatch(path, "^[A-Za-z]:[\\\\/]") ||
-             path.StartsWith(@"\\", StringComparison.Ordinal) && !path.StartsWith(@"\\?\", StringComparison.Ordinal) && !path.StartsWith(@"\\.\", StringComparison.Ordinal) &&
-             path.Substring(2).Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries).Length >= 3);
     }
 }
