@@ -303,7 +303,7 @@ byte[] forgedEffectBytes = JsonSerializer.SerializeToUtf8Bytes(forgedEffect, Bri
 File.WriteAllBytes(Path.Combine(root, "hmi-component-reviews", forgedEffectId + ".json"), forgedEffectBytes);
 Reject(() => store.Page(forgedEffectId), "Rehashed invented effect result rejected", "ArtifactChanged");
 // Authored expected output is a literal edit of a retained original, not emitted by the production patcher.
-string repository = Directory.GetCurrentDirectory();
+string repository = AppContext.BaseDirectory; // the build output sits inside the checkout; the cwd need not
 while (!File.Exists(Path.Combine(repository, "fixtures/hmi/native-classic-screen.xml"))) repository = Directory.GetParent(repository)?.FullName ?? throw new Exception("Repository fixture unavailable.");
 byte[] originalScreen = File.ReadAllBytes(Path.Combine(repository, "fixtures/hmi/native-classic-screen.xml"));
 string screenText = new UTF8Encoding(false, true).GetString(originalScreen);

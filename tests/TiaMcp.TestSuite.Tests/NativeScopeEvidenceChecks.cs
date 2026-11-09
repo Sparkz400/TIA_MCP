@@ -16,7 +16,7 @@ internal static class NativeScopeEvidenceChecks
             try { action(); } catch (BridgeException e) when (e.Code == code) { checks++; return; }
             throw new Exception("Expected " + code);
         }
-        string root = Directory.GetCurrentDirectory();
+        string root = AppContext.BaseDirectory; // the build output sits inside the checkout; the cwd need not
         while (!Directory.Exists(Path.Combine(root, "fixtures", "testsuite", "native-owned-v21")))
             root = Directory.GetParent(root)?.FullName ?? throw new Exception("Retained genuine Test Suite fixtures are required.");
         string fixture = Path.Combine(root, "fixtures", "testsuite", "native-owned-v21");
