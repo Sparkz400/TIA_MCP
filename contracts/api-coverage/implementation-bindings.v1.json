@@ -2202,8 +2202,8 @@
     },
     {
       "path": "src/TiaMcp.Host/TiaVersionSurface.cs",
-      "sha256": "fa8b029bd4bad1404af815936d69fa347bf973b5578930f6ecc85a99d072ebd3",
-      "bytes": 4931
+      "sha256": "71e03891569f34065fa671678ec693243cfac4771aae2d46d16c97907bc85528",
+      "bytes": 4975
     },
     {
       "path": "src/TiaMcp.Host/ToolGroups.cs",
