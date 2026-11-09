@@ -52,12 +52,14 @@ namespace TiaMcp.Model
         internal static void RequireRequest(JObject payload)
         {
             if (payload == null || payload.Value<int?>("schemaVersion") != 1) throw new ArgumentException("HMI engineering requires payload.schemaVersion=1.");
-            var permitted = new HashSet<string>(new[] { "schemaVersion", "operation", "target", "expectedContentHash", "properties", "name", "dataType", "placement", "bindings", "connection", "plcTag", "xml", "composition", "itemType", "eventType", "script", "additionalScreens" }, StringComparer.Ordinal);
+            var permitted = new HashSet<string>(new[] { "schemaVersion", "operation", "target", "expectedContentHash", "properties", "name", "dataType", "placement", "bindings", "connection", "plcTag", "xml", "composition", "itemType", "eventType", "script", "additionalScreens", "inputReference" }, StringComparer.Ordinal);
             foreach (var property in payload.Properties())
                 if (!permitted.Contains(property.Name)) throw new ArgumentException("Unsupported HMI engineering field: " + property.Name);
             string operation = Text(payload, "operation");
             if (!Operations.Contains(operation, StringComparer.Ordinal)) throw new ArgumentException("Unknown HMI engineering operation.");
             if (operation != "classic_xml_import" && payload["xml"] != null) throw new ArgumentException("xml is not applicable to this operation.");
+            // Recorded by the Host when it inlined xmlRef; hash-bound with the preview, never interpreted.
+            if (payload["inputReference"] != null && (payload["xml"] == null || payload["inputReference"].Type != JTokenType.Object)) throw new ArgumentException("inputReference is recorded only with Host-inlined xml.");
             if (operation != "object_create" && payload["composition"] != null) throw new ArgumentException("composition is not applicable to this operation.");
             if (operation != "item_create" && payload["itemType"] != null) throw new ArgumentException("itemType is not applicable to this operation.");
             if (operation != "event_handler_set" && (payload["eventType"] != null || payload["script"] != null)) throw new ArgumentException("eventType and script are not applicable to this operation.");

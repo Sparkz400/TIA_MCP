@@ -18,6 +18,9 @@ public static class ChangeInputReference
     {
         ["source_upsert"] = ("sourceRef", "source"),
         ["block_import_xml"] = ("xmlRef", "xml"),
+        // Classic HMI imports carry one complete native export document in payload.xml.
+        ["hmi_classic_import"] = ("xmlRef", "xml"),
+        ["hmi_classic_screen_edit"] = ("xmlRef", "xml"),
     };
 
     /// <summary>Returns the payload unchanged unless it names a reference for its kind; a reference for another kind is refused.</summary>
@@ -28,8 +31,8 @@ public static class ChangeInputReference
         var supplied = Kinds.Values.Where(k => args.ContainsKey(k.Reference)).ToArray();
         if (supplied.Length == 0) return payload;
         if (!Kinds.TryGetValue(kind, out var names) || supplied.Any(k => k.Reference != names.Reference))
-            throw new BridgeException("InvalidRequest", "sourceRef is accepted only by source_upsert and xmlRef only by block_import_xml.");
-        if (args.ContainsKey(names.Inline)) throw new BridgeException("InvalidRequest", $"Use {names.Inline} or {names.Reference}, not both.");
+            throw new BridgeException("InvalidRequest", "sourceRef is accepted only by source_upsert, and xmlRef only by block_import_xml, hmi_classic_import and hmi_classic_screen_edit.");
+        if (args.ContainsKey(names.Inline) || args.ContainsKey("xmlArtifact")) throw new BridgeException("InvalidRequest", $"Use {names.Inline}, xmlArtifact or {names.Reference}, only one of them.");
         if (args.ContainsKey("inputReference")) throw new BridgeException("InvalidRequest", "inputReference is recorded by the Host and cannot be supplied.");
         string reference = args[names.Reference] is JsonValue value && value.TryGetValue(out string? text) && !string.IsNullOrWhiteSpace(text)
             ? text : throw new BridgeException("InvalidRequest", names.Reference + " must be a non-empty string.");

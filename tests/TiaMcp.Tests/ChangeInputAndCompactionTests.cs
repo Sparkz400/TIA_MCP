@@ -53,6 +53,30 @@ internal static class ChangeInputAndCompactionTests
         finally { Directory.Delete(root, true); }
     }
 
+    internal static async Task ClassicHmiXmlRefInlinesTheExportDocument()
+    {
+        var root = Directory.CreateTempSubdirectory("tiamcp-ref-").FullName;
+        try
+        {
+            var store = new ArtifactUploadStore(root);
+            const string xml = "<Document><Hmi.Tag.TagTable ID=\"0\"><AttributeList><Name>3000_TPortalBoxRetraction</Name></AttributeList></Hmi.Tag.TagTable></Document>";
+            string reference = store.Upload(Encoding.UTF8.GetBytes(xml), "tags.xml");
+            foreach (string kind in new[] { "hmi_classic_import", "hmi_classic_screen_edit" })
+            {
+                var resolved = JsonNode.Parse(ChangeInputReference.Resolve(kind,
+                    Payload(new { schemaVersion = 1, operation = "classic_xml_import", xmlRef = reference, expectedContentHash = new string('a', 64) }), root, store.ResolveCommitted).GetRawText())!;
+                Check.Equal(xml, resolved["xml"]!.GetValue<string>());
+                Check.Equal(null, resolved["xmlRef"]);
+                Check.Equal("xml", resolved["inputReference"]!["field"]!.GetValue<string>());
+                Check.Equal(1, resolved["schemaVersion"]!.GetValue<int>());
+            }
+            await Check.BridgeError("InvalidRequest", () => Run(() => ChangeInputReference.Resolve("hmi_classic_import",
+                Payload(new { xmlRef = reference, xmlArtifact = new { path = "a", sha256 = new string('a', 64) } }), root, store.ResolveCommitted)));
+            await Check.BridgeError("InvalidRequest", () => Run(() => ChangeInputReference.Resolve("hmi_engineering", Payload(new { xmlRef = reference }), root, store.ResolveCommitted)));
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
     internal static async Task InputReferencesAreBoundedAndExclusive()
     {
         var root = Directory.CreateTempSubdirectory("tiamcp-ref-").FullName;

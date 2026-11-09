@@ -371,6 +371,7 @@ internal static partial class Program
             ("Project upgrade reconciliation trusts only a completed receipt of the admitted source at the observed layout", ProjectUpgradeRulesTests.ReceiptProvesOnlyACompletedUpgradeAtTheLayout),
             ("Change input sourceRef inlines an artifact-directory file and records its SHA-256", ChangeInputAndCompactionTests.SourceRefInlinesArtifactFileWithHash),
             ("Change input xmlRef inlines a committed upload", ChangeInputAndCompactionTests.XmlRefInlinesCommittedUpload),
+            ("Change input xmlRef inlines a Classic HMI export for hmi_classic_import and hmi_classic_screen_edit", ChangeInputAndCompactionTests.ClassicHmiXmlRefInlinesTheExportDocument),
             ("Change input references stay inside the artifact directory, bounded, UTF-8 and exclusive of inline text", ChangeInputAndCompactionTests.InputReferencesAreBoundedAndExclusive),
             ("Change results are summarized with compile counts, introduced findings and artifact paths", ChangeInputAndCompactionTests.ChangeViewsAreSummarized),
             ("Change status journals are summarized", ChangeInputAndCompactionTests.ChangeStatusJournalsAreSummarized),

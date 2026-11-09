@@ -59,6 +59,13 @@ static class ClassicScreenWorkflowTests
             try { lease.Get<int>("failure", () => throw new InvalidOperationException()); } catch (InvalidOperationException) { }
             Assert(lease.Get("failure", Read) == 4);
         });
+        check("Host-inlined xmlRef keeps its inputReference record; a record without xml or of another shape is refused", () => {
+            var payload = Payload(); payload["inputReference"] = new JObject { ["field"] = "xml", ["reference"] = "upload:x", ["origin"] = "upload", ["bytes"] = 1, ["sha256"] = new string('a', 64) };
+            HmiEngineeringRules.RequireRequest(payload); HmiEngineeringRules.RequireKind("hmi_classic_screen_edit", payload);
+            var withoutXml = (JObject)payload.DeepClone(); withoutXml.Remove("xml"); Reject(() => HmiEngineeringRules.RequireRequest(withoutXml));
+            var wrongShape = (JObject)payload.DeepClone(); wrongShape["inputReference"] = "upload:x"; Reject(() => HmiEngineeringRules.RequireRequest(wrongShape));
+            var unresolved = (JObject)payload.DeepClone(); unresolved.Remove("inputReference"); unresolved["xmlRef"] = "upload:x"; Reject(() => HmiEngineeringRules.RequireRequest(unresolved));
+        });
         check("Batches accept eight distinct screen identities and reject nine", () => {
             var payload = Payload(); var extra = new JArray(); payload["additionalScreens"] = extra;
             for (int i=1;i<8;i++) { var member = Payload(); ((JObject)member["target"])["objectPath"] = "/hmi/screens/Other"+i; extra.Add(new JObject { ["target"] = member["target"].DeepClone(), ["xml"] = member["xml"].DeepClone() }); }
