@@ -6,8 +6,8 @@ $buildRoot = Join-Path $repoRoot ('artifacts/deployment-build/' + [Guid]::NewGui
 New-Item -ItemType Directory -Path $buildRoot -Force | Out-Null
 # Copy source into a unique tree: running clients and other chats may hold the
 # normal bin/obj outputs open. Record exact input bytes, never copy those outputs.
-$inputs = @(Get-ChildItem -LiteralPath $repoRoot -File | Where-Object { $_.Name -match '\.(slnx|props|targets)$|^NuGet\.Config$|^global\.json$|^package(-lock)?\.json$|^playwright\.config\.[cm]?js$' })
-foreach ($folder in @('src','tests','contracts','scripts','fixtures','docs','third-party','ui','e2e','.github')) {
+$inputs = @(Get-ChildItem -LiteralPath $repoRoot -File | Where-Object { $_.Name -match '\.(slnx|props|targets)$|^NuGet\.Config$|^global\.json$|^package(-lock)?\.json$' })
+foreach ($folder in @('src','tests','contracts','scripts','fixtures','docs','third-party','ui','.github')) {
     $inputs += @(Get-ChildItem -LiteralPath (Join-Path $repoRoot $folder) -Recurse -File |
         Where-Object { $_.FullName -notmatch '[\\/](bin|obj|__pycache__|node_modules|test-results|playwright-report)[\\/]' })
 }
