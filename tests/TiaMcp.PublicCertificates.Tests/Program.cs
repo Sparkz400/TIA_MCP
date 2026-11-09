@@ -12,7 +12,6 @@ string root = Path.GetFullPath(args[0]); Directory.CreateDirectory(root); var ch
 void Check(bool ok, string label) { if (!ok) throw new Exception(label); checks.Add(label); }
 void Reject(Action action, string label, string code = "InvalidPublicCertificateReview")
 { try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
-string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
 byte[] Bytes(JsonObject p) => Encoding.UTF8.GetBytes(p.ToJsonString()+"\n");
 const string project = "/projects/Fixture", hardware = project + "/devices/CPU/items/CPU";
 var model = new JsonObject { ["schemaVersion"] = "project-model.v1", ["project"] = new JsonObject { ["projectPath"] = "synthetic.ap21", ["host"] = "synthetic" },

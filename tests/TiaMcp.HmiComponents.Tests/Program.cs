@@ -40,7 +40,6 @@ string root = Path.GetFullPath(args[0]); Directory.CreateDirectory(root); var ch
 void Check(bool value, string label) { if (!value) throw new Exception(label); checks.Add(label); }
 void Reject(Action action, string label, params string[] codes)
 { try { action(); } catch (BridgeException e) when (codes.Length == 0 || codes.Contains(e.Code)) { Check(true, label + " (" + e.Code + ")"); return; } throw new Exception("Expected refusal: " + label); }
-string Hash(byte[] data) => Convert.ToHexStringLower(SHA256.HashData(data));
 const string project = "/projects/Fixture", plc = project + "/plc", block = plc + "/blocks/Component", type = plc + "/types/Status";
 const string hmi = project + "/hmi/Panel", tag = hmi + "/tags/Run", foreign = project + "/hmi/Other";
 var reviews = new ProjectReviewStore(root); var uploads = new ArtifactUploadStore(root);

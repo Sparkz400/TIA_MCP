@@ -6,11 +6,11 @@ $snapshot = Join-Path $runRoot 'source'
 New-Item -ItemType Directory -Path $snapshot -Force | Out-Null
 $result = @{schemaVersion=1;status='running';nativeQualification=$false;targetProbed=$false;startedAtUtc=[DateTime]::UtcNow.ToString('O');checks=@{}}
 $files = @()
-foreach ($folder in @('src/TiaMcp.Core','src/TiaMcp.Graph','src/TiaMcp.OpcUa','src/TiaMcp.OpcUa.Cli','tests/TiaMcp.OpcUa.Tests','tests/TiaMcp.OpcUa.Dependencies.Tests','contracts','fixtures/opcua','third-party/opcua')) {
+foreach ($folder in @('src/TiaMcp.Core','src/TiaMcp.Graph','src/TiaMcp.OpcUa','src/TiaMcp.OpcUa.Cli','tests/TiaMcp.OpcUa.Tests','tests/TiaMcp.OpcUa.Dependencies.Tests','tests/Shared','contracts','fixtures/opcua','third-party/opcua')) {
     $files += @(Get-ChildItem -LiteralPath (Join-Path $repoRoot $folder) -File -Recurse |
         Where-Object { $_.FullName -notmatch '[\\/](bin|obj|__pycache__)[\\/]' })
 }
-foreach ($file in @('Directory.Build.props','global.json','NuGet.Config','scripts/probe_opcua_api.py','scripts/Inspect-OpcUaApi.ps1','scripts/test_opcua_api.py','scripts/Test-OpcUaOffline.ps1')) {
+foreach ($file in @('Directory.Build.props','tests/Directory.Build.props','global.json','NuGet.Config','scripts/probe_opcua_api.py','scripts/Inspect-OpcUaApi.ps1','scripts/test_opcua_api.py','scripts/Test-OpcUaOffline.ps1')) {
     $files += Get-Item -LiteralPath (Join-Path $repoRoot $file)
 }
 # Core can embed fixture resources and link source files outside its source directory. Include

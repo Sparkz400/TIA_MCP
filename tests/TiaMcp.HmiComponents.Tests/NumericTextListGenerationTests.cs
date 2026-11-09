@@ -14,7 +14,6 @@ internal static class NumericTextListGenerationTests
         var uploadIds = new List<string>(); int checks = 0;
         void Check(bool condition, string label) { if (!condition) throw new Exception(label); checks++; }
         void Reject(Action action, string label) { try { action(); } catch (Exception e) when (e is BridgeException or JsonException or InvalidOperationException or ArgumentException) { checks++; return; } throw new Exception("Expected refusal: " + label); }
-        string Hash(byte[] data) => Convert.ToHexStringLower(SHA256.HashData(data));
         string Upload(byte[] data)
         {
             var started = uploads.Begin("input.json", data.Length, Hash(data)); uploadIds.Add(started.UploadId);

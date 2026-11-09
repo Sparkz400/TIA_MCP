@@ -110,7 +110,6 @@ internal static class ContentArtifactTests
         try { File.WriteAllBytes(path, bytes); action(path); }
         finally { File.Delete(path); }
     }
-    private static string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
     private static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new Exception($"Expected {expected}; got {actual}"); }
     private static void Reject(Action action)
     {

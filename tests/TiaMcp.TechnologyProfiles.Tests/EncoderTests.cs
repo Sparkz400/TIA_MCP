@@ -12,7 +12,6 @@ internal static class EncoderTests
         void Check(bool ok, string label) { if (!ok) throw new Exception(label); checks.Add(label); }
         void Reject(Action action, string label, string code = "InvalidTechnologyProfile")
         { try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
-        string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
         var model = originalReview["model"]!.DeepClone().AsObject(); string plc = (string)originalPacket["before"]!["identity"]!["plcPath"]!, technology = (string)originalPacket["technologyPath"]!;
         string hardware = plc + "/hardware/Drive", block = plc + "/blocks/DB", otherPlc = "/projects/Fixture/OtherPLC", foreign = otherPlc + "/hardware/Drive";
         model["nodes"]!.AsArray().Single(n => (string?)n!["objectPath"] == technology)!["metadata"]!["systemLibraryType"] = "TO_ExternalEncoder";

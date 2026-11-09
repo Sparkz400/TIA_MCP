@@ -71,7 +71,6 @@ internal static class DependencyImpactTests
         // Exercise real publication/reopen using the preceding v6 fixture's retained originals.
         string root = (string)fixture["artifactRoot"]!;
         var reviews = new ProjectReviewStore(root); var uploads = new ArtifactUploadStore(root); var store = new HmiComponentWorkflowStore(root);
-        string Hash(byte[] data) => Convert.ToHexStringLower(SHA256.HashData(data));
         var uploaded = new List<string>();
         string Upload(byte[] data)
         {

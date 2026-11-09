@@ -36,7 +36,6 @@ internal static class RecoveryChecks
             try { action(); } catch (BridgeException e) when (e.Code == code) { Check(e.InnerException is null, label); return; }
             throw new Exception("Expected " + code + ": " + label);
         }
-        string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
         EngineeringArtifactReference Save(string name, object value)
         {
             byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(value, BridgeProtocol.Json); File.WriteAllBytes(Path.Combine(root, name), bytes); return new(name, Hash(bytes));

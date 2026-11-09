@@ -367,10 +367,6 @@ tests.Add(("Durable receipt binds native values and private plan across each rec
     var changedInstalled = (JObject)observed.DeepClone(); changedInstalled["bindings"]![0]!["installedSha256"] = "changed-installed";
     Reject(() => CapturedStorageContract.RequireReceipt(durable, "plan", "preview", "content", "profile", changedInstalled), "StaleCapturedStorageContract");
 }));
-int failed = 0;
-foreach (var test in tests) {
-    try { test.Body(); Console.WriteLine("PASS " + test.Name); }
-    catch (Exception error) { failed++; Console.WriteLine("FAIL " + test.Name + ": " + error); }
-}
+int failed = RunTests(tests, failuresToStderr: false);
 Console.WriteLine($"{tests.Count - failed}/{tests.Count} offline captured-storage tests passed; native builder qualification and production enablement remain false.");
 return failed == 0 ? 0 : 1;

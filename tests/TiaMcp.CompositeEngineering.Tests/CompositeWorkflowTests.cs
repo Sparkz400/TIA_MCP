@@ -13,7 +13,6 @@ internal static class CompositeWorkflowTests
         void Check(bool condition, string label) { if (!condition) throw new Exception(label); checks.Add(label); }
         void Reject(Action action, string label, string code)
         { try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
-        string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
         JsonObject Json(object value) => JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!.AsObject();
         byte[] request = File.ReadAllBytes(Path.Combine(root, "request.json")), expected = File.ReadAllBytes(Path.Combine(root, "report.json"));
         var packet = JsonNode.Parse(request)!.AsObject(); var uploads = new ArtifactUploadStore(root);

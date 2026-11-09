@@ -188,12 +188,7 @@ if (args.Length == 4 && args[0] is "--git-executable" or "--durable-git-executab
     DurableGitChecks.Register(tests, args[1], args[3]);
 }
 else if (args.Length != 0) throw new ArgumentException("Use --git-executable <absolute Git path> --git-fixtures <new isolated directory>.");
-int failed = 0;
-foreach (var (name, run) in tests)
-{
-    try { run(); Console.WriteLine("PASS " + name); }
-    catch (Exception ex) { failed++; Console.Error.WriteLine("FAIL " + name + ": " + ex); }
-}
+int failed = RunTests(tests, failuresToStderr: true);
 Console.WriteLine($"VCI checks: {tests.Count - failed}/{tests.Count}; {pureCount} pure checks, {tests.Count - pureCount} explicitly selected isolated Git/process checks; no native operations.");
 if (failed == 0)
 {

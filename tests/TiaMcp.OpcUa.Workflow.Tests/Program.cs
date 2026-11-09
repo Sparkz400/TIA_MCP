@@ -15,7 +15,6 @@ void Reject(string code, Action run)
 }
 string Text(JsonNode? value) => value!.GetValue<string>();
 byte[] Fixture(string name) => File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "fixtures", name));
-string Hash(byte[] value) => Convert.ToHexStringLower(SHA256.HashData(value));
 string Ref(JsonObject record) => Text(record["recordRef"]);
 string Artifact(JsonObject record, string name) => Ref(record) + ":" + name;
 string RecordPath(string root, JsonObject record, string name) => Path.Combine(root, "opcua-workflow", Ref(record).Split(':')[1], name);
@@ -224,11 +223,6 @@ Test("discovery offsets and empty last byte read are stable across restart", () 
     Equal(true, eof["complete"]!.GetValue<bool>()); Equal("", Text(eof["data"]));
 }));
 
-int failures = 0;
-foreach (var (name, run) in tests)
-{
-    try { run(); Console.WriteLine("PASS " + name); }
-    catch (Exception error) { ++failures; Console.WriteLine("FAIL " + name + ": " + error); }
-}
+int failures = RunTests(tests, failuresToStderr: false);
 Console.WriteLine($"{tests.Count - failures}/{tests.Count} OPC UA workflow checks passed; no native workers.");
 return failures == 0 ? 0 : 1;

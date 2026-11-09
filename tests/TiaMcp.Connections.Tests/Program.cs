@@ -10,7 +10,6 @@ string root = Path.GetFullPath(args[0]); Directory.CreateDirectory(root); var ch
 void Check(bool value, string label) { if (!value) throw new Exception(label); checks.Add(label); }
 void Reject(Action action, string label, string code = "InvalidConnectionReview")
 { try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
-string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
 const string project = "/projects/Fixture", a = project + "/devices/A", b = project + "/devices/B", h = project + "/devices/HMI";
 const string block = a + "/plc/blocks/Send", tag = h + "/hmi/tags/Value";
 var nodes = new JsonArray();

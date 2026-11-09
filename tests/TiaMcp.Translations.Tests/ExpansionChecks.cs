@@ -337,7 +337,6 @@ internal static class ExpansionChecks
     { var pair = wb.Read(key, culture); return new(key, culture, TranslationEditKind.Set, text, pair.Source.Sha256, pair.Target.Sha256, true, "Synthetic reviewer"); }
     private static TranslationCandidate Build(TranslationWorkbook wb, TranslationEdit[] edits)
     { var report = TranslationReview.Review(wb, wb, edits); return TranslationReview.BuildCandidate(wb, wb, edits, report["reviewSha256"]!.GetValue<string>()); }
-    private static string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
     private static byte[] Mutate(IReadOnlyDictionary<string, byte[]> data, string part, Func<string, string> edit)
     { var copy = new Dictionary<string, byte[]>(data, StringComparer.Ordinal); copy[part] = Encoding.UTF8.GetBytes(edit(Encoding.UTF8.GetString(copy[part]))); return Pack(copy); }
     private static byte[] Pack(IReadOnlyDictionary<string, byte[]> data)
