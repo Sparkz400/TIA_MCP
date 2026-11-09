@@ -95,7 +95,14 @@ finally { File.WriteAllBytes(treePath, originalTree); File.SetAttributes(treePat
 await Reject("GitUnsafePath", () => store.PrepareAsync([new(".git/config")], author, "unsafe"));
 await Reject("GitPathCollision", () => store.PrepareAsync([new("a"), new("A")], author, "aliases"));
 await Reject("GitExecutableCustomizationRefused", () => store.PrepareAsync([new(".gitattributes")], author, "driver"));
+int recordCount() => Directory.EnumerateDirectories(Path.Combine(root, "vci-workspaces", "records")).Count();
+int recordsBefore = recordCount();
 await Reject("VciInvalidInput", () => store.PrepareAsync([new("gone", Delete: true)], author, "missing", revision));
+await Reject("VciInvalidInput", () => store.PrepareAsync([new("gone", Delete: true)], author, "missing without parent"));
+Check(recordCount() == recordsBefore, "an absent deletion is refused before a record is created or the parent copied");
+try { await store.PrepareAsync([new("nested"), new("nested/child.txt")], author, "file then directory"); throw new Exception("Expected a write failure"); }
+catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }
+Check(recordCount() == recordsBefore, "a preparation that fails after creating its record removes that record");
 await Reject("VciArtifactMissing", () => Task.FromResult(store.ReadFile(revision, "../../outside")));
 await Reject("VciInputLimit", () => Task.FromResult(store.ReadArtifact(revision, "files.json", count: 65537)));
 var stale = Json(await store.PrepareAsync([new("new.txt", Upload(Encoding.UTF8.GetBytes("new")))], author, "stale", revision));
@@ -109,7 +116,10 @@ File.WriteAllText(Path.Combine(lostRoot, "commit-intent.json"), "interrupted fix
 store = new VciWorkspaceStore(root, args[0]);
 Check(Text(Json(store.Reopen(lostRef)), "state") == "outcomeUnknown", "retained commit intent survives recreation as unknown");
 await Reject("RecoveryRequired", () => store.CommitAsync(lostRef, Text(lost, "planSha256")));
-Check(Json(store.List()).GetProperty("rows").EnumerateArray().Any(r => Text(r, "state") == "integrity-failed"), "discovery reports damaged candidates without replay");
+// Discovery reads receipts only (no per-row tree hashing); reopening the listed handle verifies the damaged candidate.
+Check(Json(store.List(count: 50)).GetProperty("rows").EnumerateArray().Any(r => r.GetProperty("recordRef").GetString() == staleRef),
+    "discovery lists the damaged candidate's handle without replay");
+await Reject("VciIntegrityFailure", () => Task.FromResult(store.Reopen(staleRef)));
 var receiptFailure = Json(await store.PrepareAsync([new("receipt.txt")], author, "receipt failure", revision));
 string failureRef = Text(receiptFailure, "recordRef"), failureDirectory = Path.Combine(root, "vci-workspaces", "records", failureRef.Split(':')[2]);
 Directory.CreateDirectory(Path.Combine(failureDirectory, "commit.json"));

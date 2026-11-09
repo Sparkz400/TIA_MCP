@@ -160,24 +160,8 @@ public sealed class TechnologyProfileWorkflowStore(string artifactsRoot)
         return envelope;
     }
     private JsonObject Reference(string hash, string extension) => new() { ["path"] = "technology-profile-reviews/" + hash + extension, ["sha256"] = hash };
-    private JsonObject Publish(byte[] bytes, string extension, int limit)
-    {
-        if (bytes.Length > limit) throw new BridgeException("ArtifactCapacity", "Technology profile review artifact exceeds its byte bound.");
-        PackageStorage.EnsureNoLinks(Root); Directory.CreateDirectory(Root);
-        using var gate = PackageStorage.Lock(Path.Combine(Root, ".write.lock"));
-        string hash = Convert.ToHexStringLower(SHA256.HashData(bytes)); var artifact = Reference(hash, extension);
-        string path = PackageStorage.Under(Root, hash + extension);
-        if (!File.Exists(path))
-        {
-            if (new DirectoryInfo(Root).EnumerateFiles().Sum(f => f.Length) + bytes.Length > 512L * 1024 * 1024)
-                throw new BridgeException("ArtifactCapacity", "Technology profile review retention exceeds 512 MiB, including incomplete files.");
-            string temporary = PackageStorage.Under(Root, hash + "." + Guid.NewGuid().ToString("N") + ".tmp");
-            using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None)) { stream.Write(bytes); stream.Flush(true); }
-            File.Move(temporary, path);
-        }
-        _ = ProjectReviewStore.ReadArtifact(artifactsRoot, artifact, limit);
-        return artifact;
-    }
+    private JsonObject Publish(byte[] bytes, string extension, int limit) =>
+        PackageStorage.PublishContent(artifactsRoot, "technology-profile-reviews", bytes, extension, limit, 512L << 20, "Technology profile review");
     private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {
         ["recordId"] = artifact["sha256"]!.DeepClone(), ["reviewId"] = record["reviewId"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),
         ["summary"] = record["report"]!["summary"]!.DeepClone(), ["nativeExecutable"] = false, ["nativeQualified"] = false,

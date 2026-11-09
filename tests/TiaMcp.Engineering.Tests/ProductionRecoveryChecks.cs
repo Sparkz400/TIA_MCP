@@ -157,6 +157,12 @@ internal static class ProductionRecoveryChecks
         var restarted = new WatchTableDispatcher(lost.Native, lost.Root);
         await Reject(() => restarted.CallAsync("watch_apply", ApplyArgs(lost.Prepared)), "RecoveryRequired");
         Check(lost.Native.ApplyCount == 1, "New dispatcher never replays an unknown native apply.");
+
+        var held = await New("held-journal"); held.Native.HoldStoreLockOnApplyFailure = true;
+        try { await held.Dispatcher.CallAsync("watch_apply", ApplyArgs(held.Prepared)); throw new Exception("Expected the native apply failure"); }
+        catch (IOException e) when (e.Message == "Authored apply failure under a held journal lock") { passed++; }
+        Check(held.Native.HeldStoreLock is null && new EngineeringOperationStore(held.Root).Read((string)held.Prepared["operation"]!["id"]!).State == "dispatchIntent",
+            "A held journal lock never replaces the native failure; the committed intent keeps owning its resources.");
         Console.WriteLine($"PASS Production watch dispatcher: {passed} checks using authored fake IBridgeClient, no native execution.");
     }
 
@@ -171,6 +177,7 @@ internal static class ProductionRecoveryChecks
         private int epoch = 1;
         internal int ApplyCount, RestoreCount, EndCount;
         internal int CheckpointCount;
+        internal bool HoldStoreLockOnApplyFailure; internal FileStream? HeldStoreLock;
         internal bool LoseApplyResponse, LoseCheckpointResponse, LoseRestoreResponse;
         internal Func<JsonObject, JsonObject>? TransformSnapshot;
         internal void NewInstance() => epoch++;
@@ -196,8 +203,13 @@ internal static class ProductionRecoveryChecks
                 case "watch_apply_native":
                     ApplyCount++; current = File.ReadAllBytes((string)args["inputPath"]!); originalState = current;
                     if (LoseApplyResponse) throw new IOException("Authored lost apply response");
+                    if (HoldStoreLockOnApplyFailure)
+                    {
+                        HeldStoreLock = new FileStream(Path.Combine(root, "engineering-operations", "store.lock"), FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                        throw new IOException("Authored apply failure under a held journal lock");
+                    }
                     result = Snapshot(); break;
-                case "watch_end": EndCount++; result = new { ended = true }; break;
+                case "watch_end": EndCount++; HeldStoreLock?.Dispose(); HeldStoreLock = null; result = new { ended = true }; break;
                 case "watch_restore_native":
                     RestoreCount++; project = Path.Combine((string)args["destination"]!, "fixture.ap21"); NewInstance(); current = baseline;
                     if (LoseRestoreResponse) throw new IOException("Authored lost restore response");

@@ -164,21 +164,8 @@ public sealed partial class HmiComponentWorkflowStore(string artifactsRoot)
     private JsonObject Publish(byte[] bytes, string extension, int limit)
     {
         if (bytes.Length > limit) throw new BridgeException("ArtifactCapacity", "HMI component review artifact exceeds its byte bound.");
-        string hash = Convert.ToHexStringLower(SHA256.HashData(bytes));
-        BeforePublish?.Invoke(extension, hash);
-        PackageStorage.EnsureNoLinks(Root); Directory.CreateDirectory(Root);
-        using var gate = PackageStorage.Lock(Path.Combine(Root, ".write.lock"));
-        var artifact = Reference(hash, extension);
-        string path = PackageStorage.Under(Root, hash + extension);
-        if (!File.Exists(path))
-        {
-            if (new DirectoryInfo(Root).EnumerateFiles().Sum(f => f.Length) + bytes.Length > 512L * 1024 * 1024) throw new BridgeException("ArtifactCapacity", "Review retention exceeds 512 MiB, including incomplete files.");
-            string temporary = PackageStorage.Under(Root, hash + "." + Guid.NewGuid().ToString("N") + ".tmp");
-            using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None)) { stream.Write(bytes); stream.Flush(true); }
-            PackageStorage.PublishFile(temporary, path);
-        }
-        _ = ProjectReviewStore.ReadArtifact(artifactsRoot, artifact, limit);
-        return artifact;
+        BeforePublish?.Invoke(extension, Convert.ToHexStringLower(SHA256.HashData(bytes)));
+        return PackageStorage.PublishContent(artifactsRoot, "hmi-component-reviews", bytes, extension, limit, 512L << 20, "HMI component review");
     }
     private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {
         ["recordId"] = artifact["sha256"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),

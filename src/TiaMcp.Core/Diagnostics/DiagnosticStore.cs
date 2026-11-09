@@ -33,37 +33,16 @@ public sealed class DiagnosticStore(string artifactsRoot)
         for (var dir = new DirectoryInfo(DirectoryPath); dir is not null; dir = dir.Parent)
             if (dir.Exists && (dir.Attributes & FileAttributes.ReparsePoint) != 0)
                 throw new BridgeException("ArtifactPathDenied", "Diagnostic storage cannot traverse links.");
-        Directory.CreateDirectory(DirectoryPath);
-        // Serialize quota checks and publication across host processes sharing this artifact root.
         // Keep the zero-byte lock file: deleting it would let another process lock a new inode.
         string lockPath = Path.Combine(DirectoryPath, ".write.lock");
         if (File.Exists(lockPath) && (File.GetAttributes(lockPath) & FileAttributes.ReparsePoint) != 0)
             throw new BridgeException("ArtifactPathDenied", "Diagnostic storage lock cannot be a link.");
-        using var publicationLock = AcquireLock(lockPath);
-        string id = Convert.ToHexStringLower(SHA256.HashData(bytes));
-        string path = Path.Combine(DirectoryPath, id + extension);
-        PackageStorage.EnsureNoLinks(path);
-        var artifact = new JsonObject { ["path"] = path, ["sha256"] = id, ["bytes"] = bytes.Length };
-        if (!File.Exists(path))
-        {
-            if (new DirectoryInfo(DirectoryPath).EnumerateFiles().Sum(f => f.Length) + bytes.Length > 256L * 1024 * 1024)
-                throw new BridgeException("ArtifactCapacity", "Diagnostic retention limit is 256 MiB; archive selected artifacts explicitly.");
-            // Concurrent identical writers may race. Only an intact matching artifact is reusable.
-            try
-            {
-                using var stream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None);
-                stream.Write(bytes); stream.Flush(true);
-            }
-            catch (IOException) when (File.Exists(path)) { _ = ProjectReviewStore.ReadArtifact(artifactsRoot, artifact, MaxBytes); }
-        }
-        _ = ProjectReviewStore.ReadArtifact(artifactsRoot, artifact, MaxBytes);
-        return new JsonObject { ["id"] = id, ["artifact"] = artifact };
-    }
-
-    private static FileStream AcquireLock(string path)
-    {
-        try { return new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
-        catch (IOException) { throw new BridgeException("ArtifactBusy", "Another diagnostic artifact publication holds the storage lock. No document was published by this attempt."); }
+        JsonObject published;
+        try { published = PackageStorage.PublishContent(artifactsRoot, "trace-diagnostics", bytes, extension, MaxBytes, 256L << 20, "Diagnostic"); }
+        catch (BridgeException error) when (error.Code == "IntakeBusy")
+        { throw new BridgeException("ArtifactBusy", "Another diagnostic artifact publication holds the storage lock. No document was published by this attempt.", error); }
+        string id = published["sha256"]!.GetValue<string>();
+        return new JsonObject { ["id"] = id, ["artifact"] = new JsonObject { ["path"] = Path.Combine(DirectoryPath, id + extension), ["sha256"] = id, ["bytes"] = bytes.Length } };
     }
 
     public JsonObject Read(string id, string? schema = null)

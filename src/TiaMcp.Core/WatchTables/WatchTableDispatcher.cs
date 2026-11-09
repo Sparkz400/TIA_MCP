@@ -163,13 +163,18 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
         catch (Exception error)
         {
             primaryError = error;
-            record = store.Read(record.Id);
-            var failure = Save(directory, "failure-" + record.Revision + ".json", new { error = error.Message, type = error.GetType().FullName,
-                code = (error as BridgeException)?.Code, details = (error as BridgeOperationException)?.Details, automaticReplay = false });
-            if (record.State == "dispatchIntent" && error is BridgeOperationException) store.RecordOutcome(record.Id, record.Revision, false, [new("failure", failure)]);
-            else if (record.State is "dispatchIntent" or "checkpointIntent" || record.State == "acquired" && lease is null && error is not BridgeOperationException)
-                store.MarkUnknown(record.Id, record.Revision, failure);
-            else if (record.State == "acquired") stopAfterRelease = true;
+            // Failure to retain diagnostics (a held store lock, I/O) must still leave the committed intent owning its resources.
+            try
+            {
+                record = store.Read(record.Id);
+                var failure = Save(directory, "failure-" + record.Revision + ".json", new { error = error.Message, type = error.GetType().FullName,
+                    code = (error as BridgeException)?.Code, details = (error as BridgeOperationException)?.Details, automaticReplay = false });
+                if (record.State == "dispatchIntent" && error is BridgeOperationException) store.RecordOutcome(record.Id, record.Revision, false, [new("failure", failure)]);
+                else if (record.State is "dispatchIntent" or "checkpointIntent" || record.State == "acquired" && lease is null && error is not BridgeOperationException)
+                    store.MarkUnknown(record.Id, record.Revision, failure);
+                else if (record.State == "acquired") stopAfterRelease = true;
+            }
+            catch (Exception journal) when (journal is BridgeException or IOException or UnauthorizedAccessException) { /* Never mask the primary exception. */ }
             throw;
         }
         finally
@@ -420,7 +425,7 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
     private string Resolve(EngineeringArtifactReference artifact) => PackageStorage.Under(root, artifact.RelativePath);
     private EngineeringArtifactReference Artifact(JsonObject artifact)
     {
-        string path = Text(artifact, "path"); string relative = Path.GetRelativePath(root, path).Replace('\\', '/');
+        string path = Text(artifact, "path"); string relative = PackageStorage.Relative(Path.GetRelativePath(root, path));
         _ = PackageStorage.Under(root, relative); return new(relative, Text(artifact, "sha256"));
     }
     private EngineeringArtifactReference Save(string directory, string name, object value) => SaveBytes(directory, name, JsonSerializer.SerializeToUtf8Bytes(value, BridgeProtocol.Json));
