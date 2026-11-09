@@ -27,6 +27,24 @@ Preparation returns `changeId`, `previewHash`, `preview`, `journalPath`, and `st
 
 `checkpointSave: true` **saves the entire current in-memory project**, including previously unsaved user edits, before creating `before.zap21`. Siemens requires a saved project for archiving. The worker will not apply a mutation unless that archive exists and its SHA-256 has been recorded. `save: true` after mutation requires `compile: true` and passed compile verification.
 
+### Large inputs and summary results
+
+A long SCL source or a full LAD block XML does not have to be pasted into the call. `source_upsert` takes `sourceRef` instead of `source`, and `block_import_xml` takes `xmlRef` instead of `xml`. The reference is either:
+
+- a committed upload, `upload:<id>` from `artifact_upload_begin`/`chunk`/`commit`, or
+- a file below the Host's artifact directory, relative to it or absolute, such as an earlier `block_read` export you edited.
+
+The Host reads at most 2 MiB of UTF-8 text (a BOM is dropped), inlines it as `source`/`xml` and records `payload.inputReference` with the reference, byte count and SHA-256. The worker then treats it exactly like inline text: the preview, its hash and `requested.scl`/`requested.xml` cover the exact bytes, so later changes to the referenced file do not affect a prepared change. Links and junctions, paths outside the artifact directory, both forms at once and a reference on another kind are refused.
+
+`change_prepare`, `change_apply` and `change_status` return a summary (`responseDetail: "summary"`) by default:
+
+- `changeId`, `state`, `previewHash`, `stages`, `progress`, failures and recovery paths;
+- from the preview: kind, project, `isModified`, warnings, effects, targets, backups with path and SHA-256, and intent conflicts;
+- `payload` with every string over 1 KiB replaced by its length and SHA-256, so you can match it to what you sent;
+- `compile` counts per target with up to 20 error messages, and `baselineComparison` with introduced and resolved findings.
+
+`omitted` names the fields left out. Pass `includeDetails: true` to any of the three tools for the full view; the journal at `journalPath` always keeps everything. Classic screen edits keep their own receipt summary.
+
 ### Reporting progress
 
 Every change result and `change_status` carry `progress`:
@@ -306,7 +324,7 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `library_harmonize` | `source`, `target: { projectName, plcPath }`, `types` and/or `folderPaths`, `harmonizeNames` and/or `harmonizePaths: true` | Native `HarmonizeProject` for PLC block and data types in one PLC. The preview lists each instance's current and expected name and group path; name collisions refuse. Apply reads back exact names, paths and version links and an unchanged rest of the PLC. Renaming a typed FB also changes the exports that name it (instance DB, calling OB, a parent's multi-instance member). Natively qualified for names (`local.library_preservation.20261028`); differing paths are not constructible in V21. |
 | `library_integrate` (PLC recipe) | `action: "plc_component_plan"`, `planOnly: true`, `source`, one `selection`, `target`, `integration`; see [PLC library integration recipes](plc-library-integration-recipes.md) | Every Host not started with `--disable-library-integrate-apply` installs the verified shapes (fresh FB import, new global instance DB, new FBD FC caller or an existing one after its last network) in one `change_apply`: each step is freshly prepared, applied and read back, with one initial checkpoint. The exact additional LAD/FBD FC/FB combinations and the fresh-component FBD OB shape listed in `VerifiedShapes` are also admitted. Unlisted combinations, projects with another language than de-DE and FBs no instance profile covers stay plan only: `change_apply` refuses them with `PlcIntegrationNotQualified` before any import. Natively qualified for those shapes on owned de-DE-only scratch projects (`local.library_integrate.combined_apply.rerun.20261028`). See [combined apply](plc-library-integration-recipes.md#combined-apply). |
 
-Source declarations are parsed outside comments, literals and quoted symbols, including multiple declarations on one line. Their names must match the explicit expected set. Block and type source changes are separate. Number-addressed declarations such as `FUNCTION FC 10` are rejected; use explicit symbolic names. Name collisions are compared without case. Import XML cannot use DTDs, import unlisted top-level object kinds, repeat object IDs, change an existing block's language, or collide with an unpreviewed block number.
+Source declarations are parsed outside comments, literals and quoted symbols, including multiple declarations on one line. The title of a `REGION` statement that starts its line is free text up to the end of the line, and a `#`-prefixed local identifier is never a keyword, so a title such as `REGION Sensor Configuration` or a variable `#Type` does not look like a declaration. Their names must match the explicit expected set. Block and type source changes are separate. Number-addressed declarations such as `FUNCTION FC 10` are rejected; use explicit symbolic names. Name collisions are compared without case. Import XML cannot use DTDs, import unlisted top-level object kinds, repeat object IDs, change an existing block's language, or collide with an unpreviewed block number.
 
 Namespaced envelopes are validated separately from short names. Namespace relocation and cross-unit ownership changes are not implicit upserts. Wrong namespaces, conflicting identity selectors and a namespace/name pair owned by another scope are rejected during preparation, before any checkpoint save. Block-number collision checks scan exposed scopes across the PLC.
 
@@ -348,6 +366,32 @@ Arrays include literal signed bounds, rank, element type and nested array type d
 
 `symbol_trace` and `change_impact` match explicit nested symbolic components and literal array indices, including equivalent quoted component spellings. A dot inside a quoted name remains part of that single name, `#` retains local scope and no suffix matching is performed. To disambiguate identical native member names between blocks or units, use `symbol: "<canonical owning block path>::<native symbolic name>"` when native evidence establishes the owner. Variable indices and indirect references are not resolved by these matching rules; caller/read/write evidence continues to come from native cross references.
 
+## Large projects: filters and member cross references
+
+In a large project `project_inventory` and `software_inspect` hit `maxItems` before they reach a late station. Both take filters that are applied before the result bound, so only matching rows count against `maxItems`:
+
+- `groupPath`: group names from the top level separated by `/`, for example `Station 3000/Downholder`. It matches that group and its subgroups below blocks, tags, types and technology objects of the PLC and every software unit. A full group path copied from `software_inspect` `groups[]` (it contains `/plc/`) matches below exactly that path.
+- `namePrefix`: a case-insensitive prefix of block names (`project_inventory`) or of block, tag-table, type and technology-object names (`software_inspect`).
+- `includeHardware: false` (`project_inventory` only) leaves out device rows. Without it, device rows also count against `maxItems`, so combine it with a block filter.
+
+The walk itself is bounded separately at 200,000 visited objects; `filter.walkTruncated` and `completeness` report when it stops early. `software_inspect` still lists every software scope and unit relation. The V19 adapter refuses these filters with `UnsupportedOnTiaVersion`.
+
+`xref_query` on a global DB returns every reference to every member, which truncates at 2,000 items long before a question like "is `Real[210]` used anywhere?" is answered. Pass `memberPath`, relative to the queried block:
+
+- `Real[210]` or `Real[200..220]`: elements by constant index or range; several dimensions as `Matrix[1..2, 5]`;
+- `Station.Downholder.Enable`: a nested member; quote names with dots or spaces, as in `"Station 3000".Enable`.
+
+Only matching locations are returned and counted. Each carries `memberMatch`:
+
+| `memberMatch` | Meaning |
+| --- | --- |
+| `exact` | The member itself, a deeper member of it, or a constant index inside the range. Proves a use. |
+| `indirect` | A variable or expression index, such as `Real[#i]`, that may hit the range. |
+| `wholeArray` | The array is used without an index, for example passed as a parameter. |
+| `container` | A containing structure, or the whole block, is used as a whole. |
+
+`matchCounts` sums them. Matching uses TIA's referenced-as text of each location and, when that is empty, the member chain of the nested native sources. No `exact` row together with `completeness.complete: true` means no constant-index use; `indirect`, `wholeArray` and `container` rows are possible uses that the offline cross reference cannot resolve. Pointer, ANY and VARIANT accesses are not visible to it at all.
+
 ## Document formats, PLC documents and loadables
 
 These read-only routes are verified (`local.read_contracts.20261028`); its fixture had no PLC documents, and loadables were generated only on a CPU 1518. Each writes into a fresh directory below the export artifacts and returns every written file with its SHA-256.
@@ -357,6 +401,23 @@ These read-only routes are verified (`local.read_contracts.20261028`); its fixtu
 - `plc_loadable_generate` calls `LoadableProvider.GenerateLoadable` with an explicit `target`: `plc` or `plcSim` (`TargetOption`). Specify exactly one of `blockPaths` (non-unit program blocks) or `unitPaths` (software units; safety units are excluded). Before the native call, it checks that the selected blocks, and every block and type of the selected units, are consistent. If not, it fails with `CompileRequired` instead of compiling. Use the `plc_compile` change first. The tool never downloads and never connects to a PLC or PLCSIM. The PublicAPI documents no file name or side effects for loadables. Siemens documents loadable generation only for CPU 1518 and its subtypes from firmware V2.8; on other CPUs the PLC software exposes no `LoadableProvider` and the tool refuses with `UnsupportedCapability`.
 
 ## LAD/FBD editing
+
+### Reading networks as text
+
+`block_read` with `render: "text"` adds each network as readable text next to the unchanged XML artifact: `networks[]` with `number`, `id`, `language`, `title`, `comment` and `text`, and `text` for the whole block. For example:
+
+```text
+Network 3: Downholder enable [LAD, ID 1A]
+  TON<Time> #Storage(IN := #Enable AND #Extra, PT := #Preset, ET => #Elapsed)
+  "DB3000".Downholder.Enable := (#A OR #B) AND NOT #Inhibit
+  CALL "fb30072" "db30072"(Enable := #Enable, Active => #Active)
+```
+
+Contacts, `O`/`A`/`X` boxes and comparators become Boolean expressions; negations appear as `NOT`. Coils become assignments (`SET`/`RESET` for set and reset coils). Other instructions and calls are statements with their pin bindings: `:=` for an input, `=>` for an output wired to an operand. An instruction output used by logic appears as `<instance or name#UId>.<pin>`. Unknown instructions are shown by name and pins, not interpreted. SCL, STL and other network languages are listed but not rendered; use `format: "generatedSource"`. `culture` selects the title and comment language (default `en-US`, then the first available). The text is a reading aid; the native XML stays authoritative.
+
+`block_read` returns inline `xml` only up to 64 KiB and never together with `render: "text"`, unless `includeXml: true` (up to the worker's 512 KiB). `xmlOmitted` says why, and `artifact.path` always holds the full export for `artifact_read` or as `xmlRef`.
+
+### Native edits
 
 `graphical_operand_set` takes the `ID` of one existing `SW.Blocks.CompileUnit`, the `UId` of one existing `Access`, and replacement names for its `Symbol.Component` elements. Obtain these identifiers from the current native XML export.
 
@@ -379,6 +440,16 @@ For example, this replaces one single-component local operand in a known network
 IDs in this example are illustrative; use the current export's identifiers. A raw XML round trip remains available through `block_import_xml`, with the same scope checks, preview, checkpoint and compilation workflow.
 
 `graphical_network_patch` extends editing to explicit native fragments in FlgNet/v5. For example, `{"networkId":"1","upsertXml":["<Wire xmlns='http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5' UId='80'><IdentCon UId='21'/><NameCon UId='40' Name='in'/></Wire>"],"removeUids":["79"]}` replaces a selected wire when those Access/Part IDs actually exist. Supply the block selector alongside these fields. Fragment UIds are not generated or remapped, duplicate IDs and dangling connectors are rejected, and a failed patch leaves the original document unchanged. A fragment replaces the explicitly selected node as a whole; all other nodes retain their structure. TIA renumbers UIds and lists Access parts first on every import, so only in-place replacements of existing nodes read back exactly; a patch that adds or removes nodes fails closed with `NativePreservationMismatch` and needs its checkpoint ([qualification](../verification/graphical-changes-20261028.md)).
+
+`renumberUids: true` predicts that renumbering at prepare time. The patched network is reordered and renumbered the way V21 numbers an imported network: Access parts first in their given order, instructions in dependency post-order (each after the instructions feeding it, by destination input `en`/`pre`, `in`, `in1`…`inN`), wires in their given order, and every UId definition from 21 in document order. This is the rule the typed editor's network generation relies on, and every native export in the typed-graphical corpus is already in that order. `preview.uidRenumbering` lists each changed UId. The exact readback check is unchanged: if V21 numbers the network differently, apply still fails with `NativePreservationMismatch` and the checkpoint is needed, so try the patch on a `project_copy` first. Prepare refuses with `UidRenumberingUnpredictable` when no order can be derived: a cycle, a new terminal instruction beside other terminal instructions, or several instruction inputs on pins other than `en`, `pre` and `in`/`inN`. Patches with node changes are not natively qualified.
+
+To add a series contact in front of an existing instruction, patch with `renumberUids: true`:
+
+1. Add a new `Access` for the operand and a new `Part Name="Contact"`, each with an unused UId.
+2. Replace the wire that fed the instruction so it ends at the new contact's `in`.
+3. Add a wire from the new contact's `out` to the instruction's input, and one from the new Access to the contact's `operand`.
+
+Every Access must be wired exactly once. Read the result with `block_read` `render: "text"` before applying. Other routes are `graphical_typed_edit` with `replaceNetwork` ([typed builders](typed-lad-fbd-builders.md)), for networks the typed profiles fully cover, or `block_import_xml` of the whole block with `xmlRef`, whose readback compares by import and compile, not by UId.
 
 These routes can carry native Boolean branches, comparisons, arithmetic, moves, edge/latch instructions, timers, counters and block calls without inventing instruction schemas. They require valid native XML from the selected language and CPU family; native compilation validates pin names and instruction semantics. A complete-network insertion requires one same-language `SW.Blocks.CompileUnit` with `CompositionName="CompileUnits"`, a unique `ID` and unique nested object IDs. It inserts after `afterNetworkId` and retains existing interfaces, comments, networks and unsupported native elements.
 

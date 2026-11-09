@@ -343,7 +343,11 @@ namespace TiaMcp.Openness.V21
             var plcs = new JArray();
             var blocks = new JArray();
             var warnings = new JArray();
-            foreach (var entry in DeviceItems(project, budget))
+            var filter = new SoftwareObjectFilter(args.Value<string>("groupPath"), args.Value<string>("namePrefix"));
+            bool includeHardware = args.Value<bool?>("includeHardware") ?? true;
+            // Filtered results take maxItems only for matches; the walk has its own bound so later stations are reached.
+            var walk = filter.Active || !includeHardware ? new ScanBudget(MemberWalkLimit) : budget;
+            foreach (var entry in DeviceItems(project, walk))
             {
                 var item = entry.Item;
                 var info = new JObject { ["path"] = entry.Path, ["name"] = item.Name,
@@ -356,14 +360,19 @@ namespace TiaMcp.Openness.V21
                     if (item.Addresses.Count > 100) { budget.Truncated = true; warnings.Add("Address list bounded to 100 entries for " + entry.Path); }
                 }
                 catch (Exception ex) { warnings.Add("Addresses unavailable at " + entry.Path + ": " + ex.Message); }
-                hardware.Add(info);
+                if (includeHardware && (walk == budget || budget.Take())) hardware.Add(info);
                 PlcSoftware software;
                 try { software = item.GetService<SoftwareContainer>()?.Software as PlcSoftware; }
                 catch (Exception ex) { warnings.Add("Software unavailable at " + entry.Path + ": " + ex.Message); continue; }
                 if (software == null) continue;
                 string plcPath = entry.Path + "/plc/" + Segment(software.Name);
                 plcs.Add(new JObject { ["path"] = plcPath, ["name"] = software.Name, ["hardwarePath"] = entry.Path });
-                foreach (var block in AllBlocks(new PlcSelection { Project = project, Software = software, Path = plcPath }, budget)) blocks.Add(BlockInfo(block, plcPath));
+                foreach (var block in AllBlocks(new PlcSelection { Project = project, Software = software, Path = plcPath }, walk))
+                {
+                    if (!filter.Matches(block.Path, block.Item.Name)) continue;
+                    if (walk != budget && !budget.Take()) break;
+                    blocks.Add(BlockInfo(block, plcPath));
+                }
             }
             var result = Envelope();
             result["project"] = ProjectInfo(project);
@@ -371,8 +380,10 @@ namespace TiaMcp.Openness.V21
             result["plcs"] = plcs;
             result["blocks"] = blocks;
             result["warnings"] = warnings;
-            result["completeness"] = new JObject { ["complete"] = false, ["scopeComplete"] = !budget.Truncated && warnings.Count == 0,
-                ["truncated"] = budget.Truncated, ["maxItems"] = max, ["visitedItems"] = budget.Used,
+            if (walk != budget) result["filter"] = new JObject { ["groupPath"] = filter.GroupPath, ["namePrefix"] = filter.NamePrefix, ["includeHardware"] = includeHardware,
+                ["matchedBlocks"] = blocks.Count, ["walkLimit"] = MemberWalkLimit, ["walkTruncated"] = walk.Truncated };
+            result["completeness"] = new JObject { ["complete"] = false, ["scopeComplete"] = !budget.Truncated && !walk.Truncated && warnings.Count == 0,
+                ["truncated"] = budget.Truncated || walk.Truncated, ["maxItems"] = max, ["visitedItems"] = walk.Used,
                 ["scope"] = "Device items, configured address ranges and exposed program blocks including units/system groups; no online data.",
                 ["gaps"] = new JArray("Use software_inspect for tags and PLC data types", "Use hardware_inspect for exposed channel details", "Use technology_read for TO parameters", "Use safety_inspect for safety administration", "Library internals", "No transactional snapshot or project revision token") };
             return result;
@@ -380,6 +391,9 @@ namespace TiaMcp.Openness.V21
 
         private JObject BlockRead(JObject args)
         {
+            string render = args.Value<string>("render");
+            if (render != null && render != "text") throw new BridgeException("InvalidRequest", "render accepts only text.");
+            if (render != null && args.Value<string>("format") != null) throw new BridgeException("InvalidRequest", "render=text reads the native XML export; it cannot be combined with format.");
             if (args.Value<string>("format") != null) return FormatRead(args, "block", "blockPath", "blockName");
             var selected = SelectBlock(args);
             if (selected.Block.Item.IsKnowHowProtected) throw new BridgeException("ProtectedObject", "The selected block is know-how protected.");
@@ -406,7 +420,18 @@ namespace TiaMcp.Openness.V21
             if (file.Length <= 512 * 1024) result["xml"] = File.ReadAllText(destination);
             result["completeness"] = new JObject { ["complete"] = true, ["scope"] = "Native block XML export", ["xmlIncluded"] = file.Length <= 512 * 1024,
                 ["note"] = "Native XML is retained unchanged. No normalized semantic model or revision guarantee is implied." };
+            if (render == "text") AddNetworkText(result, EngineeringSources.ReadXml(File.ReadAllText(destination)), args.Value<string>("culture"));
             return result;
+        }
+
+        // A reading aid next to the unchanged native XML: each network as text, LAD/FBD logic as statements.
+        private static void AddNetworkText(JObject result, System.Xml.Linq.XDocument document, string culture)
+        {
+            var networks = GraphicalNetworkText.Render(document, culture);
+            result["networks"] = new JArray(networks.Select(n => new JObject { ["number"] = n.Number, ["id"] = n.Id, ["language"] = n.Language,
+                ["title"] = n.Title, ["comment"] = n.Comment, ["text"] = n.Text, ["rendered"] = n.Rendered, ["truncated"] = n.Truncated }));
+            result["text"] = GraphicalNetworkText.Format(networks);
+            result["textCoverage"] = "LAD/FBD (FlgNet) networks: contacts, O/A/X boxes and comparators as Boolean expressions; coils, instructions and calls as statements with pin bindings (:= input, => output). Unknown instructions are shown by name and pins, not interpreted. SCL/STL and other network languages are listed, not rendered. The native XML artifact stays authoritative.";
         }
 
         private JObject XrefQuery(JObject args)
@@ -414,7 +439,8 @@ namespace TiaMcp.Openness.V21
             CrossReferenceService service;
             string target;
             Project project;
-            if (!string.IsNullOrWhiteSpace(args.Value<string>("blockPath")) || !string.IsNullOrWhiteSpace(args.Value<string>("blockName")))
+            bool blockTarget = !string.IsNullOrWhiteSpace(args.Value<string>("blockPath")) || !string.IsNullOrWhiteSpace(args.Value<string>("blockName"));
+            if (blockTarget)
             {
                 var block = SelectBlock(args);
                 project = block.Project;
@@ -433,15 +459,84 @@ namespace TiaMcp.Openness.V21
             var budget = new ScanBudget(max);
             var rows = new JArray();
             var native = service.GetCrossReferences(CrossReferenceFilter.AllObjects);
-            AddSources(native.Sources, rows, budget, 0);
+            string memberPath = args.Value<string>("memberPath");
             var result = Envelope();
+            if (memberPath != null)
+            {
+                // Only matching locations take result budget; the walk itself has a separate, larger bound.
+                var filter = new CrossReferenceMemberFilter(memberPath);
+                var walk = new ScanBudget(MemberWalkLimit);
+                var counts = new JObject { ["exact"] = 0, ["indirect"] = 0, ["wholeArray"] = 0, ["container"] = 0 };
+                AddMemberSources(native.Sources, new string[0], filter, rows, budget, walk, counts, 0, blockTarget);
+                result["memberPath"] = filter.MemberPath;
+                result["matchCounts"] = counts;
+                result["memberCoverage"] = "Locations are matched by TIA's referenced-as text and the member chain of nested native sources. exact: the member, or a constant index inside the range. indirect: a variable or expression index that may hit the range. wholeArray: the array is used without an index (e.g. passed as a parameter). container: a containing structure is used as a whole. Only exact proves a use; absence of rows proves no use only when completeness.complete is true.";
+                result["completeness"] = new JObject { ["complete"] = !budget.Truncated && !walk.Truncated, ["truncated"] = budget.Truncated, ["walkTruncated"] = walk.Truncated,
+                    ["maxItems"] = max, ["visitedItems"] = walk.Used, ["walkLimit"] = MemberWalkLimit,
+                    ["scope"] = "Native offline cross-reference results for the target filtered to locations of the requested member.",
+                    ["note"] = "Indirect runtime accesses, pointer/ANY/VARIANT accesses and call-instance propagation are not resolved." };
+            }
+            else
+            {
+                AddSources(native.Sources, rows, budget, 0);
+                result["completeness"] = new JObject { ["complete"] = !budget.Truncated, ["truncated"] = budget.Truncated, ["maxItems"] = max,
+                    ["scope"] = "Native offline cross-reference results for the target, including child sources.",
+                    ["note"] = "Rows without a native engineering object preserve the native textual identity. Indirect runtime accesses and call-instance propagation are not resolved. Pass memberPath to list the users of selected members or array elements only." };
+            }
             result["project"] = ProjectInfo(project);
             result["targetPath"] = target;
             result["references"] = rows;
-            result["completeness"] = new JObject { ["complete"] = !budget.Truncated, ["truncated"] = budget.Truncated, ["maxItems"] = max,
-                ["scope"] = "Native offline cross-reference results for the target, including child sources.",
-                ["note"] = "Rows without a native engineering object preserve the native textual identity. Indirect runtime accesses and call-instance propagation are not resolved." };
             return result;
+        }
+
+        private const int MemberWalkLimit = 200000;
+
+        private static void AddMemberSources(IEnumerable<SourceObject> sources, string[] chain, CrossReferenceMemberFilter filter, JArray rows, ScanBudget budget, ScanBudget walk, JObject counts, int depth, bool blockTarget)
+        {
+            if (depth > 64) { walk.Truncated = true; return; }
+            foreach (var source in sources)
+            {
+                if (!walk.Take() || budget.Truncated) return;
+                // The queried object is the first chain element; members follow it.
+                var members = chain.Concat(new[] { source.Name }).ToArray();
+                string sourceText = string.Join(".", members.Select(m => "\"" + m + "\""));
+                // A use of the queried block itself as a whole (e.g. the DB passed as a parameter) may reach any member.
+                bool whole = blockTarget && depth == 0;
+                JArray references = null;
+                foreach (var reference in source.References)
+                {
+                    if (!walk.Take()) return;
+                    JArray locations = null;
+                    foreach (var location in reference.Locations)
+                    {
+                        if (!walk.Take()) return;
+                        // The referenced-as text is the most specific identity (it carries the index); the member chain is the fallback.
+                        bool named = (CrossReferenceMemberFilter.Parse(location.ReferencedAsName ?? "")?.Length ?? 0) > 0;
+                        string kind = filter.Match(new[] { named ? location.ReferencedAsName : sourceText });
+                        if (kind == null && whole && (CrossReferenceMemberFilter.Parse(location.ReferencedAsName ?? "")?.Length ?? 0) <= 1) kind = "container";
+                        if (kind == null) continue;
+                        if (!budget.Take()) return;
+                        counts[kind] = counts.Value<int>(kind) + 1;
+                        if (locations == null)
+                        {
+                            if (references == null)
+                            {
+                                references = new JArray();
+                                rows.Add(new JObject { ["source"] = new JObject { ["name"] = source.Name, ["path"] = source.Path, ["memberChain"] = sourceText,
+                                    ["address"] = source.Address, ["typeName"] = source.TypeName }, ["references"] = references });
+                            }
+                            locations = new JArray();
+                            references.Add(new JObject { ["name"] = reference.Name, ["path"] = reference.Path, ["device"] = reference.Device,
+                                ["typeName"] = reference.TypeName, ["hasEngineeringObject"] = reference.UnderlyingObject != null, ["locations"] = locations });
+                        }
+                        locations.Add(new JObject { ["memberMatch"] = kind, ["access"] = location.Access.ToString(), ["address"] = location.Address,
+                            ["name"] = location.Name, ["referenceLocation"] = location.ReferenceLocation, ["referenceType"] = location.ReferenceType.ToString(),
+                            ["referencedAsName"] = location.ReferencedAsName, ["typeName"] = location.TypeName });
+                    }
+                }
+                AddMemberSources(source.Children, members, filter, rows, budget, walk, counts, depth + 1, blockTarget);
+                if (budget.Truncated || walk.Truncated) return;
+            }
         }
 
         private static void AddSources(IEnumerable<SourceObject> sources, JArray rows, ScanBudget budget, int depth)

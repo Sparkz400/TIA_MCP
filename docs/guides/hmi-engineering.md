@@ -114,6 +114,8 @@ evidence; profile-wide, visual and runtime qualification remain unverified.
    integer byte count must match the retained file. The path
    must be absolute and inside the Host artifact root. Changed bytes, malformed
    references, symbolic links and junctions refuse before native preparation.
+   The first member also accepts `xmlRef`, as described under
+   [large Classic exports](#large-classic-exports-by-reference).
 4. Review and apply the single prepared change. One project checkpoint and one
    baseline/final compile pair cover the batch. Each attempted member has a
    durable dispatch and readback receipt. Failure restores the attempted prefix
@@ -304,6 +306,15 @@ Every other profile, operation and Classic object type stays behind the gate; `-
 | Unified | `event_handler_set` | Exact `hmiScreen` or `hmiScreenItem`, `eventType` (a member of that object's native event enum, such as `Tapped` or `Loaded`) and `script`. Create-only: refused when the event already has a handler. V21 has no system-function list for Unified handlers, so `script` is untrusted raw JavaScript: at most 16384 characters, no control characters except tab/CR/LF, stored verbatim as `Script.ScriptCode` with exact readback. The bridge never executes, evaluates or syntax-checks it. Property-event handlers and custom web/widget container events are not offered. |
 | Unified | `item_place` | Existing top-level faceplate container, explicit integer rectangle wholly within its native screen; exact rectangle readback. Nested coordinate systems and faceplate type lifecycle require separate qualification. |
 | Unified | `existing_binding_set`, `explicit_binding_set` | Existing faceplate interface and exact same-HMI tag identity; native interface existence, existing-value guard, tag type and ownership checks. A PLC-backed tag (nonempty `Connection`/`PlcTag`) is bound only when the bridge proves its connection's single native endpoint owner, `SymbolicAccess`, and the exact root tag or global DB member declaration and type; every other nonempty connection stays blocked. Caller assertions and matching names never authorize binding. |
+
+### Large Classic exports by reference
+
+A native Classic export is often too large to send inline; a tag table with structured tags can exceed several hundred KB. `hmi_classic_import` and `hmi_classic_screen_edit` accept `xmlRef` instead of `xml` for `classic_xml_import`:
+
+- a committed upload, `upload:<id>` from `artifact_upload_begin`/`chunk`/`commit`, or
+- a file below the Host artifact directory, relative to it or absolute, such as a `hmi_classic_screen_capture` export you edited.
+
+The Host reads at most 2 MiB of UTF-8 text, inlines it as `xml` and records `inputReference` with the reference, byte count and SHA-256. The preview hash covers the inlined text as it does inline `xml`. `xml`, `xmlArtifact` and `xmlRef` are mutually exclusive. `additionalScreens` members keep `xml` or `xmlArtifact`. The same mechanism serves `source_upsert` and `block_import_xml` ([large inputs](engineering-workflows.md#large-inputs-and-summary-results)).
 
 No request field can override native qualification or preservation availability. Unknown fields, mixed operation payloads, client qualification flags, stale identities, metadata hashes and incomplete required scope are rejected. Basic, Comfort, RT Advanced, RT Professional, Unified Comfort and Unified PC remain separate profiles; no support is inherited merely from shared API types. Diagnostics retain observed profile, catalog identifier, runtime version and native assembly identity where available.
 

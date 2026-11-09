@@ -56,6 +56,14 @@ namespace TiaMcp.Openness.V21
             for (int i = 0; i < tokens.Length; i++)
             {
                 var token = tokens[i];
+                // `#Name` is always a local identifier, never a declaration keyword
+                // (for example `#Configuration` or `#Type`). It still counts as
+                // content, so it stays refused outside a declaration.
+                if (token.Kind == SourceTokenKind.Word && i > 0 && tokens[i - 1].Kind == SourceTokenKind.Punctuation && tokens[i - 1].Text == "#")
+                {
+                    if (expectedEnd == null) throw new BridgeException("SourceScopeMismatch", "Unexpected content outside a complete block/type declaration.");
+                    continue;
+                }
                 if (token.Kind == SourceTokenKind.Word && string.Equals(token.Text, "NAMESPACE", StringComparison.OrdinalIgnoreCase))
                 {
                     if (expectedEnd != null || currentNamespace != null) throw new BridgeException("SourceScopeMismatch", "Nested namespaces or namespaces inside block/type declarations are not accepted.");
@@ -119,11 +127,17 @@ namespace TiaMcp.Openness.V21
 
         private static IEnumerable<SourceToken> LexSource(string source)
         {
+            // True while only whitespace has been seen on the current line.
+            bool lineStart = true;
+            SourceToken previous = null;
             for (int i = 0; i < source.Length;)
             {
                 char c = source[i];
                 char next = i + 1 < source.Length ? source[i + 1] : '\0';
+                if (c == '\r' || c == '\n') { lineStart = true; i++; continue; }
                 if (char.IsWhiteSpace(c) || c == '\uFEFF') { i++; continue; }
+                bool tokenAtLineStart = lineStart;
+                lineStart = false;
                 if (c == '/' && next == '/') { i += 2; while (i < source.Length && source[i] != '\r' && source[i] != '\n') i++; continue; }
                 if (c == '(' && next == '*')
                 {
@@ -155,17 +169,27 @@ namespace TiaMcp.Openness.V21
                         value.Append(c);
                     }
                     if (!closed) throw new BridgeException("InvalidSource", "Unterminated source literal or symbolic name.");
-                    yield return new SourceToken { Kind = quote == '"' ? SourceTokenKind.QuotedName : SourceTokenKind.Literal, Text = value.ToString() };
+                    yield return previous = new SourceToken { Kind = quote == '"' ? SourceTokenKind.QuotedName : SourceTokenKind.Literal, Text = value.ToString() };
                     continue;
                 }
                 if (char.IsLetter(c) || c == '_')
                 {
                     int start = i++;
                     while (i < source.Length && (char.IsLetterOrDigit(source[i]) || source[i] == '_')) i++;
-                    yield return new SourceToken { Kind = SourceTokenKind.Word, Text = source.Substring(start, i - start) };
+                    string word = source.Substring(start, i - start);
+                    bool member = previous != null && previous.Kind == SourceTokenKind.Punctuation && (previous.Text == "#" || previous.Text == ".");
+                    yield return previous = new SourceToken { Kind = SourceTokenKind.Word, Text = word };
+                    // An SCL `REGION` statement's title is free text up to the end
+                    // of the line, as TIA itself parses and exports it; words such
+                    // as Configuration, Function or Type there are not keywords.
+                    // Only a REGION that starts its line and is not a member or
+                    // `#` identifier opens a title; anything else is lexed as
+                    // before, which can only refuse more, never accept more.
+                    if (tokenAtLineStart && !member && string.Equals(word, "REGION", StringComparison.OrdinalIgnoreCase) && i < source.Length && (source[i] == ' ' || source[i] == '\t'))
+                        while (i < source.Length && source[i] != '\r' && source[i] != '\n') i++;
                     continue;
                 }
-                yield return new SourceToken { Kind = SourceTokenKind.Punctuation, Text = c.ToString() }; i++;
+                yield return previous = new SourceToken { Kind = SourceTokenKind.Punctuation, Text = c.ToString() }; i++;
             }
         }
         private enum SourceTokenKind { Word, QuotedName, Literal, Punctuation }

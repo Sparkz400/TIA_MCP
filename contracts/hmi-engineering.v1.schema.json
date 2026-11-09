@@ -382,6 +382,46 @@
         }
       }
     },
+    "xmlRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "description": "Instead of xml: a committed artifact_upload ref (upload:<id>) or a file below the Host artifact directory, at most 2 MiB UTF-8. The Host inlines the exact text as xml and records inputReference."
+    },
+    "inputReference": {
+      "type": "object",
+      "description": "Recorded by the Host when it inlined xmlRef (reference, origin, bytes, SHA-256); hash-bound with the preview. Clients do not supply it.",
+      "required": [
+        "field",
+        "reference",
+        "origin",
+        "bytes",
+        "sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "const": "xml"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "upload",
+            "artifactDirectory"
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
     "additionalScreens": {
       "description": "hmi_classic_screen_edit only: 1 to 7 additional existing regular screens of the same HMI/project copy/session. One checkpoint and compile cycle for the entire batch.",
       "type": "array",
@@ -909,6 +949,11 @@
             "required": [
               "xmlArtifact"
             ]
+          },
+          {
+            "required": [
+              "xmlRef"
+            ]
           }
         ]
       },
@@ -916,7 +961,8 @@
         "properties": {
           "xml": false,
           "xmlArtifact": false,
-          "additionalScreens": false
+          "additionalScreens": false,
+          "xmlRef": false
         }
       }
     }

@@ -354,6 +354,7 @@ internal static partial class Program
             ("Source preview includes every same-line declaration", EngineeringSourcesTests.AllDeclarationsArePreviewed),
             ("Source lexer ignores declarations inside comments and literals", EngineeringSourcesTests.CommentsAndLiteralsDoNotCreateDeclarations),
             ("Source preview rejects unbalanced and out-of-scope declarations", EngineeringSourcesTests.ScopeAndBalanceAreEnforced),
+            ("Source lexer reads REGION titles and #identifiers as text, not keywords", EngineeringSourcesTests.RegionTitlesAndLocalIdentifiersAreNotKeywords),
             ("Native XML import envelope rejects hidden objects, duplicate IDs and DTDs", EngineeringSourcesTests.XmlEnvelopeRejectsHiddenObjectsAndDuplicateIds),
             ("Recovery preflight enforces TIA project-directory boundary without creating files", EngineeringPathsTests.LengthBoundaryIsPure),
             ("Recovery preflight rejects invalid project components and relative roots", EngineeringPathsTests.InvalidPathsRejected),
@@ -367,7 +368,25 @@ internal static partial class Program
             ("Project upgrade reads the real version and project name from the project marker, not the file name", ProjectUpgradeRulesTests.MarkerDeclaresTheRealVersion),
             ("Project upgrade refuses a project folder holding another project or archive", ProjectUpgradeRulesTests.FolderHoldsOneProject),
             ("Project upgrade evidence collection records its own failure and never replaces TIA's outcome", ProjectUpgradeRulesTests.EvidenceNeverReplacesTheOutcome),
-            ("Project upgrade reconciliation trusts only a completed receipt of the admitted source at the observed layout", ProjectUpgradeRulesTests.ReceiptProvesOnlyACompletedUpgradeAtTheLayout)
+            ("Project upgrade reconciliation trusts only a completed receipt of the admitted source at the observed layout", ProjectUpgradeRulesTests.ReceiptProvesOnlyACompletedUpgradeAtTheLayout),
+            ("Change input sourceRef inlines an artifact-directory file and records its SHA-256", ChangeInputAndCompactionTests.SourceRefInlinesArtifactFileWithHash),
+            ("Change input xmlRef inlines a committed upload", ChangeInputAndCompactionTests.XmlRefInlinesCommittedUpload),
+            ("Change input xmlRef inlines a Classic HMI export for hmi_classic_import and hmi_classic_screen_edit", ChangeInputAndCompactionTests.ClassicHmiXmlRefInlinesTheExportDocument),
+            ("Change input references stay inside the artifact directory, bounded, UTF-8 and exclusive of inline text", ChangeInputAndCompactionTests.InputReferencesAreBoundedAndExclusive),
+            ("Change results are summarized with compile counts, introduced findings and artifact paths", ChangeInputAndCompactionTests.ChangeViewsAreSummarized),
+            ("Change status journals are summarized", ChangeInputAndCompactionTests.ChangeStatusJournalsAreSummarized),
+            ("Graphical text renders LAD/FBD logic as Boolean statements", GraphicalNetworkTextTests.LadderLogicBecomesBooleanStatements),
+            ("Graphical text renders boxes and calls with pin bindings", GraphicalNetworkTextTests.BoxesAndCallsShowPinBindings),
+            ("Graphical text renders operands, titles and unrendered network languages", GraphicalNetworkTextTests.OperandsTitlesAndUnrenderedNetworks),
+            ("Graphical text renders the native LAD/FBD corpus without unresolved references", GraphicalNetworkTextTests.NativeCorpusRendersWithoutUnresolvedReferences),
+            ("Cross-reference member filter matches array elements by constant index and range", CrossReferenceMemberFilterTests.ArrayElementsMatchByConstantIndexAndRange),
+            ("Cross-reference member filter reports indirect, whole-array and container uses separately", CrossReferenceMemberFilterTests.PossibleUsesAreReportedSeparately),
+            ("Cross-reference member filter refuses invalid member paths", CrossReferenceMemberFilterTests.InvalidMemberPathsAreRefused),
+            ("Software object filter matches group chains from the top of each area", SoftwareObjectFilterTests.GroupChainsMatchFromTheTopOfEachArea),
+            ("Software object filter matches full group paths and name prefixes", SoftwareObjectFilterTests.FullGroupPathsAndNamePrefixes),
+            ("Graphical UId renumbering prediction is a fixed point of every native corpus export", GraphicalUidRenumberingTests.NativeExportsAreFixedPointsOfThePrediction),
+            ("Graphical UId renumbering orders an inserted series contact like V21", GraphicalUidRenumberingTests.SeriesContactInsertionIsRenumberedInNativeOrder),
+            ("Graphical UId renumbering refuses orders it cannot derive and leaves the document unchanged", GraphicalUidRenumberingTests.UnderivableOrdersAreRefused)
         ];
         if (typedGraphicalOnly) tests = tests.Where(test => test.Name.StartsWith("Typed ", StringComparison.Ordinal)).ToArray();
         if (bridgeOnly) tests = tests.Where(test => test.Name.StartsWith("Bridge ", StringComparison.Ordinal)).ToArray();

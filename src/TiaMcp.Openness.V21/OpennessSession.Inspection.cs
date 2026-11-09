@@ -30,10 +30,14 @@ namespace TiaMcp.Openness.V21
             var plc = SelectInspectionPlc(args, "scopePath");
             var budget = new ScanBudget(Limit(args, 500));
             var warnings = new JArray();
-            var technologyEntries = TechnologyObjects(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", budget).ToList();
+            var filter = new SoftwareObjectFilter(args.Value<string>("groupPath"), args.Value<string>("namePrefix"));
+            // With a filter only matching rows take maxItems; the walk has its own bound so later stations are reached.
+            var walk = filter.Active ? new ScanBudget(MemberWalkLimit) : budget;
+            Func<bool> take = () => walk == budget || budget.Take();
+            var technologyEntries = TechnologyObjects(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", walk).ToList();
             var technologyMembership = new TechnologyBlockMembership();
             foreach (var technologyEntry in technologyEntries) technologyMembership.AddTechnology(technologyEntry.Item, technologyEntry.Path);
-            var scopes = SoftwareScopes(plc, budget, warnings).Where(scope => string.IsNullOrWhiteSpace(args.Value<string>("scopePath")) || scope.Path == args.Value<string>("scopePath")).ToList();
+            var scopes = SoftwareScopes(plc, walk, warnings).Where(scope => string.IsNullOrWhiteSpace(args.Value<string>("scopePath")) || scope.Path == args.Value<string>("scopePath")).ToList();
             if (!string.IsNullOrWhiteSpace(args.Value<string>("scopePath"))) RequireOne(scopes.Count, budget, "PLC or software-unit scope");
             var result = Envelope();
             var units = new JArray();
@@ -52,6 +56,7 @@ namespace TiaMcp.Openness.V21
                     .Concat(EngineeringGroupPaths(scope.Tags, scope.Path + "/tags", 0))
                     .Concat(scope.Path == plc.Path ? EngineeringGroupPaths(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", 0) : Enumerable.Empty<string>()))
                 {
+                    if (!filter.ContainsGroup(groupPath)) continue;
                     if (!budget.Take()) break;
                     groups.Add(groupPath);
                 }
@@ -65,16 +70,20 @@ namespace TiaMcp.Openness.V21
                         relations.Add(new JObject { ["relationType"] = relation.RelationType.ToString(), ["relatedObject"] = InspectionValue(relation.RelatedObject) });
                     }
                 }
-                foreach (var block in ScopeBlocks(scope, budget))
+                foreach (var block in ScopeBlocks(scope, walk))
                 {
+                    if (!filter.Matches(block.Path, block.Item.Name)) continue;
+                    if (!take()) break;
                     var row = BlockInfo(block, plc.Path);
                     row["scopePath"] = scope.Path;
                     row["technologyPath"] = technologyMembership.AddBlock(block.Item, block.Path);
                     row["identity"] = IdentityInfo(plc.Project, plc.Path, scope.Path, block.Path, "block", block.Item.Name);
                     blocks.Add(row);
                 }
-                foreach (var table in TagTables(scope.Tags, scope.Path + "/tags", budget))
+                foreach (var table in TagTables(scope.Tags, scope.Path + "/tags", walk))
                 {
+                    if (!filter.Matches(table.Path, table.Item.Name)) continue;
+                    if (!take()) break;
                     var row = new JObject { ["path"] = table.Path, ["name"] = table.Item.Name, ["scopePath"] = scope.Path };
                     var tags = new JArray();
                     var constants = new JArray();
@@ -102,13 +111,13 @@ namespace TiaMcp.Openness.V21
                             ["name"] = constant.Name, ["dataType"] = constant.DataTypeName, ["value"] = InspectionValue(constant.Value), ["kind"] = "system" });
                     }
                 }
-                foreach (var type in ScopeTypes(scope, budget))
-                    types.Add(new JObject { ["path"] = type.Path, ["name"] = type.Item.Name, ["scopePath"] = scope.Path,
+                foreach (var type in ScopeTypes(scope, walk).Where(t => filter.Matches(t.Path, t.Item.Name)))
+                    if (take()) types.Add(new JObject { ["path"] = type.Path, ["name"] = type.Item.Name, ["scopePath"] = scope.Path,
                         ["isConsistent"] = type.Item.IsConsistent, ["isKnowHowProtected"] = type.Item.IsKnowHowProtected });
             }
             var technology = new JArray();
-            foreach (var entry in technologyEntries)
-                technology.Add(TechnologyInfo(entry));
+            foreach (var entry in technologyEntries.Where(e => filter.Matches(e.Path, e.Item.Name)))
+                if (take()) technology.Add(TechnologyInfo(entry));
             result["project"] = ProjectInfo(plc.Project);
             result["plcPath"] = plc.Path;
             result["softwareScopes"] = units;
@@ -119,6 +128,12 @@ namespace TiaMcp.Openness.V21
             result["technologyBlockMembership"] = technologyMembership.Coverage(budget.Truncated);
             result["groupCoverage"] = "Complete bounded user-group paths, including empty groups; native system-group objects are included in their object inventories.";
             result["warnings"] = warnings;
+            if (filter.Active)
+            {
+                result["filter"] = new JObject { ["groupPath"] = filter.GroupPath, ["namePrefix"] = filter.NamePrefix, ["walkLimit"] = MemberWalkLimit, ["walkTruncated"] = walk.Truncated,
+                    ["note"] = "Blocks, tag tables, types, technology objects and group paths outside the filter are omitted; software scopes and unit relations are listed in full." };
+                if (walk.Truncated) budget.Truncated = true;
+            }
             result["completeness"] = InspectionCoverage(budget, warnings, "Program and generated system blocks, software/safety-unit contents, tag tables, constants, PLC types and technology-object identities.",
                 "Block bodies and type members require native XML reads", "Technology parameters require technology_read", "No online values", "No transactional project snapshot");
             return result;

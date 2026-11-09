@@ -199,8 +199,20 @@ namespace TiaMcp.Openness.V19
             return result;
         }
 
+        // Filters and text rendering exist on the V21 Host only; silently ignoring them would return unfiltered results.
+        private static void RefuseV21Options(JObject args, params string[] names)
+        {
+            foreach (string name in names)
+            {
+                var value = args[name];
+                if (value == null || value.Type == JTokenType.Null || (name == "includeHardware" && value.Type == JTokenType.Boolean && value.Value<bool>())) continue;
+                throw new BridgeException("UnsupportedOnTiaVersion", "The V19 adapter does not support " + name + "; it is V21-only.");
+            }
+        }
+
         private JObject Inventory(JObject args)
         {
+            RefuseV21Options(args, "groupPath", "namePrefix", "includeHardware");
             var project = SelectProject(args);
             int max = Limit(args, 500);
             var budget = new ScanBudget(max);
@@ -248,6 +260,7 @@ namespace TiaMcp.Openness.V19
         // The V21 software_inspect shape without technology objects, group paths and unit relations.
         private JObject SoftwareInspect(JObject args)
         {
+            RefuseV21Options(args, "groupPath", "namePrefix");
             var plc = SelectInspectionPlc(args, "scopePath");
             string wantedScope = args.Value<string>("scopePath");
             int max = Limit(args, 500);
@@ -317,6 +330,7 @@ namespace TiaMcp.Openness.V19
         private JObject BlockRead(JObject args)
         {
             if (args.Value<string>("format") != null) throw new BridgeException("UnsupportedOnTiaVersion", "The V19 adapter exports native XML only; simaticSd and generatedSource formats are V21-only.");
+            RefuseV21Options(args, "render", "culture");
             var plc = SelectInspectionPlc(args, "blockPath");
             string path = args.Value<string>("blockPath");
             string name = args.Value<string>("blockName");
