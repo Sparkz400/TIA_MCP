@@ -39,6 +39,65 @@ namespace TiaMcp.Tests
             return Task.CompletedTask;
         }
 
+        internal static async Task RegionTitlesAndLocalIdentifiersAreNotKeywords()
+        {
+            // Shape of a TIA-exported SCL source: region titles are free text up to the end of the line.
+            const string source = """
+                FUNCTION "RegionTitles" : Void
+                { S7_Optimized_Access := 'TRUE' }
+                VERSION : 0.1
+                   VAR_TEMP
+                      "Configuration" : Bool;
+                   END_VAR
+
+
+                BEGIN
+                	REGION Sensor Configuration
+                	    #Configuration := TRUE;
+                	END_REGION
+                	region Function calls
+                	    REGION Function Block calls
+                	        ;
+                	    END_REGION
+                	END_REGION
+                	REGION Type conversion
+                	END_REGION
+                	REGION Resource handling, global data (VAR_GLOBAL) and the PLC_TAG_TABLE
+                	END_REGION
+                	REGION Sensor's "half quoted (* title
+                	END_REGION
+                	REGION Ende END_FUNCTION FUNCTION "NotHidden"
+                	END_REGION
+                END_FUNCTION
+
+
+                """;
+            var declarations = EngineeringSources.DeclaredBlocks(source);
+            Check.Equal(1, declarations.Length);
+            Check.Equal("RegionTitles", declarations[0]);
+
+            foreach (var invalid in new[]
+            {
+                // A REGION that does not start its line keeps the old, stricter lexing.
+                "FUNCTION \"A\" : Void BEGIN ; REGION Configuration\nEND_REGION END_FUNCTION",
+                "FUNCTION \"A\" : Void BEGIN\n#Region Function calls\nEND_FUNCTION",
+                "FUNCTION \"A\" : Void BEGIN\n#x.\nREGION Function calls\nEND_FUNCTION",
+                // Real declarations on the next line are still scanned.
+                "FUNCTION \"A\" : Void BEGIN\nREGION Configuration\nCONFIGURATION \"Config\" END_CONFIGURATION\nEND_REGION\nEND_FUNCTION",
+                "FUNCTION \"A\" : Void BEGIN\nREGION Globals\nEND_REGION\nEND_FUNCTION\nVAR_GLOBAL X : Bool; END_VAR",
+                "FUNCTION \"A\" : Void BEGIN\nREGION Calls\nFUNCTION \"Hidden\" : Void END_FUNCTION\nEND_REGION\nEND_FUNCTION",
+                // A title cannot close the declaration it is in.
+                "FUNCTION \"A\" : Void BEGIN\nREGION x END_FUNCTION\nFUNCTION \"B\" : Void END_FUNCTION",
+                // A REGION outside any declaration is still unexpected content.
+                "REGION Configuration\nFUNCTION \"A\" : Void END_FUNCTION",
+                "#Configuration FUNCTION \"A\" : Void END_FUNCTION",
+            })
+                await Check.ThrowsAsync<EngineeringBridgeException>(() => Task.FromResult(EngineeringSources.DeclaredBlocks(invalid)));
+
+            // A local `#Type` identifier is not a type declaration in a block source.
+            Check.Equal("A", EngineeringSources.DeclaredBlocks("FUNCTION \"A\" : Void VAR_TEMP \"Type\" : Int; END_VAR BEGIN #Type := 1; #Function := #Resource; END_FUNCTION")[0]);
+        }
+
         internal static async Task ScopeAndBalanceAreEnforced()
         {
             foreach (var invalid in new[]

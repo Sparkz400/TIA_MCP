@@ -354,6 +354,7 @@ internal static partial class Program
             ("Source preview includes every same-line declaration", EngineeringSourcesTests.AllDeclarationsArePreviewed),
             ("Source lexer ignores declarations inside comments and literals", EngineeringSourcesTests.CommentsAndLiteralsDoNotCreateDeclarations),
             ("Source preview rejects unbalanced and out-of-scope declarations", EngineeringSourcesTests.ScopeAndBalanceAreEnforced),
+            ("Source lexer reads REGION titles and #identifiers as text, not keywords", EngineeringSourcesTests.RegionTitlesAndLocalIdentifiersAreNotKeywords),
             ("Native XML import envelope rejects hidden objects, duplicate IDs and DTDs", EngineeringSourcesTests.XmlEnvelopeRejectsHiddenObjectsAndDuplicateIds),
             ("Recovery preflight enforces TIA project-directory boundary without creating files", EngineeringPathsTests.LengthBoundaryIsPure),
             ("Recovery preflight rejects invalid project components and relative roots", EngineeringPathsTests.InvalidPathsRejected),
