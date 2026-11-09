@@ -200,10 +200,9 @@ try {
         $result.managedShard = @{index=$ShardIndex;count=$ShardCount;suites=$suites}
         $result.managedSuiteSeconds = [ordered]@{}
         $result.managedCheckSeconds = [ordered]@{}
-        dotnet build src/TiaMcp.OpcUa.Cli/TiaMcp.OpcUa.Cli.csproj --configuration $Configuration --artifacts-path $buildOutput
-        if ($LASTEXITCODE -ne 0) { throw 'OPC UA CLI build failed.' }
         $gitExecutable = (Get-Command git -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
         # Build every suite once, in parallel, through a generated solution; each suite then runs with --no-build.
+        # TiaMcp.OpcUa.Dependencies.Tests builds the OPC UA CLI it runs through its ProjectReference.
         $solutionDirectory = Join-Path $output 'managed-suites'
         dotnet new sln --name managed-suites --output $solutionDirectory | Out-Null
         if ($LASTEXITCODE -ne 0) { throw 'Managed suite solution could not be created.' }
