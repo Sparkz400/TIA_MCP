@@ -23,7 +23,8 @@ internal static class RuntimeSessionChecks
         WebRuntimeDiagnosticResult Mode(string value) => new(context, "operatingMode", "Plc.ReadOperatingMode", Id(), "read",
             JsonSerializer.SerializeToElement(value), null, null, null, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 1);
         JsonElement Outcome(Func<WebRuntimeDiagnosticResult> observe, CancellationToken token) => JsonSerializer.SerializeToElement(
-            PhysicalRuntimeSessions.RequestMode(Id(), "stop", "run", Mode("stop"), () => ("accepted", null), observe, token), BridgeProtocol.Json);
+            PhysicalRuntimeSessions.RequestMode(Id(), "stop", "run", Mode("stop"), () => Task.FromResult<(string, int?)>(("accepted", null)),
+                () => Task.FromResult(observe()), token).GetAwaiter().GetResult(), BridgeProtocol.Json);
         var lost = Outcome(() => throw new BridgeException("RuntimeTimeout", "Synthetic lost readback."), CancellationToken.None);
         check(lost.GetProperty("state").GetString() == "unknown" && lost.GetProperty("dispatched").GetBoolean() &&
             lost.GetProperty("dispatch").GetString() == "accepted" && lost.GetProperty("errorCode").GetString() == "RuntimeTimeout",

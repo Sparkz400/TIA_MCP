@@ -26,6 +26,9 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
     internal bool SessionDispatched { get; private set; }
     internal bool Unusable { get; private set; }
     internal bool CanReconnect { get; private set; }
+    /// <summary>Held by the store for each request on this session: one session never runs two requests at once.</summary>
+    internal SemaphoreSlim Lock { get; } = new(1);
+    internal bool Usable => session is { Connected: true } && !Unusable;
     internal DateTimeOffset LastUsed { get; private set; } = DateTimeOffset.UtcNow;
 
     internal OpcUaRuntimeClient(OpcUaRuntimeSelection selection, X509Certificate2 clientCertificate, string clientUri, string pkiPath)
@@ -318,13 +321,8 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
     private void CheckOutput(object value)
     {
         var bytes = JsonSerializer.SerializeToUtf8Bytes(value);
+        // No password-echo scan: the password travels only inside the encrypted identity token, and a short one matched ordinary values.
         if (bytes.Length > MaxMessageBytes) throw Error("UaResponseLimit");
-        if (passwordBytes is { Length: > 0 })
-        {
-            var escaped = JsonSerializer.SerializeToUtf8Bytes(System.Text.Encoding.UTF8.GetString(passwordBytes));
-            if (bytes.AsSpan().IndexOf(passwordBytes) >= 0 || bytes.AsSpan().IndexOf(escaped.AsSpan(1, escaped.Length - 2)) >= 0)
-                throw Error("UaSecretEchoRejected");
-        }
     }
     private NodeId Resolve(OpcUaRuntimeNode node)
     {

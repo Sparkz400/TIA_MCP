@@ -32,6 +32,8 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         internal RuntimeSessionStatus Status = status;
         internal Dictionary<string, WebRuntimeSymbol> Selections = new(StringComparer.Ordinal);
         internal Dictionary<string, JsonElement> Metadata = new(StringComparer.Ordinal);
+        /// <summary>Held for each request on this session; taken before, never while holding, the store gate.</summary>
+        internal readonly SemaphoreSlim Lock = new(1);
     }
     private readonly string root;
     private readonly string hostId = Guid.NewGuid().ToString("N");
@@ -75,7 +77,9 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
                 return Observe(existing);
             }
             if (live.Count >= 4) throw Error("RuntimeSessionCapacity");
-            var records = Directory.EnumerateFiles(root, "*.json").Select(path => Read(Path.GetFileNameWithoutExtension(path))).ToArray();
+            // Only attempt-named files are records; a stray file (notes.json) is not one. A corrupt attempt-named record still refuses.
+            var records = Directory.EnumerateFiles(root, "*.json").Select(Path.GetFileNameWithoutExtension)
+                .Where(ProtectedCredentialGuard.IsId).Select(id => Read(id!)).ToArray();
             // Bounded retention: the oldest resolved records make room for a new attempt; unresolved records are never removed.
             var retired = records.Where(r => Resolved(r.State)).OrderBy(r => File.GetLastWriteTimeUtc(PathFor(r.AttemptId))).Take(records.Length - 1023).ToArray();
             if (records.Length - retired.Length >= 1024) throw Error("RuntimeSessionCapacity");
@@ -115,45 +119,49 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
 
     public async Task<object> Browse(string attemptId, string? symbol, bool children, CancellationToken cancellationToken)
     {
-        await gate.WaitAsync(cancellationToken);
+        Live entry = await Enter(attemptId, cancellationToken);
         try
         {
-            Live entry = Active(attemptId);
             JsonElement metadata = default;
-            Use(entry, () => metadata = entry.Client.BrowseAsync(symbol, children, cancellationToken).GetAwaiter().GetResult(), cancellationToken);
+            await Use(entry, async () => metadata = await entry.Client.BrowseAsync(symbol, children, cancellationToken), cancellationToken);
             string? selectionId = null; WebRuntimeSymbol? selection = null;
             if (!children)
             {
-                if (entry.Selections.Count >= 256) throw Error("RuntimeSelectionCapacity");
                 selection = WebRuntimeProtocol.Symbol(entry.Client.Context, symbol!, "simple", metadata[0]);
-                selectionId = Guid.NewGuid().ToString("N"); entry.Selections.Add(selectionId,selection);
-                entry.Metadata.Add(selectionId,metadata[0].Clone());
+                await gate.WaitAsync(cancellationToken);
+                try
+                {
+                    if (entry.Selections.Count >= 256) throw Error("RuntimeSelectionCapacity");
+                    selectionId = Guid.NewGuid().ToString("N"); entry.Selections.Add(selectionId,selection);
+                    entry.Metadata.Add(selectionId,metadata[0].Clone());
+                }
+                finally { gate.Release(); }
             }
             return new { attemptId, context = entry.Client.Context, metadata, selectionId, selection,
                 scope = children ? "immediateChildrenOnly" : "exactSuppliedSymbol", nativeQualified = false };
         }
-        finally { gate.Release(); }
+        finally { entry.Lock.Release(); }
     }
 
     public async Task<WebRuntimeReadResult> ReadValue(string attemptId, string selectionId, string representation, CancellationToken cancellationToken, RuntimeCaptureHandoff? handoff = null)
     {
         Id(selectionId); if (representation is not ("simple" or "raw")) throw Error("RuntimeRepresentationUnsupported");
-        await gate.WaitAsync(cancellationToken);
+        Live entry = await Enter(attemptId, cancellationToken);
         try
         {
-            Live entry = Active(attemptId);
             if (!entry.Selections.TryGetValue(selectionId, out var selection)) throw Error("RuntimeSelectionUnavailable");
             if (handoff is not null) RuntimeCaptureHandoffs.ValidateRead(Path.GetDirectoryName(root)!, handoff, CaptureSession(entry.Status));
             WebRuntimeReadResult? value = null;
-            Use(entry, () =>
+            // No Api.GetPermissions per sample: the PLC enforces read permission itself and a denial comes back as a
+            // permissionDenied read result. Only the login's explicit no-permissions flag refuses locally.
+            await Use(entry, async () =>
             {
-                string[] permissions = entry.Client.PermissionsAsync(cancellationToken).GetAwaiter().GetResult();
-                if (entry.Client.Profile.HasNoPermissions == true || WebRuntimeProtocol.ReadAvailability(entry.Client.Methods, permissions) != "permittedAtObservation") throw Error("RuntimePermissionDenied");
-                value = Current(entry, selection, representation, cancellationToken);
+                if (entry.Client.Profile.HasNoPermissions == true) throw Error("RuntimePermissionDenied");
+                value = await Current(entry, selection, representation, cancellationToken);
             }, cancellationToken);
             return value!;
         }
-        finally { gate.Release(); }
+        finally { entry.Lock.Release(); }
     }
 
     /// <summary>Owned-PLCSIM writes after the caller verified the binding: every exact precondition holds before the first write; each write is read back.</summary>
@@ -162,16 +170,16 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         if (writes is not { Length: >= 1 and <= 16 } || writes.Any(w => w is null) || writes.Select(w => w.SelectionId).Distinct(StringComparer.Ordinal).Count() != writes.Length)
             throw Error("RuntimeWriteLimit");
         foreach (var write in writes) Id(write.SelectionId);
-        await gate.WaitAsync(cancellationToken);
+        Live entry = await Enter(attemptId, cancellationToken);
         try
         {
-            Live entry = Active(attemptId);
             var selections = writes.Select(w => entry.Selections.TryGetValue(w.SelectionId, out var s) ? s : throw Error("RuntimeSelectionUnavailable")).ToArray();
             object? result = null;
-            Use(entry, () =>
+            await Use(entry, async () =>
             {
-                Permitted(entry, "write_value", cancellationToken);
-                var before = selections.Select(s => Current(entry, s, "simple", cancellationToken)).ToArray();
+                await Permitted(entry, "write_value", cancellationToken);
+                var before = new WebRuntimeReadResult[selections.Length];
+                for (int i = 0; i < selections.Length; i++) before[i] = await Current(entry, selections[i], "simple", cancellationToken);
                 if (before.Where((read, i) => !Holds(read, writes[i].Expected)).Any())
                 { result = new { attemptId, state = "preconditionMismatch", dispatched = 0, before }; return; }
                 var items = new List<object>(); bool complete = true;
@@ -180,9 +188,9 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
                     string dispatch = "unknown"; int? code = null; string? errorCode = null; WebRuntimeReadResult? after = null;
                     try
                     {
-                        (dispatch, code) = entry.Client.MutateAsync(WebRuntimeProtocol.Write(Guid.NewGuid().ToString("N"), before[i].Selection, writes[i].Value), cancellationToken).GetAwaiter().GetResult();
+                        (dispatch, code) = await entry.Client.MutateAsync(WebRuntimeProtocol.Write(Guid.NewGuid().ToString("N"), before[i].Selection, writes[i].Value), cancellationToken);
                         afterSend?.Invoke(); // Qualification fault point only: the Host exits before the outcome is read back.
-                        if (dispatch == "accepted") after = Current(entry, selections[i], "simple", cancellationToken);
+                        if (dispatch == "accepted") after = await Current(entry, selections[i], "simple", cancellationToken);
                     }
                     // A lost response leaves the outcome unknown and a failed readback unobserved; both are reported, never retried.
                     catch (BridgeException error) { errorCode = error.Code; }
@@ -195,7 +203,7 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
             }, cancellationToken);
             return result!;
         }
-        finally { gate.Release(); }
+        finally { entry.Lock.Release(); }
     }
 
     /// <summary>Owned-PLCSIM RUN/STOP request after the caller verified the binding; the exact current mode must hold first and the result is observed.</summary>
@@ -203,40 +211,39 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
     {
         _ = WebRuntimeProtocol.ChangeOperatingMode(new('0',32), mode); // Refuse a bad selection before session or credential use.
         if (expectedMode is not ("run" or "stop") || expectedMode == mode) throw Error("RuntimeOperatingModeInvalid");
-        await gate.WaitAsync(cancellationToken);
+        Live entry = await Enter(attemptId, cancellationToken);
         try
         {
-            Live entry = Active(attemptId);
             object? result = null;
-            Use(entry, () =>
+            await Use(entry, async () =>
             {
-                Permitted(entry, "change_operating_mode", cancellationToken);
-                WebRuntimeDiagnosticResult Observe() => entry.Client.DiagnosticAsync("operatingMode", null, null, cancellationToken).GetAwaiter().GetResult();
-                var before = Observe();
+                await Permitted(entry, "change_operating_mode", cancellationToken);
+                Task<WebRuntimeDiagnosticResult> Observe() => entry.Client.DiagnosticAsync("operatingMode", null, null, cancellationToken);
+                var before = await Observe();
                 if (!IsMode(before, expectedMode)) { result = new { attemptId, state = "preconditionMismatch", dispatched = false, before }; return; }
-                result = RequestMode(attemptId, expectedMode, mode, before,
-                    () => entry.Client.MutateAsync(WebRuntimeProtocol.ChangeOperatingMode(Guid.NewGuid().ToString("N"), mode), cancellationToken).GetAwaiter().GetResult(),
+                result = await RequestMode(attemptId, expectedMode, mode, before,
+                    () => entry.Client.MutateAsync(WebRuntimeProtocol.ChangeOperatingMode(Guid.NewGuid().ToString("N"), mode), cancellationToken),
                     Observe, cancellationToken);
             }, cancellationToken);
             return result!;
         }
-        finally { gate.Release(); }
+        finally { entry.Lock.Release(); }
     }
 
     /// <summary>Sends one RUN/STOP request and observes the mode for a bounded time. Once the request may have gone out, a lost
     /// response or a failed or cancelled readback is reported as dispatched with an unknown outcome; nothing is retried.</summary>
-    internal static object RequestMode(string attemptId, string expectedMode, string mode, WebRuntimeDiagnosticResult before,
-        Func<(string Status, int? ProviderErrorCode)> mutate, Func<WebRuntimeDiagnosticResult> observe, CancellationToken cancellationToken)
+    internal static async Task<object> RequestMode(string attemptId, string expectedMode, string mode, WebRuntimeDiagnosticResult before,
+        Func<Task<(string Status, int? ProviderErrorCode)>> mutate, Func<Task<WebRuntimeDiagnosticResult>> observe, CancellationToken cancellationToken)
     {
         string dispatch = "unknown"; int? code = null; WebRuntimeDiagnosticResult? after = null;
         try
         {
-            (dispatch, code) = mutate();
+            (dispatch, code) = await mutate();
             // Boolean success only acknowledges the request; observe Plc.ReadOperatingMode for a bounded time.
             for (int i = 0; dispatch == "accepted" && i < 20 && !IsMode(after, mode); i++)
             {
-                if (i > 0) Task.Delay(250, cancellationToken).GetAwaiter().GetResult();
-                after = observe();
+                if (i > 0) await Task.Delay(250, cancellationToken);
+                after = await observe();
             }
         }
         catch (Exception error) when (error is BridgeException or OperationCanceledException)
@@ -249,31 +256,30 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
 
     private static bool Holds(WebRuntimeReadResult? read, JsonElement wanted) =>
         read is { Status: "read", Value: { } value } && JsonElement.DeepEquals(value, wanted);
-    private static void Permitted(Live entry, string permission, CancellationToken cancellationToken)
+    private static async Task Permitted(Live entry, string permission, CancellationToken cancellationToken)
     {
-        string[] permissions = entry.Client.PermissionsAsync(cancellationToken).GetAwaiter().GetResult();
+        string[] permissions = await entry.Client.PermissionsAsync(cancellationToken);
         if (entry.Client.Profile.HasNoPermissions == true || !permissions.Contains(permission, StringComparer.Ordinal)) throw Error("RuntimePermissionDenied");
     }
-    private static WebRuntimeReadResult Current(Live entry, WebRuntimeSymbol selection, string representation, CancellationToken cancellationToken)
+    private static async Task<WebRuntimeReadResult> Current(Live entry, WebRuntimeSymbol selection, string representation, CancellationToken cancellationToken)
     {
-        var current = entry.Client.BrowseAsync(selection.Symbol, false, cancellationToken).GetAwaiter().GetResult();
+        var current = await entry.Client.BrowseAsync(selection.Symbol, false, cancellationToken);
         var refreshed = WebRuntimeProtocol.Symbol(entry.Client.Context, selection.Symbol, representation, current[0]);
         if (refreshed.MetadataSha256 != selection.MetadataSha256) throw Error("RuntimeSymbolMetadataChanged");
-        return entry.Client.ReadAsync(refreshed, cancellationToken).GetAwaiter().GetResult();
+        return await entry.Client.ReadAsync(refreshed, cancellationToken);
     }
 
     public async Task<WebRuntimeDiagnosticResult> Diagnostics(string attemptId, string kind, string? language, int? count, CancellationToken cancellationToken)
     {
         _ = WebRuntimeProtocol.Diagnostic(new('0',32), kind, language, count); // Refuse a bad selection before session or credential use.
-        await gate.WaitAsync(cancellationToken);
+        Live entry = await Enter(attemptId, cancellationToken);
         try
         {
-            Live entry = Active(attemptId);
             WebRuntimeDiagnosticResult? result = null;
-            Use(entry, () => result = entry.Client.DiagnosticAsync(kind, language, count, cancellationToken).GetAwaiter().GetResult(), cancellationToken);
+            await Use(entry, async () => result = await entry.Client.DiagnosticAsync(kind, language, count, cancellationToken), cancellationToken);
             return result!;
         }
-        finally { gate.Release(); }
+        finally { entry.Lock.Release(); }
     }
 
     public async Task<RuntimeSessionStatus> Status(string attemptId, CancellationToken cancellationToken)
@@ -294,6 +300,16 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         finally { gate.Release(); }
     }
     public async Task<RuntimeSessionStatus> Disconnect(string attemptId, CancellationToken cancellationToken, bool acknowledgeUnknown = false)
+    {
+        // An in-flight request on this session finishes before logout.
+        Live? held;
+        await gate.WaitAsync(cancellationToken);
+        try { held = live.GetValueOrDefault(attemptId); } finally { gate.Release(); }
+        if (held is not null) await held.Lock.WaitAsync(cancellationToken);
+        try { return await Disconnected(attemptId, acknowledgeUnknown, cancellationToken); }
+        finally { held?.Lock.Release(); }
+    }
+    private async Task<RuntimeSessionStatus> Disconnected(string attemptId, bool acknowledgeUnknown, CancellationToken cancellationToken)
     {
         await gate.WaitAsync(cancellationToken);
         try
@@ -336,7 +352,23 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         if (!JsonElement.DeepEquals(JsonSerializer.SerializeToElement(retained,Json),JsonSerializer.SerializeToElement(entry.Status,Json)))
             throw Error("RuntimeRecordChanged");
     }
-    private void Use(Live entry, Action action, CancellationToken cancellationToken)
+    /// <summary>Takes the session's own lock (never while holding the gate) and re-checks the session under the gate.
+    /// The session's requests then run without the gate, so one slow session cannot hold the others past their deadlines.</summary>
+    private async Task<Live> Enter(string attemptId, CancellationToken cancellationToken)
+    {
+        Live entry;
+        await gate.WaitAsync(cancellationToken);
+        try { entry = Active(attemptId); } finally { gate.Release(); }
+        await entry.Lock.WaitAsync(cancellationToken);
+        try
+        {
+            await gate.WaitAsync(cancellationToken);
+            try { if (Active(attemptId) != entry) throw Error("RuntimeSessionUnavailable"); } finally { gate.Release(); }
+            return entry;
+        }
+        catch { entry.Lock.Release(); throw; }
+    }
+    private async Task Use(Live entry, Func<Task> action, CancellationToken cancellationToken)
     {
         var login = entry.Status.Login;
         try
@@ -344,18 +376,30 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
             // Only the credential's state is checked under the vault lock; the session's requests run after it is released,
             // so a slow PLC cannot hold other vault users (block protection) past their bounded wait.
             Vault(login).Use(login.Credential, Binding(login.Endpoint, login.PeerCertificateSha256, login.User, login.Mode), _ => { });
-            if (Failure(() =>
+            if (await FailureAsync(async () =>
             {
-                entry.Client.VerifySessionAsync(login.User,login.Mode,cancellationToken).GetAwaiter().GetResult();
+                await entry.Client.VerifySessionAsync(login.User,login.Mode,cancellationToken);
                 var status = entry.Status with { Profile = entry.Client.Profile };
-                Save(status); entry.Status = status;
-                action();
+                // The journaled record is rewritten only when the observed profile changed, not on every sample.
+                if (!JsonElement.DeepEquals(JsonSerializer.SerializeToElement(status,Json),JsonSerializer.SerializeToElement(entry.Status,Json)))
+                {
+                    await gate.WaitAsync(cancellationToken);
+                    try { Save(status); entry.Status = status; } finally { gate.Release(); }
+                }
+                await action();
             }) is { } failure) throw Error(failure);
         }
         catch (Exception error) when (entry.Client.SessionUnusable)
         {
-            entry.Status = entry.Status with { State = "remoteSessionUnknown", ErrorCode = Code(error), ReadAvailability = "permissionUnknown" };
-            Save(entry.Status); throw;
+            // Unbounded wait: the failure must be published, and no gate holder waits for a session lock.
+            await gate.WaitAsync();
+            try
+            {
+                entry.Status = entry.Status with { State = "remoteSessionUnknown", ErrorCode = Code(error), ReadAvailability = "permissionUnknown" };
+                Save(entry.Status);
+            }
+            finally { gate.Release(); }
+            throw;
         }
     }
     private static void Consume(CredentialVault vault,CredentialReference reference,CredentialBinding binding,Action<byte[]> action)
@@ -368,17 +412,21 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
     private static string? Failure(Action action)
     {
         try { action(); return null; }
-        catch (Exception error)
-        {
-            return error is BridgeException e && e.Code is
-                "RuntimePermissionDenied" or "RuntimeSymbolMetadataChanged" or "RuntimeResponseInvalid" or "RuntimeResponseLimit" or
-                "RuntimeAuthenticationDenied" or "RuntimeTransportFailure" or "RuntimeTimeout" or "RuntimeCancelled" or
-                "RuntimeTlsUnverified" or "RuntimeHttpFailure" or "RuntimeSessionExpired" or "RuntimeBrowseFailed" or
-                "RuntimeDiscoveryFailed" or "RuntimeRequestLimit" or "RuntimeLoginResponseInvalid" or "RuntimeProviderRejected" or "RuntimeSecretEchoRejected"
-                or "RuntimeProfileInvalid" or "RuntimeSessionIdentityMismatch"
-                ? e.Code : "RuntimeOperationFailed";
-        }
+        catch (Exception error) { return Fixed(error); }
     }
+    private static async Task<string?> FailureAsync(Func<Task> action)
+    {
+        try { await action(); return null; }
+        catch (Exception error) { return Fixed(error); }
+    }
+    private static string Fixed(Exception error) =>
+        error is BridgeException e && e.Code is
+            "RuntimePermissionDenied" or "RuntimeSymbolMetadataChanged" or "RuntimeResponseInvalid" or "RuntimeResponseLimit" or
+            "RuntimeAuthenticationDenied" or "RuntimeTransportFailure" or "RuntimeTimeout" or "RuntimeCancelled" or
+            "RuntimeTlsUnverified" or "RuntimeHttpFailure" or "RuntimeSessionExpired" or "RuntimeBrowseFailed" or
+            "RuntimeDiscoveryFailed" or "RuntimeRequestLimit" or "RuntimeLoginResponseInvalid" or "RuntimeProviderRejected" or "RuntimeSecretEchoRejected"
+            or "RuntimeProfileInvalid" or "RuntimeSessionIdentityMismatch"
+            ? e.Code : "RuntimeOperationFailed";
     private static CredentialVault Vault(RuntimeLoginSelection login) => CredentialVault.Existing(CredentialVault.UserRoot(login.VaultName));
     private RuntimeSessionStatus Observe(RuntimeSessionStatus status) => live.ContainsKey(status.AttemptId) || Resolved(status.State) ? status :
         status with { State = "hostEndedRemoteUnknown" };
@@ -394,7 +442,11 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
                 try
                 {
                     foreach (var entry in live.Values.Where(x => x.Client.IdleExpired).ToArray())
+                    {
+                        if (!entry.Lock.Wait(0)) continue; // A request is in flight: never wait for a session lock under the gate.
                         try { await Close(entry); } catch { entry.Client.Dispose(); live.Remove(entry.Status.AttemptId); }
+                        finally { entry.Lock.Release(); }
+                    }
                 }
                 finally { gate.Release(); }
             }
@@ -432,7 +484,11 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
     private static BridgeException Error(string code) => new(code,"Runtime operation refused; inspect the exact attempt and local credential binding. No secret or remote error text is returned.");
     public async ValueTask DisposeAsync()
     {
-        stop.Cancel(); await idleWorker; await gate.WaitAsync();
+        stop.Cancel(); await idleWorker;
+        // In-flight requests (each bounded by its deadline) finish before logout.
+        await gate.WaitAsync(); var busy = live.Values.ToArray(); gate.Release();
+        foreach (var entry in busy) await entry.Lock.WaitAsync();
+        await gate.WaitAsync();
         try
         {
             foreach (var entry in live.Values.ToArray())
