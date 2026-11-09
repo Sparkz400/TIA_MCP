@@ -123,13 +123,14 @@ class Run(StateRun):
     def prepare(self, label, kind, payload, preview=None, shown=None, exact=None):
         if kind != "graph_import":
             return super().prepare(label, kind, payload, preview, shown, exact)
-        # The Host replaces graphRef's document by its validated XML and source hash before the worker sees the payload.
+        # The Host replaces graphRef's document by its validated XML and source hash before the worker sees the payload;
+        # the preview then shows that XML by bytes and sha256 only (the text is the prepared requested.xml).
         prepared = self.h.stage("prepare " + label, lambda: self.h.tool("change_prepare", self.args(kind, payload)))
         actual = prepared["preview"]
         echoed = actual["payload"]
         require(prepared["state"] == "prepared" and actual["changeId"] == prepared["changeId"] and actual["kind"] == kind and actual["project"]["path"] == self.project
                 and echoed.get("graphRef") == payload["graphRef"] and echoed.get("expectedBlockNames") == payload["expectedBlockNames"]
-                and len(echoed.get("sourceSha256") or "") == 64 and "<SW.Blocks.FB" in echoed.get("xml", ""),
+                and len(echoed.get("sourceSha256") or "") == 64 and len((echoed.get("xml") or {}).get("sha256") or "") == 64,
                 "Preview of %s differs: %s" % (label, {k: actual.get(k) for k in ("kind", "project")}))
         return prepared
 

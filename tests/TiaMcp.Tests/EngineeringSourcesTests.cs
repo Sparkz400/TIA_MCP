@@ -412,8 +412,9 @@ namespace TiaMcp.Tests
 // loading the worker or Siemens assemblies.
 namespace TiaMcp.Openness.V21
 {
-    internal sealed class BridgeException(string code, string message) : Exception(message)
+    internal sealed class BridgeException(string code, string message, Newtonsoft.Json.Linq.JObject? details = null) : Exception(message)
     {
         internal string Code { get; } = code;
+        internal Newtonsoft.Json.Linq.JObject? Details { get; } = details;
     }
 }

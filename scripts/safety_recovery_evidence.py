@@ -8,6 +8,7 @@ from api_coverage import read_bytes
 from audit_retained_evidence import evidence_path
 from run_block_tests import file_record
 from engineering_preservation import require, native_payload_hash
+from preview_payload import preview_payload
 from smoke_safety_direct import require_signature_evidence, require_safety_equal, native_payload_hash as legacy_payload_hash
 import safety_lifecycle
 from compilation_evidence import require_baseline_compile
@@ -76,7 +77,7 @@ def load_source(source_path, artifacts, workspace):
     require(prepared.get('state') == 'prepared' and type(prepared.get('processId')) is int
             and prepared['processId'] == process_id and preview.get('kind') == 'safety_import_xml'
             and preview.get('changeId') == change_id and preview.get('project', {}).get('path') == project
-            and preview.get('payload') == payload, 'Original safety preview context differs')
+            and preview.get('payload') in (payload, preview_payload(payload)), 'Original safety preview context differs')
     inspections = [row['result'] for row in steps[:prepared_index] if row['name'] == 'safety_inspect'
         and row.get('isError') is False and row['arguments'].get('blockPath') == selected]
     require(inspections, 'Missing successful pre-change selected-block signatures')

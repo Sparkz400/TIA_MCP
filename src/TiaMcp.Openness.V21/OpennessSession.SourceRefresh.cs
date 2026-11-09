@@ -15,10 +15,11 @@ namespace TiaMcp.Openness.V21
         {
             var plc = SelectPlc(change.Selector);
             var blocks = new JArray();
+            var find = BlockLookup(plc, change);
             foreach (var backup in change.Backups.OfType<JObject>().Where(b => b["blockName"] != null))
             {
                 string name = backup.Value<string>("blockName");
-                var block = FindBlockByName(plc, name, false, change);
+                var block = find(name, false);
                 if (block == null) { blocks.Add(new JObject { ["blockName"] = name, ["present"] = false }); continue; }
                 string after = Path.Combine(change.Directory, "after-refresh-" + Guid.NewGuid().ToString("N") + ".xml");
                 block.Item.Export(new FileInfo(after), ExportOptions.WithDefaults, DocumentInfoOptions.None);

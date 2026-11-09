@@ -182,6 +182,57 @@ internal static class TagTableImportTests
         var prepared = ChangeMilestoneRules.From("prepared", Stages(), null);
         Check.Equal(false, prepared.Value<bool>("projectEditComplete"));
         Check.Equal(true, prepared.Value<string>("summary")!.StartsWith("Prepared only"));
+        var notApplied = ChangeMilestoneRules.From("not_applied", Stages("change_finished_with_failure"), null);
+        Check.Equal(true, notApplied.Value<string>("summary")!.StartsWith("The change failed before the project was changed"));
+        return Task.CompletedTask;
+    }
+
+    internal static Task ChangeLifecycleRules()
+    {
+        // A not_applied change no longer blocks preparation, and a replayed apply of any resolved outcome returns its view.
+        foreach (var state in new[] { "applied", "restored", "rolled_back", "not_applied" })
+        {
+            Check.Equal(true, ChangeMilestoneRules.IsResolvedOutcome(state));
+            Check.Equal(false, ChangeMilestoneRules.IsUnresolved(state));
+        }
+        foreach (var state in new[] { "recovery_required", "checkpointing", "applying", "restoring" })
+        {
+            Check.Equal(false, ChangeMilestoneRules.IsResolvedOutcome(state));
+            Check.Equal(true, ChangeMilestoneRules.IsUnresolved(state));
+        }
+        return Task.CompletedTask;
+    }
+
+    internal static async Task RestorePreChecks()
+    {
+        static async Task Refused(string code, Action action) =>
+            Check.Equal(code, (await Check.ThrowsAsync<TagException>(() => { action(); return Task.CompletedTask; })).Code);
+        // A wrong previewHash is refused even when the change is already restored.
+        await Refused("PreviewMismatch", () => ChangeMilestoneRules.RestoreAlreadyDone("restored", "wrong", "hash"));
+        Check.Equal(true, ChangeMilestoneRules.RestoreAlreadyDone("restored", "hash", "hash"));
+        Check.Equal(false, ChangeMilestoneRules.RestoreAlreadyDone("applied", "hash", "hash"));
+        var view = new JObject { ["state"] = "applied" };
+        var owned = await Check.ThrowsAsync<TagException>(() => { ChangeMilestoneRules.RequireRestorable("applied", false, () => true, () => view); return Task.CompletedTask; });
+        Check.Equal("OwnedSessionRequired", owned.Code);
+        Check.Equal(view, owned.Details);
+        await Refused("InvalidChangeState", () => ChangeMilestoneRules.RequireRestorable("not_applied", true, () => true, () => view));
+        await Refused("CheckpointInvalid", () => ChangeMilestoneRules.RequireRestorable("recovery_required", true, () => false, () => view));
+        ChangeMilestoneRules.RequireRestorable("recovery_required", true, () => true, () => view);
+        await Refused("SessionChanged", () => ChangeMilestoneRules.RequireSameAttachment(10, 11));
+        await Refused("SessionChanged", () => ChangeMilestoneRules.RequireSameAttachment(10, null));
+        ChangeMilestoneRules.RequireSameAttachment(10, 10);
+        await Refused("ProjectChanged", () => ChangeMilestoneRules.RequireSameProject("D:/p/a.ap21", "D:/p/b.ap21"));
+        ChangeMilestoneRules.RequireSameProject("D:/P/A.ap21", "d:/p/a.ap21");
+        await Refused("OfflineRequired", () => ChangeMilestoneRules.RequireOffline("/projects/p/devices/PLC_1/items/CPU", false));
+        ChangeMilestoneRules.RequireOffline("/projects/p/devices/PLC_1/items/CPU", true);
+    }
+
+    internal static Task DecisionLogSkipsTornLines()
+    {
+        string line = IntentRules.Line("D:/p/a.ap21", "c1", JObject.Parse("""{"id":"door-reset","statement":"Reset only with the door closed.","target":"Servos"}"""));
+        var decisions = IntentRules.DecisionsOf(new[] { line, "", "{\"projectPath\":\"D:", IntentRules.Line("D:/other.ap21", "c2", JObject.Parse("""{"id":"x","statement":"s"}""")) }, "d:/P/A.ap21");
+        Check.Equal(1, decisions.Count);
+        Check.Equal("c1", decisions[0].Value<string>("changeId"));
         return Task.CompletedTask;
     }
 }
