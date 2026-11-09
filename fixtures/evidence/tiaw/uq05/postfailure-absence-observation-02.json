@@ -1,0 +1,7 @@
+{
+  "observedAt": 1792057729.7347615,
+  "originalExactCleanupPassed": false,
+  "sameIdentitiesCurrentlyPresent": [],
+  "helperAttempt": "No process with exact PID40032 existed when helper opened the PID; no Dispose or termination was invoked.",
+  "automaticReplay": false
+}

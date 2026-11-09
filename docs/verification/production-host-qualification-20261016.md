@@ -26,7 +26,7 @@ The collector now traverses direct Host→worker→native children and preserves
 
 ## Owned native workflow
 
-`D:\TIAW\ph1601` passes **9/9 independent gates**: reviewed FALSE→TRUE Bool edit, native readback and unchanged peers, fresh original reopen, checkpoint recovery to a separate destination, fresh restored reopen and original/restored reconciliation. All six native instances, the worker and Host exited 0. The independent byte comparison permits only the native export timestamp and the one approved literal; IDs, comments, whitespace and all seven peer exports are preserved. Detailed independent result (`artifacts/production-host-20261016/bool-01-independent.json`).
+`D:\TIAW\ph1601` ([retained copy](../../fixtures/evidence/tiaw/ph1601)) passes **9/9 independent gates**: reviewed FALSE→TRUE Bool edit, native readback and unchanged peers, fresh original reopen, checkpoint recovery to a separate destination, fresh restored reopen and original/restored reconciliation. All six native instances, the worker and Host exited 0. The independent byte comparison permits only the native export timestamp and the one approved literal; IDs, comments, whitespace and all seven peer exports are preserved. Detailed independent result (`artifacts/production-host-20261016/bool-01-independent.json`).
 
 The original saved project retains TRUE; the separately recovered checkpoint retains FALSE. Reconciliation records both dispositions rather than replacing the original project.
 
@@ -34,8 +34,8 @@ The original saved project retains TRUE; the separately recovered checkpoint ret
 
 | Case | Actual loss and cleanup | Independent result |
 | --- | --- | --- |
-| `D:\TIAW\ph1602` | Worker exits 73 after Save, before response; Host exits 1. The exact orphaned native process requires the admitted cleanup helper and exits 75. Fresh recovery Host/worker/native lifetimes exit 0. | 6/6 gates; 11 original-operation journal revisions; one dispatch; final state `reconciled`. |
-| `D:\TIAW\ph1603` | Host exits 74 after receiving the saved native result, before publication. Its worker and native processes exit 0; fresh recovery lifetimes also exit 0. | 6/6 gates; 11 original-operation journal revisions; one dispatch; final state `reconciled`. |
+| `D:\TIAW\ph1602` ([retained copy](../../fixtures/evidence/tiaw/ph1602)) | Worker exits 73 after Save, before response; Host exits 1. The exact orphaned native process requires the admitted cleanup helper and exits 75. Fresh recovery Host/worker/native lifetimes exit 0. | 6/6 gates; 11 original-operation journal revisions; one dispatch; final state `reconciled`. |
+| `D:\TIAW\ph1603` ([retained copy](../../fixtures/evidence/tiaw/ph1603)) | Host exits 74 after receiving the saved native result, before publication. Its worker and native processes exit 0; fresh recovery lifetimes also exit 0. | 6/6 gates; 11 original-operation journal revisions; one dispatch; final state `reconciled`. |
 
 Both restarted Hosts reject duplicate apply with `RecoveryRequired` and competing acquisition with `ResourceBusy` before starting recovery. Worker loss persists `outcomeUnknown`; Host loss retains the uncertain dispatch intent. After checkpoint retrieval and a fresh restored reopen, both refusals are tested again while original readback remains outstanding. Only fresh original-resource observation plus restored evidence completes reconciliation. The independent audit verifies the immutable journal chain, exactly one dispatch, strict native bytes, distinct process/session epochs, and original retained-handle terminal evidence. Worker-loss detail (`artifacts/production-host-20261016/worker-loss-01-independent.json`); both complete cases are included in the final audit (`artifacts/production-host-20261016/qualification-final.json`).
 

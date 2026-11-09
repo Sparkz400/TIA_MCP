@@ -1,0 +1,56 @@
+{
+  "mode": "create-bool",
+  "root": "D:\\TIAW\\we1602",
+  "worker": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\TiaMcp.Openness.V21.exe",
+  "workerSha256": "f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157",
+  "host": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.exe",
+  "hostSha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f",
+  "hostFiles": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\Microsoft.Extensions.AI.Abstractions.dll",
+      "sha256": "bcc8f693103eb00505179f154b1b3a996b85d067e112facd724fd9d695f17a5e"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\ModelContextProtocol.Core.dll",
+      "sha256": "b1752096ea9d2f38ba88e467f04aea43fb300d9a54d881c165f62b69028ee3ab"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\ModelContextProtocol.dll",
+      "sha256": "8cd6f626c8d6a0a5ff3e154789d3fcde2b1d66a595c0ef0198e092c2c30fe93a"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Core.dll",
+      "sha256": "b52bf1f641a94fcd31fefc9cd651ba17d698cad3ed33fe2983aa74ca90bebc52"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.deps.json",
+      "sha256": "e87d38800e52c7c5a6dd09ef4ebfd2954c8b8244c00de8fe27ad20092ddfe04b"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.dll",
+      "sha256": "16af082ee0ee68510d7f97a68a1b80468dea27e6ec43e14b53e58f7761506aa6"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.exe",
+      "sha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.runtimeconfig.json",
+      "sha256": "61a2a447a31667ca1fb9081bec4ffbeb230bb1813fadfa98ebc3a242ce38e36e"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.OpcUa.dll",
+      "sha256": "7f07b24c08cd2b62920606d01dad642a31d164be0eae3270a7758dbf972bcf6d"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Translations.dll",
+      "sha256": "fdc4b3cf50dc518c154c76fb0cf8892caa310b0c6fcba63b059ca30119d73aad"
+    }
+  ],
+  "commentInput": null,
+  "nativeCleanupHelper": null,
+  "nativeSequential": true,
+  "actualMcpHost": true,
+  "automaticReplay": false,
+  "effects": "Fresh owned offline scratch only; one reviewed watch edit and explicit archive recovery."
+}

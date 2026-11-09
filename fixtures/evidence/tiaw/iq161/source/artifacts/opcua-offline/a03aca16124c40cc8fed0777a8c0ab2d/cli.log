@@ -1,0 +1,5 @@
+D:\TIAW\iq161\source\artifacts\opcua-offline\a03aca16124c40cc8fed0777a8c0ab2d\machine-v1-review.json
+Offline review only; no target, PLC mapping, import or runtime qualification.
+D:\TIAW\iq161\source\artifacts\opcua-offline\a03aca16124c40cc8fed0777a8c0ab2d\machine-breaking-impact.json
+Offline review only; no target, PLC mapping, import or runtime qualification.
+{"code":"OpcUaReviewFailed","message":"The file \u0027D:\\TIAW\\iq161\\source\\artifacts\\opcua-offline\\a03aca16124c40cc8fed0777a8c0ab2d\\machine-v1-review.json\u0027 already exists."}

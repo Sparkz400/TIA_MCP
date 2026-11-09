@@ -1,0 +1,28 @@
+PASS independent cross-file identities, alias, model URI and hash
+PASS input order deterministic, names excluded from content binding
+PASS missing external file and required model
+PASS namespace table alone does not provide a required model
+PASS standard nodes require explicit files
+PASS identical duplicates remain ambiguous with all provenance
+PASS conflicting definitions are skipped, not arbitrarily compared
+PASS two-hop client impact contains independently expected path
+PASS published consumer fixture binds the exact set and expected clients
+PASS direct changes separated from indirect and unrelated clients
+PASS cycles terminate and yield a shortest path
+PASS removed dependencies retain before impact evidence
+PASS new dependencies use after evidence
+PASS no invented path assembled across snapshots
+PASS ambiguous edges stop traversal and surface consumer gaps
+PASS missing references surface in client coverage even without changes
+PASS reference types, inverse targets, parent, method and roles resolve
+PASS stale dependency bytes invalidate manifest even if primary unchanged
+PASS strict consumer manifest validation
+PASS metadata-only edits visible even without node changes
+PASS invalid identities and XML retain parser defenses
+PASS source and capacity bounds fail explicitly
+PASS unresolved-row bound applies after cross-file resolution
+PASS CLI dependencies, compare-set and v2 manifest
+PASS CLI unresolved report exit, overwrite and input preservation
+PASS CLI comparison without consumers and stale manifest refusal
+PASS CLI errors never publish reports
+27/27 offline OPC UA dependency checks passed.

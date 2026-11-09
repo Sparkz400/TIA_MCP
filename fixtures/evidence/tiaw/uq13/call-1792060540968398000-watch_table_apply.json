@@ -1,0 +1,18 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"error\":{\"code\":\"EngineeringError\",\"message\":\"Error when calling method \\u0027Import\\u0027 of type \\u0027Siemens.Engineering.SW.WatchAndForceTables.PlcWatchTableComposition\\u0027.\\r\\n\\r\\nCannot update the \\u0027MultilingualText\\u0027 object with Simatic ML ID \\u00272\\u0027 at line number 68 at line position 12.\\r\\n\\r\\nThe value of attribute \\u0027Comment text\\u0027 contains an invalid character at Position 21.\",\"details\":{\"exceptionType\":\"Siemens.Engineering.EngineeringTargetInvocationException\"}}}"
+    }
+  ],
+  "structuredContent": {
+    "error": {
+      "code": "EngineeringError",
+      "message": "Error when calling method 'Import' of type 'Siemens.Engineering.SW.WatchAndForceTables.PlcWatchTableComposition'.\r\n\r\nCannot update the 'MultilingualText' object with Simatic ML ID '2' at line number 68 at line position 12.\r\n\r\nThe value of attribute 'Comment text' contains an invalid character at Position 21.",
+      "details": {
+        "exceptionType": "Siemens.Engineering.EngineeringTargetInvocationException"
+      }
+    }
+  },
+  "isError": true
+}

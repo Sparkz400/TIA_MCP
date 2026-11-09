@@ -1,0 +1,212 @@
+{
+  "completed": false,
+  "productionEnabled": false,
+  "trials": [],
+  "automaticReplay": false,
+  "failure": {
+    "type": "ValueError",
+    "message": "Native tool failed: {\"content\": [{\"type\": \"text\", \"text\": \"An error occurred invoking 'qualification_translation_apply'.\"}], \"isError\": true}"
+  },
+  "cleanup": {
+    "hostExitCode": 0,
+    "forcedHostStop": false,
+    "workerExits": [
+      {
+        "processId": 51144,
+        "startedAtUtc": "2026-10-16T07:25:32.4670687Z",
+        "processExitVerified": true,
+        "exitCode": 0,
+        "waitBudgetSeconds": 30,
+        "elapsedMs": 2348,
+        "forcedTermination": false,
+        "projectLockReleaseVerified": false
+      }
+    ],
+    "stderrEofObserved": true,
+    "closeInterrupted": null,
+    "tree": {
+      "completed": true,
+      "exits": [
+        {
+          "identity": {
+            "pid": 39764,
+            "parentPid": 54328,
+            "created": 1792135531.312461,
+            "name": "TiaMcp.Host.exe",
+            "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Host.exe",
+            "command": [
+              "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Host.exe",
+              "--timeout-seconds",
+              "300",
+              "--worker",
+              "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\TiaMcp.Openness.V21.exe",
+              "--artifacts",
+              "D:\\TIAW\\tr1603"
+            ]
+          },
+          "role": "host",
+          "ancestry": [],
+          "proof": {
+            "processId": 39764,
+            "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION",
+            "inheritable": false,
+            "basis": "Original handle captured from exact owned startup ancestry before native reply; never reopened for cleanup",
+            "handleCaptured": true,
+            "processExitVerified": true,
+            "handleClosed": true,
+            "projectLockReleaseVerified": false,
+            "capturedAtUtc": "2026-10-16T07:25:31.343506+00:00",
+            "birthAndImageVerified": true,
+            "processStartedAtUtc": "2026-10-16T07:25:31.3124609Z",
+            "imagePath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Host.exe",
+            "sameOsHandleRetained": true,
+            "originalFileTimeTicks": 134366091313124609,
+            "ownerProcessId": 54328,
+            "ownerHandleValue": 892,
+            "exitCode": 0,
+            "terminalAtUtc": "2026-10-16T07:27:22.104542+00:00",
+            "forcedTermination": false,
+            "deadlineOrCancellationObserved": false,
+            "unknownReasons": [],
+            "completed": true
+          }
+        },
+        {
+          "identity": {
+            "pid": 51144,
+            "parentPid": 39764,
+            "created": 1792135532.467069,
+            "name": "TiaMcp.Openness.V21.exe",
+            "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\TiaMcp.Openness.V21.exe",
+            "command": [
+              "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\TiaMcp.Openness.V21.exe",
+              "--pipe",
+              "TiaMcp-2a8a79407f734ff1a4ee1cfebb7e5cb9"
+            ]
+          },
+          "role": "worker",
+          "ancestry": [
+            {
+              "pid": 39764,
+              "parentPid": 54328,
+              "created": 1792135531.312461,
+              "name": "TiaMcp.Host.exe",
+              "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Host.exe",
+              "command": [
+                "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Host.exe",
+                "--timeout-seconds",
+                "300",
+                "--worker",
+                "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\TiaMcp.Openness.V21.exe",
+                "--artifacts",
+                "D:\\TIAW\\tr1603"
+              ]
+            }
+          ],
+          "proof": {
+            "processId": 51144,
+            "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION",
+            "inheritable": false,
+            "basis": "Original handle captured from exact owned startup ancestry before native reply; never reopened for cleanup",
+            "handleCaptured": true,
+            "processExitVerified": true,
+            "handleClosed": true,
+            "projectLockReleaseVerified": false,
+            "capturedAtUtc": "2026-10-16T07:25:32.672136+00:00",
+            "birthAndImageVerified": true,
+            "processStartedAtUtc": "2026-10-16T07:25:32.4670687Z",
+            "imagePath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\TiaMcp.Openness.V21.exe",
+            "sameOsHandleRetained": true,
+            "originalFileTimeTicks": 134366091324670687,
+            "ownerProcessId": 54328,
+            "ownerHandleValue": 648,
+            "exitCode": 0,
+            "terminalAtUtc": "2026-10-16T07:27:22.108136+00:00",
+            "forcedTermination": false,
+            "deadlineOrCancellationObserved": false,
+            "unknownReasons": [],
+            "completed": true
+          }
+        },
+        {
+          "identity": {
+            "pid": 50564,
+            "parentPid": 51144,
+            "created": 1792135533.4225795,
+            "name": "Siemens.Automation.Portal.exe",
+            "exe": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+            "command": [
+              "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+              "-bootstrapper=Siemens.Automation.Opns.Loader.Impl:Siemens.Automation.Openness.Loader.BootStrapper",
+              "-nosplashscreen"
+            ]
+          },
+          "role": "native",
+          "ancestry": [
+            {
+              "pid": 51144,
+              "parentPid": 39764,
+              "created": 1792135532.467069,
+              "name": "TiaMcp.Openness.V21.exe",
+              "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\TiaMcp.Openness.V21.exe",
+              "command": [
+                "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\TiaMcp.Openness.V21.exe",
+                "--pipe",
+                "TiaMcp-2a8a79407f734ff1a4ee1cfebb7e5cb9"
+              ]
+            },
+            {
+              "pid": 39764,
+              "parentPid": 54328,
+              "created": 1792135531.312461,
+              "name": "TiaMcp.Host.exe",
+              "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Host.exe",
+              "command": [
+                "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Host.exe",
+                "--timeout-seconds",
+                "300",
+                "--worker",
+                "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\TiaMcp.Openness.V21.exe",
+                "--artifacts",
+                "D:\\TIAW\\tr1603"
+              ]
+            }
+          ],
+          "proof": {
+            "processId": 50564,
+            "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION",
+            "inheritable": false,
+            "basis": "Original handle captured from exact owned startup ancestry before native reply; never reopened for cleanup",
+            "handleCaptured": true,
+            "processExitVerified": true,
+            "handleClosed": true,
+            "projectLockReleaseVerified": false,
+            "capturedAtUtc": "2026-10-16T07:25:33.678776+00:00",
+            "birthAndImageVerified": true,
+            "processStartedAtUtc": "2026-10-16T07:25:33.4225796Z",
+            "imagePath": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+            "sameOsHandleRetained": true,
+            "originalFileTimeTicks": 134366091334225796,
+            "ownerProcessId": 54328,
+            "ownerHandleValue": 952,
+            "exitCode": 0,
+            "terminalAtUtc": "2026-10-16T07:27:22.111438+00:00",
+            "forcedTermination": false,
+            "deadlineOrCancellationObserved": false,
+            "unknownReasons": [],
+            "completed": true
+          }
+        }
+      ],
+      "errors": [],
+      "unknownReasons": [],
+      "startupOutcomeUnknown": false,
+      "forcedTermination": false,
+      "startupInventoryUnknownReasons": [],
+      "finalizationErrors": [],
+      "expectedWorkerCount": 1,
+      "workerStartupCaptured": true,
+      "nativeStartupInventoryComplete": true
+    }
+  }
+}

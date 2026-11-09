@@ -1,0 +1,17 @@
+{
+  "request": {
+    "operationId": "96589d2385c049259edff2b00abe680b",
+    "planSha256": "84c4ce94e41097acc3e254d810884152a2e00dfed800bcc362b923f2de651975",
+    "revision": 5,
+    "newProjectPath": "D:\\TIAW\\ta1602\\collision\\TiaMcpScratch_20261016_085129_85eed50d.ap21"
+  },
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "An error occurred invoking 'qualification_translation_recover'."
+      }
+    ],
+    "isError": true
+  }
+}

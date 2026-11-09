@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"error\":{\"code\":\"WatchTableCollision\",\"message\":\"Creation requires an independently observed absent destination.\",\"details\":null}}"
+    }
+  ],
+  "structuredContent": {
+    "error": {
+      "code": "WatchTableCollision",
+      "message": "Creation requires an independently observed absent destination.",
+      "details": null
+    }
+  },
+  "isError": true
+}

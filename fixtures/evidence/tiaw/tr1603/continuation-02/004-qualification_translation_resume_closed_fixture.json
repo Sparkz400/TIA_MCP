@@ -1,0 +1,16 @@
+{
+  "request": {
+    "operationId": "9a4e37aaf6e54a7788e8ac2942f10624",
+    "revision": 16,
+    "closeRelativePath": "continuation-01\\exact-close.json",
+    "originalCloseSha256": "441a3c3d512ab3f4fa569282a3d5e4813a0925ff4f7ecc99463cffcf5531998c"
+  },
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"relativePath\":\"translation-import/blobs/c612cb61e4bfd6433d942885ccd96a7cfe717f4065c8ea2e88ac22a5291c367b\",\"sha256\":\"c612cb61e4bfd6433d942885ccd96a7cfe717f4065c8ea2e88ac22a5291c367b\"}"
+      }
+    ]
+  }
+}

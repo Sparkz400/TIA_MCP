@@ -1,0 +1,19 @@
+{
+  "origin": "TIA Portal V21 Openness/offline",
+  "observedAtUtc": "2026-10-16T07:01:29.6603953Z",
+  "processId": null,
+  "processes": [
+    {
+      "processId": 31240,
+      "mode": "WithUserInterface",
+      "executablePath": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+      "projectPath": "D:\\01_Projekte\\2026\\200756_FelixSchoeller\\200756_FelixSchoeller_Bausteine_V00\\200756_FelixSchoeller_Bausteine.ap21"
+    },
+    {
+      "processId": 46480,
+      "mode": "WithoutUserInterface",
+      "executablePath": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+      "projectPath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\scratch\\TiaMcpScratch_20261016_065827_d9c19e50\\TiaMcpScratch_20261016_065827_d9c19e50\\TiaMcpScratch_20261016_065827_d9c19e50.ap21"
+    }
+  ]
+}

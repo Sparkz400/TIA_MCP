@@ -1,0 +1,23 @@
+{
+  "identity": {
+    "pid": 53620,
+    "parentPid": 4772,
+    "created": 1792060587.998452,
+    "name": "TiaMcp.Host.exe",
+    "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\published-host\\TiaMcp.Host.exe",
+    "command": [
+      "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\published-host\\TiaMcp.Host.exe",
+      "--timeout-seconds",
+      "240",
+      "--worker",
+      "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\src\\TiaMcp.Openness.V21\\bin\\Release\\net48\\TiaMcp.Openness.V21.exe",
+      "--artifacts",
+      "D:\\TIAW\\uq13",
+      "--component-qualification",
+      "--watch-qualification",
+      "none"
+    ]
+  },
+  "point": "none",
+  "processes": []
+}

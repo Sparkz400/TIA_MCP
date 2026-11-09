@@ -1,0 +1,365 @@
+  Wiederherzustellende Projekte werden ermittelt...
+  "D:\TIAW\iq163\source\src\TiaMcp.OpcUa.Cli\TiaMcp.OpcUa.Cli.csproj" wiederhergestellt (in 87 ms.).
+  "D:\TIAW\iq163\source\src\TiaMcp.Core\TiaMcp.Core.csproj" wiederhergestellt (in 77 ms.).
+  "D:\TIAW\iq163\source\src\TiaMcp.OpcUa\TiaMcp.OpcUa.csproj" wiederhergestellt (in 87 ms.).
+  TiaMcp.Core -> D:\TIAW\iq163\source\artifacts\final-managed-01\dotnet\bin\TiaMcp.Core\release\TiaMcp.Core.dll
+  TiaMcp.OpcUa -> D:\TIAW\iq163\source\artifacts\final-managed-01\dotnet\bin\TiaMcp.OpcUa\release\TiaMcp.OpcUa.dll
+  TiaMcp.OpcUa.Cli -> D:\TIAW\iq163\source\artifacts\final-managed-01\dotnet\bin\TiaMcp.OpcUa.Cli\release\TiaMcp.OpcUa.Cli.dll
+
+Der Buildvorgang wurde erfolgreich ausgeführt.
+    0 Warnung(en)
+    0 Fehler
+
+Verstrichene Zeit 00:00:09.83
+PASS Engineering identity and canonical capture contracts: 25 checks; no native execution.
+PASS Native target guards and durable engineering operations: 50 checks; synthetic callbacks only, no native execution. Receipts retained at D:\TIAW\iq163\source\artifacts\final-managed-01\temp\engineering-operations-ef5889dbfc954619a8173a54769f45bc
+PASS Production recovery store contracts: 24 checks; synthetic checkpoints, no native execution; fixtures D:\TIAW\iq163\source\artifacts\final-managed-01\temp\production-recovery-fa2b371994134e3b8d697b6b9a5d80af
+PASS Production watch dispatcher: 16 checks using authored fake IBridgeClient, no native execution.
+PASS Interrupted watch recovery reachability: 50 checks; fake bridge only, retained bounded filesystem fixtures, no native calls.
+PASS Watch interruption matrix: 38 checks; actual managed child exit/restart/competing processes, synthetic bridge only.
+PASS Expanded watch dispatcher: 16 checks with genuine seed XML and synthetic bridge; native profiles remain gated.
+PASS Shared legacy mutation admission: 30 checks, including cross-process operation/admission conflicts; no native execution.
+PASS Recovery boundary independent audit: 131 checks; fake bridge only, no native execution.
+PASS Production adapter boundaries: 88 checks; fake worker, durable restart/readback/recovery, no native execution.
+PASS WT exact candidate: 39 checks; current production admission remains closed.
+PASS WT source-negative recovery: 15 actual dispatcher checks including pre-effect marker failure; no native mutation.
+PASS WT-04 authoring: 57 managed checks; native mutation profiles remain unverified.
+PASS Authored MotorA entry oracle and TEMP retained
+PASS Determinism, explanation and immutable input/output
+PASS MotorB, nested instance and explicit external storage
+PASS Stale source, mixed project/PLC/capture and stale declarations
+PASS All normalized selection sources and declaration evidence
+PASS Ambiguous, unavailable and unsupported types stay gaps
+PASS Duplicate policy preserves intent and conflicting types reject
+PASS Budget exhaustion retains every omitted candidate
+PASS Reusable template mapping, order, type and role guards
+PASS Separate address observations, optimized DB and alignment guards
+PASS One thousand captured rows retain deterministic bounded paging intent
+PASS Hash-bound case and native-gate separation
+PASS Document no-op and defensive byte copies
+PASS Document exact field edit preserves every unselected XML node
+PASS Document cleared scalar uses native empty element without relaxing hashes
+PASS Document comments retain Unicode whitespace and CRLF
+PASS Document rename preserves opaque attributes
+PASS Document reorder preserves inter-row comments PI and whitespace slots
+PASS Document duplicate allocates unique native IDs and preserves source
+PASS Document remove affects exact row only
+PASS Document hash distinguishes blank Text and unknown payload whitespace
+PASS Document hash tolerates known indentation timestamp and encoding
+PASS Document scalar edits reject opaque child markup without mutation
+PASS Document force profiles remain capture only
+PASS Document wrong versions exports object types and ambiguous fields reject
+PASS Document hexadecimal ID duplicates aliases malformed and missing reject
+PASS Document DTD oversized deep malformed and row count limits reject
+PASS Document invalid edits permutations ordinals and XML text reject atomically
+PASS Document clone refuses attribute and element ID references
+PASS Genuine owned XML captures: hashes, no-op, reviewed delta and recovery baseline
+30/30 watch planner groups passed; no native table qualification.
+PASS three-way unchanged
+PASS three-way projectOnly
+PASS three-way workspaceOnly
+PASS three-way bothChangedIdentically
+PASS three-way divergentChange
+PASS three-way deletedProjectOnly
+PASS three-way deletedWorkspaceOnly
+PASS three-way deletedBoth
+PASS three-way deleteVsChange
+PASS three-way deleteVsChange
+PASS three-way addedProjectOnly
+PASS three-way addedWorkspaceOnly
+PASS three-way addedBothIdentically
+PASS three-way divergentAddition
+PASS empty complete inventories contain no invented deletion
+PASS native green is not content equality
+PASS different native status does not change identical content
+PASS expected manifest digest binds all inputs
+PASS incomplete inventory never implies deletion
+PASS same package different exact target collision
+PASS same name different native identity collision
+PASS missing native identity observation is unknown
+PASS missing companion is incomplete not deletion
+PASS unmanaged file prevents adopting missing mapping
+PASS multiply mapped file cannot acquire two writers
+PASS duplicate exact object even at different file paths is ambiguous
+PASS mixed capture snapshots refused
+PASS profile cannot guess support from extension
+PASS profile object family binding
+PASS incomplete profile does not assert completeness
+PASS unsafe path ../a
+PASS unsafe path a/../b
+PASS unsafe path /root/a
+PASS unsafe path C:/a
+PASS unsafe path \\server\share
+PASS unsafe path a\b
+PASS unsafe path a//b
+PASS unsafe path a:stream
+PASS unsafe path NUL.txt
+PASS unsafe path x/COM1.log
+PASS unsafe path x/LPT².txt
+PASS unsafe path CON .txt
+PASS unsafe path a.
+PASS unsafe path a 
+PASS unsafe path a?b
+PASS unsafe path a/./b
+PASS unsafe path a
+b
+PASS unsafe path a�
+PASS links refused
+PASS path collision a A
+PASS path collision café café
+PASS path collision a a/b
+PASS unknown auxiliary companion retained and hashed
+PASS unified scripts require explicit paired roles
+PASS library GUID and version companion required
+PASS library SD does not drop resources
+PASS deterministic order and cloned outputs
+PASS byte file package and path budgets
+PASS read-only result snapshots
+PASS project ownership cannot be mixed
+PASS object content observation cannot silently disappear
+PASS 1000 object deterministic bounded comparison
+PASS opaque native status must be bounded observable text
+PASS VCI preservation exact multilingual comment coverage is scoped and never native import acceptance
+PASS VCI preservation lost secondary language cannot become passing native green
+PASS VCI preservation changed placeholders and empty translated text fail exact comparison
+PASS VCI preservation unknown extra cultures require explicit review
+PASS VCI preservation duplicate native cultures are ambiguous
+PASS VCI preservation wrong native kind name or number refuses apparent text equality
+PASS VCI preservation external entity XML cannot read local or network input
+PASS VCI preservation rich XML text representation remains unqualified
+PASS VCI preservation missing resources and unknown auxiliary bytes remain explicit
+PASS VCI preservation SD cannot evade resource requirement by declaring a different package
+PASS VCI preservation SCL does not acquire language qualification from matching tokens
+PASS VCI preservation an unreviewed companion cannot hide behind exact comments
+PASS VCI preservation native identity duplicate fields and disguised root are rejected
+PASS VCI preservation ambiguous duplicate compositions and text fields are rejected
+PASS VCI retained package all supplied native and unknown companion bytes participate
+PASS VCI retained package changed workspace language and unknown companions fail
+PASS VCI retained package missing added and case-renamed companions cannot pass
+PASS VCI retained package a matching hash with wrong reviewed byte count fails
+PASS VCI retained package review inputs are immutable snapshots
+PASS VCI retained package reviewed aliases and ancestor collisions are rejected
+PASS VCI retained package unsafe paths links malformed hashes and bounds are rejected
+PASS Git raw exact-file commit preserves BOM CRLF binary Unicode and excluded files
+PASS Git modify add delete exact tree and offline history diff branch inspection
+PASS Git immutable revision materialization verifies raw bytes and preserves source
+PASS Git reviewed plan binding and later working-byte drift refuse without ref change
+PASS Git HEAD movement and dirty index invalidate reviewed changes
+PASS Git unmerged index conflicts are never considered an admissible snapshot
+PASS Git intent-to-add assume-unchanged and skip-worktree index state refused
+PASS Git active hooks refused and hook marker never executed
+PASS Git filters attributes includes executable config and remotes refused
+PASS Git inherited Git configuration repository and execution environment ignored
+PASS Git symbolic branch alias cannot redirect a reviewed publication
+PASS Git deleted tracked attributes cannot hide executable configuration
+PASS Git branch compare-and-swap creates updates and refuses wrong prior state
+PASS Git concurrent branch creation CAS retains competitor and unknown dispatch
+PASS Git journal failure before dispatch prevents mutation
+PASS Git lost completion record returns unknown and candidate reconciles by fresh readback
+PASS Git index lock and controlled reservation refusal preserve foreign locks
+PASS Git unreviewed option traversal identity and destination inputs refused
+PASS Git symbolic-link and submodule index modes are refused
+PASS Git bounded inventory catches ignored files and all binary bytes
+PASS Git actual Git output is bounded and stopped without ref mutation
+PASS Git cancellation before dispatch leaves HEAD index and journal untouched
+PASS Git 100-file complete package commit and independently hashed revision export
+PASS Git process timeout terminates isolated slow executable fixture
+PASS Git process cancellation terminates isolated slow executable fixture
+PASS Durable Git init persists exact branch intent and requires explicit result gates
+PASS Durable Git commit readback is durable and excludes unreviewed raw files
+PASS Durable Git branch callback binds expected absent ref and immutable target
+PASS Durable Git materialize owns exact new destination and preserves source snapshot
+PASS Durable Git stale native recheck blocks dispatch and restart cannot reuse pending callback
+PASS Durable Git changed branch choice is refused before Git writes
+PASS Durable Git interruption at publicationPrepared retains ownership and refuses automatic replay
+PASS Durable Git interruption at verified retains ownership and refuses automatic replay
+PASS Durable Git tampered earlier callback prevents completion
+VCI checks: 118/118; 84 pure checks, 34 explicitly selected isolated Git/process checks; no native operations.
+PASS independent bilingual oracle and missing/empty distinction
+PASS no-op returns original ZIP bytes exactly
+PASS original and candidate byte arrays are defensive copies
+PASS profile maps are captured defensively
+PASS approved target overlay preserves unrelated parts and shared peers
+PASS literal formula-looking text is never executed
+PASS Unicode spaces combining marks and CRLF survive
+PASS OOXML control and literal escape sequences preserve exact values
+PASS isolated surrogate is blocked
+PASS review completeness excludes no hidden global claims
+PASS unapproved suggestion cannot produce candidate
+PASS approval digest binds edited text and reviewer
+PASS source mode is explicit and peer target remains untouched
+PASS source and target expected states are independently checked
+PASS stale native key does not fall back to text or row name
+PASS changed project observation and content are rejected
+PASS changed workbook or profile cannot silently rebase
+PASS provided workbook digest must be exact
+PASS keep is explicit no-op and needs no approval
+PASS empty set differs from clear and missing approval remains keep
+PASS clear and missing-cell creation obey profile
+PASS placeholder omission addition and multiplicity mismatch are blocked
+PASS unknown token grammar blocks edits
+PASS glossary version scope and approved terminology are checked
+PASS UTF16 profile limit blocks oversize text
+PASS rich text is readable and preserved but editing refused
+PASS shared string conversion requires profile consent
+PASS shared phonetic opaque metadata is preserved and edit refused
+PASS malformed relationship part location gives structured refusal
+PASS source edit explicitly invalidates downstream translation reviews
+PASS limits cannot be enlarged beyond fixed safety ceilings
+PASS duplicate edits keys and locations rejected
+PASS claimed native-qualified profile is refused
+PASS duplicate JSON keys are rejected
+PASS ZIP traversal absolute percent and backslash parts rejected
+PASS duplicate package entries rejected
+PASS compressed expanded entry cell and XML depth bounds enforced
+PASS ZIP CRC corruption rejected even with correct outer SHA
+PASS truncated ZIP rejected
+PASS encrypted ZIP declaration refused
+PASS DTD UTF8 UTF16 and malformed XML rejected
+PASS external relationships and package escape rejected
+PASS macro content types and formula cells refused
+PASS duplicate cells and inconsistent row addresses refused
+PASS missing package relationship targets refused
+PASS immutable output paths preserve existing bytes
+PASS output artifacts have exact hashes and immutable receipts
+PASS review and candidate are deterministic across reordered edits
+PASS broad format envelope preserves styles comments hidden sheets numbers and rich source
+PASS format envelope no-op returns exact original package
+PASS rich source formatting survives target change
+PASS inspection pages enumerate each exact target once in ordinal order
+PASS inspection resume is serializable deterministic and never an approval
+PASS inspection cursor rejects changed package profile and observation
+PASS inspection bounds and empty final page are explicit
+PASS inspection distinguishes missing empty unchanged and rich targets
+PASS reconciliation creates unapproved proposals bound to fresh capture
+PASS reconciliation reports source conflicts without automatic rebase
+PASS reconciliation reports target conflicts and already applied values independently
+PASS reconciliation preserves concurrent unrelated translation change
+PASS reconciliation source and native-key edits cannot become target suggestions
+PASS reconciliation rejects foreign identity and changed mapping
+PASS reconciliation refuses removed cells and accepts explicit clear only
+PASS reconciliation rejects rich-text flattening and same-text format edits
+PASS reconciliation rejects unrelated package and selected-cell style edits
+PASS reconciliation no-op is deterministic with zero proposals
+PASS simultaneous source and target changes require a fresh target review
+PASS malformed proposals and glossary are refused even without changes
+PASS multi-owner duplicate keys are refused across worksheet boundaries
+PASS profile missing-target locations count toward cell limit
+PASS ambiguous mapped string encodings are refused
+PASS escaped invalid UTF16 is refused during workbook capture
+72/72 translation checks passed; native execution: false
+PASS Test Suite offline definitions/results/job semantics: 442 independent checks; no native Test Suite execution.
+PASS capture requires committed uploads and refuses filesystem paths
+PASS captured inputs survive release of all committed uploads
+PASS inspection pages preserve missing empty whitespace and exact multilingual states
+PASS inspection cursors reject newer captures and paging bounds
+PASS inspection bounds oversized repeated sources before collecting a full page
+PASS preapproved proposals are rejected without manufacturing an approval
+PASS approval requires explicit every-change consent reviewer and exact digest
+PASS Host-to-library candidate preserves independent XML peers and Unicode
+PASS completed review and candidate reopen in a fresh managed process
+PASS review pages bind exact record and section and retain complete report
+PASS large individual review rows are explicit omissions with exact artifact retrieval
+PASS proposal count is bounded before review
+PASS complete review amplification is bounded before report allocation
+PASS oversized reconciliation is refused without truncating its conflicts or proposals
+PASS retention refuses excessive ancestry before publishing an unreopenable complete record
+PASS restart rejects changed retained original.xlsx
+PASS restart rejects changed retained profile.json
+PASS restart rejects changed retained project.json
+PASS restart rejects changed retained proposals.json
+PASS restart rejects changed retained review.json
+PASS restart rejects changed retained approved-proposals.json
+PASS restart rejects changed retained approved-review.json
+PASS restart rejects changed retained candidate.xlsx
+PASS restart rejects changed retained candidate-manifest.json
+PASS unapproved review exposes expected source restriction before approval
+PASS unapproved review exposes expected target restriction before approval
+PASS unapproved review exposes exact native key restriction before approval
+PASS unapproved review exposes rich text restriction before approval
+PASS unapproved review exposes placeholder restriction before approval
+PASS unapproved review exposes length restriction before approval
+PASS unapproved review exposes source-language restriction before approval
+PASS unapproved review exposes clear-cell restriction restriction before approval
+PASS clear missing creation and whitespace remain distinct through candidates
+PASS new review cannot reuse an approval from concurrent proposals
+PASS concurrent publication has one writer and preserves both reviewed intents
+PASS reconciliation uses current capture and always creates fresh unapproved proposals
+PASS reconciliation returns concurrent target conflicts
+PASS reconciliation returns concurrent source conflicts
+PASS reconciliation refuses foreign projects profile drift and unrelated edited package changes
+PASS candidate publication interruption at intent survives restart without overwrite
+PASS candidate publication interruption at candidate.xlsx survives restart without overwrite
+PASS candidate publication interruption at candidate-manifest.json survives restart without overwrite
+PASS candidate publication interruption at native-handoff.json survives restart without overwrite
+PASS candidate publication interruption at before-receipt survives restart without overwrite
+PASS candidate publication interruption at complete survives restart without overwrite
+PASS incomplete capture publication is discoverable but unusable
+PASS incomplete review publication is discoverable but unusable
+PASS incomplete approval publication is discoverable but unusable
+PASS incomplete reconciliation publication is discoverable but unusable
+49/49 offline Host translation checks passed; native execution: false
+PASS completed owned fixture resumes by observation without repeating import or recovery
+PASS owned fixture resume cannot adopt an unresolved operation
+PASS explicit pre-checkpoint adapter transition observes unchanged content without replay
+PASS pre-checkpoint transition refuses incomplete original lifetime proof
+PASS pre-checkpoint transition refuses changed original texts and retains ownership
+PASS production gate refuses before native lease, resource acquisition or checkpoint
+PASS native peer comparison retains all content except creation time and exact approved culture text
+PASS unknown native peer profile cannot bypass preservation
+PASS one no-op dispatch, full readback, save, reopen and cleanup
+PASS one nonempty edit dispatch, full readback, save, reopen and cleanup
+PASS exact operation review hash and revision are mandatory
+PASS candidate receipt approval and byte tampering cannot acquire
+PASS tampered retained original peer bytes refuse before native lease
+PASS no approval cannot become a native candidate
+PASS initial native packet refuses source writes
+PASS initial native packet refuses clear writes
+PASS initial native packet refuses empty-target writes
+PASS complete initial fresh export detects unchanged mapped-peer drift
+PASS native receipt must bind actual workbook and full peers
+PASS unsupported peer hash claims cannot replace original export evidence
+PASS interruption at acquired retains outcome and never replays
+PASS interruption at checkpointIntent retains outcome and never replays
+PASS interruption at checkpointReturned retains outcome and never replays
+PASS interruption at checkpointRetained retains outcome and never replays
+PASS interruption at dispatchIntent retains outcome and never replays
+PASS interruption at rawResultRetained retains outcome and never replays
+PASS interruption at readbackRetained retains outcome and never replays
+PASS interruption at compiled retains outcome and never replays
+PASS interruption at saved retains outcome and never replays
+PASS interruption at reopened retains outcome and never replays
+PASS interruption at closed retains outcome and never replays
+PASS interruption at completed retains outcome and never replays
+PASS fresh observation 1 rejects source drift before dispatch
+PASS fresh observation 1 rejects target drift before dispatch
+PASS fresh observation 1 rejects peer-row drift before dispatch
+PASS fresh observation 1 rejects languages drift before dispatch
+PASS fresh observation 1 rejects categories drift before dispatch
+PASS fresh observation 1 rejects objects drift before dispatch
+PASS fresh observation 1 rejects peers drift before dispatch
+PASS fresh observation 1 rejects epoch drift before dispatch
+PASS fresh observation 1 rejects adapter drift before dispatch
+PASS fresh observation 1 rejects profile drift before dispatch
+PASS fresh observation 1 rejects offline drift before dispatch
+PASS fresh observation 1 rejects path drift before dispatch
+PASS fresh observation 1 rejects key drift before dispatch
+PASS fresh observation 1 rejects hidden-sheet drift before dispatch
+PASS fresh observation 2 rejects source drift before dispatch
+PASS fresh observation 2 rejects target drift before dispatch
+PASS fresh observation 2 rejects peer-row drift before dispatch
+PASS fresh observation 2 rejects languages drift before dispatch
+PASS fresh observation 2 rejects categories drift before dispatch
+PASS fresh observation 2 rejects objects drift before dispatch
+PASS fresh observation 2 rejects peers drift before dispatch
+PASS fresh observation 2 rejects epoch drift before dispatch
+PASS fresh observation 2 rejects adapter drift before dispatch
+PASS fresh observation 2 rejects profile drift before dispatch
+PASS fresh observation 2 rejects offline drift before dispatch
+PASS fresh observation 2 rejects path drift before dispatch
+PASS fresh observation 2 rejects key drift before dispatch
+PASS fresh observation 2 rejects hidden-sheet drift before dispatch
+PASS shared project ownership excludes a competing operation
+PASS same controller lock excludes reentrant apply
+PASS returned import with source damage keeps recovery ownership and prevents save
+PASS returned import with target damage keeps recovery ownership and prevents save

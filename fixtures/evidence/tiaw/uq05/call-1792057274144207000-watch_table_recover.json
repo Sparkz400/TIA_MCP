@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"error\":{\"code\":\"WorkerDisconnected\",\"message\":\"The TIA worker connection failed: Worker disconnected before completing a response.\",\"details\":null}}"
+    }
+  ],
+  "structuredContent": {
+    "error": {
+      "code": "WorkerDisconnected",
+      "message": "The TIA worker connection failed: Worker disconnected before completing a response.",
+      "details": null
+    }
+  },
+  "isError": true
+}

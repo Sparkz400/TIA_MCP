@@ -1,0 +1,62 @@
+{
+  "completed": true,
+  "originalAttemptAccepted": false,
+  "originalExactCleanupPassed": true,
+  "nativeLifetimes": [
+    {
+      "processId": 61012,
+      "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION",
+      "inheritable": false,
+      "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.",
+      "handleCaptured": true,
+      "processExitVerified": true,
+      "handleClosed": true,
+      "projectLockReleaseVerified": false,
+      "capturedAtUtc": "2026-10-15T11:02:25.041334+00:00",
+      "timeoutMs": 45000,
+      "waitChunkMs": 1000,
+      "waitCount": 7,
+      "completed": true,
+      "waitResult": 0,
+      "exitCode": 0,
+      "elapsedMs": 6799
+    },
+    {
+      "processId": 6320,
+      "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION",
+      "inheritable": false,
+      "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.",
+      "handleCaptured": true,
+      "processExitVerified": true,
+      "handleClosed": true,
+      "projectLockReleaseVerified": false,
+      "capturedAtUtc": "2026-10-15T11:02:58.007884+00:00",
+      "timeoutMs": 45000,
+      "waitChunkMs": 1000,
+      "waitCount": 7,
+      "completed": true,
+      "waitResult": 0,
+      "exitCode": 0,
+      "elapsedMs": 6167
+    },
+    {
+      "processId": 19980,
+      "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION",
+      "inheritable": false,
+      "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.",
+      "handleCaptured": true,
+      "processExitVerified": true,
+      "handleClosed": true,
+      "projectLockReleaseVerified": false,
+      "capturedAtUtc": "2026-10-15T11:03:32.218219+00:00",
+      "timeoutMs": 45000,
+      "waitChunkMs": 1000,
+      "waitCount": 8,
+      "completed": true,
+      "waitResult": 0,
+      "exitCode": 0,
+      "elapsedMs": 7336
+    }
+  ],
+  "automaticReplay": false
+}

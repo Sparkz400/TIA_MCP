@@ -1,0 +1,63 @@
+{
+  "mode": "reorder",
+  "root": "D:\\TIAW\\uq17",
+  "worker": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\src\\TiaMcp.Openness.V21\\bin\\Release\\net48\\TiaMcp.Openness.V21.exe",
+  "workerSha256": "d98271b29d7d28ca4ff5534557c0714b6ebab7e7542b2670cfbd2d30ac0a7f5a",
+  "host": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\published-host\\TiaMcp.Host.exe",
+  "hostSha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f",
+  "hostFiles": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\published-host\\Microsoft.Extensions.AI.Abstractions.dll",
+      "sha256": "bcc8f693103eb00505179f154b1b3a996b85d067e112facd724fd9d695f17a5e"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\published-host\\ModelContextProtocol.Core.dll",
+      "sha256": "b1752096ea9d2f38ba88e467f04aea43fb300d9a54d881c165f62b69028ee3ab"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\published-host\\ModelContextProtocol.dll",
+      "sha256": "8cd6f626c8d6a0a5ff3e154789d3fcde2b1d66a595c0ef0198e092c2c30fe93a"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\published-host\\TiaMcp.Core.dll",
+      "sha256": "7c39da0a58e6c395a2e0f53064e334223c86f5c1d7733c0463fc1b8638026486"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\published-host\\TiaMcp.Host.deps.json",
+      "sha256": "7969e812de3e17993b8fe7a6357890a9bf134dd1954b67e5447d500582872dba"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\published-host\\TiaMcp.Host.dll",
+      "sha256": "d4c17d7ce1f9325463ef07b7d169466e6c6d4130bf4c8c497d4306911716f102"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\published-host\\TiaMcp.Host.exe",
+      "sha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\published-host\\TiaMcp.Host.runtimeconfig.json",
+      "sha256": "61a2a447a31667ca1fb9081bec4ffbeb230bb1813fadfa98ebc3a242ce38e36e"
+    }
+  ],
+  "commentInput": null,
+  "nativeCleanupHelper": {
+    "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\startup-unblock-20261015\\owned-cleanup\\build-04\\OwnedPortalCleanup.exe",
+    "sha256": "24f7050e667eb4caa9f258767b9bceac0b1e999b82bcf40e034de4c62ad900d6",
+    "method": "TerminateProcess(exactOwnedHandle)",
+    "sources": [
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\startup-unblock-20261015\\owned-cleanup\\build-04\\source\\Program.cs",
+        "sha256": "58b39ee7f33cc16ec5893b89ac5bc989cce3be42367f9fed058a5b5dd101b0e8"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\startup-unblock-20261015\\owned-cleanup\\build-04\\source\\OwnedPortalCleanup.csproj",
+        "sha256": "55cfd28da77eec170619d02146c40076d80aa8ca11fb9f0049ee43bdebe0b720"
+      }
+    ]
+  },
+  "nativeSequential": true,
+  "actualMcpHost": true,
+  "automaticReplay": false,
+  "effects": "Fresh owned offline scratch only; one reviewed watch edit and explicit archive recovery.",
+  "hostProcessId": 61356
+}

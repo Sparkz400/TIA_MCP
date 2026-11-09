@@ -1,0 +1,21 @@
+{
+  "original": {
+    "nativeKey": "zMKSD2+5TJH/jvYwF4VcdOHRmI/cTuIMHVev+N9yvnt6LCGvUxgXN7BvwyNOyTwMwq9vxC9QUtA0HtyNm5dR2vdlu8wAKu6STeC8kikusg0aIp2POSTMcp6b93IQVBTqb4mXMHDK8eKByJzddCg5L6Kq1WUKmPtOA0EJDU1CpHhXVCt/0CubzepS2c3/YLuoYeFPlIoFFU7B2ejcEyqlfNq0O4SZMUGAnyWqP/Lp0SWv8cV8Vg3qL/OVl1GgasETFNev3QBXL4NCxXSVYLhUyA==",
+    "category": "<BlockCommentCategoryData>",
+    "source": {
+      "state": "text",
+      "text": "Prueftext Main {0}",
+      "richText": false
+    },
+    "target": {
+      "state": "text",
+      "text": "Verification text Main {0}",
+      "richText": false
+    }
+  },
+  "requested": {
+    "nativeKey": "zMKSD2+5TJH/jvYwF4VcdOHRmI/cTuIMHVev+N9yvnt6LCGvUxgXN7BvwyNOyTwMwq9vxC9QUtA0HtyNm5dR2vdlu8wAKu6STeC8kikusg0aIp2POSTMcp6b93IQVBTqb4mXMHDK8eKByJzddCg5L6Kq1WUKmPtOA0EJDU1CpHhXVCt/0CubzepS2c3/YLuoYeFPlIoFFU7B2ejcEyqlfNq0O4SZMUGAnyWqP/Lp0SWv8cV8Vg3qL/OVl1GgasETFNev3QBXL4NCxXSVYLhUyA==",
+    "replacement": "Verified translation Main {0} \u2014 \u03a9"
+  },
+  "scope": "one existing nonempty en-GB target"
+}

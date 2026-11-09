@@ -1,0 +1,226 @@
+{
+  "schemaVersion": "opcua-model-comparison.v1",
+  "schemaSha256": "c7ac09ea7504d54174e1eb4c5a8123c0cc491040703dfcd6bfe085bf6c53f9f0",
+  "nativeQualified": false,
+  "targetProbed": false,
+  "tiaImportAccepted": false,
+  "plcMappingsResolved": false,
+  "dependencyClosureComplete": false,
+  "limitations": [
+    "General NodeSet schema and selected identities/shapes only; no Siemens mapping dialect validation.",
+    "Values, type definitions, permissions and vendor extensions are retained as hashes; changes require review.",
+    "Required model versions, inherited access, effective permissions and transitive client dependencies are not resolved.",
+    "Keep the original hash-bound input bytes; this report is not an importable or lossless replacement model."
+  ],
+  "beforeSha256": "5815918286e0bcaf12440722be72fd000b594fe808514ed8052cec57501f69ba",
+  "afterSha256": "d9b68ab0b1032baeed2f552effc5fea9ceec611ee543f05fd7a0b47ce93ad7e4",
+  "changes": [
+    {
+      "nodeKey": "nsu=urn%3Aexample%3Amachine%3A1;s=Machine",
+      "field": "nodeRemoved",
+      "severity": "breaking",
+      "before": {
+        "namespaceUri": "urn:example:machine:1",
+        "identifierType": "s",
+        "identifier": "Machine",
+        "key": "nsu=urn%3Aexample%3Amachine%3A1;s=Machine"
+      },
+      "after": null
+    },
+    {
+      "nodeKey": "nsu=urn%3Aexample%3Amachine%3A1;s=Machine.Reset",
+      "field": "nodeRemoved",
+      "severity": "breaking",
+      "before": {
+        "namespaceUri": "urn:example:machine:1",
+        "identifierType": "s",
+        "identifier": "Machine.Reset",
+        "key": "nsu=urn%3Aexample%3Amachine%3A1;s=Machine.Reset"
+      },
+      "after": null
+    },
+    {
+      "nodeKey": "nsu=urn%3Aexample%3Amachine%3A1;s=Machine.Speed",
+      "field": "nodeRemoved",
+      "severity": "breaking",
+      "before": {
+        "namespaceUri": "urn:example:machine:1",
+        "identifierType": "s",
+        "identifier": "Machine.Speed",
+        "key": "nsu=urn%3Aexample%3Amachine%3A1;s=Machine.Speed"
+      },
+      "after": null
+    },
+    {
+      "nodeKey": "nsu=urn%3Aexample%3Amachine%3A2;s=Machine",
+      "field": "nodeAdded",
+      "severity": "additiveCandidate",
+      "before": null,
+      "after": {
+        "namespaceUri": "urn:example:machine:2",
+        "identifierType": "s",
+        "identifier": "Machine",
+        "key": "nsu=urn%3Aexample%3Amachine%3A2;s=Machine"
+      }
+    },
+    {
+      "nodeKey": "nsu=urn%3Aexample%3Amachine%3A2;s=Machine.Axis.Speed",
+      "field": "nodeAdded",
+      "severity": "additiveCandidate",
+      "before": null,
+      "after": {
+        "namespaceUri": "urn:example:machine:2",
+        "identifierType": "s",
+        "identifier": "Machine.Axis.Speed",
+        "key": "nsu=urn%3Aexample%3Amachine%3A2;s=Machine.Axis.Speed"
+      }
+    },
+    {
+      "nodeKey": "nsu=urn%3Aexample%3Amachine%3A2;s=Machine.Reset",
+      "field": "nodeAdded",
+      "severity": "additiveCandidate",
+      "before": null,
+      "after": {
+        "namespaceUri": "urn:example:machine:2",
+        "identifierType": "s",
+        "identifier": "Machine.Reset",
+        "key": "nsu=urn%3Aexample%3Amachine%3A2;s=Machine.Reset"
+      }
+    },
+    {
+      "nodeKey": null,
+      "field": "modelMetadata",
+      "severity": "reviewRequired",
+      "before": [
+        {
+          "modelUri": "urn:example:machine:1",
+          "version": "1.0.0",
+          "publicationDate": "2026-10-14T00:00:00Z",
+          "modelVersion": null,
+          "metadataSha256": "5bd36fd15e316bfabb9b6672e22942e0284f2356e0ee3a77d63e364da29a8669",
+          "requiredModels": [
+            {
+              "modelUri": "http://opcfoundation.org/UA/",
+              "version": "1.05.04",
+              "publicationDate": "2024-12-01T00:00:00Z",
+              "modelVersion": null,
+              "resolution": "notEvaluated"
+            }
+          ]
+        }
+      ],
+      "after": [
+        {
+          "modelUri": "urn:example:machine:2",
+          "version": "2.0.0",
+          "publicationDate": "2026-10-16T00:00:00Z",
+          "modelVersion": null,
+          "metadataSha256": "52101b5b98a5dd518621bf6598597ea2bdecf646d1c0740b110f6951802bf270",
+          "requiredModels": [
+            {
+              "modelUri": "http://opcfoundation.org/UA/",
+              "version": "1.05.04",
+              "publicationDate": "2024-12-01T00:00:00Z",
+              "modelVersion": null,
+              "resolution": "notEvaluated"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nodeKey": null,
+      "field": "envelopeOrExtensions",
+      "severity": "reviewRequired",
+      "before": "833c6b0c232ee138366b9e7732acad202089c75fa01127294ba0b1513e929b00",
+      "after": "c90f05f4126727840455434292b45876920372d10b0bf71d251638b73d946c61"
+    }
+  ],
+  "breakingChangeCount": 3,
+  "clientImpacts": [
+    {
+      "consumerId": "Historian-A",
+      "directChanges": [
+        {
+          "nodeKey": "nsu=urn%3Aexample%3Amachine%3A1;s=Machine.Speed",
+          "field": "nodeRemoved",
+          "severity": "breaking"
+        }
+      ],
+      "status": "affected",
+      "dependencyCoverage": "declaredNodeKeysOnly"
+    },
+    {
+      "consumerId": "Dashboard-B",
+      "directChanges": [
+        {
+          "nodeKey": "nsu=urn%3Aexample%3Amachine%3A1;s=Machine",
+          "field": "nodeRemoved",
+          "severity": "breaking"
+        },
+        {
+          "nodeKey": "nsu=urn%3Aexample%3Amachine%3A1;s=Machine.Speed",
+          "field": "nodeRemoved",
+          "severity": "breaking"
+        }
+      ],
+      "status": "affected",
+      "dependencyCoverage": "declaredNodeKeysOnly"
+    },
+    {
+      "consumerId": "MES-C",
+      "directChanges": [
+        {
+          "nodeKey": "nsu=urn%3Aexample%3Amachine%3A1;s=Machine.Reset",
+          "field": "nodeRemoved",
+          "severity": "breaking"
+        }
+      ],
+      "status": "affected",
+      "dependencyCoverage": "declaredNodeKeysOnly"
+    }
+  ],
+  "unknownConsumers": true,
+  "compatibilityCertified": false,
+  "beforeDiagnostics": [
+    {
+      "code": "StandardModelNotResolved",
+      "sourceNodeKey": "nsu=urn%3Aexample%3Amachine%3A1;s=Machine",
+      "targetNodeKey": "nsu=http%3A%2F%2Fopcfoundation.org%2FUA%2F;i=47",
+      "kind": "referenceType"
+    },
+    {
+      "code": "StandardModelNotResolved",
+      "sourceNodeKey": "nsu=urn%3Aexample%3Amachine%3A1;s=Machine.Speed",
+      "targetNodeKey": "nsu=http%3A%2F%2Fopcfoundation.org%2FUA%2F;i=10",
+      "kind": "dataType"
+    },
+    {
+      "code": "StandardModelNotResolved",
+      "sourceNodeKey": "nsu=urn%3Aexample%3Amachine%3A1;s=Machine.Speed",
+      "targetNodeKey": "nsu=http%3A%2F%2Fopcfoundation.org%2FUA%2F;i=47",
+      "kind": "referenceType"
+    }
+  ],
+  "afterDiagnostics": [
+    {
+      "code": "StandardModelNotResolved",
+      "sourceNodeKey": "nsu=urn%3Aexample%3Amachine%3A2;s=Machine",
+      "targetNodeKey": "nsu=http%3A%2F%2Fopcfoundation.org%2FUA%2F;i=47",
+      "kind": "referenceType"
+    },
+    {
+      "code": "StandardModelNotResolved",
+      "sourceNodeKey": "nsu=urn%3Aexample%3Amachine%3A2;s=Machine.Axis.Speed",
+      "targetNodeKey": "nsu=http%3A%2F%2Fopcfoundation.org%2FUA%2F;i=11",
+      "kind": "dataType"
+    },
+    {
+      "code": "StandardModelNotResolved",
+      "sourceNodeKey": "nsu=urn%3Aexample%3Amachine%3A2;s=Machine.Axis.Speed",
+      "targetNodeKey": "nsu=http%3A%2F%2Fopcfoundation.org%2FUA%2F;i=47",
+      "kind": "referenceType"
+    }
+  ],
+  "outcome": "changesDetected"
+}

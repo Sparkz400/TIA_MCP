@@ -1,0 +1,16 @@
+{
+  "sources": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-02\\source\\scripts\\qualify_watch_authoring.py",
+      "sha256": "095ce79566f0d54e38a333e99130bbdfd1268795dbc7519498fd24f00bc382c6"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-02\\source\\scripts\\verify_watch_authoring.py",
+      "sha256": "eba10ef1232219f8d2da4af06626b3fe257268e8602ff6ca3c6f06dc84346bbd"
+    }
+  ],
+  "case": "create-bool",
+  "template": "packagedGenuineNativeCapture",
+  "automaticRetry": false,
+  "scope": "One direct root instance Bool row; default reason comment; no maintenance or explicit comment profile."
+}

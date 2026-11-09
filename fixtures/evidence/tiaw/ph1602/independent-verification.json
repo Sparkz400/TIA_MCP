@@ -1,0 +1,271 @@
+{
+  "kind": "independent-watch-expansion-verification",
+  "root": "D:\\TIAW\\ph1602",
+  "nativeInvoked": false,
+  "verifiedAtUtc": "2026-10-16T05:11:34.230485+00:00",
+  "stages": [
+    {
+      "name": "reviewedExactDocumentDelta",
+      "passed": true,
+      "detail": {
+        "operationId": "57793fce700c4f2986f3f122a7132de1",
+        "reviewedPlanSha256": "e2f7fbb12b5503ab8a694e621955eeeaae94297d4333a2f11e692eb409931cde",
+        "reviewedInputSha256": "f9564ee980f08582ad65dfe899486b608a577f618ee0eb2da9fb64383c111f25",
+        "baseline": {
+          "path": "D:\\TIAW\\ph1602\\watch-observations\\w_bd6f39b184f5\\watch-0.xml",
+          "sha256": "3df07dbf87ffdd1e9052a9235ef7dee25d1b537cc5730bca17917b3bcaf0f6ae",
+          "bytes": 3697
+        },
+        "candidate": {
+          "path": "D:\\TIAW\\ph1602\\watch\\38f2e1fe15d6\\reviewed.xml",
+          "sha256": "f9564ee980f08582ad65dfe899486b608a577f618ee0eb2da9fb64383c111f25",
+          "bytes": 3600
+        },
+        "delta": {
+          "kind": "modifyValue",
+          "beforeRows": 1,
+          "candidateRows": 1,
+          "nativeIdsPreservedExceptFreshCloneIds": true,
+          "unknownPayloadPreserved": true
+        },
+        "frozenSources": {
+          "manifest": {
+            "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\manifest.json",
+            "sha256": "4c8be2a10a41b5c3742159b9ca150c869a6e6aed8408eb451ba2d23c3fee7591",
+            "bytes": 63169
+          },
+          "worker": {
+            "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\worker\\TiaMcp.Openness.V21.exe",
+            "sha256": "d7460d05ca82b97467d01c6c8549ddafc062505026136af7608fddcbdb3a6dfc",
+            "bytes": 1360896
+          },
+          "verifiedFiles": 261
+        },
+        "nativeInvoked": false,
+        "noOnlineAction": true
+      }
+    },
+    {
+      "name": "nativeRunIdentity",
+      "passed": true,
+      "detail": {
+        "operationId": "57793fce700c4f2986f3f122a7132de1",
+        "mode": "save.after"
+      }
+    },
+    {
+      "name": "durableJournal",
+      "passed": true,
+      "detail": {
+        "records": 11,
+        "states": [
+          "prepared",
+          "acquired",
+          "checkpointIntent",
+          "ready",
+          "dispatchIntent",
+          "outcomeUnknown",
+          "recoveryIntent",
+          "recoveryIntent",
+          "recoveryIntent",
+          "recoveryIntent",
+          "reconciled"
+        ]
+      }
+    },
+    {
+      "name": "independentApproval",
+      "passed": true,
+      "detail": {
+        "path": "D:\\TIAW\\ph1602\\independent-review.json",
+        "sha256": "1db0a5065d9120c35b2a35363c9429118483fcb024c2787146b7a289826e2adc",
+        "bytes": 1464
+      }
+    },
+    {
+      "name": "interruptionRestartCompetingOwnersAndNoReplay",
+      "passed": true,
+      "detail": {
+        "point": "save.after",
+        "hostRestartVerified": true,
+        "hostRestartEvidence": "exactClosedHostAndOwnedProcessHandlesBeforeRestart",
+        "actualHostLifecycle": {
+          "hostCount": 2,
+          "exactWorkerLifetimes": 2,
+          "exactNativeLifetimes": 5,
+          "initialHostProcessId": 41804,
+          "finalHostProcessId": 37184,
+          "closedBeforeRestart": true,
+          "coordinatorInterventionRequired": true,
+          "normalLifecyclePassed": false,
+          "explicitNativeTermination": true,
+          "coordinatorNativeCleanup": {
+            "method": "TerminateProcess(exactOwnedHandle)",
+            "explicitNativeTermination": true,
+            "coordinatorInterventionRequired": true,
+            "normalLifecyclePassed": false,
+            "processId": 21932,
+            "exitCode": 75,
+            "originalMonitorHandleExitVerified": true,
+            "requestedAtUtc": "2026-10-16T05:09:58.8018608Z",
+            "closedAtUtc": "2026-10-16T05:09:59.100318Z",
+            "intent": {
+              "path": "D:\\TIAW\\ph1602\\coordinator-native-close-intent.json",
+              "sha256": "54d09d427f14c65201ec7742f1f2bd2398a4576679c92926f14577a5ac950ed4",
+              "bytes": 1177
+            },
+            "result": {
+              "path": "D:\\TIAW\\ph1602\\coordinator-native-close.json",
+              "sha256": "18514408bc1632ab4f987cc23529ac998877193fb38724e3f92fb119154669a9",
+              "bytes": 1267
+            },
+            "helper": {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\cleanup-helper-01\\OwnedPortalCleanup.exe",
+              "sha256": "24f7050e667eb4caa9f258767b9bceac0b1e999b82bcf40e034de4c62ad900d6",
+              "method": "TerminateProcess(exactOwnedHandle)",
+              "sources": [
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\cleanup-helper-01\\source\\Program.cs",
+                  "sha256": "58b39ee7f33cc16ec5893b89ac5bc989cce3be42367f9fed058a5b5dd101b0e8"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\cleanup-helper-01\\source\\OwnedPortalCleanup.csproj",
+                  "sha256": "55cfd28da77eec170619d02146c40076d80aa8ca11fb9f0049ee43bdebe0b720"
+                }
+              ]
+            }
+          },
+          "receipts": [
+            {
+              "path": "D:\\TIAW\\ph1602\\host-01-close.json",
+              "sha256": "60733316168b480897ace6fde95087b73006c8c00212f38fc9ee88d3d7a8548d",
+              "bytes": 28626
+            },
+            {
+              "path": "D:\\TIAW\\ph1602\\host-02-close.json",
+              "sha256": "6f2552c33b0592de8301fa7396be2c5538af7fddb1eea89ba7c4c2deb35d14bc",
+              "bytes": 38845
+            }
+          ]
+        },
+        "competingOwnerRefused": true,
+        "automaticReplay": false,
+        "marker": {
+          "path": "D:\\TIAW\\ph1602\\interruption-marker.json",
+          "sha256": "9e173a279e35f1c112e88b6958e053239c44352068641d1639b49787a4a6ec07",
+          "bytes": 388
+        }
+      }
+    },
+    {
+      "name": "freshOriginalRestoredAndReconciliation",
+      "passed": true,
+      "detail": {
+        "originalDisposition": "verifiedApplied",
+        "restoredProjectVerified": true,
+        "retrievalResponseRetained": true,
+        "recoveryPath": "D:\\TIAW\\ph1602\\r_d163b07ac2\\TiaMcpScratch_20261016_050817_4567dfa4\\TiaMcpScratch_20261016_050817_4567dfa4.ap21",
+        "finalState": "reconciled"
+      }
+    }
+  ],
+  "issues": [],
+  "edit": {
+    "kind": "modifyValue",
+    "beforeRows": 1,
+    "candidateRows": 1,
+    "nativeIdsPreservedExceptFreshCloneIds": true,
+    "unknownPayloadPreserved": true
+  },
+  "interruption": {
+    "point": "save.after",
+    "hostRestartVerified": true,
+    "hostRestartEvidence": "exactClosedHostAndOwnedProcessHandlesBeforeRestart",
+    "actualHostLifecycle": {
+      "hostCount": 2,
+      "exactWorkerLifetimes": 2,
+      "exactNativeLifetimes": 5,
+      "initialHostProcessId": 41804,
+      "finalHostProcessId": 37184,
+      "closedBeforeRestart": true,
+      "coordinatorInterventionRequired": true,
+      "normalLifecyclePassed": false,
+      "explicitNativeTermination": true,
+      "coordinatorNativeCleanup": {
+        "method": "TerminateProcess(exactOwnedHandle)",
+        "explicitNativeTermination": true,
+        "coordinatorInterventionRequired": true,
+        "normalLifecyclePassed": false,
+        "processId": 21932,
+        "exitCode": 75,
+        "originalMonitorHandleExitVerified": true,
+        "requestedAtUtc": "2026-10-16T05:09:58.8018608Z",
+        "closedAtUtc": "2026-10-16T05:09:59.100318Z",
+        "intent": {
+          "path": "D:\\TIAW\\ph1602\\coordinator-native-close-intent.json",
+          "sha256": "54d09d427f14c65201ec7742f1f2bd2398a4576679c92926f14577a5ac950ed4",
+          "bytes": 1177
+        },
+        "result": {
+          "path": "D:\\TIAW\\ph1602\\coordinator-native-close.json",
+          "sha256": "18514408bc1632ab4f987cc23529ac998877193fb38724e3f92fb119154669a9",
+          "bytes": 1267
+        },
+        "helper": {
+          "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\cleanup-helper-01\\OwnedPortalCleanup.exe",
+          "sha256": "24f7050e667eb4caa9f258767b9bceac0b1e999b82bcf40e034de4c62ad900d6",
+          "method": "TerminateProcess(exactOwnedHandle)",
+          "sources": [
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\cleanup-helper-01\\source\\Program.cs",
+              "sha256": "58b39ee7f33cc16ec5893b89ac5bc989cce3be42367f9fed058a5b5dd101b0e8"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\cleanup-helper-01\\source\\OwnedPortalCleanup.csproj",
+              "sha256": "55cfd28da77eec170619d02146c40076d80aa8ca11fb9f0049ee43bdebe0b720"
+            }
+          ]
+        }
+      },
+      "receipts": [
+        {
+          "path": "D:\\TIAW\\ph1602\\host-01-close.json",
+          "sha256": "60733316168b480897ace6fde95087b73006c8c00212f38fc9ee88d3d7a8548d",
+          "bytes": 28626
+        },
+        {
+          "path": "D:\\TIAW\\ph1602\\host-02-close.json",
+          "sha256": "6f2552c33b0592de8301fa7396be2c5538af7fddb1eea89ba7c4c2deb35d14bc",
+          "bytes": 38845
+        }
+      ]
+    },
+    "competingOwnerRefused": true,
+    "automaticReplay": false,
+    "marker": {
+      "path": "D:\\TIAW\\ph1602\\interruption-marker.json",
+      "sha256": "9e173a279e35f1c112e88b6958e053239c44352068641d1639b49787a4a6ec07",
+      "bytes": 388
+    }
+  },
+  "recovery": {
+    "originalDisposition": "verifiedApplied",
+    "restoredProjectVerified": true,
+    "retrievalResponseRetained": true,
+    "recoveryPath": "D:\\TIAW\\ph1602\\r_d163b07ac2\\TiaMcpScratch_20261016_050817_4567dfa4\\TiaMcpScratch_20261016_050817_4567dfa4.ap21",
+    "finalState": "reconciled"
+  },
+  "retainedFailure": {
+    "path": "D:\\TIAW\\ph1602\\failure.json",
+    "sha256": "3b0eac39969a4f56debe171c8108cc9fc267416d9ff21671188756cc8bcc5543",
+    "bytes": 237
+  },
+  "completed": true,
+  "qualificationPassed": false,
+  "hostRestartVerified": true,
+  "interruptionMatrixCasePassed": true,
+  "coordinatorInterventionRequired": true,
+  "normalLifecyclePassed": false,
+  "explicitNativeTermination": true,
+  "coverageGaps": []
+}

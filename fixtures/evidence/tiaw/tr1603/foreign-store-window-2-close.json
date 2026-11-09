@@ -1,0 +1,54 @@
+{
+  "kind": "held-coordinator-store-window-close",
+  "releasedAtUtc": "2026-10-16T07:27:22.130145+00:00",
+  "locks": [
+    {
+      "path": "D:\\TIAW\\wt06\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\wt05\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\wt04\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\wt03\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\wt02\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\wt01\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\wm03\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\wm02\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\wm01\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\wa1604\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\wa1603\\engineering-operations\\store.lock",
+      "closed": true
+    }
+  ],
+  "allClosed": true,
+  "journalsModified": false,
+  "automaticReplay": false,
+  "bodyFailure": null
+}

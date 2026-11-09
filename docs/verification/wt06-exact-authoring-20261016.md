@@ -1,13 +1,13 @@
 # WT-06 exact creation qualification — 16 October 2026
 
-The corrected frozen package-03 native qualification **passed** at `D:/TIAW/we1602`. Production authoring admission remains closed: creation-specific unknown-outcome proof and a final normal production Host proof have not run. The retained WT-05 revision-03 creation and production Host binary-01 interruption evidence remain separate baselines. No generic `watch.create-instance.v1`, `watch.add-instance-bool.v1`, or `watch.reference-free-authoring-ids.v1` key has been enabled.
+The corrected frozen package-03 native qualification **passed** at `D:/TIAW/we1602` ([retained copy](../../fixtures/evidence/tiaw/we1602)). Production authoring admission remains closed: creation-specific unknown-outcome proof and a final normal production Host proof have not run. The retained WT-05 revision-03 creation and production Host binary-01 interruption evidence remain separate baselines. No generic `watch.create-instance.v1`, `watch.add-instance-bool.v1`, or `watch.reference-free-authoring-ids.v1` key has been enabled.
 
 | Frozen evidence | SHA-256 / outcome |
 | --- | --- |
 | `artifacts/watch-exact-20261016/package-03/manifest.json` | `cf6ddbf03e92cc0a1694f521bbbd0d48e96da04e4295af928c23561e4545a666` |
 | Exact worker executable | `f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157` |
 | Reviewed `native-packet-02.json` | `50e44ec59a77b377af423c442477d4af1afb120796f34ab732f0f2de86ccc459` |
-| `D:/TIAW/we1602/exact-profile-verification.json` | `bb946d506cb67a1a434f31873edaed813f69b488431c484445f6201a2c03b362`; complete |
+| `D:/TIAW/we1602/exact-profile-verification.json` ([retained copy](../../fixtures/evidence/tiaw/we1602/exact-profile-verification.json)) | `bb946d506cb67a1a434f31873edaed813f69b488431c484445f6201a2c03b362`; complete |
 | Independent file-only rerun `independent-rerun-02.json` | `01973dd08d72b61d8a731a611b6da95c801dbff6e7157abb7ba298a45c97b864`; complete |
 | `native-terminal-02.json` | `acc6812c2f608d648360f569d9f6ceb8b85c3c4017e7d4aa2fc2eed4fc8006ee`; zero pending owned resources |
 
@@ -29,7 +29,7 @@ It runs the helper and fresh restored source capture, then the normal independen
 
 Portable validation from private outputs passes 39 exact-scope cases, 15 actual dispatcher reconciliation cases, 57 existing managed authoring checks, 31 worker boundary checks, 5 actual Host visibility/boundary cases, 8 independent negative-oracle cases, 7 negative-controller cases and the prior 23 WT-05 Python cases. The reconciliation cases include the initial marker without checkpoint and fail-closed missing marker, wrong request binding, and corrupted baseline receipt. Four frozen builds (Host, worker, Engineering tests, worker boundary tests) succeeded with zero warnings/errors. Native qualification comes from the separate successful packet above, not these portable checks.
 
-The first frozen native packet (`package-02`, `D:/TIAW/we1601`) failed at the old dynamic `GetAttribute("Author")` call, before archive, intent marker, or any source write. The current correction uses the installed typed `HeaderAuthor` property and native XML leaf. The original Host/worker/native handles all exited normally. The old controller parsed the plain MCP error before saving it, so the exact Host stderr exception is retained but the raw MCP reply is unavailable; the corrected controller persists replies before decoding and normalizes plain errors as `ToolError`.
+The first frozen native packet (`package-02`, `D:/TIAW/we1601` ([retained copy](../../fixtures/evidence/tiaw/we1601))) failed at the old dynamic `GetAttribute("Author")` call, before archive, intent marker, or any source write. The current correction uses the installed typed `HeaderAuthor` property and native XML leaf. The original Host/worker/native handles all exited normally. The old controller parsed the plain MCP error before saving it, so the exact Host stderr exception is retained but the raw MCP reply is unavailable; the corrected controller persists replies before decoding and normalizes plain errors as `ToolError`.
 
 This failure was separately reconciled under the exact reviewed read-only packet in `artifacts/watch-exact-20261016/reconcile01/packet.json`. Unchanged frozen package-02 opened the saved original, generated its source capture, and prepared without apply to export the absent destination and complete peers. Independent checks proved the original binding and all six peer bytes unchanged in a fresh native process; all three new original process handles exited normally. Only then did the typed admission store append unchanged reconciliation. `terminal-audit.json` records zero pending owned resources and closed store locks. The failed qualification remains failed; reconciliation is not native qualification or production admission.
 

@@ -1,0 +1,17 @@
+{
+  "request": {
+    "operationId": "98d5fadce9d547d78715636b37e5d948",
+    "planSha256": "45a7cc3f541531ea77083eac281489e9e7a923c944e9aabdce0e609a61d786ad",
+    "revision": 0,
+    "interruptBeforeDispatch": true
+  },
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "An error occurred invoking 'qualification_translation_apply'."
+      }
+    ],
+    "isError": true
+  }
+}

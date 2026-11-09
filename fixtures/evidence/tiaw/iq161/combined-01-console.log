@@ -1,0 +1,12 @@
+PASS Contract coverage: 149 MCP tools, 55 mutation kinds, 222 feature entries; evidence/criteria references valid.
+Traceback (most recent call last):
+  File "D:\TIAW\iq161\source\scripts\api_coverage_bindings.py", line 320, in <module>
+    if __name__=='__main__': main()
+                             ~~~~^^
+  File "D:\TIAW\iq161\source\scripts\api_coverage_bindings.py", line 317, in main
+    elif args.command=='validate': print(json.dumps(validate(inventory.json_read(args.binding),args.repo)))
+                                                    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\TIAW\iq161\source\scripts\api_coverage_bindings.py", line 276, in validate
+    if inventory.canonical(binding)!=inventory.canonical(actual): raise ValueError('Binding content differs from current anchored inventory')
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Binding content differs from current anchored inventory

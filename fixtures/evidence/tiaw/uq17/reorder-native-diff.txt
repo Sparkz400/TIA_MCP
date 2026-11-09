@@ -1,0 +1,135 @@
+--- reviewed
+
++++ native
+
+@@ -3,5 +3,5 @@
+
+   <Engineering version="V21" />
+   <DocumentInfo>
+-    <Created>2026-10-15T11:00:29.2924161Z</Created>
++    <Created>2026-10-15T11:00:38.5926319Z</Created>
+     <ExportSetting>WithDefaults</ExportSetting>
+     <InstalledProducts>
+@@ -57,37 +57,4 @@
+
+     </AttributeList>
+     <ObjectList>
+-      <SW.WatchAndForceTables.PlcWatchTableEntry ID="B" CompositionName="Entries">
+-        <AttributeList>
+-          <DisplayFormat>Bool</DisplayFormat>
+-          <ModifyTrigger>Permanent</ModifyTrigger>
+-          <ModifyValue>FALSE</ModifyValue>
+-          <MonitorTrigger>Permanent</MonitorTrigger>
+-          <Name>"TiaMcp_EnableGate_DB".Active</Name>
+-        </AttributeList>
+-        <ObjectList>
+-          <MultilingualText ID="C" CompositionName="Comment">
+-            <ObjectList>
+-              <MultilingualTextItem ID="D" CompositionName="Items">
+-                <AttributeList>
+-                  <Culture>de-DE</Culture>
+-                  <Text>Owned row 2 / de-DE {0}</Text>
+-                </AttributeList>
+-              </MultilingualTextItem>
+-              <MultilingualTextItem ID="E" CompositionName="Items">
+-                <AttributeList>
+-                  <Culture>en-GB</Culture>
+-                  <Text>Owned row 2 / en-GB {0}</Text>
+-                </AttributeList>
+-              </MultilingualTextItem>
+-              <MultilingualTextItem ID="F" CompositionName="Items">
+-                <AttributeList>
+-                  <Culture>nl-NL</Culture>
+-                  <Text>Owned row 2 / nl-NL {0}</Text>
+-                </AttributeList>
+-              </MultilingualTextItem>
+-            </ObjectList>
+-          </MultilingualText>
+-        </ObjectList>
+-      </SW.WatchAndForceTables.PlcWatchTableEntry>
+       <SW.WatchAndForceTables.PlcWatchTableEntry ID="1" CompositionName="Entries">
+         <AttributeList>
+@@ -104,5 +71,5 @@
+
+                 <AttributeList>
+                   <Culture>de-DE</Culture>
+-                  <Text>Freigabestatus {0}</Text>
++                  <Text>Owned row 2 / de-DE {0}</Text>
+                 </AttributeList>
+               </MultilingualTextItem>
+@@ -110,5 +77,5 @@
+
+                 <AttributeList>
+                   <Culture>en-GB</Culture>
+-                  <Text>Enable status {0}</Text>
++                  <Text>Owned row 2 / en-GB {0}</Text>
+                 </AttributeList>
+               </MultilingualTextItem>
+@@ -116,5 +83,5 @@
+
+                 <AttributeList>
+                   <Culture>nl-NL</Culture>
+-                  <Text>Schakelstatus {0}</Text>
++                  <Text>Owned row 2 / nl-NL {0}</Text>
+                 </AttributeList>
+               </MultilingualTextItem>
+@@ -127,5 +94,5 @@
+
+           <DisplayFormat>Bool</DisplayFormat>
+           <ModifyTrigger>Permanent</ModifyTrigger>
+-          <ModifyValue>TRUE</ModifyValue>
++          <ModifyValue>FALSE</ModifyValue>
+           <MonitorTrigger>Permanent</MonitorTrigger>
+           <Name>"TiaMcp_EnableGate_DB".Active</Name>
+@@ -137,5 +104,5 @@
+
+                 <AttributeList>
+                   <Culture>de-DE</Culture>
+-                  <Text>Owned row 1 / de-DE {0}</Text>
++                  <Text>Freigabestatus {0}</Text>
+                 </AttributeList>
+               </MultilingualTextItem>
+@@ -143,8 +110,41 @@
+
+                 <AttributeList>
+                   <Culture>en-GB</Culture>
++                  <Text>Enable status {0}</Text>
++                </AttributeList>
++              </MultilingualTextItem>
++              <MultilingualTextItem ID="A" CompositionName="Items">
++                <AttributeList>
++                  <Culture>nl-NL</Culture>
++                  <Text>Schakelstatus {0}</Text>
++                </AttributeList>
++              </MultilingualTextItem>
++            </ObjectList>
++          </MultilingualText>
++        </ObjectList>
++      </SW.WatchAndForceTables.PlcWatchTableEntry>
++      <SW.WatchAndForceTables.PlcWatchTableEntry ID="B" CompositionName="Entries">
++        <AttributeList>
++          <DisplayFormat>Bool</DisplayFormat>
++          <ModifyTrigger>Permanent</ModifyTrigger>
++          <ModifyValue>TRUE</ModifyValue>
++          <MonitorTrigger>Permanent</MonitorTrigger>
++          <Name>"TiaMcp_EnableGate_DB".Active</Name>
++        </AttributeList>
++        <ObjectList>
++          <MultilingualText ID="C" CompositionName="Comment">
++            <ObjectList>
++              <MultilingualTextItem ID="D" CompositionName="Items">
++                <AttributeList>
++                  <Culture>de-DE</Culture>
++                  <Text>Owned row 1 / de-DE {0}</Text>
++                </AttributeList>
++              </MultilingualTextItem>
++              <MultilingualTextItem ID="E" CompositionName="Items">
++                <AttributeList>
++                  <Culture>en-GB</Culture>
+                   <Text>Owned row 1 / en-GB {0}</Text>
+                 </AttributeList>
+               </MultilingualTextItem>
+-              <MultilingualTextItem ID="A" CompositionName="Items">
++              <MultilingualTextItem ID="F" CompositionName="Items">
+                 <AttributeList>
+                   <Culture>nl-NL</Culture>

@@ -1,0 +1,8 @@
+{
+  "approved": true,
+  "operationId": "8dc3fe356740412d8de54f8e5d0f6f2f",
+  "reviewedPlanSha256": "78a8540080777be03f98cbeb48d7555ea1eb2d00e01a4eaf679b95e6cbd09f0d",
+  "oracle": "one exact existing Active Bool row FALSE to TRUE; three exact comments; all other XML identical",
+  "reviewedInputSha256": "7c94e2977fbf1999c2ffae6aea197064cba4ca01a88a6e4dc07fb75a8d6cef7f",
+  "noOnlineAction": true
+}

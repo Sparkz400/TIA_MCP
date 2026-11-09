@@ -1,0 +1,25 @@
+{
+  "request": {},
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"origin\":\"TIA Portal V21 Openness/offline\",\"observedAtUtc\":\"2026-10-16T07:55:34.5367823Z\",\"processId\":null,\"processes\":[{\"processId\":46480,\"mode\":\"WithoutUserInterface\",\"executablePath\":\"C:\\\\Program Files\\\\Siemens\\\\Automation\\\\Portal V21\\\\bin\\\\Siemens.Automation.Portal.exe\",\"projectPath\":\"D:\\\\03_Entwicklung\\\\TIA_MCP\\\\artifacts\\\\recovery\\\\r_3bee47cc\\\\TiaMcpScratch_20261016_065827_d9c19e50\\\\TiaMcpScratch_20261016_065827_d9c19e50.ap21\"}]}"
+      }
+    ],
+    "structuredContent": {
+      "origin": "TIA Portal V21 Openness/offline",
+      "observedAtUtc": "2026-10-16T07:55:34.5367823Z",
+      "processId": null,
+      "processes": [
+        {
+          "processId": 46480,
+          "mode": "WithoutUserInterface",
+          "executablePath": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+          "projectPath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\recovery\\r_3bee47cc\\TiaMcpScratch_20261016_065827_d9c19e50\\TiaMcpScratch_20261016_065827_d9c19e50.ap21"
+        }
+      ]
+    },
+    "isError": false
+  }
+}

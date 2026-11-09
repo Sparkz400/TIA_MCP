@@ -1,0 +1,19 @@
+{
+  "pid": 39792,
+  "parentPid": 52688,
+  "created": 1792133563.4011388,
+  "name": "TiaMcp.Host.exe",
+  "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.exe",
+  "command": [
+    "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.exe",
+    "--timeout-seconds",
+    "600",
+    "--worker",
+    "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe",
+    "--artifacts",
+    "D:\\TIAW\\ts1601\\h",
+    "--timeout-seconds",
+    "600",
+    "--testsuite-scope-probe"
+  ]
+}

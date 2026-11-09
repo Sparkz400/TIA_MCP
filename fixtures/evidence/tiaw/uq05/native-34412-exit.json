@@ -1,0 +1,18 @@
+{
+  "processId": 34412,
+  "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION",
+  "inheritable": false,
+  "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.",
+  "handleCaptured": true,
+  "processExitVerified": true,
+  "handleClosed": true,
+  "projectLockReleaseVerified": false,
+  "capturedAtUtc": "2026-10-15T09:48:58.370252+00:00",
+  "timeoutMs": 45000,
+  "waitChunkMs": 1000,
+  "waitCount": 6,
+  "completed": true,
+  "waitResult": 0,
+  "exitCode": 0,
+  "elapsedMs": 5524
+}

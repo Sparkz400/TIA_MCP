@@ -1,0 +1,49 @@
+{
+  "artifactRoot": "D:\\TIAW",
+  "processId": 42956,
+  "projectPath": "D:\\TIAW\\ts02\\s\\TiaMcpScratch_20261015_075139_5b4719a4\\TiaMcpScratch_20261015_075139_5b4719a4\\TiaMcpScratch_20261015_075139_5b4719a4.ap21",
+  "ownedScratch": true,
+  "creationTool": "tia_create_scratch",
+  "plcName": "ScratchPLC",
+  "blockName": "TiaMcp_IsEnabled",
+  "ruleSetName": "TiaMcp_CasingAvailability",
+  "definitionSha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+  "binarySha256": "080ce03b97f8e0a341afdc2ca0b245cf8c32287e1a64f29ef673b19ac6758364",
+  "apiSha256": {
+    "Base": "8c12b0fa70c298f1cd1221105880752ab204ed63c9f6d9dcb68833d977bcb5d0",
+    "Step7": "dfbbe3863005fa2fbc8cb553a3e7e4612acbaca19124939eb8d29de24c814eba",
+    "TestSuite": "03e1b656eea82492ce3852a722d02cbc261c19c6c008035807c6e6d30c3d1fdb"
+  },
+  "sourceFiles": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\native\\TestSuiteStyleGroupAvailabilityEvidence\\Program.cs",
+      "sha256": "4d45c2afc85a341215c3df84a7b0297d95ce7a83976099567b69f547bb6b20dc",
+      "bytes": 22642
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\native\\TestSuiteStyleGroupAvailabilityEvidence\\TestSuiteStyleGroupAvailabilityEvidence.csproj",
+      "sha256": "7d2affe7166b9e6717c8432a36479bfe59e6df249946b7f1dd9bab1319037b6c",
+      "bytes": 991
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-watch-20261015\\testsuite\\style-group-scope-profile.provenance.json",
+      "sha256": "e97024fdc5dc59f6e69e98d228888174373860decbfff5937c1c55d197ac09f4",
+      "bytes": 1176
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-watch-20261015\\testsuite\\vendor-help-style-setscope.htm",
+      "sha256": "24d26256aa7d9aaa6c2b38c5e168fcc6fcfdc4627677115db6e9f4df02f3f82f",
+      "bytes": 28867
+    }
+  ],
+  "mode": "run-style-group-availability",
+  "outputDirectory": "D:\\TIAW\\ts02\\evidence\\run-style-group-availability-01",
+  "isolatedScratch": true,
+  "allProjectObjectsOwned": true,
+  "availabilityOnlyScopeUnverifiedAccepted": true,
+  "ownershipEvidence": {
+    "path": "D:\\TIAW\\ts02\\step-scratch_create-d5143.json",
+    "sha256": "3d8e8889480a97f1c149398f286033303074172e0ad85a6425d82a6184c2b8fa"
+  },
+  "scopeProfile": "ownedRootProgramBlocks"
+}

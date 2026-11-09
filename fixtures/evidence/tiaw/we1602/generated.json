@@ -1,0 +1,404 @@
+{
+  "generationId": "bcd5da4d2a2a448c8e0ef868e976960e",
+  "generationSha256": "52208bf9febbf1657432213549b6e4c183ce278dd1caf4f959bb3870f4488cba",
+  "artifact": {
+    "relativePath": "watch-generations/bcd5da4d2a2a448c8e0ef868e976960e.json",
+    "sha256": "52208bf9febbf1657432213549b6e4c183ce278dd1caf4f959bb3870f4488cba"
+  },
+  "plan": {
+    "schemaVersion": "watch-table-plan.v1",
+    "tableName": "WT05_BoolCreation",
+    "source": {
+      "object": {
+        "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+        "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+        "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+        "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate",
+        "kind": "block"
+      },
+      "snapshot": {
+        "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+        "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+        "tiaVersion": 21
+      },
+      "contentSha256": "18a064eb13d466bd4a39caeb967efbf2b491fc9d49d582d49e7ccea5756d4b84"
+    },
+    "instance": {
+      "storage": {
+        "object": {
+          "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+          "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+          "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+          "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+          "kind": "block"
+        },
+        "snapshot": {
+          "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+          "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+          "tiaVersion": 21
+        },
+        "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+      },
+      "memberPath": []
+    },
+    "diagnosticCaseSha256": null,
+    "diagnosticSourceRevisionSha256": null,
+    "template": null,
+    "templateBindings": [],
+    "externalStorage": [],
+    "candidates": [
+      {
+        "id": "member0",
+        "sourceKind": "instanceDb",
+        "sourceObject": {
+          "object": {
+            "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+            "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+            "kind": "block"
+          },
+          "snapshot": {
+            "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+            "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+            "tiaVersion": 21
+          },
+          "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+        },
+        "storage": {
+          "object": {
+            "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+            "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+            "kind": "block"
+          },
+          "snapshot": {
+            "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+            "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+            "tiaVersion": 21
+          },
+          "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+        },
+        "memberPath": [
+          "Enable"
+        ],
+        "datatype": "Bool",
+        "role": "Input",
+        "reason": "Captured Input state of the selected FB instance: Enable",
+        "resolution": "capturedDeclaration",
+        "storageClass": "instanceMember",
+        "unavailableReason": null,
+        "symbolComponents": [
+          "TiaMcp_EnableGate_DB",
+          "Enable"
+        ],
+        "evidence": {
+          "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+          "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+          "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+          "declaration": {
+            "storagePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+            "memberPath": [
+              "Enable"
+            ],
+            "datatype": "Bool",
+            "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+          },
+          "xmlLine": 68,
+          "origin": "nativeInstanceExport",
+          "instanceResolution": "Native InstanceType/TypeInstance relation between exact DB and FB engineering identities."
+        },
+        "networkId": null,
+        "hypothesisIds": []
+      },
+      {
+        "id": "member1",
+        "sourceKind": "instanceDb",
+        "sourceObject": {
+          "object": {
+            "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+            "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+            "kind": "block"
+          },
+          "snapshot": {
+            "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+            "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+            "tiaVersion": 21
+          },
+          "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+        },
+        "storage": {
+          "object": {
+            "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+            "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+            "kind": "block"
+          },
+          "snapshot": {
+            "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+            "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+            "tiaVersion": 21
+          },
+          "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+        },
+        "memberPath": [
+          "Active"
+        ],
+        "datatype": "Bool",
+        "role": "Output",
+        "reason": "Captured Output state of the selected FB instance: Active",
+        "resolution": "capturedDeclaration",
+        "storageClass": "instanceMember",
+        "unavailableReason": null,
+        "symbolComponents": [
+          "TiaMcp_EnableGate_DB",
+          "Active"
+        ],
+        "evidence": {
+          "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+          "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+          "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+          "declaration": {
+            "storagePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+            "memberPath": [
+              "Active"
+            ],
+            "datatype": "Bool",
+            "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+          },
+          "xmlLine": 77,
+          "origin": "nativeInstanceExport",
+          "instanceResolution": "Native InstanceType/TypeInstance relation between exact DB and FB engineering identities."
+        },
+        "networkId": null,
+        "hypothesisIds": []
+      }
+    ],
+    "rows": [
+      {
+        "ordinal": 0,
+        "candidateId": "member0",
+        "candidate": {
+          "id": "member0",
+          "sourceKind": "instanceDb",
+          "sourceObject": {
+            "object": {
+              "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+              "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+              "kind": "block"
+            },
+            "snapshot": {
+              "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+              "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+              "tiaVersion": 21
+            },
+            "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+          },
+          "storage": {
+            "object": {
+              "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+              "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+              "kind": "block"
+            },
+            "snapshot": {
+              "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+              "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+              "tiaVersion": 21
+            },
+            "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+          },
+          "memberPath": [
+            "Enable"
+          ],
+          "datatype": "Bool",
+          "role": "Input",
+          "reason": "Captured Input state of the selected FB instance: Enable",
+          "resolution": "capturedDeclaration",
+          "storageClass": "instanceMember",
+          "unavailableReason": null,
+          "symbolComponents": [
+            "TiaMcp_EnableGate_DB",
+            "Enable"
+          ],
+          "evidence": {
+            "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+            "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+            "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+            "declaration": {
+              "storagePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+              "memberPath": [
+                "Enable"
+              ],
+              "datatype": "Bool",
+              "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+            },
+            "xmlLine": 68,
+            "origin": "nativeInstanceExport",
+            "instanceResolution": "Native InstanceType/TypeInstance relation between exact DB and FB engineering identities."
+          },
+          "networkId": null,
+          "hypothesisIds": []
+        },
+        "displayFormat": "Undef",
+        "modifyIntention": false,
+        "modifyValue": null,
+        "onlineAddress": null,
+        "suppliedAddressObservation": null,
+        "selectionReasons": [
+          {
+            "candidateId": "member0",
+            "reason": "Captured Input state of the selected FB instance: Enable",
+            "evidence": {
+              "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+              "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+              "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+              "declaration": {
+                "storagePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+                "memberPath": [
+                  "Enable"
+                ],
+                "datatype": "Bool",
+                "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+              },
+              "xmlLine": 68,
+              "origin": "nativeInstanceExport",
+              "instanceResolution": "Native InstanceType/TypeInstance relation between exact DB and FB engineering identities."
+            }
+          }
+        ]
+      },
+      {
+        "ordinal": 1,
+        "candidateId": "member1",
+        "candidate": {
+          "id": "member1",
+          "sourceKind": "instanceDb",
+          "sourceObject": {
+            "object": {
+              "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+              "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+              "kind": "block"
+            },
+            "snapshot": {
+              "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+              "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+              "tiaVersion": 21
+            },
+            "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+          },
+          "storage": {
+            "object": {
+              "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+              "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+              "kind": "block"
+            },
+            "snapshot": {
+              "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+              "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+              "tiaVersion": 21
+            },
+            "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+          },
+          "memberPath": [
+            "Active"
+          ],
+          "datatype": "Bool",
+          "role": "Output",
+          "reason": "Captured Output state of the selected FB instance: Active",
+          "resolution": "capturedDeclaration",
+          "storageClass": "instanceMember",
+          "unavailableReason": null,
+          "symbolComponents": [
+            "TiaMcp_EnableGate_DB",
+            "Active"
+          ],
+          "evidence": {
+            "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+            "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+            "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+            "declaration": {
+              "storagePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+              "memberPath": [
+                "Active"
+              ],
+              "datatype": "Bool",
+              "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+            },
+            "xmlLine": 77,
+            "origin": "nativeInstanceExport",
+            "instanceResolution": "Native InstanceType/TypeInstance relation between exact DB and FB engineering identities."
+          },
+          "networkId": null,
+          "hypothesisIds": []
+        },
+        "displayFormat": "Undef",
+        "modifyIntention": false,
+        "modifyValue": null,
+        "onlineAddress": null,
+        "suppliedAddressObservation": null,
+        "selectionReasons": [
+          {
+            "candidateId": "member1",
+            "reason": "Captured Output state of the selected FB instance: Active",
+            "evidence": {
+              "observationId": "c5fa80a94b6c4d0586bfd904e84090fa",
+              "sourceSha256": "88d536fa230978db6cd9e67599e3fa3be625b65f32736fea7e7eac01ca920036",
+              "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+              "declaration": {
+                "storagePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+                "memberPath": [
+                  "Active"
+                ],
+                "datatype": "Bool",
+                "contentSha256": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b"
+              },
+              "xmlLine": 77,
+              "origin": "nativeInstanceExport",
+              "instanceResolution": "Native InstanceType/TypeInstance relation between exact DB and FB engineering identities."
+            }
+          }
+        ]
+      }
+    ],
+    "unresolvedSuggestions": [],
+    "sourceGaps": [],
+    "duplicates": [],
+    "addressObservations": [],
+    "addressWarnings": {
+      "items": [],
+      "truncated": false
+    },
+    "candidateCount": 2,
+    "omittedByBudget": 0,
+    "sourceTruncated": false,
+    "truncated": false,
+    "maxRows": 64,
+    "duplicatePolicy": "preserve",
+    "nativeExecutable": false,
+    "nativeDocumentGenerated": false,
+    "qualification": "offlinePlanningOnly",
+    "pendingNativeGates": [
+      "currentOwnerAdmission",
+      "genuineNativeEntryGrammar",
+      "exactTargetSymbolAndProfileValidation",
+      "independentNativeReadback",
+      "preservationCompileApplicability",
+      "saveReopenRecovery"
+    ],
+    "planSha256": "8ac82c8b5ea0a859ce8779987e4313bc01fae0b817ad365a67576d9c6b7c5aa5"
+  },
+  "materializationProfile": "Symbolic scalar rows from captured native row grammar; each scalar datatype requires its own native verification.",
+  "nativeMutationAttempted": false
+}

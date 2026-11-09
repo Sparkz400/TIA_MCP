@@ -20,6 +20,7 @@ import time
 import psutil
 from block_test_process import OwnedTiaProcessWatcher
 from qualify_worker_startup_exact import identity
+from qualification_root import ENVIRONMENT as SHORT_ROOT_ENVIRONMENT, short_root
 from smoke_mcp import Client
 from retained_native_lifecycle import terminal_deadline_seconds, wait_retained_terminal
 
@@ -32,8 +33,11 @@ HOST_SHA = "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f"
 WORKER_SHA = "d98271b29d7d28ca4ff5534557c0714b6ebab7e7542b2670cfbd2d30ac0a7f5a"
 PACKAGE = REPO / "artifacts/startup-unblock-20261015/testsuite/manifest.json"
 PACKAGE_SHA = "daee99fb731f218db1cac84887a752a1d654da2d575973cb5a6467c0d355de8d"
-PROJECT = Path("D:/TIAW/ts02/s/TiaMcpScratch_20261015_075139_5b4719a4/"
-               "TiaMcpScratch_20261015_075139_5b4719a4/TiaMcpScratch_20261015_075139_5b4719a4.ap21")
+SHORT_ROOT = short_root()
+# The retained ts02 scratch project is native and is not copied into the repository.
+RETAINED_RUN = SHORT_ROOT / "ts02"
+PROJECT = (RETAINED_RUN / "s/TiaMcpScratch_20261015_075139_5b4719a4/"
+           "TiaMcpScratch_20261015_075139_5b4719a4/TiaMcpScratch_20261015_075139_5b4719a4.ap21")
 HELPER_SHA = "fff9ca863df86d066faa1f4e69702bee3374db3384f8f4c787b836e84144f4b8"
 SCOPE_ORACLE = REPO / "scripts/native/TestSuiteSystemScopeEvidence/verify_scope.py"
 SCOPE_ORACLE_SHA = "d90d0c7b2a837118082289b1a697e52a9e074f63af1547af5f38e2ef20c0d361"
@@ -134,9 +138,9 @@ def validate_package(args):
     require(ownership.get("completed") is True and same_path(ownership["project"]["path"], PROJECT),
             "The retained completed creation receipt does not own the exact ts02 project.")
     root = args.root.resolve()
-    require(root.is_relative_to(Path("D:/TIAW").resolve()) and not root.exists() and
-            not root.is_relative_to(Path("D:/TIAW/ts02").resolve()),
-            "A fresh run directory under D:/TIAW outside retained ts02 is required.")
+    require(root.is_relative_to(SHORT_ROOT) and not root.exists() and
+            not root.is_relative_to(RETAINED_RUN),
+            f"A fresh run directory under {SHORT_ROOT} ({SHORT_ROOT_ENVIRONMENT}) outside retained ts02 is required.")
     StoreReadWindow, gate = shared_api()
     require(callable(StoreReadWindow) and callable(gate), "Shared store/recovery gate API is missing.")
     package["controllerSourceFiles"] = controller_sources
@@ -171,7 +175,7 @@ def preparation(args):
 
 
 def store_roots(root):
-    return sorted({(REPO / "artifacts").resolve(), Path("D:/TIAW/ts02").resolve(),
+    return sorted({(REPO / "artifacts").resolve(), RETAINED_RUN,
                    Path(root).resolve()}, key=lambda p: str(p).casefold())
 
 
@@ -556,7 +560,7 @@ class Session:
             package = self.run.package
             admission = {"mode": "inspect-system-scope", "ownedScratch": True, "allProjectObjectsOwned": True,
                 "sequentialNativeAdmission": True, "checkpointRetrievalGatePassed": True, "systemCaseName": "SingleStep",
-                "artifactRoot": str(Path("D:/TIAW").resolve()), "outputDirectory": str(self.directory / "capture"),
+                "artifactRoot": str(SHORT_ROOT),"outputDirectory": str(self.directory / "capture"),
                 "processId": native["pid"], "nativeProcessStartTimeUtc": self.data["nativeProcessStartTimeUtc"],
                 "projectPath": str(PROJECT), "binarySha256": package["binary"]["sha256"],
                 "apiSha256": package["apiSha256"], "ownershipEvidence": package["ownershipEvidence"],
@@ -744,7 +748,7 @@ class Run:
 
 def parser():
     value = argparse.ArgumentParser(description=__doc__)
-    value.add_argument("--root", type=Path, required=True, help="Fresh output under D:/TIAW, outside ts02.")
+    value.add_argument("--root", type=Path, required=True, help="Fresh output under the short root (TIA_MCP_SHORT_ROOT, default D:/TIAW), outside ts02.")
     value.add_argument("--recovery-gate", type=Path, required=True, help="Six hash-bound actual-Host interruption receipts; all are reverified.")
     value.add_argument("--host", type=Path, default=HOST)
     value.add_argument("--worker", type=Path, default=WORKER)

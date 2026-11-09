@@ -1,0 +1,38 @@
+{
+  "operationId": "57793fce700c4f2986f3f122a7132de1",
+  "reviewedPlanSha256": "e2f7fbb12b5503ab8a694e621955eeeaae94297d4333a2f11e692eb409931cde",
+  "reviewedInputSha256": "f9564ee980f08582ad65dfe899486b608a577f618ee0eb2da9fb64383c111f25",
+  "baseline": {
+    "path": "D:\\TIAW\\ph1602\\watch-observations\\w_bd6f39b184f5\\watch-0.xml",
+    "sha256": "3df07dbf87ffdd1e9052a9235ef7dee25d1b537cc5730bca17917b3bcaf0f6ae",
+    "bytes": 3697
+  },
+  "candidate": {
+    "path": "D:\\TIAW\\ph1602\\watch\\38f2e1fe15d6\\reviewed.xml",
+    "sha256": "f9564ee980f08582ad65dfe899486b608a577f618ee0eb2da9fb64383c111f25",
+    "bytes": 3600
+  },
+  "delta": {
+    "kind": "modifyValue",
+    "beforeRows": 1,
+    "candidateRows": 1,
+    "nativeIdsPreservedExceptFreshCloneIds": true,
+    "unknownPayloadPreserved": true
+  },
+  "frozenSources": {
+    "manifest": {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\manifest.json",
+      "sha256": "4c8be2a10a41b5c3742159b9ca150c869a6e6aed8408eb451ba2d23c3fee7591",
+      "bytes": 63169
+    },
+    "worker": {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\worker\\TiaMcp.Openness.V21.exe",
+      "sha256": "d7460d05ca82b97467d01c6c8549ddafc062505026136af7608fddcbdb3a6dfc",
+      "bytes": 1360896
+    },
+    "verifiedFiles": 261
+  },
+  "nativeInvoked": false,
+  "noOnlineAction": true,
+  "approved": true
+}

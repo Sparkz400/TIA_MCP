@@ -1,0 +1,9 @@
+{
+  "approved": true,
+  "operationId": "3f96ca5ade7a44ef810edf903540904b",
+  "reviewedPlanSha256": "f96d2179d16384a1d96c05ca03b311de80355af360ec9ad61f174cc1d78501e7",
+  "oracle": "One existing Bool ModifyValue FALSE to TRUE; entire parsed document otherwise equal; all three authored comments preserved.",
+  "inputSha256": "40bcf92e40e35b084c6b48f8b9100ba8dd898b4a76885de4aaefee8fdc43cbdb",
+  "stableBaselineVerified": true,
+  "noOnlineAction": true
+}

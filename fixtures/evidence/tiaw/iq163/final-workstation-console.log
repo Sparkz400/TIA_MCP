@@ -1,0 +1,53 @@
+  Wiederherzustellende Projekte werden ermittelt...
+  "D:\TIAW\iq163\source\src\TiaMcp.TestSuite.V21\TiaMcp.TestSuite.V21.csproj" wiederhergestellt (in 345 ms.).
+  "D:\TIAW\iq163\source\tests\TiaMcp.WatchAdapter.Boundary.Tests\TiaMcp.WatchAdapter.Boundary.Tests.csproj" wiederhergestellt (in 345 ms.).
+  "D:\TIAW\iq163\source\src\TiaMcp.Openness.V21\TiaMcp.Openness.V21.csproj" wiederhergestellt (in 345 ms.).
+  TiaMcp.TestSuite.V21 -> D:\TIAW\iq163\source\artifacts\final-workstation-01\dotnet\bin\TiaMcp.TestSuite.V21\release\TiaMcp.TestSuite.V21.dll
+  TiaMcp.Openness.V21 -> D:\TIAW\iq163\source\artifacts\final-workstation-01\dotnet\bin\TiaMcp.Openness.V21\release\TiaMcp.Openness.V21.exe
+  TiaMcp.WatchAdapter.Boundary.Tests -> D:\TIAW\iq163\source\artifacts\final-workstation-01\dotnet\bin\TiaMcp.WatchAdapter.Boundary.Tests\release\TiaMcp.WatchAdapter.Boundary.Tests.exe
+
+Der Buildvorgang wurde erfolgreich ausgeführt.
+    0 Warnung(en)
+    0 Fehler
+
+Verstrichene Zeit 00:00:10.20
+PASS Production worker watch target/query and translation journal guards: 31 checks; offline reflection only, no native calls.
+  Wiederherzustellende Projekte werden ermittelt...
+  "D:\TIAW\iq163\source\tests\TiaMcp.ComponentQualification.Boundary.Tests\TiaMcp.ComponentQualification.Boundary.Tests.csproj" wiederhergestellt (in 271 ms.).
+  2 von 3 Projekten sind für die Wiederherstellung auf dem neuesten Stand.
+  TiaMcp.TestSuite.V21 -> D:\TIAW\iq163\source\artifacts\final-workstation-01\dotnet\bin\TiaMcp.TestSuite.V21\release\TiaMcp.TestSuite.V21.dll
+  TiaMcp.Openness.V21 -> D:\TIAW\iq163\source\artifacts\final-workstation-01\dotnet\bin\TiaMcp.Openness.V21\release\TiaMcp.Openness.V21.exe
+  TiaMcp.ComponentQualification.Boundary.Tests -> D:\TIAW\iq163\source\artifacts\final-workstation-01\dotnet\bin\TiaMcp.ComponentQualification.Boundary.Tests\release\TiaMcp.ComponentQualification.Boundary.Tests.exe
+
+Der Buildvorgang wurde erfolgreich ausgeführt.
+    0 Warnung(en)
+    0 Fehler
+
+Verstrichene Zeit 00:00:03.55
+PASS change_prepare enabled=False -> ComponentQualificationDisabled
+PASS change_apply enabled=False -> MutationAdmissionRequired
+PASS change_status enabled=False -> ComponentQualificationDisabled
+PASS change_prepare enabled=True -> OwnedScratchRequired
+PASS change_apply enabled=True -> MutationAdmissionRequired
+PASS component_window_plan enabled=False -> ComponentQualificationDisabled
+PASS component_window_step enabled=True -> MutationAdmissionRequired
+PASS component_window_read enabled=True -> ComponentReservationRequired
+PASS component_window_source enabled=True -> ComponentReservationRequired
+PASS captured storage boundary receipt=False context=False -> ordinary route unchanged
+PASS captured storage boundary receipt=True context=False -> StaleDeclaration
+PASS captured storage boundary receipt=False context=True -> StaleDeclaration
+12 offline production-routing boundary checks passed; no native session started.
+  Wiederherzustellende Projekte werden ermittelt...
+  "D:\TIAW\iq163\source\tests\TiaMcp.TestSuite.Worker.Tests\TiaMcp.TestSuite.Worker.Tests.csproj" wiederhergestellt (in 407 ms.).
+  2 von 3 Projekten sind für die Wiederherstellung auf dem neuesten Stand.
+  TiaMcp.TestSuite.V21 -> D:\TIAW\iq163\source\artifacts\final-workstation-01\dotnet\bin\TiaMcp.TestSuite.V21\release\TiaMcp.TestSuite.V21.dll
+  TiaMcp.Openness.V21 -> D:\TIAW\iq163\source\artifacts\final-workstation-01\dotnet\bin\TiaMcp.Openness.V21\release\TiaMcp.Openness.V21.exe
+  TiaMcp.TestSuite.Worker.Tests -> D:\TIAW\iq163\source\artifacts\final-workstation-01\dotnet\bin\TiaMcp.TestSuite.Worker.Tests\release\TiaMcp.TestSuite.Worker.Tests.exe
+
+Der Buildvorgang wurde erfolgreich ausgeführt.
+    0 Warnung(en)
+    0 Fehler
+
+Verstrichene Zeit 00:00:05.27
+PASS Test Suite owning-worker fake/reflection boundary: 96 checks; no native calls.
+PASS Compiled worker keeps discovery/attachment descriptors disposal-free and isolates closure of its own qualification Portal. No Siemens assembly was loaded.

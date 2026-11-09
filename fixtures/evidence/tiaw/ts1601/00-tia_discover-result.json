@@ -1,0 +1,13 @@
+{
+  "origin": "TIA Portal V21 Openness/offline",
+  "observedAtUtc": "2026-10-16T06:52:45.6352902Z",
+  "processId": null,
+  "processes": [
+    {
+      "processId": 31240,
+      "mode": "WithUserInterface",
+      "executablePath": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+      "projectPath": "D:\\01_Projekte\\2026\\200756_FelixSchoeller\\200756_FelixSchoeller_Bausteine_V00\\200756_FelixSchoeller_Bausteine.ap21"
+    }
+  ]
+}

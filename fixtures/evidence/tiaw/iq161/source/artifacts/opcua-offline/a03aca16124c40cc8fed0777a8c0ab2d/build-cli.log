@@ -1,0 +1,12 @@
+  Wiederherzustellende Projekte werden ermittelt...
+  "D:\TIAW\iq161\source\artifacts\opcua-offline\a03aca16124c40cc8fed0777a8c0ab2d\source\src\TiaMcp.OpcUa.Cli\TiaMcp.OpcUa.Cli.csproj" wiederhergestellt (in 161 ms.).
+  2 von 3 Projekten sind für die Wiederherstellung auf dem neuesten Stand.
+  TiaMcp.Core -> D:\TIAW\iq161\source\artifacts\opcua-offline\a03aca16124c40cc8fed0777a8c0ab2d\source\src\TiaMcp.Core\bin\Release\net10.0\TiaMcp.Core.dll
+  TiaMcp.OpcUa -> D:\TIAW\iq161\source\artifacts\opcua-offline\a03aca16124c40cc8fed0777a8c0ab2d\source\src\TiaMcp.OpcUa\bin\Release\net10.0\TiaMcp.OpcUa.dll
+  TiaMcp.OpcUa.Cli -> D:\TIAW\iq161\source\artifacts\opcua-offline\a03aca16124c40cc8fed0777a8c0ab2d\source\src\TiaMcp.OpcUa.Cli\bin\Release\net10.0\TiaMcp.OpcUa.Cli.dll
+
+Der Buildvorgang wurde erfolgreich ausgeführt.
+    0 Warnung(en)
+    0 Fehler
+
+Verstrichene Zeit 00:00:04.32

@@ -1,0 +1,190 @@
+{
+  "kind": "independent-watch-expansion-verification",
+  "root": "D:\\TIAW\\ph1601",
+  "nativeInvoked": false,
+  "verifiedAtUtc": "2026-10-16T05:07:49.782875+00:00",
+  "stages": [
+    {
+      "name": "reviewedExactDocumentDelta",
+      "passed": true,
+      "detail": {
+        "operationId": "65e1e7e550cd4f0ea65be332df2b0e97",
+        "reviewedPlanSha256": "4c172179c0ab3624bb89b7fc26ac616c546492cef24e0a4127f291d9a08f0a5e",
+        "reviewedInputSha256": "e2ad9880273602a81a6b4b0c63873a7fd820260814d019cee304b9b2d0581da1",
+        "baseline": {
+          "path": "D:\\TIAW\\ph1601\\watch-observations\\w_5defe9f9ecb1\\watch-0.xml",
+          "sha256": "e4294de2bf3b98fd0949c88e880e5c6144b34835c0058ef734ac41e86bada765",
+          "bytes": 3697
+        },
+        "candidate": {
+          "path": "D:\\TIAW\\ph1601\\watch\\a71392d64f42\\reviewed.xml",
+          "sha256": "e2ad9880273602a81a6b4b0c63873a7fd820260814d019cee304b9b2d0581da1",
+          "bytes": 3600
+        },
+        "delta": {
+          "kind": "modifyValue",
+          "beforeRows": 1,
+          "candidateRows": 1,
+          "nativeIdsPreservedExceptFreshCloneIds": true,
+          "unknownPayloadPreserved": true
+        },
+        "frozenSources": {
+          "manifest": {
+            "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\manifest.json",
+            "sha256": "4c8be2a10a41b5c3742159b9ca150c869a6e6aed8408eb451ba2d23c3fee7591",
+            "bytes": 63169
+          },
+          "worker": {
+            "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\worker\\TiaMcp.Openness.V21.exe",
+            "sha256": "d7460d05ca82b97467d01c6c8549ddafc062505026136af7608fddcbdb3a6dfc",
+            "bytes": 1360896
+          },
+          "verifiedFiles": 261
+        },
+        "nativeInvoked": false,
+        "noOnlineAction": true
+      }
+    },
+    {
+      "name": "nativeRunIdentity",
+      "passed": true,
+      "detail": {
+        "operationId": "65e1e7e550cd4f0ea65be332df2b0e97",
+        "mode": "bool"
+      }
+    },
+    {
+      "name": "durableJournal",
+      "passed": true,
+      "detail": {
+        "records": 12,
+        "states": [
+          "prepared",
+          "acquired",
+          "checkpointIntent",
+          "ready",
+          "dispatchIntent",
+          "dispatchIntent",
+          "succeeded",
+          "recoveryIntent",
+          "recoveryIntent",
+          "recoveryIntent",
+          "recoveryIntent",
+          "reconciled"
+        ]
+      }
+    },
+    {
+      "name": "independentApproval",
+      "passed": true,
+      "detail": {
+        "path": "D:\\TIAW\\ph1601\\independent-review.json",
+        "sha256": "094e4110dd70647b1c2cf4c244af5c9d94172ad0ad3c814a903c07c5d2cdaf4d",
+        "bytes": 1464
+      }
+    },
+    {
+      "name": "exactHostWorkerAndNativeCleanup",
+      "passed": true,
+      "detail": {
+        "hostCount": 1,
+        "exactWorkerLifetimes": 1,
+        "exactNativeLifetimes": 6,
+        "initialHostProcessId": 49048,
+        "finalHostProcessId": 49048,
+        "closedBeforeRestart": false,
+        "coordinatorInterventionRequired": false,
+        "normalLifecyclePassed": true,
+        "explicitNativeTermination": false,
+        "coordinatorNativeCleanup": null,
+        "receipts": [
+          {
+            "path": "D:\\TIAW\\ph1601\\host-01-close.json",
+            "sha256": "4c71e5a09d934a16cfcde84a4a23121af78c4165084e21cc05ee2ea85a0f879b",
+            "bytes": 63084
+          }
+        ],
+        "forcedTermination": false
+      }
+    },
+    {
+      "name": "nativeAppliedReadbackAndPeers",
+      "passed": true,
+      "detail": {
+        "saved": true,
+        "completeXmlAndPeersVerified": true
+      }
+    },
+    {
+      "name": "freshReopen",
+      "passed": true,
+      "detail": {
+        "processId": 44052,
+        "sessionEpoch": "aed7aa60a4ac45ad8cfa0d4517a7ffc1"
+      }
+    },
+    {
+      "name": "freshOriginalRestoredAndReconciliation",
+      "passed": true,
+      "detail": {
+        "originalDisposition": "verifiedApplied",
+        "restoredProjectVerified": true,
+        "retrievalResponseRetained": true,
+        "recoveryPath": "D:\\TIAW\\ph1601\\r_cf4621f9fd\\TiaMcpScratch_20261016_050326_b99b3277\\TiaMcpScratch_20261016_050326_b99b3277.ap21",
+        "finalState": "reconciled"
+      }
+    },
+    {
+      "name": "nativeWorkflowCompleted",
+      "passed": true,
+      "detail": {
+        "path": "D:\\TIAW\\ph1601\\result.json",
+        "sha256": "6851fb2f16a3a19f52edd8b202ef7e2edacabc2fdb98dab8679c294acb77d5f6",
+        "bytes": 408
+      }
+    }
+  ],
+  "issues": [],
+  "actualHostLifecycle": {
+    "hostCount": 1,
+    "exactWorkerLifetimes": 1,
+    "exactNativeLifetimes": 6,
+    "initialHostProcessId": 49048,
+    "finalHostProcessId": 49048,
+    "closedBeforeRestart": false,
+    "coordinatorInterventionRequired": false,
+    "normalLifecyclePassed": true,
+    "explicitNativeTermination": false,
+    "coordinatorNativeCleanup": null,
+    "receipts": [
+      {
+        "path": "D:\\TIAW\\ph1601\\host-01-close.json",
+        "sha256": "4c71e5a09d934a16cfcde84a4a23121af78c4165084e21cc05ee2ea85a0f879b",
+        "bytes": 63084
+      }
+    ],
+    "forcedTermination": false
+  },
+  "edit": {
+    "kind": "modifyValue",
+    "beforeRows": 1,
+    "candidateRows": 1,
+    "nativeIdsPreservedExceptFreshCloneIds": true,
+    "unknownPayloadPreserved": true
+  },
+  "recovery": {
+    "originalDisposition": "verifiedApplied",
+    "restoredProjectVerified": true,
+    "retrievalResponseRetained": true,
+    "recoveryPath": "D:\\TIAW\\ph1601\\r_cf4621f9fd\\TiaMcpScratch_20261016_050326_b99b3277\\TiaMcpScratch_20261016_050326_b99b3277.ap21",
+    "finalState": "reconciled"
+  },
+  "completed": true,
+  "qualificationPassed": true,
+  "hostRestartVerified": false,
+  "interruptionMatrixCasePassed": false,
+  "coordinatorInterventionRequired": false,
+  "normalLifecyclePassed": true,
+  "explicitNativeTermination": false,
+  "coverageGaps": []
+}

@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"error\":{\"code\":\"StaleNativeTarget\",\"message\":\"Reprepare after reconnect, owner, binary, profile or offline-state change.\",\"details\":null}}"
+    }
+  ],
+  "structuredContent": {
+    "error": {
+      "code": "StaleNativeTarget",
+      "message": "Reprepare after reconnect, owner, binary, profile or offline-state change.",
+      "details": null
+    }
+  },
+  "isError": true
+}

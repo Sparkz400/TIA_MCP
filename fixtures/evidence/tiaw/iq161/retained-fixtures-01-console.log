@@ -1,0 +1,15 @@
+24 file-only populated category gate checks passed; no Siemens assembly referenced or native call made.
+PASS reorder explicit preorder candidate and immutable source
+PASS delete explicit preorder candidate and immutable source
+PASS refuse unknown scalar atomically
+PASS refuse unknown scalar attribute atomically
+PASS refuse unknown nested object atomically
+PASS refuse reference attribute atomically
+PASS refuse reference element in metadata atomically
+PASS refuse external document id atomically
+PASS refuse wrong table id atomically
+PASS refuse duplicate cultures atomically
+PASS refuse wrong trigger atomically
+PASS refuse wrong datatype atomically
+PASS refuse reference-like attribute casing atomically
+PASS refuse opaque language markup atomically

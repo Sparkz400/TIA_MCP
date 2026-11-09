@@ -1,0 +1,53 @@
+PASS independent fixture structure and qualification flags
+PASS actions, interlocks, supervision and conditions
+PASS all four branch kinds
+PASS v6 namespaced export envelope and foreign lookalikes
+PASS unsupported namespace is never silently accepted
+PASS unsupported plain document reports no graph
+PASS numeric duplicate identity and ambiguous reference
+PASS duplicate transition and branch identities
+PASS step and transition numbers are unique across sequences
+PASS kinds and charts have independent numbering; branch identities are sequence scoped
+PASS jumps resolve into another sequence and HTML links to the target
+PASS direct references cannot cross sequence boundaries
+PASS broken references are checked by typed kind
+PASS IsMissing target is not a valid resolution
+PASS invalid and absent identity values stay unresolved
+PASS invalid enum values and language are reported
+PASS malformed structure and endpoints remain visible
+PASS duplicate containers do not hide identities
+PASS byte exact retention and defensive copying
+PASS UTF16 BOM and declaration preserved
+PASS JSON is deterministic, complete and can restore source bytes
+PASS independent v1/v2 expected change set
+PASS identical and formatting only comparisons
+PASS namespace prefixes and attribute order are not content changes
+PASS added, removed and reordered nodes
+PASS interlock, supervision and action ordering changes
+PASS unknown elements, attributes, comments and mixed language envelope participate in diff
+PASS literal whitespace and xml:space are significant
+PASS unknown content movement is reported alongside a known action change
+PASS inherited whitespace is compared even alongside other changes
+PASS mixed text content spacing survives normalization
+PASS HTML escapes all input and contains no active source content
+PASS HTML includes diagram, jumps, branch ports and all details
+PASS ambiguous identities do not produce a misleading diagram
+PASS unrelated end sentinels remain separate diagram nodes
+PASS bounded larger sequence remains completely inspectable
+PASS malformed XML and DTD/external entities refused
+PASS byte, depth and element budgets
+PASS CLI inspect, view, compare and preserve
+PASS CLI refuses replacement, including input file
+PASS CLI structural failure still produces reviewable evidence
+PASS CLI usage, help, malformed XML and missing files
+PASS native evidence artifact integrity and owned process receipts
+PASS native empty modules are readable and explicitly diagnosed
+PASS native rich graph retains independent branch, action and condition expectations
+PASS native roundtrip, fresh reopen and recovery preserve the graph
+PASS native alternative branches retain split, merge and jump topology
+PASS native cross-sequence jumps and duplicate rejection agree with reader scope
+PASS native bytes and embedded language XML remain available without certification
+PASS independent installed Siemens XSD validation of both authored fixtures
+PASS independent XSD validation of native graphs and known empty-module rejection
+51/51 passed. Generated review artifacts: D:\TIAW\iq161\source\artifacts\solution-01\bin\TiaMcp.Graph.Tests\release\generated\df28fd7a0da642c1bb7c4296d89259b6
+Native evidence checks cover the recorded V21 fixtures; arbitrary input documents are not certified.

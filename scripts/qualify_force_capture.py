@@ -24,6 +24,7 @@ from smoke_mcp import Client
 from retained_native_lifecycle import (FILE_STORAGE_SERVER, FILE_STORAGE_TERMINAL_SECONDS,
                                        terminal_deadline_seconds as _deadline)
 from qualify_worker_startup_exact import identity
+from qualification_root import ENVIRONMENT as SHORT_ROOT_ENVIRONMENT, short_root
 from qualify_translation_category_probe import (StoreExclusiveWindow, WindowsFiles, safe_path,
     verify_recovery_gate, require, resource_key, overlaps)
 
@@ -1125,7 +1126,8 @@ class Coordinator:
 
 def preflight(args):
     root = safe_path(args.root)
-    require(root.is_relative_to(Path("D:/TIAW").resolve()) and root != Path("D:/TIAW").resolve(), "Fresh short force root must be under D:/TIAW")
+    short = short_root()
+    require(root.is_relative_to(short) and root != short, f"Fresh short force root must be under {short} ({SHORT_ROOT_ENVIRONMENT})")
     if args.phase == "checkpoint": require(not root.exists(), "Checkpoint phase requires a fresh root; no replay")
     else: require((root / "plan.json").is_file() and (args.phase == "request-cleanup" or not (root / args.phase).exists()), "Existing plan and new phase directory required")
     package = bind_package(args.controller_manifest)

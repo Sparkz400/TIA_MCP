@@ -1,0 +1,103 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"id\":\"eb1f1ee948f64e6581b09e63f7f40e8f\",\"revision\":5,\"state\":\"recoveryRequired\",\"idempotencyKey\":\"exact-delete\",\"planSha256\":\"0ed47f4ac83cfa0f3fedc2aef56e6ae1c4e9e6f3aa1bcb1af7eb1426d2ebf45b\",\"plan\":{\"operation\":\"watchDocumentEdit\",\"target\":{\"reference\":{\"object\":{\"projectPath\":\"D:\\\\TIAW\\\\uq18\\\\scratch\\\\TiaMcpScratch_20261015_110514_f61492dd\\\\TiaMcpScratch_20261015_110514_f61492dd\\\\TiaMcpScratch_20261015_110514_f61492dd.ap21\",\"plcPath\":\"/projects/TiaMcpScratch_20261015_110514_f61492dd/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC\",\"scopePath\":\"/projects/TiaMcpScratch_20261015_110514_f61492dd/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC\",\"objectPath\":\"/projects/TiaMcpScratch_20261015_110514_f61492dd/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/watch/root/MilestoneWatch\",\"kind\":\"watchTable\"},\"snapshot\":{\"observationId\":\"08dc46814ac1496f9a67be39568fa101\",\"sourceSha256\":\"d5c84e31ae4dbd27bb3ae1322ead907eca1f43ec8eb40af21234551b32b2168c\",\"tiaVersion\":21},\"contentSha256\":\"ca0d6a740ecb9319647510bcb80e9e99dbe1a2eab26842c9acedd1b57fb68226\"},\"projectFilePath\":\"D:\\\\TIAW\\\\uq18\\\\scratch\\\\TiaMcpScratch_20261015_110514_f61492dd\\\\TiaMcpScratch_20261015_110514_f61492dd\\\\TiaMcpScratch_20261015_110514_f61492dd.ap21\",\"sessionEpoch\":\"d6ac81447ac14e4780bffb1d6b2b53b6\",\"adapterSha256\":\"d98271b29d7d28ca4ff5534557c0714b6ebab7e7542b2670cfbd2d30ac0a7f5a\",\"profileSha256\":\"f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f\",\"hardwareIdentity\":\"OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||\",\"nativeIdentity\":null,\"offline\":true,\"probes\":[{\"name\":\"offline\",\"state\":\"observed\",\"evidenceSha256\":\"d5c84e31ae4dbd27bb3ae1322ead907eca1f43ec8eb40af21234551b32b2168c\"},{\"name\":\"watchImport\",\"state\":\"observed\",\"evidenceSha256\":\"f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f\"}]},\"resources\":[{\"resourceKey\":\"project:D:\\\\TIAW\\\\UQ18\\\\SCRATCH\\\\TIAMCPSCRATCH_20261015_110514_F61492DD\\\\TIAMCPSCRATCH_20261015_110514_F61492DD\\\\TIAMCPSCRATCH_20261015_110514_F61492DD.AP21\",\"kind\":\"project\",\"effect\":\"oneReviewedWatchEdit:delete\",\"recoveryStrategy\":\"projectArchiveToNewLocation\"}],\"inputs\":[{\"relativePath\":\"watch/98534d2c3355/review.json\",\"sha256\":\"d20e8086e0de1eac1c0cea3b3f2347e9e3e0b7207b50079a56acc95c760d0e67\"},{\"relativePath\":\"watch/98534d2c3355/reviewed.xml\",\"sha256\":\"22fe5dd92730f306004c1c0a0546796010f74fcc820d3889d4aca29dee6a9bf5\"}],\"requiredProbes\":[\"offline\",\"watchImport\"],\"requiredGates\":[\"readback\",\"preservation\",\"saved\",\"freshReopen\"]},\"previousSha256\":\"20c895c1dfe272431c0e4849cc826974dbf1db5800ad50504842d7e8ef6720b3\",\"recordedAt\":\"2026-10-15T11:07:08.7288585+00:00\",\"checkpoints\":[{\"relativePath\":\"watch/98534d2c3355/watch-307088ee99b8.zap21\",\"sha256\":\"63860f54582aca16a5a412483bec9991ee6bf4a88371f9c10b320e7fd2617f12\"}],\"evidence\":[{\"gate\":\"failure\",\"artifact\":{\"relativePath\":\"watch/98534d2c3355/failure-4.json\",\"sha256\":\"1f8805becbc9673b587cf44abc15bb99ee9cd88350679073b730cc53caf5ee8c\"}}],\"reconciliation\":[],\"recoveryDestinations\":[],\"recoveryResolutions\":[]}"
+    }
+  ],
+  "structuredContent": {
+    "id": "eb1f1ee948f64e6581b09e63f7f40e8f",
+    "revision": 5,
+    "state": "recoveryRequired",
+    "idempotencyKey": "exact-delete",
+    "planSha256": "0ed47f4ac83cfa0f3fedc2aef56e6ae1c4e9e6f3aa1bcb1af7eb1426d2ebf45b",
+    "plan": {
+      "operation": "watchDocumentEdit",
+      "target": {
+        "reference": {
+          "object": {
+            "projectPath": "D:\\TIAW\\uq18\\scratch\\TiaMcpScratch_20261015_110514_f61492dd\\TiaMcpScratch_20261015_110514_f61492dd\\TiaMcpScratch_20261015_110514_f61492dd.ap21",
+            "plcPath": "/projects/TiaMcpScratch_20261015_110514_f61492dd/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "scopePath": "/projects/TiaMcpScratch_20261015_110514_f61492dd/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "objectPath": "/projects/TiaMcpScratch_20261015_110514_f61492dd/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/watch/root/MilestoneWatch",
+            "kind": "watchTable"
+          },
+          "snapshot": {
+            "observationId": "08dc46814ac1496f9a67be39568fa101",
+            "sourceSha256": "d5c84e31ae4dbd27bb3ae1322ead907eca1f43ec8eb40af21234551b32b2168c",
+            "tiaVersion": 21
+          },
+          "contentSha256": "ca0d6a740ecb9319647510bcb80e9e99dbe1a2eab26842c9acedd1b57fb68226"
+        },
+        "projectFilePath": "D:\\TIAW\\uq18\\scratch\\TiaMcpScratch_20261015_110514_f61492dd\\TiaMcpScratch_20261015_110514_f61492dd\\TiaMcpScratch_20261015_110514_f61492dd.ap21",
+        "sessionEpoch": "d6ac81447ac14e4780bffb1d6b2b53b6",
+        "adapterSha256": "d98271b29d7d28ca4ff5534557c0714b6ebab7e7542b2670cfbd2d30ac0a7f5a",
+        "profileSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f",
+        "hardwareIdentity": "OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||",
+        "nativeIdentity": null,
+        "offline": true,
+        "probes": [
+          {
+            "name": "offline",
+            "state": "observed",
+            "evidenceSha256": "d5c84e31ae4dbd27bb3ae1322ead907eca1f43ec8eb40af21234551b32b2168c"
+          },
+          {
+            "name": "watchImport",
+            "state": "observed",
+            "evidenceSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f"
+          }
+        ]
+      },
+      "resources": [
+        {
+          "resourceKey": "project:D:\\TIAW\\UQ18\\SCRATCH\\TIAMCPSCRATCH_20261015_110514_F61492DD\\TIAMCPSCRATCH_20261015_110514_F61492DD\\TIAMCPSCRATCH_20261015_110514_F61492DD.AP21",
+          "kind": "project",
+          "effect": "oneReviewedWatchEdit:delete",
+          "recoveryStrategy": "projectArchiveToNewLocation"
+        }
+      ],
+      "inputs": [
+        {
+          "relativePath": "watch/98534d2c3355/review.json",
+          "sha256": "d20e8086e0de1eac1c0cea3b3f2347e9e3e0b7207b50079a56acc95c760d0e67"
+        },
+        {
+          "relativePath": "watch/98534d2c3355/reviewed.xml",
+          "sha256": "22fe5dd92730f306004c1c0a0546796010f74fcc820d3889d4aca29dee6a9bf5"
+        }
+      ],
+      "requiredProbes": [
+        "offline",
+        "watchImport"
+      ],
+      "requiredGates": [
+        "readback",
+        "preservation",
+        "saved",
+        "freshReopen"
+      ]
+    },
+    "previousSha256": "20c895c1dfe272431c0e4849cc826974dbf1db5800ad50504842d7e8ef6720b3",
+    "recordedAt": "2026-10-15T11:07:08.7288585+00:00",
+    "checkpoints": [
+      {
+        "relativePath": "watch/98534d2c3355/watch-307088ee99b8.zap21",
+        "sha256": "63860f54582aca16a5a412483bec9991ee6bf4a88371f9c10b320e7fd2617f12"
+      }
+    ],
+    "evidence": [
+      {
+        "gate": "failure",
+        "artifact": {
+          "relativePath": "watch/98534d2c3355/failure-4.json",
+          "sha256": "1f8805becbc9673b587cf44abc15bb99ee9cd88350679073b730cc53caf5ee8c"
+        }
+      }
+    ],
+    "reconciliation": [],
+    "recoveryDestinations": [],
+    "recoveryResolutions": []
+  },
+  "isError": false
+}

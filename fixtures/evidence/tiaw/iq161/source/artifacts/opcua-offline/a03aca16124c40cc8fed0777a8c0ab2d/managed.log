@@ -1,0 +1,32 @@
+PASS fixture inventory and nonqualification
+PASS identical model
+PASS additive fixture has no removed identities
+PASS breaking version identifies old clients
+PASS namespace indexes are not node identities
+PASS alias expansion and numeric normalization
+PASS GUID and opaque identities
+PASS numeric overflow
+PASS unknown namespace index
+PASS duplicate namespace
+PASS normalized ID collision
+PASS duplicate aliases
+PASS recursive alias rejected
+PASS datatype change breaks clients
+PASS array rank and bounds
+PASS schema required browse name
+PASS array dimension overflow is structured
+PASS wrong root namespace
+PASS DTD blocked
+PASS schemaLocation is not fetched
+PASS depth bound includes extensions
+PASS input byte bound
+PASS reference dependencies explicit
+PASS permission changes never hidden
+PASS vendor extension changes require review
+PASS whitespace in value not discarded
+PASS opaque QName binding changes are retained
+PASS method argument changes are breaking
+PASS stale consumer evidence
+PASS invented consumer node denied
+PASS node capacity
+31/31 offline OPC UA checks passed. No native qualification.

@@ -1,0 +1,10 @@
+{
+  "name": "qualification_testsuite_prepare",
+  "arguments": {
+    "projectPath": "D:\\TIAW\\ts1602\\h\\scratch\\TiaMcpScratch_20261016_080953_aac136ea\\TiaMcpScratch_20261016_080953_aac136ea\\TiaMcpScratch_20261016_080953_aac136ea.ap21",
+    "fixture": "clean",
+    "idempotencyKey": "ts1602-clean",
+    "runs": 1
+  },
+  "expectInjectedLoss": false
+}

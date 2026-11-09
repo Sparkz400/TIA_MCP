@@ -1,0 +1,12 @@
+{
+  "pid": 19076,
+  "parentPid": 27328,
+  "created": 1792127431.8659043,
+  "name": "Siemens.Automation.Portal.exe",
+  "exe": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+  "command": [
+    "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+    "-bootstrapper=Siemens.Automation.Opns.Loader.Impl:Siemens.Automation.Openness.Loader.BootStrapper",
+    "-nosplashscreen"
+  ]
+}

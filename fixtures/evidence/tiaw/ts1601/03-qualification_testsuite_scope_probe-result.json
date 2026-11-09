@@ -1,0 +1,81 @@
+{
+  "projectPath": "D:\\TIAW\\ts1601\\h\\scratch\\TiaMcpScratch_20261016_065446_d49378f1\\TiaMcpScratch_20261016_065446_d49378f1\\TiaMcpScratch_20261016_065446_d49378f1.ap21",
+  "projectModified": false,
+  "productAssembly": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\PublicAPI\\V21\\net48\\Siemens.Engineering.TestSuite.dll",
+  "servicePresent": true,
+  "executionLicense": "unknown",
+  "completeEffectiveScope": false,
+  "nativeExecutionAuthorized": false,
+  "scopeReason": "No qualified complete effective-object readback or exhaustive proof profile. SetScope and diagnostic findings cannot establish coverage.",
+  "rules": [
+    {
+      "name": "TiaMcp_CasingAvailability",
+      "present": true,
+      "effectiveScopeComplete": false,
+      "attributes": [
+        {
+          "name": "Name",
+          "access": "ReadWrite"
+        }
+      ],
+      "compositions": [],
+      "invocations": [
+        {
+          "name": "CopyScope",
+          "parameters": 1
+        },
+        {
+          "name": "Delete",
+          "parameters": 0
+        },
+        {
+          "name": "SaveToFile",
+          "parameters": 1
+        },
+        {
+          "name": "SetScope",
+          "parameters": 2
+        },
+        {
+          "name": "ShowInEditor",
+          "parameters": 0
+        }
+      ],
+      "scopeRoutes": [],
+      "definitionPath": "D:\\TIAW\\ts1601\\h\\scope-probe\\4dcb3697973a481e854b773510f28f1a\\rule-1.xml"
+    }
+  ],
+  "styleExecutorPresent": true,
+  "inventory": [
+    {
+      "name": "Main",
+      "type": "Siemens.Engineering.SW.Blocks.OB",
+      "number": 1,
+      "programmingLanguage": "SCL"
+    },
+    {
+      "name": "TiaMcp_EnableGate",
+      "type": "Siemens.Engineering.SW.Blocks.FB",
+      "number": 1,
+      "programmingLanguage": "SCL"
+    },
+    {
+      "name": "TiaMcp_EnableGate_DB",
+      "type": "Siemens.Engineering.SW.Blocks.InstanceDB",
+      "number": 1,
+      "programmingLanguage": "DB"
+    },
+    {
+      "name": "TiaMcp_IsEnabled",
+      "type": "Siemens.Engineering.SW.Blocks.FC",
+      "number": 1,
+      "programmingLanguage": "SCL"
+    }
+  ],
+  "requestedScope": "ScratchPLC/Program blocks",
+  "styleExecutionInvoked": false,
+  "processId": 28936,
+  "sessionEpoch": "67c080c79dc245fcb68140615cbf6507",
+  "workerSha256": "48f066b2fe0fe3dd04f9d669f31a7fff577462e6e9c29172075287f09046d279",
+  "artifactDirectory": "D:\\TIAW\\ts1601\\h\\scope-probe\\4dcb3697973a481e854b773510f28f1a"
+}

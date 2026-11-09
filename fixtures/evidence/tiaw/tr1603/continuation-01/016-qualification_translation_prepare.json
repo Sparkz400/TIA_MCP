@@ -1,0 +1,18 @@
+{
+  "request": {
+    "projectPath": "D:\\TIAW\\tr1603\\scratch\\TiaMcpScratch_20261016_072546_4a5239b1\\TiaMcpScratch_20261016_072546_4a5239b1\\TiaMcpScratch_20261016_072546_4a5239b1.ap21",
+    "plcPath": "/projects/TiaMcpScratch_20261016_072546_4a5239b1/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+    "idempotencyKey": "translation-continuation-01-edit",
+    "nativeKey": "zMKSD2+5TJH/jvYwF4VcdOHRmI/cTuIMHVev+N9yvnt6LCGvUxgXN7BvwyNOyTwMQPqScp4lBQdpszLWyQNbUPB9V2zLRqi5KMNJ1sri9rcAzdQ3+F+es8Dwp93oTv+L35cBPBzgjrj97TNz6hk8winb3IENqHvdA+keBzwhftNSm1Qibxs9KbgoyECKOSRz3DUY0M9TcbBOPmNWUf4XcRsE2w69ZTaX6fmGF7OYkknDuDT8kxMh24x6WQU9oA2u7Kt4MzJQUCsB61we0p/fYA==",
+    "replacement": "Verified translation Main {0} \u2014 \u03a9"
+  },
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "An error occurred invoking 'qualification_translation_prepare'."
+      }
+    ],
+    "isError": true
+  }
+}

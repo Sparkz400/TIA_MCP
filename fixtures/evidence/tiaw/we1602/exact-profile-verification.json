@@ -1,0 +1,260 @@
+{
+  "kind": "independent-watch-exact-profile-verification",
+  "completed": true,
+  "qualificationPassed": true,
+  "profile": "watch.create-owned-v21-1511-v41-de-active-bool.v1",
+  "productionActivation": false,
+  "nativeInvoked": false,
+  "issues": [],
+  "stages": {
+    "creationLifecycle": {
+      "kind": "independent-watch-authoring-verification",
+      "completed": true,
+      "qualificationPassed": true,
+      "nativeInvoked": false,
+      "root": "D:\\TIAW\\we1602",
+      "verifiedAtUtc": "2026-10-16T09:26:31.907844+00:00",
+      "stages": [
+        {
+          "name": "exactGeneratedCreationReview",
+          "passed": true,
+          "detail": {
+            "operationId": "a4cad60758c9452999d028bd72d15d51",
+            "reviewedPlanSha256": "86cdbb36f22f5830108dce2c29e6f55021e46f06d8d90a83bd2830b624c2d196",
+            "reviewedInputSha256": "1b052ec8af495a2397abb347654ff478d105059312d3a6d11357a67716dc1cba",
+            "delta": {
+              "rows": 1,
+              "symbol": "\"TiaMcp_EnableGate_DB\".Active",
+              "datatype": "Bool",
+              "modifyValue": "",
+              "defaultCommentCulture": "de-DE",
+              "reason": "Captured Output state of the selected FB instance: Active",
+              "requiredProfiles": [
+                "watch.add-instance-bool.v1",
+                "watch.create-instance.v1",
+                "watch.reference-free-authoring-ids.v1"
+              ],
+              "documentIdMapping": {
+                "0": "0",
+                "1": "1",
+                "2": "2",
+                "3": "3"
+              }
+            },
+            "frozenSources": {
+              "manifest": {
+                "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\manifest.json",
+                "sha256": "cf6ddbf03e92cc0a1694f521bbbd0d48e96da04e4295af928c23561e4545a666",
+                "bytes": 265951
+              },
+              "worker": {
+                "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\TiaMcp.Openness.V21.exe",
+                "sha256": "f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157",
+                "bytes": 1381376
+              },
+              "verifiedFiles": 1537
+            },
+            "nativeInvoked": false,
+            "noOnlineAction": true
+          }
+        },
+        {
+          "name": "nativeCreationPersistenceRecoveryAndCleanup",
+          "passed": true,
+          "detail": {
+            "journalRevisions": 12,
+            "singleDispatch": true,
+            "restoredAbsence": true,
+            "recoveredReopen": true,
+            "unchangedPeers": 6,
+            "lifecycle": {
+              "hostCount": 1,
+              "exactWorkerLifetimes": 1,
+              "exactNativeLifetimes": 6,
+              "initialHostProcessId": 39060,
+              "finalHostProcessId": 39060,
+              "closedBeforeRestart": false,
+              "coordinatorInterventionRequired": false,
+              "normalLifecyclePassed": true,
+              "explicitNativeTermination": false,
+              "coordinatorNativeCleanup": null,
+              "receipts": [
+                {
+                  "path": "D:\\TIAW\\we1602\\host-01-close.json",
+                  "sha256": "0d9f4d90ace42c0bdf564f6f3874ea2f842ca16ee4499a7fadf2bef719dac268",
+                  "bytes": 70551
+                }
+              ],
+              "forcedTermination": false
+            },
+            "profileBinding": {
+              "adapterSha256": "f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157",
+              "profileSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f",
+              "hardwareIdentity": "OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||",
+              "nativeIdentity": null
+            }
+          }
+        },
+        {
+          "name": "checkpointRecoveryAndCleanup",
+          "passed": true,
+          "detail": {
+            "completed": true,
+            "originalDisposition": "verifiedApplied",
+            "restoredAbsence": true,
+            "freshRecoveredReopen": true,
+            "recoveryPath": "D:\\TIAW\\we1602\\r_e2e01728b8\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+            "finalState": "reconciled",
+            "peerExportsVerified": 6,
+            "exactLifecycle": {
+              "hostCount": 1,
+              "exactWorkerLifetimes": 1,
+              "exactNativeLifetimes": 6,
+              "initialHostProcessId": 39060,
+              "finalHostProcessId": 39060,
+              "closedBeforeRestart": false,
+              "coordinatorInterventionRequired": false,
+              "normalLifecyclePassed": true,
+              "explicitNativeTermination": false,
+              "coordinatorNativeCleanup": null,
+              "receipts": [
+                {
+                  "path": "D:\\TIAW\\we1602\\host-01-close.json",
+                  "sha256": "0d9f4d90ace42c0bdf564f6f3874ea2f842ca16ee4499a7fadf2bef719dac268",
+                  "bytes": 70551
+                }
+              ],
+              "forcedTermination": false
+            }
+          }
+        },
+        {
+          "name": "frozenPackagesAndController",
+          "passed": true,
+          "detail": {
+            "packages": {
+              "host": [
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\Microsoft.Extensions.AI.Abstractions.dll",
+                  "sha256": "bcc8f693103eb00505179f154b1b3a996b85d067e112facd724fd9d695f17a5e"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\ModelContextProtocol.Core.dll",
+                  "sha256": "b1752096ea9d2f38ba88e467f04aea43fb300d9a54d881c165f62b69028ee3ab"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\ModelContextProtocol.dll",
+                  "sha256": "8cd6f626c8d6a0a5ff3e154789d3fcde2b1d66a595c0ef0198e092c2c30fe93a"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Core.dll",
+                  "sha256": "b52bf1f641a94fcd31fefc9cd651ba17d698cad3ed33fe2983aa74ca90bebc52"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Core.pdb",
+                  "sha256": "336cf750de6f84f204d8083678316136cc9bdf76892ded778860d475e73b22cb"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.deps.json",
+                  "sha256": "e87d38800e52c7c5a6dd09ef4ebfd2954c8b8244c00de8fe27ad20092ddfe04b"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.dll",
+                  "sha256": "16af082ee0ee68510d7f97a68a1b80468dea27e6ec43e14b53e58f7761506aa6"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.exe",
+                  "sha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.pdb",
+                  "sha256": "f8096a6f6979f4d0eac0584976d659ea0a0dd4341201d5476f4538a4ebcef9dc"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.runtimeconfig.json",
+                  "sha256": "61a2a447a31667ca1fb9081bec4ffbeb230bb1813fadfa98ebc3a242ce38e36e"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.OpcUa.dll",
+                  "sha256": "7f07b24c08cd2b62920606d01dad642a31d164be0eae3270a7758dbf972bcf6d"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.OpcUa.pdb",
+                  "sha256": "5153091480d00e415e0cb07e34fc119ee89e6f75f1e4ff07163319ff252211d6"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Translations.dll",
+                  "sha256": "fdc4b3cf50dc518c154c76fb0cf8892caa310b0c6fcba63b059ca30119d73aad"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Translations.pdb",
+                  "sha256": "1d0d6513c7a0ade77bc098ade4f30b07d0c756a596a31f4bc29e51f2738338d4"
+                }
+              ],
+              "worker": [
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\Newtonsoft.Json.dll",
+                  "sha256": "e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\TiaMcp.Openness.V21.exe",
+                  "sha256": "f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\TiaMcp.Openness.V21.exe.config",
+                  "sha256": "3a2be7a1bca2543035f80263898dc1a0a3a96bcf2f72834222b3a6a7bff13a39"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\TiaMcp.Openness.V21.pdb",
+                  "sha256": "e8047154ebdc931f69ed6b47fd342861b1fecc036187a6dd7add38ef5c08a23d"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\TiaMcp.TestSuite.V21.dll",
+                  "sha256": "a5392c4009bf61f428a2b66290fde8a6819aa9fd0cc12729f7cb1867fbcbc8dd"
+                },
+                {
+                  "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\TiaMcp.TestSuite.V21.pdb",
+                  "sha256": "5b74e98cf3bf1eb53891ac43e367ecbc3dccb5bf61cb5444e42219fb3f30872e"
+                }
+              ]
+            },
+            "sourcesRetained": true
+          }
+        }
+      ],
+      "issues": [],
+      "requiredProfiles": [
+        "watch.add-instance-bool.v1",
+        "watch.create-instance.v1",
+        "watch.reference-free-authoring-ids.v1"
+      ],
+      "productionActivation": false,
+      "limitations": [
+        "Only the recorded one-row create/default-comment/native target profile.",
+        "Maintenance, explicit multilingual comments, other scalar types, collision and stale-source native refusal remain separate qualifications."
+      ]
+    },
+    "savedNativeSourceDriftAndRestoration": {
+      "passed": true,
+      "evidence": {
+        "realSavedSourceDrift": true,
+        "refusedByNativePreEffectGuard": true,
+        "restoredCompletePeers": true,
+        "hostPrepareAgainstChangedSource": false,
+        "watchImportInvoked": false
+      }
+    },
+    "exactCandidateFreshRestorationCollisionsAndOwnership": {
+      "passed": true,
+      "evidence": {
+        "collisionCases": 3,
+        "lateStaleEpochRefusedBeforeCheckpoint": true,
+        "sharedAdmissionsTerminal": 2
+      }
+    }
+  },
+  "limitations": [
+    "Actual Host prepare with a concurrently changed FB remains separate from the native pre-effect stale guard trial.",
+    "Authoring-specific process-loss/native failure and broader table/comment/scalar profiles are not admitted by this packet."
+  ]
+}

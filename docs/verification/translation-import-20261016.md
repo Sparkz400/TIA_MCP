@@ -26,7 +26,7 @@ The package/source/API/recovery preflight passed. A held resource-window check f
 
 | Field | Retained value |
 | --- | --- |
-| Store | `D:\TIAW\wt02\engineering-operations` |
+| Store | `D:\TIAW\wt02\engineering-operations` ([retained copy](../../fixtures/evidence/tiaw/wt02/engineering-operations)) |
 | Operation | `8dc3fe356740412d8de54f8e5d0f6f2f` |
 | Revision/state | `4` / `dispatchIntent` |
 | Idempotency key | `first-watch-normal` |

@@ -1,0 +1,25 @@
+{
+  "request": {
+    "path": "D:\\TIAW\\tr1603\\scratch\\TiaMcpScratch_20261016_072546_4a5239b1\\TiaMcpScratch_20261016_072546_4a5239b1\\TiaMcpScratch_20261016_072546_4a5239b1.ap21"
+  },
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"origin\":\"TIA Portal V21 Openness/offline\",\"observedAtUtc\":\"2026-10-16T07:38:33.7807540Z\",\"processId\":39620,\"project\":{\"name\":\"TiaMcpScratch_20261016_072546_4a5239b1\",\"path\":\"D:\\\\TIAW\\\\tr1603\\\\scratch\\\\TiaMcpScratch_20261016_072546_4a5239b1\\\\TiaMcpScratch_20261016_072546_4a5239b1\\\\TiaMcpScratch_20261016_072546_4a5239b1.ap21\"},\"opened\":true,\"saved\":false}"
+      }
+    ],
+    "structuredContent": {
+      "origin": "TIA Portal V21 Openness/offline",
+      "observedAtUtc": "2026-10-16T07:38:33.7807540Z",
+      "processId": 39620,
+      "project": {
+        "name": "TiaMcpScratch_20261016_072546_4a5239b1",
+        "path": "D:\\TIAW\\tr1603\\scratch\\TiaMcpScratch_20261016_072546_4a5239b1\\TiaMcpScratch_20261016_072546_4a5239b1\\TiaMcpScratch_20261016_072546_4a5239b1.ap21"
+      },
+      "opened": true,
+      "saved": false
+    },
+    "isError": false
+  }
+}
