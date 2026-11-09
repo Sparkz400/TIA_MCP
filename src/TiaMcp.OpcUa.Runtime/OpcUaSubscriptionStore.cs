@@ -47,7 +47,7 @@ internal sealed class OpcUaSubscriptionStore : CaptureSegmentStore<OpcUaSubscrip
     // Tallies: [0] notifications, [1] duplicate messages, [2] missing sequences, [3] confirmed remote cleanup.
     protected override void ValidateRow(OpcUaSubscriptionPlan plan, OpcUaSubscriptionRow row, long sequence, long[] tallies)
     {
-        OpcUaSubscriptionContracts.ValidateRow(plan,row); Require(row.Sequence == sequence,Integrity);
+        OpcUaSubscriptionContracts.ValidateRow(plan,row); if (row.Sequence != sequence) throw Error("UaSubscriptionIntegrityFailure"); // literal code: scripts/error_registry.py finds codes by literal raises only
         tallies[0] += OpcUaSubscriptionContracts.Count(row.Event);
         tallies[1] += row.Event.Duplicate ? 1 : 0; tallies[2] += row.Event.MissingCount;
         if (Cleanup(row)) tallies[3] = 1;
