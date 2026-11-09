@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -27,7 +28,8 @@ def canonical(value):
     return json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
 
 
-from evidence_hash import sha256 as digest_bytes
+def digest_bytes(value):
+    return hashlib.sha256(value).hexdigest()
 
 
 def read_bytes(path, limit=MAX_FILE):
