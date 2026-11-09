@@ -87,6 +87,10 @@ namespace TiaMcp.Openness.V21
             // Snapshot while the connection is healthy; reporting below never reads Project.
             string projectPath = project.Path.FullName;
             var target = ResolveHmiTarget(project, (JObject)change.Payload["target"]);
+            // A Classic tag-table import leaves graphic lists out of its capture (HmiPreservationRules.ClassicTagTablePolicy);
+            // decided from the resolved native object, never from the payload's declared kind.
+            bool withoutGraphicLists = change.Kind == "hmi_classic_import" && change.Payload.Value<string>("operation") == "classic_xml_import"
+                && IsClassicTagTable(HmiEngineeringObject(project, (JObject)change.Payload["target"]).Native);
             string directory = Path.Combine(change.Directory, "hmi-" + stage + "-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(directory);
             var artifacts = new JObject();
@@ -104,7 +108,7 @@ namespace TiaMcp.Openness.V21
                 foreach (var current in targets)
                 {
                     capturedTargets.Add(HmiTargetView(current));
-                    if (current.Family == "classic")
+                    if (current.Family == "classic" && !withoutGraphicLists)
                         capture.Run("classic-graphic-list-admission", current.Path + "/graphicLists", null,
                             () => RequireClassicGraphicListCapture(current));
                 }
@@ -115,18 +119,21 @@ namespace TiaMcp.Openness.V21
                     Directory.CreateDirectory(targetDirectory);
                     capture.Run("capture-target", current.Path, null, () =>
                     {
-                        if (current.Family == "classic") CaptureClassicEngineeringScope(current, targetDirectory, artifacts, missing, capture);
+                        if (current.Family == "classic") CaptureClassicEngineeringScope(current, targetDirectory, artifacts, missing, capture, withoutGraphicLists);
                         else CaptureUnifiedEngineeringScope(current, targetDirectory, artifacts, missing, typed, capture);
                     });
                 }
                 // Typed node hashes join after all exports so they never count against the native-file export bound.
                 foreach (var node in typed.Properties()) artifacts.Add(node.Name, node.Value);
             }, () => artifacts.Count);
-            var manifest = capture.Manifest(change.Kind, artifacts, missing, capturedTargets);
+            var manifest = capture.Manifest(change.Kind, artifacts, missing, capturedTargets, withoutGraphicLists ? HmiPreservationRules.ClassicTagTablePolicy : null);
             string path = capture.SaveManifest(manifest);
             change.Readbacks.Add(new JObject { ["role"] = "hmi-" + stage + "-preservation-manifest", ["artifact"] = ChangeArtifact(path) });
             return manifest;
         }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static bool IsClassicTagTable(object native) => native is Siemens.Engineering.Hmi.Tag.TagTable;
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private JObject CaptureClassicScreenEditScope(EngineeringChange change, Project project, string stage)
@@ -158,7 +165,7 @@ namespace TiaMcp.Openness.V21
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void CaptureClassicEngineeringScope(HmiTargetSelection target, string directory, JObject artifacts, JArray missing, HmiPreservationCapture capture)
+        private static void CaptureClassicEngineeringScope(HmiTargetSelection target, string directory, JObject artifacts, JArray missing, HmiPreservationCapture capture, bool withoutGraphicLists = false)
         {
             var hmi = (Siemens.Engineering.Hmi.HmiTarget)target.Software;
             foreach (var screen in ClassicScreens(hmi.ScreenFolder.Screens, hmi.ScreenFolder.Folders, "/screens", 0))
@@ -176,7 +183,9 @@ namespace TiaMcp.Openness.V21
             CaptureClassicEngineeringFolder(hmi.VBScriptFolder, "VBScripts", target.Path + "/scripts", directory, artifacts, capture, 0);
             foreach (var cycle in hmi.Cycles)
                 CaptureHmiArtifact(directory, target.Path + "/cycles/" + Segment(cycle.Name), artifacts, capture, f => cycle.Export(f, ExportOptions.WithDefaults));
-            RequireClassicGraphicListCapture(target); // Defence in depth; never skip graphic-list preservation.
+            // Defence in depth: only the tag-table import scope may leave graphic lists out, and it says so in its coverage.
+            if (withoutGraphicLists) missing.Add(HmiPreservationRules.ClassicGraphicListExcludedNote);
+            else RequireClassicGraphicListCapture(target);
             foreach (var list in hmi.TextLists)
                 CaptureHmiArtifact(directory, target.Path + "/textLists/" + Segment(list.Name), artifacts, capture, f => list.Export(f, ExportOptions.WithDefaults));
             if (hmi.ScreenGlobalElements != null)
@@ -964,9 +973,10 @@ namespace TiaMcp.Openness.V21
             var scope = HmiTargetView(selected);
             var result = LibraryHmiCompiler(selected).Compile();
             InvalidateHmiObservations();
-            // Classic screen edits compare the complete before/after diagnostic sets, so an HMI that already carries
-            // hundreds of findings must not be cut at the summary budget (observed: 313 errors, 59 warnings).
-            int budget = change.Kind == "hmi_classic_screen_edit" ? DeviceCompilation.ComparisonMessageBudget : DeviceCompilation.DefaultMessageBudget;
+            // Every HMI change kind compares the complete before/after diagnostic sets, so an HMI that already carries
+            // hundreds of findings must not be cut at the summary budget (observed: 313 errors, 59 warnings on a screen edit;
+            // a full Classic tag-table import baseline of 144 errors, 169 warnings exceeded 500 rows on 9 November 2026).
+            int budget = DeviceCompilation.ComparisonMessageBudget;
             return new JObject { ["errorCount"] = result.ErrorCount, ["warningCount"] = result.WarningCount, ["targets"] = new JArray(ChangeCompilation(result, scope.Value<string>("compileScope"), budget)),
                 ["compileScope"] = scope["compileScopeKind"].DeepClone(), ["runtimeVerified"] = false };
         }

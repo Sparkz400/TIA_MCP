@@ -331,8 +331,35 @@ namespace TiaMcp.Model
 
         /// <summary>Whether the capture shows only the kind's standing notes, every HMI of the kind's family (StandingNotesOnly).</summary>
         internal static bool ScopeAccepted(string kind, JObject manifest)
-            => StandingNotes(kind) is string[] notes && StandingNotesOnly(manifest, KindFamily(kind), notes)
-                && (kind == "hmi_classic_screen_edit" ? ClassicScreenScopeOnly(manifest) : manifest?["scopePolicy"] == null);
+        {
+            if (!(StandingNotes(kind) is string[] notes)) return false;
+            if (kind == "hmi_classic_screen_edit") return StandingNotesOnly(manifest, KindFamily(kind), notes) && ClassicScreenScopeOnly(manifest);
+            if (kind == "hmi_classic_import" && manifest?.Value<string>("scopePolicy") == HmiPreservationRules.ClassicTagTablePolicy)
+                return ClassicTagTableScopeOnly(manifest);
+            return StandingNotesOnly(manifest, KindFamily(kind), notes) && manifest?["scopePolicy"] == null;
+        }
+
+        /// <summary>Kinds whose apply accepts compiler findings that disappear (ClassicScreenCompileRules.NoNewProblems) rather than
+        /// requiring exactly the baseline's: the Classic screen edit, and a Classic tag-table import, whose new tags resolve
+        /// "tag does not exist" findings in screens that already reference them. Any new or worsened finding still fails.</summary>
+        internal static bool AllowsResolvedCompileProblems(string kind, JObject beforeManifest)
+            => kind == "hmi_classic_screen_edit"
+                || kind == "hmi_classic_import" && beforeManifest?.Value<string>("scopePolicy") == HmiPreservationRules.ClassicTagTablePolicy;
+
+        // The tag-table import scope: the full Classic capture without graphic lists. Every target must record the excluded
+        // graphic-list note next to the standing note, and no graphic-list artifact may appear in it.
+        private static bool ClassicTagTableScopeOnly(JObject manifest)
+        {
+            var missing = manifest["missingCoverage"] as JArray;
+            var targets = manifest["targets"] as JArray;
+            var artifacts = manifest["artifacts"] as JObject;
+            if (!StandingNotesOnly(manifest, "classic", HmiPreservationRules.ClassicExportNote, HmiPreservationRules.ClassicGraphicListExcludedNote)
+                || artifacts == null || artifacts.Count == 0) return false;
+            int excluded = missing.Count(n => (string)n == HmiPreservationRules.ClassicGraphicListExcludedNote);
+            int standing = missing.Count(n => (string)n == HmiPreservationRules.ClassicExportNote);
+            return excluded == targets.Count && standing == targets.Count
+                && artifacts.Properties().All(p => p.Name.IndexOf("/graphicLists/", StringComparison.Ordinal) < 0);
+        }
 
         private static bool ClassicScreenScopeOnly(JObject manifest)
         {
