@@ -76,7 +76,8 @@ public sealed class ComponentQualificationWindowStore
                 if (!previous.HasExited && previous.StartTime.ToUniversalTime() == r.OwnerHostBirthUtc)
                     Fail("ResourceBusy", "The exact prior Host is still alive; ownership cannot be stolen.");
             }
-            catch (ArgumentException) { /* Exact previous PID no longer exists. */ }
+            // The exact previous PID no longer exists, exited meanwhile, or was reused by a process this user cannot query (so not the prior same-user Host).
+            catch (Exception error) when (error is ArgumentException or InvalidOperationException or System.ComponentModel.Win32Exception) { }
         }
         return r with { OwnerHostProcessId = current.Id, OwnerHostBirthUtc = current.StartTime.ToUniversalTime(), InstallationAllowed = false };
     });
@@ -200,8 +201,10 @@ public sealed class ComponentQualificationWindowStore
             Fail("MutationScopeIncomplete", "Original source and prepared-plan resources must already exist.");
     }
 
-    internal static IReadOnlyList<string> PendingResourceKeysUnderLock(string artifactRoot) => Records(artifactRoot)
-        .Where(r => !Terminal(r)).SelectMany(r => r.ResourceKeys).ToArray();
+    internal static IReadOnlyList<string> PendingResourceKeysUnderLock(string artifactRoot) =>
+        PendingResourcesUnderLock(artifactRoot).Select(x => x.Key).ToArray();
+    internal static IReadOnlyList<(string Id, string Key)> PendingResourcesUnderLock(string artifactRoot) => Records(artifactRoot)
+        .Where(r => !Terminal(r)).SelectMany(r => r.ResourceKeys.Select(key => (r.Id, key))).ToArray();
 
     private ComponentWindowReservation Change(string id, int revision, string transition, Func<ComponentWindowReservation, ComponentWindowReservation> update)
     {
@@ -244,6 +247,7 @@ public sealed class ComponentQualificationWindowStore
         if (files.Length is < 1 or > 96) Fail("JournalInvalid", "Component reservation revisions must be bounded.");
         // A scan needs a finished window only for its chain: its plan, sources or evidence may be gone.
         if (new FileInfo(files[^1]).Length > 2 * 1024 * 1024) Fail("JournalInvalid", "Component revisions must be contiguous and bounded.");
+        if (scan && JournalScanCache.TryGet(path, files, out ComponentWindowReservation cached)) return cached;
         var last = PackageStorage.Load<ComponentWindowReservation>(files[^1]);
         bool live = !scan || !Terminal(last);
         ComponentWindowReservation? previous = null;
@@ -254,6 +258,7 @@ public sealed class ComponentQualificationWindowStore
             if (record.Id != id || record.Revision != i) Fail("JournalInvalid", "Component reservation identity changed.");
             ValidateRecord(root, previous, record, live); previous = record;
         }
+        if (!live) JournalScanCache.Remember(path, files, previous!);
         return previous!;
     }
     private static void ValidateRecord(string root, ComponentWindowReservation? prior, ComponentWindowReservation r, bool live = true)

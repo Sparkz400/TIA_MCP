@@ -71,7 +71,9 @@ public sealed class EngineeringOperationStore
     {
         using var held = Lock(); return Records().Where(HoldsResources).ToArray();
     }
-    internal IReadOnlyList<string> PendingResourceKeysUnderLock() => Records().Where(HoldsResources).SelectMany(ReservedKeys).ToArray();
+    internal IReadOnlyList<string> PendingResourceKeysUnderLock() => PendingResourcesUnderLock().Select(x => x.Key).ToArray();
+    internal IReadOnlyList<(string Id, string Key)> PendingResourcesUnderLock() =>
+        Records().Where(HoldsResources).SelectMany(r => ReservedKeys(r).Select(key => (r.Id, key))).ToArray();
 
     public EngineeringOperationRecord Acquire(string id, int expectedRevision,
         Action<EngineeringOperationRecord>? verifyCredentials = null) => Change(id, expectedRevision, r =>
@@ -423,6 +425,7 @@ public sealed class EngineeringOperationStore
         if (files.Length is 0 or > 10000) Fail("JournalInvalid", "Missing or excessive operation revisions.");
         // A scan needs a record that owns nothing only for its chain: its paths or artifacts may be gone (a removed drive, a deleted folder).
         if (new FileInfo(files[^1]).Length > 8 * 1024 * 1024) Fail("JournalInvalid", "A persisted revision exceeds 8 MiB.");
+        if (scan && JournalScanCache.TryGet(root, files, out EngineeringOperationRecord cached)) return cached;
         var last = PackageStorage.Load<EngineeringOperationRecord>(files[^1]);
         bool live = !scan || HoldsResources(last);
         EngineeringOperationRecord? previous = null;
@@ -438,6 +441,7 @@ public sealed class EngineeringOperationStore
             ValidateTransition(previous, record, live);
             previous = record;
         }
+        if (!live) JournalScanCache.Remember(root, files, previous!);
         return previous!;
     }
 

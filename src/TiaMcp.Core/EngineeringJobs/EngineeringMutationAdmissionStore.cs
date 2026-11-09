@@ -34,13 +34,14 @@ public sealed class EngineeringMutationAdmissionStore
         string[] keys = ScopeKeys(scope);
         using var held = PackageStorage.Lock(lockPath);
         var pendingAdmissions = RecordsUnderLock(artifacts).Where(r => r.State is "dispatchIntent" or "outcomeUnknown").ToArray();
-        var owned = new EngineeringOperationStore(artifacts).PendingResourceKeysUnderLock()
-            .Concat(pendingAdmissions.SelectMany(r => r.ResourceKeys))
-            .Concat(ComponentQualificationWindowStore.PendingResourceKeysUnderLock(artifacts));
-        if (owned.Any(a => keys.Any(b => EngineeringResourceKey.Overlaps(a, b))))
+        bool Blocks(string owned) => keys.Any(key => EngineeringResourceKey.Overlaps(owned, key));
+        string[] admissions = pendingAdmissions.Where(r => r.ResourceKeys.Any(Blocks)).Select(r => r.Id).ToArray();
+        string[] operations = new EngineeringOperationStore(artifacts).PendingResourcesUnderLock().Where(x => Blocks(x.Key)).Select(x => x.Id).Distinct().ToArray();
+        string[] windows = ComponentQualificationWindowStore.PendingResourcesUnderLock(artifacts).Where(x => Blocks(x.Key)).Select(x => x.Id).Distinct().ToArray();
+        if (admissions.Length + operations.Length + windows.Length > 0)
             throw new BridgeOperationException("ResourceBusy", "An unreconciled engineering operation or mutation admission owns a requested resource. Inspect and reconcile the recorded owner; do not retry the write.",
                 JsonSerializer.SerializeToElement(new {
-                    blockingAdmissionIds = pendingAdmissions.Where(r => r.ResourceKeys.Any(a => keys.Any(b => EngineeringResourceKey.Overlaps(a, b)))).Select(r => r.Id).ToArray(),
+                    blockingAdmissionIds = admissions, blockingOperationIds = operations, blockingComponentWindowIds = windows,
                     statusTool = "engineering_operation_status", reconciliationTool = "engineering_admission_reconcile", automaticRetryAllowed = false
                 }, BridgeProtocol.Json));
         string id = Guid.NewGuid().ToString("N");
@@ -135,6 +136,7 @@ public sealed class EngineeringMutationAdmissionStore
         if (files.Length is < 1 or > 16) throw new BridgeException("JournalInvalid", "Mutation admission revisions are missing or excessive.");
         // A scan needs a finished record only for its chain: its paths or responses may be gone (a removed drive, a deleted folder).
         if (new FileInfo(files[^1]).Length > 1024 * 1024) throw new BridgeException("JournalInvalid", "Mutation admission revisions must be contiguous and bounded.");
+        if (scan && JournalScanCache.TryGet(root, files, out EngineeringMutationAdmission cached)) return cached;
         var last = PackageStorage.Load<EngineeringMutationAdmission>(files[^1]);
         bool live = !scan || last.State is not ("returned" or "reconciled");
         EngineeringMutationAdmission? previous = null;
@@ -146,6 +148,7 @@ public sealed class EngineeringMutationAdmissionStore
             if (next.Id != id || next.Revision != i) throw new BridgeException("JournalInvalid", "Mutation admission revision identity differs.");
             ValidateRecord(artifacts, previous, next, live); previous = next;
         }
+        if (!live) JournalScanCache.Remember(root, files, previous!);
         return previous!;
     }
 

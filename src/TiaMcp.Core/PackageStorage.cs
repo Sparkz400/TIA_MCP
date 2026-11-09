@@ -124,7 +124,8 @@ internal static class PackageStorage
             JsonSerializer.Serialize(stream, value, BridgeProtocol.Json);
             stream.Flush(true);
         }
-        PublishFile(temporary, path);
+        // Write-through: the Git operation journal counts a saved callback record as committed.
+        PublishFile(temporary, path, (source, target) => MoveDurably(source, target, replace: true), Thread.Sleep);
     }
 
     internal static void PublishFile(string temporary, string destination) =>
@@ -174,6 +175,32 @@ internal static class PackageStorage
                 throw new BridgeException("PackageChanged", "Manifest publication did not preserve the prepared bytes.");
             return;
         }
+    }
+
+    /// <summary>
+    /// Content-addressed review artifact <c>artifacts/folder/sha256.extension</c>: one shared .write.lock, a retention cap that counts
+    /// incomplete files, temp file plus byte-checked rename, then a bounded re-read. Returns <c>{ path: "folder/name", sha256 }</c>.
+    /// </summary>
+    internal static System.Text.Json.Nodes.JsonObject PublishContent(string artifactsRoot, string folder, byte[] bytes, string extension,
+        int limit, long cap, string label)
+    {
+        if (bytes.Length > limit) throw new BridgeException("ArtifactCapacity", label + " artifact exceeds its byte bound.");
+        string root = Path.Combine(Path.GetFullPath(artifactsRoot), folder);
+        EnsureNoLinks(root); Directory.CreateDirectory(root);
+        using var gate = Lock(Path.Combine(root, ".write.lock"));
+        string hash = Convert.ToHexStringLower(SHA256.HashData(bytes));
+        var artifact = new System.Text.Json.Nodes.JsonObject { ["path"] = folder + "/" + hash + extension, ["sha256"] = hash };
+        string path = Under(root, hash + extension);
+        if (!File.Exists(path))
+        {
+            if (new DirectoryInfo(root).EnumerateFiles().Sum(f => f.Length) + bytes.Length > cap)
+                throw new BridgeException("ArtifactCapacity", label + " retention exceeds " + (cap >> 20) + " MiB, including incomplete files.");
+            string temporary = Under(root, hash + "." + Guid.NewGuid().ToString("N") + ".tmp");
+            using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None)) { stream.Write(bytes); stream.Flush(true); }
+            PublishFile(temporary, path);
+        }
+        _ = ProjectReviewStore.ReadArtifact(artifactsRoot, artifact, limit);
+        return artifact;
     }
 
     internal static T Load<T>(string path)

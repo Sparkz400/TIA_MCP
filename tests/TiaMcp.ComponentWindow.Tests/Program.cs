@@ -106,6 +106,15 @@ using (var held = new FileStream(Path.Combine(dead.Root, "engineering-operations
 string revision = Path.Combine(dead.Root, "engineering-component-windows", resumed.Id, "00000001.json");
 var changed = JsonNode.Parse(File.ReadAllText(revision))!.AsObject(); changed["installationAllowed"] = true; File.WriteAllText(revision, changed.ToJsonString());
 Reject(() => deadStore.Read(resumed.Id), "JournalInvalid");
+{
+    // A prior owner PID reused by a process this user cannot query (here the System process, PID 4) is not the prior same-user Host.
+    var reused = Fixture(Path.Combine(basis, "reused-pid")); string rm = Path.Combine(reused.Root, "manifest.json"); File.WriteAllText(rm, JsonSerializer.Serialize(reused.Manifest, BridgeProtocol.Json));
+    var reusedOwner = JsonNode.Parse(Child("acquire", reused.Root, rm))!.AsObject(); string rid = reusedOwner["id"]!.GetValue<string>();
+    string first = Path.Combine(reused.Root, "engineering-component-windows", rid, "00000000.json");
+    var record = JsonNode.Parse(File.ReadAllText(first))!.AsObject(); record["ownerHostProcessId"] = 4; File.WriteAllText(first, record.ToJsonString());
+    var reusedResume = new ComponentQualificationWindowStore(reused.Root).Resume(rid, 0, reusedOwner["capability"]!.GetValue<string>());
+    Check(reusedResume.OwnerHostProcessId == Environment.ProcessId && !reusedResume.InstallationAllowed, "A reused PID owned by an unqueryable process does not block owner resume");
+}
 var interrupted = Fixture(Path.Combine(basis, "interrupted")); string im = Path.Combine(interrupted.Root, "manifest.json"); File.WriteAllText(im, JsonSerializer.Serialize(interrupted.Manifest, BridgeProtocol.Json));
 var previousOwner = JsonNode.Parse(Child("acquire-interrupted", interrupted.Root, im))!.AsObject(); var interruptedStore = new ComponentQualificationWindowStore(interrupted.Root);
 string iid = previousOwner["id"]!.GetValue<string>(), itoken = previousOwner["capability"]!.GetValue<string>();
