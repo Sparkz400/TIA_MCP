@@ -33,23 +33,14 @@ Suggested sequence: finish #209 with #210, #211 and #218, and widen #211's basel
 
 ## Code audit follow-ups (9 November)
 
-A whole-repository audit on 9 November found the items below. The bridge queue and held-cleanup fixes, Host path confinement, the
-V21 change apply/restore fixes and the scripts/CI clean-up landed with it; these remain. Each names the file and the smallest fix.
+A whole-repository audit on 9 November found 34 items; all but the ones below landed with it (bridge queueing and held cleanups,
+Host path confinement, V21 change apply/restore, runtime session locking, the shared capture store, Core store hardening and the
+scripts/CI clean-up). Nothing here was qualified natively: the changes are covered by the offline suites only.
 
-- [ ] **OPC UA session survives client-side errors:** `OpcUaRuntimeSessionStore.Use` retires a live session as `remoteSessionUnknown` on `UaBrowseDenied`, `UaNamespaceUnavailable`, `UaWriteValueInvalid` and `UaNodeInvalid`, which come from a normal server reply; rethrow those without changing state, and test a browse of a missing node.
-- [ ] **Per-session runtime locks:** `OpcUaRuntimeSessionStore.Use` and `PhysicalRuntimeSessions.Use`/`RequestMode` hold one global semaphore across network I/O (UA `Publish` up to 4 s, Web RUN/STOP polling about 5 s), so concurrent sessions miss their 10 s deadline and captures end with `sessionUnavailable`. Lock per session; keep the global gate for bookkeeping only; make the mode-observe loop async.
-- [ ] **Short UA passwords:** `OpcUaRuntimeClient.CheckOutput` rejects any result containing the password bytes, so a password like `1` fails nearly every read with `UaSecretEchoRejected`. Remove the echo check (the password only travels in the encrypted identity token).
-- [ ] **Web runtime session robustness:** `PhysicalRuntimeSessions.Connect` throws on any non-ID `*.json` in `artifacts/runtime-web` (filter by ID first); `Use` rewrites and fsyncs the record on every read (save only on change); `ReadValue` calls `GetPermissions` per sample (drop it on the read path); a certificate-pin mismatch is reported as `RuntimeTransportFailure` instead of `RuntimeTlsUnverified` (map the inner `AuthenticationException`, add a flipped-pin test); add one test of the real `Connect` → `ReadValue` path.
-- [ ] **UA idle sweep:** the 2-minute idle close in `OpcUaRuntimeSessionStore` breaks connect → `runtime_plcsim_bind` (minutes) → write; rely on the server session timeout. Cache `ClientIdentity`'s five assembly hashes.
-- [ ] **Capture stores:** merge the duplicated `OpcUaSubscriptionStore`/`RuntimeCaptureStore` mechanics (same on-disk format and codes); cache verified snapshots by content-addressed reference so status and paging stop re-hashing the whole capture; write exports through a temp file; add tests for the uncovered limit/tamper codes (`RuntimeCaptureValueLimit`, `UaSubscriptionByteLimit`, `UaSubscriptionRecordChanged`, …); replace the sleep-then-assert in `CaptureChecks.cs`; extend `Test-RuntimeCaptureDiskFull.ps1` to the UA subscription writer.
-- [ ] **Watch apply failure journaling:** in `WatchTableDispatcher` Apply's catch, `store.Read` can throw `IntakeBusy` and replace the native failure before it is journaled; guard the journaling so the primary error always propagates.
-- [ ] **Durable package saves:** `PackageStorage.Save` publishes with plain `File.Move`; use `MoveDurably` (write-through) like the operation stores, so a Git callback record survives power loss.
-- [ ] **VCI store:** `VciWorkspaceStore.PrepareAsync` copies the parent repository before validating deletions and never removes a failed entry (permanent slot of `MaxRecords = 128`); validate first and clean up. `List` re-hashes every working tree per row through `Reopen`; drop that call.
-- [ ] **Component window resume on PID reuse:** `ComponentQualificationWindowStore.Resume` catches only `ArgumentException`; a reused PID owned by SYSTEM throws `Win32Exception`.
-- [ ] **Journal scan cost and diagnostics:** admission scans re-validate every record's full chain (cache by folder/revision count/last write); `ResourceBusy` details should also list blocking operation and component-window IDs; `WatchTableDispatcher.Artifact` should validate with `PackageStorage.Relative` up front.
-- [ ] **Shared content publish:** fourteen workflow stores carry their own `Publish(bytes, ext, limit)` with drifting lock waits and move semantics; extract one `PackageStorage` helper.
-- [ ] **V19/V21 worker loop:** share the request loop, error mapping and traversal between the V19 and V21 workers (about 200 duplicated lines) and map `AccessDenied`/`LicenseUnavailable` by exact Siemens type; needs a V19 build and check on PCNico.
-- [ ] **Shared test harness:** 47 test projects each carry their own `Test/Check/Reject` harness (about 1,200 lines in three shapes); move it to one linked file with a `tests/Directory.Build.props`.
+- [ ] **V19/V21 shared worker loop:** the request loop, error mapping and traversal are shared in a prepared change (about 200 duplicated lines removed, `AccessDenied`/`LicenseUnavailable` mapped by exact Siemens type). The V19 worker cannot be compiled without a V19 SDK, so it waits for a build and a read-only V19 check on the workstation that has one.
+- [ ] **UA session during a long bind:** the 2-minute idle sweep no longer closes a healthy session, but the client still requests a 60 s session timeout with keep-alive disabled, so a server that honours it ends the session during a 2-5 minute `runtime_plcsim_bind`. Raising the timeout or enabling keep-alive also changes how long an orphaned session survives a Host crash; decide, then test.
+- [ ] **UA disk-full case not executed:** `Test-RuntimeCaptureDiskFull.ps1 -UaTestAssembly` and `UaDiskFullChecks.cs` exist but need an elevated run (`Mount-VHD`); `UaSubscriptionValueLimit` still has no test.
+- [ ] **Native confirmation of the change-pipeline fixes:** `not_applied` after a failed checkpoint, the intent-log readback and the hashed preview payload are tested offline only; confirm on an owned scratch project at the next native slot.
 
 ## Resume and integration
 
