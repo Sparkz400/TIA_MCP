@@ -54,7 +54,9 @@ namespace TiaMcp.Model
                 string name = Attribute(item, "ObjectName");
                 if (string.IsNullOrEmpty(name) || !names.Add(name)) throw new ArgumentException("Missing or duplicate screen-item name: " + name);
                 int left = Number(item, "Left"), top = Number(item, "Top"), w = Number(item, "Width"), h = Number(item, "Height");
-                if (left < 0 || top < 0 || w < 1 || h < 1 || (long)left + w > width || (long)top + h > height)
+                // A native horizontal/vertical Line exports Height or Width 0 (observed in Classic V21); other items need an area.
+                int minimum = item.Name.LocalName == "Hmi.Screen.Line" ? 0 : 1;
+                if (left < 0 || top < 0 || w < minimum || h < minimum || (w < 1 && h < 1) || (long)left + w > width || (long)top + h > height)
                     throw new ArgumentException("Item lies outside the native screen rectangle: " + name);
                 var compositions = item.Element("ObjectList")?.Elements().ToArray() ?? Array.Empty<XElement>();
                 int font = Array.FindIndex(compositions, x => x.Name.LocalName.StartsWith("Hmi.Globalization.Font", StringComparison.Ordinal) || x.Name.LocalName == "MultilingualText");

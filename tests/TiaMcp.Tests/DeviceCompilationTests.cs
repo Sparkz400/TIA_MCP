@@ -81,6 +81,12 @@ namespace TiaMcp.Tests
             Check.Equal(false, (bool)described["messagesTruncated"]!);
             result.Messages = Enumerable.Range(0, 1000).Select(_ => new CompilerResultMessage { State = "Success" }).Append(new CompilerResultMessage { State = "Error" });
             Check.Equal(true, (bool)DeviceCompilation.Describe(result, "/selected")["messagesTruncated"]!);
+            // Comparison callers (Classic screen edits) list many pre-existing findings completely.
+            result.Messages = Enumerable.Range(0, 1500).Select(_ => new CompilerResultMessage { State = "Error" });
+            Check.Equal(true, (bool)DeviceCompilation.Describe(result, "/selected")["messagesTruncated"]!);
+            described = DeviceCompilation.Describe(result, "/selected", DeviceCompilation.ComparisonMessageBudget);
+            Check.Equal(1500, ((JArray)described["messages"]!).Count);
+            Check.Equal(false, (bool)described["messagesTruncated"]!);
             var root = new CompilerResultMessage(); var last = root; result.Messages = [root];
             for (int i = 0; i < 66; i++) { var child = new CompilerResultMessage(); last.Messages = [child]; last = child; }
             described = DeviceCompilation.Describe(result, "/selected");

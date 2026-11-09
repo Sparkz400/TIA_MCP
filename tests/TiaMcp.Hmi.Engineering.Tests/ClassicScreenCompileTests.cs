@@ -21,6 +21,10 @@ static class ClassicScreenCompileTests
             rows.Last["description"] = "Compiling finished (errors: 1; warnings: 1)";
             Assert(ClassicScreenCompileRules.Completed(baseline));
             Assert(ClassicScreenCompileRules.NoNewProblems(baseline, (JObject)baseline.DeepClone()));
+            var aborted = (JObject)baseline.DeepClone(); aborted["targets"][0]["messages"].Last["description"] = "Compiling aborted (errors: 1; warnings: 1)";
+            Assert(ClassicScreenCompileRules.Completed(aborted));
+            aborted["targets"][0]["messages"].Last["description"] = "Compiling aborted (errors: 2; warnings: 1)";
+            Assert(!ClassicScreenCompileRules.Completed(aborted));
             var fixedResult = (JObject)baseline.DeepClone(); var fixedRows = (JArray)fixedResult["targets"][0]["messages"];
             fixedRows.RemoveAt(fixedRows.Count - 2); fixedResult["errorCount"] = 0; fixedResult["targets"][0]["errorCount"] = 0;
             fixedRows.Last["description"] = "Compiling finished (errors: 0; warnings: 1)";

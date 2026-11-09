@@ -98,6 +98,14 @@ static class ClassicScreenWorkflowTests
                 Reject(()=>ClassicScreenPreflight.Check(candidate,original,new[]{original},new HashSet<string>()));
             }
         });
+        check("Preflight admits native horizontal/vertical lines but no zero-area line or other item", () => {
+            foreach(var (type,w,h,ok) in new[]{("Hmi.Screen.Line",530,0,true),("Hmi.Screen.Line",0,40,true),("Hmi.Screen.Line",0,0,false),("Hmi.Screen.Line",-1,40,false),("Hmi.Screen.Rectangle",530,0,false)}) {
+                var original=Screen();var candidate=Screen();var item=ClassicScreenPreflight.Items(candidate).Single();
+                item.Name=type;item.Element("AttributeList").SetElementValue("Width",w);item.Element("AttributeList").SetElementValue("Height",h);
+                if(ok) ClassicScreenPreflight.Check(candidate,original,new[]{original},new HashSet<string>());
+                else Reject(()=>ClassicScreenPreflight.Check(candidate,original,new[]{original},new HashSet<string>()));
+            }
+        });
         check("Composer copies native events and explicitly changes scalar placement without mutating sources", () => {
             var original=Screen(); string before=original.ToString();
             var request=new JObject { ["components"]=new JArray(new JObject { ["sourceScreenPath"]="/hmi/screens/Main", ["sourceItem"]="Prototype",["name"]="Clone",["attributes"]=new JObject { ["Left"]=200 } }) };
