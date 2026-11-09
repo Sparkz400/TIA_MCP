@@ -20,7 +20,7 @@ and actual stdio MCP with absent native workers. Workstation boundary tests and
 retained native fixtures have explicit separate runners. No omitted suite is
 silently counted as passed.
 
-The first clean checkpoint is `D:/TIAW/iq161/source`, with 1,728 files and adjacent
+The first clean checkpoint is `D:/TIAW/iq161/source` ([retained manifest](../../fixtures/evidence/tiaw/iq161/source-manifest.json)), with 1,728 files and adjacent
 manifest SHA-256 `dc4b7fb810c8defa854b727c39b7f5c5b56cd8f0f9723279c10d40303d0ec820`.
 Its 27-suite managed partition, translation/Test Suite/OPC UA actual MCP checks,
 Test Suite schema harness, catalog checks and real Git/process tests passed.
@@ -73,7 +73,7 @@ under the existing ignore rules; retained source fixtures and status records are
 included.
 
 Final checkpoint validation uses the staged Git checkout at
-`D:/TIAW/iq163/source`, 1,740 files, manifest SHA-256
+`D:/TIAW/iq163/source` ([retained manifest](../../fixtures/evidence/tiaw/iq163/source-manifest.json)), 1,740 files, manifest SHA-256
 `93814f061104cc75cc7a9ccd93fc039d9d5f6cf844dd5e7e72636929de85bf8c`.
 Its first aggregate exposed two retained documentation hashes whose CRLF bytes
 changed under the repository's LF policy. The text inputs and binding receipt

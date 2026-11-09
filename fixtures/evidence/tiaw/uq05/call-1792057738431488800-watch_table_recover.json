@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"error\":{\"code\":\"RecoveryRequired\",\"message\":\"Reconcile earlier intent before preparing a separate recovery attempt.\",\"details\":null}}"
+    }
+  ],
+  "structuredContent": {
+    "error": {
+      "code": "RecoveryRequired",
+      "message": "Reconcile earlier intent before preparing a separate recovery attempt.",
+      "details": null
+    }
+  },
+  "isError": true
+}

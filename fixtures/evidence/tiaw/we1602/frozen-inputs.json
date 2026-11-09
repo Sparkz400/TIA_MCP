@@ -1,0 +1,130 @@
+{
+  "packages": {
+    "host": [
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\Microsoft.Extensions.AI.Abstractions.dll",
+        "sha256": "bcc8f693103eb00505179f154b1b3a996b85d067e112facd724fd9d695f17a5e"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\ModelContextProtocol.Core.dll",
+        "sha256": "b1752096ea9d2f38ba88e467f04aea43fb300d9a54d881c165f62b69028ee3ab"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\ModelContextProtocol.dll",
+        "sha256": "8cd6f626c8d6a0a5ff3e154789d3fcde2b1d66a595c0ef0198e092c2c30fe93a"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Core.dll",
+        "sha256": "b52bf1f641a94fcd31fefc9cd651ba17d698cad3ed33fe2983aa74ca90bebc52"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Core.pdb",
+        "sha256": "336cf750de6f84f204d8083678316136cc9bdf76892ded778860d475e73b22cb"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.deps.json",
+        "sha256": "e87d38800e52c7c5a6dd09ef4ebfd2954c8b8244c00de8fe27ad20092ddfe04b"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.dll",
+        "sha256": "16af082ee0ee68510d7f97a68a1b80468dea27e6ec43e14b53e58f7761506aa6"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.exe",
+        "sha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.pdb",
+        "sha256": "f8096a6f6979f4d0eac0584976d659ea0a0dd4341201d5476f4538a4ebcef9dc"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.runtimeconfig.json",
+        "sha256": "61a2a447a31667ca1fb9081bec4ffbeb230bb1813fadfa98ebc3a242ce38e36e"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.OpcUa.dll",
+        "sha256": "7f07b24c08cd2b62920606d01dad642a31d164be0eae3270a7758dbf972bcf6d"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.OpcUa.pdb",
+        "sha256": "5153091480d00e415e0cb07e34fc119ee89e6f75f1e4ff07163319ff252211d6"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Translations.dll",
+        "sha256": "fdc4b3cf50dc518c154c76fb0cf8892caa310b0c6fcba63b059ca30119d73aad"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Translations.pdb",
+        "sha256": "1d0d6513c7a0ade77bc098ade4f30b07d0c756a596a31f4bc29e51f2738338d4"
+      }
+    ],
+    "worker": [
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\Newtonsoft.Json.dll",
+        "sha256": "e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\TiaMcp.Openness.V21.exe",
+        "sha256": "f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\TiaMcp.Openness.V21.exe.config",
+        "sha256": "3a2be7a1bca2543035f80263898dc1a0a3a96bcf2f72834222b3a6a7bff13a39"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\TiaMcp.Openness.V21.pdb",
+        "sha256": "e8047154ebdc931f69ed6b47fd342861b1fecc036187a6dd7add38ef5c08a23d"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\TiaMcp.TestSuite.V21.dll",
+        "sha256": "a5392c4009bf61f428a2b66290fde8a6819aa9fd0cc12729f7cb1867fbcbc8dd"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\TiaMcp.TestSuite.V21.pdb",
+        "sha256": "5b74e98cf3bf1eb53891ac43e367ecbc3dccb5bf61cb5444e42219fb3f30872e"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\source\\scripts\\qualify_watch_production_host.py",
+      "sha256": "62aeeaa0b168fa2ffe02a62d50415dd0f3308c0bfc753cf693f28edc59f818c8"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\source\\scripts\\exact_qualification_client.py",
+      "sha256": "3adb95dfbf4aaac8a6761596bdeee2b9f5b4e4602a5d647cc6d9221ac07c379f"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\source\\scripts\\retained_native_lifecycle.py",
+      "sha256": "dff10491a60f497c7f0b96eac0d19f966390b0ea1269b5fb9d4b9f9c47a8c891"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\source\\scripts\\qualify_exact_worker_startup.py",
+      "sha256": "f5863085945133b95178d6b78606f8b13a832713b54d67790b2fb1c0ded7e308"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\source\\scripts\\qualify_watch_mcp.py",
+      "sha256": "f58f390041963b954070ad5a8ad789fb6d8a2789d90fcbb0482d1d098b2b473e"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\source\\scripts\\qualify_worker_startup_exact.py",
+      "sha256": "6455ee5f67c8936d25c9dd05edbb026d0698065429a50e9a2aae00bd6d8b88b8"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\source\\scripts\\smoke_mcp.py",
+      "sha256": "5d2764eb14caf49988f5f3e8cee8fd42bf8aad6eef9966506d48c1dbde6ef23b"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\source\\scripts\\block_test_process.py",
+      "sha256": "52eb1811eff1987ab37ca301c2ce53d626e4780c1dd5072bf986cd0bece83ad9"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\source\\scripts\\verify_watch_expansion.py",
+      "sha256": "4a4bd966ecea6f21234a02f74f0664ae7ac3af8b47a2054e176fd33412fab985"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\source\\scripts\\verify_watch_workflow.py",
+      "sha256": "56f1a946013eafbe8e2bb7eb16a312d5be53d242ec633c5afd4c782dc6558aee"
+    }
+  ]
+}

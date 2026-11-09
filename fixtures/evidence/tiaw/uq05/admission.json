@@ -1,0 +1,13 @@
+{
+  "mode": "retrieve.before",
+  "root": "D:\\TIAW\\uq05",
+  "worker": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\src\\TiaMcp.Openness.V21\\bin\\Release\\net48\\TiaMcp.Openness.V21.exe",
+  "workerSha256": "d98271b29d7d28ca4ff5534557c0714b6ebab7e7542b2670cfbd2d30ac0a7f5a",
+  "host": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\published-host\\TiaMcp.Host.exe",
+  "hostSha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f",
+  "nativeSequential": true,
+  "actualMcpHost": true,
+  "automaticReplay": false,
+  "effects": "Fresh owned offline scratch only; one reviewed watch edit and explicit archive recovery.",
+  "hostProcessId": 51148
+}

@@ -1,0 +1,203 @@
+{
+  "kind": "independent-watch-expansion-verification",
+  "root": "D:\\TIAW\\ph1603",
+  "nativeInvoked": false,
+  "verifiedAtUtc": "2026-10-16T05:15:24.677113+00:00",
+  "stages": [
+    {
+      "name": "reviewedExactDocumentDelta",
+      "passed": true,
+      "detail": {
+        "operationId": "7c5234e9c54648b7861aa2956c80d8e4",
+        "reviewedPlanSha256": "87dafb14430f5165b78bbdd8e44c835d4d29ddd71179a47c0f768c4c9505c9da",
+        "reviewedInputSha256": "fe19b2d2d2b7bac7d1e18328c0695e5920b8375c6588c0cfdaec68e123ddf3c9",
+        "baseline": {
+          "path": "D:\\TIAW\\ph1603\\watch-observations\\w_f428ea02e7de\\watch-0.xml",
+          "sha256": "2a0493c8e9aec46f0709f30090d829a532095f0f8634b7d1805db7cbde2230a2",
+          "bytes": 3697
+        },
+        "candidate": {
+          "path": "D:\\TIAW\\ph1603\\watch\\afa1959b85a4\\reviewed.xml",
+          "sha256": "fe19b2d2d2b7bac7d1e18328c0695e5920b8375c6588c0cfdaec68e123ddf3c9",
+          "bytes": 3600
+        },
+        "delta": {
+          "kind": "modifyValue",
+          "beforeRows": 1,
+          "candidateRows": 1,
+          "nativeIdsPreservedExceptFreshCloneIds": true,
+          "unknownPayloadPreserved": true
+        },
+        "frozenSources": {
+          "manifest": {
+            "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\manifest.json",
+            "sha256": "4c8be2a10a41b5c3742159b9ca150c869a6e6aed8408eb451ba2d23c3fee7591",
+            "bytes": 63169
+          },
+          "worker": {
+            "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\worker\\TiaMcp.Openness.V21.exe",
+            "sha256": "d7460d05ca82b97467d01c6c8549ddafc062505026136af7608fddcbdb3a6dfc",
+            "bytes": 1360896
+          },
+          "verifiedFiles": 261
+        },
+        "nativeInvoked": false,
+        "noOnlineAction": true
+      }
+    },
+    {
+      "name": "nativeRunIdentity",
+      "passed": true,
+      "detail": {
+        "operationId": "7c5234e9c54648b7861aa2956c80d8e4",
+        "mode": "host.watch_apply_native"
+      }
+    },
+    {
+      "name": "durableJournal",
+      "passed": true,
+      "detail": {
+        "records": 11,
+        "states": [
+          "prepared",
+          "acquired",
+          "checkpointIntent",
+          "ready",
+          "dispatchIntent",
+          "outcomeUnknown",
+          "recoveryIntent",
+          "recoveryIntent",
+          "recoveryIntent",
+          "recoveryIntent",
+          "reconciled"
+        ]
+      }
+    },
+    {
+      "name": "independentApproval",
+      "passed": true,
+      "detail": {
+        "path": "D:\\TIAW\\ph1603\\independent-review.json",
+        "sha256": "97c1a35dc289e9bf9ed31176ab7c1c65abd1983d07a1cf09c08968237eee2cb0",
+        "bytes": 1464
+      }
+    },
+    {
+      "name": "interruptionRestartCompetingOwnersAndNoReplay",
+      "passed": true,
+      "detail": {
+        "point": "host.watch_apply_native",
+        "hostRestartVerified": true,
+        "hostRestartEvidence": "exactClosedHostAndOwnedProcessHandlesBeforeRestart",
+        "actualHostLifecycle": {
+          "hostCount": 2,
+          "exactWorkerLifetimes": 2,
+          "exactNativeLifetimes": 5,
+          "initialHostProcessId": 24588,
+          "finalHostProcessId": 42448,
+          "closedBeforeRestart": true,
+          "coordinatorInterventionRequired": false,
+          "normalLifecyclePassed": false,
+          "explicitNativeTermination": false,
+          "coordinatorNativeCleanup": null,
+          "receipts": [
+            {
+              "path": "D:\\TIAW\\ph1603\\host-01-close.json",
+              "sha256": "7ebfc442cf6bab09cd21f40bbe43a3af5983914320d8bc1943883e1e1a4ccc53",
+              "bytes": 27305
+            },
+            {
+              "path": "D:\\TIAW\\ph1603\\host-02-close.json",
+              "sha256": "28da770752aa6fa77509c4aa508aa45b2e6365e2def9ee42104a9517932e825c",
+              "bytes": 38845
+            }
+          ],
+          "forcedTermination": false
+        },
+        "competingOwnerRefused": true,
+        "automaticReplay": false,
+        "marker": {
+          "path": "D:\\TIAW\\ph1603\\interruption-marker.json",
+          "sha256": "7e2e509183bc4b35d3643408d215d5d0fa483b64ba995bd01c05d91ec9e5d9c1",
+          "bytes": 10874
+        }
+      }
+    },
+    {
+      "name": "freshOriginalRestoredAndReconciliation",
+      "passed": true,
+      "detail": {
+        "originalDisposition": "verifiedApplied",
+        "restoredProjectVerified": true,
+        "retrievalResponseRetained": true,
+        "recoveryPath": "D:\\TIAW\\ph1603\\r_53b83230c7\\TiaMcpScratch_20261016_051200_2955ce39\\TiaMcpScratch_20261016_051200_2955ce39.ap21",
+        "finalState": "reconciled"
+      }
+    }
+  ],
+  "issues": [],
+  "edit": {
+    "kind": "modifyValue",
+    "beforeRows": 1,
+    "candidateRows": 1,
+    "nativeIdsPreservedExceptFreshCloneIds": true,
+    "unknownPayloadPreserved": true
+  },
+  "interruption": {
+    "point": "host.watch_apply_native",
+    "hostRestartVerified": true,
+    "hostRestartEvidence": "exactClosedHostAndOwnedProcessHandlesBeforeRestart",
+    "actualHostLifecycle": {
+      "hostCount": 2,
+      "exactWorkerLifetimes": 2,
+      "exactNativeLifetimes": 5,
+      "initialHostProcessId": 24588,
+      "finalHostProcessId": 42448,
+      "closedBeforeRestart": true,
+      "coordinatorInterventionRequired": false,
+      "normalLifecyclePassed": false,
+      "explicitNativeTermination": false,
+      "coordinatorNativeCleanup": null,
+      "receipts": [
+        {
+          "path": "D:\\TIAW\\ph1603\\host-01-close.json",
+          "sha256": "7ebfc442cf6bab09cd21f40bbe43a3af5983914320d8bc1943883e1e1a4ccc53",
+          "bytes": 27305
+        },
+        {
+          "path": "D:\\TIAW\\ph1603\\host-02-close.json",
+          "sha256": "28da770752aa6fa77509c4aa508aa45b2e6365e2def9ee42104a9517932e825c",
+          "bytes": 38845
+        }
+      ],
+      "forcedTermination": false
+    },
+    "competingOwnerRefused": true,
+    "automaticReplay": false,
+    "marker": {
+      "path": "D:\\TIAW\\ph1603\\interruption-marker.json",
+      "sha256": "7e2e509183bc4b35d3643408d215d5d0fa483b64ba995bd01c05d91ec9e5d9c1",
+      "bytes": 10874
+    }
+  },
+  "recovery": {
+    "originalDisposition": "verifiedApplied",
+    "restoredProjectVerified": true,
+    "retrievalResponseRetained": true,
+    "recoveryPath": "D:\\TIAW\\ph1603\\r_53b83230c7\\TiaMcpScratch_20261016_051200_2955ce39\\TiaMcpScratch_20261016_051200_2955ce39.ap21",
+    "finalState": "reconciled"
+  },
+  "retainedFailure": {
+    "path": "D:\\TIAW\\ph1603\\failure.json",
+    "sha256": "1b40150a9db2ca13d271078e8f7d833b7682def9b0e38ec32381ec8749314bf8",
+    "bytes": 950
+  },
+  "completed": true,
+  "qualificationPassed": false,
+  "hostRestartVerified": true,
+  "interruptionMatrixCasePassed": true,
+  "coordinatorInterventionRequired": false,
+  "normalLifecyclePassed": false,
+  "explicitNativeTermination": false,
+  "coverageGaps": []
+}

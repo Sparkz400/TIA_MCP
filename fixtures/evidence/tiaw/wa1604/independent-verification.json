@@ -1,0 +1,207 @@
+{
+  "kind": "independent-watch-authoring-verification",
+  "completed": true,
+  "qualificationPassed": true,
+  "nativeInvoked": false,
+  "root": "D:\\TIAW\\wa1604",
+  "verifiedAtUtc": "2026-10-16T05:46:26.500258+00:00",
+  "stages": [
+    {
+      "name": "exactGeneratedCreationReview",
+      "passed": true,
+      "detail": {
+        "operationId": "93db799b413f415c9ca0f730f52f0470",
+        "reviewedPlanSha256": "a5e81312e1a5053467aad7917fa2cab712ed82ed549265fcb11c4585a0482554",
+        "reviewedInputSha256": "1b052ec8af495a2397abb347654ff478d105059312d3a6d11357a67716dc1cba",
+        "delta": {
+          "rows": 1,
+          "symbol": "\"TiaMcp_EnableGate_DB\".Active",
+          "datatype": "Bool",
+          "modifyValue": "",
+          "defaultCommentCulture": "de-DE",
+          "reason": "Captured Output state of the selected FB instance: Active",
+          "requiredProfiles": [
+            "watch.add-instance-bool.v1",
+            "watch.create-instance.v1",
+            "watch.reference-free-authoring-ids.v1"
+          ],
+          "documentIdMapping": {
+            "0": "0",
+            "1": "1",
+            "2": "2",
+            "3": "3"
+          }
+        },
+        "frozenSources": {
+          "manifest": {
+            "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\manifest.json",
+            "sha256": "114190360c055b31794bdf7be85600ac62f9437dd172c5265ed9ba8b8d45267a",
+            "bytes": 68123
+          },
+          "worker": {
+            "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\worker\\TiaMcp.Openness.V21.exe",
+            "sha256": "ab3956e0bb551a79e3bbdc00be776dac103413befb495c4993872f8d6216cf4f",
+            "bytes": 1373696
+          },
+          "verifiedFiles": 277
+        },
+        "nativeInvoked": false,
+        "noOnlineAction": true
+      }
+    },
+    {
+      "name": "nativeCreationPersistenceRecoveryAndCleanup",
+      "passed": true,
+      "detail": {
+        "journalRevisions": 12,
+        "singleDispatch": true,
+        "restoredAbsence": true,
+        "recoveredReopen": true,
+        "unchangedPeers": 6,
+        "lifecycle": {
+          "hostCount": 1,
+          "exactWorkerLifetimes": 1,
+          "exactNativeLifetimes": 5,
+          "initialHostProcessId": 36616,
+          "finalHostProcessId": 36616,
+          "closedBeforeRestart": false,
+          "coordinatorInterventionRequired": false,
+          "normalLifecyclePassed": true,
+          "explicitNativeTermination": false,
+          "coordinatorNativeCleanup": null,
+          "receipts": [
+            {
+              "path": "D:\\TIAW\\wa1604\\host-01-close.json",
+              "sha256": "fab88087cea590183a5bce4e9d5d202c390d4f5a7b92b45d3896c85a93e2e957",
+              "bytes": 56701
+            }
+          ],
+          "forcedTermination": false
+        },
+        "profileBinding": {
+          "adapterSha256": "ab3956e0bb551a79e3bbdc00be776dac103413befb495c4993872f8d6216cf4f",
+          "profileSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f",
+          "hardwareIdentity": "OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||",
+          "nativeIdentity": null
+        }
+      }
+    },
+    {
+      "name": "checkpointRecoveryAndCleanup",
+      "passed": true,
+      "detail": {
+        "completed": true,
+        "originalDisposition": "verifiedApplied",
+        "restoredAbsence": true,
+        "freshRecoveredReopen": true,
+        "recoveryPath": "D:\\TIAW\\wa1604\\r_76da341deb\\TiaMcpScratch_20261016_054239_b6893002\\TiaMcpScratch_20261016_054239_b6893002.ap21",
+        "finalState": "reconciled",
+        "peerExportsVerified": 6,
+        "exactLifecycle": {
+          "hostCount": 1,
+          "exactWorkerLifetimes": 1,
+          "exactNativeLifetimes": 5,
+          "initialHostProcessId": 36616,
+          "finalHostProcessId": 36616,
+          "closedBeforeRestart": false,
+          "coordinatorInterventionRequired": false,
+          "normalLifecyclePassed": true,
+          "explicitNativeTermination": false,
+          "coordinatorNativeCleanup": null,
+          "receipts": [
+            {
+              "path": "D:\\TIAW\\wa1604\\host-01-close.json",
+              "sha256": "fab88087cea590183a5bce4e9d5d202c390d4f5a7b92b45d3896c85a93e2e957",
+              "bytes": 56701
+            }
+          ],
+          "forcedTermination": false
+        }
+      }
+    },
+    {
+      "name": "frozenPackagesAndController",
+      "passed": true,
+      "detail": {
+        "packages": {
+          "host": [
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\Microsoft.Extensions.AI.Abstractions.dll",
+              "sha256": "bcc8f693103eb00505179f154b1b3a996b85d067e112facd724fd9d695f17a5e"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\ModelContextProtocol.Core.dll",
+              "sha256": "b1752096ea9d2f38ba88e467f04aea43fb300d9a54d881c165f62b69028ee3ab"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\ModelContextProtocol.dll",
+              "sha256": "8cd6f626c8d6a0a5ff3e154789d3fcde2b1d66a595c0ef0198e092c2c30fe93a"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Core.deps.json",
+              "sha256": "aa5a6001ad5b771a1e30c2b767f512603d7937371f18cf85acf11fb17232954f"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Core.dll",
+              "sha256": "c42df17638e321bb5e09fb5d4ab220b10e79b3738c02a03944a5793d8135c9aa"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Core.pdb",
+              "sha256": "07f2055afe5a80796d8fdcfa9e1e864f37114a5429ac235cfb0844b238f4d81b"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Host.deps.json",
+              "sha256": "7969e812de3e17993b8fe7a6357890a9bf134dd1954b67e5447d500582872dba"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Host.dll",
+              "sha256": "0e8ccf64f920cdf73f9391c2eec179b6cd4084568b1faed4b00dba22769e0de5"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Host.exe",
+              "sha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Host.pdb",
+              "sha256": "a62a0145a306691c3a9f10f8c9b75993fc81b84499d023bcde9f64da7dbbca22"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Host.runtimeconfig.json",
+              "sha256": "56a13ba05e82629b54e12a87f0011eecf394f0f1016d810c73488822c4c5c7ec"
+            }
+          ],
+          "worker": [
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\worker\\Newtonsoft.Json.dll",
+              "sha256": "e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\worker\\TiaMcp.Openness.V21.exe",
+              "sha256": "ab3956e0bb551a79e3bbdc00be776dac103413befb495c4993872f8d6216cf4f"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\worker\\TiaMcp.Openness.V21.exe.config",
+              "sha256": "3a2be7a1bca2543035f80263898dc1a0a3a96bcf2f72834222b3a6a7bff13a39"
+            },
+            {
+              "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\worker\\TiaMcp.Openness.V21.pdb",
+              "sha256": "5c4ec76118ecf7976be896f7c861c19dfcd52ccbe7f959e12f48db2a100fc128"
+            }
+          ]
+        },
+        "sourcesRetained": true
+      }
+    }
+  ],
+  "issues": [],
+  "requiredProfiles": [
+    "watch.add-instance-bool.v1",
+    "watch.create-instance.v1",
+    "watch.reference-free-authoring-ids.v1"
+  ],
+  "productionActivation": false,
+  "limitations": [
+    "Only the recorded one-row create/default-comment/native target profile.",
+    "Maintenance, explicit multilingual comments, other scalar types, collision and stale-source native refusal remain separate qualifications."
+  ]
+}

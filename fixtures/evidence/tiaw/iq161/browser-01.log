@@ -1,0 +1,91 @@
+npm notice run tia_mcp@1.0.0 test:explorer:browser
+npm notice run node ui/project-explorer/tests/browser.mjs
+{
+  "timestamp": "2026-10-16T08:56:09.036Z",
+  "evidenceKind": "fixture_browser_qualification",
+  "browser": "156.0.8078.4",
+  "executablePath": "C:\\Users\\nschuermann\\AppData\\Local\\ms-playwright\\chromium-1248\\chrome-win64\\chrome.exe",
+  "checks": [
+    "Self-contained offline viewer starts with zero network requests",
+    "Duplicate display names preserve distinct exact native references",
+    "Block icons use exposed type metadata and remain neutral when type is unknown",
+    "Relationships, unresolved endpoints and source evidence are visible",
+    "Graph SVG export includes evidence manifest",
+    "Graph PNG rasterization succeeds offline",
+    "Empty native groups remain native selections",
+    "Protected content explicitly distinguished from empty",
+    "Adversarial Unicode HTML labels are text, never executed",
+    "Virtual folder cannot become engineering selection",
+    "Keyboard tree navigation follows visible hierarchy",
+    "Unavailable HMI and typed preview providers remain explicit",
+    "Provider attachments integrate without executing HMI scripts or treating raw XML as typed content",
+    "Real typed provider node keys, native UIds, pins, opaque nodes and unresolved wires render schematically",
+    "1024px dark desktop layout has no page overflow",
+    "760px stacked layout has no page overflow",
+    "Expired historical snapshot is visibly stale",
+    "Delayed old detail result cannot overwrite newer exact selection",
+    "Worker session loss is visible; old reference is retained without name substitution",
+    "MCP App handshake, real host request envelope, lazy children, search, exact verify and explicit agent selection work through parent protocol",
+    "MCP relationship incoming/outgoing filters send native in/out and return only correctly directed edges",
+    "Live JSON export transfers host-owned artifact via bounded artifact_read and verifies SHA-256",
+    "Tampered live artifact is rejected instead of downloading corrupted project data",
+    "1k/10k/50k trees virtualize DOM rows; 500-node graph renders within measured bounds"
+  ],
+  "performance": [
+    {
+      "count": 1000,
+      "firstViewportMs": 26.19999999552965,
+      "renderedRows": 26,
+      "afterScrollRows": 21,
+      "graphRenderMs": 116.39999999850988,
+      "graphNodes": 500,
+      "graphEdges": 1000,
+      "heap": {
+        "usedJSHeapSize": 16100000,
+        "totalJSHeapSize": 23100000
+      },
+      "passesViewportTarget": true,
+      "passesGraphTarget": true
+    },
+    {
+      "count": 10000,
+      "firstViewportMs": 115.89999999850988,
+      "renderedRows": 26,
+      "afterScrollRows": 21,
+      "graphRenderMs": 115.20000000298023,
+      "graphNodes": 500,
+      "graphEdges": 1000,
+      "heap": {
+        "usedJSHeapSize": 16100000,
+        "totalJSHeapSize": 23100000
+      },
+      "passesViewportTarget": true,
+      "passesGraphTarget": true
+    },
+    {
+      "count": 50000,
+      "firstViewportMs": 411.29999999701977,
+      "renderedRows": 26,
+      "afterScrollRows": 26,
+      "graphRenderMs": 114.89999999850988,
+      "graphNodes": 500,
+      "graphEdges": 1000,
+      "heap": {
+        "usedJSHeapSize": 16100000,
+        "totalJSHeapSize": 23100000
+      },
+      "passesViewportTarget": true,
+      "passesGraphTarget": true
+    }
+  ],
+  "screenshots": [
+    "D:\\TIAW\\iq161\\source\\output\\playwright\\project-explorer\\2026-10-16T08-56-07-643Z-45220\\fixture-relationships-light-1440.png",
+    "D:\\TIAW\\iq161\\source\\output\\playwright\\project-explorer\\2026-10-16T08-56-07-643Z-45220\\fixture-typed-preview-light-1440.png",
+    "D:\\TIAW\\iq161\\source\\output\\playwright\\project-explorer\\2026-10-16T08-56-07-643Z-45220\\fixture-details-light-1440.png",
+    "D:\\TIAW\\iq161\\source\\output\\playwright\\project-explorer\\2026-10-16T08-56-07-643Z-45220\\fixture-details-dark-1024.png",
+    "D:\\TIAW\\iq161\\source\\output\\playwright\\project-explorer\\2026-10-16T08-56-07-643Z-45220\\fixture-responsive-760.png"
+  ],
+  "passed": true,
+  "pageErrors": [],
+  "networkRequests": []
+}

@@ -1,0 +1,106 @@
+{
+  "packages": {
+    "host": [
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\host\\Microsoft.Extensions.AI.Abstractions.dll",
+        "sha256": "bcc8f693103eb00505179f154b1b3a996b85d067e112facd724fd9d695f17a5e"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\host\\ModelContextProtocol.Core.dll",
+        "sha256": "b1752096ea9d2f38ba88e467f04aea43fb300d9a54d881c165f62b69028ee3ab"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\host\\ModelContextProtocol.dll",
+        "sha256": "8cd6f626c8d6a0a5ff3e154789d3fcde2b1d66a595c0ef0198e092c2c30fe93a"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\host\\TiaMcp.Core.dll",
+        "sha256": "6a4d286dab64bfc5e2e86ea0d624867fd7e37aceb3b82d2bfbb456ee1e19e84e"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\host\\TiaMcp.Core.pdb",
+        "sha256": "9b582090632b30841a644a2c23e0f6d74b872d82a125190b778c89d4078e470a"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\host\\TiaMcp.Host.deps.json",
+        "sha256": "7969e812de3e17993b8fe7a6357890a9bf134dd1954b67e5447d500582872dba"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\host\\TiaMcp.Host.dll",
+        "sha256": "8b471be8d6f11dc7c6ab2a5ec5711f0b1a07d5b6c217ad6457199326c5f5433b"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\host\\TiaMcp.Host.exe",
+        "sha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\host\\TiaMcp.Host.pdb",
+        "sha256": "c23b42b8aa8fe2ce119a497c9759141cb5cdbe3f6b6f4af2d444581b454cc960"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\host\\TiaMcp.Host.runtimeconfig.json",
+        "sha256": "56a13ba05e82629b54e12a87f0011eecf394f0f1016d810c73488822c4c5c7ec"
+      }
+    ],
+    "worker": [
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\worker\\Newtonsoft.Json.dll",
+        "sha256": "e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\worker\\TiaMcp.Openness.V21.exe",
+        "sha256": "d7460d05ca82b97467d01c6c8549ddafc062505026136af7608fddcbdb3a6dfc"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\worker\\TiaMcp.Openness.V21.exe.config",
+        "sha256": "3a2be7a1bca2543035f80263898dc1a0a3a96bcf2f72834222b3a6a7bff13a39"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-host-20261016\\binary-01\\worker\\TiaMcp.Openness.V21.pdb",
+        "sha256": "54dc28d69082e9dc6e5f8c759b3349483e2b19cb24f1ac3158f768f0fb58e742"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_watch_production_host.py",
+      "sha256": "62aeeaa0b168fa2ffe02a62d50415dd0f3308c0bfc753cf693f28edc59f818c8"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\exact_qualification_client.py",
+      "sha256": "3adb95dfbf4aaac8a6761596bdeee2b9f5b4e4602a5d647cc6d9221ac07c379f"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\retained_native_lifecycle.py",
+      "sha256": "dff10491a60f497c7f0b96eac0d19f966390b0ea1269b5fb9d4b9f9c47a8c891"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_exact_worker_startup.py",
+      "sha256": "f5863085945133b95178d6b78606f8b13a832713b54d67790b2fb1c0ded7e308"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_watch_mcp.py",
+      "sha256": "9c9583ee12c907461872654da0bf47472fecac63da074606710f2a34e075f2ab"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_worker_startup_exact.py",
+      "sha256": "6455ee5f67c8936d25c9dd05edbb026d0698065429a50e9a2aae00bd6d8b88b8"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\smoke_mcp.py",
+      "sha256": "5d2764eb14caf49988f5f3e8cee8fd42bf8aad6eef9966506d48c1dbde6ef23b"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\block_test_process.py",
+      "sha256": "52eb1811eff1987ab37ca301c2ce53d626e4780c1dd5072bf986cd0bece83ad9"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\verify_watch_expansion.py",
+      "sha256": "4a4bd966ecea6f21234a02f74f0664ae7ac3af8b47a2054e176fd33412fab985"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\verify_watch_workflow.py",
+      "sha256": "56f1a946013eafbe8e2bb7eb16a312d5be53d242ec633c5afd4c782dc6558aee"
+    }
+  ]
+}

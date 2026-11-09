@@ -1,0 +1,63 @@
+[
+  {
+    "pid": 37828,
+    "parentPid": 51148,
+    "created": 1792057103.1420069,
+    "name": "TiaMcp.Openness.V21.exe",
+    "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\src\\TiaMcp.Openness.V21\\bin\\Release\\net48\\TiaMcp.Openness.V21.exe",
+    "command": [
+      "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\src\\TiaMcp.Openness.V21\\bin\\Release\\net48\\TiaMcp.Openness.V21.exe",
+      "--component-qualification",
+      "--pipe",
+      "TiaMcp-f0f42f776f9b49bbad072b0e5af3e4da"
+    ]
+  },
+  {
+    "pid": 43560,
+    "parentPid": 37828,
+    "created": 1792057103.457838,
+    "name": "Siemens.Automation.Portal.exe",
+    "exe": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+    "command": [
+      "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+      "-bootstrapper=Siemens.Automation.Opns.Loader.Impl:Siemens.Automation.Openness.Loader.BootStrapper",
+      "-nosplashscreen"
+    ]
+  },
+  {
+    "pid": 15784,
+    "parentPid": 37828,
+    "created": 1792057190.7846715,
+    "name": "Siemens.Automation.Portal.exe",
+    "exe": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+    "command": [
+      "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+      "-bootstrapper=Siemens.Automation.Opns.Loader.Impl:Siemens.Automation.Openness.Loader.BootStrapper",
+      "-nosplashscreen"
+    ]
+  },
+  {
+    "pid": 52076,
+    "parentPid": 37828,
+    "created": 1792057233.4073124,
+    "name": "Siemens.Automation.Portal.exe",
+    "exe": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+    "command": [
+      "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+      "-bootstrapper=Siemens.Automation.Opns.Loader.Impl:Siemens.Automation.Openness.Loader.BootStrapper",
+      "-nosplashscreen"
+    ]
+  },
+  {
+    "pid": 40032,
+    "parentPid": 37828,
+    "created": 1792057265.8240273,
+    "name": "Siemens.Automation.Portal.exe",
+    "exe": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+    "command": [
+      "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+      "-bootstrapper=Siemens.Automation.Opns.Loader.Impl:Siemens.Automation.Openness.Loader.BootStrapper",
+      "-nosplashscreen"
+    ]
+  }
+]

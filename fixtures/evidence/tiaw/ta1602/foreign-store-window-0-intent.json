@@ -1,0 +1,706 @@
+{
+  "kind": "held-coordinator-store-window",
+  "mode": "isolatedQualificationMutation",
+  "readOnly": false,
+  "effects": "Fresh isolated translation fixture only; wt02 is retained untouched",
+  "projectPath": "D:\\TIAW\\ta1602\\uncreated-project-scope",
+  "resourceKeys": [
+    "workspace:D:\\TIAW\\TA1602",
+    "project:D:\\TIAW\\TA1602\\UNCREATED-PROJECT-SCOPE"
+  ],
+  "resources": [
+    {
+      "kind": "workspace",
+      "path": "D:\\TIAW\\ta1602",
+      "effect": "owned isolated fixture and recovery outputs"
+    },
+    {
+      "kind": "project",
+      "path": "D:\\TIAW\\ta1602\\uncreated-project-scope",
+      "effect": "bounded project beneath reserved workspace"
+    }
+  ],
+  "roots": [
+    "D:\\03_Entwicklung\\TIA_MCP\\artifacts",
+    "D:\\TIAW\\ph1601",
+    "D:\\TIAW\\ph1602",
+    "D:\\TIAW\\ph1603",
+    "D:\\TIAW\\ta1601",
+    "D:\\TIAW\\tr1601",
+    "D:\\TIAW\\tr1602",
+    "D:\\TIAW\\tr1603",
+    "D:\\TIAW\\ts01",
+    "D:\\TIAW\\ts02",
+    "D:\\TIAW\\ts1601\\h",
+    "D:\\TIAW\\ts1602\\h",
+    "D:\\TIAW\\uq01",
+    "D:\\TIAW\\uq02",
+    "D:\\TIAW\\uq03",
+    "D:\\TIAW\\uq04"
+  ],
+  "automaticReplay": false,
+  "nativeDispatchedByWindow": false,
+  "nativeQualified": false,
+  "stores": [
+    {
+      "root": "D:\\03_Entwicklung\\TIA_MCP\\artifacts",
+      "observations": []
+    },
+    {
+      "root": "D:\\TIAW\\ph1601",
+      "observations": [
+        {
+          "store": "engineering-operations",
+          "id": "65e1e7e550cd4f0ea65be332df2b0e97",
+          "state": "reconciled",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ph1601\\engineering-operations\\65e1e7e550cd4f0ea65be332df2b0e97\\000011.json",
+            "sha256": "643a9b8ec2bf66f94f521779639086032fdffea6449d72e4bf70ae7ad2e4f4aa",
+            "bytes": 5529
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\PH1601\\SCRATCH\\TIAMCPSCRATCH_20261016_050326_B99B3277\\TIAMCPSCRATCH_20261016_050326_B99B3277\\TIAMCPSCRATCH_20261016_050326_B99B3277.AP21",
+            "project:D:\\TIAW\\PH1601\\R_CF4621F9FD"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "5c2cb8ae82e44ce2988bc49e382ddfd5",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ph1601\\engineering-admissions\\5c2cb8ae82e44ce2988bc49e382ddfd5\\00000001.json",
+            "sha256": "f8aabd73b4f846c8f18cecf837ca1db9b3636ec10124c198efafcd933b6d2e47",
+            "bytes": 1330
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\PH1601\\SCRATCH\\TIAMCPSCRATCH_20261016_050326_B99B3277\\TIAMCPSCRATCH_20261016_050326_B99B3277\\TIAMCPSCRATCH_20261016_050326_B99B3277.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "a644d05f8487412296ead110e9508594",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ph1601\\engineering-admissions\\a644d05f8487412296ead110e9508594\\00000001.json",
+            "sha256": "046f96cc7303f3e37453d8aa82c92131448701acfb4fa798f105b5b2993f95b8",
+            "bytes": 1155
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\PH1601\\SCRATCH\\TIAMCPSCRATCH_20261016_050326_B99B3277"
+          ],
+          "hashChainVerified": true
+        }
+      ]
+    },
+    {
+      "root": "D:\\TIAW\\ph1602",
+      "observations": [
+        {
+          "store": "engineering-operations",
+          "id": "438bcd7c9b564d5f969505758bcba0a5",
+          "state": "prepared",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ph1602\\engineering-operations\\438bcd7c9b564d5f969505758bcba0a5\\000000.json",
+            "sha256": "be5e24cb96828b9a78a97f4dfadc6d3cd8a3c0fc5a9cd10e20663c3561089aa9",
+            "bytes": 2706
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\PH1602\\SCRATCH\\TIAMCPSCRATCH_20261016_050817_4567DFA4\\TIAMCPSCRATCH_20261016_050817_4567DFA4\\TIAMCPSCRATCH_20261016_050817_4567DFA4.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-operations",
+          "id": "57793fce700c4f2986f3f122a7132de1",
+          "state": "reconciled",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ph1602\\engineering-operations\\57793fce700c4f2986f3f122a7132de1\\000010.json",
+            "sha256": "75e8bdc1858c7da54df51223eed9e6274bd7097cd263536153075fdb54ce6936",
+            "bytes": 4746
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\PH1602\\SCRATCH\\TIAMCPSCRATCH_20261016_050817_4567DFA4\\TIAMCPSCRATCH_20261016_050817_4567DFA4\\TIAMCPSCRATCH_20261016_050817_4567DFA4.AP21",
+            "project:D:\\TIAW\\PH1602\\R_D163B07AC2"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "56c39596d25b4fde9dd99f7cd3c7ea89",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ph1602\\engineering-admissions\\56c39596d25b4fde9dd99f7cd3c7ea89\\00000001.json",
+            "sha256": "d1b526a6e9deed2216dec54cfa1920a84b2458d7fcb838b97ee1fa493541a651",
+            "bytes": 1330
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\PH1602\\SCRATCH\\TIAMCPSCRATCH_20261016_050817_4567DFA4\\TIAMCPSCRATCH_20261016_050817_4567DFA4\\TIAMCPSCRATCH_20261016_050817_4567DFA4.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "e09340dd66ea4015b542a9aab65ef5df",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ph1602\\engineering-admissions\\e09340dd66ea4015b542a9aab65ef5df\\00000001.json",
+            "sha256": "1334dc1998f2fdfb0d2228e851dad672c44ab68562b0783b3701d3853d3520f8",
+            "bytes": 1155
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\PH1602\\SCRATCH\\TIAMCPSCRATCH_20261016_050817_4567DFA4"
+          ],
+          "hashChainVerified": true
+        }
+      ]
+    },
+    {
+      "root": "D:\\TIAW\\ph1603",
+      "observations": [
+        {
+          "store": "engineering-operations",
+          "id": "7c5234e9c54648b7861aa2956c80d8e4",
+          "state": "reconciled",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ph1603\\engineering-operations\\7c5234e9c54648b7861aa2956c80d8e4\\000010.json",
+            "sha256": "b6e21384dcce2574fa3a54f1a00c29e1b84d16782edd8429f5bed57d3b74a82b",
+            "bytes": 4593
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\PH1603\\SCRATCH\\TIAMCPSCRATCH_20261016_051200_2955CE39\\TIAMCPSCRATCH_20261016_051200_2955CE39\\TIAMCPSCRATCH_20261016_051200_2955CE39.AP21",
+            "project:D:\\TIAW\\PH1603\\R_53B83230C7"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-operations",
+          "id": "8ffec8522515452d8c4ed8f28836cb85",
+          "state": "prepared",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ph1603\\engineering-operations\\8ffec8522515452d8c4ed8f28836cb85\\000000.json",
+            "sha256": "959ac1c7b491844ead06e1bc36209de6916a4459f4a02c608ea313437eefcaab",
+            "bytes": 2706
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\PH1603\\SCRATCH\\TIAMCPSCRATCH_20261016_051200_2955CE39\\TIAMCPSCRATCH_20261016_051200_2955CE39\\TIAMCPSCRATCH_20261016_051200_2955CE39.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "549bc628987d4ef0b32dd1dcb345ec07",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ph1603\\engineering-admissions\\549bc628987d4ef0b32dd1dcb345ec07\\00000001.json",
+            "sha256": "52f4c83cdcbc8d81b86f886320470986b4477c23b485fbdc2fb122e070be3f25",
+            "bytes": 1330
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\PH1603\\SCRATCH\\TIAMCPSCRATCH_20261016_051200_2955CE39\\TIAMCPSCRATCH_20261016_051200_2955CE39\\TIAMCPSCRATCH_20261016_051200_2955CE39.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "b5f31dac9f8c4d7ea881408eeeffa92b",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ph1603\\engineering-admissions\\b5f31dac9f8c4d7ea881408eeeffa92b\\00000001.json",
+            "sha256": "f90cbfcdd9093cade9b9d5fa8954b6fa9f8fde2bec06f9f3ef942f78746b796e",
+            "bytes": 1155
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\PH1603\\SCRATCH\\TIAMCPSCRATCH_20261016_051200_2955CE39"
+          ],
+          "hashChainVerified": true
+        }
+      ]
+    },
+    {
+      "root": "D:\\TIAW\\ta1601",
+      "observations": [
+        {
+          "store": "engineering-operations",
+          "id": "98d5fadce9d547d78715636b37e5d948",
+          "state": "reconciled",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ta1601\\engineering-operations\\98d5fadce9d547d78715636b37e5d948\\000008.json",
+            "sha256": "f1a2795800b86ce60eacc72a28858ce68db9802991a538073c0931ba102ded55",
+            "bytes": 5456
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\TA1601\\SCRATCH\\TIAMCPSCRATCH_20261016_084629_65EAF900\\TIAMCPSCRATCH_20261016_084629_65EAF900\\TIAMCPSCRATCH_20261016_084629_65EAF900.AP21",
+            "project:D:\\TIAW\\TA1601\\FAILURE-RECOVERY-TA1601\\TIAMCPSCRATCH_20261016_084629_65EAF900\\TIAMCPSCRATCH_20261016_084629_65EAF900.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "8d117e615de14368b0d77dfb8f257b48",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ta1601\\engineering-admissions\\8d117e615de14368b0d77dfb8f257b48\\00000001.json",
+            "sha256": "20f8c0db4a4fae539aa921710697d935624723fc895a56bf5ba1c1df7a386ec2",
+            "bytes": 1155
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\TA1601\\SCRATCH\\TIAMCPSCRATCH_20261016_084629_65EAF900"
+          ],
+          "hashChainVerified": true
+        }
+      ]
+    },
+    {
+      "root": "D:\\TIAW\\tr1601",
+      "observations": [
+        {
+          "store": "engineering-admissions",
+          "id": "f4d5eacb3f87487496752312cc637921",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\tr1601\\engineering-admissions\\f4d5eacb3f87487496752312cc637921\\00000001.json",
+            "sha256": "3d55674166e5c572d65da85b3327271995653277a083262ec703ae94c3d81ec6",
+            "bytes": 1155
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\TR1601\\SCRATCH\\TIAMCPSCRATCH_20261016_071554_F7D5E9D6"
+          ],
+          "hashChainVerified": true
+        }
+      ]
+    },
+    {
+      "root": "D:\\TIAW\\tr1602",
+      "observations": [
+        {
+          "store": "engineering-admissions",
+          "id": "c1df9e12230e4a5b9050a505535c3512",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\tr1602\\engineering-admissions\\c1df9e12230e4a5b9050a505535c3512\\00000001.json",
+            "sha256": "db6b5824022c4d0d990e0ca124d6c9edfd5383a995f5c8e3c2309ff9c627ad44",
+            "bytes": 1155
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\TR1602\\SCRATCH\\TIAMCPSCRATCH_20261016_072220_65CEBA2F"
+          ],
+          "hashChainVerified": true
+        }
+      ]
+    },
+    {
+      "root": "D:\\TIAW\\tr1603",
+      "observations": [
+        {
+          "store": "engineering-operations",
+          "id": "204954cca0ca4067a04a88ab974fb2b5",
+          "state": "reconciled",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\tr1603\\engineering-operations\\204954cca0ca4067a04a88ab974fb2b5\\000015.json",
+            "sha256": "6681c513892d90e6ec33f3e8244bb95281a672177838cd8ea09fbe9397c83702",
+            "bytes": 8200
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\TR1603\\SCRATCH\\TIAMCPSCRATCH_20261016_072546_4A5239B1\\TIAMCPSCRATCH_20261016_072546_4A5239B1\\TIAMCPSCRATCH_20261016_072546_4A5239B1.AP21",
+            "project:D:\\TIAW\\TR1603\\RECOVERY-CONTINUATION-02-EDIT\\TIAMCPSCRATCH_20261016_072546_4A5239B1\\TIAMCPSCRATCH_20261016_072546_4A5239B1.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-operations",
+          "id": "9a4e37aaf6e54a7788e8ac2942f10624",
+          "state": "reconciled",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\tr1603\\engineering-operations\\9a4e37aaf6e54a7788e8ac2942f10624\\000016.json",
+            "sha256": "4b43c3e419c7bd287a0d5190d06dc0c426f3bc24cb5bfeee6338567c88bc0e30",
+            "bytes": 8418
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\TR1603\\SCRATCH\\TIAMCPSCRATCH_20261016_072546_4A5239B1\\TIAMCPSCRATCH_20261016_072546_4A5239B1\\TIAMCPSCRATCH_20261016_072546_4A5239B1.AP21",
+            "project:D:\\TIAW\\TR1603\\RECOVERY-CONTINUATION-01-NOOP\\TIAMCPSCRATCH_20261016_072546_4A5239B1\\TIAMCPSCRATCH_20261016_072546_4A5239B1.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-operations",
+          "id": "ae1d88e7565f4d85ba84c412f9df7f96",
+          "state": "reconciled",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\tr1603\\engineering-operations\\ae1d88e7565f4d85ba84c412f9df7f96\\000003.json",
+            "sha256": "60a24053d724ca821eafa8a0c836110e57487fab56672a56f3a7a852dc433a0c",
+            "bytes": 3950
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\TR1603\\SCRATCH\\TIAMCPSCRATCH_20261016_072546_4A5239B1\\TIAMCPSCRATCH_20261016_072546_4A5239B1\\TIAMCPSCRATCH_20261016_072546_4A5239B1.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "ccf3d849ff2745489b4135e3711c1ebf",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\tr1603\\engineering-admissions\\ccf3d849ff2745489b4135e3711c1ebf\\00000001.json",
+            "sha256": "3af607eab5a4c5fca4614a6fe55a5adc97605f3936ab3f96d6e429f3cef367bb",
+            "bytes": 1155
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\TR1603\\SCRATCH\\TIAMCPSCRATCH_20261016_072546_4A5239B1"
+          ],
+          "hashChainVerified": true
+        }
+      ]
+    },
+    {
+      "root": "D:\\TIAW\\ts01",
+      "observations": []
+    },
+    {
+      "root": "D:\\TIAW\\ts02",
+      "observations": []
+    },
+    {
+      "root": "D:\\TIAW\\ts1601\\h",
+      "observations": [
+        {
+          "store": "engineering-admissions",
+          "id": "8bb194c9c0934c82b74279cfe4449c38",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ts1601\\h\\engineering-admissions\\8bb194c9c0934c82b74279cfe4449c38\\00000001.json",
+            "sha256": "e96ab3330f22cc823353885136fccc9a79f7945471b1b637d75a64ccac4cd57c",
+            "bytes": 1161
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\TS1601\\H\\SCRATCH\\TIAMCPSCRATCH_20261016_065446_D49378F1"
+          ],
+          "hashChainVerified": true
+        }
+      ]
+    },
+    {
+      "root": "D:\\TIAW\\ts1602\\h",
+      "observations": [
+        {
+          "store": "engineering-admissions",
+          "id": "8f103cbe3a734f0294a0bb06f3456471",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\ts1602\\h\\engineering-admissions\\8f103cbe3a734f0294a0bb06f3456471\\00000001.json",
+            "sha256": "1255c3304645ab4aaf6091a50df9b33324677dccd32f0f08eb9c5443973b72e1",
+            "bytes": 1161
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\TS1602\\H\\SCRATCH\\TIAMCPSCRATCH_20261016_080953_AAC136EA"
+          ],
+          "hashChainVerified": true
+        }
+      ]
+    },
+    {
+      "root": "D:\\TIAW\\uq01",
+      "observations": [
+        {
+          "store": "engineering-operations",
+          "id": "40a3cd61672342329c744356aac5cd3b",
+          "state": "prepared",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq01\\engineering-operations\\40a3cd61672342329c744356aac5cd3b\\000000.json",
+            "sha256": "52f7d5966474dfe9fd33ab83798c4da1fca272aa874f754d849700688297d2a7",
+            "bytes": 2700
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ01\\SCRATCH\\TIAMCPSCRATCH_20261015_092421_F9287035\\TIAMCPSCRATCH_20261015_092421_F9287035\\TIAMCPSCRATCH_20261015_092421_F9287035.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-operations",
+          "id": "921c09a99f6b4279999b7f1d065a6e21",
+          "state": "reconciled",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq01\\engineering-operations\\921c09a99f6b4279999b7f1d065a6e21\\000004.json",
+            "sha256": "a8ac5a73b57c0982c77faffa3590af451d8a5c269a2bf003f66a4b2ab7ffde72",
+            "bytes": 3348
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ01\\SCRATCH\\TIAMCPSCRATCH_20261015_092421_F9287035\\TIAMCPSCRATCH_20261015_092421_F9287035\\TIAMCPSCRATCH_20261015_092421_F9287035.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "1c776f69a6784c35b7768669eea1dc4b",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq01\\engineering-admissions\\1c776f69a6784c35b7768669eea1dc4b\\00000001.json",
+            "sha256": "01cadfabdf780fb0530628dd01382445b2705ef9fecc73a687b982bebae7504a",
+            "bytes": 1325
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ01\\SCRATCH\\TIAMCPSCRATCH_20261015_092421_F9287035\\TIAMCPSCRATCH_20261015_092421_F9287035\\TIAMCPSCRATCH_20261015_092421_F9287035.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "7de34f69fba84788ab0fb807189c8939",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq01\\engineering-admissions\\7de34f69fba84788ab0fb807189c8939\\00000001.json",
+            "sha256": "01a7ce8ab4e489382b19831d039c65c6352dcb6528e64943a4a15b48883c19f3",
+            "bytes": 1150
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ01\\SCRATCH\\TIAMCPSCRATCH_20261015_092421_F9287035"
+          ],
+          "hashChainVerified": true
+        }
+      ]
+    },
+    {
+      "root": "D:\\TIAW\\uq02",
+      "observations": [
+        {
+          "store": "engineering-operations",
+          "id": "683d27974b514b11b84cc4a2760c987f",
+          "state": "reconciled",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq02\\engineering-operations\\683d27974b514b11b84cc4a2760c987f\\000004.json",
+            "sha256": "ee3c7b04a8b9e7eb2607653ab8b9767d56c0bb19486936a551f80970b1db0e9a",
+            "bytes": 3348
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ02\\SCRATCH\\TIAMCPSCRATCH_20261015_092918_97EF2422\\TIAMCPSCRATCH_20261015_092918_97EF2422\\TIAMCPSCRATCH_20261015_092918_97EF2422.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-operations",
+          "id": "ff8ec0ce3f914c82b7dba87112884241",
+          "state": "prepared",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq02\\engineering-operations\\ff8ec0ce3f914c82b7dba87112884241\\000000.json",
+            "sha256": "ab8eb57f6fc544511e24c85366f911e0e42a9de7701ad3dbbf67b91d00407d84",
+            "bytes": 2700
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ02\\SCRATCH\\TIAMCPSCRATCH_20261015_092918_97EF2422\\TIAMCPSCRATCH_20261015_092918_97EF2422\\TIAMCPSCRATCH_20261015_092918_97EF2422.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "33b26714e2fb4f59839085a4a0f5291a",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq02\\engineering-admissions\\33b26714e2fb4f59839085a4a0f5291a\\00000001.json",
+            "sha256": "3fb2d16dd7014f0ccc3bdb50a54b6bcb42e3221b9c6e69f8e1a2aead31a32a49",
+            "bytes": 1151
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ02\\SCRATCH\\TIAMCPSCRATCH_20261015_092918_97EF2422"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "d11cdd4ba40c45c08ea5e0052c97087c",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq02\\engineering-admissions\\d11cdd4ba40c45c08ea5e0052c97087c\\00000001.json",
+            "sha256": "8b715e051bd2197809abbd24c84fa0aa9fea22a761fdbb0635beb1bd712d0161",
+            "bytes": 1326
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ02\\SCRATCH\\TIAMCPSCRATCH_20261015_092918_97EF2422\\TIAMCPSCRATCH_20261015_092918_97EF2422\\TIAMCPSCRATCH_20261015_092918_97EF2422.AP21"
+          ],
+          "hashChainVerified": true
+        }
+      ]
+    },
+    {
+      "root": "D:\\TIAW\\uq03",
+      "observations": [
+        {
+          "store": "engineering-operations",
+          "id": "c0c1f84f2bbe478eb6ae422b423daadd",
+          "state": "reconciled",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq03\\engineering-operations\\c0c1f84f2bbe478eb6ae422b423daadd\\000004.json",
+            "sha256": "008cb14a140a056ac9ff23fa0b3824ae8614043aeff6ecd88c0866e42cab58cc",
+            "bytes": 3347
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ03\\SCRATCH\\TIAMCPSCRATCH_20261015_093316_FE31C51F\\TIAMCPSCRATCH_20261015_093316_FE31C51F\\TIAMCPSCRATCH_20261015_093316_FE31C51F.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-operations",
+          "id": "cf9036c15b81458db06b9d9edb1175f8",
+          "state": "prepared",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq03\\engineering-operations\\cf9036c15b81458db06b9d9edb1175f8\\000000.json",
+            "sha256": "24e3de02bcf0238f26247221eee56c97c480120b5b2479fb89f9d5aa8342dcfd",
+            "bytes": 2700
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ03\\SCRATCH\\TIAMCPSCRATCH_20261015_093316_FE31C51F\\TIAMCPSCRATCH_20261015_093316_FE31C51F\\TIAMCPSCRATCH_20261015_093316_FE31C51F.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "5b088a091c93437ab399ba550461d7fe",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq03\\engineering-admissions\\5b088a091c93437ab399ba550461d7fe\\00000001.json",
+            "sha256": "440adee2f836971e35cf242676c3f3d6a1a3a2c57272a35c8445d2d551ff8107",
+            "bytes": 1326
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ03\\SCRATCH\\TIAMCPSCRATCH_20261015_093316_FE31C51F\\TIAMCPSCRATCH_20261015_093316_FE31C51F\\TIAMCPSCRATCH_20261015_093316_FE31C51F.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "f9877fea964e4e37ba04d7a79100e81a",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq03\\engineering-admissions\\f9877fea964e4e37ba04d7a79100e81a\\00000001.json",
+            "sha256": "0ac9958cf866ee96d454b3228b13fbf004034004434696ef82aae90645a4c7f2",
+            "bytes": 1151
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ03\\SCRATCH\\TIAMCPSCRATCH_20261015_093316_FE31C51F"
+          ],
+          "hashChainVerified": true
+        }
+      ]
+    },
+    {
+      "root": "D:\\TIAW\\uq04",
+      "observations": [
+        {
+          "store": "engineering-operations",
+          "id": "013bde247cd240718d362399f92d23bc",
+          "state": "prepared",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq04\\engineering-operations\\013bde247cd240718d362399f92d23bc\\000000.json",
+            "sha256": "fb45dfef41b550533a4afd6353896589c8f1a0c5610c0cf23652f6c460afd93b",
+            "bytes": 2700
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ04\\SCRATCH\\TIAMCPSCRATCH_20261015_093552_477D1CBE\\TIAMCPSCRATCH_20261015_093552_477D1CBE\\TIAMCPSCRATCH_20261015_093552_477D1CBE.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-operations",
+          "id": "46dd84bd2e7f42719db157fd0dd3c4d5",
+          "state": "reconciled",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq04\\engineering-operations\\46dd84bd2e7f42719db157fd0dd3c4d5\\000003.json",
+            "sha256": "1d20854e58bc0d49970a4e487dcea65f376d6bd3368d02a62af1cfb6469c5413",
+            "bytes": 3180
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ04\\SCRATCH\\TIAMCPSCRATCH_20261015_093552_477D1CBE\\TIAMCPSCRATCH_20261015_093552_477D1CBE\\TIAMCPSCRATCH_20261015_093552_477D1CBE.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "744e65fabf494c8093e7fcced901ba4e",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq04\\engineering-admissions\\744e65fabf494c8093e7fcced901ba4e\\00000001.json",
+            "sha256": "945c74ddb53d92b63d1f8d897e3996390a7ad9fec4c353100ac03d1e64ed76ba",
+            "bytes": 1326
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ04\\SCRATCH\\TIAMCPSCRATCH_20261015_093552_477D1CBE\\TIAMCPSCRATCH_20261015_093552_477D1CBE\\TIAMCPSCRATCH_20261015_093552_477D1CBE.AP21"
+          ],
+          "hashChainVerified": true
+        },
+        {
+          "store": "engineering-admissions",
+          "id": "bdd7ae06b51d4824ad8a0bcb196f1eda",
+          "state": "returned",
+          "pending": false,
+          "latest": {
+            "path": "D:\\TIAW\\uq04\\engineering-admissions\\bdd7ae06b51d4824ad8a0bcb196f1eda\\00000001.json",
+            "sha256": "66152b04f115ec696e21132cb2e21108903794eb7b9b183eb23be12996e61df5",
+            "bytes": 1151
+          },
+          "resourceKeys": [
+            "project:D:\\TIAW\\UQ04\\SCRATCH\\TIAMCPSCRATCH_20261015_093552_477D1CBE"
+          ],
+          "hashChainVerified": true
+        }
+      ]
+    }
+  ],
+  "acquiredAtUtc": "2026-10-16T08:51:12.445142+00:00",
+  "coordinatorPid": 26124,
+  "sameHandlesHeldThroughDispatch": true,
+  "lockFiles": [
+    "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\engineering-operations\\store.lock",
+    "D:\\TIAW\\ph1601\\engineering-operations\\store.lock",
+    "D:\\TIAW\\ph1602\\engineering-operations\\store.lock",
+    "D:\\TIAW\\ph1603\\engineering-operations\\store.lock",
+    "D:\\TIAW\\ta1601\\engineering-operations\\store.lock",
+    "D:\\TIAW\\tr1601\\engineering-operations\\store.lock",
+    "D:\\TIAW\\tr1602\\engineering-operations\\store.lock",
+    "D:\\TIAW\\tr1603\\engineering-operations\\store.lock",
+    "D:\\TIAW\\ts01\\engineering-operations\\store.lock",
+    "D:\\TIAW\\ts02\\engineering-operations\\store.lock",
+    "D:\\TIAW\\ts1601\\h\\engineering-operations\\store.lock",
+    "D:\\TIAW\\ts1602\\h\\engineering-operations\\store.lock",
+    "D:\\TIAW\\uq01\\engineering-operations\\store.lock",
+    "D:\\TIAW\\uq02\\engineering-operations\\store.lock",
+    "D:\\TIAW\\uq03\\engineering-operations\\store.lock",
+    "D:\\TIAW\\uq04\\engineering-operations\\store.lock"
+  ],
+  "journalsModified": false
+}

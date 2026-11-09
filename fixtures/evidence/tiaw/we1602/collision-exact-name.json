@@ -1,0 +1,25 @@
+{
+  "code": "WatchTableCollision",
+  "arguments": {
+    "request": {
+      "generationId": "c2644a5f718e4c29b8e5f96060d94616",
+      "generationSha256": "e770c30c240044403c62d66e731880076eced1b89d3460a32ee9d6f42bc0a84e",
+      "idempotencyKey": "collision-exact-name",
+      "mode": "create",
+      "destination": {
+        "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+        "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+        "group": "root",
+        "tableName": "WT05_BoolCreation"
+      },
+      "steps": [
+        {
+          "kind": "add",
+          "candidateId": "member1",
+          "templateOrdinal": 0
+        }
+      ]
+    }
+  },
+  "automaticReplay": false
+}

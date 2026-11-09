@@ -1,0 +1,114 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"id\":\"5677e9eb65f645c188904849b7388da5\",\"revision\":2,\"state\":\"stopped\",\"idempotencyKey\":\"wt05-create-bool-late-collision\",\"planSha256\":\"3181398544885611163232dd4259a6203321250a46b97f1a39a0fdf17f8bae83\",\"plan\":{\"operation\":\"watchAuthoring\",\"target\":{\"reference\":{\"object\":{\"projectPath\":\"D:\\\\TIAW\\\\we1602\\\\scratch\\\\TiaMcpScratch_20261016_092205_92409b23\\\\TiaMcpScratch_20261016_092205_92409b23\\\\TiaMcpScratch_20261016_092205_92409b23.ap21\",\"plcPath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC\",\"scopePath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC\",\"objectPath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/watch/root/WT05_BoolCreation\",\"kind\":\"watchTable\"},\"snapshot\":{\"observationId\":\"f3b0d88b42434df6b835be02abe33519\",\"sourceSha256\":\"90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a\",\"tiaVersion\":21},\"contentSha256\":\"de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59\"},\"projectFilePath\":\"D:\\\\TIAW\\\\we1602\\\\scratch\\\\TiaMcpScratch_20261016_092205_92409b23\\\\TiaMcpScratch_20261016_092205_92409b23\\\\TiaMcpScratch_20261016_092205_92409b23.ap21\",\"sessionEpoch\":\"0b44e985dc2b4bdab175108fa73c3c99\",\"adapterSha256\":\"f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157\",\"profileSha256\":\"f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f\",\"hardwareIdentity\":\"OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||\",\"nativeIdentity\":null,\"offline\":true,\"probes\":[{\"name\":\"offline\",\"state\":\"observed\",\"evidenceSha256\":\"90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a\"},{\"name\":\"watchImport\",\"state\":\"observed\",\"evidenceSha256\":\"f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f\"}]},\"resources\":[{\"resourceKey\":\"project:D:\\\\TIAW\\\\WE1602\\\\SCRATCH\\\\TIAMCPSCRATCH_20261016_092205_92409B23\\\\TIAMCPSCRATCH_20261016_092205_92409B23\\\\TIAMCPSCRATCH_20261016_092205_92409B23.AP21\",\"kind\":\"project\",\"effect\":\"reviewedWatchAuthoring:create\",\"recoveryStrategy\":\"projectArchiveToNewLocation\"}],\"inputs\":[{\"relativePath\":\"watch/8f634fb473294ff8a5799ebe3f737276/review.json\",\"sha256\":\"f1b3a4a8878c84a724a23c5dd2d713d79ebd007ed4e4aac3dd8d0fac63e8a61c\"},{\"relativePath\":\"watch/8f634fb473294ff8a5799ebe3f737276/reviewed.xml\",\"sha256\":\"1b052ec8af495a2397abb347654ff478d105059312d3a6d11357a67716dc1cba\"},{\"relativePath\":\"watch-generations/bcd5da4d2a2a448c8e0ef868e976960e.json\",\"sha256\":\"52208bf9febbf1657432213549b6e4c183ce278dd1caf4f959bb3870f4488cba\"},{\"relativePath\":\"watch/8f634fb473294ff8a5799ebe3f737276/native-template.xml\",\"sha256\":\"d710c6b85dd5c94cc27d7eb7edc24f5ac188ec5bdbaccdae5998acf5b697c09d\"},{\"relativePath\":\"watch-source-captures/instance-36bf2501a6514ee3ac8f2f1745d71399/fb.xml\",\"sha256\":\"e572e89ec0f6b4c68b61551c77f3325f8e80111943a841add6fbc6d1793f081b\"},{\"relativePath\":\"watch-source-captures/instance-36bf2501a6514ee3ac8f2f1745d71399/instance.xml\",\"sha256\":\"b3c636df9737f7506aa2cec3bb1e99c5879f4769eb35ea0a2eadd735253a6bad\"},{\"relativePath\":\"watch-observations/w_8b374b63f235/absent.txt\",\"sha256\":\"de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59\"},{\"relativePath\":\"watch-observations/w_8b374b63f235/snapshot.json\",\"sha256\":\"28f682c9dd0cb56476988c86fe360717b0f44c98e11ec8f4833804a76b9e8880\"}],\"requiredProbes\":[\"offline\",\"watchImport\"],\"requiredGates\":[\"readback\",\"preservation\",\"saved\",\"freshReopen\"]},\"previousSha256\":\"d8127befef6d2d92afca47a32f79315a867364e920b71169a9282b367f70f1bb\",\"recordedAt\":\"2026-10-16T09:24:52.0104494+00:00\",\"checkpoints\":[],\"evidence\":[],\"reconciliation\":[],\"recoveryDestinations\":[],\"recoveryResolutions\":[]}"
+    }
+  ],
+  "structuredContent": {
+    "id": "5677e9eb65f645c188904849b7388da5",
+    "revision": 2,
+    "state": "stopped",
+    "idempotencyKey": "wt05-create-bool-late-collision",
+    "planSha256": "3181398544885611163232dd4259a6203321250a46b97f1a39a0fdf17f8bae83",
+    "plan": {
+      "operation": "watchAuthoring",
+      "target": {
+        "reference": {
+          "object": {
+            "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+            "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/watch/root/WT05_BoolCreation",
+            "kind": "watchTable"
+          },
+          "snapshot": {
+            "observationId": "f3b0d88b42434df6b835be02abe33519",
+            "sourceSha256": "90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a",
+            "tiaVersion": 21
+          },
+          "contentSha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59"
+        },
+        "projectFilePath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+        "sessionEpoch": "0b44e985dc2b4bdab175108fa73c3c99",
+        "adapterSha256": "f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157",
+        "profileSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f",
+        "hardwareIdentity": "OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||",
+        "nativeIdentity": null,
+        "offline": true,
+        "probes": [
+          {
+            "name": "offline",
+            "state": "observed",
+            "evidenceSha256": "90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a"
+          },
+          {
+            "name": "watchImport",
+            "state": "observed",
+            "evidenceSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f"
+          }
+        ]
+      },
+      "resources": [
+        {
+          "resourceKey": "project:D:\\TIAW\\WE1602\\SCRATCH\\TIAMCPSCRATCH_20261016_092205_92409B23\\TIAMCPSCRATCH_20261016_092205_92409B23\\TIAMCPSCRATCH_20261016_092205_92409B23.AP21",
+          "kind": "project",
+          "effect": "reviewedWatchAuthoring:create",
+          "recoveryStrategy": "projectArchiveToNewLocation"
+        }
+      ],
+      "inputs": [
+        {
+          "relativePath": "watch/8f634fb473294ff8a5799ebe3f737276/review.json",
+          "sha256": "f1b3a4a8878c84a724a23c5dd2d713d79ebd007ed4e4aac3dd8d0fac63e8a61c"
+        },
+        {
+          "relativePath": "watch/8f634fb473294ff8a5799ebe3f737276/reviewed.xml",
+          "sha256": "1b052ec8af495a2397abb347654ff478d105059312d3a6d11357a67716dc1cba"
+        },
+        {
+          "relativePath": "watch-generations/bcd5da4d2a2a448c8e0ef868e976960e.json",
+          "sha256": "52208bf9febbf1657432213549b6e4c183ce278dd1caf4f959bb3870f4488cba"
+        },
+        {
+          "relativePath": "watch/8f634fb473294ff8a5799ebe3f737276/native-template.xml",
+          "sha256": "d710c6b85dd5c94cc27d7eb7edc24f5ac188ec5bdbaccdae5998acf5b697c09d"
+        },
+        {
+          "relativePath": "watch-source-captures/instance-36bf2501a6514ee3ac8f2f1745d71399/fb.xml",
+          "sha256": "e572e89ec0f6b4c68b61551c77f3325f8e80111943a841add6fbc6d1793f081b"
+        },
+        {
+          "relativePath": "watch-source-captures/instance-36bf2501a6514ee3ac8f2f1745d71399/instance.xml",
+          "sha256": "b3c636df9737f7506aa2cec3bb1e99c5879f4769eb35ea0a2eadd735253a6bad"
+        },
+        {
+          "relativePath": "watch-observations/w_8b374b63f235/absent.txt",
+          "sha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59"
+        },
+        {
+          "relativePath": "watch-observations/w_8b374b63f235/snapshot.json",
+          "sha256": "28f682c9dd0cb56476988c86fe360717b0f44c98e11ec8f4833804a76b9e8880"
+        }
+      ],
+      "requiredProbes": [
+        "offline",
+        "watchImport"
+      ],
+      "requiredGates": [
+        "readback",
+        "preservation",
+        "saved",
+        "freshReopen"
+      ]
+    },
+    "previousSha256": "d8127befef6d2d92afca47a32f79315a867364e920b71169a9282b367f70f1bb",
+    "recordedAt": "2026-10-16T09:24:52.0104494+00:00",
+    "checkpoints": [],
+    "evidence": [],
+    "reconciliation": [],
+    "recoveryDestinations": [],
+    "recoveryResolutions": []
+  },
+  "isError": false
+}

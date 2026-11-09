@@ -1,0 +1,39 @@
+[
+  {
+    "pid": 39712,
+    "parentPid": 3112,
+    "created": 1792060417.819999,
+    "name": "TiaMcp.Openness.V21.exe",
+    "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\src\\TiaMcp.Openness.V21\\bin\\Release\\net48\\TiaMcp.Openness.V21.exe",
+    "command": [
+      "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\src\\TiaMcp.Openness.V21\\bin\\Release\\net48\\TiaMcp.Openness.V21.exe",
+      "--component-qualification",
+      "--pipe",
+      "TiaMcp-b22f58b69eb049cdb2e2c0d130d2477c"
+    ]
+  },
+  {
+    "pid": 46232,
+    "parentPid": 39712,
+    "created": 1792060417.9760585,
+    "name": "Siemens.Automation.Portal.exe",
+    "exe": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+    "command": [
+      "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+      "-bootstrapper=Siemens.Automation.Opns.Loader.Impl:Siemens.Automation.Openness.Loader.BootStrapper",
+      "-nosplashscreen"
+    ]
+  },
+  {
+    "pid": 16440,
+    "parentPid": 39712,
+    "created": 1792060503.40336,
+    "name": "Siemens.Automation.Portal.exe",
+    "exe": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+    "command": [
+      "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+      "-bootstrapper=Siemens.Automation.Opns.Loader.Impl:Siemens.Automation.Openness.Loader.BootStrapper",
+      "-nosplashscreen"
+    ]
+  }
+]

@@ -1,0 +1,115 @@
+{
+  "completed": false,
+  "nativeExecutionInvoked": false,
+  "scopeQualified": false,
+  "automaticReplay": false,
+  "steps": [],
+  "sources": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_testsuite_scope_editor.py",
+      "sha256": "304372bbe015ff314a7df3583da222c987eca68fcdecfb3d6fab6bba1d12d9f3"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_exact_worker_startup.py",
+      "sha256": "f5863085945133b95178d6b78606f8b13a832713b54d67790b2fb1c0ded7e308"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\exact_qualification_client.py",
+      "sha256": "3adb95dfbf4aaac8a6761596bdeee2b9f5b4e4602a5d647cc6d9221ac07c379f"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\retained_native_lifecycle.py",
+      "sha256": "dff10491a60f497c7f0b96eac0d19f966390b0ea1269b5fb9d4b9f9c47a8c891"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_worker_startup_exact.py",
+      "sha256": "6455ee5f67c8936d25c9dd05edbb026d0698065429a50e9a2aae00bd6d8b88b8"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\smoke_mcp.py",
+      "sha256": "5d2764eb14caf49988f5f3e8cee8fd42bf8aad6eef9966506d48c1dbde6ef23b"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\block_test_process.py",
+      "sha256": "52eb1811eff1987ab37ca301c2ce53d626e4780c1dd5072bf986cd0bece83ad9"
+    }
+  ],
+  "packages": {
+    "host": [
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\Microsoft.Extensions.AI.Abstractions.dll",
+        "sha256": "bcc8f693103eb00505179f154b1b3a996b85d067e112facd724fd9d695f17a5e"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\ModelContextProtocol.Core.dll",
+        "sha256": "b1752096ea9d2f38ba88e467f04aea43fb300d9a54d881c165f62b69028ee3ab"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\ModelContextProtocol.dll",
+        "sha256": "8cd6f626c8d6a0a5ff3e154789d3fcde2b1d66a595c0ef0198e092c2c30fe93a"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Core.dll",
+        "sha256": "ed1cdddd9afd4a774ee1d059da13055d8a62c385f23ead6a437399c5d07b7f13"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Core.pdb",
+        "sha256": "bbf9e7463970e5a6008bd01156f20b9568322c6048548aff165c9b4b8a951edb"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.deps.json",
+        "sha256": "d5ef029c53a096ab6a91f9aab0844a7d051e979c840dedece48a69c994b27877"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.dll",
+        "sha256": "40e621218d3bee9d1d3099ad064c537af94ca64ef31f411e68a4b75ba1a84a3f"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.exe",
+        "sha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.pdb",
+        "sha256": "27c3f853a2712cd8d392380679455573604913d47bb9b0d2e61a5a94fb5ea878"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.runtimeconfig.json",
+        "sha256": "61a2a447a31667ca1fb9081bec4ffbeb230bb1813fadfa98ebc3a242ce38e36e"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Translations.dll",
+        "sha256": "6113c43c2e9d51b2a33eed8263e36a3faee059eb6b7743ee600affb457806455"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Translations.pdb",
+        "sha256": "04dcc370142d48a80c8908e485cc9ee1b4373d2ae596da38933f236d3c018e7e"
+      }
+    ],
+    "worker": [
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\Newtonsoft.Json.dll",
+        "sha256": "e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe",
+        "sha256": "48f066b2fe0fe3dd04f9d669f31a7fff577462e6e9c29172075287f09046d279"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe.config",
+        "sha256": "3a2be7a1bca2543035f80263898dc1a0a3a96bcf2f72834222b3a6a7bff13a39"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.pdb",
+        "sha256": "e617aaf5300b1ecdefc7054f5a13a81e9105cf3747c72ee6bb3a74c9f04ae0a5"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.TestSuite.V21.dll",
+        "sha256": "f5ec4f5ed3aa1ac2b577b96b28e60d3399b811f0966a00cbf5d3cc9dda5b53a1"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.TestSuite.V21.pdb",
+        "sha256": "4f5078613d6458da7d548f9d12659486755e2b772ea851f6c1df217e12111326"
+      }
+    ]
+  }
+}

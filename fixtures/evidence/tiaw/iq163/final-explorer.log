@@ -1,0 +1,29 @@
+✔ viewer transport blocks all mutation tools and unsupported actions before dispatch (1.9219ms)
+✔ offline cursor is bound to query and released snapshot cannot be reused (1.1919ms)
+✔ offline metadata never claims live content verification (0.512ms)
+✔ stale or inconclusive verification prevents sending exact selection (0.4539ms)
+✔ metadata mismatch is rejected even when snapshot header validity remains true (0.2739ms)
+✔ offline native detail observations retain provider previews and own content hashes (0.3277ms)
+✔ verified selection uses same exact reference and session loss is visible (0.3374ms)
+✔ MCP SDK adapter requires negotiated host support and fixes tool/action routes (1.0834ms)
+✔ live relationships map display directions to native in/out while offline keeps its own vocabulary (1.3343ms)
+✔ protocol bridge negotiates and pins parent origin; unrelated messages cannot resolve calls (0.7983ms)
+✔ bounded artifact transfer verifies every chunk and final SHA-256 (12.687ms)
+✔ artifact transfer rejects oversized, changed, stalled and tampered bytes without retry (1.6131ms)
+✔ independent hierarchy preserves native empty groups, explicit virtual folder and ancestry (3.6854ms)
+✔ same-name objects have exact case-sensitive distinct refs; cross-session/copy/rename rejected (0.5125ms)
+✔ every child page appears once and search preserves scope and Unicode (17.6134ms)
+✔ cyclic edges terminate, graph limits enforced and unresolved endpoints retained (1.1731ms)
+✔ invalid hierarchy, virtual mutation identities and false content claims are rejected (0.7083ms)
+✔ SVG safely escapes project labels and carries coverage, filters and capture provenance (9.8294ms)
+✔ PNG export embeds Unicode manifest in a standalone iTXt chunk (0.3328ms)
+✔ offline graph bounds full response including duplicated unresolved evidence and drops details (3.3252ms)
+✔ snapshot rejects more than 1000 retained relationship records (0.3192ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 218.7614

@@ -1,0 +1,18 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"error\":{\"code\":\"WatchTableCollision\",\"message\":\"A watch or force table already occupies this name in the selected PLC.\",\"details\":{\"exceptionType\":\"TiaMcp.Openness.V21.BridgeException\"}}}"
+    }
+  ],
+  "structuredContent": {
+    "error": {
+      "code": "WatchTableCollision",
+      "message": "A watch or force table already occupies this name in the selected PLC.",
+      "details": {
+        "exceptionType": "TiaMcp.Openness.V21.BridgeException"
+      }
+    }
+  },
+  "isError": true
+}

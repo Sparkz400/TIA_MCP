@@ -1,0 +1,52 @@
+{
+  "mode": "create-bool",
+  "root": "D:\\TIAW\\wa1604",
+  "worker": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\worker\\TiaMcp.Openness.V21.exe",
+  "workerSha256": "ab3956e0bb551a79e3bbdc00be776dac103413befb495c4993872f8d6216cf4f",
+  "host": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Host.exe",
+  "hostSha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f",
+  "hostFiles": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\Microsoft.Extensions.AI.Abstractions.dll",
+      "sha256": "bcc8f693103eb00505179f154b1b3a996b85d067e112facd724fd9d695f17a5e"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\ModelContextProtocol.Core.dll",
+      "sha256": "b1752096ea9d2f38ba88e467f04aea43fb300d9a54d881c165f62b69028ee3ab"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\ModelContextProtocol.dll",
+      "sha256": "8cd6f626c8d6a0a5ff3e154789d3fcde2b1d66a595c0ef0198e092c2c30fe93a"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Core.deps.json",
+      "sha256": "aa5a6001ad5b771a1e30c2b767f512603d7937371f18cf85acf11fb17232954f"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Core.dll",
+      "sha256": "c42df17638e321bb5e09fb5d4ab220b10e79b3738c02a03944a5793d8135c9aa"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Host.deps.json",
+      "sha256": "7969e812de3e17993b8fe7a6357890a9bf134dd1954b67e5447d500582872dba"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Host.dll",
+      "sha256": "0e8ccf64f920cdf73f9391c2eec179b6cd4084568b1faed4b00dba22769e0de5"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Host.exe",
+      "sha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\host\\TiaMcp.Host.runtimeconfig.json",
+      "sha256": "56a13ba05e82629b54e12a87f0011eecf394f0f1016d810c73488822c4c5c7ec"
+    }
+  ],
+  "commentInput": null,
+  "nativeCleanupHelper": null,
+  "nativeSequential": true,
+  "actualMcpHost": true,
+  "automaticReplay": false,
+  "effects": "Fresh owned offline scratch only; one reviewed watch edit and explicit archive recovery."
+}

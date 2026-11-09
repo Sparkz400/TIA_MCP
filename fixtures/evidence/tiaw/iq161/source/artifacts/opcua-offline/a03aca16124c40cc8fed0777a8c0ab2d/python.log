@@ -1,0 +1,14 @@
+test_accessors_are_bound_to_installed_bytes (test_opcua_api.OpcUaApiTests.test_accessors_are_bound_to_installed_bytes) ... ok
+test_candidate_profiles_fail_closed (test_opcua_api.OpcUaApiTests.test_candidate_profiles_fail_closed) ... ok
+test_consumer_fixture_matches_exact_source (test_opcua_api.OpcUaApiTests.test_consumer_fixture_matches_exact_source) ... ok
+test_dtd_utf8_and_utf16_rejected (test_opcua_api.OpcUaApiTests.test_dtd_utf8_and_utf16_rejected) ... ok
+test_empty_or_execution_report_is_rejected (test_opcua_api.OpcUaApiTests.test_empty_or_execution_report_is_rejected) ... ok
+test_malformed_document_is_explicit (test_opcua_api.OpcUaApiTests.test_malformed_document_is_explicit) ... ok
+test_metadata_capacity (test_opcua_api.OpcUaApiTests.test_metadata_capacity) ... ok
+test_optional_missing_does_not_mean_target_absent (test_opcua_api.OpcUaApiTests.test_optional_missing_does_not_mean_target_absent) ... ok
+test_schema_inventory_does_not_imply_ua_support (test_opcua_api.OpcUaApiTests.test_schema_inventory_does_not_imply_ua_support) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.202s
+
+OK

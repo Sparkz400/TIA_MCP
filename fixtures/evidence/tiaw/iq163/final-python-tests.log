@@ -1,0 +1,333 @@
+PASS tia_start
+PASS project_open
+PASS sim_status
+PASS sim_create
+PASS simulation_download
+PASS simulation_provision_scratch_credential
+FAIL validation: Generated memory-card content differs from the download manifest.
+PASS sim_release
+PASS tia_detach
+D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmp_dmmcqr1\report.json
+PASS tia_start
+PASS project_open
+PASS sim_status
+PASS sim_create
+PASS simulation_download
+PASS sim_state
+PASS sim_state
+PASS sim_tags
+PASS sim_read
+PASS sim_write
+PASS sim_read
+PASS sim_test
+PASS sim_release
+PASS tia_detach
+D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmpld3nakmn\report.json
+PASS tia_start
+PASS project_open
+PASS sim_status
+PASS sim_create
+PASS simulation_download
+PASS simulation_provision_scratch_credential
+FAIL validation: Runtime credential provisioning did not preserve protection and return the CPU to OFF.
+PASS sim_release
+PASS tia_detach
+D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmpdede6mri\report.json
+PASS tia_start
+PASS project_open
+PASS sim_status
+PASS sim_create
+PASS simulation_download
+PASS simulation_provision_scratch_credential
+PASS sim_state
+PASS sim_state
+PASS sim_tags
+PASS sim_read
+PASS sim_write
+PASS sim_read
+PASS sim_test
+PASS sim_release
+PASS tia_detach
+D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmptm81fy79\report.json
+PASS tia_start
+PASS project_open
+PASS sim_status
+PASS sim_create
+PASS simulation_download
+PASS simulation_provision_scratch_credential
+PASS sim_state
+PASS sim_state
+PASS sim_tags
+PASS sim_read
+PASS sim_write
+PASS sim_read
+PASS sim_test
+PASS sim_release
+PASS tia_detach
+D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmpej6zx1_r\report.json
+....................................................................................................................................................s.......................usage: python.exe -m unittest [-h] --project PROJECT
+                              --credential-metadata CREDENTIAL_METADATA
+                              [--credential-journal CREDENTIAL_JOURNAL]
+                              [--report REPORT] [--host HOST]
+                              [--worker WORKER] [--sim-worker SIM_WORKER]
+                              [--provision-runtime-credential]
+                              [--trust-owned-empty-cpu-certificate]
+python.exe -m unittest: error: --trust-owned-empty-cpu-certificate requires --provision-runtime-credential
+PASS tia_start
+PASS project_open
+PASS sim_status
+PASS sim_create
+PASS simulation_download
+PASS simulation_provision_scratch_credential
+FAIL validation: Runtime TLS trust evidence does not match the authorized owned empty CPU and its attempt pin.
+PASS sim_release
+PASS tia_detach
+D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmp_jb1f3l9\report.json
+Prepared block tests: D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmpf0urtisj\output
+1 suites; engineeringVerified=False; runtimeVerified=False
+Prepared block tests: D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmpfqhidrqb
+9 suites; engineeringVerified=False; runtimeVerified=False
+Qualifying runtime-boolean (runtime)
+runtime-boolean: passed
+...........................usage: python.exe -m unittest [-h] [--live | --engineering-only]
+                              [--fixture FIXTURE] [--suite SUITE]
+                              [--case-selection CASE_SELECTION]
+                              [--stop-file STOP_FILE]
+                              [--report-directory REPORT_DIRECTORY]
+                              [--artifacts ARTIFACTS] [--host HOST]
+                              [--worker WORKER] [--sim-worker SIM_WORKER]
+                              [--provision-runtime-credential]
+                              [--trust-owned-empty-cpu-certificate]
+                              [--timeout TIMEOUT] [--continue-on-failure]
+python.exe -m unittest: error: --case-selection requires --live
+usage: python.exe -m unittest [-h] [--live | --engineering-only]
+                              [--fixture FIXTURE] [--suite SUITE]
+                              [--case-selection CASE_SELECTION]
+                              [--stop-file STOP_FILE]
+                              [--report-directory REPORT_DIRECTORY]
+                              [--artifacts ARTIFACTS] [--host HOST]
+                              [--worker WORKER] [--sim-worker SIM_WORKER]
+                              [--provision-runtime-credential]
+                              [--trust-owned-empty-cpu-certificate]
+                              [--timeout TIMEOUT] [--continue-on-failure]
+python.exe -m unittest: error: --case-selection requires --live
+......................usage: python.exe -m unittest [-h] [--live | --engineering-only]
+                              [--fixture FIXTURE] [--suite SUITE]
+                              [--case-selection CASE_SELECTION]
+                              [--stop-file STOP_FILE]
+                              [--report-directory REPORT_DIRECTORY]
+                              [--artifacts ARTIFACTS] [--host HOST]
+                              [--worker WORKER] [--sim-worker SIM_WORKER]
+                              [--provision-runtime-credential]
+                              [--trust-owned-empty-cpu-certificate]
+                              [--timeout TIMEOUT] [--continue-on-failure]
+python.exe -m unittest: error: --worker is required for native qualification; worker build selection must be explicit
+usage: python.exe -m unittest [-h] [--live | --engineering-only]
+                              [--fixture FIXTURE] [--suite SUITE]
+                              [--case-selection CASE_SELECTION]
+                              [--stop-file STOP_FILE]
+                              [--report-directory REPORT_DIRECTORY]
+                              [--artifacts ARTIFACTS] [--host HOST]
+                              [--worker WORKER] [--sim-worker SIM_WORKER]
+                              [--provision-runtime-credential]
+                              [--trust-owned-empty-cpu-certificate]
+                              [--timeout TIMEOUT] [--continue-on-failure]
+python.exe -m unittest: error: --worker is required for native qualification; worker build selection must be explicit
+Runtime qualification: D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmph4ezgyok\result
+1 suites; engineeringVerified=True; runtimeVerified=False
+Qualifying runtime-boolean (engineering)
+runtime-boolean: passed
+Engineering qualification: D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmpsd7m9ku1\report
+1 suites; engineeringVerified=True; runtimeVerified=False
+Qualifying runtime-boolean (runtime)
+runtime-boolean: passed
+...usage: python.exe -m unittest [-h] [--live | --engineering-only]
+                              [--fixture FIXTURE] [--suite SUITE]
+                              [--case-selection CASE_SELECTION]
+                              [--stop-file STOP_FILE]
+                              [--report-directory REPORT_DIRECTORY]
+                              [--artifacts ARTIFACTS] [--host HOST]
+                              [--worker WORKER] [--sim-worker SIM_WORKER]
+                              [--provision-runtime-credential]
+                              [--trust-owned-empty-cpu-certificate]
+                              [--timeout TIMEOUT] [--continue-on-failure]
+python.exe -m unittest: error: --sim-worker is required for --live
+.usage: python.exe -m unittest [-h] [--live | --engineering-only]
+                              [--fixture FIXTURE] [--suite SUITE]
+                              [--case-selection CASE_SELECTION]
+                              [--stop-file STOP_FILE]
+                              [--report-directory REPORT_DIRECTORY]
+                              [--artifacts ARTIFACTS] [--host HOST]
+                              [--worker WORKER] [--sim-worker SIM_WORKER]
+                              [--provision-runtime-credential]
+                              [--trust-owned-empty-cpu-certificate]
+                              [--timeout TIMEOUT] [--continue-on-failure]
+python.exe -m unittest: error: argument --live: not allowed with argument --engineering-only/--engineering
+..usage: python.exe -m unittest [-h] [--live | --engineering-only]
+                              [--fixture FIXTURE] [--suite SUITE]
+                              [--case-selection CASE_SELECTION]
+                              [--stop-file STOP_FILE]
+                              [--report-directory REPORT_DIRECTORY]
+                              [--artifacts ARTIFACTS] [--host HOST]
+                              [--worker WORKER] [--sim-worker SIM_WORKER]
+                              [--provision-runtime-credential]
+                              [--trust-owned-empty-cpu-certificate]
+                              [--timeout TIMEOUT] [--continue-on-failure]
+python.exe -m unittest: error: --provision-runtime-credential requires --live
+usage: python.exe -m unittest [-h] [--live | --engineering-only]
+                              [--fixture FIXTURE] [--suite SUITE]
+                              [--case-selection CASE_SELECTION]
+                              [--stop-file STOP_FILE]
+                              [--report-directory REPORT_DIRECTORY]
+                              [--artifacts ARTIFACTS] [--host HOST]
+                              [--worker WORKER] [--sim-worker SIM_WORKER]
+                              [--provision-runtime-credential]
+                              [--trust-owned-empty-cpu-certificate]
+                              [--timeout TIMEOUT] [--continue-on-failure]
+python.exe -m unittest: error: --provision-runtime-credential requires --live
+.usage: python.exe -m unittest [-h] [--live | --engineering-only]
+                              [--fixture FIXTURE] [--suite SUITE]
+                              [--case-selection CASE_SELECTION]
+                              [--stop-file STOP_FILE]
+                              [--report-directory REPORT_DIRECTORY]
+                              [--artifacts ARTIFACTS] [--host HOST]
+                              [--worker WORKER] [--sim-worker SIM_WORKER]
+                              [--provision-runtime-credential]
+                              [--trust-owned-empty-cpu-certificate]
+                              [--timeout TIMEOUT] [--continue-on-failure]
+python.exe -m unittest: error: --trust-owned-empty-cpu-certificate requires --provision-runtime-credential
+Runtime qualification: D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmpp4ncni6c\report
+1 suites; engineeringVerified=True; runtimeVerified=True
+Prepared block tests: D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmp3blybk95
+9 suites; engineeringVerified=False; runtimeVerified=False
+Qualifying runtime-boolean (runtime)
+runtime-boolean: failed
+Runtime qualification: D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmpu1jckymp\report
+2 suites; engineeringVerified=False; runtimeVerified=False
+Qualifying runtime-boolean (runtime)
+runtime-boolean: blocked
+Runtime qualification: D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmpbq1oxwun\result
+2 suites; engineeringVerified=False; runtimeVerified=False
+Runtime qualification: D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmp61co6xgv\result
+1 suites; engineeringVerified=False; runtimeVerified=False
+Qualifying runtime-boolean (runtime)
+runtime-boolean: passed
+Runtime qualification: D:\TIAW\iq163\source\artifacts\block-tests\test-temp\tmp4eh0m_fg\result
+2 suites; engineeringVerified=False; runtimeVerified=False
+Report: C:\Users\NSCHUE~1\AppData\Local\Temp\tmppmfi2wbs\result.json
+Report: C:\Users\NSCHUE~1\AppData\Local\Temp\tmpfz_lji3w\result.json
+Report: C:\Users\NSCHUE~1\AppData\Local\Temp\tmp8_7tom1e\result.json
+Report: C:\Users\NSCHUE~1\AppData\Local\Temp\tmphpf3yivn\result.json
+Report: C:\Users\NSCHUE~1\AppData\Local\Temp\tmpj8qj43g9\result.json
+Validated 14 fixture manifests; reports: D:\TIAW\iq163\source\artifacts\conformance\test-tmp\fixture_9rwyj146\reports
+PASS scl-boolean/program_prepare
+PASS scl-boolean/program_prepare
+Validated 1 fixture manifests; reports: D:\TIAW\iq163\source\artifacts\conformance\test-tmp\fixture_10v0_o9r\reports
+observation: library_prepared
+Report: new-report\result.json
+BLOCKED_EXACT_PROCESS_CLEANUP {"processId": 6372, "reason": "Wait interrupted: KeyboardInterrupt", "originalHandleRetained": true, "automaticTermination": false, "dependentDispatchProhibited": true, "atUtc": "2026-10-16T09:36:20.374967+00:00", "identity": {"pid": 6372, "parentPid": 60808, "created": 6372.0, "name": "Siemens.Automation.Portal.exe", "exe": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-ux86pp30\\Siemens.Automation.Portal.exe", "command": ["D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-ux86pp30\\Siemens.Automation.Portal.exe"]}, "role": "native", "handleEvidence": {"processId": 6372, "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION", "inheritable": false, "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.", "handleCaptured": true, "processExitVerified": false, "handleClosed": false, "projectLockReleaseVerified": false, "capturedAtUtc": "2026-10-16T09:36:20.325424+00:00", "birthAndImageVerified": true, "processStartedAtUtc": "2026-10-16T00:00:00.0000000Z", "originalFileTimeTicks": 116444799720000000, "imagePath": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-ux86pp30\\Siemens.Automation.Portal.exe", "sameOsHandleRetained": true, "ownerProcessId": 46044, "ownerHandleValue": null}}
+{"cleanupRequired": "C:\\Users\\NSCHUE~1\\AppData\\Local\\Temp\\synthetic-force-coordinator-nxzv6_j3\\run\\checkpoint\\helper\\cleanup-live.json", "originalHandlesAndStoreWindowRetained": true}
+{"cleanupRequired": "C:\\Users\\NSCHUE~1\\AppData\\Local\\Temp\\synthetic-force-coordinator-y_r9xrdr\\cleanup-live.json", "originalHandlesAndStoreWindowRetained": true}
+{"cleanupRequired": "C:\\Users\\NSCHUE~1\\AppData\\Local\\Temp\\synthetic-force-coordinator-e35_h0zs\\cleanup-live.json", "originalHandlesAndStoreWindowRetained": true}
+{"cleanupRequired": "C:\\Users\\NSCHUE~1\\AppData\\Local\\Temp\\synthetic-force-coordinator-um92_ufk\\cleanup-live.json", "originalHandlesAndStoreWindowRetained": true}
+................................................................................................................................................................................................................................................................................................................................................................................................usage: python.exe -m unittest [-h] --root ROOT --recovery-gate RECOVERY_GATE
+                              [--host HOST] [--worker WORKER]
+                              [--package PACKAGE]
+                              [--controller-manifest CONTROLLER_MANIFEST]
+                              (--prepare-only | --execute-native)
+                              [--output OUTPUT] [--timeout TIMEOUT]
+python.exe -m unittest: error: one of the arguments --prepare-only --execute-native is required
+{"nativeInvoked": false, "ready": true, "phase": "checkpoint", "output": "C:\\Users\\NSCHUE~1\\AppData\\Local\\Temp\\synthetic-force-coordinator-yzf_7kbc\\preflight.json"}
+{"nativeInvoked": false, "sourceReady": true, "nativeAdmissionReady": false, "output": "C:\\Users\\nschuermann\\AppData\\Local\\Temp\\testsuite-coordinator-synthetic-uj02kb7x\\prepared.json"}
+{
+  "completed": false,
+  "nativeMayHaveBeenInvoked": false,
+  "automaticReplay": false,
+  "failure": {
+    "type": "ValueError",
+    "message": "synthetic incomplete recovery gate"
+  },
+  "nativeInvoked": false
+}
+{
+  "completed": true,
+  "preparedOnly": true,
+  "nativeInvoked": false,
+  "root": "synthetic",
+  "resourceRoots": []
+}
+tool
+qualification_watch_authoring_source_negative
+tool
+Fault cleanup failed; retaining original handles through terminal proof: helper failed
+Fault cleanup failed; retaining original handles through terminal proof: 
+PASS launcher MCP initialize
+PASS packaged tool list
+PASS packaged feature catalog matches external contract
+PASS packaged engineering capabilities
+PASS packaged engineering discovery
+PASS packaged simulator status
+PASS launcher MCP initialize
+PASS packaged tool list
+PASS packaged feature catalog matches external contract
+PASS packaged engineering capabilities
+PASS packaged engineering discovery
+PASS packaged simulator status
+.....................................................................................................................................................................................................................usage: smoke_package.py [-h] --bundle BUNDLE [--configuration CONFIGURATION]
+                        --report REPORT
+smoke_package.py: error: Select a fresh report path; previous qualification evidence is immutable.
+PASS launcher MCP initialize
+PASS packaged tool list
+PASS packaged feature catalog matches external contract
+PASS packaged engineering capabilities
+PASS packaged engineering discovery
+PASS packaged simulator status
+PASS direct packaged host resolves engineering worker
+PASS direct packaged host resolves simulator worker
+PASS launcher MCP initialize
+PASS packaged tool list
+PASS packaged feature catalog matches external contract
+PASS packaged engineering capabilities
+PASS packaged engineering discovery
+PASS packaged simulator status
+PASS direct packaged host resolves engineering worker
+PASS direct packaged host resolves simulator worker
+FAIL launcher construction failed
+PASS launcher MCP initialize
+PASS packaged tool list
+PASS packaged feature catalog matches external contract
+PASS packaged engineering capabilities
+PASS packaged engineering discovery
+PASS packaged simulator status
+BLOCKED_EXACT_PROCESS_CLEANUP {"processId": 6372, "reason": "Exact terminal deadline exceeded", "originalHandleRetained": true, "automaticTermination": false, "dependentDispatchProhibited": true, "atUtc": "2026-10-16T09:36:29.496055+00:00", "identity": {"pid": 6372, "parentPid": 60808, "created": 6372.0, "name": "Siemens.Automation.Portal.exe", "exe": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-lw60l5p7\\Siemens.Automation.Portal.exe", "command": ["D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-lw60l5p7\\Siemens.Automation.Portal.exe"]}, "role": "native", "handleEvidence": {"processId": 6372, "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION", "inheritable": false, "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.", "handleCaptured": true, "processExitVerified": false, "handleClosed": false, "projectLockReleaseVerified": false, "capturedAtUtc": "2026-10-16T09:36:29.495562+00:00", "birthAndImageVerified": true, "processStartedAtUtc": "2026-10-16T00:00:00.0000000Z", "originalFileTimeTicks": 63720000000, "imagePath": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-lw60l5p7\\Siemens.Automation.Portal.exe", "sameOsHandleRetained": true, "ownerProcessId": 46044, "ownerHandleValue": null}}
+BLOCKED_EXACT_PROCESS_CLEANUP {"processId": 6372, "reason": "Wait interrupted: KeyboardInterrupt", "originalHandleRetained": true, "automaticTermination": false, "dependentDispatchProhibited": true, "atUtc": "2026-10-16T09:36:29.585654+00:00", "identity": {"pid": 6372, "parentPid": 60808, "created": 6372.0, "name": "Siemens.Automation.Portal.exe", "exe": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-1ktfpzja\\Siemens.Automation.Portal.exe", "command": ["D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-1ktfpzja\\Siemens.Automation.Portal.exe"]}, "role": "native", "handleEvidence": {"processId": 6372, "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION", "inheritable": false, "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.", "handleCaptured": true, "processExitVerified": false, "handleClosed": false, "projectLockReleaseVerified": false, "capturedAtUtc": "2026-10-16T09:36:29.583610+00:00", "birthAndImageVerified": true, "processStartedAtUtc": "2026-10-16T00:00:00.0000000Z", "originalFileTimeTicks": 63720000000, "imagePath": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-1ktfpzja\\Siemens.Automation.Portal.exe", "sameOsHandleRetained": true, "ownerProcessId": 46044, "ownerHandleValue": null}}
+BLOCKED_EXACT_PROCESS_CLEANUP {"processId": 6372, "reason": "Terminal query interrupted: KeyboardInterrupt", "originalHandleRetained": true, "automaticTermination": false, "dependentDispatchProhibited": true, "atUtc": "2026-10-16T09:36:29.618654+00:00", "identity": {"pid": 6372, "parentPid": 60808, "created": 6372.0, "name": "Siemens.Automation.Portal.exe", "exe": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-oc5cp9ip\\Siemens.Automation.Portal.exe", "command": ["D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-oc5cp9ip\\Siemens.Automation.Portal.exe"]}, "role": "native", "handleEvidence": {"processId": 6372, "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION", "inheritable": false, "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.", "handleCaptured": true, "processExitVerified": false, "handleClosed": false, "projectLockReleaseVerified": false, "capturedAtUtc": "2026-10-16T09:36:29.617442+00:00", "birthAndImageVerified": true, "processStartedAtUtc": "2026-10-16T00:00:00.0000000Z", "originalFileTimeTicks": 63720000000, "imagePath": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-oc5cp9ip\\Siemens.Automation.Portal.exe", "sameOsHandleRetained": true, "ownerProcessId": 46044, "ownerHandleValue": null}}
+BLOCKED_EXACT_PROCESS_CLEANUP {"processId": 6372, "reason": "Terminal query interrupted: SystemExit", "originalHandleRetained": true, "automaticTermination": false, "dependentDispatchProhibited": true, "atUtc": "2026-10-16T09:36:29.622833+00:00", "identity": {"pid": 6372, "parentPid": 60808, "created": 6372.0, "name": "Siemens.Automation.Portal.exe", "exe": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-r95di7q3\\Siemens.Automation.Portal.exe", "command": ["D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-r95di7q3\\Siemens.Automation.Portal.exe"]}, "role": "native", "handleEvidence": {"processId": 6372, "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION", "inheritable": false, "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.", "handleCaptured": true, "processExitVerified": false, "handleClosed": false, "projectLockReleaseVerified": false, "capturedAtUtc": "2026-10-16T09:36:29.621697+00:00", "birthAndImageVerified": true, "processStartedAtUtc": "2026-10-16T00:00:00.0000000Z", "originalFileTimeTicks": 63720000000, "imagePath": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-r95di7q3\\Siemens.Automation.Portal.exe", "sameOsHandleRetained": true, "ownerProcessId": 46044, "ownerHandleValue": null}}
+BLOCKED_STARTUP_INVENTORY {"reason": "Expected startup inventory incomplete; exact handles and dispatch boundary retained", "expectedWorkerCount": 1, "workerStartupCaptured": false, "nativeStartupInventoryComplete": true, "captureErrors": [], "hostEofProhibited": true, "nativeDetachProhibited": true, "originalHandlesRetained": true, "automaticTermination": false, "requiresExternalReconciliation": true, "atUtc": "2026-10-16T09:36:29.647872+00:00"}
+Startup inventory hold interrupted: KeyboardInterrupt; original handles retained, no detach/EOF
+Startup inventory hold interrupted: SystemExit; original handles retained, no detach/EOF
+BLOCKED_HELPER_CLEANUP {"failure": "OSError: identity capture failed", "storeLocksRetained": true, "originalCreateProcessHandleRetained": true, "automaticTermination": false}
+BLOCKED_HELPER_CLEANUP {"outcomeUnknown": true, "originalCreateProcessHandleRetained": true, "storeLocksRetained": true, "hostCloseProhibited": true, "automaticTermination": false, "failure": "TimeoutExpired: Command 'helper' timed out after 30 seconds"}
+BLOCKED_HELPER_CLEANUP {"outcomeUnknown": true, "storeLocksRetained": true, "originalCreateProcessHandleRetained": true, "failure": "KeyboardInterrupt: "}
+PASS case
+PASS case
+PASS stale-tag-address
+PASS stale-tag-address
+PASS stale-tag-address
+PASS stale-tag-address
+BLOCKED_EXACT_PROCESS_CLEANUP {"processId": 6372, "reason": "Wait interrupted: KeyboardInterrupt", "originalHandleRetained": true, "automaticTermination": false, "dependentDispatchProhibited": true, "atUtc": "2026-10-16T09:36:53.354063+00:00", "identity": {"pid": 6372, "parentPid": 60808, "created": 6372.0, "name": "Siemens.Automation.Portal.exe", "exe": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-tzql36ym\\Siemens.Automation.Portal.exe", "command": ["D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-tzql36ym\\Siemens.Automation.Portal.exe"]}, "role": "native", "handleEvidence": {"processId": 6372, "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION", "inheritable": false, "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.", "handleCaptured": true, "processExitVerified": false, "handleClosed": false, "projectLockReleaseVerified": false, "capturedAtUtc": "2026-10-16T09:36:53.352558+00:00", "birthAndImageVerified": true, "processStartedAtUtc": "2026-10-16T00:00:00.0000000Z", "originalFileTimeTicks": 63720000000, "imagePath": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-tzql36ym\\Siemens.Automation.Portal.exe", "sameOsHandleRetained": true, "ownerProcessId": 46044, "ownerHandleValue": null}}
+tia_start
+tia_detach
+tia_start
+tia_detach
+{"completed": true, "mode": "reorder", "root": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-4a8q62t7", "profile": "v21-watch-reference-free-preorder-1"}
+BLOCKED_EXACT_PROCESS_CLEANUP {"processId": 6372, "reason": "Terminal query interrupted: KeyboardInterrupt", "originalHandleRetained": true, "automaticTermination": false, "dependentDispatchProhibited": true, "atUtc": "2026-10-16T09:36:53.396362+00:00", "identity": {"pid": 6372, "parentPid": 60808, "created": 6372.0, "name": "Siemens.Automation.Portal.exe", "exe": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-rk8z93lp\\Siemens.Automation.Portal.exe", "command": ["D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-rk8z93lp\\Siemens.Automation.Portal.exe"]}, "role": "native", "handleEvidence": {"processId": 6372, "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION", "inheritable": false, "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.", "handleCaptured": true, "processExitVerified": false, "handleClosed": false, "projectLockReleaseVerified": false, "capturedAtUtc": "2026-10-16T09:36:53.394170+00:00", "birthAndImageVerified": true, "processStartedAtUtc": "2026-10-16T00:00:00.0000000Z", "originalFileTimeTicks": 63720000000, "imagePath": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-rk8z93lp\\Siemens.Automation.Portal.exe", "sameOsHandleRetained": true, "ownerProcessId": 46044, "ownerHandleValue": null}}
+BLOCKED_EXACT_PROCESS_CLEANUP {"processId": 6372, "reason": "Terminal query interrupted: SystemExit", "originalHandleRetained": true, "automaticTermination": false, "dependentDispatchProhibited": true, "atUtc": "2026-10-16T09:36:53.401473+00:00", "identity": {"pid": 6372, "parentPid": 60808, "created": 6372.0, "name": "Siemens.Automation.Portal.exe", "exe": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-gvpp3ou8\\Siemens.Automation.Portal.exe", "command": ["D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-gvpp3ou8\\Siemens.Automation.Portal.exe"]}, "role": "native", "handleEvidence": {"processId": 6372, "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION", "inheritable": false, "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.", "handleCaptured": true, "processExitVerified": false, "handleClosed": false, "projectLockReleaseVerified": false, "capturedAtUtc": "2026-10-16T09:36:53.399585+00:00", "birthAndImageVerified": true, "processStartedAtUtc": "2026-10-16T00:00:00.0000000Z", "originalFileTimeTicks": 63720000000, "imagePath": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-gvpp3ou8\\Siemens.Automation.Portal.exe", "sameOsHandleRetained": true, "ownerProcessId": 46044, "ownerHandleValue": null}}
+BLOCKED_EXACT_PROCESS_CLEANUP {"processId": 6372, "reason": "Wait interrupted: KeyboardInterrupt", "originalHandleRetained": true, "automaticTermination": false, "dependentDispatchProhibited": true, "atUtc": "2026-10-16T09:36:53.504434+00:00", "identity": {"pid": 6372, "parentPid": 60808, "created": 6372.0, "name": "Siemens.Automation.Portal.exe", "exe": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-_e3z9rdf\\Siemens.Automation.Portal.exe", "command": ["D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-_e3z9rdf\\Siemens.Automation.Portal.exe"]}, "role": "native", "handleEvidence": {"processId": 6372, "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION", "inheritable": false, "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.", "handleCaptured": true, "processExitVerified": false, "handleClosed": false, "projectLockReleaseVerified": false, "capturedAtUtc": "2026-10-16T09:36:53.502216+00:00", "birthAndImageVerified": true, "processStartedAtUtc": "2026-10-16T00:00:00.0000000Z", "originalFileTimeTicks": 63720000000, "imagePath": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-_e3z9rdf\\Siemens.Automation.Portal.exe", "sameOsHandleRetained": true, "ownerProcessId": 46044, "ownerHandleValue": null}}
+BLOCKED_EXACT_PROCESS_CLEANUP {"processId": 6372, "reason": "Wait interrupted: SystemExit", "originalHandleRetained": true, "automaticTermination": false, "dependentDispatchProhibited": true, "atUtc": "2026-10-16T09:36:53.504567+00:00", "identity": {"pid": 6372, "parentPid": 60808, "created": 6372.0, "name": "Siemens.Automation.Portal.exe", "exe": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-_e3z9rdf\\Siemens.Automation.Portal.exe", "command": ["D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-_e3z9rdf\\Siemens.Automation.Portal.exe"]}, "role": "native", "handleEvidence": {"processId": 6372, "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION", "inheritable": false, "basis": "Handle captured immediately from the exact owned tia_start process ID; never reopened by PID.", "handleCaptured": true, "processExitVerified": false, "handleClosed": false, "projectLockReleaseVerified": false, "capturedAtUtc": "2026-10-16T09:36:53.502216+00:00", "birthAndImageVerified": true, "processStartedAtUtc": "2026-10-16T00:00:00.0000000Z", "originalFileTimeTicks": 63720000000, "imagePath": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-_e3z9rdf\\Siemens.Automation.Portal.exe", "sameOsHandleRetained": true, "ownerProcessId": 46044, "ownerHandleValue": null}}
+{"completed": true, "mode": "reorder", "root": "D:\\TIAW\\iq163\\source\\artifacts\\startup-lifecycle-review-20261016\\mock-d_q1cbme", "profile": "v21-watch-reference-free-preorder-1"}
+............................................................................................................................................................................................................................................................................................................................................................................................................................
+----------------------------------------------------------------------
+Ran 1237 tests in 110.205s
+
+OK (skipped=1)

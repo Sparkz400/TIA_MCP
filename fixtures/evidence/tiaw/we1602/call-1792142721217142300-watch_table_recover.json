@@ -1,0 +1,469 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"operation\":{\"id\":\"a4cad60758c9452999d028bd72d15d51\",\"revision\":8,\"state\":\"recoveryIntent\",\"idempotencyKey\":\"wt05-create-bool\",\"planSha256\":\"86cdbb36f22f5830108dce2c29e6f55021e46f06d8d90a83bd2830b624c2d196\",\"plan\":{\"operation\":\"watchAuthoring\",\"target\":{\"reference\":{\"object\":{\"projectPath\":\"D:\\\\TIAW\\\\we1602\\\\scratch\\\\TiaMcpScratch_20261016_092205_92409b23\\\\TiaMcpScratch_20261016_092205_92409b23\\\\TiaMcpScratch_20261016_092205_92409b23.ap21\",\"plcPath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC\",\"scopePath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC\",\"objectPath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/watch/root/WT05_BoolCreation\",\"kind\":\"watchTable\"},\"snapshot\":{\"observationId\":\"9455aec4215c4e9b8877cc1a6b2edddf\",\"sourceSha256\":\"90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a\",\"tiaVersion\":21},\"contentSha256\":\"de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59\"},\"projectFilePath\":\"D:\\\\TIAW\\\\we1602\\\\scratch\\\\TiaMcpScratch_20261016_092205_92409b23\\\\TiaMcpScratch_20261016_092205_92409b23\\\\TiaMcpScratch_20261016_092205_92409b23.ap21\",\"sessionEpoch\":\"0b44e985dc2b4bdab175108fa73c3c99\",\"adapterSha256\":\"f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157\",\"profileSha256\":\"f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f\",\"hardwareIdentity\":\"OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||\",\"nativeIdentity\":null,\"offline\":true,\"probes\":[{\"name\":\"offline\",\"state\":\"observed\",\"evidenceSha256\":\"90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a\"},{\"name\":\"watchImport\",\"state\":\"observed\",\"evidenceSha256\":\"f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f\"}]},\"resources\":[{\"resourceKey\":\"project:D:\\\\TIAW\\\\WE1602\\\\SCRATCH\\\\TIAMCPSCRATCH_20261016_092205_92409B23\\\\TIAMCPSCRATCH_20261016_092205_92409B23\\\\TIAMCPSCRATCH_20261016_092205_92409B23.AP21\",\"kind\":\"project\",\"effect\":\"reviewedWatchAuthoring:create\",\"recoveryStrategy\":\"projectArchiveToNewLocation\"}],\"inputs\":[{\"relativePath\":\"watch/dbf6fc9d3e144abe9c824a0f4642c108/review.json\",\"sha256\":\"55c75112e467e7b230dc0fb5200708a94dd5342ec8f787e876420a8a4bb21370\"},{\"relativePath\":\"watch/dbf6fc9d3e144abe9c824a0f4642c108/reviewed.xml\",\"sha256\":\"1b052ec8af495a2397abb347654ff478d105059312d3a6d11357a67716dc1cba\"},{\"relativePath\":\"watch-generations/bcd5da4d2a2a448c8e0ef868e976960e.json\",\"sha256\":\"52208bf9febbf1657432213549b6e4c183ce278dd1caf4f959bb3870f4488cba\"},{\"relativePath\":\"watch/dbf6fc9d3e144abe9c824a0f4642c108/native-template.xml\",\"sha256\":\"d710c6b85dd5c94cc27d7eb7edc24f5ac188ec5bdbaccdae5998acf5b697c09d\"},{\"relativePath\":\"watch-source-captures/instance-36bf2501a6514ee3ac8f2f1745d71399/fb.xml\",\"sha256\":\"e572e89ec0f6b4c68b61551c77f3325f8e80111943a841add6fbc6d1793f081b\"},{\"relativePath\":\"watch-source-captures/instance-36bf2501a6514ee3ac8f2f1745d71399/instance.xml\",\"sha256\":\"b3c636df9737f7506aa2cec3bb1e99c5879f4769eb35ea0a2eadd735253a6bad\"},{\"relativePath\":\"watch-observations/w_9dd36bc279bf/absent.txt\",\"sha256\":\"de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59\"},{\"relativePath\":\"watch-observations/w_9dd36bc279bf/snapshot.json\",\"sha256\":\"8180981be6e563b34c68ac3b309358d281d49d7f9301ae769fe7d01c6face0ab\"}],\"requiredProbes\":[\"offline\",\"watchImport\"],\"requiredGates\":[\"readback\",\"preservation\",\"saved\",\"freshReopen\"]},\"previousSha256\":\"b035b54f03b903ebcce844e9142b7ecc3d0278c033326c34970072b2a85cc545\",\"recordedAt\":\"2026-10-16T09:25:21.1936415+00:00\",\"checkpoints\":[{\"relativePath\":\"watch/dbf6fc9d3e144abe9c824a0f4642c108/watch-671cbfd99b1a.zap21\",\"sha256\":\"0be94b0a13cef013f9ab90bdb4a240bc594624113834b1ffd3bb420720d666ac\"}],\"evidence\":[{\"gate\":\"dispatch.readback\",\"artifact\":{\"relativePath\":\"watch/dbf6fc9d3e144abe9c824a0f4642c108/applied.json\",\"sha256\":\"65eb99144b6333221be51b34e058a8819aa5d3dca6079bf6293a6a750ffaf1b7\"}},{\"gate\":\"readback\",\"artifact\":{\"relativePath\":\"watch/dbf6fc9d3e144abe9c824a0f4642c108/fresh-reopen-14b8696fa2c74189a5ebd0957bc66002.json\",\"sha256\":\"451d4089c3912e31a8a2f779477668f73545393124f395414995e3f5478f70f7\"}},{\"gate\":\"preservation\",\"artifact\":{\"relativePath\":\"watch/dbf6fc9d3e144abe9c824a0f4642c108/fresh-reopen-14b8696fa2c74189a5ebd0957bc66002.json\",\"sha256\":\"451d4089c3912e31a8a2f779477668f73545393124f395414995e3f5478f70f7\"}},{\"gate\":\"saved\",\"artifact\":{\"relativePath\":\"watch/dbf6fc9d3e144abe9c824a0f4642c108/fresh-reopen-14b8696fa2c74189a5ebd0957bc66002.json\",\"sha256\":\"451d4089c3912e31a8a2f779477668f73545393124f395414995e3f5478f70f7\"}},{\"gate\":\"freshReopen\",\"artifact\":{\"relativePath\":\"watch/dbf6fc9d3e144abe9c824a0f4642c108/fresh-reopen-14b8696fa2c74189a5ebd0957bc66002.json\",\"sha256\":\"451d4089c3912e31a8a2f779477668f73545393124f395414995e3f5478f70f7\"}},{\"gate\":\"recovery.retrieve\",\"artifact\":{\"relativePath\":\"watch/dbf6fc9d3e144abe9c824a0f4642c108/recovered.json\",\"sha256\":\"910170a971f80947e913ed262c4cfee04c5b44730e1d16ebd61d422ef7617e71\"}}],\"reconciliation\":[],\"recoveryDestinations\":[{\"resourceKey\":\"project:D:\\\\TIAW\\\\WE1602\\\\SCRATCH\\\\TIAMCPSCRATCH_20261016_092205_92409B23\\\\TIAMCPSCRATCH_20261016_092205_92409B23\\\\TIAMCPSCRATCH_20261016_092205_92409B23.AP21\",\"recoveryLocation\":\"D:\\\\TIAW\\\\we1602\\\\r_e2e01728b8\"}],\"recoveryResolutions\":[]},\"recovered\":{\"project\":{\"name\":\"TiaMcpScratch_20261016_092205_92409b23\",\"path\":\"D:\\\\TIAW\\\\we1602\\\\r_e2e01728b8\\\\TiaMcpScratch_20261016_092205_92409b23\\\\TiaMcpScratch_20261016_092205_92409b23.ap21\"},\"destination\":\"D:\\\\TIAW\\\\we1602\\\\r_e2e01728b8\",\"processId\":6892,\"sessionEpoch\":\"e775d264c4434058ab30477eb4e77b17\"},\"restored\":{\"observation\":{\"reference\":{\"object\":{\"projectPath\":\"D:\\\\TIAW\\\\we1602\\\\r_e2e01728b8\\\\TiaMcpScratch_20261016_092205_92409b23\\\\TiaMcpScratch_20261016_092205_92409b23.ap21\",\"plcPath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC\",\"scopePath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC\",\"objectPath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/watch/root/WT05_BoolCreation\",\"kind\":\"watchTable\"},\"snapshot\":{\"observationId\":\"e4a3aa6b4c4c4883b4f11d41f3e8a203\",\"sourceSha256\":\"90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a\",\"tiaVersion\":21},\"contentSha256\":\"de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59\"},\"projectFilePath\":\"D:\\\\TIAW\\\\we1602\\\\r_e2e01728b8\\\\TiaMcpScratch_20261016_092205_92409b23\\\\TiaMcpScratch_20261016_092205_92409b23.ap21\",\"sessionEpoch\":\"e775d264c4434058ab30477eb4e77b17\",\"adapterSha256\":\"f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157\",\"profileSha256\":\"f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f\",\"hardwareIdentity\":\"OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||\",\"nativeIdentity\":null,\"offline\":true,\"probes\":[{\"name\":\"offline\",\"state\":\"observed\",\"evidenceSha256\":\"90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a\"},{\"name\":\"watchImport\",\"state\":\"observed\",\"evidenceSha256\":\"f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f\"}]},\"target\":{\"kind\":\"watch\",\"exists\":false,\"group\":\"root\",\"name\":\"WT05_BoolCreation\",\"artifact\":{\"path\":\"D:\\\\TIAW\\\\we1602\\\\watch-observations\\\\w_2024332c0527\\\\absent.txt\",\"bytes\":44,\"sha256\":\"de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59\",\"mediaType\":\"application/xml\"},\"semanticSha256\":\"de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59\",\"isConsistent\":true,\"rows\":[]},\"tables\":[{\"kind\":\"force\",\"group\":\"root\",\"name\":\"Force table\",\"artifact\":{\"path\":\"D:\\\\TIAW\\\\we1602\\\\watch-observations\\\\w_2024332c0527\\\\force-0.xml\",\"bytes\":2219,\"sha256\":\"d2d1f8cb44691d9e40181e4b1a6df1bdc61af65891c8f42f7d84a38105b6efd5\",\"mediaType\":\"application/xml\"},\"semanticSha256\":\"5d1c654e89ebb79ac649da01736e1657bdc099e6537ea08951f4d35ec113a64b\"}],\"peers\":{\"force:root/Force table\":\"5d1c654e89ebb79ac649da01736e1657bdc099e6537ea08951f4d35ec113a64b\",\"group:root\":\"Beobachtungs- und Forcetabellen\",\"block:/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_IsEnabled\":\"075583563f8563e498840bfd4def288109ca7ea4923a8f83510c367d9d818c0e\",\"block:/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate\":\"18a064eb13d466bd4a39caeb967efbf2b491fc9d49d582d49e7ccea5756d4b84\",\"block:/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB\":\"1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b\",\"block:/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/Main\":\"7fa3474795e4b152817835e66ee5191677439d11183a013b5fd37cf8bc189ea9\",\"tags:/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/Standard-Variablentabelle\":\"5bad612873f09039c42de0f0e8e81fc88146548d1c404d3b85896defa8a274b6\",\"hardware\":[{\"path\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/Profilschiene_0\",\"name\":\"Profilschiene_0\",\"typeIdentifier\":\"OrderNumber:6ES7 590-1***0-0AA0\",\"positionNumber\":0,\"containerPath\":null,\"attributes\":{\"Author\":\"nschuermann\",\"Comment\":\"\",\"Name\":\"Profilschiene_0\"},\"channels\":[],\"addresses\":[]},{\"path\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC\",\"name\":\"ScratchPLC\",\"typeIdentifier\":\"OrderNumber:6ES7 511-1AL03-0AB0/V4.1\",\"positionNumber\":1,\"containerPath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/Profilschiene_0\",\"attributes\":{\"AdditionalInformation\":\"\",\"Author\":\"nschuermann\",\"Comment\":\"\",\"LocationIdentifier\":\"\",\"Name\":\"ScratchPLC\",\"PlantDesignation\":\"\"},\"channels\":[],\"addresses\":[]},{\"path\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/CPU-Display_1\",\"name\":\"CPU-Display_1\",\"typeIdentifier\":null,\"positionNumber\":3,\"containerPath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC\",\"attributes\":{\"Name\":\"CPU-Display_1\"},\"channels\":[],\"addresses\":[]},{\"path\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/Kartenleser%2F-schreiber_1\",\"name\":\"Kartenleser/-schreiber_1\",\"typeIdentifier\":null,\"positionNumber\":4,\"containerPath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC\",\"attributes\":{\"Name\":\"Kartenleser/-schreiber_1\"},\"channels\":[],\"addresses\":[]},{\"path\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/OPC%20UA_1\",\"name\":\"OPC UA_1\",\"typeIdentifier\":null,\"positionNumber\":254,\"containerPath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC\",\"attributes\":{\"Name\":\"OPC UA_1\"},\"channels\":[],\"addresses\":[]},{\"path\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1\",\"name\":\"PROFINET-Schnittstelle_1\",\"typeIdentifier\":null,\"positionNumber\":32768,\"containerPath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC\",\"attributes\":{\"Author\":\"nschuermann\",\"Comment\":\"\",\"Name\":\"PROFINET-Schnittstelle_1\"},\"channels\":[],\"addresses\":[],\"network\":{\"nodes\":[{\"name\":\"X1\",\"type\":\"Ethernet\",\"subnet\":null,\"attributes\":{\"Address\":\"192.168.0.1\",\"IpProtocolSelection\":\"Project\",\"PnDeviceName\":\"scratchplc.profinet-schnittstelle_1\",\"PnDeviceNameAutoGeneration\":true,\"PnDeviceNameSetDirectly\":false,\"SubnetMask\":\"255.255.255.0\",\"UseIpProtocol\":true,\"UseRouter\":false}}],\"controllers\":[{\"index\":0,\"system\":{\"state\":\"notAssigned\"}}],\"connectors\":[]}},{\"path\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1/items/Port_1\",\"name\":\"Port_1\",\"typeIdentifier\":null,\"positionNumber\":32769,\"containerPath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1\",\"attributes\":{\"Author\":\"nschuermann\",\"Comment\":\"\",\"Name\":\"Port_1\"},\"channels\":[],\"addresses\":[]},{\"path\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1/items/Port_2\",\"name\":\"Port_2\",\"typeIdentifier\":null,\"positionNumber\":32770,\"containerPath\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1\",\"attributes\":{\"Author\":\"nschuermann\",\"Comment\":\"\",\"Name\":\"Port_2\"},\"channels\":[],\"addresses\":[]}],\"languages\":{\"active\":[\"de-DE\"],\"reference\":\"de-DE\",\"editing\":\"de-DE\"},\"access\":[{\"owner\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/Profilschiene_0\",\"available\":false,\"watch\":null,\"force\":null},{\"owner\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC\",\"available\":true,\"watch\":[],\"force\":[]},{\"owner\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/Kartenleser%2F-schreiber_1\",\"available\":false,\"watch\":null,\"force\":null},{\"owner\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/CPU-Display_1\",\"available\":true,\"watch\":[],\"force\":[]},{\"owner\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/OPC%20UA_1\",\"available\":false,\"watch\":null,\"force\":null},{\"owner\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1\",\"available\":false,\"watch\":null,\"force\":null},{\"owner\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1/items/Port_1\",\"available\":false,\"watch\":null,\"force\":null},{\"owner\":\"/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1/items/Port_2\",\"available\":false,\"watch\":null,\"force\":null}]},\"peerSha256\":\"53ca9816c8feaeac51db511bb1fcf768df38d02047cb4326171b7221be0d46b1\",\"projectModified\":false,\"project\":{\"name\":\"TiaMcpScratch_20261016_092205_92409b23\",\"path\":\"D:\\\\TIAW\\\\we1602\\\\r_e2e01728b8\\\\TiaMcpScratch_20261016_092205_92409b23\\\\TiaMcpScratch_20261016_092205_92409b23.ap21\"},\"processId\":6892,\"coverage\":\"All watch/force documents, exported blocks/types/tag tables, configured hardware, languages and exposed watch/force access assignments for this bounded fixture. Unexposed vendor data is not claimed.\",\"receipt\":{\"path\":\"D:\\\\TIAW\\\\we1602\\\\watch-observations\\\\w_2024332c0527\\\\snapshot.json\",\"bytes\":11892,\"sha256\":\"980abb2f43733fe39f5a6a041c404309e35bda1eb17794670c2f08012ef1ec23\",\"mediaType\":\"application/xml\"}},\"evidence\":{\"relativePath\":\"watch/dbf6fc9d3e144abe9c824a0f4642c108/recovered.json\",\"sha256\":\"910170a971f80947e913ed262c4cfee04c5b44730e1d16ebd61d422ef7617e71\"},\"next\":\"Reconcile original and freshly reopened recovery through watch_reconcile_recovery.\"}"
+    }
+  ],
+  "structuredContent": {
+    "operation": {
+      "id": "a4cad60758c9452999d028bd72d15d51",
+      "revision": 8,
+      "state": "recoveryIntent",
+      "idempotencyKey": "wt05-create-bool",
+      "planSha256": "86cdbb36f22f5830108dce2c29e6f55021e46f06d8d90a83bd2830b624c2d196",
+      "plan": {
+        "operation": "watchAuthoring",
+        "target": {
+          "reference": {
+            "object": {
+              "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+              "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/watch/root/WT05_BoolCreation",
+              "kind": "watchTable"
+            },
+            "snapshot": {
+              "observationId": "9455aec4215c4e9b8877cc1a6b2edddf",
+              "sourceSha256": "90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a",
+              "tiaVersion": 21
+            },
+            "contentSha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59"
+          },
+          "projectFilePath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+          "sessionEpoch": "0b44e985dc2b4bdab175108fa73c3c99",
+          "adapterSha256": "f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157",
+          "profileSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f",
+          "hardwareIdentity": "OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||",
+          "nativeIdentity": null,
+          "offline": true,
+          "probes": [
+            {
+              "name": "offline",
+              "state": "observed",
+              "evidenceSha256": "90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a"
+            },
+            {
+              "name": "watchImport",
+              "state": "observed",
+              "evidenceSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f"
+            }
+          ]
+        },
+        "resources": [
+          {
+            "resourceKey": "project:D:\\TIAW\\WE1602\\SCRATCH\\TIAMCPSCRATCH_20261016_092205_92409B23\\TIAMCPSCRATCH_20261016_092205_92409B23\\TIAMCPSCRATCH_20261016_092205_92409B23.AP21",
+            "kind": "project",
+            "effect": "reviewedWatchAuthoring:create",
+            "recoveryStrategy": "projectArchiveToNewLocation"
+          }
+        ],
+        "inputs": [
+          {
+            "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/review.json",
+            "sha256": "55c75112e467e7b230dc0fb5200708a94dd5342ec8f787e876420a8a4bb21370"
+          },
+          {
+            "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/reviewed.xml",
+            "sha256": "1b052ec8af495a2397abb347654ff478d105059312d3a6d11357a67716dc1cba"
+          },
+          {
+            "relativePath": "watch-generations/bcd5da4d2a2a448c8e0ef868e976960e.json",
+            "sha256": "52208bf9febbf1657432213549b6e4c183ce278dd1caf4f959bb3870f4488cba"
+          },
+          {
+            "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/native-template.xml",
+            "sha256": "d710c6b85dd5c94cc27d7eb7edc24f5ac188ec5bdbaccdae5998acf5b697c09d"
+          },
+          {
+            "relativePath": "watch-source-captures/instance-36bf2501a6514ee3ac8f2f1745d71399/fb.xml",
+            "sha256": "e572e89ec0f6b4c68b61551c77f3325f8e80111943a841add6fbc6d1793f081b"
+          },
+          {
+            "relativePath": "watch-source-captures/instance-36bf2501a6514ee3ac8f2f1745d71399/instance.xml",
+            "sha256": "b3c636df9737f7506aa2cec3bb1e99c5879f4769eb35ea0a2eadd735253a6bad"
+          },
+          {
+            "relativePath": "watch-observations/w_9dd36bc279bf/absent.txt",
+            "sha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59"
+          },
+          {
+            "relativePath": "watch-observations/w_9dd36bc279bf/snapshot.json",
+            "sha256": "8180981be6e563b34c68ac3b309358d281d49d7f9301ae769fe7d01c6face0ab"
+          }
+        ],
+        "requiredProbes": [
+          "offline",
+          "watchImport"
+        ],
+        "requiredGates": [
+          "readback",
+          "preservation",
+          "saved",
+          "freshReopen"
+        ]
+      },
+      "previousSha256": "b035b54f03b903ebcce844e9142b7ecc3d0278c033326c34970072b2a85cc545",
+      "recordedAt": "2026-10-16T09:25:21.1936415+00:00",
+      "checkpoints": [
+        {
+          "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/watch-671cbfd99b1a.zap21",
+          "sha256": "0be94b0a13cef013f9ab90bdb4a240bc594624113834b1ffd3bb420720d666ac"
+        }
+      ],
+      "evidence": [
+        {
+          "gate": "dispatch.readback",
+          "artifact": {
+            "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/applied.json",
+            "sha256": "65eb99144b6333221be51b34e058a8819aa5d3dca6079bf6293a6a750ffaf1b7"
+          }
+        },
+        {
+          "gate": "readback",
+          "artifact": {
+            "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/fresh-reopen-14b8696fa2c74189a5ebd0957bc66002.json",
+            "sha256": "451d4089c3912e31a8a2f779477668f73545393124f395414995e3f5478f70f7"
+          }
+        },
+        {
+          "gate": "preservation",
+          "artifact": {
+            "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/fresh-reopen-14b8696fa2c74189a5ebd0957bc66002.json",
+            "sha256": "451d4089c3912e31a8a2f779477668f73545393124f395414995e3f5478f70f7"
+          }
+        },
+        {
+          "gate": "saved",
+          "artifact": {
+            "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/fresh-reopen-14b8696fa2c74189a5ebd0957bc66002.json",
+            "sha256": "451d4089c3912e31a8a2f779477668f73545393124f395414995e3f5478f70f7"
+          }
+        },
+        {
+          "gate": "freshReopen",
+          "artifact": {
+            "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/fresh-reopen-14b8696fa2c74189a5ebd0957bc66002.json",
+            "sha256": "451d4089c3912e31a8a2f779477668f73545393124f395414995e3f5478f70f7"
+          }
+        },
+        {
+          "gate": "recovery.retrieve",
+          "artifact": {
+            "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/recovered.json",
+            "sha256": "910170a971f80947e913ed262c4cfee04c5b44730e1d16ebd61d422ef7617e71"
+          }
+        }
+      ],
+      "reconciliation": [],
+      "recoveryDestinations": [
+        {
+          "resourceKey": "project:D:\\TIAW\\WE1602\\SCRATCH\\TIAMCPSCRATCH_20261016_092205_92409B23\\TIAMCPSCRATCH_20261016_092205_92409B23\\TIAMCPSCRATCH_20261016_092205_92409B23.AP21",
+          "recoveryLocation": "D:\\TIAW\\we1602\\r_e2e01728b8"
+        }
+      ],
+      "recoveryResolutions": []
+    },
+    "recovered": {
+      "project": {
+        "name": "TiaMcpScratch_20261016_092205_92409b23",
+        "path": "D:\\TIAW\\we1602\\r_e2e01728b8\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21"
+      },
+      "destination": "D:\\TIAW\\we1602\\r_e2e01728b8",
+      "processId": 6892,
+      "sessionEpoch": "e775d264c4434058ab30477eb4e77b17"
+    },
+    "restored": {
+      "observation": {
+        "reference": {
+          "object": {
+            "projectPath": "D:\\TIAW\\we1602\\r_e2e01728b8\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+            "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/watch/root/WT05_BoolCreation",
+            "kind": "watchTable"
+          },
+          "snapshot": {
+            "observationId": "e4a3aa6b4c4c4883b4f11d41f3e8a203",
+            "sourceSha256": "90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a",
+            "tiaVersion": 21
+          },
+          "contentSha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59"
+        },
+        "projectFilePath": "D:\\TIAW\\we1602\\r_e2e01728b8\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+        "sessionEpoch": "e775d264c4434058ab30477eb4e77b17",
+        "adapterSha256": "f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157",
+        "profileSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f",
+        "hardwareIdentity": "OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||",
+        "nativeIdentity": null,
+        "offline": true,
+        "probes": [
+          {
+            "name": "offline",
+            "state": "observed",
+            "evidenceSha256": "90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a"
+          },
+          {
+            "name": "watchImport",
+            "state": "observed",
+            "evidenceSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f"
+          }
+        ]
+      },
+      "target": {
+        "kind": "watch",
+        "exists": false,
+        "group": "root",
+        "name": "WT05_BoolCreation",
+        "artifact": {
+          "path": "D:\\TIAW\\we1602\\watch-observations\\w_2024332c0527\\absent.txt",
+          "bytes": 44,
+          "sha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59",
+          "mediaType": "application/xml"
+        },
+        "semanticSha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59",
+        "isConsistent": true,
+        "rows": []
+      },
+      "tables": [
+        {
+          "kind": "force",
+          "group": "root",
+          "name": "Force table",
+          "artifact": {
+            "path": "D:\\TIAW\\we1602\\watch-observations\\w_2024332c0527\\force-0.xml",
+            "bytes": 2219,
+            "sha256": "d2d1f8cb44691d9e40181e4b1a6df1bdc61af65891c8f42f7d84a38105b6efd5",
+            "mediaType": "application/xml"
+          },
+          "semanticSha256": "5d1c654e89ebb79ac649da01736e1657bdc099e6537ea08951f4d35ec113a64b"
+        }
+      ],
+      "peers": {
+        "force:root/Force table": "5d1c654e89ebb79ac649da01736e1657bdc099e6537ea08951f4d35ec113a64b",
+        "group:root": "Beobachtungs- und Forcetabellen",
+        "block:/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_IsEnabled": "075583563f8563e498840bfd4def288109ca7ea4923a8f83510c367d9d818c0e",
+        "block:/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate": "18a064eb13d466bd4a39caeb967efbf2b491fc9d49d582d49e7ccea5756d4b84",
+        "block:/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB": "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b",
+        "block:/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/Main": "7fa3474795e4b152817835e66ee5191677439d11183a013b5fd37cf8bc189ea9",
+        "tags:/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/Standard-Variablentabelle": "5bad612873f09039c42de0f0e8e81fc88146548d1c404d3b85896defa8a274b6",
+        "hardware": [
+          {
+            "path": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/Profilschiene_0",
+            "name": "Profilschiene_0",
+            "typeIdentifier": "OrderNumber:6ES7 590-1***0-0AA0",
+            "positionNumber": 0,
+            "containerPath": null,
+            "attributes": {
+              "Author": "nschuermann",
+              "Comment": "",
+              "Name": "Profilschiene_0"
+            },
+            "channels": [],
+            "addresses": []
+          },
+          {
+            "path": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC",
+            "name": "ScratchPLC",
+            "typeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+            "positionNumber": 1,
+            "containerPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/Profilschiene_0",
+            "attributes": {
+              "AdditionalInformation": "",
+              "Author": "nschuermann",
+              "Comment": "",
+              "LocationIdentifier": "",
+              "Name": "ScratchPLC",
+              "PlantDesignation": ""
+            },
+            "channels": [],
+            "addresses": []
+          },
+          {
+            "path": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/CPU-Display_1",
+            "name": "CPU-Display_1",
+            "typeIdentifier": null,
+            "positionNumber": 3,
+            "containerPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC",
+            "attributes": {
+              "Name": "CPU-Display_1"
+            },
+            "channels": [],
+            "addresses": []
+          },
+          {
+            "path": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/Kartenleser%2F-schreiber_1",
+            "name": "Kartenleser/-schreiber_1",
+            "typeIdentifier": null,
+            "positionNumber": 4,
+            "containerPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC",
+            "attributes": {
+              "Name": "Kartenleser/-schreiber_1"
+            },
+            "channels": [],
+            "addresses": []
+          },
+          {
+            "path": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/OPC%20UA_1",
+            "name": "OPC UA_1",
+            "typeIdentifier": null,
+            "positionNumber": 254,
+            "containerPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC",
+            "attributes": {
+              "Name": "OPC UA_1"
+            },
+            "channels": [],
+            "addresses": []
+          },
+          {
+            "path": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1",
+            "name": "PROFINET-Schnittstelle_1",
+            "typeIdentifier": null,
+            "positionNumber": 32768,
+            "containerPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC",
+            "attributes": {
+              "Author": "nschuermann",
+              "Comment": "",
+              "Name": "PROFINET-Schnittstelle_1"
+            },
+            "channels": [],
+            "addresses": [],
+            "network": {
+              "nodes": [
+                {
+                  "name": "X1",
+                  "type": "Ethernet",
+                  "subnet": null,
+                  "attributes": {
+                    "Address": "192.168.0.1",
+                    "IpProtocolSelection": "Project",
+                    "PnDeviceName": "scratchplc.profinet-schnittstelle_1",
+                    "PnDeviceNameAutoGeneration": true,
+                    "PnDeviceNameSetDirectly": false,
+                    "SubnetMask": "255.255.255.0",
+                    "UseIpProtocol": true,
+                    "UseRouter": false
+                  }
+                }
+              ],
+              "controllers": [
+                {
+                  "index": 0,
+                  "system": {
+                    "state": "notAssigned"
+                  }
+                }
+              ],
+              "connectors": []
+            }
+          },
+          {
+            "path": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1/items/Port_1",
+            "name": "Port_1",
+            "typeIdentifier": null,
+            "positionNumber": 32769,
+            "containerPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1",
+            "attributes": {
+              "Author": "nschuermann",
+              "Comment": "",
+              "Name": "Port_1"
+            },
+            "channels": [],
+            "addresses": []
+          },
+          {
+            "path": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1/items/Port_2",
+            "name": "Port_2",
+            "typeIdentifier": null,
+            "positionNumber": 32770,
+            "containerPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1",
+            "attributes": {
+              "Author": "nschuermann",
+              "Comment": "",
+              "Name": "Port_2"
+            },
+            "channels": [],
+            "addresses": []
+          }
+        ],
+        "languages": {
+          "active": [
+            "de-DE"
+          ],
+          "reference": "de-DE",
+          "editing": "de-DE"
+        },
+        "access": [
+          {
+            "owner": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/Profilschiene_0",
+            "available": false,
+            "watch": null,
+            "force": null
+          },
+          {
+            "owner": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC",
+            "available": true,
+            "watch": [],
+            "force": []
+          },
+          {
+            "owner": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/Kartenleser%2F-schreiber_1",
+            "available": false,
+            "watch": null,
+            "force": null
+          },
+          {
+            "owner": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/CPU-Display_1",
+            "available": true,
+            "watch": [],
+            "force": []
+          },
+          {
+            "owner": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/OPC%20UA_1",
+            "available": false,
+            "watch": null,
+            "force": null
+          },
+          {
+            "owner": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1",
+            "available": false,
+            "watch": null,
+            "force": null
+          },
+          {
+            "owner": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1/items/Port_1",
+            "available": false,
+            "watch": null,
+            "force": null
+          },
+          {
+            "owner": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1/items/Port_2",
+            "available": false,
+            "watch": null,
+            "force": null
+          }
+        ]
+      },
+      "peerSha256": "53ca9816c8feaeac51db511bb1fcf768df38d02047cb4326171b7221be0d46b1",
+      "projectModified": false,
+      "project": {
+        "name": "TiaMcpScratch_20261016_092205_92409b23",
+        "path": "D:\\TIAW\\we1602\\r_e2e01728b8\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21"
+      },
+      "processId": 6892,
+      "coverage": "All watch/force documents, exported blocks/types/tag tables, configured hardware, languages and exposed watch/force access assignments for this bounded fixture. Unexposed vendor data is not claimed.",
+      "receipt": {
+        "path": "D:\\TIAW\\we1602\\watch-observations\\w_2024332c0527\\snapshot.json",
+        "bytes": 11892,
+        "sha256": "980abb2f43733fe39f5a6a041c404309e35bda1eb17794670c2f08012ef1ec23",
+        "mediaType": "application/xml"
+      }
+    },
+    "evidence": {
+      "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/recovered.json",
+      "sha256": "910170a971f80947e913ed262c4cfee04c5b44730e1d16ebd61d422ef7617e71"
+    },
+    "next": "Reconcile original and freshly reopened recovery through watch_reconcile_recovery."
+  },
+  "isError": false
+}

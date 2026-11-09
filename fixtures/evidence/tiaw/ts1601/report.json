@@ -1,0 +1,1060 @@
+{
+  "completed": false,
+  "nativeExecutionInvoked": false,
+  "scopeQualified": false,
+  "automaticReplay": false,
+  "steps": [
+    {
+      "name": "tia_discover",
+      "result": {
+        "origin": "TIA Portal V21 Openness/offline",
+        "observedAtUtc": "2026-10-16T06:52:45.6352902Z",
+        "processId": null,
+        "processes": [
+          {
+            "processId": 31240,
+            "mode": "WithUserInterface",
+            "executablePath": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+            "projectPath": "D:\\01_Projekte\\2026\\200756_FelixSchoeller\\200756_FelixSchoeller_Bausteine_V00\\200756_FelixSchoeller_Bausteine.ap21"
+          }
+        ]
+      }
+    },
+    {
+      "name": "tia_start",
+      "result": {
+        "origin": "TIA Portal V21 Openness/offline",
+        "observedAtUtc": "2026-10-16T06:54:44.4148312Z",
+        "processId": 28936,
+        "attached": true,
+        "ownsPortalProcess": true,
+        "disconnectBehavior": "Dispose this connection and publicly close its exact worker-created scope-probe UI process. The qualification controller must independently verify its exit through the original retained handle.",
+        "projects": [],
+        "capabilities": [
+          {
+            "name": "discover",
+            "status": "conditional",
+            "reason": "Installed V21 Openness; discovery depends on current Windows session and Openness access."
+          },
+          {
+            "name": "attach",
+            "status": "conditional",
+            "reason": "Requires an accessible V21 process and Openness authorization; attaches without opening or closing its projects."
+          },
+          {
+            "name": "project_inventory",
+            "status": "conditional",
+            "reason": "Bounded offline device/address and block inventory including exposed software/safety units and generated system groups. Detailed inspection is provided by separate tools."
+          },
+          {
+            "name": "project_index",
+            "status": "conditional",
+            "reason": "Bounded immutable metadata snapshots with authenticated pagination; external edits require explicit metadata verification, not a whole-project or logic revision."
+          },
+          {
+            "name": "project_model",
+            "status": "conditional",
+            "reason": "Read-only versioned native hierarchy, bounded cached child/search queries, exact snapshot references, separately observed inspection/relationship evidence and portable JSON exports. Metadata does not certify content; hardware composition does not prove physical topology."
+          },
+          {
+            "name": "block_read",
+            "status": "conditional",
+            "reason": "Native SimaticML XML export for eligible blocks; protected, inconsistent and F-system blocks can reject export."
+          },
+          {
+            "name": "xref_query",
+            "status": "conditional",
+            "reason": "Native CrossReferenceService on the selected block or PLC; bounded result flattening with native locations."
+          },
+          {
+            "name": "start",
+            "status": "conditional",
+            "reason": "Explicitly starts a worker-owned TIA instance without UI; disposal requests connection release. Siemens closes the instance when no other Openness client remains."
+          },
+          {
+            "name": "catalog_query",
+            "status": "conditional",
+            "reason": "Queries the installed hardware catalog of the attached V21 instance; an open project is required."
+          },
+          {
+            "name": "scratch_create",
+            "status": "conditional",
+            "reason": "Only a worker-owned empty TIA instance can create a uniquely named scratch project, one catalog-verified CPU and fixed SCL fixtures."
+          },
+          {
+            "name": "project_open",
+            "status": "conditional",
+            "reason": "Existing .ap21 files can be opened in an empty worker-owned instance; no automatic upgrade."
+          },
+          {
+            "name": "software_inspect",
+            "status": "conditional",
+            "reason": "Tags/constants, types, software/safety units, block/DB interfaces and TO parameters via exposed services and native XML."
+          },
+          {
+            "name": "hardware_inspect",
+            "status": "conditional",
+            "reason": "Offline hardware attributes, configured address ranges, network and exposed channel metadata; coverage varies by module."
+          },
+          {
+            "name": "static_analysis",
+            "status": "conditional",
+            "reason": "Native cross-reference call graphs, readers/writers, I/O associations and change impact. Indirect access and unresolved instance propagation remain explicit gaps."
+          },
+          {
+            "name": "recoverable_changes",
+            "status": "conditional",
+            "reason": "Prepare/apply with preview hashes, conflict detection, recovery archive, persistent journal and compile results. Supported source/XML and typed engineering subsets only."
+          },
+          {
+            "name": "library_management",
+            "status": "conditional",
+            "reason": "Managed global/project libraries, exact native type/version inspection, native copies, constrained authoring/update operations and durable resource journals. HMI products and native target qualification remain separate prerequisites."
+          },
+          {
+            "name": "safety_engineering",
+            "status": "conditional",
+            "reason": "Exposed safety metadata/signatures and dedicated eligible F-block XML import. Protection is respected; safety acceptance/commissioning is outside this workflow."
+          },
+          {
+            "name": "simulation_download",
+            "status": "conditional",
+            "reason": "Offline memory-card generation for an independently verified owned PLCSIM Advanced V8 instance; no physical PLC download route."
+          },
+          {
+            "name": "simulation_provision_scratch_credential",
+            "status": "conditional",
+            "reason": "Existing generated scratch credential provisioning only for a ticket-bound owned local PLCSIM instance over isolated Softbus; runtime qualification is separate."
+          },
+          {
+            "name": "runtime_values",
+            "status": "conditional",
+            "reason": "Separate PLCSIM Advanced V8 adapter provides typed values and bounded test scenarios; installed runtime license and compatible CPU/program are required."
+          },
+          {
+            "name": "physical_plc",
+            "status": "unsupported",
+            "reason": "No physical PLC runtime writes, forces, downloads or CPU state changes are exposed."
+          }
+        ]
+      }
+    },
+    {
+      "name": "tia_create_scratch",
+      "result": {
+        "origin": "TIA Portal V21 Openness/offline",
+        "observedAtUtc": "2026-10-16T06:54:46.2992220Z",
+        "processId": 28936,
+        "artifactDirectory": "D:\\TIAW\\ts1601\\h\\scratch\\TiaMcpScratch_20261016_065446_d49378f1",
+        "stages": [
+          "project_created",
+          "cpu_catalog_verified",
+          "device_created",
+          "new_scratch_cpu_security_configured",
+          "scl_blocks_generated",
+          "software_compiled",
+          "project_saved",
+          "blocks_exported"
+        ],
+        "selectedCpu": {
+          "typeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+          "typeName": "CPU 1511-1 PN",
+          "articleNumber": "6ES7 511-1AL03-0AB0",
+          "version": "V4.1",
+          "selection": "Installed standard CPU 1511-1 PN; newest available firmware across matching articles, with article number as deterministic tie-break."
+        },
+        "scratchSecurity": {
+          "cpus": [
+            {
+              "cpuName": "ScratchPLC",
+              "configuration": "WithPassword",
+              "credentialMetadataPath": "D:\\TIAW\\ts1601\\h\\scratch\\TiaMcpScratch_20261016_065446_d49378f1\\scratch-credentials\\77fa5552d3f64b8d8007bbeef16a5cf3.json",
+              "credentialStorage": "Windows DPAPI CurrentUser",
+              "secretReturned": false,
+              "runtimeUser": {
+                "format": "Windows DPAPI CurrentUser",
+                "credentialId": "a38ed7e22d3e4c91b0779b19d596e2db",
+                "purpose": "Generated password for one new isolated scratch CPU runtime user",
+                "projectPath": "D:\\TIAW\\ts1601\\h\\scratch\\TiaMcpScratch_20261016_065446_d49378f1\\TiaMcpScratch_20261016_065446_d49378f1\\TiaMcpScratch_20261016_065446_d49378f1.ap21",
+                "deviceName": "ScratchStation",
+                "cpuName": "ScratchPLC",
+                "username": "TiaMcpTest_f3fbebb65c63",
+                "roleName": "TiaMcpRuntime_f3fbebb65c63",
+                "functionRightIdentifier": "ProtectionLevelFullAccess",
+                "functionRightName": "Vollzugriff",
+                "protectedPath": "D:\\TIAW\\ts1601\\h\\scratch\\TiaMcpScratch_20261016_065446_d49378f1\\scratch-credentials\\a38ed7e22d3e4c91b0779b19d596e2db.dpapi",
+                "state": "configured",
+                "anonymousAccessChanged": false,
+                "existingProtectionDisabled": false,
+                "secretReturned": false,
+                "roleIdentifier": "TiaMcpRuntime_f3fbebb65c63",
+                "isActive": true,
+                "authenticationType": "Password",
+                "credentialMetadataPath": "D:\\TIAW\\ts1601\\h\\scratch\\TiaMcpScratch_20261016_065446_d49378f1\\scratch-credentials\\a38ed7e22d3e4c91b0779b19d596e2db.json",
+                "supported": true
+              }
+            }
+          ],
+          "scope": "Only newly created CPUs in the current worker-owned scratch project",
+          "existingProtectionDisabled": false
+        },
+        "compile": {
+          "state": "Success",
+          "errorCount": 0,
+          "warningCount": 0,
+          "messages": [
+            {
+              "description": "",
+              "path": "ScratchPLC",
+              "state": "Success",
+              "depth": 0
+            },
+            {
+              "description": "",
+              "path": "Program blocks",
+              "state": "Success",
+              "depth": 1
+            },
+            {
+              "description": "Block was successfully compiled.",
+              "path": "Main (OB1)",
+              "state": "Success",
+              "depth": 2
+            },
+            {
+              "description": "Block was successfully compiled.",
+              "path": "TiaMcp_EnableGate (FB1)",
+              "state": "Success",
+              "depth": 2
+            },
+            {
+              "description": "Block was successfully compiled.",
+              "path": "TiaMcp_IsEnabled (FC1)",
+              "state": "Success",
+              "depth": 2
+            },
+            {
+              "description": "Compiling finished (errors: 0; warnings: 0)",
+              "path": null,
+              "state": "Success",
+              "depth": 0
+            }
+          ],
+          "messagesTruncated": false
+        },
+        "exports": [
+          {
+            "block": {
+              "path": "/projects/TiaMcpScratch_20261016_065446_d49378f1/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_IsEnabled",
+              "plcPath": "/projects/TiaMcpScratch_20261016_065446_d49378f1/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "name": "TiaMcp_IsEnabled",
+              "number": 1,
+              "kind": "FC",
+              "programmingLanguage": "SCL",
+              "isConsistent": true,
+              "isKnowHowProtected": false
+            },
+            "artifact": {
+              "path": "D:\\TIAW\\ts1601\\h\\scratch\\TiaMcpScratch_20261016_065446_d49378f1\\block-d7be97b5d97d490a8b1e8ff85b61580c.xml",
+              "bytes": 5835,
+              "sha256": "accbe6529e477991ee04c7c7a3bd7b24c315c5ed7a2e9fcd32494b6aac4e1dc0",
+              "mediaType": "application/xml"
+            }
+          },
+          {
+            "block": {
+              "path": "/projects/TiaMcpScratch_20261016_065446_d49378f1/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate",
+              "plcPath": "/projects/TiaMcpScratch_20261016_065446_d49378f1/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "name": "TiaMcp_EnableGate",
+              "number": 1,
+              "kind": "FB",
+              "programmingLanguage": "SCL",
+              "isConsistent": true,
+              "isKnowHowProtected": false
+            },
+            "artifact": {
+              "path": "D:\\TIAW\\ts1601\\h\\scratch\\TiaMcpScratch_20261016_065446_d49378f1\\block-9ea7e594aec54caaa9c8e9515b99fe35.xml",
+              "bytes": 7433,
+              "sha256": "42f9c22ca0bc52d50b2f16543b14712437de489e46d464eebb99aaf73b587500",
+              "mediaType": "application/xml"
+            }
+          },
+          {
+            "block": {
+              "path": "/projects/TiaMcpScratch_20261016_065446_d49378f1/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+              "plcPath": "/projects/TiaMcpScratch_20261016_065446_d49378f1/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "name": "TiaMcp_EnableGate_DB",
+              "number": 1,
+              "kind": "InstanceDB",
+              "programmingLanguage": "DB",
+              "isConsistent": true,
+              "isKnowHowProtected": false
+            },
+            "artifact": {
+              "path": "D:\\TIAW\\ts1601\\h\\scratch\\TiaMcpScratch_20261016_065446_d49378f1\\block-2a9bed7d806d4f27a56d564c6d5c1733.xml",
+              "bytes": 4740,
+              "sha256": "4087d5e0d5706949a5fa32988e55dc46ad439de9141b69d3a946e758fc68945d",
+              "mediaType": "application/xml"
+            }
+          },
+          {
+            "block": {
+              "path": "/projects/TiaMcpScratch_20261016_065446_d49378f1/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/Main",
+              "plcPath": "/projects/TiaMcpScratch_20261016_065446_d49378f1/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "name": "Main",
+              "number": 1,
+              "kind": "OB",
+              "programmingLanguage": "SCL",
+              "isConsistent": true,
+              "isKnowHowProtected": false
+            },
+            "artifact": {
+              "path": "D:\\TIAW\\ts1601\\h\\scratch\\TiaMcpScratch_20261016_065446_d49378f1\\block-1b179b98256849bbb19136f4107e8825.xml",
+              "bytes": 6545,
+              "sha256": "db961b5375196754a6cf24f78ff14fabb1b5bff5a42096205e20af350d77411a",
+              "mediaType": "application/xml"
+            }
+          }
+        ],
+        "exportScope": "Only the four fixed standard source fixtures; generated safety/system blocks are not exported.",
+        "completed": true,
+        "project": {
+          "name": "TiaMcpScratch_20261016_065446_d49378f1",
+          "path": "D:\\TIAW\\ts1601\\h\\scratch\\TiaMcpScratch_20261016_065446_d49378f1\\TiaMcpScratch_20261016_065446_d49378f1\\TiaMcpScratch_20261016_065446_d49378f1.ap21"
+        },
+        "attemptedCoverage": [
+          "One installed CPU",
+          "Fixed standard SCL FC, FB, instance DB and cyclic Main OB call",
+          "Software compile",
+          "Native block XML exports"
+        ],
+        "unverified": [
+          "KOP/LAD",
+          "FUP/FBD",
+          "AWL/STL",
+          "Safety",
+          "PLCSIM download and execution"
+        ]
+      }
+    },
+    {
+      "name": "qualification_testsuite_scope_probe",
+      "result": {
+        "projectPath": "D:\\TIAW\\ts1601\\h\\scratch\\TiaMcpScratch_20261016_065446_d49378f1\\TiaMcpScratch_20261016_065446_d49378f1\\TiaMcpScratch_20261016_065446_d49378f1.ap21",
+        "projectModified": false,
+        "productAssembly": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\PublicAPI\\V21\\net48\\Siemens.Engineering.TestSuite.dll",
+        "servicePresent": true,
+        "executionLicense": "unknown",
+        "completeEffectiveScope": false,
+        "nativeExecutionAuthorized": false,
+        "scopeReason": "No qualified complete effective-object readback or exhaustive proof profile. SetScope and diagnostic findings cannot establish coverage.",
+        "rules": [
+          {
+            "name": "TiaMcp_CasingAvailability",
+            "present": true,
+            "effectiveScopeComplete": false,
+            "attributes": [
+              {
+                "name": "Name",
+                "access": "ReadWrite"
+              }
+            ],
+            "compositions": [],
+            "invocations": [
+              {
+                "name": "CopyScope",
+                "parameters": 1
+              },
+              {
+                "name": "Delete",
+                "parameters": 0
+              },
+              {
+                "name": "SaveToFile",
+                "parameters": 1
+              },
+              {
+                "name": "SetScope",
+                "parameters": 2
+              },
+              {
+                "name": "ShowInEditor",
+                "parameters": 0
+              }
+            ],
+            "scopeRoutes": [],
+            "definitionPath": "D:\\TIAW\\ts1601\\h\\scope-probe\\4dcb3697973a481e854b773510f28f1a\\rule-1.xml"
+          }
+        ],
+        "styleExecutorPresent": true,
+        "inventory": [
+          {
+            "name": "Main",
+            "type": "Siemens.Engineering.SW.Blocks.OB",
+            "number": 1,
+            "programmingLanguage": "SCL"
+          },
+          {
+            "name": "TiaMcp_EnableGate",
+            "type": "Siemens.Engineering.SW.Blocks.FB",
+            "number": 1,
+            "programmingLanguage": "SCL"
+          },
+          {
+            "name": "TiaMcp_EnableGate_DB",
+            "type": "Siemens.Engineering.SW.Blocks.InstanceDB",
+            "number": 1,
+            "programmingLanguage": "DB"
+          },
+          {
+            "name": "TiaMcp_IsEnabled",
+            "type": "Siemens.Engineering.SW.Blocks.FC",
+            "number": 1,
+            "programmingLanguage": "SCL"
+          }
+        ],
+        "requestedScope": "ScratchPLC/Program blocks",
+        "styleExecutionInvoked": false,
+        "processId": 28936,
+        "sessionEpoch": "67c080c79dc245fcb68140615cbf6507",
+        "workerSha256": "48f066b2fe0fe3dd04f9d669f31a7fff577462e6e9c29172075287f09046d279",
+        "artifactDirectory": "D:\\TIAW\\ts1601\\h\\scope-probe\\4dcb3697973a481e854b773510f28f1a"
+      }
+    },
+    {
+      "name": "qualification_testsuite_scope_probe",
+      "result": {
+        "projectPath": "D:\\TIAW\\ts1601\\h\\scratch\\TiaMcpScratch_20261016_065446_d49378f1\\TiaMcpScratch_20261016_065446_d49378f1\\TiaMcpScratch_20261016_065446_d49378f1.ap21",
+        "projectModified": false,
+        "productAssembly": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\PublicAPI\\V21\\net48\\Siemens.Engineering.TestSuite.dll",
+        "servicePresent": true,
+        "executionLicense": "unknown",
+        "completeEffectiveScope": false,
+        "nativeExecutionAuthorized": false,
+        "scopeReason": "No qualified complete effective-object readback or exhaustive proof profile. SetScope and diagnostic findings cannot establish coverage.",
+        "rules": [
+          {
+            "name": "TiaMcp_CasingAvailability",
+            "present": true,
+            "effectiveScopeComplete": false,
+            "attributes": [
+              {
+                "name": "Name",
+                "access": "ReadWrite"
+              }
+            ],
+            "compositions": [],
+            "invocations": [
+              {
+                "name": "CopyScope",
+                "parameters": 1
+              },
+              {
+                "name": "Delete",
+                "parameters": 0
+              },
+              {
+                "name": "SaveToFile",
+                "parameters": 1
+              },
+              {
+                "name": "SetScope",
+                "parameters": 2
+              },
+              {
+                "name": "ShowInEditor",
+                "parameters": 0
+              }
+            ],
+            "scopeRoutes": [],
+            "definitionPath": "D:\\TIAW\\ts1601\\h\\scope-probe\\d8139d9945504a5a84926791d56fa0e2\\rule-1.xml"
+          }
+        ],
+        "styleExecutorPresent": true,
+        "inventory": [
+          {
+            "name": "Main",
+            "type": "Siemens.Engineering.SW.Blocks.OB",
+            "number": 1,
+            "programmingLanguage": "SCL"
+          },
+          {
+            "name": "TiaMcp_EnableGate",
+            "type": "Siemens.Engineering.SW.Blocks.FB",
+            "number": 1,
+            "programmingLanguage": "SCL"
+          },
+          {
+            "name": "TiaMcp_EnableGate_DB",
+            "type": "Siemens.Engineering.SW.Blocks.InstanceDB",
+            "number": 1,
+            "programmingLanguage": "DB"
+          },
+          {
+            "name": "TiaMcp_IsEnabled",
+            "type": "Siemens.Engineering.SW.Blocks.FC",
+            "number": 1,
+            "programmingLanguage": "SCL"
+          }
+        ],
+        "requestedScope": "ScratchPLC/Program blocks",
+        "styleExecutionInvoked": false,
+        "processId": 28936,
+        "sessionEpoch": "67c080c79dc245fcb68140615cbf6507",
+        "workerSha256": "48f066b2fe0fe3dd04f9d669f31a7fff577462e6e9c29172075287f09046d279",
+        "artifactDirectory": "D:\\TIAW\\ts1601\\h\\scope-probe\\d8139d9945504a5a84926791d56fa0e2"
+      }
+    },
+    {
+      "name": "tia_detach",
+      "result": {
+        "origin": "TIA Portal V21 Openness/offline",
+        "observedAtUtc": "2026-10-16T07:01:25.3042264Z",
+        "processId": null,
+        "attached": false,
+        "ownsPortalProcess": false,
+        "disconnectBehavior": "Dispose only this Openness attachment; the user-owned TIA instance remains open.",
+        "projects": [],
+        "capabilities": [
+          {
+            "name": "discover",
+            "status": "conditional",
+            "reason": "Installed V21 Openness; discovery depends on current Windows session and Openness access."
+          },
+          {
+            "name": "attach",
+            "status": "conditional",
+            "reason": "Requires an accessible V21 process and Openness authorization; attaches without opening or closing its projects."
+          },
+          {
+            "name": "project_inventory",
+            "status": "conditional",
+            "reason": "Bounded offline device/address and block inventory including exposed software/safety units and generated system groups. Detailed inspection is provided by separate tools."
+          },
+          {
+            "name": "project_index",
+            "status": "conditional",
+            "reason": "Bounded immutable metadata snapshots with authenticated pagination; external edits require explicit metadata verification, not a whole-project or logic revision."
+          },
+          {
+            "name": "project_model",
+            "status": "conditional",
+            "reason": "Read-only versioned native hierarchy, bounded cached child/search queries, exact snapshot references, separately observed inspection/relationship evidence and portable JSON exports. Metadata does not certify content; hardware composition does not prove physical topology."
+          },
+          {
+            "name": "block_read",
+            "status": "conditional",
+            "reason": "Native SimaticML XML export for eligible blocks; protected, inconsistent and F-system blocks can reject export."
+          },
+          {
+            "name": "xref_query",
+            "status": "conditional",
+            "reason": "Native CrossReferenceService on the selected block or PLC; bounded result flattening with native locations."
+          },
+          {
+            "name": "start",
+            "status": "conditional",
+            "reason": "Explicitly starts a worker-owned TIA instance without UI; disposal requests connection release. Siemens closes the instance when no other Openness client remains."
+          },
+          {
+            "name": "catalog_query",
+            "status": "conditional",
+            "reason": "Queries the installed hardware catalog of the attached V21 instance; an open project is required."
+          },
+          {
+            "name": "scratch_create",
+            "status": "conditional",
+            "reason": "Only a worker-owned empty TIA instance can create a uniquely named scratch project, one catalog-verified CPU and fixed SCL fixtures."
+          },
+          {
+            "name": "project_open",
+            "status": "conditional",
+            "reason": "Existing .ap21 files can be opened in an empty worker-owned instance; no automatic upgrade."
+          },
+          {
+            "name": "software_inspect",
+            "status": "conditional",
+            "reason": "Tags/constants, types, software/safety units, block/DB interfaces and TO parameters via exposed services and native XML."
+          },
+          {
+            "name": "hardware_inspect",
+            "status": "conditional",
+            "reason": "Offline hardware attributes, configured address ranges, network and exposed channel metadata; coverage varies by module."
+          },
+          {
+            "name": "static_analysis",
+            "status": "conditional",
+            "reason": "Native cross-reference call graphs, readers/writers, I/O associations and change impact. Indirect access and unresolved instance propagation remain explicit gaps."
+          },
+          {
+            "name": "recoverable_changes",
+            "status": "conditional",
+            "reason": "Prepare/apply with preview hashes, conflict detection, recovery archive, persistent journal and compile results. Supported source/XML and typed engineering subsets only."
+          },
+          {
+            "name": "library_management",
+            "status": "conditional",
+            "reason": "Managed global/project libraries, exact native type/version inspection, native copies, constrained authoring/update operations and durable resource journals. HMI products and native target qualification remain separate prerequisites."
+          },
+          {
+            "name": "safety_engineering",
+            "status": "conditional",
+            "reason": "Exposed safety metadata/signatures and dedicated eligible F-block XML import. Protection is respected; safety acceptance/commissioning is outside this workflow."
+          },
+          {
+            "name": "simulation_download",
+            "status": "conditional",
+            "reason": "Offline memory-card generation for an independently verified owned PLCSIM Advanced V8 instance; no physical PLC download route."
+          },
+          {
+            "name": "simulation_provision_scratch_credential",
+            "status": "conditional",
+            "reason": "Existing generated scratch credential provisioning only for a ticket-bound owned local PLCSIM instance over isolated Softbus; runtime qualification is separate."
+          },
+          {
+            "name": "runtime_values",
+            "status": "conditional",
+            "reason": "Separate PLCSIM Advanced V8 adapter provides typed values and bounded test scenarios; installed runtime license and compatible CPU/program are required."
+          },
+          {
+            "name": "physical_plc",
+            "status": "unsupported",
+            "reason": "No physical PLC runtime writes, forces, downloads or CPU state changes are exposed."
+          }
+        ],
+        "disposedOwnedPortalConnection": true,
+        "processExitVerified": false
+      }
+    },
+    {
+      "name": "tia_discover",
+      "result": {
+        "origin": "TIA Portal V21 Openness/offline",
+        "observedAtUtc": "2026-10-16T07:01:29.6603953Z",
+        "processId": null,
+        "processes": [
+          {
+            "processId": 31240,
+            "mode": "WithUserInterface",
+            "executablePath": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+            "projectPath": "D:\\01_Projekte\\2026\\200756_FelixSchoeller\\200756_FelixSchoeller_Bausteine_V00\\200756_FelixSchoeller_Bausteine.ap21"
+          },
+          {
+            "processId": 46480,
+            "mode": "WithoutUserInterface",
+            "executablePath": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+            "projectPath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\scratch\\TiaMcpScratch_20261016_065827_d9c19e50\\TiaMcpScratch_20261016_065827_d9c19e50\\TiaMcpScratch_20261016_065827_d9c19e50.ap21"
+          }
+        ]
+      }
+    }
+  ],
+  "sources": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_testsuite_scope_editor.py",
+      "sha256": "304372bbe015ff314a7df3583da222c987eca68fcdecfb3d6fab6bba1d12d9f3"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_exact_worker_startup.py",
+      "sha256": "f5863085945133b95178d6b78606f8b13a832713b54d67790b2fb1c0ded7e308"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\exact_qualification_client.py",
+      "sha256": "3adb95dfbf4aaac8a6761596bdeee2b9f5b4e4602a5d647cc6d9221ac07c379f"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\retained_native_lifecycle.py",
+      "sha256": "dff10491a60f497c7f0b96eac0d19f966390b0ea1269b5fb9d4b9f9c47a8c891"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_worker_startup_exact.py",
+      "sha256": "6455ee5f67c8936d25c9dd05edbb026d0698065429a50e9a2aae00bd6d8b88b8"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\smoke_mcp.py",
+      "sha256": "5d2764eb14caf49988f5f3e8cee8fd42bf8aad6eef9966506d48c1dbde6ef23b"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\block_test_process.py",
+      "sha256": "52eb1811eff1987ab37ca301c2ce53d626e4780c1dd5072bf986cd0bece83ad9"
+    }
+  ],
+  "packages": {
+    "host": [
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\Microsoft.Extensions.AI.Abstractions.dll",
+        "sha256": "bcc8f693103eb00505179f154b1b3a996b85d067e112facd724fd9d695f17a5e"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\ModelContextProtocol.Core.dll",
+        "sha256": "b1752096ea9d2f38ba88e467f04aea43fb300d9a54d881c165f62b69028ee3ab"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\ModelContextProtocol.dll",
+        "sha256": "8cd6f626c8d6a0a5ff3e154789d3fcde2b1d66a595c0ef0198e092c2c30fe93a"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Core.dll",
+        "sha256": "ed1cdddd9afd4a774ee1d059da13055d8a62c385f23ead6a437399c5d07b7f13"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Core.pdb",
+        "sha256": "bbf9e7463970e5a6008bd01156f20b9568322c6048548aff165c9b4b8a951edb"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.deps.json",
+        "sha256": "d5ef029c53a096ab6a91f9aab0844a7d051e979c840dedece48a69c994b27877"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.dll",
+        "sha256": "40e621218d3bee9d1d3099ad064c537af94ca64ef31f411e68a4b75ba1a84a3f"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.exe",
+        "sha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.pdb",
+        "sha256": "27c3f853a2712cd8d392380679455573604913d47bb9b0d2e61a5a94fb5ea878"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.runtimeconfig.json",
+        "sha256": "61a2a447a31667ca1fb9081bec4ffbeb230bb1813fadfa98ebc3a242ce38e36e"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Translations.dll",
+        "sha256": "6113c43c2e9d51b2a33eed8263e36a3faee059eb6b7743ee600affb457806455"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Translations.pdb",
+        "sha256": "04dcc370142d48a80c8908e485cc9ee1b4373d2ae596da38933f236d3c018e7e"
+      }
+    ],
+    "worker": [
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\Newtonsoft.Json.dll",
+        "sha256": "e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe",
+        "sha256": "48f066b2fe0fe3dd04f9d669f31a7fff577462e6e9c29172075287f09046d279"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe.config",
+        "sha256": "3a2be7a1bca2543035f80263898dc1a0a3a96bcf2f72834222b3a6a7bff13a39"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.pdb",
+        "sha256": "e617aaf5300b1ecdefc7054f5a13a81e9105cf3747c72ee6bb3a74c9f04ae0a5"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.TestSuite.V21.dll",
+        "sha256": "f5ec4f5ed3aa1ac2b577b96b28e60d3399b811f0966a00cbf5d3cc9dda5b53a1"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.TestSuite.V21.pdb",
+        "sha256": "4f5078613d6458da7d548f9d12659486755e2b772ea851f6c1df217e12111326"
+      }
+    ]
+  },
+  "host": {
+    "pid": 39792,
+    "parentPid": 52688,
+    "created": 1792133563.4011388,
+    "name": "TiaMcp.Host.exe",
+    "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.exe",
+    "command": [
+      "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.exe",
+      "--timeout-seconds",
+      "600",
+      "--worker",
+      "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe",
+      "--artifacts",
+      "D:\\TIAW\\ts1601\\h",
+      "--timeout-seconds",
+      "600",
+      "--testsuite-scope-probe"
+    ]
+  },
+  "nativePid": 28936,
+  "close": {
+    "hostExitCode": 0,
+    "forcedHostStop": false,
+    "workerExits": [
+      {
+        "processId": 42664,
+        "startedAtUtc": "2026-10-16T06:52:45.0106182Z",
+        "processExitVerified": true,
+        "exitCode": 0,
+        "waitBudgetSeconds": 30,
+        "elapsedMs": 39,
+        "forcedTermination": false,
+        "projectLockReleaseVerified": false
+      }
+    ],
+    "stderrEofObserved": true,
+    "closeInterrupted": null,
+    "tree": {
+      "completed": true,
+      "exits": [
+        {
+          "identity": {
+            "pid": 39792,
+            "parentPid": 52688,
+            "created": 1792133563.4011388,
+            "name": "TiaMcp.Host.exe",
+            "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.exe",
+            "command": [
+              "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.exe",
+              "--timeout-seconds",
+              "600",
+              "--worker",
+              "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe",
+              "--artifacts",
+              "D:\\TIAW\\ts1601\\h",
+              "--timeout-seconds",
+              "600",
+              "--testsuite-scope-probe"
+            ]
+          },
+          "role": "host",
+          "ancestry": [],
+          "proof": {
+            "processId": 39792,
+            "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION",
+            "inheritable": false,
+            "basis": "Original handle captured from exact owned startup ancestry before native reply; never reopened for cleanup",
+            "handleCaptured": true,
+            "processExitVerified": true,
+            "handleClosed": true,
+            "projectLockReleaseVerified": false,
+            "capturedAtUtc": "2026-10-16T06:52:43.457321+00:00",
+            "birthAndImageVerified": true,
+            "processStartedAtUtc": "2026-10-16T06:52:43.4011387Z",
+            "imagePath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.exe",
+            "sameOsHandleRetained": true,
+            "originalFileTimeTicks": 134366071634011387,
+            "ownerProcessId": 52688,
+            "ownerHandleValue": 708,
+            "exitCode": 0,
+            "terminalAtUtc": "2026-10-16T07:01:29.909544+00:00",
+            "forcedTermination": false,
+            "deadlineOrCancellationObserved": false,
+            "unknownReasons": [],
+            "completed": true
+          }
+        },
+        {
+          "identity": {
+            "pid": 42664,
+            "parentPid": 39792,
+            "created": 1792133565.0106182,
+            "name": "TiaMcp.Openness.V21.exe",
+            "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe",
+            "command": [
+              "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe",
+              "--testsuite-scope-probe",
+              "--pipe",
+              "TiaMcp-51c8e472008f4a84816ef30e23dbdcc9"
+            ]
+          },
+          "role": "worker",
+          "ancestry": [
+            {
+              "pid": 39792,
+              "parentPid": 52688,
+              "created": 1792133563.4011388,
+              "name": "TiaMcp.Host.exe",
+              "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.exe",
+              "command": [
+                "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.exe",
+                "--timeout-seconds",
+                "600",
+                "--worker",
+                "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe",
+                "--artifacts",
+                "D:\\TIAW\\ts1601\\h",
+                "--timeout-seconds",
+                "600",
+                "--testsuite-scope-probe"
+              ]
+            }
+          ],
+          "proof": {
+            "processId": 42664,
+            "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION",
+            "inheritable": false,
+            "basis": "Original handle captured from exact owned startup ancestry before native reply; never reopened for cleanup",
+            "handleCaptured": true,
+            "processExitVerified": true,
+            "handleClosed": true,
+            "projectLockReleaseVerified": false,
+            "capturedAtUtc": "2026-10-16T06:52:45.206132+00:00",
+            "birthAndImageVerified": true,
+            "processStartedAtUtc": "2026-10-16T06:52:45.0106182Z",
+            "imagePath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe",
+            "sameOsHandleRetained": true,
+            "originalFileTimeTicks": 134366071650106182,
+            "ownerProcessId": 52688,
+            "ownerHandleValue": 728,
+            "exitCode": 0,
+            "terminalAtUtc": "2026-10-16T07:01:29.912580+00:00",
+            "forcedTermination": false,
+            "deadlineOrCancellationObserved": false,
+            "unknownReasons": [],
+            "completed": true
+          }
+        },
+        {
+          "identity": {
+            "pid": 28936,
+            "parentPid": 42664,
+            "created": 1792133566.097904,
+            "name": "Siemens.Automation.Portal.exe",
+            "exe": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+            "command": [
+              "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe"
+            ]
+          },
+          "role": "native",
+          "ancestry": [
+            {
+              "pid": 42664,
+              "parentPid": 39792,
+              "created": 1792133565.0106182,
+              "name": "TiaMcp.Openness.V21.exe",
+              "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe",
+              "command": [
+                "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe",
+                "--testsuite-scope-probe",
+                "--pipe",
+                "TiaMcp-51c8e472008f4a84816ef30e23dbdcc9"
+              ]
+            },
+            {
+              "pid": 39792,
+              "parentPid": 52688,
+              "created": 1792133563.4011388,
+              "name": "TiaMcp.Host.exe",
+              "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.exe",
+              "command": [
+                "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Host\\release\\TiaMcp.Host.exe",
+                "--timeout-seconds",
+                "600",
+                "--worker",
+                "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\ts04-scope-probe-20261016\\revision-02\\build\\bin\\TiaMcp.Openness.V21\\release\\TiaMcp.Openness.V21.exe",
+                "--artifacts",
+                "D:\\TIAW\\ts1601\\h",
+                "--timeout-seconds",
+                "600",
+                "--testsuite-scope-probe"
+              ]
+            }
+          ],
+          "proof": {
+            "processId": 28936,
+            "access": "SYNCHRONIZE|QUERY_LIMITED_INFORMATION",
+            "inheritable": false,
+            "basis": "Original handle captured from exact owned startup ancestry before native reply; never reopened for cleanup",
+            "handleCaptured": true,
+            "processExitVerified": true,
+            "handleClosed": true,
+            "projectLockReleaseVerified": false,
+            "capturedAtUtc": "2026-10-16T06:52:46.332267+00:00",
+            "birthAndImageVerified": true,
+            "processStartedAtUtc": "2026-10-16T06:52:46.0979041Z",
+            "imagePath": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+            "sameOsHandleRetained": true,
+            "originalFileTimeTicks": 134366071660979041,
+            "ownerProcessId": 52688,
+            "ownerHandleValue": 764,
+            "exitCode": 0,
+            "terminalAtUtc": "2026-10-16T07:01:29.508119+00:00",
+            "forcedTermination": false,
+            "deadlineOrCancellationObserved": false,
+            "unknownReasons": [],
+            "completed": true
+          }
+        }
+      ],
+      "errors": [],
+      "unknownReasons": [],
+      "startupOutcomeUnknown": false,
+      "forcedTermination": false,
+      "startupInventoryUnknownReasons": [],
+      "finalizationErrors": [],
+      "expectedWorkerCount": 1,
+      "workerStartupCaptured": true,
+      "nativeStartupInventoryComplete": true
+    }
+  },
+  "hostLogs": [
+    "info: ModelContextProtocol.Server.StdioServerTransport[857250842]",
+    "      Server (stream) (TiaMcp.Host) transport reading messages.",
+    "info: Microsoft.Hosting.Lifetime[0]",
+    "      Application started. Press Ctrl+C to shut down.",
+    "info: Microsoft.Hosting.Lifetime[0]",
+    "      Hosting environment: Production",
+    "info: Microsoft.Hosting.Lifetime[0]",
+    "      Content root path: D:\\03_Entwicklung\\TIA_MCP",
+    "info: ModelContextProtocol.Server.McpServer[570385771]",
+    "      Server (TiaMcp.Host 1.0.0.0) method 'initialize' request handler called.",
+    "info: ModelContextProtocol.Server.McpServer[1867955179]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'initialize' request handler completed in 27.7196ms.",
+    "info: ModelContextProtocol.Server.McpServer[570385771]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler called.",
+    "info: ModelContextProtocol.Server.McpServer[2065726448]",
+    "      \"tia_discover\" completed. IsError = False.",
+    "info: ModelContextProtocol.Server.McpServer[1867955179]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler completed in 772.759ms.",
+    "info: ModelContextProtocol.Server.McpServer[570385771]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler called.",
+    "info: ModelContextProtocol.Server.McpServer[2065726448]",
+    "      \"tia_start\" completed. IsError = False.",
+    "info: ModelContextProtocol.Server.McpServer[1867955179]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler completed in 119740.6238ms.",
+    "info: ModelContextProtocol.Server.McpServer[570385771]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler called.",
+    "info: ModelContextProtocol.Server.McpServer[2065726448]",
+    "      \"tia_create_scratch\" completed. IsError = False.",
+    "info: ModelContextProtocol.Server.McpServer[1867955179]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler completed in 75279.3477ms.",
+    "info: ModelContextProtocol.Server.McpServer[570385771]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler called.",
+    "info: ModelContextProtocol.Server.McpServer[2065726448]",
+    "      \"qualification_testsuite_scope_probe\" completed. IsError = False.",
+    "info: ModelContextProtocol.Server.McpServer[1867955179]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler completed in 4539.6963ms.",
+    "info: ModelContextProtocol.Server.McpServer[570385771]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler called.",
+    "info: ModelContextProtocol.Server.McpServer[2065726448]",
+    "      \"qualification_testsuite_scope_probe\" completed. IsError = False.",
+    "info: ModelContextProtocol.Server.McpServer[1867955179]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler completed in 447.1956ms.",
+    "info: ModelContextProtocol.Server.McpServer[570385771]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler called.",
+    "info: ModelContextProtocol.Server.McpServer[2065726448]",
+    "      \"tia_detach\" completed. IsError = False.",
+    "info: ModelContextProtocol.Server.McpServer[1867955179]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler completed in 120.0526ms.",
+    "info: ModelContextProtocol.Server.McpServer[570385771]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler called.",
+    "info: ModelContextProtocol.Server.McpServer[2065726448]",
+    "      \"tia_discover\" completed. IsError = False.",
+    "info: ModelContextProtocol.Server.McpServer[1867955179]",
+    "      Server (TiaMcp.Host 1.0.0.0), Client (testsuite-scope-editor 1) method 'tools/call' request handler completed in 29.4305ms.",
+    "info: ModelContextProtocol.Server.StdioServerTransport[1221292038]",
+    "      Server (stream) (TiaMcp.Host) transport completed reading messages.",
+    "info: Microsoft.Hosting.Lifetime[0]",
+    "      Application is shutting down...",
+    "info: ModelContextProtocol.Server.StdioServerTransport[1375634372]",
+    "      Server (stream) (TiaMcp.Host) shutting down.",
+    "info: ModelContextProtocol.Server.StdioServerTransport[1256455528]",
+    "      Server (stream) (TiaMcp.Host) shut down.",
+    "{\"bridgeWorkerExit\":{\"processId\":42664,\"startedAtUtc\":\"2026-10-16T06:52:45.0106182Z\",\"processExitVerified\":true,\"exitCode\":0,\"waitBudgetSeconds\":30,\"elapsedMs\":39,\"forcedTermination\":false,\"projectLockReleaseVerified\":false}}"
+  ],
+  "failure": {
+    "type": "RuntimeError",
+    "message": "Preexisting native inventory changed"
+  }
+}

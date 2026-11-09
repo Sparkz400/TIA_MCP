@@ -1,0 +1,26 @@
+{
+  "identity": {
+    "pid": 21932,
+    "parentPid": 39144,
+    "created": 1792127365.6234703,
+    "name": "Siemens.Automation.Portal.exe",
+    "exe": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+    "command": [
+      "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+      "-bootstrapper=Siemens.Automation.Opns.Loader.Impl:Siemens.Automation.Openness.Loader.BootStrapper",
+      "-nosplashscreen"
+    ]
+  },
+  "markerSha256": "9e173a279e35f1c112e88b6958e053239c44352068641d1639b49787a4a6ec07",
+  "helperSha256": "24f7050e667eb4caa9f258767b9bceac0b1e999b82bcf40e034de4c62ad900d6",
+  "projectPath": "D:\\TIAW\\ph1602\\scratch\\TiaMcpScratch_20261016_050817_4567dfa4\\TiaMcpScratch_20261016_050817_4567dfa4\\TiaMcpScratch_20261016_050817_4567dfa4.ap21",
+  "method": "TerminateProcess(exactOwnedHandle)",
+  "projectIdentityBasis": "Durable interruption marker from the exact admitted worker, not a new native attachment",
+  "explicitNativeTermination": true,
+  "automaticReplay": false,
+  "requestedAtUtc": "2026-10-16T05:09:58.8018608Z",
+  "sameOsHandleRetained": true,
+  "completed": true,
+  "exitCode": 75,
+  "closedAtUtc": "2026-10-16T05:09:59.100318Z"
+}

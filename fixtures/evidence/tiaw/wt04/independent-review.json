@@ -1,0 +1,9 @@
+{
+  "approved": true,
+  "operationId": "72fbb25f3f634368a2b0a39530f3669b",
+  "reviewedPlanSha256": "ebfc90b497fe653dd49c82653f7890c9f73589845e20f344ea40a2007485cf17",
+  "oracle": "one exact Active Bool literal FALSE to TRUE; all other XML and 3 comments unchanged",
+  "reviewedInputSha256": "b687923408db3e20f6aa953ee98429e5c339b20d0e9f93fa227a731308ca366f",
+  "stableBaselineVerified": true,
+  "noOnlineAction": true
+}

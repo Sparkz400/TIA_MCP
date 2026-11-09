@@ -1,0 +1,74 @@
+{
+  "kind": "held-coordinator-store-window-close",
+  "releasedAtUtc": "2026-10-16T07:38:39.254204+00:00",
+  "locks": [
+    {
+      "path": "D:\\TIAW\\uq07\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\uq06\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\uq05\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\uq04\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\uq03\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\uq02\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\uq01\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\ts1601\\h\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\ts02\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\ts01\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\tr1602\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\tr1601\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\ph1603\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\ph1602\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\TIAW\\ph1601\\engineering-operations\\store.lock",
+      "closed": true
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\engineering-operations\\store.lock",
+      "closed": true
+    }
+  ],
+  "allClosed": true,
+  "journalsModified": false,
+  "automaticReplay": false,
+  "bodyFailure": null
+}

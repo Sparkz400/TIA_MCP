@@ -4,6 +4,8 @@
 .dotnet/
 .packages/
 artifacts/
+# Retained copies of cited qualification receipts keep their original layout.
+!/fixtures/evidence/tiaw/**/artifacts/
 
 # Generated reports, screenshots and scratch files
 /.tmp/

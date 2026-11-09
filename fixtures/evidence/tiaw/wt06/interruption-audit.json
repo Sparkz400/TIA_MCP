@@ -1,0 +1,12 @@
+{
+  "workerProcessId": 53840,
+  "workerExitCode": 73,
+  "nativeExitVerified": true,
+  "workerExitVerified": true,
+  "state": "outcomeUnknown",
+  "saved": true,
+  "operationId": "3f96ca5ade7a44ef810edf903540904b",
+  "nativeProcessId": 38200,
+  "automaticReplay": false,
+  "revision": 5
+}

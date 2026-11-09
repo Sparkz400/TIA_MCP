@@ -1,0 +1,147 @@
+{
+  "kind": "translation-fresh-fixture-qualification",
+  "packages": {
+    "host": [
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\Microsoft.Extensions.AI.Abstractions.dll",
+        "sha256": "bcc8f693103eb00505179f154b1b3a996b85d067e112facd724fd9d695f17a5e"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\ModelContextProtocol.Core.dll",
+        "sha256": "b1752096ea9d2f38ba88e467f04aea43fb300d9a54d881c165f62b69028ee3ab"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\ModelContextProtocol.dll",
+        "sha256": "8cd6f626c8d6a0a5ff3e154789d3fcde2b1d66a595c0ef0198e092c2c30fe93a"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Core.dll",
+        "sha256": "68a1cd5926e67401a4a31b4d62bfd04c9d0859917e21c4b039e7bfd86c390248"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Core.pdb",
+        "sha256": "a5e3227c8937bf6f02f03e232e6f33b136a2f0a94b84dfc351d49d025690b072"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Host.deps.json",
+        "sha256": "d5ef029c53a096ab6a91f9aab0844a7d051e979c840dedece48a69c994b27877"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Host.dll",
+        "sha256": "f9b32995794e7efd52563a44476686290e2522f8babe8a025218ec69f70aae1a"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Host.exe",
+        "sha256": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Host.pdb",
+        "sha256": "98a517087d54e5ffff7368b5a195ad507be1cd118d20e6623a8d4a88f47bab40"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Host.runtimeconfig.json",
+        "sha256": "61a2a447a31667ca1fb9081bec4ffbeb230bb1813fadfa98ebc3a242ce38e36e"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Translations.dll",
+        "sha256": "57cd70fd7460fa38e0935a06634c3ad187b1be4ee66a5742432925f5845458b2"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\host\\TiaMcp.Translations.pdb",
+        "sha256": "a0d6d360e2566c5f47718bad0f21723d721faaf3295e58037aab7203dee0e89d"
+      }
+    ],
+    "worker": [
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\Newtonsoft.Json.dll",
+        "sha256": "e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\TiaMcp.Openness.V21.exe",
+        "sha256": "6e3fee2247c67737aed4981e82f5e25b2555c2ac80bc4b6c1b4c486506557f03"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\TiaMcp.Openness.V21.exe.config",
+        "sha256": "3a2be7a1bca2543035f80263898dc1a0a3a96bcf2f72834222b3a6a7bff13a39"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\TiaMcp.Openness.V21.pdb",
+        "sha256": "e57171cfc0e7ea4a36e34b2274ecaa7ac8fe3249765f0184565ccc35192e9552"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\TiaMcp.TestSuite.V21.dll",
+        "sha256": "dd1f15ce65a4f8678de9dac8af94f0d0656149e0066c46d3ad8de832eca76640"
+      },
+      {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\translation-native-20261016-02\\package-02\\worker\\TiaMcp.TestSuite.V21.pdb",
+        "sha256": "b1627438e276b94f21dff828eb1168fc907bc07f4b7b95ac17b071dc856fd5f4"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\block_test_process.py",
+      "sha256": "52eb1811eff1987ab37ca301c2ce53d626e4780c1dd5072bf986cd0bece83ad9",
+      "bytes": 7447
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\component_window_lifetime.py",
+      "sha256": "0c6954c1ad44a207f005e0ae7022f0b34edb683fdf5aae96c35f8ab80ec57c9a",
+      "bytes": 7336
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\exact_qualification_client.py",
+      "sha256": "3adb95dfbf4aaac8a6761596bdeee2b9f5b4e4602a5d647cc6d9221ac07c379f",
+      "bytes": 4851
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_exact_worker_startup.py",
+      "sha256": "f5863085945133b95178d6b78606f8b13a832713b54d67790b2fb1c0ded7e308",
+      "bytes": 9904
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_translation_category_probe.py",
+      "sha256": "bffb0a4f6a42d648642abdb981bdbf043bcd1573014c023bf1d972e268fac824",
+      "bytes": 49153
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_translation_import.py",
+      "sha256": "f0e3fe5450fada5a1fc9e5fb815a9a670f742a39138b1f53973f1c43271e7c0f",
+      "bytes": 13066
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\qualify_worker_startup_exact.py",
+      "sha256": "6455ee5f67c8936d25c9dd05edbb026d0698065429a50e9a2aae00bd6d8b88b8",
+      "bytes": 6251
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\retained_native_lifecycle.py",
+      "sha256": "dff10491a60f497c7f0b96eac0d19f966390b0ea1269b5fb9d4b9f9c47a8c891",
+      "bytes": 27974
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\smoke_mcp.py",
+      "sha256": "5d2764eb14caf49988f5f3e8cee8fd42bf8aad6eef9966506d48c1dbde6ef23b",
+      "bytes": 9059
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\verify_translation_populated_category_probe.py",
+      "sha256": "40baf4246d7c8759a403f8acdd86f18839b1a9927555ef68a557a625b0618dec",
+      "bytes": 19843
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\verify_watch_expansion.py",
+      "sha256": "4a4bd966ecea6f21234a02f74f0664ae7ac3af8b47a2054e176fd33412fab985",
+      "bytes": 52355
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\verify_watch_workflow.py",
+      "sha256": "56f1a946013eafbe8e2bb7eb16a312d5be53d242ec633c5afd4c782dc6558aee",
+      "bytes": 26730
+    }
+  ],
+  "root": "D:\\TIAW\\tr1603",
+  "productionEnabled": false,
+  "automaticReplay": false,
+  "effects": "One newly owned offline bilingual scratch; category probes, two reviewed imports, separate checkpoint restorations and read-only reconciliation."
+}

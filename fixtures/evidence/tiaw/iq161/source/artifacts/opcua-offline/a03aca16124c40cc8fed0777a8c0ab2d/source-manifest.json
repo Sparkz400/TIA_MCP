@@ -1,0 +1,681 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "sha256": "f842523b898bde42889113aa47de2221017dc3e1f2b6cda9ae77582d040076cf",
+      "path": "contracts\\api-coverage-bindings.v1.schema.json"
+    },
+    {
+      "sha256": "f3b4d7b285dd82099e5b1f907b64373a3089cee2124f281c2a94420670f121c5",
+      "path": "contracts\\api-coverage-registry.v1.schema.json"
+    },
+    {
+      "sha256": "94d644dc6fadf92f9d6c3a1799bd8e8f4de066244248c2075268ee73f5c57e63",
+      "path": "contracts\\api-coverage-snapshot.v1.schema.json"
+    },
+    {
+      "sha256": "4118bbec63bf5baad1c088222b147c699d6333510fdfa54811ae0e1234cfbec9",
+      "path": "contracts\\api-coverage\\implementation-bindings.v1.json"
+    },
+    {
+      "sha256": "881da7aaa435b7e045bfdce5405093280e214662f7a3cea1a1a1099827992b59",
+      "path": "contracts\\api-coverage\\registry.v1.json"
+    },
+    {
+      "sha256": "8018f52e7fe5c612eabddb1c3cd430a8292a24752b69faa7cb2e9f19d0653082",
+      "path": "contracts\\block-test-result.schema.json"
+    },
+    {
+      "sha256": "954cddfb0461ec165481e8441f5dad29041247a808a52d98a111c05f1c005cdb",
+      "path": "contracts\\block-test-suite.schema.json"
+    },
+    {
+      "sha256": "03c1075d9c8707e2e83222609bfab3cb9932685754ae632ed3e9f7560af8d282",
+      "path": "contracts\\capability-report.schema.json"
+    },
+    {
+      "sha256": "c5cefc15b0685d7c293a9993104396a8aab44ec5fe578dea2e4fe53d9b21f012",
+      "path": "contracts\\device-inventory.v1.schema.json"
+    },
+    {
+      "sha256": "61736a7abe34f719d9badb3945db40ee35c8434a3aa6bf83394a2b6523d5c575",
+      "path": "contracts\\diagnostic-case.v1.schema.json"
+    },
+    {
+      "sha256": "c958501250fe8191fcb21c66f41b14de8a04b0337883c993fbac817997c6bf09",
+      "path": "contracts\\diagnostic-replan-request.v1.schema.json"
+    },
+    {
+      "sha256": "b1c838d2b239fca92cedbce9ec051c6dcf39bc8327f1bbf166207bca77dfe5bb",
+      "path": "contracts\\diagnostic-report.v1.schema.json"
+    },
+    {
+      "sha256": "2e9669856685b936933c733d820ccbce7158f5c4e8b3ae67584035b1ee98a8ad",
+      "path": "contracts\\diagnostic-signal-manifest.v1.schema.json"
+    },
+    {
+      "sha256": "e382138a6b0567a0e04060756c4d85373c88b1ee7276b8e22a08c721da7cd283",
+      "path": "contracts\\engineering-mutation-admission.v1.schema.json"
+    },
+    {
+      "sha256": "2eb436f19fa8489a06919cd049f1e0678ca4f2e2fb1ecc8564a2ad3ab33b0f12",
+      "path": "contracts\\engineering-object-reference.v1.schema.json"
+    },
+    {
+      "sha256": "cf13791e757702f2e355ab6af20269603a5c4f41f27825df1a62abb26a3449ad",
+      "path": "contracts\\engineering-operation.v1.schema.json"
+    },
+    {
+      "sha256": "45bdb20bb5c2e9853ec9d64bd66e9754b9d5609707673688144d84544726cb34",
+      "path": "contracts\\feature-catalog.schema.json"
+    },
+    {
+      "sha256": "b8e3c2326d0307258fd26a7ecc8a52093ce3dccbf1fd11178eaee6d32f2c8830",
+      "path": "contracts\\feature-catalog.v1.json"
+    },
+    {
+      "sha256": "9e119dc46e9f7c0ecb994e3495dc54878bbae65c3f26a7c669b9bf73d06c9ed2",
+      "path": "contracts\\fixture-manifest.schema.json"
+    },
+    {
+      "sha256": "95a09fc5180a56a953623593e6f672aa2bf9bf0faa43a3fd7d13dc6ac9120482",
+      "path": "contracts\\hmi-engineering.v1.schema.json"
+    },
+    {
+      "sha256": "3b3a8c97f2532b2ecb88224bd7e7a1462d8bf0ccfd02db22b9764ffb365f2b08",
+      "path": "contracts\\hmi-identity.v2.schema.json"
+    },
+    {
+      "sha256": "53788eac8036aab6ba2195f73798925d125208a78e4836e5cb446e092f7e866a",
+      "path": "contracts\\hmi-inspection.v1.schema.json"
+    },
+    {
+      "sha256": "a877e893e394c4e8e12d5299dfb6ebaa2e474b1bcfb4cae8c3415b3c5da2074a",
+      "path": "contracts\\hmi-library-handoff.v1.schema.json"
+    },
+    {
+      "sha256": "70613f603ae9ca68bfb1c581933738663777baddb8f948949d9163728e1a7337",
+      "path": "contracts\\hmi-references.v1.schema.json"
+    },
+    {
+      "sha256": "26381c2e94845926ba387e867dfa98fabe4ba98ee6a8bdeacedf4f0b8b29708d",
+      "path": "contracts\\library-change-journal.schema.json"
+    },
+    {
+      "sha256": "ddd8fe7938c4f03306f9fc811cff01361ed6bbded4a31f89c0ad7249c921ee66",
+      "path": "contracts\\library-package.schema.json"
+    },
+    {
+      "sha256": "e0831f3afb0af40be516c73eb2e17449305d2217268456258c22463fa01a8a51",
+      "path": "contracts\\opc-ua-consumers.v1.schema.json"
+    },
+    {
+      "sha256": "20ce6dd1c21f2131b3e709c2bcfe251eae2ffa8c8f9123f9cb544778099d7c21",
+      "path": "contracts\\opc-ua-consumers.v2.schema.json"
+    },
+    {
+      "sha256": "8d161dd7b6e1a240ac346764c47b27222f8f2dec7325517a390ca2dbae360a0a",
+      "path": "contracts\\opc-ua-profiles.v1.json"
+    },
+    {
+      "sha256": "20e016c7c0a7848f90ed47454181c81d7770cdf44c534ef6460f9d544460d302",
+      "path": "contracts\\opc-ua-workflow.v1.schema.json"
+    },
+    {
+      "sha256": "1d8feb45649fb873215d6f86f7947fd720eeefe35f7d4d8aea2f8024042600dc",
+      "path": "contracts\\plc-library-integration-recipe.v1.schema.json"
+    },
+    {
+      "sha256": "de89cc52da631bec3085926da55d4fb10bb58266764703f06bdd86dfd9e938bc",
+      "path": "contracts\\project-model-provider.v1.schema.json"
+    },
+    {
+      "sha256": "c1558a8156298ad8e95fc66ec3a526180447caea97882339ca1cd148b71adcaa",
+      "path": "contracts\\project-model.v1.schema.json"
+    },
+    {
+      "sha256": "0321af0350db4985efcb3a570452715873906a57630fd4c4fd490365695ef0fb",
+      "path": "contracts\\README.md"
+    },
+    {
+      "sha256": "0267a0f7184645a641c6b93450e86749f221893a338e3cecdf53880a0cb811d3",
+      "path": "contracts\\test-result.schema.json"
+    },
+    {
+      "sha256": "6d40bd81c1e002d59bbf14eb466d5b90ccd0e2fdf37a16e75392fae9f691506e",
+      "path": "contracts\\testsuite-assessment.v1.schema.json"
+    },
+    {
+      "sha256": "186c7d6b9eb6ef24a11d273e8bda6fef0a70dc11993b2e68032b3bc3ebc557ec",
+      "path": "contracts\\testsuite-definition.v1.schema.json"
+    },
+    {
+      "sha256": "df346172adfd83076fbe9368729818aa0691d6e38f0c4179e6eb94fe00c5a495",
+      "path": "contracts\\testsuite-job-state.v1.schema.json"
+    },
+    {
+      "sha256": "8082e5dc6251fee48cdffcff0a41eda83202931f4f0f05718b9088015abd2e4c",
+      "path": "contracts\\testsuite-result.v1.schema.json"
+    },
+    {
+      "sha256": "0599f7f1f6f280129bd0e4aaf538167397dcee5d17c7b37622bd28d75061b651",
+      "path": "contracts\\testsuite-run.v1.schema.json"
+    },
+    {
+      "sha256": "9fd1a8125ad401ff2e27ea0e546330d9cdddc1575e01b55ac7418e077f44849f",
+      "path": "contracts\\testsuite-scope-coverage.v1.schema.json"
+    },
+    {
+      "sha256": "4fc72aac864839e55b6b480d2b8588a2eb78065b2c23c42d2df3c623fa110aaf",
+      "path": "contracts\\testsuite-style-job.v1.schema.json"
+    },
+    {
+      "sha256": "ccb328daa111449abf695f75a620fafd5fc74988879aa752b6de283019e9ef2f",
+      "path": "contracts\\testsuite-style-review.v1.schema.json"
+    },
+    {
+      "sha256": "2e65002e720449b1a75cd57ec18b63acf609bb2754e4f1ff5f21a01397470eb8",
+      "path": "contracts\\trace-capabilities.v1.schema.json"
+    },
+    {
+      "sha256": "598c16b848bc100df2f2766ad3db5e6126a63651e862f5403555d9de8680cba2",
+      "path": "contracts\\trace-comparison.v1.schema.json"
+    },
+    {
+      "sha256": "27e8b3df1a7ffaf3afd0daa28101fdad16de604c64e35024bf621146fc20a54c",
+      "path": "contracts\\trace-csv-options.v1.schema.json"
+    },
+    {
+      "sha256": "454ed9d0a5dc434d02a7e65af9a15f1f50955758172284a1708c712bb4a8b4f8",
+      "path": "contracts\\trace-measurement.v1.schema.json"
+    },
+    {
+      "sha256": "509cc0a4b1d6102dba026e36076cb76b8175ee992ff7c61551b134db9cbdf3f4",
+      "path": "contracts\\trace-plan.v1.schema.json"
+    },
+    {
+      "sha256": "540fd67947ce4a363d022a885a00ee318e5bd24b7239543790d9e49f66888d71",
+      "path": "contracts\\trace-readback-check.v1.schema.json"
+    },
+    {
+      "sha256": "15a453c282a1f27b35f3641523e34203887f9a52356a4f1e494f6b7b6c1c9c22",
+      "path": "contracts\\trace-readback.v1.schema.json"
+    },
+    {
+      "sha256": "433203b7e81560021a9cca4c1e55f91e301b9af5d0dec213b8e89192f0c3e7c0",
+      "path": "contracts\\translation-candidate.v1.schema.json"
+    },
+    {
+      "sha256": "ae3cfbdd3b56b273d821d5c8f548bb2a32575a616c73024bfd87202f7857a353",
+      "path": "contracts\\translation-inspection-page.v1.schema.json"
+    },
+    {
+      "sha256": "b5afa568a4d93a6cdb284f963e011c77986b0e0ed7e78e6802215b87a1a6fae7",
+      "path": "contracts\\translation-profile.v1.schema.json"
+    },
+    {
+      "sha256": "0e6b606f0b840059d82a2b20d8685e6a1f54502acd6d9805f4bbe130d717825a",
+      "path": "contracts\\translation-proposals.v1.schema.json"
+    },
+    {
+      "sha256": "cbeb251787425ee41b338bd9025ab56f361d8cd3d819d2a94e496685465e36d1",
+      "path": "contracts\\translation-reconciliation.v1.schema.json"
+    },
+    {
+      "sha256": "101c24b412d4308134e6d0f21e75f1ec61b52dcfb880731025fbc13dba9458ce",
+      "path": "contracts\\translation-review.v1.schema.json"
+    },
+    {
+      "sha256": "16e254822ef1d4300e723585615670c2ebfb3ed874e9d6190c9b51dce33d5f77",
+      "path": "contracts\\translation-workflow.v1.schema.json"
+    },
+    {
+      "sha256": "98407e3b43df4e665a5d213f2d57d4a11bed9559d5f92233c3fead235ccc5647",
+      "path": "contracts\\typed-graphical-change.schema.json"
+    },
+    {
+      "sha256": "10b433ada7995d77ae2286cf5a79a21c2bb04fee5f7b3542b208a2697584e1fa",
+      "path": "contracts\\typed-graphical-model.schema.json"
+    },
+    {
+      "sha256": "be0621846e7da565423c2673283afad5398270fdececd86dbeb4b4f3d13920c5",
+      "path": "contracts\\typed-graphical-profiles.schema.json"
+    },
+    {
+      "sha256": "1751bd455d1eed24e1f87f18ef4b9e3235c517256b53102ea6282b3a395265b9",
+      "path": "contracts\\typed-graphical-read.schema.json"
+    },
+    {
+      "sha256": "d5a26dba43274225ece2191aa13335416eabce773e0bd993ba372f1e9850ecbf",
+      "path": "contracts\\vci-conflict-report.v1.schema.json"
+    },
+    {
+      "sha256": "dd8db2507a6d060c27c1fccb9954c489c9fb7261f525d3f57c7826206920e1b1",
+      "path": "contracts\\vci-manifest.v1.schema.json"
+    },
+    {
+      "sha256": "cdf4117b97415d0df7a2d4538d82dff1f06e38e231ac2781671cddc9706cc491",
+      "path": "contracts\\watch-table-authoring.v1.schema.json"
+    },
+    {
+      "sha256": "5d698029cad10ed805463c71abffd118440c3b0e2b0a8a1fbc987a5b9f196fec",
+      "path": "contracts\\watch-table-plan.v1.schema.json"
+    },
+    {
+      "sha256": "9a8a42812d4ae719e8e78a4dc2ff7c04497f13a4e54269ef0109161b3b54385e",
+      "path": "Directory.Build.props"
+    },
+    {
+      "sha256": "16410b827426474e5f02af25ae0b1d64e1a922cf2e12a9cd15766b0c7e220eff",
+      "path": "fixtures\\opcua\\consumers-v1.json"
+    },
+    {
+      "sha256": "cde9324afced92a9a402288b8ad55f6f6e31b11739d7f0b2c5046bf5424e3768",
+      "path": "fixtures\\opcua\\dependencies\\consumers-v2.json"
+    },
+    {
+      "sha256": "7c690321724d8b5a0539963d847646d31da7457d741ad1ebffaa5ebc43068605",
+      "path": "fixtures\\opcua\\dependencies\\device.xml"
+    },
+    {
+      "sha256": "b4fe2bfa12cff15ad719895e61cfd7fd3177a7198ce175efeb1c24ea5cf88462",
+      "path": "fixtures\\opcua\\dependencies\\types-v1.xml"
+    },
+    {
+      "sha256": "cd21ff721cc65602cd206e7b1d3e7e68abec77e2f4522c3857e37074e7cad5c0",
+      "path": "fixtures\\opcua\\dependencies\\types-v2.xml"
+    },
+    {
+      "sha256": "c65264d4ea444a6c0c142a3ab58fcff7d4efbbca1629a408d1059cd1907ccb55",
+      "path": "fixtures\\opcua\\machine-v1.1.xml"
+    },
+    {
+      "sha256": "5815918286e0bcaf12440722be72fd000b594fe808514ed8052cec57501f69ba",
+      "path": "fixtures\\opcua\\machine-v1.xml"
+    },
+    {
+      "sha256": "d9b68ab0b1032baeed2f552effc5fea9ceec611ee543f05fd7a0b47ce93ad7e4",
+      "path": "fixtures\\opcua\\machine-v2.xml"
+    },
+    {
+      "sha256": "38f2dc4a4abbce87bf4de5b1c372020ef73d53fb2d279c3491b6685d65d48812",
+      "path": "fixtures\\opcua\\README.md"
+    },
+    {
+      "sha256": "d710c6b85dd5c94cc27d7eb7edc24f5ac188ec5bdbaccdae5998acf5b697c09d",
+      "path": "fixtures\\watch-tables\\native-owned-v21\\MilestoneWatch.before.xml"
+    },
+    {
+      "sha256": "b48d6da8fa62c0da7cc8a2da4ea036ac55836660a448ba533135abb5b8451b73",
+      "path": "global.json"
+    },
+    {
+      "sha256": "f545a7e2ea14ac53cdfb91217cae67b8ff14275313f6298f9a3331d205b6c948",
+      "path": "NuGet.Config"
+    },
+    {
+      "sha256": "0abfd84e59d03f6f1c9542ea80463023c08f24319a7fc49ee0d646de3b0f73af",
+      "path": "scripts\\Inspect-OpcUaApi.ps1"
+    },
+    {
+      "sha256": "ef0e99d69ddf14ac80f7fcda4253ebf1094006242d36a079ea7147e6924e115c",
+      "path": "scripts\\probe_opcua_api.py"
+    },
+    {
+      "sha256": "25d6df32f6da05d602807066a1eb35a1c886701da14e3065b2d5bb3283414650",
+      "path": "scripts\\test_opcua_api.py"
+    },
+    {
+      "sha256": "b531239c72548ac3c613761d7cd14e8bf22df7a6c60da05e4852e5fccc19c78a",
+      "path": "scripts\\Test-OpcUaOffline.ps1"
+    },
+    {
+      "sha256": "ceaf6e4e41f526a0d1aa9efac3668231768a35d559b311661d4bcf90a7baeb66",
+      "path": "src\\TiaMcp.Core\\ArtifactStore.cs"
+    },
+    {
+      "sha256": "9bce750130ca4e0d9823855f7f1affe64279d445ef5944a5cd90fa754de5ed8b",
+      "path": "src\\TiaMcp.Core\\ArtifactUploadStore.cs"
+    },
+    {
+      "sha256": "2ba3df695fc67d15d3be49cae49516db4a10ed2c613bd3fe133db77edfd8789c",
+      "path": "src\\TiaMcp.Core\\BridgeClient.cs"
+    },
+    {
+      "sha256": "3453bce08d2785ba136b46aa2add3c91a0811935adab17b1c3ec41c47892b30e",
+      "path": "src\\TiaMcp.Core\\BridgeProtocol.cs"
+    },
+    {
+      "sha256": "93072a1dfb16f4f7894dcaf67f1b4d515a10dabe939dadff195cb82d0333b05d",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\DiagnosticCodeReader.cs"
+    },
+    {
+      "sha256": "1111bc0727301943d840d660fafead5d9da47fcd0fd7d37da620e6b5bf9b75ce",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\DiagnosticEvidence.cs"
+    },
+    {
+      "sha256": "6b81ffd58ee0bae3c8e4a68b3c05e5c58c5185b8297c8055c0dda40375a83bcd",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\DiagnosticPlanner.cs"
+    },
+    {
+      "sha256": "110678a1604ed4c85a15bf6ca84667b85166f38874addc230f8983220901acf7",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\DiagnosticReplanner.cs"
+    },
+    {
+      "sha256": "a16a5fdce7e13448139741edd75c3df0c3e15935ea01908006081b0f84edcca4",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\DiagnosticReportContext.cs"
+    },
+    {
+      "sha256": "28f45cad443f7165363a5782780e97bec4267fc24d19a0de3a81f33b04ed04fb",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\DiagnosticSignalSelector.cs"
+    },
+    {
+      "sha256": "2c2e540fad3a81ea94b9302456823eccd54fc336d104119fdd5bf8d27afe8c9e",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\DiagnosticStore.cs"
+    },
+    {
+      "sha256": "11f96532dba37e5dcb025fc820ff73c8e92a33fcc2c10ad71ac1139a0ec9781d",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\DiagnosticTemplates.cs"
+    },
+    {
+      "sha256": "9269b3f7933e16b31368a0ec1ef5bbbd04a89ce892d9aaadafc6c783fa5cbd91",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\TraceComparison.cs"
+    },
+    {
+      "sha256": "0727a2bfb3e5937427a11a79006e1832cd22e786e0819f11ede7b2cee7ddcb25",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\TraceCsvReader.cs"
+    },
+    {
+      "sha256": "abc900d94b01179973c2f7b68cf36af16bdd6a384894cc7ddd6b88b1bb52ab6b",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\TraceMeasurements.cs"
+    },
+    {
+      "sha256": "4012b50cd65ab9ed58a0c0ad8c8a3a9c2f1a87e6f82e691695e49cc0e1d050c5",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\TraceNumber.cs"
+    },
+    {
+      "sha256": "e8e48bf6098606105b2cf27545dd2eab786e69c9ab893cd8ad5f802f60d1bf61",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\TracePlanning.cs"
+    },
+    {
+      "sha256": "bff4a45b1e856c8dfa7332da498b287855306e3020766e806d0ec3b4a61c68af",
+      "path": "src\\TiaMcp.Core\\Diagnostics\\TraceReadback.cs"
+    },
+    {
+      "sha256": "c6bc1db282105d619f5f0e6ebc55d02d84e6ac2576f4178291ac25ddef8a14a0",
+      "path": "src\\TiaMcp.Core\\Engineering\\CanonicalJson.cs"
+    },
+    {
+      "sha256": "bec66e8b9eafbc9ae24744cf8b8df7606074113001486e480dae7e09a122eea8",
+      "path": "src\\TiaMcp.Core\\Engineering\\EngineeringIdentity.cs"
+    },
+    {
+      "sha256": "aed8e5e0a53ee4d4385ea0734dd5a787fc8b8342fd7eee255846c180011941dc",
+      "path": "src\\TiaMcp.Core\\Engineering\\NativeTargetObservation.cs"
+    },
+    {
+      "sha256": "40e25bc113373771f6d68195c3e2bbf93f9e7487ad4927742f19e28177b8bb97",
+      "path": "src\\TiaMcp.Core\\EngineeringJobs\\ComponentQualificationWindowStore.cs"
+    },
+    {
+      "sha256": "b2d2d6f04dd952e05badd2f78330ac8b8e9be88cb88f3b358bde9de7b62d50e0",
+      "path": "src\\TiaMcp.Core\\EngineeringJobs\\ComponentWindowEvidence.cs"
+    },
+    {
+      "sha256": "85904954d8e59443812858fad55fde083a94e6b0eb2ceb40c3ee736c59a70a50",
+      "path": "src\\TiaMcp.Core\\EngineeringJobs\\EngineeringMutationAdmissionStore.cs"
+    },
+    {
+      "sha256": "79930847b76189842b34e270a09147a3688fd0ee7c3c19d0043718ac4fad9553",
+      "path": "src\\TiaMcp.Core\\EngineeringJobs\\EngineeringOperationModels.cs"
+    },
+    {
+      "sha256": "4c759f7a4352041a8fdcd92aa6329f97ce861945aaa658b93e9b4e5b02776c73",
+      "path": "src\\TiaMcp.Core\\EngineeringJobs\\EngineeringOperationStore.cs"
+    },
+    {
+      "sha256": "1ee6f12002dc1035b2c3b5019497d148f84af470d18ea762a0e1c4c4bb16df57",
+      "path": "src\\TiaMcp.Core\\EngineeringJobs\\EngineeringResourceKey.cs"
+    },
+    {
+      "sha256": "767508cf3958c5dd67f9cc6c4ec68fc9dc1d996378508c4a55999fe245db32bd",
+      "path": "src\\TiaMcp.Core\\FeatureCatalog.cs"
+    },
+    {
+      "sha256": "257d43be4431dc14f8536b7136fd0d7a3c8dea8c6d8f899663a68d7be2c3651c",
+      "path": "src\\TiaMcp.Core\\Inventory\\InventoryExport.cs"
+    },
+    {
+      "sha256": "018db697f23bd2fe7afb79fa9225b11400107146ce1d199bc83baef3ee1bf8b5",
+      "path": "src\\TiaMcp.Core\\Inventory\\InventoryModels.cs"
+    },
+    {
+      "sha256": "3ec7628bf09d023ceb99c6bc35353dd1f02532f205a4e9feb721021b7ed6dbcf",
+      "path": "src\\TiaMcp.Core\\Inventory\\InventoryStore.cs"
+    },
+    {
+      "sha256": "d900c064798929489c026b6daea37e42b3345a022bfa90b88989eb5df849eb39",
+      "path": "src\\TiaMcp.Core\\Inventory\\SiemensWebIdentity.cs"
+    },
+    {
+      "sha256": "5777f1e4dfb7eb7f1d63d927fcedfb548b70e16b267eef67e94950ae50dd810b",
+      "path": "src\\TiaMcp.Core\\PackageIntakeModels.cs"
+    },
+    {
+      "sha256": "b5f16591caa1191ba6bb2bcf82b1c8b4914ff5fffc3ac3d27d2f6058ecc258bd",
+      "path": "src\\TiaMcp.Core\\PackageStorage.cs"
+    },
+    {
+      "sha256": "a1a7e8e93914e43dd3c91eeffe4cf0d3a2bbb0126663dca546b787698c336498",
+      "path": "src\\TiaMcp.Core\\PackageStore.cs"
+    },
+    {
+      "sha256": "9ac5cd09eddad6ee3debd44d096a2f18b3464a64296f19ad7cf9e04e488fd20d",
+      "path": "src\\TiaMcp.Core\\ProjectReviewStore.cs"
+    },
+    {
+      "sha256": "3eea1fc08abe722cbf4c3638547d510b47ef1c1c9382c80c210b2a86818edcb2",
+      "path": "src\\TiaMcp.Core\\SimulationCardMoveRetry.cs"
+    },
+    {
+      "sha256": "dd7845371ac4eb574d35ab3128421c849cc86e9d0b3720929950407ada0db9ec",
+      "path": "src\\TiaMcp.Core\\SimulationDiscoveryWait.cs"
+    },
+    {
+      "sha256": "0d39af367d7e59fd5240fe05395de13883aaf664029ca0c5669bb6b4ba30424b",
+      "path": "src\\TiaMcp.Core\\TestSuite\\TestSuiteAvailability.cs"
+    },
+    {
+      "sha256": "72627dfa1ef771446020872dd86f7bbbcbfac011abec80dcab3931d946b9e2eb",
+      "path": "src\\TiaMcp.Core\\TestSuite\\TestSuiteCasingResultProfile.cs"
+    },
+    {
+      "sha256": "0cfacf0076d9c6801354079e9e748785b54b5f3930c1d9341d08055df6f34305",
+      "path": "src\\TiaMcp.Core\\TestSuite\\TestSuiteDefinitionBundle.cs"
+    },
+    {
+      "sha256": "bcc53161f8d0adeba31824d70239726bef919353230f1ba4858e5d9052e3ed2f",
+      "path": "src\\TiaMcp.Core\\TestSuite\\TestSuiteDefinitions.cs"
+    },
+    {
+      "sha256": "178cf90beacc357190e46efa6c375d522675be77dc1a59e6dae60738fbe4275c",
+      "path": "src\\TiaMcp.Core\\TestSuite\\TestSuiteJobState.cs"
+    },
+    {
+      "sha256": "164069ffbc9687edf04d82a22f5df870af896842d479037501806e578e4a607d",
+      "path": "src\\TiaMcp.Core\\TestSuite\\TestSuiteResults.cs"
+    },
+    {
+      "sha256": "a6e229686c2b88967012c0e1c50fd58318febde417e2961b2ea33ec64de97f78",
+      "path": "src\\TiaMcp.Core\\TestSuite\\TestSuiteScopeCoverage.cs"
+    },
+    {
+      "sha256": "9ee6284b420abae4c5b1eedc4abd65e9853493136a37e356ff643b8b47787493",
+      "path": "src\\TiaMcp.Core\\TestSuite\\TestSuiteStyleAdapter.cs"
+    },
+    {
+      "sha256": "02180952fdba782e3295745201f44d60db9513007c896486989b82866970bf3a",
+      "path": "src\\TiaMcp.Core\\TestSuite\\TestSuiteStyleJobs.cs"
+    },
+    {
+      "sha256": "e4c8cb6e49bbd90951f604edf10c9b423b85c65d766f37c0819eab699c9548fc",
+      "path": "src\\TiaMcp.Core\\TestSuite\\TestSuiteStyleOperation.cs"
+    },
+    {
+      "sha256": "01163d563793a48f2aa8cc1ef5453d5aaadb43284d54a9ac74a69763691a7f05",
+      "path": "src\\TiaMcp.Core\\TestSuite\\TestSuiteSystemScopePreservation.cs"
+    },
+    {
+      "sha256": "b42d039e95231278a4e91cbecb648a1b9e82de784bbf9e0920dd20fb5720599f",
+      "path": "src\\TiaMcp.Core\\TestSuite\\TestSuiteTestAccess.cs"
+    },
+    {
+      "sha256": "244d1c88b6885ac447a3a3bb301b77b08e8893d94543c59a95a4f373bec743a2",
+      "path": "src\\TiaMcp.Core\\TestSuite\\TestSuiteWorkerAdapter.cs"
+    },
+    {
+      "sha256": "501c48218eaf093a8daaa0192fce1d1d7e015244cb7d947f5639be9b3aebb6d6",
+      "path": "src\\TiaMcp.Core\\TiaMcp.Core.csproj"
+    },
+    {
+      "sha256": "03d1afecfe0307d37baed5e1ece46b9bbe79a5ed5fcb76effa62d86c14f098fb",
+      "path": "src\\TiaMcp.Core\\VersionControl\\EngineeringGitOperationJournal.cs"
+    },
+    {
+      "sha256": "5b45d89418a214151134986f7febb0545bd6e48dd4ca511379c04a4a8a9f7a29",
+      "path": "src\\TiaMcp.Core\\VersionControl\\GitOperationBinding.cs"
+    },
+    {
+      "sha256": "bad508fa3f6b847bd1f645e043ddeeb498f622bf3b11b4d0368de764b93b15dd",
+      "path": "src\\TiaMcp.Core\\VersionControl\\GitProcess.cs"
+    },
+    {
+      "sha256": "7099eec678e18d71846d00fd6d9dd7f8cf088e435770f641181a4c3226b7093e",
+      "path": "src\\TiaMcp.Core\\VersionControl\\GitWorkspaceModels.cs"
+    },
+    {
+      "sha256": "d9344e98eb7265e8ab6682ac12848b5fabcaac8aa5190e67003f897ed7fad01c",
+      "path": "src\\TiaMcp.Core\\VersionControl\\GitWorkspaceRunner.cs"
+    },
+    {
+      "sha256": "799bb47cd8994ad1d20bee00899dd9c13f369a287cb07fee48165e8598b45ce8",
+      "path": "src\\TiaMcp.Core\\VersionControl\\VciBlockCommentPreservation.cs"
+    },
+    {
+      "sha256": "877e3b2b6612fc6830c10d718a041f583986aac9c04531dfea2e3d82e2f82148",
+      "path": "src\\TiaMcp.Core\\VersionControl\\VciComparison.cs"
+    },
+    {
+      "sha256": "3bb2c8ab6740d31b368e8ec05e518934ba817cf47a16be7297e0e7008b764cf7",
+      "path": "src\\TiaMcp.Core\\VersionControl\\VciModels.cs"
+    },
+    {
+      "sha256": "89900d895eaa5a207e04c1f55fef4a775156d65dbf6a3c9b1895e731dbbe8625",
+      "path": "src\\TiaMcp.Core\\VersionControl\\VciRetainedPackagePreservation.cs"
+    },
+    {
+      "sha256": "ff9d10827c303a72ea560fbb48f50168d1a10c69deb6467c6bf0a0635ddd25c9",
+      "path": "src\\TiaMcp.Core\\WatchTables\\WatchAuthoringProfile.cs"
+    },
+    {
+      "sha256": "b5ce882f6476936150568bd202b647ef75987456091645664b53562212750e56",
+      "path": "src\\TiaMcp.Core\\WatchTables\\WatchTableAuthoring.cs"
+    },
+    {
+      "sha256": "cfb3ba3e66e8727c19436c483d21e9cdb57c420f5fd9c9b72df0278dab38c21e",
+      "path": "src\\TiaMcp.Core\\WatchTables\\WatchTableDispatcher.Admission.cs"
+    },
+    {
+      "sha256": "9ac3b1420fd9362cdd075bd6e33998b3094ef8fd26538b06a261f07fd6cc8b59",
+      "path": "src\\TiaMcp.Core\\WatchTables\\WatchTableDispatcher.Authoring.cs"
+    },
+    {
+      "sha256": "40b34780dcbd30e278291f4f89fe019dc609bfa5ffc55e7871760859933e344d",
+      "path": "src\\TiaMcp.Core\\WatchTables\\WatchTableDispatcher.ComponentWindow.cs"
+    },
+    {
+      "sha256": "1d7551881b11a1989056f961a716c0a7705cf4f9babe4750c8664c2527c5c7f8",
+      "path": "src\\TiaMcp.Core\\WatchTables\\WatchTableDispatcher.cs"
+    },
+    {
+      "sha256": "a57281890986b927fefdac98d508ce536af917438a2335708e58d3710121cb84",
+      "path": "src\\TiaMcp.Core\\WatchTables\\WatchTableDispatcher.SourceNegative.cs"
+    },
+    {
+      "sha256": "acca1c289f8b5f5e430dac615d9f552504f06ade931de2e37a64180260ab5036",
+      "path": "src\\TiaMcp.Core\\WatchTables\\WatchTableDocument.cs"
+    },
+    {
+      "sha256": "3ebb858a9528abbb695b8296f4804960794ac210c46d78d7ff60cf6c43441797",
+      "path": "src\\TiaMcp.Core\\WatchTables\\WatchTableModels.cs"
+    },
+    {
+      "sha256": "ea174f86efc7ed91bd25fb07c2a201b67588b6e563a51be4c814f0f3d25d342b",
+      "path": "src\\TiaMcp.Core\\WatchTables\\WatchTablePlanner.cs"
+    },
+    {
+      "sha256": "bf4fb03d6d5ce1dbfa4165e3390a50affebf33fe05df393f2127e2699d3b6ea8",
+      "path": "src\\TiaMcp.Core\\WatchTables\\WatchTableRecoveryReconciliation.cs"
+    },
+    {
+      "sha256": "1ff7f531ed0ab507e975210174caa6d89d9c4110a989b79423f5b68f228e4c42",
+      "path": "src\\TiaMcp.Core\\WorkerPipeWriter.cs"
+    },
+    {
+      "sha256": "70fc8dedc89e7e29d8dd746cd587dcc6370f567a9a32bac9a3abb8583ddf1799",
+      "path": "src\\TiaMcp.OpcUa.Cli\\Program.cs"
+    },
+    {
+      "sha256": "ecbb68ef7e3471e82d04d23d929c91214ccb122eb1363283cdec1c89800cffe7",
+      "path": "src\\TiaMcp.OpcUa.Cli\\TiaMcp.OpcUa.Cli.csproj"
+    },
+    {
+      "sha256": "bfa3881e5ab4b53314dfe88ed3034b22a93d390715040f018a7fd07849e30042",
+      "path": "src\\TiaMcp.OpcUa\\OpcUaDependencyAnalysis.cs"
+    },
+    {
+      "sha256": "af3d978ad3db000aac9568a3c068a258f7e85c6ffc195822304bb808d4169e8e",
+      "path": "src\\TiaMcp.OpcUa\\OpcUaModelReview.cs"
+    },
+    {
+      "sha256": "3316a236b300038a83ef15f6e70134cc49901504f07c2e6b627ac0b40b5ad8e7",
+      "path": "src\\TiaMcp.OpcUa\\OpcUaNodeIdentity.cs"
+    },
+    {
+      "sha256": "ced81c3a95450556f5dc79850cf78331d483f33e47c6d707b107c43fdd8121dd",
+      "path": "src\\TiaMcp.OpcUa\\OpcUaWorkflowStore.cs"
+    },
+    {
+      "sha256": "dce6e0bed52a053b55886ccb1c0dba7d734c2748379008e5ec5a05aad29ac8e4",
+      "path": "src\\TiaMcp.OpcUa\\TiaMcp.OpcUa.csproj"
+    },
+    {
+      "sha256": "b871e74cb20db6bdada084fd5caa68c791b0aa8ba9417e3cd47a93961fd9a6a6",
+      "path": "tests\\TiaMcp.OpcUa.Dependencies.Tests\\Program.cs"
+    },
+    {
+      "sha256": "1dad054c0a667399f87725dc52b187a5543b795fca8ded4b46223fb81de4c46e",
+      "path": "tests\\TiaMcp.OpcUa.Dependencies.Tests\\TiaMcp.OpcUa.Dependencies.Tests.csproj"
+    },
+    {
+      "sha256": "d04a57c3e2b2ebf7ebff368322d7dfcdf6074879e48686100dfd1e515489b00c",
+      "path": "tests\\TiaMcp.OpcUa.Tests\\Program.cs"
+    },
+    {
+      "sha256": "972d6dec5816eabb024b5d8ba59b6c124a686aa1275500fb54219940a8d471ab",
+      "path": "tests\\TiaMcp.OpcUa.Tests\\TiaMcp.OpcUa.Tests.csproj"
+    },
+    {
+      "sha256": "6714e3e96e6f4890a82f6a07d5d482a83b6a84c63977c9d4a61fb70bb8f8eb35",
+      "path": "third-party\\opcua\\LICENSE"
+    },
+    {
+      "sha256": "960be227536b5e4740d8b5604c70c3d144441edd9dfdb8aecd627bb91bf8f8ed",
+      "path": "third-party\\opcua\\README.md"
+    },
+    {
+      "sha256": "c7ac09ea7504d54174e1eb4c5a8123c0cc491040703dfcd6bfe085bf6c53f9f0",
+      "path": "third-party\\opcua\\UANodeSet.xsd"
+    }
+  ]
+}

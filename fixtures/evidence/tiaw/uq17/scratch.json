@@ -1,0 +1,195 @@
+{
+  "origin": "TIA Portal V21 Openness/offline",
+  "observedAtUtc": "2026-10-15T10:58:43.6075809Z",
+  "processId": 33356,
+  "artifactDirectory": "D:\\TIAW\\uq17\\scratch\\TiaMcpScratch_20261015_105843_2e6e5b18",
+  "stages": [
+    "project_created",
+    "cpu_catalog_verified",
+    "device_created",
+    "new_scratch_cpu_security_configured",
+    "scl_blocks_generated",
+    "software_compiled",
+    "project_saved",
+    "blocks_exported"
+  ],
+  "selectedCpu": {
+    "typeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+    "typeName": "CPU 1511-1 PN",
+    "articleNumber": "6ES7 511-1AL03-0AB0",
+    "version": "V4.1",
+    "selection": "Installed standard CPU 1511-1 PN; newest available firmware across matching articles, with article number as deterministic tie-break."
+  },
+  "scratchSecurity": {
+    "cpus": [
+      {
+        "cpuName": "ScratchPLC",
+        "configuration": "WithPassword",
+        "credentialMetadataPath": "D:\\TIAW\\uq17\\scratch\\TiaMcpScratch_20261015_105843_2e6e5b18\\scratch-credentials\\0394b389ef80430990c02e7ebb6afda0.json",
+        "credentialStorage": "Windows DPAPI CurrentUser",
+        "secretReturned": false,
+        "runtimeUser": {
+          "format": "Windows DPAPI CurrentUser",
+          "credentialId": "dc22435f89424015a2dbe4ef0f7d6e64",
+          "purpose": "Generated password for one new isolated scratch CPU runtime user",
+          "projectPath": "D:\\TIAW\\uq17\\scratch\\TiaMcpScratch_20261015_105843_2e6e5b18\\TiaMcpScratch_20261015_105843_2e6e5b18\\TiaMcpScratch_20261015_105843_2e6e5b18.ap21",
+          "deviceName": "ScratchStation",
+          "cpuName": "ScratchPLC",
+          "username": "TiaMcpTest_c30c406bae86",
+          "roleName": "TiaMcpRuntime_c30c406bae86",
+          "functionRightIdentifier": "ProtectionLevelFullAccess",
+          "functionRightName": "Vollzugriff",
+          "protectedPath": "D:\\TIAW\\uq17\\scratch\\TiaMcpScratch_20261015_105843_2e6e5b18\\scratch-credentials\\dc22435f89424015a2dbe4ef0f7d6e64.dpapi",
+          "state": "configured",
+          "anonymousAccessChanged": false,
+          "existingProtectionDisabled": false,
+          "secretReturned": false,
+          "roleIdentifier": "TiaMcpRuntime_c30c406bae86",
+          "isActive": true,
+          "authenticationType": "Password",
+          "credentialMetadataPath": "D:\\TIAW\\uq17\\scratch\\TiaMcpScratch_20261015_105843_2e6e5b18\\scratch-credentials\\dc22435f89424015a2dbe4ef0f7d6e64.json",
+          "supported": true
+        }
+      }
+    ],
+    "scope": "Only newly created CPUs in the current worker-owned scratch project",
+    "existingProtectionDisabled": false
+  },
+  "compile": {
+    "state": "Success",
+    "errorCount": 0,
+    "warningCount": 0,
+    "messages": [
+      {
+        "description": "",
+        "path": "ScratchPLC",
+        "state": "Success",
+        "depth": 0
+      },
+      {
+        "description": "",
+        "path": "Program blocks",
+        "state": "Success",
+        "depth": 1
+      },
+      {
+        "description": "Block was successfully compiled.",
+        "path": "Main (OB1)",
+        "state": "Success",
+        "depth": 2
+      },
+      {
+        "description": "Block was successfully compiled.",
+        "path": "TiaMcp_EnableGate (FB1)",
+        "state": "Success",
+        "depth": 2
+      },
+      {
+        "description": "Block was successfully compiled.",
+        "path": "TiaMcp_IsEnabled (FC1)",
+        "state": "Success",
+        "depth": 2
+      },
+      {
+        "description": "Compiling finished (errors: 0; warnings: 0)",
+        "path": null,
+        "state": "Success",
+        "depth": 0
+      }
+    ],
+    "messagesTruncated": false
+  },
+  "exports": [
+    {
+      "block": {
+        "path": "/projects/TiaMcpScratch_20261015_105843_2e6e5b18/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_IsEnabled",
+        "plcPath": "/projects/TiaMcpScratch_20261015_105843_2e6e5b18/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+        "name": "TiaMcp_IsEnabled",
+        "number": 1,
+        "kind": "FC",
+        "programmingLanguage": "SCL",
+        "isConsistent": true,
+        "isKnowHowProtected": false
+      },
+      "artifact": {
+        "path": "D:\\TIAW\\uq17\\scratch\\TiaMcpScratch_20261015_105843_2e6e5b18\\block-36af22a4324645f5863a0e069244cacd.xml",
+        "bytes": 5835,
+        "sha256": "1a1fe1eeabcbc9b01a8cd0daab4f23893050c83d698a1a7c8c0ff7521b3e43ca",
+        "mediaType": "application/xml"
+      }
+    },
+    {
+      "block": {
+        "path": "/projects/TiaMcpScratch_20261015_105843_2e6e5b18/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate",
+        "plcPath": "/projects/TiaMcpScratch_20261015_105843_2e6e5b18/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+        "name": "TiaMcp_EnableGate",
+        "number": 1,
+        "kind": "FB",
+        "programmingLanguage": "SCL",
+        "isConsistent": true,
+        "isKnowHowProtected": false
+      },
+      "artifact": {
+        "path": "D:\\TIAW\\uq17\\scratch\\TiaMcpScratch_20261015_105843_2e6e5b18\\block-724af80e2caa444da7c777214d07a58f.xml",
+        "bytes": 7434,
+        "sha256": "4f86a470f9ac8cc1bd8f7e642ce520d45234699a6ab40fbf64ad6ac18c00ef6f",
+        "mediaType": "application/xml"
+      }
+    },
+    {
+      "block": {
+        "path": "/projects/TiaMcpScratch_20261015_105843_2e6e5b18/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+        "plcPath": "/projects/TiaMcpScratch_20261015_105843_2e6e5b18/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+        "name": "TiaMcp_EnableGate_DB",
+        "number": 1,
+        "kind": "InstanceDB",
+        "programmingLanguage": "DB",
+        "isConsistent": true,
+        "isKnowHowProtected": false
+      },
+      "artifact": {
+        "path": "D:\\TIAW\\uq17\\scratch\\TiaMcpScratch_20261015_105843_2e6e5b18\\block-813a29f071b4414b9b6bcdf85a151d67.xml",
+        "bytes": 4740,
+        "sha256": "26ab56412bfc8795bfa95e46f689b5fb9aead3d45c43cc44e4fe61012f32b62f",
+        "mediaType": "application/xml"
+      }
+    },
+    {
+      "block": {
+        "path": "/projects/TiaMcpScratch_20261015_105843_2e6e5b18/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/Main",
+        "plcPath": "/projects/TiaMcpScratch_20261015_105843_2e6e5b18/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+        "name": "Main",
+        "number": 1,
+        "kind": "OB",
+        "programmingLanguage": "SCL",
+        "isConsistent": true,
+        "isKnowHowProtected": false
+      },
+      "artifact": {
+        "path": "D:\\TIAW\\uq17\\scratch\\TiaMcpScratch_20261015_105843_2e6e5b18\\block-436085cc368f491f9114990852abddd2.xml",
+        "bytes": 6544,
+        "sha256": "09df44732add472c1f59737ec27cfd0e00e4cddb13b5e735f0d80060e45544dd",
+        "mediaType": "application/xml"
+      }
+    }
+  ],
+  "exportScope": "Only the four fixed standard source fixtures; generated safety/system blocks are not exported.",
+  "completed": true,
+  "project": {
+    "name": "TiaMcpScratch_20261015_105843_2e6e5b18",
+    "path": "D:\\TIAW\\uq17\\scratch\\TiaMcpScratch_20261015_105843_2e6e5b18\\TiaMcpScratch_20261015_105843_2e6e5b18\\TiaMcpScratch_20261015_105843_2e6e5b18.ap21"
+  },
+  "attemptedCoverage": [
+    "One installed CPU",
+    "Fixed standard SCL FC, FB, instance DB and cyclic Main OB call",
+    "Software compile",
+    "Native block XML exports"
+  ],
+  "unverified": [
+    "KOP/LAD",
+    "FUP/FBD",
+    "AWL/STL",
+    "Safety",
+    "PLCSIM download and execution"
+  ]
+}

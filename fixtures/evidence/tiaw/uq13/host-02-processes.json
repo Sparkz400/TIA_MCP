@@ -1,0 +1,51 @@
+[
+  {
+    "pid": 19996,
+    "parentPid": 53620,
+    "created": 1792060588.6827796,
+    "name": "TiaMcp.Openness.V21.exe",
+    "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\src\\TiaMcp.Openness.V21\\bin\\Release\\net48\\TiaMcp.Openness.V21.exe",
+    "command": [
+      "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\deployment-build\\b274e08b806a44f4928e429f190b153d\\src\\TiaMcp.Openness.V21\\bin\\Release\\net48\\TiaMcp.Openness.V21.exe",
+      "--component-qualification",
+      "--pipe",
+      "TiaMcp-7a7f637564104e4db72606d1fb2bdea2"
+    ]
+  },
+  {
+    "pid": 37612,
+    "parentPid": 19996,
+    "created": 1792060588.8481565,
+    "name": "Siemens.Automation.Portal.exe",
+    "exe": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+    "command": [
+      "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+      "-bootstrapper=Siemens.Automation.Opns.Loader.Impl:Siemens.Automation.Openness.Loader.BootStrapper",
+      "-nosplashscreen"
+    ]
+  },
+  {
+    "pid": 54036,
+    "parentPid": 19996,
+    "created": 1792060626.4951975,
+    "name": "Siemens.Automation.Portal.exe",
+    "exe": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+    "command": [
+      "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+      "-bootstrapper=Siemens.Automation.Opns.Loader.Impl:Siemens.Automation.Openness.Loader.BootStrapper",
+      "-nosplashscreen"
+    ]
+  },
+  {
+    "pid": 49392,
+    "parentPid": 19996,
+    "created": 1792060659.4454331,
+    "name": "Siemens.Automation.Portal.exe",
+    "exe": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Bin\\Siemens.Automation.Portal.exe",
+    "command": [
+      "C:\\Program Files\\Siemens\\Automation\\Portal V21\\bin\\Siemens.Automation.Portal.exe",
+      "-bootstrapper=Siemens.Automation.Opns.Loader.Impl:Siemens.Automation.Openness.Loader.BootStrapper",
+      "-nosplashscreen"
+    ]
+  }
+]

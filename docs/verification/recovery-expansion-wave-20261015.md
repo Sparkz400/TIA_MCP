@@ -16,9 +16,9 @@ Runs were sequential; no concurrent native work was delegated.
 
 | Run | Exact outcome |
 | --- | --- |
-| `D:/TIAW/wm01`, frozen build-02 worker | New-worker startup timed out before any project command; no checkpoint/interruption profile ran. Shutdown did not initially confirm exit. Both exact owned processes were subsequently absent; this is not a clean-exit receipt. |
-| `D:/TIAW/wm02`, previously accepted binary-04 worker | Startup, owned scratch creation, close and unforced worker/native exit succeeded. Control only; no watch change or interruption profile ran. |
-| `D:/TIAW/wm03`, integrated build-04 worker | Startup timed out before any project command. Exact owned TIA PID 53904 was forcibly stopped after executable/parent/start-time verification; worker PID 20792 then exited. Both were verified absent. Original failure remains failed. |
+| `D:/TIAW/wm01` ([retained copy](../../fixtures/evidence/tiaw/wm01)), frozen build-02 worker | New-worker startup timed out before any project command; no checkpoint/interruption profile ran. Shutdown did not initially confirm exit. Both exact owned processes were subsequently absent; this is not a clean-exit receipt. |
+| `D:/TIAW/wm02` ([retained copy](../../fixtures/evidence/tiaw/wm02)), previously accepted binary-04 worker | Startup, owned scratch creation, close and unforced worker/native exit succeeded. Control only; no watch change or interruption profile ran. |
+| `D:/TIAW/wm03` ([retained copy](../../fixtures/evidence/tiaw/wm03)), integrated build-04 worker | Startup timed out before any project command. Exact owned TIA PID 53904 was forcibly stopped after executable/parent/start-time verification; worker PID 20792 then exited. Both were verified absent. Original failure remains failed. |
 
 Cleanup intent (`artifacts/recovery-expansion-20261015/native/wm03-cleanup-intent.json`) and cleanup result (`artifacts/recovery-expansion-20261015/native/wm03-cleanup-result.json`) retain the forced termination. Unrelated sessions were untouched. The static startup comparison (`artifacts/recovery-expansion-20261015/recovery-audit/startup-static-comparison.json`) found unchanged startup methods, program entry, configuration and Newtonsoft dependency. The first failed worker also retained the old session source. Read-only allowlist inspection does not establish the timeout's cause. No registry, security configuration or installed MCP package was changed. The current native execution window is closed; engineering obligations remain open.
 

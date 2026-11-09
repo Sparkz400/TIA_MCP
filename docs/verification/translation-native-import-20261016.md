@@ -6,7 +6,7 @@ The independent final verification (`artifacts/translation-native-20261016-02/na
 
 ## Accepted native evidence
 
-Original native evidence remains under `D:\TIAW\tr1603`. The final receipt directory is `D:\TIAW\tr1603\continuation-02`; its hashed prior packet is `continuation-01`. The delivery manifest (`artifacts/translation-native-20261016-02/delivery.json`) binds these locations, package manifests and verification receipts.
+Original native evidence remains under `D:\TIAW\tr1603` ([retained copy](../../fixtures/evidence/tiaw/tr1603)). The final receipt directory is `D:\TIAW\tr1603\continuation-02` ([retained copy](../../fixtures/evidence/tiaw/tr1603/continuation-02)); its hashed prior packet is `continuation-01`. The delivery manifest (`artifacts/translation-native-20261016-02/delivery.json`) binds these locations, package manifests and verification receipts.
 
 | Trial | Durable operation | Result |
 | --- | --- | --- |

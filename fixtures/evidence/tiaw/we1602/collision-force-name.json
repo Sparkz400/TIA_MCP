@@ -1,0 +1,25 @@
+{
+  "code": "WatchTableCollision",
+  "arguments": {
+    "request": {
+      "generationId": "66f2ccbc3ad84348be01d4c8cc69c259",
+      "generationSha256": "27f373feafe450640f5e43a3799dfa895b7f83d3867fa97130b3dd445f3227af",
+      "idempotencyKey": "collision-force-name",
+      "mode": "create",
+      "destination": {
+        "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+        "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+        "group": "root",
+        "tableName": "Force table"
+      },
+      "steps": [
+        {
+          "kind": "add",
+          "candidateId": "member1",
+          "templateOrdinal": 0
+        }
+      ]
+    }
+  },
+  "automaticReplay": false
+}

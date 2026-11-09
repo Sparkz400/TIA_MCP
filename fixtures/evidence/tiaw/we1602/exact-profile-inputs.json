@@ -1,0 +1,15 @@
+{
+  "sources": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\source\\scripts\\qualify_watch_exact_profile.py",
+      "sha256": "e925c294f9d59bcb8f9b0e9735889453150ffa2fdf966270f20046b755662658"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\source\\scripts\\verify_watch_exact_profile.py",
+      "sha256": "273d74e20b0787fc1c0d9c0d7dd82b577a6402feffee98ce9e76413aa39f87f7"
+    }
+  ],
+  "productionActivation": false,
+  "profile": "watch.create-owned-v21-1511-v41-de-active-bool.v1",
+  "automaticRetry": false
+}

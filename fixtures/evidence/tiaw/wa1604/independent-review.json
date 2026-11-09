@@ -1,0 +1,40 @@
+{
+  "operationId": "93db799b413f415c9ca0f730f52f0470",
+  "reviewedPlanSha256": "a5e81312e1a5053467aad7917fa2cab712ed82ed549265fcb11c4585a0482554",
+  "reviewedInputSha256": "1b052ec8af495a2397abb347654ff478d105059312d3a6d11357a67716dc1cba",
+  "delta": {
+    "rows": 1,
+    "symbol": "\"TiaMcp_EnableGate_DB\".Active",
+    "datatype": "Bool",
+    "modifyValue": "",
+    "defaultCommentCulture": "de-DE",
+    "reason": "Captured Output state of the selected FB instance: Active",
+    "requiredProfiles": [
+      "watch.add-instance-bool.v1",
+      "watch.create-instance.v1",
+      "watch.reference-free-authoring-ids.v1"
+    ],
+    "documentIdMapping": {
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "3": "3"
+    }
+  },
+  "frozenSources": {
+    "manifest": {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\manifest.json",
+      "sha256": "114190360c055b31794bdf7be85600ac62f9437dd172c5265ed9ba8b8d45267a",
+      "bytes": 68123
+    },
+    "worker": {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\wt05-authoring-20261016\\revision-03\\binary\\worker\\TiaMcp.Openness.V21.exe",
+      "sha256": "ab3956e0bb551a79e3bbdc00be776dac103413befb495c4993872f8d6216cf4f",
+      "bytes": 1373696
+    },
+    "verifiedFiles": 277
+  },
+  "nativeInvoked": false,
+  "noOnlineAction": true,
+  "approved": true
+}

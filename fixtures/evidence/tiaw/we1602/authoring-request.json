@@ -1,0 +1,19 @@
+{
+  "generationId": "bcd5da4d2a2a448c8e0ef868e976960e",
+  "generationSha256": "52208bf9febbf1657432213549b6e4c183ce278dd1caf4f959bb3870f4488cba",
+  "idempotencyKey": "wt05-create-bool",
+  "mode": "create",
+  "destination": {
+    "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+    "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+    "group": "root",
+    "tableName": "WT05_BoolCreation"
+  },
+  "steps": [
+    {
+      "kind": "add",
+      "candidateId": "member1",
+      "templateOrdinal": 0
+    }
+  ]
+}

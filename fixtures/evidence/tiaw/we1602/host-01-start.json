@@ -1,0 +1,23 @@
+{
+  "identity": {
+    "pid": 39060,
+    "parentPid": 17776,
+    "created": 1792142383.8912416,
+    "name": "TiaMcp.Host.exe",
+    "exe": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.exe",
+    "command": [
+      "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\host\\TiaMcp.Host.exe",
+      "--timeout-seconds",
+      "240",
+      "--worker",
+      "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\watch-exact-20261016\\package-03\\worker\\TiaMcp.Openness.V21.exe",
+      "--artifacts",
+      "D:\\TIAW\\we1602",
+      "--component-qualification",
+      "--watch-qualification",
+      "none"
+    ]
+  },
+  "point": "none",
+  "processes": []
+}

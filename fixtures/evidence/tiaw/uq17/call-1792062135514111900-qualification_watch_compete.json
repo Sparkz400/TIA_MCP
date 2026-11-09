@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"code\":\"ResourceBusy\",\"operationId\":\"11e0eac02846493c9872a897647dd05f\",\"competitorId\":\"fd59866ab00e4d6ab9607d728a3339b7\",\"hostProcessId\":17132,\"nativeDispatchInvoked\":false}"
+    }
+  ]
+}

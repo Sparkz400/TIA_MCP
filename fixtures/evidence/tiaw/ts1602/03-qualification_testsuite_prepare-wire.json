@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "An error occurred invoking 'qualification_testsuite_prepare'."
+    }
+  ],
+  "isError": true
+}

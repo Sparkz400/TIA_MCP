@@ -1,0 +1,16 @@
+{
+  "completed": true,
+  "nativeInvoked": false,
+  "profileQualificationPassed": false,
+  "failingProfileRemainsDisabled": true,
+  "recovery": {
+    "originalDisposition": "unchanged",
+    "restoredProjectVerified": true,
+    "retrievalResponseRetained": true,
+    "recoveryPath": "D:\\TIAW\\uq17\\r_e61a46fb25\\TiaMcpScratch_20261015_105843_2e6e5b18\\TiaMcpScratch_20261015_105843_2e6e5b18.ap21",
+    "finalState": "reconciled"
+  },
+  "exactNormalCleanupVerified": true,
+  "hostRestartVerified": true,
+  "replayAndCompetingOwnerRefused": true
+}

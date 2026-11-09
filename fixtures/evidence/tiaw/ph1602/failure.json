@@ -1,0 +1,4 @@
+{
+  "error": "watch_table_apply: {\"error\": {\"code\": \"WorkerDisconnected\", \"message\": \"The TIA worker connection failed: Worker disconnected before completing a response.\", \"details\": null}}",
+  "automaticReplay": false
+}

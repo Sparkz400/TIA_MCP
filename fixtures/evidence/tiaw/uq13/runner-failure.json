@@ -1,0 +1,4 @@
+{
+  "error": "watch_table_apply: {\"error\": {\"code\": \"EngineeringError\", \"message\": \"Error when calling method 'Import' of type 'Siemens.Engineering.SW.WatchAndForceTables.PlcWatchTableComposition'.\\r\\n\\r\\nCannot update the 'MultilingualText' object with Simatic ML ID '2' at line number 68 at line position 12.\\r\\n\\r\\nThe value of attribute 'Comment text' contains an invalid character at Position 21.\", \"details\": {\"exceptionType\": \"Siemens.Engineering.EngineeringTargetInvocationException\"}}}",
+  "automaticReplay": false
+}

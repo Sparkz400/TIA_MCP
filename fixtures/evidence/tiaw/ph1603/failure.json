@@ -1,0 +1,4 @@
+{
+  "error": "MCP host exited: info: ModelContextProtocol.Server.McpServer[1867955179]\n      Server (TiaMcp.Host 1.0.0.0), Client (production-host-bool-qualification 1) method 'tools/call' request handler completed in 9288.532ms.\ninfo: ModelContextProtocol.Server.McpServer[570385771]\n      Server (TiaMcp.Host 1.0.0.0), Client (production-host-bool-qualification 1) method 'tools/call' request handler called.\ninfo: ModelContextProtocol.Server.McpServer[2065726448]\n      \"watch_table_prepare\" completed. IsError = False.\ninfo: ModelContextProtocol.Server.McpServer[1867955179]\n      Server (TiaMcp.Host 1.0.0.0), Client (production-host-bool-qualification 1) method 'tools/call' request handler completed in 1314.6947ms.\ninfo: ModelContextProtocol.Server.McpServer[570385771]\n      Server (TiaMcp.Host 1.0.0.0), Client (production-host-bool-qualification 1) method 'tools/call' request handler called.",
+  "automaticReplay": false
+}

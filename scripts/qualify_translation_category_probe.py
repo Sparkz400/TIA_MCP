@@ -24,6 +24,7 @@ import native_dispatch_guard
 from smoke_mcp import Client
 import verify_watch_expansion as watch_oracle
 from verify_watch_workflow import canonical_matches, canonical_sha, load
+from qualification_root import short_root
 from verify_translation_populated_category_probe import MAIN_BLOCK_LABELS, decode, main_prefix, populated_control
 
 REPO = Path(__file__).resolve().parents[1]
@@ -465,7 +466,7 @@ def preflight(args):
         require(sha(source) == template["sourceSha256"][Path(source).name], "Frozen collector source changed")
     api_root = Path(r"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48")
     require(all(sha(api_root / name) == value for name, value in template["apiSha256"].items()), "Installed API bytes changed")
-    expected_roots = {safe_path(REPO / "artifacts"), safe_path(Path("D:/TIAW/wt02")), root}
+    expected_roots = {safe_path(REPO / "artifacts"), safe_path(short_root() / "wt02"), root}
     roots = [safe_path(p) for p in (args.resource_root or sorted(expected_roots, key=str))]
     require(len(roots) == 3 and set(roots) == expected_roots, "Exactly canonical repository, source wt02 ledger and new run roots must be admitted")
     gate = verify_recovery_gate(args.recovery_gate, host, worker)
@@ -687,7 +688,7 @@ def main():
     parser.add_argument("--host", type=Path, default=BUILD / "published-host/TiaMcp.Host.exe")
     parser.add_argument("--worker", type=Path, default=BUILD / "src/TiaMcp.Openness.V21/bin/Release/net48/TiaMcp.Openness.V21.exe")
     parser.add_argument("--root", type=Path, required=True)
-    parser.add_argument("--project", type=Path, default=Path(r"D:\TIAW\wt02\s\TiaMcpScratch_20261015_071342_e395a300\TiaMcpScratch_20261015_071342_e395a300\TiaMcpScratch_20261015_071342_e395a300.ap21"))
+    parser.add_argument("--project", type=Path, default=short_root() / "wt02/s/TiaMcpScratch_20261015_071342_e395a300/TiaMcpScratch_20261015_071342_e395a300/TiaMcpScratch_20261015_071342_e395a300.ap21")
     parser.add_argument("--source-capture", type=Path, default=REPO / "artifacts/production-watch-20261015/translations/native-category-01")
     parser.add_argument("--template", type=Path, default=LANE / "native-request-template.json")
     parser.add_argument("--managed-tests", type=Path, default=LANE / "managed-build/bin/TiaMcp.Translations.Tests/debug/TiaMcp.Translations.Tests.dll")

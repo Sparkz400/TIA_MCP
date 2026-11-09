@@ -1,0 +1,26 @@
+[
+  {
+    "path": "D:\\TIAW\\uq05\\controller-source\\qualify_watch_mcp.py",
+    "sha256": "9ddfc1d52e65134d2092c6bf8f085e34238c1dd7f0bb2697cfada81c85cf48f8"
+  },
+  {
+    "path": "D:\\TIAW\\uq05\\controller-source\\qualify_worker_startup_exact.py",
+    "sha256": "6455ee5f67c8936d25c9dd05edbb026d0698065429a50e9a2aae00bd6d8b88b8"
+  },
+  {
+    "path": "D:\\TIAW\\uq05\\controller-source\\smoke_mcp.py",
+    "sha256": "5d2764eb14caf49988f5f3e8cee8fd42bf8aad6eef9966506d48c1dbde6ef23b"
+  },
+  {
+    "path": "D:\\TIAW\\uq05\\controller-source\\block_test_process.py",
+    "sha256": "52eb1811eff1987ab37ca301c2ce53d626e4780c1dd5072bf986cd0bece83ad9"
+  },
+  {
+    "path": "D:\\TIAW\\uq05\\controller-source\\verify_watch_expansion.py",
+    "sha256": "f6db81a361964e44b0d2587ccc3dc8679f6561d3d2a34ab88d13ce5469d0bbb8"
+  },
+  {
+    "path": "D:\\TIAW\\uq05\\controller-source\\verify_watch_workflow.py",
+    "sha256": "59ce5775138ebe22cd5d96bd036cbf9808646d7464f12da502becd36801bd876"
+  }
+]

@@ -1,0 +1,53 @@
+{
+  "nativeQualification": false,
+  "startedAtUtc": "2026-10-16T09:01:57.9015629Z",
+  "schemaVersion": 1,
+  "targetProbed": false,
+  "dotnetSdk": "10.0.402",
+  "completedAtUtc": "2026-10-16T09:02:33.3707491Z",
+  "status": "passed",
+  "binaries": [
+    {
+      "sha256": "595997b5bc4f2806762f784d1c44dce792587f3b61fd842cfd730877bb58b846",
+      "path": "source\\src\\TiaMcp.OpcUa.Cli\\bin\\Release\\net10.0\\TiaMcp.Core.dll"
+    },
+    {
+      "sha256": "6b83e4b0733ee7249a419b2f3f6c4b2575270346218598c85854abb562a20ca7",
+      "path": "source\\src\\TiaMcp.OpcUa.Cli\\bin\\Release\\net10.0\\TiaMcp.OpcUa.Cli.deps.json"
+    },
+    {
+      "sha256": "0da08af78fd45630709f2a211262151448c8bd1ea97d84c57d5b0700a4bc41ce",
+      "path": "source\\src\\TiaMcp.OpcUa.Cli\\bin\\Release\\net10.0\\TiaMcp.OpcUa.Cli.dll"
+    },
+    {
+      "sha256": "c7e518b96a82024281f11cb79004aaa638959ed1ca812cfaeb89e679296bf937",
+      "path": "source\\src\\TiaMcp.OpcUa.Cli\\bin\\Release\\net10.0\\TiaMcp.OpcUa.Cli.exe"
+    },
+    {
+      "sha256": "c230a317a54dd960bcbeb5f347f52e18dc665a26f7efda2159fced9a5ac7e097",
+      "path": "source\\src\\TiaMcp.OpcUa.Cli\\bin\\Release\\net10.0\\TiaMcp.OpcUa.Cli.runtimeconfig.json"
+    },
+    {
+      "sha256": "45a406a62924909621b4aa7bf8ecd5c8ac4353fc594c08cc6dbdf4a9adf040da",
+      "path": "source\\src\\TiaMcp.OpcUa.Cli\\bin\\Release\\net10.0\\TiaMcp.OpcUa.dll"
+    }
+  ],
+  "testBinary": {
+    "sha256": "f2ed7e4c11f5d5072db326052cb8f7bd4e30470af9d61cb2f0ee9380c6b12b25",
+    "path": "source\\tests\\TiaMcp.OpcUa.Tests\\bin\\Release\\net10.0\\TiaMcp.OpcUa.Tests.dll"
+  },
+  "sourceManifestSha256": "e6891f10190f3615562751fb6f66a9695d6d44017c222974528ba321c4918e7e",
+  "dependencyTestBinary": {
+    "sha256": "b891272092573e4c75468e7235600a9c550b9e51d02160283a0a04526e32075a",
+    "path": "source\\tests\\TiaMcp.OpcUa.Dependencies.Tests\\bin\\Release\\net10.0\\TiaMcp.OpcUa.Dependencies.Tests.dll"
+  },
+  "python": "Python 3.13.15",
+  "checks": {
+    "existingOutputPreservation": "passed",
+    "nativeAcceptance": "notRun",
+    "metadataTests": "passed",
+    "fixtureImpact": "passed",
+    "dependencyTests": "passed",
+    "managedTests": "passed"
+  }
+}

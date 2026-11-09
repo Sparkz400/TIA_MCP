@@ -1,0 +1,16 @@
+{
+  "request": {
+    "operationId": "9a4e37aaf6e54a7788e8ac2942f10624",
+    "planSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "revision": 0
+  },
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "An error occurred invoking 'qualification_translation_apply'."
+      }
+    ],
+    "isError": true
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"origin\":\"TIA Portal V21 Openness/offline\",\"observedAtUtc\":\"2026-10-16T05:10:48.3409474Z\",\"processId\":19076,\"project\":{\"name\":\"TiaMcpScratch_20261016_050817_4567dfa4\",\"path\":\"D:\\\\TIAW\\\\ph1602\\\\r_d163b07ac2\\\\TiaMcpScratch_20261016_050817_4567dfa4\\\\TiaMcpScratch_20261016_050817_4567dfa4.ap21\"},\"opened\":true,\"saved\":false}"
+    }
+  ],
+  "structuredContent": {
+    "origin": "TIA Portal V21 Openness/offline",
+    "observedAtUtc": "2026-10-16T05:10:48.3409474Z",
+    "processId": 19076,
+    "project": {
+      "name": "TiaMcpScratch_20261016_050817_4567dfa4",
+      "path": "D:\\TIAW\\ph1602\\r_d163b07ac2\\TiaMcpScratch_20261016_050817_4567dfa4\\TiaMcpScratch_20261016_050817_4567dfa4.ap21"
+    },
+    "opened": true,
+    "saved": false
+  },
+  "isError": false
+}

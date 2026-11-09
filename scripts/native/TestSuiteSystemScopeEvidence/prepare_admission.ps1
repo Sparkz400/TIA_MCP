@@ -7,7 +7,7 @@ param(
     [Parameter(Mandatory=$true)][string]$OutputDirectory,
     [Parameter(Mandatory=$true)][string]$AdmissionPath,
     [Parameter(Mandatory=$true)][string]$PackageManifest,
-    [string]$ArtifactRoot = 'D:\TIAW'
+    [string]$ArtifactRoot = $(if ($env:TIA_MCP_SHORT_ROOT) { $env:TIA_MCP_SHORT_ROOT } else { 'D:\TIAW' })
 )
 $ErrorActionPreference = 'Stop'
 function Get-ExactArtifact([string]$ArtifactPath) {

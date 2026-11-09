@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"error\":{\"code\":\"RecoveryRequired\",\"message\":\"A prior attempt cannot be dispatched again; inspect and reconcile it.\",\"details\":null}}"
+    }
+  ],
+  "structuredContent": {
+    "error": {
+      "code": "RecoveryRequired",
+      "message": "A prior attempt cannot be dispatched again; inspect and reconcile it.",
+      "details": null
+    }
+  },
+  "isError": true
+}

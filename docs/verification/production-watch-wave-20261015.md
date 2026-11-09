@@ -13,7 +13,7 @@ See [workflow boundaries](../reference/watch-table-workflow.md) and [journal sem
 
 ## Normal native milestone
 
-`D:\TIAW\wt04` completed on frozen `native/binary-03` through the real production dispatcher. Operation `72fbb25f3f634368a2b0a39530f3669b` binds reviewed digest `ebfc90b497fe653dd49c82653f7890c9f73589845e20f344ea40a2007485cf17`.
+`D:\TIAW\wt04` ([retained copy](../../fixtures/evidence/tiaw/wt04)) completed on frozen `native/binary-03` through the real production dispatcher. Operation `72fbb25f3f634368a2b0a39530f3669b` binds reviewed digest `ebfc90b497fe653dd49c82653f7890c9f73589845e20f344ea40a2007485cf17`.
 
 The independent nine-stage verification (`artifacts/production-watch-20261015/document-review/wt04-workflow-verification-02.json`) checks the complete journal chain, approved delta, typed/native XML readback, stable baseline, archive identity, distinct fresh processes, original/restored observations and final `reconciled` state. Strict native comparisons exclude only `DocumentInfo.Created` and the approved literal; they do not discard meaningful whitespace, comments, native IDs or the failed blank-peer case. Seven exported peers remain equal across five later phases. All six owned native PIDs exited; cleanup receipt (`artifacts/production-watch-20261015/document-review/wt04-cleanup-review-01.json`).
 
@@ -23,7 +23,7 @@ Seven byte-identical owned exports are packaged with hashes and relative provena
 
 ## Actual interruption and explicit recovery
 
-`D:\TIAW\wt06`, frozen worker `native/binary-04` (SHA-256 `f14c8e07ba5529c36637d779ff5fc891f4d92be8cf55fe9ff52dd72489613ce7`), deliberately terminates the worker after import and save but before its response. Worker PID 53840 exited with code 73. The Host records `outcomeUnknown` at revision 5 and retains resource ownership; no successful readback is invented. The marker binds the exact saved original and owned native PID 38200, which also exited.
+`D:\TIAW\wt06` ([retained copy](../../fixtures/evidence/tiaw/wt06)), frozen worker `native/binary-04` (SHA-256 `f14c8e07ba5529c36637d779ff5fc891f4d92be8cf55fe9ff52dd72489613ce7`), deliberately terminates the worker after import and save but before its response. Worker PID 53840 exited with code 73. The Host records `outcomeUnknown` at revision 5 and retains resource ownership; no successful readback is invented. The marker binds the exact saved original and owned native PID 38200, which also exited.
 
 Operation `3f96ca5ade7a44ef810edf903540904b` binds reviewed digest `f96d2179d16384a1d96c05ca03b311de80355af360ec9ad61f174cc1d78501e7`. A fresh recovery runner explicitly attempts the same apply and receives `RecoveryRequired` before native dispatch. It then retrieves the checkpoint, reopens that destination in another fresh instance, and separately opens the saved original. The recovered target is `FALSE`, the original is `TRUE`, all peers match, and the final journal is `reconciled` with exactly one dispatch. The recovery worker PID 23368 exited with code 0.
 

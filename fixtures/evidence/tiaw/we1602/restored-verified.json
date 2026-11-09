@@ -1,0 +1,173 @@
+{
+  "operation": {
+    "id": "a4cad60758c9452999d028bd72d15d51",
+    "revision": 9,
+    "state": "recoveryIntent",
+    "idempotencyKey": "wt05-create-bool",
+    "planSha256": "86cdbb36f22f5830108dce2c29e6f55021e46f06d8d90a83bd2830b624c2d196",
+    "plan": {
+      "operation": "watchAuthoring",
+      "target": {
+        "reference": {
+          "object": {
+            "projectPath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+            "plcPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "scopePath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "objectPath": "/projects/TiaMcpScratch_20261016_092205_92409b23/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/watch/root/WT05_BoolCreation",
+            "kind": "watchTable"
+          },
+          "snapshot": {
+            "observationId": "9455aec4215c4e9b8877cc1a6b2edddf",
+            "sourceSha256": "90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a",
+            "tiaVersion": 21
+          },
+          "contentSha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59"
+        },
+        "projectFilePath": "D:\\TIAW\\we1602\\scratch\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23\\TiaMcpScratch_20261016_092205_92409b23.ap21",
+        "sessionEpoch": "0b44e985dc2b4bdab175108fa73c3c99",
+        "adapterSha256": "f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157",
+        "profileSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f",
+        "hardwareIdentity": "OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||",
+        "nativeIdentity": null,
+        "offline": true,
+        "probes": [
+          {
+            "name": "offline",
+            "state": "observed",
+            "evidenceSha256": "90579c04ec8609ac25d23d265c92dce4db49ae1414ca3e40518972a5150a002a"
+          },
+          {
+            "name": "watchImport",
+            "state": "observed",
+            "evidenceSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f"
+          }
+        ]
+      },
+      "resources": [
+        {
+          "resourceKey": "project:D:\\TIAW\\WE1602\\SCRATCH\\TIAMCPSCRATCH_20261016_092205_92409B23\\TIAMCPSCRATCH_20261016_092205_92409B23\\TIAMCPSCRATCH_20261016_092205_92409B23.AP21",
+          "kind": "project",
+          "effect": "reviewedWatchAuthoring:create",
+          "recoveryStrategy": "projectArchiveToNewLocation"
+        }
+      ],
+      "inputs": [
+        {
+          "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/review.json",
+          "sha256": "55c75112e467e7b230dc0fb5200708a94dd5342ec8f787e876420a8a4bb21370"
+        },
+        {
+          "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/reviewed.xml",
+          "sha256": "1b052ec8af495a2397abb347654ff478d105059312d3a6d11357a67716dc1cba"
+        },
+        {
+          "relativePath": "watch-generations/bcd5da4d2a2a448c8e0ef868e976960e.json",
+          "sha256": "52208bf9febbf1657432213549b6e4c183ce278dd1caf4f959bb3870f4488cba"
+        },
+        {
+          "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/native-template.xml",
+          "sha256": "d710c6b85dd5c94cc27d7eb7edc24f5ac188ec5bdbaccdae5998acf5b697c09d"
+        },
+        {
+          "relativePath": "watch-source-captures/instance-36bf2501a6514ee3ac8f2f1745d71399/fb.xml",
+          "sha256": "e572e89ec0f6b4c68b61551c77f3325f8e80111943a841add6fbc6d1793f081b"
+        },
+        {
+          "relativePath": "watch-source-captures/instance-36bf2501a6514ee3ac8f2f1745d71399/instance.xml",
+          "sha256": "b3c636df9737f7506aa2cec3bb1e99c5879f4769eb35ea0a2eadd735253a6bad"
+        },
+        {
+          "relativePath": "watch-observations/w_9dd36bc279bf/absent.txt",
+          "sha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59"
+        },
+        {
+          "relativePath": "watch-observations/w_9dd36bc279bf/snapshot.json",
+          "sha256": "8180981be6e563b34c68ac3b309358d281d49d7f9301ae769fe7d01c6face0ab"
+        }
+      ],
+      "requiredProbes": [
+        "offline",
+        "watchImport"
+      ],
+      "requiredGates": [
+        "readback",
+        "preservation",
+        "saved",
+        "freshReopen"
+      ]
+    },
+    "previousSha256": "fe2d56cd47db61a98e2688c7b47f27579dd98cbb611ce828f7dd2a0e627a051f",
+    "recordedAt": "2026-10-16T09:25:51.291877+00:00",
+    "checkpoints": [
+      {
+        "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/watch-671cbfd99b1a.zap21",
+        "sha256": "0be94b0a13cef013f9ab90bdb4a240bc594624113834b1ffd3bb420720d666ac"
+      }
+    ],
+    "evidence": [
+      {
+        "gate": "dispatch.readback",
+        "artifact": {
+          "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/applied.json",
+          "sha256": "65eb99144b6333221be51b34e058a8819aa5d3dca6079bf6293a6a750ffaf1b7"
+        }
+      },
+      {
+        "gate": "readback",
+        "artifact": {
+          "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/fresh-reopen-14b8696fa2c74189a5ebd0957bc66002.json",
+          "sha256": "451d4089c3912e31a8a2f779477668f73545393124f395414995e3f5478f70f7"
+        }
+      },
+      {
+        "gate": "preservation",
+        "artifact": {
+          "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/fresh-reopen-14b8696fa2c74189a5ebd0957bc66002.json",
+          "sha256": "451d4089c3912e31a8a2f779477668f73545393124f395414995e3f5478f70f7"
+        }
+      },
+      {
+        "gate": "saved",
+        "artifact": {
+          "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/fresh-reopen-14b8696fa2c74189a5ebd0957bc66002.json",
+          "sha256": "451d4089c3912e31a8a2f779477668f73545393124f395414995e3f5478f70f7"
+        }
+      },
+      {
+        "gate": "freshReopen",
+        "artifact": {
+          "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/fresh-reopen-14b8696fa2c74189a5ebd0957bc66002.json",
+          "sha256": "451d4089c3912e31a8a2f779477668f73545393124f395414995e3f5478f70f7"
+        }
+      },
+      {
+        "gate": "recovery.retrieve",
+        "artifact": {
+          "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/recovered.json",
+          "sha256": "910170a971f80947e913ed262c4cfee04c5b44730e1d16ebd61d422ef7617e71"
+        }
+      },
+      {
+        "gate": "recovery.restored",
+        "artifact": {
+          "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/reconcile-restored-c53f0dca6f6d401580ba03e92424fd13.json",
+          "sha256": "1844bcb22fd8bcbe3d5dfd1e94a79788d79a6cd0e23db61b0769b8359dae549a"
+        }
+      }
+    ],
+    "reconciliation": [],
+    "recoveryDestinations": [
+      {
+        "resourceKey": "project:D:\\TIAW\\WE1602\\SCRATCH\\TIAMCPSCRATCH_20261016_092205_92409B23\\TIAMCPSCRATCH_20261016_092205_92409B23\\TIAMCPSCRATCH_20261016_092205_92409B23.AP21",
+        "recoveryLocation": "D:\\TIAW\\we1602\\r_e2e01728b8"
+      }
+    ],
+    "recoveryResolutions": []
+  },
+  "verified": "restored",
+  "evidence": {
+    "relativePath": "watch/dbf6fc9d3e144abe9c824a0f4642c108/reconcile-restored-c53f0dca6f6d401580ba03e92424fd13.json",
+    "sha256": "1844bcb22fd8bcbe3d5dfd1e94a79788d79a6cd0e23db61b0769b8359dae549a"
+  },
+  "next": "Freshly observe the other resource before reservations can be released."
+}

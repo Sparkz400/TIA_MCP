@@ -1,0 +1,14 @@
+{
+  "request": {
+    "projectPath": "D:\\TIAW\\ta1601\\scratch\\TiaMcpScratch_20261016_084629_65eaf900\\TiaMcpScratch_20261016_084629_65eaf900\\TiaMcpScratch_20261016_084629_65eaf900.ap21",
+    "plcPath": "/projects/TiaMcpScratch_20261016_084629_65eaf900/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC"
+  },
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"completed\":true,\"projectPath\":\"D:\\\\TIAW\\\\ta1601\\\\scratch\\\\TiaMcpScratch_20261016_084629_65eaf900\\\\TiaMcpScratch_20261016_084629_65eaf900\\\\TiaMcpScratch_20261016_084629_65eaf900.ap21\",\"seedMarker\":{\"path\":\"D:\\\\TIAW\\\\ta1601\\\\scratch\\\\TiaMcpScratch_20261016_084629_65eaf900\\\\TiaMcpScratch_20261016_084629_65eaf900\\\\translation-seed-intent.json\",\"bytes\":460,\"sha256\":\"1272aa7571852423960be39f405aacbc7a12f0e3066d994028fe75e895b90862\",\"mediaType\":\"application/xml\"},\"checkpoint\":{\"path\":\"D:\\\\TIAW\\\\ta1601\\\\translation-native\\\\fixture-6c6be289a93a448b90d98cb845ebd51a\\\\before-seed.zap21\",\"bytes\":359598,\"sha256\":\"997c0d255251aa08921a6c80547fd8e355e9382d5cb37693a4ce97b35a8d90a1\",\"mediaType\":\"application/xml\"},\"savedAndReopened\":true}"
+      }
+    ]
+  }
+}

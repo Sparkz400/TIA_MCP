@@ -1,0 +1,4 @@
+{
+  "error": "Process exit was not observed within the bounded wait.",
+  "automaticReplay": false
+}
