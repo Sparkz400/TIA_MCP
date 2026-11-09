@@ -20,7 +20,10 @@ For a relocatable ZIP, run `./scripts/Package.ps1 -Offline`. It writes the bundl
 
 An installed optional API does not establish product/license or native workflow support. The
 [3 November workstation inventory](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/release-readiness-20261103.md)
-finds CFC/DCC and V19 prerequisites, while their adapters and qualification remain open.
+finds CFC/DCC and V19 prerequisites. V19 now has a read-only adapter: build
+`src/TiaMcp.Openness.V19` and start a second Host with `--tia-version 19`
+([V19 adapter](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/tia-v19-adapter.md)); the CFC/DCC
+adapters and qualification remain open.
 The qualification-only [TS-Q03 runner](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/testsuite-system-q03-20261103.md)
 needs an operator-configured isolated OPC UA fixture and does not enable production system tests.
 

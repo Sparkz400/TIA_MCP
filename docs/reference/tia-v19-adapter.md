@@ -5,7 +5,8 @@ against the installed V19 Openness SDK. It reads V19 projects; it never changes,
 To edit a V19 project, upgrade a copy into V21 with `project_upgrade` on a normal (V21) Host.
 
 This is the first adapter of `tia.multiversion` (X12): one worker, build and evidence per TIA major version.
-V15.1, V17, V18 and V20 have no adapter.
+V15.1, V17, V18 and V20 have no adapter. Qualified natively on V19 Update 5 (`local.tia.v19-adapter.20261109`,
+[record](../verification/tia-v19-adapter-20261109.md)).
 
 ## Prerequisites
 
@@ -13,8 +14,11 @@ V15.1, V17, V18 and V20 have no adapter.
   Siemens registers under `HKLM\SOFTWARE\Siemens\Automation\Openness\19.0\PublicAPI\19.0.0.0`) and the licenses
   V19 needs to open the project.
 - Membership in the `Siemens TIA Openness` group, as for V21.
-- The worker in the Openness AllowList. Debug builds register themselves once
-  `scripts/Register-DevOpennessWorker.ps1 -Grant` has run elevated; otherwise TIA asks for access.
+- The worker approved for Openness under TIA V19's own key,
+  `HKLM\SOFTWARE\Siemens\Automation\Openness\19.0\Whitelist` (V19 does not read the shared `AllowList`). Debug
+  builds register there once `scripts/Register-DevOpennessWorker.ps1 -Grant` has run elevated; otherwise TIA asks for
+  access, and `--check-openness-registration` with `--tia-version 19` reports that key
+  ([registration guide](../guides/openness-application-registration.md#tia-v19-builds)).
 
 ## Build and start
 
@@ -53,11 +57,17 @@ V19 descriptions; every other tool is neither listed nor callable, and no prompt
 
 A worker operation the adapter does not implement is refused with `UnsupportedOnTiaVersion` before any native call.
 
+The adapter never saves, but TIA's background indexer rewrites the project's `IM/SearchIndex` files when V19 opens it
+primary (7 files in the qualification run; none on a read-only open). The `.ap19` file and all other project files stay
+unchanged. A project that a V19 Portal holds open is refused by `project_upgrade` with `SourceLocked`.
+
 ## Paths are version-independent
 
 The adapter builds object paths with the V21 worker's code (`ObjectIdentity`), so the path of an object in a V19
 project and in its V21 upgrade differ only in the `/projects/<name>` segment (`project_upgrade` names the copy
-`<name>_V21`). Native XML is not interchangeable between versions: compare content, not bytes.
+`<name>_V21`). Native XML is not interchangeable between versions: compare content, not bytes. `project_upgrade` does not compile,
+and V21 refuses to export the blocks it leaves inconsistent, so compile the upgraded copy (`plc_compile`) before
+reading its blocks.
 
 ## Fixtures and qualification
 
