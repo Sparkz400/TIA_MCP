@@ -17,7 +17,6 @@ Interruption at each durable boundary is qualify_interruption.py --hmi-fixture w
 """
 import argparse
 import base64
-import hashlib
 import json
 import pathlib
 import subprocess
@@ -33,8 +32,7 @@ RETAINED = {"author": ROOT / "fixtures/hmi-coordinated/retained-v1-v3", "set": R
             "refused": ROOT / "fixtures/hmi/unified-text-list/retained-refused"}
 
 
-def digest(raw):
-    return hashlib.sha256(raw).hexdigest()
+from evidence_hash import sha256 as digest
 
 
 def install_retained(store):

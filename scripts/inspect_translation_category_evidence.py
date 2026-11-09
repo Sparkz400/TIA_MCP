@@ -5,7 +5,6 @@ anomaly, not the managed parser or a claim that category semantics are resolved.
 """
 from collections import Counter
 from datetime import datetime, timezone
-import hashlib
 import json
 from pathlib import Path
 import sys
@@ -22,8 +21,7 @@ API = Path("C:/Program Files/Siemens/Automation/Portal V21/PublicAPI/V21/net48/S
 S = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 
 
-def digest(data):
-    return hashlib.sha256(data).hexdigest()
+from evidence_hash import sha256 as digest
 
 
 def artifact(path):

@@ -6,7 +6,6 @@ managed-reader check. No native process is opened or attached.
 """
 from collections import Counter
 from datetime import datetime, timezone
-import hashlib
 import json
 from pathlib import Path
 import sys
@@ -27,7 +26,7 @@ EXPECTED_MODES = ["plc-all", "plc-hardware", "plc-comments", "plc-alarms", "plc-
                   "block-all", "block-hardware", "block-comments", "owner-all", "owner-hardware", "owner-comments", "empty-objects", "null-objects"]
 
 
-def digest(data): return hashlib.sha256(data).hexdigest()
+from evidence_hash import sha256 as digest
 
 
 def artifact(path): return {"path": str(path), "sha256": digest(path.read_bytes()), "bytes": path.stat().st_size}

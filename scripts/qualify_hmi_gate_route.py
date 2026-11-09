@@ -36,7 +36,6 @@ the saved original read-write at the first attempt.
 Interruption at each durable boundary is qualify_interruption.py with the ci-*/et-* scenarios.
 """
 import argparse
-import hashlib
 import json
 import pathlib
 import re
@@ -72,8 +71,7 @@ def admission(kind, profile):
     return "production" if profile in PRODUCTION.get(kind, ()) else "qualification"
 
 
-def digest(raw):
-    return hashlib.sha256(raw).hexdigest()
+from evidence_hash import sha256 as digest
 
 
 def resolve_fixture(profile, fixture=None, seeded_report=None):

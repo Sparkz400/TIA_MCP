@@ -2,7 +2,6 @@
 import argparse
 import base64
 import copy
-import hashlib
 import json
 from pathlib import Path
 
@@ -11,8 +10,7 @@ from referencing import Registry, Resource
 from smoke_mcp import Client, ROOT
 
 
-def sha(raw):
-    return hashlib.sha256(raw).hexdigest()
+from evidence_hash import sha256 as sha
 
 
 def validators():

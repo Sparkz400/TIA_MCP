@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 from pathlib import Path, PurePosixPath
 import re
@@ -17,8 +16,7 @@ KIND_BY_ELEMENT = {"SW.Types.PlcStruct": ("plc_type_import_xml", "expectedTypeNa
 ORDER = ["SW.Types.PlcStruct", "SW.Tags.PlcTagTable", "SW.Blocks.FC", "SW.Blocks.FB", "SW.Blocks.GlobalDB", "SW.Blocks.InstanceDB", "SW.Blocks.OB"]
 
 
-def sha256(data):
-    return hashlib.sha256(data).hexdigest()
+from evidence_hash import sha256
 
 
 def pal_object(text):

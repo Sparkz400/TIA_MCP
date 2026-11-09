@@ -4,7 +4,7 @@ Comments and all string bodies are opaque. Exact declarations/dispatch anchors a
 retained; overload/member dispatch and dependency closure stay conservative.
 """
 from __future__ import annotations
-import argparse, hashlib, json, re
+import argparse, json, re
 from pathlib import Path
 import api_coverage as inventory
 
@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = 'contracts/api-coverage/implementation-bindings.v1.json'
 CATALOG = 'contracts/feature-catalog.v1.json'
 
-def digest(value): return hashlib.sha256(value).hexdigest()
+from evidence_hash import sha256 as digest
 def tokens(text):
     """Return (kind,value,start,end), retaining offsets and ignoring comment decoys."""
     result=[]; i=0; size=len(text)

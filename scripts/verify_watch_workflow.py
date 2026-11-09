@@ -7,7 +7,6 @@ No production parser or semantic-hash implementation is imported.
 import argparse
 import copy
 from datetime import datetime, timezone
-import hashlib
 import json
 from pathlib import Path
 import re
@@ -34,7 +33,7 @@ def need(condition, message):
     if not condition: raise VerificationError(message)
 
 
-def sha(data): return hashlib.sha256(data).hexdigest()
+from evidence_hash import sha256 as sha
 
 
 def load(path):
