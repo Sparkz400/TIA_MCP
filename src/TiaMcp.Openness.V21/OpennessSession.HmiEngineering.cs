@@ -964,7 +964,10 @@ namespace TiaMcp.Openness.V21
             var scope = HmiTargetView(selected);
             var result = LibraryHmiCompiler(selected).Compile();
             InvalidateHmiObservations();
-            return new JObject { ["errorCount"] = result.ErrorCount, ["warningCount"] = result.WarningCount, ["targets"] = new JArray(ChangeCompilation(result, scope.Value<string>("compileScope"))),
+            // Classic screen edits compare the complete before/after diagnostic sets, so an HMI that already carries
+            // hundreds of findings must not be cut at the summary budget (observed: 313 errors, 59 warnings).
+            int budget = change.Kind == "hmi_classic_screen_edit" ? DeviceCompilation.ComparisonMessageBudget : DeviceCompilation.DefaultMessageBudget;
+            return new JObject { ["errorCount"] = result.ErrorCount, ["warningCount"] = result.WarningCount, ["targets"] = new JArray(ChangeCompilation(result, scope.Value<string>("compileScope"), budget)),
                 ["compileScope"] = scope["compileScopeKind"].DeepClone(), ["runtimeVerified"] = false };
         }
 

@@ -27,7 +27,9 @@ namespace TiaMcp.Model
             {
                 var messages = (JArray)target["messages"];
                 string text = messages.Last?.Value<string>("description") ?? "";
-                var summary = Regex.Match(text, @"\A(?:Compiling finished \(errors: (?<e>[0-9]+); warnings: (?<w>[0-9]+)\)|Compilation completed: (?<e>[0-9]+) errors, (?<w>[0-9]+) warnings\.)\z");
+                // Classic V21 ends an HMI compile that has errors with "Compiling aborted (...)" (observed 9 November 2026,
+                // 144 errors / 169 warnings, complete untruncated rows). Its counters are checked exactly like "finished".
+                var summary = Regex.Match(text, @"\A(?:Compiling (?:finished|aborted) \(errors: (?<e>[0-9]+); warnings: (?<w>[0-9]+)\)|Compilation completed: (?<e>[0-9]+) errors, (?<w>[0-9]+) warnings\.)\z");
                 if (!summary.Success || !long.TryParse(summary.Groups["e"].Value, out long e) || !long.TryParse(summary.Groups["w"].Value, out long w)
                     || e != target.Value<int>("errorCount") || w != target.Value<int>("warningCount")) return false;
                 errors += e; warnings += w;

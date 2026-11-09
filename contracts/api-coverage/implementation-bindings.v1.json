@@ -2427,8 +2427,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/ClassicScreenCompileRules.cs",
-      "sha256": "82c18deefded51109a5645f8ec1635c780e83af3c99dbb8428b258d828161494",
-      "bytes": 8499
+      "sha256": "c0334cf5da6493bae807775393572c932c4df2865551d6a29bcf1da33ab78d69",
+      "bytes": 8760
     },
     {
       "path": "src/TiaMcp.Openness.V21/ClassicScreenComposer.Properties.cs",
@@ -2437,8 +2437,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/ClassicScreenComposer.cs",
-      "sha256": "dc749e2d82bbfab32729e5a12c43f1358e4f01d9a897b32f84b33b1657bb43e8",
-      "bytes": 7591
+      "sha256": "557221eea6c978de48b4c39fe93223d3e5005fec76f53c71cd80e27a7e4b7157",
+      "bytes": 9285
     },
     {
       "path": "src/TiaMcp.Openness.V21/ClassicScreenDocumentCache.cs",
@@ -2447,8 +2447,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/ClassicScreenPreflight.cs",
-      "sha256": "2fb77f358cb17d6c467e25ce02cfcd047804d910e94ccc01f68cc8d2a9d3d802",
-      "bytes": 6694
+      "sha256": "ba8bbf399baa5ad53fba8bf0899c71ace4c3e03df36adc7a9eadda04bc4708eb",
+      "bytes": 6938
     },
     {
       "path": "src/TiaMcp.Openness.V21/ClassicScreenPreview.cs",
@@ -2497,8 +2497,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/DeviceCompilation.cs",
-      "sha256": "9338ec7500cf84876e7bd1aae424616693acd7296d366eec2c6c6c65ddd71f0b",
-      "bytes": 9570
+      "sha256": "467db0250e9deefdb4d1ed9245801f52d5cae0676b3be9d46ef93b40e863258e",
+      "bytes": 9926
     },
     {
       "path": "src/TiaMcp.Openness.V21/DriveObjectRules.cs",
@@ -2702,8 +2702,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
-      "sha256": "b15ac9c1b4554d2d8c3f796fa113f88cd3fbb7129a5aead17be06b18807a9306",
-      "bytes": 148263
+      "sha256": "306db506c19251106ba82ecec4d9aaf3209580fdda7b1babd789ed392db7e399",
+      "bytes": 148324
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ClassicScreenArea.cs",
@@ -2827,8 +2827,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiEngineering.cs",
-      "sha256": "a20755be4ad550ccc198f797de0930bc974d1415e5929a1279fd88b9450eed98",
-      "bytes": 90906
+      "sha256": "87a8f5db3c485df18ec5f1f33728103bfa3511b7abacb16a36d0b41157d9d4b4",
+      "bytes": 91295
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiExports.cs",

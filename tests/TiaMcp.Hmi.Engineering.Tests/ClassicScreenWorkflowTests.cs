@@ -98,6 +98,28 @@ static class ClassicScreenWorkflowTests
                 Reject(()=>ClassicScreenPreflight.Check(candidate,original,new[]{original},new HashSet<string>()));
             }
         });
+        check("Composer renumbers cloned TabIndex duplicates the way Classic V21 import does", () => {
+            // Observed 9 November 2026 (screen 3055): composed TabIndex values and TIA's readback after import.
+            int[] composed = { -1,-1,-1,-1,2,-1,2,-1,2,-1,2,-1,3,3,-1,13,13,13,13,13,13,13,13,13,13,13,13,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,7,-1 };
+            int[] native = { -1,-1,-1,-1,1,-1,2,-1,3,-1,4,-1,5,6,-1,8,9,10,11,12,13,14,15,16,17,18,19,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,7,-1 };
+            var screen = Screen(); var list = ClassicScreenPreflight.Items(screen).Single().Parent;
+            list.RemoveNodes();
+            for (int i = 0; i < composed.Length; i++)
+                list.Add(XElement.Parse($"<Hmi.Screen.Rectangle><AttributeList><ObjectName>Item{i}</ObjectName><TabIndex>{composed[i]}</TabIndex></AttributeList></Hmi.Screen.Rectangle>"));
+            ClassicScreenComposer.NormalizeTabIndexes(screen);
+            var result = ClassicScreenPreflight.Items(screen).Select(x => int.Parse(x.Element("AttributeList").Element("TabIndex").Value)).ToArray();
+            Assert(result.SequenceEqual(native));
+            ClassicScreenComposer.NormalizeTabIndexes(screen);
+            Assert(ClassicScreenPreflight.Items(screen).Select(x => int.Parse(x.Element("AttributeList").Element("TabIndex").Value)).SequenceEqual(native));
+        });
+        check("Preflight admits native horizontal/vertical lines but no zero-area line or other item", () => {
+            foreach(var (type,w,h,ok) in new[]{("Hmi.Screen.Line",530,0,true),("Hmi.Screen.Line",0,40,true),("Hmi.Screen.Line",0,0,false),("Hmi.Screen.Line",-1,40,false),("Hmi.Screen.Rectangle",530,0,false)}) {
+                var original=Screen();var candidate=Screen();var item=ClassicScreenPreflight.Items(candidate).Single();
+                item.Name=type;item.Element("AttributeList").SetElementValue("Width",w);item.Element("AttributeList").SetElementValue("Height",h);
+                if(ok) ClassicScreenPreflight.Check(candidate,original,new[]{original},new HashSet<string>());
+                else Reject(()=>ClassicScreenPreflight.Check(candidate,original,new[]{original},new HashSet<string>()));
+            }
+        });
         check("Composer copies native events and explicitly changes scalar placement without mutating sources", () => {
             var original=Screen(); string before=original.ToString();
             var request=new JObject { ["components"]=new JArray(new JObject { ["sourceScreenPath"]="/hmi/screens/Main", ["sourceItem"]="Prototype",["name"]="Clone",["attributes"]=new JObject { ["Left"]=200 } }) };

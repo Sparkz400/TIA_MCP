@@ -74,7 +74,12 @@ namespace TiaMcp.Openness.V21
             return result;
         }
 
-        internal static JObject Describe(CompilerResult result, string target)
+        // Default listing budget for compile summaries. Callers that compare complete diagnostic sets
+        // (Classic screen edits on HMIs with many pre-existing findings) pass a larger budget.
+        internal const int DefaultMessageBudget = 500;
+        internal const int ComparisonMessageBudget = 20000;
+
+        internal static JObject Describe(CompilerResult result, string target, int budget = DefaultMessageBudget)
         {
             var messages = new JArray(); bool truncated = false; int visited = 0, omitted = 0;
             Action<IEnumerable<CompilerResultMessage>, int> collect = null;
@@ -84,8 +89,8 @@ namespace TiaMcp.Openness.V21
                 {
                     // One "Block was successfully compiled." row per block: past the budget, childless Success and Information rows
                     // are counted, not listed; any other row past it still truncates, so a 1,000-block compile is complete only without findings there.
-                    if (visited >= 500 && (item.State.ToString() == "Success" || item.State.ToString() == "Information") && !item.Messages.Any()) { omitted++; continue; }
-                    if (visited++ >= 500) { truncated = true; return; }
+                    if (visited >= budget && (item.State.ToString() == "Success" || item.State.ToString() == "Information") && !item.Messages.Any()) { omitted++; continue; }
+                    if (visited++ >= budget) { truncated = true; return; }
                     messages.Add(new JObject { ["description"] = item.Description, ["path"] = item.Path, ["state"] = item.State.ToString(), ["depth"] = depth });
                     collect(item.Messages, depth + 1);
                     if (truncated) return;

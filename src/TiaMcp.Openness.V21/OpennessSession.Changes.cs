@@ -1341,7 +1341,7 @@ namespace TiaMcp.Openness.V21
             });
         }
 
-        private static JObject ChangeCompilation(CompilerResult result, string target) => DeviceCompilation.Describe(result, target);
+        private static JObject ChangeCompilation(CompilerResult result, string target, int budget = DeviceCompilation.DefaultMessageBudget) => DeviceCompilation.Describe(result, target, budget);
 
         private void PrepareBlockTargets(EngineeringChange change, PlcSelection plc, bool safety, bool mustExist, JArray effects)
         {

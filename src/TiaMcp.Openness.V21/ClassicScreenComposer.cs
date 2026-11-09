@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
@@ -84,9 +85,34 @@ namespace TiaMcp.Model
             // Only the proven open-link form is accepted when regenerating export-local IDs.
             if (result.Descendants().Attributes("TargetID").Any(a => a.Value != "@OpenLink"))
                 throw new ArgumentException("Local TargetID links require a preserving remapper; this composer supports native @OpenLink components only.");
+            NormalizeTabIndexes(result);
             int id = 0;
             foreach (var attribute in result.Descendants().Attributes("ID")) attribute.Value = (id++).ToString("X");
             return result;
+        }
+
+        // Cloned components carry their source TabIndex, so a composed screen can hold duplicates. Classic V21 import
+        // renumbers them, and the exact readback then refuses the edit (observed 9 November 2026, screen 3055). Native
+        // exports always hold 1..N for the tab-stop items. Apply the observed import rule first: a value that is unique
+        // and within 1..N stays; duplicates and out-of-range values take the smallest free values in document order.
+        internal static void NormalizeTabIndexes(XDocument screen)
+        {
+            var fields = ClassicScreenPreflight.Items(screen).Select(i => i.Element("AttributeList")?.Element("TabIndex"))
+                .Where(f => f != null && int.TryParse(f.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int v) && v >= 0).ToArray();
+            int count = fields.Length;
+            var values = fields.Select(f => int.Parse(f.Value, CultureInfo.InvariantCulture)).ToArray();
+            var occurrences = values.GroupBy(v => v).ToDictionary(g => g.Key, g => g.Count());
+            var kept = new bool[count]; var used = new HashSet<int>();
+            for (int i = 0; i < count; i++)
+                if (values[i] >= 1 && values[i] <= count && occurrences[values[i]] == 1) { kept[i] = true; used.Add(values[i]); }
+            int next = 1;
+            for (int i = 0; i < count; i++)
+            {
+                if (kept[i]) continue;
+                while (used.Contains(next)) next++;
+                SetScalar(fields[i], next.ToString(CultureInfo.InvariantCulture));
+                used.Add(next);
+            }
         }
 
         private static void SetScalar(XElement field, string value)
