@@ -88,6 +88,18 @@ internal static class CaptureChecks
             custom["items"]![0]!["dataType"]=JsonSerializer.SerializeToNode(new OpcUaRuntimeNode("urn:custom:types","string","CounterType"),BridgeProtocol.Json);
             OpcUaCaptureContracts.ValidateRead(retainedPlan,customRow with {ReadResultJson=custom.ToJsonString()});
             check(true,"UA original custom declared DataType not equated with decoded builtin type");
+            // A valid UA string array can exceed one segment's budget; the writer refuses it before staging.
+            var wide=JsonNode.Parse(rows[8].Deserialize<RuntimeCaptureRow>(BridgeProtocol.Json)!.ReadResultJson!)!.AsObject();var wideItem=wide["items"]![0]!.AsObject();
+            wideItem["builtInType"]="String";wideItem["arrayDimensions"]=null;
+            wideItem["value"]=new JsonObject{["dimensions"]=new JsonArray(100),["elementEncoding"]="string",
+                ["elements"]=new JsonArray(Enumerable.Range(0,100).Select(_=>(JsonNode?)JsonValue.Create(new string('x',16384))).ToArray())};
+            using(var limits=new RuntimeCaptureStore(Path.Combine(root,"value-limit")))
+            {
+                var bounded=limits.Create(retainedPlan with{CaptureId=Id()});string? limited=null;
+                try{bounded.Append(rows[8].Deserialize<RuntimeCaptureRow>(BridgeProtocol.Json)! with{Sequence=0,ReadResultJson=wide.ToJsonString()});}catch(BridgeException e){limited=e.Code;}
+                check(limited=="RuntimeCaptureValueLimit","UA row above the segment budget refused (actual "+limited+")");
+                bounded.Finish("valueLimit",0);
+            }
             int services=server.Audit.Count;
             await captures.Start(capture,request,default); await captures.Stop(capture,default);
             check(server.Audit.Count==services,"UA capture repeat start and stop never replay");
@@ -98,8 +110,11 @@ internal static class CaptureChecks
             await Refuse(()=>captures.Start(Id(),request,default),"UaCaptureSessionBusy",check);
             await Task.Delay(150); var stopped=Json(await captures.Stop(running,default));
             check(stopped.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="stopped","UA explicit stop terminal reason");
-            services=server.Audit.Count; await Task.Delay(200);
-            check(server.Audit.Count==services,"UA no requests after stop completion");
+            // Stop awaited the poll worker, so the committed record is final: a later status reads the same head without any request.
+            services=server.Audit.Count;
+            var afterStop=Json(await captures.Status(running,default));
+            check(server.Audit.Count==services && afterStop.GetProperty("snapshotRef").GetString()==stopped.GetProperty("snapshotRef").GetString() &&
+                afterStop.GetProperty("state").GetString()=="ended","UA no requests after stop completion");
             if((await sessions.Status(attempt)).State!="connected") { await sessions.Disconnect(attempt); attempt=Id(); await sessions.Connect(attempt,server.Selection); }
             server.ReadDelayMs=250;
             string slow=Id(); await captures.Start(slow,new(attempt,[FixtureServer.Node("bool")],100,1),default);
@@ -115,8 +130,12 @@ internal static class CaptureChecks
             await captures.Start(failed,new(attempt,[FixtureServer.Node("bool")],100,3),default);
             var failure=await End(captures,failed);
             check(failure.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="sessionUnavailable","UA invalid session ends capture");
-            services=server.Audit.Count; await Task.Delay(200);
-            check(server.Audit.Count==services,"UA failure does not reconnect or retry");
+            // Stop awaits the finished worker; its committed record shows the one refused read and no reconnect row.
+            var settled=Json(await captures.Stop(failed,default));
+            check(settled.GetProperty("snapshotRef").GetString()==failure.GetProperty("snapshotRef").GetString() &&
+                settled.GetProperty("recordedProgress").GetProperty("readAttempts").GetInt64()==1 &&
+                Json(captures.Page(settled.GetProperty("snapshotRef").GetString()!,0,200)).GetProperty("rows").EnumerateArray().All(x=>!x.TryGetProperty("reconnect",out _)),
+                "UA failure does not reconnect or retry");
             server.Mode="normal"; await sessions.Disconnect(attempt);
 
             // Fail actual publication with an owned directory collision; the committed prefix remains immutable.

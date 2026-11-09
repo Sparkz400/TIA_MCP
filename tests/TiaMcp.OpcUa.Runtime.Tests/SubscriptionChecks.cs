@@ -105,6 +105,7 @@ internal static class SubscriptionChecks
                 "The default keep-alive count survives a server revision to 1000 ms");
             server.Mode="normal";
             await RetainedControls(root,sessions,capture,status,check);
+            StoreLimits(root,status.GetProperty("plan").Deserialize<OpcUaSubscriptionPlan>(BridgeProtocol.Json)!,check);
             var next=typeof(OpcUaRuntimeSubscriptions).GetMethod("Next",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic)!;
             var previous=typeof(OpcUaRuntimeSubscriptions).GetMethod("Previous",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic)!;
             check((uint)next.Invoke(null,[uint.MaxValue])! == 1 && (uint)next.Invoke(null,[1u])! == 2 && (uint)previous.Invoke(null,[1u])! == uint.MaxValue,"Sequence counter wrap excludes zero with independent boundary constants");
@@ -157,6 +158,35 @@ internal static class SubscriptionChecks
             check(refused,"Rehashed retained subscription contradiction refused: "+mutation.Name);
         }
         check(originalHashes.All(x=>Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(x.Key)))==x.Value),"Every original subscription byte unchanged by rehashed controls");
+    }
+    // Store refusals that no live fixture flow reaches; each uses a fresh capture in its own store root.
+    internal static void StoreLimits(string root,OpcUaSubscriptionPlan plan,Action<bool,string> check)
+    {
+        void Fails(Action action,string code){string? actual=null;try{action();}catch(BridgeException e){actual=e.Code;}check(actual==code,"Subscription store refusal "+code+" (actual "+actual+")");}
+        static OpcUaSubscriptionRow Gap(long sequence)=>new(sequence,0,DateTimeOffset.UtcNow,new("gap",1,GapFrom:1,GapTo:1,MissingCount:1));
+        string storeRoot=Path.Combine(root,"store-limits");
+        using var store=new OpcUaSubscriptionStore(storeRoot);
+        var small=plan with{CaptureId=Id(),Request=plan.Request with{MaximumBytes=1L<<20}};
+        var bounded=store.Create(small);
+        Fails(()=>store.Create(small),"OpcUaSubscriptionExists");
+        Fails(()=>bounded.Append(Gap(1)),"UaSubscriptionStateInvalid");
+        string? limited=null;
+        for(long n=0;n<20000 && limited is null;n++)try{bounded.Append(Gap(n));}catch(BridgeException e){limited=e.Code;}
+        check(limited=="UaSubscriptionByteLimit" && bounded.Rows<20000,"Subscription byte budget refuses the row that would pass MaximumBytes (actual "+limited+")");
+        bounded.Finish("byteLimit",0);
+        Fails(()=>store.Page(bounded.Reference,-1),"OpcUaSubscriptionPageLimit");
+        Fails(()=>store.Page("capture:"+small.CaptureId+":0:"+new string('0',64)),"OpcUaSubscriptionReferenceInvalid");
+        Fails(()=>store.Status("../bad",false),"OpcUaSubscriptionIdentityInvalid");
+        Fails(()=>store.Export(bounded.Reference,"xml",false),"OpcUaSubscriptionFormatInvalid");
+        var changed=store.Create(plan with{CaptureId=Id()});string changedId=changed.Reference.Split(':')[1];
+        string head=Path.Combine(storeRoot,"runtime-ua-subscriptions",changedId,"head.json");
+        File.WriteAllText(head,JsonSerializer.Serialize("ua-subscription:"+changedId+":0:"+new string('0',64)));
+        changed.Append(Gap(0));
+        Fails(()=>changed.Finish("stopped",0),"UaSubscriptionRecordChanged");
+        File.WriteAllText(head,JsonSerializer.Serialize(new string('0',600)));
+        Fails(()=>store.Status(changedId,false),"UaSubscriptionLimit");
+        for(int i=Directory.GetDirectories(Path.Combine(storeRoot,"runtime-ua-subscriptions")).Length;i<64;i++)Directory.CreateDirectory(Path.Combine(storeRoot,"runtime-ua-subscriptions",Id()));
+        Fails(()=>store.Create(plan with{CaptureId=Id()}),"UaSubscriptionCapacity");
     }
     private static OpcUaSubscriptionEvent[] Events(OpcUaRuntimeSubscriptions subscriptions,JsonElement status)=>
         Json(subscriptions.Page(status.GetProperty("snapshotRef").GetString()!,0,200)).GetProperty("rows").EnumerateArray().Select(x=>x.GetProperty("event").Deserialize<OpcUaSubscriptionEvent>(BridgeProtocol.Json)!).ToArray();

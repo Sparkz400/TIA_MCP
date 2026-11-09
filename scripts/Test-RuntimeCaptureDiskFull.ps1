@@ -1,5 +1,7 @@
 param(
     [Parameter(Mandatory=$true)][string]$TestAssembly,
+    # TiaMcp.OpcUa.Runtime.Tests.dll: adds the OPC UA subscription store case on the same owned volume.
+    [string]$UaTestAssembly,
     [string]$OutputDirectory = 'artifacts/runtime-disk-full'
 )
 $ErrorActionPreference = 'Stop'
@@ -10,6 +12,7 @@ if (-not $output.StartsWith($artifactRoot + [IO.Path]::DirectorySeparatorChar, [
     throw 'Disk fixture must live below this repository artifacts directory.'
 }
 $assembly = (Resolve-Path -LiteralPath $TestAssembly).Path
+$uaAssembly = if ($UaTestAssembly) { (Resolve-Path -LiteralPath $UaTestAssembly).Path } else { $null }
 if (Test-Path -LiteralPath $output) { throw 'Use a new output directory to retain every prior result.' }
 [IO.Directory]::CreateDirectory($output) | Out-Null
 $diskPath = Join-Path $output 'bounded-64m.vhdx'
@@ -48,6 +51,16 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Disk-full test process failed with exit code $LASTEXITCODE." }
     $checks = Get-Content -LiteralPath (Join-Path $output 'evidence/disk-full-checks.json') -Raw | ConvertFrom-Json
     if (-not $checks.actualDiskFull) { throw 'Test did not prove actual filesystem exhaustion.' }
+    $receipt.uaSubscription = 'notRun'
+    if ($uaAssembly) {
+        $testFinished = $false
+        & dotnet $uaAssembly --disk-full $volumeRoot $token (Join-Path $output 'evidence-ua') 2>&1 | Tee-Object -FilePath (Join-Path $output 'checks-ua.log')
+        $testFinished = $true
+        if ($LASTEXITCODE -ne 0) { throw "UA disk-full test process failed with exit code $LASTEXITCODE." }
+        $uaChecks = Get-Content -LiteralPath (Join-Path $output 'evidence-ua/disk-full-checks.json') -Raw | ConvertFrom-Json
+        if (-not $uaChecks.actualDiskFull) { throw 'UA test did not prove actual filesystem exhaustion.' }
+        $receipt.uaSubscription = 'passed'
+    }
     $receipt.actualDiskFull = $true
     $receipt.status = 'passed'
 } catch {

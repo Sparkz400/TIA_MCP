@@ -21,6 +21,12 @@ if (args.Length == 3 && args[0] == "--subscription-input-checks" && args[1] == "
     return;
 }
 
+if (args.Length == 4 && args[0] == "--disk-full")
+{
+    await UaDiskFullChecks.Run(args[1], args[2], args[3]);
+    return;
+}
+
 if (args.Length == 4 && args[0] == "--crash-client")
 {
     var selection = JsonSerializer.Deserialize<OpcUaRuntimeSelection>(File.ReadAllText(args[2]), BridgeProtocol.Json)!;

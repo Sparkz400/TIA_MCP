@@ -34,6 +34,23 @@ internal static class RuntimeCaptureChecks
             var export=Json(store.Export(finalRef,"csv",false));Check(export.GetProperty("artifacts").GetArrayLength()==2,"CSV always has full JSON companion");
             string jsonPath=export.GetProperty("artifacts")[0].GetProperty("path").GetString()!;
             using(var doc=JsonDocument.Parse(File.ReadAllText(jsonPath)))Check(doc.RootElement.GetProperty("rows")[0].GetProperty("readResultJson").GetString()==exact,"Export preserves exact JSON text");
+            Fails(()=>store.Create(plan),"RuntimeCaptureExists");
+            Fails(()=>store.Export(finalRef,"xml",false),"RuntimeCaptureFormatInvalid");
+            Fails(()=>writer.Append(Row(3,1005)),"RuntimeCaptureStateInvalid");
+            // A same-length edit keeping the write time passes the verified-snapshot cache; export still re-hashes each segment
+            // and fails mid-write without leaving a final-named or temporary export file.
+            string captureDirectory=Path.Combine(root,"runtime-captures",id),firstSegment=Path.Combine(captureDirectory,"000001.segment");
+            byte[] kept=File.ReadAllBytes(firstSegment);var written=File.GetLastWriteTimeUtc(firstSegment);
+            Json(store.Status(id,false));var exportFiles=Directory.GetFiles(captureDirectory).Order().ToArray();
+            byte[] flipped=(byte[])kept.Clone();flipped[^1]^=1;File.WriteAllBytes(firstSegment,flipped);File.SetLastWriteTimeUtc(firstSegment,written);
+            Fails(()=>store.Export(finalRef,"csv",false),"RuntimeCaptureIntegrityFailure");
+            Check(Directory.GetFiles(captureDirectory).Order().SequenceEqual(exportFiles) && !Json(store.Status(id,false)).GetProperty("uncommittedTailPresent").GetBoolean(),"Failed export leaves no partial export file");
+            File.WriteAllBytes(firstSegment,kept);File.SetLastWriteTimeUtc(firstSegment,written);
+            var failedRead=store.Create(plan with{CaptureId=Guid.NewGuid().ToString("N")});
+            failedRead.Append(Row(0,1) with{ReadResultJson=null,ErrorCode="RuntimeCaptureReadFailed"});
+            Fails(()=>failedRead.Append(Row(1,2) with{ReadResultJson=null,ErrorCode="RuntimeCaptureUnclassified"}),"RuntimeCaptureIntegrityFailure");
+            failedRead.Finish("sessionUnavailable",3);
+            Check(Json(store.Page(failedRead.Reference)).GetProperty("rows")[0].GetProperty("errorCode").GetString()=="RuntimeCaptureReadFailed","Unclassified read failure retains RuntimeCaptureReadFailed");
             string crashId=Guid.NewGuid().ToString("N");store.Create(plan with{CaptureId=crashId});
             Check(Json(store.Status(crashId,false)).GetProperty("state").GetString()=="interrupted","Orphaned acquisition is never resumed");
             string segment=Path.Combine(root,"runtime-captures",id,"000001.segment");byte[] original=File.ReadAllBytes(segment);
