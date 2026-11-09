@@ -209,7 +209,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.code == 'true'
     runs-on: windows-latest
-    # Full hosted runs take 17-20 minutes; 20 cancelled them at the limit.
+    # Full hosted runs took 17-20 minutes before the fixture suites were built once; 20 cancelled them at the limit.
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
