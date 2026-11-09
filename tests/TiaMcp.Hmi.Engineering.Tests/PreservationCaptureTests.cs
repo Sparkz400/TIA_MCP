@@ -135,6 +135,44 @@ static class PreservationCaptureTests
             Assert(mixed["contentHash"].Type == JTokenType.Null, "other-family target remains unqualified");
         }));
 
+        check("A Classic tag-table import scope excludes graphic lists only with its own note and policy", () => InDirectory(directory => {
+            var capture = Capture(directory);
+            capture.Capture(() => capture.Run("classic-export", HmiPath + "/screens/Main", null, () => { }), () => 1);
+            string standing = HmiPreservationRules.ClassicExportNote, excluded = HmiPreservationRules.ClassicGraphicListExcludedNote;
+            string policy = HmiPreservationRules.ClassicTagTablePolicy;
+            var scoped = capture.Manifest("hmi_classic_import", Artifacts(), new JArray(standing, excluded), Targets(), policy);
+            var expected = HmiPreservationRules.ScopeHash("classic", new Dictionary<string, string> { [HmiPath + "/screens/Main"] = new string('a', 64) }, true, policy);
+            Assert(scoped.Value<string>("scopePolicy") == policy && !scoped.Value<bool>("complete"), "declared, incomplete scope");
+            Assert(scoped.Value<string>("contentHash") == expected && HmiEngineeringRules.ScopeAccepted("hmi_classic_import", scoped), "accepted with its own hash");
+            Assert(expected != Manifest(capture).Value<string>("contentHash"), "the policy is part of the content hash");
+            var unscoped = capture.Manifest("hmi_classic_import", Artifacts(), new JArray(standing, excluded), Targets());
+            Assert(unscoped["contentHash"].Type == JTokenType.Null, "the excluded note needs the tag-table policy");
+            var noNote = capture.Manifest("hmi_classic_import", Artifacts(), new JArray(standing), Targets(), policy);
+            Assert(noNote["contentHash"].Type == JTokenType.Null, "the policy needs the excluded note");
+            var twoTargets = capture.Manifest("hmi_classic_import", Artifacts(), new JArray(standing, excluded, standing),
+                new JArray(new JObject { ["family"] = "classic" }, new JObject { ["family"] = "classic" }), policy);
+            Assert(twoTargets["contentHash"].Type == JTokenType.Null, "every Classic target records the excluded note");
+            var withList = new JObject { [HmiPath + "/graphicLists/Status"] = new JObject { ["sha256"] = new string('b', 64), ["bytes"] = 3 } };
+            var listed = capture.Manifest("hmi_classic_import", withList, new JArray(standing, excluded), Targets(), policy);
+            Assert(listed["contentHash"].Type == JTokenType.Null, "a scope that claims to exclude graphic lists cannot contain one");
+            var extra = capture.Manifest("hmi_classic_import", Artifacts(), new JArray(standing, excluded, "unobserved content"), Targets(), policy);
+            Assert(extra["contentHash"].Type == JTokenType.Null, "another gap stays closed");
+            Assert(!HmiEngineeringRules.ScopeAccepted("hmi_classic_screen_edit", scoped) && !HmiEngineeringRules.ScopeAccepted("hmi_engineering", scoped), "other kinds refuse the scope");
+            try { capture.Manifest("hmi_classic_screen_edit", Artifacts(), new JArray(standing, excluded), Targets(), policy); throw new Exception("Expected policy refusal"); }
+            catch (ArgumentException) { }
+        }));
+
+        check("Only the screen edit and the Classic tag-table import scope accept resolved compile findings", () => {
+            var tagTable = new JObject { ["scopePolicy"] = HmiPreservationRules.ClassicTagTablePolicy };
+            var whole = new JObject { ["scopePolicy"] = null };
+            Assert(HmiEngineeringRules.AllowsResolvedCompileProblems("hmi_classic_screen_edit", null), "screen edit");
+            Assert(HmiEngineeringRules.AllowsResolvedCompileProblems("hmi_classic_import", tagTable), "tag-table import scope");
+            Assert(!HmiEngineeringRules.AllowsResolvedCompileProblems("hmi_classic_import", whole), "whole-HMI Classic import stays exact");
+            Assert(!HmiEngineeringRules.AllowsResolvedCompileProblems("hmi_classic_import", null), "no manifest stays exact");
+            foreach (string kind in new[] { "hmi_text_list_import", "hmi_external_tag_create", "hmi_engineering" })
+                Assert(!HmiEngineeringRules.AllowsResolvedCompileProblems(kind, tagTable), kind + " stays exact");
+        });
+
         check("Nested capture phases identify the failing export, not its enclosing target", () => InDirectory(directory => {
             var capture = Capture(directory);
             capture.Capture(() => capture.Run("capture-target", HmiPath, null, () => {

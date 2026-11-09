@@ -237,6 +237,18 @@ generic Classic object exporter are blocked too; metadata inspection and Unified
 graphic-list exports are unaffected by this particular guard. There is no caller
 override. The separate bounded screen workflow never requests graphic-list export.
 
+One exception (9 November 2026): `hmi_classic_import` of a Classic tag table
+(`hmiTagTable`, decided from the resolved native object) captures every other
+Classic export but leaves graphic lists out under scope policy
+`classic-tag-table-import-without-graphic-lists-v1`. Each Classic target records the
+excluded graphic-list note next to the standing Classic note. The policy is part of the
+content hash, so a hash from this scope does not match a whole-HMI capture. A tag-table
+import does not write graphic lists. Their content and references to them are not
+verified. Screen imports and every other kind still refuse while lists exist.
+Its apply accepts compiler findings that disappear, as the bounded screen edit does:
+new tags resolve "tag does not exist" findings in screens that already reference them.
+Any new or worsened error or warning still fails the change. Every HMI change kind lists up to 20,000 compiler rows, so a large baseline is compared in full.
+
 Each capture writes `capture-progress.jsonl` beside `manifest.json`. Start records
 are flushed before native dispatch; completion records follow successful operations.
 A missing completion identifies an operation whose result is not established, not

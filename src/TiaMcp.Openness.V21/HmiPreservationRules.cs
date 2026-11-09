@@ -22,6 +22,10 @@ namespace TiaMcp.Model
         internal const string UnifiedTypedReadbackNote = "Unified typed readback compares the public V21 object model (screens, items, dynamizations, event handlers with hashed script code, parts, translations, tags, alarms, logs, audit, runtime settings, groups, lists, script modules) per node. V21 has no Screen.Export, so payloads without a public getter remain uncompared; this readback is not natively qualified.";
         // The coverage note every Classic capture records once per target; hmi_classic_import accepts exactly it (HmiEngineeringRules.StandingNotes).
         internal const string ClassicExportNote = "All exposed Classic screen/template/popup/slide-in/global/overview, tag-table, connection, cycle, script and text/graphic-list exports are captured. The installed HmiTarget has no public alarm composition; embedded/resource dependency closure and export stability still need exact-profile native qualification.";
+        // A Classic tag-table import cannot write graphic lists, so its capture leaves them out while their native export stays
+        // blocked (HmiNativeExportSafety); every other Classic export is still captured and compared.
+        internal const string ClassicTagTablePolicy = "classic-tag-table-import-without-graphic-lists-v1";
+        internal const string ClassicGraphicListExcludedNote = "Classic graphic lists are not exported or compared: their native export is blocked after an HmiOpenLink conversion failure terminated TIA Portal. A tag-table import does not write graphic lists; their content and references to them are not verified by this capture.";
 
         internal static string Hash(string value)
         {
@@ -144,7 +148,7 @@ namespace TiaMcp.Model
             if (!complete) throw new ArgumentException("PreservationUnavailable: incomplete HMI exports/readback cannot establish a content fingerprint.");
             if (nativeArtifactHashes == null || nativeArtifactHashes.Count == 0 || nativeArtifactHashes.Count > 50000)
                 throw new ArgumentException("A bounded, nonempty complete native-artifact manifest is required.");
-            if (scopePolicy != null && scopePolicy != ClassicScreenPolicy) throw new ArgumentException("Unknown preservation scope policy.");
+            if (scopePolicy != null && scopePolicy != ClassicScreenPolicy && scopePolicy != ClassicTagTablePolicy) throw new ArgumentException("Unknown preservation scope policy.");
             var text = new StringBuilder("hmi-preservation-v1\n" + family + "\n" + (scopePolicy == null ? "" : scopePolicy + "\n"));
             foreach (var pair in nativeArtifactHashes.OrderBy(p => p.Key, StringComparer.Ordinal))
             {

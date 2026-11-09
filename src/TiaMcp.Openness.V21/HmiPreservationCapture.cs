@@ -54,8 +54,10 @@ namespace TiaMcp.Openness.V21
             current = parent;
         }
 
-        internal JObject Manifest(string kind, JObject artifacts, JArray missing, JArray targets)
+        internal JObject Manifest(string kind, JObject artifacts, JArray missing, JArray targets, string classicTagTablePolicy = null)
         {
+            if (classicTagTablePolicy != null && (kind != "hmi_classic_import" || classicTagTablePolicy != HmiPreservationRules.ClassicTagTablePolicy))
+                throw new ArgumentException("The Classic tag-table scope policy belongs to hmi_classic_import only.");
             if (Failure != null)
                 missing.Add("Native preservation capture failed; already-produced artifacts are retained and cannot authorize mutation.");
             var manifest = new JObject { ["schemaVersion"] = 1, ["policyVersion"] = HmiPreservationRules.PolicyVersion,
@@ -67,18 +69,22 @@ namespace TiaMcp.Openness.V21
                 ["progressPath"] = ProgressPath, ["capturedAtUtc"] = DateTime.UtcNow.ToString("O") };
             var hashes = artifacts.Properties().ToDictionary(p => p.Name,
                 p => p.Value.Value<string>("contentSha256") ?? p.Value.Value<string>("sha256"), StringComparer.Ordinal);
-            string scopePolicy = kind == "hmi_classic_screen_edit" ? HmiPreservationRules.ClassicScreenPolicy : null;
+            string scopePolicy = kind == "hmi_classic_screen_edit" ? HmiPreservationRules.ClassicScreenPolicy : classicTagTablePolicy;
             if (scopePolicy != null)
             {
                 manifest["scopePolicy"] = scopePolicy;
-                manifest["scope"] = "Every regular screen of the selected Classic HMI only; explicit excluded coverage below.";
+                manifest["scope"] = scopePolicy == HmiPreservationRules.ClassicScreenPolicy
+                    ? "Every regular screen of the selected Classic HMI only; explicit excluded coverage below."
+                    : "All discovered project HMI targets; complete public Classic export surface except graphic lists; explicit excluded coverage below.";
             }
             manifest["observedArtifactsHash"] = hashes.Count == 0 ? null : HmiPreservationRules.ScopeHash(family, hashes, true, scopePolicy);
             if (Failure == null && missing.Count == 0) manifest["contentHash"] = manifest["observedArtifactsHash"].DeepClone();
             else if (Failure == null && HmiEngineeringRules.ScopeAccepted(kind, manifest))
             {
                 manifest["contentHash"] = manifest["observedArtifactsHash"].DeepClone();
-                manifest["scopeAcceptance"] = scopePolicy ?? (kind + (family == "classic" ? ": only the standing Classic export note" : ": only the standing Unified tag-table export and typed-readback notes"));
+                manifest["scopeAcceptance"] = scopePolicy == HmiPreservationRules.ClassicTagTablePolicy
+                    ? kind + ": " + scopePolicy + "; only the standing Classic export note and the excluded graphic-list note"
+                    : scopePolicy ?? (kind + (family == "classic" ? ": only the standing Classic export note" : ": only the standing Unified tag-table export and typed-readback notes"));
             }
             return manifest;
         }
