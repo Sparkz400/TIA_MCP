@@ -58,6 +58,9 @@ jobs:
 
   python-shard:
     name: Python harnesses (shard ${{ matrix.shard }}/3)
+    needs: changes
+    # Only the aggregate `python` check is required, so docs-only changes may skip the whole matrix.
+    if: needs.changes.outputs.code == 'true'
     runs-on: windows-latest
     timeout-minutes: 20
     strategy:
@@ -92,15 +95,17 @@ jobs:
   python:
     # Keeps the required check name stable across the shard split.
     name: Python contracts and harnesses
-    needs: python-shard
+    needs: [changes, python-shard]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
       - name: Require every Python shard to pass
         env:
           RESULT: ${{ needs.python-shard.result }}
+          CODE: ${{ needs.changes.outputs.code }}
         run: |
-          test "$RESULT" = success || { echo "Python shards: $RESULT"; exit 1; }
+          # Skipped counts only when the scope job decided docs-only, not when it failed.
+          test "$RESULT" = success || { test "$RESULT" = skipped && test "$CODE" = false; } || { echo "Python shards: $RESULT (code=$CODE)"; exit 1; }
 
   managed:
     name: .NET managed suites (shard ${{ matrix.shard }}/4)
