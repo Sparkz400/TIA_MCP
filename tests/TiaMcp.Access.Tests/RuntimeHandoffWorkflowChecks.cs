@@ -15,7 +15,6 @@ internal static class RuntimeHandoffWorkflowChecks
         void Check(bool value, string label) { if (!value) throw new Exception(label); checks.Add(label); }
         void Reject(Action run, string label, string code)
         { try { run(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
-        string Hash(byte[] data) => Convert.ToHexStringLower(SHA256.HashData(data));
         JsonObject Json(object value) => JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!.AsObject();
         var uploads = new ArtifactUploadStore(root); var store = new RuntimeHandoffWorkflowStore(root);
         (string Ref, string Id) Upload(byte[] bytes)

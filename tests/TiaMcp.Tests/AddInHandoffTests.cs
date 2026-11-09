@@ -69,7 +69,6 @@ internal static class AddInHandoffTests
         public ValueTask DisposeAsync() => Store.DisposeAsync();
     }
     private static string Id() => Guid.NewGuid().ToString("N");
-    private static string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
     private static string Challenge(JsonObject value) => (string)value["challenge"]!;
     private static void Unqualified(JsonObject value)
     {

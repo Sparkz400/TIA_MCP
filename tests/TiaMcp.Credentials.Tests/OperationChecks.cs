@@ -31,7 +31,6 @@ internal static class OperationChecks
             try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; }
             throw new Exception("Expected " + code + ": " + label);
         }
-        string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
         EngineeringArtifactReference Save(string name, object value)
         {
             byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(value, BridgeProtocol.Json); File.WriteAllBytes(Path.Combine(root, name), bytes);

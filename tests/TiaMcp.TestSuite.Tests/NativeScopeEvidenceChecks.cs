@@ -21,7 +21,6 @@ internal static class NativeScopeEvidenceChecks
             root = Directory.GetParent(root)?.FullName ?? throw new Exception("Retained genuine Test Suite fixtures are required.");
         string fixture = Path.Combine(root, "fixtures", "testsuite", "native-owned-v21");
         byte[] Read(string path) => File.ReadAllBytes(Path.Combine(fixture, path));
-        string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
         byte[] source = Read("inputs/vendor-help-example.tst"), exported = Read("definitions/system.tst");
         Check(Hash(source) == "7c139e29b965e7769e32b8cf14be55b2f0ef6f4a83febd1ca78cb10e0c77bcee" &&
             Hash(exported) == "fba99160b6e881c3561c2175f46395aad51613873eb6e0cfa2ff93a6a0210276", "Genuine source and native-export bytes changed.");

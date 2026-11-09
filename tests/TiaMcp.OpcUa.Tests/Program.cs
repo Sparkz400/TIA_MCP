@@ -11,7 +11,6 @@ byte[] Xml(string body, string namespaces = "<Uri>urn:test</Uri>") => Encoding.U
     $"<UANodeSet xmlns=\"{ns}\"><NamespaceUris>{namespaces}</NamespaceUris>{body}</UANodeSet>");
 byte[] Variable(string extra = "", string content = "") => Xml($"<UAVariable NodeId=\"ns=1;s=Speed\" BrowseName=\"1:Speed\" DataType=\"i=10\" {extra}>{content}</UAVariable>");
 byte[] Fixture(string name) => File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "fixtures", name));
-string Hash(byte[] data) => Convert.ToHexStringLower(SHA256.HashData(data));
 void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected {expected}, got {actual}"); }
 void Reject(string code, Action action)
 {
@@ -189,11 +188,6 @@ Test("XML event budget includes annotations and opaque elements before DOM alloc
     }
 });
 
-int failures = 0;
-foreach (var test in tests)
-{
-    try { test.Run(); Console.WriteLine("PASS " + test.Name); }
-    catch (Exception ex) { failures++; Console.Error.WriteLine("FAIL " + test.Name + ": " + ex); }
-}
+int failures = RunTests(tests, failuresToStderr: true);
 Console.WriteLine($"{tests.Count - failures}/{tests.Count} offline OPC UA checks passed. No native qualification.");
 return failures == 0 ? 0 : 1;

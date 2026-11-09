@@ -10,7 +10,6 @@ void Check(bool value, string name) { if (!value) throw new Exception(name); che
 void Reject(string code, Action action)
 { try { action(); } catch (BridgeException error) { Check(error.Code == code, "refuses " + code + ": " + error.Code); return; } throw new Exception("Expected " + code); }
 byte[] Bytes(string text) => Encoding.UTF8.GetBytes(text);
-string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
 JsonElement Json(object value) => JsonSerializer.SerializeToElement(value, BridgeProtocol.Json);
 string Text(JsonElement value, string key) => value.GetProperty(key).GetString()!;
 AutomationMlDocument Parse(string text) => AutomationMlDocument.Parse(Bytes(text));

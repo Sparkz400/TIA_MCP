@@ -271,12 +271,7 @@ if (args.Length == 1)
 }
 else if (args.Length != 0) throw new ArgumentException("Optional argument: path to the built OPC UA CLI DLL.");
 
-int failures = 0;
-foreach (var test in tests)
-{
-    try { test.Run(); Console.WriteLine("PASS " + test.Name); }
-    catch (Exception ex) { failures++; Console.Error.WriteLine("FAIL " + test.Name + ": " + ex); }
-}
+int failures = RunTests(tests, failuresToStderr: true);
 Console.WriteLine($"{tests.Count - failures}/{tests.Count} offline OPC UA dependency checks passed.");
 if (args.Length == 0) Console.WriteLine("CLI subprocess checks not run; supply the CLI DLL path or use Test-OpcUaOffline.ps1.");
 return failures == 0 ? 0 : 1;

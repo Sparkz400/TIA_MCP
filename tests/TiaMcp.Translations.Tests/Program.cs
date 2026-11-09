@@ -22,7 +22,6 @@ var parts = Directory.GetFiles(fixtureRoot, "*", SearchOption.AllDirectories)
     .Where(p => !p.EndsWith(".json", StringComparison.OrdinalIgnoreCase)).ToDictionary(p => Path.GetRelativePath(fixtureRoot, p).Replace('\\', '/'), File.ReadAllBytes, StringComparer.Ordinal);
 var profile = TranslationJson.Parse<WorkbookProfile>(File.ReadAllText(Path.Combine(fixtureRoot, "profile.json")));
 var oracle = JsonNode.Parse(File.ReadAllText(Path.Combine(fixtureRoot, "expected.json")))!;
-string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
 var identity = new EngineeringObjectReference(new(@"D:\synthetic\TranslationFixture_A.ap21", null, null, "/project/TranslationFixture_A", "project"), new("fixture-observation-1", new string('a', 64)), new string('b', 64));
 var tests = new List<(string Name, Action Run)>();
 void Test(string name, Action body) => tests.Add((name, body));
@@ -312,8 +311,7 @@ Test("review and candidate are deterministic across reordered edits", () => { va
 
 ExpansionChecks.Register(tests, parts, profile, identity);
 
-int failures = 0;
-foreach (var test in tests) { try { test.Run(); Console.WriteLine("PASS " + test.Name); } catch (Exception ex) { failures++; Console.WriteLine("FAIL " + test.Name + ": " + ex); } }
+int failures = RunTests(tests, failuresToStderr: false);
 Console.WriteLine($"{tests.Count - failures}/{tests.Count} translation checks passed; native execution: false");
 if (failures == 0 && args.Length == 2 && args[0] == "--demo")
 {

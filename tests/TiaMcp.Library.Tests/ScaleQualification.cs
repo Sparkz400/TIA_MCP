@@ -30,7 +30,6 @@ internal static class ScaleQualification
             Save(); return result;
         }
         static void Require(bool condition, string message) { if (!condition) throw new Exception(message); }
-        static string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
         static void Refuse(string code, Action action)
         {
             try { action(); } catch (BridgeException error) when (error.Code == code) { return; }

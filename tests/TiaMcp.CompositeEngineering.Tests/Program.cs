@@ -17,7 +17,6 @@ string root = Path.GetFullPath(args[0]); Directory.CreateDirectory(root); var ch
 void Check(bool ok, string label) { if (!ok) throw new Exception(label); checks.Add(label); }
 void Reject(Action run, string label, string? code = "InvalidCompositeEngineeringReview")
 { try { run(); } catch (BridgeException e) when (code is null || e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
-string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
 JsonObject Obj(string text) => JsonNode.Parse(text)!.AsObject();
 const string p = "/projects/Fixture", plc = p + "/PLC", hw = plc + "/Hardware", peer = plc + "/Peer", to = plc + "/Axis";
 JsonObject Node(string path, string kind, string? parent) => new() { ["nodeId"] = path, ["objectPath"] = path, ["kind"] = kind, ["name"] = "Shared",
