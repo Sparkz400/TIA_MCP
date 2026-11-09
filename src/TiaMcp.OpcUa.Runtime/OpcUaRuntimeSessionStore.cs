@@ -52,11 +52,13 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
         applicationUri = clientUri, certificateSha256 = Convert.ToHexStringLower(SHA256.HashData(certificate.RawData)),
         certificateDerBase64 = Convert.ToBase64String(certificate.RawData), privateKeyStorage = protectedIdentity ? "windowsDpapiCurrentUser" : "ephemeralHostMemory",
         notBefore = certificate.NotBefore.ToUniversalTime(), expiresAt = certificate.NotAfter.ToUniversalTime(),
-        state = ClientCertificateState(certificate), physicalQualified = false,
-        runtimeBinaries = new[] { typeof(OpcUaRuntimeSessionStore).Assembly, typeof(OpcUaRuntimeSelection).Assembly,
-            typeof(Opc.Ua.Client.Session).Assembly, typeof(CertificateFactory).Assembly, typeof(Variant).Assembly }
-            .Distinct().Select(a => new { name = a.GetName().Name, version = a.GetName().Version!.ToString(),
-                sha256 = Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(a.Location))) }) };
+        state = ClientCertificateState(certificate), physicalQualified = false, runtimeBinaries = RuntimeBinaries.Value };
+
+    // The loaded assemblies cannot change within the process: hash them once.
+    private static readonly Lazy<object[]> RuntimeBinaries = new(() => new[] { typeof(OpcUaRuntimeSessionStore).Assembly, typeof(OpcUaRuntimeSelection).Assembly,
+        typeof(Opc.Ua.Client.Session).Assembly, typeof(CertificateFactory).Assembly, typeof(Variant).Assembly }
+        .Distinct().Select(a => (object)new { name = a.GetName().Name, version = a.GetName().Version!.ToString(),
+            sha256 = Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(a.Location))) }).ToArray());
 
     public static string ClientCertificateState(X509Certificate2 certificate) =>
         DateTime.UtcNow < certificate.NotBefore.ToUniversalTime() ? "notYetValid" :
@@ -201,18 +203,40 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
         if (maximum is < 1 or > 256) throw Error("UaRequestLimit");
         return Use(attemptId, (client, token) => client.Browse(attemptId, node, maximum, token), ct);
     }
+    /// <summary>Waits for the session's own lock, never while holding the store gate (lock order: session, then gate).
+    /// The caller re-checks the entry under the gate and releases the returned client's lock.</summary>
+    private async Task<OpcUaRuntimeClient?> Enter(string attemptId, CancellationToken token)
+    {
+        OpcUaRuntimeClient? client;
+        await gate.WaitAsync(token);
+        try { Open(); client = live.GetValueOrDefault(attemptId)?.Client; } finally { gate.Release(); }
+        if (client is not null) await client.Lock.WaitAsync(token);
+        return client;
+    }
+    private bool Current(string attemptId, OpcUaRuntimeClient client, out Live entry) =>
+        live.TryGetValue(attemptId, out entry!) && entry.Client == client;
+    // A complete, normal server reply or a client-side refusal before dispatch: the session itself is unaffected.
+    private static bool Answered(Exception e) => e is BridgeException { Code: "UaBrowseDenied" or "UaNamespaceUnavailable" or "UaWriteValueInvalid" or "UaNodeInvalid" };
     private async Task<T> Use<T>(string attemptId, Func<OpcUaRuntimeClient, CancellationToken, Task<T>> action, CancellationToken ct, string? acquisitionId = null)
     {
         Id(attemptId);
         using var deadline = Deadline(ct);
-        await gate.WaitAsync(deadline.Token);
+        // The request runs under this session's lock only; the gate covers just the bookkeeping, so one slow session
+        // (a Publish waiting for its keep-alive) cannot hold every other session past its deadline.
+        var client = await Enter(attemptId, deadline.Token) ?? throw Error("UaSessionUnavailable");
         try
         {
-            Open();
-            if (!live.TryGetValue(attemptId, out var entry) || entry.Status.State != "connected") throw Error("UaSessionUnavailable");
-            if (acquisition.TryGetValue(attemptId,out var reserved) && reserved!=acquisitionId) throw Error("UaSessionAcquisitionBusy");
-            if (acquisitionId is not null && reserved!=acquisitionId) throw Error("UaSessionAcquisitionUnavailable");
-            if (Load(attemptId) != entry.Status) throw Error("UaSessionRecordChanged");
+            Live entry;
+            await gate.WaitAsync(deadline.Token);
+            try
+            {
+                Open();
+                if (!Current(attemptId, client, out entry) || entry.Status.State != "connected") throw Error("UaSessionUnavailable");
+                if (acquisition.TryGetValue(attemptId,out var reserved) && reserved!=acquisitionId) throw Error("UaSessionAcquisitionBusy");
+                if (acquisitionId is not null && reserved!=acquisitionId) throw Error("UaSessionAcquisitionUnavailable");
+                if (Load(attemptId) != entry.Status) throw Error("UaSessionRecordChanged");
+            }
+            finally { gate.Release(); }
             bool vaultBusy = false;
             try
             {
@@ -226,18 +250,20 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
                 }
                 return await action(entry.Client, deadline.Token);
             }
-            catch (Exception e) when (!vaultBusy)
+            catch (Exception e) when (!vaultBusy && !Answered(e))
             {
                 var status = entry.Status with { State = "remoteSessionUnknown",
                     ErrorCode = e is UaContinuationCleanupFailure ? Code(e) :
                         ct.IsCancellationRequested ? "UaCancelled" : deadline.IsCancellationRequested ? "UaTimeout" : Code(e),
                     OperationErrorCode = e is UaContinuationCleanupFailure cleanup ? cleanup.OperationErrorCode : null, UpdatedAt = DateTimeOffset.UtcNow };
                 entry.Client.Invalidate(acquisitionId is not null && !ct.IsCancellationRequested && OpcUaReconnectHistory.Retryable(status.ErrorCode));
-                Save(status); live[attemptId] = new(entry.Client, status);
+                // Unbounded wait: the failure must be published, and no gate holder waits for a session lock.
+                await gate.WaitAsync();
+                try { Save(status); live[attemptId] = new(entry.Client, status); } finally { gate.Release(); }
                 throw Error(status.ErrorCode!);
             }
         }
-        finally { gate.Release(); }
+        finally { client.Lock.Release(); }
     }
     internal async Task<OpcUaRuntimeStatus> Acquire(string attemptId,string captureId,CancellationToken ct)
     {
@@ -253,15 +279,22 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
     internal async Task<(string? Transfer,string? Status)> ReconnectAcquisition(string attemptId,string captureId,CancellationToken ct)
     {
         (string?,string?) transfer=default;
-        using var deadline=Deadline(ct);await gate.WaitAsync(deadline.Token);
+        using var deadline=Deadline(ct);
+        var client=await Enter(attemptId,deadline.Token) ?? throw Error("UaReconnectUnavailable");
         try
         {
-            Open();
-            if(acquisition.GetValueOrDefault(attemptId)!=captureId || !live.TryGetValue(attemptId,out var entry) || Load(attemptId)!=entry.Status)
-                throw Error("UaReconnectUnavailable");
-            // A busy vault refused the call before anything was sent and left the session connected: nothing to reactivate.
-            if(entry.Status.State=="connected")return transfer;
-            if(entry.Status.State!="remoteSessionUnknown" || !entry.Client.CanReconnect)throw Error("UaReconnectUnavailable");
+            Live entry;
+            await gate.WaitAsync(deadline.Token);
+            try
+            {
+                Open();
+                if(acquisition.GetValueOrDefault(attemptId)!=captureId || !Current(attemptId,client,out entry) || Load(attemptId)!=entry.Status)
+                    throw Error("UaReconnectUnavailable");
+                // A busy vault refused the call before anything was sent and left the session connected: nothing to reactivate.
+                if(entry.Status.State=="connected")return transfer;
+                if(entry.Status.State!="remoteSessionUnknown" || !entry.Client.CanReconnect)throw Error("UaReconnectUnavailable");
+            }
+            finally {gate.Release();}
             var status=entry.Status;
             try
             {
@@ -276,14 +309,18 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
                 string code=ct.IsCancellationRequested?"UaCancelled":deadline.IsCancellationRequested?"UaTimeout":Code(e);
                 entry.Client.Invalidate(!ct.IsCancellationRequested && OpcUaReconnectHistory.Retryable(code));
                 status=status with {ErrorCode=code,UpdatedAt=DateTimeOffset.UtcNow};
-                Save(status);live[attemptId]=new(entry.Client,status);throw Error(code);
+                await gate.WaitAsync();
+                try {Save(status);live[attemptId]=new(entry.Client,status);} finally {gate.Release();}
+                throw Error(code);
             }
             // Never expose a recovered transport if its durable status could not be published.
+            await gate.WaitAsync();
             try {Save(status);live[attemptId]=new(entry.Client,status);}
             catch {entry.Client.Invalidate();throw;}
+            finally {gate.Release();}
             return transfer;
         }
-        finally {gate.Release();}
+        finally {client.Lock.Release();}
     }
     internal Task<OpcUaRuntimeReadResult> ReadAcquisition(string attemptId,string captureId,OpcUaRuntimeNode[] nodes,CancellationToken ct) =>
         Use(attemptId,(client,token)=>client.Read(attemptId,nodes,token),ct,captureId);
@@ -295,18 +332,23 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
         Use(attemptId,(client,token)=>client.Republish(sequence,token),ct,captureId);
     internal async Task<OpcUaSubscriptionEvent?> DeleteSubscription(string attemptId,string captureId)
     {
-        using var deadline=new CancellationTokenSource(TimeoutMs);await gate.WaitAsync(deadline.Token);
+        using var deadline=new CancellationTokenSource(TimeoutMs);
+        var client=await Enter(attemptId,deadline.Token);
+        if(client is null)return null;
         try {
-            if(acquisition.GetValueOrDefault(attemptId)!=captureId || !live.TryGetValue(attemptId,out var entry))return null;
+            Live entry;
+            await gate.WaitAsync(deadline.Token);
+            try {if(acquisition.GetValueOrDefault(attemptId)!=captureId || !Current(attemptId,client,out entry))return null;} finally {gate.Release();}
             var result=await entry.Client.DeleteSubscription(deadline.Token);
             if(result is {Kind:"failure"} || result is {Kind:"deleted",StatusCode:not "0x00000000"})
             {
                 entry.Client.Invalidate();
                 var status=entry.Status with {State="remoteSessionUnknown",ErrorCode="UaSubscriptionCleanupUnknown",UpdatedAt=DateTimeOffset.UtcNow};
-                Save(status);live[attemptId]=new(entry.Client,status);
+                await gate.WaitAsync();
+                try {Save(status);live[attemptId]=new(entry.Client,status);} finally {gate.Release();}
             }
             return result;
-        } finally {gate.Release();}
+        } finally {client.Lock.Release();}
     }
     public async Task<OpcUaRuntimeStatus> Status(string attemptId, CancellationToken ct = default)
     {
@@ -315,8 +357,15 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
     }
     public async Task<OpcUaRuntimeStatus> Disconnect(string attemptId, bool acknowledgeUnknown = false, CancellationToken ct = default)
     {
-        Id(attemptId); using var deadline = Deadline(ct); await gate.WaitAsync(deadline.Token);
-        try { Open(); if(acquisition.ContainsKey(attemptId))throw Error("UaSessionAcquisitionBusy"); return await Close(attemptId, acknowledgeUnknown); } finally { gate.Release(); }
+        Id(attemptId); using var deadline = Deadline(ct);
+        // An in-flight request on this session finishes before the session closes.
+        var client = await Enter(attemptId, deadline.Token);
+        try
+        {
+            await gate.WaitAsync(deadline.Token);
+            try { Open(); if(acquisition.ContainsKey(attemptId))throw Error("UaSessionAcquisitionBusy"); return await Close(attemptId, acknowledgeUnknown); } finally { gate.Release(); }
+        }
+        finally { client?.Lock.Release(); }
     }
     private async Task<OpcUaRuntimeStatus> Close(string attemptId, bool acknowledgeUnknown)
     {
@@ -342,8 +391,15 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
                 await gate.WaitAsync(stop.Token);
                 try
                 {
-                    foreach (var id in live.Where(x => !acquisition.ContainsKey(x.Key) && DateTimeOffset.UtcNow - x.Value.Client.LastUsed > TimeSpan.FromMinutes(2)).Select(x => x.Key).ToArray())
-                        await Close(id, false);
+                    // Only sessions that are already dead close here, after the same two-minute grace. An unused healthy session is
+                    // left to the server's session timeout, so connect -> online-compare bind -> write is not cut off locally.
+                    // A busy session is skipped, never awaited under the gate.
+                    foreach (var (id, entry) in live.Where(x => !acquisition.ContainsKey(x.Key) && !x.Value.Client.Usable &&
+                        DateTimeOffset.UtcNow - x.Value.Client.LastUsed > TimeSpan.FromMinutes(2)).ToArray())
+                    {
+                        if (!entry.Client.Lock.Wait(0)) continue;
+                        try { await Close(id, false); } finally { entry.Client.Lock.Release(); }
+                    }
                 }
                 finally { gate.Release(); }
             }
@@ -355,6 +411,9 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
     {
         if (disposed) return;
         stop.Cancel(); await idle;
+        // In-flight requests (each bounded by its deadline) finish before their clients close.
+        await gate.WaitAsync(); var busy = live.Values.Select(x => x.Client).ToArray(); gate.Release();
+        foreach (var client in busy) await client.Lock.WaitAsync();
         await gate.WaitAsync();
         bool failed = idleFailed;
         try

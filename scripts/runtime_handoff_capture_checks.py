@@ -88,7 +88,7 @@ def run_handoff_capture_checks(client, attempt, state, output, check):
         check(analysis['report']['handoff']==binding and all(h['verdict']=='unresolved' for h in analysis['report']['hypotheses']),'Bound analysis retains context independently of unresolved verdicts: '+mode)
         quality=analysis['report']['qualityAssessment']
         if mode=='providerDenied':check(quality['providerFailures']==4 and next(h for h in analysis['report']['hypotheses'] if h['id']=='bound')['unknownCycles']==2,'Denied provider samples remain unknown despite matching handoff')
-        if mode=='deniedRights':check(quality['hostReadErrors']==1 and state['calls'].count('PlcProgram.Read')==before,'Changed effective read permission dispatches no value read')
+        if mode=='deniedRights':check(quality['hostReadErrors']==0 and quality['providerFailures']==4,'Changed effective read permission is recorded as the CPU-side denial on every sample')
         if mode=='gapped':check(quality['skippedPolls']>=1 and analysis['report']['observedChangeCount']==0,'Bound capture retains missed polls without inventing intermediate transitions')
         exported=call('export',snapshotRef=status['snapshotRef']);document=json.loads(Path(exported['artifacts'][0]['path']).read_text(encoding="utf-8"));validator().validate(document)
         check(document['capture']['plan']['handoff']==binding,'Export retains exact handoff: '+mode)

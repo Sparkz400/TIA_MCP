@@ -51,7 +51,7 @@ def qualify(c, call, fixture, ended, download, schema, attempt, nodes, output, c
     plain = uuid.uuid4().hex
     call(c, "subscription_start", dict(captureId=plain, request=dict(request, events=None, maximumNotifications=1)))
     check("events" not in ended(plain)["plan"]["request"], "Explicit null event option preserves existing signal-only intent")
-    for mode in ("eventNullMessage", "eventSecretEcho"):
+    for mode in ("eventNullMessage",):  # No credential-echo case: the client no longer scans values for the password.
         fixture("mode", value=mode)
         selected = uuid.uuid4().hex
         call(c, "subscription_start", dict(captureId=selected, request=dict(request, nodes=[], maximumNotifications=1)))
@@ -62,10 +62,7 @@ def qualify(c, call, fixture, ended, download, schema, attempt, nodes, output, c
         fixture("emitEvent", number=4, severity=700)
         result = ended(selected)
         original = call(c, "subscription_page", dict(snapshotRef=result["snapshotRef"], count=200))["rows"]
-        if mode == "eventSecretEcho":
-            check(result["recordedProgress"]["notifications"] == 0 and any(r["event"]["errorCode"] == "UaSecretEchoRejected" for r in original), "Credential echoed in event field refuses before journal commit")
-        else:
-            message = next(n["fields"][6] for r in original for n in r["event"].get("events", []))
-            check(message["kind"] == "value" and message["text"] is None and message["locale"] == "de-DE", "Protected event preserves localized null text")
+        message = next(n["fields"][6] for r in original for n in r["event"].get("events", []))
+        check(message["kind"] == "value" and message["text"] is None and message["locale"] == "de-DE", "Protected event preserves localized null text")
     fixture("mode", value="normal")
     return capture, request, reference, rows

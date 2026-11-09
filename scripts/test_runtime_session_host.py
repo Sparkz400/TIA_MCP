@@ -96,7 +96,8 @@ def main():
                     if state['mode']=='slowRead':time.sleep(11)
                     if state.get('readDelay'):time.sleep(state['readDelay'])
                     value=[0,255,17] if body['params']['mode']=='raw' else state.get('symbols',{}).get(body['params']['var'],{}).get('value',18446744073709551615)
-                    if state['mode']=='providerDenied':error={'code':2,'message':password,'data':token}
+                    # The CPU enforces read permission itself; the Host no longer asks Api.GetPermissions per read.
+                    if state['mode']=='providerDenied' or not state['rights']:error={'code':2,'message':password,'data':token}
                     if state['mode']=='echoToken':value=token
                 elif method=='Syslog.Browse':
                     assert body['params']=={'count':2}
@@ -340,7 +341,7 @@ def main():
         count=len(state['calls']);call(c,'read',readargs,code='RuntimeRecordChanged');check(len(state['calls'])==count,'Changed local ownership record refuses before network')
         retained_path.write_bytes(retained_bytes)
         call(c,'read',{**readargs,'selectionId':'0'*32},code='RuntimeSelectionUnavailable')
-        state['rights']=False;before=state['calls'].count('PlcProgram.Read');call(c,'read',readargs,code='RuntimePermissionDenied');check(state['calls'].count('PlcProgram.Read')==before,'Denied permissions never dispatch read');state['rights']=True
+        state['rights']=False;before=state['calls'].count('Api.GetPermissions');failed=call(c,'read',readargs);check(failed['status']=='permissionDenied' and failed['value'] is None and state['calls'].count('Api.GetPermissions')==before,'A read asks no permission list; the CPU-side denial is reported as permissionDenied');state['rights']=True
         state['drift']=True;call(c,'read',readargs,code='RuntimeSymbolMetadataChanged');state['drift']=False
         state['mode']='providerDenied';failed=call(c,'read',readargs);check(failed['status']=='permissionDenied' and failed['value'] is None,'Remote failure has no stale good value or remote text')
         state['mode']='wrongId';call(c,'read',readargs,code='RuntimeResponseInvalid')

@@ -138,6 +138,11 @@ try
             var full = await store.Browse(id, FixtureServer.Node("fixture")); Save("browse-full", full);
             Check(!full.Truncated && full.References.Count == FixtureServer.Values.Count, "Multiple continuation pages complete exact fixture");
             Check(full.References.All(x => x.ReferenceType?.Identifier == "35" && x.TypeDefinition?.Identifier == "63"), "Reference and type-definition identities retained");
+            // A Bad browse status is a complete, normal reply: the session stays connected and keeps working.
+            await Refused(() => store.Browse(id, FixtureServer.Node("absent")), "UaBrowseDenied", "Browsing a missing node is refused");
+            await Refused(() => store.Read(id, [new("urn:tiamcp:absent-namespace", "string", "x")]), "UaNamespaceUnavailable", "An unknown namespace is refused");
+            Check((await store.Status(id)).State == "connected" && (await store.Read(id, [FixtureServer.Node("bool")])).Items[0].Outcome == "value",
+                "Answered refusals leave the session connected and the next read works");
             created = server.Audit.Count;
             await Refused(() => store.Read(id, Enumerable.Repeat(FixtureServer.Node("bool"), 65).ToArray()), "UaRequestLimit", "Read capacity rejected before network");
             await Refused(() => store.Read(id, [new(FixtureServer.Namespace, "numeric", "0001")]), "UaNodeInvalid", "Noncanonical NodeId rejected before network");
@@ -212,8 +217,10 @@ try
         {
             string id = Id(); var status = await store.Connect(id, User(server.Selection));
             Check(status.State == "connected", "Protected-consumer username fixture authenticates");
+            // The password goes only into the encrypted identity token; values are not scanned for it (a short password matched ordinary data).
             server.Mode = "secretEcho";
-            await Refused(() => store.Read(id, [FixtureServer.Node(echoNode)]), "UaSecretEchoRejected", "Server value cannot echo credential: " + echoNode);
+            var echoed = await store.Read(id, [FixtureServer.Node(echoNode)]);
+            Check(echoed.Items[0].Outcome == "value" && (await store.Status(id)).State == "connected", "A value containing the password text is an ordinary value: " + echoNode);
             server.Mode = "normal"; await store.Disconnect(id);
         }
         {
@@ -311,6 +318,24 @@ try
             using var owner = new FileStream(Path.Combine(output, "cleanup-" + fault, "owner.lock"), FileMode.Open, FileAccess.ReadWrite, FileShare.None);
             Check(owner.CanWrite, fault + " releases original owner lock");
         }
+        await using (var store = Store("parallel-sessions"))
+        {
+            // One session's slow request holds only that session: another session's read completes meanwhile.
+            string slow = Id(), quick = Id();
+            await store.Connect(slow, server.Selection); await store.Connect(quick, second.Selection);
+            server.ReadDelayMs = 3000;
+            try
+            {
+                var pending = store.Read(slow, [FixtureServer.Node("bool")]);
+                await Task.Delay(500);
+                var clock = Stopwatch.StartNew();
+                Check((await store.Read(quick, [FixtureServer.Node("bool")])).Items[0].Outcome == "value" && clock.ElapsedMilliseconds < 1500 && !pending.IsCompleted,
+                    "A read on another session completes while one session's read is in flight (" + clock.ElapsedMilliseconds + " ms)");
+                Check((await pending).Items[0].Outcome == "value", "The slow read still completes");
+            }
+            finally { server.ReadDelayMs = 0; }
+            Check((await store.Disconnect(slow)).State == "closed" && (await store.Disconnect(quick)).State == "closed", "Parallel sessions close");
+        }
         var third = await Start("third"); var fourth = await Start("fourth");
         {
             var store = Store("idle-publication"); string id1 = Id(), id2 = Id();
@@ -323,6 +348,11 @@ try
             var clientObject = entry.GetType().GetProperty("Client")!.GetValue(entry)!;
             clientObject.GetType().GetProperty("LastUsed", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
                 .SetValue(clientObject, DateTimeOffset.UtcNow.AddMinutes(-3));
+            // An unused but healthy session is never closed locally; only a dead one is swept.
+            await Task.Delay(1500);
+            Check(server.SessionCount > 0 && (await store.Status(id1)).State == "connected", "An unused healthy session survives the idle sweep");
+            clientObject.GetType().GetMethod("Invalidate", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(clientObject, [false]);
             int first = server.SessionCount, other = second.SessionCount;
             var wait = Stopwatch.StartNew();
             while (server.SessionCount == first && wait.Elapsed < TimeSpan.FromSeconds(5)) await Task.Delay(25);

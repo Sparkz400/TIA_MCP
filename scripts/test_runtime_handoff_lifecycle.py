@@ -60,7 +60,8 @@ def verify(root, proof, runtime):
     for key in ['retiredCredentialRpcRange','rotatedCertificateRpcRange']:
         first,last=proof[key];assert 0<=first==last<=len(requests)
     assert rows_by_case['credentialRetired'][-1]['errorCode']=='CredentialRetired'
-    assert rows_by_case['certificateRotated'][-1]['errorCode']=='RuntimeSessionUnavailable'
+    # A refused certificate is a TLS refusal (RuntimeTlsUnverified), which the capture row records under its generic read-failure code.
+    assert rows_by_case['certificateRotated'][-1]['errorCode']=='RuntimeCaptureReadFailed'
     crash=proof['crash'];status=captures['inflightHostCrash']['status']
     assert crash['processId']>0 and crash['exit']['hostExitCode']!=0 and crash['exit']['stderrEofObserved']
     assert crash['exit']['workerExits']==[] and crash['inFlightRequest'] in requests and crash['inFlightRequest']['method']=='PlcProgram.Read'
