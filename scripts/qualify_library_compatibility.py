@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 from pathlib import Path
 import shutil
 import uuid
@@ -20,7 +21,9 @@ OLD_FIRMWARE_CPU = "CPU 1511-1 PN"
 # CPU firmware before V3.1 has no PLC security wizard (confidential-data password, runtime users) to configure.
 SECURITY_FIRMWARE = (3, 1)
 # Shipped with every V21 installation: a real native V13 library, below the supported V14..V20 upgrade range.
-V13_LIBRARY = Path(r"D:\Arbeit\Siemens\Portal V21\Data\Hmi\Styles\Predefined-Styles\Predefined-Styles.al13")
+# TIA_MCP_PORTAL_EXE names <install>\Bin\Siemens.Automation.Portal.exe; the library sits under the same install root.
+PORTAL_ROOT = Path(os.environ.get("TIA_MCP_PORTAL_EXE") or r"D:\Arbeit\Siemens\Portal V21\Bin\Siemens.Automation.Portal.exe").parents[1]
+V13_LIBRARY = PORTAL_ROOT / "Data/Hmi/Styles/Predefined-Styles/Predefined-Styles.al13"
 UNSAVED_SOURCE = ('FUNCTION "%s" : Void\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\nVAR_TEMP\n    Scratch : Bool;\nEND_VAR\n'
                   'BEGIN\n    #Scratch := TRUE;\nEND_FUNCTION\n') % UNSAVED
 UNCOMPILED_TYPE = "TiaMcpUncompiledType"
