@@ -94,8 +94,11 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Project model and portable explorer tests failed.' }
     node --test ui/project-explorer/tests/model.test.cjs ui/project-explorer/tests/client.test.cjs
     if ($LASTEXITCODE -ne 0) { throw 'Explorer model/client checks failed.' }
-    dotnet "tests/TiaMcp.Tests/bin/$Configuration/net10.0/TiaMcp.Tests.dll" --verify-worker "src/TiaMcp.Openness.V21/bin/$Configuration/net48/TiaMcp.Openness.V21.exe"
-    if ($LASTEXITCODE -ne 0) { throw 'Worker lifecycle regression check failed.' }
+    # Build.ps1 already ran this check unless the build was skipped.
+    if ($SkipBuild) {
+        dotnet "tests/TiaMcp.Tests/bin/$Configuration/net10.0/TiaMcp.Tests.dll" --verify-worker "src/TiaMcp.Openness.V21/bin/$Configuration/net48/TiaMcp.Openness.V21.exe"
+        if ($LASTEXITCODE -ne 0) { throw 'Worker lifecycle regression check failed.' }
+    }
     python -B (Join-Path $PSScriptRoot 'verify_worker_probe_arguments.py') --worker "src/TiaMcp.Openness.V21/bin/$Configuration/net48/TiaMcp.Openness.V21.exe"
     if ($LASTEXITCODE -ne 0) { throw 'Worker discovery probe argument checks failed.' }
     & "tests/TiaMcp.WatchAdapter.Boundary.Tests/bin/$Configuration/net48/TiaMcp.WatchAdapter.Boundary.Tests.exe"
