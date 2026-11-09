@@ -22,8 +22,7 @@ public sealed class TestSuiteQualificationTools(IBridgeClient bridge, HostOption
         { TestSuiteSystemQualification.Admit(context, options.ArtifactsDirectory); return; }
         if (!options.TestSuiteQualification || context.ExecutionProfile != Profile || context.Application is not null || context.Run.Definitions.Length != 1 ||
             !new[] { "TiaMcp_Q01_Clean", "TiaMcp_Q01_Violating" }.Contains(context.Run.Definitions[0].Name) ||
-            !Path.GetFullPath(context.Operation.Plan.Target.ProjectFilePath).StartsWith(
-                Path.Combine(Path.GetFullPath(options.ArtifactsDirectory), "scratch") + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            new ArtifactStore(Path.Combine(options.ArtifactsDirectory, "scratch")).TryResolve(Path.GetFullPath(context.Operation.Plan.Target.ProjectFilePath)) is null)
             throw new BridgeException("TestSuiteProfileUnqualified", "Only the exact owned, UI-observed qualification fixture is admitted.");
     });
     [McpServerTool(Name = "qualification_testsuite_prepare", Destructive = true, OpenWorld = false)]

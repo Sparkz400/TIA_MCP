@@ -52,7 +52,7 @@ public sealed partial class TiaTools
             members.AddRange(extra.Select(x => x!.AsObject()));
         }
         if (members.Count > 8) throw new ArgumentException("A screen batch is bounded to eight members.");
-        string root = Path.GetFullPath(options.ArtifactsDirectory).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        var store = new ArtifactStore(options.ArtifactsDirectory);
         foreach (var member in members)
         {
             if (!member.ContainsKey("xmlArtifact")) continue;
@@ -63,10 +63,9 @@ public sealed partial class TiaTools
                 || expectedHash.Length != 64 || !expectedHash.All(Uri.IsHexDigit))
                 throw new ArgumentException("Use xml or xmlArtifact {path,sha256,bytes?}, never both; artifact paths and SHA-256 values must be strings.");
             if (!Path.IsPathFullyQualified(inputPath)) throw new ArgumentException("Screen artifact paths must be absolute.");
-            string path = Path.GetFullPath(inputPath);
-            if (!path.StartsWith(root, StringComparison.OrdinalIgnoreCase)) throw new ArgumentException("Screen artifacts must be retained under this Host's artifact root.");
+            string path = store.TryResolve(inputPath) ?? throw new ArgumentException("Screen artifacts must be retained under this Host's artifact root.");
             if (new FileInfo(path).Length > 8 * 1024 * 1024) throw new ArgumentException("Screen XML artifact exceeds its byte bound.");
-            new ArtifactStore(options.ArtifactsDirectory).Read(path, 0, 1); // Reuse the artifact-root and junction/symlink guard.
+            store.Read(path, 0, 1); // Reuse the junction/symlink guard.
             using var stream = File.OpenRead(path);
             if (stream.Length > 8 * 1024 * 1024) throw new ArgumentException("Screen XML artifact exceeds its byte bound.");
             if (artifact.ContainsKey("bytes") && (artifact["bytes"] is not System.Text.Json.Nodes.JsonValue byteValue

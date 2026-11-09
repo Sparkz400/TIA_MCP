@@ -350,7 +350,7 @@ var beats = new List<int>();
 using (var stopBeats = new CancellationTokenSource())
 {
     var heartbeat = ToolSurface.Heartbeat(TimeSpan.FromMilliseconds(20), "probe", stopBeats.Token, (beat, message) =>
-    { lock (beats) beats.Add(beat); Check(message.StartsWith("probe still running", StringComparison.Ordinal), "Heartbeat names the running tool"); return Task.CompletedTask; });
+    { lock (beats) beats.Add(beat); Check(message.StartsWith("probe still in progress", StringComparison.Ordinal), "Heartbeat names the pending tool"); return Task.CompletedTask; });
     await Task.Delay(200);
     stopBeats.Cancel(); await heartbeat;
 }

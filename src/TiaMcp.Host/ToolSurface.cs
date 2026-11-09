@@ -109,7 +109,7 @@ internal static class ToolSurface
         {
             for (var beat = 1; await timer.WaitForNextTickAsync(stop); beat++)
                 // Not cancelled mid-write: the result waits for this notification, so none follows it.
-                await notify(beat, $"{tool} still running after {Stopwatch.GetElapsedTime(started).TotalSeconds:0} s");
+                await notify(beat, $"{tool} still in progress after {Stopwatch.GetElapsedTime(started).TotalSeconds:0} s");
         }
         // A lost heartbeat must never change the outcome of the native call it accompanies.
         catch (Exception) { }
