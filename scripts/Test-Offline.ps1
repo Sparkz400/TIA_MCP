@@ -87,7 +87,7 @@ $ManagedCheckGroups = @(
 # Seconds per Python test file (local Python run, about 1:1 with hosted runners; CI run 42379522823); others count as 0.4 s.
 # test_inventory_translation_exports.py is absent: it skips without retained native exports, as on hosted runners.
 $PythonTestSeconds = @{
-    'test_qualification_optimization.py' = 93.8
+    'test_qualification_optimization.py' = 46.9
     'test_encoder_lifecycle.py' = 41.7
     'test_encoder_copy_admission.py' = 26.5
     'test_encoder_hardware_preservation.py' = 20.4
