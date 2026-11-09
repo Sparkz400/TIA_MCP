@@ -5,7 +5,8 @@ from pathlib import Path
 import re
 import unittest
 
-from qualify_tia_v19 import V19_TOOLS, below_project, content, inventory_view
+from qualify_tia_v19 import V19_TOOLS, SourceWatch, below_project, content, inventory_view
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 SURFACE = (ROOT / "src/TiaMcp.Host/TiaVersionSurface.cs").read_text(encoding="utf-8")
@@ -110,6 +111,23 @@ class Paths(unittest.TestCase):
         for broken in ({**result, "warnings": ["x"]}, {**result, "completeness": {"truncated": True}}):
             with self.assertRaises(AssertionError):
                 inventory_view(broken)
+
+
+class Sources(unittest.TestCase):
+    def test_only_the_search_index_may_change_on_open(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / "IM/SearchIndex").mkdir(parents=True)
+            (root / "P.ap19").write_bytes(b"project")
+            (root / "IM/SearchIndex/segments_1").write_bytes(b"a")
+            h = type("H", (), {"report": {}})()
+            watch = SourceWatch(h, root)
+            (root / "IM/SearchIndex/segments_1").write_bytes(b"b")
+            (root / "IM/SearchIndex/segments_2").write_bytes(b"c")
+            self.assertEqual(watch.check("primaryOpen"), {"searchIndexFiles": 2})
+            (root / "P.ap19").write_bytes(b"changed")
+            with self.assertRaises(AssertionError):
+                watch.check("secondaryOpen")
 
 
 if __name__ == "__main__":

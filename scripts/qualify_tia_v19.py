@@ -12,9 +12,14 @@
 3. V21 Host: project_upgrade upgrades the fixture's project folder and its archive into V21 on owned copies with an
    unchanged source; each upgraded project reopens with the same inventory below the project segment, and every block,
    PLC data type and tag table equals its V19 export in the compared content (block attributes and interface members;
-   type members; tags and constants). While the seeder holds the fixture open in V19, its upgrade is attempted too.
+   type members; tags and constants). Because the upgrade does not compile and V21 refuses to export inconsistent blocks,
+   each upgraded copy is compiled with a checkpointed plc_compile change first, which must leave every block consistent.
+   While the seeder holds the fixture open in V19, its upgrade is refused with SourceLocked.
 
-The fixture stays in the run (it is synthetic and names no local folder). Sources are hashed before and after.
+The fixture stays in the run (it is synthetic and names no local folder). Its archive and every project file are hashed
+before and after; each V19 open (adapter primary and read-only, the held Portal) may change only TIA's search index
+(IM/SearchIndex), which its background indexer rewrites, and the .ap19 file must stay byte-identical. While the seeder
+holds the fixture open, V21's project_upgrade refuses it with SourceLocked.
 """
 from __future__ import annotations
 
@@ -28,6 +33,7 @@ import time
 import xml.etree.ElementTree as ET
 
 from block_test_process import OwnedTiaProcessWatcher
+from compilation_evidence import require_compile_only
 from library_native_harness import Harness, require
 from run_block_tests import wait_owned_tia_exit
 
@@ -47,7 +53,7 @@ LIMITATIONS = [
     "The V19 adapter is read-only: discover, attach, start, status, detach, project_open, project_inventory, software_inspect and native-XML block_read, type_read and tag_table_read. No change, compile, save or archive route exists for V19.",
     "Upgrade content comparison covers block attributes (name, number, language, memory layout) and interface members (name, data type, start value), PLC data type members, and tags (name, data type, address) and constants (name, data type, value). Network code is not compared.",
     "Only TIA V19 Update 5 (Openness 19.0.0.0) on this workstation; V15.1, V17, V18 and V20 sources and adapters are not exercised.",
-    "Nothing is compiled after the upgrade: block consistency is recorded as V21 reports it.",
+    "project_upgrade does not compile; the qualifier compiles each owned upgraded copy (plc_compile) before comparing, so the comparison is of the compiled V21 state.",
 ]
 
 
@@ -58,6 +64,28 @@ def sha256(path):
 def fingerprint(folder):
     """Every file below a project folder: relative name, size and SHA-256."""
     return {p.relative_to(folder).as_posix(): sha256(p) for p in sorted(Path(folder).rglob("*")) if p.is_file()}
+
+
+# TIA's background search indexer rewrites these files whenever a Portal opens the project (primary or secondary);
+# they are not project content. Every other source file must stay byte-identical.
+SEARCH_INDEX = "IM/SearchIndex/"
+
+
+class SourceWatch:
+    """The fixture's project folder as of the last check; each check records what an open changed."""
+
+    def __init__(self, h, folder):
+        self.h, self.folder, self.state = h, folder, fingerprint(folder)
+        self.h.report["sourceChanges"] = {}
+
+    def check(self, phase):
+        after = fingerprint(self.folder)
+        changed = sorted(name for name in set(self.state) | set(after) if self.state.get(name) != after.get(name))
+        outside = [name for name in changed if not name.startswith(SEARCH_INDEX)]
+        require(not outside, "%s changed project files outside TIA's search index: %s" % (phase, outside))
+        self.h.report["sourceChanges"][phase] = {"searchIndexFiles": len(changed)}
+        self.state = after
+        return {"searchIndexFiles": len(changed)}
 
 
 def local(tag):
@@ -241,17 +269,20 @@ def body(h):
     project, archive = Path(seeded["project"]["path"]), Path(seeded["archive"]["path"])
     sources = {"projectFolder": fingerprint(project.parent), "archive": sha256(archive)}
     h.report["sourceFiles"] = len(sources["projectFolder"])
-    v19 = adapter(h, fixture, project)
-    upgrades(h, fixture, project, archive, v19)
+    watch = SourceWatch(h, project.parent)
+    v19 = adapter(h, fixture, project, watch)
+    upgrades(h, fixture, project, archive, v19, watch)
     def sources_unchanged():
         after = fingerprint(project.parent)
         changed = sorted(name for name in set(sources["projectFolder"]) | set(after) if sources["projectFolder"].get(name) != after.get(name))
-        require(not changed and sha256(archive) == sources["archive"], "The fixture's source files changed: %s" % changed)
-        return {"files": len(after), "archive": sources["archive"]}
-    h.stage("the fixture's project folder and archive are unchanged", sources_unchanged)
+        outside = [name for name in changed if not name.startswith(SEARCH_INDEX)]
+        require(not outside and sha256(archive) == sources["archive"], "The fixture's source files changed: %s" % outside)
+        require(after[project.name] == sources["projectFolder"][project.name], "The .ap19 project file changed")
+        return {"files": len(after), "searchIndexFilesChanged": len(changed), "archive": sources["archive"]}
+    h.stage("the fixture's archive and every project file outside TIA's search index are unchanged", sources_unchanged)
 
 
-def adapter(h, fixture, project):
+def adapter(h, fixture, project, watch):
     connect(h, 19)
     def surface():
         tools = {t["name"] for t in h.client.request("tools/list", {})["tools"]}
@@ -287,18 +318,19 @@ def adapter(h, fixture, project):
         return codes
     h.stage("the V19 adapter refuses the V21 export formats", formats)
     release(h, watcher, "V19 read")
+    h.stage("the primary open changed no project file outside TIA's search index", lambda: watch.check("primaryOpen"))
 
     watcher = owned(h, "V19 read-only")
     secondary = h.stage("open the V19 fixture read-only", lambda: h.tool("project_open", {"path": str(project), "readOnly": True}))
     require(secondary["readOnly"] is True, "readOnly did not open a secondary project")
     require(inventory_view(h.tool("project_inventory", {"maxItems": 2000})) == view, "The read-only inventory differs")
     def readonly_export():
-        result = h.client.request("tools/call", {"name": "block_read", "arguments": {"blockPath": next(iter(objects["block"]))}})
-        error = ((result.get("structuredContent") or {}).get("error") or {})
-        require(not result.get("isError") or error.get("code") == "ReadOnlyProject", "Unexpected read-only export outcome: %s" % error)
-        return {"exported": not result.get("isError"), "code": error.get("code")}
-    h.report["readOnlyExport"] = h.stage("block_read on the read-only project", readonly_export)
+        error = h.call_error("block_read", {"blockPath": next(iter(objects["block"]))})
+        require(error.get("code") == "ReadOnlyProject", "Expected TIA's read-only export refusal: %s" % error)
+        return error["code"]
+    h.stage("block_read on the read-only project is refused with ReadOnlyProject", readonly_export)
     release(h, watcher, "V19 read-only")
+    h.stage("the read-only open changed no project file outside TIA's search index", lambda: watch.check("secondaryOpen"))
 
     held = h.stage("the seeder holds the fixture open in its own V19 Portal", lambda: fixture.hold(project))
     def attached():
@@ -314,13 +346,14 @@ def adapter(h, fixture, project):
     return {"view": view, "contents": contents, "objects": objects, "fixture": fixture}
 
 
-def upgrades(h, fixture, project, archive, v19):
+def upgrades(h, fixture, project, archive, v19, watch):
     connect(h, 21)
     results = {}
     try:
-        results["lockedSource"] = locked(h, project)
+        results["lockedSource"] = h.stage("project_upgrade while V19 holds the fixture open", lambda: locked(h, project))
     finally:
         h.report["holdRelease"] = h.stage("release the held fixture", fixture.unhold)
+    h.stage("the held open changed no project file outside TIA's search index", lambda: watch.check("heldOpen"))
     for label, source in (("projectFolder", project), ("archive", archive)):
         results[label] = upgrade(h, label, source, v19)
     require(results["projectFolder"]["inventory"] == results["archive"]["inventory"], "Folder and archive upgrades differ")
@@ -328,13 +361,12 @@ def upgrades(h, fixture, project, archive, v19):
 
 
 def locked(h, project):
-    """project_upgrade while V19 holds the fixture open: recorded as V21 answers, with an unchanged source either way."""
+    """project_upgrade while V19 holds the fixture open is refused with SourceLocked and leaves the source unchanged."""
     watcher = owned(h, "locked-source upgrade")
     before = fingerprint(project.parent)
-    result = h.client.request("tools/call", {"name": "project_upgrade", "arguments": {"path": str(project), "expectedSha256": sha256(project)}})
-    content = result.get("structuredContent") or {}
-    outcome = {"upgraded": not result.get("isError"), "code": (content.get("error") or {}).get("code"),
-               "nativeType": ((content.get("error") or {}).get("details") or {}).get("nativeType")}
+    error = h.call_error("project_upgrade", {"path": str(project), "expectedSha256": sha256(project)})
+    require(error.get("code") == "SourceLocked", "Expected SourceLocked while V19 holds the fixture: %s" % error)
+    outcome = {"upgraded": False, "code": error["code"]}
     require(fingerprint(project.parent) == before, "The locked source changed")
     release(h, watcher, "locked-source upgrade")
     return outcome
@@ -352,21 +384,34 @@ def upgrade(h, label, source, v19):
     release(h, watcher, "upgrade " + label)
     watcher = owned(h, "reopen " + label)
     h.stage("reopen the upgraded " + label, lambda: h.reopen_project(str(upgraded)))
-    def compared():
+    def reopened_inventory():
         reopened = inventory_view(h.tool("project_inventory", {"maxItems": 2000}))
         require(reopened == view, "The reopened inventory differs from the upgraded one")
         expected = {k: v for k, v in v19["view"].items() if k != "consistency"}
         require({k: v for k, v in reopened.items() if k != "consistency"} == expected, "The V21 inventory differs from the V19 one below the project")
+        return {"inconsistentBlocks": sorted(p for p, ok in reopened["consistency"].items() if not ok)}
+    before_compile = h.stage("the reopened %s has the V19 inventory below the project" % label, reopened_inventory)
+    # The upgrade does not compile, and V21 refuses to export inconsistent blocks: compile the owned upgraded copy first.
+    def compiled():
+        plc = h.tool("project_inventory", {"maxItems": 2000})["plcs"][0]["path"]
+        prepared = h.tool("change_prepare", {"kind": "plc_compile", "plcPath": plc, "payload": {}})
+        applied = h.apply_prepared("plc_compile", prepared)
+        require_compile_only(prepared, applied, plc)
+        after = inventory_view(h.tool("project_inventory", {"maxItems": 2000}))
+        require(all(after["consistency"].values()), "Blocks stay inconsistent after the V21 compile: %s" % [p for p, ok in after["consistency"].items() if not ok])
+        return {"changeId": applied["changeId"], "compile": applied.get("compile")}
+    compile_result = h.stage("compile the upgraded %s in V21" % label, compiled)
+    def compared():
         _, _, objects = seeded_objects(h, None)
         contents = read_all(h, objects, 21)
         require(set(contents) == set(v19["contents"]), "Upgraded objects differ: %s" % sorted(set(contents) ^ set(v19["contents"])))
         differing = sorted(path for path in contents if contents[path]["content"] != v19["contents"][path]["content"])
         require(not differing, "Content differs after the upgrade: %s" % {p: [v19["contents"][p]["content"], contents[p]["content"]] for p in differing})
-        return {"objects": len(contents), "inconsistentBlocks": sorted(p for p, ok in reopened["consistency"].items() if not ok)}
+        return {"objects": len(contents)}
     comparison = h.stage("the upgraded %s equals the V19 fixture" % label, compared)
     release(h, watcher, "reopen " + label)
     return {"project": result["project"]["name"], "logs": [{k: log.get(k) for k in ("succeeded", "errors", "warnings")} for log in logs],
-            "inventory": {k: v for k, v in view.items() if k != "consistency"}, **comparison}
+            "inventory": {k: v for k, v in view.items() if k != "consistency"}, **before_compile, "compile": compile_result, **comparison}
 
 
 if __name__ == "__main__":
