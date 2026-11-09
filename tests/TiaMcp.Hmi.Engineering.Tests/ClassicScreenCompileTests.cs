@@ -11,6 +11,7 @@ static class ClassicScreenCompileTests
             ["messages"] = new JArray(Row("", "Runtime", "Warning", 0), Row($"Time stamp: {stamp} - {bytes} bytes used", "Runtime", "Warning", 1),
                 Row("Software compilation started.", null, "Information", 2), Row("", owner, "Warning", 2), Row(warning, null, "Warning", 3),
                 Row("Compilation completed: 0 errors, 1 warnings.", null, "Warning", 0)) }) };
+    static JObject Completed(JObject value) { value["targets"][0]["messages"].Last["description"] = "Compiling finished (errors: 0; warnings: 1)"; return value; }
     public static void Run(Action<string, Action> check)
     {
         void Assert(bool value) { if (!value) throw new Exception("Classic diagnostic comparison assertion failed"); }
@@ -44,6 +45,18 @@ static class ClassicScreenCompileTests
             Assert(!ClassicScreenCompileRules.ProblemsUnchanged(before, Fixture(warning: "The position or size of the object is invalid.")));
             var count = Fixture(); count["warningCount"] = 2; Assert(!ClassicScreenCompileRules.ProblemsUnchanged(before, count));
             count = Fixture(); count["targets"][0]["warningCount"] = 2; Assert(!ClassicScreenCompileRules.ProblemsUnchanged(before, count));
+        });
+        check("Classic generated screen-trigger labels are ignored; owner, event and other text stay significant", () => {
+            JObject Trigger(string name, string owner = "3024_Screen", string evt = "Loaded", string text = "The parameter of a function is not available for trigger") {
+                var result = Fixture(owner: owner, warning: $"{text} {name}, event '{evt}'. The referenced object does not exist.");
+                return result;
+            }
+            var before = Trigger("3074_Old_Screen");
+            Assert(ClassicScreenCompileRules.ProblemsUnchanged(before, Trigger("3024_Screen")));
+            Assert(ClassicScreenCompileRules.NoNewProblems(Completed(before), Completed(Trigger("3024_Screen"))));
+            Assert(!ClassicScreenCompileRules.ProblemsUnchanged(before, Trigger("3024_Screen", owner: "3025_Screen")));
+            Assert(!ClassicScreenCompileRules.ProblemsUnchanged(before, Trigger("3024_Screen", evt: "Cleared")));
+            Assert(!ClassicScreenCompileRules.ProblemsUnchanged(before, Trigger("3024_Screen", text: "The tag is invalid for trigger")));
         });
         check("Classic timestamp recognition refuses leaves, changed formats and incomplete diagnostic trees", () => {
             var before = Fixture();

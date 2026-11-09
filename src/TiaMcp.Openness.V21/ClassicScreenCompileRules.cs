@@ -114,6 +114,14 @@ namespace TiaMcp.Model
                         && messages[i + 1].Value<string>("description") == "Software compilation started."
                         && IsTimestampHeader(row.Value<string>("description")))
                         row["state"] = "Information";
+                    // Re-importing a screen renames its generated event trigger after the screen's current name
+                    // (observed 9 November 2026: "trigger 3074_Setup_Infeed_..." became "trigger 3024_Setup_..."
+                    // after an in-place rollback). The owning object path, event, state and text stay significant.
+                    if (path == null && ancestors.Count > 0 && !string.IsNullOrEmpty(ancestors[ancestors.Count - 1]))
+                    {
+                        var trigger = TriggerLabel.Match(row.Value<string>("description"));
+                        if (trigger.Success) row["description"] = trigger.Groups["pre"].Value + "<trigger>" + trigger.Groups["post"].Value;
+                    }
                     // Native leaf paths are often null; retain their complete owner hierarchy.
                     ancestors.Add(path);
                     row["path"] = new JArray(ancestors).ToString(Formatting.None);
@@ -123,6 +131,8 @@ namespace TiaMcp.Model
             }
             return result;
         }
+
+        private static readonly Regex TriggerLabel = new Regex(@"\A(?<pre>.*\bfor trigger )(?<name>[^,\r\n]+)(?<post>, event '[^']+'\..*)\z", RegexOptions.Singleline);
 
         private static bool Count(JObject value, string key) => value[key]?.Type == JTokenType.Integer && value.Value<long>(key) >= 0 && value.Value<long>(key) <= int.MaxValue;
         private static bool IsTimestampHeader(string text)
