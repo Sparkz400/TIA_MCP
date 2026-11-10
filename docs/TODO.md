@@ -40,7 +40,8 @@ scripts/CI clean-up). Nothing here was qualified natively: the changes are cover
 - [ ] **V19/V21 shared worker loop:** the request loop, error mapping and traversal are shared in a prepared change (about 200 duplicated lines removed, `AccessDenied`/`LicenseUnavailable` mapped by exact Siemens type). The V19 worker cannot be compiled without a V19 SDK, so it waits for a build and a read-only V19 check on the workstation that has one.
 - [ ] **UA session during a long bind, native confirmation:** decided on 10 November: the client requests a 600 s session timeout and still sends no keep-alive (no background traffic), so a session orphaned by a Host crash lives up to the server's revised timeout, at most 10 minutes. The offline suite checks the requested value only. Open: confirm on an owned PLCSIM instance that a session survives a 2-5 minute `runtime_plcsim_bind`; a server whose configured maximum session timeout is shorter still ends it.
 - [ ] **UA disk-full case not executed:** `Test-RuntimeCaptureDiskFull.ps1 -UaTestAssembly` and `UaDiskFullChecks.cs` exist but need an elevated run (`Mount-VHD`).
-- [ ] **Native confirmation of the change-pipeline fixes:** `not_applied` after a failed checkpoint, the intent-log readback and the hashed preview payload are tested offline only; confirm on an owned scratch project at the next native slot.
+- [x] **Native confirmation of the change-pipeline fixes:** `not_applied` after a failed checkpoint, the intent decision log and the hashed preview payload passed natively on 10 November (`local.plc_object_mutations.audit.20261110`, 390/390, [record](verification/native-audit-20261110.md)); the run found and fixed that a `not_applied` apply could not be replayed through mutation admission. `block_export`, `plc_io_map` and `plc_tag_usage` were qualified the same day (`local.read_contracts.20261110`, 187/187).
+- [ ] **Intent log, access denied:** a decision log that is read-only or occupied by a directory raises `UnauthorizedAccessException`, which the apply's `catch (IOException)` does not handle, so the change would not stay `applied`. Not exercised; decide whether to catch it, then test.
 
 ## Resume and integration
 
@@ -100,13 +101,12 @@ Feasible capabilities that had no row or box; under the 15 October scope policy 
 
 ### Open matrix rows by owner
 
-Catalog `0.4.174`, 37 open cells in 9 rows, each row under its first owner (the matrix summary counts a shared row once per owner); blocked rows are not listed, deferred rows are under [deferred rows](#deferred-rows). The blocker named is the one the catalog records. The 29 October runs are in the [verification record](verification/native-reruns-20261029.md). Reconciled with the matrix on 10 November; the 24 compile-only cells closed the same day.
+Catalog `0.4.175`, 28 open cells in 6 rows, each row under its first owner (the matrix summary counts a shared row once per owner); blocked rows are not listed, deferred rows are under [deferred rows](#deferred-rows). The blocker named is the one the catalog records. The 29 October runs are in the [verification record](verification/native-reruns-20261029.md). Reconciled with the matrix on 10 November; the 24 compile-only cells closed the same day.
 
 | Owner | Open cells | Rows | Blocker |
 | --- | --- | --- | --- |
 | X07 HMI | 13 | `change.hmi_classic_screen_edit`, `hmi_classic_screen_capture`, `hmi_classic_screen_compose` | Profile-wide, visual and runtime acceptance of the Classic screen workflow |
 | D06 Test Suite | 9 | `testsuite_system_plan_prepare` | Operator setup (TS-Q03) |
-| L04 Explorer and integration | 9 | `block_export`, `plc_io_map`, `plc_tag_usage` | Native qualification (added 10 November, offline tests only) |
 | D16 physical runtime | 3 | `runtime.physical_plc` | Owned physical PLC |
 | L05 deployment | 3 | `deployment.vm_qualification` | VMware guest |
 

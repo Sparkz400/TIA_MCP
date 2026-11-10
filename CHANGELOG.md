@@ -249,6 +249,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- **Replay of a failed apply:** `change_apply` repeated with the same idempotency key after a change ended `not_applied` or `rolled_back` was refused with `RecoveryRequired` by mutation admission; it now returns the recorded outcome, as it already did for `applied` ([record](docs/verification/native-audit-20261110.md)).
+
 - **`readbackVerified` on applied changes:** the progress milestone stayed `notReached` on applied changes whose readback had run. An attribute write such as `tag_set` now records `attribute_readback_verified`, stages ending in `_verified_after_save` (`source_upsert`, `certificate_create`, `instance_db_create`) count, a compile-only change reports `skipped`, and an applied kind that checks inside its mutation without a stage reports `notRecorded`.
 - **`software_inspect` with many groups:** on a project with more user groups than `maxItems`, group paths used up the item budget, so a read such as `include: "constants"` with `namePrefix` returned no tag tables.
 - **Empty text file for data blocks:** `block_read` with `render: "text"` and `block_export` wrote a 0-byte text file for a block without networks. A block with no text form now gets no file and a `textUnavailable` reason.

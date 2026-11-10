@@ -4714,6 +4714,30 @@
       ]
     },
     {
+      "id": "local.plc_object_mutations.audit.20261110",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "807fa62857f63db5ba1a5cc2b43fd8373c577285",
+        "passedScope": "Rerun of local.plc_object_mutations.audit.20261102 with the 9 November audit paths: scripts/qualify_plc_object_mutations.py on a frozen Debug build of 807fa628 (artifacts/nc4, git archive), 390/390 steps in one owned scratch CPU 1511-1 PN. New: a change whose recovery archive TIA refuses ends not_applied with the native failure, no archive hash and the PLC software unchanged; a replay with the same idempotency key returns that outcome; the next change on the project prepares and applies. Intent decisions are written to intent-decisions.jsonl after an applied change, a half-written line is skipped, a repeated decision is named previouslyConfirmed and a contradicting one a conflict with one warning; with the log locked the change still ends applied with an intent-log-write-failure readback. A source_upsert preview carries its source as {bytes, sha256} equal to the persisted input; a wrong previewHash is refused (PreviewMismatch) and a changed input file is refused (ArtifactChanged) with the change still prepared."
+      },
+      "artifacts": [
+        "evidence/local.plc_object_mutations.audit.20261110.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN at PLC-root scope: no software units, namespaces, safety, know-how protection or generated system-group objects, so AmbiguousTarget, namespace, ProtectedObject and GeneratedObject-block refusals are not exercised.",
+        "SCL blocks and one global DB only; LAD/FBD/STL targets, OB attributes (PriorityNumber, CyclicTime, PhaseOffset, ProcessImagePartNumber), HeaderName and HeaderVersion are not written.",
+        "Renamed and deleted groups were empty or held only a subgroup; groups holding blocks, types or tables are not renamed or moved.",
+        "Not covered here: block_protect, block_unprotect, block_write_protection_set, call_connection_set, call_parameter_set, device_compile, graphical_network_insert, graphical_network_patch, graphical_operand_set, graphical_typed_edit, project_compile, tag_table_create, tag_table_delete, tag_table_rename.",
+        "Engineering only; runtime behavior is not observed.",
+        "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (ScopedRecoveryRequired since #221, the block being covered by metadata only) by design and the retained checkpoint is the recovery input.",
+        "The apply-side unresolved-change guard is reached only when a change prepared before the failure still matches its fingerprint; the failed apply changed the project, so that change is refused first by the fingerprint check (StaleRevision, or FingerprintUnavailable on the inconsistent block), also before the checkpoint.",
+        "Of the 9 November audit fixes this run reaches: not_applied after a recovery archive that TIA refuses (a directory at before.zap21), its replay, the next change on the same project, the intent decision log (first write, a half-written line skipped, previouslyConfirmed, conflicts, a locked log leaving the change applied) and the {bytes, sha256} preview payload with PreviewMismatch and ArtifactChanged. A decision log that is read-only or a directory (UnauthorizedAccessException) is not exercised.",
+        "The replay of a not_applied apply passed only after the admission fix of 807fa628; the first attempt of the day (x11_b95feca9, frozen build 01b8c0f3) was refused there with RecoveryRequired and is kept beside the run."
+      ]
+    },
+    {
       "id": "local.translation.adoption-refusal.20261102",
       "status": "passed",
       "profile": {
@@ -7501,7 +7525,8 @@
         "evidenceIds": [
           "local.read_contracts.20261028",
           "local.read_contracts.20261102",
-          "local.plc_object_mutations.audit.20261102"
+          "local.plc_object_mutations.audit.20261102",
+          "local.plc_object_mutations.audit.20261110"
         ]
       },
       "availability": {
@@ -7548,7 +7573,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.read_contracts.20261028",
-          "local.plc_object_mutations.audit.20261102"
+          "local.plc_object_mutations.audit.20261102",
+          "local.plc_object_mutations.audit.20261110"
         ]
       },
       "availability": {
