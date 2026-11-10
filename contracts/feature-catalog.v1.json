@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.174",
+  "catalogVersion": "0.4.175",
   "targetTiaVersions": [
     21
   ],
@@ -2952,7 +2952,7 @@
         "evidence/local.typed.crossscope.engineering.rerun.20261029.json"
       ],
       "limitations": [
-        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
+        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54\u2026.zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
         "Engineering only: the runtime gate is not run."
       ]
     },
@@ -4393,7 +4393,7 @@
         "tiaVersion": 21,
         "machine": "PCNico",
         "sourceCommit": "d57defa5b499bfe94396d6079d4af603de5403ad",
-        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of d57defa5 (artifacts/oi3, git archive; main with PR 184's RFC 8785 hashing, PR 186's exact decimal parsing of request floats and the runner scanners' RFC 8785 fix), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Each of the three advance requests (verifyImport, prepareGraphical, verifyInstallation) carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the number literals 1e3 and 2.2250738585072012e-308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of the verifyImport request (1e3 as 1000, the other as 2.2250738585072014e-308) reproduced the Host's recorded requestSha256 5d077eef."
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of d57defa5 (artifacts/oi3, git archive; main with PR 184's RFC 8785 hashing, PR 186's exact decimal parsing of request floats and the runner scanners' RFC 8785 fix), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Each of the three advance requests (verifyImport, prepareGraphical, verifyInstallation) carried the non-ASCII key pr\u00fcfName\u540d\u524d, non-ASCII text with an astral emoji (sent as \\u escapes) and the number literals 1e3 and 2.2250738585072012e-308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of the verifyImport request (1e3 as 1000, the other as 2.2250738585072014e-308) reproduced the Host's recorded requestSha256 5d077eef."
       },
       "artifacts": [
         "evidence/local.component.canonical-hash.20261101.json"
@@ -4411,7 +4411,7 @@
         "tiaVersion": 21,
         "machine": "PCNico",
         "sourceCommit": "4b970cc91fdb0532a49a0f6833f9e0cf8d664eb6",
-        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of 4b970cc9 (artifacts/hz3, git archive; main with PR 190's exact worker number reading and range refusal, and PR 199's id-keeping refusal), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Before the first advance, the same advance request with 1.8e308 added was refused with InvalidRequest ('A request number is outside the double range.', from the worker's request reader, relayed by the Host with the request id); the window's revision, state and children (start, applyLibrary) were unchanged, and the verifyImport advance that followed dispatched on the same Host session. Each of the three advance requests carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of all three advance requests (1e3 as 1000, 2.2250738585072014e-308, 1.7976931348623157e+308, i.e. double.MaxValue) reproduced the Host's recorded hashes c857106f, 340dd121 and c5e740ce."
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of 4b970cc9 (artifacts/hz3, git archive; main with PR 190's exact worker number reading and range refusal, and PR 199's id-keeping refusal), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Before the first advance, the same advance request with 1.8e308 added was refused with InvalidRequest ('A request number is outside the double range.', from the worker's request reader, relayed by the Host with the request id); the window's revision, state and children (start, applyLibrary) were unchanged, and the verifyImport advance that followed dispatched on the same Host session. Each of the three advance requests carried the non-ASCII key pr\u00fcfName\u540d\u524d, non-ASCII text with an astral emoji (sent as \\u escapes) and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of all three advance requests (1e3 as 1000, 2.2250738585072014e-308, 1.7976931348623157e+308, i.e. double.MaxValue) reproduced the Host's recorded hashes c857106f, 340dd121 and c5e740ce."
       },
       "artifacts": [
         "evidence/local.component.canonical-hash.20261102.json"
@@ -4564,6 +4564,29 @@
         "contentSha256 is checked as distinct, stable and content-tracking, not recomputed independently: no other tool exports a block without document info.",
         "The generatedSource offline-project refusal and exclusive access are not observable here: the scratch is offline and no other client contends.",
         "Engineering reads only; no runtime, online or physical-device observation."
+      ]
+    },
+    {
+      "id": "local.read_contracts.20261110",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "01b8c0f36482cb78195553233d281907beef3a9f",
+        "passedScope": "Rerun of local.read_contracts.20261102 with three new features: scripts/qualify_read_contracts.py on a frozen Debug build of 01b8c0f3 (artifacts/nc3, git archive), 187/187 steps in owned scratch projects; identity, typed refusal and completeness per feature for 37 read features. New: block_export (FB/FC/OB and DB selections equal to software_inspect, each native XML with its indexed size and block name, text files, namePrefix, maxBlocks paging with nextOffset, ProjectNotFound), plc_io_map (ranges and tags equal to an oracle from hardware_inspect and software_inspect on two DI 16x24VDC HF, a range without tags, two tags without listed hardware, PlcNotFound, AmbiguousTarget and complete=false with two PLCs) and plc_tag_usage over the block_export index (readers and writers of each I/Q tag from two SCL functions, a one-block index, unusedOnly, PlcNotFound). isModified was equal before and after the I/O analysis reads. Two earlier attempts on this day stopped on runner defects and are kept beside the run (rc_b19aaea1: the shared harness read a journal the summary result no longer carries; rc_71068bac: the runner expected the absolute operand to stay absolute)."
+      },
+      "artifacts": [
+        "evidence/local.read_contracts.20261110.json"
+      ],
+      "limitations": [
+        "One owned scratch project: CPU 1511-1 PN V4.1 with one software unit, plus CPU 1518-4 PN/DP added by hardware_add, and one VCI workspace (outside the project) mapping the SCL blocks RcCaller and RcFb by export; no safety, technology objects, HMI, connections, PLC documents or know-how protection, so those content families are observed only as empty, complete results.",
+        "Truncation is shown with maxItems/pageSize 1 (vci_workspace_inspect: 2) where the fixture has more rows; connection_inspect and plc_document_inventory have no rows to truncate here, and library_compare has a fixed 200-row bound that this fixture does not reach.",
+        "contentSha256 is checked as distinct, stable and content-tracking; it is not recomputed independently, because no other tool exports a block without document info.",
+        "A refused cpuTypeIdentifier is reported after the scratch project was created, because Siemens needs an open project for catalog access; the partial project is named in the refusal and its Portal is discarded.",
+        "plc_loadable_generate is positive only on the CPU 1518; on the CPU 1511 it is refused (UnsupportedCapability), as Siemens documents loadables only for CPU 1518 and its subtypes from firmware V2.8.",
+        "I/O analysis: two central DI 16x24VDC HF V1.0 (one tagged, one untagged), three Bool tags in table RcIo (one on the module, an output and an input without hardware) and two SCL functions; no output module, distributed I/O, drive telegram, shared address, LAD/FBD/STL network, protected block or paged index. The block_export index carries a size but no hash per file, so each XML is checked by size and by the block name it holds, each text file as present and non-empty. plc_tag_usage's untyped refusal of an index outside the artifact directory is not exercised.",
+        "Engineering reads only; no runtime, online or physical-device observation.",
+        "plc_tag_usage reported no absolute access: V21 replaced the absolute SCL operand %I0.1 with a tag it created at that address (Tag_...), which plc_io_map listed and plc_tag_usage reported with its reader. An absolute access was not produced natively; that branch has offline coverage only."
       ]
     },
     {
@@ -6379,8 +6402,9 @@
         ]
       },
       "implementation": {
-        "status": "implemented",
+        "status": "partial",
         "limitations": [
+          "Identity, completeness and typed refusals natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with two DI 16x24VDC HF, three Bool tags and two SCL functions) by local.read_contracts.20261110; see that evidence for what the fixture does not hold.",
           "Host-side batch over project_inventory and block_read render=text: one native XML export and one text file per block, bounded to 500 blocks per call with offset paging. The batch is sequential and not atomic; edits in TIA between two exports are not detected.",
           "Selection is bounded by the inventory walk (2000 rows); completeness.inventoryComplete is false when that bound cut the block list.",
           "Know-how protected blocks and blocks TIA refuses to export are listed as skipped rows with their error code, not exported.",
@@ -6388,14 +6412,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261110"
+        ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "Selection, paging and row shaping are covered by offline Host tests; no native batch run is recorded yet."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -6423,8 +6448,9 @@
         ]
       },
       "implementation": {
-        "status": "implemented",
+        "status": "partial",
         "limitations": [
+          "Identity, completeness and typed refusals natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with two DI 16x24VDC HF, three Bool tags and two SCL functions) by local.read_contracts.20261110; see that evidence for what the fixture does not hold.",
           "Host-side join of compact project_inventory hardware rows and software_inspect tags; offline configuration only.",
           "A tag is placed by its first byte; the span of a structured tag is not evaluated.",
           "Address ranges the hardware inventory does not expose, such as drive telegrams configured in Startdrive, appear as tags without listed hardware.",
@@ -6433,14 +6459,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261110"
+        ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "The analysis is covered by offline Host tests; no native run is recorded yet."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -6468,8 +6495,9 @@
         ]
       },
       "implementation": {
-        "status": "implemented",
+        "status": "partial",
         "limitations": [
+          "Identity, completeness and typed refusals natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with two DI 16x24VDC HF, three Bool tags and two SCL functions) by local.read_contracts.20261110; see that evidence for what the fixture does not hold.",
           "Static scan of the native XML files of a block_export index: LAD/FBD (FlgNet) wires and SCL (StructuredText) accesses, matched by the first component of a global symbol. STL and GRAPH networks are not scanned.",
           "Blocks outside the index, know-how protected and skipped blocks, technology objects, HMI, hardware-identifier access, PEEK/POKE and other indirect addressing are not covered; an unused tag is unused in the scanned code only.",
           "The exported files are not checked against the current project state.",
@@ -6477,14 +6505,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261110"
+        ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "The analysis is covered by offline Host tests; no native run is recorded yet."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -29469,7 +29498,7 @@
           "Native, 1 November (build 10763a35): the route passed on the desk-configured TP700 Comfort pair (local.hmi.classic-import.route.20261101, 63/63 checks): every refusal before any write; BackColor on both HMIs' Overview_A (identity separation), a no-op and a GridColor import of Overview_B, a no-op import of the start screen and a QualificationTags import adding one internal tag, each with every stage, no compiler problems, the target's independent re-export carrying exactly the intended delta, every other export unchanged, same-key replay and another key refused RecoveryRequired; a stale preview refused; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay (local.hmi.classic-import.interruption.20261101, 8/8).",
           "Qualified on one desk-configured TP700 Comfort fixture (start screen set in the editor). Import(Override) of the start screen kept it natively, but the start-screen setting has no public getter, so the compile rule is its only guard. Other Classic devices, object types, customer projects, runtime and visual behavior are not covered.",
           "Lifecycle, 1 November (build 2431ccf9): on the same TP700 Comfort pair both compiles of every apply named only the target HmiTarget, both Host lifetimes ended normally (Host and worker exit 0, owned TIA process exited) and a new TIA process then reopened the saved project read-write at once (local.hmi.lifecycle.20261101, 72/72).",
-          "WinCC RT Advanced and KTP700 Basic PN, 1–2 November (build 750121ea): the route passed on their seeded HmiSeeder baselines (no start screen; the compile rule kept that error unchanged after every apply) with 72/72 and 71/71 checks (local.hmi.classic-import.profiles.route.20261101; Basic has no popup), and ci-* interruption 8/8 on each (local.hmi.classic-import.profiles.interruption.20261102); production admits both profiles."
+          "WinCC RT Advanced and KTP700 Basic PN, 1\u20132 November (build 750121ea): the route passed on their seeded HmiSeeder baselines (no start screen; the compile rule kept that error unchanged after every apply) with 72/72 and 71/71 checks (local.hmi.classic-import.profiles.route.20261101; Basic has no popup), and ci-* interruption 8/8 on each (local.hmi.classic-import.profiles.interruption.20261102); production admits both profiles."
         ]
       },
       "qualification": {

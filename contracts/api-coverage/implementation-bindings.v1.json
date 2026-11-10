@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "5a0193093392bd5649f54b61d96178d4edea686659f5edee7469c71c441a5df0",
-      "bytes": 1865662
+      "sha256": "02052b5f98d17b974723e4c7bccb175691975815891e22c21dee4276c7495862",
+      "bytes": 1870116
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -3097,8 +3097,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SharedMutationAdmission.cs",
-      "sha256": "6018d6e84a8ac7227863b66ca9207c36a6080c28656cdc5b7613835699903f36",
-      "bytes": 33052
+      "sha256": "d24b9c83e436eaf1b31cafffbd12f66b7772358af5f8650cb676d75fca381c44",
+      "bytes": 33229
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Simulation.cs",
@@ -110864,7 +110864,15 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261110",
+          "profileSha256": "500c99383b7d22ac00b450e2f3dc52f3909d9414a128a447170aabcbe27a278a",
+          "artifacts": [
+            "evidence/local.read_contracts.20261110.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -127063,7 +127071,15 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261110",
+          "profileSha256": "500c99383b7d22ac00b450e2f3dc52f3909d9414a128a447170aabcbe27a278a",
+          "artifacts": [
+            "evidence/local.read_contracts.20261110.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -127266,7 +127282,15 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261110",
+          "profileSha256": "500c99383b7d22ac00b450e2f3dc52f3909d9414a128a447170aabcbe27a278a",
+          "artifacts": [
+            "evidence/local.read_contracts.20261110.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -142395,6 +142419,11 @@
       "sha256": "ef73008b873bfbdf6daa92c1bb16284d18ba87d2f257448a5d1aee5e6910c3ed"
     },
     {
+      "path": "evidence/local.read_contracts.20261110.json",
+      "state": "observed",
+      "sha256": "d868299ab5182cceca9f64c6f68aa990ee4424e1da1eab462db229930cb6ce5d"
+    },
+    {
       "path": "evidence/local.reliability.20261024.json",
       "state": "observed",
       "sha256": "fcec66b5d014bb2356bed9a04e8de4bd49d1a1e28940f1714994eac289932706"
@@ -143718,6 +143747,10 @@
     {
       "id": "local.read_contracts.20261102",
       "profileSha256": "69d2451588f4002ec2c0789c8e54a4958c372cfebb1d2dcbc6ce6650dca9f432"
+    },
+    {
+      "id": "local.read_contracts.20261110",
+      "profileSha256": "500c99383b7d22ac00b450e2f3dc52f3909d9414a128a447170aabcbe27a278a"
     },
     {
       "id": "local.reliability.20261024",
