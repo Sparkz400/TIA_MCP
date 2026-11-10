@@ -73,6 +73,9 @@ class NativeAudit:
         if name not in self.ALLOWED_TOOLS | self.OPTIONAL_TOOLS:
             raise ValueError("Tool is outside isolated block-test scope: " + name)
         arguments = arguments or {}
+        # The change tools answer with a summary by default; the runners read full previews and journals.
+        if name in ("change_prepare", "change_apply", "change_status"):
+            arguments = {"includeDetails": True, **arguments}
         record = {"tool": name, "startedAtUtc": utc_now(), "arguments": redact(copy.deepcopy(arguments), self.secrets), "status": "started"}
         self.records.append(record)
         self.persist()
