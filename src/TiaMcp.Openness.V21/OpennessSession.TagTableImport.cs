@@ -29,6 +29,48 @@ namespace TiaMcp.Openness.V21
             return result;
         }
 
+        // Row form of tag_table_import_xml: the rows are merged into the table's own native export (or a new table), so members
+        // the rows do not name are imported back exactly as exported. The result takes the XML form's checks unchanged.
+        private string TagRowsXml(EngineeringChange change, PlcSelection plc, Project project, JObject payload, JArray effects)
+        {
+            foreach (var property in payload.Properties())
+                if (property.Name != "tagTableName" && property.Name != "tags" && property.Name != "commentCulture" && property.Name != "scopePath" && property.Name != "groupPath")
+                    throw new BridgeException("InvalidRequest", "The row form takes tagTableName, tags and optional commentCulture, scopePath and groupPath; not " + property.Name + ".");
+            string tableName = change.ObjectNames[0];
+            var rows = TagTableRowRules.Rows(payload["tags"]);
+            string culture = payload["commentCulture"] != null ? ChangeText(payload, "commentCulture", 32) : project.LanguageSettings.ReferenceLanguage?.Culture.Name;
+            if (rows.Any(row => row.Comment != null) && !project.LanguageSettings.ActiveLanguages.Any(language => language.Culture.Name == culture))
+                throw new BridgeException("InvalidRequest", "commentCulture " + culture + " is not an active project language; a comment in it would not be read back.");
+            var existing = MutationTagGroup(change, plc).TagTables.FirstOrDefault(table => string.Equals(table.Name, tableName, StringComparison.OrdinalIgnoreCase));
+            System.Xml.Linq.XDocument before = null;
+            if (existing != null)
+            {
+                string path = Path.Combine(change.Directory, "rows-base-" + Guid.NewGuid().ToString("N") + ".xml");
+                existing.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                before = EngineeringSources.ReadXml(File.ReadAllText(path));
+                tableName = existing.Name;
+                change.ObjectNames = new[] { tableName };
+            }
+            var document = TagTableRowRules.Document(tableName, before, rows, culture, out int added, out int updated);
+            effects.Add(new JObject { ["tagRows"] = new JObject { ["tagTableName"] = tableName, ["tableAction"] = existing == null ? "create" : "update", ["tagsAdded"] = added, ["tagsUpdated"] = updated } });
+            return document.ToString(System.Xml.Linq.SaveOptions.DisableFormatting);
+        }
+
+        // I/O address ranges of every hardware item whose addresses the PLC owns or may own (no or an unresolved controller counts),
+        // for the advisory hardware cross-check of imported tag addresses.
+        private static System.Collections.Generic.List<(string IoType, int StartByte, int LengthBits, string Path)> IoAddressRanges(PlcSelection plc)
+        {
+            var budget = new ScanBudget(50000);
+            var hardware = DeviceItems(plc.Project, budget).ToArray();
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "The hardware configuration is too large to list every I/O address range.");
+            var ranges = new System.Collections.Generic.List<(string IoType, int StartByte, int LengthBits, string Path)>();
+            foreach (var entry in hardware)
+                foreach (var address in entry.Item.Addresses)
+                    if (!address.AddressControllers.Any() || address.AddressControllers.Any(controller => ControllerMatchesSelectedPlc(controller, plc.Software) != false))
+                        ranges.Add((address.IoType.ToString(), address.StartAddress, address.Length, entry.Path));
+            return ranges;
+        }
+
         private void PrepareScopedTagImport(EngineeringChange change)
         {
             change.TagTableEvidence = new JObject { ["policy"] = TagTableImportRules.Policy, ["before"] = CaptureTagImportScope(change, "before-scope") };

@@ -24,7 +24,7 @@ public static class ChangeResultCompaction
     private static readonly string[] PreviewFields =
     [
         "changeId", "kind", "project", "isModified", "warnings", "effects", "language", "insertedNetworkId", "uidRenumbering",
-        "targetScopePath", "targetGroupPath", "targetNamespace", "baseFingerprint", "checkpoint", "compileAndSave",
+        "targetScopePath", "targetGroupPath", "targetNamespace", "baseFingerprint", "checkpoint", "compileAndSave", "hardwareCrossCheck",
     ];
 
     /// <summary>A change view (or a change_status journal envelope) as a bounded summary. Results that are already summaries,
