@@ -380,6 +380,7 @@ internal static partial class Program
             ("Change input references stay inside the artifact directory, bounded, UTF-8 and exclusive of inline text", ChangeInputAndCompactionTests.InputReferencesAreBoundedAndExclusive),
             ("Change results are summarized with compile counts, introduced findings and artifact paths", ChangeInputAndCompactionTests.ChangeViewsAreSummarized),
             ("Change status journals are summarized", ChangeInputAndCompactionTests.ChangeStatusJournalsAreSummarized),
+            ("A tag_set batch summary lists every item", ChangeInputAndCompactionTests.TagBatchSummariesListEveryItem),
             ("Graphical text renders LAD/FBD logic as Boolean statements", GraphicalNetworkTextTests.LadderLogicBecomesBooleanStatements),
             ("Graphical text renders boxes and calls with pin bindings", GraphicalNetworkTextTests.BoxesAndCallsShowPinBindings),
             ("Graphical text renders SCL networks as source text", GraphicalNetworkTextTests.StructuredTextBecomesSclSource),
