@@ -103,7 +103,7 @@ namespace TiaMcp.Openness.V21
                 change.Preview["checkpoint"] = "Applying requires checkpointSave=true: current in-memory project edits are saved before a compressed recovery archive is created. No mutation proceeds without that archive.";
                 change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. Save-after-change requires a successful compile. Compile does not validate machine behavior.";
                 if (UsesCompileBaseline(change))
-                    change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. With compile=true the same scope compiles before and after the mutation; the change fails on an introduced or worsened error, a changed compile scope or incomplete diagnostics (tag-table imports also fail on new or changed warnings). Unchanged findings may remain and are listed in compile.baselineComparison; inspect compilerSucceeded. Compile does not validate machine behavior.";
+                    change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. With compile=true the same scope compiles before and after the mutation; the change fails on an introduced or worsened error, a changed compile scope or incomplete diagnostics (tag-table imports also fail on new or changed warnings of the imported tables). Unchanged findings may remain and are listed in compile.baselineComparison, as are warnings of other objects that the compile merely reports again (revealed); inspect compilerSucceeded. Compile does not validate machine behavior.";
                 change.Preview["backups"] = change.Backups;
                 if (args["intent"] is JObject intent)
                 {
@@ -249,7 +249,7 @@ namespace TiaMcp.Openness.V21
                         {
                             change.Compilation["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(change.Compilation);
                             change.Compilation["unresolvedSymbols"] = UnresolvedSymbolRules.From(change.Compilation);
-                            if (change.CompileBaseline != null) change.Compilation["baselineComparison"] = CompileBaselineRules.Compare(change.CompileBaseline, change.Compilation);
+                            if (change.CompileBaseline != null) change.Compilation["baselineComparison"] = CompileBaselineRules.Compare(change.CompileBaseline, change.Compilation, change.BlockNames.Concat(change.ObjectNames));
                         }
                         // A text-list import or an admitted HMI kind must leave the compiler problems as the compile before the write found them;
                         // a Classic screen edit or tag-table import may also resolve some (HmiEngineeringRules.AllowsResolvedCompileProblems),
