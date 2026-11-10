@@ -59,7 +59,7 @@ same rule (`807fa628`); the rerun's replay returned `not_applied`.
 - `rc_71068bac` (build `e1120de9`) stopped at `plc_io_map` after 125 steps: the runner expected the absolute operand to
   stay absolute (see the finding above).
 
-All four stopped attempts closed their Portal and are kept beside the passing runs.
+All three stopped attempts closed their Portal and are kept beside the passing runs.
 
 ## Not covered
 
