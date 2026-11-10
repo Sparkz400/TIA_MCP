@@ -192,7 +192,9 @@ The live scratch fixture `scripts/smoke_write_guards.py` qualified these guards 
 ### Many tag edits in one change
 
 Each applied change pays for the whole safety sequence: a project fingerprint at
-prepare, again before apply and again after save, a checkpoint save with a full
+prepare, during admission, before apply and again after save
+([reused](#fingerprint-reuse-between-changes) where the project is provably in the
+same saved state), a checkpoint save with a full
 `before.zap21`, a baseline compile, the compile after the edit and the final save.
 On a large project that is minutes per change, and every applied change makes all
 other prepared previews stale (`StaleRevision`), so single edits cannot be prepared
@@ -265,6 +267,53 @@ run is not in the evidence store or the feature catalog. It covers Bool tags on
 bit memory in one table at PLC-root scope; tags that blocks reference, software
 units, and the safety-tag and F-I/O refusals of a batch on an F-CPU are not
 exercised, and no large project has been timed.
+
+### Fingerprint reuse between changes
+
+A change fingerprint reads the whole project: every device item, software scope and
+block with its native fingerprints. One applied change needs that read five times:
+at prepare, twice while the Host admits the apply, before the checkpoint
+(`StaleRevision`) and for the recorded outcome. Between an applied-and-saved change
+and the next one the project is normally untouched, so the worker keeps its last
+read and reuses it, under these conditions only:
+
+- TIA reports the project as saved (`IsModified` false) with the same
+  `LastModified`, in the same TIA process and at the same project path, as when
+  the content was read. It was in that state before and after the read.
+- The change has the same kind and the same target blocks as the read. OPC UA
+  kinds, library changes and reconciliation always read in full.
+- Nothing but the steps of a prepared change ran in between. Any other worker
+  operation, for example a `block_read` or `software_inspect`, drops the kept read,
+  and so does the worker itself before it saves, changes or closes a project. Its
+  own writes therefore never depend on the save state.
+
+Safety signatures, runtime groups and the safety login state are read fresh every
+time, and so are the kind-specific parts such as the requested tag attributes. The
+fingerprint value is the one a full read gives for that state, so previews,
+`StaleRevision`, `change_restore` and reconciliation compare the same hashes as
+before. With reuse, a change that follows another of the same kind reads the
+project once (its outcome) instead of five times; `fingerprintContent` in the full
+change view and the journal reports `fullReads` and `reusedForSavedState`.
+
+What this relies on is TIA's own save state: an edit made outside the worker
+between two steps must either turn `IsModified` true or, once saved, change
+`LastModified`. `tia_session_status` reports both per project.
+`scripts/qualify_fingerprint_reuse.py` checked the scriptable part natively on
+10 November 2026 in an owned scratch CPU (TIA V21): an unsaved tag rename, block
+source and hardware comment each turned `IsModified` true and nothing was reused
+until the next save; every save cleared it and changed `LastModified`, which has
+sub-second resolution; a reused read and a full read gave the same fingerprint; a
+follow-up change read the project once; a stale preview was still refused. That run
+is not in the evidence store.
+
+**Not verified: edits made by hand in the TIA user interface.** The owned instance
+is headless, so no script can make them. To check on a workstation: open a copy or
+scratch project in TIA with its user interface, attach, and call
+`tia_session_status` (`isModified` false). Then, one at a time, rename a tag, edit
+a block network, change a module parameter and undo an edit by hand; after each,
+`tia_session_status` must report `isModified` true. Save in TIA; it must report
+false with a new `lastModified`. Finally prepare a change, edit a block by hand
+without saving, and apply: the apply must refuse with `StaleRevision`.
 
 ## Refresh from unchanged source
 

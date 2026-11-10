@@ -57,6 +57,12 @@ namespace TiaMcp.Openness.V21
             if (_watchLease != null && operation != "watch_checkpoint" && operation != "watch_apply_native" && operation != "watch_end")
                 throw new BridgeException("ResourceBusy", "The native watch dispatch owns exclusive access.");
             ObserveIndexOperation(operation);
+            // Kept fingerprint content survives only the prepare/admission/apply/status steps of a prepared change.
+            if (!FingerprintContentRules.Keeps(operation, arguments?["kind"]?.Type == JTokenType.String ? arguments.Value<string>("kind") : null,
+                    arguments?["operation"]?.Type == JTokenType.String ? arguments.Value<string>("operation") : null,
+                    (arguments?["arguments"] as JObject)?["changeId"]?.Type == JTokenType.String ? arguments["arguments"].Value<string>("changeId") : null,
+                    _sharedMutationOperation, _sharedMutationArguments?["changeId"]?.Type == JTokenType.String ? _sharedMutationArguments.Value<string>("changeId") : null))
+                _projectContent.Clear();
             try { return Dispatch(operation, arguments); }
             // TIA refuses exports and other writes in a secondary (read-only) project; report that as the typed read-only refusal.
             catch (EngineeringTargetInvocationException ex) when (ex.Message.IndexOf("read-only context", StringComparison.OrdinalIgnoreCase) >= 0
@@ -285,7 +291,7 @@ namespace TiaMcp.Openness.V21
             result["disconnectBehavior"] = _ownsPortal ? "Dispose this connection. Siemens closes the headless instance when this is its last attached Openness client; process exit is not verified. Only explicitly saved scratch data is retained." : "Dispose only this Openness attachment; the user-owned TIA instance remains open.";
             if ((_testSuiteScopeProbe || _testSuiteQualification) && _ownsPortal)
                 result["disconnectBehavior"] = "Dispose this connection and publicly close its exact worker-created scope-probe UI process. The qualification controller must independently verify its exit through the original retained handle.";
-            result["projects"] = _portal == null ? new JArray() : new JArray(_portal.Projects.Select(p => { var info = ProjectInfo(p); info["readOnly"] = !p.IsPrimary; return info; }));
+            result["projects"] = _portal == null ? new JArray() : new JArray(_portal.Projects.Select(p => { var info = ProjectInfo(p); info["readOnly"] = !p.IsPrimary; info["isModified"] = p.IsModified; info["lastModified"] = p.LastModified.ToString("O"); return info; }));
             result["capabilities"] = Capabilities();
             return result;
         }
