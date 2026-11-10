@@ -249,8 +249,14 @@ namespace TiaMcp.Openness.V21
                             if (change.CompileBaseline != null) change.Compilation["baselineComparison"] = CompileBaselineRules.Compare(change.CompileBaseline, change.Compilation);
                         }
                         // A text-list import or an admitted HMI kind must leave the compiler problems as the compile before the write found them;
-                        // a Classic screen edit or tag-table import may also resolve some (HmiEngineeringRules.AllowsResolvedCompileProblems).
-                        if (HmiEngineeringRules.AllowsResolvedCompileProblems(change.Kind, change.HmiBeforeManifest) ? !ClassicScreenCompileRules.NoNewProblems(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
+                        // a Classic screen edit or tag-table import may also resolve some (HmiEngineeringRules.AllowsResolvedCompileProblems),
+                        // and a screen edit that removes the last error may reveal warnings outside its screens (ClassicScreenCompileRules.NoNewProblems).
+                        bool resolvedAllowed = HmiEngineeringRules.AllowsResolvedCompileProblems(change.Kind, change.HmiBeforeManifest);
+                        JArray unmaskedWarnings = null;
+                        bool noNewHmiProblems = resolvedAllowed && ClassicScreenCompileRules.NoNewProblems(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation,
+                            change.Kind == "hmi_classic_screen_edit" ? ClassicScreenCompileRules.EditedScreenNames(change.Payload) : null, out unmaskedWarnings);
+                        if (noNewHmiProblems && unmaskedWarnings.Count > 0) change.Compilation["unmaskedWarnings"] = unmaskedWarnings;
+                        if (resolvedAllowed ? !noNewHmiProblems
                             : change.Kind == "hmi_text_list_import" || HmiEngineeringRules.IsAdmittedKind(change.Kind) ? !HmiTextListImportRules.CompileProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
                             : change.Kind == TagTableImportRules.Kind ? change.Compilation?["baselineComparison"]?.Value<bool>("verified") != true
                             : UsesCompileBaseline(change) ? change.Compilation == null || !CompileBaselineRules.Accepts(change.CompileBaseline, change.Compilation, (JObject)change.Compilation["baselineComparison"])
@@ -664,15 +670,25 @@ namespace TiaMcp.Openness.V21
                 case "tag_table_import_xml":
                 {
                     var plc = SelectPlc(change.Selector);
-                    string xml = ChangeText(payload, "xml", 2 * 1024 * 1024);
                     bool types = change.Kind == "plc_type_import_xml";
-                    change.ObjectNames = ChangeNames(payload, types ? "expectedTypeNames" : "expectedTableNames");
+                    // Row form of a tag-table import: {tagTableName, tags:[...]} instead of {xml, expectedTableNames}.
+                    bool rows = !types && payload["tags"] != null;
+                    if (rows && (payload["xml"] != null || payload["expectedTableNames"] != null))
+                        throw new BridgeException("InvalidRequest", "Give either xml with expectedTableNames, or tagTableName with tags.");
+                    string xml = rows ? null : ChangeText(payload, "xml", 2 * 1024 * 1024);
+                    change.ObjectNames = rows ? new[] { ChangeText(payload, "tagTableName", 128) } : ChangeNames(payload, types ? "expectedTypeNames" : "expectedTableNames");
+                    if (rows)
+                    {
+                        change.Namespace = "";
+                        PrepareMutationScope(change, plc, "tagTable", change.ObjectNames);
+                        xml = TagRowsXml(change, plc, project, payload, effects);
+                    }
                     var document = EngineeringSources.ReadXml(xml);
                     string elementName = types ? "SW.Types.PlcStruct" : "SW.Tags.PlcTagTable";
                     var declarations = EngineeringSources.NamedXmlObjects(document, elementName);
                     change.Namespace = types ? ImportNamespace(document) : "";
                     if (!new HashSet<string>(declarations, StringComparer.Ordinal).SetEquals(change.ObjectNames)) throw new BridgeException("XmlScopeMismatch", "Imported object names must exactly match the expected set.");
-                    PrepareMutationScope(change, plc, types ? "type" : "tagTable", change.ObjectNames);
+                    if (!rows) PrepareMutationScope(change, plc, types ? "type" : "tagTable", change.ObjectNames);
                     if (types) PrepareTypeTargets(change, plc, effects);
                     else
                     {
@@ -701,6 +717,10 @@ namespace TiaMcp.Openness.V21
                             change.Backups.Add(new JObject { ["tableName"] = table.Name, ["artifact"] = ChangeArtifact(path) });
                         }
                         effects.Add(new JObject { ["importTagTables"] = new JArray(change.ObjectNames) });
+                        // Advisory only: findings or an unreadable hardware configuration never refuse the import.
+                        var crossCheck = TagTableRowRules.CrossCheck(document, () => IoAddressRanges(plc));
+                        preview["hardwareCrossCheck"] = crossCheck;
+                        if (TagTableRowRules.Warning(crossCheck) is string crossCheckWarning) ((JArray)preview["warnings"]).Add(crossCheckWarning);
                     }
                     change.InputPath = Path.Combine(change.Directory, "requested.xml");
                     File.WriteAllText(change.InputPath, xml, new UTF8Encoding(true));

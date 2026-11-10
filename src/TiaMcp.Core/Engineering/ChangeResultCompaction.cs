@@ -24,7 +24,7 @@ public static class ChangeResultCompaction
     private static readonly string[] PreviewFields =
     [
         "changeId", "kind", "project", "isModified", "warnings", "effects", "language", "insertedNetworkId", "uidRenumbering",
-        "targetScopePath", "targetGroupPath", "targetNamespace", "baseFingerprint", "checkpoint", "compileAndSave",
+        "targetScopePath", "targetGroupPath", "targetNamespace", "baseFingerprint", "checkpoint", "compileAndSave", "hardwareCrossCheck",
     ];
 
     /// <summary>A change view (or a change_status journal envelope) as a bounded summary. Results that are already summaries,
@@ -101,6 +101,8 @@ public static class ChangeResultCompaction
                 if (name != "existing") row[name] = Bound(value?.DeepClone());
             result["baselineComparison"] = row;
         }
+        // Warnings a Classic screen edit revealed outside its screens by removing the last error; accepted, so always shown.
+        if (compile["unmaskedWarnings"] is JsonArray unmasked) result["unmaskedWarnings"] = Bound(unmasked.DeepClone());
         return result;
     }
 
