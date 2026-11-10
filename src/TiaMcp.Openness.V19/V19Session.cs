@@ -212,7 +212,7 @@ namespace TiaMcp.Openness.V19
 
         private JObject Inventory(JObject args)
         {
-            RefuseV21Options(args, "groupPath", "namePrefix", "includeHardware");
+            RefuseV21Options(args, "groupPath", "namePrefix", "includeHardware", "includeBlocks", "compact");
             var project = SelectProject(args);
             int max = Limit(args, 500);
             var budget = new ScanBudget(max);
@@ -260,7 +260,7 @@ namespace TiaMcp.Openness.V19
         // The V21 software_inspect shape without technology objects, group paths and unit relations.
         private JObject SoftwareInspect(JObject args)
         {
-            RefuseV21Options(args, "groupPath", "namePrefix");
+            RefuseV21Options(args, "groupPath", "namePrefix", "include", "compact");
             var plc = SelectInspectionPlc(args, "scopePath");
             string wantedScope = args.Value<string>("scopePath");
             int max = Limit(args, 500);

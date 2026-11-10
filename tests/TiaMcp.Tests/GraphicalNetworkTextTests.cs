@@ -35,6 +35,54 @@ internal static class GraphicalNetworkTextTests
         return Task.CompletedTask;
     }
 
+    // A hand-written StructuredText v4 network in the shape TIA exports: tokens, blanks and line breaks in document order.
+    private const string SclNetwork = """
+        <Document><SW.Blocks.FC ID="0"><ObjectList><SW.Blocks.CompileUnit ID="3" CompositionName="CompileUnits"><AttributeList>
+        <NetworkSource><StructuredText xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v4">
+          <Token Text="REGION" /><Blank /><Text>Outputs</Text><NewLine />
+          <Blank Num="4" /><LineComment><Text> vacuum valve</Text></LineComment><NewLine />
+          <Blank Num="4" /><Access Scope="GlobalVariable"><Symbol><Component Name="o452_0_xVacuum" /></Symbol></Access>
+          <Blank /><Token Text=":=" /><Blank />
+          <Access Scope="GlobalVariable"><Symbol><Component Name="Station DB"><BooleanAttribute Name="HasQuotes">true</BooleanAttribute></Component>
+            <Token Text="." /><Component Name="COP" /><Token Text="." /><Component Name="Bit"><Token Text="[" />
+            <Access Scope="LiteralConstant"><Constant><ConstantType>Int</ConstantType><ConstantValue>3</ConstantValue></Constant></Access><Token Text="]" /></Component>
+          </Symbol></Access>
+          <Blank /><Token Text="AND" /><Blank /><Token Text="NOT" /><Blank />
+          <Access Scope="LocalVariable"><Symbol><Component Name="Inhibit" /></Symbol></Access><Token Text=";" /><NewLine Num="2" />
+          <Blank Num="4" /><Access Scope="LocalVariable"><Symbol><Component Name="Value" /></Symbol></Access><Blank /><Token Text=":=" /><Blank />
+          <Access Scope="Call"><Instruction Name="PEEK"><TemplateValue Name="value_type" Type="Type">Byte</TemplateValue><Token Text="(" />
+            <Parameter Name="area"><Blank /><Token Text=":=" /><Blank /><Access Scope="GlobalConstant"><Constant Name="AREA_INPUT" /></Access></Parameter>
+            <Token Text=")" /></Instruction></Access><Token Text=";" /><NewLine />
+          <Blank Num="4" /><Access Scope="Call"><CallInfo BlockType="FB" Name="fbStation"><Instance Scope="LocalVariable"><Component Name="Station" /></Instance>
+            <Token Text="(" /><Parameter Name="OUT_Done"><Blank /><Token Text="=&gt;" /><Blank />
+            <Access Scope="GlobalVariable"><Symbol><Component Name="Tag_1" /><Component Name="Word" SliceAccessModifier="x4" /></Symbol></Access></Parameter>
+            <Token Text=")" /></CallInfo></Access><Token Text=";" /><NewLine />
+          <Token Text="END_REGION" />
+        </StructuredText></NetworkSource><ProgrammingLanguage>SCL</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit></ObjectList></SW.Blocks.FC></Document>
+        """;
+
+    internal static Task StructuredTextBecomesSclSource()
+    {
+        var document = XDocument.Parse(SclNetwork);
+        var network = GraphicalNetworkText.Render(document).Single();
+        Check.Equal("SCL", network.Language);
+        Check.Equal(true, network.Rendered);
+        Check.Equal(string.Join(Environment.NewLine,
+            "REGION Outputs",
+            "    // vacuum valve",
+            "    o452_0_xVacuum := \"Station DB\".COP.Bit[3] AND NOT #Inhibit;",
+            "",
+            "    #Value := PEEK(area := \"AREA_INPUT\");",
+            "    #Station(OUT_Done => Tag_1.Word.%X4);",
+            "END_REGION"), network.Text);
+        // The response bound cuts a long network; the caller's own bound (the text artifact) keeps it whole.
+        var cut = GraphicalNetworkText.Render(document, null, 20).Single();
+        Check.Equal(true, cut.Truncated);
+        Check.Equal(true, cut.Text.StartsWith("REGION Outputs", StringComparison.Ordinal) && cut.Text.EndsWith("... (truncated)", StringComparison.Ordinal));
+        Check.Equal(false, GraphicalNetworkText.Render(document, null, int.MaxValue).Single().Truncated);
+        return Task.CompletedTask;
+    }
+
     internal static Task BoxesAndCallsShowPinBindings()
     {
         Check.Equal("TON<Time> #Storage(IN := #Enable, PT := #Preset, ET => #Elapsed)" + Environment.NewLine + "#Done := #Storage.Q", Single("Tgp_TON_LAD.xml").Text);
@@ -67,7 +115,7 @@ internal static class GraphicalNetworkTextTests
                 <MultilingualTextItem ID="3" CompositionName="Items"><AttributeList><Culture>de-DE</Culture><Text>Niederhalter</Text></AttributeList></MultilingualTextItem>
                 <MultilingualTextItem ID="4" CompositionName="Items"><AttributeList><Culture>en-US</Culture><Text>Downholder</Text></AttributeList></MultilingualTextItem>
               </ObjectList></MultilingualText></ObjectList></SW.Blocks.CompileUnit>
-              <SW.Blocks.CompileUnit ID="5" CompositionName="CompileUnits"><AttributeList><NetworkSource><StructuredText /></NetworkSource><ProgrammingLanguage>SCL</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit>
+              <SW.Blocks.CompileUnit ID="5" CompositionName="CompileUnits"><AttributeList><NetworkSource><StatementList /></NetworkSource><ProgrammingLanguage>STL</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit>
             </ObjectList></SW.Blocks.FC></Document>
             """);
         var networks = GraphicalNetworkText.Render(document);
@@ -79,7 +127,7 @@ internal static class GraphicalNetworkTextTests
         Check.Equal(true, networks[1].Text.Contains("generatedSource", StringComparison.Ordinal));
         string text = GraphicalNetworkText.Format(networks);
         Check.Equal(true, text.StartsWith("Network 1: Downholder [LAD, ID 1]", StringComparison.Ordinal));
-        Check.Equal(true, text.Contains("Network 2 [SCL, ID 5]", StringComparison.Ordinal));
+        Check.Equal(true, text.Contains("Network 2 [STL, ID 5]", StringComparison.Ordinal));
         return Task.CompletedTask;
     }
 

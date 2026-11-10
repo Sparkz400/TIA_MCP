@@ -25,6 +25,18 @@ namespace TiaMcp.Openness.V21
 {
     internal sealed partial class OpennessSession
     {
+        private static readonly string[] SoftwareSectionNames = { "blocks", "tags", "constants", "types", "technology" };
+
+        /// <summary>The sections named by include (comma-separated), or null for all of them.</summary>
+        internal static HashSet<string> SoftwareSections(string include)
+        {
+            if (include == null) return null;
+            var names = include.Split(',').Select(name => name.Trim()).ToArray();
+            if (names.Any(name => !SoftwareSectionNames.Contains(name, StringComparer.Ordinal)))
+                throw new BridgeException("InvalidRequest", "include accepts a comma-separated list of: " + string.Join(", ", SoftwareSectionNames) + ".");
+            return new HashSet<string>(names, StringComparer.Ordinal);
+        }
+
         private JObject SoftwareInspect(JObject args)
         {
             var plc = SelectInspectionPlc(args, "scopePath");
@@ -34,6 +46,13 @@ namespace TiaMcp.Openness.V21
             // With a filter only matching rows take maxItems; the walk has its own bound so later stations are reached.
             var walk = filter.Active ? new ScanBudget(MemberWalkLimit) : budget;
             Func<bool> take = () => walk == budget || budget.Take();
+            var sections = SoftwareSections(args.Value<string>("include"));
+            Func<string, bool> wants = section => sections == null || sections.Contains(section);
+            bool compact = args.Value<bool?>("compact") == true;
+            // The first place the item bound cut the result, so a caller sees what is missing instead of inferring it.
+            JObject truncation = null;
+            Action<string, string> cut = (section, detail) => { if (truncation == null) truncation = new JObject { ["section"] = section, ["detail"] = detail,
+                ["hint"] = "Raise maxItems, or narrow the read with include, groupPath or namePrefix." }; };
             var technologyEntries = TechnologyObjects(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", walk).ToList();
             var technologyMembership = new TechnologyBlockMembership();
             foreach (var technologyEntry in technologyEntries) technologyMembership.AddTechnology(technologyEntry.Item, technologyEntry.Path);
@@ -72,8 +91,9 @@ namespace TiaMcp.Openness.V21
                 }
                 foreach (var block in ScopeBlocks(scope, walk))
                 {
+                    if (!wants("blocks")) break;
                     if (!filter.Matches(block.Path, block.Item.Name)) continue;
-                    if (!take()) break;
+                    if (!take()) { cut("blocks", "Blocks after " + blocks.Count + " are not listed."); break; }
                     var row = BlockInfo(block, plc.Path);
                     row["scopePath"] = scope.Path;
                     row["technologyPath"] = technologyMembership.AddBlock(block.Item, block.Path);
@@ -82,9 +102,12 @@ namespace TiaMcp.Openness.V21
                 }
                 foreach (var table in TagTables(scope.Tags, scope.Path + "/tags", walk))
                 {
+                    if (!wants("tags") && !wants("constants")) break;
                     if (!filter.Matches(table.Path, table.Item.Name)) continue;
-                    if (!take()) break;
-                    var row = new JObject { ["path"] = table.Path, ["name"] = table.Item.Name, ["scopePath"] = scope.Path };
+                    if (!take()) { cut("tagTables", "Tag tables after " + tables.Count + " are not listed."); break; }
+                    var row = new JObject { ["path"] = table.Path, ["name"] = table.Item.Name, ["scopePath"] = scope.Path,
+                        ["tagCount"] = table.Item.Tags.Count, ["constantCount"] = table.Item.UserConstants.Count + table.Item.SystemConstants.Count,
+                        ["tagsTruncated"] = false, ["constantsTruncated"] = false };
                     var tags = new JArray();
                     var constants = new JArray();
                     row["tags"] = tags;
@@ -92,7 +115,21 @@ namespace TiaMcp.Openness.V21
                     tables.Add(row);
                     foreach (var tag in table.Item.Tags)
                     {
-                        if (!budget.Take()) break;
+                        if (!wants("tags")) break;
+                        if (!budget.Take())
+                        {
+                            row["tagsTruncated"] = true;
+                            cut("tagTables", "Tag table " + table.Item.Name + " lists " + tags.Count + " of " + table.Item.Tags.Count + " tags; later tables are not listed.");
+                            break;
+                        }
+                        if (compact)
+                        {
+                            // The path is the table path + "/tags/" + the escaped name; external-access flags come with the full form.
+                            var brief = new JObject { ["name"] = tag.Name, ["dataType"] = tag.DataTypeName, ["logicalAddress"] = tag.LogicalAddress };
+                            if (tag.IsSafety) brief["isSafety"] = true;
+                            tags.Add(brief);
+                            continue;
+                        }
                         tags.Add(new JObject { ["path"] = table.Path + "/tags/" + Segment(tag.Name), ["name"] = tag.Name,
                             ["dataType"] = tag.DataTypeName, ["logicalAddress"] = tag.LogicalAddress, ["isSafety"] = tag.IsSafety,
                             ["externalAccessible"] = tag.ExternalAccessible, ["externalVisible"] = tag.ExternalVisible,
@@ -100,24 +137,28 @@ namespace TiaMcp.Openness.V21
                     }
                     foreach (var constant in table.Item.UserConstants)
                     {
-                        if (!budget.Take()) break;
+                        if (!wants("constants")) break;
+                        if (!budget.Take()) { row["constantsTruncated"] = true; cut("tagTables", "Constants of tag table " + table.Item.Name + " are incomplete; later tables are not listed."); break; }
                         constants.Add(new JObject { ["path"] = table.Path + "/constants/" + Segment(constant.Name),
                             ["name"] = constant.Name, ["dataType"] = constant.DataTypeName, ["value"] = InspectionValue(constant.Value), ["kind"] = "user" });
                     }
                     foreach (var constant in table.Item.SystemConstants)
                     {
-                        if (!budget.Take()) break;
+                        if (!wants("constants")) break;
+                        if (!budget.Take()) { row["constantsTruncated"] = true; cut("tagTables", "Constants of tag table " + table.Item.Name + " are incomplete; later tables are not listed."); break; }
                         constants.Add(new JObject { ["path"] = table.Path + "/systemConstants/" + Segment(constant.Name),
                             ["name"] = constant.Name, ["dataType"] = constant.DataTypeName, ["value"] = InspectionValue(constant.Value), ["kind"] = "system" });
                     }
                 }
-                foreach (var type in ScopeTypes(scope, walk).Where(t => filter.Matches(t.Path, t.Item.Name)))
-                    if (take()) types.Add(new JObject { ["path"] = type.Path, ["name"] = type.Item.Name, ["scopePath"] = scope.Path,
+                foreach (var type in ScopeTypes(scope, walk).Where(t => wants("types") && filter.Matches(t.Path, t.Item.Name)))
+                    if (!take()) cut("types", "PLC data types after " + types.Count + " are not listed.");
+                    else types.Add(new JObject { ["path"] = type.Path, ["name"] = type.Item.Name, ["scopePath"] = scope.Path,
                         ["isConsistent"] = type.Item.IsConsistent, ["isKnowHowProtected"] = type.Item.IsKnowHowProtected });
             }
             var technology = new JArray();
-            foreach (var entry in technologyEntries.Where(e => filter.Matches(e.Path, e.Item.Name)))
-                if (take()) technology.Add(TechnologyInfo(entry));
+            foreach (var entry in technologyEntries.Where(e => wants("technology") && filter.Matches(e.Path, e.Item.Name)))
+                if (!take()) cut("technologyObjects", "Technology objects after " + technology.Count + " are not listed.");
+                else technology.Add(TechnologyInfo(entry));
             result["project"] = ProjectInfo(plc.Project);
             result["plcPath"] = plc.Path;
             result["softwareScopes"] = units;
@@ -128,6 +169,8 @@ namespace TiaMcp.Openness.V21
             result["technologyBlockMembership"] = technologyMembership.Coverage(budget.Truncated);
             result["groupCoverage"] = "Complete bounded user-group paths, including empty groups; native system-group objects are included in their object inventories.";
             result["warnings"] = warnings;
+            if (sections != null) result["include"] = new JArray(sections.OrderBy(section => section, StringComparer.Ordinal));
+            if (truncation != null) result["truncation"] = truncation;
             if (filter.Active)
             {
                 result["filter"] = new JObject { ["groupPath"] = filter.GroupPath, ["namePrefix"] = filter.NamePrefix, ["walkLimit"] = MemberWalkLimit, ["walkTruncated"] = walk.Truncated,
@@ -207,9 +250,30 @@ namespace TiaMcp.Openness.V21
             var warnings = new JArray();
             var items = new JArray();
             var hardware = DeviceItems(project, lookup).ToArray();
+            bool compact = args.Value<bool?>("compact") == true;
+            int omitted = 0;
             foreach (var entry in hardware)
             {
                 if (!string.IsNullOrWhiteSpace(wanted) && !string.Equals(entry.Path, wanted, StringComparison.Ordinal)) continue;
+                if (compact)
+                {
+                    // Identity, address ranges and channels only: the attribute, network and GSD reads are what exhaust maxItems on a large station.
+                    try
+                    {
+                        var ranges = new JArray(entry.Item.Addresses.Where(a => a.StartAddress >= 0).Select(a => new JObject { ["io"] = a.IoType.ToString(), ["start"] = a.StartAddress,
+                            ["bits"] = a.Length, ["bytes"] = TiaMcp.Analysis.OfflineEvidence.IoBitLengthToByteLength(a.Length) }));
+                        var signals = new JArray(entry.Item.Channels.Select(c => new JObject { ["number"] = c.Number, ["io"] = c.IoType.ToString(), ["type"] = c.Type.ToString() }));
+                        if (ranges.Count == 0 && signals.Count == 0 && string.IsNullOrEmpty(entry.Item.TypeIdentifier)) { omitted++; continue; }
+                        if (!budget.Take()) break;
+                        var brief = new JObject { ["path"] = entry.Path, ["name"] = entry.Item.Name, ["positionNumber"] = entry.Item.PositionNumber };
+                        if (!string.IsNullOrEmpty(entry.Item.TypeIdentifier)) brief["typeIdentifier"] = entry.Item.TypeIdentifier;
+                        if (ranges.Count > 0) brief["addresses"] = ranges;
+                        if (signals.Count > 0) brief["channels"] = signals;
+                        items.Add(brief);
+                    }
+                    catch (Exception exception) { warnings.Add(InspectionWarning(entry.Path, exception)); }
+                    continue;
+                }
                 if (!budget.Take()) break;
                 var row = new JObject { ["path"] = entry.Path, ["name"] = entry.Item.Name,
                     ["positionNumber"] = entry.Item.PositionNumber, ["classification"] = entry.Item.Classification.ToString(),
@@ -254,6 +318,8 @@ namespace TiaMcp.Openness.V21
             var result = Envelope();
             result["project"] = ProjectInfo(project);
             result["items"] = items;
+            if (compact) result["compact"] = new JObject { ["omittedRows"] = omitted,
+                ["note"] = "Identity, I/O address ranges and channels only; attributes, network and GSD details need a read without compact. Items without a type identifier, I/O addresses and channels are counted, not listed." };
             result["warnings"] = warnings;
             result["completeness"] = InspectionCoverage(budget, warnings, "Configured hardware attributes, address ranges, channels, subnet memberships, I/O-controller/connector associations, port interconnections and GSD identities exposed by V21 Openness.",
                 "Channel terminal/signal mappings only when exposed as native attributes; no guessed byte-per-channel allocation", "No electrical wiring or runtime diagnostics", "Attribute values limited to 4096 characters");

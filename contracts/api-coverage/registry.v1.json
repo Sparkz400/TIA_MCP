@@ -732,6 +732,27 @@
       ]
     },
     {
+      "featureId": "block_export",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "plc_io_map",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "plc_tag_usage",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
       "featureId": "block_interface",
       "obligations": [
         "L04",

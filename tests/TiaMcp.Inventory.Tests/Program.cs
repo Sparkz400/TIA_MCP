@@ -2,6 +2,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
 using System.Globalization;
@@ -378,6 +379,116 @@ var wrapped = ToolSurface.WithError(JsonDocument.Parse("{\"type\":\"object\",\"p
 Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties").GetProperty("self").GetProperty("$ref").GetString() == "#/$defs/result"
     && wrapped.GetProperty("anyOf").GetArrayLength() == 2, "Declared result schemas keep their references under the error alternative");
 
+// JsonElement arguments: typed for clients, and a JSON object that still arrives as a string is parsed instead of refused.
+{
+    var input = JsonNode.Parse("{\"type\":\"object\",\"properties\":{\"request\":true,\"intent\":{\"default\":null},\"payload\":{},\"kind\":{\"type\":\"string\"},\"maxItems\":{\"type\":\"integer\",\"default\":5}}}")!.AsObject();
+    var structured = ToolSurface.StructuredArguments(input, "payload");
+    Check(structured.Order(StringComparer.Ordinal).SequenceEqual(new[] { "intent", "payload", "request" }), "Unconstrained and named object arguments are the structured ones");
+    Check(input["properties"]!["request"]!["type"]!.GetValue<string>() == "object" && input["properties"]!["payload"]!["type"]!.GetValue<string>() == "object"
+        && input["properties"]!["intent"]!.AsObject().ContainsKey("default") && !input["properties"]!["intent"]!.AsObject().ContainsKey("type")
+        && input["properties"]!["kind"]!["type"]!.GetValue<string>() == "string", "request and the object argument are declared as objects; optional and typed arguments keep their schema");
+    Check(ToolSurface.StructuredArguments(JsonNode.Parse("{\"type\":\"object\"}")!.AsObject(), null).Length == 0, "A tool without properties has no structured arguments");
+    JsonElement Text(string value) => JsonSerializer.SerializeToElement(value);
+    Check(ToolSurface.StructuredValue(Text(" {\"maxBlocks\":0,\"blockPaths\":[\"a\"]}")) is { ValueKind: JsonValueKind.Object } parsed
+        && parsed.GetProperty("blockPaths")[0].GetString() == "a", "An object sent as a JSON string is parsed");
+    Check(ToolSurface.StructuredValue(Text("[1,2]")) is { ValueKind: JsonValueKind.Array }, "An array sent as a JSON string is parsed");
+    Check(ToolSurface.StructuredValue(Text("{not json")) is null && ToolSurface.StructuredValue(Text("plain")) is null && ToolSurface.StructuredValue(Text("")) is null
+        && ToolSurface.StructuredValue(JsonDocument.Parse("{\"a\":1}").RootElement) is null && ToolSurface.StructuredValue(Text("7")) is null,
+        "Anything that is not a JSON object or array in a string is passed on unchanged");
+}
+// block_export: selection, paging and compact rows are computed from project_inventory and block_read results.
+{
+    const string plc = "/projects/P/devices/D/items/CPU/plc/CPU";
+    string Block(string path, string kind, bool protectedBlock = false) => "{\"path\":\"" + plc + "/blocks/" + path + "\",\"plcPath\":\"" + plc + "\",\"name\":\"" + path.Split('/')[^1]
+        + "\",\"number\":7,\"kind\":\"" + kind + "\",\"programmingLanguage\":\"SCL\",\"isConsistent\":true,\"isKnowHowProtected\":" + (protectedBlock ? "true" : "false") + "}";
+    var inventory = JsonDocument.Parse("{\"project\":{\"name\":\"P\"},\"plcs\":[{\"path\":\"" + plc + "\"}],\"completeness\":{\"truncated\":false},\"blocks\":["
+        + Block("groups/B/fcTwo", "FC") + "," + Block("groups/A/fbOne", "FB") + "," + Block("groups/A/dbData", "GlobalDB") + "," + Block("groups/C/fbLocked", "FB", true) + "]}").RootElement;
+    var kinds = new[] { "FB", "FC", "OB" };
+    var page = BlockExportIndex.Select(inventory, kinds, null, 0, 2);
+    Check(page.Select(b => b.GetProperty("name").GetString()).SequenceEqual(new[] { "fbOne", "fcTwo" }), "Blocks are selected by kind in path order, one page at a time");
+    Check(BlockExportIndex.Select(inventory, kinds, "/other", 0, 10).Count == 0 && BlockExportIndex.Select(inventory, new[] { "GlobalDB" }, plc, 0, 10).Count == 1, "plcPath and kinds narrow the selection");
+    var exportDirectory = Path.Combine(output, "block-export");
+    var read = JsonDocument.Parse("{\"artifact\":{\"path\":\"" + exportDirectory.Replace("\\", "\\\\") + "\\\\block-1.xml\",\"bytes\":42},\"textArtifact\":{\"path\":\""
+        + exportDirectory.Replace("\\", "\\\\") + "\\\\block-1.txt\"},\"networks\":[{},{}]}").RootElement;
+    var rows = new List<JsonObject> { BlockExportIndex.Row(page[0], read, null, null), BlockExportIndex.Row(page[1], null, "BlockExportUnavailable", "inconsistent") };
+    Check(rows[0]["path"]!.GetValue<string>() == "groups/A/fbOne" && rows[0]["xml"]!.GetValue<string>() == "block-1.xml" && rows[0]["text"]!.GetValue<string>() == "block-1.txt"
+        && rows[0]["networks"]!.GetValue<int>() == 2 && rows[0]["bytes"]!.GetValue<long>() == 42 && rows[0]["skipped"] is null, "An exported row names its files relative to the directory and its path relative to the PLC");
+    Check(rows[1]["skipped"]!["code"]!.GetValue<string>() == "BlockExportUnavailable" && rows[1]["xml"] is null, "A failed block is a skipped row with its error");
+    var built = BlockExportIndex.Build(inventory, kinds, null, 0, 2, exportDirectory, rows);
+    Check(built["matchedBlocks"]!.GetValue<int>() == 3 && built["exported"]!.GetValue<int>() == 1 && built["skipped"]!.GetValue<int>() == 1 && built["nextOffset"]!.GetValue<int>() == 2
+        && !built["completeness"]!["complete"]!.GetValue<bool>(), "A partial page reports the next offset and is not complete");
+    Check(File.Exists(built["index"]!.GetValue<string>()) && JsonNode.Parse(File.ReadAllText(built["index"]!.GetValue<string>()))!["blocks"]!.AsArray().Count == 2, "The rows are also written to an index file");
+    var last = BlockExportIndex.Build(inventory, kinds, null, 2, 2, exportDirectory, [BlockExportIndex.Row(BlockExportIndex.Select(inventory, kinds, null, 2, 2)[0], null, "ProtectedObject", "protected")]);
+    Check(last["nextOffset"] is null && last["completeness"]!["complete"]!.GetValue<bool>(), "The last page is complete and has no next offset");
+}
+// plc_io_map: address ranges, the tags inside them and the two kinds of gap.
+{
+    Check(IoMap.Parse("a", "T", "Bool", "%I400.3") is { Area: 'I', Byte: 400, Bit: 3, Bytes: 1 } && IoMap.Parse("b", "T", "Word", "%QW470") is { Area: 'Q', Byte: 470, Bit: null, Bytes: 2 }
+        && IoMap.Parse("c", "T", "DWord", "%ID8") is { Bytes: 4 } && IoMap.Parse("d", "T", "Bool", "%M1.0") is null && IoMap.Parse("e", "T", "Bool", null) is null
+        && IoMap.Parse("f", "T", "\"PD_TEL105_IN\"", "%I10007.0") is { Byte: 10007 }, "I and Q addresses are parsed with their width; memory and missing addresses are not I/O");
+    var inventory = JsonDocument.Parse("""
+        {"project":{"name":"P"},"plcs":[{"path":"/p"}],"completeness":{"truncated":false},"hardware":[
+          {"path":"devices/D/items/DI1","name":"DI1","typeIdentifier":"OrderNumber:6ES7 131","addresses":[{"io":"Input","start":400,"bytes":1}]},
+          {"path":"devices/D/items/DQ1","name":"DQ1","addresses":[{"io":"Output","start":450,"bytes":2}]},
+          {"path":"devices/D/items/Valves","name":"Valves","addresses":[{"io":"Output","start":900,"bytes":6}]},
+          {"path":"devices/D/items/Rack","name":"Rack","typeIdentifier":"System:Rack"}]}
+        """).RootElement;
+    var software = JsonDocument.Parse("""
+        {"plcPath":"/p","completeness":{"truncated":false},"tagTables":[{"name":"IO","tags":[
+          {"name":"iStart","dataType":"Bool","logicalAddress":"%I400.4"},{"name":"iAlias","dataType":"Bool","logicalAddress":"%I400.4"},
+          {"name":"oLamp","dataType":"Bool","logicalAddress":"%Q451.0"},{"name":"iOld","dataType":"Bool","logicalAddress":"%I201.0"},
+          {"name":"mFlag","dataType":"Bool","logicalAddress":"%M0.0"}]}]}
+        """).RootElement;
+    var map = IoMap.Build(inventory, software);
+    Check(map["summary"]!["ranges"]!.GetValue<int>() == 3 && map["summary"]!["ioTags"]!.GetValue<int>() == 4 && map["summary"]!["rangesWithoutTags"]!.GetValue<int>() == 1
+        && map["summary"]!["tagsWithoutListedHardware"]!.GetValue<int>() == 1, "The map counts ranges, I/O tags and both gaps");
+    Check(map["ranges"]![0]!["range"]!.GetValue<string>() == "%I400..400" && map["ranges"]![0]!["tags"]!.AsArray().Select(t => t!.GetValue<string>()).SequenceEqual(new[] { "%I400.4 iAlias", "%I400.4 iStart" })
+        && map["ranges"]![1]!["tags"]![0]!.GetValue<string>() == "%Q451.0 oLamp", "A tag is placed in the range that contains its first byte");
+    Check(map["rangesWithoutTags"]![0]!["module"]!.GetValue<string>() == "devices/D/items/Valves" && map["tagsWithoutListedHardware"]![0]!["name"]!.GetValue<string>() == "iOld"
+        && map["sharedAddresses"]![0]!["address"]!.GetValue<string>() == "%I400.4" && map["completeness"]!["complete"]!.GetValue<bool>(), "Untagged ranges, tags without hardware and shared addresses are listed");
+}
+// plc_tag_usage: readers and writers from exported LAD and SCL networks.
+{
+    var block = XDocument.Parse("""
+        <Document><SW.Blocks.FC ID="0"><AttributeList><Name>fcStation</Name></AttributeList><ObjectList>
+          <SW.Blocks.CompileUnit ID="1" CompositionName="CompileUnits"><AttributeList><NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5"><Parts>
+            <Access Scope="GlobalVariable" UId="21"><Symbol><Component Name="iStart" /></Symbol></Access>
+            <Access Scope="GlobalVariable" UId="22"><Symbol><Component Name="oLamp" /></Symbol></Access>
+            <Access Scope="GlobalVariable" UId="23"><Symbol><Address Area="Output" Type="Bool" BitOffset="3601" /></Symbol></Access>
+            <Access Scope="LocalVariable" UId="24"><Symbol><Component Name="iStart" /></Symbol></Access>
+            <Part Name="Contact" UId="30" /><Part Name="Coil" UId="31" /><Part Name="Coil" UId="32" />
+          </Parts><Wires>
+            <Wire UId="40"><IdentCon UId="21" /><NameCon UId="30" Name="operand" /></Wire>
+            <Wire UId="41"><IdentCon UId="22" /><NameCon UId="31" Name="operand" /></Wire>
+            <Wire UId="42"><IdentCon UId="23" /><NameCon UId="32" Name="operand" /></Wire>
+            <Wire UId="43"><IdentCon UId="24" /><NameCon UId="30" Name="operand" /></Wire>
+          </Wires></FlgNet></NetworkSource></AttributeList></SW.Blocks.CompileUnit>
+          <SW.Blocks.CompileUnit ID="2" CompositionName="CompileUnits"><AttributeList><NetworkSource><StructuredText xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v4">
+            <Access Scope="GlobalVariable"><Symbol><Component Name="oValve" /></Symbol></Access><Blank /><Token Text=":=" /><Blank />
+            <Access Scope="GlobalVariable"><Symbol><Component Name="DB" /><Token Text="." /><Component Name="Bit"><Token Text="[" /><Access Scope="GlobalVariable"><Symbol><Component Name="iIndex" /></Symbol></Access><Token Text="]" /></Component></Symbol></Access>
+            <Token Text=";" /><NewLine />
+            <Access Scope="Call"><CallInfo BlockType="FB"><Instance Scope="GlobalVariable"><Component Name="instDB" /></Instance><Token Text="(" />
+              <Parameter Name="IN"><Blank /><Token Text=":=" /><Blank /><Access Scope="GlobalVariable"><Symbol><Component Name="iStart" /></Symbol></Access></Parameter><Token Text="," />
+              <Parameter Name="OUT"><Blank /><Token Text="=&gt;" /><Blank /><Access Scope="GlobalVariable"><Symbol><Component Name="oLamp" /></Symbol></Access></Parameter>
+            <Token Text=")" /></CallInfo></Access><Token Text=";" />
+          </StructuredText></NetworkSource></AttributeList></SW.Blocks.CompileUnit>
+        </ObjectList></SW.Blocks.FC></Document>
+        """);
+    var uses = TagUsageScan.Uses(block);
+    bool Has(string operand, int network, bool write) => uses.Any(u => u.Block == "fcStation" && u.Operand == operand && u.Network == network && u.Write == write);
+    Check(Has("iStart", 1, false) && Has("oLamp", 1, true) && Has("%Q450.1", 1, true) && uses.Count(u => u.Operand == "iStart" && u.Network == 1) == 1,
+        "LAD contacts read, coils write, absolute addresses are reported and a local variable of the same name is not a tag");
+    Check(Has("oValve", 2, true) && Has("DB", 2, false) && Has("iIndex", 2, false) && Has("iStart", 2, false) && Has("oLamp", 2, true) && !Has("oValve", 2, false),
+        "SCL assignment targets and call outputs are writes; right-hand sides, indices and call inputs are reads");
+    var tags = new[] { IoMap.Parse("iStart", "IO", "Bool", "%I400.4")!, IoMap.Parse("iSpare", "IO", "Bool", "%I400.5")!, IoMap.Parse("oLamp", "IO", "Bool", "%Q451.0")!, IoMap.Parse("oValve", "IO", "Bool", "%Q452.0")! };
+    var report = TagUsageScan.Report(tags, uses, false);
+    Check(report["summary"]!["unused"]!.GetValue<int>() == 1 && report["summary"]!["readOnly"]!.GetValue<int>() == 1 && report["summary"]!["writeOnly"]!.GetValue<int>() == 2,
+        "The summary counts unused, read-only and write-only tags");
+    Check(report["tags"]![0]!["readers"]!.AsArray().Select(r => r!.GetValue<string>()).SequenceEqual(new[] { "fcStation N1", "fcStation N2" }) && report["tags"]![1]!["readers"] is null
+        && report["tags"]![2]!["writers"]!.AsArray().Count == 2 && report["absoluteAccesses"]![0]!["address"]!.GetValue<string>() == "%Q450.1", "Rows list readers and writers by block and network; absolute accesses are separate");
+    var unusedOnly = TagUsageScan.Report(tags, uses, true);
+    Check(unusedOnly["tags"]!.AsArray().Count == 1 && unusedOnly["tags"]![0]!["name"]!.GetValue<string>() == "iSpare" && unusedOnly["summary"]!["ioTags"]!.GetValue<int>() == 4, "unusedOnly keeps only unreferenced tags and the full summary");
+}
 // Resources read through the artifact-root and link checks of artifact_read; completion lists names only, never through links.
 var resourceRoot = Path.Combine(output, "resources");
 var outside = Path.Combine(output, "outside");

@@ -384,6 +384,7 @@ internal static partial class Program
             ("Change status journals are summarized", ChangeInputAndCompactionTests.ChangeStatusJournalsAreSummarized),
             ("Graphical text renders LAD/FBD logic as Boolean statements", GraphicalNetworkTextTests.LadderLogicBecomesBooleanStatements),
             ("Graphical text renders boxes and calls with pin bindings", GraphicalNetworkTextTests.BoxesAndCallsShowPinBindings),
+            ("Graphical text renders SCL networks as source text", GraphicalNetworkTextTests.StructuredTextBecomesSclSource),
             ("Graphical text renders operands, titles and unrendered network languages", GraphicalNetworkTextTests.OperandsTitlesAndUnrenderedNetworks),
             ("Graphical text renders the native LAD/FBD corpus without unresolved references", GraphicalNetworkTextTests.NativeCorpusRendersWithoutUnresolvedReferences),
             ("Cross-reference member filter matches array elements by constant index and range", CrossReferenceMemberFilterTests.ArrayElementsMatchByConstantIndexAndRange),

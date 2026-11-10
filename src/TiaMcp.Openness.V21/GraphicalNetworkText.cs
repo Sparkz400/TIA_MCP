@@ -23,7 +23,7 @@ namespace TiaMcp.Openness.V21
             internal bool Truncated, Rendered;
         }
 
-        internal static Network[] Render(XDocument document, string culture = null)
+        internal static Network[] Render(XDocument document, string culture = null, int maxNetworkCharacters = MaxNetworkCharacters)
         {
             var result = new List<Network>();
             int number = 0;
@@ -36,12 +36,15 @@ namespace TiaMcp.Openness.V21
                     Language = attributes?.Element("ProgrammingLanguage")?.Value,
                     Title = Text(unit, "Title", culture), Comment = Text(unit, "Comment", culture),
                 };
-                var flg = attributes?.Element("NetworkSource")?.Elements().FirstOrDefault(e => e.Name.LocalName == "FlgNet");
+                var source = attributes?.Element("NetworkSource");
+                var flg = source?.Elements().FirstOrDefault(e => e.Name.LocalName == "FlgNet");
+                var structured = source?.Elements().FirstOrDefault(e => e.Name.LocalName == "StructuredText");
                 string body;
                 if (flg != null) { body = new Renderer(flg).Render(); network.Rendered = true; }
-                else if (attributes?.Element("NetworkSource") == null || !attributes.Element("NetworkSource").HasElements) body = "(empty network)";
+                else if (structured != null) { body = StructuredText(structured); network.Rendered = true; }
+                else if (source == null || !source.HasElements) body = "(empty network)";
                 else body = "(" + (network.Language ?? "unknown") + " network is not rendered; read block_read format=generatedSource or the native XML)";
-                if (body.Length > MaxNetworkCharacters) { body = body.Substring(0, MaxNetworkCharacters) + Environment.NewLine + "... (truncated)"; network.Truncated = true; }
+                if (body.Length > maxNetworkCharacters) { body = body.Substring(0, maxNetworkCharacters) + Environment.NewLine + "... (truncated)"; network.Truncated = true; }
                 network.Text = body;
                 result.Add(network);
             }
@@ -63,6 +66,53 @@ namespace TiaMcp.Openness.V21
             }
             return text.ToString();
         }
+
+        /// <summary>SCL source of an exported StructuredText network, rebuilt from its tokens in document order. Local variables carry
+        /// their '#', quoted names their quotes; a block call shows its instance or function name, never the type of the instance.</summary>
+        internal static string StructuredText(XElement source)
+        {
+            var text = new StringBuilder();
+            foreach (var child in source.Elements()) AppendStructured(child, text);
+            return text.ToString().TrimEnd();
+        }
+
+        private static void AppendStructured(XElement element, StringBuilder text)
+        {
+            string name = element.Name.LocalName;
+            switch (name)
+            {
+                case "Token": text.Append((string)element.Attribute("Text")); return;
+                case "Blank": text.Append(' ', Count(element)); return;
+                case "NewLine": for (int i = Count(element); i > 0; i--) text.Append(Environment.NewLine); return;
+                case "ConstantValue": case "Text": text.Append(element.Value); return;
+                case "LineComment": text.Append("//"); break;
+                case "Instruction": case "Parameter": text.Append((string)element.Attribute("Name")); break;
+                case "Address": text.Append(Renderer.Absolute(element)); return;
+                case "Constant":
+                    if (element.Attribute("Name") != null) text.Append('"').Append((string)element.Attribute("Name")).Append('"');
+                    break;
+                case "Component":
+                    var previous = element.ElementsBeforeSelf().LastOrDefault();
+                    // Older exports list the components of a symbol without the '.' tokens.
+                    if (previous != null && previous.Name.LocalName == "Component") text.Append('.');
+                    // The scope is on the Access around a Symbol, or on the Instance of a call.
+                    bool local = previous == null && (string)(element.Parent?.Attribute("Scope") ?? element.Parent?.Parent?.Attribute("Scope")) == "LocalVariable";
+                    bool quoted = element.Elements().Any(e => e.Name.LocalName == "BooleanAttribute" && (string)e.Attribute("Name") == "HasQuotes" && e.Value == "true");
+                    string component = (string)element.Attribute("Name");
+                    text.Append(local ? "#" + component : quoted ? "\"" + component + "\"" : component);
+                    string slice = (string)element.Attribute("SliceAccessModifier");
+                    if (!string.IsNullOrEmpty(slice)) text.Append(".%").Append(slice.ToUpperInvariant());
+                    break;
+                default:
+                    // Declared attributes and template arguments are not part of the source text.
+                    if (name == "TemplateValue" || name == "ConstantType" || name.EndsWith("Attribute", StringComparison.Ordinal)) return;
+                    break;
+            }
+            foreach (var child in element.Elements()) AppendStructured(child, text);
+        }
+
+        private static int Count(XElement element) =>
+            int.TryParse((string)element.Attribute("Num"), NumberStyles.None, CultureInfo.InvariantCulture, out int count) && count > 0 ? Math.Min(count, 4096) : 1;
 
         private static string Text(XElement unit, string composition, string culture)
         {
@@ -299,7 +349,7 @@ namespace TiaMcp.Openness.V21
                 return text.ToString();
             }
 
-            private static string Absolute(XElement address)
+            internal static string Absolute(XElement address)
             {
                 string area = (string)address.Attribute("Area");
                 string prefix = area == "Input" ? "I" : area == "Output" ? "Q" : area == "Memory" ? "M" : area ?? "?";
