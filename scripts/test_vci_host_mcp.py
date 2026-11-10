@@ -236,7 +236,12 @@ def main():
         damaged = call('vci_prepare',dict(files=[dict(relativePath='new.txt')],author=author,message='damage',parentRevisionRef=first['recordRef']))
         (directory(damaged['recordRef'])/'repository/new.txt').write_bytes(b'damaged')
         reject('vci_commit',dict(previewRef=damaged['recordRef'],reviewedPlanSha256=damaged['planSha256']),'VciIntegrityFailure')
-        check('damaged candidates remain discoverable', any(row['state']=='integrity-failed' for row in call('vci_list')['rows']))
+        # vci_list derives state from receipt files only, so a damaged working tree stays listed as prepared; vci_reopen verifies its bytes.
+        listed, offset = [], 0
+        while offset is not None:
+            page = call('vci_list', dict(offset=offset, count=50)); listed += page['rows']; offset = page['nextOffset']
+        check('damaged candidates remain discoverable', any(row['recordRef']==damaged['recordRef'] and row['state']=='prepared' for row in listed))
+        reject('vci_reopen', dict(recordRef=damaged['recordRef']), 'VciIntegrityFailure')
         check('parent remains independently intact', download(first['recordRef'],path='PLC/Über Motor.s7dcl') == raw)
         # Stop only this harness's live Host tree after its durable dispatch record.
         interrupted = call('vci_prepare',dict(files=[dict(relativePath='interrupted/'+str(i)+'.txt') for i in range(50)],
