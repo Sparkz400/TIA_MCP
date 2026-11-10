@@ -9,7 +9,9 @@ selectors become ambiguous and loadable generation has a supported target. Scrat
 Portal first, because a refused CPU identifier leaves the partially created project open by design. A VCI workspace with
 two mapped blocks shows each mapping's contentSha256: distinct per object, stable across reads, and changed only for
 the block whose header is then edited. Generated-source reads report the project's unsaved state before and after, and
-every change preview reports isModified (31 October audit).
+every change preview reports isModified (31 October audit). Two central DI 16x24VDC HF modules, a tag table RcIo and two
+SCL functions then back the I/O analysis reads: block_export against software_inspect and the files on disk, plc_io_map
+against hardware_inspect and software_inspect, and plc_tag_usage against the two functions' known accesses.
 """
 from __future__ import annotations
 
@@ -18,7 +20,9 @@ import csv
 import hashlib
 import json
 from pathlib import Path
+import re
 import shutil
+from xml.etree import ElementTree
 
 from library_native_harness import Harness, require
 from qualify_cpu_memory_bytes import add_cpu
@@ -43,6 +47,7 @@ FEATURES = {
     "vci_workspace_inspect": ("vci_workspace_inspect",), "connection_inspect": ("connection_inspect",),
     "access_inspect": ("access_inspect",), "certificate_inspect": ("certificate_inspect",), "web_inspect": ("web_inspect",),
     "plc_compare": ("plc_compare",),
+    "block_export": ("block_export",), "plc_io_map": ("plc_io_map",), "plc_tag_usage": ("plc_tag_usage",),
 }
 NEEDS = ("identity", "refusal", "completeness")
 # Tools without a target selector have nothing to refuse; their identity is the exact set they report.
@@ -62,6 +67,11 @@ LIMITATIONS = [
     "for catalog access; the partial project is named in the refusal and its Portal is discarded.",
     "plc_loadable_generate is positive only on the CPU 1518; on the CPU 1511 it is refused (UnsupportedCapability), as "
     "Siemens documents loadables only for CPU 1518 and its subtypes from firmware V2.8.",
+    "I/O analysis: two central DI 16x24VDC HF V1.0 (one tagged, one untagged), three Bool tags in table RcIo (one on the module, "
+    "an output and an input without hardware) and two SCL functions; no output module, distributed I/O, drive telegram, shared "
+    "address, LAD/FBD/STL network, protected block or paged index. The block_export index carries a size but no hash per file, so "
+    "each XML is checked by size and by the block name it holds, each text file as present and non-empty. plc_tag_usage's "
+    "untyped refusal of an index outside the artifact directory is not exercised.",
     "Engineering reads only; no runtime, online or physical-device observation.",
 ]
 
@@ -129,6 +139,23 @@ SCRATCH_CPU = "OrderNumber:6ES7 511-1AL03-0AB0/V4.1"
 UNKNOWN_CPU = "OrderNumber:6ES7 999-9XX99-9XX9/V9.9"
 LOADABLE_CPU = "CPU 1518-4 PN/DP"
 ZERO_GUID = "00000000-0000-0000-0000-000000000001"
+IO_MODULE = "OrderNumber:6ES7 521-1BH00-0AB0/V1.0"  # DI 16x24VDC HF, as plugged by qualify_hardware_changes.py.
+# %d: the first input byte of RcDiA. RcIn is the tag on its bit 0; bit 1 has no tag and stays an absolute access.
+IO_SOURCE = '''FUNCTION "RcIoRead" : Bool
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+BEGIN
+\t#RcIoRead := "RcIn" AND %%I%d.1;
+END_FUNCTION
+
+FUNCTION "RcIoWrite" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+BEGIN
+\t"RcOut" := TRUE;
+END_FUNCTION
+
+'''
 
 
 def sha256(path):
@@ -160,6 +187,39 @@ def explicit(result):
     require(completeness.get("scopeComplete", completeness.get("complete")) is True or result.get("warnings"),
             "An incomplete scope must name its warnings: %s" % completeness)
     return {"scopeComplete": completeness.get("scopeComplete", completeness.get("complete")), "warnings": len(result.get("warnings") or [])}
+
+
+def verify_block_export(result, expected):
+    """block_export lists exactly the expected (path, name, kind, number) blocks, none skipped; each row's XML has the indexed
+    size and holds that block, its text file is not empty (or textUnavailable says why there is none), and the index file
+    holds the same rows."""
+    rows, directory = result["blocks"], Path(result["directory"])
+    require(sorted((b["path"], b["name"], b["kind"], b["number"]) for b in rows) == sorted(expected),
+            "Exported blocks differ from the expected set: %s" % [b["path"] for b in rows])
+    require((result["exported"], result["skipped"]) == (len(rows), 0), "Export counts differ from the rows")
+    for row in rows:
+        require("skipped" not in row and (directory / row["xml"]).stat().st_size == row["bytes"], "XML file differs from its row: %s" % row)
+        name = ElementTree.parse(directory / row["xml"]).getroot().find("./*/AttributeList/Name")
+        require(name is not None and name.text == row["name"], "XML file holds another block: %s" % row)
+        require((directory / row["text"]).stat().st_size > 0 if "text" in row else row.get("textUnavailable"), "No text file and no reason: %s" % row)
+    index = Path(result["index"])
+    require(index.parent == directory and json.loads(index.read_text(encoding="utf-8-sig"))["blocks"] == rows, "The index file differs from the response")
+    return len(rows)
+
+
+def io_expectation(items, tables):
+    """What plc_io_map must report, from hardware_inspect items and software_inspect tag tables: per (range, module path) the
+    "address name" tags whose first byte lies in it, and the I/Q tags in no range."""
+    tags = [(m.group(1), int(m.group(2)), t["logicalAddress"] + " " + t["name"]) for table in tables for t in table["tags"]
+            for m in [re.fullmatch(r"%([IQ])[BWD]?(\d+)(\.[0-7])?", t.get("logicalAddress") or "")] if m]
+    ranges = {}
+    for item in items:
+        for a in item.get("addresses") or []:
+            if a["ioType"] in ("Input", "Output") and a["startAddress"] >= 0:
+                area, first, last = "I" if a["ioType"] == "Input" else "Q", a["startAddress"], a["startAddress"] + max(1, a["byteSpan"]) - 1
+                ranges[("%%%s%d..%d" % (area, first, last), item["path"])] = sorted(text for tag_area, byte, text in tags if tag_area == area and first <= byte <= last)
+    placed = {text for texts in ranges.values() for text in texts}
+    return ranges, sorted(text for _, _, text in tags if text not in placed)
 
 
 def coverage_gaps(coverage):
@@ -576,6 +636,104 @@ def vci_mappings(r):
     r.ok("vci_workspace_inspect", ("identity",), "vci_workspace_inspect: only RcFb's contentSha256 follows its header edit", "vci_workspace_inspect", {}, edited)
 
 
+def io_reads(r):
+    """block_export, plc_io_map and plc_tag_usage on two DI modules, the tag table RcIo and two SCL functions, each checked
+    against hardware_inspect, software_inspect and the exported files; the project's isModified is the same before and after."""
+    h, p1 = r.h, r.p1
+    slot = r.device1 + "/items/"
+    rails = [i["path"] for i in h.tool("hardware_inspect", {"maxItems": 2000})["items"] if i["path"].startswith(slot) and "/" not in i["path"][len(slot):] and i["path"] != r.cpu1]
+    require(len(rails) == 1, "Expected one rail beside the CPU: %s" % rails)  # Its name follows the TIA user interface language.
+    for name, position in (("RcDiA", 2), ("RcDiB", 3)):
+        r.apply("plug " + name, "hardware_plug", {"hardwarePath": rails[0], "typeIdentifier": IO_MODULE, "name": name, "positionNumber": position})
+    hardware = h.tool("hardware_inspect", {"maxItems": 2000})
+    bounded(hardware["completeness"], False)
+    under = lambda path, name: path == slot + name or path.startswith(slot + name + "/")
+    inputs = [a["startAddress"] for i in hardware["items"] if under(i["path"], "RcDiA") for a in i.get("addresses") or [] if a["ioType"] == "Input" and a["startAddress"] >= 0]
+    require(inputs, "RcDiA exposes no input range")
+    start = h.report["ioStartByte"] = min(inputs)
+    r.apply("create tag table RcIo", "tag_table_import_xml", {"tagTableName": "RcIo", "tags": [
+        {"name": "RcIn", "dataType": "Bool", "logicalAddress": "%%I%d.0" % start}, {"name": "RcOut", "dataType": "Bool", "logicalAddress": "%Q200.0"},
+        {"name": "RcSpare", "dataType": "Bool", "logicalAddress": "%I200.0"}]}, {"plcPath": p1})
+    r.apply("create RcIoRead and RcIoWrite", "source_upsert", {"language": "SCL", "source": IO_SOURCE % start, "expectedBlockNames": ["RcIoRead", "RcIoWrite"]}, {"plcPath": p1})
+    software = h.tool("software_inspect", {"plcPath": p1, "maxItems": 2000})
+    bounded(software["completeness"], False)
+    base = p1 + "/blocks/"
+    blocks = [(b["path"][len(base):] if b["path"].startswith(base) else b["path"], b["name"], b["kind"], b["number"]) for b in software["blocks"]]
+    require({"RcFb", "RcHost", "RcCaller", "RcUnitFc", "RcIoRead", "RcIoWrite"} <= {b[1] for b in blocks if b[2] in ("FB", "FC")}, "software_inspect lacks a created block")
+    ranges, unplaced = io_expectation(hardware["items"], software["tagTables"])
+    io_tags = sorted(text.split(" ", 1)[1] for text in [t for texts in ranges.values() for t in texts] + unplaced)
+    probe = {"kind": "group_create", "payload": {"groupKind": "blocks", "groupPath": p1 + "/blocks", "name": "RcIoProbe"}, "plcPath": p1}  # Prepared only: its preview reads isModified.
+    before = h.stage("isModified before the I/O analysis reads", lambda: h.tool("change_prepare", probe)["preview"]["isModified"])
+
+    def exported(kinds, prefix=""):
+        def check(result):
+            require(result["project"]["path"] == r.project and result["kinds"] == list(kinds), "Export target differs")
+            count = verify_block_export(result, [b for b in blocks if b[2] in kinds and b[1].startswith(prefix)])
+            c = result["completeness"]
+            require(c["complete"] is True and c["inventoryComplete"] is True and result.get("nextOffset") is None and result["matchedBlocks"] == count, "A full export is not complete: %s" % c)
+            return {"index": result["index"], "directory": result["directory"], "blocks": {b["name"]: b.get("text") for b in result["blocks"]}}
+        return check
+    full = r.ok("block_export", ("identity", "completeness"), "block_export of the PLC's FBs, FCs and OBs", "block_export", {"plcPath": p1}, exported(("FB", "FC", "OB")))
+    dbs = r.ok("block_export", ("identity",), "block_export kinds GlobalDB,InstanceDB", "block_export", {"plcPath": p1, "kinds": "GlobalDB,InstanceDB"}, exported(("GlobalDB", "InstanceDB")))
+    require({"RcFbDb", "RcHostDb"} <= set(dbs["blocks"]), "The instance DBs were not exported: %s" % sorted(dbs["blocks"]))
+    narrow = r.ok("block_export", ("identity",), "block_export namePrefix RcIoW", "block_export", {"plcPath": p1, "namePrefix": "RcIoW"}, exported(("FB", "FC", "OB"), "RcIoW"))
+    require(list(narrow["blocks"]) == ["RcIoWrite"] and '"RcOut"' in (Path(narrow["directory"]) / narrow["blocks"]["RcIoWrite"]).read_text(encoding="utf-8"),
+            "RcIoWrite's text file lacks its assignment")
+
+    def first_page(result):
+        c = result["completeness"]
+        require(len(result["blocks"]) == 1 and result["nextOffset"] == 1 and result["matchedBlocks"] == len(full["blocks"]), "The first page differs")
+        require(c["complete"] is False and c["inventoryComplete"] is True, "A cut export claims completeness: %s" % c)
+        return c
+    r.ok("block_export", ("completeness",), "block_export with maxBlocks 1 names nextOffset", "block_export", {"plcPath": p1, "maxBlocks": 1}, first_page)
+    r.refuse("block_export", "block_export of an unknown project", "block_export", {"projectName": "NoSuchProject"}, ("ProjectNotFound",))
+
+    def io_map(result):
+        paths = [i["path"] for i in hardware["items"]]
+        whole = lambda path: next((p for p in paths if p == path or p.endswith("/" + path)), path)  # Compact rows may name a module below the project.
+        require((result["project"]["path"], result["plcPath"]) == (r.project, p1), "I/O map target differs")
+        require({(row["range"], whole(row["module"])): sorted(row["tags"]) for row in result["ranges"]} == ranges and all(row["tagCount"] == len(row["tags"]) for row in result["ranges"]),
+                "Ranges differ from hardware_inspect and software_inspect: %s" % result["ranges"])
+        tagged = [key for key in ranges if under(key[1], "RcDiA") and key[0].startswith("%%I%d.." % start)]
+        require(len(tagged) == 1 and ranges[tagged[0]] == ["%%I%d.0 RcIn" % start], "RcIn is not the one tag in RcDiA's range: %s" % ranges)
+        empty = {(e["range"], whole(e["module"])) for e in result["rangesWithoutTags"]}
+        require(empty == {key for key, texts in ranges.items() if not texts} and any(under(key[1], "RcDiB") for key in empty), "Untagged ranges differ: %s" % sorted(empty))
+        loose = result["tagsWithoutListedHardware"]
+        require(sorted(t["address"] + " " + t["name"] for t in loose) == unplaced
+                and {("RcOut", "%Q200.0", "RcIo"), ("RcSpare", "%I200.0", "RcIo")} <= {(t["name"], t["address"], t["table"]) for t in loose}, "Tags without hardware differ: %s" % loose)
+        require(result["summary"] == {"ranges": len(ranges), "ioTags": len(io_tags), "rangesWithoutTags": len(empty), "tagsWithoutListedHardware": len(unplaced)},
+                "Summary differs: %s" % result["summary"])
+        c = result["completeness"]
+        require(c["complete"] is True and (c["hardwareTruncated"], c["tagsTruncated"], c["plcsInProject"]) == (False, False, 1), "The map is not complete: %s" % c)
+        return {"ranges": sorted(map(list, ranges)), "tagsWithoutListedHardware": unplaced, "summary": result["summary"]}
+    r.ok("plc_io_map", ("identity", "completeness"), "plc_io_map of the PLC", "plc_io_map", {"plcPath": p1}, io_map)
+    r.refuse("plc_io_map", "plc_io_map of an unknown PLC", "plc_io_map", {"plcPath": p1 + "Missing"}, ("PlcNotFound",))
+
+    def usage(scanned, readers, only=None):
+        def check(result):
+            tags = {t["name"]: t for t in result["tags"]}
+            require(sorted(tags) == (io_tags if only is None else only), "Reported tags differ: %s" % sorted(tags))
+            if only is None:
+                require((tags["RcIn"]["address"], tags["RcIn"].get("readers"), tags["RcIn"].get("writers")) == ("%%I%d.0" % start, readers, None), "RcIn usage differs: %s" % tags["RcIn"])
+                require((tags["RcOut"].get("readers"), tags["RcOut"].get("writers"), tags["RcOut"].get("note")) == (None, ["RcIoWrite N1"], None), "RcOut usage differs: %s" % tags["RcOut"])
+                require(tags["RcSpare"] == {"address": "%I200.0", "name": "RcSpare"}, "RcSpare is not unused: %s" % tags["RcSpare"])
+            absolute = {a["address"]: a["blocks"] for a in result["absoluteAccesses"]}
+            require(absolute.get("%%I%d.1" % start) == (["RcIoRead N1 (read)"] if readers else None), "Absolute accesses differ: %s" % absolute)
+            require(result["summary"]["ioTags"] == len(io_tags) and (result["blocksScanned"], result["blocksNotScanned"]) == (scanned, []), "Scan counts differ: %s" % result["summary"])
+            # Static evidence over the index only: the result never claims completeness.
+            require(result["completeness"]["complete"] is False and result["completeness"]["tagsTruncated"] is False, "Completeness differs: %s" % result["completeness"])
+            return {"summary": result["summary"], "tags": result["tags"], "absoluteAccesses": result["absoluteAccesses"]}
+        return check
+    r.ok("plc_tag_usage", ("identity", "completeness"), "plc_tag_usage over the full index", "plc_tag_usage", {"index": full["index"], "plcPath": p1},
+         usage(len(full["blocks"]), ["RcIoRead N1"]))
+    r.ok("plc_tag_usage", ("completeness",), "plc_tag_usage over RcIoWrite's index alone finds no reader", "plc_tag_usage", {"index": narrow["index"], "plcPath": p1}, usage(1, None))
+    unused = [name for name in io_tags if name not in ("RcIn", "RcOut")]
+    r.ok("plc_tag_usage", ("identity",), "plc_tag_usage unusedOnly keeps the unreferenced tags", "plc_tag_usage", {"index": full["index"], "plcPath": p1, "unusedOnly": True},
+         usage(len(full["blocks"]), ["RcIoRead N1"], unused))
+    r.refuse("plc_tag_usage", "plc_tag_usage of an unknown PLC", "plc_tag_usage", {"index": full["index"], "plcPath": p1 + "Missing"}, ("PlcNotFound",))
+    h.stage("isModified is unchanged by the I/O analysis reads", lambda: require(h.tool("change_prepare", probe)["preview"]["isModified"] is before, "A read changed isModified") or {"isModified": before})
+
+
 def library_reads(r):
     h, gate = r.h, r.gate
 
@@ -703,6 +861,9 @@ def two_plcs(r):
     r.refuse("object_resolve", "object_resolve of Main without a PLC selector", "object_resolve", {"selectors": {"name": "Main"}}, ("AmbiguousTarget",))
     r.refuse("plc_alarm_inspect", "plc_alarm_inspect without a PLC selector", "plc_alarm_inspect", {}, ("AmbiguousTarget",))
     r.refuse("opcua_engineering_inspect", "opcua_engineering_inspect without a selector", "opcua_engineering_inspect", {}, ("AmbiguousTarget",))
+    r.refuse("plc_io_map", "plc_io_map without a PLC selector", "plc_io_map", {}, ("AmbiguousTarget",))
+    r.ok("plc_io_map", ("completeness",), "plc_io_map with two PLCs in the project is not complete", "plc_io_map", {"plcPath": p1},
+         lambda result: require(result["completeness"]["complete"] is False and result["completeness"]["plcsInProject"] == 2, "Two PLCs still read as complete") or result["completeness"])
     r.refuse("change_prepare", "change_prepare without a PLC selector", "change_prepare", {"kind": "block_rename", "payload": {"blockName": "Main", "newName": "Main2"}}, ("AmbiguousTarget",))
     r.refuse("change_prepare", "change_prepare of an unknown kind", "change_prepare", {"kind": "no_such_kind", "payload": {}}, ("UnsupportedChange",))
 
@@ -787,6 +948,7 @@ def body(h):
     seed(r)
     project_reads(r)
     hardware_reads(r)
+    io_reads(r)
     library_reads(r)
     two_plcs(r)
     change_tools(r)
