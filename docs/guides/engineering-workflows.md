@@ -189,6 +189,83 @@ The live scratch fixture `scripts/smoke_write_guards.py` qualified these guards 
 
 `change_status` returns the recorded state, stage list, compile diagnostics and recovery archive. The host also supplies `artifactDirectory` so a strict GUID `changeId` can read its saved journal after a host restart. A journal left at `applying`, `checkpointing` or `restoring` records an uncertain outcome; it does not prove that the last native operation completed.
 
+### Many tag edits in one change
+
+Each applied change pays for the whole safety sequence: a project fingerprint at
+prepare, again before apply and again after save, a checkpoint save with a full
+`before.zap21`, a baseline compile, the compile after the edit and the final save.
+On a large project that is minutes per change, and every applied change makes all
+other prepared previews stale (`StaleRevision`), so single edits cannot be prepared
+ahead. `tag_set` therefore also takes many edits as one change:
+
+```json
+{
+  "kind": "tag_set",
+  "payload": {
+    "items": [
+      { "tagTableName": "Drives", "memberName": "T350_Old_AddressIn", "attributes": { "Name": "T350_New_AddressIn" } },
+      { "tagTableName": "Drives", "memberName": "T350_Old_AddressOut", "attributes": { "Name": "T350_New_AddressOut" } },
+      { "tagTablePath": "<exact table path>", "memberName": "Spare", "attributes": { "LogicalAddress": "%M40.0" } }
+    ]
+  }
+}
+```
+
+`items` holds 1 to 500 edits and replaces `tagTableName`/`tagTablePath`,
+`memberName` and `attributes` at the top of the payload; giving both is refused.
+Each item names its table and tag like a single `tag_set` and may set `Name`,
+`DataTypeName` and `LogicalAddress`. The tables may differ and may sit in different
+tag-table groups, but all must belong to one software scope (the PLC or one
+software unit). `constant_set` and the other tag kinds take no `items`.
+
+The change runs the sequence once for all items: one fingerprint check, one
+checkpoint archive, one baseline compile, one compile after all edits and one save.
+The safety properties are those of a single `tag_set`:
+
+- **Preview.** `preview.items` lists every edit with its table path, tag and the
+  before and after value of each attribute. The summary result keeps the whole
+  list; it does not stop at 50 rows like other arrays. Each distinct table is
+  exported once as a backup.
+- **All or nothing before the first write.** Preparation refuses the whole change,
+  naming `items[n]`, if any item names a missing table or tag, a safety tag
+  (`SafetyBoundary`), a `LogicalAddress` inside an F-I/O address range
+  (`SafetyBoundary`), an attribute outside the three above, or a name that is
+  already taken (`ObjectExists`). Apply repeats every one of these checks for all
+  items, and checks that each attribute is writable and convertible, before it
+  writes the first tag.
+- **Names.** Two items cannot request the same new name, one tag cannot be edited
+  by two items, and a new name must be free in the software scope before the
+  change. A swap or a chain (A becomes B while B becomes C) is refused, because its
+  result would depend on the write order; apply the rename that frees the name as a
+  separate change first. A tag may keep its name or change only its case.
+- **Fingerprint.** The stale-revision fingerprint covers the requested attributes of
+  every item's tag in addition to the project-wide content.
+- **Readback.** After the writes, every item is looked up again by its final name:
+  the tag exists, a renamed tag's old name is gone, it is not a safety tag and each
+  requested attribute has the requested value. The same readback runs again after
+  compile and save. Both are journaled as `tag-batch-readback` with one row per item.
+- **Failure.** A native failure after the first write leaves the whole change
+  `recovery_required`, like any other change; `change_restore` returns the project
+  to the state before all items.
+
+`phaseTimings` in the change view and journal now also records the three
+fingerprint runs (`prepare-fingerprint`, `stale-revision-fingerprint`,
+`after-fingerprint`) next to `checkpoint-save`, `checkpoint-archive` and
+`changed-project-save`, so the cost of a change on a given project can be read from
+its journal.
+
+The batch rules (shape, bounds, name collisions, complete summary list) are covered
+by managed tests. `scripts/qualify_tag_batch.py` ran the route once natively on
+10 November 2026 in an owned scratch CPU (TIA V21): nine refusals left the table
+unchanged, a batch of five renames (one also readdressed) was applied, read back
+after the writes and after save, made an earlier prepared batch stale, and
+`change_restore` returned all five tags to their old names. Five single changes
+took 17.6 s there and the batch 3.5 s, about the cost of one single change. That
+run is not in the evidence store or the feature catalog. It covers Bool tags on
+bit memory in one table at PLC-root scope; tags that blocks reference, software
+units, and the safety-tag and F-I/O refusals of a batch on an F-CPU are not
+exercised, and no large project has been timed.
+
 ## Refresh from unchanged source
 
 To check whether regenerating a block clears compiler findings, start with `plc_compile`; it reports diagnostics without editing anything. If a refresh is still warranted, read the block's own source with `block_read` and `format: "generatedSource"` (the temporary external source is removed again), and apply exactly that text with `source_upsert`, `compile: true`.
@@ -284,7 +361,7 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `tag_table_create` | `tagTableName`, optional `scopePath`, `groupPath` | Creates one empty tag table; the name must be free in the software scope across all tag-table groups (case-insensitive). |
 | `tag_table_rename` | `tagTableName` or `tagTablePath`, `newName` | Renames one tag table; its members stay, and `newName` must be free in the software scope. |
 | `tag_table_delete` | `tagTableName` or `tagTablePath` | Deletes one empty user tag table (no tags, no user constants); the default tag table is refused with `DefaultTagTable`, a non-empty table with `TagTableNotEmpty`. |
-| `tag_set` | `tagTableName` or `tagTablePath`, `memberName`, `attributes: {...}` | Edits an existing tag's exposed writable `Name`, `DataTypeName` and/or `LogicalAddress`. A new `LogicalAddress` inside the address range of an F-I/O the PLC owns refuses at prepare with `SafetyBoundary`; nothing is written. |
+| `tag_set` | `tagTableName` or `tagTablePath`, `memberName`, `attributes: {...}`; or `items: [{tagTableName or tagTablePath, memberName, attributes}]` ([many edits in one change](#many-tag-edits-in-one-change)) | Edits an existing tag's exposed writable `Name`, `DataTypeName` and/or `LogicalAddress`. A new `LogicalAddress` inside the address range of an F-I/O the PLC owns refuses at prepare with `SafetyBoundary`; nothing is written. With `items`, 1 to 500 such edits in one software scope share one fingerprint check, checkpoint archive, compile and save; a refusal on any item refuses the whole change before a write. |
 | `constant_set` | `tagTableName` or `tagTablePath`, `memberName`, `attributes: {...}` | Edits an existing user constant's exposed writable `Name`, `DataTypeName` and/or `Value`. System constants are excluded. |
 | `tag_delete` / `constant_delete` | `tagTableName` or `tagTablePath`, `memberName`, `dependencyPolicy: "rejectReferenced"` | Deletes exactly one existing tag or user constant after dependency checks. |
 | `tag_create` | `tagTableName` or `tagTablePath`, `name`, `dataTypeName`, `logicalAddress` | Creates one tag in an existing table. Names already used by a tag or constant in the software scope are rejected. An absolute I/O address inside the address range of an F-I/O the PLC owns refuses at prepare with `SafetyBoundary` (TIA would make it a safety tag), before anything is created; a created tag TIA still reports as a safety tag fails verification. Readback is exact, so use native spelling such as `%M0.0`. The F-I/O refusal of `tag_create`, `tag_set`, `tag_table_import_xml`, project-ward `vci_synchronize` and tag-table `library_instantiate` was rechecked natively on an F-CPU with ET 200SP F-DI (`local.safety.fio-routes.20261101`). |

@@ -88,6 +88,7 @@ namespace TiaMcp.Openness.V21
 
         private void PrepareTagEdit(EngineeringChange change, JObject preview)
         {
+            if (IsTagBatch(change)) { PrepareTagBatch(change, preview); return; }
             var plc = SelectPlc(change.Selector);
             change.ObjectNames = new[] { MutationObjectName(change, plc, "tagTable") };
             PrepareMutationScope(change, plc, "tagTable", change.ObjectNames);
@@ -112,6 +113,7 @@ namespace TiaMcp.Openness.V21
 
         private void ApplyTagEdit(EngineeringChange change)
         {
+            if (IsTagBatch(change)) { ApplyTagBatch(change); return; }
             var plc = SelectPlc(change.Selector);
             var table = MutationTable(change, plc);
             var member = MutationTagMember(change, table);
@@ -129,6 +131,137 @@ namespace TiaMcp.Openness.V21
                 if (change.Kind == "tag_set" && attrs["LogicalAddress"] != null) RejectFIoAddresses(plc, new[] { ChangeText(attrs, "LogicalAddress", 1024) });
                 ApplyAttributes(member, attrs, new HashSet<string>(new[] { "Name", "DataTypeName", change.Kind == "constant_set" ? "Value" : "LogicalAddress" }, StringComparer.Ordinal));
             }
+        }
+
+        private static readonly HashSet<string> TagBatchAllow = new HashSet<string>(TagBatchRules.Attributes, StringComparer.Ordinal);
+        private sealed class TagBatchTarget { internal TagBatchRules.Item Item; internal string TablePath, TableName; internal PlcTagTable Table; internal PlcTag Tag; }
+
+        // tag_set with payload.items (TagBatchRules): many tag edits under one fingerprint check, checkpoint, compile pair and save.
+        private static bool IsTagBatch(EngineeringChange change)
+        {
+            if (!TagBatchRules.IsBatch(change.Payload)) return false;
+            if (change.Kind != "tag_set") throw new BridgeException("InvalidRequest", "payload.items is supported by tag_set only.");
+            return true;
+        }
+
+        // Resolves every item to its table and tag and runs every refusal without writing. Prepare and apply share it, so apply
+        // repeats the safety-tag, name-collision and F-I/O checks for all items immediately before the first write.
+        private List<TagBatchTarget> ResolveTagBatch(EngineeringChange change, PlcSelection plc, bool prepare)
+        {
+            var items = TagBatchRules.Items(change.Payload);
+            string payloadScope = change.Payload.Value<string>("scopePath"), selectorScope = change.Selector.Value<string>("scopePath");
+            if (!string.IsNullOrWhiteSpace(payloadScope) && !string.IsNullOrWhiteSpace(selectorScope) && payloadScope != selectorScope)
+                throw new BridgeException("ScopeMismatch", "Top-level and payload scopePath selectors disagree.");
+            string explicitScope = prepare ? (string.IsNullOrWhiteSpace(payloadScope) ? selectorScope : payloadScope) : change.ScopePath;
+            var budget = new ScanBudget(50000);
+            var tables = new List<Tuple<SoftwareScope, TagTableEntry>>();
+            foreach (var scope in SoftwareScopes(plc, budget))
+            {
+                if (!string.IsNullOrWhiteSpace(explicitScope) && scope.Path != explicitScope) continue;
+                foreach (var table in TagTables(scope.Tags, scope.Path + "/tags", budget)) tables.Add(Tuple.Create(scope, table));
+            }
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "Tag-table lookup is incomplete; no preview can be prepared.");
+            var targets = new List<TagBatchTarget>();
+            SoftwareScope selected = null;
+            foreach (var item in items)
+            {
+                // Apply resolves by the table path the preview recorded.
+                string path = prepare ? item.TablePath : change.TagBatchTablePaths[item.Index];
+                var matches = tables.Where(t => (path == null || t.Item2.Path == path) &&
+                    (item.TableName == null || string.Equals(t.Item2.Item.Name, item.TableName, StringComparison.OrdinalIgnoreCase))).Take(2).ToArray();
+                if (matches.Length == 0)
+                    throw new BridgeException("ObjectNotFound", "items[" + item.Index + "]: no tag table matches " + (item.TablePath ?? item.TableName) + " in the selected scope. Nothing was written.", new JObject { ["index"] = item.Index });
+                if (matches.Length > 1)
+                    throw new BridgeException("AmbiguousTarget", "items[" + item.Index + "]: tagTableName " + item.TableName + " matches more than one tag table. Specify scopePath or tagTablePath.", new JObject { ["index"] = item.Index });
+                if (selected != null && !ReferenceEquals(selected, matches[0].Item1))
+                    throw new BridgeException("ScopeMismatch", "items[" + item.Index + "]: tag tables span multiple software scopes; split the change per scope.", new JObject { ["index"] = item.Index });
+                selected = matches[0].Item1;
+                var table = matches[0].Item2;
+                if (selected.Kind == "safetyUnit") throw new BridgeException("SafetyBoundary", "Safety-unit mutations require the explicit safety import workflow.", new JObject { ["index"] = item.Index });
+                if (ObjectIdentity.IsGeneratedPath(table.Path)) throw new BridgeException("GeneratedObject", "Generated system-group objects are not eligible for direct mutation.", new JObject { ["index"] = item.Index });
+                var tag = table.Item.Tags.Find(item.MemberName);
+                if (tag == null || tag.Name != item.MemberName)
+                    throw new BridgeException("ObjectNotFound", "items[" + item.Index + "]: no editable tag has the exact memberName " + item.MemberName + " in " + table.Item.Name + ". Nothing was written.",
+                        new JObject { ["index"] = item.Index, ["tagTablePath"] = table.Path, ["memberName"] = item.MemberName });
+                if (tag.IsSafety)
+                    throw new BridgeException("SafetyBoundary", "items[" + item.Index + "]: " + item.MemberName + " is a safety tag. Safety tags are excluded from generic tag edits, including tags in standard PLC tables; the whole change is refused and nothing was written.",
+                        new JObject { ["index"] = item.Index, ["tagTablePath"] = table.Path, ["memberName"] = item.MemberName });
+                targets.Add(new TagBatchTarget { Item = item, TablePath = table.Path, TableName = table.Item.Name, Table = table.Item, Tag = tag });
+            }
+            TagBatchRules.RequireNoCollisions(targets.Select(t => (t.Item, t.TablePath)), ScopeSymbolNames(selected.Tags));
+            RejectFIoAddresses(plc, targets.Select(t => t.Item.Attributes.Value<string>("LogicalAddress")).Where(address => address != null));
+            if (prepare) change.ScopePath = selected.Path;
+            return targets;
+        }
+
+        private void PrepareTagBatch(EngineeringChange change, JObject preview)
+        {
+            var plc = SelectPlc(change.Selector);
+            var targets = ResolveTagBatch(change, plc, true);
+            change.Namespace = "";
+            change.GroupPath = change.ScopePath + "/tags";
+            change.Selector["scopePath"] = change.ScopePath;
+            change.ObjectNames = targets.Select(t => t.TableName).Distinct(StringComparer.Ordinal).ToArray();
+            change.TagBatchTablePaths = targets.Select(t => t.TablePath).ToArray();
+            int number = 0;
+            foreach (var table in targets.GroupBy(t => t.TablePath, StringComparer.Ordinal))
+            {
+                string path = Path.Combine(change.Directory, "before-tags-" + number++ + ".xml");
+                table.First().Table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                change.Backups.Add(new JObject { ["tableName"] = table.First().TableName, ["tablePath"] = table.Key, ["artifact"] = ChangeArtifact(path) });
+            }
+            // Every item is listed; PrepareAttributes also refuses an unwritable attribute or an unconvertible value here.
+            preview["items"] = new JArray(targets.Select(t => new JObject { ["index"] = t.Item.Index, ["tagTableName"] = t.TableName, ["tagTablePath"] = t.TablePath,
+                ["memberName"] = t.Item.MemberName, ["attributes"] = PrepareAttributes(t.Tag, t.Item.Attributes, TagBatchAllow) }));
+            ((JArray)preview["effects"]).Add(new JObject { ["action"] = "tag_set", ["itemCount"] = targets.Count, ["renames"] = targets.Count(t => t.Item.NewName != null),
+                ["tagTables"] = new JArray(change.ObjectNames), ["items"] = "preview.items lists every edit." });
+            ((JArray)preview["warnings"]).Add("All " + targets.Count + " edits share one checkpoint archive, one compile and one save. A refusal on any item refuses the whole change before a write; " +
+                "a native failure after the first write leaves the whole change recovery_required.");
+            change.TagBatchTargets = targets;
+        }
+
+        private void ApplyTagBatch(EngineeringChange change)
+        {
+            var plc = SelectPlc(change.Selector);
+            var targets = ResolveTagBatch(change, plc, false);
+            // Every item's attributes are preflighted (declared writable, convertible) before the first one is written.
+            foreach (var target in targets) PrepareAttributes(target.Tag, target.Item.Attributes, TagBatchAllow);
+            foreach (var target in targets) ApplyAttributes(target.Tag, target.Item.Attributes, TagBatchAllow);
+            VerifyTagBatch(change, "after-mutation");
+            change.Stages.Add("tag_batch_readback_verified");
+        }
+
+        // Reads every item back by its final name from a fresh table lookup: the tag exists under that name, a renamed tag's
+        // old name is gone, it is no safety tag and each requested attribute holds the requested value.
+        private void VerifyTagBatch(EngineeringChange change, string stage)
+        {
+            var plc = SelectPlc(change.Selector);
+            var budget = new ScanBudget(50000);
+            var tables = TagTables(ResolveSoftwareScope(plc, change.ScopePath).Tags, change.ScopePath + "/tags", budget).ToDictionary(t => t.Path, t => t.Item, StringComparer.Ordinal);
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "Tag-table readback is incomplete.");
+            var rows = new JArray();
+            foreach (var item in TagBatchRules.Items(change.Payload))
+            {
+                string tablePath = change.TagBatchTablePaths[item.Index];
+                var details = new JObject { ["index"] = item.Index, ["tagTablePath"] = tablePath, ["memberName"] = item.MemberName, ["name"] = item.FinalName, ["stage"] = stage };
+                if (!tables.TryGetValue(tablePath, out var table)) throw new BridgeException("MutationVerificationFailed", "items[" + item.Index + "]: the tag table is missing at readback.", details);
+                var tag = table.Tags.Find(item.FinalName);
+                if (tag == null || tag.Name != item.FinalName)
+                    throw new BridgeException("MutationVerificationFailed", "items[" + item.Index + "]: no tag named " + item.FinalName + " exists at readback.", details);
+                if (!string.Equals(item.FinalName, item.MemberName, StringComparison.OrdinalIgnoreCase) && table.Tags.Find(item.MemberName) != null)
+                    throw new BridgeException("MutationVerificationFailed", "items[" + item.Index + "]: the renamed tag's old name " + item.MemberName + " still exists at readback.", details);
+                if (tag.IsSafety) throw new BridgeException("SafetyBoundary", "items[" + item.Index + "]: " + item.FinalName + " is a safety tag after the edit; generic tag edits exclude safety tags. Recover from the checkpoint.", details);
+                var actual = new JObject();
+                foreach (var property in item.Attributes.Properties())
+                {
+                    object value = ReadAttributeValue(tag, property.Name, TagBatchAllow, false, out var type);
+                    actual[property.Name] = ChangeScalar(value);
+                    if (!JToken.DeepEquals(ChangeScalar(ConvertChangeValue(property.Value, type)), actual[property.Name]))
+                        throw new BridgeException("MutationVerificationFailed", "items[" + item.Index + "]: attribute " + property.Name + " of " + item.FinalName + " differs from the request at readback.", details);
+                }
+                rows.Add(new JObject { ["index"] = item.Index, ["tagTablePath"] = tablePath, ["memberName"] = item.MemberName, ["name"] = tag.Name, ["attributes"] = actual });
+            }
+            change.Readbacks.Add(new JObject { ["role"] = "tag-batch-readback", ["stage"] = stage, ["verifiedItems"] = rows.Count, ["items"] = rows });
         }
 
         private static void RejectTagNameCollision(EngineeringChange change, PlcSelection plc, string name, IEngineeringObject except)

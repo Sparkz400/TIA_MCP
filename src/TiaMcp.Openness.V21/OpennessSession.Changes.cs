@@ -67,14 +67,15 @@ namespace TiaMcp.Openness.V21
             if (string.IsNullOrWhiteSpace(change.Selector.Value<string>("plcPath")))
                 change.Selector["plcPath"] = ObjectIdentity.PlcPath(payload.Value<string>("scopePath") ?? args.Value<string>("scopePath"))
                     ?? ObjectIdentity.PlcPath(payload.Value<string>("blockPath") ?? payload.Value<string>("typePath") ?? payload.Value<string>("tagTablePath") ?? payload.Value<string>("technologyPath")
-                        ?? payload.Value<string>("unitPath") ?? payload.Value<string>("objectPath"));
+                        ?? payload.Value<string>("unitPath") ?? payload.Value<string>("objectPath")
+                        ?? (payload["items"] as JArray)?.OfType<JObject>().Select(item => item["tagTablePath"]).FirstOrDefault(path => path?.Type == JTokenType.String)?.Value<string>());
             try
             {
                 using (SharedMutationExclusive("TIA MCP: prepare offline change preview"))
                 {
                     change.Preview = PrepareEngineeringMutation(change, project);
                     if (change.Kind == TagTableImportRules.Kind) PrepareScopedTagImport(change);
-                    change.BaseFingerprint = EngineeringFingerprint(change, project);
+                    change.BaseFingerprint = MeasureChange(change, "prepare-fingerprint", () => EngineeringFingerprint(change, project));
                 }
                 change.Preview["changeId"] = id;
                 change.Preview["kind"] = kind;
@@ -180,7 +181,7 @@ namespace TiaMcp.Openness.V21
             EnsureProjectOffline(project);
             using (SharedMutationExclusive("TIA MCP: checkpoint and apply " + change.Kind))
             {
-                if (EngineeringFingerprint(change, project) != change.BaseFingerprint)
+                if (MeasureChange(change, "stale-revision-fingerprint", () => EngineeringFingerprint(change, project)) != change.BaseFingerprint)
                     throw new BridgeException("StaleRevision", "Project or affected objects changed since preparation. Prepare a new preview; no write was applied.");
                 var compileOnlyPlc = change.Kind == "plc_compile" ? SelectPlc(change.Selector) : null;
                 if (compileOnlyPlc != null) PlcCompilation.Prepare(change.Payload, change.Selector.Value<string>("plcPath"), compileOnlyPlc.Path, compileOnlyPlc.Software.GetService<ICompilable>());
@@ -287,10 +288,12 @@ namespace TiaMcp.Openness.V21
                     if (change.Kind == "source_upsert") { VerifyExpectedBlocksExist(change, SelectPlc(change.Selector)); change.Stages.Add("source_blocks_verified_after_save"); }
                     if (change.Kind == "certificate_create") { VerifyCreatedCertificateAfterSave(change, project); change.Stages.Add("certificate_verified_after_save"); }
                     if (change.Kind == "instance_db_create") { VerifyInstanceDb(change, SelectPlc(change.Selector)); change.Stages.Add("instance_db_verified_after_save"); }
+                    // A batch is read back item by item again after compile and save.
+                    if (change.TagBatchTablePaths != null) { VerifyTagBatch(change, save ? "after-save" : "after-compile"); change.Stages.Add("tag_batch_verified_after_" + (save ? "save" : "compile")); }
                     if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_drive_tags") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
                     change.AfterFingerprint = change.Kind == "hmi_classic_screen_edit"
                         ? ClassicScreenCapturedFingerprint(change, project, change.HmiEvidence["after-save"] as JObject)
-                        : EngineeringFingerprint(change, project);
+                        : MeasureChange(change, "after-fingerprint", () => EngineeringFingerprint(change, project));
                     change.State = "applied";
                     WriteChangeJournal(change);
                 }
@@ -308,7 +311,7 @@ namespace TiaMcp.Openness.V21
                     if (mutationReached) RecoverFailedClassicScreen(change, project);
                     if (change.State != "rolled_back" && change.State != "not_applied")
                         try { change.AfterFingerprint = EngineeringFingerprint(change, project); } catch { }
-                    else change.AttributeTarget = null;
+                    else { change.AttributeTarget = null; change.TagBatchTargets = null; }
                     change.Stages.Add("change_finished_with_failure");
                     WriteChangeJournal(change);
                     throw new BridgeException((ex as BridgeException)?.Code ?? "EngineeringError", ex.Message, ChangeView(change));
@@ -394,6 +397,7 @@ namespace TiaMcp.Openness.V21
                 VerifyHardwareRecovery(change, restored);
                 change.State = "restored";
                 change.AttributeTarget = null;
+                change.TagBatchTargets = null;
                 change.Stages.Add("checkpoint_retrieved_to_new_directory");
                 WriteChangeJournal(change);
                 return ChangeView(change);
@@ -1603,6 +1607,10 @@ namespace TiaMcp.Openness.V21
                 var attrs = change.Payload["attributes"] as JObject ?? new JObject();
                 snapshot["targetAttributes"] = new JObject(attrs.Properties().Select(p => new JProperty(p.Name, ChangeScalar(change.AttributeTarget.GetAttribute(p.Name)))));
             }
+            // A batch covers the requested attributes of every item's tag.
+            if (change.TagBatchTargets != null)
+                snapshot["targetAttributes"] = new JArray(change.TagBatchTargets.Select(target =>
+                    new JObject(target.Item.Attributes.Properties().Select(p => new JProperty(p.Name, ChangeScalar(target.Tag.GetAttribute(p.Name)))))));
             if (change.Kind == "to_parameters")
             {
                 var target = RequiredTechnologyObject(SelectPlc(change.Selector), change.Payload);
@@ -1984,6 +1992,9 @@ namespace TiaMcp.Openness.V21
             internal readonly JArray Backups = new JArray();
             internal readonly JArray Stages = new JArray();
             internal IEngineeringObject AttributeTarget;
+            // tag_set with payload.items: the resolved table path per item, and the tags whose requested attributes the fingerprint covers.
+            internal string[] TagBatchTablePaths;
+            internal List<TagBatchTarget> TagBatchTargets;
         }
     }
 }
