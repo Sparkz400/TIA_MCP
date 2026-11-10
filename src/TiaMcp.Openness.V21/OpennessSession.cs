@@ -346,8 +346,12 @@ namespace TiaMcp.Openness.V21
             var warnings = new JArray();
             var filter = new SoftwareObjectFilter(args.Value<string>("groupPath"), args.Value<string>("namePrefix"));
             bool includeHardware = args.Value<bool?>("includeHardware") ?? true;
+            bool includeBlocks = args.Value<bool?>("includeBlocks") ?? true;
+            bool compact = args.Value<bool?>("compact") == true;
+            string projectBase = "/projects/" + Segment(project.Name) + "/";
+            int omittedHardware = 0;
             // Filtered results take maxItems only for matches; the walk has its own bound so later stations are reached.
-            var walk = filter.Active || !includeHardware ? new ScanBudget(MemberWalkLimit) : budget;
+            var walk = filter.Active || !includeHardware || !includeBlocks || compact ? new ScanBudget(MemberWalkLimit) : budget;
             foreach (var entry in DeviceItems(project, walk))
             {
                 var item = entry.Item;
@@ -361,18 +365,45 @@ namespace TiaMcp.Openness.V21
                     if (item.Addresses.Count > 100) { budget.Truncated = true; warnings.Add("Address list bounded to 100 entries for " + entry.Path); }
                 }
                 catch (Exception ex) { warnings.Add("Addresses unavailable at " + entry.Path + ": " + ex.Message); }
-                if (includeHardware && (walk == budget || budget.Take())) hardware.Add(info);
+                if (includeHardware && compact)
+                {
+                    // Compact rows: module identity and its I/O ranges; containers without either are counted, not listed.
+                    var ranges = new JArray((info["addresses"] as JArray ?? new JArray()).Where(a => (int)a["startAddress"] >= 0)
+                        .Select(a => new JObject { ["io"] = (string)a["ioType"], ["start"] = a["startAddress"], ["bytes"] = a["byteSpan"] }));
+                    if (ranges.Count == 0 && string.IsNullOrEmpty(item.TypeIdentifier)) omittedHardware++;
+                    else if (budget.Take())
+                    {
+                        var brief = new JObject { ["path"] = entry.Path.StartsWith(projectBase, StringComparison.Ordinal) ? entry.Path.Substring(projectBase.Length) : entry.Path, ["name"] = item.Name };
+                        if (!string.IsNullOrEmpty(item.TypeIdentifier)) brief["typeIdentifier"] = item.TypeIdentifier;
+                        if (ranges.Count > 0) brief["addresses"] = ranges;
+                        hardware.Add(brief);
+                    }
+                }
+                else if (includeHardware && (walk == budget || budget.Take())) hardware.Add(info);
                 PlcSoftware software;
                 try { software = item.GetService<SoftwareContainer>()?.Software as PlcSoftware; }
                 catch (Exception ex) { warnings.Add("Software unavailable at " + entry.Path + ": " + ex.Message); continue; }
                 if (software == null) continue;
                 string plcPath = entry.Path + "/plc/" + Segment(software.Name);
                 plcs.Add(new JObject { ["path"] = plcPath, ["name"] = software.Name, ["hardwarePath"] = entry.Path });
+                if (!includeBlocks) continue;
                 foreach (var block in AllBlocks(new PlcSelection { Project = project, Software = software, Path = plcPath }, walk))
                 {
                     if (!filter.Matches(block.Path, block.Item.Name)) continue;
                     if (walk != budget && !budget.Take()) break;
-                    blocks.Add(BlockInfo(block, plcPath));
+                    var row = BlockInfo(block, plcPath);
+                    if (compact)
+                    {
+                        // Relative to plcPath + "/blocks/"; the usual flag values are left out.
+                        string blockBase = plcPath + "/blocks/";
+                        if (block.Path.StartsWith(blockBase, StringComparison.Ordinal)) row["path"] = block.Path.Substring(blockBase.Length);
+                        // The PLC is its index in plcs instead of a repeated path.
+                        row.Remove("plcPath");
+                        row["plc"] = plcs.Count - 1;
+                        if ((bool)row["isConsistent"]) row.Remove("isConsistent");
+                        if (!(bool)row["isKnowHowProtected"]) row.Remove("isKnowHowProtected");
+                    }
+                    blocks.Add(row);
                 }
             }
             var result = Envelope();
@@ -381,7 +412,10 @@ namespace TiaMcp.Openness.V21
             result["plcs"] = plcs;
             result["blocks"] = blocks;
             result["warnings"] = warnings;
-            if (walk != budget) result["filter"] = new JObject { ["groupPath"] = filter.GroupPath, ["namePrefix"] = filter.NamePrefix, ["includeHardware"] = includeHardware,
+            if (compact) result["compact"] = new JObject { ["hardwarePathBase"] = projectBase, ["blockPathBase"] = "plcPath + \"/blocks/\"",
+                ["omittedHardwareRows"] = omittedHardware,
+                ["note"] = "Hardware rows without a type identifier and without I/O addresses are counted, not listed; diagnosis addresses are left out. Block rows name their PLC by its index in plcs, and omit isConsistent when true and isKnowHowProtected when false." };
+            if (walk != budget) result["filter"] = new JObject { ["groupPath"] = filter.GroupPath, ["namePrefix"] = filter.NamePrefix, ["includeHardware"] = includeHardware, ["includeBlocks"] = includeBlocks,
                 ["matchedBlocks"] = blocks.Count, ["walkLimit"] = MemberWalkLimit, ["walkTruncated"] = walk.Truncated };
             result["completeness"] = new JObject { ["complete"] = false, ["scopeComplete"] = !budget.Truncated && !walk.Truncated && warnings.Count == 0,
                 ["truncated"] = budget.Truncated || walk.Truncated, ["maxItems"] = max, ["visitedItems"] = walk.Used,
@@ -421,18 +455,37 @@ namespace TiaMcp.Openness.V21
             if (file.Length <= 512 * 1024) result["xml"] = File.ReadAllText(destination);
             result["completeness"] = new JObject { ["complete"] = true, ["scope"] = "Native block XML export", ["xmlIncluded"] = file.Length <= 512 * 1024,
                 ["note"] = "Native XML is retained unchanged. No normalized semantic model or revision guarantee is implied." };
-            if (render == "text") AddNetworkText(result, EngineeringSources.ReadXml(File.ReadAllText(destination)), args.Value<string>("culture"));
+            if (render == "text")
+            {
+                // The export is the result; a text rendering that fails must not lose it.
+                try { AddNetworkText(result, ReadExportedXml(destination), args.Value<string>("culture"), Path.ChangeExtension(destination, ".txt")); }
+                catch (Exception ex) when (ex is System.Xml.XmlException || ex is InvalidOperationException || ex is IOException)
+                { result["textUnavailable"] = new JObject { ["reason"] = ex.Message, ["read"] = "artifact.path holds the complete native XML" }; }
+            }
             return result;
         }
 
-        // A reading aid next to the unchanged native XML: each network as text, LAD/FBD logic as statements.
-        private static void AddNetworkText(JObject result, System.Xml.Linq.XDocument document, string culture)
+        // TIA's own export of one block: read without the 4 MiB bound that guards supplied import documents.
+        private static System.Xml.Linq.XDocument ReadExportedXml(string path)
         {
+            using (var reader = System.Xml.XmlReader.Create(path, new System.Xml.XmlReaderSettings { DtdProcessing = System.Xml.DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 256L * 1024 * 1024 }))
+                return System.Xml.Linq.XDocument.Load(reader, System.Xml.Linq.LoadOptions.PreserveWhitespace);
+        }
+
+        // A reading aid next to the unchanged native XML: each network as text, LAD/FBD logic as statements.
+        // textPath, when given, receives every network in full; the response keeps each network bounded.
+        private static void AddNetworkText(JObject result, System.Xml.Linq.XDocument document, string culture, string textPath = null)
+        {
+            if (textPath != null)
+            {
+                File.WriteAllText(textPath, GraphicalNetworkText.Format(GraphicalNetworkText.Render(document, culture, int.MaxValue)), new System.Text.UTF8Encoding(false));
+                result["textArtifact"] = FileArtifact(new FileInfo(textPath), "text/plain");
+            }
             var networks = GraphicalNetworkText.Render(document, culture);
             result["networks"] = new JArray(networks.Select(n => new JObject { ["number"] = n.Number, ["id"] = n.Id, ["language"] = n.Language,
                 ["title"] = n.Title, ["comment"] = n.Comment, ["text"] = n.Text, ["rendered"] = n.Rendered, ["truncated"] = n.Truncated }));
             result["text"] = GraphicalNetworkText.Format(networks);
-            result["textCoverage"] = "LAD/FBD (FlgNet) networks: contacts, O/A/X boxes and comparators as Boolean expressions; coils, instructions and calls as statements with pin bindings (:= input, => output). Unknown instructions are shown by name and pins, not interpreted. SCL/STL and other network languages are listed, not rendered. The native XML artifact stays authoritative.";
+            result["textCoverage"] = "LAD/FBD (FlgNet) networks: contacts, O/A/X boxes and comparators as Boolean expressions; coils, instructions and calls as statements with pin bindings (:= input, => output). Unknown instructions are shown by name and pins, not interpreted. SCL (StructuredText) networks: the source text rebuilt from its tokens. STL and other network languages are listed, not rendered. A network longer than 16384 characters is cut in the response and complete in textArtifact. The native XML artifact stays authoritative.";
         }
 
         private JObject XrefQuery(JObject args)
