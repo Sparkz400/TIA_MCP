@@ -66,7 +66,8 @@ namespace TiaMcp.Model
             }
             var compilation = state == "applied" ? journal["compile"] as JObject : evidence?["rollbackCompile"] as JObject;
             if (!ClassicScreenCompileRules.Completed(compilation)
-                || !(state == "applied" ? ClassicScreenCompileRules.NoNewProblems(evidence?["baselineCompile"] as JObject, compilation)
+                || !(state == "applied" ? ClassicScreenCompileRules.NoNewProblems(evidence?["baselineCompile"] as JObject, compilation,
+                        journal["preview"]?["payload"]?["target"] is JObject ? ClassicScreenCompileRules.EditedScreenNames((JObject)journal["preview"]["payload"]) : null, out _)
                     : ClassicScreenCompileRules.ProblemsUnchanged(evidence?["baselineCompile"] as JObject, compilation)))
                 throw new ArgumentException("The terminal outcome lacks complete, unchanged successful compiler diagnostics.");
             var manifest = evidence?[state == "applied" ? "after-save" : "rollback-after-save"] as JObject;

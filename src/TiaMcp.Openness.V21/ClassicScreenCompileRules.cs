@@ -37,20 +37,63 @@ namespace TiaMcp.Model
             return errors == result.Value<int>("errorCount") && warnings == result.Value<int>("warningCount");
         }
 
-        internal static bool NoNewProblems(JObject before, JObject after)
+        internal static bool NoNewProblems(JObject before, JObject after) => NoNewProblems(before, after, null, out _);
+
+        // V21 stops an HMI compile that finds errors ("Compiling aborted") before some later checks. When an edit removes the
+        // last error, those checks run and report findings that existed all along (observed 10 November 2026: 110 errors -> 0
+        // revealed 18 warnings in other screens and project graphics). With editedScreens given, such a baseline-aborted,
+        // now error-free target accepts new warnings whose owner hierarchy names no edited screen and returns them in
+        // `unmasked`. Every error, every new finding inside an edited screen, and every other case still fails.
+        internal static bool NoNewProblems(JObject before, JObject after, ICollection<string> editedScreens, out JArray unmasked)
         {
+            unmasked = new JArray();
             if (!Completed(before) || !Completed(after)) return false;
             var b = ProblemSet(before); var a = ProblemSet(after);
             if (!b.Keys.OrderBy(x => x, StringComparer.Ordinal).SequenceEqual(a.Keys.OrderBy(x => x, StringComparer.Ordinal))) return false;
             foreach (var target in a)
             {
-                var remaining = new List<string>(b[target.Key]);
-                foreach (string diagnostic in target.Value) if (!remaining.Remove(diagnostic)) return false;
                 var bt = before["targets"].Single(t => t.Value<string>("target") == target.Key);
                 var at = after["targets"].Single(t => t.Value<string>("target") == target.Key);
-                if (at.Value<int>("errorCount") > bt.Value<int>("errorCount") || at.Value<int>("warningCount") > bt.Value<int>("warningCount")) return false;
+                bool unmasking = editedScreens != null && editedScreens.Count > 0 && bt.Value<int>("errorCount") > 0 && at.Value<int>("errorCount") == 0
+                    && (bt["messages"] as JArray)?.Last?.Value<string>("description")?.StartsWith("Compiling aborted (", StringComparison.Ordinal) == true;
+                var remaining = new List<string>(b[target.Key]);
+                foreach (string diagnostic in target.Value)
+                {
+                    if (remaining.Remove(diagnostic)) continue;
+                    if (!unmasking || !OutsideEditedScreens(diagnostic, editedScreens, out JArray row)) return false;
+                    unmasked.Add(row);
+                }
+                if (at.Value<int>("errorCount") > bt.Value<int>("errorCount") || !unmasking && at.Value<int>("warningCount") > bt.Value<int>("warningCount")) return false;
             }
             return true;
+        }
+
+        // A ProblemSet entry is [state, description, owner hierarchy as a JSON array]; only a warning none of whose owners is an edited screen qualifies.
+        private static bool OutsideEditedScreens(string diagnostic, ICollection<string> editedScreens, out JArray row)
+        {
+            row = JArray.Parse(diagnostic);
+            if (row.Count != 3 || row[0].Value<string>() != "Warning" || row[2].Type != JTokenType.String) return false;
+            var owners = JArray.Parse(row[2].Value<string>());
+            return owners.Count > 0 && owners.All(o => o.Type == JTokenType.Null || !editedScreens.Contains(o.Value<string>()));
+        }
+
+        /// <summary>The native names of every screen a hmi_classic_screen_edit payload edits (target and additionalScreens),
+        /// taken from the last segment of each required objectPath (escaped with Uri.EscapeDataString), never from the optional name.</summary>
+        internal static HashSet<string> EditedScreenNames(JObject payload)
+        {
+            var names = new HashSet<string>(StringComparer.Ordinal);
+            var targets = new List<JToken> { payload?["target"] };
+            if (payload?["additionalScreens"] is JArray extra) targets.AddRange(extra.Select(m => m["target"]));
+            foreach (var target in targets)
+            {
+                string path = (target as JObject)?.Value<string>("objectPath");
+                int slash = path?.LastIndexOf('/') ?? -1;
+                string name = slash < 0 ? null : Uri.UnescapeDataString(path.Substring(slash + 1));
+                if (string.IsNullOrEmpty(name) || path.IndexOf("/screens/", StringComparison.Ordinal) < 0)
+                    throw new ArgumentException("Every edited screen needs an exact screen objectPath.");
+                names.Add(name);
+            }
+            return names;
         }
 
         private static Dictionary<string, List<string>> ProblemSet(JObject compilation)
