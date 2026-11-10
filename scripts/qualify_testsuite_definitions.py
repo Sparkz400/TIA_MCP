@@ -18,7 +18,6 @@ unchanged, refuses a second prepare without replaying it, reads the rule back, a
 from __future__ import annotations
 
 import argparse
-import hashlib
 from pathlib import Path
 
 from library_native_harness import Harness, require
@@ -49,8 +48,7 @@ PROBE_LIMITATIONS = [
 ]
 
 
-def sha(raw):
-    return hashlib.sha256(raw).hexdigest()
+from evidence_hash import sha256 as sha
 
 
 def inventories(h, **extra):

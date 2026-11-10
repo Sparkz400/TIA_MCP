@@ -98,7 +98,9 @@ run through the existing physical-runtime suite, followed by an independent
 raw-chain/value/schedule reader in the offline and workstation runners.
 `Test-RuntimeCaptureDiskFull.ps1` is a separate bounded-volume qualification
 because creating and mounting its dedicated 64 MiB VHD requires Windows privileges
-that portable CI and this session do not provide. Capacity refusal and manual-clock
+that portable CI and this session do not provide. Its optional `-UaTestAssembly`
+(`TiaMcp.OpcUa.Runtime.Tests.dll`) adds the OPC UA subscription store case on the
+same volume. Capacity refusal and manual-clock
 load tests do not substitute for that actual disk-full result.
 
 `qualify_runtime_soak.py --assembly <PhysicalRuntime.Tests.dll> --output <fresh-dir>

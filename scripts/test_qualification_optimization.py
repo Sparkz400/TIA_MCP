@@ -1,4 +1,4 @@
-"""Run the actual evidence regressions with both Python optimization modes."""
+"""Run the actual evidence regressions under -OO, which strips asserts like -O and also docstrings."""
 import os
 import subprocess
 import sys
@@ -8,7 +8,7 @@ from pathlib import Path
 
 class QualificationOptimizationTests(unittest.TestCase):
     def test_native_evidence_guards_survive_optimization(self):
-        for option in ('-O', '-OO'):
+        for option in ('-OO',):
             with self.subTest(option=option):
                 result = subprocess.run([sys.executable, option, '-m', 'unittest',
                     'test_encoder_hardware_qualification', 'test_engineering_preservation', 'test_native_evidence_guards',

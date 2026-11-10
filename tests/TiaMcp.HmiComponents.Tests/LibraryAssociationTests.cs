@@ -15,7 +15,6 @@ internal static class LibraryAssociationTests
         const string project = "/projects/LibraryFixture", plc = project + "/plc", block = plc + "/blocks/RenamedInstance", type = plc + "/types/Unassociated", hmi = project + "/hmi";
         const string typeGuid = "146cafdb-e1d5-4111-9b23-1078b6557d53", versionGuid = "43b5c338-b589-4ab5-8c82-cae3e08e9d06";
         void Check(bool ok, string label) { if (!ok) throw new Exception(label); checks.Add(label); }
-        string Hash(byte[] data) => Convert.ToHexStringLower(SHA256.HashData(data));
         string Upload(byte[] data)
         {
             var upload = uploads.Begin("original", data.Length, Hash(data)); uploaded.Add(upload.UploadId);

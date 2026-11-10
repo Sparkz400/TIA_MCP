@@ -3,5 +3,6 @@
   <ItemGroup>
     <ProjectReference Include="../TiaMcp.Core/TiaMcp.Core.csproj" />
     <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Client" Version="1.5.378.182" />
+    <InternalsVisibleTo Include="TiaMcp.OpcUa.Runtime.Tests" />
   </ItemGroup>
 </Project>

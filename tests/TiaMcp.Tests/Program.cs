@@ -242,7 +242,9 @@ internal static partial class Program
             ("Bridge timeout keeps the request in flight and never replays", BridgeTimeout),
             ("Bridge active cancellation keeps the request in flight and never replays", BridgeActiveCancellation),
             ("Bridge records a late response after cancellation and continues", BridgeLateCompletion),
+            ("Bridge held cleanup that times out keeps the bridge usable", BridgeHeldCleanupTimeout),
             ("Bridge cancellation while queued leaves session usable", BridgeQueuedCancellation),
+            ("Bridge queued call gives up after the bridge timeout without sending", BridgeQueueTimeout),
             ("Bridge pre-cancelled call never starts a worker", BridgePreCancelled),
             ("Bridge mismatched response ID is terminal", () => BridgeTerminalFault("wrongId", "ProtocolMismatch")),
             ("Bridge mismatched protocol version is terminal", () => BridgeTerminalFault("wrongVersion", "ProtocolMismatch")),
@@ -346,6 +348,9 @@ internal static partial class Program
             ("Unresolved symbols are listed from compiler messages without guessing", TagTableImportTests.UnresolvedSymbols),
             ("Confirmed intent is recorded, compared and never evaluated", TagTableImportTests.ConfirmedIntent),
             ("Change milestones say whether the project edit is complete", TagTableImportTests.ChangeMilestones),
+            ("Resolved change outcomes replay and unresolved ones block preparation", TagTableImportTests.ChangeLifecycleRules),
+            ("Change restore refuses each pre-check before any native call", TagTableImportTests.RestorePreChecks),
+            ("Intent decision log skips a half-written line", TagTableImportTests.DecisionLogSkipsTornLines),
             ("UMAC role changes plan exact effects and preserve administrators", UmacRoleRulesTests.PlansExactEffectsAndPreservesAdministrators),
             ("Graphical fragments use the native default namespace", EngineeringSourcesTests.GraphicalFragmentsUseNativeDefaultNamespace),
             ("Native network insertion preserves existing units and checks IDs", EngineeringSourcesTests.NativeNetworkInsertionPreservesExistingUnitsAndChecksIds),
@@ -628,6 +633,49 @@ internal static partial class Program
         Check.Equal(true, late[0].Succeeded);
         Check.Equal(3, fixture.Events().Count(item => item.Kind == "request" && item.Operation == "echo"));
         Check.Equal(0, fixture.Events().Count(item => item.Operation == "mustNotRun"));
+    }
+
+    private static async Task BridgeHeldCleanupTimeout()
+    {
+        // A held mutation_end that itself times out becomes the interrupted request: refused, not faulted.
+        await using var fixture = new BridgeFixture(timeoutSeconds: 3);
+        await fixture.Client.CallAsync("echo");
+        await Check.BridgeError("TimeoutOutcomeUnknown", () => fixture.Client.CallAsync("echo", new { delayMs = 3500 }));
+        await Check.BridgeError("PreviousOperationRunning", () => fixture.Client.CallAsync("mutation_end", new { leaseToken = "lease", delayMs = 4500 }));
+        // The call that delivers the held cleanup waits out its timeout and is refused while the cleanup runs.
+        for (int attempt = 0; ; attempt++)
+        {
+            try { await fixture.Client.CallAsync("mustNotRun"); throw new InvalidOperationException("mustNotRun was sent."); }
+            catch (BridgeException error) when (error.Code == "PreviousOperationRunning")
+            {
+                if (fixture.Events().Any(e => e.Operation == "mutation_end")) break;
+                if (attempt >= 120) throw;
+                await Task.Delay(100);
+            }
+        }
+        Check.Equal(1, fixture.Client.LateResponses.Count);
+        await Check.BridgeError("PreviousOperationRunning", () => fixture.Client.CallAsync("mustNotRun"));
+        for (int attempt = 0; ; attempt++)
+        {
+            try { await fixture.Client.CallAsync("echo"); break; }
+            catch (BridgeException error) when (error.Code == "PreviousOperationRunning" && attempt < 120) { await Task.Delay(100); }
+        }
+        Check.Equal("echo,echo,mutation_end,echo", string.Join(",", fixture.Events().Where(e => e.Kind == "request").Select(e => e.Operation)));
+        Check.Equal("echo,mutation_end", string.Join(",", fixture.Client.LateResponses.Select(late => late.Operation)));
+    }
+
+    private static async Task BridgeQueueTimeout()
+    {
+        // The third call queues behind two that each fit the timeout but together exceed it.
+        await using var fixture = new BridgeFixture(timeoutSeconds: 5);
+        await fixture.Client.CallAsync("echo");
+        var first = fixture.Client.CallAsync("echo", new { delayMs = 3500 });
+        await BridgeFixture.WaitForAsync(() => fixture.Events().Count(e => e.Kind == "request") == 2, "first slow echo request");
+        var second = fixture.Client.CallAsync("echo", new { delayMs = 3500 });
+        await Check.BridgeError("QueueTimeout", () => fixture.Client.CallAsync("mustNotRun"));
+        await first; await second;
+        await fixture.Client.CallAsync("echo");
+        Check.Equal(0, fixture.Events().Count(e => e.Operation == "mustNotRun"));
     }
 
     private static async Task BridgeQueuedCancellation()

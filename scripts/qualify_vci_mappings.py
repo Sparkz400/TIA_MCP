@@ -207,8 +207,7 @@ def phase_a(run):
     remove(run, workspace, root, "VciFc")
 
 
-def sha(data):
-    return hashlib.sha256(data).hexdigest()
+from evidence_hash import sha256 as sha
 
 
 def plain_git(run, directory, *arguments):

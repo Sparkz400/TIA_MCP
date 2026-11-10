@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import io
 import json
 import os
@@ -21,8 +20,7 @@ OBSERVED = ["Open Library V14 SP1.zal14", "Open Library V18 Comfort.zal18", "Ope
             "Open Library V18 Unified.zal18"]
 
 
-def sha256(data):
-    return hashlib.sha256(data).hexdigest()
+from evidence_hash import sha256
 
 
 def tree(directory):

@@ -153,7 +153,15 @@ internal static partial class Program
             File.WriteAllText(Path.Combine(root, "data.xml"), "fixture");
             var store = new ArtifactStore(root);
             foreach (var path in new[] { "../data.xml", root + "-sibling/data.xml", root })
+            {
                 await Check.BridgeError("ArtifactPathDenied", () => { store.Read(path); return Task.CompletedTask; });
+                await Check.BridgeError("ArtifactPathDenied", () => { store.Resolve(path); return Task.CompletedTask; });
+                Check.Equal(null, store.TryResolve(path));
+            }
+            // Host guards confine through Resolve: a sibling sharing the root's name prefix is outside it.
+            Check.Equal(null, new ArtifactStore(root + "/scratch").TryResolve(root + "/scratch2/project.ap21"));
+            Check.Equal(Path.Combine(root, "scratch", "project.ap21"), new ArtifactStore(root + "/scratch").Resolve(root + "/scratch/project.ap21"));
+            Check.Equal(Path.Combine(root, "data.xml"), store.Resolve("data.xml"));
             foreach (var range in new[] { (-1L, 1), (0L, 0), (0L, 65537), (8L, 1) })
                 await Check.BridgeError("InvalidRequest", () => { store.Read("data.xml", range.Item1, range.Item2); return Task.CompletedTask; });
             foreach (var missing in new[] { "missing.json", "missing-directory/journal.json" })

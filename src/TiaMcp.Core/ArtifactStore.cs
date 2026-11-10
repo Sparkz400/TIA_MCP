@@ -18,10 +18,7 @@ public sealed class ArtifactStore(string root)
     {
         if (offset < 0 || count is < 1 or > 65536)
             throw new BridgeException("InvalidRequest", "offset must be nonnegative and count must be between 1 and 65536 bytes.");
-        var full = Path.GetFullPath(Path.IsPathRooted(path) ? path : Path.Combine(_root, path));
-        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-        if (!full.StartsWith(_root + Path.DirectorySeparatorChar, comparison))
-            throw new BridgeException("ArtifactPathDenied", "The file must be inside this host's configured artifact directory.");
+        var full = Resolve(path);
         // Junctions/symlinks cannot be used to turn this tool into unrestricted filesystem access.
         for (FileSystemInfo? item = new FileInfo(full); item is not null; item = item switch
         {
@@ -63,6 +60,18 @@ public sealed class ArtifactStore(string root)
         stream.ReadExactly(buffer);
         return new(Path.GetRelativePath(_root, full), length, hash, offset, buffer.Length, offset + buffer.Length,
             offset + buffer.Length == length, "base64", Convert.ToBase64String(buffer));
+    }
+
+    /// <summary>The full path of <paramref name="path"/> (absolute, or relative to the root) when it lies strictly below the root; links are not checked.</summary>
+    public string Resolve(string path) => TryResolve(path)
+        ?? throw new BridgeException("ArtifactPathDenied", "The file must be inside this host's configured artifact directory.");
+
+    /// <summary>Like <see cref="Resolve"/>, but null outside the root, for callers that report their own error.</summary>
+    public string? TryResolve(string path)
+    {
+        var full = Path.GetFullPath(Path.IsPathRooted(path) ? path : Path.Combine(_root, path));
+        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        return full.StartsWith(_root + Path.DirectorySeparatorChar, comparison) ? full : null;
     }
 
     private static FileStream OpenRead(string path)

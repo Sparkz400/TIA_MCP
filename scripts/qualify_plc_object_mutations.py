@@ -20,6 +20,7 @@ import re
 
 from compilation_evidence import require_compile_only, require_plc_compile
 from library_native_harness import Harness, require
+from preview_payload import preview_payload
 from qualification_owned_scratch import complete_inventory, snapshot
 from qualify_typed_resolution import empty_tag_template, tag_fixture
 
@@ -213,7 +214,7 @@ class Run:
         expected = {"changeId": prepared["changeId"], "kind": kind, "project": {"path": self.project},
                     "targetScopePath": None if kind == "plc_compile" else self.plc,
                     "targetGroupPath": target_group(kind, self.plc, payload), **(preview or {})}
-        require(prepared["state"] == "prepared" and shown["payload"] == payload and matches(expected, shown),
+        require(prepared["state"] == "prepared" and shown["payload"] == preview_payload(payload) and matches(expected, shown),
                 "Preview of %s differs: %s" % (label, {key: shown.get(key) for key in expected}))
         require(isinstance(shown.get("isModified"), bool), "Preview of %s does not report isModified" % label)
         return prepared

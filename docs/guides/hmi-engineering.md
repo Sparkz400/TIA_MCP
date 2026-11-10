@@ -64,7 +64,9 @@ checkpoint/input/export hashes, complete declared screen scope and exact project
 save fingerprint under native exclusive access. Unsaved edits, changed saved
 state, a nonterminal journal or incomplete evidence keep the lock held. The
 reconciliation performs no import, save or replay. `ResourceBusy` includes the
-blocking admission IDs and the reconciliation tool name. Other operation kinds
+blocking admission, engineering operation and component window IDs
+(`blockingAdmissionIds`, `blockingOperationIds`, `blockingComponentWindowIds`) and the
+reconciliation tool name. Other operation kinds
 retain their existing isolated recovery rules.
 
 For large screen sets, use `--timeout-seconds 900` and a client tool timeout longer

@@ -11,7 +11,6 @@ internal static class CoordinatedTextListTests
         string root = Path.Combine(parent, "text-coordinated"); Directory.CreateDirectory(root);
         var store = new HmiComponentWorkflowStore(root); var reviews = new ProjectReviewStore(root); var uploads = new ArtifactUploadStore(root);
         var uploadIds = new List<string>(); var cases = new JsonArray(); int checks = 0;
-        string Hash(byte[] data) => Convert.ToHexStringLower(SHA256.HashData(data));
         void Check(bool value, string label) { if (!value) throw new Exception(label); checks++; }
         void Reject(Action action, string label) { try { action(); } catch (Exception e) when (e is BridgeException or ArgumentException or JsonException or InvalidOperationException) { checks++; return; } throw new Exception("Expected refusal: " + label); }
         string Upload(byte[] bytes)

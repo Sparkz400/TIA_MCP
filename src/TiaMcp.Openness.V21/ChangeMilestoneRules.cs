@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
@@ -30,9 +31,45 @@ namespace TiaMcp.Openness.V21
                 ["summary"] = state == "applied" ? (saved ? "The project edit is applied and saved." : "The project edit is applied but not saved.") +
                         (compilation?["compilerSucceeded"]?.Type == JTokenType.Boolean && !compilation.Value<bool>("compilerSucceeded") ? " The project still has compiler errors; see compile.baselineComparison." : "")
                     : state == "restored" ? "The change was restored."
+                    : state == "not_applied" ? "The change failed before the project was changed; prepare a new change."
                     : failed ? "The project edit did not complete; inspect recovery before anything else."
                     : state == "prepared" ? "Prepared only; nothing in the project has changed." : "In progress: " + state + ".",
                 ["notCovered"] = "This reports the project edit only. Repository changes, MCP qualification and the build actually running in this Host are separate; see host_build_identity." };
+        }
+
+        // A replayed apply reports these recorded outcomes; anything else was attempted and needs explicit recovery.
+        internal static bool IsResolvedOutcome(string state) => state == "applied" || state == "restored" || state == "rolled_back" || state == "not_applied";
+
+        // While a change is in one of these states, its TIA process may hold its unsaved edits: no other checkpoint save may run.
+        internal static bool IsUnresolved(string state) => state == "recovery_required" || state == "checkpointing" || state == "applying" || state == "restoring";
+
+        /// <summary>True when the change is already restored and the caller only reports it. The previewHash is checked first.</summary>
+        internal static bool RestoreAlreadyDone(string state, string requestedPreviewHash, string previewHash)
+        {
+            if (requestedPreviewHash != previewHash) throw new BridgeException("PreviewMismatch", "Wrong previewHash.");
+            return state == "restored";
+        }
+
+        internal static void RequireRestorable(string state, bool ownsPortal, Func<bool> archiveIntact, Func<JObject> view)
+        {
+            if (!ownsPortal) throw new BridgeException("OwnedSessionRequired", "Automatic archive retrieval is limited to worker-owned TIA instances. The checkpoint archive is available for manual recovery in a user-owned instance.", view());
+            if (state != "applied" && state != "recovery_required") throw new BridgeException("InvalidChangeState", "This change has no applied state to recover.");
+            if (!archiveIntact()) throw new BridgeException("CheckpointInvalid", "The recorded recovery archive is missing or its hash has changed.");
+        }
+
+        internal static void RequireSameAttachment(int? preparedProcessId, int? currentProcessId)
+        {
+            if (preparedProcessId != currentProcessId) throw new BridgeException("SessionChanged", "Change belongs to a different TIA attachment.");
+        }
+
+        internal static void RequireSameProject(string projectPath, string changeProjectPath)
+        {
+            if (!string.Equals(projectPath, changeProjectPath, StringComparison.OrdinalIgnoreCase)) throw new BridgeException("ProjectChanged", "Change belongs to a different project file.");
+        }
+
+        internal static void RequireOffline(string devicePath, bool offline)
+        {
+            if (!offline) throw new BridgeException("OfflineRequired", "Offline engineering changes require the target to be offline. No disconnect or CPU action was performed: " + devicePath);
         }
 
         private static JObject Row(string name, string status) => new JObject { ["milestone"] = name, ["status"] = status };

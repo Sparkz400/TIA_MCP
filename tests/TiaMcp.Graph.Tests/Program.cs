@@ -386,12 +386,7 @@ if (args.Length == 2 && args[0] == "--schema-dir")
 }
 else if (args.Length != 0) { Console.Error.WriteLine("Usage: [--schema-dir installed-schema-directory]"); return 2; }
 
-int failed = 0;
-foreach (var test in tests)
-{
-    try { test.Run(); Console.WriteLine("PASS " + test.Name); }
-    catch (Exception ex) { failed++; Console.Error.WriteLine("FAIL " + test.Name + ": " + ex); }
-}
+int failed = RunTests(tests, failuresToStderr: true);
 Console.WriteLine($"{tests.Count - failed}/{tests.Count} passed. Generated review artifacts: {generated}");
 Console.WriteLine("Native evidence checks cover the recorded V21 fixtures; arbitrary input documents are not certified.");
 return failed == 0 ? 0 : 1;

@@ -87,7 +87,7 @@ $ManagedCheckGroups = @(
 # Seconds per Python test file (local Python run, about 1:1 with hosted runners; CI run 42379522823); others count as 0.4 s.
 # test_inventory_translation_exports.py is absent: it skips without retained native exports, as on hosted runners.
 $PythonTestSeconds = @{
-    'test_qualification_optimization.py' = 93.8
+    'test_qualification_optimization.py' = 46.9
     'test_encoder_lifecycle.py' = 41.7
     'test_encoder_copy_admission.py' = 26.5
     'test_encoder_hardware_preservation.py' = 20.4
@@ -200,10 +200,9 @@ try {
         $result.managedShard = @{index=$ShardIndex;count=$ShardCount;suites=$suites}
         $result.managedSuiteSeconds = [ordered]@{}
         $result.managedCheckSeconds = [ordered]@{}
-        dotnet build src/TiaMcp.OpcUa.Cli/TiaMcp.OpcUa.Cli.csproj --configuration $Configuration --artifacts-path $buildOutput
-        if ($LASTEXITCODE -ne 0) { throw 'OPC UA CLI build failed.' }
         $gitExecutable = (Get-Command git -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
         # Build every suite once, in parallel, through a generated solution; each suite then runs with --no-build.
+        # TiaMcp.OpcUa.Dependencies.Tests builds the OPC UA CLI it runs through its ProjectReference.
         $solutionDirectory = Join-Path $output 'managed-suites'
         dotnet new sln --name managed-suites --output $solutionDirectory | Out-Null
         if ($LASTEXITCODE -ne 0) { throw 'Managed suite solution could not be created.' }

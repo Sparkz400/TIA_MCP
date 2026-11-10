@@ -7,7 +7,6 @@ string root = Path.GetFullPath(args.Length == 1 ? args[0] : Path.Combine(Path.Ge
 if (Directory.Exists(root)) throw new IOException("Choose a fresh checkpoint test directory.");
 Directory.CreateDirectory(root);
 int passed = 0;
-string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
 JsonObject Artifact(string path) => new() { ["path"] = path, ["bytes"] = new FileInfo(path).Length, ["sha256"] = Hash(File.ReadAllBytes(path)) };
 void Assert(bool value) { if (!value) throw new Exception("Checkpoint evidence assertion failed."); }
 void Check(string name, Action action) { action(); passed++; Console.WriteLine("PASS " + name); }

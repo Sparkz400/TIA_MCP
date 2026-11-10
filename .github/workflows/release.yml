@@ -1,6 +1,6 @@
 name: Release
 
-# Version tags only. Reruns the offline checks, packages and strictly verifies the offline bundle
+# Version tags only. Requires passed offline and Explorer runs on the tagged commit, packages and strictly verifies the offline bundle
 # and creates a DRAFT release; the maintainer reviews and publishes it (docs/guides/releasing.md).
 # It never publishes a release, creates a tag or pushes.
 on:
@@ -11,17 +11,27 @@ permissions:
   contents: read
 
 jobs:
-  offline:
-    name: Offline validation
-    uses: ./.github/workflows/offline.yml
-
-  explorer:
-    name: Explorer validation
-    uses: ./.github/workflows/playwright.yml
+  checks:
+    name: Tagged commit passed CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read # gh run list only
+    steps:
+      - name: Require successful offline and Explorer runs on the tagged commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          # main already ran both workflows on this commit; tag it only after they pass.
+          for workflow in offline.yml playwright.yml; do
+            passed=$(gh run list --workflow "$workflow" --commit "$GITHUB_SHA" --status success --json databaseId --jq length)
+            test "$passed" -gt 0 || { echo "No successful $workflow run on $GITHUB_SHA."; exit 1; }
+          done
 
   build:
     name: Package and verify
-    needs: [offline, explorer]
+    needs: checks
     runs-on: windows-latest
     timeout-minutes: 40
     permissions:

@@ -69,63 +69,83 @@ public sealed partial class VciWorkspaceStore
             Require(total <= Limits.MaxTotalBytes, "VciInputLimit", "Selected raw bytes exceed 64 MiB.");
             payloads.Add(file.RelativePath, bytes);
         }
+        // Refuse an absent deletion before a record exists or the parent repository is copied.
+        var parent = parentRevisionRef is null ? default : Committed(parentRevisionRef);
+        var parentFiles = new HashSet<string>(parentRevisionRef is null ? [] : parent.Files.Select(f => f.RelativePath), StringComparer.OrdinalIgnoreCase);
+        Require(files.All(f => !f.Delete || parentFiles.Contains(f.RelativePath)), "VciInvalidInput", "Selected deletion is absent from the parent revision.");
         var entry = NewEntry();
-        WriteNew(Path.Combine(entry.Path, "intent.json"), new { kind = "prepare", parentRevisionRef, branchName, files, author, message });
-        string repository = Path.Combine(entry.Path, "repository");
-        if (parentRevisionRef is null)
+        try
         {
-            var journal = new Journal(Path.Combine(entry.Path, "init-journal"));
-            var runner = Runner(journal);
-            journal.Bind(GitOperationBinding.Initialize(repository, runner.ControlDirectory, runner.ExecutableSha256, branchName ?? "main"));
-            await runner.InitializeAsync(repository, branchName ?? "main", token);
-        }
-        else
-        {
-            var before = await CopyRevision(parentRevisionRef, repository, token);
-            if (branchName is not null && GitSafety.Branch(branchName) != before.HeadReference)
+            WriteNew(Path.Combine(entry.Path, "intent.json"), new { kind = "prepare", parentRevisionRef, branchName, files, author, message });
+            string repository = Path.Combine(entry.Path, "repository");
+            if (parentRevisionRef is null)
             {
-                var journal = new Journal(Path.Combine(entry.Path, "fork-journal")); var fork = Runner(journal);
-                var copied = await fork.InspectAsync(repository, token);
-                journal.Bind(GitOperationBinding.Fork(copied, fork.ControlDirectory, fork.ExecutableSha256, branchName));
-                await fork.ForkAsync(repository, copied.Sha256, branchName, token);
-            }
-        }
-        foreach (var file in files)
-        {
-            token.ThrowIfCancellationRequested();
-            string destination = PackageStorage.Under(repository, file.RelativePath);
-            if (file.Delete)
-            {
-                Require(File.Exists(destination), "VciInvalidInput", "Selected deletion is absent from the parent revision.");
-                File.Delete(destination);
+                var journal = new Journal(Path.Combine(entry.Path, "init-journal"));
+                var runner = Runner(journal);
+                journal.Bind(GitOperationBinding.Initialize(repository, runner.ControlDirectory, runner.ExecutableSha256, branchName ?? "main"));
+                await runner.InitializeAsync(repository, branchName ?? "main", token);
             }
             else
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-                File.WriteAllBytes(destination, payloads[file.RelativePath]);
+                var before = await CopyRevision(parent, repository, token);
+                if (branchName is not null && GitSafety.Branch(branchName) != before.HeadReference)
+                {
+                    var journal = new Journal(Path.Combine(entry.Path, "fork-journal")); var fork = Runner(journal);
+                    var copied = await fork.InspectAsync(repository, token);
+                    journal.Bind(GitOperationBinding.Fork(copied, fork.ControlDirectory, fork.ExecutableSha256, branchName));
+                    await fork.ForkAsync(repository, copied.Sha256, branchName, token);
+                }
             }
+            foreach (var file in files)
+            {
+                token.ThrowIfCancellationRequested();
+                string destination = PackageStorage.Under(repository, file.RelativePath);
+                if (file.Delete)
+                {
+                    Require(File.Exists(destination), "VciInvalidInput", "Selected deletion is absent from the parent revision.");
+                    File.Delete(destination);
+                }
+                else
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+                    File.WriteAllBytes(destination, payloads[file.RelativePath]);
+                }
+            }
+            var inspect = Runner();
+            var snapshot = await inspect.InspectAsync(repository, token);
+            var changes = files.Select(f => new GitFileChange(f.RelativePath, f.Delete)).ToArray();
+            var plan = await inspect.PrepareCommitAsync(repository, snapshot.Sha256, changes, author, message, token);
+            var diff = await inspect.DiffAsync(repository, snapshot.Sha256, token);
+            WriteBytes(Path.Combine(entry.Path, "diff.txt"), Encoding.UTF8.GetBytes(diff));
+            WriteNew(Path.Combine(entry.Path, "files.json"), snapshot.Files);
+            var artifacts = new List<VciStoredArtifact> { Artifact(entry.Path, "diff.txt"), Artifact(entry.Path, "files.json") };
+            if (Directory.Exists(Path.Combine(entry.Path, "fork-journal")))
+                artifacts.AddRange(new[] { "fork-journal/intent.json", "fork-journal/0001.json", "fork-journal/0002.json" }.Select(name => Artifact(entry.Path, name)));
+            var review = new VciGitReview(entry.Id, parentRevisionRef, inspect.ExecutableSha256, snapshot.Sha256,
+                plan.Sha256, changes, author, message, snapshot.Files.ToArray(),
+                artifacts.ToArray(), snapshot.HeadReference);
+            WriteNew(Path.Combine(entry.Path, "review.json"), review);
+            return Reopen(Reference("preview", entry.Id, Path.Combine(entry.Path, "review.json")));
         }
-        var inspect = Runner();
-        var snapshot = await inspect.InspectAsync(repository, token);
-        var changes = files.Select(f => new GitFileChange(f.RelativePath, f.Delete)).ToArray();
-        var plan = await inspect.PrepareCommitAsync(repository, snapshot.Sha256, changes, author, message, token);
-        var diff = await inspect.DiffAsync(repository, snapshot.Sha256, token);
-        WriteBytes(Path.Combine(entry.Path, "diff.txt"), Encoding.UTF8.GetBytes(diff));
-        WriteNew(Path.Combine(entry.Path, "files.json"), snapshot.Files);
-        var artifacts = new List<VciStoredArtifact> { Artifact(entry.Path, "diff.txt"), Artifact(entry.Path, "files.json") };
-        if (Directory.Exists(Path.Combine(entry.Path, "fork-journal")))
-            artifacts.AddRange(new[] { "fork-journal/intent.json", "fork-journal/0001.json", "fork-journal/0002.json" }.Select(name => Artifact(entry.Path, name)));
-        var review = new VciGitReview(entry.Id, parentRevisionRef, inspect.ExecutableSha256, snapshot.Sha256,
-            plan.Sha256, changes, author, message, snapshot.Files.ToArray(),
-            artifacts.ToArray(), snapshot.HeadReference);
-        WriteNew(Path.Combine(entry.Path, "review.json"), review);
-        return Reopen(Reference("preview", entry.Id, Path.Combine(entry.Path, "review.json")));
+        catch
+        {
+            // A failed preparation leaves no partial record behind to count against MaxRecords.
+            try
+            {
+                // Git writes read-only objects; refuse links before clearing attributes so deletion can succeed.
+                _ = PackageStorage.StoredBytes(entry.Path);
+                foreach (var file in Directory.EnumerateFiles(entry.Path, "*", SearchOption.AllDirectories)) File.SetAttributes(file, FileAttributes.Normal);
+                PackageStorage.DeleteOwned(records, entry.Path);
+            }
+            catch (Exception cleanup) when (cleanup is BridgeException or IOException or UnauthorizedAccessException) { /* Never mask the primary failure. */ }
+            throw;
+        }
     }
 
     // A new candidate repository is a verified copy of a committed or fetched parent; the parent never changes.
-    private async Task<GitWorkspaceSnapshot> CopyRevision(string parentRevisionRef, string repository, CancellationToken token)
+    private async Task<GitWorkspaceSnapshot> CopyRevision((string Commit, string SnapshotSha256, string Repository, GitFileEvidence[] Files) parent,
+        string repository, CancellationToken token)
     {
-        var parent = Committed(parentRevisionRef);
         var reader = Runner();
         var before = await reader.InspectAsync(parent.Repository, token);
         Require(before.Matches(parent.SnapshotSha256), "PreviewStale", "Parent repository differs from its retained committed revision.");
@@ -360,12 +380,13 @@ public sealed partial class VciWorkspaceStore
                     File.Exists(Path.Combine(directory, "export.json")) ? "export" :
                     File.Exists(Path.Combine(directory, "fetch.json")) ? "fetch" : File.Exists(Path.Combine(directory, "push.json")) ? "push" :
                     File.Exists(Path.Combine(directory, "commit.json")) ? "revision" : File.Exists(Path.Combine(directory, "review.json")) ? "preview" : null;
-                if (kind is not null) { reference = Reference(kind, id, Path.Combine(directory, Receipt(kind))); _ = Reopen(reference); state = kind == "preview" ? "prepared" : "complete"; }
+                if (kind is not null) { reference = Reference(kind, id, Path.Combine(directory, Receipt(kind))); state = kind == "preview" ? "prepared" : "complete"; }
                 if (kind == "preview" && HasCommitIntent(directory)) state = "outcomeUnknown";
                 // A dispatched remote operation without its receipt may have changed the remote; refusals before dispatch stay incomplete.
                 if (kind is null && (Directory.Exists(Path.Combine(directory, "fork-journal")) ||
                     File.Exists(Path.Combine(directory, "push-journal", "0001.json")) || File.Exists(Path.Combine(directory, "fetch-journal", "0001.json")))) state = "outcomeUnknown";
             }
+            // State comes from receipt files only; vci_reopen of the chosen record verifies the full chain and working tree.
             catch (Exception e) when (e is BridgeException or IOException or JsonException or UnauthorizedAccessException) { state = "integrity-failed"; }
             return new { id, recordRef = reference, state };
         }).ToArray();

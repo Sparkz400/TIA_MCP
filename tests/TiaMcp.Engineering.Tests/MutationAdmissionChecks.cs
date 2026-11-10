@@ -85,6 +85,14 @@ internal static class MutationAdmissionChecks
         Check(record.State == "reconciled", "Independent complete evidence releases unknown dispatch");
         operation = operations.Acquire(operation.Id, operation.Revision);
         Check(Child("admission", root, scopeFile) == "ResourceBusy", "Separate process admission cannot cross acquired shared operation");
+        try { admissionStore.Acquire(expected, new('7', 64)); throw new Exception("Expected ResourceBusy"); }
+        catch (BridgeOperationException error) when (error.Code == "ResourceBusy")
+        {
+            var details = error.Details!.Value;
+            Check(details.GetProperty("blockingOperationIds").EnumerateArray().Single().GetString() == operation.Id &&
+                details.GetProperty("blockingAdmissionIds").GetArrayLength() == 0 && details.GetProperty("blockingComponentWindowIds").GetArrayLength() == 0,
+                "ResourceBusy names the blocking engineering operation, not only admissions");
+        }
         operations.Stop(operation.Id, operation.Revision);
         record = admissionStore.Acquire(expected, new('9', 64));
         record = admissionStore.Returned(record.Id, record.Revision, response);
@@ -118,6 +126,17 @@ internal static class MutationAdmissionChecks
         var tampered = JsonNode.Parse(File.ReadAllText(corrupt))!.AsObject(); tampered["requestSha256"] = new string('0', 64); File.WriteAllText(corrupt, tampered.ToJsonString());
         Reject(() => admissionStore.Read(record.Id), "JournalInvalid");
         Reject(() => admissionStore.Acquire(Scope(Path.Combine(root, "third.ap21")), new('1', 64)), "JournalInvalid");
+        // Scans memoize a finished admission by its last revision file: an unchanged chain is not re-read, a changed revision file revalidates it.
+        string cacheRoot = Path.Combine(Path.GetTempPath(), "admission-scan-cache-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(cacheRoot);
+        File.WriteAllText(Path.Combine(cacheRoot, response.RelativePath), "synthetic legacy response; no native qualification");
+        var cacheStore = new EngineeringMutationAdmissionStore(cacheRoot);
+        var memoized = cacheStore.Acquire(Scope(Path.Combine(cacheRoot, "a.ap21")), new('5', 64)); cacheStore.Returned(memoized.Id, memoized.Revision, response);
+        _ = cacheStore.Acquire(Scope(Path.Combine(cacheRoot, "b.ap21")), new('5', 64));
+        File.WriteAllText(Path.Combine(cacheRoot, "engineering-admissions", memoized.Id, "00000000.json"), "{}");
+        Check(cacheStore.Acquire(Scope(Path.Combine(cacheRoot, "c.ap21")), new('5', 64)).State == "dispatchIntent", "A second scan reuses the validated finished admission");
+        string lastRevision = Path.Combine(cacheRoot, "engineering-admissions", memoized.Id, "00000001.json");
+        File.SetLastWriteTimeUtc(lastRevision, File.GetLastWriteTimeUtc(lastRevision).AddMinutes(1));
+        Reject(() => cacheStore.Acquire(Scope(Path.Combine(cacheRoot, "d.ap21")), new('5', 64)), "JournalInvalid");
 
         // A scan reads a finished admission for its chain only: a resource that can no longer prove its identity (here a new
         // hard link; likewise a removed drive) and a deleted response no longer block every later mutation.

@@ -18,6 +18,7 @@ import base64
 import ctypes
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import time
@@ -32,7 +33,7 @@ from smoke_mcp import Client
 PRODUCTION = {'translation_native_capture', 'translation_native_prepare', 'translation_native_apply',
               'translation_native_status', 'translation_native_recover', 'translation_native_reconcile'}
 SOURCE, ORIGINAL, REPLACEMENT = 'Prueftext Main {0}', 'Verification text Main {0}', 'Verified translation Main {0} — Ω'
-TIA_EXE = Path(r'D:\Arbeit\Siemens\Portal V21\Bin\Siemens.Automation.Portal.exe')
+TIA_EXE = Path(os.environ.get('TIA_MCP_PORTAL_EXE') or r'D:\Arbeit\Siemens\Portal V21\Bin\Siemens.Automation.Portal.exe')
 CASES = ('worker:checkpointIntent', 'host:dispatchIntent', 'worker:dispatchIntent', 'host:checkpointIntent')
 # Only the worker's current scratch may configure generated CPU security (EnsureCurrentScratchProject); prepare writes nothing.
 SCRATCH_PROBE = {'kind': 'hardware_add', 'payload': {'typeIdentifier': 'OrderNumber:6ES7 511-1AL03-0AB0/V4.1', 'deviceName': 'TrScratchProbe',

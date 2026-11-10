@@ -48,7 +48,7 @@ public sealed partial class VciWorkspaceStore
             init.Bind(GitOperationBinding.Initialize(repository, initializer.ControlDirectory, initializer.ExecutableSha256, branchName));
             await initializer.InitializeAsync(repository, branchName, token);
         }
-        else await CopyRevision(parentRevisionRef, repository, token);
+        else await CopyRevision(Committed(parentRevisionRef), repository, token);
         var journal = new Journal(Path.Combine(entry.Path, "fetch-journal")); var runner = Runner(journal);
         var before = await runner.InspectAsync(repository, token);
         string remoteCommit = await runner.RemoteHeadAsync(repository, configured, branchName, token)

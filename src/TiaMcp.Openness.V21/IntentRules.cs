@@ -63,6 +63,20 @@ namespace TiaMcp.Openness.V21
             return text;
         }
 
+        /// <summary>Decisions of one project from the decision log. A line a crash left half-written is skipped, not fatal.</summary>
+        internal static List<JObject> DecisionsOf(IEnumerable<string> lines, string projectPath)
+        {
+            var decisions = new List<JObject>();
+            foreach (var line in lines)
+            {
+                if (line.Length == 0) continue;
+                JObject decision;
+                try { decision = JObject.Parse(line); } catch (JsonException) { continue; }
+                if (string.Equals(decision.Value<string>("projectPath"), projectPath, StringComparison.OrdinalIgnoreCase)) decisions.Add(decision);
+            }
+            return decisions;
+        }
+
         internal static string Line(string projectPath, string changeId, JObject decision) =>
             new JObject { ["projectPath"] = projectPath, ["changeId"] = changeId, ["id"] = decision["id"], ["statement"] = decision["statement"], ["target"] = decision["target"] }
                 .ToString(Formatting.None);

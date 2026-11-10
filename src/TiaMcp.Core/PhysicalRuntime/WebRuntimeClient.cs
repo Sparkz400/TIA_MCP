@@ -331,11 +331,17 @@ public sealed class WebRuntimeClient : IDisposable
             T result = parse(buffer.AsMemory(0, length)); lastUse = Stopwatch.GetTimestamp(); return result;
         }
         catch (OperationCanceledException) { throw Error(cancellationToken.IsCancellationRequested ? "RuntimeCancelled" : "RuntimeTimeout"); }
-        catch (HttpRequestException) { throw Error("RuntimeTransportFailure"); }
+        // A refused peer certificate (pin, name, validity or usage) surfaces as a failed TLS handshake, not as a cable fault.
+        catch (HttpRequestException e) { throw Error(Tls(e) ? "RuntimeTlsUnverified" : "RuntimeTransportFailure"); }
         catch (IOException) { throw Error("RuntimeTransportFailure"); }
         finally { CryptographicOperations.ZeroMemory(requestBytes); CryptographicOperations.ZeroMemory(buffer); }
     }
 
+    private static bool Tls(Exception? e)
+    {
+        for (; e is not null; e = e.InnerException) if (e is System.Security.Authentication.AuthenticationException) return true;
+        return false;
+    }
     private void Active() { if (token is null || IdleExpired || SessionUnusable) throw Error("RuntimeSessionExpired"); }
     private static string Id() => Guid.NewGuid().ToString("N");
     private static JsonElement Request(string method, string id, object? parameters = null) =>

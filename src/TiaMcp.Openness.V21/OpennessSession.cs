@@ -316,6 +316,7 @@ namespace TiaMcp.Openness.V21
             CloseManagedLibraries();
             _projectIndexes.Invalidate("dispose");
             _indexRequests.Clear();
+            ReleaseResolvedChanges();
             var portal = _portal;
             var ownedQualificationPortal = _ownedQualificationPortal;
             var processIdentity = _portalProcessIdentity;

@@ -11,7 +11,6 @@ internal static class DependencyAssociationTests
         var uploads = new ArtifactUploadStore(root); var reviews = new ProjectReviewStore(root); var store = new HmiComponentWorkflowStore(root);
         var checks = new List<string>(); var uploaded = new List<string>(); var reviewIds = new HashSet<string>(); var packets = new JsonArray();
         void Check(bool ok, string label) { if (!ok) throw new Exception(label); checks.Add(label); }
-        string Hash(byte[] data) => Convert.ToHexStringLower(SHA256.HashData(data));
         string Upload(byte[] data)
         {
             var started = uploads.Begin("original", data.Length, Hash(data)); uploaded.Add(started.UploadId);

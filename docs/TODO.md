@@ -31,6 +31,17 @@ Every finding from the multi-drive safety engineering session has an issue below
 
 Suggested sequence: finish #209 with #210, #211 and #218, and widen #211's baseline comparison to every operation for #221; use #213 as the inventory foundation for #212 and #214. Incorporate #215, #216 and #217 into the diagnostic/recovery workflow. Apply #219 and #220 across these workstreams.
 
+## Code audit follow-ups (9 November)
+
+A whole-repository audit on 9 November found 34 items; all but the ones below landed with it (bridge queueing and held cleanups,
+Host path confinement, V21 change apply/restore, runtime session locking, the shared capture store, Core store hardening and the
+scripts/CI clean-up). Nothing here was qualified natively: the changes are covered by the offline suites only.
+
+- [ ] **V19/V21 shared worker loop:** the request loop, error mapping and traversal are shared in a prepared change (about 200 duplicated lines removed, `AccessDenied`/`LicenseUnavailable` mapped by exact Siemens type). The V19 worker cannot be compiled without a V19 SDK, so it waits for a build and a read-only V19 check on the workstation that has one.
+- [ ] **UA session during a long bind:** the 2-minute idle sweep no longer closes a healthy session, but the client still requests a 60 s session timeout with keep-alive disabled, so a server that honours it ends the session during a 2-5 minute `runtime_plcsim_bind`. Raising the timeout or enabling keep-alive also changes how long an orphaned session survives a Host crash; decide, then test.
+- [ ] **UA disk-full case not executed:** `Test-RuntimeCaptureDiskFull.ps1 -UaTestAssembly` and `UaDiskFullChecks.cs` exist but need an elevated run (`Mount-VHD`); `UaSubscriptionValueLimit` still has no test.
+- [ ] **Native confirmation of the change-pipeline fixes:** `not_applied` after a failed checkpoint, the intent-log readback and the hashed preview payload are tested offline only; confirm on an owned scratch project at the next native slot.
+
 ## Resume and integration
 
 - [x] Independently review vendor receipts, licenses and prerequisites. All seven retained PAL/DMC ZIPs, recorded license hashes and inner-archive hashes match. Version-specific notices, older setup guides and the unreviewed toolbox dependency boundary are recorded in the [independent review](verification/vendor-intake-review-20261025.md). Native compatibility, DMC CPU setup and HMI/runtime gates remain separate.

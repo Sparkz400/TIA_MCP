@@ -24,7 +24,6 @@ internal static class ExternalResourceChecks
         if(Directory.Exists(root))throw new Exception("Fresh external resource evidence directory required");Directory.CreateDirectory(root);
         var checks=new List<string>();void Check(bool ok,string label){if(!ok)throw new Exception(label);checks.Add(label);}
         void Reject(Action action,string code,string label){try{action();}catch(BridgeException e)when(e.Code==code){Check(true,label);return;}throw new Exception("Expected "+code+": "+label);}
-        string Hash(byte[] b)=>Convert.ToHexStringLower(SHA256.HashData(b));
         EngineeringArtifactReference Save(string name,byte[] data){File.WriteAllBytes(Path.Combine(root,name),data);return new(name,Hash(data));}
         EngineeringArtifactReference Json(string name,object value)=>Save(name,JsonSerializer.SerializeToUtf8Bytes(value,BridgeProtocol.Json));
         var before=Save("before-state.json",Encoding.UTF8.GetBytes("{\"application\":\"main\",\"version\":1}"));

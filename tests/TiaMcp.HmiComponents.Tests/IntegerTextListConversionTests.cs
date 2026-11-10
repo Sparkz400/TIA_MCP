@@ -20,7 +20,6 @@ internal static class IntegerTextListConversionTests
         }
         var store = new HmiComponentWorkflowStore(root); var reviews = new ProjectReviewStore(root); var uploads = new ArtifactUploadStore(root);
         var refusals = new JsonArray(); var cases = new JsonArray(); var checks = new JsonArray(); var uploaded = new List<string>();
-        string Hash(byte[] value) => Convert.ToHexStringLower(SHA256.HashData(value));
         void Check(bool value, string label) { if (!value) throw new Exception(label); checks.Add(label); }
         string Upload(byte[] value)
         {

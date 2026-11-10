@@ -19,6 +19,7 @@ from pathlib import Path
 import re
 
 from library_native_harness import Harness, require
+from preview_payload import preview_payload
 from qualification_owned_scratch import complete_inventory, snapshot
 from qualify_access_changes import Run as StateRun
 from qualify_hardware_changes import under
@@ -99,7 +100,7 @@ class Run(StateRun):
         prepared = self.h.stage("prepare " + label, lambda: self.h.tool("change_prepare", self.args(kind, payload, **(top or {}))))
         actual = prepared["preview"]
         wanted = {"changeId": prepared["changeId"], "kind": kind, "project": {"path": self.project}, **(preview or {})}
-        require(prepared["state"] == "prepared" and actual["payload"] == payload and matches(wanted, actual),
+        require(prepared["state"] == "prepared" and actual["payload"] == preview_payload(payload) and matches(wanted, actual),
                 "Preview of %s differs: %s" % (label, {key: actual.get(key) for key in [*wanted, "payload"]}))
         self.finish(label, kind, prepared, **expected)
         return prepared

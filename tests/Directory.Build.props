@@ -1,0 +1,8 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <!-- Items are evaluated after every property, so the project's own TargetFramework is known here.
+       The net48 worker-boundary suites keep their own helpers: Harness.cs needs the modern BCL. -->
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) and '$(TargetFramework)' != 'net48'">
+    <Compile Include="$(MSBuildThisFileDirectory)Shared/Harness.cs" Link="Shared/Harness.cs" />
+  </ItemGroup>
+</Project>

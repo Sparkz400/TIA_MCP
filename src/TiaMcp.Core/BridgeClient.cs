@@ -35,34 +35,35 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
     private readonly List<LateBridgeResponse> _late = [];
     // shortcut: only the shared-mutation lease release is held back; add other cleanup calls here if they need the same.
     private static readonly HashSet<string> DeferredCleanups = new(StringComparer.Ordinal) { "mutation_end" };
-    private readonly List<(string Operation, object? Arguments)> _deferred = [];
+    private readonly List<(string Operation, string Id, string Frame)> _deferred = [];
     public IReadOnlyList<LateBridgeResponse> LateResponses { get { lock (_late) return _late.ToArray(); } }
     public bool? WorkerShutdownSucceeded { get; private set; }
 
     public async Task<JsonElement> CallAsync(string operation, object? arguments = null, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(operation)) throw new ArgumentException("Operation is required.", nameof(operation));
-        BridgeProtocol.EncodeRequest(Guid.NewGuid().ToString("N"), operation, arguments); // Reject an oversized request before waiting.
-        await _gate.WaitAsync(cancellationToken);
+        var id = Guid.NewGuid().ToString("N");
+        var frame = BridgeProtocol.EncodeRequest(id, operation, arguments); // Rejects an oversized request before waiting.
+        // A queued call has sent nothing, so giving up here is always safe.
+        if (!await _gate.WaitAsync(TimeSpan.FromSeconds(options.TimeoutSeconds), cancellationToken))
+            throw new BridgeException("QueueTimeout", $"{operation} waited {options.TimeoutSeconds} s for the engineering worker: another bridge call is still running; nothing was sent.");
         try
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
             if (options.Disabled) throw new BridgeException("NativeWorkersDisabled", "This Host disables Siemens engineering and simulator workers. Use supplied-document tools, or use an engineering package on a Siemens-equipped workstation.");
             if (_faulted) throw new BridgeException("BridgeFaulted", "The previous operation lost its connection or timed out. Its outcome may be unknown. Inspect TIA and restart this MCP host before continuing; no request was retried.");
-            await SettleInterruptedAsync(operation, arguments);
+            await SettleInterruptedAsync(operation, id, frame);
             // Owner discovery observes an existing connection; it must not create one.
             if (operation == "addin_owner_context" && _pipe is null)
                 throw new BridgeException("AddInOwnerUnavailable", "No connected worker owns this Host session. Owner observation never starts or attaches a worker.");
-            return await SendAsync(operation, arguments, cancellationToken);
+            return await SendAsync(operation, id, frame, cancellationToken);
         }
         finally { _gate.Release(); }
     }
 
     // Under the gate.
-    private async Task<JsonElement> SendAsync(string operation, object? arguments, CancellationToken cancellationToken)
+    private async Task<JsonElement> SendAsync(string operation, string id, string frame, CancellationToken cancellationToken)
     {
-            var id = Guid.NewGuid().ToString("N");
-            var frame = BridgeProtocol.EncodeRequest(id, operation, arguments);
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             deadline.CancelAfter(TimeSpan.FromSeconds(options.TimeoutSeconds));
             bool sent = false, interrupted = false;
@@ -109,13 +110,13 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
 
     // Under the gate: refuse while an interrupted request still runs; once it ended, record its response or fault the bridge.
     // A held cleanup (the interrupted dispatch's lease release) is delivered first, right after the late response.
-    private async Task SettleInterruptedAsync(string operation, object? arguments)
+    private async Task SettleInterruptedAsync(string operation, string id, string frame)
     {
         if (_inflight is null) return;
         if (!_inflight.IsCompleted)
         {
             bool held = DeferredCleanups.Contains(operation);
-            if (held) _deferred.Add((operation, arguments));
+            if (held) _deferred.Add((operation, id, frame));
             throw new BridgeException("PreviousOperationRunning", $"The interrupted {_inflightOperation} request is still running in the worker; nothing was sent. " +
                 (held ? operation + " is held and delivered as soon as it finishes." : "Try again after it finishes. It is never replayed."));
         }
@@ -128,14 +129,6 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
             catch (BridgeOperationException error) { succeeded = false; code = error.Code; }
             lock (_late) _late.Add(new LateBridgeResponse(_inflightOperation!, _inflightId!, succeeded, code, DateTimeOffset.UtcNow));
             Console.Error.WriteLine(JsonSerializer.Serialize(new { bridgeLateResponse = new { operation = _inflightOperation, requestId = _inflightId, succeeded, errorCode = code } }));
-            var held = _deferred.ToArray(); _deferred.Clear();
-            foreach (var cleanup in held)
-            {
-                string? cleanupError = null;
-                try { await SendAsync(cleanup.Operation, cleanup.Arguments, CancellationToken.None); }
-                catch (BridgeOperationException error) { cleanupError = error.Code; }
-                Console.Error.WriteLine(JsonSerializer.Serialize(new { bridgeDeferredCleanup = new { operation = cleanup.Operation, errorCode = cleanupError } }));
-            }
         }
         catch (Exception ex) when (ex is not BridgeOperationException)
         {
@@ -143,6 +136,24 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
             if (_pipe is not null) await _pipe.DisposeAsync();
             _pipe = null;
             throw new BridgeException("BridgeFaulted", "The interrupted operation lost its connection before responding. Its outcome may be unknown. Inspect TIA and restart this MCP host before continuing; no request was sent.", ex);
+        }
+        var cleanups = _deferred.ToArray(); _deferred.Clear();
+        for (int i = 0; i < cleanups.Length; i++)
+        {
+            string? cleanupError = null;
+            // SendAsync faults the bridge itself on a broken transport, and makes a timed-out cleanup the interrupted request.
+            try { await SendAsync(cleanups[i].Operation, cleanups[i].Id, cleanups[i].Frame, CancellationToken.None); }
+            catch (BridgeException error) { cleanupError = error.Code; }
+            Console.Error.WriteLine(JsonSerializer.Serialize(new { bridgeDeferredCleanup = new { operation = cleanups[i].Operation, errorCode = cleanupError } }));
+            if (_faulted)
+                throw new BridgeException("BridgeFaulted", $"The held {cleanups[i].Operation} lost its connection. Its outcome may be unknown. Inspect TIA and restart this MCP host before continuing; no further request was sent.");
+            if (_inflight is not null)
+            {
+                // The cleanup itself still runs: hold the rest again and refuse or settle this call like any other.
+                _deferred.AddRange(cleanups[(i + 1)..]);
+                await SettleInterruptedAsync(operation, id, frame);
+                return;
+            }
         }
     }
 

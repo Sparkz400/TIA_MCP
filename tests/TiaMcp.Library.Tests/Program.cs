@@ -38,7 +38,6 @@ static void RejectReachability(string message, Action action)
     catch (ArgumentException error) when (error.Message.Contains(message, StringComparison.Ordinal)) { return; }
     throw new Exception("Expected reference-proof rejection containing: " + message);
 }
-static string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
 static string Write(string work, string name, byte[] bytes) { Directory.CreateDirectory(work); var path = Path.Combine(work, name); File.WriteAllBytes(path, bytes); return path; }
 static byte[] Zip(params (string Name, byte[] Bytes, int? Attributes)[] files)
 {

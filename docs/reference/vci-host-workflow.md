@@ -85,8 +85,11 @@ preservation or current target state from matching names or hashes.
 
 ## Interruptions and integrity
 
-Each candidate is separate from its parent. Failed preparations remain discoverable
-as incomplete records. A commit intent without a complete receipt remains
+Each candidate is separate from its parent. A deletion absent from the parent is
+refused before any record is created; a preparation that fails later removes its own
+partial record. Other failed operations remain discoverable as incomplete records.
+`vci_list` derives each row's state from its receipt files only; `vci_reopen` of a
+listed handle verifies the full chain and working bytes. A commit intent without a complete receipt remains
 `outcomeUnknown`; `vci_commit` refuses a repeat, even if the last Git callback says
 `verified`. Reopen exposes the validated callback phase, operation ID, candidate
 commit/tree and callback digest for diagnosis.

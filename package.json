@@ -11,13 +11,12 @@
   },
   "scripts": {
     "test:explorer": "node --test ui/project-explorer/tests/model.test.cjs ui/project-explorer/tests/client.test.cjs",
-    "test:explorer:browser": "node ui/project-explorer/tests/browser.mjs",
-    "test:playwright:list": "playwright test --list"
+    "test:explorer:browser": "node ui/project-explorer/tests/browser.mjs"
   },
   "keywords": [],
   "type": "commonjs",
   "devDependencies": {
-    "@playwright/test": "^1.64.1",
-    "@types/node": "^26.6.6"
+    "@types/node": "^26.6.6",
+    "playwright": "^1.64.1"
   }
 }

@@ -93,8 +93,9 @@ internal static class PackageChecks
         string reportDirectory = Path.Combine(root, "vci-workspaces", "records", Text(conflict, "recordRef").Split(':')[2]);
         File.AppendAllText(Path.Combine(reportDirectory, "comparison.json"), " ");
         Reject("VciIntegrityFailure", () => store.ReadArtifact(Text(conflict, "recordRef"), "comparison.json"));
-        Check(Json(store.List(count:50)).GetProperty("rows").EnumerateArray().Any(r => r.GetProperty("state").GetString() == "integrity-failed" &&
-            r.GetProperty("id").GetString() == Text(conflict, "recordRef").Split(':')[2]), "discovery exposes damaged package publication without replay");
+        Check(Json(store.List(count:50)).GetProperty("rows").EnumerateArray().Any(r => r.GetProperty("recordRef").GetString() == Text(conflict, "recordRef")),
+            "discovery lists the damaged package publication's handle without replay");
+        Reject("VciIntegrityFailure", () => store.Reopen(Text(conflict, "recordRef")));
         return checks;
     }
 }

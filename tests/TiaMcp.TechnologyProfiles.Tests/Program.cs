@@ -10,7 +10,6 @@ string root=Path.GetFullPath(args[0]); Directory.CreateDirectory(root); var chec
 void Check(bool ok,string label) { if(!ok) throw new Exception(label); checks.Add(label); }
 void Reject(Action action,string label,string code="InvalidTechnologyProfile")
 { try {action();} catch(BridgeException e) when(e.Code==code) {Check(true,label);return;} throw new Exception("Expected refusal: "+label); }
-string Hash(byte[] data)=>Convert.ToHexStringLower(SHA256.HashData(data));
 const string project="/projects/Fixture", plc=project+"/PLC", technology=plc+"/technology/Axis日本😀", peer=plc+"/technology/Peer", hardware=plc+"/hardware/Drive";
 JsonObject Node(string path,string kind,string? parent)=>new(){["nodeId"]=path,["objectPath"]=path,["kind"]=kind,["name"]=path.Split('/').Last(),["parentId"]=parent,["origin"]="native",["plcPath"]=plc,["metadata"]=new JsonObject()};
 var nodes=new JsonArray(Node(project,"project",null),Node(plc,"plc",project),Node(technology,"technologyObject",plc),Node(peer,"technologyObject",plc),Node(hardware,"hardware",plc));

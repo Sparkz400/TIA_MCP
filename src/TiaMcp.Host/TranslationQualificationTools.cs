@@ -21,7 +21,7 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
     private TranslationWorkerAdapter Adapter(string projectPath, string plcPath, string? sourceCulture = null, string? targetCulture = null, string[]? plcPaths = null,
         string[]? categoryIds = null) =>
         new(bridge, Root, projectPath, plcPath, (context, action) => {
-            if (!context.Operation.Plan.Target.ProjectFilePath.StartsWith(Path.GetFullPath(Root).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            if (new ArtifactStore(Root).TryResolve(Path.GetFullPath(context.Operation.Plan.Target.ProjectFilePath)) is null)
                 throw new BridgeException("ProjectIsolationRequired", "Qualification requires the newly owned fixture beneath this run root.");
         }, sourceCulture ?? "de-DE", targetCulture ?? "en-GB", plcPaths, categoryIds);
     private TranslationWorkerAdapter Adapter(string id)
@@ -173,9 +173,8 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
     [Description("Explicit qualification runtime only: reopen an already reconciled fixture after exact prior process closure; verify current content without replaying the completed import.")]
     public Task<EngineeringArtifactReference> ResumeClosedFixture(string operationId, int revision, string closeRelativePath, string originalCloseSha256, CancellationToken cancellationToken)
     {
-        string path = Path.GetFullPath(Path.Combine(Root, closeRelativePath));
-        if (!path.StartsWith(Path.GetFullPath(Root).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
-            throw new BridgeException("InvalidArtifact", "Lifetime receipt must be inside the original run root.");
+        string path = new ArtifactStore(Root).TryResolve(closeRelativePath)
+            ?? throw new BridgeException("InvalidArtifact", "Lifetime receipt must be inside the original run root.");
         TranslationRetention.NoLinks(path); byte[] bytes = File.ReadAllBytes(path);
         if (Sha256(bytes) != originalCloseSha256) throw new BridgeException("ArtifactChanged", "Original exact lifetime evidence changed.");
         return Runner.ResumeClosedFixture(operationId, revision, Adapter(operationId), bytes, cancellationToken);
