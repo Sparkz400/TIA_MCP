@@ -291,10 +291,11 @@ class Candidates(unittest.TestCase):
         parent = {k for k in keys if "embeddingParent" in k}
         # The startup and cyclic-interrupt OB callers, verified on 8 November; the further classes and cyclic combinations are candidates.
         event = {k for k in keys if "obEventClass" in k}
-        self.assertEqual(48, len(event)); parent -= event
+        self.assertEqual(88, len(event)); parent -= event
         # The 15 combinations of the other verified classes with LAD, an earlier placement and reuse, verified on 8 November.
         # Two or three of LAD, an earlier placement and reuse on each verified event class, verified on 8 November.
-        self.assertEqual(set(), event - verified)
+        # The five classes added on 10 November are candidates until their native runs pass.
+        self.assertEqual(40, len(event - verified)); keys -= event - verified
         self.assertEqual(25, len(keys - parent - event)); self.assertEqual(set(), keys - parent - event - verified)
         self.assertEqual(8, len(parent)); self.assertEqual(set(), parent - verified)
 

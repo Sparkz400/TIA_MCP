@@ -52,7 +52,10 @@ EVENT_CLASSES = {"ProgramCycle": (OB_NUMBER, None),
                  "TimeOfDay": (10, (("CaughtUp", "Bool"), ("SecondTimeInterval", "Bool"))),
                  "TimeDelayInterrupt": (20, (("Sign", "Word"),)),
                  "HardwareInterrupt": (40, (("LADDR", "HW_IO"), ("USI", "Word"), ("IChannel", "USInt"), ("EventType", "Byte"))),
-                 "DiagnosticErrorInterrupt": (82, (("IO_State", "Word"), ("LADDR", "HW_ANY"), ("Channel", "UInt"), ("MultiError", "Bool")))}
+                 "DiagnosticErrorInterrupt": (82, (("IO_State", "Word"), ("LADDR", "HW_ANY"), ("Channel", "UInt"), ("MultiError", "Bool"))),
+                 # As in qualify_plcsim_gaps.py, whose OB55/56/57/83/86 V21 imported and ran (no start information for 55-57).
+                 "Status": (55, ()), "Update": (56, ()), "Profile": (57, ()),
+                 "PullOrPlugOfModules": (83, (("LADDR", "HW_IO"), ("Event_Class", "Byte"), ("Fault_ID", "Byte"))), "RackOrStationFailure": (86, (("LADDR", "HW_IO"), ("Event_Class", "Byte"), ("Fault_ID", "Byte")))}
 # A LAD OB takes its coil network from the LAD FC caller fixture, imported under this name before the baseline.
 LAD_PEER = "TiaMcpLadPeer"
 HARNESS = ("qualify_plc_component.py", "qualification_owned_scratch.py", "compilation_evidence.py", "smoke_mcp.py",
@@ -168,6 +171,47 @@ COMBINATIONS = {
     "obDiagnosticReuseLad": (True, {"kind": "OB", "language": "LAD", "eventClass": "DiagnosticErrorInterrupt"}, []),
     "obDiagnosticReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "DiagnosticErrorInterrupt"}, []),
     "obDiagnosticReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "DiagnosticErrorInterrupt"}, []),
+    # Status, update, profile, pull/plug and rack-failure OBs in every combination of LAD, an earlier placement and reuse; candidates since 10 November.
+    "obStatus": (False, {"kind": "OB", "language": "FBD", "eventClass": "Status"}, ["obCaller", "obEventClass.Status"]),
+    "obStatusLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "Status"}, ["ladCaller", "obCaller", "obEventClass.Status"]),
+    "obStatusEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "Status"}, ["earlierPlacement", "obCaller", "obEventClass.Status"]),
+    "obStatusReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "Status"}, ["obCaller", "obEventClass.Status", "reusedComponent"]),
+    "obStatusLadEarlier": (False, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "Status"}, ["earlierPlacement", "ladCaller", "obCaller", "obEventClass.Status"]),
+    "obStatusReuseLad": (True, {"kind": "OB", "language": "LAD", "eventClass": "Status"}, ["ladCaller", "obCaller", "obEventClass.Status", "reusedComponent"]),
+    "obStatusReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "Status"}, ["earlierPlacement", "obCaller", "obEventClass.Status", "reusedComponent"]),
+    "obStatusReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "Status"}, ["earlierPlacement", "ladCaller", "obCaller", "obEventClass.Status", "reusedComponent"]),
+    "obUpdate": (False, {"kind": "OB", "language": "FBD", "eventClass": "Update"}, ["obCaller", "obEventClass.Update"]),
+    "obUpdateLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "Update"}, ["ladCaller", "obCaller", "obEventClass.Update"]),
+    "obUpdateEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "Update"}, ["earlierPlacement", "obCaller", "obEventClass.Update"]),
+    "obUpdateReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "Update"}, ["obCaller", "obEventClass.Update", "reusedComponent"]),
+    "obUpdateLadEarlier": (False, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "Update"}, ["earlierPlacement", "ladCaller", "obCaller", "obEventClass.Update"]),
+    "obUpdateReuseLad": (True, {"kind": "OB", "language": "LAD", "eventClass": "Update"}, ["ladCaller", "obCaller", "obEventClass.Update", "reusedComponent"]),
+    "obUpdateReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "Update"}, ["earlierPlacement", "obCaller", "obEventClass.Update", "reusedComponent"]),
+    "obUpdateReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "Update"}, ["earlierPlacement", "ladCaller", "obCaller", "obEventClass.Update", "reusedComponent"]),
+    "obProfile": (False, {"kind": "OB", "language": "FBD", "eventClass": "Profile"}, ["obCaller", "obEventClass.Profile"]),
+    "obProfileLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "Profile"}, ["ladCaller", "obCaller", "obEventClass.Profile"]),
+    "obProfileEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "Profile"}, ["earlierPlacement", "obCaller", "obEventClass.Profile"]),
+    "obProfileReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "Profile"}, ["obCaller", "obEventClass.Profile", "reusedComponent"]),
+    "obProfileLadEarlier": (False, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "Profile"}, ["earlierPlacement", "ladCaller", "obCaller", "obEventClass.Profile"]),
+    "obProfileReuseLad": (True, {"kind": "OB", "language": "LAD", "eventClass": "Profile"}, ["ladCaller", "obCaller", "obEventClass.Profile", "reusedComponent"]),
+    "obProfileReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "Profile"}, ["earlierPlacement", "obCaller", "obEventClass.Profile", "reusedComponent"]),
+    "obProfileReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "Profile"}, ["earlierPlacement", "ladCaller", "obCaller", "obEventClass.Profile", "reusedComponent"]),
+    "obPullPlug": (False, {"kind": "OB", "language": "FBD", "eventClass": "PullOrPlugOfModules"}, ["obCaller", "obEventClass.PullOrPlugOfModules"]),
+    "obPullPlugLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "PullOrPlugOfModules"}, ["ladCaller", "obCaller", "obEventClass.PullOrPlugOfModules"]),
+    "obPullPlugEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "PullOrPlugOfModules"}, ["earlierPlacement", "obCaller", "obEventClass.PullOrPlugOfModules"]),
+    "obPullPlugReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "PullOrPlugOfModules"}, ["obCaller", "obEventClass.PullOrPlugOfModules", "reusedComponent"]),
+    "obPullPlugLadEarlier": (False, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "PullOrPlugOfModules"}, ["earlierPlacement", "ladCaller", "obCaller", "obEventClass.PullOrPlugOfModules"]),
+    "obPullPlugReuseLad": (True, {"kind": "OB", "language": "LAD", "eventClass": "PullOrPlugOfModules"}, ["ladCaller", "obCaller", "obEventClass.PullOrPlugOfModules", "reusedComponent"]),
+    "obPullPlugReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "PullOrPlugOfModules"}, ["earlierPlacement", "obCaller", "obEventClass.PullOrPlugOfModules", "reusedComponent"]),
+    "obPullPlugReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "PullOrPlugOfModules"}, ["earlierPlacement", "ladCaller", "obCaller", "obEventClass.PullOrPlugOfModules", "reusedComponent"]),
+    "obRackFailure": (False, {"kind": "OB", "language": "FBD", "eventClass": "RackOrStationFailure"}, ["obCaller", "obEventClass.RackOrStationFailure"]),
+    "obRackFailureLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "RackOrStationFailure"}, ["ladCaller", "obCaller", "obEventClass.RackOrStationFailure"]),
+    "obRackFailureEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "RackOrStationFailure"}, ["earlierPlacement", "obCaller", "obEventClass.RackOrStationFailure"]),
+    "obRackFailureReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "RackOrStationFailure"}, ["obCaller", "obEventClass.RackOrStationFailure", "reusedComponent"]),
+    "obRackFailureLadEarlier": (False, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "RackOrStationFailure"}, ["earlierPlacement", "ladCaller", "obCaller", "obEventClass.RackOrStationFailure"]),
+    "obRackFailureReuseLad": (True, {"kind": "OB", "language": "LAD", "eventClass": "RackOrStationFailure"}, ["ladCaller", "obCaller", "obEventClass.RackOrStationFailure", "reusedComponent"]),
+    "obRackFailureReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "RackOrStationFailure"}, ["earlierPlacement", "obCaller", "obEventClass.RackOrStationFailure", "reusedComponent"]),
+    "obRackFailureReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "RackOrStationFailure"}, ["earlierPlacement", "ladCaller", "obCaller", "obEventClass.RackOrStationFailure", "reusedComponent"]),
     # The reused-FB multi-instance in a Host FB that a parent FB embeds, beside the verified FBD one (multiInstanceParent): LAD, an
     # earlier placement and the Host's own DB in every combination, and the verified shape two levels deep with the parent's and the
     # grandparent's DBs. All verified on 7 November.
@@ -379,7 +423,7 @@ def fbd_ob(main_xml, peer_xml, source_tag, target_tag, language="FBD", event_cla
     xml, count = re.subn(r"<NetworkSource>.*?</NetworkSource>", lambda _: body, main_xml, flags=re.S)
     require(count == 1, "Main must export exactly one network.")
     number, inputs = EVENT_CLASSES[event_class]
-    if inputs:
+    if inputs is not None:
         section = '<Section Name="Input">' + "".join('<Member Name="%s" Datatype="%s" Accessibility="Public" Informative="true" />' % member
                                                     for member in inputs) + "</Section>"
         xml, count = re.subn(r'<Section Name="Input">.*?</Section>', lambda _: section, xml, flags=re.S)
