@@ -72,6 +72,9 @@ class Client:
             schema.validate(result["structuredContent"])
 
     def tool(self, name, arguments=None):
+        # The change tools answer with a summary by default; qualification runners read full previews and journals.
+        if name in ("change_prepare", "change_apply", "change_status"):
+            arguments = {"includeDetails": True, **(arguments or {})}
         result = self.request("tools/call", {"name": name, "arguments": arguments or {}})
         if result.get("isError"):
             raise RuntimeError(f"{name}: {result}")
