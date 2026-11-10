@@ -1,4 +1,5 @@
 using System.Xml.Linq;
+using Newtonsoft.Json.Linq;
 using TiaMcp.Openness.V21;
 
 namespace TiaMcp.Tests;
@@ -80,6 +81,76 @@ internal static class GraphicalNetworkTextTests
         Check.Equal(true, cut.Truncated);
         Check.Equal(true, cut.Text.StartsWith("REGION Outputs", StringComparison.Ordinal) && cut.Text.EndsWith("... (truncated)", StringComparison.Ordinal));
         Check.Equal(false, GraphicalNetworkText.Render(document, null, int.MaxValue).Single().Truncated);
+        return Task.CompletedTask;
+    }
+
+    // Shape of a native V21 DB export: typed members carry nested sections, array overrides are sparse Subelements.
+    private const string DataBlock = """
+        <Document><SW.Blocks.GlobalDB ID="0"><AttributeList><Interface>
+        <Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5"><Section Name="Static">
+          <Member Name="Enable" Datatype="Bool" Remanence="Retain"><Comment><MultiLanguageText Lang="de-DE">Freigabe</MultiLanguageText><MultiLanguageText Lang="en-US">Release
+        of the station</MultiLanguageText></Comment><StartValue>TRUE</StartValue></Member>
+          <Member Name="Item" Datatype="&quot;SampleType&quot;" Remanence="NonRetain"><Sections><Section Name="None">
+            <Member Name="Samples" Datatype="Array[-2..2] of Int">
+              <Subelement Path="2"><StartValue>23</StartValue><Comment><MultiLanguageText Lang="en-US">last</MultiLanguageText></Comment></Subelement>
+            </Member>
+            <Member Name="Meta" Datatype="Struct"><Member Name="Count" Datatype="DInt"><StartValue>5</StartValue></Member></Member>
+          </Section></Sections></Member>
+          <Member Name="Timer" Datatype="TON_TIME"><Sections><Section Name="Input"><Member Name="PT" Datatype="Time"><StartValue>T#2s</StartValue></Member></Section><Section Name="InOut" /></Sections></Member>
+        </Section></Sections></Interface><Name>Data</Name><ProgrammingLanguage>DB</ProgrammingLanguage></AttributeList></SW.Blocks.GlobalDB></Document>
+        """;
+
+    internal static Task DataBlockInterfaceBecomesText()
+    {
+        var document = XDocument.Parse(DataBlock);
+        string expected = string.Join(Environment.NewLine,
+            "Interface of \"Data\" [GlobalDB]",
+            "Static",
+            "  Enable : Bool := TRUE {Retain}  // Release of the station",
+            "  Item : \"SampleType\"",
+            "    Samples : Array[-2..2] of Int",
+            "      [2] := 23  // last",
+            "    Meta : Struct",
+            "      Count : DInt := 5",
+            "  Timer : TON_TIME",
+            "    (Input)",
+            "      PT : Time := T#2s");
+        var rendered = GraphicalNetworkText.RenderInterface(document)!;
+        Check.Equal(expected, rendered.Text); Check.Equal(7, rendered.Members); Check.Equal(false, rendered.Truncated);
+        Check.Equal(true, GraphicalNetworkText.RenderInterface(document, "de-DE")!.Text.Contains("// Freigabe", StringComparison.Ordinal));
+        var cut = GraphicalNetworkText.RenderInterface(document, null, 40)!;
+        Check.Equal(true, cut.Truncated); Check.Equal(true, cut.Text.EndsWith("... (truncated)", StringComparison.Ordinal));
+        // A block without networks used to get a 0-byte text file: its interface is the text, complete in the artifact.
+        var response = GraphicalNetworkText.Describe(document, null, out string? complete);
+        Check.Equal(expected + Environment.NewLine, complete);
+        Check.Equal(0, ((JArray)response["networks"]!).Count);
+        Check.Equal(expected, response["interface"]!.Value<string>("text")); Check.Equal(7, response["interface"]!.Value<int>("members"));
+        Check.Equal(GraphicalNetworkText.InterfaceCoverage, response.Value<string>("textCoverage"));
+        Check.Equal(false, response.ContainsKey("textUnavailable"));
+        var instance = XDocument.Parse(DataBlock.Replace("SW.Blocks.GlobalDB", "SW.Blocks.InstanceDB").Replace("<Name>Data</Name>", "<Name>Data</Name><InstanceOfName>Gate</InstanceOfName>"));
+        Check.Equal(true, GraphicalNetworkText.RenderInterface(instance)!.Text.StartsWith("Interface of \"Data\" [InstanceDB of \"Gate\"]", StringComparison.Ordinal));
+        return Task.CompletedTask;
+    }
+
+    internal static Task ResponseCarriesEachTextOnceAndNoEmptyFile()
+    {
+        // The whole block in one piece is the text artifact; the response has each network once.
+        var response = GraphicalNetworkText.Describe(XDocument.Parse(SclNetwork), null, out string? complete);
+        Check.Equal(false, response.ContainsKey("text")); Check.Equal(false, response.ContainsKey("interface"));
+        var network = (JObject)((JArray)response["networks"]!).Single();
+        Check.Equal(true, network.Value<string>("text")!.StartsWith("REGION Outputs", StringComparison.Ordinal));
+        Check.Equal(true, complete!.StartsWith("Network 1", StringComparison.Ordinal) && complete.Contains("REGION Outputs", StringComparison.Ordinal));
+        Check.Equal(GraphicalNetworkText.Coverage, response.Value<string>("textCoverage"));
+        // Nothing renderable: no text to write, and the response says so instead of pointing at an empty file.
+        foreach (string xml in new[] {
+            "<Document><SW.Blocks.GlobalDB ID=\"0\"><AttributeList><Interface><Sections xmlns=\"http://www.siemens.com/automation/Openness/SW/Interface/v5\"><Section Name=\"Static\" /></Sections></Interface><Name>Empty</Name></AttributeList></SW.Blocks.GlobalDB></Document>",
+            "<Document><SW.Blocks.ArrayDB ID=\"0\"><AttributeList><Name>NoInterface</Name></AttributeList></SW.Blocks.ArrayDB></Document>" })
+        {
+            response = GraphicalNetworkText.Describe(XDocument.Parse(xml), null, out complete);
+            Check.Equal<string?>(null, complete);
+            Check.Equal(true, response["textUnavailable"]!.Value<string>("reason")!.Contains("no text form", StringComparison.Ordinal));
+            Check.Equal(false, response.ContainsKey("textCoverage")); Check.Equal(false, response.ContainsKey("interface"));
+        }
         return Task.CompletedTask;
     }
 
