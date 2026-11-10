@@ -101,6 +101,8 @@ public static class ChangeResultCompaction
                 if (name != "existing") row[name] = Bound(value?.DeepClone());
             result["baselineComparison"] = row;
         }
+        // Warnings a Classic screen edit revealed outside its screens by removing the last error; accepted, so always shown.
+        if (compile["unmaskedWarnings"] is JsonArray unmasked) result["unmaskedWarnings"] = Bound(unmasked.DeepClone());
         return result;
     }
 
