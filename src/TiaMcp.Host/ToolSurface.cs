@@ -69,10 +69,11 @@ internal static class ToolSurface
             // object contract that ObjectArguments enforces at the Host boundary.
             string? objectArgument = name == "change_prepare" ? "payload"
                 : new[] { "hmi_classic_screen_capture", "hmi_classic_screen_compose", "hmi_inspect", "hmi_references", "hmi_capabilities" }.Contains(name) ? "request" : null;
-            if (objectArgument is not null)
+            var input = JsonNode.Parse(tool.ProtocolTool.InputSchema.GetRawText())!.AsObject();
+            var structured = StructuredArguments(input, objectArgument);
+            if (structured.Length > 0)
             {
-                var input = JsonNode.Parse(tool.ProtocolTool.InputSchema.GetRawText())!.AsObject();
-                input["properties"]![objectArgument] = new JsonObject { ["type"] = "object", ["additionalProperties"] = true };
+                JsonArguments[name] = structured;
                 tool.ProtocolTool.InputSchema = JsonSerializer.SerializeToElement(input);
             }
             if (schemas.TryGetValue(name, out var schema)) tool.ProtocolTool.OutputSchema = schema;
@@ -86,9 +87,42 @@ internal static class ToolSurface
                 prompts.Remove(prompt);
     }
 
+    // Tool arguments bound to JsonElement, by tool name. Filled by Apply before any call is served.
+    private static readonly Dictionary<string, string[]> JsonArguments = new(StringComparer.Ordinal);
+
+    /// <summary>Types every argument the SDK left unconstrained (a JsonElement parameter) and returns their names.
+    /// An unconstrained schema makes some clients send the value as a JSON-encoded string, which the tools then refuse
+    /// ("The node must be of type 'JsonObject'"). A required <c>request</c> and the named object argument are declared as objects.</summary>
+    internal static string[] StructuredArguments(JsonObject input, string? objectArgument)
+    {
+        if (input["properties"] is not JsonObject properties) return [];
+        var names = new List<string>();
+        foreach (var (property, schema) in properties.ToArray())
+        {
+            bool unconstrained = schema is JsonValue flag && flag.TryGetValue<bool>(out var any) && any
+                || schema is JsonObject declared && !new[] { "type", "$ref", "anyOf", "oneOf", "allOf", "enum", "const" }.Any(declared.ContainsKey);
+            if (!unconstrained && property != objectArgument) continue;
+            names.Add(property);
+            if (property == objectArgument || property == "request")
+                properties[property] = new JsonObject { ["type"] = "object", ["additionalProperties"] = true };
+        }
+        return [.. names];
+    }
+
+    /// <summary>A JSON object or array that arrived as a string, parsed; null for anything else, which is passed on unchanged.</summary>
+    internal static JsonElement? StructuredValue(JsonElement value)
+    {
+        if (value.ValueKind != JsonValueKind.String || value.GetString()!.TrimStart() is not { Length: > 0 } text || text[0] is not ('{' or '[')) return null;
+        try { using var document = JsonDocument.Parse(text); return document.RootElement.Clone(); }
+        catch (JsonException) { return null; }
+    }
+
     internal static void Configure(IMcpRequestFilterBuilder filters) =>
         filters.AddCallToolFilter(next => async (context, token) =>
         {
+            if (context.Params?.Arguments is { } arguments && JsonArguments.TryGetValue(context.Params.Name, out var structured))
+                foreach (var argument in structured)
+                    if (arguments.TryGetValue(argument, out var value) && StructuredValue(value) is { } parsed) arguments[argument] = parsed;
             if (context.Params?.ProgressToken is not { } progress) return await next(context, token);
             var tool = context.Params.Name;
             // Sent before dispatch so a broken transport fails the call before any native work starts.

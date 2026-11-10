@@ -413,7 +413,21 @@ Network 3: Downholder enable [LAD, ID 1A]
   CALL "fb30072" "db30072"(Enable := #Enable, Active => #Active)
 ```
 
-Contacts, `O`/`A`/`X` boxes and comparators become Boolean expressions; negations appear as `NOT`. Coils become assignments (`SET`/`RESET` for set and reset coils). Other instructions and calls are statements with their pin bindings: `:=` for an input, `=>` for an output wired to an operand. An instruction output used by logic appears as `<instance or name#UId>.<pin>`. Unknown instructions are shown by name and pins, not interpreted. SCL, STL and other network languages are listed but not rendered; use `format: "generatedSource"`. `culture` selects the title and comment language (default `en-US`, then the first available). The text is a reading aid; the native XML stays authoritative.
+Contacts, `O`/`A`/`X` boxes and comparators become Boolean expressions; negations appear as `NOT`. Coils become assignments (`SET`/`RESET` for set and reset coils). Other instructions and calls are statements with their pin bindings: `:=` for an input, `=>` for an output wired to an operand. An instruction output used by logic appears as `<instance or name#UId>.<pin>`. Unknown instructions are shown by name and pins, not interpreted. SCL networks are rendered as their source text, rebuilt from the exported tokens. STL and other network languages are listed but not rendered; use `format: "generatedSource"`. `culture` selects the title and comment language (default `en-US`, then the first available). The text is a reading aid; the native XML stays authoritative.
+
+The response cuts a network after 16,384 characters (`truncated`); `textArtifact` is a UTF-8 file next to the XML with every network in full. If the rendering fails, the read still succeeds and `textUnavailable` gives the reason.
+
+To read or search a whole program, use `block_export` instead of one `block_read` per block. It selects blocks like `project_inventory` (`groupPath`, `namePrefix`) and by `kinds` (default `FB,FC,OB`), exports each as XML and as a text file into the exports directory, and returns one row per block with both file names and no block content. The same rows are written to `index`. Know-how protected blocks and blocks TIA refuses to export are rows with `skipped`. A call exports at most `maxBlocks` blocks (default 200, up to 500) in path order; continue with `nextOffset`. The batch is not atomic: an edit in TIA between two exports is not detected.
+
+To check the I/O of a program:
+
+1. `plc_io_map` joins the configured address ranges with the tags: `ranges` (module, range, tags), `rangesWithoutTags`, `tagsWithoutListedHardware` and `sharedAddresses`. Drive telegrams configured in Startdrive are not in the hardware inventory, so their tags are listed as without hardware; a range without tags may still be used through its hardware identifier.
+2. `block_export` writes the blocks to files and returns an `index`.
+3. `plc_tag_usage` with that `index` reports `readers` and `writers` per I/Q tag as block and network number, and `absoluteAccesses` for direct `%I`/`%Q` operands. `unusedOnly: true` keeps only tags that no scanned block references. This is static evidence over the exported blocks: protected or skipped blocks, technology objects, HMI, hardware-identifier access and `PEEK`/`POKE` are not seen, so read "unused" as "unused in the scanned code".
+
+For large stations use the compact reads: `project_inventory` with `compact: true` (and `includeBlocks: false` for hardware only) and `hardware_inspect` with `compact: true` return identity and address ranges without repeating full paths and attribute sets.
+
+For tag and I/O lists, `software_inspect` with `include: "tags"` and `compact: true` returns every tag as name, data type and address without spending `maxItems` on blocks and constants. Check `truncation` and each table's `tagsTruncated`: a table that reports fewer tags than its `tagCount` was cut by `maxItems`.
 
 `block_read` returns inline `xml` only up to 64 KiB and never together with `render: "text"`, unless `includeXml: true` (up to the worker's 512 KiB). `xmlOmitted` says why, and `artifact.path` always holds the full export for `artifact_read` or as `xmlRef`.
 

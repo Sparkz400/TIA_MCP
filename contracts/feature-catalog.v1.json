@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.173",
+  "catalogVersion": "0.4.174",
   "targetTiaVersions": [
     21
   ],
@@ -6352,6 +6352,139 @@
         "status": "conditional",
         "reasons": [
           "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "block_export",
+      "domain": "inspection",
+      "title": "Export many blocks as native XML and readable text files",
+      "mcpTools": [
+        "block_export"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Existing V21 or V8 typed integration route; target availability must be probed independently."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Host-side batch over project_inventory and block_read render=text: one native XML export and one text file per block, bounded to 500 blocks per call with offset paging. The batch is sequential and not atomic; edits in TIA between two exports are not detected.",
+          "Selection is bounded by the inventory walk (2000 rows); completeness.inventoryComplete is false when that bound cut the block list.",
+          "Know-how protected blocks and blocks TIA refuses to export are listed as skipped rows with their error code, not exported.",
+          "Text files follow block_read render=text: LAD/FBD and SCL networks are rendered; STL and other languages are listed only. The native XML stays authoritative."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Selection, paging and row shaping are covered by offline Host tests; no native batch run is recorded yet."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "plc_io_map",
+      "domain": "inspection",
+      "title": "Map configured I/O address ranges to PLC tags",
+      "mcpTools": [
+        "plc_io_map"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Existing V21 or V8 typed integration route; target availability must be probed independently."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Host-side join of compact project_inventory hardware rows and software_inspect tags; offline configuration only.",
+          "A tag is placed by its first byte; the span of a structured tag is not evaluated.",
+          "Address ranges the hardware inventory does not expose, such as drive telegrams configured in Startdrive, appear as tags without listed hardware.",
+          "With several PLCs the address ranges of all of them are listed together; ranges are not attributed to one PLC's IO system.",
+          "A range without tags can still be used through its hardware identifier or absolute addressing."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result.",
+          "The analysis is covered by offline Host tests; no native run is recorded yet."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "plc_tag_usage",
+      "domain": "inspection",
+      "title": "Report readers and writers of I/O tags from exported blocks",
+      "mcpTools": [
+        "plc_tag_usage"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Existing V21 or V8 typed integration route; target availability must be probed independently."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Static scan of the native XML files of a block_export index: LAD/FBD (FlgNet) wires and SCL (StructuredText) accesses, matched by the first component of a global symbol. STL and GRAPH networks are not scanned.",
+          "Blocks outside the index, know-how protected and skipped blocks, technology objects, HMI, hardware-identifier access, PEEK/POKE and other indirect addressing are not covered; an unused tag is unused in the scanned code only.",
+          "The exported files are not checked against the current project state.",
+          "Read/write direction in LAD/FBD follows the wire order and coil parts; unusual instruction pins can be classified by position only."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result.",
+          "The analysis is covered by offline Host tests; no native run is recorded yet."
         ]
       },
       "prerequisites": [
