@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "4b388f43906fbc7f51bb2c46df89c4fab9af9738e2c3339cfe4eb096dd34d962",
-      "bytes": 1873931
+      "sha256": "0dd00dfb1fc36011ca7d38bfea3e2db82ca70f604d06311443023581b17d3e1a",
+      "bytes": 1880226
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -3317,8 +3317,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs",
-      "sha256": "b3df5d9e0bff891d2508766aae786b602edc6cefaee5a4e05018f58afecd5c52",
-      "bytes": 25893
+      "sha256": "ffa565c7f3854398ccccacdd2237c1f0a37795d351f912b03bdb2333d42d50b0",
+      "bytes": 28502
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcHmiIntegrationPlanner.cs",
@@ -115649,6 +115649,27 @@
           ]
         },
         {
+          "id": "local.library_integrate.candidate_shapes.ob_event_classes_3.20261110",
+          "profileSha256": "6ea55c4a9616e1159c68495a2753b06d9b9df2d6a01713a9fffb3d30fd096f04",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.ob_event_classes_3.20261110.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.ob_combinations_4.20261110",
+          "profileSha256": "9b84f446fdf15168dd51d19a7acb8abab14cc752838e9d7e33f63d3dd016627c",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.ob_combinations_4.20261110.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.combined_apply.regression.20261110",
+          "profileSha256": "5d80040425bda1ff3eb5335c8eea28799b7b9fb52cd2cf82a2398ae25f6848fc",
+          "artifacts": [
+            "evidence/local.library_integrate.combined_apply.regression.20261110.json"
+          ]
+        },
+        {
           "id": "local.library_integrate.candidate_shapes.embedding_parent.20261107",
           "profileSha256": "2de00642514da8d5ccaad70d9184e1782aadab75f32b993528b64b087a7c8489",
           "artifacts": [
@@ -124679,6 +124700,27 @@
           "profileSha256": "59e324bb04c47b962b4be38052df06768b647500c3ecccb5dcd5fa5d72b6908f",
           "artifacts": [
             "evidence/local.library_integrate.candidate_shapes.ob_combinations_3.20261108.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.ob_event_classes_3.20261110",
+          "profileSha256": "6ea55c4a9616e1159c68495a2753b06d9b9df2d6a01713a9fffb3d30fd096f04",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.ob_event_classes_3.20261110.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.ob_combinations_4.20261110",
+          "profileSha256": "9b84f446fdf15168dd51d19a7acb8abab14cc752838e9d7e33f63d3dd016627c",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.ob_combinations_4.20261110.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.combined_apply.regression.20261110",
+          "profileSha256": "5d80040425bda1ff3eb5335c8eea28799b7b9fb52cd2cf82a2398ae25f6848fc",
+          "artifacts": [
+            "evidence/local.library_integrate.combined_apply.regression.20261110.json"
           ]
         },
         {
@@ -142133,6 +142175,11 @@
       "sha256": "0324ffb6342f7a6f5600bec992b593b50e52f214fd738e7266cc20e4fe127f4d"
     },
     {
+      "path": "evidence/local.library_integrate.candidate_shapes.ob_combinations_4.20261110.json",
+      "state": "observed",
+      "sha256": "75f71658ad28a72c56e8eb61e43fb88a2f1d5f9c044fff58843d16c971709adb"
+    },
+    {
       "path": "evidence/local.library_integrate.candidate_shapes.ob_event_classes.20261108.json",
       "state": "observed",
       "sha256": "3e0b8126266a108640b4ad41e94bc287ca39c5e2fe7d3d8b4ea22bd13cfab5d0"
@@ -142141,6 +142188,11 @@
       "path": "evidence/local.library_integrate.candidate_shapes.ob_event_classes_2.20261108.json",
       "state": "observed",
       "sha256": "70221222e7a510cf8346b7457bca9531ca9de1513a9429abc6ad78e8411ca4f8"
+    },
+    {
+      "path": "evidence/local.library_integrate.candidate_shapes.ob_event_classes_3.20261110.json",
+      "state": "observed",
+      "sha256": "8b736335716af47e1f3dc3889e09f7d55fc9ff1dc30db0f2b3423f49b2ef1a61"
     },
     {
       "path": "evidence/local.library_integrate.candidate_shapes.rerun.20261031.json",
@@ -142166,6 +142218,11 @@
       "path": "evidence/local.library_integrate.combined_apply.regression.20261102.json",
       "state": "observed",
       "sha256": "213bd2ba9f67589e10c8eeb8d6d9719bd470f3efd2ecffeffe8f6e76ad6d5a37"
+    },
+    {
+      "path": "evidence/local.library_integrate.combined_apply.regression.20261110.json",
+      "state": "observed",
+      "sha256": "222ca0f6879afae2321dd5007a0525e6328ea18db0be45291abefd37d2409cfd"
     },
     {
       "path": "evidence/local.library_integrate.combined_apply.rerun.20261028.json",
@@ -143528,12 +143585,20 @@
       "profileSha256": "59e324bb04c47b962b4be38052df06768b647500c3ecccb5dcd5fa5d72b6908f"
     },
     {
+      "id": "local.library_integrate.candidate_shapes.ob_combinations_4.20261110",
+      "profileSha256": "9b84f446fdf15168dd51d19a7acb8abab14cc752838e9d7e33f63d3dd016627c"
+    },
+    {
       "id": "local.library_integrate.candidate_shapes.ob_event_classes.20261108",
       "profileSha256": "7b39426dcefdae6d7683447ea97737b2eb2f7e402a91e4ecfe9e2a931056fd34"
     },
     {
       "id": "local.library_integrate.candidate_shapes.ob_event_classes_2.20261108",
       "profileSha256": "c5f3444f38209fad224217797d4803b97df92ebf3f34cc842bdf563237d9b203"
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.ob_event_classes_3.20261110",
+      "profileSha256": "6ea55c4a9616e1159c68495a2753b06d9b9df2d6a01713a9fffb3d30fd096f04"
     },
     {
       "id": "local.library_integrate.candidate_shapes.rerun.20261031",
@@ -143554,6 +143619,10 @@
     {
       "id": "local.library_integrate.combined_apply.regression.20261102",
       "profileSha256": "5c937e73916c20920d8c720f0459ceb7c54a32204a1d1cfc60b31613fe49911e"
+    },
+    {
+      "id": "local.library_integrate.combined_apply.regression.20261110",
+      "profileSha256": "5d80040425bda1ff3eb5335c8eea28799b7b9fb52cd2cf82a2398ae25f6848fc"
     },
     {
       "id": "local.library_integrate.combined_apply.rerun.20261028",
