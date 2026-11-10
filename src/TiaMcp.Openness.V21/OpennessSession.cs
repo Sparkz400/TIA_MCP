@@ -472,20 +472,17 @@ namespace TiaMcp.Openness.V21
                 return System.Xml.Linq.XDocument.Load(reader, System.Xml.Linq.LoadOptions.PreserveWhitespace);
         }
 
-        // A reading aid next to the unchanged native XML: each network as text, LAD/FBD logic as statements.
-        // textPath, when given, receives every network in full; the response keeps each network bounded.
+        // A reading aid next to the unchanged native XML: each network as text, LAD/FBD logic as statements; for a block without
+        // networks (a DB) its declared interface. textPath, when given, receives the complete text; the response keeps it bounded.
         private static void AddNetworkText(JObject result, System.Xml.Linq.XDocument document, string culture, string textPath = null)
         {
-            if (textPath != null)
+            var rendered = GraphicalNetworkText.Describe(document, culture, out string complete);
+            if (textPath != null && complete != null)
             {
-                File.WriteAllText(textPath, GraphicalNetworkText.Format(GraphicalNetworkText.Render(document, culture, int.MaxValue)), new System.Text.UTF8Encoding(false));
+                File.WriteAllText(textPath, complete, new System.Text.UTF8Encoding(false));
                 result["textArtifact"] = FileArtifact(new FileInfo(textPath), "text/plain");
             }
-            var networks = GraphicalNetworkText.Render(document, culture);
-            result["networks"] = new JArray(networks.Select(n => new JObject { ["number"] = n.Number, ["id"] = n.Id, ["language"] = n.Language,
-                ["title"] = n.Title, ["comment"] = n.Comment, ["text"] = n.Text, ["rendered"] = n.Rendered, ["truncated"] = n.Truncated }));
-            result["text"] = GraphicalNetworkText.Format(networks);
-            result["textCoverage"] = "LAD/FBD (FlgNet) networks: contacts, O/A/X boxes and comparators as Boolean expressions; coils, instructions and calls as statements with pin bindings (:= input, => output). Unknown instructions are shown by name and pins, not interpreted. SCL (StructuredText) networks: the source text rebuilt from its tokens. STL and other network languages are listed, not rendered. A network longer than 16384 characters is cut in the response and complete in textArtifact. The native XML artifact stays authoritative.";
+            foreach (var field in rendered.Properties()) result[field.Name] = field.Value;
         }
 
         private JObject XrefQuery(JObject args)

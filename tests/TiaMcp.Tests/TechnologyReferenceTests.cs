@@ -77,6 +77,36 @@ namespace TiaMcp.Tests
             return Task.CompletedTask;
         }
 
+        internal static Task FailedHardwareWalkIsReportedOnce()
+        {
+            // A hardware walk that throws used to leave readError without a reason, and every later reference repeated the walk.
+            var first = new DeviceItem { Name = "A" }; var second = new DeviceItem { Name = "B" };
+            var project = ProjectFor((first, "a"), (second, "b"));
+            int walks = 0;
+            IEnumerable<Device> Failing() { if (++walks > 0) throw new InvalidOperationException(new string('x', 600), new TimeoutException("portal busy")); yield break; }
+            project.Devices = Failing();
+            var values = OpennessSession.ReferenceForTest(project, new object[] { first, second, first }, out bool complete, out var coverage);
+            Check.Equal(false, complete); Check.Equal(1, walks);
+            Check.Equal(true, values.All(v => v.Value<string>("reason") == "hardwareMembershipUnavailable" && v.Value<bool>("identityComplete") == false));
+            Check.Equal("readError", coverage.Value<string>("hardwareMembershipStatus"));
+            var error = (JObject)coverage["hardwareMembershipError"]!;
+            Check.Equal(typeof(InvalidOperationException).FullName, error.Value<string>("type"));
+            Check.Equal(512, error.Value<string>("message")!.Length); Check.Equal<string?>(null, error.Value<string>("code"));
+            Check.Equal(typeof(TimeoutException).FullName, error["causes"]!.Single().Value<string>("type")); Check.Equal("portal busy", error["causes"]![0]!.Value<string>("message"));
+            // The exception text stays in the coverage; reference values carry the reason code only.
+            Check.Equal(false, values.ToString().Contains("xxx") || values.ToString().Contains("portal busy"));
+            // A typed refusal of the walk keeps its code.
+            var item = new DeviceItem(); project = ProjectFor((item, "id")); project.Devices.Single().DeviceItems = [item, item];
+            OpennessSession.ReferenceForTest(project, item, out complete, out coverage);
+            Check.Equal("AmbiguousTarget", coverage["hardwareMembershipError"]!.Value<string>("code"));
+            Check.Equal(true, coverage["hardwareMembershipError"]!.Value<string>("message")!.StartsWith("Compiler hardware identity is repeated", StringComparison.Ordinal));
+            // A complete walk reports no error.
+            project = ProjectFor((item, "id")); item.DeviceItems = [];
+            OpennessSession.ReferenceForTest(project, item, out complete, out coverage);
+            Check.Equal(true, complete); Check.Equal(JTokenType.Null, coverage["hardwareMembershipError"]!.Type);
+            return Task.CompletedTask;
+        }
+
         internal static Task FailedProvidersAndIdentityText()
         {
             foreach (string failure in new[] { "unavailable", "throw", "empty", "oversize", "unicode", "nullFind", "drift", "path" })

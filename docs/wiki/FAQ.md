@@ -35,6 +35,10 @@ project open. A completed edit with a lost response also has an evidence-based
 lock reconciliation path. Unverified recovery still holds the lock. See
 [screen recovery and long-running imports](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#screen-failure-recovery-without-closing-tia).
 
+## Why does every change take minutes on a large project?
+
+Each applied change fingerprints the project three times, saves it, writes a full recovery archive and compiles before and after the edit. None of that is skipped. To rename or readdress many PLC tags, send them as one `tag_set` change with `items`, so the sequence runs once for all of them; see [many tag edits in one change](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#many-tag-edits-in-one-change).
+
 ## Why is Classic graphic-list export blocked?
 
 A native reference-conversion failure was observed during export. Until that route

@@ -50,7 +50,7 @@ The Host reads at most 2 MiB of UTF-8 text (a BOM is dropped), inlines it as `so
 Every change result and `change_status` carry `progress`:
 
 - `projectEditComplete`, true once the change is applied and saved, or restored
-- `milestones`: prepared, checkpoint saved, recovery archive created, project changed, readback verified, compiled, compiler succeeded, saved; each `done`, `notReached`, `skipped`, `pending` or, for the compiler, `yes`/`no`/`unknown`
+- `milestones`: prepared, checkpoint saved, recovery archive created, project changed, readback verified, compiled, compiler succeeded, saved; each `done`, `notReached`, `skipped`, `pending` or, for the compiler, `yes`/`no`/`unknown`. `readbackVerified` is `done` when the change recorded a verified readback stage: `attribute_readback_verified` after an attribute write such as `tag_set`, or a stage ending in `_verified` or `_verified_after_save`. On an applied change it is `skipped` for a compile-only kind, which writes nothing to read back, and `notRecorded` for a kind that checks its result inside the mutation without recording a stage; `notRecorded` does not mean the check was left out
 - a one-line `summary`
 - `notCovered`, a reminder that repository work, MCP qualification and the running build are separate questions
 
@@ -189,6 +189,83 @@ The live scratch fixture `scripts/smoke_write_guards.py` qualified these guards 
 
 `change_status` returns the recorded state, stage list, compile diagnostics and recovery archive. The host also supplies `artifactDirectory` so a strict GUID `changeId` can read its saved journal after a host restart. A journal left at `applying`, `checkpointing` or `restoring` records an uncertain outcome; it does not prove that the last native operation completed.
 
+### Many tag edits in one change
+
+Each applied change pays for the whole safety sequence: a project fingerprint at
+prepare, again before apply and again after save, a checkpoint save with a full
+`before.zap21`, a baseline compile, the compile after the edit and the final save.
+On a large project that is minutes per change, and every applied change makes all
+other prepared previews stale (`StaleRevision`), so single edits cannot be prepared
+ahead. `tag_set` therefore also takes many edits as one change:
+
+```json
+{
+  "kind": "tag_set",
+  "payload": {
+    "items": [
+      { "tagTableName": "Drives", "memberName": "T350_Old_AddressIn", "attributes": { "Name": "T350_New_AddressIn" } },
+      { "tagTableName": "Drives", "memberName": "T350_Old_AddressOut", "attributes": { "Name": "T350_New_AddressOut" } },
+      { "tagTablePath": "<exact table path>", "memberName": "Spare", "attributes": { "LogicalAddress": "%M40.0" } }
+    ]
+  }
+}
+```
+
+`items` holds 1 to 500 edits and replaces `tagTableName`/`tagTablePath`,
+`memberName` and `attributes` at the top of the payload; giving both is refused.
+Each item names its table and tag like a single `tag_set` and may set `Name`,
+`DataTypeName` and `LogicalAddress`. The tables may differ and may sit in different
+tag-table groups, but all must belong to one software scope (the PLC or one
+software unit). `constant_set` and the other tag kinds take no `items`.
+
+The change runs the sequence once for all items: one fingerprint check, one
+checkpoint archive, one baseline compile, one compile after all edits and one save.
+The safety properties are those of a single `tag_set`:
+
+- **Preview.** `preview.items` lists every edit with its table path, tag and the
+  before and after value of each attribute. The summary result keeps the whole
+  list; it does not stop at 50 rows like other arrays. Each distinct table is
+  exported once as a backup.
+- **All or nothing before the first write.** Preparation refuses the whole change,
+  naming `items[n]`, if any item names a missing table or tag, a safety tag
+  (`SafetyBoundary`), a `LogicalAddress` inside an F-I/O address range
+  (`SafetyBoundary`), an attribute outside the three above, or a name that is
+  already taken (`ObjectExists`). Apply repeats every one of these checks for all
+  items, and checks that each attribute is writable and convertible, before it
+  writes the first tag.
+- **Names.** Two items cannot request the same new name, one tag cannot be edited
+  by two items, and a new name must be free in the software scope before the
+  change. A swap or a chain (A becomes B while B becomes C) is refused, because its
+  result would depend on the write order; apply the rename that frees the name as a
+  separate change first. A tag may keep its name or change only its case.
+- **Fingerprint.** The stale-revision fingerprint covers the requested attributes of
+  every item's tag in addition to the project-wide content.
+- **Readback.** After the writes, every item is looked up again by its final name:
+  the tag exists, a renamed tag's old name is gone, it is not a safety tag and each
+  requested attribute has the requested value. The same readback runs again after
+  compile and save. Both are journaled as `tag-batch-readback` with one row per item.
+- **Failure.** A native failure after the first write leaves the whole change
+  `recovery_required`, like any other change; `change_restore` returns the project
+  to the state before all items.
+
+`phaseTimings` in the change view and journal now also records the three
+fingerprint runs (`prepare-fingerprint`, `stale-revision-fingerprint`,
+`after-fingerprint`) next to `checkpoint-save`, `checkpoint-archive` and
+`changed-project-save`, so the cost of a change on a given project can be read from
+its journal.
+
+The batch rules (shape, bounds, name collisions, complete summary list) are covered
+by managed tests. `scripts/qualify_tag_batch.py` ran the route once natively on
+10 November 2026 in an owned scratch CPU (TIA V21): nine refusals left the table
+unchanged, a batch of five renames (one also readdressed) was applied, read back
+after the writes and after save, made an earlier prepared batch stale, and
+`change_restore` returned all five tags to their old names. Five single changes
+took 17.6 s there and the batch 3.5 s, about the cost of one single change. That
+run is not in the evidence store or the feature catalog. It covers Bool tags on
+bit memory in one table at PLC-root scope; tags that blocks reference, software
+units, and the safety-tag and F-I/O refusals of a batch on an F-CPU are not
+exercised, and no large project has been timed.
+
 ## Refresh from unchanged source
 
 To check whether regenerating a block clears compiler findings, start with `plc_compile`; it reports diagnostics without editing anything. If a refresh is still warranted, read the block's own source with `block_read` and `format: "generatedSource"` (the temporary external source is removed again), and apply exactly that text with `source_upsert`, `compile: true`.
@@ -284,7 +361,7 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `tag_table_create` | `tagTableName`, optional `scopePath`, `groupPath` | Creates one empty tag table; the name must be free in the software scope across all tag-table groups (case-insensitive). |
 | `tag_table_rename` | `tagTableName` or `tagTablePath`, `newName` | Renames one tag table; its members stay, and `newName` must be free in the software scope. |
 | `tag_table_delete` | `tagTableName` or `tagTablePath` | Deletes one empty user tag table (no tags, no user constants); the default tag table is refused with `DefaultTagTable`, a non-empty table with `TagTableNotEmpty`. |
-| `tag_set` | `tagTableName` or `tagTablePath`, `memberName`, `attributes: {...}` | Edits an existing tag's exposed writable `Name`, `DataTypeName` and/or `LogicalAddress`. A new `LogicalAddress` inside the address range of an F-I/O the PLC owns refuses at prepare with `SafetyBoundary`; nothing is written. |
+| `tag_set` | `tagTableName` or `tagTablePath`, `memberName`, `attributes: {...}`; or `items: [{tagTableName or tagTablePath, memberName, attributes}]` ([many edits in one change](#many-tag-edits-in-one-change)) | Edits an existing tag's exposed writable `Name`, `DataTypeName` and/or `LogicalAddress`. A new `LogicalAddress` inside the address range of an F-I/O the PLC owns refuses at prepare with `SafetyBoundary`; nothing is written. With `items`, 1 to 500 such edits in one software scope share one fingerprint check, checkpoint archive, compile and save; a refusal on any item refuses the whole change before a write. |
 | `constant_set` | `tagTableName` or `tagTablePath`, `memberName`, `attributes: {...}` | Edits an existing user constant's exposed writable `Name`, `DataTypeName` and/or `Value`. System constants are excluded. |
 | `tag_delete` / `constant_delete` | `tagTableName` or `tagTablePath`, `memberName`, `dependencyPolicy: "rejectReferenced"` | Deletes exactly one existing tag or user constant after dependency checks. |
 | `tag_create` | `tagTableName` or `tagTablePath`, `name`, `dataTypeName`, `logicalAddress` | Creates one tag in an existing table. Names already used by a tag or constant in the software scope are rejected. An absolute I/O address inside the address range of an F-I/O the PLC owns refuses at prepare with `SafetyBoundary` (TIA would make it a safety tag), before anything is created; a created tag TIA still reports as a safety tag fails verification. Readback is exact, so use native spelling such as `%M0.0`. The F-I/O refusal of `tag_create`, `tag_set`, `tag_table_import_xml`, project-ward `vci_synchronize` and tag-table `library_instantiate` was rechecked natively on an F-CPU with ET 200SP F-DI (`local.safety.fio-routes.20261101`). |
@@ -415,7 +492,9 @@ In a large project `project_inventory` and `software_inspect` hit `maxItems` bef
 - `namePrefix`: a case-insensitive prefix of block names (`project_inventory`) or of block, tag-table, type and technology-object names (`software_inspect`).
 - `includeHardware: false` (`project_inventory` only) leaves out device rows. Without it, device rows also count against `maxItems`, so combine it with a block filter.
 
-The walk itself is bounded separately at 200,000 visited objects; `filter.walkTruncated` and `completeness` report when it stops early. `software_inspect` still lists every software scope and unit relation. The V19 adapter refuses these filters with `UnsupportedOnTiaVersion`.
+The walk itself is bounded separately at 200,000 visited objects; `filter.walkTruncated` and `completeness` report when it stops early. `software_inspect` still lists every software scope and unit relation.
+
+Group paths (`softwareScopes[].groups`) never count against `maxItems`. They have their own bound of the same size, shared by all scopes of one read; when it cuts the list, the scope carries `groupsTruncated`, `groupTruncation` gives the count, and `completeness.truncated` is set. `namePrefix` does not narrow group paths, only `groupPath` does. With `include` the group paths are left out, because the call names the sections it wants; `groupCoverage` says which applies. The V19 adapter refuses these filters with `UnsupportedOnTiaVersion`.
 
 `xref_query` on a global DB returns every reference to every member, which truncates at 2,000 items long before a question like "is `Real[210]` used anywhere?" is answered. Pass `memberPath`, relative to the queried block:
 
@@ -445,7 +524,7 @@ These read-only routes are verified (`local.read_contracts.20261028`); its fixtu
 
 ### Reading networks as text
 
-`block_read` with `render: "text"` adds each network as readable text next to the unchanged XML artifact: `networks[]` with `number`, `id`, `language`, `title`, `comment` and `text`, and `text` for the whole block. For example:
+`block_read` with `render: "text"` adds each network as readable text next to the unchanged XML artifact: `networks[]` with `number`, `id`, `language`, `title`, `comment` and `text`. The whole block in one piece is the `textArtifact` file; the response does not repeat it. For example:
 
 ```text
 Network 3: Downholder enable [LAD, ID 1A]
@@ -458,7 +537,20 @@ Contacts, `O`/`A`/`X` boxes and comparators become Boolean expressions; negation
 
 The response cuts a network after 16,384 characters (`truncated`); `textArtifact` is a UTF-8 file next to the XML with every network in full. If the rendering fails, the read still succeeds and `textUnavailable` gives the reason.
 
-To read or search a whole program, use `block_export` instead of one `block_read` per block. It selects blocks like `project_inventory` (`groupPath`, `namePrefix`) and by `kinds` (default `FB,FC,OB`), exports each as XML and as a text file into the exports directory, and returns one row per block with both file names and no block content. The same rows are written to `index`. Know-how protected blocks and blocks TIA refuses to export are rows with `skipped`. A call exports at most `maxBlocks` blocks (default 200, up to 500) in path order; continue with `nextOffset`. The batch is not atomic: an edit in TIA between two exports is not detected.
+A block without networks, such as a data block, is rendered as its declared interface instead. `networks` is empty and `interface` holds `text`, `members` (the number of declared members) and `truncated`:
+
+```text
+Interface of "DB3000" [GlobalDB]
+Static
+  Enable : Bool := TRUE {Retain}  // Release of the station
+  Item : "SampleType"
+    Samples : Array[-2..2] of Int
+      [2] := 23
+```
+
+Each line is a member with its data type, start value, a retain setting other than `NonRetain` and its comment. Members of structures and PLC data types are indented below their parent, and array elements appear only where the export declares them. These are offline declarations, not runtime values. The same 16,384-character bound applies, and `textArtifact` holds the complete text. `textCoverage` says which of the two forms was rendered. A block with neither networks nor interface members has no text form: no text file is written and `textUnavailable` says so.
+
+To read or search a whole program, use `block_export` instead of one `block_read` per block. It selects blocks like `project_inventory` (`groupPath`, `namePrefix`) and by `kinds` (default `FB,FC,OB`), exports each as XML and as a text file into the exports directory, and returns one row per block with both file names and no block content. A data block's text file is its declared interface (select data blocks with `kinds: "GlobalDB,InstanceDB"`); a block with no text form has no `text` file name and a `textUnavailable` reason. The same rows are written to `index`. Know-how protected blocks and blocks TIA refuses to export are rows with `skipped`. A call exports at most `maxBlocks` blocks (default 200, up to 500) in path order; continue with `nextOffset`. The batch is not atomic: an edit in TIA between two exports is not detected.
 
 To check the I/O of a program:
 
@@ -833,4 +925,13 @@ fields. The independent reference budget is 50,000 native reads; per-value text
 remains bounded. `persistenceVerified: false` and `atomicSnapshot: false` retain
 cross-session and consistency limitations. Fresh qualification rejects older
 name-only projections even if they have matching display fields.
+
+A hardware reference is resolved against one walk of the project's hardware
+(`hardwareMembershipStatus`). If that walk fails, the status is `readError` and
+`hardwareMembershipError` keeps the exception `type`, the worker's error `code`
+when it has one, the first 512 characters of the `message` and up to four inner
+exceptions in `causes`. The walk is not
+repeated: every hardware and channel reference of that read is unresolved with
+reason `hardwareMembershipUnavailable`, while values that need no hardware
+path, such as addresses, are still read.
 [Executed checks and native gates](../verification/technology-references-20261017.md).

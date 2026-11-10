@@ -113,13 +113,20 @@ namespace TiaMcp.Tests
                         if (fault == "nullReadback") { t.Values["First"] = null; t.Attributes[0].SupportedTypes = [typeof(int)]; }
                     }
                 };
+                long failedBefore = OpennessSession.AttributeReadbacksForTest;
                 Action act = () => OpennessSession.ApplyAttributesForTest(t, Request(("First", 2), ("Second", 2), ("Third", 2)), Allowed);
                 if (fault is "setter" or "getterReadback") await Check.ThrowsAsync<InvalidOperationException>(() => { act(); return Task.CompletedTask; });
                 else await Refuse(fault == "permission" ? "AttributeNotWritable" : fault == "type" ? "PreviewStale" : fault == "accessReadback" ? "AttributeNotReadable" : "MutationVerificationFailed", act);
                 Check.Equal(fault is "permission" or "type" ? "First" : fault == "setter" ? "First,Second" : "First,Second,Third", string.Join(',', t.Writes));
+                Check.Equal(failedBefore, OpennessSession.AttributeReadbacksForTest);
             }
+            // A matched read-back is counted, so an apply can record it as a verified stage; a write of nothing is not one.
+            long before = OpennessSession.AttributeReadbacksForTest;
             var readOnly = new Target(); readOnly.AfterWrite = (_, _) => readOnly.Attributes[0].AccessMode = EngineeringAttributeAccessMode.Read;
             OpennessSession.ApplyAttributesForTest(readOnly, Request(("First", 2)), Allowed); Check.Equal(1, readOnly.Writes.Count);
+            Check.Equal(before + 1, OpennessSession.AttributeReadbacksForTest);
+            OpennessSession.ApplyAttributesForTest(new Target(), Request(), Allowed);
+            Check.Equal(before + 1, OpennessSession.AttributeReadbacksForTest);
         }
 
         private enum Choice { First, Second }
@@ -168,6 +175,7 @@ namespace TiaMcp.Openness.V21
     {
         internal static JArray PreviewAttributesForTest(IEngineeringObject target, JObject attributes, HashSet<string> allowed) => PrepareAttributes(target, attributes, allowed);
         internal static void ApplyAttributesForTest(IEngineeringObject target, JObject attributes, HashSet<string> allowed) => ApplyAttributes(target, attributes, allowed);
+        internal static long AttributeReadbacksForTest => System.Threading.Interlocked.Read(ref _attributeReadbacks);
         internal static Dictionary<string, object> NormalizedAttributesForTest(IEngineeringObject target, JObject attributes, HashSet<string> allowed)
         { PrepareAttributes(target, attributes, allowed, out var converted); return converted; }
     }
