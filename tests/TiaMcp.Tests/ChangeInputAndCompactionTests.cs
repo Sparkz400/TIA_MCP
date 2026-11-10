@@ -159,6 +159,31 @@ internal static class ChangeInputAndCompactionTests
         return Task.CompletedTask;
     }
 
+    // tag_set with payload.items: the summary lists every edit although other arrays stop at MaxArray.
+    internal static Task TagBatchSummariesListEveryItem()
+    {
+        int count = ChangeResultCompaction.MaxArray * 3;
+        JsonArray Rows(Func<int, JsonNode> row) => new(Enumerable.Range(0, count).Select(row).ToArray());
+        var view = new JsonObject
+        {
+            ["changeId"] = "c3", ["state"] = "prepared", ["previewHash"] = "h3",
+            ["preview"] = new JsonObject
+            {
+                ["kind"] = "tag_set", ["effects"] = new JsonArray(new JsonObject { ["action"] = "tag_set", ["itemCount"] = count }),
+                ["items"] = Rows(i => new JsonObject { ["index"] = i, ["tagTableName"] = "Tags", ["memberName"] = "Old" + i,
+                    ["attributes"] = new JsonArray(new JsonObject { ["name"] = "Name", ["before"] = "Old" + i, ["after"] = "New" + i }) }),
+                ["payload"] = new JsonObject { ["items"] = Rows(i => new JsonObject { ["memberName"] = "Old" + i }) },
+            },
+        };
+        var summary = ChangeResultCompaction.Compact(view)!["preview"]!;
+        var items = summary["items"]!.AsArray();
+        Check.Equal(count, items.Count);
+        Check.Equal("New" + (count - 1), items[count - 1]!["attributes"]![0]!["after"]!.GetValue<string>());
+        // The echoed request stays bounded; preview.items is the complete list.
+        Check.Equal(ChangeResultCompaction.MaxArray + 1, summary["payload"]!["items"]!.AsArray().Count);
+        return Task.CompletedTask;
+    }
+
     internal static Task ChangeStatusJournalsAreSummarized()
     {
         var status = new JsonObject

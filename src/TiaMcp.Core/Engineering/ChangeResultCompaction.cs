@@ -42,6 +42,8 @@ public static class ChangeResultCompaction
             var summary = new JsonObject();
             foreach (string name in PreviewFields)
                 if (preview[name] is { } value) summary[name] = Bound(value.DeepClone());
+            // A tag_set batch lists every edit: the worker bounds the item count, so only strings are bounded here.
+            if (preview["items"] is JsonArray items) summary["items"] = new JsonArray(items.Select(item => Bound(item?.DeepClone())).ToArray());
             if (preview["payload"] is JsonObject payload) summary["payload"] = Payload(payload);
             if (preview["intent"] is JsonObject intent)
                 summary["intent"] = new JsonObject { ["conflicts"] = Bound(intent["conflicts"]?.DeepClone()), ["previouslyConfirmed"] = Bound(intent["previouslyConfirmed"]?.DeepClone()) };
