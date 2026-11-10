@@ -110,6 +110,47 @@ Existing safety-tag tables are
 refused, F-I/O address checks still run, and a native safety tag discovered after
 import fails verification with the checkpoint retained.
 
+### Tag rows and the hardware cross-check
+
+`tag_table_import_xml` also takes rows instead of SimaticML, for example an I/O list:
+
+```json
+{ "tagTableName": "Station1_IO", "commentCulture": "en-US",
+  "tags": [ { "name": "S1_StartButton", "dataType": "Bool", "logicalAddress": "%I0.0", "comment": "-S1 start" },
+            { "name": "S1_Speed", "dataType": "Int", "logicalAddress": "%QW4" } ] }
+```
+
+The worker exports the named table, merges the rows into that export and imports the
+result through the same checks, readback and scoped restore as the XML form. A row
+whose name matches an existing tag (case-insensitive) sets its data type, address and,
+when given, comment; other rows are added; members no row names stay as exported. A
+table that does not exist is created, in `groupPath` when given. `xml` and
+`expectedTableNames` cannot be combined with rows.
+
+- 1 to 2000 rows; names unique. Each address is an absolute I, Q or M bit, byte, word,
+  double-word or long-word address and is normalized to the exported spelling
+  (`e1.2` becomes `%I1.2`); elementary type names likewise (`BOOL` becomes `Bool`).
+- Comments need an active project language: `commentCulture`, else the reference language.
+- Rows cannot rename or delete a tag, or change a constant.
+
+Both forms report `preview.hardwareCrossCheck`. It compares every imported tag on an
+absolute I or Q address with the I/O address ranges of configured hardware the PLC owns
+or may own, and each elementary data type width with its address width. Findings are
+`noConfiguredAddress`, `partlyConfigured` and `dataTypeWidthMismatch` (at most 100
+listed, all counted). The check is advisory: `status` is `passed`, `findings` or
+`unavailable` (the hardware configuration could not be read), and none of them refuses
+or delays the import; a preview warning names findings and an unavailable check. It
+does not show that a signal is wired to an address. The F-I/O address refusal
+(`SafetyBoundary`) is separate and still blocks.
+
+`scripts/qualify_tag_rows.py` exercised both natively on 10 November 2026 in an owned V21
+scratch (CPU 1511-1 PN with one DI 16x24VDC HF): rows created a table, then added to and
+updated it while an unnamed tag stayed, and an import with all three findings applied,
+compiled and read back. V21 itself accepted a `Word` tag on a byte address, so
+`dataTypeWidthMismatch` is a hint about the list, not a predicted import failure. No
+evidence record is retained for that run; the `unavailable` status, software units and
+distributed I/O are covered by offline rule checks only.
+
 With `compile=true`, the checkpoint precedes a baseline compile and the import.
 Complete diagnostics are compared after import; existing errors may remain or
 disappear, but new/changed errors or warnings, changed compiler targets, and
@@ -239,7 +280,7 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `plc_type_import_xml` | `xml`, `expectedTypeNames: [...]` | Native `SW.Types.PlcStruct` XML import. Protected existing types are rejected. |
 | `type_rename` | `typeName` or `typePath`, `newName` | Native rename of one unprotected UDT within its existing group, software scope and namespace. |
 | `type_delete` | `typeName` or `typePath`, `dependencyPolicy: "rejectReferenced"` | Deletes one unprotected UDT only after the conservative offline dependency scan succeeds. |
-| `tag_table_import_xml` | `xml`, `expectedTableNames: [...]` | Native `SW.Tags.PlcTagTable` import. Tag collisions outside the previewed tables are rejected, and so is any imported tag on an absolute I/O address inside the address range of an F-I/O the PLC owns (`SafetyBoundary` at prepare, before anything is imported). |
+| `tag_table_import_xml` | `xml`, `expectedTableNames: [...]`; or `tagTableName`, `tags: [...]` ([row form](#tag-rows-and-the-hardware-cross-check)) | Native `SW.Tags.PlcTagTable` import. Tag collisions outside the previewed tables are rejected, and so is any imported tag on an absolute I/O address inside the address range of an F-I/O the PLC owns (`SafetyBoundary` at prepare, before anything is imported). |
 | `tag_table_create` | `tagTableName`, optional `scopePath`, `groupPath` | Creates one empty tag table; the name must be free in the software scope across all tag-table groups (case-insensitive). |
 | `tag_table_rename` | `tagTableName` or `tagTablePath`, `newName` | Renames one tag table; its members stay, and `newName` must be free in the software scope. |
 | `tag_table_delete` | `tagTableName` or `tagTablePath` | Deletes one empty user tag table (no tags, no user constants); the default tag table is refused with `DefaultTagTable`, a non-empty table with `TagTableNotEmpty`. |
