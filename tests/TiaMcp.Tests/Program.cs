@@ -344,6 +344,7 @@ internal static partial class Program
             ("Tag import fingerprints ignore serialization but retain declaration changes", TagTableImportTests.ContentFingerprint),
             ("Tag import compilation tolerates only existing complete diagnostics", TagTableImportTests.CompileDelta),
             ("Compile baselines classify existing, resolved and introduced findings", TagTableImportTests.CompileBaselineClassification),
+            ("Compile baselines list warnings outside the change's own objects as revealed", TagTableImportTests.WarningsOutsideTheChangesOwnObjectsAreRevealed),
             ("Source refresh separates number, interface and body, ignoring serialization IDs", TagTableImportTests.SourceRefreshParts),
             ("Unresolved symbols are listed from compiler messages without guessing", TagTableImportTests.UnresolvedSymbols),
             ("Confirmed intent is recorded, compared and never evaluated", TagTableImportTests.ConfirmedIntent),

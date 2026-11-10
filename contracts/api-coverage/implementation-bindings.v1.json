@@ -2507,8 +2507,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/CompileBaselineRules.cs",
-      "sha256": "740e11117bf7612abf5f1a66d00d01bafcb4b2032ec430a1fa3abeb66800f3f6",
-      "bytes": 4741
+      "sha256": "37a11a4a8af903b0adf6f332c166278e689a7237db288ea05861eefc6856b03a",
+      "bytes": 6871
     },
     {
       "path": "src/TiaMcp.Openness.V21/CompileOnlyRules.cs",
@@ -2752,8 +2752,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
-      "sha256": "78383fd78ef37b1314006d04cf8bf9297a8f7c5baa5cf5e0625fe93486c56d41",
-      "bytes": 154109
+      "sha256": "5bb6860a701205710488df5638cdea1d78be1f5318184ff5f2fc41f95f7b9419",
+      "bytes": 154261
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ClassicScreenArea.cs",
