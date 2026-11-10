@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "02052b5f98d17b974723e4c7bccb175691975815891e22c21dee4276c7495862",
-      "bytes": 1870116
+      "sha256": "4b388f43906fbc7f51bb2c46df89c4fab9af9738e2c3339cfe4eb096dd34d962",
+      "bytes": 1873931
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -119230,6 +119230,13 @@
           "artifacts": [
             "evidence/local.plc_object_mutations.audit.20261102.json"
           ]
+        },
+        {
+          "id": "local.plc_object_mutations.audit.20261110",
+          "profileSha256": "8b5d0182430ee5dc9f074eac75b503b64691a2d0027c8e6d40a258a540285ab1",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.audit.20261110.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -119307,6 +119314,13 @@
           "profileSha256": "8ac284451f6a3f3ebc8f834d0dd664ae3cc8d05a679d451dfbedcce53e939b47",
           "artifacts": [
             "evidence/local.plc_object_mutations.audit.20261102.json"
+          ]
+        },
+        {
+          "id": "local.plc_object_mutations.audit.20261110",
+          "profileSha256": "8b5d0182430ee5dc9f074eac75b503b64691a2d0027c8e6d40a258a540285ab1",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.audit.20261110.json"
           ]
         }
       ],
@@ -142299,6 +142313,11 @@
       "sha256": "82de4e79d21d9aec318eadc9c08dd3294d06152ae047107e884a5ef1cc1c32bf"
     },
     {
+      "path": "evidence/local.plc_object_mutations.audit.20261110.json",
+      "state": "observed",
+      "sha256": "dafded2e30c5ff03e7ec3320ff6b3a3af1098e61e29bb629b9460fb9e5f95066"
+    },
+    {
       "path": "evidence/local.plc_object_mutations.rerun.20261028.json",
       "state": "observed",
       "sha256": "6e3ec873adb7c4c2595812c2a86fefb6117bea997c4f11d40737d5937897cb59"
@@ -143651,6 +143670,10 @@
     {
       "id": "local.plc_object_mutations.audit.20261102",
       "profileSha256": "8ac284451f6a3f3ebc8f834d0dd664ae3cc8d05a679d451dfbedcce53e939b47"
+    },
+    {
+      "id": "local.plc_object_mutations.audit.20261110",
+      "profileSha256": "8b5d0182430ee5dc9f074eac75b503b64691a2d0027c8e6d40a258a540285ab1"
     },
     {
       "id": "local.plc_object_mutations.rerun.20261028",
