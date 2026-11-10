@@ -48,12 +48,15 @@ class FakeHarness:
                 "stages": ["prechange_project_saved", "change_finished_with_failure"]}
 
 
+PROJECT = "D:/a/S.ap21"  # A constant, so the fake log is not written from run state that tool results set.
+
+
 class FakeRun(q.Run):
     """Prepares into a folder and appends applied decisions to the decision log as the worker does."""
 
     def __init__(self, folder):
         super().__init__(FakeHarness())
-        self.plc, self.project, self.folder, self.refusals = P, "D:/a/S.ap21", pathlib.Path(folder), []
+        self.plc, self.project, self.folder, self.refusals, self.intents = P, PROJECT, pathlib.Path(folder), [], {}
 
     def state(self):
         return {}
@@ -66,14 +69,16 @@ class FakeRun(q.Run):
         (directory / "journal.json").write_text(json.dumps({"preview": shown}), encoding="utf-8")
         if "source" in payload:
             (directory / "requested.scl").write_bytes(codecs.BOM_UTF8 + payload["source"].encode("utf-8"))
+        self.intents[directory.name] = intent  # The log is written from the test's own data, not from a tool result.
         return {"changeId": directory.name, "previewHash": "h", "journalPath": str(directory / "journal.json"), "preview": shown, "intent": intent}
 
     def finish(self, label, kind, prepared, **expected):
         readbacks = []
         try:
             with (self.folder / "changes" / "intent-decisions.jsonl").open("a", encoding="utf-8") as log:
-                for decision in prepared["intent"]["decisions"]:
-                    log.write(json.dumps({"projectPath": self.project, "changeId": prepared["changeId"], **{k: decision[k] for k in ("id", "statement", "target")}}) + "\n")
+                change = next(name for name in self.intents if name == prepared["changeId"])
+                for decision in self.intents[change]["decisions"]:
+                    log.write(json.dumps({"projectPath": PROJECT, "changeId": change, **{k: decision[k] for k in ("id", "statement", "target")}}) + "\n")
         except OSError as error:
             readbacks.append({"role": "intent-log-write-failure", "message": str(error)})
         return prepared, {"readbacks": readbacks}
