@@ -59,6 +59,7 @@ namespace TiaMcp.Openness.V21
             var scopes = SoftwareScopes(plc, walk, warnings).Where(scope => string.IsNullOrWhiteSpace(args.Value<string>("scopePath")) || scope.Path == args.Value<string>("scopePath")).ToList();
             if (!string.IsNullOrWhiteSpace(args.Value<string>("scopePath"))) RequireOne(scopes.Count, budget, "PLC or software-unit scope");
             var result = Envelope();
+            var groupListing = new SoftwareGroupListing(filter, sections != null, Limit(args, 500));
             var units = new JArray();
             var blocks = new JArray();
             var tables = new JArray();
@@ -69,15 +70,14 @@ namespace TiaMcp.Openness.V21
                     ["identity"] = IdentityInfo(plc.Project, plc.Path, scope.Path, scope.Path, scope.Kind, scope.Name) };
                 units.Add(scopeInfo);
                 scopeInfo["namespacePreset"] = scope.Unit?.NamespacePreset;
-                var groups = new JArray(); scopeInfo["groups"] = groups;
-                foreach (string groupPath in EngineeringGroupPaths(scope.Blocks, scope.Path + "/blocks", 0)
-                    .Concat(EngineeringGroupPaths(scope.Types, scope.Path + "/types", 0))
-                    .Concat(EngineeringGroupPaths(scope.Tags, scope.Path + "/tags", 0))
-                    .Concat(scope.Path == plc.Path ? EngineeringGroupPaths(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", 0) : Enumerable.Empty<string>()))
+                if (groupListing.Listed)
                 {
-                    if (!filter.ContainsGroup(groupPath)) continue;
-                    if (!budget.Take()) break;
-                    groups.Add(groupPath);
+                    // Group paths never take maxItems: with many groups they used it up before any requested section was read.
+                    scopeInfo["groups"] = new JArray(groupListing.Take(EngineeringGroupPaths(scope.Blocks, scope.Path + "/blocks", 0)
+                        .Concat(EngineeringGroupPaths(scope.Types, scope.Path + "/types", 0))
+                        .Concat(EngineeringGroupPaths(scope.Tags, scope.Path + "/tags", 0))
+                        .Concat(scope.Path == plc.Path ? EngineeringGroupPaths(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", 0) : Enumerable.Empty<string>()), out bool groupsCut));
+                    if (groupsCut) scopeInfo["groupsTruncated"] = true;
                 }
                 if (scope.Unit != null)
                 {
@@ -167,7 +167,14 @@ namespace TiaMcp.Openness.V21
             result["types"] = types;
             result["technologyObjects"] = technology;
             result["technologyBlockMembership"] = technologyMembership.Coverage(budget.Truncated);
-            result["groupCoverage"] = "Complete bounded user-group paths, including empty groups; native system-group objects are included in their object inventories.";
+            result["groupCoverage"] = groupListing.Coverage;
+            if (groupListing.Truncated)
+            {
+                result["groupTruncation"] = new JObject { ["listed"] = groupListing.Count, ["limit"] = Limit(args, 500),
+                    ["detail"] = "Group paths after " + groupListing.Count + " are not listed; scopes with groupsTruncated are incomplete and later scopes list none.",
+                    ["hint"] = "Raise maxItems or narrow the read with groupPath or scopePath. Blocks, tag tables, types and technology objects are not affected." };
+                budget.Truncated = true;
+            }
             result["warnings"] = warnings;
             if (sections != null) result["include"] = new JArray(sections.OrderBy(section => section, StringComparer.Ordinal));
             if (truncation != null) result["truncation"] = truncation;
