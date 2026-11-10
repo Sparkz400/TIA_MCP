@@ -23,6 +23,30 @@ internal static class SoftwareObjectFilterTests
         return Task.CompletedTask;
     }
 
+    internal static Task GroupPathsHaveTheirOwnBound()
+    {
+        // namePrefix does not narrow groups: on a project with more groups than maxItems they used to take the whole item budget.
+        var groups = Enumerable.Range(0, 100).Select(i => Plc + "/blocks/groups/G" + i).ToArray();
+        int read = 0;
+        IEnumerable<string> Source() { foreach (var path in groups) { read++; yield return path; } }
+        var listing = new SoftwareGroupListing(new SoftwareObjectFilter(null, "Const"), includeGiven: false, maximum: 60);
+        var first = listing.Take(Source(), out bool cut);
+        Check.Equal(60, first.Count); Check.Equal(true, cut); Check.Equal(true, listing.Truncated); Check.Equal(61, read);
+        Check.Equal(0, listing.Take(Source(), out cut).Count); Check.Equal(true, cut);
+        Check.Equal(true, listing.Coverage.Contains("groupTruncation", StringComparison.Ordinal));
+        // The bound is shared by all scopes of one read; a scope that fits is complete.
+        var fits = new SoftwareGroupListing(new SoftwareObjectFilter("G1", null), false, 60);
+        Check.Equal(1, fits.Take(groups, out cut).Count); Check.Equal(false, cut); Check.Equal(false, fits.Truncated);
+        Check.Equal(false, fits.Coverage.Contains("groupTruncation", StringComparison.Ordinal));
+        // include names the sections to read; group paths are not read at all then.
+        read = 0;
+        var omitted = new SoftwareGroupListing(new SoftwareObjectFilter(null, "Const"), includeGiven: true, maximum: 60);
+        Check.Equal(false, omitted.Listed);
+        Check.Equal(0, omitted.Take(Source(), out cut).Count); Check.Equal(false, cut); Check.Equal(0, read); Check.Equal(false, omitted.Truncated);
+        Check.Equal(true, omitted.Coverage.StartsWith("Group paths are not listed when include is given", StringComparison.Ordinal));
+        return Task.CompletedTask;
+    }
+
     internal static Task FullGroupPathsAndNamePrefixes()
     {
         var path = new SoftwareObjectFilter(Plc + "/blocks/groups/Station%203000/", null);

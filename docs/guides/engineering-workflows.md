@@ -50,7 +50,7 @@ The Host reads at most 2 MiB of UTF-8 text (a BOM is dropped), inlines it as `so
 Every change result and `change_status` carry `progress`:
 
 - `projectEditComplete`, true once the change is applied and saved, or restored
-- `milestones`: prepared, checkpoint saved, recovery archive created, project changed, readback verified, compiled, compiler succeeded, saved; each `done`, `notReached`, `skipped`, `pending` or, for the compiler, `yes`/`no`/`unknown`
+- `milestones`: prepared, checkpoint saved, recovery archive created, project changed, readback verified, compiled, compiler succeeded, saved; each `done`, `notReached`, `skipped`, `pending` or, for the compiler, `yes`/`no`/`unknown`. `readbackVerified` is `done` when the change recorded a verified readback stage: `attribute_readback_verified` after an attribute write such as `tag_set`, or a stage ending in `_verified` or `_verified_after_save`. On an applied change it is `skipped` for a compile-only kind, which writes nothing to read back, and `notRecorded` for a kind that checks its result inside the mutation without recording a stage; `notRecorded` does not mean the check was left out
 - a one-line `summary`
 - `notCovered`, a reminder that repository work, MCP qualification and the running build are separate questions
 
@@ -541,7 +541,9 @@ In a large project `project_inventory` and `software_inspect` hit `maxItems` bef
 - `namePrefix`: a case-insensitive prefix of block names (`project_inventory`) or of block, tag-table, type and technology-object names (`software_inspect`).
 - `includeHardware: false` (`project_inventory` only) leaves out device rows. Without it, device rows also count against `maxItems`, so combine it with a block filter.
 
-The walk itself is bounded separately at 200,000 visited objects; `filter.walkTruncated` and `completeness` report when it stops early. `software_inspect` still lists every software scope and unit relation. The V19 adapter refuses these filters with `UnsupportedOnTiaVersion`.
+The walk itself is bounded separately at 200,000 visited objects; `filter.walkTruncated` and `completeness` report when it stops early. `software_inspect` still lists every software scope and unit relation.
+
+Group paths (`softwareScopes[].groups`) never count against `maxItems`. They have their own bound of the same size, shared by all scopes of one read; when it cuts the list, the scope carries `groupsTruncated`, `groupTruncation` gives the count, and `completeness.truncated` is set. `namePrefix` does not narrow group paths, only `groupPath` does. With `include` the group paths are left out, because the call names the sections it wants; `groupCoverage` says which applies. The V19 adapter refuses these filters with `UnsupportedOnTiaVersion`.
 
 `xref_query` on a global DB returns every reference to every member, which truncates at 2,000 items long before a question like "is `Real[210]` used anywhere?" is answered. Pass `memberPath`, relative to the queried block:
 
@@ -571,7 +573,7 @@ These read-only routes are verified (`local.read_contracts.20261028`); its fixtu
 
 ### Reading networks as text
 
-`block_read` with `render: "text"` adds each network as readable text next to the unchanged XML artifact: `networks[]` with `number`, `id`, `language`, `title`, `comment` and `text`, and `text` for the whole block. For example:
+`block_read` with `render: "text"` adds each network as readable text next to the unchanged XML artifact: `networks[]` with `number`, `id`, `language`, `title`, `comment` and `text`. The whole block in one piece is the `textArtifact` file; the response does not repeat it. For example:
 
 ```text
 Network 3: Downholder enable [LAD, ID 1A]
@@ -584,7 +586,20 @@ Contacts, `O`/`A`/`X` boxes and comparators become Boolean expressions; negation
 
 The response cuts a network after 16,384 characters (`truncated`); `textArtifact` is a UTF-8 file next to the XML with every network in full. If the rendering fails, the read still succeeds and `textUnavailable` gives the reason.
 
-To read or search a whole program, use `block_export` instead of one `block_read` per block. It selects blocks like `project_inventory` (`groupPath`, `namePrefix`) and by `kinds` (default `FB,FC,OB`), exports each as XML and as a text file into the exports directory, and returns one row per block with both file names and no block content. The same rows are written to `index`. Know-how protected blocks and blocks TIA refuses to export are rows with `skipped`. A call exports at most `maxBlocks` blocks (default 200, up to 500) in path order; continue with `nextOffset`. The batch is not atomic: an edit in TIA between two exports is not detected.
+A block without networks, such as a data block, is rendered as its declared interface instead. `networks` is empty and `interface` holds `text`, `members` (the number of declared members) and `truncated`:
+
+```text
+Interface of "DB3000" [GlobalDB]
+Static
+  Enable : Bool := TRUE {Retain}  // Release of the station
+  Item : "SampleType"
+    Samples : Array[-2..2] of Int
+      [2] := 23
+```
+
+Each line is a member with its data type, start value, a retain setting other than `NonRetain` and its comment. Members of structures and PLC data types are indented below their parent, and array elements appear only where the export declares them. These are offline declarations, not runtime values. The same 16,384-character bound applies, and `textArtifact` holds the complete text. `textCoverage` says which of the two forms was rendered. A block with neither networks nor interface members has no text form: no text file is written and `textUnavailable` says so.
+
+To read or search a whole program, use `block_export` instead of one `block_read` per block. It selects blocks like `project_inventory` (`groupPath`, `namePrefix`) and by `kinds` (default `FB,FC,OB`), exports each as XML and as a text file into the exports directory, and returns one row per block with both file names and no block content. A data block's text file is its declared interface (select data blocks with `kinds: "GlobalDB,InstanceDB"`); a block with no text form has no `text` file name and a `textUnavailable` reason. The same rows are written to `index`. Know-how protected blocks and blocks TIA refuses to export are rows with `skipped`. A call exports at most `maxBlocks` blocks (default 200, up to 500) in path order; continue with `nextOffset`. The batch is not atomic: an edit in TIA between two exports is not detected.
 
 To check the I/O of a program:
 
@@ -959,4 +974,13 @@ fields. The independent reference budget is 50,000 native reads; per-value text
 remains bounded. `persistenceVerified: false` and `atomicSnapshot: false` retain
 cross-session and consistency limitations. Fresh qualification rejects older
 name-only projections even if they have matching display fields.
+
+A hardware reference is resolved against one walk of the project's hardware
+(`hardwareMembershipStatus`). If that walk fails, the status is `readError` and
+`hardwareMembershipError` keeps the exception `type`, the worker's error `code`
+when it has one, the first 512 characters of the `message` and up to four inner
+exceptions in `causes`. The walk is not
+repeated: every hardware and channel reference of that read is unresolved with
+reason `hardwareMembershipUnavailable`, while values that need no hardware
+path, such as addresses, are still read.
 [Executed checks and native gates](../verification/technology-references-20261017.md).

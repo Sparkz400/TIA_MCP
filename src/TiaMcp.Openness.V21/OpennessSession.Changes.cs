@@ -227,8 +227,10 @@ namespace TiaMcp.Openness.V21
                     }
                     if (!IsCompileOnlyKind(change.Kind))
                     {
+                        long attributeReadbacks = System.Threading.Interlocked.Read(ref _attributeReadbacks);
                         ApplyEngineeringMutation(change, project);
                         change.Stages.Add("mutation_applied");
+                        if (System.Threading.Interlocked.Read(ref _attributeReadbacks) != attributeReadbacks) change.Stages.Add("attribute_readback_verified");
                         // Durable stage boundaries tell reconciliation how far an interrupted apply got.
                         WriteChangeJournal(change);
                     }

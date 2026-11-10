@@ -49,4 +49,40 @@ namespace TiaMcp.Openness.V21
             return true;
         }
     }
+
+    /// <summary>The user-group paths software_inspect lists per scope. They have their own bound (the value of maxItems, counted
+    /// apart from it), so a project with many groups cannot use up the item budget before a requested section is read. With
+    /// include the caller named the sections to read; group paths are not one of them and are left out.</summary>
+    internal sealed class SoftwareGroupListing
+    {
+        private readonly SoftwareObjectFilter _filter;
+        private readonly int _maximum;
+
+        internal bool Listed { get; }
+        internal int Count { get; private set; }
+        internal bool Truncated { get; private set; }
+
+        internal SoftwareGroupListing(SoftwareObjectFilter filter, bool includeGiven, int maximum)
+        { _filter = filter; _maximum = maximum; Listed = !includeGiven; }
+
+        /// <summary>The paths of one scope that are listed; stops reading the source at the bound.</summary>
+        internal System.Collections.Generic.List<string> Take(System.Collections.Generic.IEnumerable<string> groupPaths, out bool truncated)
+        {
+            var listed = new System.Collections.Generic.List<string>();
+            truncated = false;
+            if (!Listed) return listed;
+            foreach (string path in groupPaths)
+            {
+                if (!_filter.ContainsGroup(path)) continue;
+                if (Count >= _maximum) { truncated = Truncated = true; break; }
+                Count++;
+                listed.Add(path);
+            }
+            return listed;
+        }
+
+        internal string Coverage => !Listed ? "Group paths are not listed when include is given; read without include to list them."
+            : "Bounded user-group paths, including empty groups, counted apart from maxItems" + (Truncated ? "; the list is incomplete, see groupTruncation" : "") +
+              "; native system-group objects are included in their object inventories.";
+    }
 }
