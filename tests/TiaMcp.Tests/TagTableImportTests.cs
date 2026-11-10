@@ -239,6 +239,17 @@ internal static class TagTableImportTests
         Check.Equal(true, prepared.Value<string>("summary")!.StartsWith("Prepared only"));
         var notApplied = ChangeMilestoneRules.From("not_applied", Stages("change_finished_with_failure"), null);
         Check.Equal(true, notApplied.Value<string>("summary")!.StartsWith("The change failed before the project was changed"));
+        // readbackVerified reports what ran: a verified stage (also one after the save), no readback for a compile, or none recorded.
+        static string Readback(JObject progress) => progress["milestones"]!.Single(m => m.Value<string>("milestone") == "readbackVerified").Value<string>("status")!;
+        string[] head = ["prechange_project_saved", "recovery_archive_created"];
+        Check.Equal("done", Readback(ChangeMilestoneRules.From("applied", Stages([.. head, "mutation_applied", "attribute_readback_verified", "changed_project_saved"]), null)));
+        Check.Equal("done", Readback(ChangeMilestoneRules.From("applied", Stages([.. head, "mutation_applied", "compile_finished", "changed_project_saved", "source_blocks_verified_after_save"]), new JObject { ["compilerSucceeded"] = true })));
+        Check.Equal("skipped", Readback(ChangeMilestoneRules.From("applied", Stages([.. head, "compile_only_requested", "compile_finished", "changed_project_saved"]), new JObject { ["compilerSucceeded"] = true })));
+        Check.Equal("notRecorded", Readback(ChangeMilestoneRules.From("applied", Stages([.. head, "mutation_applied", "changed_project_saved"]), null)));
+        Check.Equal("notRecorded", Readback(done));
+        Check.Equal("notReached", Readback(failed));
+        Check.Equal("notReached", Readback(ChangeMilestoneRules.From("recovery_required", Stages([.. head, "compile_only_requested", "compile_finished", "change_finished_with_failure"]), new JObject { ["compilerSucceeded"] = false })));
+        Check.Equal("pending", Readback(prepared));
         return Task.CompletedTask;
     }
 

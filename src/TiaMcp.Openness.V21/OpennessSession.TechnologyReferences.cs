@@ -27,6 +27,7 @@ namespace TiaMcp.Openness.V21
             private bool _collision;
             private Dictionary<DeviceItem, string> _hardwarePaths;
             private string _hardwareMembership = "notRequested";
+            private JObject _hardwareError;
 
             internal TechnologyReferenceReader(Project project, string plcPath, int maximum = 50000)
             { _project = project; _plcPath = plcPath; _maximum = maximum; _budget = new ScanBudget(maximum); }
@@ -97,8 +98,21 @@ namespace TiaMcp.Openness.V21
                 var result = Reference("hardware", Identifier(item), item);
                 if (_hardwarePaths == null)
                 {
+                    // One failed walk of the project's hardware fails every hardware reference the same way: do it once and keep why.
+                    if (_hardwareError != null) throw new ReferenceFailure("hardwareMembershipUnavailable");
                     _hardwareMembership = "readError";
-                    _hardwarePaths = Read(() => DeviceCompilation.Items(_project)).ToDictionary(entry => entry.Item, entry => entry.Path);
+                    try { _hardwarePaths = Read(() => DeviceCompilation.Items(_project)).ToDictionary(entry => entry.Item, entry => entry.Path); }
+                    catch (ReferenceFailure) { throw; }
+                    catch (Exception error)
+                    {
+                        Func<Exception, string> bounded = e => (e.Message ?? "").Length <= 512 ? e.Message ?? "" : e.Message.Substring(0, 512);
+                        var causes = new JArray();
+                        for (var inner = error.InnerException; inner != null && causes.Count < 4; inner = inner.InnerException)
+                            causes.Add(new JObject { ["type"] = inner.GetType().FullName, ["message"] = bounded(inner) });
+                        _hardwareError = new JObject { ["type"] = error.GetType().FullName, ["code"] = (error as BridgeException)?.Code,
+                            ["message"] = bounded(error), ["causes"] = causes };
+                        throw new ReferenceFailure("hardwareMembershipUnavailable");
+                    }
                     _hardwareMembership = "complete";
                 }
                 if (!_hardwarePaths.TryGetValue(item, out var path)) throw new ReferenceFailure("hardwareNotInProject");
@@ -172,7 +186,7 @@ namespace TiaMcp.Openness.V21
             internal JObject Coverage() => new JObject { ["providerStatus"] = _providerStatus, ["projectPath"] = _projectPath,
                 ["selectionPlcPath"] = _plcPath, ["visitedReads"] = _budget.Used, ["maximumReads"] = _maximum,
                 ["truncated"] = _budget.Truncated, ["identifierCollisionDetected"] = _collision,
-                ["hardwareMembershipStatus"] = _hardwareMembership, ["hardwareItemsVisited"] = _hardwarePaths?.Count ?? 0,
+                ["hardwareMembershipStatus"] = _hardwareMembership, ["hardwareMembershipError"] = _hardwareError, ["hardwareItemsVisited"] = _hardwarePaths?.Count ?? 0,
                 ["hardwareItemsLimit"] = 50000,
                 ["persistenceVerified"] = false, ["atomicSnapshot"] = false };
         }

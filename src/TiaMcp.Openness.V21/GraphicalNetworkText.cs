@@ -67,6 +67,109 @@ namespace TiaMcp.Openness.V21
             return text.ToString();
         }
 
+        internal sealed class InterfaceText
+        {
+            internal string Text;
+            internal int Members;
+            internal bool Truncated;
+        }
+
+        /// <summary>The declared interface of an exported block as text: sections, member names, data types, start values and comments,
+        /// nested members indented. Null when the block declares no member. Used for blocks without networks (data blocks).</summary>
+        internal static InterfaceText RenderInterface(XDocument document, string culture = null, int maxCharacters = MaxNetworkCharacters)
+        {
+            var block = document.Root?.Elements().FirstOrDefault(e => e.Name.LocalName.StartsWith("SW.Blocks.", StringComparison.Ordinal));
+            var attributes = block?.Element("AttributeList");
+            var sections = attributes?.Element("Interface")?.Elements().Where(e => e.Name.LocalName == "Sections").Elements().Where(e => e.Name.LocalName == "Section").ToArray();
+            if (sections == null) return null;
+            var text = new StringBuilder();
+            int members = 0;
+            text.Append("Interface of \"").Append(attributes.Element("Name")?.Value).Append("\" [").Append(block.Name.LocalName.Substring("SW.Blocks.".Length));
+            string instanceOf = attributes.Element("InstanceOfName")?.Value;
+            if (!string.IsNullOrEmpty(instanceOf)) text.Append(" of \"").Append(instanceOf).Append('"');
+            text.Append(']').AppendLine();
+            foreach (var section in sections)
+            {
+                if (!section.Elements().Any(e => e.Name.LocalName == "Member")) continue;
+                text.Append((string)section.Attribute("Name") ?? "?").AppendLine();
+                AppendMembers(section, text, 1, culture, ref members);
+            }
+            if (members == 0) return null;
+            var result = new InterfaceText { Members = members, Text = text.ToString().TrimEnd() };
+            if (result.Text.Length > maxCharacters) { result.Text = result.Text.Substring(0, maxCharacters) + Environment.NewLine + "... (truncated)"; result.Truncated = true; }
+            return result;
+        }
+
+        private static void AppendMembers(XElement parent, StringBuilder text, int depth, string culture, ref int members)
+        {
+            foreach (var member in parent.Elements().Where(e => e.Name.LocalName == "Member"))
+            {
+                members++;
+                text.Append(' ', depth * 2).Append((string)member.Attribute("Name")).Append(" : ").Append((string)member.Attribute("Datatype") ?? "?");
+                string remanence = (string)member.Attribute("Remanence");
+                AppendValue(member, text, culture, remanence != null && remanence != "NonRetain" ? " {" + remanence + "}" : "");
+                if (depth > 64) { text.Append(' ', depth * 2 + 2).AppendLine("... (nesting too deep; see the native XML)"); continue; }
+                foreach (var element in member.Elements().Where(e => e.Name.LocalName == "Subelement"))
+                {
+                    text.Append(' ', depth * 2 + 2).Append('[').Append((string)element.Attribute("Path")).Append(']');
+                    AppendValue(element, text, culture, "");
+                }
+                AppendMembers(member, text, depth + 1, culture, ref members);
+                // A member of a PLC data type or block type lists that type's members in nested sections ("None" for a data type).
+                foreach (var nested in member.Elements().Where(e => e.Name.LocalName == "Sections").Elements().Where(e => e.Name.LocalName == "Section"))
+                {
+                    string name = (string)nested.Attribute("Name");
+                    bool labelled = name != null && name != "None" && nested.Elements().Any(e => e.Name.LocalName == "Member");
+                    if (labelled) text.Append(' ', depth * 2 + 2).Append('(').Append(name).Append(')').AppendLine();
+                    AppendMembers(nested, text, depth + (labelled ? 2 : 1), culture, ref members);
+                }
+            }
+        }
+
+        // " := start value", the retain marker and " // comment" of a member or array element, then the line end.
+        private static void AppendValue(XElement declaration, StringBuilder text, string culture, string marker)
+        {
+            string start = declaration.Elements().FirstOrDefault(e => e.Name.LocalName == "StartValue")?.Value;
+            if (!string.IsNullOrEmpty(start)) text.Append(" := ").Append(start);
+            text.Append(marker);
+            var comments = declaration.Elements().Where(e => e.Name.LocalName == "Comment").Elements().Where(e => e.Name.LocalName == "MultiLanguageText" && !string.IsNullOrWhiteSpace(e.Value)).ToArray();
+            var comment = comments.FirstOrDefault(c => (string)c.Attribute("Lang") == culture) ?? comments.FirstOrDefault(c => (string)c.Attribute("Lang") == "en-US") ?? comments.FirstOrDefault();
+            if (comment != null) text.Append("  // ").Append(comment.Value.Trim().Replace("\r", "").Replace("\n", " "));
+            text.AppendLine();
+        }
+
+        internal const string Coverage = "LAD/FBD (FlgNet) networks: contacts, O/A/X boxes and comparators as Boolean expressions; coils, instructions and calls as statements with pin bindings (:= input, => output). Unknown instructions are shown by name and pins, not interpreted. SCL (StructuredText) networks: the source text rebuilt from its tokens. STL and other network languages are listed, not rendered. A network longer than 16384 characters is cut in the response and complete in textArtifact. The native XML artifact stays authoritative.";
+        internal const string InterfaceCoverage = "The block has no networks; its declared interface is rendered instead: sections, member names, data types, start values, comments in the requested culture, retain settings other than NonRetain, explicitly declared array elements and the members of nested structures and PLC data types. These are offline declarations, not runtime values; other member attributes are not rendered. Text longer than 16384 characters is cut in the response and complete in textArtifact. The native XML artifact stays authoritative.";
+
+        /// <summary>The render=text fields of a block_read response. complete receives the full text for the text artifact, or null when
+        /// the block has neither networks nor interface members: then no file is written and textUnavailable says so.</summary>
+        internal static Newtonsoft.Json.Linq.JObject Describe(XDocument document, string culture, out string complete)
+        {
+            var result = new Newtonsoft.Json.Linq.JObject();
+            var networks = Render(document, culture);
+            // Each network carries its own text; the whole block in one piece is the text artifact, not a second copy in the response.
+            result["networks"] = new Newtonsoft.Json.Linq.JArray(networks.Select(n => new Newtonsoft.Json.Linq.JObject { ["number"] = n.Number, ["id"] = n.Id, ["language"] = n.Language,
+                ["title"] = n.Title, ["comment"] = n.Comment, ["text"] = n.Text, ["rendered"] = n.Rendered, ["truncated"] = n.Truncated }));
+            if (networks.Length > 0)
+            {
+                complete = Format(Render(document, culture, int.MaxValue));
+                result["textCoverage"] = Coverage;
+                return result;
+            }
+            var declared = RenderInterface(document, culture);
+            if (declared == null)
+            {
+                complete = null;
+                result["textUnavailable"] = new Newtonsoft.Json.Linq.JObject { ["reason"] = "The block has no networks and declares no interface members, so it has no text form. No text file was written.",
+                    ["read"] = "artifact.path holds the complete native XML" };
+                return result;
+            }
+            complete = RenderInterface(document, culture, int.MaxValue).Text + Environment.NewLine;
+            result["interface"] = new Newtonsoft.Json.Linq.JObject { ["text"] = declared.Text, ["members"] = declared.Members, ["truncated"] = declared.Truncated };
+            result["textCoverage"] = InterfaceCoverage;
+            return result;
+        }
+
         /// <summary>SCL source of an exported StructuredText network, rebuilt from its tokens in document order. Local variables carry
         /// their '#', quoted names their quotes; a block call shows its instance or function name, never the type of the instance.</summary>
         internal static string StructuredText(XElement source)

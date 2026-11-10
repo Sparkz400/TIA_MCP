@@ -53,6 +53,9 @@ namespace TiaMcp.Openness.V21
             return result;
         }
 
+        // Attribute writes whose native read-back matched the request; an apply compares it before and after its mutation to record the stage.
+        private static long _attributeReadbacks;
+
         private static void ApplyAttributes(IEngineeringObject target, JObject attributes, HashSet<string> allowlist)
         {
             // Preflight every value before dispatch; partial native failures still require checkpoint recovery.
@@ -72,6 +75,7 @@ namespace TiaMcp.Openness.V21
                 if (type != expected.GetType() || !JToken.DeepEquals(ChangeScalar(expected), ChangeScalar(actual)))
                     throw new BridgeException("MutationVerificationFailed", "Native attribute type/value read-back differs from the request: " + property.Name);
             }
+            if (attributes.Count > 0) System.Threading.Interlocked.Increment(ref _attributeReadbacks);
         }
     }
 }

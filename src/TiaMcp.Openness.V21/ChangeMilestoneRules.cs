@@ -16,12 +16,15 @@ namespace TiaMcp.Openness.V21
             bool mutated = Has("mutation_applied") || HasSuffix("_imported") || HasSuffix("_created") || Has("compile_only_requested");
             bool compiled = Has("compile_finished");
             bool saved = Has("changed_project_saved") || Has("scoped_restore_saved");
+            // A readback is a stage ending in _verified, also when it ran after the save. A compile-only kind writes nothing to read back
+            // (skipped). An applied kind whose check runs inside its mutation and records no stage of its own is notRecorded, not notReached.
+            bool readback = (HasSuffix("_verified") || HasSuffix("_verified_after_save")) && !Has("scoped_restore_compile_verified") || HasSuffix("verified_content");
             var milestones = new JArray(
                 Row("prepared", state == "preparing" ? "pending" : "done"),
                 Row("checkpointSaved", Step(Has("prechange_project_saved"), mutated)),
                 Row("recoveryArchiveCreated", Step(Has("recovery_archive_created"), mutated)),
                 Row("projectChanged", Step(mutated, compiled)),
-                Row("readbackVerified", Step(HasSuffix("_verified") && !Has("scoped_restore_compile_verified") || HasSuffix("verified_content"), saved)),
+                Row("readbackVerified", readback ? "done" : state == "applied" ? (Has("compile_only_requested") ? "skipped" : "notRecorded") : Step(false, saved)),
                 Row("compiled", compilation == null && state == "applied" ? "skipped" : Step(compiled, saved)),
                 Row("compilerSucceeded", compilation?["compilerSucceeded"] == null ? "unknown" : compilation.Value<bool>("compilerSucceeded") ? "yes" : "no"),
                 Row("saved", Step(saved, false)));
