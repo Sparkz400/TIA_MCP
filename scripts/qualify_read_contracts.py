@@ -140,7 +140,7 @@ UNKNOWN_CPU = "OrderNumber:6ES7 999-9XX99-9XX9/V9.9"
 LOADABLE_CPU = "CPU 1518-4 PN/DP"
 ZERO_GUID = "00000000-0000-0000-0000-000000000001"
 IO_MODULE = "OrderNumber:6ES7 521-1BH00-0AB0/V1.0"  # DI 16x24VDC HF, as plugged by qualify_hardware_changes.py.
-# %d: the first input byte of RcDiA. RcIn is the tag on its bit 0; bit 1 has no tag and stays an absolute access.
+# %d: the first input byte of RcDiA. RcIn is the tag on its bit 0; bit 1 has no tag; V21 creates one (Tag_...) for the absolute operand on import.
 IO_SOURCE = '''FUNCTION "RcIoRead" : Bool
 { S7_Optimized_Access := 'TRUE' }
 VERSION : 0.1
@@ -695,7 +695,9 @@ def io_reads(r):
         require({(row["range"], whole(row["module"])): sorted(row["tags"]) for row in result["ranges"]} == ranges and all(row["tagCount"] == len(row["tags"]) for row in result["ranges"]),
                 "Ranges differ from hardware_inspect and software_inspect: %s" % result["ranges"])
         tagged = [key for key in ranges if under(key[1], "RcDiA") and key[0].startswith("%%I%d.." % start)]
-        require(len(tagged) == 1 and ranges[tagged[0]] == ["%%I%d.0 RcIn" % start], "RcIn is not the one tag in RcDiA's range: %s" % ranges)
+        # V21 replaces the absolute SCL operand %I<start>.1 with a tag it creates at that address (Tag_...).
+        texts = ranges[tagged[0]] if len(tagged) == 1 else []
+        require(len(texts) == 2 and texts[0] == "%%I%d.0 RcIn" % start and texts[1].startswith("%%I%d.1 Tag_" % start), "RcDiA's range does not hold RcIn and the created tag: %s" % ranges)
         empty = {(e["range"], whole(e["module"])) for e in result["rangesWithoutTags"]}
         require(empty == {key for key, texts in ranges.items() if not texts} and any(under(key[1], "RcDiB") for key in empty), "Untagged ranges differ: %s" % sorted(empty))
         loose = result["tagsWithoutListedHardware"]
@@ -717,8 +719,10 @@ def io_reads(r):
                 require((tags["RcIn"]["address"], tags["RcIn"].get("readers"), tags["RcIn"].get("writers")) == ("%%I%d.0" % start, readers, None), "RcIn usage differs: %s" % tags["RcIn"])
                 require((tags["RcOut"].get("readers"), tags["RcOut"].get("writers"), tags["RcOut"].get("note")) == (None, ["RcIoWrite N1"], None), "RcOut usage differs: %s" % tags["RcOut"])
                 require(tags["RcSpare"] == {"address": "%I200.0", "name": "RcSpare"}, "RcSpare is not unused: %s" % tags["RcSpare"])
-            absolute = {a["address"]: a["blocks"] for a in result["absoluteAccesses"]}
-            require(absolute.get("%%I%d.1" % start) == (["RcIoRead N1 (read)"] if readers else None), "Absolute accesses differ: %s" % absolute)
+                created = [t for name, t in tags.items() if name.startswith("Tag_")]
+                require(len(created) == 1 and (created[0]["address"], created[0].get("readers"), created[0].get("writers")) == ("%%I%d.1" % start, readers, None), "The created tag's usage differs: %s" % created)
+            # The block holds no absolute operand any more, so none may be reported for it.
+            require(not any(a["address"] == "%%I%d.1" % start for a in result["absoluteAccesses"]), "An absolute access is reported for a tag operand: %s" % result["absoluteAccesses"])
             require(result["summary"]["ioTags"] == len(io_tags) and (result["blocksScanned"], result["blocksNotScanned"]) == (scanned, []), "Scan counts differ: %s" % result["summary"])
             # Static evidence over the index only: the result never claims completeness.
             require(result["completeness"]["complete"] is False and result["completeness"]["tagsTruncated"] is False, "Completeness differs: %s" % result["completeness"])
@@ -727,7 +731,7 @@ def io_reads(r):
     r.ok("plc_tag_usage", ("identity", "completeness"), "plc_tag_usage over the full index", "plc_tag_usage", {"index": full["index"], "plcPath": p1},
          usage(len(full["blocks"]), ["RcIoRead N1"]))
     r.ok("plc_tag_usage", ("completeness",), "plc_tag_usage over RcIoWrite's index alone finds no reader", "plc_tag_usage", {"index": narrow["index"], "plcPath": p1}, usage(1, None))
-    unused = [name for name in io_tags if name not in ("RcIn", "RcOut")]
+    unused = [name for name in io_tags if name not in ("RcIn", "RcOut") and not name.startswith("Tag_")]
     r.ok("plc_tag_usage", ("identity",), "plc_tag_usage unusedOnly keeps the unreferenced tags", "plc_tag_usage", {"index": full["index"], "plcPath": p1, "unusedOnly": True},
          usage(len(full["blocks"]), ["RcIoRead N1"], unused))
     r.refuse("plc_tag_usage", "plc_tag_usage of an unknown PLC", "plc_tag_usage", {"index": full["index"], "plcPath": p1 + "Missing"}, ("PlcNotFound",))
