@@ -255,8 +255,16 @@ fingerprint runs (`prepare-fingerprint`, `stale-revision-fingerprint`,
 its journal.
 
 The batch rules (shape, bounds, name collisions, complete summary list) are covered
-by managed tests. The batch route has not been run against TIA Portal yet; the
-single-tag route it reuses for each write is natively qualified.
+by managed tests. `scripts/qualify_tag_batch.py` ran the route once natively on
+10 November 2026 in an owned scratch CPU (TIA V21): nine refusals left the table
+unchanged, a batch of five renames (one also readdressed) was applied, read back
+after the writes and after save, made an earlier prepared batch stale, and
+`change_restore` returned all five tags to their old names. Five single changes
+took 17.6 s there and the batch 3.5 s, about the cost of one single change. That
+run is not in the evidence store or the feature catalog. It covers Bool tags on
+bit memory in one table at PLC-root scope; tags that blocks reference, software
+units, and the safety-tag and F-I/O refusals of a batch on an F-CPU are not
+exercised, and no large project has been timed.
 
 ## Refresh from unchanged source
 
