@@ -199,6 +199,16 @@ The screen route accepts a completed baseline with existing diagnostics. The
 final compile may retain or remove them; a new diagnostic, changed ownership,
 increased count, unknown summary or truncated result refuses. Rollback must
 restore the **exact** baseline diagnostics, including pre-existing errors.
+
+One exception covers findings an aborted compile never reached. V21 stops an HMI
+compile that finds errors (`Compiling aborted (…)`) before some later checks. When the
+edit removes the last error, those checks run and report findings that were there all
+along. On 10 November 2026 a 3024–3027 batch took 110 errors to 0 and revealed 18
+warnings in other screens and project graphics. So when the baseline aborted with
+errors and the final compile has none, a new **warning** is accepted if its owner
+hierarchy names none of the edited screens. The warning count may then rise. The change
+result lists each accepted warning in `compile.unmaskedWarnings`. A new error, or any
+new finding inside an edited screen, still refuses.
 Currently recognized screen completion summaries are the observed English
 `Compiling finished (errors: …; warnings: …)` and `Compilation completed: … errors,
 … warnings.` shapes; unknown/localized summaries refuse without importing.

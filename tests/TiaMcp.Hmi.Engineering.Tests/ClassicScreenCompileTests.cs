@@ -72,5 +72,36 @@ static class ClassicScreenCompileTests
                 Assert(!ClassicScreenCompileRules.ProblemsUnchanged(before, other));
             }
         });
+        check("An edit that removes the last error accepts revealed warnings outside its screens only", () => {
+            // Baseline: one error in the edited screen; V21 aborts. Candidate: no errors; findings the aborted run never reached appear.
+            JObject Result(int errors, string summary, params JObject[] findings)
+            {
+                int warnings = findings.Count(f => f.Value<string>("state") == "Warning");
+                var rows = new JArray(Row("", "Runtime", errors > 0 ? "Error" : "Warning", 0), Row("Software compilation started.", null, "Information", 1));
+                foreach (var f in findings) rows.Add(f);
+                rows.Add(Row(summary.Replace("{e}", errors.ToString()).Replace("{w}", warnings.ToString()), null, errors > 0 ? "Error" : "Warning", 0));
+                return new JObject { ["errorCount"] = errors, ["warningCount"] = warnings, ["targets"] = new JArray(new JObject {
+                    ["target"] = "/hmi/Runtime", ["errorCount"] = errors, ["warningCount"] = warnings, ["messagesTruncated"] = false, ["messages"] = rows }) };
+            }
+            JObject[] In(string screen, string state, string text) => new[] { Row("", screen, state, 1), Row("", "Item_1", state, 2), Row(text, null, state, 3) };
+            var edited = new HashSet<string> { "3024_Edited" };
+            var baseline = Result(1, "Compiling aborted (errors: {e}; warnings: {w})", In("3024_Edited", "Error", "The tag does not exist.").Concat(In("3031_Other", "Warning", "Known warning.")).ToArray());
+            var clean = Result(0, "Compiling finished (errors: {e}; warnings: {w})", In("3031_Other", "Warning", "Known warning.").Concat(In("3004_Other", "Warning", "The position or size of the object is invalid.")).ToArray());
+            Assert(ClassicScreenCompileRules.NoNewProblems(baseline, clean, edited, out var unmasked) && unmasked.Count == 1
+                && unmasked[0][1].Value<string>() == "The position or size of the object is invalid." && unmasked[0][2].Value<string>().Contains("3004_Other"));
+            Assert(!ClassicScreenCompileRules.NoNewProblems(baseline, clean));
+            Assert(!ClassicScreenCompileRules.NoNewProblems(baseline, clean, new HashSet<string>(), out _));
+            Assert(!ClassicScreenCompileRules.NoNewProblems(baseline, clean, new HashSet<string> { "3004_Other" }, out _));
+            var inside = Result(0, "Compiling finished (errors: {e}; warnings: {w})", In("3024_Edited", "Warning", "A new warning in the edited screen.").ToArray());
+            Assert(!ClassicScreenCompileRules.NoNewProblems(baseline, inside, edited, out _));
+            var stillFailing = Result(1, "Compiling aborted (errors: {e}; warnings: {w})", In("3024_Edited", "Error", "The tag does not exist.").Concat(In("3004_Other", "Warning", "Revealed?")).ToArray());
+            Assert(!ClassicScreenCompileRules.NoNewProblems(baseline, stillFailing, edited, out _));
+            var finishedBaseline = Result(1, "Compiling finished (errors: {e}; warnings: {w})", In("3024_Edited", "Error", "The tag does not exist.").ToArray());
+            Assert(!ClassicScreenCompileRules.NoNewProblems(finishedBaseline, clean, edited, out _));
+            Assert(ClassicScreenCompileRules.EditedScreenNames(new JObject { ["target"] = new JObject { ["objectPath"] = "/hmi/R/screens/folders/302x/3024_A%20B" },
+                ["additionalScreens"] = new JArray(new JObject { ["target"] = new JObject { ["objectPath"] = "/hmi/R/screens/B" } }) }).SetEquals(new[] { "3024_A B", "B" }));
+            try { ClassicScreenCompileRules.EditedScreenNames(new JObject { ["target"] = new JObject { ["name"] = "A" } }); throw new Exception("Expected a missing-path refusal"); }
+            catch (ArgumentException) { }
+        });
     }
 }

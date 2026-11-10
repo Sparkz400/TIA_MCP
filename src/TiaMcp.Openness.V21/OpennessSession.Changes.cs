@@ -249,8 +249,14 @@ namespace TiaMcp.Openness.V21
                             if (change.CompileBaseline != null) change.Compilation["baselineComparison"] = CompileBaselineRules.Compare(change.CompileBaseline, change.Compilation);
                         }
                         // A text-list import or an admitted HMI kind must leave the compiler problems as the compile before the write found them;
-                        // a Classic screen edit or tag-table import may also resolve some (HmiEngineeringRules.AllowsResolvedCompileProblems).
-                        if (HmiEngineeringRules.AllowsResolvedCompileProblems(change.Kind, change.HmiBeforeManifest) ? !ClassicScreenCompileRules.NoNewProblems(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
+                        // a Classic screen edit or tag-table import may also resolve some (HmiEngineeringRules.AllowsResolvedCompileProblems),
+                        // and a screen edit that removes the last error may reveal warnings outside its screens (ClassicScreenCompileRules.NoNewProblems).
+                        bool resolvedAllowed = HmiEngineeringRules.AllowsResolvedCompileProblems(change.Kind, change.HmiBeforeManifest);
+                        JArray unmaskedWarnings = null;
+                        bool noNewHmiProblems = resolvedAllowed && ClassicScreenCompileRules.NoNewProblems(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation,
+                            change.Kind == "hmi_classic_screen_edit" ? ClassicScreenCompileRules.EditedScreenNames(change.Payload) : null, out unmaskedWarnings);
+                        if (noNewHmiProblems && unmaskedWarnings.Count > 0) change.Compilation["unmaskedWarnings"] = unmaskedWarnings;
+                        if (resolvedAllowed ? !noNewHmiProblems
                             : change.Kind == "hmi_text_list_import" || HmiEngineeringRules.IsAdmittedKind(change.Kind) ? !HmiTextListImportRules.CompileProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
                             : change.Kind == TagTableImportRules.Kind ? change.Compilation?["baselineComparison"]?.Value<bool>("verified") != true
                             : UsesCompileBaseline(change) ? change.Compilation == null || !CompileBaselineRules.Accepts(change.CompileBaseline, change.Compilation, (JObject)change.Compilation["baselineComparison"])
