@@ -11,10 +11,18 @@ Since the 31 October audit every preview reports the project's unsaved state (is
 refuse compile=false at apply, and once the final partial failure leaves its change recovery_required, change_prepare
 refuses another change on the project (RecoveryRequired, naming it) and a change prepared before the failure is refused
 before its checkpoint.
+
+Since the 9 November audit: the preview shows source/XML by length and hash and the persisted input must still match it
+at apply; a checkpoint that fails before any mutation ends not_applied and blocks nothing; decisions of applied changes
+are read back from the decision log past a half-written line, and a decision log that cannot be written leaves the
+change applied.
 """
 from __future__ import annotations
 
 import argparse
+import codecs
+import hashlib
+import json
 from pathlib import Path
 import re
 
@@ -163,6 +171,26 @@ def member_effect(name, *changes):
     return {"memberName": name, "attributes": [{"name": n, "before": b, "after": a} for n, b, a in changes]}
 
 
+def stored_input(path):
+    """A prepared input file as the preview states it: UTF-8 length and SHA-256 without the BOM the worker writes."""
+    data = Path(path).read_bytes()
+    data = data[len(codecs.BOM_UTF8):] if data.startswith(codecs.BOM_UTF8) else data
+    return {"bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+
+
+class Details(Harness):
+    """The change tools answer with a summary by default; this runner compares full previews, compile rows and readbacks."""
+
+    def tool(self, name, arguments=None):
+        if name in ("change_prepare", "change_status"):
+            arguments = {**arguments, "includeDetails": True}
+        return super().tool(name, arguments)
+
+    @staticmethod
+    def apply_args(prepared, deferred=False):
+        return {**Harness.apply_args(prepared, deferred), "includeDetails": True}
+
+
 class Run:
     """The owned scratch's current native snapshot, the reopened pre-change state and per-kind criterion coverage."""
 
@@ -207,8 +235,8 @@ class Run:
     def state(self):
         return view(complete_inventory(self.h.tool))
 
-    def prepare(self, label, kind, payload, preview=None):
-        arguments = {"kind": kind, "payload": payload, "plcPath": self.plc}
+    def prepare(self, label, kind, payload, preview=None, intent=None):
+        arguments = {"kind": kind, "payload": payload, "plcPath": self.plc, **({"intent": intent} if intent else {})}
         prepared = self.h.stage("prepare " + label, lambda: self.h.tool("change_prepare", arguments))
         shown = prepared["preview"]
         expected = {"changeId": prepared["changeId"], "kind": kind, "project": {"path": self.project},
@@ -392,8 +420,10 @@ def edit_types(run):
 def edit_blocks(run, gate):
     run.refuse("source_upsert", "a declaration outside expectedBlockNames", {"language": "SCL", "source": drop(2), "expectedBlockNames": ["X11Other"]}, "SourceScopeMismatch")
     run.refuse("source_upsert", "STL source for the SCL block X11Edit", {"language": "STL", "source": STL_EDIT, "expectedBlockNames": ["X11Edit"]}, "LanguageConversionNotSupported")
-    run.mutate("rewrite X11Drop", "source_upsert", {"language": "SCL", "source": drop(2), "expectedBlockNames": ["X11Drop"]},
-               {"effects": [{"action": "source_upsert", "existingBlock": run.info("X11Drop")}]}, changed=[run.blk("X11Drop")])
+    rewrite = run.prepare("rewrite X11Drop", "source_upsert", {"language": "SCL", "source": drop(2), "expectedBlockNames": ["X11Drop"]},
+                          {"effects": [{"action": "source_upsert", "existingBlock": run.info("X11Drop")}]})
+    hashed_input(run, rewrite)
+    run.finish("rewrite X11Drop", "source_upsert", rewrite, changed=[run.blk("X11Drop")])
     data, existing = run.xml(run.blk("X11Data")), {"effects": [{"action": "block_import_xml", "existingBlock": run.info("X11Data")}]}
     run.mutate("reimport X11Data unchanged", "block_import_xml", {"xml": data, "expectedBlockNames": ["X11Data"]}, existing)
     run.refuse("block_import_xml", "a copy keeping X11Data's number", {"xml": replace_once(data, "<Name>X11Data</Name>", "<Name>X11Copy</Name>"), "expectedBlockNames": ["X11Copy"]}, "BlockNumberCollision")
@@ -461,6 +491,102 @@ def compile_plc(run):
     prepared = run.prepare("compile the PLC", "plc_compile", {}, {"effects": [{"action": "compile", "plcPath": run.plc}]})
     run.refuse_apply("plc_compile", "compile=false", prepared, "InvalidRequest", compile=False, save=False)
     run.finish("compile the PLC", "plc_compile", prepared)
+
+
+def hashed_input(run, prepared):
+    """The preview (and the journal) name the source by length and hash only; apply refuses while the persisted input differs."""
+    folder = Path(prepared["journalPath"]).parent
+    source, shown = folder / "requested.scl", prepared["preview"]["payload"]["source"]
+    original = source.read_bytes()
+    def bound():
+        journal = json.loads((folder / "journal.json").read_text(encoding="utf-8-sig"))
+        require(stored_input(source) == shown == journal["preview"]["payload"]["source"], "The preview hash does not name the persisted source: %s" % shown)
+        return shown
+    run.h.stage("the preview names the persisted source by length and hash", bound)
+    run.refuse_apply("source_upsert", "a wrong previewHash", prepared, "PreviewMismatch", previewHash="0" * 64)
+    source.write_bytes(original + b"// changed after the preview\n")
+    try:
+        run.refuse_apply("source_upsert", "a persisted source changed after the preview", prepared, "ArtifactChanged")
+    finally:
+        source.write_bytes(original)
+
+
+def audit_fixes(run):
+    """The 9 November change-pipeline fixes: not_applied after a failed checkpoint, then the decision log."""
+    h, base = run.h, run.plc + "/blocks"
+    def group(name):
+        return ({"groupKind": "blocks", "groupPath": base, "name": name},
+                {"effects": [{"action": "group_create", "groupKind": "blocks", "groupPath": base, "name": name}]})
+
+    label = "create X11Blocked behind an occupied recovery archive path"
+    prepared = run.prepare(label, "group_create", *group("X11Blocked"))
+    # A non-empty directory where the checkpoint must write before.zap21: no archive file can appear there.
+    blocker = Path(prepared["journalPath"]).parent / "before.zap21"
+    (blocker / "occupied").mkdir(parents=True)
+    def blocked():
+        before = run.state()
+        row = {"kind": "group_create", "changeId": prepared["changeId"], "previewHash": prepared["previewHash"], "state": "dispatching"}
+        h.report["mutations"].append(row)
+        h.persist()
+        arguments = h.apply_args(prepared)
+        error = h.call_error("change_apply", arguments)
+        status = h.tool("change_status", {"changeId": prepared["changeId"]})
+        row["state"] = status["state"]
+        require(status["state"] == "not_applied" and status["failure"] and not status["recoveryArchiveSha256"],
+                "A failed checkpoint must end not_applied with its failure: %s, %s" % (status["state"], status["failure"]))
+        require("change_finished_with_failure" in status["stages"] and not {"recovery_archive_created", "mutation_applied"} & set(status["stages"]),
+                "The failed checkpoint reached the mutation: %s" % status["stages"])
+        require(run.state() == before and not blocker.is_file(), "The failed checkpoint changed the PLC software or wrote an archive")
+        # The same idempotency key reports the recorded outcome instead of RecoveryRequired.
+        replayed = h.tool("change_apply", arguments)
+        require(replayed["state"] == "not_applied" and run.state() == before, "The replayed apply did not report not_applied")
+        return {"code": error.get("code"), "message": error.get("message"), "failure": status["failure"], "stages": status["stages"]}
+    h.report["auditFixes"] = {"notApplied": h.stage("apply " + label + " ends not_applied", blocked)}
+
+    # Prepared and applied on the same project right after the failure: not_applied blocks no later change.
+    decision = {"id": "X11-D1", "source": "X11 runner", "statement": "X11 audit groups stay empty.", "target": base}
+    payload, preview = group("X11IntentA")
+    label = "create X11IntentA with a decision"
+    first = run.prepare(label, "group_create", payload, {**preview, "intent": {"decisions": [decision], "previouslyConfirmed": [], "conflicts": []}},
+                        intent={"decisions": [decision]})
+    run.finish(label, "group_create", first, added=["group:" + base + "/groups/X11IntentA"])
+    log = Path(first["journalPath"]).parent.parent / "intent-decisions.jsonl"
+    def logged():
+        rows = [json.loads(line) for line in log.read_text(encoding="utf-8-sig").splitlines()]
+        require(len(rows) == 1 and Path(rows[0].pop("projectPath")) == Path(run.project) and
+                rows[0] == {"changeId": first["changeId"], **{key: decision[key] for key in ("id", "statement", "target")}},
+                "The decision log differs: %s" % rows)
+        # A line a crash left half-written; later preparations must read past it.
+        with log.open("a", encoding="utf-8") as stream:
+            stream.write('{"projectPath":"X11 half-written\n')
+        return rows
+    h.report["auditFixes"]["decisionLog"] = h.stage("the decision log records the applied decision", logged)
+    earlier = {"id": decision["id"], "earlierChangeId": first["changeId"], "earlierStatement": decision["statement"], "earlierTarget": base}
+    def warned(prepared):
+        return [w for w in prepared["preview"]["warnings"] if "conflicts with a decision" in w]
+    payload, preview = group("X11IntentB")
+    same = run.prepare("create X11IntentB repeating the decision", "group_create", payload,
+                       {**preview, "intent": {"previouslyConfirmed": [earlier], "conflicts": []}}, intent={"decisions": [decision]})
+    payload, preview = group("X11IntentC")
+    conflict = run.prepare("create X11IntentC contradicting the decision", "group_create", payload,
+                           {**preview, "intent": {"previouslyConfirmed": [], "conflicts": [earlier]}},
+                           intent={"decisions": [{**decision, "statement": "X11 audit groups hold blocks."}]})
+    require(not warned(same) and len(warned(conflict)) == 1, "Only the contradicting decision must be warned about")
+    import msvcrt  # Windows only, like every native run.
+    recorded = log.read_bytes()
+    with log.open("rb") as held:
+        # Locked from its end onwards the log cannot be appended to: the change must still end applied.
+        held.seek(0, 2)
+        msvcrt.locking(held.fileno(), msvcrt.LK_NBLCK, 1 << 20)
+        _, applied = run.finish("create X11IntentC while the decision log is locked", "group_create", conflict,
+                                added=["group:" + base + "/groups/X11IntentC"])
+    def unlogged():
+        failures = [row for row in applied["readbacks"] if row.get("role") == "intent-log-write-failure"]
+        status = h.tool("change_status", {"changeId": conflict["changeId"]})
+        require(len(failures) == 1 and status["state"] == "applied" and log.read_bytes() == recorded,
+                "A locked decision log must be reported on the applied change and stay unwritten: %s" % applied["readbacks"])
+        return failures[0]
+    h.report["auditFixes"]["decisionLogLocked"] = h.stage("the locked decision log is reported on the applied change", unlogged)
 
 
 def reopen(run):
@@ -611,6 +737,7 @@ def body(h):
     edit_blocks(run, gate)
     edit_groups(run)
     compile_plc(run)
+    audit_fixes(run)
     reopen(run)
     recover_each_kind(run)
     gaps = coverage_gaps(run.coverage, KINDS)
@@ -626,4 +753,4 @@ if __name__ == "__main__":
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
     args.runner = __file__
-    Harness(args, "x11_", "X11 PLC object mutations in one owned scratch CPU 1511-1 PN", LIMITATIONS, []).run(body)
+    Details(args, "x11_", "X11 PLC object mutations in one owned scratch CPU 1511-1 PN", LIMITATIONS, []).run(body)

@@ -82,6 +82,8 @@ The intent becomes part of the preview, so `previewHash` covers it, and it stays
 
 With `compile: true`, a change compiles its compile scope (the selected PLC, or every device for hardware, network, safety and other device-wide kinds) after the checkpoint and before the mutation, and again afterwards. Apply fails with `CompileFailed` only on an introduced or worsened error, a changed compile scope or incomplete diagnostics. Findings that were already there, such as another device's address conflict, do not fail the change. `compile.baselineComparison` lists them as existing (or resolved, once fixed) next to introduced ones, and `compile.compilerSucceeded` says whether the whole scope compiled without errors. A saved change with `compilerSucceeded: false` is valid; the project still has those errors. Without complete baseline diagnostics only a clean compile passes. Tag-table imports also fail on new or changed warnings ([below](#tag-table-import-scope)); compile-only kinds report their diagnostics as the result, and HMI kinds keep their own baseline rules. An inconsistent block that is not a target of the change is fingerprinted by its metadata only and listed in `fingerprintCoverage.inconsistentBlocksMetadataOnly`; because that is weaker, `change_restore` of such a change refuses whole-project restore with `ScopedRecoveryRequired` and names the retained archive. An inconsistent target still refuses with `FingerprintUnavailable`; compile it first or read its generated source. Natively checked on 7 November 2026 (`local.compile-baseline.unrelated-errors.20261107`, [record](../verification/unrelated-errors-20261107.md)).
 
+TIA's software compile is incremental, and it reports a warning only for an object it recompiles. A compile with nothing changed reports no warnings even when blocks have them, and recompiling an object reports its old warnings again. The comparison therefore cannot tell a new warning from an old one that is merely reported again. For a change that names its own objects (the blocks, data types or tag tables it writes), `baselineComparison` lists warnings of other objects under `revealed` (`revealedCount`, `revealedNote`) instead of `introduced`. Revealed warnings do not fail any change, including a tag-table import, and do not clear `verified`. For the same reason a warning listed as `resolved` is only known to be absent from this compile's output. Errors are different: TIA compiles an object with errors again on every compile, so errors are reported until they are fixed, and a new error is always `introduced`. Kinds without named objects (hardware, network, technology objects) keep every new finding as introduced. One consequence: a warning that a change really causes in another object, for example in a block that uses a retyped tag, is also listed as revealed. The warning behaviour was observed natively on 10 November 2026 in an owned scratch CPU (two SCL warnings: reported on import, absent from three following compiles, reported again on reimport of the unchanged block); the error behaviour is inferred from a project run and block consistency, and is not qualified on a scratch.
+
 The new individual type/tag/constant edits, user-group edits, graphical network patches/inserts, call-argument edits, hardware-address edits, block renames and deletions, technology-object deletions and hardware deletions require `compile: true` even when `save` is false. Their native mutation routes are implemented; the pure regression tests do not establish qualification on a particular CPU, software-unit configuration or hardware family.
 
 The worker checks its fingerprint and import-file hash again under exclusive TIA access before saving or changing anything. The fingerprint includes project save state, hardware identities/address ranges, network configuration, exposed standard/software-unit/safety-unit block identities and native fingerprints, type/tag paths and modification metadata, unit namespace presets and relations, and relevant selected attributes. It is explicitly scoped to exposed metadata; it is not a global revision guarantee for data the public API does not expose.
@@ -192,7 +194,9 @@ The live scratch fixture `scripts/smoke_write_guards.py` qualified these guards 
 ### Many tag edits in one change
 
 Each applied change pays for the whole safety sequence: a project fingerprint at
-prepare, again before apply and again after save, a checkpoint save with a full
+prepare, during admission, before apply and again after save
+([reused](#fingerprint-reuse-between-changes) where the project is provably in the
+same saved state), a checkpoint save with a full
 `before.zap21`, a baseline compile, the compile after the edit and the final save.
 On a large project that is minutes per change, and every applied change makes all
 other prepared previews stale (`StaleRevision`), so single edits cannot be prepared
@@ -265,6 +269,53 @@ run is not in the evidence store or the feature catalog. It covers Bool tags on
 bit memory in one table at PLC-root scope; tags that blocks reference, software
 units, and the safety-tag and F-I/O refusals of a batch on an F-CPU are not
 exercised, and no large project has been timed.
+
+### Fingerprint reuse between changes
+
+A change fingerprint reads the whole project: every device item, software scope and
+block with its native fingerprints. One applied change needs that read five times:
+at prepare, twice while the Host admits the apply, before the checkpoint
+(`StaleRevision`) and for the recorded outcome. Between an applied-and-saved change
+and the next one the project is normally untouched, so the worker keeps its last
+read and reuses it, under these conditions only:
+
+- TIA reports the project as saved (`IsModified` false) with the same
+  `LastModified`, in the same TIA process and at the same project path, as when
+  the content was read. It was in that state before and after the read.
+- The change has the same kind and the same target blocks as the read. OPC UA
+  kinds, library changes and reconciliation always read in full.
+- Nothing but the steps of a prepared change ran in between. Any other worker
+  operation, for example a `block_read` or `software_inspect`, drops the kept read,
+  and so does the worker itself before it saves, changes or closes a project. Its
+  own writes therefore never depend on the save state.
+
+Safety signatures, runtime groups and the safety login state are read fresh every
+time, and so are the kind-specific parts such as the requested tag attributes. The
+fingerprint value is the one a full read gives for that state, so previews,
+`StaleRevision`, `change_restore` and reconciliation compare the same hashes as
+before. With reuse, a change that follows another of the same kind reads the
+project once (its outcome) instead of five times; `fingerprintContent` in the full
+change view and the journal reports `fullReads` and `reusedForSavedState`.
+
+What this relies on is TIA's own save state: an edit made outside the worker
+between two steps must either turn `IsModified` true or, once saved, change
+`LastModified`. `tia_session_status` reports both per project.
+`scripts/qualify_fingerprint_reuse.py` checked the scriptable part natively on
+10 November 2026 in an owned scratch CPU (TIA V21): an unsaved tag rename, block
+source and hardware comment each turned `IsModified` true and nothing was reused
+until the next save; every save cleared it and changed `LastModified`, which has
+sub-second resolution; a reused read and a full read gave the same fingerprint; a
+follow-up change read the project once; a stale preview was still refused. That run
+is not in the evidence store.
+
+**Not verified: edits made by hand in the TIA user interface.** The owned instance
+is headless, so no script can make them. To check on a workstation: open a copy or
+scratch project in TIA with its user interface, attach, and call
+`tia_session_status` (`isModified` false). Then, one at a time, rename a tag, edit
+a block network, change a module parameter and undo an edit by hand; after each,
+`tia_session_status` must report `isModified` true. Save in TIA; it must report
+false with a new `lastModified`. Finally prepare a change, edit a block by hand
+without saving, and apply: the apply must refuse with `StaleRevision`.
 
 ## Refresh from unchanged source
 

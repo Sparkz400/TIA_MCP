@@ -260,7 +260,8 @@ namespace TiaMcp.Openness.V21
                     }
                     else
                     {
-                        bool returnedApply = operation == "change_apply" && change.IdempotencyKey == ChangeText(args, "idempotencyKey", 128) && change.State == "applied";
+                        // Every resolved outcome replays as a readback, as ChangeApply itself answers (applied, restored, rolled_back, not_applied).
+                        bool returnedApply = operation == "change_apply" && change.IdempotencyKey == ChangeText(args, "idempotencyKey", 128) && ChangeMilestoneRules.IsResolvedOutcome(change.State);
                         if (operation == "change_apply" && change.IdempotencyKey != null && !returnedApply)
                             throw new BridgeException("RecoveryRequired", "The earlier engineering attempt cannot be replayed with this key/state.");
                         var project = ProjectForChange(change); EnsureProjectOffline(project);

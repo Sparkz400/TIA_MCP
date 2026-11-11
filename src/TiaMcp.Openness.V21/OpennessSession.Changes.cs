@@ -59,7 +59,7 @@ namespace TiaMcp.Openness.V21
                 ProjectPath = project.Path.FullName, ProjectName = project.Name,
                 Selector = new JObject { ["projectName"] = project.Name, ["plcPath"] = args["plcPath"]?.DeepClone(), ["scopePath"] = args["scopePath"]?.DeepClone() },
                 State = "preparing", Journal = Path.Combine(directory, "journal.json"),
-                PreparedProcessId = _processId, CapturedStorageQualification = capturedStorage
+                PreparedProcessId = _processId, CapturedStorageQualification = capturedStorage, ReuseProjectContent = true
             };
 #if SAFETY_FPARAMETER_DISCOVERY
             if (kind == "safety_fparameter_set" && args.Value<bool?>("fParameterDiscovery") == true) change.Selector["fParameterDiscovery"] = true;
@@ -103,7 +103,7 @@ namespace TiaMcp.Openness.V21
                 change.Preview["checkpoint"] = "Applying requires checkpointSave=true: current in-memory project edits are saved before a compressed recovery archive is created. No mutation proceeds without that archive.";
                 change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. Save-after-change requires a successful compile. Compile does not validate machine behavior.";
                 if (UsesCompileBaseline(change))
-                    change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. With compile=true the same scope compiles before and after the mutation; the change fails on an introduced or worsened error, a changed compile scope or incomplete diagnostics (tag-table imports also fail on new or changed warnings). Unchanged findings may remain and are listed in compile.baselineComparison; inspect compilerSucceeded. Compile does not validate machine behavior.";
+                    change.Preview["compileAndSave"] = "Apply explicitly chooses compile and save. With compile=true the same scope compiles before and after the mutation; the change fails on an introduced or worsened error, a changed compile scope or incomplete diagnostics (tag-table imports also fail on new or changed warnings of the imported tables). Unchanged findings may remain and are listed in compile.baselineComparison, as are warnings of other objects that the compile merely reports again (revealed); inspect compilerSucceeded. Compile does not validate machine behavior.";
                 change.Preview["backups"] = change.Backups;
                 if (args["intent"] is JObject intent)
                 {
@@ -198,6 +198,8 @@ namespace TiaMcp.Openness.V21
                 change.IdempotencyKey = key;
                 _changeKeys[key] = change.Id;
                 change.State = "checkpointing";
+                // From here the worker saves and changes the project itself; the kept project content is dropped first.
+                _projectContent.Clear();
                 try
                 {
                     // Inside the try: a failed journal write must still end in a resolvable state.
@@ -249,7 +251,7 @@ namespace TiaMcp.Openness.V21
                         {
                             change.Compilation["compilerSucceeded"] = CompilationEvidenceRules.IsSuccessful(change.Compilation);
                             change.Compilation["unresolvedSymbols"] = UnresolvedSymbolRules.From(change.Compilation);
-                            if (change.CompileBaseline != null) change.Compilation["baselineComparison"] = CompileBaselineRules.Compare(change.CompileBaseline, change.Compilation);
+                            if (change.CompileBaseline != null) change.Compilation["baselineComparison"] = CompileBaselineRules.Compare(change.CompileBaseline, change.Compilation, change.BlockNames.Concat(change.ObjectNames));
                         }
                         // A text-list import or an admitted HMI kind must leave the compiler problems as the compile before the write found them;
                         // a Classic screen edit or tag-table import may also resolve some (HmiEngineeringRules.AllowsResolvedCompileProblems),
@@ -371,6 +373,7 @@ namespace TiaMcp.Openness.V21
             Directory.CreateDirectory(recoveryDirectory);
             bool wasScratchProject = _scratchProject != null && project.Equals(_scratchProject);
             change.RecoveryDirectory = recoveryDirectory;
+            _projectContent.Clear();
             change.State = "restoring";
             WriteChangeJournal(change);
             try
@@ -1487,6 +1490,136 @@ namespace TiaMcp.Openness.V21
             };
         }
 
+        // The project-wide part of a change fingerprint: every device item, software scope and block. Safety states are kept apart
+        // because the safety login state is session state, not project content.
+        private sealed class ProjectContent
+        {
+            internal JArray Hardware = new JArray(), Software = new JArray(), SafetyStates = new JArray();
+            internal JArray GeneratedExclusions = new JArray(), MissingProviders = new JArray(), InconsistentBystanders = new JArray();
+            internal int NativeFingerprintBlocks;
+            internal readonly List<Tuple<string, PlcSoftware>> Plcs = new List<Tuple<string, PlcSoftware>>();
+            internal readonly List<bool> SafetyCoverage = new List<bool>();
+
+            // Tokens are attached to a snapshot when used, so the kept copy and every use are separate trees.
+            internal ProjectContent Copy(JArray safetyStates)
+            {
+                var copy = new ProjectContent { Hardware = (JArray)Hardware.DeepClone(), Software = (JArray)Software.DeepClone(), SafetyStates = safetyStates ?? (JArray)SafetyStates.DeepClone(),
+                    GeneratedExclusions = (JArray)GeneratedExclusions.DeepClone(), MissingProviders = (JArray)MissingProviders.DeepClone(),
+                    InconsistentBystanders = (JArray)InconsistentBystanders.DeepClone(), NativeFingerprintBlocks = NativeFingerprintBlocks };
+                copy.Plcs.AddRange(Plcs); copy.SafetyCoverage.AddRange(SafetyCoverage);
+                return copy;
+            }
+        }
+
+        private readonly FingerprintContentCache<ProjectContent> _projectContent = new FingerprintContentCache<ProjectContent>();
+
+        private FingerprintSaveState ProjectSaveState(Project project)
+        {
+            var saved = project.LastModified;
+            return new FingerprintSaveState(_processId, project.Path?.FullName, saved.ToString("O") + "|" + saved.Kind, project.IsModified);
+        }
+
+        private static bool HasSafetySignatureCoverage(JObject safetyState)
+        {
+            var safetySignatures = safetyState["signatures"] as JArray;
+            return safetyState.Value<bool>("available") && safetySignatures != null && safetySignatures.Count > 0
+                && safetySignatures.All(signature => !string.IsNullOrWhiteSpace(signature.Value<string>("type"))
+                    && signature["value"] != null && signature["value"].Type != JTokenType.Null);
+        }
+
+        // Reuses the last project-wide read while the project is in the same saved state (FingerprintContentCache). Only prepared
+        // changes of this session ask for it; OPC UA kinds add per-PLC content inside the read and always read in full.
+        private ProjectContent ProjectContentFor(EngineeringChange change, Project project, bool tagImport, HashSet<string> targets, JArray opcUa)
+        {
+            bool reusable = change.ReuseProjectContent && opcUa == null;
+            string variant = FingerprintContentRules.Variant(change.Kind, targets);
+            var before = ProjectSaveState(project);
+            var kept = reusable ? _projectContent.Find(before, variant) : null;
+            if (kept != null)
+            {
+                // Safety states are read fresh. A changed signature coverage changes how protected generated blocks are read, so it reads in full.
+                var safetyStates = new JArray(kept.Plcs.Select(plc => new JObject { ["plcPath"] = plc.Item1, ["safety"] = ReadSafety(plc.Item2) }));
+                if (safetyStates.Select(state => HasSafetySignatureCoverage((JObject)state["safety"])).SequenceEqual(kept.SafetyCoverage))
+                {
+                    change.ProjectContentReuses++;
+                    return kept.Copy(safetyStates);
+                }
+            }
+            var content = ReadProjectContent(change, project, tagImport, targets, opcUa);
+            change.ProjectContentReads++;
+            if (reusable) _projectContent.Store(before, ProjectSaveState(project), variant, content.Copy(null));
+            else _projectContent.Clear();
+            return content;
+        }
+
+        private ProjectContent ReadProjectContent(EngineeringChange change, Project project, bool tagImport, HashSet<string> targets, JArray opcUa)
+        {
+            var read = new ProjectContent();
+            JArray hardware = read.Hardware, software = read.Software, safetyStates = read.SafetyStates;
+            JArray generatedExclusions = read.GeneratedExclusions, missingProviders = read.MissingProviders, inconsistentBystanders = read.InconsistentBystanders;
+            var budget = new ScanBudget(50000);
+            foreach (var entry in DeviceItems(project, budget))
+            {
+                var item = entry.Item;
+                var hw = new JObject { ["path"] = entry.Path, ["typeIdentifier"] = item.TypeIdentifier, ["position"] = item.PositionNumber };
+                var network = item.GetService<NetworkInterface>();
+                if (network != null) hw["nodes"] = new JArray(network.Nodes.Select(NodeSnapshot));
+                hw["addresses"] = new JArray(item.Addresses.Select(address => new JObject { ["type"] = address.IoType.ToString(), ["start"] = address.StartAddress, ["length"] = address.Length }));
+                hardware.Add(hw);
+                var plc = item.GetService<SoftwareContainer>()?.Software as PlcSoftware;
+                if (plc == null) continue;
+                var selection = new PlcSelection { Project = project, Software = plc, Path = entry.Path + "/plc/" + Segment(plc.Name) };
+                opcUa?.Add(new JObject { ["plcPath"] = selection.Path, ["serverInterfaceGroup"] = OpcUaSnapshot(OpcUaProviderFor(plc)?.CommunicationGroup?.ServerInterfaceGroup, budget) });
+                var safetyState = ReadSafety(plc);
+                bool hasSafetySignatureCoverage = HasSafetySignatureCoverage(safetyState);
+                safetyStates.Add(new JObject { ["plcPath"] = selection.Path, ["safety"] = safetyState });
+                read.Plcs.Add(Tuple.Create(selection.Path, plc));
+                read.SafetyCoverage.Add(hasSafetySignatureCoverage);
+                var scopes = SoftwareScopes(selection, budget);
+                foreach (var scope in scopes)
+                {
+                    var blockItems = new JArray();
+                    foreach (var block in ScopeBlocks(scope, budget))
+                    {
+                        bool protectedBlock = block.Item.IsKnowHowProtected;
+                        bool consistentBlock = block.Item.IsConsistent;
+                        var info = new JObject { ["name"] = block.Item.Name, ["path"] = block.Path, ["number"] = block.Item.Number,
+                            ["language"] = block.Item.ProgrammingLanguage.ToString(), ["modified"] = block.Item.ModifiedDate.ToString("O"),
+                            ["protected"] = protectedBlock, ["consistent"] = consistentBlock, ["nativeSystemGroup"] = block.NativeSystemGroup };
+                        if (tagImport)
+                        {
+                            info["fingerprintMode"] = "tagImportBlockMetadataOnly";
+                            blockItems.Add(info);
+                            continue;
+                        }
+                        var content = EngineeringFingerprintRules.ReadBlockContent(block.NativeSystemGroup, protectedBlock, consistentBlock, hasSafetySignatureCoverage, block.Path, () =>
+                        {
+                            var provider = block.Item.GetService<FingerprintProvider>();
+                            return provider == null ? null : new JArray(provider.GetFingerprints().OrderBy(f => f.Id).Select(f => new JObject { ["id"] = f.Id.ToString(), ["value"] = ChangeScalar(f.Value) }));
+                        }, targets.Contains(block.Item.Name));
+                        info["fingerprintMode"] = content.Mode;
+                        if (content.Payload != null) { info["fingerprints"] = content.Payload; read.NativeFingerprintBlocks++; }
+                        else if (content.Mode == "protectedGeneratedMetadata")
+                            generatedExclusions.Add(new JObject { ["path"] = block.Path, ["name"] = block.Item.Name,
+                                ["mode"] = content.Mode, ["consistent"] = consistentBlock,
+                                ["reason"] = "Protected native system-group derived payload: checksum API can reject generated safety blocks after compilation; identity/modified/protection/consistency metadata remains covered." });
+                        else if (content.Mode == "inconsistentMetadataOnly") inconsistentBystanders.Add(block.Path);
+                        else missingProviders.Add(block.Path);
+                        blockItems.Add(info);
+                    }
+                    software.Add(new JObject { ["name"] = scope.Name, ["path"] = scope.Path, ["kind"] = scope.Kind, ["blocks"] = blockItems,
+                        ["userGroups"] = new JArray(EngineeringGroupPaths(scope.Blocks, scope.Path + "/blocks", 0)
+                            .Concat(EngineeringGroupPaths(scope.Types, scope.Path + "/types", 0)).Concat(EngineeringGroupPaths(scope.Tags, scope.Path + "/tags", 0))),
+                        ["namespacePreset"] = scope.Unit?.NamespacePreset,
+                        ["relations"] = scope.Unit == null ? null : new JArray(scope.Unit.Relations.Select(relation => new JObject { ["relationType"] = relation.RelationType.ToString(), ["relatedObject"] = InspectionValue(relation.RelatedObject) })),
+                        ["types"] = new JArray(ScopeTypes(scope, budget).Select(type => EngineeringFingerprintRules.RequireConsistentType(change.Kind, () => type.Item.IsConsistent, type.Path, new JObject { ["name"] = type.Item.Name, ["path"] = type.Path, ["modified"] = type.Item.ModifiedDate.ToString("O"), ["protected"] = type.Item.IsKnowHowProtected }))),
+                        ["tagTables"] = new JArray(TagTables(scope.Tags, scope.Path + "/tags", budget).Select(table => new JObject { ["name"] = table.Item.Name, ["path"] = table.Path, ["modified"] = table.Item.ModifiedTimeStamp.ToString("O") })) });
+                }
+            }
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish a complete change fingerprint for this project size.");
+            return read;
+        }
+
         // locationIndependent omits only the project location and save state, to compare a retrieved archive copy with its original.
         private string EngineeringFingerprint(EngineeringChange change, Project project, bool locationIndependent = false)
         {
@@ -1517,78 +1650,13 @@ namespace TiaMcp.Openness.V21
             var snapshot = new JObject { ["fingerprintPolicyVersion"] = 2, ["projectPath"] = project.Path.FullName, ["lastModified"] = project.LastModified.ToString("O"), ["isModified"] = project.IsModified,
                 ["simulationDuringBlockCompilationEnabled"] = project.GetService<PlcSimulationSettingsProvider>()?.IsSimulationDuringBlockCompilationEnabled };
             if (locationIndependent) { snapshot.Remove("projectPath"); snapshot.Remove("lastModified"); snapshot.Remove("isModified"); }
-            var hardware = new JArray();
-            var software = new JArray();
-            var safetyStates = new JArray();
-            var generatedExclusions = new JArray();
-            var missingProviders = new JArray();
-            var inconsistentBystanders = new JArray();
             var targets = new HashSet<string>(change.BlockNames ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
-            int nativeFingerprintBlocks = 0;
-            var budget = new ScanBudget(50000);
             var opcUa = change.Kind.StartsWith("opcua_", StringComparison.Ordinal) ? new JArray() : null;
-            foreach (var entry in DeviceItems(project, budget))
-            {
-                var item = entry.Item;
-                var hw = new JObject { ["path"] = entry.Path, ["typeIdentifier"] = item.TypeIdentifier, ["position"] = item.PositionNumber };
-                var network = item.GetService<NetworkInterface>();
-                if (network != null) hw["nodes"] = new JArray(network.Nodes.Select(NodeSnapshot));
-                hw["addresses"] = new JArray(item.Addresses.Select(address => new JObject { ["type"] = address.IoType.ToString(), ["start"] = address.StartAddress, ["length"] = address.Length }));
-                hardware.Add(hw);
-                var plc = item.GetService<SoftwareContainer>()?.Software as PlcSoftware;
-                if (plc == null) continue;
-                var selection = new PlcSelection { Project = project, Software = plc, Path = entry.Path + "/plc/" + Segment(plc.Name) };
-                opcUa?.Add(new JObject { ["plcPath"] = selection.Path, ["serverInterfaceGroup"] = OpcUaSnapshot(OpcUaProviderFor(plc)?.CommunicationGroup?.ServerInterfaceGroup, budget) });
-                var safetyState = ReadSafety(plc);
-                var safetySignatures = safetyState["signatures"] as JArray;
-                bool hasSafetySignatureCoverage = safetyState.Value<bool>("available") && safetySignatures != null && safetySignatures.Count > 0
-                    && safetySignatures.All(signature => !string.IsNullOrWhiteSpace(signature.Value<string>("type"))
-                        && signature["value"] != null && signature["value"].Type != JTokenType.Null);
-                safetyStates.Add(new JObject { ["plcPath"] = selection.Path, ["safety"] = safetyState });
-                var scopes = SoftwareScopes(selection, budget);
-                foreach (var scope in scopes)
-                {
-                    var blockItems = new JArray();
-                    foreach (var block in ScopeBlocks(scope, budget))
-                    {
-                        bool protectedBlock = block.Item.IsKnowHowProtected;
-                        bool consistentBlock = block.Item.IsConsistent;
-                        var info = new JObject { ["name"] = block.Item.Name, ["path"] = block.Path, ["number"] = block.Item.Number,
-                            ["language"] = block.Item.ProgrammingLanguage.ToString(), ["modified"] = block.Item.ModifiedDate.ToString("O"),
-                            ["protected"] = protectedBlock, ["consistent"] = consistentBlock, ["nativeSystemGroup"] = block.NativeSystemGroup };
-                        if (tagImport)
-                        {
-                            info["fingerprintMode"] = "tagImportBlockMetadataOnly";
-                            blockItems.Add(info);
-                            continue;
-                        }
-                        var content = EngineeringFingerprintRules.ReadBlockContent(block.NativeSystemGroup, protectedBlock, consistentBlock, hasSafetySignatureCoverage, block.Path, () =>
-                        {
-                            var provider = block.Item.GetService<FingerprintProvider>();
-                            return provider == null ? null : new JArray(provider.GetFingerprints().OrderBy(f => f.Id).Select(f => new JObject { ["id"] = f.Id.ToString(), ["value"] = ChangeScalar(f.Value) }));
-                        }, targets.Contains(block.Item.Name));
-                        info["fingerprintMode"] = content.Mode;
-                        if (content.Payload != null) { info["fingerprints"] = content.Payload; nativeFingerprintBlocks++; }
-                        else if (content.Mode == "protectedGeneratedMetadata")
-                            generatedExclusions.Add(new JObject { ["path"] = block.Path, ["name"] = block.Item.Name,
-                                ["mode"] = content.Mode, ["consistent"] = consistentBlock,
-                                ["reason"] = "Protected native system-group derived payload: checksum API can reject generated safety blocks after compilation; identity/modified/protection/consistency metadata remains covered." });
-                        else if (content.Mode == "inconsistentMetadataOnly") inconsistentBystanders.Add(block.Path);
-                        else missingProviders.Add(block.Path);
-                        blockItems.Add(info);
-                    }
-                    software.Add(new JObject { ["name"] = scope.Name, ["path"] = scope.Path, ["kind"] = scope.Kind, ["blocks"] = blockItems,
-                        ["userGroups"] = new JArray(EngineeringGroupPaths(scope.Blocks, scope.Path + "/blocks", 0)
-                            .Concat(EngineeringGroupPaths(scope.Types, scope.Path + "/types", 0)).Concat(EngineeringGroupPaths(scope.Tags, scope.Path + "/tags", 0))),
-                        ["namespacePreset"] = scope.Unit?.NamespacePreset,
-                        ["relations"] = scope.Unit == null ? null : new JArray(scope.Unit.Relations.Select(relation => new JObject { ["relationType"] = relation.RelationType.ToString(), ["relatedObject"] = InspectionValue(relation.RelatedObject) })),
-                        ["types"] = new JArray(ScopeTypes(scope, budget).Select(type => EngineeringFingerprintRules.RequireConsistentType(change.Kind, () => type.Item.IsConsistent, type.Path, new JObject { ["name"] = type.Item.Name, ["path"] = type.Path, ["modified"] = type.Item.ModifiedDate.ToString("O"), ["protected"] = type.Item.IsKnowHowProtected }))),
-                        ["tagTables"] = new JArray(TagTables(scope.Tags, scope.Path + "/tags", budget).Select(table => new JObject { ["name"] = table.Item.Name, ["path"] = table.Path, ["modified"] = table.Item.ModifiedTimeStamp.ToString("O") })) });
-                }
-            }
-            if (budget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish a complete change fingerprint for this project size.");
-            snapshot["hardware"] = hardware;
-            snapshot["software"] = software;
+            var content = ProjectContentFor(change, project, tagImport, targets, opcUa);
+            JArray safetyStates = content.SafetyStates, generatedExclusions = content.GeneratedExclusions, missingProviders = content.MissingProviders, inconsistentBystanders = content.InconsistentBystanders;
+            int nativeFingerprintBlocks = content.NativeFingerprintBlocks;
+            snapshot["hardware"] = content.Hardware;
+            snapshot["software"] = content.Software;
             snapshot["safety"] = safetyStates;
             if (tagImport)
                 snapshot["tagTableContent"] = new JArray(CaptureTagImportScope(change, "fingerprint").Select(row =>
@@ -1897,10 +1965,14 @@ namespace TiaMcp.Openness.V21
             view["scratchSecurity"] = change.ScratchSecurity?.DeepClone();
             view["automaticRetryAllowed"] = false;
             view["phaseTimings"] = change.PhaseTimings.DeepClone();
+            view["fingerprintContent"] = FingerprintContentView(change);
             view["progressPath"] = Path.Combine(change.Directory, "progress.json");
             view["progress"] = ChangeMilestoneRules.From(change.State, change.Stages, change.Compilation);
             return change.Kind == "hmi_classic_screen_edit" && !includeDetails ? ClassicScreenReceipts.Compact(view) : view;
         }
+
+        // How often this change's fingerprints read the whole project and how often they reused the last read of the same saved state.
+        private static JObject FingerprintContentView(EngineeringChange change) => new JObject { ["fullReads"] = change.ProjectContentReads, ["reusedForSavedState"] = change.ProjectContentReuses };
 
         private static string DecisionLog(string changesDirectory) => Path.Combine(changesDirectory, "intent-decisions.jsonl");
 
@@ -1938,6 +2010,7 @@ namespace TiaMcp.Openness.V21
                 ["scratchSecurity"] = change.ScratchSecurity?.DeepClone(), ["safetyAfter"] = change.SafetyAfter?.DeepClone(), ["technologyAfter"] = change.TechnologyAfter?.DeepClone() };
             var temporary = change.Journal + ".new";
             data["phaseTimings"] = change.PhaseTimings.DeepClone();
+            data["fingerprintContent"] = FingerprintContentView(change);
             File.WriteAllText(temporary, data.ToString(Formatting.Indented), new UTF8Encoding(false));
             if (File.Exists(change.Journal)) TiaMcp.Core.JournalFileReplacement.Replace(temporary, change.Journal); else File.Move(temporary, change.Journal);
             // A completed phase can precede the terminal state transition. Refresh
@@ -1995,6 +2068,9 @@ namespace TiaMcp.Openness.V21
             internal readonly JArray Stages = new JArray();
             internal IEngineeringObject AttributeTarget;
             // tag_set with payload.items: the resolved table path per item, and the tags whose requested attributes the fingerprint covers.
+            // Set for changes prepared in this session; other fingerprint callers (library changes, reconciliation replays) always read in full.
+            internal bool ReuseProjectContent;
+            internal int ProjectContentReads, ProjectContentReuses;
             internal string[] TagBatchTablePaths;
             internal List<TagBatchTarget> TagBatchTargets;
         }

@@ -119,6 +119,61 @@ internal static class TagTableImportTests
         return Task.CompletedTask;
     }
 
+    // TIA reports a warning only for an object it recompiles, so a warning of another object is revealed, not introduced.
+    internal static Task WarningsOutsideTheChangesOwnObjectsAreRevealed()
+    {
+        static JObject Result(params (string State, string Object, string Text)[] findings)
+        {
+            var messages = new JArray();
+            foreach (var group in findings.GroupBy(f => f.Object))
+            {
+                messages.Add(new JObject { ["depth"] = 0, ["path"] = "PLC_1", ["state"] = group.First().State, ["description"] = "" });
+                messages.Add(new JObject { ["depth"] = 1, ["path"] = "Program blocks", ["state"] = group.First().State, ["description"] = "" });
+                messages.Add(new JObject { ["depth"] = 2, ["path"] = group.Key, ["state"] = group.First().State, ["description"] = "" });
+                foreach (var finding in group) messages.Add(new JObject { ["depth"] = 3, ["path"] = "3", ["state"] = finding.State, ["description"] = finding.Text });
+            }
+            int errors = findings.Count(f => f.State == "Error"), warnings = findings.Length - errors;
+            return new JObject { ["errorCount"] = errors, ["warningCount"] = warnings, ["targets"] = new JArray(new JObject {
+                ["target"] = "/plc/PLC_1", ["state"] = errors > 0 ? "Error" : warnings > 0 ? "Warning" : "Success", ["errorCount"] = errors, ["warningCount"] = warnings, ["messagesTruncated"] = false, ["messages"] = messages }) };
+        }
+        var before = Result();
+        var after = Result(("Warning", "Belt (DB85)", "MaxSpeed too large"), ("Warning", "Gate (FC1)", "Accuracy may be lost"));
+        // Without declared own objects nothing changes: both are introduced.
+        var plain = CompileBaselineRules.Compare(before, after);
+        Check.Equal(2, plain.Value<int>("introducedCount"));
+        Check.Equal(0, plain.Value<int>("revealedCount"));
+        Check.Equal(false, plain.Value<bool>("verified"));
+        // The change wrote Gate: its warning is introduced, the other object's warning is revealed.
+        var own = CompileBaselineRules.Compare(before, after, new[] { "gate" });
+        Check.Equal(1, own.Value<int>("introducedCount"));
+        Check.Equal("Accuracy may be lost", own["introduced"]![0]![1]!.Value<string>());
+        Check.Equal(1, own.Value<int>("revealedCount"));
+        Check.Equal("MaxSpeed too large", own["revealed"]![0]![1]!.Value<string>());
+        Check.Equal(CompileBaselineRules.RevealedNote, own.Value<string>("revealedNote"));
+        Check.Equal(false, own.Value<bool>("verified"));
+        // A change that wrote neither (a tag table) has only revealed warnings and stays verified.
+        var other = CompileBaselineRules.Compare(before, after, new[] { "Tags" });
+        Check.Equal(0, other.Value<int>("introducedCount"));
+        Check.Equal(2, other.Value<int>("revealedCount"));
+        Check.Equal(true, other.Value<bool>("verified"));
+        // "Gate" does not own "GateKeeper (FC2)", and a plain name segment matches exactly.
+        var prefix = CompileBaselineRules.Compare(before, Result(("Warning", "GateKeeper (FC2)", "W"), ("Warning", "Tags", "T")), new[] { "Gate", "Tags" });
+        Check.Equal(1, prefix.Value<int>("revealedCount"));
+        Check.Equal("W", prefix["revealed"]![0]![1]!.Value<string>());
+        Check.Equal("T", prefix["introduced"]![0]![1]!.Value<string>());
+        // An error in another object is never revealed: it is introduced and fails the change.
+        var error = CompileBaselineRules.Compare(before, Result(("Error", "Belt (DB85)", "Tag not found")), new[] { "Tags" });
+        Check.Equal(1, error.Value<int>("introducedErrorCount"));
+        Check.Equal(0, error.Value<int>("revealedCount"));
+        Check.Equal(false, error.Value<bool>("verified"));
+        Check.Equal(false, CompileBaselineRules.Accepts(before, Result(("Error", "Belt (DB85)", "Tag not found")), error));
+        // An existing warning stays existing whoever owns it.
+        var same = CompileBaselineRules.Compare(after, after, new[] { "Tags" });
+        Check.Equal(2, same.Value<int>("existingCount"));
+        Check.Equal(0, same.Value<int>("revealedCount"));
+        return Task.CompletedTask;
+    }
+
     internal static Task SourceRefreshParts()
     {
         static string Block(string number, string member, string code) =>
