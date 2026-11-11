@@ -14,6 +14,7 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/TagTableRowRules.cs" Link="TagTableRowRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/TagBatchRules.cs" Link="TagBatchRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ChangeBatchRules.cs" Link="ChangeBatchRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/SafetyTagRenameRules.cs" Link="SafetyTagRenameRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/FParameterAllowlistRules.cs" Link="FParameterAllowlistRules.cs" />
     <None Include="../../contracts/safety-fparameter-allowlist.v1.json" Link="safety-fparameter-allowlist.v1.json" CopyToOutputDirectory="PreserveNewest" />
     <Compile Include="../../src/TiaMcp.Openness.V21/VciResolutionRules.cs" Link="VciResolutionRules.cs" />

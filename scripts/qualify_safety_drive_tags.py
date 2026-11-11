@@ -2,7 +2,12 @@
 at the addresses Startdrive reports, while generic tag routes keep refusing them. The telegram is inserted by the native fixture
 helper (drive_telegram_set refuses safety telegrams). With the two real safety tags in place, tag_set, tag_delete and
 tag_create batches (payload.items) that touch one of them or its address must refuse as a whole and change no tag.
-Owned scratch only; never a user project, no download."""
+With --safety-tag-rename the run also renames one of the safety tags through a single tag_set with safetyAcknowledged=true:
+every other edit of a safety tag must stay refused, the renamed tag must read back as a safety tag on its address, and the
+safety state before and after is recorded. The renamed tag is one the safety program uses: the fixture helper creates a Bool
+tag on bit 0 of the telegram's input (tag_create refuses every F-I/O address, and the F-compiler rejects the two Word tags as
+F-I/O accesses), and safety_import_xml gives the generated main safety block one F-FBD network that reads it. The block must
+name the new tag after the rename. Owned scratch only; never a user project, no download."""
 import argparse
 import json
 from pathlib import Path
@@ -11,12 +16,26 @@ import uuid
 
 from smoke_mcp import Client, ROOT
 
+MAIN = 'Main_Safety_RTG1'
+FLG = 'http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5'
+
+
+def reading_network(source, target):
+    """One F-FBD network: target := source, both Bool tags (the shape probe_safety_logic.py imports)."""
+    return ('<NetworkSource><FlgNet xmlns="%s"><Parts>'
+            '<Access Scope="GlobalVariable" UId="21"><Symbol><Component Name="%s" /></Symbol></Access>'
+            '<Access Scope="GlobalVariable" UId="22"><Symbol><Component Name="%s" /></Symbol></Access>'
+            '<Part Name="Coil" UId="23" /></Parts>'
+            '<Wires><Wire UId="24"><IdentCon UId="21" /><NameCon UId="23" Name="in" /></Wire>'
+            '<Wire UId="25"><IdentCon UId="22" /><NameCon UId="23" Name="operand" /></Wire></Wires></FlgNet></NetworkSource>' % (FLG, source, target))
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--artifacts', type=Path, required=True)
     parser.add_argument('--host', type=Path, default=ROOT / 'src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe')
     parser.add_argument('--worker', type=Path, default=ROOT / 'src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe')
+    parser.add_argument('--safety-tag-rename', action='store_true', help='Also rename a safety tag through tag_set with safetyAcknowledged=true.')
     args = parser.parse_args()
     root = args.artifacts.resolve()
     root.mkdir(parents=True, exist_ok=False)
@@ -140,6 +159,74 @@ def main():
             assert tag_rows() == before, 'A refused batch changed a tag'
         record('every tag is unchanged after the refused batches', before)
         refused('safety_drive_tags', {**payload, 'safetyAcknowledged': True}, 'ObjectExists')
+        if args.safety_tag_rename:
+            # The one generic edit of a safety tag: a single tag_set, safetyAcknowledged=true, attributes holding only Name.
+            # The tag to rename is one the safety program uses: a Bool safety tag on bit 0 of the telegram's input, created by the
+            # fixture helper, read by one F-FBD network in the generated main safety block.
+            status, new_name = 'SafeDrive_Bit0', 'SafeDrive_StoActive'
+            change('tag_create', {'tagTableName': table, 'name': 'SafeUsed', 'dataTypeName': 'Bool', 'logicalAddress': '%M10.2'}, plc=fplc)
+            seed = root / 'safety-bit-tag.json'
+            seed.write_text(json.dumps(dict(ownsPortalProcess=True, creationTool='tia_create_scratch', processId=started['processId'], projectPath=project['path'],
+                                            plcName=fplc.rsplit('/', 1)[-1], tagTable=table, tagName=status, tagAddress='%%I%d.0' % ranges['Input'])), encoding='utf-8')
+            out = subprocess.run([str(helper), 'safety-bit-tag', str(seed)], text=True, capture_output=True)
+            record('fixture creates a Bool safety tag on the telegram', {'exit': out.returncode, 'stdout': out.stdout[-2000:]})
+            assert out.returncode == 0, out.stdout
+            assert tag_rows()[status] == ('%%I%d.0' % ranges['Input'], 'Bool', True), tag_rows().get(status)
+            main_xml = client.tool('block_read', {'plcPath': fplc, 'blockName': MAIN})['xml']
+            assert main_xml.count('<NetworkSource />') == 1 and '<ProgrammingLanguage>F_FBD</ProgrammingLanguage>' in main_xml, 'The main safety block must hold exactly one empty F-FBD network'
+            logic = change('safety_import_xml', {'xml': main_xml.replace('<NetworkSource />', reading_network(status, 'SafeUsed')), 'expectedBlockNames': [MAIN], 'safetyAcknowledged': True}, plc=fplc)
+            used_xml = client.tool('block_read', {'plcPath': fplc, 'blockName': MAIN})['xml']
+            assert 'Component Name="%s"' % status in used_xml, 'The main safety block does not read the safety tag after the import'
+            record('main safety block reads the safety tag', {'stages': logic['stages'], 'compilerSucceeded': logic['compile']['compilerSucceeded'],
+                                                              'introducedErrors': logic['compile']['baselineComparison'].get('introducedErrorCount'), 'safetyAfter': logic.get('safetyAfter')})
+            assert logic['compile']['compilerSucceeded'] is True, logic['compile']
+            before = tag_rows()
+            rename = lambda **more: {'tagTableName': table, 'memberName': status, 'attributes': {'Name': new_name}, **more}
+            refusals = [
+                ('a safety tag renamed without safetyAcknowledged', 'tag_set', rename(), 'SafetyBoundary'),
+                ('safetyAcknowledged false', 'tag_set', rename(safetyAcknowledged=False), 'InvalidRequest'),
+                ('a new address for a safety tag', 'tag_set', {**rename(safetyAcknowledged=True), 'attributes': {'LogicalAddress': '%%I%d.1' % ranges['Input']}}, 'SafetyBoundary'),
+                ('a new data type beside the new name', 'tag_set', {**rename(safetyAcknowledged=True), 'attributes': {'Name': new_name, 'DataTypeName': 'Int'}}, 'SafetyBoundary'),
+                ('a name another tag has', 'tag_set', {**rename(safetyAcknowledged=True), 'attributes': {'Name': 'StdA'}}, 'ObjectExists'),
+                ('safetyAcknowledged on a standard tag', 'tag_set', {'tagTableName': table, 'memberName': 'StdA', 'attributes': {'Name': 'StdA_R'}, 'safetyAcknowledged': True}, 'InvalidRequest'),
+                ('safetyAcknowledged on tag_delete', 'tag_delete', {**drop(status), 'safetyAcknowledged': True}, 'InvalidRequest'),
+                ('safetyAcknowledged beside items', 'tag_set', {'items': [edit(status, Name=new_name)], 'safetyAcknowledged': True}, 'InvalidRequest'),
+            ]
+            for label, kind, body, code in refusals:
+                result = client.request('tools/call', {'name': 'change_prepare', 'arguments': {'kind': kind, 'plcPath': fplc, 'payload': body}})
+                error = (result.get('structuredContent') or {}).get('error') or {}
+                record('rename refusal: %s refused with %s' % (label, code), error)
+                assert result.get('isError') and error.get('code') == code, error
+                assert tag_rows() == before, 'A refused safety-tag edit changed a tag'
+            prepared = client.tool('change_prepare', {'kind': 'tag_set', 'plcPath': fplc, 'payload': rename(safetyAcknowledged=True)})
+            preview = prepared['preview']
+            record('safety-tag rename prepared', {'safetyTagRename': preview.get('safetyTagRename'), 'safetyBefore': preview.get('safetyBefore'), 'warnings': preview.get('warnings')})
+            assert preview['safetyTagRename'] == {'memberName': status, 'newName': new_name, 'dataTypeName': 'Bool', 'logicalAddress': before[status][0]}, preview.get('safetyTagRename')
+            assert preview['safetyBefore']['available'] is True and any('safety program signatures' in w for w in preview['warnings']), preview
+            assert tag_rows() == before, 'Preparing the rename changed a tag'
+            renamed = client.tool('change_apply', {'changeId': prepared['changeId'], 'previewHash': prepared['previewHash'], 'idempotencyKey': uuid.uuid4().hex,
+                                                   'checkpointSave': True, 'compile': True, 'save': True})
+            assert renamed['state'] == 'applied' and 'safety_tag_rename_verified' in renamed['stages'] and 'changed_project_saved' in renamed['stages'], (renamed['state'], renamed['stages'])
+            view = client.tool('change_status', {'changeId': renamed['changeId'], 'includeDetails': True})
+            safety_after = view.get('safetyAfter') or renamed.get('safetyAfter')
+            assert safety_after and safety_after['available'] is True, 'The applied rename records no safety state'
+            keys = ('signatures', 'runtimeGroups')
+            record('safety-tag rename applied', {'stages': renamed['stages'], 'compilerSucceeded': renamed['compile']['compilerSucceeded'],
+                                                 'introducedErrors': renamed['compile']['baselineComparison'].get('introducedErrorCount'),
+                                                 'safetyBefore': preview['safetyBefore'], 'safetyAfter': safety_after,
+                                                 'safetyStateUnchanged': {key: preview['safetyBefore'].get(key) == safety_after.get(key) for key in keys}})
+            after = tag_rows()
+            record('renamed safety tag read back', after)
+            assert status not in after and after[new_name] == before[status] and after[new_name][2] is True, after
+            assert {name: row for name, row in after.items() if name != new_name} == {name: row for name, row in before.items() if name != status}, 'Another tag changed'
+            # The safety program follows the rename: the main safety block names the new tag and no longer the old one.
+            renamed_xml = client.tool('block_read', {'plcPath': fplc, 'blockName': MAIN})['xml']
+            block = next(b for b in client.tool('software_inspect', {'plcPath': fplc, 'include': 'blocks', 'maxItems': 2000})['blocks'] if b['name'] == MAIN)
+            record('main safety block after the rename', {'namesNewTag': 'Component Name="%s"' % new_name in renamed_xml, 'namesOldTag': 'Component Name="%s"' % status in renamed_xml,
+                                                         'isConsistent': block.get('isConsistent'), 'signatureKindsChanged': [
+                                                             s['type'] for s, t in zip(preview['safetyBefore']['signatures'], safety_after['signatures']) if s != t]})
+            assert 'Component Name="%s"' % new_name in renamed_xml and 'Component Name="%s"' % status not in renamed_xml, 'The main safety block does not follow the rename'
+            applied = renamed  # the closing restore returns to the state before the rename
         restored = client.tool('change_restore', {'changeId': applied['changeId'], 'previewHash': applied['previewHash']})
         record('restore from the checkpoint', {'state': restored['state'], 'recoveredProject': restored.get('recoveredProject')})
         assert restored['state'] == 'restored', restored['state']

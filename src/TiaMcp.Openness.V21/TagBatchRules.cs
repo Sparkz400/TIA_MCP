@@ -34,6 +34,9 @@ namespace TiaMcp.Openness.V21
             foreach (string field in SingleFields)
                 if (payload[field] != null)
                     throw new BridgeException("InvalidRequest", "Give either items, or tagTableName/tagTablePath with memberName and attributes; " + field + " cannot accompany items.");
+            // A safety tag is renamed by a single tag_set only (SafetyTagRenameRules); a batch never edits one.
+            if (payload["safetyAcknowledged"] != null)
+                throw new BridgeException("InvalidRequest", "safetyAcknowledged cannot accompany items: a batch never edits a safety tag. Rename a safety tag with a single tag_set.");
             if (!(payload["items"] is JArray array) || array.Count < 1 || array.Count > MaxItems)
                 throw new BridgeException("InvalidRequest", "items must be an array of 1.." + MaxItems + " tag edits.");
             var result = new Item[array.Count];

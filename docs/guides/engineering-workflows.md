@@ -276,6 +276,53 @@ moves or creates a tag inside a PROFIsafe telegram
 (`local.safety.fio-routes.20261111`), is refused as a whole with `SafetyBoundary`
 naming the item, and no tag changes. No large project has been timed.
 
+### Renaming a safety tag
+
+Generic tag changes exclude safety tags. The one exception is a rename, asked for
+explicitly:
+
+```json
+{
+  "kind": "tag_set",
+  "payload": { "tagTableName": "SafeDriveTags", "memberName": "SafeDrive_S_ZSW1",
+               "attributes": { "Name": "SafeDrive_Status" }, "safetyAcknowledged": true }
+}
+```
+
+- `attributes` must hold `Name` and nothing else. Address and data type belong to
+  the F-I/O configuration and stay excluded (`SafetyBoundary`), as does deleting a
+  safety tag.
+- It is a single change only. `safetyAcknowledged` beside or inside `items` is
+  refused, so a batch never edits a safety tag. On a standard tag, on `tag_delete`,
+  `constant_set` or `constant_delete`, or with any value but `true`, the flag is
+  refused with `InvalidRequest`. Kinds that do not edit an existing tag ignore it.
+- The safety offline program must be writable. If it has a password and TIA is not
+  logged on, the change is refused with `SafetyLoginRequired`; the tool never takes
+  a safety password.
+- The preview holds `safetyTagRename` (old and new name, data type, address),
+  `safetyBefore` (signatures and runtime groups) and a warning. After the write the
+  tag is read back under its new name and must still be a safety tag on the same
+  address with the same data type (`safety_tag_rename_verified`); the applied
+  change records `safetyAfter`.
+
+This does not validate, accept or approve the safety program. `scripts/qualify_safety_drive_tags.py
+--safety-tag-rename` ran it natively on 11 November 2026 on an owned scratch F-CPU
+with a PROFIsafe telegram, in two runs:
+
+- A tag no safety block used (the telegram's status word,
+  `local.safety.tag-rename.20261111`): renamed, compiled and saved; the four
+  offline signatures were the same before and after.
+- A tag the safety program used (`local.safety.tag-rename-used.20261111`): a Bool
+  tag on bit 0 of the telegram's input, read by one F-FBD network of the generated
+  main safety block. After the rename the block named the new tag and was
+  consistent, the compile reported no new error, and the four offline signatures
+  were again the same before and after.
+
+That is what TIA V21 did in this fixture, not a rule. Other uses of a safety tag
+(several blocks, an F-FB interface, F-LAD, F-I/O modules) are not exercised, so
+compare `safetyBefore` and `safetyAfter` on every rename and treat a changed
+signature as a changed safety program.
+
 ### Items on other kinds
 
 These kinds take `{"items": [<one payload of that kind>, ...]}` with 1 to 100 items
@@ -495,7 +542,7 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `tag_table_create` | `tagTableName`, optional `scopePath`, `groupPath` | Creates one empty tag table; the name must be free in the software scope across all tag-table groups (case-insensitive). |
 | `tag_table_rename` | `tagTableName` or `tagTablePath`, `newName` | Renames one tag table; its members stay, and `newName` must be free in the software scope. |
 | `tag_table_delete` | `tagTableName` or `tagTablePath` | Deletes one empty user tag table (no tags, no user constants); the default tag table is refused with `DefaultTagTable`, a non-empty table with `TagTableNotEmpty`. |
-| `tag_set` | `tagTableName` or `tagTablePath`, `memberName`, `attributes: {...}`; or `items: [{tagTableName or tagTablePath, memberName, attributes}]` ([many edits in one change](#many-tag-edits-in-one-change)) | Edits an existing tag's exposed writable `Name`, `DataTypeName` and/or `LogicalAddress`. A new `LogicalAddress` inside the address range of an F-I/O the PLC owns refuses at prepare with `SafetyBoundary`; nothing is written. With `items`, 1 to 500 such edits in one software scope share one fingerprint check, checkpoint archive, compile and save; a refusal on any item refuses the whole change before a write. |
+| `tag_set` | `tagTableName` or `tagTablePath`, `memberName`, `attributes: {...}`; or `items: [{tagTableName or tagTablePath, memberName, attributes}]` ([many edits in one change](#many-tag-edits-in-one-change)) | Edits an existing tag's exposed writable `Name`, `DataTypeName` and/or `LogicalAddress`. A new `LogicalAddress` inside the address range of an F-I/O the PLC owns refuses at prepare with `SafetyBoundary`; nothing is written. With `items`, 1 to 500 such edits in one software scope share one fingerprint check, checkpoint archive, compile and save; a refusal on any item refuses the whole change before a write. A safety tag is refused (`SafetyBoundary`) with one exception: a single `tag_set` with `safetyAcknowledged: true` and `attributes` holding only `Name` [renames it](#renaming-a-safety-tag). |
 | `constant_set` | `tagTableName` or `tagTablePath`, `memberName`, `attributes: {...}` | Edits an existing user constant's exposed writable `Name`, `DataTypeName` and/or `Value`. System constants are excluded. |
 | `tag_delete` / `constant_delete` | `tagTableName` or `tagTablePath`, `memberName`, `dependencyPolicy: "rejectReferenced"` | Deletes exactly one existing tag or user constant after dependency checks. |
 | `tag_create` | `tagTableName` or `tagTablePath`, `name`, `dataTypeName`, `logicalAddress` | Creates one tag in an existing table. Names already used by a tag or constant in the software scope are rejected. An absolute I/O address inside the address range of an F-I/O the PLC owns refuses at prepare with `SafetyBoundary` (TIA would make it a safety tag), before anything is created; a created tag TIA still reports as a safety tag fails verification. Readback is exact, so use native spelling such as `%M0.0`. The F-I/O refusal of `tag_create`, `tag_set`, `tag_table_import_xml`, project-ward `vci_synchronize` and tag-table `library_instantiate` was rechecked natively on an F-CPU with ET 200SP F-DI (`local.safety.fio-routes.20261101`). |

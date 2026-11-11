@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "6b325128ca6199af21e6377aac0f05901fb52424a0379d34e825c2642d8203c2",
-      "bytes": 1900880
+      "sha256": "ab7fccec4dcf5d5d06a9cc2cc3548cf4db707af4bda22506f6c99a22edd3b4fd",
+      "bytes": 1908487
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1977,8 +1977,8 @@
     },
     {
       "path": "src/TiaMcp.Host/EngineeringTools.cs",
-      "sha256": "989e27440f54d3fdfeea03567b17d63d6409d690f6e6b6a76a2f28bf549f5aff",
-      "bytes": 53786
+      "sha256": "08d0b9899483f6fa1facb6c54aab65cdc153da0cbe0b02a414e2f8b918cfd5c1",
+      "bytes": 54121
     },
     {
       "path": "src/TiaMcp.Host/GraphTools.cs",
@@ -2767,8 +2767,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
-      "sha256": "736168c6338d64e4a5621a5cc65e52b7e4dceb01f0ab07648688eeebfe0be5de",
-      "bytes": 163705
+      "sha256": "bd9c312e4b766e80901864e19ace626a786624e44b9ccb56801d8109211c59ba",
+      "bytes": 163751
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ClassicScreenArea.cs",
@@ -2982,8 +2982,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
-      "sha256": "25bf64ea262dcba097e1a3fc14e4638fa77babf80808a403154034ac77a35fca",
-      "bytes": 44082
+      "sha256": "967370ce2473f2d9a50ddf59bdecf64810fc4129aecf0534f6fba19b343e9848",
+      "bytes": 47658
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
@@ -3416,6 +3416,11 @@
       "bytes": 6054
     },
     {
+      "path": "src/TiaMcp.Openness.V21/SafetyTagRenameRules.cs",
+      "sha256": "6baff5b2d73570cf6fe71bc3e15a1f705e83dc443a4b968ef328ffc86f18829a",
+      "bytes": 1886
+    },
+    {
       "path": "src/TiaMcp.Openness.V21/SimulationDiscoveryObserver.cs",
       "sha256": "2e81a32a675779f823f5acdb02d543ea06fc12f4d2dbef8f605b026700f0a847",
       "bytes": 6785
@@ -3457,8 +3462,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TagBatchRules.cs",
-      "sha256": "cbc8ddf977fa54b816f501cbb6648893b549dc58d0f15f756fd957b5c18c6432",
-      "bytes": 7486
+      "sha256": "2a9759b5ceacd09abdf646af128b0689050e46c84f9b8787951b6d93371aa54f",
+      "bytes": 7838
     },
     {
       "path": "src/TiaMcp.Openness.V21/TagTableImportRules.cs",
@@ -89409,8 +89414,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareBlockEdit",
-              "line": 334,
-              "endLine": 344,
+              "line": 373,
+              "endLine": 383,
               "sha256": "33fb05ba244d99cb3998f50207fd6acde188ea05ddee7147ca61f32503d761e9"
             }
           ]
@@ -89429,8 +89434,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyBlockEdit",
-              "line": 346,
-              "endLine": 352,
+              "line": 385,
+              "endLine": 391,
               "sha256": "72f5c29360c08b58cf3d8c54e5b30706243d7eb94189be96cea12d278c6f3cf7"
             }
           ]
@@ -89481,8 +89486,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -89543,8 +89548,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -89765,8 +89770,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareBlockEdit",
-              "line": 334,
-              "endLine": 344,
+              "line": 373,
+              "endLine": 383,
               "sha256": "33fb05ba244d99cb3998f50207fd6acde188ea05ddee7147ca61f32503d761e9"
             }
           ]
@@ -89785,8 +89790,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyBlockEdit",
-              "line": 346,
-              "endLine": 352,
+              "line": 385,
+              "endLine": 391,
               "sha256": "72f5c29360c08b58cf3d8c54e5b30706243d7eb94189be96cea12d278c6f3cf7"
             }
           ]
@@ -89888,8 +89893,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -90859,8 +90864,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagCreate",
-              "line": 286,
-              "endLine": 301,
+              "line": 325,
+              "endLine": 340,
               "sha256": "a112b78c415ce50bf1b23abbbfca0e595e088e6eb425f1d7e249c661625c62b2"
             }
           ]
@@ -90893,8 +90898,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "TagCreate",
-              "line": 304,
-              "endLine": 327,
+              "line": 343,
+              "endLine": 366,
               "sha256": "1fae27bee49687e2778477629102486ea0984b6de3fb00242fdf983e2d802ea7"
             }
           ]
@@ -90924,9 +90929,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagEdit",
-              "line": 89,
-              "endLine": 115,
-              "sha256": "2b2eb0ca513c62a509864c2cf531e7a51c239a05b67e4088f7c63cfee0e9954c"
+              "line": 94,
+              "endLine": 128,
+              "sha256": "bd81830ae544d05429db4318c574702af5afd428561dd72080114835a67ad8d0"
             }
           ]
         },
@@ -90944,9 +90949,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyTagEdit",
-              "line": 117,
-              "endLine": 137,
-              "sha256": "c6df2cf1f5258e8c5c53b6d4781e65428396278735b5a70e1b60e94657ddf513"
+              "line": 130,
+              "endLine": 165,
+              "sha256": "5dc57db86aa2391c35a529f2af3c0d196c279f7f4bb730ee52a36f32b19072ed"
             }
           ]
         }
@@ -90975,9 +90980,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagEdit",
-              "line": 89,
-              "endLine": 115,
-              "sha256": "2b2eb0ca513c62a509864c2cf531e7a51c239a05b67e4088f7c63cfee0e9954c"
+              "line": 94,
+              "endLine": 128,
+              "sha256": "bd81830ae544d05429db4318c574702af5afd428561dd72080114835a67ad8d0"
             }
           ]
         },
@@ -90995,9 +91000,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyTagEdit",
-              "line": 117,
-              "endLine": 137,
-              "sha256": "c6df2cf1f5258e8c5c53b6d4781e65428396278735b5a70e1b60e94657ddf513"
+              "line": 130,
+              "endLine": 165,
+              "sha256": "5dc57db86aa2391c35a529f2af3c0d196c279f7f4bb730ee52a36f32b19072ed"
             }
           ]
         }
@@ -92092,8 +92097,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 481,
-              "endLine": 494,
+              "line": 520,
+              "endLine": 533,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             }
           ]
@@ -92112,8 +92117,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 496,
-              "endLine": 551,
+              "line": 535,
+              "endLine": 590,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -92150,8 +92155,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 481,
-              "endLine": 494,
+              "line": 520,
+              "endLine": 533,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             }
           ]
@@ -92170,8 +92175,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 496,
-              "endLine": 551,
+              "line": 535,
+              "endLine": 590,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -92208,8 +92213,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 481,
-              "endLine": 494,
+              "line": 520,
+              "endLine": 533,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             }
           ]
@@ -92228,8 +92233,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 496,
-              "endLine": 551,
+              "line": 535,
+              "endLine": 590,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -93253,8 +93258,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -93407,8 +93412,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareBlockEdit",
-              "line": 334,
-              "endLine": 344,
+              "line": 373,
+              "endLine": 383,
               "sha256": "33fb05ba244d99cb3998f50207fd6acde188ea05ddee7147ca61f32503d761e9"
             },
             {
@@ -93477,8 +93482,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 481,
-              "endLine": 494,
+              "line": 520,
+              "endLine": 533,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -93533,8 +93538,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareInstanceDbCreate",
-              "line": 382,
-              "endLine": 408,
+              "line": 421,
+              "endLine": 447,
               "sha256": "8aaac5d61ea993dab758fb2b92355c428cdad5af7425eaa35c64b7261faec773"
             },
             {
@@ -93596,16 +93601,16 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagCreate",
-              "line": 286,
-              "endLine": 301,
+              "line": 325,
+              "endLine": 340,
               "sha256": "a112b78c415ce50bf1b23abbbfca0e595e088e6eb425f1d7e249c661625c62b2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagEdit",
-              "line": 89,
-              "endLine": 115,
-              "sha256": "2b2eb0ca513c62a509864c2cf531e7a51c239a05b67e4088f7c63cfee0e9954c"
+              "line": 94,
+              "endLine": 128,
+              "sha256": "bd81830ae544d05429db4318c574702af5afd428561dd72080114835a67ad8d0"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -93861,8 +93866,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyBlockEdit",
-              "line": 346,
-              "endLine": 352,
+              "line": 385,
+              "endLine": 391,
               "sha256": "72f5c29360c08b58cf3d8c54e5b30706243d7eb94189be96cea12d278c6f3cf7"
             },
             {
@@ -93952,8 +93957,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyInstanceDbCreate",
-              "line": 410,
-              "endLine": 418,
+              "line": 449,
+              "endLine": 457,
               "sha256": "3bfc196f2791a227aaa9409527765891829056f8df508e0dc7392b6f8a3138c1"
             },
             {
@@ -94029,9 +94034,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyTagEdit",
-              "line": 117,
-              "endLine": 137,
-              "sha256": "c6df2cf1f5258e8c5c53b6d4781e65428396278735b5a70e1b60e94657ddf513"
+              "line": 130,
+              "endLine": 165,
+              "sha256": "5dc57db86aa2391c35a529f2af3c0d196c279f7f4bb730ee52a36f32b19072ed"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -94155,8 +94160,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -94239,8 +94244,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 496,
-              "endLine": 551,
+              "line": 535,
+              "endLine": 590,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -94351,8 +94356,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "TagCreate",
-              "line": 304,
-              "endLine": 327,
+              "line": 343,
+              "endLine": 366,
               "sha256": "1fae27bee49687e2778477629102486ea0984b6de3fb00242fdf983e2d802ea7"
             },
             {
@@ -94494,8 +94499,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -94648,8 +94653,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareBlockEdit",
-              "line": 334,
-              "endLine": 344,
+              "line": 373,
+              "endLine": 383,
               "sha256": "33fb05ba244d99cb3998f50207fd6acde188ea05ddee7147ca61f32503d761e9"
             },
             {
@@ -94718,8 +94723,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 481,
-              "endLine": 494,
+              "line": 520,
+              "endLine": 533,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -94774,8 +94779,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareInstanceDbCreate",
-              "line": 382,
-              "endLine": 408,
+              "line": 421,
+              "endLine": 447,
               "sha256": "8aaac5d61ea993dab758fb2b92355c428cdad5af7425eaa35c64b7261faec773"
             },
             {
@@ -94837,16 +94842,16 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagCreate",
-              "line": 286,
-              "endLine": 301,
+              "line": 325,
+              "endLine": 340,
               "sha256": "a112b78c415ce50bf1b23abbbfca0e595e088e6eb425f1d7e249c661625c62b2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagEdit",
-              "line": 89,
-              "endLine": 115,
-              "sha256": "2b2eb0ca513c62a509864c2cf531e7a51c239a05b67e4088f7c63cfee0e9954c"
+              "line": 94,
+              "endLine": 128,
+              "sha256": "bd81830ae544d05429db4318c574702af5afd428561dd72080114835a67ad8d0"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -95102,8 +95107,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyBlockEdit",
-              "line": 346,
-              "endLine": 352,
+              "line": 385,
+              "endLine": 391,
               "sha256": "72f5c29360c08b58cf3d8c54e5b30706243d7eb94189be96cea12d278c6f3cf7"
             },
             {
@@ -95193,8 +95198,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyInstanceDbCreate",
-              "line": 410,
-              "endLine": 418,
+              "line": 449,
+              "endLine": 457,
               "sha256": "3bfc196f2791a227aaa9409527765891829056f8df508e0dc7392b6f8a3138c1"
             },
             {
@@ -95270,9 +95275,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyTagEdit",
-              "line": 117,
-              "endLine": 137,
-              "sha256": "c6df2cf1f5258e8c5c53b6d4781e65428396278735b5a70e1b60e94657ddf513"
+              "line": 130,
+              "endLine": 165,
+              "sha256": "5dc57db86aa2391c35a529f2af3c0d196c279f7f4bb730ee52a36f32b19072ed"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -95396,8 +95401,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -95480,8 +95485,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 496,
-              "endLine": 551,
+              "line": 535,
+              "endLine": 590,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -95592,8 +95597,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "TagCreate",
-              "line": 304,
-              "endLine": 327,
+              "line": 343,
+              "endLine": 366,
               "sha256": "1fae27bee49687e2778477629102486ea0984b6de3fb00242fdf983e2d802ea7"
             },
             {
@@ -95766,8 +95771,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -95920,8 +95925,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareBlockEdit",
-              "line": 334,
-              "endLine": 344,
+              "line": 373,
+              "endLine": 383,
               "sha256": "33fb05ba244d99cb3998f50207fd6acde188ea05ddee7147ca61f32503d761e9"
             },
             {
@@ -95990,8 +95995,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 481,
-              "endLine": 494,
+              "line": 520,
+              "endLine": 533,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -96046,8 +96051,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareInstanceDbCreate",
-              "line": 382,
-              "endLine": 408,
+              "line": 421,
+              "endLine": 447,
               "sha256": "8aaac5d61ea993dab758fb2b92355c428cdad5af7425eaa35c64b7261faec773"
             },
             {
@@ -96109,16 +96114,16 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagCreate",
-              "line": 286,
-              "endLine": 301,
+              "line": 325,
+              "endLine": 340,
               "sha256": "a112b78c415ce50bf1b23abbbfca0e595e088e6eb425f1d7e249c661625c62b2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagEdit",
-              "line": 89,
-              "endLine": 115,
-              "sha256": "2b2eb0ca513c62a509864c2cf531e7a51c239a05b67e4088f7c63cfee0e9954c"
+              "line": 94,
+              "endLine": 128,
+              "sha256": "bd81830ae544d05429db4318c574702af5afd428561dd72080114835a67ad8d0"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -96374,8 +96379,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyBlockEdit",
-              "line": 346,
-              "endLine": 352,
+              "line": 385,
+              "endLine": 391,
               "sha256": "72f5c29360c08b58cf3d8c54e5b30706243d7eb94189be96cea12d278c6f3cf7"
             },
             {
@@ -96465,8 +96470,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyInstanceDbCreate",
-              "line": 410,
-              "endLine": 418,
+              "line": 449,
+              "endLine": 457,
               "sha256": "3bfc196f2791a227aaa9409527765891829056f8df508e0dc7392b6f8a3138c1"
             },
             {
@@ -96542,9 +96547,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyTagEdit",
-              "line": 117,
-              "endLine": 137,
-              "sha256": "c6df2cf1f5258e8c5c53b6d4781e65428396278735b5a70e1b60e94657ddf513"
+              "line": 130,
+              "endLine": 165,
+              "sha256": "5dc57db86aa2391c35a529f2af3c0d196c279f7f4bb730ee52a36f32b19072ed"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -96668,8 +96673,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -96752,8 +96757,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 496,
-              "endLine": 551,
+              "line": 535,
+              "endLine": 590,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -96864,8 +96869,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "TagCreate",
-              "line": 304,
-              "endLine": 327,
+              "line": 343,
+              "endLine": 366,
               "sha256": "1fae27bee49687e2778477629102486ea0984b6de3fb00242fdf983e2d802ea7"
             },
             {
@@ -97007,8 +97012,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -97161,8 +97166,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareBlockEdit",
-              "line": 334,
-              "endLine": 344,
+              "line": 373,
+              "endLine": 383,
               "sha256": "33fb05ba244d99cb3998f50207fd6acde188ea05ddee7147ca61f32503d761e9"
             },
             {
@@ -97231,8 +97236,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 481,
-              "endLine": 494,
+              "line": 520,
+              "endLine": 533,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -97287,8 +97292,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareInstanceDbCreate",
-              "line": 382,
-              "endLine": 408,
+              "line": 421,
+              "endLine": 447,
               "sha256": "8aaac5d61ea993dab758fb2b92355c428cdad5af7425eaa35c64b7261faec773"
             },
             {
@@ -97350,16 +97355,16 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagCreate",
-              "line": 286,
-              "endLine": 301,
+              "line": 325,
+              "endLine": 340,
               "sha256": "a112b78c415ce50bf1b23abbbfca0e595e088e6eb425f1d7e249c661625c62b2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagEdit",
-              "line": 89,
-              "endLine": 115,
-              "sha256": "2b2eb0ca513c62a509864c2cf531e7a51c239a05b67e4088f7c63cfee0e9954c"
+              "line": 94,
+              "endLine": 128,
+              "sha256": "bd81830ae544d05429db4318c574702af5afd428561dd72080114835a67ad8d0"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -97615,8 +97620,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyBlockEdit",
-              "line": 346,
-              "endLine": 352,
+              "line": 385,
+              "endLine": 391,
               "sha256": "72f5c29360c08b58cf3d8c54e5b30706243d7eb94189be96cea12d278c6f3cf7"
             },
             {
@@ -97706,8 +97711,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyInstanceDbCreate",
-              "line": 410,
-              "endLine": 418,
+              "line": 449,
+              "endLine": 457,
               "sha256": "3bfc196f2791a227aaa9409527765891829056f8df508e0dc7392b6f8a3138c1"
             },
             {
@@ -97783,9 +97788,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyTagEdit",
-              "line": 117,
-              "endLine": 137,
-              "sha256": "c6df2cf1f5258e8c5c53b6d4781e65428396278735b5a70e1b60e94657ddf513"
+              "line": 130,
+              "endLine": 165,
+              "sha256": "5dc57db86aa2391c35a529f2af3c0d196c279f7f4bb730ee52a36f32b19072ed"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -97909,8 +97914,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -97993,8 +97998,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 496,
-              "endLine": 551,
+              "line": 535,
+              "endLine": 590,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -98105,8 +98110,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "TagCreate",
-              "line": 304,
-              "endLine": 327,
+              "line": 343,
+              "endLine": 366,
               "sha256": "1fae27bee49687e2778477629102486ea0984b6de3fb00242fdf983e2d802ea7"
             },
             {
@@ -98248,8 +98253,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -98402,8 +98407,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareBlockEdit",
-              "line": 334,
-              "endLine": 344,
+              "line": 373,
+              "endLine": 383,
               "sha256": "33fb05ba244d99cb3998f50207fd6acde188ea05ddee7147ca61f32503d761e9"
             },
             {
@@ -98472,8 +98477,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 481,
-              "endLine": 494,
+              "line": 520,
+              "endLine": 533,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -98528,8 +98533,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareInstanceDbCreate",
-              "line": 382,
-              "endLine": 408,
+              "line": 421,
+              "endLine": 447,
               "sha256": "8aaac5d61ea993dab758fb2b92355c428cdad5af7425eaa35c64b7261faec773"
             },
             {
@@ -98591,16 +98596,16 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagCreate",
-              "line": 286,
-              "endLine": 301,
+              "line": 325,
+              "endLine": 340,
               "sha256": "a112b78c415ce50bf1b23abbbfca0e595e088e6eb425f1d7e249c661625c62b2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagEdit",
-              "line": 89,
-              "endLine": 115,
-              "sha256": "2b2eb0ca513c62a509864c2cf531e7a51c239a05b67e4088f7c63cfee0e9954c"
+              "line": 94,
+              "endLine": 128,
+              "sha256": "bd81830ae544d05429db4318c574702af5afd428561dd72080114835a67ad8d0"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -98856,8 +98861,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyBlockEdit",
-              "line": 346,
-              "endLine": 352,
+              "line": 385,
+              "endLine": 391,
               "sha256": "72f5c29360c08b58cf3d8c54e5b30706243d7eb94189be96cea12d278c6f3cf7"
             },
             {
@@ -98947,8 +98952,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyInstanceDbCreate",
-              "line": 410,
-              "endLine": 418,
+              "line": 449,
+              "endLine": 457,
               "sha256": "3bfc196f2791a227aaa9409527765891829056f8df508e0dc7392b6f8a3138c1"
             },
             {
@@ -99024,9 +99029,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyTagEdit",
-              "line": 117,
-              "endLine": 137,
-              "sha256": "c6df2cf1f5258e8c5c53b6d4781e65428396278735b5a70e1b60e94657ddf513"
+              "line": 130,
+              "endLine": 165,
+              "sha256": "5dc57db86aa2391c35a529f2af3c0d196c279f7f4bb730ee52a36f32b19072ed"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -99150,8 +99155,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -99234,8 +99239,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 496,
-              "endLine": 551,
+              "line": 535,
+              "endLine": 590,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -99346,8 +99351,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "TagCreate",
-              "line": 304,
-              "endLine": 327,
+              "line": 343,
+              "endLine": 366,
               "sha256": "1fae27bee49687e2778477629102486ea0984b6de3fb00242fdf983e2d802ea7"
             },
             {
@@ -99489,8 +99494,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -99643,8 +99648,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareBlockEdit",
-              "line": 334,
-              "endLine": 344,
+              "line": 373,
+              "endLine": 383,
               "sha256": "33fb05ba244d99cb3998f50207fd6acde188ea05ddee7147ca61f32503d761e9"
             },
             {
@@ -99713,8 +99718,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 481,
-              "endLine": 494,
+              "line": 520,
+              "endLine": 533,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -99769,8 +99774,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareInstanceDbCreate",
-              "line": 382,
-              "endLine": 408,
+              "line": 421,
+              "endLine": 447,
               "sha256": "8aaac5d61ea993dab758fb2b92355c428cdad5af7425eaa35c64b7261faec773"
             },
             {
@@ -99832,16 +99837,16 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagCreate",
-              "line": 286,
-              "endLine": 301,
+              "line": 325,
+              "endLine": 340,
               "sha256": "a112b78c415ce50bf1b23abbbfca0e595e088e6eb425f1d7e249c661625c62b2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagEdit",
-              "line": 89,
-              "endLine": 115,
-              "sha256": "2b2eb0ca513c62a509864c2cf531e7a51c239a05b67e4088f7c63cfee0e9954c"
+              "line": 94,
+              "endLine": 128,
+              "sha256": "bd81830ae544d05429db4318c574702af5afd428561dd72080114835a67ad8d0"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -100097,8 +100102,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyBlockEdit",
-              "line": 346,
-              "endLine": 352,
+              "line": 385,
+              "endLine": 391,
               "sha256": "72f5c29360c08b58cf3d8c54e5b30706243d7eb94189be96cea12d278c6f3cf7"
             },
             {
@@ -100188,8 +100193,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyInstanceDbCreate",
-              "line": 410,
-              "endLine": 418,
+              "line": 449,
+              "endLine": 457,
               "sha256": "3bfc196f2791a227aaa9409527765891829056f8df508e0dc7392b6f8a3138c1"
             },
             {
@@ -100265,9 +100270,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyTagEdit",
-              "line": 117,
-              "endLine": 137,
-              "sha256": "c6df2cf1f5258e8c5c53b6d4781e65428396278735b5a70e1b60e94657ddf513"
+              "line": 130,
+              "endLine": 165,
+              "sha256": "5dc57db86aa2391c35a529f2af3c0d196c279f7f4bb730ee52a36f32b19072ed"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -100391,8 +100396,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -100475,8 +100480,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 496,
-              "endLine": 551,
+              "line": 535,
+              "endLine": 590,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -100587,8 +100592,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "TagCreate",
-              "line": 304,
-              "endLine": 327,
+              "line": 343,
+              "endLine": 366,
               "sha256": "1fae27bee49687e2778477629102486ea0984b6de3fb00242fdf983e2d802ea7"
             },
             {
@@ -100730,8 +100735,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -100884,8 +100889,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareBlockEdit",
-              "line": 334,
-              "endLine": 344,
+              "line": 373,
+              "endLine": 383,
               "sha256": "33fb05ba244d99cb3998f50207fd6acde188ea05ddee7147ca61f32503d761e9"
             },
             {
@@ -100954,8 +100959,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 481,
-              "endLine": 494,
+              "line": 520,
+              "endLine": 533,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -101010,8 +101015,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareInstanceDbCreate",
-              "line": 382,
-              "endLine": 408,
+              "line": 421,
+              "endLine": 447,
               "sha256": "8aaac5d61ea993dab758fb2b92355c428cdad5af7425eaa35c64b7261faec773"
             },
             {
@@ -101073,16 +101078,16 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagCreate",
-              "line": 286,
-              "endLine": 301,
+              "line": 325,
+              "endLine": 340,
               "sha256": "a112b78c415ce50bf1b23abbbfca0e595e088e6eb425f1d7e249c661625c62b2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagEdit",
-              "line": 89,
-              "endLine": 115,
-              "sha256": "2b2eb0ca513c62a509864c2cf531e7a51c239a05b67e4088f7c63cfee0e9954c"
+              "line": 94,
+              "endLine": 128,
+              "sha256": "bd81830ae544d05429db4318c574702af5afd428561dd72080114835a67ad8d0"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -101338,8 +101343,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyBlockEdit",
-              "line": 346,
-              "endLine": 352,
+              "line": 385,
+              "endLine": 391,
               "sha256": "72f5c29360c08b58cf3d8c54e5b30706243d7eb94189be96cea12d278c6f3cf7"
             },
             {
@@ -101429,8 +101434,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyInstanceDbCreate",
-              "line": 410,
-              "endLine": 418,
+              "line": 449,
+              "endLine": 457,
               "sha256": "3bfc196f2791a227aaa9409527765891829056f8df508e0dc7392b6f8a3138c1"
             },
             {
@@ -101506,9 +101511,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyTagEdit",
-              "line": 117,
-              "endLine": 137,
-              "sha256": "c6df2cf1f5258e8c5c53b6d4781e65428396278735b5a70e1b60e94657ddf513"
+              "line": 130,
+              "endLine": 165,
+              "sha256": "5dc57db86aa2391c35a529f2af3c0d196c279f7f4bb730ee52a36f32b19072ed"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -101632,8 +101637,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -101716,8 +101721,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 496,
-              "endLine": 551,
+              "line": 535,
+              "endLine": 590,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -101828,8 +101833,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "TagCreate",
-              "line": 304,
-              "endLine": 327,
+              "line": 343,
+              "endLine": 366,
               "sha256": "1fae27bee49687e2778477629102486ea0984b6de3fb00242fdf983e2d802ea7"
             },
             {
@@ -101971,8 +101976,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -102125,8 +102130,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareBlockEdit",
-              "line": 334,
-              "endLine": 344,
+              "line": 373,
+              "endLine": 383,
               "sha256": "33fb05ba244d99cb3998f50207fd6acde188ea05ddee7147ca61f32503d761e9"
             },
             {
@@ -102195,8 +102200,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 481,
-              "endLine": 494,
+              "line": 520,
+              "endLine": 533,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -102251,8 +102256,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareInstanceDbCreate",
-              "line": 382,
-              "endLine": 408,
+              "line": 421,
+              "endLine": 447,
               "sha256": "8aaac5d61ea993dab758fb2b92355c428cdad5af7425eaa35c64b7261faec773"
             },
             {
@@ -102314,16 +102319,16 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagCreate",
-              "line": 286,
-              "endLine": 301,
+              "line": 325,
+              "endLine": 340,
               "sha256": "a112b78c415ce50bf1b23abbbfca0e595e088e6eb425f1d7e249c661625c62b2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagEdit",
-              "line": 89,
-              "endLine": 115,
-              "sha256": "2b2eb0ca513c62a509864c2cf531e7a51c239a05b67e4088f7c63cfee0e9954c"
+              "line": 94,
+              "endLine": 128,
+              "sha256": "bd81830ae544d05429db4318c574702af5afd428561dd72080114835a67ad8d0"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -102579,8 +102584,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyBlockEdit",
-              "line": 346,
-              "endLine": 352,
+              "line": 385,
+              "endLine": 391,
               "sha256": "72f5c29360c08b58cf3d8c54e5b30706243d7eb94189be96cea12d278c6f3cf7"
             },
             {
@@ -102670,8 +102675,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyInstanceDbCreate",
-              "line": 410,
-              "endLine": 418,
+              "line": 449,
+              "endLine": 457,
               "sha256": "3bfc196f2791a227aaa9409527765891829056f8df508e0dc7392b6f8a3138c1"
             },
             {
@@ -102747,9 +102752,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyTagEdit",
-              "line": 117,
-              "endLine": 137,
-              "sha256": "c6df2cf1f5258e8c5c53b6d4781e65428396278735b5a70e1b60e94657ddf513"
+              "line": 130,
+              "endLine": 165,
+              "sha256": "5dc57db86aa2391c35a529f2af3c0d196c279f7f4bb730ee52a36f32b19072ed"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TagTableLifecycle.cs",
@@ -102873,8 +102878,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
-              "line": 437,
-              "endLine": 479,
+              "line": 476,
+              "endLine": 518,
               "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
             },
             {
@@ -102957,8 +102962,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 496,
-              "endLine": 551,
+              "line": 535,
+              "endLine": 590,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -103069,8 +103074,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "TagCreate",
-              "line": 304,
-              "endLine": 327,
+              "line": 343,
+              "endLine": 366,
               "sha256": "1fae27bee49687e2778477629102486ea0984b6de3fb00242fdf983e2d802ea7"
             },
             {
@@ -103121,8 +103126,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareInstanceDbCreate",
-              "line": 382,
-              "endLine": 408,
+              "line": 421,
+              "endLine": 447,
               "sha256": "8aaac5d61ea993dab758fb2b92355c428cdad5af7425eaa35c64b7261faec773"
             }
           ]
@@ -103141,8 +103146,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyInstanceDbCreate",
-              "line": 410,
-              "endLine": 418,
+              "line": 449,
+              "endLine": 457,
               "sha256": "3bfc196f2791a227aaa9409527765891829056f8df508e0dc7392b6f8a3138c1"
             }
           ]
@@ -107131,8 +107136,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagCreate",
-              "line": 286,
-              "endLine": 301,
+              "line": 325,
+              "endLine": 340,
               "sha256": "a112b78c415ce50bf1b23abbbfca0e595e088e6eb425f1d7e249c661625c62b2"
             }
           ]
@@ -107165,8 +107170,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "TagCreate",
-              "line": 304,
-              "endLine": 327,
+              "line": 343,
+              "endLine": 366,
               "sha256": "1fae27bee49687e2778477629102486ea0984b6de3fb00242fdf983e2d802ea7"
             }
           ]
@@ -107196,9 +107201,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagEdit",
-              "line": 89,
-              "endLine": 115,
-              "sha256": "2b2eb0ca513c62a509864c2cf531e7a51c239a05b67e4088f7c63cfee0e9954c"
+              "line": 94,
+              "endLine": 128,
+              "sha256": "bd81830ae544d05429db4318c574702af5afd428561dd72080114835a67ad8d0"
             }
           ]
         },
@@ -107216,9 +107221,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyTagEdit",
-              "line": 117,
-              "endLine": 137,
-              "sha256": "c6df2cf1f5258e8c5c53b6d4781e65428396278735b5a70e1b60e94657ddf513"
+              "line": 130,
+              "endLine": 165,
+              "sha256": "5dc57db86aa2391c35a529f2af3c0d196c279f7f4bb730ee52a36f32b19072ed"
             }
           ]
         }
@@ -107247,9 +107252,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareTagEdit",
-              "line": 89,
-              "endLine": 115,
-              "sha256": "2b2eb0ca513c62a509864c2cf531e7a51c239a05b67e4088f7c63cfee0e9954c"
+              "line": 94,
+              "endLine": 128,
+              "sha256": "bd81830ae544d05429db4318c574702af5afd428561dd72080114835a67ad8d0"
             }
           ]
         },
@@ -107267,9 +107272,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "ApplyTagEdit",
-              "line": 117,
-              "endLine": 137,
-              "sha256": "c6df2cf1f5258e8c5c53b6d4781e65428396278735b5a70e1b60e94657ddf513"
+              "line": 130,
+              "endLine": 165,
+              "sha256": "5dc57db86aa2391c35a529f2af3c0d196c279f7f4bb730ee52a36f32b19072ed"
             }
           ]
         }
@@ -118329,6 +118334,20 @@
           "profileSha256": "ae0d59a8d9182c3976629151e39fa7e88233ed8614352f6baa87061520817908",
           "artifacts": [
             "evidence/local.safety.tag-batch.20261111.json"
+          ]
+        },
+        {
+          "id": "local.safety.tag-rename.20261111",
+          "profileSha256": "36719754e63f49a8cbcf951d2b6996bc7a03b456cae20653f103028ae1a3f2d3",
+          "artifacts": [
+            "evidence/local.safety.tag-rename.20261111.json"
+          ]
+        },
+        {
+          "id": "local.safety.tag-rename-used.20261111",
+          "profileSha256": "625cb4edd7fa725c7beec2ca7c0348c496c0153d2d898598f3f13790ef18c7ad",
+          "artifacts": [
+            "evidence/local.safety.tag-rename-used.20261111.json"
           ]
         }
       ],
@@ -142898,6 +142917,16 @@
       "sha256": "393ef367d3b9e2afdc30c77cfb5f655d3482852c4817823582a76c5b4d00cd85"
     },
     {
+      "path": "evidence/local.safety.tag-rename-used.20261111.json",
+      "state": "observed",
+      "sha256": "ee216a6d72bb8d62f530b359f051dc9e7caa2107607364389920b3f7fbf5932f"
+    },
+    {
+      "path": "evidence/local.safety.tag-rename.20261111.json",
+      "state": "observed",
+      "sha256": "ed640e00bf0807aaeca9c7b601db196851ef8aa6b088df78563ca881ed667a60"
+    },
+    {
       "path": "evidence/local.safety_changes.20261028.json",
       "state": "observed",
       "sha256": "be47f77d600843111308847056c93bb78df683d22625890221a2315cdb6dcd8a"
@@ -144246,6 +144275,14 @@
     {
       "id": "local.safety.tag-batch.20261111",
       "profileSha256": "ae0d59a8d9182c3976629151e39fa7e88233ed8614352f6baa87061520817908"
+    },
+    {
+      "id": "local.safety.tag-rename-used.20261111",
+      "profileSha256": "625cb4edd7fa725c7beec2ca7c0348c496c0153d2d898598f3f13790ef18c7ad"
+    },
+    {
+      "id": "local.safety.tag-rename.20261111",
+      "profileSha256": "36719754e63f49a8cbcf951d2b6996bc7a03b456cae20653f103028ae1a3f2d3"
     },
     {
       "id": "local.safety_changes.20261028",
