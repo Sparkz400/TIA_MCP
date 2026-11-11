@@ -119,17 +119,21 @@ def main():
         assert before['StdA'] == ('%M10.0', 'Bool', False) and before['StdB'] == ('%M10.1', 'Bool', False) and all(before[n][2] for n in tags.values()), before
         edit = lambda member, **attributes: {'tagTableName': table, 'memberName': member, 'attributes': attributes}
         drop = lambda member: {'tagTableName': table, 'memberName': member, 'dependencyPolicy': 'rejectReferenced'}
+        # On this F-CPU a tag_delete item of a standard tag is refused before a later item is reached: its dependency scan
+        # cannot export the safety program's blocks (DependencyCoverageIncomplete). The safety tag is therefore the first
+        # item of the tag_delete batch, and the other order is recorded with the refusal it gets.
         batches = [
-            ('tag_set', 'renames a safety tag', [edit('StdA', Name='StdA_R'), edit(tags['status'], Name='Renamed_S_ZSW1')]),
-            ('tag_set', 'moves a standard tag onto the safety telegram', [edit('StdA', Name='StdA_R'), edit('StdB', LogicalAddress='%%I%d.0' % ranges['Input'])]),
-            ('tag_delete', 'deletes a safety tag', [drop('StdB'), drop(tags['control'])]),
-            ('tag_create', 'creates a tag on the safety telegram', [standard('StdC', 2), {'tagTableName': table, 'name': 'Generic_S_STW1', 'dataTypeName': 'Word', 'logicalAddress': '%%QW%d' % ranges['Output']}]),
+            ('tag_set', 'renames a safety tag', [edit('StdA', Name='StdA_R'), edit(tags['status'], Name='Renamed_S_ZSW1')], 1, 'SafetyBoundary'),
+            ('tag_set', 'moves a standard tag onto the safety telegram', [edit('StdA', Name='StdA_R'), edit('StdB', LogicalAddress='%%I%d.0' % ranges['Input'])], 1, 'SafetyBoundary'),
+            ('tag_delete', 'deletes a safety tag', [drop(tags['control']), drop('StdB')], 0, 'SafetyBoundary'),
+            ('tag_delete', 'deletes a standard tag on the F-CPU', [drop('StdB'), drop(tags['control'])], 0, 'DependencyCoverageIncomplete'),
+            ('tag_create', 'creates a tag on the safety telegram', [standard('StdC', 2), {'tagTableName': table, 'name': 'Generic_S_STW1', 'dataTypeName': 'Word', 'logicalAddress': '%%QW%d' % ranges['Output']}], 1, 'SafetyBoundary'),
         ]
-        for kind, label, items in batches:
+        for kind, label, items, index, code in batches:
             result = client.request('tools/call', {'name': 'change_prepare', 'arguments': {'kind': kind, 'plcPath': fplc, 'payload': {'items': items}}})
             error = (result.get('structuredContent') or {}).get('error') or {}
-            record('%s batch whose second item %s refused' % (kind, label), error)
-            assert result.get('isError') and error.get('code') == 'SafetyBoundary' and error.get('message', '').startswith('items[1]'), error
+            record('%s batch whose item %d %s refused with %s' % (kind, index, label, code), error)
+            assert result.get('isError') and error.get('code') == code and error.get('message', '').startswith('items[%d]' % index), error
             assert tag_rows() == before, 'A refused batch changed a tag'
         record('every tag is unchanged after the refused batches', before)
         refused('safety_drive_tags', {**payload, 'safetyAcknowledged': True}, 'ObjectExists')
