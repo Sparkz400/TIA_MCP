@@ -1,0 +1,93 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.fingerprint.reuse.20261111",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-11T08:04:27+00:00",
+  "source": {
+    "commit": "53d2a8fcc1f918d8f8b848916b4c58b3c90070e4",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "LT-PRG2024-03",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Reused change-fingerprint content behind --enable-fingerprint-reuse: scripts/qualify_fingerprint_reuse.py on a Debug build of 53d2a8fc, 35/35 steps in one owned scratch CPU 1511-1 PN. A preparation on the same saved state reuses the previous project-wide read and yields the same baseFingerprint as a full read; any other worker operation drops the kept read. A change whose preparation read in full counts 2 full reads and 3 reuses, a follow-up change of the same kind 1 full read and 4 reuses (prepare, two admission checks, the stale-revision check, the outcome). After a tag rename, an SCL block source and a hardware Comment applied without save, tia_session_status reports isModified true and two further preparations each read in full (5 full reads for the change that then saves); every save reports isModified false with a changed lastModified, which has sub-second resolution. A preview made stale by another applied change is refused with StaleRevision while reuse is active.",
+  "limitations": [
+    "One owned scratch standard CPU in a headless TIA instance: edits made by hand in the TIA user interface, or by another Openness client, are not exercised. Reuse is therefore off by default.",
+    "The unsaved edits are a PLC tag rename, an SCL FC source and a hardware Comment written by the worker itself.",
+    "The scratch project is small; the time saved on a large project is not measured.",
+    "Engineering only; runtime behavior is not observed."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "70fe12eb7fe1ca05952920ce7c850644bfeb752cdca076129b3c2b2543c66ac0"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "8c5651966e903b58d027410ba3b51c69476c75057693b512a074917705bc87a6"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "ab8d1b440faa344b206f567f07dd250e21c28c7ba47b4cb224a42d4452d0bcab",
+      "bytes": 411921,
+      "completed": true,
+      "steps": [
+        "start owned TIA fingerprint reuse",
+        "create owned scratch fingerprint reuse",
+        "prepare seed tags",
+        "apply seed tags",
+        "prepare rename 0 (first of its kind: full read)",
+        "prepare rename 0 again (reused)",
+        "prepare rename 0 after another operation (full read)",
+        "apply rename 0",
+        "prepare rename 1 (reused from the previous outcome)",
+        "apply rename 1",
+        "prepare tag rename",
+        "apply tag rename (not saved)",
+        "prepare probe 1 while unsaved after tag rename",
+        "prepare probe 2 while unsaved after tag rename",
+        "apply save after tag rename",
+        "prepare undo probe after tag rename",
+        "apply undo probe after tag rename",
+        "prepare block source",
+        "apply block source (not saved)",
+        "prepare probe 1 while unsaved after block source",
+        "prepare probe 2 while unsaved after block source",
+        "apply save after block source",
+        "prepare undo probe after block source",
+        "apply undo probe after block source",
+        "prepare hardware comment",
+        "apply hardware comment (not saved)",
+        "prepare probe 1 while unsaved after hardware comment",
+        "prepare probe 2 while unsaved after hardware comment",
+        "apply save after hardware comment",
+        "prepare undo probe after hardware comment",
+        "apply undo probe after hardware comment",
+        "prepare rename 3 (made stale below)",
+        "prepare rename 4",
+        "apply rename 4",
+        "refuse apply of the stale preview"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_status",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

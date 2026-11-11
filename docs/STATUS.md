@@ -1,11 +1,11 @@
 # Current status
 
 TIA MCP is pre-1.0; use it only with offline projects, copies, scratch projects and
-simulators you own (see the [README](../README.md)). Counts from catalog `0.4.176` (10 November 2026); backlog reviewed on 3 November:
+simulators you own (see the [README](../README.md)). Counts from catalog `0.4.177` (11 November 2026); backlog reviewed on 3 November:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.176` (10 November): 496 features, 477 verified, 19 unverified; 334 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Feature catalog | `0.4.177` (11 November): 496 features, 477 verified, 19 unverified; 334 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
 | Release matrix rows | 133 shipped, 344 limited, 6 unqualified, 12 unavailable on V21, 1 deferred |
 | Matrix cells | 2,184 bound, **28 open**, 72 blocked, 3 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted; backlog reconciled on 3 November against catalog `0.4.130` ([ledger](plans/release-obligations-20261015.md), [acceptance rules](plans/release-acceptance.md), [review](verification/release-readiness-20261103.md)) |

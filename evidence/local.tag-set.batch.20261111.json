@@ -1,0 +1,89 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.tag-set.batch.20261111",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-11T08:04:26+00:00",
+  "source": {
+    "commit": "53d2a8fcc1f918d8f8b848916b4c58b3c90070e4",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "LT-PRG2024-03",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "tag_set with payload.items: scripts/qualify_tag_batch.py --count 5 on a Debug build of 53d2a8fc, 29/29 steps in one owned scratch CPU 1511-1 PN. Five single tag_set renames and one tag_set batch of five renames (one item also readdressed) each apply with checkpoint, compile and save; the batch lists every item in its summary preview, keeps one table backup, runs recovery_archive_created, baseline_compile_finished, mutation_applied, tag_batch_readback_verified, compile_finished, changed_project_saved and tag_batch_verified_after_save once each, reads every item back after the writes and after save, and the table reads back with exactly the intended names and addresses. Nine refused preparations (a name another tag holds, a swap, two items with one new name, one tag twice, an unknown tag, an unknown table, an attribute outside the allowlist, items beside the single-tag fields, items on tag_table_delete) leave the table unchanged. A batch prepared before the applied one is refused with StaleRevision. change_restore of the batch retrieves its checkpoint and the recovered copy holds the tags as before the batch. The journal times prepare-fingerprint, stale-revision-fingerprint, checkpoint-save, checkpoint-archive, changed-project-save and after-fingerprint for every change; five single changes took 16.7 s and the batch 3.4 s.",
+  "limitations": [
+    "One owned scratch standard CPU at PLC-root scope; Bool tags on bit memory in one tag table.",
+    "No block references the renamed tags here (local.change-batch.items.20261111 covers that), and the safety-tag refusal of a batch needs a project with a safety tag.",
+    "Timings are from a small scratch project and one run; no large project was timed.",
+    "Engineering only; runtime behavior is not observed."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "70fe12eb7fe1ca05952920ce7c850644bfeb752cdca076129b3c2b2543c66ac0"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "8c5651966e903b58d027410ba3b51c69476c75057693b512a074917705bc87a6"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "59008c9a2432051348b8327d54da0e23e10540d04889a2f82a5b82f3e2d62fb7",
+      "bytes": 238740,
+      "completed": true,
+      "steps": [
+        "start owned TIA tag batch",
+        "create owned scratch tag batch",
+        "prepare seed",
+        "apply tag_table_import_xml",
+        "prepare single TbSingle0",
+        "apply tag_set",
+        "prepare single TbSingle1",
+        "apply tag_set",
+        "prepare single TbSingle2",
+        "apply tag_set",
+        "prepare single TbSingle3",
+        "apply tag_set",
+        "prepare single TbSingle4",
+        "apply tag_set",
+        "refuse batch: a name another tag holds",
+        "refuse batch: a swap",
+        "refuse batch: two items with one new name",
+        "refuse batch: one tag twice",
+        "refuse batch: an unknown tag",
+        "refuse batch: an unknown table",
+        "refuse batch: an attribute outside the allowlist",
+        "refuse batch: items beside the single-tag fields",
+        "refuse items on tag_table_delete",
+        "prepare a batch made stale below",
+        "prepare batch of 5",
+        "apply tag_set",
+        "batch preview, stages and readback",
+        "refuse apply of the stale batch",
+        "restore the batch checkpoint"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

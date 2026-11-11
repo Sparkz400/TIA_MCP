@@ -1,0 +1,123 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.change-batch.items.20261111",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-11T08:04:27+00:00",
+  "source": {
+    "commit": "53d2a8fcc1f918d8f8b848916b4c58b3c90070e4",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "LT-PRG2024-03",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "payload.items on tag_set and the simple single-object kinds: scripts/qualify_change_batch.py on a Debug build of 53d2a8fc, 61/61 steps in one owned scratch CPU 1511-1 PN. Batches of tag_create, constant_create, constant_set, constant_delete, tag_delete, tag_table_create, tag_table_rename, block_rename, block_attributes_set and type_rename each apply under one recovery archive, one baseline compile, one mutation stage, one compile and one save, list every item in order in preview.items, record a readback stage and read back with exactly the intended names. A tag_set batch renames two tags that a compiled SCL block uses; the block names the new tags afterwards and stays consistent. Six refused preparations (one object in two items, one name from two items, a name that exists, an unknown object in a later item, items on block_delete, fields beside items) name their item and leave the PLC software unchanged. Inside a software unit, with scopePath beside items, tag_create, tag_set, constant_create and tag_delete batches apply and an item naming another scope refuses with ScopeMismatch. Midway failure: TIA accepts a double quote in tag-table and tag names (those two candidate batches apply) and rejects it in a data type name, so a type_rename batch fails natively at its second item after the first was renamed; the error names items[1] and says item 0 was written, the stages hold batch_items_preflighted and no mutation_applied, the change is recovery_required with a recovery archive, another change_prepare is refused with RecoveryRequired, and change_restore retrieves the checkpoint with the PLC software equal to the state before the batch.",
+  "limitations": [
+    "One owned scratch standard CPU: PLC-root scope and one software unit (tag kinds only); namespaces are not exercised.",
+    "The batch that fails after its first write is a type_rename; a block_rename batch that fails midway leaves the renamed block inconsistent, and change_restore then refuses with ScopedRecoveryRequired by the existing inconsistent-block rule (observed in an earlier run of the day, not part of this report).",
+    "The safety-tag refusal of a batch needs a project with a safety tag; the F-I/O address refusal of a tag_set and a tag_create batch was observed on an F-CPU in a run of qualify_fio_tag_routes.py that did not complete (it stopped later at vci_workspace_create on the project language) and is not curated.",
+    "Each batch has two or three items; the 100-item bound is covered by managed tests only.",
+    "Engineering only; runtime behavior is not observed."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "70fe12eb7fe1ca05952920ce7c850644bfeb752cdca076129b3c2b2543c66ac0"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "8c5651966e903b58d027410ba3b51c69476c75057693b512a074917705bc87a6"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "4e002fd477d3254671938e81c6cf2bf73c7e73908609b2781bdfa8db8a350e1d",
+      "bytes": 621537,
+      "completed": true,
+      "steps": [
+        "start owned TIA change batch",
+        "create owned scratch change batch",
+        "prepare seed tags",
+        "apply tag_table_import_xml",
+        "prepare seed a block that uses two tags",
+        "apply source_upsert",
+        "prepare rename two referenced tags",
+        "apply tag_set",
+        "readback renamed referenced tags",
+        "the block follows the renamed tags",
+        "prepare create three tags",
+        "apply tag_create",
+        "prepare create two constants",
+        "apply constant_create",
+        "prepare edit two constants",
+        "apply constant_set",
+        "readback tags and constants",
+        "refuse constant_set batch: one tag in two items",
+        "refuse tag_create batch: one name from two items",
+        "refuse tag_create batch: a name that exists",
+        "refuse constant_set batch: an unknown constant in a later item",
+        "refuse block_delete batch: a kind that does not batch",
+        "refuse tag_create batch: fields beside items",
+        "prepare delete two constants",
+        "apply constant_delete",
+        "prepare delete two unused tags",
+        "apply tag_delete",
+        "readback deleted members",
+        "prepare create two tag tables",
+        "apply tag_table_create",
+        "prepare rename two tag tables",
+        "apply tag_table_rename",
+        "readback tag tables",
+        "prepare seed two blocks",
+        "apply source_upsert",
+        "prepare rename two blocks",
+        "apply block_rename",
+        "prepare set two block headers",
+        "apply block_attributes_set",
+        "readback blocks",
+        "prepare seed two data types",
+        "apply type_source_upsert",
+        "prepare rename two data types",
+        "apply type_rename",
+        "readback data types",
+        "prepare create a software unit",
+        "apply software_unit_create",
+        "prepare unit: create a tag table",
+        "apply tag_table_create",
+        "prepare unit: create three tags",
+        "apply tag_create",
+        "prepare unit: rename two tags",
+        "apply tag_set",
+        "prepare unit: create two constants",
+        "apply constant_create",
+        "prepare unit: delete one tag and keep the rest",
+        "apply tag_delete",
+        "refuse tag_create batch: an item naming another scope than the batch",
+        "readback the unit's table",
+        "a batch fails at its second item after the first was written",
+        "restore returns the state before the failed batch"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}
