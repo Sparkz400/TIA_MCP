@@ -2542,8 +2542,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/DeviceCompilation.cs",
-      "sha256": "467db0250e9deefdb4d1ed9245801f52d5cae0676b3be9d46ef93b40e863258e",
-      "bytes": 9926
+      "sha256": "14c1df639c1f324f933915db8ff7e4871a2fc558a45e1d2372805870941f0e30",
+      "bytes": 10920
     },
     {
       "path": "src/TiaMcp.Openness.V21/DriveObjectRules.cs",
@@ -3202,8 +3202,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TechnologyReferences.cs",
-      "sha256": "99105139afe63381129119832c69240058f389877030f6265bd392bc6e2bf5bc",
-      "bytes": 11523
+      "sha256": "1b038b9248c9b0ec33c7a6d29fb03d8dc45009d677402b993dee73d12b82d513",
+      "bytes": 12414
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TechnologySelection.cs",

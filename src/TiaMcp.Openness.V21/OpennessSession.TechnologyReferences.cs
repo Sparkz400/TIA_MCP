@@ -26,6 +26,7 @@ namespace TiaMcp.Openness.V21
             private string _providerStatus = "notRequested", _projectPath;
             private bool _collision;
             private Dictionary<DeviceItem, string> _hardwarePaths;
+            private HashSet<string> _repeatedHardwarePaths = new HashSet<string>(StringComparer.Ordinal);
             private string _hardwareMembership = "notRequested";
             private JObject _hardwareError;
 
@@ -101,7 +102,10 @@ namespace TiaMcp.Openness.V21
                     // One failed walk of the project's hardware fails every hardware reference the same way: do it once and keep why.
                     if (_hardwareError != null) throw new ReferenceFailure("hardwareMembershipUnavailable");
                     _hardwareMembership = "readError";
-                    try { _hardwarePaths = Read(() => DeviceCompilation.Items(_project)).ToDictionary(entry => entry.Item, entry => entry.Path); }
+                    // Two sibling items with one name (for example both bus adapters of a PN/PN coupler) are ambiguous themselves,
+                    // but must not make every other hardware reference of the project unresolvable.
+                    var repeated = new HashSet<string>(StringComparer.Ordinal);
+                    try { _hardwarePaths = Read(() => DeviceCompilation.Items(_project, repeated)).ToDictionary(entry => entry.Item, entry => entry.Path); }
                     catch (ReferenceFailure) { throw; }
                     catch (Exception error)
                     {
@@ -113,9 +117,13 @@ namespace TiaMcp.Openness.V21
                             ["message"] = bounded(error), ["causes"] = causes };
                         throw new ReferenceFailure("hardwareMembershipUnavailable");
                     }
-                    _hardwareMembership = "complete";
+                    _repeatedHardwarePaths = repeated;
+                    _hardwareMembership = repeated.Count == 0 ? "complete" : "completeWithRepeatedPaths";
                 }
                 if (!_hardwarePaths.TryGetValue(item, out var path)) throw new ReferenceFailure("hardwareNotInProject");
+                // A repeated path names more than one item, and so does every path below it.
+                if (_repeatedHardwarePaths.Any(taken => path == taken || path.StartsWith(taken + "/", StringComparison.Ordinal)))
+                    throw new ReferenceFailure("hardwarePathAmbiguous");
                 result["name"] = Text(Read(() => item.Name)); result["positionNumber"] = Read(() => item.PositionNumber);
                 result["typeIdentifier"] = Text(Read(() => item.TypeIdentifier));
                 if (!path.EndsWith("/items/" + Uri.EscapeDataString(result.Value<string>("name")), StringComparison.Ordinal))
@@ -186,7 +194,7 @@ namespace TiaMcp.Openness.V21
             internal JObject Coverage() => new JObject { ["providerStatus"] = _providerStatus, ["projectPath"] = _projectPath,
                 ["selectionPlcPath"] = _plcPath, ["visitedReads"] = _budget.Used, ["maximumReads"] = _maximum,
                 ["truncated"] = _budget.Truncated, ["identifierCollisionDetected"] = _collision,
-                ["hardwareMembershipStatus"] = _hardwareMembership, ["hardwareMembershipError"] = _hardwareError, ["hardwareItemsVisited"] = _hardwarePaths?.Count ?? 0,
+                ["hardwareMembershipStatus"] = _hardwareMembership, ["hardwareMembershipError"] = _hardwareError, ["hardwareItemsVisited"] = _hardwarePaths?.Count ?? 0, ["hardwareRepeatedPaths"] = _repeatedHardwarePaths.Count,
                 ["hardwareItemsLimit"] = 50000,
                 ["persistenceVerified"] = false, ["atomicSnapshot"] = false };
         }

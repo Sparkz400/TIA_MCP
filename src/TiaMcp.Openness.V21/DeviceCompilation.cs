@@ -53,11 +53,14 @@ namespace TiaMcp.Openness.V21
 
         internal sealed class ItemEntry { internal DeviceItem Item; internal string Path; internal string DevicePath; }
 
-        internal static List<ItemEntry> Items(Project project)
+        /// <summary>Every device item with its path. Strict by default: a compile target must be unambiguous, so a repeated path refuses.
+        /// With <paramref name="repeated"/> the walk continues instead and records each path that does not lead to exactly one item.</summary>
+        internal static List<ItemEntry> Items(Project project, HashSet<string> repeated = null)
         {
             var result = new List<ItemEntry>();
             var paths = new HashSet<string>(StringComparer.Ordinal);
             var objects = new HashSet<DeviceItem>();
+            var firstPaths = new Dictionary<DeviceItem, string>();
             Action<IEnumerable<DeviceItem>, string, string, int> collect = null;
             collect = (items, parent, device, depth) => {
                 foreach (var item in items)
@@ -65,7 +68,16 @@ namespace TiaMcp.Openness.V21
                     if (depth > 64 || result.Count >= 50000) throw new BridgeException("TraversalLimit", "Compiler hardware selection exceeds its bound.");
                     if (string.IsNullOrWhiteSpace(item.Name)) throw new BridgeException("TargetIdentityUnavailable", "Compiler hardware name is missing.");
                     string path = parent + "/items/" + Uri.EscapeDataString(item.Name);
-                    if (!paths.Add(path) || !objects.Add(item)) throw new BridgeException("AmbiguousTarget", "Compiler hardware identity is repeated: " + path);
+                    bool newPath = paths.Add(path), newObject = objects.Add(item);
+                    if (!newPath || !newObject)
+                    {
+                        if (repeated == null) throw new BridgeException("AmbiguousTarget", "Compiler hardware identity is repeated: " + path);
+                        repeated.Add(path);
+                        // One object reached twice (listed twice, or inside itself) is listed once, is ambiguous at its first path
+                        // too, and is not walked again. A second item on a known path is kept, so it resolves as ambiguous.
+                        if (!newObject) { repeated.Add(firstPaths[item]); continue; }
+                    }
+                    if (repeated != null) firstPaths[item] = path;
                     result.Add(new ItemEntry { Item = item, Path = path, DevicePath = device });
                     collect(item.DeviceItems, path, device, depth + 1);
                 }
