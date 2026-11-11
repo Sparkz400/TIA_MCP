@@ -267,9 +267,14 @@ after the writes and after save, made an earlier prepared batch stale, and
 `change_restore` returned all five tags to their old names. Five single changes
 took 17.6 s there and the batch 3.5 s, about the cost of one single change. That
 run is not in the evidence store or the feature catalog. It covers Bool tags on
-bit memory in one table at PLC-root scope; tags that blocks reference, software
-units, and the safety-tag and F-I/O refusals of a batch on an F-CPU are not
-exercised, and no large project has been timed.
+bit memory in one table at PLC-root scope. Tags that blocks reference and software
+units are covered by `scripts/qualify_change_batch.py`
+(`local.change-batch.items-2.20261111`). The refusals on an F-CPU were checked on
+11 November 2026: a batch whose item renames or deletes a real safety tag, or
+moves or creates a tag inside a PROFIsafe telegram
+(`local.safety.tag-batch.20261111`), or on an F-DI input
+(`local.safety.fio-routes.20261111`), is refused as a whole with `SafetyBoundary`
+naming the item, and no tag changes. No large project has been timed.
 
 ### Items on other kinds
 
@@ -303,8 +308,9 @@ and parent group. Three kinds have a rule of their own:
 
 - `block_number_set`: two items may not take the same number for blocks of one
   kind (`BlockNumberCollision`), and a number another item frees is still taken.
-  TIA V21 numbers the blocks of a software unit itself, so an item naming such a
-  block is refused with `AttributeNotWritable`, as a single change is.
+  In the native run of 11 November 2026, TIA V21 reported `AutoNumber` as not
+  writable on the FCs of a software unit, in a namespace and outside it, so an
+  item naming such a block was refused with `AttributeNotWritable`.
 - `group_create`: two items may not create the same name under one parent. A parent
   that another item creates does not exist yet, so that item is refused with
   `GroupNotFound`; create nested groups in a second change.
@@ -340,7 +346,10 @@ second item TIA rejects after the first was written, which must end
 `recovery_required`, block further changes and restore to the state before the
 batch. The refusals of a batch that touches a real safety tag or an F-I/O address
 are checked on an F-CPU by `scripts/qualify_safety_drive_tags.py` and
-`scripts/qualify_fio_tag_routes.py`.
+`scripts/qualify_fio_tag_routes.py`. One limit showed there: on an F-CPU a
+`tag_delete` batch item naming a standard tag was refused with
+`DependencyCoverageIncomplete`, because its dependency scan could not export the
+safety program's block `FOB_RTG1`.
 
 ### Fingerprint reuse between changes
 
