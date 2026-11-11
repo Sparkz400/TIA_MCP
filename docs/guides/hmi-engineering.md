@@ -55,6 +55,17 @@ the response and journal. A verified failure before the import reports
 `not_applied`. Missing artifacts, changed peers, incomplete native reads or a
 failed restoration remain `recovery_required`; no unrelated edit is discarded.
 
+When the rollback compile itself cannot run (`Cannot compile. Cannot access the project
+path.`), the restored diagnostics cannot be compared, so the change stays
+`recovery_required` and nothing is saved. The worker still exports and compares every
+regular screen. If they equal the pre-import capture, the journal has
+`hmiEvidence.rollbackCompilerUnavailable: true`, the stage
+`hmi_rollback_scope_verified_unsaved` and a `recoveryFailure` that says so: the open
+project holds the original screens unsaved, and the saved project is still the
+checkpoint. Closing the project without saving returns to that checkpoint; compile the
+HMI again after reopening. The journal does not become `rolled_back`, so the change
+still has to be resolved before a new preparation.
+
 A client timeout is different from an import failure: TIA may finish after the
 client stops waiting. Inspect the retained change journal before taking any next
 action. For a terminal `applied` or verified `rolled_back` Classic screen change,
@@ -217,6 +228,20 @@ The exact observed `Cannot compile. Cannot access the project path.` result can
 trigger one compiler retry before any screen import, after a fresh capture
 proves the original screen scope unchanged. Both attempts are retained. A second
 failure stops with `BaselineCompileUnavailable`; no candidate is replayed.
+
+That result means the compiler could not run. It says nothing about the screens. V21
+answers a compile of an HMI without runtime-relevant changes from its last result
+(`No HMI runtime-relevant changes have been made … New compilation is not necessary.`).
+Such a baseline is a valid diagnostics reference, but it generated nothing, so it does
+not show that the compiler can run in this TIA session; the journal records it as
+`hmiEvidence.baselineCompileSkippedGeneration: true`. The path failure can therefore
+first appear in the compile after the import. On 11 November 2026 it did, and again in
+the rollback compile two minutes later; its cause is not identified and it is not
+detected before the import. The change then reports `CompileFailed` with
+`compile.compilerUnavailable: true` and a message naming the compiler, and rollback
+proceeds as described under
+[screen failure recovery](#screen-failure-recovery-without-closing-tia). See the
+[11 November record](../verification/classic-screen-compile-path-failure-20261111.md).
 
 For inconsistent PLC source use `change_prepare(kind="plc_compile", payload={},
 plcPath="<exact path>")`; for one HMI use `kind="hmi_compile"` and `payload.target`.

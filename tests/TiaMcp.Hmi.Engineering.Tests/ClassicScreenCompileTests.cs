@@ -37,6 +37,40 @@ static class ClassicScreenCompileTests
             Assert(!ClassicScreenCompileRules.NoNewProblems(baseline, baseline));
             Assert(!ClassicScreenCompileRules.Completed(new JObject()));
         });
+        check("A compiler that could not run is reported apart from the edit and from a diagnostics difference", () => {
+            // Shapes of the 11 November 2026 apply, with synthetic names: the baseline was answered from the last compile,
+            // the compile after the import and the rollback compile both stopped at the generator with the path error.
+            var baseline = Completed(Fixture());
+            ((JArray)baseline["targets"][0]["messages"]).Insert(3, Row(ClassicScreenCompileRules.GenerationSkippedText, null, "Information", 2));
+            Assert(ClassicScreenCompileRules.Completed(baseline) && ClassicScreenCompileRules.SkippedGeneration(baseline));
+            Assert(!ClassicScreenCompileRules.SkippedGeneration(Completed(Fixture())) && !ClassicScreenCompileRules.SkippedGeneration(null));
+            // The same text as a warning, not the compiler's information row, is an ordinary diagnostic.
+            Assert(!ClassicScreenCompileRules.SkippedGeneration(Completed(Fixture(warning: ClassicScreenCompileRules.GenerationSkippedText))));
+
+            var failed = Fixture(); failed["errorCount"] = 1; failed["targets"][0]["errorCount"] = 1;
+            var rows = (JArray)failed["targets"][0]["messages"];
+            rows.RemoveAt(1); rows[0]["state"] = "Error";
+            rows.Insert(rows.Count - 1, Row("Internal WARNING (detail: EvaluateStringRelations: stream to patch is null).", null, "Warning", 2));
+            rows.Insert(rows.Count - 1, Row(ClassicScreenCompileRules.PathFailureText, null, "Error", 2));
+            failed["warningCount"] = 2; failed["targets"][0]["warningCount"] = 2;
+            rows.Last["description"] = "Compiling aborted (errors: 1; warnings: 2)"; rows.Last["state"] = "Error";
+            Assert(ClassicScreenCompileRules.IsTransientPathFailure(failed) && !ClassicScreenCompileRules.Completed(failed));
+            Assert(!ClassicScreenCompileRules.NoNewProblems(baseline, failed));
+
+            string final = ClassicScreenCompileRules.FinalCompileUnavailable(failed);
+            Assert(final != null && final.Contains(ClassicScreenCompileRules.PathFailureText) && final.Contains("says nothing about the edited screens"));
+            Assert(ClassicScreenCompileRules.FinalCompileUnavailable(baseline) == null && ClassicScreenCompileRules.FinalCompileUnavailable(null) == null);
+
+            string unverified = ClassicScreenCompileRules.RollbackCompileFailure(baseline, failed, false);
+            string restored = ClassicScreenCompileRules.RollbackCompileFailure(baseline, failed, true);
+            Assert(unverified.Contains("could not run") && !unverified.Contains("saved project is still the checkpoint"));
+            Assert(restored.StartsWith(unverified) && restored.Contains("scope equals the pre-import capture") && restored.Contains("saved project is still the checkpoint"));
+            Assert(!restored.Contains("do not match"));
+            // A real difference keeps the old verdict; an exact match has none. A skipped-generation baseline is a valid reference for both.
+            Assert(ClassicScreenCompileRules.RollbackCompileFailure(baseline, Completed(Fixture(owner: "ControlB")), true) == "Rollback compiler diagnostics do not match the successful baseline.");
+            Assert(ClassicScreenCompileRules.RollbackCompileFailure(baseline, new JObject(), true) == "Rollback compiler diagnostics do not match the successful baseline.");
+            Assert(ClassicScreenCompileRules.RollbackCompileFailure(baseline, Completed(Fixture("03.11.2026 10:10", 2883512)), true) == null);
+        });
         check("Classic timestamp/byte-count wrapper is metadata, retained warning locations are significant", () => {
             var before = Fixture(); var copy = before.DeepClone();
             Assert(ClassicScreenCompileRules.ProblemsUnchanged(before, Fixture("03.11.2026 10:10", 2883512)));
