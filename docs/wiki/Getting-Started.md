@@ -99,7 +99,7 @@ If a call is cancelled or times out anyway, TIA finishes it: later calls return
 restart ([interrupted calls](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#prepare-apply-inspect)).
 
 Native HMI qualification uses independently seeded owned fixtures. Classic
-Comfort and RT Advanced preparation sets an existing start screen; Unified
+Comfort and RT Advanced preparation sets an existing start screen (a new fixture can get one without the editor, see the [start-screen record](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/classic-start-screen-master-copy-20261111.md)); Unified
 preparation has separate transfer-security prerequisites. The
 [fixture preparation guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/hmi-fixture-preparation.md)
 describes the operator handoff, saved-state checks and owned-editor cleanup.
