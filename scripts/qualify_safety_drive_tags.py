@@ -96,6 +96,11 @@ def main():
         tags = {'status': 'SafeDrive_S_ZSW1', 'control': 'SafeDrive_S_STW1'}
         payload = {'hardwarePath': drive_path, **handle, 'tagTableName': table, 'tags': tags}
         refused('safety_drive_tags', payload, 'InvalidRequest')
+        # Two standard tags for the batch refusals below, created first: the closing change_restore needs
+        # safety_drive_tags to be the project's last change.
+        standard = lambda name, bit: {'tagTableName': table, 'name': name, 'dataTypeName': 'Bool', 'logicalAddress': '%%M10.%d' % bit}
+        batch = change('tag_create', {'items': [standard('StdA', 0), standard('StdB', 1)]}, plc=fplc)
+        record('a tag_create batch of two standard tags applied on the F-CPU', {'stages': batch['stages']})
         applied = change('safety_drive_tags', {**payload, 'safetyAcknowledged': True}, plc=fplc)
         plan = applied['preview']['safetyDriveTags']
         record('safety_drive_tags applied', {'plan': plan, 'stages': applied['stages'], 'compilerSucceeded': applied['compile']['compilerSucceeded'],
@@ -112,10 +117,8 @@ def main():
         assert got == {tags['status']: ('%%IW%d' % ranges['Input'], 'Word', True), tags['control']: ('%%QW%d' % ranges['Output'], 'Word', True)}, got
 
         # payload.items beside real safety tags: one item on a safety tag, or on its address, refuses the whole batch.
-        standard = lambda name, bit: {'tagTableName': table, 'name': name, 'dataTypeName': 'Bool', 'logicalAddress': '%%M10.%d' % bit}
-        batch = change('tag_create', {'items': [standard('StdA', 0), standard('StdB', 1)]}, plc=fplc)
         before = tag_rows()
-        record('a tag_create batch of two standard tags applied beside the safety tags', {'stages': batch['stages'], 'tags': before})
+        record('standard and safety tags before the refused batches', before)
         assert before['StdA'] == ('%M10.0', 'Bool', False) and before['StdB'] == ('%M10.1', 'Bool', False) and all(before[n][2] for n in tags.values()), before
         edit = lambda member, **attributes: {'tagTableName': table, 'memberName': member, 'attributes': attributes}
         drop = lambda member: {'tagTableName': table, 'memberName': member, 'dependencyPolicy': 'rejectReferenced'}
