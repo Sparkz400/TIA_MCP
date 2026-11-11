@@ -37,7 +37,7 @@ internal static class Program
     }
     [MethodImpl(MethodImplOptions.NoInlining)] static void Run(string[] args)
     {
-        if (args.Length != 2 || !new[] { "seed", "drift", "consume", "safety-telegram" }.Contains(args[0])) throw new Exception("Expected seed|drift|consume|safety-telegram authorization.json");
+        if (args.Length != 2 || !new[] { "seed", "drift", "consume", "safety-telegram", "safety-bit-tag" }.Contains(args[0])) throw new Exception("Expected seed|drift|consume|safety-telegram|safety-bit-tag authorization.json");
         string receipt = Path.GetFullPath(args[1]); var auth = JObject.Parse(File.ReadAllText(receipt));
         string projectPath = Path.GetFullPath(auth.Value<string>("projectPath"));
         if (auth.Value<bool?>("ownsPortalProcess") != true || auth.Value<string>("creationTool") != "tia_create_scratch"
@@ -49,6 +49,7 @@ internal static class Program
             if (portal.Projects.Count != 1 || portal.Projects[0].Path.FullName != projectPath) throw new Exception("Wrong scratch project");
             var project = portal.Projects[0];
             if (args[0] == "safety-telegram") { SafetyTelegram(project, auth.Value<string>("driveDevice"), auth.Value<int?>("safetyTelegram") ?? 30); return; }
+            if (args[0] == "safety-bit-tag") { SafetyBitTag(project, auth.Value<string>("plcName"), auth.Value<string>("tagTable"), auth.Value<string>("tagName"), auth.Value<string>("tagAddress")); return; }
             var plc = project.Devices.SelectMany(d => Items(d.DeviceItems)).Select(i => i.GetService<SoftwareContainer>()?.Software as PlcSoftware).Single(p => p != null);
             if (args[0] == "drift")
             {
@@ -101,6 +102,16 @@ internal static class Program
         if (!drive.Telegrams.CanInsertSafetyTelegram(number)) throw new Exception("Startdrive refuses safety telegram " + number + " on " + deviceName);
         drive.Telegrams.InsertSafetyTelegram(number);
         Console.WriteLine(string.Join("; ", drive.Telegrams.Select(t => t.Type + " " + t.TelegramNumber)));
+    }
+    // Safety-tag rename fixture: a Bool tag on one bit of the PROFIsafe telegram, which TIA makes a safety tag that an F-block can
+    // read. MCP's tag_create refuses every address inside an F-I/O range, so the fixture creates it.
+    [MethodImpl(MethodImplOptions.NoInlining)] static void SafetyBitTag(Project project, string plcName, string tableName, string tagName, string address)
+    {
+        var plc = project.Devices.SelectMany(d => Items(d.DeviceItems)).Select(i => i.GetService<SoftwareContainer>()?.Software as PlcSoftware).Single(p => p != null && p.Name == plcName);
+        var table = plc.TagTableGroup.TagTables.Find(tableName) ?? throw new Exception("Tag table missing: " + tableName);
+        var tag = table.Tags.Create(tagName, "Bool", address);
+        if (!tag.IsSafety) throw new Exception(address + " did not become a safety tag");
+        Console.WriteLine("Created safety tag " + tag.Name + " at " + tag.LogicalAddress);
     }
     static IEnumerable<DeviceItem> Items(DeviceItemComposition items) { foreach (var i in items) { yield return i; foreach (var c in Items(i.DeviceItems)) yield return c; } }
 }
