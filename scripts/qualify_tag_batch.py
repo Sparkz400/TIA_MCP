@@ -85,8 +85,9 @@ def body(h):
     refuse("an unknown table", {"items": [good, {"tagTableName": "TbNoTable", "memberName": "X", "attributes": {"Name": "Y"}}]}, "ObjectNotFound")
     refuse("an attribute outside the allowlist", {"items": [good, item(batch[1], ExternalWritable="false")]}, "UnsupportedAttribute")
     refuse("items beside the single-tag fields", {"items": [good], "tagTableName": TABLE, "memberName": batch[1], "attributes": {"Name": "Z"}}, "InvalidRequest")
-    h.stage("refuse items on constant_set", lambda: require(
-        h.call_error("change_prepare", {"kind": "constant_set", "payload": {"items": [good]}, "plcPath": plc}).get("code") == "InvalidRequest", "constant_set accepted items"))
+    # Kinds that do not batch refuse items; the batched kinds beside tag_set are covered by qualify_change_batch.py.
+    h.stage("refuse items on tag_table_delete", lambda: require(
+        h.call_error("change_prepare", {"kind": "tag_table_delete", "payload": {"items": [{"tagTableName": TABLE}]}, "plcPath": plc}).get("code") == "InvalidRequest", "tag_table_delete accepted items"))
 
     # After: all renames in one change; the last item also moves its tag.
     moved = "%M399.7"

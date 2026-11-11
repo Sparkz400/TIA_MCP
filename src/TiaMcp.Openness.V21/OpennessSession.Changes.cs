@@ -1415,9 +1415,12 @@ namespace TiaMcp.Openness.V21
                     if (!block.Item.IsConsistent)
                         throw new BridgeException("FingerprintUnavailable", "The target block " + name + " is inconsistent; its native backup and fingerprint cannot be established. Compile it first (plc_compile) or read its generated source. Nothing was changed.",
                             new JObject { ["blockPath"] = block.Path, ["fallback"] = new JObject { ["tool"] = "block_read", ["format"] = "generatedSource" } });
-                    string backup = Path.Combine(change.Directory, "before-" + Guid.NewGuid().ToString("N") + ".xml");
-                    block.Item.Export(new FileInfo(backup), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-                    change.Backups.Add(new JObject { ["blockName"] = name, ["blockPath"] = block.Path, ["artifact"] = ChangeArtifact(backup) });
+                    if (!change.PreflightOnly)
+                    {
+                        string backup = Path.Combine(change.Directory, "before-" + Guid.NewGuid().ToString("N") + ".xml");
+                        block.Item.Export(new FileInfo(backup), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                        change.Backups.Add(new JObject { ["blockName"] = name, ["blockPath"] = block.Path, ["artifact"] = ChangeArtifact(backup) });
+                    }
                     effects.Add(new JObject { ["action"] = change.Kind, ["existingBlock"] = BlockInfo(block, plc.Path) });
                 }
                 else effects.Add(new JObject { ["action"] = "create", ["blockName"] = name });
@@ -1837,9 +1840,12 @@ namespace TiaMcp.Openness.V21
                 {
                     var type = matches[0];
                     if (type.IsKnowHowProtected) throw new BridgeException("ProtectedObject", "Protected data type cannot be changed: " + name);
-                    string path = Path.Combine(change.Directory, "before-type-" + Guid.NewGuid().ToString("N") + ".xml");
-                    type.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-                    change.Backups.Add(new JObject { ["typeName"] = name, ["artifact"] = ChangeArtifact(path) });
+                    if (!change.PreflightOnly)
+                    {
+                        string path = Path.Combine(change.Directory, "before-type-" + Guid.NewGuid().ToString("N") + ".xml");
+                        type.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                        change.Backups.Add(new JObject { ["typeName"] = name, ["artifact"] = ChangeArtifact(path) });
+                    }
                 }
                 effects.Add(new JObject { ["dataType"] = name, ["action"] = matches.Length == 0 ? "create" : "update" });
             }
@@ -2086,6 +2092,8 @@ namespace TiaMcp.Openness.V21
             internal List<TagBatchTarget> TagBatchTargets;
             // payload.items on the kinds of ChangeBatchRules: one prepared member change per item.
             internal List<EngineeringChange> BatchMembers;
+            // A batch item prepared again at apply, only for its checks: it writes no backup export.
+            internal bool PreflightOnly;
         }
     }
 }

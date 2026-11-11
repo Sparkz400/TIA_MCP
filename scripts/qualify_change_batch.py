@@ -3,7 +3,9 @@
 Each batch must apply under one checkpoint archive, one mutation stage, one compile and one save, list every item in its
 preview and leave exactly the intended names. Covered: tag_set (tags referenced by a compiled SCL block, whose source must
 name the new tags afterwards), tag_create, constant_create, constant_set, constant_delete, tag_delete, tag_table_create,
-tag_table_rename, block_rename, block_attributes_set and type_rename. Refused batches (one object in two items, one name
+tag_table_rename, block_rename, block_attributes_set and type_rename, and the tag kinds again inside a software unit
+with scopePath beside items. A batch whose second item TIA refuses natively, after the first was written, must end recovery_required, block
+further changes, and restore to the state before the batch. Refused batches (one object in two items, one name
 from two items, a name that exists, an unknown object in a later item, items on a kind that does not batch, fields beside
 items) must name the item and leave the software unchanged.
 """
@@ -16,9 +18,9 @@ from pathlib import Path
 from library_native_harness import Harness, require
 
 TABLE = "BatchTags"
-LIMITATIONS = ["One owned scratch standard CPU at PLC-root scope; software units and namespaces are not exercised.",
+LIMITATIONS = ["One owned scratch standard CPU: PLC-root scope and one software unit (tag kinds only); namespaces are not exercised.",
                "The safety-tag and F-I/O refusals of a batch need an F-CPU fixture (qualify_fio_tag_routes.py covers the F-I/O address refusal).",
-               "A batch that fails after its first write (recovery_required) is not provoked."]
+               "The batch that fails after its first write is whichever candidate TIA refuses natively at its second item (a name with a double quote); see midwayFailureCandidates."]
 STAGES = ("recovery_archive_created", "baseline_compile_finished", "mutation_applied", "compile_finished", "changed_project_saved")
 
 
@@ -124,6 +126,76 @@ def body(h):
     apply("rename two data types", "type_rename", {"items": [{"typeName": "ByA", "newName": "ByA_R"}, {"typeName": "ByB", "newName": "ByB_R"}]}, 2)
     expect("data types", lambda s: {"ByA_R", "ByB_R"} <= set(s["types"]) and not {"ByA", "ByB"} & set(s["types"]))
 
+    # A software unit: the same batches with scopePath beside items.
+    apply("create a software unit", "software_unit_create", {"name": "BatchUnit"})
+    scopes = [u["path"] for u in h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})["softwareScopes"] if u["name"] == "BatchUnit"]
+    require(len(scopes) == 1, "Expected one software unit BatchUnit: %s" % scopes)
+    unit = scopes[0]
+    apply("unit: create a tag table", "tag_table_create", {"tagTableName": "UnitTags", "scopePath": unit})
+    unit_tag = lambda name, address: {"tagTableName": "UnitTags", "name": name, "dataTypeName": "Bool", "logicalAddress": address}
+    apply("unit: create three tags", "tag_create", {"scopePath": unit, "items": [unit_tag("Ut0", "%M240.0"), unit_tag("Ut1", "%M240.1"), unit_tag("Ut2", "%M240.2")]}, 3)
+    unit_item = lambda member, **attributes: {"tagTableName": "UnitTags", "memberName": member, "attributes": attributes}
+    apply("unit: rename two tags", "tag_set", {"scopePath": unit, "items": [unit_item("Ut0", Name="Ut0_R"), unit_item("Ut1", Name="Ut1_R")]}, 2)
+    apply("unit: create two constants", "constant_create", {"scopePath": unit, "items": [{"tagTableName": "UnitTags", "name": "Uc0", "dataTypeName": "Int", "value": "1"},
+                                                                                         {"tagTableName": "UnitTags", "name": "Uc1", "dataTypeName": "Int", "value": "2"}]}, 2)
+    apply("unit: delete one tag and keep the rest", "tag_delete", {"scopePath": unit, "items": [{"tagTableName": "UnitTags", "memberName": "Ut2", "dependencyPolicy": "rejectReferenced"}]}, 1)
+    other = dict(unit_tag("UtX", "%M240.5"), scopePath=plc)
+    refuse("an item naming another scope than the batch", "tag_create", {"scopePath": unit, "items": [unit_tag("UtY", "%M240.4"), other]}, "ScopeMismatch", "items[1] ")
+    expect("the unit's table", lambda s: s["tables"].get("UnitTags") == {"tags": ["Ut0_R", "Ut1_R"], "constants": ["Uc0", "Uc1"]})
+
+    # A batch that fails after its first write. Preparation and the preflight pass; TIA itself refuses the second item's
+    # name when it is written. Which names TIA refuses is its own rule, so candidates are tried until one fails natively;
+    # a candidate TIA accepts is simply an applied batch.
+    bad = 'Bf"Bad'
+    # Tag tables first: a block (or type) renamed by the first item stays inconsistent after the failure, and change_restore
+    # then refuses by design with ScopedRecoveryRequired, leaving the retained archive as the recovery input.
+    candidates = [
+        ("tag_table_rename", {"items": [{"tagTableName": "BtA_R", "newName": "BfTableOk"}, {"tagTableName": "BtB_R", "newName": bad}]}),
+        ("tag_create", {"items": [create("BfTagOk", "%M250.0"), create(bad, "%M250.1")]}),
+        ("type_rename", {"items": [{"typeName": "ByA_R", "newName": "BfTypeOk"}, {"typeName": "ByB_R", "newName": bad}]}),
+        ("block_rename", {"items": [{"blockName": "BbA_R", "newName": "BfBlockOk"}, {"blockName": "BbB_R", "newName": bad}]}),
+    ]
+    outcomes = h.report["midwayFailureCandidates"] = []
+    failed = None
+    for kind, payload in candidates:
+        before = software()
+        prepared = h.client.request("tools/call", {"name": "change_prepare", "arguments": {"kind": kind, "payload": payload, **p}})
+        if prepared.get("isError"):
+            outcomes.append({"kind": kind, "outcome": "refused at preparation", "code": ((prepared.get("structuredContent") or {}).get("error") or {}).get("code")})
+            continue
+        prepared = prepared["structuredContent"]
+        row = {"kind": kind, "changeId": prepared["changeId"], "previewHash": prepared["previewHash"], "state": "dispatching"}
+        h.report["mutations"].append(row)
+        result = h.client.request("tools/call", {"name": "change_apply", "arguments": Harness.apply_args(prepared)})
+        status = h.tool("change_status", {"changeId": prepared["changeId"], "includeDetails": True})
+        row["state"] = status["state"]
+        error = (result.get("structuredContent") or {}).get("error") or {}
+        outcomes.append({"kind": kind, "outcome": status["state"], "code": error.get("code"), "message": (error.get("message") or "")[:300], "stages": status["stages"]})
+        h.persist()
+        if status["state"] == "recovery_required":
+            failed = (kind, prepared, status, error, before)
+            break
+        require(status["state"] == "applied", "Unexpected outcome of a %s candidate: %s" % (kind, status["state"]))
+    require(failed is not None, "No candidate batch failed natively at its second item: %s" % outcomes)
+    kind, failing, status, error, before = failed
+
+    def midway():
+        require(error.get("message", "").startswith("items[1]: ") and "Items 0..0 were already written" in error.get("message", ""),
+                "The failure does not name its item and what was written: %s" % error.get("message"))
+        require("batch_items_preflighted" in status["stages"] and "mutation_applied" not in status["stages"], "Unexpected stages: %s" % status["stages"])
+        require(status["recoveryArchiveSha256"], "The failed batch has no recovery archive")
+        require(software() != before, "The first item was not written before the failure")
+        blocked = h.call_error("change_prepare", {"kind": "tag_create", "payload": create("BfLater", "%M250.2"), **p})
+        require(blocked.get("code") == "RecoveryRequired", "Another change was prepared while the batch needs recovery: %s" % blocked.get("code"))
+        return {"kind": kind, "code": error.get("code"), "message": error.get("message")[:300]}
+    h.stage("a batch fails at its second item after the first was written", midway)
+
+    def restored():
+        recovered = h.tool("change_restore", {"changeId": failing["changeId"], "previewHash": failing["previewHash"]})
+        require(recovered["state"] == "restored" and "checkpoint_retrieved_to_new_directory" in recovered["stages"], "Checkpoint recovery was not verified")
+        require(software() == before, "The recovered copy differs from the state before the failed batch")
+        return recovered["recoveredProject"]["path"]
+    h.stage("restore returns the state before the failed batch", restored)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

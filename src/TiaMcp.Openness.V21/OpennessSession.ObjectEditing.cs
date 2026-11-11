@@ -94,9 +94,12 @@ namespace TiaMcp.Openness.V21
             PrepareMutationScope(change, plc, "tagTable", change.ObjectNames);
             var table = MutationTable(change, plc);
             var member = MutationTagMember(change, table);
-            string path = Path.Combine(change.Directory, "before-tags.xml");
-            table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-            change.Backups.Add(new JObject { ["tableName"] = table.Name, ["artifact"] = ChangeArtifact(path) });
+            if (!change.PreflightOnly)
+            {
+                string path = Path.Combine(change.Directory, "before-tags.xml");
+                table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                change.Backups.Add(new JObject { ["tableName"] = table.Name, ["artifact"] = ChangeArtifact(path) });
+            }
             if (change.Kind.EndsWith("_delete", StringComparison.Ordinal))
                 preview["dependencies"] = CheckDeleteDependencies(change, plc, member, change.Payload.Value<string>("memberName"));
             else
@@ -279,9 +282,12 @@ namespace TiaMcp.Openness.V21
             PrepareMutationScope(change, plc, "tagTable", change.ObjectNames);
             var table = MutationTable(change, plc);
             TagCreate(change, plc, table, false);
-            string path = Path.Combine(change.Directory, "before-tags.xml");
-            table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-            change.Backups.Add(new JObject { ["tableName"] = table.Name, ["artifact"] = ChangeArtifact(path) });
+            if (!change.PreflightOnly)
+            {
+                string path = Path.Combine(change.Directory, "before-tags.xml");
+                table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                change.Backups.Add(new JObject { ["tableName"] = table.Name, ["artifact"] = ChangeArtifact(path) });
+            }
             string detail = change.Kind == "constant_create" ? "value" : "logicalAddress";
             ((JArray)preview["effects"]).Add(new JObject { ["action"] = change.Kind, ["tableName"] = table.Name, ["name"] = change.Payload["name"], ["dataTypeName"] = change.Payload["dataTypeName"], [detail] = change.Payload[detail] });
         }

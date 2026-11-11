@@ -101,7 +101,7 @@ Feasible capabilities that had no row or box; under the 15 October scope policy 
 
 ### Open matrix rows by owner
 
-Catalog `0.4.176`, 28 open cells in 6 rows, each row under its first owner (the matrix summary counts a shared row once per owner); blocked rows are not listed, deferred rows are under [deferred rows](#deferred-rows). The blocker named is the one the catalog records. The 29 October runs are in the [verification record](verification/native-reruns-20261029.md). Reconciled with the matrix on 10 November; the 24 compile-only cells closed the same day.
+Catalog `0.4.177`, 28 open cells in 6 rows, each row under its first owner (the matrix summary counts a shared row once per owner); blocked rows are not listed, deferred rows are under [deferred rows](#deferred-rows). The blocker named is the one the catalog records. The 29 October runs are in the [verification record](verification/native-reruns-20261029.md). Reconciled with the matrix on 10 November; the 24 compile-only cells closed the same day.
 
 | Owner | Open cells | Rows | Blocker |
 | --- | --- | --- | --- |

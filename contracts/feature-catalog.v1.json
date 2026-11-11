@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.176",
+  "catalogVersion": "0.4.177",
   "targetTiaVersions": [
     21
   ],
@@ -5719,6 +5719,64 @@
         "Standard route only; one parent chain per case, at most two embedding levels; the component is the reused FB. Software units and other routes stay plan-only.",
         "The Host FB is FBD or LAD; an embedded caller of other languages is not exercised."
       ]
+    },
+    {
+      "id": "local.tag-set.batch.20261111",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "53d2a8fcc1f918d8f8b848916b4c58b3c90070e4",
+        "passedScope": "tag_set with payload.items: scripts/qualify_tag_batch.py --count 5 on a Debug build of 53d2a8fc, 29/29 steps in one owned scratch CPU 1511-1 PN. Five single tag_set renames and one tag_set batch of five renames (one item also readdressed) each apply with checkpoint, compile and save; the batch lists every item in its summary preview, keeps one table backup, runs recovery_archive_created, baseline_compile_finished, mutation_applied, tag_batch_readback_verified, compile_finished, changed_project_saved and tag_batch_verified_after_save once each, reads every item back after the writes and after save, and the table reads back with exactly the intended names and addresses. Nine refused preparations (a name another tag holds, a swap, two items with one new name, one tag twice, an unknown tag, an unknown table, an attribute outside the allowlist, items beside the single-tag fields, items on tag_table_delete) leave the table unchanged. A batch prepared before the applied one is refused with StaleRevision. change_restore of the batch retrieves its checkpoint and the recovered copy holds the tags as before the batch. The journal times prepare-fingerprint, stale-revision-fingerprint, checkpoint-save, checkpoint-archive, changed-project-save and after-fingerprint for every change; five single changes took 16.7 s and the batch 3.4 s."
+      },
+      "artifacts": [
+        "evidence/local.tag-set.batch.20261111.json"
+      ],
+      "limitations": [
+        "One owned scratch standard CPU at PLC-root scope; Bool tags on bit memory in one tag table.",
+        "No block references the renamed tags here (local.change-batch.items.20261111 covers that), and the safety-tag refusal of a batch needs a project with a safety tag.",
+        "Timings are from a small scratch project and one run; no large project was timed.",
+        "Engineering only; runtime behavior is not observed."
+      ]
+    },
+    {
+      "id": "local.change-batch.items.20261111",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "53d2a8fcc1f918d8f8b848916b4c58b3c90070e4",
+        "passedScope": "payload.items on tag_set and the simple single-object kinds: scripts/qualify_change_batch.py on a Debug build of 53d2a8fc, 61/61 steps in one owned scratch CPU 1511-1 PN. Batches of tag_create, constant_create, constant_set, constant_delete, tag_delete, tag_table_create, tag_table_rename, block_rename, block_attributes_set and type_rename each apply under one recovery archive, one baseline compile, one mutation stage, one compile and one save, list every item in order in preview.items, record a readback stage and read back with exactly the intended names. A tag_set batch renames two tags that a compiled SCL block uses; the block names the new tags afterwards and stays consistent. Six refused preparations (one object in two items, one name from two items, a name that exists, an unknown object in a later item, items on block_delete, fields beside items) name their item and leave the PLC software unchanged. Inside a software unit, with scopePath beside items, tag_create, tag_set, constant_create and tag_delete batches apply and an item naming another scope refuses with ScopeMismatch. Midway failure: TIA accepts a double quote in tag-table and tag names (those two candidate batches apply) and rejects it in a data type name, so a type_rename batch fails natively at its second item after the first was renamed; the error names items[1] and says item 0 was written, the stages hold batch_items_preflighted and no mutation_applied, the change is recovery_required with a recovery archive, another change_prepare is refused with RecoveryRequired, and change_restore retrieves the checkpoint with the PLC software equal to the state before the batch."
+      },
+      "artifacts": [
+        "evidence/local.change-batch.items.20261111.json"
+      ],
+      "limitations": [
+        "One owned scratch standard CPU: PLC-root scope and one software unit (tag kinds only); namespaces are not exercised.",
+        "The batch that fails after its first write is a type_rename; a block_rename batch that fails midway leaves the renamed block inconsistent, and change_restore then refuses with ScopedRecoveryRequired by the existing inconsistent-block rule (observed in an earlier run of the day, not part of this report).",
+        "The safety-tag refusal of a batch needs a project with a safety tag; the F-I/O address refusal of a tag_set and a tag_create batch was observed on an F-CPU in a run of qualify_fio_tag_routes.py that did not complete (it stopped later at vci_workspace_create on the project language) and is not curated.",
+        "Each batch has two or three items; the 100-item bound is covered by managed tests only.",
+        "Engineering only; runtime behavior is not observed."
+      ]
+    },
+    {
+      "id": "local.fingerprint.reuse.20261111",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "53d2a8fcc1f918d8f8b848916b4c58b3c90070e4",
+        "passedScope": "Reused change-fingerprint content behind --enable-fingerprint-reuse: scripts/qualify_fingerprint_reuse.py on a Debug build of 53d2a8fc, 35/35 steps in one owned scratch CPU 1511-1 PN. A preparation on the same saved state reuses the previous project-wide read and yields the same baseFingerprint as a full read; any other worker operation drops the kept read. A change whose preparation read in full counts 2 full reads and 3 reuses, a follow-up change of the same kind 1 full read and 4 reuses (prepare, two admission checks, the stale-revision check, the outcome). After a tag rename, an SCL block source and a hardware Comment applied without save, tia_session_status reports isModified true and two further preparations each read in full (5 full reads for the change that then saves); every save reports isModified false with a changed lastModified, which has sub-second resolution. A preview made stale by another applied change is refused with StaleRevision while reuse is active."
+      },
+      "artifacts": [
+        "evidence/local.fingerprint.reuse.20261111.json"
+      ],
+      "limitations": [
+        "One owned scratch standard CPU in a headless TIA instance: edits made by hand in the TIA user interface, or by another Openness client, are not exercised. Reuse is therefore off by default.",
+        "The unsaved edits are a PLC tag rename, an SCL FC source and a hardware Comment written by the worker itself.",
+        "The scratch project is small; the time saved on a large project is not measured.",
+        "Engineering only; runtime behavior is not observed."
+      ]
     }
   ],
   "features": [
@@ -7581,7 +7639,8 @@
           "local.read_contracts.20261028",
           "local.read_contracts.20261102",
           "local.plc_object_mutations.audit.20261102",
-          "local.plc_object_mutations.audit.20261110"
+          "local.plc_object_mutations.audit.20261110",
+          "local.fingerprint.reuse.20261111"
         ]
       },
       "availability": {
@@ -7629,7 +7688,8 @@
         "evidenceIds": [
           "local.read_contracts.20261028",
           "local.plc_object_mutations.audit.20261102",
-          "local.plc_object_mutations.audit.20261110"
+          "local.plc_object_mutations.audit.20261110",
+          "local.fingerprint.reuse.20261111"
         ]
       },
       "availability": {
@@ -9190,7 +9250,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.engineering_gaps.20261029"
+          "local.engineering_gaps.20261029",
+          "local.change-batch.items.20261111"
         ]
       },
       "availability": {
@@ -9239,7 +9300,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.engineering_gaps.20261029"
+          "local.engineering_gaps.20261029",
+          "local.change-batch.items.20261111"
         ]
       },
       "availability": {
@@ -9340,7 +9402,8 @@
         "evidenceIds": [
           "local.milestones.rerun.20261028",
           "local.plc_object_mutations.rerun.20261028",
-          "local.plc_object_mutations.audit.20261102"
+          "local.plc_object_mutations.audit.20261102",
+          "local.change-batch.items.20261111"
         ]
       },
       "availability": {
@@ -9444,7 +9507,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.change-batch.items.20261111"
         ]
       },
       "availability": {
@@ -11834,7 +11898,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.change-batch.items.20261111"
         ]
       },
       "availability": {
@@ -11946,7 +12011,9 @@
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
           "local.safety.fio-routes.20261101",
-          "local.compile-baseline.unrelated-errors.20261107"
+          "local.compile-baseline.unrelated-errors.20261107",
+          "local.tag-set.batch.20261111",
+          "local.change-batch.items.20261111"
         ]
       },
       "availability": {
@@ -12001,7 +12068,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.change-batch.items.20261111"
         ]
       },
       "availability": {
@@ -12054,7 +12122,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.change-batch.items.20261111"
         ]
       },
       "availability": {
@@ -12107,7 +12176,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.change-batch.items.20261111"
         ]
       },
       "availability": {
@@ -12173,7 +12243,8 @@
           "local.safety.drive-tags.20261107",
           "local.change.confirmed-intent.20261107",
           "local.progress.reporting.20261107",
-          "local.compile-baseline.unrelated-blocks.20261107"
+          "local.compile-baseline.unrelated-blocks.20261107",
+          "local.change-batch.items.20261111"
         ]
       },
       "availability": {
@@ -12225,7 +12296,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.change-batch.items.20261111"
         ]
       },
       "availability": {
