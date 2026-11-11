@@ -347,9 +347,9 @@ second item TIA rejects after the first was written, which must end
 batch. The refusals of a batch that touches a real safety tag or an F-I/O address
 are checked on an F-CPU by `scripts/qualify_safety_drive_tags.py` and
 `scripts/qualify_fio_tag_routes.py`. One limit showed there: on an F-CPU a
-`tag_delete` batch item naming a standard tag was refused with
-`DependencyCoverageIncomplete`, because its dependency scan could not export the
-safety program's block `FOB_RTG1`.
+`tag_delete` batch item naming a standard tag was refused, because its
+dependency scan could not export the safety program's block `FOB_RTG1`
+([open item](../TODO.md#release-mechanics-and-policy)).
 
 ### Fingerprint reuse between changes
 
