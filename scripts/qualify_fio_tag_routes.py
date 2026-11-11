@@ -179,7 +179,9 @@ def vci_routes(h, plc, table, fio, f):
     groups = [g["path"] for g in h.tool("vci_workspace_inspect")["groups"] if g.get("kind") == "system"]
     require(len(groups) == 1, "Expected one system VCI workspace group: %s" % groups)
     root = h.directory.parent / ("vci-" + h.directory.name)  # Beside the artifact store, so outside it and outside the project.
-    change(h, "vci_workspace_create", {"groupPath": groups[0], "name": WORKSPACE, "rootPath": str(root), "language": "en-US"}, f)
+    # The workspace language must be an active project language; a scratch project's follow the TIA installation (de-DE on a German one).
+    language = h.report["vciLanguage"] = h.tool("project_properties", {"maxItems": 200})["languageSettings"]["editing"]
+    change(h, "vci_workspace_create", {"groupPath": groups[0], "name": WORKSPACE, "rootPath": str(root), "language": language}, f)
     workspace = groups[0] + "/" + WORKSPACE
     base = {"workspacePath": workspace, "objectPath": table, "mode": "export", "directory": "", "fileName": FIO_TABLE}
     def formats():
