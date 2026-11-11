@@ -8,7 +8,9 @@ reopen, bridge recovery and native qualification false.
 
 Supported preparation profiles are `classic-comfort`, `classic-rt-advanced`,
 `unified-comfort` and `unified-pc`. Both Classic profiles only configure an
-existing screen as the start screen. The source must contain exactly one selected positive owned
+existing screen as the start screen. A new Classic fixture no longer needs this step:
+a screen created from a master copy in an HMI without screens becomes its start screen
+([11 November 2026 record](../verification/classic-start-screen-master-copy-20261111.md)). The source must contain exactly one selected positive owned
 fixture with independently observed archive retrieval, distinct HMI owners and
 an unchanged archive. A PLC recovery report is no longer required (1 November
 2026): it never established HMI archive recovery or preservation, and no current
