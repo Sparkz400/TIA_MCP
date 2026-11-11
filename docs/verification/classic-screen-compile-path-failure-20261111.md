@@ -73,13 +73,22 @@ They are a symptom of the failure: the generator could not read data of faceplat
 instances it had read before. Not known: whether the HMI runtime or simulation was
 running from that TIA session.
 
-## Why it was not reproduced
+## Reproduction attempt
 
-A reproduction needs an owned RT Advanced project that compiles without errors, because
-a compile with errors aborts before generation. Openness exposes no setter for the
-Classic start screen, so such a project cannot be created without the TIA user
-interface, and no prepared fixture archive was available on the workstation. The
-customer project and its checkpoint archive were not opened.
+A compilable owned RT Advanced fixture can be built without the editor since the same
+day: a screen created from a master copy in an HMI without screens becomes its start
+screen (pull request 298 of this repository). On a retrieved copy of that fixture, in an
+owned headless Portal, two runs replayed the order of native calls of the apply under
+one exclusive access: save, archive, compile, re-import of a changed screen, compile,
+re-import, compile; and the same without the archive. In both, the first compile was
+answered from the last result and the two compiles after a re-import generated and
+finished with 0 errors. **The failure did not occur.**
+
+The fixture has one screen with one rectangle and one tag, no faceplate instances,
+graphic lists or connections, and the Portal ran without user interface for under a
+minute. The runs rule out the bare sequence on a minimal HMI, as the 10 November
+journals already did on the real one, and nothing else. The customer project and its
+checkpoint archive were not opened.
 
 ## Change
 
@@ -112,12 +121,10 @@ compiler fails this way.
 
 ## Open
 
-- Identify the cause on an owned error-free RT Advanced fixture. First experiment,
-  headless and repeatable once the fixture exists: compile error-free, archive, re-import
-  one screen unchanged, compile; with a control that skips the archive. Then vary what
-  the journals cannot rule out: a long-lived TIA session with an earlier error-free
-  compile from the user interface, a running HMI runtime or simulation, and a full
-  rather than a delta generation.
+- Identify the cause. Still to vary on the owned fixture: faceplate instances with
+  graphic lists from a project library, a Portal with user interface that has run for
+  hours with an earlier error-free compile from the editor, a running HMI runtime or
+  simulation, and a full rather than a delta generation.
 - Until then the failure is detected only after the import.
 - A change left `recovery_required` this way has no in-place reconciliation after the
   project is closed without saving and reopened.
