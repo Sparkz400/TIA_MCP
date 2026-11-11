@@ -81,8 +81,13 @@ namespace TiaMcp.Openness.V21
             string name = ChangeText(change.Payload, "memberName", 128);
             bool constant = change.Kind.StartsWith("constant_", StringComparison.Ordinal);
             IEngineeringObject member = constant ? (IEngineeringObject)table.UserConstants.FirstOrDefault(item => item.Name == name) : table.Tags.FirstOrDefault(item => item.Name == name);
-            if (member is PlcTag tag && tag.IsSafety)
-                throw new BridgeException("SafetyBoundary", "Safety tags are excluded from generic tag edits and deletion, including tags in standard PLC tables.");
+            // A safety tag takes one edit only, asked for explicitly: a single tag_set that renames it (SafetyTagRenameRules).
+            bool rename = SafetyTagRenameRules.Requested(change.Kind, change.Payload);
+            if (member is PlcTag tag && tag.IsSafety && !rename)
+                throw new BridgeException("SafetyBoundary", "Safety tags are excluded from generic tag edits and deletion, including tags in standard PLC tables. " +
+                    "Only a rename is available: a single tag_set with safetyAcknowledged=true and attributes containing only Name.");
+            if (rename && member is PlcTag standard && !standard.IsSafety)
+                throw new BridgeException("InvalidRequest", "safetyAcknowledged=true selects a safety tag, and " + name + " is a standard tag. Omit safetyAcknowledged.");
             return member ?? throw new BridgeException("ObjectNotFound", "No editable " + (constant ? "user constant" : "tag") + " has the exact memberName. System constants are excluded.");
         }
 
@@ -106,8 +111,16 @@ namespace TiaMcp.Openness.V21
             {
                 var attrs = ChangeObject(change.Payload, "attributes");
                 if (attrs.Count == 0) throw new BridgeException("InvalidRequest", "attributes must contain at least one editable field.");
-                var allow = new HashSet<string>(new[] { "Name", "DataTypeName", change.Kind == "constant_set" ? "Value" : "LogicalAddress" }, StringComparer.Ordinal);
+                var allow = TagEditAttributes(change, plc, member, attrs);
                 if (attrs["Name"] != null) RejectTagNameCollision(change, plc, ChangeText(attrs, "Name", 128), member);
+                if (member is PlcTag safetyTag && safetyTag.IsSafety)
+                {
+                    preview["safetyBefore"] = ReadSafety(plc.Software);
+                    preview["safetyTagRename"] = new JObject { ["memberName"] = safetyTag.Name, ["newName"] = attrs.Value<string>("Name"),
+                        ["dataTypeName"] = safetyTag.DataTypeName, ["logicalAddress"] = safetyTag.LogicalAddress };
+                    ((JArray)preview["warnings"]).Add("Renames a safety tag. Blocks of the safety program that use it must be compiled again, and the safety program signatures can change. " +
+                        "Nothing here validates, accepts or approves the safety program; address and data type are not changed.");
+                }
                 if (change.Kind == "tag_set" && attrs["LogicalAddress"] != null) RejectFIoAddresses(plc, new[] { ChangeText(attrs, "LogicalAddress", 1024) });
                 change.AttributeTarget = member;
                 ((JArray)preview["effects"]).Add(new JObject { ["memberName"] = change.Payload["memberName"], ["attributes"] = PrepareAttributes(member, attrs, allow) });
@@ -132,8 +145,34 @@ namespace TiaMcp.Openness.V21
             {
                 var attrs = ChangeObject(change.Payload, "attributes");
                 if (change.Kind == "tag_set" && attrs["LogicalAddress"] != null) RejectFIoAddresses(plc, new[] { ChangeText(attrs, "LogicalAddress", 1024) });
-                ApplyAttributes(member, attrs, new HashSet<string>(new[] { "Name", "DataTypeName", change.Kind == "constant_set" ? "Value" : "LogicalAddress" }, StringComparer.Ordinal));
+                var safetyTag = member is PlcTag candidate && candidate.IsSafety ? candidate : null;
+                string address = safetyTag?.LogicalAddress, dataType = safetyTag?.DataTypeName;
+                ApplyAttributes(member, attrs, TagEditAttributes(change, plc, member, attrs));
+                if (safetyTag != null)
+                {
+                    // Read back from the table by the new name: still a safety tag, on the same address with the same data type.
+                    string renamedTo = attrs.Value<string>("Name"), previous = change.Payload.Value<string>("memberName");
+                    var renamed = table.Tags.Find(renamedTo);
+                    if (renamed == null || renamed.Name != renamedTo || (!string.Equals(previous, renamedTo, StringComparison.OrdinalIgnoreCase) && table.Tags.Find(previous) != null))
+                        throw new BridgeException("MutationVerificationFailed", "The safety tag did not read back under its new name alone. Recover from the checkpoint.");
+                    if (!renamed.IsSafety || renamed.LogicalAddress != address || renamed.DataTypeName != dataType)
+                        throw new BridgeException("SafetyVerificationFailed", "The renamed tag is no longer a safety tag on its address with its data type. Recover from the checkpoint.");
+                    change.Readbacks.Add(new JObject { ["role"] = "safety-tag-rename", ["memberName"] = previous, ["name"] = renamed.Name,
+                        ["dataTypeName"] = renamed.DataTypeName, ["logicalAddress"] = renamed.LogicalAddress, ["isSafety"] = true });
+                    change.Stages.Add("safety_tag_rename_verified");
+                }
             }
+        }
+
+        /// <summary>The attributes a tag or constant edit may set. A safety tag takes a rename only, and only with the safety offline
+        /// program writable: its address and data type belong to the F-I/O configuration.</summary>
+        private static HashSet<string> TagEditAttributes(EngineeringChange change, PlcSelection plc, IEngineeringObject member, JObject attrs)
+        {
+            if (!(member is PlcTag tag) || !tag.IsSafety)
+                return new HashSet<string>(new[] { "Name", "DataTypeName", change.Kind == "constant_set" ? "Value" : "LogicalAddress" }, StringComparer.Ordinal);
+            SafetyTagRenameRules.RequireNameOnly(attrs);
+            EnsureSafetyWritable(plc.Software);
+            return new HashSet<string>(new[] { "Name" }, StringComparer.Ordinal);
         }
 
         private static readonly HashSet<string> TagBatchAllow = new HashSet<string>(TagBatchRules.Attributes, StringComparer.Ordinal);

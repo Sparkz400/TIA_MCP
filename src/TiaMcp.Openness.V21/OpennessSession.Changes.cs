@@ -295,7 +295,7 @@ namespace TiaMcp.Openness.V21
                     if (change.Kind == "instance_db_create") { VerifyInstanceDb(change, SelectPlc(change.Selector)); change.Stages.Add("instance_db_verified_after_save"); }
                     // A batch is read back item by item again after compile and save.
                     if (change.TagBatchTablePaths != null) { VerifyTagBatch(change, save ? "after-save" : "after-compile"); change.Stages.Add("tag_batch_verified_after_" + (save ? "save" : "compile")); }
-                    if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_drive_tags") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
+                    if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_drive_tags" || change.Preview?["safetyTagRename"] != null) change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
                     change.AfterFingerprint = change.Kind == "hmi_classic_screen_edit"
                         ? ClassicScreenCapturedFingerprint(change, project, change.HmiEvidence["after-save"] as JObject)
                         : MeasureChange(change, "after-fingerprint", () => EngineeringFingerprint(change, project));

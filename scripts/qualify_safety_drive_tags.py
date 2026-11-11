@@ -2,7 +2,9 @@
 at the addresses Startdrive reports, while generic tag routes keep refusing them. The telegram is inserted by the native fixture
 helper (drive_telegram_set refuses safety telegrams). With the two real safety tags in place, tag_set, tag_delete and
 tag_create batches (payload.items) that touch one of them or its address must refuse as a whole and change no tag.
-Owned scratch only; never a user project, no download."""
+With --safety-tag-rename the run also renames one of the safety tags through a single tag_set with safetyAcknowledged=true:
+every other edit of a safety tag must stay refused, the renamed tag must read back as a safety tag on its address, and the
+safety state before and after is recorded. Owned scratch only; never a user project, no download."""
 import argparse
 import json
 from pathlib import Path
@@ -17,6 +19,7 @@ def main():
     parser.add_argument('--artifacts', type=Path, required=True)
     parser.add_argument('--host', type=Path, default=ROOT / 'src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe')
     parser.add_argument('--worker', type=Path, default=ROOT / 'src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe')
+    parser.add_argument('--safety-tag-rename', action='store_true', help='Also rename a safety tag through tag_set with safetyAcknowledged=true.')
     args = parser.parse_args()
     root = args.artifacts.resolve()
     root.mkdir(parents=True, exist_ok=False)
@@ -140,6 +143,48 @@ def main():
             assert tag_rows() == before, 'A refused batch changed a tag'
         record('every tag is unchanged after the refused batches', before)
         refused('safety_drive_tags', {**payload, 'safetyAcknowledged': True}, 'ObjectExists')
+        if args.safety_tag_rename:
+            # The one generic edit of a safety tag: a single tag_set, safetyAcknowledged=true, attributes holding only Name.
+            status, new_name = tags['status'], 'SafeDrive_Status'
+            rename = lambda **more: {'tagTableName': table, 'memberName': status, 'attributes': {'Name': new_name}, **more}
+            refusals = [
+                ('a safety tag renamed without safetyAcknowledged', 'tag_set', rename(), 'SafetyBoundary'),
+                ('safetyAcknowledged false', 'tag_set', rename(safetyAcknowledged=False), 'InvalidRequest'),
+                ('a new address for a safety tag', 'tag_set', {**rename(safetyAcknowledged=True), 'attributes': {'LogicalAddress': '%IW2'}}, 'SafetyBoundary'),
+                ('a new data type beside the new name', 'tag_set', {**rename(safetyAcknowledged=True), 'attributes': {'Name': new_name, 'DataTypeName': 'Int'}}, 'SafetyBoundary'),
+                ('a name another tag has', 'tag_set', {**rename(safetyAcknowledged=True), 'attributes': {'Name': 'StdA'}}, 'ObjectExists'),
+                ('safetyAcknowledged on a standard tag', 'tag_set', {'tagTableName': table, 'memberName': 'StdA', 'attributes': {'Name': 'StdA_R'}, 'safetyAcknowledged': True}, 'InvalidRequest'),
+                ('safetyAcknowledged on tag_delete', 'tag_delete', {**drop(status), 'safetyAcknowledged': True}, 'InvalidRequest'),
+                ('safetyAcknowledged beside items', 'tag_set', {'items': [edit(status, Name=new_name)], 'safetyAcknowledged': True}, 'InvalidRequest'),
+            ]
+            for label, kind, body, code in refusals:
+                result = client.request('tools/call', {'name': 'change_prepare', 'arguments': {'kind': kind, 'plcPath': fplc, 'payload': body}})
+                error = (result.get('structuredContent') or {}).get('error') or {}
+                record('rename refusal: %s refused with %s' % (label, code), error)
+                assert result.get('isError') and error.get('code') == code, error
+                assert tag_rows() == before, 'A refused safety-tag edit changed a tag'
+            prepared = client.tool('change_prepare', {'kind': 'tag_set', 'plcPath': fplc, 'payload': rename(safetyAcknowledged=True)})
+            preview = prepared['preview']
+            record('safety-tag rename prepared', {'safetyTagRename': preview.get('safetyTagRename'), 'safetyBefore': preview.get('safetyBefore'), 'warnings': preview.get('warnings')})
+            assert preview['safetyTagRename'] == {'memberName': status, 'newName': new_name, 'dataTypeName': 'Word', 'logicalAddress': before[status][0]}, preview.get('safetyTagRename')
+            assert preview['safetyBefore']['available'] is True and any('safety program signatures' in w for w in preview['warnings']), preview
+            assert tag_rows() == before, 'Preparing the rename changed a tag'
+            renamed = client.tool('change_apply', {'changeId': prepared['changeId'], 'previewHash': prepared['previewHash'], 'idempotencyKey': uuid.uuid4().hex,
+                                                   'checkpointSave': True, 'compile': True, 'save': True})
+            assert renamed['state'] == 'applied' and 'safety_tag_rename_verified' in renamed['stages'] and 'changed_project_saved' in renamed['stages'], (renamed['state'], renamed['stages'])
+            view = client.tool('change_status', {'changeId': renamed['changeId'], 'includeDetails': True})
+            safety_after = view.get('safetyAfter') or renamed.get('safetyAfter')
+            assert safety_after and safety_after['available'] is True, 'The applied rename records no safety state'
+            keys = ('signatures', 'runtimeGroups')
+            record('safety-tag rename applied', {'stages': renamed['stages'], 'compilerSucceeded': renamed['compile']['compilerSucceeded'],
+                                                 'introducedErrors': renamed['compile']['baselineComparison'].get('introducedErrorCount'),
+                                                 'safetyBefore': preview['safetyBefore'], 'safetyAfter': safety_after,
+                                                 'safetyStateUnchanged': {key: preview['safetyBefore'].get(key) == safety_after.get(key) for key in keys}})
+            after = tag_rows()
+            record('renamed safety tag read back', after)
+            assert status not in after and after[new_name] == before[status] and after[new_name][2] is True, after
+            assert {name: row for name, row in after.items() if name != new_name} == {name: row for name, row in before.items() if name != status}, 'Another tag changed'
+            applied = renamed  # the closing restore returns to the state before the rename
         restored = client.tool('change_restore', {'changeId': applied['changeId'], 'previewHash': applied['previewHash']})
         record('restore from the checkpoint', {'state': restored['state'], 'recoveredProject': restored.get('recoveredProject')})
         assert restored['state'] == 'restored', restored['state']
