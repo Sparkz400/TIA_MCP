@@ -12,9 +12,40 @@ namespace TiaMcp.Model
     // It is compile metadata, not a diagnostic. Keep original evidence; normalize a clone only.
     internal static class ClassicScreenCompileRules
     {
+        internal const string PathFailureText = "Cannot compile. Cannot access the project path.";
+        internal const string GenerationSkippedText = "No HMI runtime-relevant changes have been made since the last error-free HMI compilation. New compilation is not necessary.";
+
+        // The compiler could not run; its result says nothing about the project content. The name is historical: on
+        // 11 November 2026 one apply got this result for the post-import and for the rollback compile, two minutes apart.
         internal static bool IsTransientPathFailure(JObject result) => result?["targets"] is JArray targets
             && targets.OfType<JObject>().Any(t => (t["messages"] as JArray)?.OfType<JObject>().Any(m =>
-                m.Value<string>("state") == "Error" && m.Value<string>("description") == "Cannot compile. Cannot access the project path.") == true);
+                m.Value<string>("state") == "Error" && m.Value<string>("description") == PathFailureText) == true);
+
+        // V21 answers a compile of an HMI without runtime-relevant changes from its last result. Such a result is a valid
+        // diagnostics reference (observed 10 November 2026: equal to a later real rollback compile), but generated nothing,
+        // so it does not show that the compiler can run in this TIA session.
+        internal static bool SkippedGeneration(JObject result) => result?["targets"] is JArray targets
+            && targets.OfType<JObject>().Any(t => (t["messages"] as JArray)?.OfType<JObject>().Any(m =>
+                m.Value<string>("state") == "Information" && m.Value<string>("description") == GenerationSkippedText) == true);
+
+        /// <summary>Why the compile after the import does not verify the edit, when the reason is the compiler rather than the edit; otherwise null.</summary>
+        internal static string FinalCompileUnavailable(JObject compilation) => IsTransientPathFailure(compilation)
+            ? "The HMI compiler could not run after the import (\"" + PathFailureText + "\"). Its result says nothing about the edited screens. "
+                + "Verified screen rollback is attempted; inspect the retained outcome."
+            : null;
+
+        /// <summary>Null when the rollback compile restored the baseline diagnostics exactly; otherwise the reason, naming a compiler that could not run apart from a real difference.</summary>
+        /// <param name="scopeRestored">The full regular-screen scope was captured after the rollback compile and equals the pre-import capture.</param>
+        /// <param name="editSaved">The apply had already saved the edited project (stage changed_project_saved) when it failed.</param>
+        internal static string RollbackCompileFailure(JObject baseline, JObject rollback, bool scopeRestored, bool editSaved = false)
+        {
+            if (IsTransientPathFailure(rollback))
+                return "The HMI compiler could not run for the rollback compile (\"" + PathFailureText + "\"), so the restored diagnostics could not be compared with the baseline."
+                    + (!scopeRestored ? "" : " Every attempted screen was re-imported and read back, and the regular-screen scope equals the pre-import capture. The rollback was not saved: "
+                        + (editSaved ? "the saved project holds the edit, and closing the project without saving returns to the edit, not to the original screens. The retained recovery archive is the checkpoint."
+                            : "the saved project is still the checkpoint. Closing the project without saving returns to it; compile the HMI again after reopening."));
+            return Completed(rollback) && ProblemsUnchanged(baseline, rollback) ? null : "Rollback compiler diagnostics do not match the successful baseline.";
+        }
 
         // A returned compiler result with diagnostics is distinct from a compiler
         // that could not run. Keep the complete original tree in the journal.

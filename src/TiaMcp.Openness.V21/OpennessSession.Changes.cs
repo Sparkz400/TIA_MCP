@@ -267,9 +267,13 @@ namespace TiaMcp.Openness.V21
                             : change.Kind == TagTableImportRules.Kind ? change.Compilation?["baselineComparison"]?.Value<bool>("verified") != true
                             : UsesCompileBaseline(change) ? change.Compilation == null || !CompileBaselineRules.Accepts(change.CompileBaseline, change.Compilation, (JObject)change.Compilation["baselineComparison"])
                             : !CompilationEvidenceRules.IsCompleted(change.Compilation))
+                        {
+                            string unavailable = change.Kind == "hmi_classic_screen_edit" ? ClassicScreenCompileRules.FinalCompileUnavailable(change.Compilation) : null;
+                            if (unavailable != null) change.Compilation["compilerUnavailable"] = true;
                             throw new BridgeException(change.Compilation?.Value<int?>("errorCount") == 0 ? "CompileDiagnosticRegression" : "CompileFailed",
-                                "The change failed compiler verification: errors, new/changed warnings, or incomplete diagnostics. "
+                                unavailable ?? "The change failed compiler verification: errors, new/changed warnings, or incomplete diagnostics. "
                                 + (change.Kind == "hmi_classic_screen_edit" ? "Verified screen rollback is attempted; inspect the retained outcome." : "Inspect the retained outcome."));
+                        }
                     }
                     if (IsHmiChangeKind(change.Kind)) VerifyHmiEngineeringPreservation(change, project);
                     if (change.Kind == "software_unit_create_from") RequireUnrenamedUnitMembers(change);
