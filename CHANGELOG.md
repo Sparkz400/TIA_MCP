@@ -256,6 +256,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- **F-I/O refusal of a `tag_set` batch names its item:** a `tag_set` batch refused because one item's address lies in an F-I/O range reported `SafetyBoundary` without saying which item. The message now starts with `items[n]:` and the details carry `index` and `memberName`, like every other batch refusal.
 - **Decision log that cannot be written:** a read-only `intent-decisions.jsonl`, or a directory in its place, raised `UnauthorizedAccessException` after a change was applied, which the apply did not catch. It is now recorded as `intent-log-write-failure` like other log write failures and the change stays `applied`.
 - **Replay of a failed apply:** `change_apply` repeated with the same idempotency key after a change ended `not_applied` or `rolled_back` was refused with `RecoveryRequired` by mutation admission; it now returns the recorded outcome, as it already did for `applied` ([record](docs/verification/native-audit-20261110.md)).
 
