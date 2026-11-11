@@ -46,6 +46,7 @@ internal sealed partial class FixtureServer : StandardServer
     internal X509Certificate2? AdvertisedCertificate;
     internal string? AdvertisedEndpoint;
     private ApplicationConfiguration? fixtureConfiguration;
+    internal double LastRequestedSessionTimeout;
     internal int SessionCount => ServerInternal.SessionManager.GetSessions().Count;
     internal readonly TaskCompletionSource ReadEntered = new(TaskCreationOptions.RunContinuationsAsynchronously);
     internal string Endpoint { get; private set; } = "";
@@ -175,6 +176,7 @@ internal sealed partial class FixtureServer : StandardServer
         ApplicationDescription client,string serverUri,string endpointUrl,string sessionName,byte[] nonce,byte[] certificate,
         double timeout,uint maximumResponse,CancellationToken ct)
     {
+        LastRequestedSessionTimeout=timeout;
         var result=await base.CreateSessionAsync(channel,header,client,serverUri,endpointUrl,sessionName,nonce,certificate,timeout,maximumResponse,ct);
         if(AdvertisedEndpoint is not null)foreach(var endpoint in result.ServerEndpoints)endpoint.EndpointUrl=AdvertisedEndpoint;
         return result;

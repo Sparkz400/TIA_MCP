@@ -2337,8 +2337,8 @@
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs",
-      "sha256": "f9040974f3b5df4cc83ffb367033b1249a3720dcbaea3f88d62a204a86f54fe8",
-      "bytes": 24429
+      "sha256": "244d56afb7220cade87fcf778c85025684ce9cacea8643f1696702940b98d1f5",
+      "bytes": 24743
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",

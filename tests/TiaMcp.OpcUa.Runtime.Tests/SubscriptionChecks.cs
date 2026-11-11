@@ -105,7 +105,7 @@ internal static class SubscriptionChecks
                 "The default keep-alive count survives a server revision to 1000 ms");
             server.Mode="normal";
             await RetainedControls(root,sessions,capture,status,check);
-            StoreLimits(root,status.GetProperty("plan").Deserialize<OpcUaSubscriptionPlan>(BridgeProtocol.Json)!,check);
+            StoreLimits(root,status.GetProperty("plan").Deserialize<OpcUaSubscriptionPlan>(BridgeProtocol.Json)!,events.Single(x=>x.Notifications is [{Value.Node.Identifier:"array"}]),check);
             var next=typeof(OpcUaRuntimeSubscriptions).GetMethod("Next",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic)!;
             var previous=typeof(OpcUaRuntimeSubscriptions).GetMethod("Previous",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic)!;
             check((uint)next.Invoke(null,[uint.MaxValue])! == 1 && (uint)next.Invoke(null,[1u])! == 2 && (uint)previous.Invoke(null,[1u])! == uint.MaxValue,"Sequence counter wrap excludes zero with independent boundary constants");
@@ -160,7 +160,7 @@ internal static class SubscriptionChecks
         check(originalHashes.All(x=>Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(x.Key)))==x.Value),"Every original subscription byte unchanged by rehashed controls");
     }
     // Store refusals that no live fixture flow reaches; each uses a fresh capture in its own store root.
-    internal static void StoreLimits(string root,OpcUaSubscriptionPlan plan,Action<bool,string> check)
+    internal static void StoreLimits(string root,OpcUaSubscriptionPlan plan,OpcUaSubscriptionEvent array,Action<bool,string> check)
     {
         void Fails(Action action,string code){string? actual=null;try{action();}catch(BridgeException e){actual=e.Code;}check(actual==code,"Subscription store refusal "+code+" (actual "+actual+")");}
         static OpcUaSubscriptionRow Gap(long sequence)=>new(sequence,0,DateTimeOffset.UtcNow,new("gap",1,GapFrom:1,GapTo:1,MissingCount:1));
@@ -174,6 +174,15 @@ internal static class SubscriptionChecks
         for(long n=0;n<20000 && limited is null;n++)try{bounded.Append(Gap(n));}catch(BridgeException e){limited=e.Code;}
         check(limited=="UaSubscriptionByteLimit" && bounded.Rows<20000,"Subscription byte budget refuses the row that would pass MaximumBytes (actual "+limited+")");
         bounded.Finish("byteLimit",0);
+        // A valid UA string array can exceed one segment's budget; the writer refuses it before staging.
+        var wide=JsonSerializer.SerializeToNode(array,BridgeProtocol.Json)!.AsObject();var wideValue=wide["notifications"]![0]!["value"]!.AsObject();
+        wideValue["builtInType"]="String";wideValue["arrayDimensions"]=null;
+        wideValue["value"]=new JsonObject{["dimensions"]=new JsonArray(100),["elementEncoding"]="string",
+            ["elements"]=new JsonArray(Enumerable.Range(0,100).Select(_=>(JsonNode?)JsonValue.Create(new string('x',16384))).ToArray())};
+        var valueBounded=store.Create(plan with{CaptureId=Id()});
+        Fails(()=>valueBounded.Append(new(0,0,DateTimeOffset.UtcNow,wide.Deserialize<OpcUaSubscriptionEvent>(BridgeProtocol.Json)!)),"UaSubscriptionValueLimit");
+        check(valueBounded.Rows==0,"A subscription row above the segment budget is not staged");
+        valueBounded.Finish("valueLimit",0);
         Fails(()=>store.Page(bounded.Reference,-1),"OpcUaSubscriptionPageLimit");
         Fails(()=>store.Page("capture:"+small.CaptureId+":0:"+new string('0',64)),"OpcUaSubscriptionReferenceInvalid");
         Fails(()=>store.Status("../bad",false),"OpcUaSubscriptionIdentityInvalid");

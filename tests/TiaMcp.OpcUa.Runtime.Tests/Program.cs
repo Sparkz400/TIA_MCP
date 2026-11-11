@@ -345,7 +345,9 @@ try
         var third = await Start("third"); var fourth = await Start("fourth");
         {
             var store = Store("idle-publication"); string id1 = Id(), id2 = Id();
-            await store.Connect(id1, server.Selection); await store.Connect(id2, second.Selection);
+            await store.Connect(id1, server.Selection);
+            Check(server.LastRequestedSessionTimeout == 600_000, "The client asks for a session timeout that outlives a long bind");
+            await store.Connect(id2, second.Selection);
             File.WriteAllText(Path.Combine(output, "idle-publication", id1 + ".tmp"), "owned collision");
             // Test-only inactivity trigger; the actual timer, server session and failing publication are real.
             var liveField = typeof(OpcUaRuntimeSessionStore).GetField("live", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
