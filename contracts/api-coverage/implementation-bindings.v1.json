@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "6b325128ca6199af21e6377aac0f05901fb52424a0379d34e825c2642d8203c2",
-      "bytes": 1900880
+      "sha256": "8f23c88f287857641f60852b0c21fb08fc6969c2ae29f2ae42e2b9c5a5342e4e",
+      "bytes": 1904552
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -118335,6 +118335,13 @@
           "artifacts": [
             "evidence/local.safety.tag-batch.20261111.json"
           ]
+        },
+        {
+          "id": "local.safety.tag-rename.20261111",
+          "profileSha256": "36719754e63f49a8cbcf951d2b6996bc7a03b456cae20653f103028ae1a3f2d3",
+          "artifacts": [
+            "evidence/local.safety.tag-rename.20261111.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -142903,6 +142910,11 @@
       "sha256": "393ef367d3b9e2afdc30c77cfb5f655d3482852c4817823582a76c5b4d00cd85"
     },
     {
+      "path": "evidence/local.safety.tag-rename.20261111.json",
+      "state": "observed",
+      "sha256": "ed640e00bf0807aaeca9c7b601db196851ef8aa6b088df78563ca881ed667a60"
+    },
+    {
       "path": "evidence/local.safety_changes.20261028.json",
       "state": "observed",
       "sha256": "be47f77d600843111308847056c93bb78df683d22625890221a2315cdb6dcd8a"
@@ -144251,6 +144263,10 @@
     {
       "id": "local.safety.tag-batch.20261111",
       "profileSha256": "ae0d59a8d9182c3976629151e39fa7e88233ed8614352f6baa87061520817908"
+    },
+    {
+      "id": "local.safety.tag-rename.20261111",
+      "profileSha256": "36719754e63f49a8cbcf951d2b6996bc7a03b456cae20653f103028ae1a3f2d3"
     },
     {
       "id": "local.safety_changes.20261028",

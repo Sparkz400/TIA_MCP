@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.178",
+  "catalogVersion": "0.4.179",
   "targetTiaVersions": [
     21
   ],
@@ -5837,6 +5837,25 @@
         "On an F-CPU a tag_delete item of a standard tag is refused with DependencyCoverageIncomplete before a later item is reached, so a safety tag as a later item of a tag_delete batch is not reachable here.",
         "The PROFIsafe telegram was inserted by the qualification fixture, not by an MCP route. No F-destination address, safety acceptance, password or download; engineering evidence only, not machine safety acceptance.",
         "The source commit changes only this runner (the order of its tag_delete batch and of its standard tags) after the built 48bf67a8; src and every executable run are byte-identical to it."
+      ]
+    },
+    {
+      "id": "local.safety.tag-rename.20261111",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "90d20b075f362994415f282d2bba6da97ccf7e14",
+        "passedScope": "Renaming a safety tag through a single tag_set with safetyAcknowledged=true: scripts/qualify_safety_drive_tags.py --safety-tag-rename on a Debug build of 90d20b07, 32/32 steps (artifacts/sd/n3), and the same runner without the flag as regression guard, 21/21 steps (artifacts/sd/n2), each in one owned TIA V21 scratch with an added CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) as IO controller of a SINAMICS G120C PN 6SL3210-1KE21-3AF1 (firmware 4.7.14) with PROFIsafe telegram 30, inserted by the native fixture helper. With the real safety tags SafeDrive_S_ZSW1 (%IW0) and SafeDrive_S_STW1 (%QW0) in place, eight preparations were refused and software_inspect showed every tag unchanged after each: the rename without safetyAcknowledged (SafetyBoundary), safetyAcknowledged false (InvalidRequest), a new LogicalAddress (SafetyBoundary), a new DataTypeName beside the new Name (SafetyBoundary), a name another tag has (ObjectExists), safetyAcknowledged on a standard tag, on tag_delete and beside items (InvalidRequest each). The acknowledged rename of SafeDrive_S_ZSW1 to SafeDrive_Status then prepared with safetyTagRename, safetyBefore and the warning in its preview, and applied with checkpoint, baseline compile, safety_tag_rename_verified, compile (0 introduced errors) and save. The tag read back as SafeDrive_Status at %IW0, Word, isSafety true; the old name was gone and every other tag was unchanged. The four offline signatures (collective, software, hardware, communication address) and the F-runtime group were identical in safetyBefore and safetyAfter. change_restore of the rename returned the checkpoint. The regression run repeats local.safety.tag-batch.20261111 unchanged: every batch touching a safety tag or the telegram's addresses is still refused."
+      },
+      "artifacts": [
+        "evidence/local.safety.tag-rename.20261111.json"
+      ],
+      "limitations": [
+        "No block of the safety program used the renamed tag: the scratch F-CPU holds only the generated, empty main safety block. What a rename does to the signatures of a safety program that uses the tag, and whether it then needs a new acceptance, is not observed.",
+        "One Word safety tag of a PROFIsafe telegram 30 on one owned F-CPU 1511F-1 PN; safety tags on F-I/O modules, tags in software units and tags in user tag-table groups are not exercised.",
+        "The safety offline program had no password, so the SafetyLoginRequired refusal is covered by the shared guard of the other safety kinds only, not by this run.",
+        "The PROFIsafe telegram was inserted by the qualification fixture, not by an MCP route. No safety acceptance, password or download; engineering evidence only, not machine safety acceptance."
       ]
     }
   ],
@@ -12072,7 +12091,8 @@
           "A preceding write that changes another requested attribute type causes refusal before that later setter; split dependent edits into separately reviewed changes. Earlier setters can already have taken effect.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "A LogicalAddress change to an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native write with SafetyBoundary (TIA would make the tag a safety tag); nothing is written (1 November 2026; rechecked natively in local.safety.fio-routes.20261101).",
-          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107)."
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107).",
+          "Safety tags are refused, with one exception: a single tag_set with safetyAcknowledged=true and attributes holding only Name renames one (never inside items; safety offline program writable; safetyBefore, safetyTagRename and a warning in the preview; safetyAfter on the applied change). Qualified natively for a PROFIsafe telegram tag that no safety block uses (local.safety.tag-rename.20261111): the offline signatures were unchanged. The effect on a safety program that uses the tag is not observed, and nothing validates or accepts the safety program."
         ]
       },
       "qualification": {
@@ -12084,7 +12104,8 @@
           "local.tag-set.batch.20261111",
           "local.change-batch.items.20261111",
           "local.safety.fio-routes.20261111",
-          "local.safety.tag-batch.20261111"
+          "local.safety.tag-batch.20261111",
+          "local.safety.tag-rename.20261111"
         ]
       },
       "availability": {

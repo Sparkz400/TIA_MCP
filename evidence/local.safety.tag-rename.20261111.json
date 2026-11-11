@@ -1,0 +1,144 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.safety.tag-rename.20261111",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-11T11:57:13+00:00",
+  "source": {
+    "commit": "90d20b075f362994415f282d2bba6da97ccf7e14",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "LT-PRG2024-03",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Renaming a safety tag through a single tag_set with safetyAcknowledged=true: scripts/qualify_safety_drive_tags.py --safety-tag-rename on a Debug build of 90d20b07, 32/32 steps (artifacts/sd/n3), and the same runner without the flag as regression guard, 21/21 steps (artifacts/sd/n2), each in one owned TIA V21 scratch with an added CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) as IO controller of a SINAMICS G120C PN 6SL3210-1KE21-3AF1 (firmware 4.7.14) with PROFIsafe telegram 30, inserted by the native fixture helper. With the real safety tags SafeDrive_S_ZSW1 (%IW0) and SafeDrive_S_STW1 (%QW0) in place, eight preparations were refused and software_inspect showed every tag unchanged after each: the rename without safetyAcknowledged (SafetyBoundary), safetyAcknowledged false (InvalidRequest), a new LogicalAddress (SafetyBoundary), a new DataTypeName beside the new Name (SafetyBoundary), a name another tag has (ObjectExists), safetyAcknowledged on a standard tag, on tag_delete and beside items (InvalidRequest each). The acknowledged rename of SafeDrive_S_ZSW1 to SafeDrive_Status then prepared with safetyTagRename, safetyBefore and the warning in its preview, and applied with checkpoint, baseline compile, safety_tag_rename_verified, compile (0 introduced errors) and save. The tag read back as SafeDrive_Status at %IW0, Word, isSafety true; the old name was gone and every other tag was unchanged. The four offline signatures (collective, software, hardware, communication address) and the F-runtime group were identical in safetyBefore and safetyAfter. change_restore of the rename returned the checkpoint. The regression run repeats local.safety.tag-batch.20261111 unchanged: every batch touching a safety tag or the telegram's addresses is still refused.",
+  "limitations": [
+    "No block of the safety program used the renamed tag: the scratch F-CPU holds only the generated, empty main safety block. What a rename does to the signatures of a safety program that uses the tag, and whether it then needs a new acceptance, is not observed.",
+    "One Word safety tag of a PROFIsafe telegram 30 on one owned F-CPU 1511F-1 PN; safety tags on F-I/O modules, tags in software units and tags in user tag-table groups are not exercised.",
+    "The safety offline program had no password, so the SafetyLoginRequired refusal is covered by the shared guard of the other safety kinds only, not by this run.",
+    "The PROFIsafe telegram was inserted by the qualification fixture, not by an MCP route. No safety acceptance, password or download; engineering evidence only, not machine safety acceptance."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "b58d02e2e7fde8e6258777c2c5e05dc2946a2818adf8b4cc9c3113b196d159cd"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "3f81c780927bfaaac1c785d241088a6914cfe57177174423d28c40762bc7f22e"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "0405512066f676cb31d6240ec269816d1359d338823b7f2b042aec516b2d7b9c"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "3514ddef744221cef8dd44e2f0691aef35de704d787d27ad64a55a41992bcbbc",
+      "bytes": 108252,
+      "completed": true,
+      "steps": [
+        "owned scratch",
+        "types",
+        "inventory before safety telegram",
+        "fixture inserts PROFIsafe telegram 30",
+        "inventory after safety telegram",
+        "tag_create refused with SafetyBoundary",
+        "safety_drive_tags refused with InvalidRequest",
+        "a tag_create batch of two standard tags applied on the F-CPU",
+        "safety_drive_tags applied",
+        "change_status confirms the applied change",
+        "safety tags read back",
+        "standard and safety tags before the refused batches",
+        "tag_set batch whose item 1 renames a safety tag refused with SafetyBoundary",
+        "tag_set batch whose item 1 moves a standard tag onto the safety telegram refused with SafetyBoundary",
+        "tag_delete batch whose item 0 deletes a safety tag refused with SafetyBoundary",
+        "tag_delete batch whose item 0 deletes a standard tag on the F-CPU refused with DependencyCoverageIncomplete",
+        "tag_create batch whose item 1 creates a tag on the safety telegram refused with SafetyBoundary",
+        "every tag is unchanged after the refused batches",
+        "safety_drive_tags refused with ObjectExists",
+        "rename refusal: a safety tag renamed without safetyAcknowledged refused with SafetyBoundary",
+        "rename refusal: safetyAcknowledged false refused with InvalidRequest",
+        "rename refusal: a new address for a safety tag refused with SafetyBoundary",
+        "rename refusal: a new data type beside the new name refused with SafetyBoundary",
+        "rename refusal: a name another tag has refused with ObjectExists",
+        "rename refusal: safetyAcknowledged on a standard tag refused with InvalidRequest",
+        "rename refusal: safetyAcknowledged on tag_delete refused with InvalidRequest",
+        "rename refusal: safetyAcknowledged beside items refused with InvalidRequest",
+        "safety-tag rename prepared",
+        "safety-tag rename applied",
+        "renamed safety tag read back",
+        "restore from the checkpoint",
+        "owned worker shutdown"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "drive_inventory",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    },
+    {
+      "report": "report.json",
+      "sha256": "9611f54e37c775107376236a5c2ab0dcca9699c760b2888a635c985c31f26d64",
+      "bytes": 98318,
+      "completed": true,
+      "steps": [
+        "owned scratch",
+        "types",
+        "inventory before safety telegram",
+        "fixture inserts PROFIsafe telegram 30",
+        "inventory after safety telegram",
+        "tag_create refused with SafetyBoundary",
+        "safety_drive_tags refused with InvalidRequest",
+        "a tag_create batch of two standard tags applied on the F-CPU",
+        "safety_drive_tags applied",
+        "change_status confirms the applied change",
+        "safety tags read back",
+        "standard and safety tags before the refused batches",
+        "tag_set batch whose item 1 renames a safety tag refused with SafetyBoundary",
+        "tag_set batch whose item 1 moves a standard tag onto the safety telegram refused with SafetyBoundary",
+        "tag_delete batch whose item 0 deletes a safety tag refused with SafetyBoundary",
+        "tag_delete batch whose item 0 deletes a standard tag on the F-CPU refused with DependencyCoverageIncomplete",
+        "tag_create batch whose item 1 creates a tag on the safety telegram refused with SafetyBoundary",
+        "every tag is unchanged after the refused batches",
+        "safety_drive_tags refused with ObjectExists",
+        "restore from the checkpoint",
+        "owned worker shutdown"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "drive_inventory",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}
