@@ -66,6 +66,10 @@ static class ClassicScreenCompileTests
             Assert(unverified.Contains("could not run") && !unverified.Contains("saved project is still the checkpoint"));
             Assert(restored.StartsWith(unverified) && restored.Contains("scope equals the pre-import capture") && restored.Contains("saved project is still the checkpoint"));
             Assert(!restored.Contains("do not match"));
+            // A failure after the apply's own save: the saved project is the edit, so "close without saving" must not be advised.
+            string afterSave = ClassicScreenCompileRules.RollbackCompileFailure(baseline, failed, true, editSaved: true);
+            Assert(afterSave.StartsWith(unverified) && afterSave.Contains("saved project holds the edit") && afterSave.Contains("recovery archive")
+                && !afterSave.Contains("saved project is still the checkpoint") && !afterSave.Contains("returns to it"));
             // A real difference keeps the old verdict; an exact match has none. A skipped-generation baseline is a valid reference for both.
             Assert(ClassicScreenCompileRules.RollbackCompileFailure(baseline, Completed(Fixture(owner: "ControlB")), true) == "Rollback compiler diagnostics do not match the successful baseline.");
             Assert(ClassicScreenCompileRules.RollbackCompileFailure(baseline, new JObject(), true) == "Rollback compiler diagnostics do not match the successful baseline.");

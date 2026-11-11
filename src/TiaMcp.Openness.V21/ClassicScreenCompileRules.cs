@@ -35,12 +35,15 @@ namespace TiaMcp.Model
             : null;
 
         /// <summary>Null when the rollback compile restored the baseline diagnostics exactly; otherwise the reason, naming a compiler that could not run apart from a real difference.</summary>
-        internal static string RollbackCompileFailure(JObject baseline, JObject rollback, bool scopeRestored)
+        /// <param name="scopeRestored">The full regular-screen scope was captured after the rollback compile and equals the pre-import capture.</param>
+        /// <param name="editSaved">The apply had already saved the edited project (stage changed_project_saved) when it failed.</param>
+        internal static string RollbackCompileFailure(JObject baseline, JObject rollback, bool scopeRestored, bool editSaved = false)
         {
             if (IsTransientPathFailure(rollback))
                 return "The HMI compiler could not run for the rollback compile (\"" + PathFailureText + "\"), so the restored diagnostics could not be compared with the baseline."
-                    + (scopeRestored ? " Every attempted screen was re-imported and read back, and the regular-screen scope equals the pre-import capture. The rollback was not saved: the saved project is still the checkpoint."
-                        + " Closing the project without saving returns to it; compile the HMI again after reopening." : "");
+                    + (!scopeRestored ? "" : " Every attempted screen was re-imported and read back, and the regular-screen scope equals the pre-import capture. The rollback was not saved: "
+                        + (editSaved ? "the saved project holds the edit, and closing the project without saving returns to the edit, not to the original screens. The retained recovery archive is the checkpoint."
+                            : "the saved project is still the checkpoint. Closing the project without saving returns to it; compile the HMI again after reopening."));
             return Completed(rollback) && ProblemsUnchanged(baseline, rollback) ? null : "Rollback compiler diagnostics do not match the successful baseline.";
         }
 

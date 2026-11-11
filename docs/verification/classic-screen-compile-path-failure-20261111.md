@@ -51,9 +51,21 @@ rebuild in the TIA user interface then finished without errors.
   10 November applies it equalled the later real rollback compile row for row. It
   proves nothing about whether the compiler can run.
 
-Differences between the two days that the journals show: the baseline had 0 errors on
-11 November and 110 on 10 November, and the worker build was newer. Neither is shown to
-matter. Not known: whether the HMI runtime or simulation was running from that TIA
+"Not sufficient" does not clear the archive or the other factors: they may be necessary
+together with something else. The difference between the two days that fits the
+compiler's own messages best is the prior compile result. On 11 November an error-free
+result from the user interface (time stamp about four hours old) existed before the
+checkpoint archive, and `stream to patch is null` suggests the generator was trying to
+update an existing result. On 10 November the baseline was an aborted compile with 110
+errors. This is weakened by one observation: the earlier 10 November apply generated
+error-free 26 minutes before the later apply's archive, although its rollback compile
+then aborted with the original errors. The worker build was also newer on 11 November;
+its changes since the 10th touch fingerprint reuse and batching, not the compile or the
+project folder. None of this is shown to matter.
+
+The same path failure was seen in a baseline compile around 4 November, which is why
+one baseline retry exists. That journal is no longer retained on the workstation, so it
+cannot be compared. Not known: whether the HMI runtime or simulation was running from that TIA
 session, and whether the later clean rebuild reported 18 or 58 warnings, which would
 tell whether the 39 graphics-list warnings are real findings of a full build or a
 symptom of the failure.
@@ -75,7 +87,10 @@ customer project and its checkpoint archive were not opened.
   regular-screen scope before it gives its verdict. On equality the journal carries
   `hmiEvidence.rollbackCompilerUnavailable`, the stage
   `hmi_rollback_scope_verified_unsaved` and a `recoveryFailure` stating that the open
-  project holds the original screens unsaved and the saved project is the checkpoint.
+  project holds the original screens unsaved. It says the saved project is the
+  checkpoint only when the apply failed before its own save; after
+  `changed_project_saved` it says the saved project holds the edit and names the
+  recovery archive instead.
   The state remains `recovery_required`; nothing is saved without verified diagnostics.
 - `hmiEvidence.baselineCompileSkippedGeneration` records whether the baseline was
   answered from the last compile. It does not refuse: both successful 10 November
@@ -94,10 +109,12 @@ compiler fails this way.
 
 ## Open
 
-- Identify the cause on an owned error-free RT Advanced fixture, varying what the
-  journals cannot rule out: a long-lived TIA session with an earlier error-free compile
-  from the user interface, a running HMI runtime or simulation, and a full rather than a
-  delta generation.
+- Identify the cause on an owned error-free RT Advanced fixture. First experiment,
+  headless and repeatable once the fixture exists: compile error-free, archive, re-import
+  one screen unchanged, compile; with a control that skips the archive. Then vary what
+  the journals cannot rule out: a long-lived TIA session with an earlier error-free
+  compile from the user interface, a running HMI runtime or simulation, and a full
+  rather than a delta generation.
 - Until then the failure is detected only after the import.
 - A change left `recovery_required` this way has no in-place reconciliation after the
   project is closed without saving and reopened.

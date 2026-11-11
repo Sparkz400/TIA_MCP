@@ -61,10 +61,13 @@ path.`), the restored diagnostics cannot be compared, so the change stays
 regular screen. If they equal the pre-import capture, the journal has
 `hmiEvidence.rollbackCompilerUnavailable: true`, the stage
 `hmi_rollback_scope_verified_unsaved` and a `recoveryFailure` that says so: the open
-project holds the original screens unsaved, and the saved project is still the
-checkpoint. Closing the project without saving returns to that checkpoint; compile the
-HMI again after reopening. The journal does not become `rolled_back`, so the change
-still has to be resolved before a new preparation.
+project holds the original screens unsaved. If the apply failed before its own save
+(no `changed_project_saved` stage), the saved project is still the checkpoint: closing
+the project without saving returns to it, and the HMI should be compiled again after
+reopening. If the apply had already saved, the saved project holds the edit and only
+the retained recovery archive is the checkpoint; the message says which case applies.
+The journal does not become `rolled_back`, so the change still has to be resolved
+before a new preparation.
 
 A client timeout is different from an import failure: TIA may finish after the
 client stops waiting. Inspect the retained change journal before taking any next

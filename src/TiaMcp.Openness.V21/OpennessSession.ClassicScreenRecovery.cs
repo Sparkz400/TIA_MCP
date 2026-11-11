@@ -78,7 +78,9 @@ namespace TiaMcp.Openness.V21
                 {
                     change.HmiEvidence["rollbackCompilerUnavailable"] = true;
                     change.Stages.Add("hmi_rollback_scope_verified_unsaved");
-                    throw new BridgeException("RecoveryRequired", ClassicScreenCompileRules.RollbackCompileFailure(change.HmiEvidence["baselineCompile"] as JObject, compilation, true));
+                    // The apply may have failed after its own save; then the saved project is the edit, not the checkpoint.
+                    throw new BridgeException("RecoveryRequired", ClassicScreenCompileRules.RollbackCompileFailure(change.HmiEvidence["baselineCompile"] as JObject, compilation, true,
+                        change.Stages.Contains("changed_project_saved")));
                 }
                 InvalidateHmiObservations();
                 project.Save();
