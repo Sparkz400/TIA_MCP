@@ -293,8 +293,9 @@ explicitly:
   the F-I/O configuration and stay excluded (`SafetyBoundary`), as does deleting a
   safety tag.
 - It is a single change only. `safetyAcknowledged` beside or inside `items` is
-  refused, so a batch never edits a safety tag. On a standard tag, on another kind,
-  or with any value but `true`, the flag is refused with `InvalidRequest`.
+  refused, so a batch never edits a safety tag. On a standard tag, on `tag_delete`,
+  `constant_set` or `constant_delete`, or with any value but `true`, the flag is
+  refused with `InvalidRequest`. Kinds that do not edit an existing tag ignore it.
 - The safety offline program must be writable. If it has a password and TIA is not
   logged on, the change is refused with `SafetyLoginRequired`; the tool never takes
   a safety password.
