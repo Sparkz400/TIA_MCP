@@ -532,6 +532,9 @@ namespace TiaMcp.Openness.V21
                 RequireHmiScope(change, compiled);
                 change.HmiEvidence["preImport"] = compiled;
                 change.HmiEvidence["baselineCompileChangedCapture"] = compiled.Value<string>("contentHash") != change.HmiBeforeManifest.Value<string>("contentHash");
+                // Recorded, not refused: such a baseline is a valid diagnostics reference but did not exercise the generator.
+                if (change.Kind == "hmi_classic_screen_edit")
+                    change.HmiEvidence["baselineCompileSkippedGeneration"] = ClassicScreenCompileRules.SkippedGeneration(change.HmiEvidence["baselineCompile"] as JObject);
                 change.Stages.Add("hmi_baseline_compiled");
                 WriteChangeJournal(change);
                 change.Stages.Add("hmi_native_write_started");

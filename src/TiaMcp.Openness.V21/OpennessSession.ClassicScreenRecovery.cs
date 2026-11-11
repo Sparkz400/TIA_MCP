@@ -65,12 +65,23 @@ namespace TiaMcp.Openness.V21
                 WriteChangeJournal(change);
                 var compilation = CompileHmiEngineeringChange(change, project);
                 change.HmiEvidence["rollbackCompile"] = compilation;
-                if (!ClassicScreenCompileRules.Completed(compilation) || !ClassicScreenCompileRules.ProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, compilation))
-                    throw new BridgeException("RecoveryRequired", "Rollback compiler diagnostics do not match the successful baseline.");
-                change.Stages.Add("hmi_rollback_compiled");
+                // A compiler that could not run leaves the restored content unverified by diagnostics only. The scope is
+                // then still captured and compared, so the journal says whether the open project holds the original screens.
+                bool compilerUnavailable = ClassicScreenCompileRules.IsTransientPathFailure(compilation);
+                string compileFailure = ClassicScreenCompileRules.RollbackCompileFailure(change.HmiEvidence["baselineCompile"] as JObject, compilation, false);
+                if (compileFailure != null && !compilerUnavailable) throw new BridgeException("RecoveryRequired", compileFailure);
+                if (!compilerUnavailable) change.Stages.Add("hmi_rollback_compiled");
                 var after = CaptureHmiEngineeringScope(change, project, "rollback");
                 ClassicScreenRecoveryRules.RequireRestoredScope(baseline, after);
                 change.HmiEvidence["rollback"] = after;
+                if (compilerUnavailable)
+                {
+                    change.HmiEvidence["rollbackCompilerUnavailable"] = true;
+                    change.Stages.Add("hmi_rollback_scope_verified_unsaved");
+                    // The apply may have failed after its own save; then the saved project is the edit, not the checkpoint.
+                    throw new BridgeException("RecoveryRequired", ClassicScreenCompileRules.RollbackCompileFailure(change.HmiEvidence["baselineCompile"] as JObject, compilation, true,
+                        change.Stages.Contains("changed_project_saved")));
+                }
                 InvalidateHmiObservations();
                 project.Save();
                 change.Stages.Add("hmi_rollback_saved");
