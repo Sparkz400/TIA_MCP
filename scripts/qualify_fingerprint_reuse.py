@@ -143,4 +143,5 @@ if __name__ == "__main__":
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
     args.runner = __file__
+    args.host_args = ["--enable-fingerprint-reuse"]  # off by default
     Harness(args, "fr_", "save-state marker and reused change-fingerprint content in one owned scratch CPU", LIMITATIONS, []).run(body)

@@ -122,6 +122,12 @@ def body(h):
     change(h, "tag_create", {"tagTablePath": table, "name": PROBE_TAG, "dataTypeName": "Bool", "logicalAddress": "%M40.0"}, f)
     refuse(h, "a new tag on the F-DI input", "tag_create", {"tagTablePath": table, "name": "FioIn", "dataTypeName": "Bool", "logicalAddress": fio}, f, address=fio)
     refuse(h, PROBE_TAG + " moved onto the F-DI input", "tag_set", {"tagTablePath": table, "memberName": PROBE_TAG, "attributes": {"LogicalAddress": fio}}, f, address=fio)
+    # payload.items: one item on the F-DI input refuses the whole batch, whatever the other items are.
+    refuse(h, "a tag_set batch whose item moves " + PROBE_TAG + " onto the F-DI input", "tag_set",
+           {"items": [{"tagTablePath": table, "memberName": PROBE_TAG, "attributes": {"LogicalAddress": fio}}]}, f, address=fio)
+    refuse(h, "a tag_create batch with one new tag on the F-DI input", "tag_create",
+           {"items": [{"tagTablePath": table, "name": "FioFree", "dataTypeName": "Bool", "logicalAddress": "%M44.0"},
+                      {"tagTablePath": table, "name": "FioIn", "dataTypeName": "Bool", "logicalAddress": fio}]}, f, address=fio)
 
     # tag_table_import_xml
     refuse(h, "a new table with a tag on the F-DI input", "tag_table_import_xml",

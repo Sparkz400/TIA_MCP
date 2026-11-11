@@ -18,6 +18,7 @@ namespace TiaMcp.Openness.V21
                 bool testSuiteQualification = false;
                 bool translationQualification = false;
                 bool libraryIntegrateApply = false;
+                bool fingerprintReuse = false;
                 string hmiTextListQualification = null;
                 string hmiChangeQualification = null;
                 string apiDirectory = InstalledApiDirectory();
@@ -51,6 +52,7 @@ namespace TiaMcp.Openness.V21
                     else if (args[i] == "--testsuite-scope-probe") testSuiteScopeProbe = true;
                     else if (args[i] == "--translation-qualification") translationQualification = true;
                     else if (args[i] == "--enable-library-integrate-apply") libraryIntegrateApply = true;
+                    else if (args[i] == "--enable-fingerprint-reuse") fingerprintReuse = true;
                     else if (args[i] == "--hmi-text-list-qualification" && i + 1 < args.Length && hmiTextListQualification == null &&
                         Array.IndexOf(TiaMcp.Model.HmiTextListImportRules.QualificationProfiles, args[i + 1]) >= 0) hmiTextListQualification = args[++i];
                     else if (args[i] == "--hmi-change-qualification" && i + 1 < args.Length && hmiChangeQualification == null &&
@@ -79,7 +81,7 @@ namespace TiaMcp.Openness.V21
                 if (translationQualification && (componentQualification || testSuiteScopeProbe || testSuiteQualification)) throw new ArgumentException("Separate qualification modes required.");
                 if (hmiTextListQualification != null && (componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification)) throw new ArgumentException("Separate qualification modes required.");
                 if (hmiChangeQualification != null && (componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || hmiTextListQualification != null)) throw new ArgumentException("Separate qualification modes required.");
-                return Run(pipe, apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification, translationQualification, libraryIntegrateApply, hmiTextListQualification, hmiChangeQualification);
+                return Run(pipe, apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification, translationQualification, libraryIntegrateApply, hmiTextListQualification, hmiChangeQualification, fingerprintReuse);
             }
             catch (Exception exception)
             {
@@ -121,9 +123,9 @@ namespace TiaMcp.Openness.V21
 
         // Keep JIT loading of Siemens-dependent code after installing the resolver.
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static int Run(string pipeName, string apiDirectory, bool componentQualification, bool testSuiteScopeProbe, bool testSuiteQualification, bool translationQualification, bool libraryIntegrateApply, string hmiTextListQualification, string hmiChangeQualification) =>
+        private static int Run(string pipeName, string apiDirectory, bool componentQualification, bool testSuiteScopeProbe, bool testSuiteQualification, bool translationQualification, bool libraryIntegrateApply, string hmiTextListQualification, string hmiChangeQualification, bool fingerprintReuse) =>
             WorkerLoop.Run(pipeName,
-                () => new OpennessSession(apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification, translationQualification, libraryIntegrateApply) { HmiTextListQualificationProfile = hmiTextListQualification, HmiChangeQualificationProfile = hmiChangeQualification },
+                () => new OpennessSession(apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification, translationQualification, libraryIntegrateApply) { FingerprintReuse = fingerprintReuse, HmiTextListQualificationProfile = hmiTextListQualification, HmiChangeQualificationProfile = hmiChangeQualification },
                 (session, operation, arguments) => session.Execute(operation, arguments));
     }
 }

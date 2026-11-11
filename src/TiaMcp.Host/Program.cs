@@ -29,6 +29,7 @@ try
     if (options.HmiTextListQualificationProfile is { } profile) workerArguments.AddRange(["--hmi-text-list-qualification", profile]);
     if (options.HmiChangeQualificationProfile is { } changeProfile) workerArguments.AddRange(["--hmi-change-qualification", changeProfile]);
     if (options.TiaVersion == 21 && options.LibraryIntegrateApply) workerArguments.Add("--enable-library-integrate-apply");
+    if (options.TiaVersion == 21 && options.FingerprintReuse) workerArguments.Add("--enable-fingerprint-reuse");
 #if TESTSUITE_QUALIFICATION
     if (options.TestSuiteQualification) workerArguments.Add("--testsuite-qualification");
 #endif

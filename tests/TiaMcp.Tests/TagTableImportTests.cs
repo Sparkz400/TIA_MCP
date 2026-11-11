@@ -119,6 +119,36 @@ internal static class TagTableImportTests
         return Task.CompletedTask;
     }
 
+    // The decision log is a record of an applied change: no file-system failure of its append may fail the change.
+    internal static Task IntentLogWriteFailuresNeverFailAnAppliedChange()
+    {
+        Check.Equal(true, IntentRules.IsLogWriteFailure(new IOException("disk full")));
+        Check.Equal(true, IntentRules.IsLogWriteFailure(new DirectoryNotFoundException()));
+        Check.Equal(true, IntentRules.IsLogWriteFailure(new UnauthorizedAccessException("read-only")));
+        Check.Equal(false, IntentRules.IsLogWriteFailure(new InvalidOperationException()));
+        Check.Equal(false, IntentRules.IsLogWriteFailure(new ArgumentException()));
+        // The two cases the TODO named, as the file system raises them: a read-only log and a directory in its place.
+        string directory = Path.Combine(Path.GetTempPath(), "intent-log-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        try
+        {
+            string log = Path.Combine(directory, "intent-decisions.jsonl");
+            File.WriteAllText(log, "");
+            File.SetAttributes(log, FileAttributes.ReadOnly);
+            Exception? readOnly = null;
+            try { File.AppendAllLines(log, ["x"]); } catch (Exception error) { readOnly = error; }
+            File.SetAttributes(log, FileAttributes.Normal);
+            File.Delete(log);
+            Directory.CreateDirectory(log);
+            Exception? occupied = null;
+            try { File.AppendAllLines(log, ["x"]); } catch (Exception error) { occupied = error; }
+            Check.Equal(true, readOnly is not null && IntentRules.IsLogWriteFailure(readOnly));
+            Check.Equal(true, occupied is not null && IntentRules.IsLogWriteFailure(occupied));
+        }
+        finally { Directory.Delete(directory, true); }
+        return Task.CompletedTask;
+    }
+
     // TIA reports a warning only for an object it recompiles, so a warning of another object is revealed, not introduced.
     internal static Task WarningsOutsideTheChangesOwnObjectsAreRevealed()
     {

@@ -59,7 +59,7 @@ namespace TiaMcp.Openness.V21
                 ProjectPath = project.Path.FullName, ProjectName = project.Name,
                 Selector = new JObject { ["projectName"] = project.Name, ["plcPath"] = args["plcPath"]?.DeepClone(), ["scopePath"] = args["scopePath"]?.DeepClone() },
                 State = "preparing", Journal = Path.Combine(directory, "journal.json"),
-                PreparedProcessId = _processId, CapturedStorageQualification = capturedStorage, ReuseProjectContent = true
+                PreparedProcessId = _processId, CapturedStorageQualification = capturedStorage, ReuseProjectContent = FingerprintReuse
             };
 #if SAFETY_FPARAMETER_DISCOVERY
             if (kind == "safety_fparameter_set" && args.Value<bool?>("fParameterDiscovery") == true) change.Selector["fParameterDiscovery"] = true;
@@ -68,7 +68,8 @@ namespace TiaMcp.Openness.V21
                 change.Selector["plcPath"] = ObjectIdentity.PlcPath(payload.Value<string>("scopePath") ?? args.Value<string>("scopePath"))
                     ?? ObjectIdentity.PlcPath(payload.Value<string>("blockPath") ?? payload.Value<string>("typePath") ?? payload.Value<string>("tagTablePath") ?? payload.Value<string>("technologyPath")
                         ?? payload.Value<string>("unitPath") ?? payload.Value<string>("objectPath")
-                        ?? (payload["items"] as JArray)?.OfType<JObject>().Select(item => item["tagTablePath"]).FirstOrDefault(path => path?.Type == JTokenType.String)?.Value<string>());
+                        ?? (payload["items"] as JArray)?.OfType<JObject>().SelectMany(item => new[] { item["scopePath"], item["tagTablePath"], item["blockPath"], item["typePath"] })
+                            .FirstOrDefault(path => path?.Type == JTokenType.String)?.Value<string>());
             try
             {
                 using (SharedMutationExclusive("TIA MCP: prepare offline change preview"))
@@ -315,18 +316,19 @@ namespace TiaMcp.Openness.V21
                     if (mutationReached) RecoverFailedClassicScreen(change, project);
                     if (change.State != "rolled_back" && change.State != "not_applied")
                         try { change.AfterFingerprint = EngineeringFingerprint(change, project); } catch { }
-                    else { change.AttributeTarget = null; change.TagBatchTargets = null; }
+                    else { change.AttributeTarget = null; change.TagBatchTargets = null; change.BatchMembers = null; }
                     change.Stages.Add("change_finished_with_failure");
                     WriteChangeJournal(change);
                     throw new BridgeException((ex as BridgeException)?.Code ?? "EngineeringError", ex.Message, ChangeView(change));
                 }
             }
             // The decision log records the applied change but is not part of it: a failed append must not undo "applied".
+            // A read-only log, or a directory in its place, raises UnauthorizedAccessException rather than IOException.
             try { RecordAppliedDecisions(change); }
-            catch (IOException ex)
+            catch (Exception ex) when (IntentRules.IsLogWriteFailure(ex))
             {
                 change.Readbacks.Add(new JObject { ["role"] = "intent-log-write-failure", ["message"] = ex.Message });
-                try { WriteChangeJournal(change); } catch (IOException) { /* The applied journal is already durable. */ }
+                try { WriteChangeJournal(change); } catch (Exception journal) when (IntentRules.IsLogWriteFailure(journal)) { /* The applied journal is already durable. */ }
             }
             return ChangeView(change);
         }
@@ -403,6 +405,7 @@ namespace TiaMcp.Openness.V21
                 change.State = "restored";
                 change.AttributeTarget = null;
                 change.TagBatchTargets = null;
+                change.BatchMembers = null;
                 change.Stages.Add("checkpoint_retrieved_to_new_directory");
                 WriteChangeJournal(change);
                 return ChangeView(change);
@@ -426,6 +429,7 @@ namespace TiaMcp.Openness.V21
             if (change.Kind == "hmi_dynamization_create") return PrepareHmiEngineeringMutation(change, project);
             if (change.Kind == "hmi_event_handler_create") return PrepareHmiEngineeringMutation(change, project);
             if (change.Kind == "hmi_text_list_import") return PrepareHmiTextListImportMutation(change, project);
+            if (ChangeBatchRules.IsBatch(change.Kind, change.Payload)) return PrepareChangeBatch(change, project);
             var payload = change.Payload;
             var preview = new JObject { ["effects"] = new JArray(), ["warnings"] = new JArray() };
             var effects = (JArray)preview["effects"];
@@ -1010,6 +1014,7 @@ namespace TiaMcp.Openness.V21
             if (change.Kind == "hmi_dynamization_create") { ApplyHmiEngineeringMutation(change, project); return; }
             if (change.Kind == "hmi_event_handler_create") { ApplyHmiEngineeringMutation(change, project); return; }
             if (change.Kind == "hmi_text_list_import") { ApplyHmiTextListImportMutation(change, project); return; }
+            if (change.BatchMembers != null) { ApplyChangeBatch(change, project); return; }
             var payload = change.Payload;
             switch (change.Kind)
             {
@@ -1512,6 +1517,8 @@ namespace TiaMcp.Openness.V21
         }
 
         private readonly FingerprintContentCache<ProjectContent> _projectContent = new FingerprintContentCache<ProjectContent>();
+        /// <summary>Set by --enable-fingerprint-reuse. Off by default: every fingerprint reads the whole project.</summary>
+        internal bool FingerprintReuse { get; set; }
 
         private FingerprintSaveState ProjectSaveState(Project project)
         {
@@ -1678,6 +1685,10 @@ namespace TiaMcp.Openness.V21
                 snapshot["targetAttributes"] = new JObject(attrs.Properties().Select(p => new JProperty(p.Name, ChangeScalar(change.AttributeTarget.GetAttribute(p.Name)))));
             }
             // A batch covers the requested attributes of every item's tag.
+            // A batch of attribute edits covers each member's requested attributes; members without attributes hold null.
+            if (change.BatchMembers != null && change.BatchMembers.Any(member => member.AttributeTarget != null))
+                snapshot["targetAttributes"] = new JArray(change.BatchMembers.Select(member => member.AttributeTarget == null ? (JToken)JValue.CreateNull()
+                    : new JObject((member.Payload["attributes"] as JObject ?? new JObject()).Properties().Select(p => new JProperty(p.Name, ChangeScalar(member.AttributeTarget.GetAttribute(p.Name)))))));
             if (change.TagBatchTargets != null)
                 snapshot["targetAttributes"] = new JArray(change.TagBatchTargets.Select(target =>
                     new JObject(target.Item.Attributes.Properties().Select(p => new JProperty(p.Name, ChangeScalar(target.Tag.GetAttribute(p.Name)))))));
@@ -2073,6 +2084,8 @@ namespace TiaMcp.Openness.V21
             internal int ProjectContentReads, ProjectContentReuses;
             internal string[] TagBatchTablePaths;
             internal List<TagBatchTarget> TagBatchTargets;
+            // payload.items on the kinds of ChangeBatchRules: one prepared member change per item.
+            internal List<EngineeringChange> BatchMembers;
         }
     }
 }

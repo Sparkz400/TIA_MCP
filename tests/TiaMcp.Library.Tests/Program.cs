@@ -618,6 +618,10 @@ Test("CLI combined library_integrate apply is on by default, the old flag is a n
     Equal(true, HostOptions.Parse([]).LibraryIntegrateApply);
     Equal(true, HostOptions.Parse(["--enable-library-integrate-apply"]).LibraryIntegrateApply);
     Equal(false, HostOptions.Parse(["--disable-library-integrate-apply"]).LibraryIntegrateApply);
+    // Fingerprint reuse is off unless asked for, and V21-only.
+    Equal(false, HostOptions.Parse([]).FingerprintReuse);
+    Equal(true, HostOptions.Parse(["--enable-fingerprint-reuse"]).FingerprintReuse);
+    try { HostOptions.Parse(["--tia-version", "19", "--enable-fingerprint-reuse"]); throw new Exception("V19 accepted fingerprint reuse"); } catch (ArgumentException) { }
     try { HostOptions.Parse(["--enable-library-integrate-apply", "--disable-library-integrate-apply"]); throw new Exception("Contradicting flags were accepted."); }
     catch (ArgumentException error) when (error.Message.Contains("exclude each other")) { }
 });
