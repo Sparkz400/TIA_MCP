@@ -82,7 +82,7 @@ The intent becomes part of the preview, so `previewHash` covers it, and it stays
 
 With `compile: true`, a change compiles its compile scope (the selected PLC, or every device for hardware, network, safety and other device-wide kinds) after the checkpoint and before the mutation, and again afterwards. Apply fails with `CompileFailed` only on an introduced or worsened error, a changed compile scope or incomplete diagnostics. Findings that were already there, such as another device's address conflict, do not fail the change. `compile.baselineComparison` lists them as existing (or resolved, once fixed) next to introduced ones, and `compile.compilerSucceeded` says whether the whole scope compiled without errors. A saved change with `compilerSucceeded: false` is valid; the project still has those errors. Without complete baseline diagnostics only a clean compile passes. Tag-table imports also fail on new or changed warnings ([below](#tag-table-import-scope)); compile-only kinds report their diagnostics as the result, and HMI kinds keep their own baseline rules. An inconsistent block that is not a target of the change is fingerprinted by its metadata only and listed in `fingerprintCoverage.inconsistentBlocksMetadataOnly`; because that is weaker, `change_restore` of such a change refuses whole-project restore with `ScopedRecoveryRequired` and names the retained archive. An inconsistent target still refuses with `FingerprintUnavailable`; compile it first or read its generated source. Natively checked on 7 November 2026 (`local.compile-baseline.unrelated-errors.20261107`, [record](../verification/unrelated-errors-20261107.md)).
 
-TIA's software compile is incremental, and it reports a warning only for an object it recompiles. A compile with nothing changed reports no warnings even when blocks have them, and recompiling an object reports its old warnings again. The comparison therefore cannot tell a new warning from an old one that is merely reported again. For a change that names its own objects (the blocks, data types or tag tables it writes), `baselineComparison` lists warnings of other objects under `revealed` (`revealedCount`, `revealedNote`) instead of `introduced`. Revealed warnings do not fail any change, including a tag-table import, and do not clear `verified`. For the same reason a warning listed as `resolved` is only known to be absent from this compile's output. Errors are different: TIA compiles an object with errors again on every compile, so errors are reported until they are fixed, and a new error is always `introduced`. Kinds without named objects (hardware, network, technology objects) keep every new finding as introduced. One consequence: a warning that a change really causes in another object, for example in a block that uses a retyped tag, is also listed as revealed. The warning behaviour was observed natively on 10 November 2026 in an owned scratch CPU (two SCL warnings: reported on import, absent from three following compiles, reported again on reimport of the unchanged block); the error behaviour was observed the same way on 11 November 2026 (a data type lost a member that a compiled FC uses; five consecutive compiles, one after an unrelated import, each reported the same error and the FC stayed inconsistent).
+TIA's software compile is incremental, and it reports a warning only for an object it recompiles. A compile with nothing changed reports no warnings even when blocks have them, and recompiling an object reports its old warnings again. The comparison therefore cannot tell a new warning from an old one that is merely reported again. For a change that names its own objects (the blocks, data types or tag tables it writes), `baselineComparison` lists warnings of other objects under `revealed` (`revealedCount`, `revealedNote`) instead of `introduced`. Revealed warnings do not fail any change, including a tag-table import, and do not clear `verified`. For the same reason a warning listed as `resolved` is only known to be absent from this compile's output. Errors are different: TIA compiles an object with errors again on every compile, so errors are reported until they are fixed, and a new error is always `introduced`. Kinds without named objects (hardware, network, technology objects) keep every new finding as introduced. One consequence: a warning that a change really causes in another object, for example in a block that uses a retyped tag, is also listed as revealed. The warning behaviour was observed natively on 10 November 2026 in an owned scratch CPU (two SCL warnings: reported on import, absent from three following compiles, reported again on reimport of the unchanged block); in the same kind of probe no warning was ever located in a tag table or a PLC data type (tags on one address, an overlapping word, an input without hardware all compiled without warnings; a conversion warning sat under the block using them, and was listed as revealed when the tag or the type was renamed); the error behaviour was observed the same way on 11 November 2026 (a data type lost a member that a compiled FC uses; five consecutive compiles, one after an unrelated import, each reported the same error and the FC stayed inconsistent).
 
 The new individual type/tag/constant edits, user-group edits, graphical network patches/inserts, call-argument edits, hardware-address edits, block renames and deletions, technology-object deletions and hardware deletions require `compile: true` even when `save` is false. Their native mutation routes are implemented; the pure regression tests do not establish qualification on a particular CPU, software-unit configuration or hardware family.
 
@@ -295,21 +295,32 @@ is refused, when two items edit the same object or produce the same name, or whe
 the items span more than one software scope. A name that another item frees still
 counts as taken, so the result never depends on the order of writes.
 
-At apply the stale-revision fingerprint is checked once, then the items are written
-in order; each item repeats its own checks and reads its own write back when its
-turn comes. Unlike the `tag_set` batch, the items are not preflighted a second time
-as a group before the first write. A failure at a later item therefore leaves the
-whole change `recovery_required` with the earlier items written, and the message
-says how many. The fingerprint covers the requested attributes of every attribute
-item, and the change's target blocks and own objects are the union of its items'.
+At apply the stale-revision fingerprint is checked once. Then every item is
+prepared a second time, with all of its kind's checks and without writing backups,
+before the first item is written; a refusal there refuses the whole change with
+nothing written. Only then are the items written in order, each reading its own
+write back. If TIA itself rejects an item at that point (for example a name it does
+not accept), the change ends `recovery_required` with the earlier items written;
+the message names the item and says how many were written, and `change_restore`
+returns the project to the state before the batch. One exception is the existing
+rule for inconsistent blocks: a block that an earlier item renamed has not been
+compiled yet, so `change_restore` refuses with `ScopedRecoveryRequired` and the
+retained archive is the recovery input, as for a single block change whose compile
+fails. The fingerprint covers the
+requested attributes of every attribute item, and the change's target blocks and
+own objects are the union of its items'.
 
 Deleting blocks or data types, group edits and the import kinds do not batch:
 their dependency scans and nesting make items depend on each other, and the import
 kinds already take several objects.
 
-`scripts/qualify_change_batch.py` checks every one of these kinds natively in an
-owned scratch CPU, together with a `tag_set` batch on tags a compiled block uses
-(the block must name the new tags afterwards and stay consistent).
+`scripts/qualify_change_batch.py` checks all of this natively in an owned scratch
+CPU: every one of these kinds; a `tag_set` batch on tags a compiled block uses (the
+block must name the new tags afterwards and stay consistent); the tag kinds again
+inside a software unit with `scopePath` beside `items`; and a batch whose second
+item TIA rejects after the first was written, which must end `recovery_required`,
+block further changes and restore to the state before the batch. Namespaces, and
+the safety-tag refusal of a batch, are not exercised.
 
 ### Fingerprint reuse between changes
 

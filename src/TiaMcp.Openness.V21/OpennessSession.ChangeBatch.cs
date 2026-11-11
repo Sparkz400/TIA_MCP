@@ -28,7 +28,7 @@ namespace TiaMcp.Openness.V21
                 Directory.CreateDirectory(member.Directory);
                 JObject row;
                 try { row = PrepareEngineeringMutation(member, project); }
-                catch (BridgeException error) { throw BatchItemFailure(error, index, "The whole change is refused; nothing was written."); }
+                catch (Exception error) { throw BatchItemFailure(error, index, "The whole change is refused; nothing was written."); }
                 row["index"] = index;
                 row["payload"] = PreviewPayload(member);
                 rows.Add(row);
@@ -72,7 +72,7 @@ namespace TiaMcp.Openness.V21
                 };
                 if (probe.Payload["scopePath"] == null) probe.Payload["scopePath"] = change.ScopePath;
                 try { PrepareEngineeringMutation(probe, project); }
-                catch (BridgeException error) { throw BatchItemFailure(error, index, "The preflight of all items refused the change before any item was written."); }
+                catch (Exception error) { throw BatchItemFailure(error, index, "The preflight of all items refused the change before any item was written."); }
                 if (probe.ScopePath != change.ScopePath)
                     throw new BridgeException("PreviewStale", "items[" + index + "] resolves to another software scope than at preparation. No item was written.");
                 probes.Add(probe);
@@ -82,7 +82,8 @@ namespace TiaMcp.Openness.V21
             for (int index = 0; index < change.BatchMembers.Count; index++)
             {
                 try { ApplyEngineeringMutation(change.BatchMembers[index], project); }
-                catch (BridgeException error)
+                // Native TIA failures are wrapped too: the caller must learn which item failed and how many were written.
+                catch (Exception error)
                 {
                     throw BatchItemFailure(error, index, index == 0 ? "No item was written before it." : "Items 0.." + (index - 1) + " were already written; recover from the checkpoint.");
                 }
@@ -92,11 +93,14 @@ namespace TiaMcp.Openness.V21
             change.Stages.Add("batch_items_verified");
         }
 
-        private static BridgeException BatchItemFailure(BridgeException error, int index, string outcome)
+        private static BridgeException BatchItemFailure(Exception error, int index, string outcome)
         {
-            var details = error.Details != null ? (JObject)error.Details.DeepClone() : new JObject();
+            var bridge = error as BridgeException;
+            var details = bridge?.Details != null ? (JObject)bridge.Details.DeepClone() : new JObject();
             details["index"] = index;
-            return new BridgeException(error.Code, "items[" + index + "]: " + error.Message + " " + outcome, details);
+            // ChangeApply journals a native exception's chain only for an unwrapped exception, so it is kept here.
+            if (bridge == null) details["nativeException"] = NativeFailureText.Chain(error);
+            return new BridgeException(bridge?.Code ?? "EngineeringError", "items[" + index + "]: " + error.Message + " " + outcome, details);
         }
 
         // The resolved identity of the object a member edits; creating kinds edit none.
