@@ -98,6 +98,9 @@ class Harness:
         self.report["tiaProcessHandle"] = dict(self.watcher.evidence)
 
     def tool(self, name, arguments=None):
+        # The change tools answer with a summary by default; the runners read full previews and journals.
+        if name in ("change_prepare", "change_status", "change_apply"):
+            arguments = {**(arguments or {}), "includeDetails": True}
         return self.client.tool(name, arguments)
 
     def stage(self, name, operation):

@@ -174,15 +174,15 @@ release. A deprecated tool names the release that deprecated it and its replacem
 
 | Tool | Feature | Support | Toolset | 1.0 contract | Host option | Also in |
 | --- | --- | --- | --- | --- | --- | --- |
-| `block_export` | Export many blocks as native XML and readable text files | unqualified | core | experimental |  |  |
+| `block_export` | Export many blocks as native XML and readable text files | limited | core | frozen |  |  |
 | `block_interface` | Read declared block interface and offline values | limited | core | frozen |  |  |
 | `block_read` | Read original native block XML | shipped | core | frozen |  | `plc.document_formats` |
 | `object_resolve` | Resolve canonical identities across exposed software scopes | shipped | core | frozen |  |  |
 | `plc_alarm_inspect` | Read PLC alarm text lists, alarm texts, alarm classes and ProDiag supervisions | limited | core | frozen |  |  |
 | `plc_document_inventory` | List and export native PLC documents | limited | core | frozen |  |  |
-| `plc_io_map` | Map configured I/O address ranges to PLC tags | unqualified | core | experimental |  |  |
+| `plc_io_map` | Map configured I/O address ranges to PLC tags | limited | core | frozen |  |  |
 | `plc_loadable_generate` | Generate a loadable file for blocks or software units | limited | core | frozen |  |  |
-| `plc_tag_usage` | Report readers and writers of I/O tags from exported blocks | unqualified | core | experimental |  |  |
+| `plc_tag_usage` | Report readers and writers of I/O tags from exported blocks | limited | core | frozen |  |  |
 | `project_health_report` | Report captured inconsistency and coverage findings | limited | core | frozen |  |  |
 | `project_index` | Immutable metadata snapshots with bounded search, paging and explicit freshness verification | shipped | core | frozen |  | `project.index_paging` |
 | `project_inventory` | Enumerate PLCs, blocks and hardware with bounded scope | shipped | core | frozen |  |  |
