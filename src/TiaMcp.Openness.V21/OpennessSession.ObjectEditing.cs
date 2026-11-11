@@ -192,7 +192,15 @@ namespace TiaMcp.Openness.V21
                 targets.Add(new TagBatchTarget { Item = item, TablePath = table.Path, TableName = table.Item.Name, Table = table.Item, Tag = tag });
             }
             TagBatchRules.RequireNoCollisions(targets.Select(t => (t.Item, t.TablePath)), ScopeSymbolNames(selected.Tags));
-            RejectFIoAddresses(plc, targets.Select(t => t.Item.Attributes.Value<string>("LogicalAddress")).Where(address => address != null));
+            try { RejectFIoAddresses(plc, targets.Select(t => t.Item.Attributes.Value<string>("LogicalAddress")).Where(address => address != null)); }
+            catch (BridgeException refusal) when (refusal.Code == "SafetyBoundary" && refusal.Details?["logicalAddress"] != null)
+            {
+                // Like every other refusal of a batch, this one names its item.
+                var item = targets.First(t => t.Item.Attributes.Value<string>("LogicalAddress") == refusal.Details.Value<string>("logicalAddress")).Item;
+                var details = (JObject)refusal.Details.DeepClone();
+                details["index"] = item.Index; details["memberName"] = item.MemberName;
+                throw new BridgeException("SafetyBoundary", "items[" + item.Index + "]: " + refusal.Message, details);
+            }
             if (prepare) change.ScopePath = selected.Path;
             return targets;
         }
@@ -359,6 +367,7 @@ namespace TiaMcp.Openness.V21
             if (AllBlocks(plc, budget).Any(item => item.Path != block.Path && item.Item.Number == number && BlockNumberKind(item.Item) == kind))
                 throw new BridgeException("BlockNumberCollision", "Another " + kind + " block already uses number " + number + ".");
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Block-number collision check is incomplete.");
+            change.BlockNumberKey = "blockNumber\n" + kind + "\n" + number;
             allow = BlockNumberAttributes;
             // Ordered: the explicit Number applies only once auto-numbering is off.
             return new JObject { ["AutoNumber"] = false, ["Number"] = number };

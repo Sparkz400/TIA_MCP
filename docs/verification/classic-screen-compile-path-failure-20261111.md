@@ -65,10 +65,13 @@ project folder. None of this is shown to matter.
 
 The same path failure was seen in a baseline compile around 4 November, which is why
 one baseline retry exists. That journal is no longer retained on the workstation, so it
-cannot be compared. Not known: whether the HMI runtime or simulation was running from that TIA
-session, and whether the later clean rebuild reported 18 or 58 warnings, which would
-tell whether the 39 graphics-list warnings are real findings of a full build or a
-symptom of the failure.
+cannot be compared.
+
+The clean full rebuild after reopening reported 18 warnings, as the user confirmed. The
+39 `No graphics list assigned` warnings are therefore not findings of a full build.
+They are a symptom of the failure: the generator could not read data of faceplate
+instances it had read before. Not known: whether the HMI runtime or simulation was
+running from that TIA session.
 
 ## Why it was not reproduced
 

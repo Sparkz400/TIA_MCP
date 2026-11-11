@@ -267,9 +267,14 @@ after the writes and after save, made an earlier prepared batch stale, and
 `change_restore` returned all five tags to their old names. Five single changes
 took 17.6 s there and the batch 3.5 s, about the cost of one single change. That
 run is not in the evidence store or the feature catalog. It covers Bool tags on
-bit memory in one table at PLC-root scope; tags that blocks reference, software
-units, and the safety-tag and F-I/O refusals of a batch on an F-CPU are not
-exercised, and no large project has been timed.
+bit memory in one table at PLC-root scope. Tags that blocks reference and software
+units are covered by `scripts/qualify_change_batch.py`
+(`local.change-batch.items-2.20261111`). The refusals on an F-CPU were checked on
+11 November 2026: a batch whose item renames or deletes a real safety tag, or
+moves or creates a tag inside a PROFIsafe telegram
+(`local.safety.tag-batch.20261111`), or on an F-DI input
+(`local.safety.fio-routes.20261111`), is refused as a whole with `SafetyBoundary`
+naming the item, and no tag changes. No large project has been timed.
 
 ### Items on other kinds
 
@@ -277,8 +282,9 @@ These kinds take `{"items": [<one payload of that kind>, ...]}` with 1 to 100 it
 in one software scope, and an optional `scopePath` beside `items` that every item
 inherits: `constant_set`, `tag_create`, `constant_create`, `tag_delete`,
 `constant_delete`, `tag_table_create`, `tag_table_rename`, `block_rename`,
-`block_attributes_set` and `type_rename`. Any other field beside `items` is refused,
-and so is `items` on any other kind.
+`block_attributes_set`, `type_rename`, `block_number_set`, `group_create` and
+`group_rename`. Any other field beside `items` is refused, and so is `items` on any
+other kind.
 
 ```json
 {
@@ -295,6 +301,23 @@ is refused, when two items edit the same object or produce the same name, or whe
 the items span more than one software scope. A name that another item frees still
 counts as taken, so the result never depends on the order of writes.
 
+Names are compared where TIA keeps them apart: blocks and data types per namespace
+(an item selects its object with `namespace` beside the name when two namespaces of
+the scope hold it), tags and constants per software scope, groups per group kind
+and parent group. Three kinds have a rule of their own:
+
+- `block_number_set`: two items may not take the same number for blocks of one
+  kind (`BlockNumberCollision`), and a number another item frees is still taken.
+  In the native run of 11 November 2026, TIA V21 reported `AutoNumber` as not
+  writable on the FCs of a software unit, in a namespace and outside it, so an
+  item naming such a block was refused with `AttributeNotWritable`.
+- `group_create`: two items may not create the same name under one parent. A parent
+  that another item creates does not exist yet, so that item is refused with
+  `GroupNotFound`; create nested groups in a second change.
+- `group_rename`: two sibling groups may not take the same name, and no item may
+  name a group inside a group that another item renames, because the outer rename
+  changes the inner group's path.
+
 At apply the stale-revision fingerprint is checked once. Then every item is
 prepared a second time, with all of its kind's checks and without writing backups,
 before the first item is written; a refusal there refuses the whole change with
@@ -310,17 +333,23 @@ fails. The fingerprint covers the
 requested attributes of every attribute item, and the change's target blocks and
 own objects are the union of its items'.
 
-Deleting blocks or data types, group edits and the import kinds do not batch:
-their dependency scans and nesting make items depend on each other, and the import
-kinds already take several objects.
+Deleting blocks, data types or groups and the import kinds do not batch: their
+dependency scans and nesting make items depend on each other, and the import kinds
+already take several objects.
 
 `scripts/qualify_change_batch.py` checks all of this natively in an owned scratch
 CPU: every one of these kinds; a `tag_set` batch on tags a compiled block uses (the
 block must name the new tags afterwards and stay consistent); the tag kinds again
-inside a software unit with `scopePath` beside `items`; and a batch whose second
-item TIA rejects after the first was written, which must end `recovery_required`,
-block further changes and restore to the state before the batch. Namespaces, and
-the safety-tag refusal of a batch, are not exercised.
+inside a software unit with `scopePath` beside `items`; the block and data type
+kinds in a unit that holds one name in a namespace and in none; and a batch whose
+second item TIA rejects after the first was written, which must end
+`recovery_required`, block further changes and restore to the state before the
+batch. The refusals of a batch that touches a real safety tag or an F-I/O address
+are checked on an F-CPU by `scripts/qualify_safety_drive_tags.py` and
+`scripts/qualify_fio_tag_routes.py`. One limit showed there: on an F-CPU a
+`tag_delete` batch item naming a standard tag was refused, because its
+dependency scan could not export the safety program's block `FOB_RTG1`
+([open item](../TODO.md#release-mechanics-and-policy)).
 
 ### Fingerprint reuse between changes
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.177",
+  "catalogVersion": "0.4.178",
   "targetTiaVersions": [
     21
   ],
@@ -5777,6 +5777,67 @@
         "The scratch project is small; the time saved on a large project is not measured.",
         "Engineering only; runtime behavior is not observed."
       ]
+    },
+    {
+      "id": "local.change-batch.items-2.20261111",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "26d36152b84de604660f42479f2bfe980a2dbce6",
+        "passedScope": "payload.items on block_number_set, group_create and group_rename, and the batched block and type kinds in a namespace: scripts/qualify_change_batch.py on a Debug build of 48bf67a8, 129/129 steps (run cb_0cd7d0ae) in one owned scratch CPU 1511-1 PN. Repeats every step of local.change-batch.items.20261111 (batches of tag_set, tag_create, constant_create, constant_set, constant_delete, tag_delete, tag_table_create, tag_table_rename, block_rename, block_attributes_set and type_rename, the tag kinds in a software unit, their refusals, and a type_rename batch that fails natively at its second item, ends recovery_required and is restored). New: a block_number_set batch numbers two FCs 741 and 742 under one checkpoint, compile and save and both read back; one number for two blocks of one kind refuses with BlockNumberCollision naming both items, a number another item frees refuses at that item, one block in two items refuses. For block, type and tag-table groups each: a group_create batch creates two groups, a second creates a group of one name in each, a group_rename batch renames the two outer groups and another renames the two inner groups to one name under their two parents; all paths read back. On block groups, refused and unchanged: one name twice under one parent (ObjectExists), a group under a group the same batch creates (GroupNotFound at that item), a group inside a group another item renames (InvalidRequest naming both items), two siblings renamed to one name, one group in two items. Namespaces: a second software unit holds block NbSame and data type NySame once in namespace BatchNs and once in none, seeded by SCL sources with and without a NAMESPACE envelope. block_rename, block_attributes_set and type_rename batches select each object with namespace beside the name; one batch renames NbSame in both namespaces to NbSame_R and one renames NySame in both to NySame_R, and software_inspect places every object in its namespace afterwards. Refused and unchanged: a name two namespaces hold given without namespace (AmbiguousTarget at that item), one namespaced block in two items, one new name twice in one namespace, a name the namespace already holds. block_number_set on a block of that unit, in the namespace and outside it, refuses at preparation with AttributeNotWritable for AutoNumber."
+      },
+      "artifacts": [
+        "evidence/local.change-batch.items-2.20261111.json"
+      ],
+      "limitations": [
+        "One owned scratch standard CPU: PLC-root scope, one software unit (tag kinds) and one software unit with one namespace (block and type kinds, FCs and one struct type). Tag kinds are not exercised in the namespace unit; tags have no namespace.",
+        "block_number_set is applied on two FCs at PLC-root scope. In the software unit TIA reported AutoNumber as not writable on its FCs, so no number was set there; other block kinds and other units are not exercised.",
+        "Group refusals are exercised on block groups; type and tag-table groups run the applied batches only. The cross-item rules are the same code for all three and are covered by managed tests.",
+        "The batch that fails after its first write is a type_rename; the tag_table_rename and tag_create candidates with a double quote in a name were accepted by TIA and applied.",
+        "The safety-tag and F-I/O refusals of a batch are in local.safety.tag-batch.20261111 and local.safety.fio-routes.20261111. Each batch has two or three items; the 100-item bound is covered by managed tests only.",
+        "The source commit changes only scripts/qualify_safety_drive_tags.py after the built 48bf67a8; src, this runner and every executable run are byte-identical to it. Engineering only; runtime behavior is not observed."
+      ]
+    },
+    {
+      "id": "local.safety.fio-routes.20261111",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "26d36152b84de604660f42479f2bfe980a2dbce6",
+        "passedScope": "scripts/qualify_fio_tag_routes.py on a Debug build of 48bf67a8, 96/96 steps (run fr_0220f89d), on a German TIA V21 installation in one owned scratch with the standard CPU 1511-1 PN and an added CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) plus an ET 200SP station with two F-DI on its IO system (the first F-DI's inputs start at byte 0). The VCI workspace is now created in the project's editing language (de-DE here); with the former fixed en-US the run stopped at vci_workspace_create on this installation. Repeats every route of local.safety.fio-routes-2.20261101: tag_create, tag_set, tag_table_import_xml, vci_synchronize WorkspaceToProject, vci_conflict_resolve take=remote, library_instantiate of a tag-table master copy and software_unit_create_from refused at prepare with SafetyBoundary naming %I0.0 or the master copy and an F-DI, and the bit-memory routes applied with checkpoint, compile and save. New since that record: a tag_set batch whose item 0 moves FioProbe to %I0.0 and a tag_create batch whose item 1 creates a tag at %I0.0 are refused as a whole with SafetyBoundary, the message starts with items[n] and the details carry the index, the address and the first F-DI; vci_conflict_resolve take=merged with FioProbe on the F-DI input is refused; source_upsert of an SCL source and block_import_xml of an FBD block that read an absolute F-input are refused. After each refusal every tag table and tag of both PLCs (software_inspect) was unchanged."
+      },
+      "artifacts": [
+        "evidence/local.safety.fio-routes.20261111.json"
+      ],
+      "limitations": [
+        "One owned scratch: a standard CPU 1511-1 PN and a CPU 1511F-1 PN with two ET 200SP F-DI; addresses in the first F-DI's input range only. F-output ranges, ET 200MP and other F-modules are not exercised.",
+        "The batches hold one and two items and are refused at preparation; a real safety tag in a batch is in local.safety.tag-batch.20261111.",
+        "vci_conflict_resolve ran against a local bare Git remote. V21 offered only SimaticML as a tag table's VCI format; the end-of-run probes of other formats and of a second F-DI are recorded as observed, not required.",
+        "The F-CPU's generated scratch user holds full access including fail-safe (owned scratch only). No safety program is compiled, accepted or downloaded; engineering evidence only, not machine safety acceptance.",
+        "The source commit changes only scripts/qualify_safety_drive_tags.py after the built 48bf67a8; src, this runner and every executable run are byte-identical to it."
+      ]
+    },
+    {
+      "id": "local.safety.tag-batch.20261111",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "26d36152b84de604660f42479f2bfe980a2dbce6",
+        "passedScope": "payload.items beside real safety tags: scripts/qualify_safety_drive_tags.py on a Debug build of 48bf67a8, 21/21 steps in one owned TIA V21 scratch with an added CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) as IO controller of a SINAMICS G120C PN 6SL3210-1KE21-3AF1 (firmware 4.7.14) with PROFIsafe telegram 30, inserted by the native fixture helper. The run uses its own tag table SafeDriveTags, so it no longer depends on the default tag table's localized name. A tag_create batch of two standard Bool tags applied on the F-CPU with one checkpoint, compile and save. safety_drive_tags then created SafeDrive_S_ZSW1 at %IW0 and SafeDrive_S_STW1 at %QW0, both read back with isSafety true. Five batches were then refused at preparation, each naming its item, and software_inspect showed every tag unchanged after each: a tag_set batch whose item 1 renames a safety tag (SafetyBoundary, items[1], details index 1); a tag_set batch whose item 1 moves a standard tag to %I0.0 inside the safety telegram (SafetyBoundary, items[1], naming the address and the drive); a tag_delete batch whose item 0 deletes a safety tag (SafetyBoundary, items[0]); a tag_delete batch whose item 0 deletes a standard tag (DependencyCoverageIncomplete, items[0]: the dependency scan cannot export the safety program's block FOB_RTG1); a tag_create batch whose item 1 creates a Word tag at %QW0 (SafetyBoundary, items[1]). The remaining steps repeat local.safety.drive-tags.20261107: the single tag_create at %IW0 refused, safety_drive_tags refused without safetyAcknowledged and with existing tags, change_status, and change_restore from the checkpoint."
+      },
+      "artifacts": [
+        "evidence/local.safety.tag-batch.20261111.json"
+      ],
+      "limitations": [
+        "One SINAMICS G120C PN with PROFIsafe telegram 30 on one owned F-CPU 1511F-1 PN; the two safety tags are the telegram's status and control words. Safety tags on F-I/O modules, and constant kinds, are not exercised here (local.safety.fio-routes.20261111 covers the F-DI address refusals).",
+        "Every batch is refused at preparation, so the second preflight at apply and the readback refusal of a tag that turns out to be a safety tag after a write are covered by managed tests only.",
+        "On an F-CPU a tag_delete item of a standard tag is refused with DependencyCoverageIncomplete before a later item is reached, so a safety tag as a later item of a tag_delete batch is not reachable here.",
+        "The PROFIsafe telegram was inserted by the qualification fixture, not by an MCP route. No F-destination address, safety acceptance, password or download; engineering evidence only, not machine safety acceptance.",
+        "The source commit changes only this runner (the order of its tag_delete batch and of its standard tags) after the built 48bf67a8; src and every executable run are byte-identical to it."
+      ]
     }
   ],
   "features": [
@@ -9394,7 +9455,8 @@
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified. compile=false is refused before the checkpoint (local.plc_object_mutations.audit.20261102).",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "Software unit with a namespace: payload.items batches that select each block with namespace beside the name were qualified natively on FCs of one unit holding one name in a namespace and in none (local.change-batch.items-2.20261111); single changes in a namespace, other block kinds and safety or know-how protected objects are not qualified."
         ]
       },
       "qualification": {
@@ -9403,7 +9465,8 @@
           "local.milestones.rerun.20261028",
           "local.plc_object_mutations.rerun.20261028",
           "local.plc_object_mutations.audit.20261102",
-          "local.change-batch.items.20261111"
+          "local.change-batch.items.20261111",
+          "local.change-batch.items-2.20261111"
         ]
       },
       "availability": {
@@ -9448,13 +9511,15 @@
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "One standard, unprotected, non-generated block; sets AutoNumber=false then Number and reads both back. Native attribute infos must report both as readable and writable; AutoNumber is read-only for protected blocks and several OBs.",
-          "Numbers are limited to 1-65535; a number already used by another block of the same kind (FB, FC, OB or any DB) anywhere in the PLC is rejected at prepare and apply. Native OB number/event-class rules remain authoritative."
+          "Numbers are limited to 1-65535; a number already used by another block of the same kind (FB, FC, OB or any DB) anywhere in the PLC is rejected at prepare and apply. Native OB number/event-class rules remain authoritative.",
+          "payload.items: two items may not take one number for blocks of one kind (BlockNumberCollision) and a number another item frees is still taken; qualified natively on two FCs at PLC-root scope (local.change-batch.items-2.20261111). In that run TIA V21 reported AutoNumber as not writable on the FCs of a software unit, in a namespace and outside it, so the change refused there with AttributeNotWritable."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.change-batch.items-2.20261111"
         ]
       },
       "availability": {
@@ -9501,14 +9566,16 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Qualified attributes: HeaderAuthor and HeaderFamily on an FB; HeaderName, HeaderVersion and the OB attributes are not written by that run.",
           "One standard, unprotected, non-generated block; allowlist HeaderAuthor, HeaderFamily, HeaderName, HeaderVersion, plus PriorityNumber, CyclicTime, PhaseOffset and ProcessImagePartNumber for OBs only. Each attribute must also be declared readable and writable by the native attribute infos; ProcessImagePartNumber is documented read-only on export and is rejected unless the native target reports write access.",
-          "Scalar-write guards require unique access metadata, known scalar types, complete batch preflight and exact typed readback. Earlier setters can already have taken effect when a later one fails; recovery uses the checkpoint."
+          "Scalar-write guards require unique access metadata, known scalar types, complete batch preflight and exact typed readback. Earlier setters can already have taken effect when a later one fails; recovery uses the checkpoint.",
+          "Software unit with a namespace: payload.items batches that select each block with namespace beside the name were qualified natively on FCs (HeaderAuthor) of one unit holding one name in a namespace and in none (local.change-batch.items-2.20261111); single changes in a namespace, other block kinds and safety or know-how protected objects are not qualified."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
-          "local.change-batch.items.20261111"
+          "local.change-batch.items.20261111",
+          "local.change-batch.items-2.20261111"
         ]
       },
       "availability": {
@@ -11892,14 +11959,16 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Same scope and namespace, explicit collision checks, native dependency validation and mandatory compilation.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "Software unit with a namespace: payload.items batches that select each data type with namespace beside the name were qualified natively on struct types of one unit holding one name in a namespace and in none (local.change-batch.items-2.20261111); single changes in a namespace, other type kinds and safety or know-how protected objects are not qualified."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
-          "local.change-batch.items.20261111"
+          "local.change-batch.items.20261111",
+          "local.change-batch.items-2.20261111"
         ]
       },
       "availability": {
@@ -12013,7 +12082,9 @@
           "local.safety.fio-routes.20261101",
           "local.compile-baseline.unrelated-errors.20261107",
           "local.tag-set.batch.20261111",
-          "local.change-batch.items.20261111"
+          "local.change-batch.items.20261111",
+          "local.safety.fio-routes.20261111",
+          "local.safety.tag-batch.20261111"
         ]
       },
       "availability": {
@@ -12116,14 +12187,16 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "dependencyPolicy=rejectReferenced is mandatory; conservative scan rejects references and incomplete evidence. Safety/system members remain excluded.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "Observed on an F-CPU with a safety program: a tag_delete batch item naming a standard tag (dependencyPolicy rejectReferenced) was refused with DependencyCoverageIncomplete, because the dependency scan could not export the safety block FOB_RTG1 (local.safety.tag-batch.20261111). Whether this is intended is open (docs/TODO.md)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
-          "local.change-batch.items.20261111"
+          "local.change-batch.items.20261111",
+          "local.safety.tag-batch.20261111"
         ]
       },
       "availability": {
@@ -12244,7 +12317,9 @@
           "local.change.confirmed-intent.20261107",
           "local.progress.reporting.20261107",
           "local.compile-baseline.unrelated-blocks.20261107",
-          "local.change-batch.items.20261111"
+          "local.change-batch.items.20261111",
+          "local.safety.fio-routes.20261111",
+          "local.safety.tag-batch.20261111"
         ]
       },
       "availability": {
@@ -12344,13 +12419,15 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "groupKind blocks/types/tags and exact parent group path; generated/root and safety groups are excluded. Native validation and compilation are mandatory.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "payload.items: two items may not create one name under one parent, and a parent another item creates does not exist yet (GroupNotFound at that item); qualified natively for block, type and tag-table groups at PLC-root scope (local.change-batch.items-2.20261111)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.change-batch.items-2.20261111"
         ]
       },
       "availability": {
@@ -12398,13 +12475,15 @@
           "Renamed groups were empty or held only a subgroup.",
           "groupKind blocks/types/tags, exact group path and collision checks; generated/root and safety groups are excluded. Moves remain unsupported.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "payload.items: two sibling groups may not take one name, and no item may name a group inside a group another item renames; qualified natively for block, type and tag-table groups at PLC-root scope (local.change-batch.items-2.20261111)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.change-batch.items-2.20261111"
         ]
       },
       "availability": {

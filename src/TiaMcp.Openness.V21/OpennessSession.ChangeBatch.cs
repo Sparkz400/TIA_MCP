@@ -37,7 +37,7 @@ namespace TiaMcp.Openness.V21
             }
             var scopes = members.Select(m => m.ScopePath).Distinct(StringComparer.Ordinal).ToArray();
             if (scopes.Length != 1 || scopes[0] == null) throw new BridgeException("ScopeMismatch", "The items span multiple software scopes; split the change per scope. Nothing was written.");
-            ChangeBatchRules.RequireDistinct(members.Select(m => (BatchTarget(m), BatchProduced(m))));
+            RequireIndependentItems(members);
             change.ScopePath = scopes[0];
             change.Selector["scopePath"] = change.ScopePath;
             var groups = members.Select(m => m.GroupPath).Distinct(StringComparer.Ordinal).ToArray();
@@ -77,7 +77,7 @@ namespace TiaMcp.Openness.V21
                     throw new BridgeException("PreviewStale", "items[" + index + "] resolves to another software scope than at preparation. No item was written.");
                 probes.Add(probe);
             }
-            ChangeBatchRules.RequireDistinct(probes.Select(m => (BatchTarget(m), BatchProduced(m))));
+            RequireIndependentItems(probes);
             change.Stages.Add("batch_items_preflighted");
             for (int index = 0; index < change.BatchMembers.Count; index++)
             {
@@ -103,6 +103,14 @@ namespace TiaMcp.Openness.V21
             return new BridgeException(bridge?.Code ?? "EngineeringError", "items[" + index + "]: " + error.Message + " " + outcome, details);
         }
 
+        // The cross-item rules: no object edited twice, no name or block number produced twice, no renamed group inside another.
+        private static void RequireIndependentItems(List<EngineeringChange> members)
+        {
+            bool numbers = members.Count > 0 && members[0].Kind == "block_number_set";
+            ChangeBatchRules.RequireDistinct(members.Select(m => (BatchTarget(m), BatchProduced(m))), numbers ? "BlockNumberCollision" : "ObjectExists", numbers ? "block number" : "name");
+            ChangeBatchRules.RequireUnnested(members.Select(m => ChangeBatchRules.GroupTarget(m.Kind, m.Payload)).ToArray());
+        }
+
         // The resolved identity of the object a member edits; creating kinds edit none.
         private static string BatchTarget(EngineeringChange member)
         {
@@ -110,16 +118,20 @@ namespace TiaMcp.Openness.V21
             {
                 case "constant_set": case "tag_delete": case "constant_delete":
                     return member.GroupPath + "/" + member.ObjectNames[0] + "\n" + member.Payload.Value<string>("memberName");
-                case "block_rename": case "block_attributes_set": return "block\n" + member.Namespace + "\n" + member.BlockNames[0];
+                case "block_rename": case "block_attributes_set": case "block_number_set": return "block\n" + member.Namespace + "\n" + member.BlockNames[0];
                 case "type_rename": return "type\n" + member.Namespace + "\n" + member.ObjectNames[0];
                 case "tag_table_rename": return "tagTable\n" + member.ObjectNames[0];
+                case "group_rename": return ChangeBatchRules.GroupTarget(member.Kind, member.Payload);
                 default: return null;
             }
         }
 
         // Blocks and types are named per namespace; tags and constants share one name space per software scope, tag tables another.
+        // Groups are named per parent group, and a block number is taken per block kind.
         private static string BatchProduced(EngineeringChange member)
         {
+            if (member.Kind == "block_number_set") return member.BlockNumberKey;
+            if (member.Kind == "group_create" || member.Kind == "group_rename") return ChangeBatchRules.GroupProduced(member.Kind, member.Payload);
             string name = ChangeBatchRules.ProducedName(member.Kind, member.Payload);
             if (name == null) return null;
             return member.Kind == "block_rename" || member.Kind == "type_rename" ? member.Namespace + "\n" + name : name;

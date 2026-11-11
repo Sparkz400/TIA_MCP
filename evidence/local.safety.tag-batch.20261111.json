@@ -1,0 +1,88 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.safety.tag-batch.20261111",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-11T09:31:57+00:00",
+  "source": {
+    "commit": "26d36152b84de604660f42479f2bfe980a2dbce6",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "LT-PRG2024-03",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "payload.items beside real safety tags: scripts/qualify_safety_drive_tags.py on a Debug build of 48bf67a8, 21/21 steps in one owned TIA V21 scratch with an added CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) as IO controller of a SINAMICS G120C PN 6SL3210-1KE21-3AF1 (firmware 4.7.14) with PROFIsafe telegram 30, inserted by the native fixture helper. The run uses its own tag table SafeDriveTags, so it no longer depends on the default tag table's localized name. A tag_create batch of two standard Bool tags applied on the F-CPU with one checkpoint, compile and save. safety_drive_tags then created SafeDrive_S_ZSW1 at %IW0 and SafeDrive_S_STW1 at %QW0, both read back with isSafety true. Five batches were then refused at preparation, each naming its item, and software_inspect showed every tag unchanged after each: a tag_set batch whose item 1 renames a safety tag (SafetyBoundary, items[1], details index 1); a tag_set batch whose item 1 moves a standard tag to %I0.0 inside the safety telegram (SafetyBoundary, items[1], naming the address and the drive); a tag_delete batch whose item 0 deletes a safety tag (SafetyBoundary, items[0]); a tag_delete batch whose item 0 deletes a standard tag (DependencyCoverageIncomplete, items[0]: the dependency scan cannot export the safety program's block FOB_RTG1); a tag_create batch whose item 1 creates a Word tag at %QW0 (SafetyBoundary, items[1]). The remaining steps repeat local.safety.drive-tags.20261107: the single tag_create at %IW0 refused, safety_drive_tags refused without safetyAcknowledged and with existing tags, change_status, and change_restore from the checkpoint.",
+  "limitations": [
+    "One SINAMICS G120C PN with PROFIsafe telegram 30 on one owned F-CPU 1511F-1 PN; the two safety tags are the telegram's status and control words. Safety tags on F-I/O modules, and constant kinds, are not exercised here (local.safety.fio-routes.20261111 covers the F-DI address refusals).",
+    "Every batch is refused at preparation, so the second preflight at apply and the readback refusal of a tag that turns out to be a safety tag after a write are covered by managed tests only.",
+    "On an F-CPU a tag_delete item of a standard tag is refused with DependencyCoverageIncomplete before a later item is reached, so a safety tag as a later item of a tag_delete batch is not reachable here.",
+    "The PROFIsafe telegram was inserted by the qualification fixture, not by an MCP route. No F-destination address, safety acceptance, password or download; engineering evidence only, not machine safety acceptance.",
+    "The source commit changes only this runner (the order of its tag_delete batch and of its standard tags) after the built 48bf67a8; src and every executable run are byte-identical to it."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "8aefb5e52111592df0e8e81b59b9284d7eabb15fedd5be85760066cc80f4caf1"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "9b07f4f98151b5f9396efdbafee0a8b8d2b0bb8221ab37eca78b1606cb0f0780"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "0405512066f676cb31d6240ec269816d1359d338823b7f2b042aec516b2d7b9c"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "0f32fd6bbb6ebb4875edb67788978279d27aebb57a10156f334849b74679ccd2",
+      "bytes": 98209,
+      "completed": true,
+      "steps": [
+        "owned scratch",
+        "types",
+        "inventory before safety telegram",
+        "fixture inserts PROFIsafe telegram 30",
+        "inventory after safety telegram",
+        "tag_create refused with SafetyBoundary",
+        "safety_drive_tags refused with InvalidRequest",
+        "a tag_create batch of two standard tags applied on the F-CPU",
+        "safety_drive_tags applied",
+        "change_status confirms the applied change",
+        "safety tags read back",
+        "standard and safety tags before the refused batches",
+        "tag_set batch whose item 1 renames a safety tag refused with SafetyBoundary",
+        "tag_set batch whose item 1 moves a standard tag onto the safety telegram refused with SafetyBoundary",
+        "tag_delete batch whose item 0 deletes a safety tag refused with SafetyBoundary",
+        "tag_delete batch whose item 0 deletes a standard tag on the F-CPU refused with DependencyCoverageIncomplete",
+        "tag_create batch whose item 1 creates a tag on the safety telegram refused with SafetyBoundary",
+        "every tag is unchanged after the refused batches",
+        "safety_drive_tags refused with ObjectExists",
+        "restore from the checkpoint",
+        "owned worker shutdown"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "drive_inventory",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}

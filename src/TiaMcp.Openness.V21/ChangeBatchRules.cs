@@ -14,12 +14,17 @@ namespace TiaMcp.Openness.V21
     {
         internal const int MaxItems = 100;
 
-        // Kinds whose items are independent of each other once no two items share a target or a new name. Deletions of blocks
-        // and types (dependency scans), groups (nesting) and the import kinds (already multi-object) are not batched.
+        // Kinds whose items are independent of each other once no two items share a target or a new name. Three kinds need a
+        // stricter rule to be independent: block_number_set (no two items may take one number of one block kind),
+        // group_create (no two items may create one name under one parent; a parent another item creates does not exist yet
+        // and refuses at that item's own prepare) and group_rename (as before, and no item's group may lie inside another
+        // item's, whose rename would move its path). Deletions of blocks, types and groups (dependency scans, nesting) and
+        // the import kinds (already multi-object) are not batched.
         internal static readonly string[] Kinds =
         {
             "constant_set", "tag_create", "constant_create", "tag_delete", "constant_delete",
             "tag_table_create", "tag_table_rename", "block_rename", "block_attributes_set", "type_rename",
+            "block_number_set", "group_create", "group_rename",
         };
 
         internal static bool HasItems(JObject payload) => payload?["items"] != null && payload["items"].Type != JTokenType.Null;
@@ -78,7 +83,9 @@ namespace TiaMcp.Openness.V21
         /// the order of writes.</summary>
         /// <param name="items">Per item: the resolved identity of the object it edits (null when it creates one) and the name
         /// space plus name it produces (null when it produces none).</param>
-        internal static void RequireDistinct(IEnumerable<(string Target, string Produced)> items)
+        /// <param name="producedCode">The refusal code for two items producing the same thing.</param>
+        /// <param name="producedWhat">What they produce, for the message: a name or a block number.</param>
+        internal static void RequireDistinct(IEnumerable<(string Target, string Produced)> items, string producedCode = "ObjectExists", string producedWhat = "name")
         {
             var targets = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             var produced = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -94,12 +101,42 @@ namespace TiaMcp.Openness.V21
                 if (name != null)
                 {
                     if (produced.TryGetValue(name, out int first))
-                        throw new BridgeException("ObjectExists", "items[" + first + "] and items[" + index + "] request the same name. Nothing was written.");
+                        throw new BridgeException(producedCode, "items[" + first + "] and items[" + index + "] request the same " + producedWhat + ". Nothing was written.");
                     produced.Add(name, index);
                 }
                 index++;
             }
         }
+
+        /// <summary>The group a group_rename item edits, as group kind and path; null for any other kind.</summary>
+        internal static string GroupTarget(string kind, JObject member)
+        {
+            string path = Text(member["groupPath"]);
+            return kind == "group_rename" && path != null ? GroupKey(member, path.TrimEnd('/')) : null;
+        }
+
+        /// <summary>The sibling name a group item produces: group kind, parent path and name. group_create names its parent
+        /// in groupPath; group_rename names the group itself, whose parent is the path without its last segment.</summary>
+        internal static string GroupProduced(string kind, JObject member)
+        {
+            string path = Text(member["groupPath"])?.TrimEnd('/'), name = Text(member["name"]);
+            if ((kind != "group_create" && kind != "group_rename") || path == null || name == null) return null;
+            if (kind == "group_rename") path = path.Substring(0, Math.Max(0, path.LastIndexOf('/')));
+            return GroupKey(member, path) + "\n" + name;
+        }
+
+        /// <summary>Refuses a group_rename batch in which one item's group lies inside another item's: renaming the outer
+        /// group changes the inner group's path, so the inner item would no longer resolve after the first write.</summary>
+        /// <param name="targets">Per item its <see cref="GroupTarget"/>.</param>
+        internal static void RequireUnnested(IReadOnlyList<string> targets)
+        {
+            for (int outer = 0; outer < targets.Count; outer++)
+                for (int inner = 0; inner < targets.Count; inner++)
+                    if (outer != inner && targets[outer] != null && targets[inner] != null && targets[inner].StartsWith(targets[outer] + "/", StringComparison.OrdinalIgnoreCase))
+                        throw new BridgeException("InvalidRequest", "items[" + inner + "] renames a group inside the group that items[" + outer + "] renames; rename nested groups in separate changes. Nothing was written.");
+        }
+
+        private static string GroupKey(JObject member, string path) => "group\n" + Text(member["groupKind"]) + "\n" + path;
 
         private static string Text(JToken value) => value?.Type == JTokenType.String ? value.Value<string>() : null;
     }

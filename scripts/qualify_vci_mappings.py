@@ -501,7 +501,8 @@ def phase_b(run):
 def body(h):
     run = Run(h)
     run.plc = h.owned_scratch("vci mappings")
-    run.cpu, run.language = run.plc.rsplit("/plc/", 1)[0], "en-US"
+    # An active project language; a scratch project's follow the TIA installation (de-DE on a German one).
+    run.cpu, run.language = run.plc.rsplit("/plc/", 1)[0], h.tool("project_properties", {"maxItems": 200})["languageSettings"]["editing"]
     run.project = h.tool("tia_session_status")["projects"][0]["path"]
     run.current = run.snap("baseline")
     run.group = next(row["path"] for key, row in sorted(run.current["view"].items()) if key.startswith("vciGroup:") and row["kind"] == "system")
