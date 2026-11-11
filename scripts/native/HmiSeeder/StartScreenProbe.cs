@@ -66,6 +66,7 @@ internal static partial class Program
                 Report["compileA_afterBlind"] = Compile(new[] { a }); Persist();
 
                 // 4. Paste instead of import: a master copy of a screen created into an HMI that has no screen yet.
+                Report["compileB_empty"] = Compile(new[] { b }); Persist();
                 var paste = new JObject(); Report["masterCopyPaste"] = paste;
                 try
                 {
@@ -80,9 +81,76 @@ internal static partial class Program
                 catch (Exception ex) { paste["error"] = Error(ex); }
                 Report["compileB_afterPaste"] = Compile(new[] { b }); Persist();
 
-                project.Save(); Report["projectPath"] = project.Path.FullName; Report["completed"] = true;
+                project.Save(); string projectPath = project.Path.FullName; Report["projectPath"] = projectPath;
+                project.Archive(new DirectoryInfo(Output), "fixture.zap21", ProjectArchivationMode.Compressed);
+                Report["archive"] = new JObject { ["path"] = Path.Combine(Output, "fixture.zap21"), ["sha256"] = Hash(Path.Combine(Output, "fixture.zap21")) };
+                project.Close(); project = portal.Projects.Open(new FileInfo(projectPath));
+                Report["compileB_reopened"] = Compile(new[] { ClassicSoftware(project.Devices.Single(d => d.Name == "HmiDevice_B")) });
+                Report["completed"] = true;
             }
             finally { try { project?.Close(); } catch { } Report["finishedUtc"] = DateTime.UtcNow.ToString("O"); Persist(); }
+        }
+        Console.WriteLine(Path.Combine(Output, "native-report.json"));
+        return 0;
+    }
+
+    private static Software ClassicSoftware(Device device) => Items(device.DeviceItems).Select(item => item.GetService<SoftwareContainer>()?.Software)
+        .FirstOrDefault(sw => sw != null && sw.GetType().FullName.StartsWith("Siemens.Engineering.Hmi.", StringComparison.Ordinal));
+
+    // Replays, on a retrieved copy of a probe fixture, the order of native calls a screen change makes. Steps run in the given order:
+    // exclusive, save, archive, compile, reimport (export Overview_A, change its BackColor, import with Override), sleep:<seconds>, release.
+    private static int CompileExperiment(string fixtureArchive, string output, string steps)
+    {
+        fixtureArchive = Path.GetFullPath(fixtureArchive);
+        string marker = Path.Combine(Path.GetDirectoryName(fixtureArchive), "native-report.json");
+        if (Path.GetFileName(fixtureArchive) != "fixture.zap21" || !File.Exists(marker) || JObject.Parse(File.ReadAllText(marker)).Value<string>("probe") != "classic-start-screen-routes"
+            || JObject.Parse(File.ReadAllText(marker))["archive"]?.Value<string>("sha256") != Hash(fixtureArchive))
+            throw new InvalidOperationException("Only the unchanged fixture.zap21 of a startscreen-probe run is accepted.");
+        Output = Path.GetFullPath(output);
+        if (Directory.Exists(Output) || File.Exists(Output)) throw new InvalidOperationException("Choose a new output directory; existing evidence is never overwritten.");
+        Directory.CreateDirectory(Output);
+        var rows = new JArray();
+        Report = new JObject { ["schemaVersion"] = 1, ["completed"] = false, ["probe"] = "classic-compile-sequence", ["fixture"] = fixtureArchive, ["steps"] = steps, ["results"] = rows };
+        Persist();
+        using (var portal = new TiaPortal(TiaPortalMode.WithoutUserInterface))
+        {
+            Project project = null; IDisposable exclusive = null; int color = 205;
+            try
+            {
+                project = portal.Projects.Retrieve(new FileInfo(fixtureArchive), new DirectoryInfo(Path.Combine(Output, "p")));
+                Report["projectPath"] = project.Path.FullName;
+                foreach (string step in steps.Split(','))
+                {
+                    var row = new JObject { ["step"] = step, ["startedUtc"] = DateTime.UtcNow.ToString("O") }; rows.Add(row);
+                    var watch = System.Diagnostics.Stopwatch.StartNew();
+                    try
+                    {
+                        var software = ClassicSoftware(project.Devices.Single(d => d.Name == "HmiDevice_B"));
+                        if (step == "exclusive") exclusive = portal.ExclusiveAccess("HmiSeeder compile sequence");
+                        else if (step == "release") { exclusive?.Dispose(); exclusive = null; }
+                        else if (step == "save") project.Save();
+                        else if (step == "archive") project.Archive(new DirectoryInfo(Output), "before_" + rows.Count + ".zap21", ProjectArchivationMode.Compressed);
+                        else if (step == "compile") row["compile"] = Compile(new[] { software });
+                        else if (step.StartsWith("sleep:", StringComparison.Ordinal)) System.Threading.Thread.Sleep(1000 * int.Parse(step.Substring(6)));
+                        else if (step == "reimport")
+                        {
+                            object screens = Get(Get(software, "ScreenFolder"), "Screens"); object screen = Call(screens, "Find", "Overview_A");
+                            string file = Path.Combine(Output, "screen_" + rows.Count + ".xml");
+                            screen.GetType().GetMethod("Export", new[] { typeof(FileInfo), typeof(ExportOptions) }).Invoke(screen, new object[] { new FileInfo(file), ExportOptions.WithDefaults });
+                            string xml = File.ReadAllText(file); int at = xml.IndexOf("<BackColor>", StringComparison.Ordinal), end = xml.IndexOf("</BackColor>", StringComparison.Ordinal);
+                            if (at < 0 || end < at) throw new InvalidOperationException("The exported screen has no BackColor.");
+                            File.WriteAllText(file, xml.Substring(0, at) + "<BackColor>" + (color++) + ", 204, 204" + xml.Substring(end));
+                            screens.GetType().GetMethod("Import", new[] { typeof(FileInfo), typeof(ImportOptions) }).Invoke(screens, new object[] { new FileInfo(file), ImportOptions.Override });
+                        }
+                        else throw new ArgumentException("Unknown step: " + step);
+                        row["isModified"] = project.IsModified;
+                    }
+                    catch (Exception ex) { row["error"] = Error(ex); }
+                    row["milliseconds"] = watch.ElapsedMilliseconds; Persist();
+                }
+                Report["completed"] = true;
+            }
+            finally { try { exclusive?.Dispose(); } catch { } try { project?.Close(); } catch { } Persist(); }
         }
         Console.WriteLine(Path.Combine(Output, "native-report.json"));
         return 0;
