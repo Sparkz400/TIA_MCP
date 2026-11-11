@@ -10,6 +10,10 @@ namespace TiaMcp.Openness.V21
     // decisions of earlier applied changes in the same project, and never evaluated: the tool does not infer machine behavior.
     internal static class IntentRules
     {
+        /// <summary>File-system failures of the decision log append. The log is a record of an applied change, never part of it,
+        /// so none of them may turn an applied change into a failed one.</summary>
+        internal static bool IsLogWriteFailure(System.Exception error) => error is System.IO.IOException || error is System.UnauthorizedAccessException;
+
         internal static readonly JObject VerificationScope = new JObject {
             ["compileCorrectness"] = "Reported by compile.compilerSucceeded and compile.baselineComparison.",
             ["implementationAgainstIntent"] = "Recorded for review with the change; the tool does not check the implementation against it.",
