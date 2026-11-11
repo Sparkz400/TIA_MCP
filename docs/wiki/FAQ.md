@@ -37,7 +37,7 @@ lock reconciliation path. Unverified recovery still holds the lock. See
 
 ## Why does every change take minutes on a large project?
 
-Each applied change fingerprints the project, saves it, writes a full recovery archive and compiles before and after the edit. The checks are never skipped. A Host started with `--enable-fingerprint-reuse` reuses the project-wide fingerprint read while TIA reports the project in the same saved state; that is off by default. Several other kinds (creating, renaming and deleting tags, constants, tag tables, blocks and data types) take `items` the same way. To rename or readdress many PLC tags, send them as one `tag_set` change with `items`, so the sequence runs once for all of them; see [many tag edits in one change](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#many-tag-edits-in-one-change).
+Each applied change fingerprints the project, saves it, writes a full recovery archive and compiles before and after the edit. The checks are never skipped. A Host started with `--enable-fingerprint-reuse` reuses the project-wide fingerprint read while TIA reports the project in the same saved state; that is off by default. Several other kinds (creating, editing and deleting tags and constants, creating and renaming tag tables and groups, renaming and renumbering blocks, renaming data types) take `items` the same way. To rename or readdress many PLC tags, send them as one `tag_set` change with `items`, so the sequence runs once for all of them; see [many tag edits in one change](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#many-tag-edits-in-one-change).
 
 ## Why is Classic graphic-list export blocked?
 

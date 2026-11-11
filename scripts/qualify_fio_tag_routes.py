@@ -71,8 +71,9 @@ def table_path(h, plc, name):
     return found[0]
 
 
-def refuse(h, label, kind, payload, scope, module=FDI, address=None):
-    """change_prepare must refuse with SafetyBoundary naming the F-I/O module, and no tag table or tag of any PLC may change."""
+def refuse(h, label, kind, payload, scope, module=FDI, address=None, item=None):
+    """change_prepare must refuse with SafetyBoundary naming the F-I/O module (and, for a batch, the item), and no tag table
+    or tag of any PLC may change."""
     def check():
         before = tables(h)
         result = h.client.request("tools/call", {"name": "change_prepare", "arguments": {"kind": kind, "payload": payload, **scope}})
@@ -81,6 +82,7 @@ def refuse(h, label, kind, payload, scope, module=FDI, address=None):
         details = error.get("details") or {}
         require(error.get("code") == "SafetyBoundary" and module in str(details.get("fIoPath")) and (address is None or details.get("logicalAddress") == address),
                 "Expected SafetyBoundary naming %s %s, observed %s" % (module, address or "", error))
+        require(item is None or (details.get("index") == item and error.get("message", "").startswith("items[%d]: " % item)), "The refusal does not name items[%s]: %s" % (item, error))
         require(tables(h) == before, "The refused preparation changed a tag table or tag")
         return error
     return h.stage("refuse %s: %s" % (kind, label), check)
@@ -124,10 +126,10 @@ def body(h):
     refuse(h, PROBE_TAG + " moved onto the F-DI input", "tag_set", {"tagTablePath": table, "memberName": PROBE_TAG, "attributes": {"LogicalAddress": fio}}, f, address=fio)
     # payload.items: one item on the F-DI input refuses the whole batch, whatever the other items are.
     refuse(h, "a tag_set batch whose item moves " + PROBE_TAG + " onto the F-DI input", "tag_set",
-           {"items": [{"tagTablePath": table, "memberName": PROBE_TAG, "attributes": {"LogicalAddress": fio}}]}, f, address=fio)
+           {"items": [{"tagTablePath": table, "memberName": PROBE_TAG, "attributes": {"LogicalAddress": fio}}]}, f, address=fio, item=0)
     refuse(h, "a tag_create batch with one new tag on the F-DI input", "tag_create",
            {"items": [{"tagTablePath": table, "name": "FioFree", "dataTypeName": "Bool", "logicalAddress": "%M44.0"},
-                      {"tagTablePath": table, "name": "FioIn", "dataTypeName": "Bool", "logicalAddress": fio}]}, f, address=fio)
+                      {"tagTablePath": table, "name": "FioIn", "dataTypeName": "Bool", "logicalAddress": fio}]}, f, address=fio, item=1)
 
     # tag_table_import_xml
     refuse(h, "a new table with a tag on the F-DI input", "tag_table_import_xml",
@@ -179,7 +181,9 @@ def vci_routes(h, plc, table, fio, f):
     groups = [g["path"] for g in h.tool("vci_workspace_inspect")["groups"] if g.get("kind") == "system"]
     require(len(groups) == 1, "Expected one system VCI workspace group: %s" % groups)
     root = h.directory.parent / ("vci-" + h.directory.name)  # Beside the artifact store, so outside it and outside the project.
-    change(h, "vci_workspace_create", {"groupPath": groups[0], "name": WORKSPACE, "rootPath": str(root), "language": "en-US"}, f)
+    # The workspace language must be an active project language; a scratch project's follow the TIA installation (de-DE on a German one).
+    language = h.report["vciLanguage"] = h.tool("project_properties", {"maxItems": 200})["languageSettings"]["editing"]
+    change(h, "vci_workspace_create", {"groupPath": groups[0], "name": WORKSPACE, "rootPath": str(root), "language": language}, f)
     workspace = groups[0] + "/" + WORKSPACE
     base = {"workspacePath": workspace, "objectPath": table, "mode": "export", "directory": "", "fileName": FIO_TABLE}
     def formats():

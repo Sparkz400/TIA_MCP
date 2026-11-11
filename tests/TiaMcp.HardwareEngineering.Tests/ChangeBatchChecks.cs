@@ -59,6 +59,28 @@ internal static class ChangeBatchChecks
         Check(Refused(() => ChangeBatchRules.RequireDistinct(new[] { ((string)null, "X"), ((string)null, "X") })) == "ObjectExists", "two created objects with one name refuse");
         Check(Refused(() => ChangeBatchRules.RequireDistinct(new[] { ((string)null, (string)null), ((string)null, (string)null) })) == null, "items without target or name never collide");
         Check(Message(() => ChangeBatchRules.RequireDistinct(new[] { ("t/A", "A2"), ("t/B", "B2"), ("t/A", "A3") })).StartsWith("items[0] and items[2] "), "a collision names both item indexes");
+        Check(Refused(() => ChangeBatchRules.RequireDistinct(new[] { ("block\n\nA", "blockNumber\nFC\n7"), ("block\n\nB", "blockNumber\nFC\n7") }, "BlockNumberCollision", "block number")) == "BlockNumberCollision"
+              && Message(() => ChangeBatchRules.RequireDistinct(new[] { ("block\n\nA", "blockNumber\nFC\n7"), ("block\n\nB", "blockNumber\nFC\n7") }, "BlockNumberCollision", "block number")).Contains("the same block number")
+              && Refused(() => ChangeBatchRules.RequireDistinct(new[] { ("block\n\nA", "blockNumber\nFC\n7"), ("block\n\nB", "blockNumber\nFB\n7") }, "BlockNumberCollision", "block number")) == null,
+              "one number for two blocks of one kind refuses as a number collision; blocks of two kinds may share a number");
+
+        // Groups: named per group kind and parent; a renamed group may not contain another item's group.
+        static JObject Group(string kind, string path, string name) => new JObject { ["groupKind"] = kind, ["groupPath"] = path, ["name"] = name };
+        Check(ChangeBatchRules.GroupTarget("group_rename", Group("blocks", "/plc/blocks/groups/A", "B")) == "group\nblocks\n/plc/blocks/groups/A"
+              && ChangeBatchRules.GroupTarget("group_create", Group("blocks", "/plc/blocks", "B")) == null, "only a renamed group is a target");
+        Check(ChangeBatchRules.GroupProduced("group_create", Group("blocks", "/plc/blocks/groups/A", "N")) == "group\nblocks\n/plc/blocks/groups/A\nN"
+              && ChangeBatchRules.GroupProduced("group_rename", Group("blocks", "/plc/blocks/groups/A", "N")) == "group\nblocks\n/plc/blocks/groups\nN", "a created group is named under its parent, a renamed one beside its siblings");
+        Check(ChangeBatchRules.GroupProduced("group_rename", Group("blocks", "/plc/blocks/groups/A", "N")) == ChangeBatchRules.GroupProduced("group_rename", Group("blocks", "/plc/blocks/groups/B", "N"))
+              && ChangeBatchRules.GroupProduced("group_rename", Group("blocks", "/plc/blocks/groups/A", "N")) != ChangeBatchRules.GroupProduced("group_rename", Group("types", "/plc/blocks/groups/A", "N"))
+              && ChangeBatchRules.GroupProduced("group_rename", Group("blocks", "/plc/blocks/groups/A", "N")) != ChangeBatchRules.GroupProduced("group_rename", Group("blocks", "/plc/blocks/groups/A/groups/B", "N")),
+              "two siblings renamed to one name collide; other group kinds and other parents do not");
+        Check(ChangeBatchRules.GroupProduced("block_rename", Group("blocks", "/plc/blocks", "N")) == null && ChangeBatchRules.GroupProduced("group_create", new JObject { ["groupKind"] = "blocks", ["name"] = "N" }) == null,
+              "other kinds and incomplete items produce no group name");
+        string[] Targets(params string[] paths) => paths.Select(path => path == null ? null : ChangeBatchRules.GroupTarget("group_rename", Group("blocks", path, "N"))).ToArray();
+        Check(Refused(() => ChangeBatchRules.RequireUnnested(Targets("/plc/blocks/groups/A", "/plc/blocks/groups/AB", null, "/plc/blocks/groups/B/groups/A"))) == null, "sibling groups and a shared name prefix are not nested");
+        Check(Refused(() => ChangeBatchRules.RequireUnnested(Targets("/plc/blocks/groups/A/groups/B", "/plc/blocks/groups/a"))) == "InvalidRequest", "a group inside another item's group refuses, in either order and case-insensitively");
+        Check(Message(() => ChangeBatchRules.RequireUnnested(Targets("/plc/blocks/groups/A/groups/B", "/plc/blocks/groups/X", "/plc/blocks/groups/A"))).StartsWith("items[0] renames a group inside the group that items[2] renames"), "the nesting refusal names both item indexes");
+        Check(Refused(() => ChangeBatchRules.RequireUnnested(new[] { "group\nblocks\n/plc/blocks/groups/A", "group\ntypes\n/plc/blocks/groups/A/groups/B" })) == null, "groups of different kinds never nest");
         return count;
     }
 }

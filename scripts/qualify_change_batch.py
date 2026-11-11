@@ -3,11 +3,13 @@
 Each batch must apply under one checkpoint archive, one mutation stage, one compile and one save, list every item in its
 preview and leave exactly the intended names. Covered: tag_set (tags referenced by a compiled SCL block, whose source must
 name the new tags afterwards), tag_create, constant_create, constant_set, constant_delete, tag_delete, tag_table_create,
-tag_table_rename, block_rename, block_attributes_set and type_rename, and the tag kinds again inside a software unit
-with scopePath beside items. A batch whose second item TIA refuses natively, after the first was written, must end recovery_required, block
-further changes, and restore to the state before the batch. Refused batches (one object in two items, one name
-from two items, a name that exists, an unknown object in a later item, items on a kind that does not batch, fields beside
-items) must name the item and leave the software unchanged.
+tag_table_rename, block_rename, block_attributes_set, type_rename, block_number_set, group_create and group_rename, the tag
+kinds again inside a software unit with scopePath beside items, and the block and type kinds in a unit that holds one name
+in a namespace and in none. A batch whose second item TIA refuses natively, after the first was written, must end recovery_required, block
+further changes, and restore to the state before the batch. Refused batches (one object in two items, one name or block
+number from two items, a name that exists, an unknown object in a later item, a group inside a group another item renames,
+a name two namespaces hold given without namespace, items on a kind that does not batch, fields beside items) must name the
+item and leave the software unchanged.
 """
 from __future__ import annotations
 
@@ -18,7 +20,8 @@ from pathlib import Path
 from library_native_harness import Harness, require
 
 TABLE = "BatchTags"
-LIMITATIONS = ["One owned scratch standard CPU: PLC-root scope and one software unit (tag kinds only); namespaces are not exercised.",
+NS = "BatchNs"
+LIMITATIONS = ["One owned scratch standard CPU: PLC-root scope, one software unit (tag kinds only) and one unit with one namespace (block and type kinds).",
                "The safety-tag and F-I/O refusals of a batch need an F-CPU fixture (qualify_fio_tag_routes.py covers the F-I/O address refusal).",
                "The batch that fails after its first write is whichever candidate TIA refuses natively at its second item (a name with a double quote); see midwayFailureCandidates."]
 STAGES = ("recovery_archive_created", "baseline_compile_finished", "mutation_applied", "compile_finished", "changed_project_saved")
@@ -40,7 +43,9 @@ def body(h):
         view = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})
         tables = {t["name"]: {"tags": sorted(g["name"] for g in t.get("tags", [])),
                               "constants": sorted(c["name"] for c in t.get("constants", []) if c.get("kind") == "user")} for t in view["tagTables"]}
-        return {"tables": tables, "blocks": sorted(b["name"] for b in view["blocks"]), "types": sorted(t["name"] for t in view["types"])}
+        return {"tables": tables, "blocks": sorted(b["name"] for b in view["blocks"]), "types": sorted(t["name"] for t in view["types"]),
+                "numbers": {b["path"]: b.get("number") for b in view["blocks"]} | {b["name"]: b.get("number") for b in view["blocks"]},
+                "groups": sorted(path for scope in view["softwareScopes"] for path in scope["groups"])}
 
     def apply(label, kind, payload, count=None):
         prepared = h.stage("prepare " + label, lambda: h.tool("change_prepare", {"kind": kind, "payload": payload, **p}))
@@ -126,6 +131,36 @@ def body(h):
     apply("rename two data types", "type_rename", {"items": [{"typeName": "ByA", "newName": "ByA_R"}, {"typeName": "ByB", "newName": "ByB_R"}]}, 2)
     expect("data types", lambda s: {"ByA_R", "ByB_R"} <= set(s["types"]) and not {"ByA", "ByB"} & set(s["types"]))
 
+    # Block numbers: no two items may take one number of one block kind, and a number another item frees is still taken.
+    number = lambda name, value: {"blockName": name, "number": value}
+    apply("number two blocks", "block_number_set", {"items": [number("BbA_R", 741), number("BbB_R", 742)]}, 2)
+    expect("block numbers", lambda s: s["numbers"]["BbA_R"] == 741 and s["numbers"]["BbB_R"] == 742)
+    refuse("one number for two blocks of one kind", "block_number_set", {"items": [number("BbA_R", 750), number("BbB_R", 750)]}, "BlockNumberCollision", "items[0] and items[1] ")
+    refuse("a number another item frees", "block_number_set", {"items": [number("BbA_R", 742), number("BbB_R", 743)]}, "BlockNumberCollision", "items[0]: ")
+    refuse("one block in two items", "block_number_set", {"items": [number("BbA_R", 760), number("BbA_R", 761)]}, "InvalidRequest", "items[0] and items[1] ")
+
+    # Groups: created and renamed per parent; a renamed group may not contain another item's group.
+    for root in ("blocks", "types", "tags"):
+        base, title = plc + "/" + root, "Bg" + root.capitalize()
+        group = lambda path, name, root=root: {"groupKind": root, "groupPath": path, "name": name}
+        a, b = base + "/groups/" + title + "A", base + "/groups/" + title + "B"
+        apply("create two %s groups" % root, "group_create", {"items": [group(base, title + "A"), group(base, title + "B")]}, 2)
+        apply("create a nested %s group of one name in each" % root, "group_create", {"items": [group(a, "Inner"), group(b, "Inner")]}, 2)
+        expect("created %s groups" % root, lambda s, a=a, b=b: {a, b, a + "/groups/Inner", b + "/groups/Inner"} <= set(s["groups"]))
+        if root == "blocks":
+            refuse("one group name twice under one parent", "group_create", {"items": [group(a, "Dup"), group(a, "dup")]}, "ObjectExists", "items[0] and items[1] ")
+            refuse("a group under a group the same batch creates", "group_create",
+                   {"items": [group(base, title + "C"), group(base + "/groups/" + title + "C", "Inner")]}, "GroupNotFound", "items[1]: ")
+            refuse("a group inside a group another item renames", "group_rename",
+                   {"items": [group(a + "/groups/Inner", "Inner_R"), group(a, title + "A_R")]}, "InvalidRequest", "items[0] renames a group inside the group that items[1] renames")
+            refuse("two sibling groups renamed to one name", "group_rename", {"items": [group(a, title + "X"), group(b, title + "x")]}, "ObjectExists", "items[0] and items[1] ")
+            refuse("one group in two items", "group_rename", {"items": [group(a, title + "X"), group(a, title + "Y")]}, "InvalidRequest", "items[0] and items[1] ")
+        apply("rename two %s groups" % root, "group_rename", {"items": [group(a, title + "A_R"), group(b, title + "B_R")]}, 2)
+        apply("rename the nested %s groups to one name under two parents" % root, "group_rename",
+              {"items": [group(a + "_R/groups/Inner", "Inner_R"), group(b + "_R/groups/Inner", "Inner_R")]}, 2)
+        expect("renamed %s groups" % root, lambda s, a=a, b=b: {a + "_R", b + "_R", a + "_R/groups/Inner_R", b + "_R/groups/Inner_R"} <= set(s["groups"])
+               and not {a, b, a + "_R/groups/Inner", b + "_R/groups/Inner"} & set(s["groups"]))
+
     # A software unit: the same batches with scopePath beside items.
     apply("create a software unit", "software_unit_create", {"name": "BatchUnit"})
     scopes = [u["path"] for u in h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})["softwareScopes"] if u["name"] == "BatchUnit"]
@@ -142,6 +177,71 @@ def body(h):
     other = dict(unit_tag("UtX", "%M240.5"), scopePath=plc)
     refuse("an item naming another scope than the batch", "tag_create", {"scopePath": unit, "items": [unit_tag("UtY", "%M240.4"), other]}, "ScopeMismatch", "items[1] ")
     expect("the unit's table", lambda s: s["tables"].get("UnitTags") == {"tags": ["Ut0_R", "Ut1_R"], "constants": ["Uc0", "Uc1"]})
+
+    # Namespaces: a unit that holds one block name and one type name in a namespace and in none. Blocks and types are
+    # named per namespace, so an item selects its object with namespace beside the name, and two namespaces may take one name.
+    apply("create a unit for namespaces", "software_unit_create", {"name": "BatchNsUnit"})
+    scopes = [u["path"] for u in h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})["softwareScopes"] if u["name"] == "BatchNsUnit"]
+    require(len(scopes) == 1, "Expected one software unit BatchNsUnit: %s" % scopes)
+    ns_unit = scopes[0]
+    in_ns = lambda text: "NAMESPACE %s\n%sEND_NAMESPACE\n" % (NS, text)
+    apply("namespace: seed a block outside the namespace", "source_upsert", {"scopePath": ns_unit, "language": "SCL", "source": scl_fc("NbSame"), "expectedBlockNames": ["NbSame"]})
+    apply("namespace: seed three blocks in the namespace", "source_upsert",
+          {"scopePath": ns_unit, "language": "SCL", "source": in_ns(scl_fc("NbA") + scl_fc("NbB") + scl_fc("NbSame")), "expectedBlockNames": ["NbA", "NbB", "NbSame"]})
+    apply("namespace: seed a data type outside the namespace", "type_source_upsert", {"scopePath": ns_unit, "source": scl_type("NySame"), "expectedTypeNames": ["NySame"]})
+    apply("namespace: seed two data types in the namespace", "type_source_upsert",
+          {"scopePath": ns_unit, "source": in_ns(scl_type("NyA") + scl_type("NySame")), "expectedTypeNames": ["NyA", "NySame"]})
+
+    def placed(collection):
+        """Per object name in the namespace unit: whether each object of that name sits in the namespace (sorted)."""
+        rows = {}
+        for row in h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})[collection]:
+            if row.get("scopePath") == ns_unit:
+                rows.setdefault(row["name"], []).append("/namespaces/%s/" % NS in row["path"])
+        return {name: sorted(flags) for name, flags in rows.items()}
+
+    def placement(label, collection, wanted):
+        def check():
+            found = placed(collection)
+            require(found == wanted, "%s are placed differently: %s" % (label, found))
+            return found
+        h.report.setdefault("namespacePlacement", {})[label] = h.stage("placement of " + label, check)
+
+    placement("seeded blocks", "blocks", {"NbA": [True], "NbB": [True], "NbSame": [False, True]})
+    placement("seeded data types", "types", {"NyA": [True], "NySame": [False, True]})
+    block = lambda name, namespace, **more: {"blockName": name, "namespace": namespace, **more}
+    data_type = lambda name, namespace, **more: {"typeName": name, "namespace": namespace, **more}
+    in_unit = lambda *items: {"scopePath": ns_unit, "items": list(items)}
+    apply("namespace: rename two blocks", "block_rename", in_unit(block("NbA", NS, newName="NbA_R"), block("NbB", NS, newName="NbB_R")), 2)
+    refuse("a block name two namespaces hold, without namespace", "block_rename",
+           in_unit(block("NbA_R", NS, newName="NbA_S"), {"blockName": "NbSame", "newName": "NbSame_X"}), "AmbiguousTarget", "items[1]: ")
+    refuse("one namespaced block in two items", "block_attributes_set",
+           in_unit(block("NbSame", NS, attributes={"HeaderAuthor": "one"}), block("NbSame", NS, attributes={"HeaderFamily": "two"})), "InvalidRequest", "items[0] and items[1] ")
+    refuse("one new name twice in one namespace", "block_rename", in_unit(block("NbA_R", NS, newName="NbDup"), block("NbB_R", NS, newName="nbdup")), "ObjectExists", "items[0] and items[1] ")
+    refuse("a name the namespace already holds", "block_rename", in_unit(block("NbA_R", NS, newName="NbA_S"), block("NbB_R", NS, newName="NbSame")), "ObjectExists", "items[1]: ")
+    apply("namespace: set headers of one block name in two namespaces", "block_attributes_set",
+          in_unit(block("NbSame", NS, attributes={"HeaderAuthor": "inside"}), block("NbSame", "", attributes={"HeaderAuthor": "outside"})), 2)
+
+    # TIA V21 numbers a software unit's blocks itself: AutoNumber is not writable there (native run of 11 November), so
+    # block_number_set refuses such a block at preparation, in a batch as in a single change.
+    def unit_numbers():
+        outcomes = {}
+        for label, namespace, value in (("inNamespace", NS, 771), ("outsideNamespace", "", 772)):
+            before = software()
+            error = h.call_error("change_prepare", {"kind": "block_number_set", "payload": in_unit(block("NbSame", namespace, number=value)), **p})
+            require(error.get("code") == "AttributeNotWritable" and error.get("message", "").startswith("items[0]: "),
+                    "Expected AttributeNotWritable naming items[0] for a unit block %s: %s" % (label, error))
+            require(software() == before, "A refused block_number_set batch changed the PLC software")
+            outcomes[label] = error.get("message")
+        return outcomes
+    h.report["unitBlockNumbers"] = h.stage("refuse block_number_set batch: a software unit's block, in the namespace and outside it", unit_numbers)
+
+    apply("namespace: rename one block name in two namespaces to one new name", "block_rename",
+          in_unit(block("NbSame", NS, newName="NbSame_R"), block("NbSame", "", newName="NbSame_R")), 2)
+    placement("renamed blocks", "blocks", {"NbA_R": [True], "NbB_R": [True], "NbSame_R": [False, True]})
+    apply("namespace: rename one type name in two namespaces", "type_rename",
+          in_unit(data_type("NySame", NS, newName="NySame_R"), data_type("NySame", "", newName="NySame_R"), data_type("NyA", NS, newName="NyA_R")), 3)
+    placement("renamed data types", "types", {"NyA_R": [True], "NySame_R": [False, True]})
 
     # A batch that fails after its first write. Preparation and the preflight pass; TIA itself refuses the second item's
     # name when it is written. Which names TIA refuses is its own rule, so candidates are tried until one fails natively;

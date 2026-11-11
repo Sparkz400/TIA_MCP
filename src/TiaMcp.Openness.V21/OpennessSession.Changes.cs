@@ -2094,6 +2094,8 @@ namespace TiaMcp.Openness.V21
             internal List<EngineeringChange> BatchMembers;
             // A batch item prepared again at apply, only for its checks: it writes no backup export.
             internal bool PreflightOnly;
+            // block_number_set: the block kind and number the change takes, which no other item of a batch may take.
+            internal string BlockNumberKey;
         }
     }
 }

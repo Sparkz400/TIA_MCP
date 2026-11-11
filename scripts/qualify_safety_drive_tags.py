@@ -1,6 +1,8 @@
 """Qualify #212 natively: safety_drive_tags creates a G120C PN's PROFIsafe telegram 30 S_ZSW1/S_STW1 safety tags on the owning F-CPU 1511F-1 PN
 at the addresses Startdrive reports, while generic tag routes keep refusing them. The telegram is inserted by the native fixture
-helper (drive_telegram_set refuses safety telegrams). Owned scratch only; never a user project, no download."""
+helper (drive_telegram_set refuses safety telegrams). With the two real safety tags in place, tag_set, tag_delete and
+tag_create batches (payload.items) that touch one of them or its address must refuse as a whole and change no tag.
+Owned scratch only; never a user project, no download."""
 import argparse
 import json
 from pathlib import Path
@@ -87,10 +89,18 @@ def main():
             error = (result.get('structuredContent') or {}).get('error') or {}
             assert result.get('isError') and error.get('code') == code, error
             return record('%s refused with %s' % (kind, code), error)
-        refused('tag_create', {'tagTableName': 'Default tag table', 'name': 'Generic_S_ZSW1', 'dataTypeName': 'Word', 'logicalAddress': '%%IW%d' % ranges['Input']}, 'SafetyBoundary')
+        # The default tag table's name follows the TIA installation language, so the run uses its own table.
+        table = 'SafeDriveTags'
+        change('tag_table_create', {'tagTableName': table}, plc=fplc)
+        refused('tag_create', {'tagTableName': table, 'name': 'Generic_S_ZSW1', 'dataTypeName': 'Word', 'logicalAddress': '%%IW%d' % ranges['Input']}, 'SafetyBoundary')
         tags = {'status': 'SafeDrive_S_ZSW1', 'control': 'SafeDrive_S_STW1'}
-        payload = {'hardwarePath': drive_path, **handle, 'tagTableName': 'Default tag table', 'tags': tags}
+        payload = {'hardwarePath': drive_path, **handle, 'tagTableName': table, 'tags': tags}
         refused('safety_drive_tags', payload, 'InvalidRequest')
+        # Two standard tags for the batch refusals below, created first: the closing change_restore needs
+        # safety_drive_tags to be the project's last change.
+        standard = lambda name, bit: {'tagTableName': table, 'name': name, 'dataTypeName': 'Bool', 'logicalAddress': '%%M10.%d' % bit}
+        batch = change('tag_create', {'items': [standard('StdA', 0), standard('StdB', 1)]}, plc=fplc)
+        record('a tag_create batch of two standard tags applied on the F-CPU', {'stages': batch['stages']})
         applied = change('safety_drive_tags', {**payload, 'safetyAcknowledged': True}, plc=fplc)
         plan = applied['preview']['safetyDriveTags']
         record('safety_drive_tags applied', {'plan': plan, 'stages': applied['stages'], 'compilerSucceeded': applied['compile']['compilerSucceeded'],
@@ -98,10 +108,37 @@ def main():
         assert 'safety_drive_tags_verified' in applied['stages'] and 'changed_project_saved' in applied['stages'], applied['stages']
         status = record('change_status confirms the applied change', client.tool('change_status', {'changeId': applied['changeId']}))
         assert status['state'] == 'applied' and status['stages'] == applied['stages'], status['state']
-        rows = {t['name']: t for table in client.tool('software_inspect', {'plcPath': fplc, 'maxItems': 2000})['tagTables'] for t in table['tags']}
-        got = {n: (rows[n]['logicalAddress'], rows[n]['dataType'], rows[n]['isSafety']) for n in tags.values()}
+        def tag_rows():
+            return {t['name']: (t['logicalAddress'], t['dataType'], t['isSafety'])
+                    for row in client.tool('software_inspect', {'plcPath': fplc, 'maxItems': 2000})['tagTables'] for t in row['tags']}
+        rows = tag_rows()
+        got = {n: rows[n] for n in tags.values()}
         record('safety tags read back', got)
         assert got == {tags['status']: ('%%IW%d' % ranges['Input'], 'Word', True), tags['control']: ('%%QW%d' % ranges['Output'], 'Word', True)}, got
+
+        # payload.items beside real safety tags: one item on a safety tag, or on its address, refuses the whole batch.
+        before = tag_rows()
+        record('standard and safety tags before the refused batches', before)
+        assert before['StdA'] == ('%M10.0', 'Bool', False) and before['StdB'] == ('%M10.1', 'Bool', False) and all(before[n][2] for n in tags.values()), before
+        edit = lambda member, **attributes: {'tagTableName': table, 'memberName': member, 'attributes': attributes}
+        drop = lambda member: {'tagTableName': table, 'memberName': member, 'dependencyPolicy': 'rejectReferenced'}
+        # On this F-CPU a tag_delete item of a standard tag is refused before a later item is reached: its dependency scan
+        # cannot export the safety program's blocks (DependencyCoverageIncomplete). The safety tag is therefore the first
+        # item of the tag_delete batch, and the other order is recorded with the refusal it gets.
+        batches = [
+            ('tag_set', 'renames a safety tag', [edit('StdA', Name='StdA_R'), edit(tags['status'], Name='Renamed_S_ZSW1')], 1, 'SafetyBoundary'),
+            ('tag_set', 'moves a standard tag onto the safety telegram', [edit('StdA', Name='StdA_R'), edit('StdB', LogicalAddress='%%I%d.0' % ranges['Input'])], 1, 'SafetyBoundary'),
+            ('tag_delete', 'deletes a safety tag', [drop(tags['control']), drop('StdB')], 0, 'SafetyBoundary'),
+            ('tag_delete', 'deletes a standard tag on the F-CPU', [drop('StdB'), drop(tags['control'])], 0, 'DependencyCoverageIncomplete'),
+            ('tag_create', 'creates a tag on the safety telegram', [standard('StdC', 2), {'tagTableName': table, 'name': 'Generic_S_STW1', 'dataTypeName': 'Word', 'logicalAddress': '%%QW%d' % ranges['Output']}], 1, 'SafetyBoundary'),
+        ]
+        for kind, label, items, index, code in batches:
+            result = client.request('tools/call', {'name': 'change_prepare', 'arguments': {'kind': kind, 'plcPath': fplc, 'payload': {'items': items}}})
+            error = (result.get('structuredContent') or {}).get('error') or {}
+            record('%s batch whose item %d %s refused with %s' % (kind, index, label, code), error)
+            assert result.get('isError') and error.get('code') == code and error.get('message', '').startswith('items[%d]' % index), error
+            assert tag_rows() == before, 'A refused batch changed a tag'
+        record('every tag is unchanged after the refused batches', before)
         refused('safety_drive_tags', {**payload, 'safetyAcknowledged': True}, 'ObjectExists')
         restored = client.tool('change_restore', {'changeId': applied['changeId'], 'previewHash': applied['previewHash']})
         record('restore from the checkpoint', {'state': restored['state'], 'recoveredProject': restored.get('recoveredProject')})
