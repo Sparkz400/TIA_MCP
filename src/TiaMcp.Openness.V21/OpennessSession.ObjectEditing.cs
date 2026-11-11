@@ -359,6 +359,7 @@ namespace TiaMcp.Openness.V21
             if (AllBlocks(plc, budget).Any(item => item.Path != block.Path && item.Item.Number == number && BlockNumberKind(item.Item) == kind))
                 throw new BridgeException("BlockNumberCollision", "Another " + kind + " block already uses number " + number + ".");
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Block-number collision check is incomplete.");
+            change.BlockNumberKey = "blockNumber\n" + kind + "\n" + number;
             allow = BlockNumberAttributes;
             // Ordered: the explicit Number applies only once auto-numbering is off.
             return new JObject { ["AutoNumber"] = false, ["Number"] = number };
