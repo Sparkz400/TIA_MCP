@@ -1068,4 +1068,12 @@ exceptions in `causes`. The walk is not
 repeated: every hardware and channel reference of that read is unresolved with
 reason `hardwareMembershipUnavailable`, while values that need no hardware
 path, such as addresses, are still read.
+
+Two sibling hardware items with one name, for example both bus adapters of a
+PN/PN coupler, do not fail the walk. Their path names more than one item, so a
+reference to either of them, or to anything below them, is unresolved with reason
+`hardwarePathAmbiguous`; every other hardware reference of the project resolves as
+usual. The status is then `completeWithRepeatedPaths` instead of `complete`, and
+`hardwareRepeatedPaths` counts the affected paths. Compile targets keep the strict
+rule: a repeated hardware path is refused there with `AmbiguousTarget`.
 [Executed checks and native gates](../verification/technology-references-20261017.md).

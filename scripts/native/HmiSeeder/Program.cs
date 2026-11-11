@@ -63,6 +63,8 @@ internal static partial class Program
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int Run(string[] args)
     {
+        if (args.Length == 4 && args[0] == "compile-experiment") return CompileExperiment(args[1], args[2], args[3]);
+        if ((args.Length == 2 || args.Length == 3) && args[0] == "startscreen-probe") return StartScreenProbe(args[1], args.Length == 3 ? args[2] : "WinCC RT Advanced");
         if (args.Length == 3 && args[0] == "visual") return Visual(args[1], args[2]);
         if (args.Length == 2 && args[0] == "repair-ui") return RepairUi(args[1]);
         if (args.Length == 2 && args[0] == "verify-configured") return VerifyConfigured(args[1]);
