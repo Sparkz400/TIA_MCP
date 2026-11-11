@@ -57,6 +57,28 @@ namespace TiaMcp.Openness.V21
 
         private void ApplyChangeBatch(EngineeringChange change, Project project)
         {
+            // Group preflight: every item is prepared once more, with all of its kind's checks and without backup exports,
+            // against the project as it is now, before the first item is written. The stale-revision fingerprint was just
+            // checked, but it does not cover everything a kind's own checks read (a tag's safety flag, a dependency scan).
+            var probes = new List<EngineeringChange>();
+            for (int index = 0; index < change.BatchMembers.Count; index++)
+            {
+                var member = change.BatchMembers[index];
+                var probe = new EngineeringChange
+                {
+                    Id = member.Id, Kind = member.Kind, Payload = (JObject)change.Payload["items"][index].DeepClone(), Directory = member.Directory,
+                    ProjectPath = member.ProjectPath, ProjectName = member.ProjectName, Selector = (JObject)change.Selector.DeepClone(),
+                    State = "preparing", PreparedProcessId = member.PreparedProcessId, PreflightOnly = true
+                };
+                if (probe.Payload["scopePath"] == null) probe.Payload["scopePath"] = change.ScopePath;
+                try { PrepareEngineeringMutation(probe, project); }
+                catch (BridgeException error) { throw BatchItemFailure(error, index, "The preflight of all items refused the change before any item was written."); }
+                if (probe.ScopePath != change.ScopePath)
+                    throw new BridgeException("PreviewStale", "items[" + index + "] resolves to another software scope than at preparation. No item was written.");
+                probes.Add(probe);
+            }
+            ChangeBatchRules.RequireDistinct(probes.Select(m => (BatchTarget(m), BatchProduced(m))));
+            change.Stages.Add("batch_items_preflighted");
             for (int index = 0; index < change.BatchMembers.Count; index++)
             {
                 try { ApplyEngineeringMutation(change.BatchMembers[index], project); }

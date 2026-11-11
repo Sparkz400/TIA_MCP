@@ -20,9 +20,12 @@ namespace TiaMcp.Openness.V21
             var table = TagTableLifecycleCheck(change, plc);
             if (table != null)
             {
-                string path = Path.Combine(change.Directory, "before-tags.xml");
-                table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-                change.Backups.Add(new JObject { ["tableName"] = table.Name, ["artifact"] = ChangeArtifact(path) });
+                if (!change.PreflightOnly)
+                {
+                    string path = Path.Combine(change.Directory, "before-tags.xml");
+                    table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                    change.Backups.Add(new JObject { ["tableName"] = table.Name, ["artifact"] = ChangeArtifact(path) });
+                }
             }
             ((JArray)preview["effects"]).Add(new JObject { ["action"] = change.Kind, ["scopePath"] = change.ScopePath, ["groupPath"] = change.GroupPath,
                 ["tagTableName"] = change.ObjectNames[0], ["newName"] = change.Payload["newName"]?.DeepClone() });
