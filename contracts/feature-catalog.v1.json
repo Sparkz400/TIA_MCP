@@ -9455,7 +9455,8 @@
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified. compile=false is refused before the checkpoint (local.plc_object_mutations.audit.20261102).",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "Software unit with a namespace: payload.items batches that select each block with namespace beside the name were qualified natively on FCs of one unit holding one name in a namespace and in none (local.change-batch.items-2.20261111); single changes in a namespace, other block kinds and safety or know-how protected objects are not qualified."
         ]
       },
       "qualification": {
@@ -9565,7 +9566,8 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Qualified attributes: HeaderAuthor and HeaderFamily on an FB; HeaderName, HeaderVersion and the OB attributes are not written by that run.",
           "One standard, unprotected, non-generated block; allowlist HeaderAuthor, HeaderFamily, HeaderName, HeaderVersion, plus PriorityNumber, CyclicTime, PhaseOffset and ProcessImagePartNumber for OBs only. Each attribute must also be declared readable and writable by the native attribute infos; ProcessImagePartNumber is documented read-only on export and is rejected unless the native target reports write access.",
-          "Scalar-write guards require unique access metadata, known scalar types, complete batch preflight and exact typed readback. Earlier setters can already have taken effect when a later one fails; recovery uses the checkpoint."
+          "Scalar-write guards require unique access metadata, known scalar types, complete batch preflight and exact typed readback. Earlier setters can already have taken effect when a later one fails; recovery uses the checkpoint.",
+          "Software unit with a namespace: payload.items batches that select each block with namespace beside the name were qualified natively on FCs (HeaderAuthor) of one unit holding one name in a namespace and in none (local.change-batch.items-2.20261111); single changes in a namespace, other block kinds and safety or know-how protected objects are not qualified."
         ]
       },
       "qualification": {
@@ -11957,7 +11959,8 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Same scope and namespace, explicit collision checks, native dependency validation and mandatory compilation.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "Software unit with a namespace: payload.items batches that select each data type with namespace beside the name were qualified natively on struct types of one unit holding one name in a namespace and in none (local.change-batch.items-2.20261111); single changes in a namespace, other type kinds and safety or know-how protected objects are not qualified."
         ]
       },
       "qualification": {
@@ -12185,7 +12188,7 @@
           "dependencyPolicy=rejectReferenced is mandatory; conservative scan rejects references and incomplete evidence. Safety/system members remain excluded.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "On an F-CPU with a safety program, a tag_delete batch item naming a standard tag was refused with DependencyCoverageIncomplete, because the dependency scan could not export the safety block FOB_RTG1 (local.safety.tag-batch.20261111); deleting a standard tag there is therefore not available through this kind."
+          "Observed on an F-CPU with a safety program: a tag_delete batch item naming a standard tag (dependencyPolicy rejectReferenced) was refused with DependencyCoverageIncomplete, because the dependency scan could not export the safety block FOB_RTG1 (local.safety.tag-batch.20261111). Whether this is intended is open (docs/TODO.md)."
         ]
       },
       "qualification": {
