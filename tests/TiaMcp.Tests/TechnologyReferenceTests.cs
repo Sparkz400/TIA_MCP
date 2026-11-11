@@ -71,9 +71,30 @@ namespace TiaMcp.Tests
                 if (defect == "cycle") item.DeviceItems = [item];
                 if (defect == "sameName") device.DeviceItems = [item, new DeviceItem { Name = item.Name }];
                 var value = OpennessSession.ReferenceForTest(project, item, out bool complete, out var coverage);
-                Check.Equal(false, complete); Check.Equal("readError", coverage.Value<string>("hardwareMembershipStatus"));
-                Check.Equal(false, value.Value<bool>("identityComplete"));
+                Check.Equal(false, complete); Check.Equal("completeWithRepeatedPaths", coverage.Value<string>("hardwareMembershipStatus"));
+                Check.Equal(false, value.Value<bool>("identityComplete")); Check.Equal("hardwarePathAmbiguous", (string?)value["reason"]);
+                Check.Equal(JTokenType.Null, coverage["hardwareMembershipError"]!.Type);
             }
+            // Two same-named siblings elsewhere (both bus adapters of a PN/PN coupler) leave an unrelated module resolvable.
+            var module = new DeviceItem { Name = "Drive" }; var adapter = new DeviceItem { Name = "BA 2xRJ45" }; var twin = new DeviceItem { Name = adapter.Name };
+            var port = new DeviceItem { Name = "Port_1", Container = adapter }; var twinPort = new DeviceItem { Name = "Port_2", Container = twin };
+            var mixed = ProjectFor((module, "module"), (adapter, "adapter"), (twin, "twin"), (port, "port"), (twinPort, "twinPort"));
+            var resolved = OpennessSession.ReferenceForTest(mixed, module, out bool resolvedComplete, out var mixedCoverage);
+            Check.Equal(true, resolvedComplete); Check.Equal("/projects/" + Uri.EscapeDataString(mixed.Name ?? "") + "/devices/Station/items/Drive", (string?)resolved["hardwarePath"]);
+            Check.Equal("completeWithRepeatedPaths", mixedCoverage.Value<string>("hardwareMembershipStatus"));
+            Check.Equal(1, mixedCoverage.Value<int>("hardwareRepeatedPaths")); Check.Equal(5, mixedCoverage.Value<int>("hardwareItemsVisited"));
+            // Each twin is ambiguous, and so is everything below one: its path does not lead to one item from the root,
+            // although the children's own names differ.
+            foreach (var unresolvable in new[] { adapter, twin, port, twinPort })
+            {
+                var ambiguous = OpennessSession.ReferenceForTest(mixed, unresolvable, out bool ambiguousComplete, out _);
+                Check.Equal(false, ambiguousComplete); Check.Equal("hardwarePathAmbiguous", (string?)ambiguous["reason"]);
+                Check.Equal(JTokenType.Null, (ambiguous["hardwarePath"] ?? JValue.CreateNull()).Type);
+            }
+            // Without repeated paths the status stays complete.
+            mixed.Devices.Single().DeviceItems = [module, adapter];
+            OpennessSession.ReferenceForTest(mixed, port, out bool plainComplete, out var plainCoverage);
+            Check.Equal(true, plainComplete); Check.Equal("complete", plainCoverage.Value<string>("hardwareMembershipStatus")); Check.Equal(0, plainCoverage.Value<int>("hardwareRepeatedPaths"));
             return Task.CompletedTask;
         }
 
@@ -95,11 +116,12 @@ namespace TiaMcp.Tests
             Check.Equal(typeof(TimeoutException).FullName, error["causes"]!.Single().Value<string>("type")); Check.Equal("portal busy", error["causes"]![0]!.Value<string>("message"));
             // The exception text stays in the coverage; reference values carry the reason code only.
             Check.Equal(false, values.ToString().Contains("xxx") || values.ToString().Contains("portal busy"));
-            // A typed refusal of the walk keeps its code.
-            var item = new DeviceItem(); project = ProjectFor((item, "id")); project.Devices.Single().DeviceItems = [item, item];
+            // A typed refusal of the walk keeps its code: an item without a name has no path at all.
+            var item = new DeviceItem(); project = ProjectFor((item, "id")); project.Devices.Single().DeviceItems = [item, new DeviceItem { Name = " " }];
             OpennessSession.ReferenceForTest(project, item, out complete, out coverage);
-            Check.Equal("AmbiguousTarget", coverage["hardwareMembershipError"]!.Value<string>("code"));
-            Check.Equal(true, coverage["hardwareMembershipError"]!.Value<string>("message")!.StartsWith("Compiler hardware identity is repeated", StringComparison.Ordinal));
+            Check.Equal(false, complete); Check.Equal("readError", coverage.Value<string>("hardwareMembershipStatus"));
+            Check.Equal("TargetIdentityUnavailable", coverage["hardwareMembershipError"]!.Value<string>("code"));
+            Check.Equal(true, coverage["hardwareMembershipError"]!.Value<string>("message")!.StartsWith("Compiler hardware name is missing", StringComparison.Ordinal));
             // A complete walk reports no error.
             project = ProjectFor((item, "id")); item.DeviceItems = [];
             OpennessSession.ReferenceForTest(project, item, out complete, out coverage);
