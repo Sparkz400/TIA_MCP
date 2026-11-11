@@ -23,6 +23,10 @@
     <Compile Include="../TiaMcp.Openness.V21/BridgeException.cs" Link="Shared/BridgeException.cs" />
     <!-- Canonical object paths: a V19 path names the same object as the V21 path after an upgrade. -->
     <Compile Include="../TiaMcp.Openness.V21/ObjectIdentity.cs" Link="Shared/ObjectIdentity.cs" />
+    <!-- The request loop, project selection and bounded traversal: one implementation for both workers. -->
+    <Compile Include="../TiaMcp.Openness.V21/WorkerLoop.cs" Link="Shared/WorkerLoop.cs" />
+    <Compile Include="../TiaMcp.Openness.V21/OpennessTraversal.cs" Link="Shared/OpennessTraversal.cs" />
+    <Compile Include="../TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs" Link="Shared/ScanBudget.cs" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <Reference Include="Siemens.Engineering">
       <HintPath>$(TiaApiDirectory)\Siemens.Engineering.dll</HintPath>

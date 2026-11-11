@@ -535,7 +535,7 @@ A `detail` code may change in a minor release; branch on it only together with i
 | `PermissionDenied` | detail | TiaMcp.Core |
 | `PhysicalPlcRefused` | stable | TiaMcp.Openness.V21 |
 | `PlcMismatch` | detail | TiaMcp.Core |
-| `PlcNotFound` | detail | TiaMcp.Openness.V19, TiaMcp.Openness.V21 |
+| `PlcNotFound` | detail | TiaMcp.Openness.V21 |
 | `PlcOnlineCompareFailed` | detail | TiaMcp.Openness.V21 |
 | `PlcsimCaptureInvalid` | detail | TiaMcp.Core |
 | `PlcsimEndpointUnreachable` | stable | TiaMcp.Core |
@@ -572,7 +572,7 @@ A `detail` code may change in a minor release; branch on it only together with i
 | `ProtectedObject` | stable | TiaMcp.Openness.V19, TiaMcp.Openness.V21 |
 | `ProtectionDowngradeRefused` | detail | TiaMcp.Openness.V21 |
 | `ProtocolMismatch` | stable | TiaMcp.Core |
-| `ProtocolVersionMismatch` | detail | TiaMcp.Openness.V19, TiaMcp.Openness.V21 |
+| `ProtocolVersionMismatch` | detail | TiaMcp.Openness.V21 |
 | `QualificationResponseLost` | detail | TiaMcp.Openness.V21 |
 | `QueueTimeout` | stable | TiaMcp.Core |
 | `ReadOnlyOpenUnverified` | stable | TiaMcp.Openness.V19, TiaMcp.Openness.V21 |
@@ -599,7 +599,7 @@ A `detail` code may change in a minor release; branch on it only together with i
 | `ReportSize` | detail | TiaMcp.Graph |
 | `RequestTooLarge` | detail | TiaMcp.Core |
 | `ResourceBusy` | stable | TiaMcp.Core, TiaMcp.Openness.V21 |
-| `ResponseTooLarge` | detail | TiaMcp.Core, TiaMcp.Openness.V19, TiaMcp.Openness.V21, TiaMcp.Simulator.V8 |
+| `ResponseTooLarge` | detail | TiaMcp.Core, TiaMcp.Openness.V21, TiaMcp.Simulator.V8 |
 | `ReviewMismatch` | detail | TiaMcp.Core |
 | `ReviewOverlap` | detail | TiaMcp.Openness.V21 |
 | `RevisionConflict` | detail | TiaMcp.Core |

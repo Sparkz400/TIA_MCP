@@ -496,73 +496,6 @@ namespace TiaMcp.Openness.V21
                 foreach (var block in ScopeBlocks(scope, budget)) yield return block;
         }
 
-        private static IEnumerable<BlockEntry> ScopeBlocks(SoftwareScope scope, ScanBudget budget)
-        {
-            foreach (var block in Blocks(scope.Blocks, scope.Path + "/blocks", budget)) yield return block;
-            var system = scope.Blocks as PlcBlockSystemGroup;
-            if (system != null)
-                foreach (var group in system.SystemBlockGroups)
-                    foreach (var block in SystemBlocks(group, scope.Path + "/blocks/systemGroups/" + Segment(group.Name), budget, 0)) yield return block;
-        }
-
-        private static IEnumerable<BlockEntry> SystemBlocks(PlcSystemBlockGroup group, string path, ScanBudget budget, int depth)
-        {
-            if (depth > 64 || !budget.Take()) { budget.Truncated = true; yield break; }
-            foreach (var block in group.Blocks)
-            {
-                if (!budget.Take()) yield break;
-                yield return new BlockEntry { Item = block, Path = BlockObjectPath(path, block), NativeSystemGroup = true };
-            }
-            foreach (var child in group.Groups)
-                foreach (var block in SystemBlocks(child, path + "/groups/" + Segment(child.Name), budget, depth + 1)) yield return block;
-        }
-
-        private static IEnumerable<TypeEntry> ScopeTypes(SoftwareScope scope, ScanBudget budget)
-        {
-            foreach (var entry in Types(scope.Types, scope.Path + "/types", budget, 0)) yield return entry;
-            var system = scope.Types as PlcTypeSystemGroup;
-            if (system != null)
-                foreach (var group in system.SystemTypeGroups)
-                {
-                    if (!budget.Take()) yield break;
-                    foreach (var type in group.Types)
-                    {
-                        if (!budget.Take()) yield break;
-                        yield return new TypeEntry { Item = type, Path = ObjectIdentity.ObjectPath(scope.Path + "/types/systemGroups/" + Segment(group.Name), type.Name, type.Namespace) };
-                    }
-                }
-        }
-
-        private static IEnumerable<TypeEntry> Types(PlcTypeGroup group, string path, ScanBudget budget, int depth)
-        {
-            if (depth > 64) { budget.Truncated = true; yield break; }
-            foreach (var type in group.Types)
-            {
-                if (!budget.Take()) yield break;
-                yield return new TypeEntry { Item = type, Path = ObjectIdentity.ObjectPath(path, type.Name, type.Namespace) };
-            }
-            foreach (var child in group.Groups)
-            {
-                if (!budget.Take()) yield break;
-                foreach (var type in Types(child, path + "/groups/" + Segment(child.Name), budget, depth + 1)) yield return type;
-            }
-        }
-
-        private static IEnumerable<TagTableEntry> TagTables(PlcTagTableGroup group, string path, ScanBudget budget, int depth = 0)
-        {
-            if (depth > 64) { budget.Truncated = true; yield break; }
-            foreach (var table in group.TagTables)
-            {
-                if (!budget.Take()) yield break;
-                yield return new TagTableEntry { Item = table, Path = path + "/" + Segment(table.Name) };
-            }
-            foreach (var child in group.Groups)
-            {
-                if (!budget.Take()) yield break;
-                foreach (var table in TagTables(child, path + "/groups/" + Segment(child.Name), budget, depth + 1)) yield return table;
-            }
-        }
-
         private static JObject TechnologyInfo(TechnologyEntry entry) => new JObject { ["path"] = entry.Path,
             ["ownerPath"] = entry.OwnerPath, ["composition"] = entry.Composition,
             ["name"] = entry.Item.Name, ["systemLibraryType"] = entry.Item.OfSystemLibElement,
@@ -661,8 +594,5 @@ namespace TiaMcp.Openness.V21
             ["valuesAreSparse"] = true, ["dimensions"] = new JArray(array.Dimensions.Select(dimension => new JObject {
                 ["declaration"] = dimension.Declaration, ["lower"] = dimension.Lower, ["upper"] = dimension.Upper })) };
 
-        private sealed class SoftwareScope { internal string Path, Name, Kind; internal PlcUnitBase Unit; internal PlcBlockGroup Blocks; internal PlcTagTableGroup Tags; internal PlcTypeGroup Types; }
-        private sealed class TypeEntry { internal PlcType Item; internal string Path; }
-        private sealed class TagTableEntry { internal PlcTagTable Item; internal string Path; }
     }
 }

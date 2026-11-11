@@ -25,7 +25,7 @@ namespace TiaMcp.Openness.V19
     /// Host's artifact directory. Object paths use the V21 worker's canonical scheme, so a V19 path and the path of the
     /// same object after project_upgrade into V21 are equal strings.
     /// </summary>
-    internal sealed class V19Session : IDisposable
+    internal sealed class V19Session : OpennessTraversal, IDisposable
     {
         internal const string Origin = "TIA Portal V19 Openness/offline";
         // Exactly the operations this adapter implements. bridge_info reports them; anything else is refused unexecuted.
@@ -274,7 +274,7 @@ namespace TiaMcp.Openness.V19
             var types = new JArray();
             foreach (var scope in scopes)
             {
-                units.Add(new JObject { ["path"] = scope.Path, ["name"] = scope.Name, ["kind"] = scope.Kind, ["namespacePreset"] = scope.NamespacePreset,
+                units.Add(new JObject { ["path"] = scope.Path, ["name"] = scope.Name, ["kind"] = scope.Kind, ["namespacePreset"] = scope.Unit?.NamespacePreset,
                     ["identity"] = IdentityInfo(plc.Project, plc.Path, scope.Path, scope.Path, scope.Kind, scope.Name) });
                 foreach (var block in ScopeBlocks(scope, budget))
                 {
@@ -418,32 +418,10 @@ namespace TiaMcp.Openness.V19
         private Project SelectProject(JObject args)
         {
             EnsureAttached();
-            string name = args.Value<string>("projectName");
-            var matches = _portal.Projects.Where(p => string.IsNullOrWhiteSpace(name) || string.Equals(p.Name, name, StringComparison.Ordinal)).Take(2).ToList();
-            if (matches.Count == 0) throw new BridgeException("ProjectNotFound", "No matching open project was found.");
-            if (matches.Count != 1) throw new BridgeException("AmbiguousTarget", "More than one open project matches; specify projectName.");
-            return matches[0];
+            return SelectProject(_portal, args);
         }
 
-        private PlcSelection SelectPlc(JObject args)
-        {
-            var project = SelectProject(args);
-            string wanted = args.Value<string>("plcPath");
-            var budget = new ScanBudget(50000);
-            var matches = new List<PlcSelection>();
-            foreach (var entry in DeviceItems(project, budget))
-            {
-                var software = entry.Item.GetService<SoftwareContainer>()?.Software as PlcSoftware;
-                if (software == null) continue;
-                string path = entry.Path + "/plc/" + Segment(software.Name);
-                if (string.IsNullOrWhiteSpace(wanted) || string.Equals(path, wanted, StringComparison.Ordinal))
-                    matches.Add(new PlcSelection { Project = project, Software = software, Path = path });
-            }
-            if (budget.Truncated) throw new BridgeException("TraversalLimit", "PLC lookup reached its traversal limit; completeness cannot be established.");
-            if (matches.Count == 0) throw new BridgeException("PlcNotFound", "No matching PLC software was found.");
-            if (matches.Count != 1) throw new BridgeException("AmbiguousTarget", "More than one PLC matches; specify an exact plcPath from project_inventory.");
-            return matches[0];
-        }
+        private PlcSelection SelectPlc(JObject args) => SelectPlc(SelectProject(args), args);
 
         private PlcSelection SelectInspectionPlc(JObject args, string pathKey)
         {
@@ -451,47 +429,6 @@ namespace TiaMcp.Openness.V19
             string path = args.Value<string>(pathKey) ?? args.Value<string>("scopePath");
             if (string.IsNullOrWhiteSpace(args.Value<string>("plcPath")) && !string.IsNullOrWhiteSpace(path)) effective["plcPath"] = ObjectIdentity.PlcPath(path);
             return SelectPlc(effective);
-        }
-
-        private static IEnumerable<HardwareEntry> DeviceItems(Project project, ScanBudget budget)
-        {
-            string root = "/projects/" + Segment(project.Name);
-            foreach (var entry in Devices(project.Devices, root + "/devices", budget)) yield return entry;
-            foreach (var entry in Devices(project.UngroupedDevicesGroup.Devices, root + "/ungrouped", budget)) yield return entry;
-            foreach (var entry in DeviceGroups(project.DeviceGroups, root + "/groups", budget, 0)) yield return entry;
-        }
-
-        private static IEnumerable<HardwareEntry> DeviceGroups(IEnumerable<DeviceUserGroup> groups, string root, ScanBudget budget, int depth)
-        {
-            if (depth > 64) { budget.Truncated = true; yield break; }
-            foreach (var group in groups)
-            {
-                if (!budget.Take()) yield break;
-                string path = root + "/" + Segment(group.Name);
-                foreach (var entry in Devices(group.Devices, path + "/devices", budget)) yield return entry;
-                foreach (var entry in DeviceGroups(group.Groups, path + "/groups", budget, depth + 1)) yield return entry;
-            }
-        }
-
-        private static IEnumerable<HardwareEntry> Devices(IEnumerable<Device> devices, string root, ScanBudget budget)
-        {
-            foreach (var device in devices)
-            {
-                if (!budget.Take()) yield break;
-                foreach (var entry in Items(device.DeviceItems, root + "/" + Segment(device.Name), budget, 0)) yield return entry;
-            }
-        }
-
-        private static IEnumerable<HardwareEntry> Items(IEnumerable<DeviceItem> items, string root, ScanBudget budget, int depth)
-        {
-            if (depth > 64) { budget.Truncated = true; yield break; }
-            foreach (var item in items)
-            {
-                if (!budget.Take()) yield break;
-                string path = root + "/items/" + Segment(item.Name);
-                yield return new HardwareEntry { Item = item, Path = path };
-                foreach (var entry in Items(item.DeviceItems, path, budget, depth + 1)) yield return entry;
-            }
         }
 
         // Software and safety units, as in V21; a unit traversal failure is a warning on inventory, an error on lookup.
@@ -523,94 +460,9 @@ namespace TiaMcp.Openness.V19
         }
 
         private static SoftwareScope UnitScope(PlcUnitBase unit, string path, string kind) => new SoftwareScope
-        { Name = unit.Name, Kind = kind, Path = path, NamespacePreset = unit.NamespacePreset, Blocks = unit.BlockGroup, Tags = unit.TagTableGroup, Types = unit.TypeGroup };
-
-        private static IEnumerable<BlockEntry> ScopeBlocks(SoftwareScope scope, ScanBudget budget)
-        {
-            foreach (var block in Blocks(scope.Blocks, scope.Path + "/blocks", budget, 0)) yield return block;
-            if (scope.Blocks is PlcBlockSystemGroup system)
-                foreach (var group in system.SystemBlockGroups)
-                    foreach (var block in SystemBlocks(group, scope.Path + "/blocks/systemGroups/" + Segment(group.Name), budget, 0)) yield return block;
-        }
-
-        private static IEnumerable<BlockEntry> Blocks(PlcBlockGroup group, string root, ScanBudget budget, int depth)
-        {
-            if (depth > 64) { budget.Truncated = true; yield break; }
-            foreach (var block in group.Blocks)
-            {
-                if (!budget.Take()) yield break;
-                yield return new BlockEntry { Item = block, Path = ObjectIdentity.ObjectPath(root, block.Name, block.Namespace) };
-            }
-            foreach (var child in group.Groups)
-            {
-                if (!budget.Take()) yield break;
-                foreach (var block in Blocks(child, root + "/groups/" + Segment(child.Name), budget, depth + 1)) yield return block;
-            }
-        }
-
-        private static IEnumerable<BlockEntry> SystemBlocks(PlcSystemBlockGroup group, string path, ScanBudget budget, int depth)
-        {
-            if (depth > 64 || !budget.Take()) { budget.Truncated = true; yield break; }
-            foreach (var block in group.Blocks)
-            {
-                if (!budget.Take()) yield break;
-                yield return new BlockEntry { Item = block, Path = ObjectIdentity.ObjectPath(path, block.Name, block.Namespace) };
-            }
-            foreach (var child in group.Groups)
-                foreach (var block in SystemBlocks(child, path + "/groups/" + Segment(child.Name), budget, depth + 1)) yield return block;
-        }
-
-        private static IEnumerable<TypeEntry> ScopeTypes(SoftwareScope scope, ScanBudget budget)
-        {
-            foreach (var entry in Types(scope.Types, scope.Path + "/types", budget, 0)) yield return entry;
-            if (scope.Types is PlcTypeSystemGroup system)
-                foreach (var group in system.SystemTypeGroups)
-                {
-                    if (!budget.Take()) yield break;
-                    foreach (var type in group.Types)
-                    {
-                        if (!budget.Take()) yield break;
-                        yield return new TypeEntry { Item = type, Path = ObjectIdentity.ObjectPath(scope.Path + "/types/systemGroups/" + Segment(group.Name), type.Name, type.Namespace) };
-                    }
-                }
-        }
-
-        private static IEnumerable<TypeEntry> Types(PlcTypeGroup group, string path, ScanBudget budget, int depth)
-        {
-            if (depth > 64) { budget.Truncated = true; yield break; }
-            foreach (var type in group.Types)
-            {
-                if (!budget.Take()) yield break;
-                yield return new TypeEntry { Item = type, Path = ObjectIdentity.ObjectPath(path, type.Name, type.Namespace) };
-            }
-            foreach (var child in group.Groups)
-            {
-                if (!budget.Take()) yield break;
-                foreach (var type in Types(child, path + "/groups/" + Segment(child.Name), budget, depth + 1)) yield return type;
-            }
-        }
-
-        private static IEnumerable<TagTableEntry> TagTables(PlcTagTableGroup group, string path, ScanBudget budget, int depth = 0)
-        {
-            if (depth > 64) { budget.Truncated = true; yield break; }
-            foreach (var table in group.TagTables)
-            {
-                if (!budget.Take()) yield break;
-                yield return new TagTableEntry { Item = table, Path = path + "/" + Segment(table.Name) };
-            }
-            foreach (var child in group.Groups)
-            {
-                if (!budget.Take()) yield break;
-                foreach (var table in TagTables(child, path + "/groups/" + Segment(child.Name), budget, depth + 1)) yield return table;
-            }
-        }
+        { Name = unit.Name, Kind = kind, Path = path, Unit = unit, Blocks = unit.BlockGroup, Tags = unit.TagTableGroup, Types = unit.TypeGroup };
 
         // --- small helpers (same wording and limits as the V21 worker) ---
-
-        private static JObject BlockInfo(BlockEntry block, string plcPath) => new JObject { ["path"] = block.Path, ["plcPath"] = plcPath,
-            ["name"] = block.Item.Name, ["number"] = block.Item.Number, ["kind"] = block.Item.GetType().Name,
-            ["programmingLanguage"] = block.Item.ProgrammingLanguage.ToString(), ["isConsistent"] = block.Item.IsConsistent,
-            ["isKnowHowProtected"] = block.Item.IsKnowHowProtected };
 
         private static JObject IdentityInfo(Project project, string plcPath, string scopePath, string objectPath, string kind, string name) => new JObject
             { ["projectPath"] = project.Path?.FullName, ["plcPath"] = plcPath, ["scopePath"] = scopePath, ["objectPath"] = objectPath, ["kind"] = kind, ["name"] = name,
@@ -618,7 +470,6 @@ namespace TiaMcp.Openness.V19
 
         private static JObject ProjectInfo(Project project) => new JObject { ["name"] = project.Name, ["path"] = project.Path?.FullName, ["tiaVersion"] = Program.TiaMajor };
         private JObject Envelope() => new JObject { ["origin"] = Origin, ["observedAtUtc"] = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture), ["processId"] = _processId };
-        private static string Segment(string value) => Uri.EscapeDataString(value ?? "");
         private void EnsureAttached() { if (_portal == null) throw new BridgeException("NotAttached", "Attach to or explicitly start a TIA V19 instance first."); }
         private void EnsureDetached() { if (_portal != null) throw new BridgeException("AlreadyAttached", "Detach the current session before attaching to or starting another instance."); }
 
@@ -632,21 +483,6 @@ namespace TiaMcp.Openness.V19
             if (count != 1) throw new BridgeException("AmbiguousTarget", "More than one " + kind + " matches; specify its exact path.");
         }
 
-        private static int RequiredInteger(JObject args, string name)
-        {
-            if (args[name]?.Type != JTokenType.Integer || args.Value<long>(name) < 1 || args.Value<long>(name) > int.MaxValue)
-                throw new BridgeException("InvalidRequest", name + " must be a positive integer.");
-            return args.Value<int>(name);
-        }
-
-        private static int Limit(JObject args, int defaultValue)
-        {
-            if (args["maxItems"] == null) return defaultValue;
-            int value = RequiredInteger(args, "maxItems");
-            if (value > 2000) throw new BridgeException("InvalidRequest", "maxItems must be between 1 and 2000.");
-            return value;
-        }
-
         private static FileInfo NewArtifact(JObject args, string prefix)
         {
             string path = args.Value<string>("artifactDirectory");
@@ -657,34 +493,5 @@ namespace TiaMcp.Openness.V19
             if (file.Exists) throw new BridgeException("ArtifactExists", "Refusing to overwrite an existing export.");
             return file;
         }
-
-        private static JObject FileArtifact(FileInfo file)
-        {
-            string hash;
-            using (var stream = file.OpenRead())
-            using (var sha = SHA256.Create()) hash = BitConverter.ToString(sha.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
-            return new JObject { ["path"] = file.FullName, ["bytes"] = file.Length, ["sha256"] = hash, ["mediaType"] = "application/xml" };
-        }
-
-        private static bool ProjectPathIsAbsolute(string path) => !string.IsNullOrWhiteSpace(path) &&
-            (Regex.IsMatch(path, "^[A-Za-z]:[\\\\/]") ||
-             path.StartsWith(@"\\", StringComparison.Ordinal) && !path.StartsWith(@"\\?\", StringComparison.Ordinal) && !path.StartsWith(@"\\.\", StringComparison.Ordinal) &&
-             path.Substring(2).Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries).Length >= 3);
-
-        private sealed class ScanBudget
-        {
-            internal int Used;
-            internal bool Truncated;
-            private readonly int _maximum;
-            internal ScanBudget(int maximum) { _maximum = maximum; }
-            internal bool Take() { if (Used >= _maximum) { Truncated = true; return false; } Used++; return true; }
-        }
-
-        private sealed class HardwareEntry { internal DeviceItem Item; internal string Path; }
-        private sealed class BlockEntry { internal PlcBlock Item; internal string Path; }
-        private sealed class TypeEntry { internal PlcType Item; internal string Path; }
-        private sealed class TagTableEntry { internal PlcTagTable Item; internal string Path; }
-        private sealed class PlcSelection { internal Project Project; internal PlcSoftware Software; internal string Path; }
-        private sealed class SoftwareScope { internal string Path, Name, Kind, NamespacePreset; internal PlcBlockGroup Blocks; internal PlcTagTableGroup Tags; internal PlcTypeGroup Types; }
     }
 }
