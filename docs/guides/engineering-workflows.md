@@ -307,12 +307,21 @@ explicitly:
 
 This does not validate, accept or approve the safety program. `scripts/qualify_safety_drive_tags.py
 --safety-tag-rename` ran it natively on 11 November 2026 on an owned scratch F-CPU
-(`local.safety.tag-rename.20261111`): the status word of a PROFIsafe telegram was
-renamed, compiled and saved, and the four offline signatures were the same before
-and after. **No block of the safety program used that tag.** What a rename does to
-the signatures of a safety program that uses the tag, and whether it then needs a
-new acceptance, is not observed; compare `safetyBefore` and `safetyAfter` and
-treat a changed signature as a changed safety program.
+with a PROFIsafe telegram, in two runs:
+
+- A tag no safety block used (the telegram's status word,
+  `local.safety.tag-rename.20261111`): renamed, compiled and saved; the four
+  offline signatures were the same before and after.
+- A tag the safety program used (`local.safety.tag-rename-used.20261111`): a Bool
+  tag on bit 0 of the telegram's input, read by one F-FBD network of the generated
+  main safety block. After the rename the block named the new tag and was
+  consistent, the compile reported no new error, and the four offline signatures
+  were again the same before and after.
+
+That is what TIA V21 did in this fixture, not a rule. Other uses of a safety tag
+(several blocks, an F-FB interface, F-LAD, F-I/O modules) are not exercised, so
+compare `safetyBefore` and `safetyAfter` on every rename and treat a changed
+signature as a changed safety program.
 
 ### Items on other kinds
 

@@ -5857,6 +5857,26 @@
         "The safety offline program had no password, so the SafetyLoginRequired refusal is covered by the shared guard of the other safety kinds only, not by this run.",
         "The PROFIsafe telegram was inserted by the qualification fixture, not by an MCP route. No safety acceptance, password or download; engineering evidence only, not machine safety acceptance."
       ]
+    },
+    {
+      "id": "local.safety.tag-rename-used.20261111",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "b61ff94f17dc547353d8a62949956051bdba6c11",
+        "passedScope": "Renaming a safety tag that the safety program uses, through a single tag_set with safetyAcknowledged=true: scripts/qualify_safety_drive_tags.py --safety-tag-rename at b61ff94f, 35/35 steps (artifacts/sd/u3), and the same runner without the flag as regression guard, 21/21 steps (artifacts/sd/u4). Host and worker are the Debug build of 90d20b07, byte-identical to local.safety.tag-rename.20261111; the fixture helper is rebuilt with its new safety-bit-tag command. Fixture as in that record: an owned TIA V21 scratch with a CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) as IO controller of a SINAMICS G120C PN with PROFIsafe telegram 30. The fixture helper created the Bool tag SafeDrive_Bit0 at %I0.0, bit 0 of the telegram's input, which read back with isSafety true. safety_import_xml then replaced the one empty F-FBD network of the generated main safety block Main_Safety_RTG1 with SafeUsed (%M10.2) := SafeDrive_Bit0 and applied with checkpoint, compile including the safety program (0 introduced errors) and save; the collective and software offline signatures changed with that import, as expected. The eight refused preparations of local.safety.tag-rename.20261111 were repeated on this tag and left every tag unchanged. The acknowledged rename of SafeDrive_Bit0 to SafeDrive_StoActive prepared with safetyTagRename, safetyBefore and the warning, and applied with checkpoint, baseline compile, safety_tag_rename_verified, compile (0 introduced errors) and save. The tag read back as SafeDrive_StoActive at %I0.0, Bool, isSafety true, and every other tag was unchanged. Main_Safety_RTG1 named the new tag and no longer the old one and was consistent. All four offline signatures (collective, software, hardware, communication address) and the F-runtime group were identical in safetyBefore and safetyAfter. change_restore of the rename returned the checkpoint."
+      },
+      "artifacts": [
+        "evidence/local.safety.tag-rename-used.20261111.json"
+      ],
+      "limitations": [
+        "One Bool safety tag on one bit of a PROFIsafe telegram 30, read by one F-FBD network of the generated main safety block on one owned F-CPU 1511F-1 PN. Other F-blocks, F-LAD, a tag used in several blocks or in an F-FB's interface, safety tags on F-I/O modules and tags in software units are not exercised.",
+        "The signatures were unchanged in this fixture. That is one observation on TIA V21, not a rule: compare safetyBefore and safetyAfter on every rename and treat a changed signature as a changed safety program.",
+        "The Bool safety tag was created by the qualification fixture, because tag_create refuses every address inside an F-I/O range; the PROFIsafe telegram was inserted by the fixture too.",
+        "The safety offline program had no password, so the SafetyLoginRequired refusal is covered by the shared guard of the other safety kinds only.",
+        "No safety acceptance, password or download. Engineering evidence only, not machine safety acceptance."
+      ]
     }
   ],
   "features": [
@@ -10706,7 +10726,8 @@
         "limitations": [
           "Payload: hardwarePath and driveObjectNumber or driveObjectIndex of one drive object, tagTableName (a table in the PLC's root tag-table group), tags {status, control} and safetyAcknowledged: true. Creates S_ZSW1 at %IW<input start> and S_STW1 at %QW<output start> as Word, from Startdrive's addresses of PROFIsafe telegram 30 only.",
           "Refuses without acknowledgement or writable safety administration (UnsupportedCapability), without a PROFIsafe telegram (SafetyTelegramMissing), for any telegram other than 30 (UnsupportedSafetyTelegram), for a name or overlapping address already in use (ObjectExists, AddressInUse) and for an address outside an F-I/O range of this drive that the selected F-PLC owns (SafetyBoundary). Apply re-plans, refuses StaleRevision on any difference, reads every tag back as a safety tag and compiles the device.",
-          "Generic tag routes keep refusing these addresses: shared F-I/O ranges include drives' PROFIsafe telegram addresses since 7 November 2026."
+          "Generic tag routes keep refusing these addresses: shared F-I/O ranges include drives' PROFIsafe telegram addresses since 7 November 2026.",
+          "Observed on 11 November 2026: the F-compiler rejects the created Word tags as accesses of the safety program (the access does not match the channel structure of the F-I/O; WORD is not permitted for inputs and outputs of an F-I/O). They name the telegram words for standard program and diagnostics use; whether the route should create INT or per-bit tags instead is open (docs/TODO.md)."
         ]
       },
       "qualification": {
@@ -12092,7 +12113,7 @@
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "A LogicalAddress change to an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native write with SafetyBoundary (TIA would make the tag a safety tag); nothing is written (1 November 2026; rechecked natively in local.safety.fio-routes.20261101).",
           "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107).",
-          "Safety tags are refused, with one exception: a single tag_set with safetyAcknowledged=true and attributes holding only Name renames one (never inside items; safety offline program writable; safetyBefore, safetyTagRename and a warning in the preview; safetyAfter on the applied change). Qualified natively for a PROFIsafe telegram tag that no safety block uses (local.safety.tag-rename.20261111): the offline signatures were unchanged. The effect on a safety program that uses the tag is not observed, and nothing validates or accepts the safety program."
+          "Safety tags are refused, with one exception: a single tag_set with safetyAcknowledged=true and attributes holding only Name renames one (never inside items; safety offline program writable; safetyBefore, safetyTagRename and a warning in the preview; safetyAfter on the applied change). Qualified natively on an owned F-CPU for a PROFIsafe telegram tag no safety block uses (local.safety.tag-rename.20261111) and for a Bool telegram tag that one F-FBD network of the main safety block reads (local.safety.tag-rename-used.20261111): the block followed the rename and the offline signatures were unchanged in both runs. Other uses of a safety tag are not qualified, and nothing validates or accepts the safety program."
         ]
       },
       "qualification": {
@@ -12105,7 +12126,8 @@
           "local.change-batch.items.20261111",
           "local.safety.fio-routes.20261111",
           "local.safety.tag-batch.20261111",
-          "local.safety.tag-rename.20261111"
+          "local.safety.tag-rename.20261111",
+          "local.safety.tag-rename-used.20261111"
         ]
       },
       "availability": {

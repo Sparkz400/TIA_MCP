@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.179",
-    "catalogSha256": "8f23c88f287857641f60852b0c21fb08fc6969c2ae29f2ae42e2b9c5a5342e4e",
+    "catalogSha256": "ab7fccec4dcf5d5d06a9cc2cc3548cf4db707af4bda22506f6c99a22edd3b4fd",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "5c4786dd1c89d694fbb8dd6cedda08b781fd52cfb05022cdeda06a2770ef8125"
   },
@@ -6682,7 +6682,8 @@
         "local.change-batch.items.20261111",
         "local.safety.fio-routes.20261111",
         "local.safety.tag-batch.20261111",
-        "local.safety.tag-rename.20261111"
+        "local.safety.tag-rename.20261111",
+        "local.safety.tag-rename-used.20261111"
       ],
       "cells": [
         {
@@ -6696,7 +6697,8 @@
             "local.change-batch.items.20261111",
             "local.safety.fio-routes.20261111",
             "local.safety.tag-batch.20261111",
-            "local.safety.tag-rename.20261111"
+            "local.safety.tag-rename.20261111",
+            "local.safety.tag-rename-used.20261111"
           ]
         },
         {
@@ -6710,7 +6712,8 @@
             "local.change-batch.items.20261111",
             "local.safety.fio-routes.20261111",
             "local.safety.tag-batch.20261111",
-            "local.safety.tag-rename.20261111"
+            "local.safety.tag-rename.20261111",
+            "local.safety.tag-rename-used.20261111"
           ]
         },
         {
@@ -6724,7 +6727,8 @@
             "local.change-batch.items.20261111",
             "local.safety.fio-routes.20261111",
             "local.safety.tag-batch.20261111",
-            "local.safety.tag-rename.20261111"
+            "local.safety.tag-rename.20261111",
+            "local.safety.tag-rename-used.20261111"
           ]
         },
         {
@@ -6738,7 +6742,8 @@
             "local.change-batch.items.20261111",
             "local.safety.fio-routes.20261111",
             "local.safety.tag-batch.20261111",
-            "local.safety.tag-rename.20261111"
+            "local.safety.tag-rename.20261111",
+            "local.safety.tag-rename-used.20261111"
           ]
         },
         {
@@ -6752,7 +6757,8 @@
             "local.change-batch.items.20261111",
             "local.safety.fio-routes.20261111",
             "local.safety.tag-batch.20261111",
-            "local.safety.tag-rename.20261111"
+            "local.safety.tag-rename.20261111",
+            "local.safety.tag-rename-used.20261111"
           ]
         },
         {
@@ -6766,7 +6772,8 @@
             "local.change-batch.items.20261111",
             "local.safety.fio-routes.20261111",
             "local.safety.tag-batch.20261111",
-            "local.safety.tag-rename.20261111"
+            "local.safety.tag-rename.20261111",
+            "local.safety.tag-rename-used.20261111"
           ]
         }
       ]
@@ -31706,6 +31713,21 @@
         {
           "path": "evidence/local.safety.tag-batch.20261111.json",
           "sha256": "393ef367d3b9e2afdc30c77cfb5f655d3482852c4817823582a76c5b4d00cd85"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.safety.tag-rename-used.20261111",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "b61ff94f17dc547353d8a62949956051bdba6c11",
+      "retained": [
+        {
+          "path": "evidence/local.safety.tag-rename-used.20261111.json",
+          "sha256": "ee216a6d72bb8d62f530b359f051dc9e7caa2107607364389920b3f7fbf5932f"
         }
       ],
       "notRetained": []
