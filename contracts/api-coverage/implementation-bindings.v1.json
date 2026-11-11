@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "5a0193093392bd5649f54b61d96178d4edea686659f5edee7469c71c441a5df0",
-      "bytes": 1865662
+      "sha256": "0dd00dfb1fc36011ca7d38bfea3e2db82ca70f604d06311443023581b17d3e1a",
+      "bytes": 1880226
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2337,8 +2337,8 @@
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs",
-      "sha256": "f9040974f3b5df4cc83ffb367033b1249a3720dcbaea3f88d62a204a86f54fe8",
-      "bytes": 24429
+      "sha256": "244d56afb7220cade87fcf778c85025684ce9cacea8643f1696702940b98d1f5",
+      "bytes": 24743
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
@@ -3102,8 +3102,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SharedMutationAdmission.cs",
-      "sha256": "6018d6e84a8ac7227863b66ca9207c36a6080c28656cdc5b7613835699903f36",
-      "bytes": 33052
+      "sha256": "d24b9c83e436eaf1b31cafffbd12f66b7772358af5f8650cb676d75fca381c44",
+      "bytes": 33229
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Simulation.cs",
@@ -3322,8 +3322,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs",
-      "sha256": "b3df5d9e0bff891d2508766aae786b602edc6cefaee5a4e05018f58afecd5c52",
-      "bytes": 25893
+      "sha256": "ffa565c7f3854398ccccacdd2237c1f0a37795d351f912b03bdb2333d42d50b0",
+      "bytes": 28502
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcHmiIntegrationPlanner.cs",
@@ -110869,7 +110869,15 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261110",
+          "profileSha256": "500c99383b7d22ac00b450e2f3dc52f3909d9414a128a447170aabcbe27a278a",
+          "artifacts": [
+            "evidence/local.read_contracts.20261110.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -115646,6 +115654,27 @@
           ]
         },
         {
+          "id": "local.library_integrate.candidate_shapes.ob_event_classes_3.20261110",
+          "profileSha256": "6ea55c4a9616e1159c68495a2753b06d9b9df2d6a01713a9fffb3d30fd096f04",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.ob_event_classes_3.20261110.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.ob_combinations_4.20261110",
+          "profileSha256": "9b84f446fdf15168dd51d19a7acb8abab14cc752838e9d7e33f63d3dd016627c",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.ob_combinations_4.20261110.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.combined_apply.regression.20261110",
+          "profileSha256": "5d80040425bda1ff3eb5335c8eea28799b7b9fb52cd2cf82a2398ae25f6848fc",
+          "artifacts": [
+            "evidence/local.library_integrate.combined_apply.regression.20261110.json"
+          ]
+        },
+        {
           "id": "local.library_integrate.candidate_shapes.embedding_parent.20261107",
           "profileSha256": "2de00642514da8d5ccaad70d9184e1782aadab75f32b993528b64b087a7c8489",
           "artifacts": [
@@ -119227,6 +119256,13 @@
           "artifacts": [
             "evidence/local.plc_object_mutations.audit.20261102.json"
           ]
+        },
+        {
+          "id": "local.plc_object_mutations.audit.20261110",
+          "profileSha256": "8b5d0182430ee5dc9f074eac75b503b64691a2d0027c8e6d40a258a540285ab1",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.audit.20261110.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -119304,6 +119340,13 @@
           "profileSha256": "8ac284451f6a3f3ebc8f834d0dd664ae3cc8d05a679d451dfbedcce53e939b47",
           "artifacts": [
             "evidence/local.plc_object_mutations.audit.20261102.json"
+          ]
+        },
+        {
+          "id": "local.plc_object_mutations.audit.20261110",
+          "profileSha256": "8b5d0182430ee5dc9f074eac75b503b64691a2d0027c8e6d40a258a540285ab1",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.audit.20261110.json"
           ]
         }
       ],
@@ -124665,6 +124708,27 @@
           ]
         },
         {
+          "id": "local.library_integrate.candidate_shapes.ob_event_classes_3.20261110",
+          "profileSha256": "6ea55c4a9616e1159c68495a2753b06d9b9df2d6a01713a9fffb3d30fd096f04",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.ob_event_classes_3.20261110.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.ob_combinations_4.20261110",
+          "profileSha256": "9b84f446fdf15168dd51d19a7acb8abab14cc752838e9d7e33f63d3dd016627c",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.ob_combinations_4.20261110.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.combined_apply.regression.20261110",
+          "profileSha256": "5d80040425bda1ff3eb5335c8eea28799b7b9fb52cd2cf82a2398ae25f6848fc",
+          "artifacts": [
+            "evidence/local.library_integrate.combined_apply.regression.20261110.json"
+          ]
+        },
+        {
           "id": "local.library_integrate.candidate_shapes.embedding_parent.20261107",
           "profileSha256": "2de00642514da8d5ccaad70d9184e1782aadab75f32b993528b64b087a7c8489",
           "artifacts": [
@@ -127068,7 +127132,15 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261110",
+          "profileSha256": "500c99383b7d22ac00b450e2f3dc52f3909d9414a128a447170aabcbe27a278a",
+          "artifacts": [
+            "evidence/local.read_contracts.20261110.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -127271,7 +127343,15 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261110",
+          "profileSha256": "500c99383b7d22ac00b450e2f3dc52f3909d9414a128a447170aabcbe27a278a",
+          "artifacts": [
+            "evidence/local.read_contracts.20261110.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -142100,6 +142180,11 @@
       "sha256": "0324ffb6342f7a6f5600bec992b593b50e52f214fd738e7266cc20e4fe127f4d"
     },
     {
+      "path": "evidence/local.library_integrate.candidate_shapes.ob_combinations_4.20261110.json",
+      "state": "observed",
+      "sha256": "75f71658ad28a72c56e8eb61e43fb88a2f1d5f9c044fff58843d16c971709adb"
+    },
+    {
       "path": "evidence/local.library_integrate.candidate_shapes.ob_event_classes.20261108.json",
       "state": "observed",
       "sha256": "3e0b8126266a108640b4ad41e94bc287ca39c5e2fe7d3d8b4ea22bd13cfab5d0"
@@ -142108,6 +142193,11 @@
       "path": "evidence/local.library_integrate.candidate_shapes.ob_event_classes_2.20261108.json",
       "state": "observed",
       "sha256": "70221222e7a510cf8346b7457bca9531ca9de1513a9429abc6ad78e8411ca4f8"
+    },
+    {
+      "path": "evidence/local.library_integrate.candidate_shapes.ob_event_classes_3.20261110.json",
+      "state": "observed",
+      "sha256": "8b736335716af47e1f3dc3889e09f7d55fc9ff1dc30db0f2b3423f49b2ef1a61"
     },
     {
       "path": "evidence/local.library_integrate.candidate_shapes.rerun.20261031.json",
@@ -142133,6 +142223,11 @@
       "path": "evidence/local.library_integrate.combined_apply.regression.20261102.json",
       "state": "observed",
       "sha256": "213bd2ba9f67589e10c8eeb8d6d9719bd470f3efd2ecffeffe8f6e76ad6d5a37"
+    },
+    {
+      "path": "evidence/local.library_integrate.combined_apply.regression.20261110.json",
+      "state": "observed",
+      "sha256": "222ca0f6879afae2321dd5007a0525e6328ea18db0be45291abefd37d2409cfd"
     },
     {
       "path": "evidence/local.library_integrate.combined_apply.rerun.20261028.json",
@@ -142280,6 +142375,11 @@
       "sha256": "82de4e79d21d9aec318eadc9c08dd3294d06152ae047107e884a5ef1cc1c32bf"
     },
     {
+      "path": "evidence/local.plc_object_mutations.audit.20261110.json",
+      "state": "observed",
+      "sha256": "dafded2e30c5ff03e7ec3320ff6b3a3af1098e61e29bb629b9460fb9e5f95066"
+    },
+    {
       "path": "evidence/local.plc_object_mutations.rerun.20261028.json",
       "state": "observed",
       "sha256": "6e3ec873adb7c4c2595812c2a86fefb6117bea997c4f11d40737d5937897cb59"
@@ -142398,6 +142498,11 @@
       "path": "evidence/local.read_contracts.20261102.json",
       "state": "observed",
       "sha256": "ef73008b873bfbdf6daa92c1bb16284d18ba87d2f257448a5d1aee5e6910c3ed"
+    },
+    {
+      "path": "evidence/local.read_contracts.20261110.json",
+      "state": "observed",
+      "sha256": "d868299ab5182cceca9f64c6f68aa990ee4424e1da1eab462db229930cb6ce5d"
     },
     {
       "path": "evidence/local.reliability.20261024.json",
@@ -143485,12 +143590,20 @@
       "profileSha256": "59e324bb04c47b962b4be38052df06768b647500c3ecccb5dcd5fa5d72b6908f"
     },
     {
+      "id": "local.library_integrate.candidate_shapes.ob_combinations_4.20261110",
+      "profileSha256": "9b84f446fdf15168dd51d19a7acb8abab14cc752838e9d7e33f63d3dd016627c"
+    },
+    {
       "id": "local.library_integrate.candidate_shapes.ob_event_classes.20261108",
       "profileSha256": "7b39426dcefdae6d7683447ea97737b2eb2f7e402a91e4ecfe9e2a931056fd34"
     },
     {
       "id": "local.library_integrate.candidate_shapes.ob_event_classes_2.20261108",
       "profileSha256": "c5f3444f38209fad224217797d4803b97df92ebf3f34cc842bdf563237d9b203"
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.ob_event_classes_3.20261110",
+      "profileSha256": "6ea55c4a9616e1159c68495a2753b06d9b9df2d6a01713a9fffb3d30fd096f04"
     },
     {
       "id": "local.library_integrate.candidate_shapes.rerun.20261031",
@@ -143511,6 +143624,10 @@
     {
       "id": "local.library_integrate.combined_apply.regression.20261102",
       "profileSha256": "5c937e73916c20920d8c720f0459ceb7c54a32204a1d1cfc60b31613fe49911e"
+    },
+    {
+      "id": "local.library_integrate.combined_apply.regression.20261110",
+      "profileSha256": "5d80040425bda1ff3eb5335c8eea28799b7b9fb52cd2cf82a2398ae25f6848fc"
     },
     {
       "id": "local.library_integrate.combined_apply.rerun.20261028",
@@ -143629,6 +143746,10 @@
       "profileSha256": "8ac284451f6a3f3ebc8f834d0dd664ae3cc8d05a679d451dfbedcce53e939b47"
     },
     {
+      "id": "local.plc_object_mutations.audit.20261110",
+      "profileSha256": "8b5d0182430ee5dc9f074eac75b503b64691a2d0027c8e6d40a258a540285ab1"
+    },
+    {
       "id": "local.plc_object_mutations.rerun.20261028",
       "profileSha256": "605c81f58d53968f9bf8166dcbc6cab24981367c4454265ab638712c1144bab1"
     },
@@ -143723,6 +143844,10 @@
     {
       "id": "local.read_contracts.20261102",
       "profileSha256": "69d2451588f4002ec2c0789c8e54a4958c372cfebb1d2dcbc6ce6650dca9f432"
+    },
+    {
+      "id": "local.read_contracts.20261110",
+      "profileSha256": "500c99383b7d22ac00b450e2f3dc52f3909d9414a128a447170aabcbe27a278a"
     },
     {
       "id": "local.reliability.20261024",

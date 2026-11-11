@@ -42,6 +42,10 @@ class Client:
         self.process.stdin.flush()
 
     def request(self, method, params=None):
+        # The change tools answer with a summary by default; qualification runners read full previews and journals.
+        # Here, because many runners send tools/call themselves instead of through tool().
+        if method == "tools/call" and params.get("name") in ("change_prepare", "change_apply", "change_status"):
+            params = {**params, "arguments": {"includeDetails": True, **(params.get("arguments") or {})}}
         if method == "tools/call" and self.output_schemas is None:
             self.output_schemas = {tool["name"]: tool["outputSchema"] for tool in self.request("tools/list")["tools"] if "outputSchema" in tool}
         self.sequence += 1

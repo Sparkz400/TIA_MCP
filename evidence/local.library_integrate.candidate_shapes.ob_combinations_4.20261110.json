@@ -1,0 +1,100 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.candidate_shapes.ob_combinations_4.20261110",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-10T21:44:22+00:00",
+  "source": {
+    "commit": "90f631379afe98f52a6d3f0fb3fea09ff3f5e252",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_integrate_apply.py --candidates on a --component-qualification Host from Debug builds of 7e50a9e1 (artifacts/nc7, git archive), 35 cases each in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: the status (OB55), update (OB56), profile (OB57), pull or plug of modules (OB83) and rack or station failure (OB86) OB callers, each with every combination of a LAD caller, a placement after an earlier network and reuse of the installed FB. Each preview named exactly its candidate features, and each install passed the exact installed-object diff, the native caller insertion proof, the call oracle, a fresh reopen, a 0-error compile and change_restore of the initial checkpoint into a new location. An earlier run of the same 35 cases on the same build (i84c84a) installed 34 and failed obProfileReuseLadEarlier in the closing change_restore, where TIA's Retrieve was denied access to its new destination folder after both applies had passed; that case alone then passed (ob7/i71b1ad), and this run repeated all 35.",
+  "limitations": [
+    "OB fixtures are Main's envelope with the event class, number and informative inputs replaced; OB attributes and event attachments keep V21's defaults (no status, update, profile, pull/plug or rack-failure event source is configured).",
+    "The one Retrieve access denial of the earlier run was not reproduced or explained.",
+    "Event classes not named here or in the 8 November runs stay plan-only.",
+    "Engineering only; no OB runs."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "70512537795c90c5644e4ee1f76cfe4cfc029303fb9067f62fffd78a2b0fed0c"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "8289cae6959e60910bc761242bc0b32d13d2c4fede0e1c0c0ed102594de4b9ac"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "1e2d81a2d94d64cad8dfd7e7332177a36a6dd8e0338a22389090533c6116e765",
+      "bytes": 93995477,
+      "completed": true,
+      "steps": [
+        "author",
+        "candidate:obStatusLad",
+        "candidate:obStatusEarlier",
+        "candidate:obStatusReuse",
+        "candidate:obStatusLadEarlier",
+        "candidate:obStatusReuseLad",
+        "candidate:obStatusReuseEarlier",
+        "candidate:obStatusReuseLadEarlier",
+        "candidate:obUpdateLad",
+        "candidate:obUpdateEarlier",
+        "candidate:obUpdateReuse",
+        "candidate:obUpdateLadEarlier",
+        "candidate:obUpdateReuseLad",
+        "candidate:obUpdateReuseEarlier",
+        "candidate:obUpdateReuseLadEarlier",
+        "candidate:obProfileLad",
+        "candidate:obProfileEarlier",
+        "candidate:obProfileReuse",
+        "candidate:obProfileLadEarlier",
+        "candidate:obProfileReuseLad",
+        "candidate:obProfileReuseEarlier",
+        "candidate:obProfileReuseLadEarlier",
+        "candidate:obPullPlugLad",
+        "candidate:obPullPlugEarlier",
+        "candidate:obPullPlugReuse",
+        "candidate:obPullPlugLadEarlier",
+        "candidate:obPullPlugReuseLad",
+        "candidate:obPullPlugReuseEarlier",
+        "candidate:obPullPlugReuseLadEarlier",
+        "candidate:obRackFailureLad",
+        "candidate:obRackFailureEarlier",
+        "candidate:obRackFailureReuse",
+        "candidate:obRackFailureLadEarlier",
+        "candidate:obRackFailureReuseLad",
+        "candidate:obRackFailureReuseEarlier",
+        "candidate:obRackFailureReuseLadEarlier"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

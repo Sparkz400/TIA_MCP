@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.174",
+  "catalogVersion": "0.4.176",
   "targetTiaVersions": [
     21
   ],
@@ -2952,7 +2952,7 @@
         "evidence/local.typed.crossscope.engineering.rerun.20261029.json"
       ],
       "limitations": [
-        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
+        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54\u2026.zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
         "Engineering only: the runtime gate is not run."
       ]
     },
@@ -4393,7 +4393,7 @@
         "tiaVersion": 21,
         "machine": "PCNico",
         "sourceCommit": "d57defa5b499bfe94396d6079d4af603de5403ad",
-        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of d57defa5 (artifacts/oi3, git archive; main with PR 184's RFC 8785 hashing, PR 186's exact decimal parsing of request floats and the runner scanners' RFC 8785 fix), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Each of the three advance requests (verifyImport, prepareGraphical, verifyInstallation) carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the number literals 1e3 and 2.2250738585072012e-308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of the verifyImport request (1e3 as 1000, the other as 2.2250738585072014e-308) reproduced the Host's recorded requestSha256 5d077eef."
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of d57defa5 (artifacts/oi3, git archive; main with PR 184's RFC 8785 hashing, PR 186's exact decimal parsing of request floats and the runner scanners' RFC 8785 fix), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Each of the three advance requests (verifyImport, prepareGraphical, verifyInstallation) carried the non-ASCII key pr\u00fcfName\u540d\u524d, non-ASCII text with an astral emoji (sent as \\u escapes) and the number literals 1e3 and 2.2250738585072012e-308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of the verifyImport request (1e3 as 1000, the other as 2.2250738585072014e-308) reproduced the Host's recorded requestSha256 5d077eef."
       },
       "artifacts": [
         "evidence/local.component.canonical-hash.20261101.json"
@@ -4411,7 +4411,7 @@
         "tiaVersion": 21,
         "machine": "PCNico",
         "sourceCommit": "4b970cc91fdb0532a49a0f6833f9e0cf8d664eb6",
-        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of 4b970cc9 (artifacts/hz3, git archive; main with PR 190's exact worker number reading and range refusal, and PR 199's id-keeping refusal), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Before the first advance, the same advance request with 1.8e308 added was refused with InvalidRequest ('A request number is outside the double range.', from the worker's request reader, relayed by the Host with the request id); the window's revision, state and children (start, applyLibrary) were unchanged, and the verifyImport advance that followed dispatched on the same Host session. Each of the three advance requests carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of all three advance requests (1e3 as 1000, 2.2250738585072014e-308, 1.7976931348623157e+308, i.e. double.MaxValue) reproduced the Host's recorded hashes c857106f, 340dd121 and c5e740ce."
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of 4b970cc9 (artifacts/hz3, git archive; main with PR 190's exact worker number reading and range refusal, and PR 199's id-keeping refusal), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Before the first advance, the same advance request with 1.8e308 added was refused with InvalidRequest ('A request number is outside the double range.', from the worker's request reader, relayed by the Host with the request id); the window's revision, state and children (start, applyLibrary) were unchanged, and the verifyImport advance that followed dispatched on the same Host session. Each of the three advance requests carried the non-ASCII key pr\u00fcfName\u540d\u524d, non-ASCII text with an astral emoji (sent as \\u escapes) and the literals 1e3, 2.2250738585072012e-308 and 1.7976931348623158e308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of all three advance requests (1e3 as 1000, 2.2250738585072014e-308, 1.7976931348623157e+308, i.e. double.MaxValue) reproduced the Host's recorded hashes c857106f, 340dd121 and c5e740ce."
       },
       "artifacts": [
         "evidence/local.component.canonical-hash.20261102.json"
@@ -4567,6 +4567,29 @@
       ]
     },
     {
+      "id": "local.read_contracts.20261110",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "01b8c0f36482cb78195553233d281907beef3a9f",
+        "passedScope": "Rerun of local.read_contracts.20261102 with three new features: scripts/qualify_read_contracts.py on a frozen Debug build of 01b8c0f3 (artifacts/nc3, git archive), 187/187 steps in owned scratch projects; identity, typed refusal and completeness per feature for 37 read features. New: block_export (FB/FC/OB and DB selections equal to software_inspect, each native XML with its indexed size and block name, text files, namePrefix, maxBlocks paging with nextOffset, ProjectNotFound), plc_io_map (ranges and tags equal to an oracle from hardware_inspect and software_inspect on two DI 16x24VDC HF, a range without tags, two tags without listed hardware, PlcNotFound, AmbiguousTarget and complete=false with two PLCs) and plc_tag_usage over the block_export index (readers and writers of each I/Q tag from two SCL functions, a one-block index, unusedOnly, PlcNotFound). isModified was equal before and after the I/O analysis reads. Two earlier attempts on this day stopped on runner defects and are kept beside the run (rc_b19aaea1: the shared harness read a journal the summary result no longer carries; rc_71068bac: the runner expected the absolute operand to stay absolute)."
+      },
+      "artifacts": [
+        "evidence/local.read_contracts.20261110.json"
+      ],
+      "limitations": [
+        "One owned scratch project: CPU 1511-1 PN V4.1 with one software unit, plus CPU 1518-4 PN/DP added by hardware_add, and one VCI workspace (outside the project) mapping the SCL blocks RcCaller and RcFb by export; no safety, technology objects, HMI, connections, PLC documents or know-how protection, so those content families are observed only as empty, complete results.",
+        "Truncation is shown with maxItems/pageSize 1 (vci_workspace_inspect: 2) where the fixture has more rows; connection_inspect and plc_document_inventory have no rows to truncate here, and library_compare has a fixed 200-row bound that this fixture does not reach.",
+        "contentSha256 is checked as distinct, stable and content-tracking; it is not recomputed independently, because no other tool exports a block without document info.",
+        "A refused cpuTypeIdentifier is reported after the scratch project was created, because Siemens needs an open project for catalog access; the partial project is named in the refusal and its Portal is discarded.",
+        "plc_loadable_generate is positive only on the CPU 1518; on the CPU 1511 it is refused (UnsupportedCapability), as Siemens documents loadables only for CPU 1518 and its subtypes from firmware V2.8.",
+        "I/O analysis: two central DI 16x24VDC HF V1.0 (one tagged, one untagged), three Bool tags in table RcIo (one on the module, an output and an input without hardware) and two SCL functions; no output module, distributed I/O, drive telegram, shared address, LAD/FBD/STL network, protected block or paged index. The block_export index carries a size but no hash per file, so each XML is checked by size and by the block name it holds, each text file as present and non-empty. plc_tag_usage's untyped refusal of an index outside the artifact directory is not exercised.",
+        "Engineering reads only; no runtime, online or physical-device observation.",
+        "plc_tag_usage reported no absolute access: V21 replaced the absolute SCL operand %I0.1 with a tag it created at that address (Tag_...), which plc_io_map listed and plc_tag_usage reported with its reader. An absolute access was not produced natively; that branch has offline coverage only."
+      ]
+    },
+    {
       "id": "local.technology.to-delete-compile.20261102",
       "status": "passed",
       "profile": {
@@ -4688,6 +4711,30 @@
         "The apply-side unresolved-change guard is not reached sequentially: a failed apply changes the project, so the fingerprint check refuses an earlier preview first; the guard covers a change still checkpointing, applying or restoring, which a sequential run cannot hold.",
         "The first run on bc162ad2 (x11_38dc79d7, 372/373) stopped because its runner did not accept FingerprintUnavailable; fixed in 22880f21.",
         "Engineering only; runtime behavior is not observed."
+      ]
+    },
+    {
+      "id": "local.plc_object_mutations.audit.20261110",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "807fa62857f63db5ba1a5cc2b43fd8373c577285",
+        "passedScope": "Rerun of local.plc_object_mutations.audit.20261102 with the 9 November audit paths: scripts/qualify_plc_object_mutations.py on a frozen Debug build of 807fa628 (artifacts/nc4, git archive), 390/390 steps in one owned scratch CPU 1511-1 PN. New: a change whose recovery archive TIA refuses ends not_applied with the native failure, no archive hash and the PLC software unchanged; a replay with the same idempotency key returns that outcome; the next change on the project prepares and applies. Intent decisions are written to intent-decisions.jsonl after an applied change, a half-written line is skipped, a repeated decision is named previouslyConfirmed and a contradicting one a conflict with one warning; with the log locked the change still ends applied with an intent-log-write-failure readback. A source_upsert preview carries its source as {bytes, sha256} equal to the persisted input; a wrong previewHash is refused (PreviewMismatch) and a changed input file is refused (ArtifactChanged) with the change still prepared."
+      },
+      "artifacts": [
+        "evidence/local.plc_object_mutations.audit.20261110.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN at PLC-root scope: no software units, namespaces, safety, know-how protection or generated system-group objects, so AmbiguousTarget, namespace, ProtectedObject and GeneratedObject-block refusals are not exercised.",
+        "SCL blocks and one global DB only; LAD/FBD/STL targets, OB attributes (PriorityNumber, CyclicTime, PhaseOffset, ProcessImagePartNumber), HeaderName and HeaderVersion are not written.",
+        "Renamed and deleted groups were empty or held only a subgroup; groups holding blocks, types or tables are not renamed or moved.",
+        "Not covered here: block_protect, block_unprotect, block_write_protection_set, call_connection_set, call_parameter_set, device_compile, graphical_network_insert, graphical_network_patch, graphical_operand_set, graphical_typed_edit, project_compile, tag_table_create, tag_table_delete, tag_table_rename.",
+        "Engineering only; runtime behavior is not observed.",
+        "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (ScopedRecoveryRequired since #221, the block being covered by metadata only) by design and the retained checkpoint is the recovery input.",
+        "The apply-side unresolved-change guard is reached only when a change prepared before the failure still matches its fingerprint; the failed apply changed the project, so that change is refused first by the fingerprint check (StaleRevision, or FingerprintUnavailable on the inconsistent block), also before the checkpoint.",
+        "Of the 9 November audit fixes this run reaches: not_applied after a recovery archive that TIA refuses (a directory at before.zap21), its replay, the next change on the same project, the intent decision log (first write, a half-written line skipped, previouslyConfirmed, conflicts, a locked log leaving the change applied) and the {bytes, sha256} preview payload with PreviewMismatch and ArtifactChanged. A decision log that is read-only or a directory (UnauthorizedAccessException) is not exercised.",
+        "The replay of a not_applied apply passed only after the admission fix of 807fa628; the first attempt of the day (x11_b95feca9, frozen build 01b8c0f3) was refused there with RecoveryRequired and is kept beside the run."
       ]
     },
     {
@@ -5456,6 +5503,61 @@
       "limitations": [
         "One CPU 1511-1 PN V4.1 with de-DE only; each OB is created by the runner with its event class's default number and informative inputs.",
         "Event classes other than the six verified ones, and an OB caller with a multi-instance or an embedding parent, stay plan-only."
+      ]
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.ob_event_classes_3.20261110",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "7e50a9e198842af25d1e1d93f28f2ad284271dd0",
+        "passedScope": "scripts/qualify_library_integrate_apply.py --candidates on a --component-qualification Host from Debug builds of 7e50a9e1 (artifacts/nc7, git archive), five cases each in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: a fresh PLC component after the last network of an existing FBD status OB (OB55), update OB (OB56), profile OB (OB57), pull or plug of modules OB (OB83) and rack or station failure OB (OB86). Each preview named exactly obCaller and its obEventClass feature, and each install passed the exact installed-object diff, the native caller insertion proof, the call oracle, a fresh reopen, a 0-error compile and change_restore of the initial checkpoint into a new location. Two earlier attempts of the day (i87a77b, i2c2140) stopped in the author step on a runner defect (summary change results) before any case ran."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.ob_event_classes_3.20261110.json"
+      ],
+      "limitations": [
+        "OB fixtures are Main's envelope with the event class, number and informative inputs replaced; OB attributes and event attachments keep V21's defaults (no status, update, profile, pull/plug or rack-failure event source is configured).",
+        "Only these five shapes; their combinations with LAD, an earlier placement or reuse, and event classes not named here or in the 8 November runs, stay plan-only.",
+        "Engineering only; no OB runs."
+      ]
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.ob_combinations_4.20261110",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "90f631379afe98f52a6d3f0fb3fea09ff3f5e252",
+        "passedScope": "scripts/qualify_library_integrate_apply.py --candidates on a --component-qualification Host from Debug builds of 7e50a9e1 (artifacts/nc7, git archive), 35 cases each in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: the status (OB55), update (OB56), profile (OB57), pull or plug of modules (OB83) and rack or station failure (OB86) OB callers, each with every combination of a LAD caller, a placement after an earlier network and reuse of the installed FB. Each preview named exactly its candidate features, and each install passed the exact installed-object diff, the native caller insertion proof, the call oracle, a fresh reopen, a 0-error compile and change_restore of the initial checkpoint into a new location. An earlier run of the same 35 cases on the same build (i84c84a) installed 34 and failed obProfileReuseLadEarlier in the closing change_restore, where TIA's Retrieve was denied access to its new destination folder after both applies had passed; that case alone then passed (ob7/i71b1ad), and this run repeated all 35."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.ob_combinations_4.20261110.json"
+      ],
+      "limitations": [
+        "OB fixtures are Main's envelope with the event class, number and informative inputs replaced; OB attributes and event attachments keep V21's defaults (no status, update, profile, pull/plug or rack-failure event source is configured).",
+        "The one Retrieve access denial of the earlier run was not reproduced or explained.",
+        "Event classes not named here or in the 8 November runs stay plan-only.",
+        "Engineering only; no OB runs."
+      ]
+    },
+    {
+      "id": "local.library_integrate.combined_apply.regression.20261110",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "90f631379afe98f52a6d3f0fb3fea09ff3f5e252",
+        "passedScope": "scripts/qualify_library_integrate_apply.py from Debug builds of 90f63137 (artifacts/nc8, git archive), the build that admits the 40 status, update, profile, pull/plug and rack-failure OB shapes, on owned de-DE-only CPU 1511-1 PN V4.1 scratch projects. Run 1, normal Host: the verified flow (a new and an existing FBD FC caller installed, compiled, reopened and restored; the refusals; the default Host). Run 2, --candidates --case obStatus --case obRackFailureReuseLadEarlier: both installed with the same gates as in their candidate runs, and their previews named no candidate feature."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.combined_apply.regression.20261110.json"
+      ],
+      "limitations": [
+        "Run 2 used the --component-qualification Host; the runner has no mode that installs an OB combination on a Host without that flag.",
+        "Two of the 40 admitted shapes were rerun; the other 38 have their candidate runs on build 7e50a9e1 only.",
+        "Engineering only; no OB runs."
       ]
     },
     {
@@ -6379,8 +6481,9 @@
         ]
       },
       "implementation": {
-        "status": "implemented",
+        "status": "partial",
         "limitations": [
+          "Identity, completeness and typed refusals natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with two DI 16x24VDC HF, three Bool tags and two SCL functions) by local.read_contracts.20261110; see that evidence for what the fixture does not hold.",
           "Host-side batch over project_inventory and block_read render=text: one native XML export and one text file per block, bounded to 500 blocks per call with offset paging. The batch is sequential and not atomic; edits in TIA between two exports are not detected.",
           "Selection is bounded by the inventory walk (2000 rows); completeness.inventoryComplete is false when that bound cut the block list.",
           "Know-how protected blocks and blocks TIA refuses to export are listed as skipped rows with their error code, not exported.",
@@ -6388,14 +6491,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261110"
+        ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "Selection, paging and row shaping are covered by offline Host tests; no native batch run is recorded yet."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -6423,8 +6527,9 @@
         ]
       },
       "implementation": {
-        "status": "implemented",
+        "status": "partial",
         "limitations": [
+          "Identity, completeness and typed refusals natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with two DI 16x24VDC HF, three Bool tags and two SCL functions) by local.read_contracts.20261110; see that evidence for what the fixture does not hold.",
           "Host-side join of compact project_inventory hardware rows and software_inspect tags; offline configuration only.",
           "A tag is placed by its first byte; the span of a structured tag is not evaluated.",
           "Address ranges the hardware inventory does not expose, such as drive telegrams configured in Startdrive, appear as tags without listed hardware.",
@@ -6433,14 +6538,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261110"
+        ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "The analysis is covered by offline Host tests; no native run is recorded yet."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -6468,8 +6574,9 @@
         ]
       },
       "implementation": {
-        "status": "implemented",
+        "status": "partial",
         "limitations": [
+          "Identity, completeness and typed refusals natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with two DI 16x24VDC HF, three Bool tags and two SCL functions) by local.read_contracts.20261110; see that evidence for what the fixture does not hold.",
           "Static scan of the native XML files of a block_export index: LAD/FBD (FlgNet) wires and SCL (StructuredText) accesses, matched by the first component of a global symbol. STL and GRAPH networks are not scanned.",
           "Blocks outside the index, know-how protected and skipped blocks, technology objects, HMI, hardware-identifier access, PEEK/POKE and other indirect addressing are not covered; an unused tag is unused in the scanned code only.",
           "The exported files are not checked against the current project state.",
@@ -6477,14 +6584,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261110"
+        ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "The analysis is covered by offline Host tests; no native run is recorded yet."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -7472,7 +7580,8 @@
         "evidenceIds": [
           "local.read_contracts.20261028",
           "local.read_contracts.20261102",
-          "local.plc_object_mutations.audit.20261102"
+          "local.plc_object_mutations.audit.20261102",
+          "local.plc_object_mutations.audit.20261110"
         ]
       },
       "availability": {
@@ -7519,7 +7628,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.read_contracts.20261028",
-          "local.plc_object_mutations.audit.20261102"
+          "local.plc_object_mutations.audit.20261102",
+          "local.plc_object_mutations.audit.20261110"
         ]
       },
       "availability": {
@@ -13747,7 +13857,7 @@
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
-          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs. A fresh component after the last network of an existing FBD startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB passed on 8 November, and so did each of these OBs with LAD, an earlier network and reuse, alone and in every combination (local.library_integrate.candidate_shapes.ob_event_classes.20261108, local.library_integrate.candidate_shapes.ob_event_classes_2.20261108, local.library_integrate.candidate_shapes.ob_combinations_2.20261108, local.library_integrate.candidate_shapes.ob_combinations_3.20261108); every other event class, and an event-class OB with a multi-instance or an embedding parent, stays plan-only.",
+          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs. A fresh component after the last network of an existing FBD startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB passed on 8 November, and so did each of these OBs with LAD, an earlier network and reuse, alone and in every combination (local.library_integrate.candidate_shapes.ob_event_classes.20261108, local.library_integrate.candidate_shapes.ob_event_classes_2.20261108, local.library_integrate.candidate_shapes.ob_combinations_2.20261108, local.library_integrate.candidate_shapes.ob_combinations_3.20261108); the status, update, profile, pull or plug of modules and rack or station failure OBs passed the same eight shapes each on 10 November (local.library_integrate.candidate_shapes.ob_event_classes_3.20261110, local.library_integrate.candidate_shapes.ob_combinations_4.20261110; verified flow and a rerun of two of the shapes on the admitting build: local.library_integrate.combined_apply.regression.20261110); every other event class, and an event-class OB with a multi-instance or an embedding parent, stays plan-only.",
           "Embedding parents (local.library_integrate.candidate_shapes.embedding_parent.20261107): a multi-instance caller FB embedded in a parent FB installs through the captured component transitive effect, the parent gaining the member in its nested Static section; verified for the reused FB in an existing FBD FB caller. Since local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107 also with a LAD caller, an earlier placement, the caller's own instance DB and every combination of these, and two levels deep (the parent's DB, a grandparent FB and its DB each gaining the captured nested member); standard route only."
         ]
       },
@@ -13770,6 +13880,9 @@
           "local.library_integrate.candidate_shapes.ob_event_classes_2.20261108",
           "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
           "local.library_integrate.candidate_shapes.ob_combinations_3.20261108",
+          "local.library_integrate.candidate_shapes.ob_event_classes_3.20261110",
+          "local.library_integrate.candidate_shapes.ob_combinations_4.20261110",
+          "local.library_integrate.combined_apply.regression.20261110",
           "local.library_integrate.candidate_shapes.embedding_parent.20261107",
           "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
         ]
@@ -13821,7 +13934,7 @@
           "The import step's complete-project archive (for a reused FB, the typed step's own archive), taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
           "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable.",
           "Before any claim, import or save, combined apply refuses (PlcIntegrationNotQualified) unless de-DE is the project's only active, reference and editing language and an instance creation profile covers the FB (captured storage profile with its CPU and loaded API files, or a shipped global instance template matched against the planned FB export); the preview reports combinedApply.eligible=false for such projects.",
-          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs. A fresh component after the last network of an existing FBD startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB passed on 8 November, and so did each of these OBs with LAD, an earlier network and reuse, alone and in every combination (local.library_integrate.candidate_shapes.ob_event_classes.20261108, local.library_integrate.candidate_shapes.ob_event_classes_2.20261108, local.library_integrate.candidate_shapes.ob_combinations_2.20261108, local.library_integrate.candidate_shapes.ob_combinations_3.20261108); every other event class, and an event-class OB with a multi-instance or an embedding parent, stays plan-only.",
+          "OB callers (local.library_integrate.candidate_shapes.ob_combinations.20261107): besides a fresh component after the last network of an existing FBD OB, combined apply runs in a LAD OB, after an earlier OB network, and reusing the installed FB, in every combination of these. Those runs used program-cycle OBs. A fresh component after the last network of an existing FBD startup, cyclic-interrupt, time-of-day, time-delay, hardware or diagnostic error interrupt OB passed on 8 November, and so did each of these OBs with LAD, an earlier network and reuse, alone and in every combination (local.library_integrate.candidate_shapes.ob_event_classes.20261108, local.library_integrate.candidate_shapes.ob_event_classes_2.20261108, local.library_integrate.candidate_shapes.ob_combinations_2.20261108, local.library_integrate.candidate_shapes.ob_combinations_3.20261108); the status, update, profile, pull or plug of modules and rack or station failure OBs passed the same eight shapes each on 10 November (local.library_integrate.candidate_shapes.ob_event_classes_3.20261110, local.library_integrate.candidate_shapes.ob_combinations_4.20261110; verified flow and a rerun of two of the shapes on the admitting build: local.library_integrate.combined_apply.regression.20261110); every other event class, and an event-class OB with a multi-instance or an embedding parent, stays plan-only.",
           "Embedding parents (local.library_integrate.candidate_shapes.embedding_parent.20261107): a multi-instance caller FB embedded in a parent FB installs through the captured component transitive effect, the parent gaining the member in its nested Static section; verified for the reused FB in an existing FBD FB caller. Since local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107 also with a LAD caller, an earlier placement, the caller's own instance DB and every combination of these, and two levels deep (the parent's DB, a grandparent FB and its DB each gaining the captured nested member); standard route only."
         ]
       },
@@ -13847,6 +13960,9 @@
           "local.library_integrate.candidate_shapes.ob_event_classes_2.20261108",
           "local.library_integrate.candidate_shapes.ob_combinations_2.20261108",
           "local.library_integrate.candidate_shapes.ob_combinations_3.20261108",
+          "local.library_integrate.candidate_shapes.ob_event_classes_3.20261110",
+          "local.library_integrate.candidate_shapes.ob_combinations_4.20261110",
+          "local.library_integrate.combined_apply.regression.20261110",
           "local.library_integrate.candidate_shapes.embedding_parent.20261107",
           "local.library_integrate.candidate_shapes.embedding_parent_combinations.20261107"
         ]
@@ -29469,7 +29585,7 @@
           "Native, 1 November (build 10763a35): the route passed on the desk-configured TP700 Comfort pair (local.hmi.classic-import.route.20261101, 63/63 checks): every refusal before any write; BackColor on both HMIs' Overview_A (identity separation), a no-op and a GridColor import of Overview_B, a no-op import of the start screen and a QualificationTags import adding one internal tag, each with every stage, no compiler problems, the target's independent re-export carrying exactly the intended delta, every other export unchanged, same-key replay and another key refused RecoveryRequired; a stale preview refused; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay (local.hmi.classic-import.interruption.20261101, 8/8).",
           "Qualified on one desk-configured TP700 Comfort fixture (start screen set in the editor). Import(Override) of the start screen kept it natively, but the start-screen setting has no public getter, so the compile rule is its only guard. Other Classic devices, object types, customer projects, runtime and visual behavior are not covered.",
           "Lifecycle, 1 November (build 2431ccf9): on the same TP700 Comfort pair both compiles of every apply named only the target HmiTarget, both Host lifetimes ended normally (Host and worker exit 0, owned TIA process exited) and a new TIA process then reopened the saved project read-write at once (local.hmi.lifecycle.20261101, 72/72).",
-          "WinCC RT Advanced and KTP700 Basic PN, 1–2 November (build 750121ea): the route passed on their seeded HmiSeeder baselines (no start screen; the compile rule kept that error unchanged after every apply) with 72/72 and 71/71 checks (local.hmi.classic-import.profiles.route.20261101; Basic has no popup), and ci-* interruption 8/8 on each (local.hmi.classic-import.profiles.interruption.20261102); production admits both profiles."
+          "WinCC RT Advanced and KTP700 Basic PN, 1\u20132 November (build 750121ea): the route passed on their seeded HmiSeeder baselines (no start screen; the compile rule kept that error unchanged after every apply) with 72/72 and 71/71 checks (local.hmi.classic-import.profiles.route.20261101; Basic has no popup), and ci-* interruption 8/8 on each (local.hmi.classic-import.profiles.interruption.20261102); production admits both profiles."
         ]
       },
       "qualification": {

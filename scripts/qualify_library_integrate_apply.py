@@ -52,7 +52,10 @@ EVENT_CLASSES = {"ProgramCycle": (OB_NUMBER, None),
                  "TimeOfDay": (10, (("CaughtUp", "Bool"), ("SecondTimeInterval", "Bool"))),
                  "TimeDelayInterrupt": (20, (("Sign", "Word"),)),
                  "HardwareInterrupt": (40, (("LADDR", "HW_IO"), ("USI", "Word"), ("IChannel", "USInt"), ("EventType", "Byte"))),
-                 "DiagnosticErrorInterrupt": (82, (("IO_State", "Word"), ("LADDR", "HW_ANY"), ("Channel", "UInt"), ("MultiError", "Bool")))}
+                 "DiagnosticErrorInterrupt": (82, (("IO_State", "Word"), ("LADDR", "HW_ANY"), ("Channel", "UInt"), ("MultiError", "Bool"))),
+                 # As in qualify_plcsim_gaps.py, whose OB55/56/57/83/86 V21 imported and ran (no start information for 55-57).
+                 "Status": (55, ()), "Update": (56, ()), "Profile": (57, ()),
+                 "PullOrPlugOfModules": (83, (("LADDR", "HW_IO"), ("Event_Class", "Byte"), ("Fault_ID", "Byte"))), "RackOrStationFailure": (86, (("LADDR", "HW_IO"), ("Event_Class", "Byte"), ("Fault_ID", "Byte")))}
 # A LAD OB takes its coil network from the LAD FC caller fixture, imported under this name before the baseline.
 LAD_PEER = "TiaMcpLadPeer"
 HARNESS = ("qualify_plc_component.py", "qualification_owned_scratch.py", "compilation_evidence.py", "smoke_mcp.py",
@@ -168,6 +171,47 @@ COMBINATIONS = {
     "obDiagnosticReuseLad": (True, {"kind": "OB", "language": "LAD", "eventClass": "DiagnosticErrorInterrupt"}, []),
     "obDiagnosticReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "DiagnosticErrorInterrupt"}, []),
     "obDiagnosticReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "DiagnosticErrorInterrupt"}, []),
+    # Status, update, profile, pull/plug and rack-failure OBs in every combination of LAD, an earlier placement and reuse; verified since 10 November.
+    "obStatus": (False, {"kind": "OB", "language": "FBD", "eventClass": "Status"}, []),
+    "obStatusLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "Status"}, []),
+    "obStatusEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "Status"}, []),
+    "obStatusReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "Status"}, []),
+    "obStatusLadEarlier": (False, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "Status"}, []),
+    "obStatusReuseLad": (True, {"kind": "OB", "language": "LAD", "eventClass": "Status"}, []),
+    "obStatusReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "Status"}, []),
+    "obStatusReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "Status"}, []),
+    "obUpdate": (False, {"kind": "OB", "language": "FBD", "eventClass": "Update"}, []),
+    "obUpdateLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "Update"}, []),
+    "obUpdateEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "Update"}, []),
+    "obUpdateReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "Update"}, []),
+    "obUpdateLadEarlier": (False, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "Update"}, []),
+    "obUpdateReuseLad": (True, {"kind": "OB", "language": "LAD", "eventClass": "Update"}, []),
+    "obUpdateReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "Update"}, []),
+    "obUpdateReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "Update"}, []),
+    "obProfile": (False, {"kind": "OB", "language": "FBD", "eventClass": "Profile"}, []),
+    "obProfileLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "Profile"}, []),
+    "obProfileEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "Profile"}, []),
+    "obProfileReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "Profile"}, []),
+    "obProfileLadEarlier": (False, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "Profile"}, []),
+    "obProfileReuseLad": (True, {"kind": "OB", "language": "LAD", "eventClass": "Profile"}, []),
+    "obProfileReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "Profile"}, []),
+    "obProfileReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "Profile"}, []),
+    "obPullPlug": (False, {"kind": "OB", "language": "FBD", "eventClass": "PullOrPlugOfModules"}, []),
+    "obPullPlugLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "PullOrPlugOfModules"}, []),
+    "obPullPlugEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "PullOrPlugOfModules"}, []),
+    "obPullPlugReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "PullOrPlugOfModules"}, []),
+    "obPullPlugLadEarlier": (False, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "PullOrPlugOfModules"}, []),
+    "obPullPlugReuseLad": (True, {"kind": "OB", "language": "LAD", "eventClass": "PullOrPlugOfModules"}, []),
+    "obPullPlugReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "PullOrPlugOfModules"}, []),
+    "obPullPlugReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "PullOrPlugOfModules"}, []),
+    "obRackFailure": (False, {"kind": "OB", "language": "FBD", "eventClass": "RackOrStationFailure"}, []),
+    "obRackFailureLad": (False, {"kind": "OB", "language": "LAD", "eventClass": "RackOrStationFailure"}, []),
+    "obRackFailureEarlier": (False, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "RackOrStationFailure"}, []),
+    "obRackFailureReuse": (True, {"kind": "OB", "language": "FBD", "eventClass": "RackOrStationFailure"}, []),
+    "obRackFailureLadEarlier": (False, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "RackOrStationFailure"}, []),
+    "obRackFailureReuseLad": (True, {"kind": "OB", "language": "LAD", "eventClass": "RackOrStationFailure"}, []),
+    "obRackFailureReuseEarlier": (True, {"kind": "OB", "language": "FBD", "networks": 2, "eventClass": "RackOrStationFailure"}, []),
+    "obRackFailureReuseLadEarlier": (True, {"kind": "OB", "language": "LAD", "networks": 2, "eventClass": "RackOrStationFailure"}, []),
     # The reused-FB multi-instance in a Host FB that a parent FB embeds, beside the verified FBD one (multiInstanceParent): LAD, an
     # earlier placement and the Host's own DB in every combination, and the verified shape two levels deep with the parent's and the
     # grandparent's DBs. All verified on 7 November.
@@ -379,7 +423,7 @@ def fbd_ob(main_xml, peer_xml, source_tag, target_tag, language="FBD", event_cla
     xml, count = re.subn(r"<NetworkSource>.*?</NetworkSource>", lambda _: body, main_xml, flags=re.S)
     require(count == 1, "Main must export exactly one network.")
     number, inputs = EVENT_CLASSES[event_class]
-    if inputs:
+    if inputs is not None:
         section = '<Section Name="Input">' + "".join('<Member Name="%s" Datatype="%s" Accessibility="Public" Informative="true" />' % member
                                                     for member in inputs) + "</Section>"
         xml, count = re.subn(r'<Section Name="Input">.*?</Section>', lambda _: section, xml, flags=re.S)

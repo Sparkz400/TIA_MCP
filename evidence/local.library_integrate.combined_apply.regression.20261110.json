@@ -1,0 +1,103 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.combined_apply.regression.20261110",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-10T21:59:37+00:00",
+  "source": {
+    "commit": "90f631379afe98f52a6d3f0fb3fea09ff3f5e252",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_integrate_apply.py from Debug builds of 90f63137 (artifacts/nc8, git archive), the build that admits the 40 status, update, profile, pull/plug and rack-failure OB shapes, on owned de-DE-only CPU 1511-1 PN V4.1 scratch projects. Run 1, normal Host: the verified flow (a new and an existing FBD FC caller installed, compiled, reopened and restored; the refusals; the default Host). Run 2, --candidates --case obStatus --case obRackFailureReuseLadEarlier: both installed with the same gates as in their candidate runs, and their previews named no candidate feature.",
+  "limitations": [
+    "Run 2 used the --component-qualification Host; the runner has no mode that installs an OB combination on a Host without that flag.",
+    "Two of the 40 admitted shapes were rerun; the other 38 have their candidate runs on build 7e50a9e1 only.",
+    "Engineering only; no OB runs."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "4d21178da0e7750eb948c5fe0aa925883861f001bacad25d88d34e928c307209"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "39c06771d6fe929332161117bde0b365aff279f95b567e0f331a83fc8c4d8abd"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "9c53260f19129151f02e24f78543ef3406fa229f15d105bf595e9cbafd195745",
+      "bytes": 7368599,
+      "completed": true,
+      "steps": [
+        "author",
+        "install:createStandaloneFc",
+        "install:existing",
+        "refusals",
+        "defaultHost"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "library_capabilities",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    },
+    {
+      "report": "result.json",
+      "sha256": "3279adc095139010a8586550250d383511cdb88e90c2d0ccf55865ee2b87df09",
+      "bytes": 6130784,
+      "completed": true,
+      "steps": [
+        "author",
+        "candidate:obStatus",
+        "candidate:obRackFailureReuseLadEarlier"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

@@ -13,6 +13,9 @@ namespace TiaMcp.OpcUa.Runtime;
 internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
 {
     internal const int TimeoutMs = 10_000;
+    // An idle session must outlive a 2-5 minute runtime_plcsim_bind; the server revises this down to its own maximum.
+    // No keep-alive: it would be background traffic. A session orphaned by a Host crash lives this long at most.
+    internal const int SessionTimeoutMs = 600_000;
     internal const int MaxMessageBytes = 1_048_576;
     internal const string Policy = SecurityPolicies.Basic256Sha256;
     private readonly OpcUaRuntimeSelection selection;
@@ -48,7 +51,7 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
             TransportQuotas = new TransportQuotas { OperationTimeout = TimeoutMs, MaxMessageSize = MaxMessageBytes,
                 MaxStringLength = 16_384, MaxByteStringLength = 65_536, MaxArrayLength = 4096, MaxEncodingNestingLevels = 32,
                 ChannelLifetime = 60_000, SecurityTokenLifetime = 60_000 },
-            ClientConfiguration = new ClientConfiguration { DefaultSessionTimeout = 60_000, MinSubscriptionLifetime = 0 }
+            ClientConfiguration = new ClientConfiguration { DefaultSessionTimeout = SessionTimeoutMs, MinSubscriptionLifetime = 0 }
         };
     }
 
@@ -96,7 +99,7 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
         SessionDispatched = true;
         session = await new DefaultSessionFactory(null!).CreateAsync(configuration,
             new ConfiguredEndpoint(null, selected, EndpointConfiguration.Create(configuration)), false, true,
-            "TIA MCP owned read-only", 60_000, identity, null, ct);
+            "TIA MCP owned read-only", SessionTimeoutMs, identity, null, ct);
         PeerVerified = true;
         // No background polling/reconnect, automatic subscriptions or session transfer.
         session.KeepAliveInterval = Timeout.Infinite;
@@ -276,7 +279,7 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
         // Same pinned endpoint description, client certificate and user identity; the server checks the identity matches the owner.
         var old=session!;
         session=await new DefaultSessionFactory(null!).CreateAsync(configuration,old.ConfiguredEndpoint,false,true,
-            "TIA MCP owned read-only",60_000,old.Identity,null,ct);
+            "TIA MCP owned read-only",SessionTimeoutMs,old.Identity,null,ct);
         session.KeepAliveInterval=Timeout.Infinite;
         session.TransferSubscriptionsOnReconnect=false;
         session.DeleteSubscriptionsOnClose=true;
