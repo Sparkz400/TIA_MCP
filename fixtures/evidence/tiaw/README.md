@@ -15,6 +15,12 @@ lists the SHA-256 of every copied file, computed from the original bytes.
   step results, reviews, failures, recovery records and console logs.
 - `tr1603/continuation-01` and `tr1603/continuation-02`.
 - `wt02/engineering-operations`, complete.
+- The four `wa1604` observation and source-capture files that
+  [`profile-candidate-review.json`](../../watch-tables/native-authoring-v21/profile-candidate-review.json)
+  cites by SHA-256: `watch-observations/w_c8a08b4c66af/force-0.xml` and
+  `snapshot.json`, and `fb.xml` and `instance.xml` in
+  `watch-source-captures/instance-4847a89454564ec0a6fbd1804d7b9e62`. The rest of
+  those two folders was never cited.
 - The isolated OPC UA receipt
   `iq161/source/artifacts/opcua-offline/a03aca16124c40cc8fed0777a8c0ab2d`
   (its top-level files).
