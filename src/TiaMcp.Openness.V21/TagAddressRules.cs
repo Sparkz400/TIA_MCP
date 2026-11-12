@@ -70,6 +70,24 @@ namespace TiaMcp.Openness.V21
         internal static string AnyFIo(IEnumerable<(string IoType, int StartByte, int LengthBits, string Path)> fIoRanges) =>
             fIoRanges.FirstOrDefault(range => range.LengthBits > 0).Path;
 
+        /// <summary>The bit address of bit <paramref name="bit"/> (0..15) of the 16-bit word at %IW/%QW <paramref name="wordStart"/>.
+        /// S7 words are big-endian: byte <c>wordStart</c> holds bits 8..15 and byte <c>wordStart + 1</c> bits 0..7, so word bit 0 is
+        /// %I(wordStart+1).0 and word bit 8 is %I(wordStart).0.</summary>
+        internal static string WordBitAddress(bool input, int wordStart, int bit)
+        {
+            if (bit < 0 || bit > 15) throw new ArgumentOutOfRangeException(nameof(bit), "A word bit is 0..15.");
+            return (input ? "%I" : "%Q") + (wordStart + (bit < 8 ? 1 : 0)) + "." + (bit % 8);
+        }
+
+        /// <summary>True when two absolute I/O addresses address at least one common bit in the same direction.</summary>
+        internal static bool IoOverlaps(string left, string right)
+        {
+            var a = Io(left);
+            var b = Io(right);
+            return a != null && b != null && a.Value.IoType == b.Value.IoType &&
+                a.Value.StartBit < b.Value.StartBit + b.Value.LengthBits && b.Value.StartBit < a.Value.StartBit + a.Value.LengthBits;
+        }
+
         /// <summary>The first F-I/O range (ioType, start byte, length in bits, path) the address overlaps, or null.</summary>
         internal static string FIoOverlap(string logicalAddress, IEnumerable<(string IoType, int StartByte, int LengthBits, string Path)> fIoRanges)
         {

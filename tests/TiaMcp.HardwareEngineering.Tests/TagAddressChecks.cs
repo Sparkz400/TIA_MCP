@@ -33,6 +33,17 @@ internal static class TagAddressChecks
         Check(TagAddressRules.FIoOverlap("%Q4.0", ranges) == null && TagAddressRules.FIoOverlap("%M0.0", ranges) == null, "other directions and bit memory never overlap");
         Check(TagAddressRules.FIoOverlap("%I0.0", new[] { ("Input", 0, 0, "/empty") }) == null, "a zero-length range overlaps nothing");
 
+        // safety_drive_tags: PROFIsafe status/control word bits as Bool tags, on the big-endian S7 word layout.
+        Check(TagAddressRules.WordBitAddress(true, 4, 0) == "%I5.0" && TagAddressRules.WordBitAddress(true, 4, 7) == "%I5.7", "word bits 0..7 are in the word's second byte");
+        Check(TagAddressRules.WordBitAddress(false, 4, 8) == "%Q4.0" && TagAddressRules.WordBitAddress(false, 4, 15) == "%Q4.7", "word bits 8..15 are in the word's first byte");
+        Check(Enumerable.Range(0, 16).Select(b => TagAddressRules.WordBitAddress(true, 10, b)).Distinct().Count() == 16
+              && Enumerable.Range(0, 16).All(b => TagAddressRules.IoOverlaps(TagAddressRules.WordBitAddress(true, 10, b), "%IW10")), "the sixteen bits are distinct and all inside the word");
+        bool refusedBit = false;
+        try { TagAddressRules.WordBitAddress(true, 0, 16); } catch (ArgumentOutOfRangeException) { refusedBit = true; }
+        Check(refusedBit, "a word bit beyond 15 is refused");
+        Check(TagAddressRules.IoOverlaps("%IW4", "%I5.3") && !TagAddressRules.IoOverlaps("%IW4", "%I6.0") && !TagAddressRules.IoOverlaps("%IW4", "%Q5.3")
+              && !TagAddressRules.IoOverlaps("%M5.3", "%M5.3") && TagAddressRules.IoOverlaps("%I5.3", "%E5.3"), "bit overlap needs the same direction and a common bit");
+
         // tag_table_import_xml checks every imported tag's address; user constants carry none.
         var table = System.Xml.Linq.XDocument.Parse("<Document><SW.Tags.PlcTagTable ID=\"0\"><ObjectList>" +
             "<SW.Tags.PlcTag ID=\"1\" CompositionName=\"Tags\"><AttributeList><DataTypeName>Bool</DataTypeName><LogicalAddress>%M200.0</LogicalAddress><Name>A</Name></AttributeList></SW.Tags.PlcTag>" +

@@ -490,7 +490,16 @@ namespace TiaMcp.Openness.V21
                 if (++exported > 2000) throw new BridgeException("DependencyCoverageIncomplete", "Deletion dependency scan exceeds 2000 exported objects.");
                 try
                 {
-                    if (item is PlcBlock block) block.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                    if (item is PlcBlock block)
+                    {
+                        try { block.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None); }
+                        catch (Exception refused) when (!(refused is BridgeException))
+                        {
+                            // TIA refuses to export some blocks, among them those it generates for a safety program (FOB_RTG1). Their native
+                            // cross-references name no references (12 November 2026), so nothing proves such a block free of the symbol.
+                            throw new BridgeException("DependencyCoverageIncomplete", "Cannot inspect " + identity + ": " + refused.Message + " " + BlockTraits(block));
+                        }
+                    }
                     else if (item is PlcType type) type.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
                     else ((PlcTagTable)item).Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
                     var xml = EngineeringSources.ReadXml(File.ReadAllText(path));
@@ -515,6 +524,14 @@ namespace TiaMcp.Openness.V21
                 ["scope"] = "Exposed offline PLC scopes, blocks, types and tag tables. Conservative token matching; runtime pointer aliases and external consumers cannot be proven absent.", ["cascade"] = false };
             if (references.Count != 0) throw new BridgeException("DependencyExists", "Remove explicit dependencies before deleting this object; no cascade is performed.", result);
             return result;
+        }
+
+        // What TIA reports for a block whose export is refused, so the refusal names the block's kind.
+        private static string BlockTraits(PlcBlock block)
+        {
+            string Read(Func<object> read) { try { return Convert.ToString(read()); } catch (Exception ex) { return "unreadable (" + ex.GetType().Name + ")"; } }
+            return "(programming language " + Read(() => block.ProgrammingLanguage) + ", know-how protected " + Read(() => block.IsKnowHowProtected) +
+                ", consistent " + Read(() => block.IsConsistent) + ")";
         }
 
         private void PrepareGroupEdit(EngineeringChange change, JObject preview)

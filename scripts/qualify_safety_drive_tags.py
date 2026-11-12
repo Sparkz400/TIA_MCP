@@ -1,13 +1,13 @@
-"""Qualify #212 natively: safety_drive_tags creates a G120C PN's PROFIsafe telegram 30 S_ZSW1/S_STW1 safety tags on the owning F-CPU 1511F-1 PN
-at the addresses Startdrive reports, while generic tag routes keep refusing them. The telegram is inserted by the native fixture
+"""Qualify #212 natively: safety_drive_tags creates Bool safety tags on bits of a G120C PN's PROFIsafe telegram 30 S_ZSW1/S_STW1 words on
+the owning F-CPU 1511F-1 PN at the addresses Startdrive reports, while generic tag routes keep refusing them. The safety program must
+compile while one F-FBD network reads a created status bit and writes a created control bit (the Word tags of the first route
+version failed exactly that). The telegram is inserted by the native fixture
 helper (drive_telegram_set refuses safety telegrams). With the two real safety tags in place, tag_set, tag_delete and
 tag_create batches (payload.items) that touch one of them or its address must refuse as a whole and change no tag.
 With --safety-tag-rename the run also renames one of the safety tags through a single tag_set with safetyAcknowledged=true:
 every other edit of a safety tag must stay refused, the renamed tag must read back as a safety tag on its address, and the
-safety state before and after is recorded. The renamed tag is one the safety program uses: the fixture helper creates a Bool
-tag on bit 0 of the telegram's input (tag_create refuses every F-I/O address, and the F-compiler rejects the two Word tags as
-F-I/O accesses), and safety_import_xml gives the generated main safety block one F-FBD network that reads it. The block must
-name the new tag after the rename. Owned scratch only; never a user project, no download."""
+safety state before and after is recorded. The renamed tag is the status bit the safety program reads. The block must name the
+new tag after the rename. Owned scratch only; never a user project, no download."""
 import argparse
 import json
 from pathlib import Path
@@ -112,9 +112,19 @@ def main():
         table = 'SafeDriveTags'
         change('tag_table_create', {'tagTableName': table}, plc=fplc)
         refused('tag_create', {'tagTableName': table, 'name': 'Generic_S_ZSW1', 'dataTypeName': 'Word', 'logicalAddress': '%%IW%d' % ranges['Input']}, 'SafetyBoundary')
-        tags = {'status': 'SafeDrive_S_ZSW1', 'control': 'SafeDrive_S_STW1'}
-        payload = {'hardwarePath': drive_path, **handle, 'tagTableName': table, 'tags': tags}
+        # Word bit b of %IW n / %QW n: bits 0..7 are in byte n+1, bits 8..15 in byte n (S7 words are big-endian).
+        bit_address = lambda area, start, bit: '%%%s%d.%d' % (area, start + (1 if bit < 8 else 0), bit % 8)
+        bits = [{'word': 'status', 'bit': 0, 'name': 'SafeDrive_ZSW1_0'}, {'word': 'status', 'bit': 8, 'name': 'SafeDrive_ZSW1_8'},
+                {'word': 'control', 'bit': 0, 'name': 'SafeDrive_STW1_0'}]
+        expected = {b['name']: (bit_address('I' if b['word'] == 'status' else 'Q', ranges['Input' if b['word'] == 'status' else 'Output'], b['bit']), 'Bool', True)
+                    for b in bits}
+        tags = {'status': 'SafeDrive_ZSW1_0', 'control': 'SafeDrive_STW1_0'}
+        payload = {'hardwarePath': drive_path, **handle, 'tagTableName': table, 'bits': bits}
         refused('safety_drive_tags', payload, 'InvalidRequest')
+        legacy = {'hardwarePath': drive_path, **handle, 'tagTableName': table, 'tags': {'status': 'Old_S_ZSW1'}, 'safetyAcknowledged': True}
+        refused('safety_drive_tags', legacy, 'InvalidRequest')
+        refused('safety_drive_tags', {**payload, 'bits': [{'word': 'status', 'bit': 16, 'name': 'Beyond'}], 'safetyAcknowledged': True}, 'InvalidRequest')
+        refused('safety_drive_tags', {**payload, 'bits': [bits[0], {**bits[0], 'name': 'SameBit'}], 'safetyAcknowledged': True}, 'InvalidRequest')
         # Two standard tags for the batch refusals below, created first: the closing change_restore needs
         # safety_drive_tags to be the project's last change.
         standard = lambda name, bit: {'tagTableName': table, 'name': name, 'dataTypeName': 'Bool', 'logicalAddress': '%%M10.%d' % bit}
@@ -131,9 +141,10 @@ def main():
             return {t['name']: (t['logicalAddress'], t['dataType'], t['isSafety'])
                     for row in client.tool('software_inspect', {'plcPath': fplc, 'maxItems': 2000})['tagTables'] for t in row['tags']}
         rows = tag_rows()
-        got = {n: rows[n] for n in tags.values()}
+        got = {n: rows[n] for n in expected}
         record('safety tags read back', got)
-        assert got == {tags['status']: ('%%IW%d' % ranges['Input'], 'Word', True), tags['control']: ('%%QW%d' % ranges['Output'], 'Word', True)}, got
+        assert got == expected, (got, expected)
+        assert [(r['name'], r['logicalAddress'], r['dataType']) for r in plan['tags']] == [(n, a, t) for n, (a, t, _) in expected.items()], plan['tags']
 
         # payload.items beside real safety tags: one item on a safety tag, or on its address, refuses the whole batch.
         before = tag_rows()
@@ -141,9 +152,10 @@ def main():
         assert before['StdA'] == ('%M10.0', 'Bool', False) and before['StdB'] == ('%M10.1', 'Bool', False) and all(before[n][2] for n in tags.values()), before
         edit = lambda member, **attributes: {'tagTableName': table, 'memberName': member, 'attributes': attributes}
         drop = lambda member: {'tagTableName': table, 'memberName': member, 'dependencyPolicy': 'rejectReferenced'}
-        # On this F-CPU a tag_delete item of a standard tag is refused before a later item is reached: its dependency scan
-        # cannot export the safety program's blocks (DependencyCoverageIncomplete). The safety tag is therefore the first
-        # item of the tag_delete batch, and the other order is recorded with the refusal it gets.
+        # On this F-CPU a tag_delete item of a standard tag is refused before a later item is reached: TIA refuses to export the
+        # generated F-runtime-group OB FOB_RTG1, and its native cross-references name no references, so the dependency scan stays
+        # incomplete (DependencyCoverageIncomplete; decision of 12 November 2026). The safety tag is therefore the first item of
+        # the tag_delete batch, and the other order is recorded with the refusal it gets.
         batches = [
             ('tag_set', 'renames a safety tag', [edit('StdA', Name='StdA_R'), edit(tags['status'], Name='Renamed_S_ZSW1')], 1, 'SafetyBoundary'),
             ('tag_set', 'moves a standard tag onto the safety telegram', [edit('StdA', Name='StdA_R'), edit('StdB', LogicalAddress='%%I%d.0' % ranges['Input'])], 1, 'SafetyBoundary'),
@@ -156,30 +168,30 @@ def main():
             error = (result.get('structuredContent') or {}).get('error') or {}
             record('%s batch whose item %d %s refused with %s' % (kind, index, label, code), error)
             assert result.get('isError') and error.get('code') == code and error.get('message', '').startswith('items[%d]' % index), error
+            if code == 'DependencyCoverageIncomplete':
+                assert '/blocks/FOB_RTG1:' in error['message'] and 'know-how protected' in error['message'], error
             assert tag_rows() == before, 'A refused batch changed a tag'
         record('every tag is unchanged after the refused batches', before)
         refused('safety_drive_tags', {**payload, 'safetyAcknowledged': True}, 'ObjectExists')
+        refused('safety_drive_tags', {**payload, 'bits': [{**bits[0], 'name': 'OtherName'}], 'safetyAcknowledged': True}, 'AddressInUse')
+
+        # The acceptance the Word tags failed: the safety program reads a created status bit and writes a created control bit.
+        main_xml = client.tool('block_read', {'plcPath': fplc, 'blockName': MAIN})['xml']
+        assert main_xml.count('<NetworkSource />') == 1 and '<ProgrammingLanguage>F_FBD</ProgrammingLanguage>' in main_xml, 'The main safety block must hold exactly one empty F-FBD network'
+        logic = change('safety_import_xml', {'xml': main_xml.replace('<NetworkSource />', reading_network(tags['status'], tags['control'])),
+                                             'expectedBlockNames': [MAIN], 'safetyAcknowledged': True}, plc=fplc)
+        used_xml = client.tool('block_read', {'plcPath': fplc, 'blockName': MAIN})['xml']
+        record('safety program reads the status bit and writes the control bit', {
+            'stages': logic['stages'], 'compilerSucceeded': logic['compile']['compilerSucceeded'],
+            'introducedErrors': logic['compile']['baselineComparison'].get('introducedErrorCount'), 'safetyAfter': logic.get('safetyAfter'),
+            'namesBoth': all('Component Name="%s"' % n in used_xml for n in tags.values())})
+        assert logic['compile']['compilerSucceeded'] is True and logic['compile']['baselineComparison'].get('introducedErrorCount') == 0, logic['compile']
+        assert all('Component Name="%s"' % n in used_xml for n in tags.values()), 'The main safety block does not name both bits'
+        applied = logic  # the closing restore returns to the state before the last change
         if args.safety_tag_rename:
             # The one generic edit of a safety tag: a single tag_set, safetyAcknowledged=true, attributes holding only Name.
-            # The tag to rename is one the safety program uses: a Bool safety tag on bit 0 of the telegram's input, created by the
-            # fixture helper, read by one F-FBD network in the generated main safety block.
-            status, new_name = 'SafeDrive_Bit0', 'SafeDrive_StoActive'
-            change('tag_create', {'tagTableName': table, 'name': 'SafeUsed', 'dataTypeName': 'Bool', 'logicalAddress': '%M10.2'}, plc=fplc)
-            seed = root / 'safety-bit-tag.json'
-            seed.write_text(json.dumps(dict(ownsPortalProcess=True, creationTool='tia_create_scratch', processId=started['processId'], projectPath=project['path'],
-                                            plcName=fplc.rsplit('/', 1)[-1], tagTable=table, tagName=status, tagAddress='%%I%d.0' % ranges['Input'])), encoding='utf-8')
-            out = subprocess.run([str(helper), 'safety-bit-tag', str(seed)], text=True, capture_output=True)
-            record('fixture creates a Bool safety tag on the telegram', {'exit': out.returncode, 'stdout': out.stdout[-2000:]})
-            assert out.returncode == 0, out.stdout
-            assert tag_rows()[status] == ('%%I%d.0' % ranges['Input'], 'Bool', True), tag_rows().get(status)
-            main_xml = client.tool('block_read', {'plcPath': fplc, 'blockName': MAIN})['xml']
-            assert main_xml.count('<NetworkSource />') == 1 and '<ProgrammingLanguage>F_FBD</ProgrammingLanguage>' in main_xml, 'The main safety block must hold exactly one empty F-FBD network'
-            logic = change('safety_import_xml', {'xml': main_xml.replace('<NetworkSource />', reading_network(status, 'SafeUsed')), 'expectedBlockNames': [MAIN], 'safetyAcknowledged': True}, plc=fplc)
-            used_xml = client.tool('block_read', {'plcPath': fplc, 'blockName': MAIN})['xml']
-            assert 'Component Name="%s"' % status in used_xml, 'The main safety block does not read the safety tag after the import'
-            record('main safety block reads the safety tag', {'stages': logic['stages'], 'compilerSucceeded': logic['compile']['compilerSucceeded'],
-                                                              'introducedErrors': logic['compile']['baselineComparison'].get('introducedErrorCount'), 'safetyAfter': logic.get('safetyAfter')})
-            assert logic['compile']['compilerSucceeded'] is True, logic['compile']
+            # The tag to rename is the status bit the safety program reads.
+            status, new_name = tags['status'], 'SafeDrive_StoActive'
             before = tag_rows()
             rename = lambda **more: {'tagTableName': table, 'memberName': status, 'attributes': {'Name': new_name}, **more}
             refusals = [

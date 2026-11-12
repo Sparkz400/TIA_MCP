@@ -21,6 +21,7 @@ import re
 
 from compilation_evidence import require_clean_compile, require_plc_compile
 from library_native_harness import Harness, require
+from preview_payload import preview_payload
 from qualification_owned_scratch import complete_inventory, snapshot
 from qualify_plc_object_mutations import STAGES, coverage_gaps, diff, in_order, matches, view
 
@@ -216,12 +217,13 @@ class Run:
         return {"kind": kind, "payload": payload, **({"plcPath": self.plc} if kind.startswith("webserver_") else {}), **top}
 
     def prepare(self, label, kind, payload, preview=None, shown=None, exact=None):
-        """preview must match recursively, exact must be equal and the echoed payload must equal shown (default: payload)."""
+        """preview must match recursively, exact must be equal and the echoed payload must equal shown (default: payload as the
+        preview echoes it, persisted source/XML text by bytes and sha256)."""
         prepared = self.h.stage("prepare " + label, lambda: self.h.tool("change_prepare", self.args(kind, payload)))
         actual = prepared["preview"]
         expected = {"changeId": prepared["changeId"], "kind": kind, "project": {"path": self.project}, **(preview or {})}
         require(prepared["state"] == "prepared", "Preparation of %s did not reach prepared" % label)
-        self.expect(actual["payload"] == (shown or payload) and matches(expected, actual) and all(actual.get(key) == value for key, value in (exact or {}).items()),
+        self.expect(actual["payload"] == (shown or preview_payload(payload)) and matches(expected, actual) and all(actual.get(key) == value for key, value in (exact or {}).items()),
                     label, "Preview of %s differs: %s" % (label, {key: actual.get(key) for key in [*expected, *(exact or {}), "payload"]}))
         return prepared
 

@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "ab7fccec4dcf5d5d06a9cc2cc3548cf4db707af4bda22506f6c99a22edd3b4fd",
-      "bytes": 1908487
+      "sha256": "97093cc0f55ce63949445b2b21c86c5ddf7c4d30a63895ea4fa2deb1102c854b",
+      "bytes": 1915045
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2982,8 +2982,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
-      "sha256": "967370ce2473f2d9a50ddf59bdecf64810fc4129aecf0534f6fba19b343e9848",
-      "bytes": 47658
+      "sha256": "c96e82231d1de0fec95d1cfbd701bb3c3467791c05eddfa753f83a5264bf9089",
+      "bytes": 48890
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
@@ -3077,8 +3077,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
-      "sha256": "04dba4674119f501ac3e4742734063d84e2aaab94b40ee9d3504e9d26fa46850",
-      "bytes": 8271
+      "sha256": "64c0d914cfc89559773ed3f248b999d479afcb577b62f74ad594f5a820990499",
+      "bytes": 10003
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
@@ -3457,8 +3457,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TagAddressRules.cs",
-      "sha256": "e4a1380021dc7354a566b38f5ccd89d33302349075e79c72c2efda3c70cfbd5f",
-      "bytes": 5753
+      "sha256": "30f94cc9ee1a991c1bc2bffd0bd0c39e8058fd144e547ef467f49e10f05e73c7",
+      "bytes": 6894
     },
     {
       "path": "src/TiaMcp.Openness.V21/TagBatchRules.cs",
@@ -89487,8 +89487,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -89549,8 +89549,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -89894,8 +89894,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -92097,8 +92097,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 520,
-              "endLine": 533,
+              "line": 537,
+              "endLine": 550,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             }
           ]
@@ -92117,8 +92117,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 535,
-              "endLine": 590,
+              "line": 552,
+              "endLine": 607,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -92155,8 +92155,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 520,
-              "endLine": 533,
+              "line": 537,
+              "endLine": 550,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             }
           ]
@@ -92175,8 +92175,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 535,
-              "endLine": 590,
+              "line": 552,
+              "endLine": 607,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -92213,8 +92213,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 520,
-              "endLine": 533,
+              "line": 537,
+              "endLine": 550,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             }
           ]
@@ -92233,8 +92233,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 535,
-              "endLine": 590,
+              "line": 552,
+              "endLine": 607,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -93259,8 +93259,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
@@ -93482,8 +93482,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 520,
-              "endLine": 533,
+              "line": 537,
+              "endLine": 550,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -93762,9 +93762,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "SafetyDriveTagPlan",
-              "line": 40,
-              "endLine": 85,
-              "sha256": "f0d9fc4dbed40d6e5aa6c73e811eacee8dfa3f5a193e7a821b53d7120e40a9ae"
+              "line": 42,
+              "endLine": 101,
+              "sha256": "5ecc00106596dd78cfe13773513c1ebcade851d2e1bb49d6a1cd3e701072456d"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs",
@@ -94013,9 +94013,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "ApplySafetyDriveTags",
-              "line": 88,
-              "endLine": 107,
-              "sha256": "744df3bbfe8c02cc20307143e39c55aec1d1466d32404c2f66106044a6d310cf"
+              "line": 104,
+              "endLine": 123,
+              "sha256": "0b5fd04d2c49820d509be7509adf0fa12bb532037fdf40443e8c02ff49224dfa"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
@@ -94161,8 +94161,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScratchSecurity.cs",
@@ -94244,8 +94244,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 535,
-              "endLine": 590,
+              "line": 552,
+              "endLine": 607,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -94500,8 +94500,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
@@ -94723,8 +94723,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 520,
-              "endLine": 533,
+              "line": 537,
+              "endLine": 550,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -95003,9 +95003,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "SafetyDriveTagPlan",
-              "line": 40,
-              "endLine": 85,
-              "sha256": "f0d9fc4dbed40d6e5aa6c73e811eacee8dfa3f5a193e7a821b53d7120e40a9ae"
+              "line": 42,
+              "endLine": 101,
+              "sha256": "5ecc00106596dd78cfe13773513c1ebcade851d2e1bb49d6a1cd3e701072456d"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs",
@@ -95254,9 +95254,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "ApplySafetyDriveTags",
-              "line": 88,
-              "endLine": 107,
-              "sha256": "744df3bbfe8c02cc20307143e39c55aec1d1466d32404c2f66106044a6d310cf"
+              "line": 104,
+              "endLine": 123,
+              "sha256": "0b5fd04d2c49820d509be7509adf0fa12bb532037fdf40443e8c02ff49224dfa"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
@@ -95402,8 +95402,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScratchSecurity.cs",
@@ -95485,8 +95485,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 535,
-              "endLine": 590,
+              "line": 552,
+              "endLine": 607,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -95772,8 +95772,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
@@ -95995,8 +95995,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 520,
-              "endLine": 533,
+              "line": 537,
+              "endLine": 550,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -96275,9 +96275,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "SafetyDriveTagPlan",
-              "line": 40,
-              "endLine": 85,
-              "sha256": "f0d9fc4dbed40d6e5aa6c73e811eacee8dfa3f5a193e7a821b53d7120e40a9ae"
+              "line": 42,
+              "endLine": 101,
+              "sha256": "5ecc00106596dd78cfe13773513c1ebcade851d2e1bb49d6a1cd3e701072456d"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs",
@@ -96526,9 +96526,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "ApplySafetyDriveTags",
-              "line": 88,
-              "endLine": 107,
-              "sha256": "744df3bbfe8c02cc20307143e39c55aec1d1466d32404c2f66106044a6d310cf"
+              "line": 104,
+              "endLine": 123,
+              "sha256": "0b5fd04d2c49820d509be7509adf0fa12bb532037fdf40443e8c02ff49224dfa"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
@@ -96674,8 +96674,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScratchSecurity.cs",
@@ -96757,8 +96757,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 535,
-              "endLine": 590,
+              "line": 552,
+              "endLine": 607,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -97013,8 +97013,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
@@ -97236,8 +97236,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 520,
-              "endLine": 533,
+              "line": 537,
+              "endLine": 550,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -97516,9 +97516,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "SafetyDriveTagPlan",
-              "line": 40,
-              "endLine": 85,
-              "sha256": "f0d9fc4dbed40d6e5aa6c73e811eacee8dfa3f5a193e7a821b53d7120e40a9ae"
+              "line": 42,
+              "endLine": 101,
+              "sha256": "5ecc00106596dd78cfe13773513c1ebcade851d2e1bb49d6a1cd3e701072456d"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs",
@@ -97767,9 +97767,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "ApplySafetyDriveTags",
-              "line": 88,
-              "endLine": 107,
-              "sha256": "744df3bbfe8c02cc20307143e39c55aec1d1466d32404c2f66106044a6d310cf"
+              "line": 104,
+              "endLine": 123,
+              "sha256": "0b5fd04d2c49820d509be7509adf0fa12bb532037fdf40443e8c02ff49224dfa"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
@@ -97915,8 +97915,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScratchSecurity.cs",
@@ -97998,8 +97998,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 535,
-              "endLine": 590,
+              "line": 552,
+              "endLine": 607,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -98254,8 +98254,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
@@ -98477,8 +98477,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 520,
-              "endLine": 533,
+              "line": 537,
+              "endLine": 550,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -98757,9 +98757,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "SafetyDriveTagPlan",
-              "line": 40,
-              "endLine": 85,
-              "sha256": "f0d9fc4dbed40d6e5aa6c73e811eacee8dfa3f5a193e7a821b53d7120e40a9ae"
+              "line": 42,
+              "endLine": 101,
+              "sha256": "5ecc00106596dd78cfe13773513c1ebcade851d2e1bb49d6a1cd3e701072456d"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs",
@@ -99008,9 +99008,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "ApplySafetyDriveTags",
-              "line": 88,
-              "endLine": 107,
-              "sha256": "744df3bbfe8c02cc20307143e39c55aec1d1466d32404c2f66106044a6d310cf"
+              "line": 104,
+              "endLine": 123,
+              "sha256": "0b5fd04d2c49820d509be7509adf0fa12bb532037fdf40443e8c02ff49224dfa"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
@@ -99156,8 +99156,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScratchSecurity.cs",
@@ -99239,8 +99239,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 535,
-              "endLine": 590,
+              "line": 552,
+              "endLine": 607,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -99495,8 +99495,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
@@ -99718,8 +99718,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 520,
-              "endLine": 533,
+              "line": 537,
+              "endLine": 550,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -99998,9 +99998,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "SafetyDriveTagPlan",
-              "line": 40,
-              "endLine": 85,
-              "sha256": "f0d9fc4dbed40d6e5aa6c73e811eacee8dfa3f5a193e7a821b53d7120e40a9ae"
+              "line": 42,
+              "endLine": 101,
+              "sha256": "5ecc00106596dd78cfe13773513c1ebcade851d2e1bb49d6a1cd3e701072456d"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs",
@@ -100249,9 +100249,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "ApplySafetyDriveTags",
-              "line": 88,
-              "endLine": 107,
-              "sha256": "744df3bbfe8c02cc20307143e39c55aec1d1466d32404c2f66106044a6d310cf"
+              "line": 104,
+              "endLine": 123,
+              "sha256": "0b5fd04d2c49820d509be7509adf0fa12bb532037fdf40443e8c02ff49224dfa"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
@@ -100397,8 +100397,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScratchSecurity.cs",
@@ -100480,8 +100480,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 535,
-              "endLine": 590,
+              "line": 552,
+              "endLine": 607,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -100736,8 +100736,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
@@ -100959,8 +100959,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 520,
-              "endLine": 533,
+              "line": 537,
+              "endLine": 550,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -101239,9 +101239,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "SafetyDriveTagPlan",
-              "line": 40,
-              "endLine": 85,
-              "sha256": "f0d9fc4dbed40d6e5aa6c73e811eacee8dfa3f5a193e7a821b53d7120e40a9ae"
+              "line": 42,
+              "endLine": 101,
+              "sha256": "5ecc00106596dd78cfe13773513c1ebcade851d2e1bb49d6a1cd3e701072456d"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs",
@@ -101490,9 +101490,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "ApplySafetyDriveTags",
-              "line": 88,
-              "endLine": 107,
-              "sha256": "744df3bbfe8c02cc20307143e39c55aec1d1466d32404c2f66106044a6d310cf"
+              "line": 104,
+              "endLine": 123,
+              "sha256": "0b5fd04d2c49820d509be7509adf0fa12bb532037fdf40443e8c02ff49224dfa"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
@@ -101638,8 +101638,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScratchSecurity.cs",
@@ -101721,8 +101721,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 535,
-              "endLine": 590,
+              "line": 552,
+              "endLine": 607,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -101977,8 +101977,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
@@ -102200,8 +102200,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "PrepareGroupEdit",
-              "line": 520,
-              "endLine": 533,
+              "line": 537,
+              "endLine": 550,
               "sha256": "3b764a5cd7c5aa3463546a46c9a33b4dea108866c8391e7508f07676c86f50e5"
             },
             {
@@ -102480,9 +102480,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "SafetyDriveTagPlan",
-              "line": 40,
-              "endLine": 85,
-              "sha256": "f0d9fc4dbed40d6e5aa6c73e811eacee8dfa3f5a193e7a821b53d7120e40a9ae"
+              "line": 42,
+              "endLine": 101,
+              "sha256": "5ecc00106596dd78cfe13773513c1ebcade851d2e1bb49d6a1cd3e701072456d"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs",
@@ -102731,9 +102731,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "ApplySafetyDriveTags",
-              "line": 88,
-              "endLine": 107,
-              "sha256": "744df3bbfe8c02cc20307143e39c55aec1d1466d32404c2f66106044a6d310cf"
+              "line": 104,
+              "endLine": 123,
+              "sha256": "0b5fd04d2c49820d509be7509adf0fa12bb532037fdf40443e8c02ff49224dfa"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
@@ -102879,8 +102879,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "CheckDeleteDependencies",
               "line": 476,
-              "endLine": 518,
-              "sha256": "dd93767792184425f73853343bd85c9a8179057782ab8620f30b2a962d2a6ad3"
+              "endLine": 527,
+              "sha256": "5cc005ecb5b21f27922cd4e5e6c60cdfce02e1b9595731f73de80f5bce5eb21a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScratchSecurity.cs",
@@ -102962,8 +102962,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
               "name": "GroupEdit",
-              "line": 535,
-              "endLine": 590,
+              "line": 552,
+              "endLine": 607,
               "sha256": "f3395f224e56e80630a17039e1c8d17913e3f7e76dd0fa3b27fe85928f6136d2"
             },
             {
@@ -106316,9 +106316,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "SafetyDriveTagPlan",
-              "line": 40,
-              "endLine": 85,
-              "sha256": "f0d9fc4dbed40d6e5aa6c73e811eacee8dfa3f5a193e7a821b53d7120e40a9ae"
+              "line": 42,
+              "endLine": 101,
+              "sha256": "5ecc00106596dd78cfe13773513c1ebcade851d2e1bb49d6a1cd3e701072456d"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
@@ -106343,9 +106343,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyDriveTags.cs",
               "name": "ApplySafetyDriveTags",
-              "line": 88,
-              "endLine": 107,
-              "sha256": "744df3bbfe8c02cc20307143e39c55aec1d1466d32404c2f66106044a6d310cf"
+              "line": 104,
+              "endLine": 123,
+              "sha256": "0b5fd04d2c49820d509be7509adf0fa12bb532037fdf40443e8c02ff49224dfa"
             }
           ]
         }
@@ -117580,10 +117580,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.safety.drive-tags.20261107",
-          "profileSha256": "2f994d3c35e65fd7bfc311d02d73508708074d960d8e952936d68f9adad7fc4f",
+          "id": "local.safety.drive-tags-bool.20261112",
+          "profileSha256": "e346bb2022bffda31c1ca7f22c094897662683f4a0bf30d83852cd3c669dbc46",
           "artifacts": [
-            "evidence/local.safety.drive-tags.20261107.json"
+            "evidence/local.safety.drive-tags-bool.20261112.json"
           ]
         }
       ],
@@ -118253,6 +118253,13 @@
           "profileSha256": "ae0d59a8d9182c3976629151e39fa7e88233ed8614352f6baa87061520817908",
           "artifacts": [
             "evidence/local.safety.tag-batch.20261111.json"
+          ]
+        },
+        {
+          "id": "local.safety.drive-tags-bool.20261112",
+          "profileSha256": "e346bb2022bffda31c1ca7f22c094897662683f4a0bf30d83852cd3c669dbc46",
+          "artifacts": [
+            "evidence/local.safety.drive-tags-bool.20261112.json"
           ]
         }
       ],
@@ -119189,6 +119196,13 @@
           "artifacts": [
             "evidence/local.safety.fio-block-routes.20261102.json"
           ]
+        },
+        {
+          "id": "local.vci_git.de.20261112",
+          "profileSha256": "e25bd8babf4308a43dea2c4d8c169a487286a46b2b1cc2ba7d271b4dfaa6257a",
+          "artifacts": [
+            "evidence/local.vci_git.de.20261112.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -119235,6 +119249,13 @@
           "artifacts": [
             "evidence/local.vci_git.20261031.json"
           ]
+        },
+        {
+          "id": "local.vci_git.de.20261112",
+          "profileSha256": "e25bd8babf4308a43dea2c4d8c169a487286a46b2b1cc2ba7d271b4dfaa6257a",
+          "artifacts": [
+            "evidence/local.vci_git.de.20261112.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -119280,6 +119301,13 @@
           "profileSha256": "fcaed3208f3caf0691fb0940043b20d44a419401f473fa858542ddd9f20e30d5",
           "artifacts": [
             "evidence/local.vci_git.20261031.json"
+          ]
+        },
+        {
+          "id": "local.vci_git.de.20261112",
+          "profileSha256": "e25bd8babf4308a43dea2c4d8c169a487286a46b2b1cc2ba7d271b4dfaa6257a",
+          "artifacts": [
+            "evidence/local.vci_git.de.20261112.json"
           ]
         }
       ],
@@ -119333,6 +119361,13 @@
           "profileSha256": "c4f379e28d6f5998c6b83b077c1f8eddd417d2811fbcec49040b3544f22c709a",
           "artifacts": [
             "evidence/local.safety.fio-routes.20261101.json"
+          ]
+        },
+        {
+          "id": "local.vci_git.de.20261112",
+          "profileSha256": "e25bd8babf4308a43dea2c4d8c169a487286a46b2b1cc2ba7d271b4dfaa6257a",
+          "artifacts": [
+            "evidence/local.vci_git.de.20261112.json"
           ]
         }
       ],
@@ -138378,6 +138413,13 @@
           "artifacts": [
             "evidence/local.tia.v19-adapter.20261109.json"
           ]
+        },
+        {
+          "id": "local.tia.v19-adapter.shared-loop.20261112",
+          "profileSha256": "e4242a23e27d51c1e44c392c0b7fc94113c6d449ae5ea7242b63cb0173f5d04f",
+          "artifacts": [
+            "evidence/local.tia.v19-adapter.shared-loop.20261112.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -142867,6 +142909,11 @@
       "sha256": "0dd198c55e2711a7097c52e622d1eec8c4d32adcec0213d90591e12dcb560120"
     },
     {
+      "path": "evidence/local.safety.drive-tags-bool.20261112.json",
+      "state": "observed",
+      "sha256": "718093591f30fdf7b613bb2d7c3eeee2ffff3d2e36fdccc692f55ef0ccb44b78"
+    },
+    {
       "path": "evidence/local.safety.drive-tags.20261107.json",
       "state": "observed",
       "sha256": "d693b7935fc6bce4f98a7ca32e604a3f9c97ca91e4bed62026d1f76107a1703a"
@@ -143075,6 +143122,11 @@
       "path": "evidence/local.tia.v19-adapter.20261109.json",
       "state": "observed",
       "sha256": "c7ea08a11afaaa4ed883b873289ea70ec3ab4cc13e48208f98ab4a6121d7c85e"
+    },
+    {
+      "path": "evidence/local.tia.v19-adapter.shared-loop.20261112.json",
+      "state": "observed",
+      "sha256": "2a1d1286f765548a8a5ac52eb1231a39e86fea0a127dfeca047410b78f937c57"
     },
     {
       "path": "evidence/local.translation.adoption-refusal.20261102.json",
@@ -143340,6 +143392,11 @@
       "path": "evidence/local.vci_git.20261031.json",
       "state": "observed",
       "sha256": "adac56e15a0e91125c618b73c35c6e274311c08c4a0d396b9c502bb6ba6384d3"
+    },
+    {
+      "path": "evidence/local.vci_git.de.20261112.json",
+      "state": "observed",
+      "sha256": "ff3dcdc0d2f6eae9e84555863477c46117c67a91302a440eb623d5aaecd3ab8e"
     },
     {
       "path": "evidence/local.vci_mappings.20261028.json",
@@ -144237,6 +144294,10 @@
       "profileSha256": "619abb75a6897820c6e846289f62af816f4201c253e31585815bc0f764899ce8"
     },
     {
+      "id": "local.safety.drive-tags-bool.20261112",
+      "profileSha256": "e346bb2022bffda31c1ca7f22c094897662683f4a0bf30d83852cd3c669dbc46"
+    },
+    {
       "id": "local.safety.drive-tags.20261107",
       "profileSha256": "2f994d3c35e65fd7bfc311d02d73508708074d960d8e952936d68f9adad7fc4f"
     },
@@ -144403,6 +144464,10 @@
     {
       "id": "local.tia.v19-adapter.20261109",
       "profileSha256": "20d609b3ca464cd313e0643ad590285423af4ef9c51887343fc8e980b461b07b"
+    },
+    {
+      "id": "local.tia.v19-adapter.shared-loop.20261112",
+      "profileSha256": "e4242a23e27d51c1e44c392c0b7fc94113c6d449ae5ea7242b63cb0173f5d04f"
     },
     {
       "id": "local.translation.adoption-refusal.20261102",
@@ -144615,6 +144680,10 @@
     {
       "id": "local.vci_git.20261031",
       "profileSha256": "fcaed3208f3caf0691fb0940043b20d44a419401f473fa858542ddd9f20e30d5"
+    },
+    {
+      "id": "local.vci_git.de.20261112",
+      "profileSha256": "e25bd8babf4308a43dea2c4d8c169a487286a46b2b1cc2ba7d271b4dfaa6257a"
     },
     {
       "id": "local.vci_mappings.20261028",

@@ -284,7 +284,7 @@ explicitly:
 ```json
 {
   "kind": "tag_set",
-  "payload": { "tagTableName": "SafeDriveTags", "memberName": "SafeDrive_S_ZSW1",
+  "payload": { "tagTableName": "SafeDriveTags", "memberName": "SafeDrive_ZSW1_0",
                "attributes": { "Name": "SafeDrive_Status" }, "safetyAcknowledged": true }
 }
 ```
@@ -317,6 +317,10 @@ with a PROFIsafe telegram, in two runs:
   main safety block. After the rename the block named the new tag and was
   consistent, the compile reported no new error, and the four offline signatures
   were again the same before and after.
+
+Since 12 November 2026 the renamed tag is a status bit that `safety_drive_tags`
+created, read by an F-FBD network that also writes a created control bit
+(`local.safety.drive-tags-bool.20261112`).
 
 That is what TIA V21 did in this fixture, not a rule. Other uses of a safety tag
 (several blocks, an F-FB interface, F-LAD, F-I/O modules) are not exercised, so
@@ -393,10 +397,17 @@ second item TIA rejects after the first was written, which must end
 `recovery_required`, block further changes and restore to the state before the
 batch. The refusals of a batch that touches a real safety tag or an F-I/O address
 are checked on an F-CPU by `scripts/qualify_safety_drive_tags.py` and
-`scripts/qualify_fio_tag_routes.py`. One limit showed there: on an F-CPU a
-`tag_delete` batch item naming a standard tag was refused, because its
-dependency scan could not export the safety program's block `FOB_RTG1`
-([open item](../TODO.md#release-mechanics-and-policy)).
+`scripts/qualify_fio_tag_routes.py`.
+
+The dependency scan of `tag_delete`, `constant_delete`, `type_delete` and
+`block_delete` exports every block, type and tag table of the PLC and looks for the
+name. TIA refuses to export the blocks it generates for a safety program (the
+runtime group's F-OB `FOB_RTG1`, which TIA reports as a know-how protected SCL OB,
+and the blocks in its system block groups), and their native cross-references name
+no references either. So on a PLC with a safety program every such delete is
+refused with `DependencyCoverageIncomplete`; the message names the block and its
+language, protection and consistency. This is deliberate (12 November 2026):
+nothing proves those blocks free of the name.
 
 ### Fingerprint reuse between changes
 
@@ -602,7 +613,7 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `vci_conflict_resolve` | `workspacePath`, `objectPath`, `comparisonRef` (a `vci_package_compare` record), `packageId`, `take: "native"`, `"remote"` or `"merged"`; `mergedRecordRef` for `merged` | Resolves one reviewed `divergentChange` row (project side = native, workspace side = remote). The Host binds the exact remote package hashes and the bytes to write; the workspace package must equal the reviewed remote side and a fresh export of the object must hash to the reviewed native side (`contentSha256` from `vci_workspace_inspect`). `native`: `Synchronize(ProjectToWorkspace)`. `remote`/`merged`: writes the bound document, then `Synchronize(WorkspaceToProject)` with `compile=true`; a tag-table document with a tag on an F-I/O address refuses at prepare (`SafetyBoundary`). Reads back `Equal`. See [two-sided conflicts](../reference/vci-package-workflow.md#two-sided-conflict-resolution). Verified (`local.vci_git.20261031`). |
 | `safety_import_xml` | `xml`, `expectedBlockNames: [...]`, `safetyAcknowledged: true` | Dedicated import for consistent, exportable user F-blocks on a safety-enabled PLC with the required existing login state. |
 | `safety_fparameter_set` | `safetyAcknowledged: true`, `parameters: [{ hardwarePath, name, expected, value }]` (1..64) | Writes the F-parameters the [F-parameter allowlist](#f-parameter-allowlist) qualifies for the F-I/O's module type, on F-I/O owned by the selected safety PLC (its central F-source address and solely owned I/O addresses). `expected` must equal the current value; an F-destination address used or planned by another F-I/O refuses (`AddressConflict`). The safety program must already be logged in if protected. The preview shows before/after and the F-I/O `Failsafe_*Signature*` attributes; apply reads back the values and signatures, needs `compile=true` (whole-project device compile) and verifies configured-hardware preservation. It changes the safety signatures and does not validate, approve, assign PROFIsafe addresses or download. Verified for `Failsafe_FDestinationAddress` (`local.safety_changes.20261028`). |
-| `safety_drive_tags` | `safetyAcknowledged: true`, `hardwarePath`, `driveObjectNumber` or `driveObjectIndex`, `tagTableName` (root group), `tags: { status, control }` | Creates one drive object's PROFIsafe telegram 30 status (S_ZSW1, `%IW<input start>`) and control (S_STW1, `%QW<output start>`) Word tags on the owning F-PLC, at the addresses Startdrive reports (see `drive_inventory`). Refuses other telegrams, names or addresses in use and addresses outside an F-I/O range of this drive the PLC owns; reads each tag back as a safety tag and compiles the device. Generic tag routes refuse these addresses with `SafetyBoundary`. Verified (`local.safety.drive-tags.20261107`). |
+| `safety_drive_tags` | `safetyAcknowledged: true`, `hardwarePath`, `driveObjectNumber` or `driveObjectIndex`, `tagTableName` (root group), `bits: [{ word: "status" or "control", bit: 0..15, name }]` (1..32) | Creates one Bool safety tag per named bit of one drive object's PROFIsafe telegram 30 status word (S_ZSW1, input) or control word (S_STW1, output) on the owning F-PLC, at the addresses Startdrive reports (see `drive_inventory`). Word bit 0..7 is byte n+1, bit 8..15 byte n of the word at `%IW`/`%QW` n (S7 words are big-endian), so status bit 0 of a telegram at `%IW0` is `%I1.0`; the preview lists each address. The route gives no bit a meaning: take the bit assignment from the drive's Safety Integrated documentation. Word tags are not offered (`tags` is refused with `InvalidRequest`): the F-compiler refuses a Word access to a drive's F-I/O. Refuses other telegrams, a name in use, a bit an existing tag already covers (`AddressInUse`, also a Word tag an earlier version created; delete it in TIA first) and addresses outside an F-I/O range of this drive the PLC owns; reads each tag back as a safety tag and compiles the device. Generic tag routes refuse these addresses with `SafetyBoundary`. Verified (`local.safety.drive-tags-bool.20261112`): an F-FBD network of the main safety block reads a created status bit and writes a created control bit and compiles. |
 | `testsuite_application_import` | `sourcePath` (absolute `.tat` or `.ttst`), `expectedTestCaseNames: [...]` (optional for `.ttst`), `expectedTestSetNames: [...]` (`.ttst` only) | Strict Test Suite application import (`ImportOptions.None`, no `IgnoreInvalidObject`): existing names refuse, the file is copied byte-exact and the native return plus `Find` readback must match the reviewed names. Sets nothing as scope and runs nothing. See [Test Suite application tests](../reference/testsuite-production-jobs.md#ts-05-application-tests). |
 | `testsuite_system_import` | `sourcePath` (absolute `.tst`), `expectedTestCaseNames: [...]` | Strict Test Suite system-test import (`SystemTestCaseComposition.LoadFromFile`, `ImportOptions.None`, no `IgnoreInvalidObject`): existing names refuse, the file is copied byte-exact and the native return plus `Find` readback must match the reviewed names. Sets no OPC UA scope and runs nothing. See [Test Suite system tests](../reference/testsuite-production-jobs.md#ts-06-system-tests). |
 | `plc_alarm_text_list_import` | `artifactPath` (.xlsx), `expectedSha256`, `importOption: "None"` or `"Override"`, `expectedTextListNames: [...]`, optional `scopePath` | Native PLC alarm user text-list import into one PLC or software unit. See [PLC alarm and ProDiag imports](#plc-alarm-and-prodiag-imports). |

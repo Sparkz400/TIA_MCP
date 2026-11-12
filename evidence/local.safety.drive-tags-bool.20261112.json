@@ -1,0 +1,104 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.safety.drive-tags-bool.20261112",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-12T06:10:14+00:00",
+  "source": {
+    "commit": "019ae5e8c8898933d70ed886be5328229c1affb2",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "LT-PRG2024-03",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_safety_drive_tags.py --safety-tag-rename at 019ae5e8 on its Debug build, 38/38 steps (artifacts/sd/b8). Owned TIA V21 scratch with a CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) as IO controller of a SINAMICS G120C PN 6SL3210-1KE21-3AF1 (4.7.14); the fixture helper inserted PROFIsafe telegram 30 at input and output byte 0. safety_drive_tags refused a missing acknowledgement, the earlier Word tags payload, bit 16 and a doubled bit (InvalidRequest), then created SafeDrive_ZSW1_0 at %I1.0, SafeDrive_ZSW1_8 at %I0.0 and SafeDrive_STW1_0 at %Q1.0 as Bool safety tags with checkpoint, baseline and device compile and save; software_inspect read all three back as Bool safety tags. The five batch refusals beside the safety tags held, the tag_delete of a standard tag refused with DependencyCoverageIncomplete naming FOB_RTG1 as a know-how protected SCL OB, a repeat refused with ObjectExists and another name on a created bit with AddressInUse. safety_import_xml gave the main safety block Main_Safety_RTG1 one F-FBD network SafeDrive_STW1_0 := SafeDrive_ZSW1_0 and compiled the safety program with no introduced error. The eight rename refusals held; the acknowledged rename of SafeDrive_ZSW1_0 to SafeDrive_StoActive applied, read back as the same Bool safety tag, the block named the new tag and stayed consistent, and the four offline signatures were unchanged; change_restore of the rename returned the checkpoint.",
+  "limitations": [
+    "One SINAMICS G120C PN with PROFIsafe telegram 30 on one owned F-CPU 1511F-1 PN; three bits created and one F-FBD network of the generated main safety block reading the status bit and writing the control bit. Other bits, telegrams, drives, F-LAD and tags in software units are not exercised.",
+    "The PROFIsafe telegram was inserted by the qualification fixture. No Safety Integrated parameter, safety acceptance, password or download; compile success is engineering evidence, not machine safety acceptance.",
+    "INT tags were not probed; Bool bits are the access the F-compiler accepted."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "a01e0ac3c50aac877dbeaca8d91fa119d6cb72193912d562dfb9466e3b0374ff"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "1c823ff15cff5f50d310952f39e5c20fc398831b3501e325556e0526dd3e0d29"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "1edf8a5e027234d44b1ee798ce86457e09dfe184aed775e6dffd783c8d7d19d9"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "2eb16fcfccb9f9bdaf10559a737a593715fce42dbc164c73f21171cb34caf832",
+      "bytes": 114078,
+      "completed": true,
+      "steps": [
+        "owned scratch",
+        "types",
+        "inventory before safety telegram",
+        "fixture inserts PROFIsafe telegram 30",
+        "inventory after safety telegram",
+        "tag_create refused with SafetyBoundary",
+        "safety_drive_tags refused with InvalidRequest",
+        "safety_drive_tags refused with InvalidRequest",
+        "safety_drive_tags refused with InvalidRequest",
+        "safety_drive_tags refused with InvalidRequest",
+        "a tag_create batch of two standard tags applied on the F-CPU",
+        "safety_drive_tags applied",
+        "change_status confirms the applied change",
+        "safety tags read back",
+        "standard and safety tags before the refused batches",
+        "tag_set batch whose item 1 renames a safety tag refused with SafetyBoundary",
+        "tag_set batch whose item 1 moves a standard tag onto the safety telegram refused with SafetyBoundary",
+        "tag_delete batch whose item 0 deletes a safety tag refused with SafetyBoundary",
+        "tag_delete batch whose item 0 deletes a standard tag on the F-CPU refused with DependencyCoverageIncomplete",
+        "tag_create batch whose item 1 creates a tag on the safety telegram refused with SafetyBoundary",
+        "every tag is unchanged after the refused batches",
+        "safety_drive_tags refused with ObjectExists",
+        "safety_drive_tags refused with AddressInUse",
+        "safety program reads the status bit and writes the control bit",
+        "rename refusal: a safety tag renamed without safetyAcknowledged refused with SafetyBoundary",
+        "rename refusal: safetyAcknowledged false refused with InvalidRequest",
+        "rename refusal: a new address for a safety tag refused with SafetyBoundary",
+        "rename refusal: a new data type beside the new name refused with SafetyBoundary",
+        "rename refusal: a name another tag has refused with ObjectExists",
+        "rename refusal: safetyAcknowledged on a standard tag refused with InvalidRequest",
+        "rename refusal: safetyAcknowledged on tag_delete refused with InvalidRequest",
+        "rename refusal: safetyAcknowledged beside items refused with InvalidRequest",
+        "safety-tag rename prepared",
+        "safety-tag rename applied",
+        "renamed safety tag read back",
+        "main safety block after the rename",
+        "restore from the checkpoint",
+        "owned worker shutdown"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "drive_inventory",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}
