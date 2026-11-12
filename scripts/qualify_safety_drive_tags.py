@@ -152,13 +152,15 @@ def main():
         assert before['StdA'] == ('%M10.0', 'Bool', False) and before['StdB'] == ('%M10.1', 'Bool', False) and all(before[n][2] for n in tags.values()), before
         edit = lambda member, **attributes: {'tagTableName': table, 'memberName': member, 'attributes': attributes}
         drop = lambda member: {'tagTableName': table, 'memberName': member, 'dependencyPolicy': 'rejectReferenced'}
-        # TIA refuses to export the generated F-runtime-group OB FOB_RTG1; the dependency scan checks it through its native
-        # cross-references, so a tag_delete item of an unused standard tag passes and a later safety-tag item is reached.
+        # On this F-CPU a tag_delete item of a standard tag is refused before a later item is reached: TIA refuses to export the
+        # generated F-runtime-group OB FOB_RTG1, and its native cross-references name no references, so the dependency scan stays
+        # incomplete (DependencyCoverageIncomplete; decision of 12 November 2026). The safety tag is therefore the first item of
+        # the tag_delete batch, and the other order is recorded with the refusal it gets.
         batches = [
             ('tag_set', 'renames a safety tag', [edit('StdA', Name='StdA_R'), edit(tags['status'], Name='Renamed_S_ZSW1')], 1, 'SafetyBoundary'),
             ('tag_set', 'moves a standard tag onto the safety telegram', [edit('StdA', Name='StdA_R'), edit('StdB', LogicalAddress='%%I%d.0' % ranges['Input'])], 1, 'SafetyBoundary'),
             ('tag_delete', 'deletes a safety tag', [drop(tags['control']), drop('StdB')], 0, 'SafetyBoundary'),
-            ('tag_delete', 'deletes a safety tag after a standard tag', [drop('StdB'), drop(tags['control'])], 1, 'SafetyBoundary'),
+            ('tag_delete', 'deletes a standard tag on the F-CPU', [drop('StdB'), drop(tags['control'])], 0, 'DependencyCoverageIncomplete'),
             ('tag_create', 'creates a tag on the safety telegram', [standard('StdC', 2), {'tagTableName': table, 'name': 'Generic_S_STW1', 'dataTypeName': 'Word', 'logicalAddress': '%%QW%d' % ranges['Output']}], 1, 'SafetyBoundary'),
         ]
         for kind, label, items, index, code in batches:
@@ -166,26 +168,12 @@ def main():
             error = (result.get('structuredContent') or {}).get('error') or {}
             record('%s batch whose item %d %s refused with %s' % (kind, index, label, code), error)
             assert result.get('isError') and error.get('code') == code and error.get('message', '').startswith('items[%d]' % index), error
+            if code == 'DependencyCoverageIncomplete':
+                assert '/blocks/FOB_RTG1:' in error['message'] and 'know-how protected' in error['message'], error
             assert tag_rows() == before, 'A refused batch changed a tag'
         record('every tag is unchanged after the refused batches', before)
         refused('safety_drive_tags', {**payload, 'safetyAcknowledged': True}, 'ObjectExists')
         refused('safety_drive_tags', {**payload, 'bits': [{**bits[0], 'name': 'OtherName'}], 'safetyAcknowledged': True}, 'AddressInUse')
-
-        # The dependency scan beside a safety program: a standard tag is deleted, FOB_RTG1 checked by its cross-references.
-        deleted = change('tag_delete', drop('StdB'), plc=fplc)
-        scan = deleted['preview']['dependencies']
-        fob = [b for b in scan.get('crossReferencedBlocks', []) if b['objectPath'].endswith('/blocks/FOB_RTG1')]
-        record('tag_delete of a standard tag on the F-CPU applied', {'dependencies': scan, 'stages': deleted['stages']})
-        assert len(fob) == 1 and fob[0]['referencesSymbol'] is False and scan['references'] == [], scan
-        # The fallback must see something: FOB_RTG1 calls the main safety block of its runtime group.
-        assert fob[0]['sources'] >= 1 and fob[0]['references'] >= 1 and MAIN in fob[0]['referencedNames'], fob[0]
-        assert all(b['sources'] >= 1 for b in scan['crossReferencedBlocks']), scan['crossReferencedBlocks']
-        assert 'StdB' not in tag_rows(), 'StdB was not deleted'
-        # A block FOB_RTG1 uses: its cross-references must name the main safety block. Recorded, whatever refuses first.
-        result = client.request('tools/call', {'name': 'change_prepare', 'arguments': {'kind': 'block_delete', 'plcPath': fplc, 'payload': {'blockName': MAIN}}})
-        error = (result.get('structuredContent') or {}).get('error') or {}
-        record('block_delete of the main safety block refused with %s' % error.get('code'), error)
-        assert result.get('isError'), 'Deleting the main safety block was prepared'
 
         # The acceptance the Word tags failed: the safety program reads a created status bit and writes a created control bit.
         main_xml = client.tool('block_read', {'plcPath': fplc, 'blockName': MAIN})['xml']

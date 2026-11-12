@@ -4,7 +4,6 @@ using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
-using Siemens.Engineering.CrossReference;
 using Siemens.Engineering.SW.Blocks;
 using Siemens.Engineering.SW.Types;
 using Siemens.Engineering.SW.Tags;
@@ -480,8 +479,6 @@ namespace TiaMcp.Openness.V21
             catch (ArgumentException ex) { throw new BridgeException("DependencyPolicyRequired", ex.Message); }
             var budget = new ScanBudget(50000);
             var references = new JArray();
-            var crossReferenced = new JArray();
-            var generated = GeneratedSafetyBlockNames(plc);
             int exported = 0;
             string path = Path.Combine(change.Directory, "dependency-scan.xml");
             string selectedOwnerPath = target is PlcBlock selectedBlock ? ObjectIdentity.ObjectPath(change.GroupPath, selectedBlock.Name, selectedBlock.Namespace) :
@@ -496,19 +493,10 @@ namespace TiaMcp.Openness.V21
                     if (item is PlcBlock block)
                     {
                         try { block.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None); }
-                        catch (Exception refused) when (!(refused is BridgeException) && (ObjectIdentity.IsGeneratedPath(identity) || generated.Contains(block.Name)))
-                        {
-                            // TIA refuses to export the blocks it generates for a safety program: the F-OB of each runtime group, which it reports
-                            // as a know-how protected SCL OB, and the blocks in its system block groups. Such a block is checked through its own
-                            // native cross-references instead; without them the scan stays incomplete. Any other block whose export is refused
-                            // (a user's protected or inconsistent block, an I/O failure) keeps the refusal below.
-                            var checkedBlock = BlockCrossReferences(block, target, name, identity, refused);
-                            crossReferenced.Add(checkedBlock);
-                            if (checkedBlock.Value<bool>("referencesSymbol")) references.Add(new JObject { ["objectPath"] = identity, ["evidence"] = "TIA refuses to export this block; its native cross-references list the symbol." });
-                            return;
-                        }
                         catch (Exception refused) when (!(refused is BridgeException))
                         {
+                            // TIA refuses to export some blocks, among them those it generates for a safety program (FOB_RTG1). Their native
+                            // cross-references name no references (12 November 2026), so nothing proves such a block free of the symbol.
                             throw new BridgeException("DependencyCoverageIncomplete", "Cannot inspect " + identity + ": " + refused.Message + " " + BlockTraits(block));
                         }
                     }
@@ -532,77 +520,18 @@ namespace TiaMcp.Openness.V21
                 foreach (var table in TagTables(scope.Tags, scope.Path + "/tags", budget)) inspect(table.Item, table.Path);
             }
             if (budget.Truncated) throw new BridgeException("DependencyCoverageIncomplete", "The exported dependency index is truncated.");
-            var result = new JObject { ["policy"] = "rejectReferenced", ["exportedObjects"] = exported, ["references"] = references, ["crossReferencedBlocks"] = crossReferenced,
+            var result = new JObject { ["policy"] = "rejectReferenced", ["exportedObjects"] = exported, ["references"] = references,
                 ["scope"] = "Exposed offline PLC scopes, blocks, types and tag tables. Conservative token matching; runtime pointer aliases and external consumers cannot be proven absent.", ["cascade"] = false };
             if (references.Count != 0) throw new BridgeException("DependencyExists", "Remove explicit dependencies before deleting this object; no cascade is performed.", result);
             return result;
         }
 
-        // The F-OB of every safety runtime group, as the safety administration names it; empty without one.
-        private HashSet<string> GeneratedSafetyBlockNames(PlcSelection plc)
-        {
-            var names = new HashSet<string>(StringComparer.Ordinal);
-            try
-            {
-                var safety = SafetyAdministrationFor(plc.Software);
-                if (safety != null) foreach (var group in safety.RuntimeGroups) if (!string.IsNullOrEmpty(group.FOBName)) names.Add(group.FOBName);
-            }
-            catch (Exception) { names.Clear(); }
-            return names;
-        }
-
-        // What TIA reports for a block whose export is refused, so a refusal names why the cross-reference fallback did not apply.
+        // What TIA reports for a block whose export is refused, so the refusal names the block's kind.
         private static string BlockTraits(PlcBlock block)
         {
             string Read(Func<object> read) { try { return Convert.ToString(read()); } catch (Exception ex) { return "unreadable (" + ex.GetType().Name + ")"; } }
             return "(programming language " + Read(() => block.ProgrammingLanguage) + ", know-how protected " + Read(() => block.IsKnowHowProtected) +
-                ", consistent " + Read(() => block.IsConsistent) + "; only blocks TIA generates for a safety program are checked through their cross-references.)";
-        }
-
-        private static string RefusalText(Exception refusal) =>
-            string.Join(" ", (refusal?.Message ?? "").Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(line => line.Trim()));
-
-        // A block TIA will not export: its CrossReferenceService lists the objects it uses. A reference to the target object, or to an
-        // object or location with the target's name, counts as a dependency (conservative). No service, a failure, no source at all or
-        // an over-deep reference tree leaves the scan incomplete. The entry records what the service returned.
-        private static JObject BlockCrossReferences(PlcBlock block, IEngineeringObject target, string name, string identity, Exception exportRefusal)
-        {
-            string refused = RefusalText(exportRefusal);
-            CrossReferenceService service;
-            try { service = block.GetService<CrossReferenceService>(); }
-            catch (Exception ex) { throw new BridgeException("DependencyCoverageIncomplete", "Cannot inspect " + identity + ": its export is refused (" + refused + ") and its cross-references are unavailable: " + ex.Message); }
-            if (service == null)
-                throw new BridgeException("DependencyCoverageIncomplete", "Cannot inspect " + identity + ": its export is refused (" + refused + ") and it has no native cross-reference service.");
-            CrossReferenceResult native;
-            try { native = service.GetCrossReferences(CrossReferenceFilter.AllObjects); }
-            catch (Exception ex) { throw new BridgeException("DependencyCoverageIncomplete", "Cannot inspect " + identity + ": its export is refused (" + refused + ") and its cross-references failed: " + ex.Message); }
-            bool Same(string text) => string.Equals(text, name, StringComparison.OrdinalIgnoreCase) || string.Equals((text ?? "").Trim('"'), name, StringComparison.OrdinalIgnoreCase);
-            int sources = 0, referenceCount = 0;
-            bool used = false;
-            var names = new SortedSet<string>(StringComparer.Ordinal);
-            void Walk(IEnumerable<SourceObject> level, int depth)
-            {
-                if (depth > 64) throw new BridgeException("DependencyCoverageIncomplete", "Cannot inspect " + identity + ": its cross-reference tree is deeper than 64 levels.");
-                foreach (var source in level)
-                {
-                    sources++;
-                    foreach (var reference in source.References)
-                    {
-                        referenceCount++;
-                        if (names.Count < 50 && !string.IsNullOrEmpty(reference.Name)) names.Add(reference.Name);
-                        if (Equals(reference.UnderlyingObject, target) || Same(reference.Name) || reference.Locations.Any(location => Same(location.ReferencedAsName))) used = true;
-                    }
-                    Walk(source.Children, depth + 1);
-                }
-            }
-            Walk(native.Sources, 0);
-            if (sources == 0)
-                throw new BridgeException("DependencyCoverageIncomplete", "Cannot inspect " + identity + ": its export is refused (" + refused + ") and its cross-references name no source.");
-            JToken Read(Func<object> read) { try { return JToken.FromObject(read()); } catch (Exception) { return null; } }
-            return new JObject { ["objectPath"] = identity, ["exportRefused"] = refused, ["programmingLanguage"] = Read(() => block.ProgrammingLanguage.ToString()),
-                ["isKnowHowProtected"] = Read(() => block.IsKnowHowProtected), ["isConsistent"] = Read(() => block.IsConsistent),
-                ["sources"] = sources, ["references"] = referenceCount,
-                ["referencedNames"] = new JArray(names), ["referencesSymbol"] = used };
+                ", consistent " + Read(() => block.IsConsistent) + ")";
         }
 
         private void PrepareGroupEdit(EngineeringChange change, JObject preview)
