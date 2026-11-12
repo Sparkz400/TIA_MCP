@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.179",
+  "catalogVersion": "0.4.180",
   "targetTiaVersions": [
     21
   ],
@@ -5877,6 +5877,25 @@
         "The safety offline program had no password, so the SafetyLoginRequired refusal is covered by the shared guard of the other safety kinds only.",
         "No safety acceptance, password or download. Engineering evidence only, not machine safety acceptance."
       ]
+    },
+    {
+      "id": "local.safety.drive-tags-bool.20261112",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "019ae5e8c8898933d70ed886be5328229c1affb2",
+        "passedScope": "scripts/qualify_safety_drive_tags.py --safety-tag-rename at 019ae5e8 on its Debug build, 38/38 steps (artifacts/sd/b8). Owned TIA V21 scratch with a CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) as IO controller of a SINAMICS G120C PN 6SL3210-1KE21-3AF1 (4.7.14); the fixture helper inserted PROFIsafe telegram 30 at input and output byte 0. safety_drive_tags refused a missing acknowledgement, the earlier Word tags payload, bit 16 and a doubled bit (InvalidRequest), then created SafeDrive_ZSW1_0 at %I1.0, SafeDrive_ZSW1_8 at %I0.0 and SafeDrive_STW1_0 at %Q1.0 as Bool safety tags with checkpoint, baseline and device compile and save; software_inspect read all three back as Bool safety tags. The five batch refusals beside the safety tags held, the tag_delete of a standard tag refused with DependencyCoverageIncomplete naming FOB_RTG1 as a know-how protected SCL OB, a repeat refused with ObjectExists and another name on a created bit with AddressInUse. safety_import_xml gave the main safety block Main_Safety_RTG1 one F-FBD network SafeDrive_STW1_0 := SafeDrive_ZSW1_0 and compiled the safety program with no introduced error. The eight rename refusals held; the acknowledged rename of SafeDrive_ZSW1_0 to SafeDrive_StoActive applied, read back as the same Bool safety tag, the block named the new tag and stayed consistent, and the four offline signatures were unchanged; change_restore of the rename returned the checkpoint."
+      },
+      "artifacts": [
+        "evidence/local.safety.drive-tags-bool.20261112.json"
+      ],
+      "limitations": [
+        "One SINAMICS G120C PN with PROFIsafe telegram 30 on one owned F-CPU 1511F-1 PN; three bits (status 0 and 8, control 0) created, one F-FBD network of the generated main safety block reading the status bit and writing the control bit. Other bits, telegrams, drives, F-LAD and tags in software units are not exercised.",
+        "The PROFIsafe telegram was inserted by the qualification fixture. No Safety Integrated parameter, safety acceptance, password or download; compile success is engineering evidence, not machine safety acceptance.",
+        "On this F-CPU a tag_delete item of a standard tag is refused with DependencyCoverageIncomplete (decision of 12 November 2026): TIA refuses to export the generated F-runtime-group OB FOB_RTG1, reported as a know-how protected SCL OB, and in an earlier run of the same day its native cross-references named one source and no references.",
+        "Machine LT-PRG2024-03 (second workstation), German TIA V21 installation."
+      ]
     }
   ],
   "features": [
@@ -9716,7 +9735,8 @@
           "Exact standard unprotected block only. dependencyPolicy defaults to rejectReferenced; other deletion policies are not accepted.",
           "The conservative exported-XML dependency scan runs at prepare and immediately before deletion. It excludes only the exact selected declaration and rejects references or incomplete evidence; no cascade deletion or automatic reference rewriting.",
           "The dependency guard refused deleting a referenced FB natively (DependencyExists) in local.plc_object_mutations.20261028.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "On a PLC with a safety program the scan is refused with DependencyCoverageIncomplete by decision (12 November 2026): TIA refuses to export the generated F-runtime-group OB FOB_RTG1 (a know-how protected SCL OB), and its native cross-references name no references, so nothing proves it free of the name. The message names the block and its programming language, protection and consistency."
         ]
       },
       "qualification": {
@@ -10707,7 +10727,7 @@
     {
       "featureId": "change.safety_drive_tags",
       "domain": "safety",
-      "title": "Create a drive's PROFIsafe telegram 30 safety tags",
+      "title": "Create Bool safety tags on a drive's PROFIsafe telegram 30 bits",
       "mcpTools": [
         "change_prepare",
         "change_apply",
@@ -10724,16 +10744,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Payload: hardwarePath and driveObjectNumber or driveObjectIndex of one drive object, tagTableName (a table in the PLC's root tag-table group), tags {status, control} and safetyAcknowledged: true. Creates S_ZSW1 at %IW<input start> and S_STW1 at %QW<output start> as Word, from Startdrive's addresses of PROFIsafe telegram 30 only.",
-          "Refuses without acknowledgement or writable safety administration (UnsupportedCapability), without a PROFIsafe telegram (SafetyTelegramMissing), for any telegram other than 30 (UnsupportedSafetyTelegram), for a name or overlapping address already in use (ObjectExists, AddressInUse) and for an address outside an F-I/O range of this drive that the selected F-PLC owns (SafetyBoundary). Apply re-plans, refuses StaleRevision on any difference, reads every tag back as a safety tag and compiles the device.",
-          "Generic tag routes keep refusing these addresses: shared F-I/O ranges include drives' PROFIsafe telegram addresses since 7 November 2026.",
-          "Observed on 11 November 2026: the F-compiler rejects the created Word tags as accesses of the safety program (the access does not match the channel structure of the F-I/O; WORD is not permitted for inputs and outputs of an F-I/O). They name the telegram words for standard program and diagnostics use; whether the route should create INT or per-bit tags instead is open (docs/TODO.md)."
+          "Payload: hardwarePath and driveObjectNumber or driveObjectIndex of one drive object, tagTableName (a table in the PLC's root tag-table group), bits [{word: status|control, bit: 0..15, name}] (1..32) and safetyAcknowledged: true. Creates one Bool tag per bit of S_ZSW1 (input) or S_STW1 (output) of PROFIsafe telegram 30 only, at Startdrive's addresses; word bit 0..7 is byte n+1, bit 8..15 byte n. The route gives no bit a meaning.",
+          "The earlier tags payload (Word tags) is refused with InvalidRequest: the F-compiler refuses a Word access to a drive's F-I/O (observed 11 November 2026).",
+          "Refuses without acknowledgement or writable safety administration (UnsupportedCapability), without a PROFIsafe telegram (SafetyTelegramMissing), for any telegram other than 30 (UnsupportedSafetyTelegram), for a name in use (ObjectExists), a bit an existing tag already covers, including a Word tag of the earlier version (AddressInUse), and an address outside an F-I/O range of this drive that the selected F-PLC owns (SafetyBoundary). Apply re-plans, refuses StaleRevision on any difference, reads every tag back as a Bool safety tag and compiles the device.",
+          "Generic tag routes keep refusing these addresses: shared F-I/O ranges include drives' PROFIsafe telegram addresses since 7 November 2026."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.safety.drive-tags.20261107"
+          "local.safety.drive-tags-bool.20261112"
         ]
       },
       "availability": {
@@ -12055,7 +12075,8 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "dependencyPolicy=rejectReferenced is mandatory. Conservative exported-XML scans reject references and incomplete evidence.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "On a PLC with a safety program the scan is refused with DependencyCoverageIncomplete by decision (12 November 2026): TIA refuses to export the generated F-runtime-group OB FOB_RTG1 (a know-how protected SCL OB), and its native cross-references name no references, so nothing proves it free of the name. The message names the block and its programming language, protection and consistency."
         ]
       },
       "qualification": {
@@ -12231,7 +12252,7 @@
           "dependencyPolicy=rejectReferenced is mandatory; conservative scan rejects references and incomplete evidence. Safety/system members remain excluded.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Observed on an F-CPU with a safety program: a tag_delete batch item naming a standard tag (dependencyPolicy rejectReferenced) was refused with DependencyCoverageIncomplete, because the dependency scan could not export the safety block FOB_RTG1 (local.safety.tag-batch.20261111). Whether this is intended is open (docs/TODO.md)."
+          "On a PLC with a safety program the scan is refused with DependencyCoverageIncomplete by decision (12 November 2026): TIA refuses to export the generated F-runtime-group OB FOB_RTG1 (a know-how protected SCL OB), and its native cross-references name no references, so nothing proves it free of the name. The message names the block and its programming language, protection and consistency."
         ]
       },
       "qualification": {
@@ -12239,7 +12260,8 @@
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028",
           "local.change-batch.items.20261111",
-          "local.safety.tag-batch.20261111"
+          "local.safety.tag-batch.20261111",
+          "local.safety.drive-tags-bool.20261112"
         ]
       },
       "availability": {
@@ -12286,7 +12308,8 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "dependencyPolicy=rejectReferenced is mandatory; conservative scan rejects references and incomplete evidence. System constants remain excluded.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "On a PLC with a safety program the scan is refused with DependencyCoverageIncomplete by decision (12 November 2026): TIA refuses to export the generated F-runtime-group OB FOB_RTG1 (a know-how protected SCL OB), and its native cross-references name no references, so nothing proves it free of the name. The message names the block and its programming language, protection and consistency."
         ]
       },
       "qualification": {
