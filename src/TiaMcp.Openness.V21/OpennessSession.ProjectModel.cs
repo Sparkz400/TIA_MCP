@@ -513,15 +513,16 @@ namespace TiaMcp.Openness.V21
 
         private static bool CaptureModelBlock(PlcBlock block, string group, string parent, string plc, string scope, ModelCapture capture, bool generated)
         {
-            string path = BlockObjectPath(group, block);
-            parent = capture.NamespaceParent(group, parent, block.Namespace, plc, scope);
+            var values = BatchedAttributeReads.Block(block);
+            string path = ObjectIdentity.ObjectPath(group, values.Name, values.Namespace);
+            parent = capture.NamespaceParent(group, parent, values.Namespace, plc, scope);
             if (parent == null) return false;
-            var metadata = BlockInfo(new BlockEntry { Item = block, Path = path }, plc);
+            var metadata = BlockInfo(new BlockEntry { Item = block, Path = path }, plc, values);
             metadata.Remove("path"); metadata.Remove("plcPath"); metadata.Remove("name");
-            metadata["namespace"] = block.Namespace; metadata["modified"] = block.ModifiedDate.ToString("O"); metadata["generated"] = generated;
+            metadata["namespace"] = values.Namespace; metadata["modified"] = values.ModifiedDate.ToString("O"); metadata["generated"] = generated;
             if (block is InstanceDB instance) metadata["instanceOfName"] = instance.InstanceOfName;
             metadata["libraryInstance"] = PlcLibraryInstanceCapture.Read(block, capture.LibraryDependencyBudget.Take);
-            return capture.Add(path, parent, "block", block.Name, plc, scope, metadata) != null;
+            return capture.Add(path, parent, "block", values.Name, plc, scope, metadata) != null;
         }
 
         private void CaptureModelTypes(PlcTypeGroup group, string path, string parent, string plc, string scope, ModelCapture capture, int depth)
@@ -561,10 +562,13 @@ namespace TiaMcp.Openness.V21
                 string tableId = capture.Add(tablePath, id, "tagTable", table.Name, plc, scope, new JObject { ["modified"] = table.ModifiedTimeStamp.ToString("O") });
                 if (tableId == null) return;
                 foreach (var tag in BoundedModelItems(table.Tags, capture, tableId))
-                    if (capture.Add(tablePath + "/tags/" + Segment(tag.Name), tableId, "tag", tag.Name, plc, scope,
-                        new JObject { ["dataType"] = tag.DataTypeName, ["logicalAddress"] = tag.LogicalAddress, ["isSafety"] = tag.IsSafety,
-                            ["externalAccessible"] = tag.ExternalAccessible, ["externalVisible"] = tag.ExternalVisible, ["externalWritable"] = tag.ExternalWritable,
+                {
+                    var values = BatchedAttributeReads.Tag(tag);
+                    if (capture.Add(tablePath + "/tags/" + Segment(values.Name), tableId, "tag", values.Name, plc, scope,
+                        new JObject { ["dataType"] = values.DataTypeName, ["logicalAddress"] = values.LogicalAddress, ["isSafety"] = values.IsSafety,
+                            ["externalAccessible"] = values.ExternalAccessible, ["externalVisible"] = values.ExternalVisible, ["externalWritable"] = values.ExternalWritable,
                             ["valueSemantics"] = "Offline declaration; no live PLC value" }) == null) return;
+                }
                 foreach (var constant in BoundedModelItems(table.UserConstants, capture, tableId))
                     if (capture.Add(tablePath + "/constants/" + Segment(constant.Name), tableId, "constant", constant.Name, plc, scope,
                         new JObject { ["dataType"] = constant.DataTypeName, ["value"] = InspectionValue(constant.Value), ["valueSemantics"] = "Offline constant declaration" }) == null) return;

@@ -184,6 +184,12 @@ namespace TiaMcp.Openness.V21
             ["programmingLanguage"] = block.Item.ProgrammingLanguage.ToString(), ["isConsistent"] = block.Item.IsConsistent,
             ["isKnowHowProtected"] = block.Item.IsKnowHowProtected };
 
+        // Same fields and order as BlockInfo, from one batched read.
+        internal static JObject BlockInfo(BlockEntry block, string plcPath, BatchedAttributeReads.BlockAttributes values) => new JObject { ["path"] = block.Path, ["plcPath"] = plcPath,
+            ["name"] = values.Name, ["number"] = values.Number, ["kind"] = block.Item.GetType().Name,
+            ["programmingLanguage"] = values.ProgrammingLanguage, ["isConsistent"] = values.IsConsistent,
+            ["isKnowHowProtected"] = values.IsKnowHowProtected };
+
         internal static string Segment(string value) => Uri.EscapeDataString(value ?? "");
 
         internal static int RequiredInteger(JObject args, string name)

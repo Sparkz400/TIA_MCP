@@ -2421,6 +2421,11 @@
       "bytes": 4365
     },
     {
+      "path": "src/TiaMcp.Openness.V21/BatchedAttributeReads.cs",
+      "sha256": "880f1436d5a42e90353a48e17d5d9daafeba8de4b450c766590df1299774d6e1",
+      "bytes": 4648
+    },
+    {
       "path": "src/TiaMcp.Openness.V21/BridgeException.cs",
       "sha256": "836e3fd301ccfded78c5bf3cebf6398126601c92387375d94185850faf4200e1",
       "bytes": 361
@@ -2922,8 +2927,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Index.cs",
-      "sha256": "93cc37edf5105e165a75167d3007466fe70aa44a97882db15f0ec420f6d5acac",
-      "bytes": 15911
+      "sha256": "541c743c9a587ec5ef235ca1489d5d17ae182f1522b996187b778cfcb0011b1d",
+      "bytes": 16085
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Inspection.cs",
@@ -3042,8 +3047,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
-      "sha256": "aab2b85169ab063fee7d2dbb857b437b933e46370014e225d2bd4d4b823d304e",
-      "bytes": 91744
+      "sha256": "65dfff35c4059870741812eae4f21e5e49798606fe6412de6eb0897bbc74af06",
+      "bytes": 91976
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectProperties.cs",
@@ -3307,8 +3312,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessTraversal.cs",
-      "sha256": "d42e978f17675dc02dcca4d7473a8d36a005113e74d12860ab91a9cc11bece0d",
-      "bytes": 11927
+      "sha256": "02ee8e13dcd87320c5431881a3cd6815c78b1ca7a849468c9f8de55abda671ac",
+      "bytes": 12457
     },
     {
       "path": "src/TiaMcp.Openness.V21/OwnedQualificationPortal.cs",
@@ -89465,8 +89470,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -89872,8 +89877,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -90102,8 +90107,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -90265,8 +90270,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -91164,8 +91169,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -91198,8 +91203,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -91243,8 +91248,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -91277,8 +91282,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -91322,8 +91327,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -91557,8 +91562,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -91720,8 +91725,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -91883,8 +91888,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -92271,8 +92276,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -92408,8 +92413,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -92661,8 +92666,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -92798,8 +92803,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -93167,8 +93172,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -93838,8 +93843,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -94408,8 +94413,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -95079,8 +95084,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -95680,8 +95685,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -96351,8 +96356,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -96921,8 +96926,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -97592,8 +97597,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -98162,8 +98167,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -98833,8 +98838,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -99403,8 +99408,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -100074,8 +100079,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -100644,8 +100649,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -101315,8 +101320,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -101885,8 +101890,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -102556,8 +102561,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -103177,8 +103182,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -103299,8 +103304,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -103340,8 +103345,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -103491,8 +103496,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -103563,8 +103568,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -103792,8 +103797,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -103971,8 +103976,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -104134,8 +104139,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -104286,8 +104291,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -104327,8 +104332,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -104434,8 +104439,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -104479,8 +104484,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -104598,8 +104603,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -104691,8 +104696,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -104736,8 +104741,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -104791,8 +104796,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -104992,8 +104997,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -105711,8 +105716,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -105865,8 +105870,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -106028,8 +106033,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -106076,8 +106081,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -106166,8 +106171,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -106238,8 +106243,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -106295,8 +106300,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -106374,8 +106379,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -106422,8 +106427,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -107056,8 +107061,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -107405,8 +107410,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -107772,8 +107777,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -107879,8 +107884,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -108021,8 +108026,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -108135,8 +108140,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
@@ -108242,8 +108247,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
               "name": "Add",
-              "line": 1103,
-              "endLine": 1121,
+              "line": 1107,
+              "endLine": 1125,
               "sha256": "de770d641bf7a85f269843f449fb17bf8b08567fed9a2d5035716f32c50d939b"
             },
             {
