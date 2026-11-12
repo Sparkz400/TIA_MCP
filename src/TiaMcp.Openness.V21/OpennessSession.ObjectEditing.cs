@@ -481,6 +481,7 @@ namespace TiaMcp.Openness.V21
             var budget = new ScanBudget(50000);
             var references = new JArray();
             var crossReferenced = new JArray();
+            var generated = GeneratedSafetyBlockNames(plc);
             int exported = 0;
             string path = Path.Combine(change.Directory, "dependency-scan.xml");
             string selectedOwnerPath = target is PlcBlock selectedBlock ? ObjectIdentity.ObjectPath(change.GroupPath, selectedBlock.Name, selectedBlock.Namespace) :
@@ -495,15 +496,20 @@ namespace TiaMcp.Openness.V21
                     if (item is PlcBlock block)
                     {
                         try { block.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None); }
-                        catch (Exception refused) when (!(refused is BridgeException) && IsSafetyLanguageBlock(block))
+                        catch (Exception refused) when (!(refused is BridgeException) && (ObjectIdentity.IsGeneratedPath(identity) || generated.Contains(block.Name)))
                         {
-                            // TIA refuses to export the generated blocks of a safety program (FOB_RTG1 and the F-system blocks). Such an F-block
-                            // is checked through its own native cross-references instead; without them the scan stays incomplete. A standard
-                            // block whose export is refused (protected, inconsistent, an I/O failure) keeps the refusal below.
+                            // TIA refuses to export the blocks it generates for a safety program: the F-OB of each runtime group, which it reports
+                            // as a know-how protected SCL OB, and the blocks in its system block groups. Such a block is checked through its own
+                            // native cross-references instead; without them the scan stays incomplete. Any other block whose export is refused
+                            // (a user's protected or inconsistent block, an I/O failure) keeps the refusal below.
                             var checkedBlock = BlockCrossReferences(block, target, name, identity, refused);
                             crossReferenced.Add(checkedBlock);
                             if (checkedBlock.Value<bool>("referencesSymbol")) references.Add(new JObject { ["objectPath"] = identity, ["evidence"] = "TIA refuses to export this block; its native cross-references list the symbol." });
                             return;
+                        }
+                        catch (Exception refused) when (!(refused is BridgeException))
+                        {
+                            throw new BridgeException("DependencyCoverageIncomplete", "Cannot inspect " + identity + ": " + refused.Message + " " + BlockTraits(block));
                         }
                     }
                     else if (item is PlcType type) type.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
@@ -532,10 +538,25 @@ namespace TiaMcp.Openness.V21
             return result;
         }
 
-        private static bool IsSafetyLanguageBlock(PlcBlock block)
+        // The F-OB of every safety runtime group, as the safety administration names it; empty without one.
+        private HashSet<string> GeneratedSafetyBlockNames(PlcSelection plc)
         {
-            try { return block.ProgrammingLanguage.ToString().StartsWith("F_", StringComparison.Ordinal); }
-            catch (Exception) { return false; }
+            var names = new HashSet<string>(StringComparer.Ordinal);
+            try
+            {
+                var safety = SafetyAdministrationFor(plc.Software);
+                if (safety != null) foreach (var group in safety.RuntimeGroups) if (!string.IsNullOrEmpty(group.FOBName)) names.Add(group.FOBName);
+            }
+            catch (Exception) { names.Clear(); }
+            return names;
+        }
+
+        // What TIA reports for a block whose export is refused, so a refusal names why the cross-reference fallback did not apply.
+        private static string BlockTraits(PlcBlock block)
+        {
+            string Read(Func<object> read) { try { return Convert.ToString(read()); } catch (Exception ex) { return "unreadable (" + ex.GetType().Name + ")"; } }
+            return "(programming language " + Read(() => block.ProgrammingLanguage) + ", know-how protected " + Read(() => block.IsKnowHowProtected) +
+                ", consistent " + Read(() => block.IsConsistent) + "; only blocks TIA generates for a safety program are checked through their cross-references.)";
         }
 
         private static string RefusalText(Exception refusal) =>
