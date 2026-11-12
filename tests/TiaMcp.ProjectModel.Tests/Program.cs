@@ -17,6 +17,9 @@ internal static class Program
         Console.WriteLine($"MODEL REFERENCE os={System.Runtime.InteropServices.RuntimeInformation.OSDescription}; runtime={System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}; architecture={System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture}; cpu={Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER")}; logicalProcessors={Environment.ProcessorCount}; utc={DateTime.UtcNow:O}");
         var tests = new (string Name, Func<Task> Run)[] {
             ("PLC library instance observations and saved retention", PlcLibraryInstanceRetentionTests.Run),
+            ("Batched block and tag reads use one call per object", BatchedAttributeReadsTests.BatchIsUsedAndTypedPropertiesAreNotRead),
+            ("A failing batch falls back per native type", BatchedAttributeReadsTests.FailingTypeFallsBackOnceAndOtherTypesKeepBatching),
+            ("Unexpected batch values fall back to typed properties", BatchedAttributeReadsTests.UnexpectedValuesFallBack),
             ("Add-In detached selection identity and retention", AddInSelectionTests.Run),
             ("Hierarchy and exact selection", ProjectModelTests.HierarchyAndExactSelection),
             ("Cursor, lifetime and session binding", ProjectModelTests.CursorLifetimeAndSession),

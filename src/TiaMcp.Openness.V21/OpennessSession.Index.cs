@@ -153,8 +153,9 @@ namespace TiaMcp.Openness.V21
                         if (scope.Path != plcPath) add(new JObject { ["path"] = scope.Path, ["name"] = scope.Name }, scope.Kind, plcPath, scope.Path);
                         foreach (var block in ScopeBlocks(scope, budget))
                         {
-                            var data = BlockInfo(block, plcPath); data["namespace"] = block.Item.Namespace;
-                            data["modified"] = block.Item.ModifiedDate.ToString("O"); add(data, "block", plcPath, scope.Path);
+                            var values = BatchedAttributeReads.Block(block.Item);
+                            var data = BlockInfo(block, plcPath, values); data["namespace"] = values.Namespace;
+                            data["modified"] = values.ModifiedDate.ToString("O"); add(data, "block", plcPath, scope.Path);
                         }
                         foreach (var type in ScopeTypes(scope, budget)) add(new JObject { ["path"] = type.Path, ["name"] = type.Item.Name,
                             ["namespace"] = type.Item.Namespace, ["modified"] = type.Item.ModifiedDate.ToString("O"),
@@ -165,8 +166,9 @@ namespace TiaMcp.Openness.V21
                             foreach (var tag in table.Item.Tags)
                             {
                                 if (!budget.Take()) break;
-                                add(new JObject { ["path"] = table.Path + "/tags/" + Segment(tag.Name), ["name"] = tag.Name,
-                                    ["dataType"] = tag.DataTypeName, ["logicalAddress"] = tag.LogicalAddress, ["isSafety"] = tag.IsSafety }, "tag", plcPath, scope.Path);
+                                var values = BatchedAttributeReads.Tag(tag);
+                                add(new JObject { ["path"] = table.Path + "/tags/" + Segment(values.Name), ["name"] = values.Name,
+                                    ["dataType"] = values.DataTypeName, ["logicalAddress"] = values.LogicalAddress, ["isSafety"] = values.IsSafety }, "tag", plcPath, scope.Path);
                             }
                             foreach (var constant in table.Item.UserConstants)
                             {

@@ -9,6 +9,7 @@
     <Compile Include="../../src/TiaMcp.Host/ProjectExplorerArtifacts.cs" Link="ProjectExplorerArtifacts.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelStore.cs" Link="ProjectModelStore.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/PlcLibraryInstanceCapture.cs" Link="PlcLibraryInstanceCapture.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/BatchedAttributeReads.cs" Link="BatchedAttributeReads.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/LibraryDependencyCapture.cs" Link="LibraryDependencyCapture.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/BridgeException.cs" Link="BridgeException.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs" Link="OpennessSession.ScanBudget.cs" />
