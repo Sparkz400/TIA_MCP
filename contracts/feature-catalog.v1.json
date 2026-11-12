@@ -5912,6 +5912,22 @@
       "limitations": [
         "A rerun of local.vci_git.20261031 on a German TIA V21 installation; same fixture and limits (local bare Git remote, no network remote or credentials)."
       ]
+    },
+    {
+      "id": "local.tia.v19-adapter.shared-loop.20261112",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 19,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "ef6fa5d65e4c2dd5a06f71916e1536a5c5692e37",
+        "passedScope": "scripts/qualify_tia_v19.py --run-native at ef6fa5d6 on its Debug build, run v19_dd2dd36f, 53/53 stages, the same stages as local.tia.v19-adapter.20261109, now with the V19 worker on the request loop, error mapping and traversal it shares with the V21 worker since PR 279: seeded owned V19 fixture, V19 Host tool surface and refusals, project_open, inventory, software and native-XML reads of every seeded object, attach to a held V19 Portal, and V19-to-V21 project_upgrade of folder and archive with SourceLocked while held; every owned V19 Portal exited and the fixture's files outside TIA's search index were unchanged."
+      },
+      "artifacts": [
+        "evidence/local.tia.v19-adapter.shared-loop.20261112.json"
+      ],
+      "limitations": [
+        "Read-only V19 check of the shared worker loop; the AccessDenied and LicenseUnavailable mappings by exact Siemens type were not provoked natively."
+      ]
     }
   ],
   "features": [
@@ -11779,7 +11795,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.tia.v19-adapter.20261109"
+          "local.tia.v19-adapter.20261109",
+          "local.tia.v19-adapter.shared-loop.20261112"
         ]
       },
       "availability": {

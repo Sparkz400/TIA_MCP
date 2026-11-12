@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "83614bae5c88a3f13443a60b7c358262cb7765180493a7c267e241844cd6660e",
-      "bytes": 1913803
+      "sha256": "97093cc0f55ce63949445b2b21c86c5ddf7c4d30a63895ea4fa2deb1102c854b",
+      "bytes": 1915045
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -138413,6 +138413,13 @@
           "artifacts": [
             "evidence/local.tia.v19-adapter.20261109.json"
           ]
+        },
+        {
+          "id": "local.tia.v19-adapter.shared-loop.20261112",
+          "profileSha256": "e4242a23e27d51c1e44c392c0b7fc94113c6d449ae5ea7242b63cb0173f5d04f",
+          "artifacts": [
+            "evidence/local.tia.v19-adapter.shared-loop.20261112.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -143117,6 +143124,11 @@
       "sha256": "c7ea08a11afaaa4ed883b873289ea70ec3ab4cc13e48208f98ab4a6121d7c85e"
     },
     {
+      "path": "evidence/local.tia.v19-adapter.shared-loop.20261112.json",
+      "state": "observed",
+      "sha256": "2a1d1286f765548a8a5ac52eb1231a39e86fea0a127dfeca047410b78f937c57"
+    },
+    {
       "path": "evidence/local.translation.adoption-refusal.20261102.json",
       "state": "observed",
       "sha256": "d984a4630157e91a2f3ccff5158e339d874d80e3b0b2a3ccdc063f4484a64d12"
@@ -144452,6 +144464,10 @@
     {
       "id": "local.tia.v19-adapter.20261109",
       "profileSha256": "20d609b3ca464cd313e0643ad590285423af4ef9c51887343fc8e980b461b07b"
+    },
+    {
+      "id": "local.tia.v19-adapter.shared-loop.20261112",
+      "profileSha256": "e4242a23e27d51c1e44c392c0b7fc94113c6d449ae5ea7242b63cb0173f5d04f"
     },
     {
       "id": "local.translation.adoption-refusal.20261102",

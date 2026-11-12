@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.180",
-    "catalogSha256": "83614bae5c88a3f13443a60b7c358262cb7765180493a7c267e241844cd6660e",
+    "catalogSha256": "97093cc0f55ce63949445b2b21c86c5ddf7c4d30a63895ea4fa2deb1102c854b",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "5c4786dd1c89d694fbb8dd6cedda08b781fd52cfb05022cdeda06a2770ef8125"
   },
@@ -6258,28 +6258,32 @@
         "X12"
       ],
       "evidenceIds": [
-        "local.tia.v19-adapter.20261109"
+        "local.tia.v19-adapter.20261109",
+        "local.tia.v19-adapter.shared-loop.20261112"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.tia.v19-adapter.20261109"
+            "local.tia.v19-adapter.20261109",
+            "local.tia.v19-adapter.shared-loop.20261112"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.tia.v19-adapter.20261109"
+            "local.tia.v19-adapter.20261109",
+            "local.tia.v19-adapter.shared-loop.20261112"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.tia.v19-adapter.20261109"
+            "local.tia.v19-adapter.20261109",
+            "local.tia.v19-adapter.shared-loop.20261112"
           ]
         }
       ]
@@ -32271,6 +32275,21 @@
         {
           "path": "evidence/local.tia.v19-adapter.20261109.json",
           "sha256": "c7ea08a11afaaa4ed883b873289ea70ec3ab4cc13e48208f98ab4a6121d7c85e"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.tia.v19-adapter.shared-loop.20261112",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 19
+      },
+      "sourceCommit": "ef6fa5d65e4c2dd5a06f71916e1536a5c5692e37",
+      "retained": [
+        {
+          "path": "evidence/local.tia.v19-adapter.shared-loop.20261112.json",
+          "sha256": "2a1d1286f765548a8a5ac52eb1231a39e86fea0a127dfeca047410b78f937c57"
         }
       ],
       "notRetained": []
