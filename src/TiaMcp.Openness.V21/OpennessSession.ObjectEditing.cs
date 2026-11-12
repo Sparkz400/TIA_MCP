@@ -495,11 +495,11 @@ namespace TiaMcp.Openness.V21
                     if (item is PlcBlock block)
                     {
                         try { block.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None); }
-                        catch (Exception refused) when (!(refused is BridgeException) && block.IsConsistent && !block.IsKnowHowProtected)
+                        catch (Exception refused) when (!(refused is BridgeException) && IsSafetyLanguageBlock(block))
                         {
-                            // TIA refuses to export some consistent, unprotected blocks, such as the generated blocks of a safety program. Such a
-                            // block is checked through its own native cross-references instead; without them the scan stays incomplete.
-                            // Protected or inconsistent blocks keep the refusal below.
+                            // TIA refuses to export the generated blocks of a safety program (FOB_RTG1 and the F-system blocks). Such an F-block
+                            // is checked through its own native cross-references instead; without them the scan stays incomplete. A standard
+                            // block whose export is refused (protected, inconsistent, an I/O failure) keeps the refusal below.
                             var checkedBlock = BlockCrossReferences(block, target, name, identity, refused);
                             crossReferenced.Add(checkedBlock);
                             if (checkedBlock.Value<bool>("referencesSymbol")) references.Add(new JObject { ["objectPath"] = identity, ["evidence"] = "TIA refuses to export this block; its native cross-references list the symbol." });
@@ -530,6 +530,12 @@ namespace TiaMcp.Openness.V21
                 ["scope"] = "Exposed offline PLC scopes, blocks, types and tag tables. Conservative token matching; runtime pointer aliases and external consumers cannot be proven absent.", ["cascade"] = false };
             if (references.Count != 0) throw new BridgeException("DependencyExists", "Remove explicit dependencies before deleting this object; no cascade is performed.", result);
             return result;
+        }
+
+        private static bool IsSafetyLanguageBlock(PlcBlock block)
+        {
+            try { return block.ProgrammingLanguage.ToString().StartsWith("F_", StringComparison.Ordinal); }
+            catch (Exception) { return false; }
         }
 
         private static string RefusalText(Exception refusal) =>
@@ -571,7 +577,10 @@ namespace TiaMcp.Openness.V21
             Walk(native.Sources, 0);
             if (sources == 0)
                 throw new BridgeException("DependencyCoverageIncomplete", "Cannot inspect " + identity + ": its export is refused (" + refused + ") and its cross-references name no source.");
-            return new JObject { ["objectPath"] = identity, ["exportRefused"] = refused, ["sources"] = sources, ["references"] = referenceCount,
+            JToken Read(Func<object> read) { try { return JToken.FromObject(read()); } catch (Exception) { return null; } }
+            return new JObject { ["objectPath"] = identity, ["exportRefused"] = refused, ["programmingLanguage"] = Read(() => block.ProgrammingLanguage.ToString()),
+                ["isKnowHowProtected"] = Read(() => block.IsKnowHowProtected), ["isConsistent"] = Read(() => block.IsConsistent),
+                ["sources"] = sources, ["references"] = referenceCount,
                 ["referencedNames"] = new JArray(names), ["referencesSymbol"] = used };
         }
 
