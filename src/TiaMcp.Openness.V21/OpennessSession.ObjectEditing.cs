@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
+using Siemens.Engineering.CrossReference;
 using Siemens.Engineering.SW.Blocks;
 using Siemens.Engineering.SW.Types;
 using Siemens.Engineering.SW.Tags;
@@ -479,6 +480,7 @@ namespace TiaMcp.Openness.V21
             catch (ArgumentException ex) { throw new BridgeException("DependencyPolicyRequired", ex.Message); }
             var budget = new ScanBudget(50000);
             var references = new JArray();
+            var crossReferenced = new JArray();
             int exported = 0;
             string path = Path.Combine(change.Directory, "dependency-scan.xml");
             string selectedOwnerPath = target is PlcBlock selectedBlock ? ObjectIdentity.ObjectPath(change.GroupPath, selectedBlock.Name, selectedBlock.Namespace) :
@@ -490,7 +492,19 @@ namespace TiaMcp.Openness.V21
                 if (++exported > 2000) throw new BridgeException("DependencyCoverageIncomplete", "Deletion dependency scan exceeds 2000 exported objects.");
                 try
                 {
-                    if (item is PlcBlock block) block.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                    if (item is PlcBlock block)
+                    {
+                        try { block.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None); }
+                        catch (Exception refused) when (!(refused is BridgeException))
+                        {
+                            // TIA refuses to export some blocks, such as the generated F-runtime-group OB of a safety program. Such a block is
+                            // checked through its own native cross-references instead; without them the scan stays incomplete.
+                            bool used = BlockCrossReferencesSymbol(block, target, name, identity, refused);
+                            crossReferenced.Add(new JObject { ["objectPath"] = identity, ["exportRefused"] = FirstLine(refused.Message), ["referencesSymbol"] = used });
+                            if (used) references.Add(new JObject { ["objectPath"] = identity, ["evidence"] = "TIA refuses to export this block; its native cross-references list the symbol." });
+                            return;
+                        }
+                    }
                     else if (item is PlcType type) type.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
                     else ((PlcTagTable)item).Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
                     var xml = EngineeringSources.ReadXml(File.ReadAllText(path));
@@ -511,10 +525,43 @@ namespace TiaMcp.Openness.V21
                 foreach (var table in TagTables(scope.Tags, scope.Path + "/tags", budget)) inspect(table.Item, table.Path);
             }
             if (budget.Truncated) throw new BridgeException("DependencyCoverageIncomplete", "The exported dependency index is truncated.");
-            var result = new JObject { ["policy"] = "rejectReferenced", ["exportedObjects"] = exported, ["references"] = references,
+            var result = new JObject { ["policy"] = "rejectReferenced", ["exportedObjects"] = exported, ["references"] = references, ["crossReferencedBlocks"] = crossReferenced,
                 ["scope"] = "Exposed offline PLC scopes, blocks, types and tag tables. Conservative token matching; runtime pointer aliases and external consumers cannot be proven absent.", ["cascade"] = false };
             if (references.Count != 0) throw new BridgeException("DependencyExists", "Remove explicit dependencies before deleting this object; no cascade is performed.", result);
             return result;
+        }
+
+        private static string FirstLine(string text) => (text ?? "").Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
+
+        // A block TIA will not export: its CrossReferenceService lists every object it uses. A reference to the target object, or to an
+        // object or location with the target's name, counts as a dependency (conservative). No service, a failure or an over-deep
+        // reference tree leaves the scan incomplete.
+        private static bool BlockCrossReferencesSymbol(PlcBlock block, IEngineeringObject target, string name, string identity, Exception exportRefusal)
+        {
+            CrossReferenceService service;
+            try { service = block.GetService<CrossReferenceService>(); }
+            catch (Exception ex) { throw new BridgeException("DependencyCoverageIncomplete", "Cannot inspect " + identity + ": its export is refused (" + FirstLine(exportRefusal.Message) + ") and its cross-references are unavailable: " + ex.Message); }
+            if (service == null)
+                throw new BridgeException("DependencyCoverageIncomplete", "Cannot inspect " + identity + ": its export is refused (" + FirstLine(exportRefusal.Message) + ") and it has no native cross-reference service.");
+            CrossReferenceResult native;
+            try { native = service.GetCrossReferences(CrossReferenceFilter.AllObjects); }
+            catch (Exception ex) { throw new BridgeException("DependencyCoverageIncomplete", "Cannot inspect " + identity + ": its export is refused and its cross-references failed: " + ex.Message); }
+            bool Same(string text) => string.Equals(text, name, StringComparison.OrdinalIgnoreCase) || string.Equals((text ?? "").Trim('"'), name, StringComparison.OrdinalIgnoreCase);
+            bool Walk(IEnumerable<SourceObject> sources, int depth)
+            {
+                if (depth > 64) throw new BridgeException("DependencyCoverageIncomplete", "Cannot inspect " + identity + ": its cross-reference tree is deeper than 64 levels.");
+                foreach (var source in sources)
+                {
+                    foreach (var reference in source.References)
+                    {
+                        if (Equals(reference.UnderlyingObject, target) || Same(reference.Name)) return true;
+                        if (reference.Locations.Any(location => Same(location.ReferencedAsName))) return true;
+                    }
+                    if (Walk(source.Children, depth + 1)) return true;
+                }
+                return false;
+            }
+            return Walk(native.Sources, 0);
         }
 
         private void PrepareGroupEdit(EngineeringChange change, JObject preview)
