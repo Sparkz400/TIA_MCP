@@ -177,6 +177,9 @@ def main():
         fob = [b for b in scan.get('crossReferencedBlocks', []) if b['objectPath'].endswith('/blocks/FOB_RTG1')]
         record('tag_delete of a standard tag on the F-CPU applied', {'dependencies': scan, 'stages': deleted['stages']})
         assert len(fob) == 1 and fob[0]['referencesSymbol'] is False and scan['references'] == [], scan
+        # The fallback must see something: FOB_RTG1 calls the main safety block of its runtime group.
+        assert fob[0]['sources'] >= 1 and fob[0]['references'] >= 1 and MAIN in fob[0]['referencedNames'], fob[0]
+        assert all(b['sources'] >= 1 for b in scan['crossReferencedBlocks']), scan['crossReferencedBlocks']
         assert 'StdB' not in tag_rows(), 'StdB was not deleted'
         # A block FOB_RTG1 uses: its cross-references must name the main safety block. Recorded, whatever refuses first.
         result = client.request('tools/call', {'name': 'change_prepare', 'arguments': {'kind': 'block_delete', 'plcPath': fplc, 'payload': {'blockName': MAIN}}})
