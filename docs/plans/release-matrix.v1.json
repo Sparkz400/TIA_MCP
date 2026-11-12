@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.180",
-    "catalogSha256": "a9c9cb874e72ae0804476cf771b2c3b6aacf6e1b15506c026e8f6802e43cb76b",
+    "catalogSha256": "83614bae5c88a3f13443a60b7c358262cb7765180493a7c267e241844cd6660e",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "5c4786dd1c89d694fbb8dd6cedda08b781fd52cfb05022cdeda06a2770ef8125"
   },
@@ -19155,7 +19155,8 @@
       ],
       "evidenceIds": [
         "local.vci_mappings.20261028",
-        "local.vci_git.20261031"
+        "local.vci_git.20261031",
+        "local.vci_git.de.20261112"
       ],
       "cells": [
         {
@@ -19163,7 +19164,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.vci_mappings.20261028",
-            "local.vci_git.20261031"
+            "local.vci_git.20261031",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19171,7 +19173,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.vci_mappings.20261028",
-            "local.vci_git.20261031"
+            "local.vci_git.20261031",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19179,7 +19182,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.vci_mappings.20261028",
-            "local.vci_git.20261031"
+            "local.vci_git.20261031",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19187,7 +19191,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.vci_mappings.20261028",
-            "local.vci_git.20261031"
+            "local.vci_git.20261031",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19195,7 +19200,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.vci_mappings.20261028",
-            "local.vci_git.20261031"
+            "local.vci_git.20261031",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19203,7 +19209,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.vci_mappings.20261028",
-            "local.vci_git.20261031"
+            "local.vci_git.20261031",
+            "local.vci_git.de.20261112"
           ]
         }
       ]
@@ -19224,7 +19231,8 @@
       ],
       "evidenceIds": [
         "local.vci_mappings.20261028",
-        "local.vci_git.20261031"
+        "local.vci_git.20261031",
+        "local.vci_git.de.20261112"
       ],
       "cells": [
         {
@@ -19232,7 +19240,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.vci_mappings.20261028",
-            "local.vci_git.20261031"
+            "local.vci_git.20261031",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19240,7 +19249,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.vci_mappings.20261028",
-            "local.vci_git.20261031"
+            "local.vci_git.20261031",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19248,7 +19258,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.vci_mappings.20261028",
-            "local.vci_git.20261031"
+            "local.vci_git.20261031",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19256,7 +19267,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.vci_mappings.20261028",
-            "local.vci_git.20261031"
+            "local.vci_git.20261031",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19264,7 +19276,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.vci_mappings.20261028",
-            "local.vci_git.20261031"
+            "local.vci_git.20261031",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19272,7 +19285,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.vci_mappings.20261028",
-            "local.vci_git.20261031"
+            "local.vci_git.20261031",
+            "local.vci_git.de.20261112"
           ]
         }
       ]
@@ -19294,7 +19308,8 @@
       "evidenceIds": [
         "local.vci_mappings.20261028",
         "local.vci_git.20261031",
-        "local.safety.fio-routes.20261101"
+        "local.safety.fio-routes.20261101",
+        "local.vci_git.de.20261112"
       ],
       "cells": [
         {
@@ -19303,7 +19318,8 @@
           "evidenceIds": [
             "local.vci_mappings.20261028",
             "local.vci_git.20261031",
-            "local.safety.fio-routes.20261101"
+            "local.safety.fio-routes.20261101",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19312,7 +19328,8 @@
           "evidenceIds": [
             "local.vci_mappings.20261028",
             "local.vci_git.20261031",
-            "local.safety.fio-routes.20261101"
+            "local.safety.fio-routes.20261101",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19321,7 +19338,8 @@
           "evidenceIds": [
             "local.vci_mappings.20261028",
             "local.vci_git.20261031",
-            "local.safety.fio-routes.20261101"
+            "local.safety.fio-routes.20261101",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19330,7 +19348,8 @@
           "evidenceIds": [
             "local.vci_mappings.20261028",
             "local.vci_git.20261031",
-            "local.safety.fio-routes.20261101"
+            "local.safety.fio-routes.20261101",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19339,7 +19358,8 @@
           "evidenceIds": [
             "local.vci_mappings.20261028",
             "local.vci_git.20261031",
-            "local.safety.fio-routes.20261101"
+            "local.safety.fio-routes.20261101",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -19348,7 +19368,8 @@
           "evidenceIds": [
             "local.vci_mappings.20261028",
             "local.vci_git.20261031",
-            "local.safety.fio-routes.20261101"
+            "local.safety.fio-routes.20261101",
+            "local.vci_git.de.20261112"
           ]
         }
       ]
@@ -27643,7 +27664,8 @@
         "local.vci_git.20261031",
         "local.safety.fio-routes-2.20261101",
         "local.safety.fio-routes.20261102",
-        "local.safety.fio-block-routes.20261102"
+        "local.safety.fio-block-routes.20261102",
+        "local.vci_git.de.20261112"
       ],
       "cells": [
         {
@@ -27653,7 +27675,8 @@
             "local.vci_git.20261031",
             "local.safety.fio-routes-2.20261101",
             "local.safety.fio-routes.20261102",
-            "local.safety.fio-block-routes.20261102"
+            "local.safety.fio-block-routes.20261102",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -27663,7 +27686,8 @@
             "local.vci_git.20261031",
             "local.safety.fio-routes-2.20261101",
             "local.safety.fio-routes.20261102",
-            "local.safety.fio-block-routes.20261102"
+            "local.safety.fio-block-routes.20261102",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -27673,7 +27697,8 @@
             "local.vci_git.20261031",
             "local.safety.fio-routes-2.20261101",
             "local.safety.fio-routes.20261102",
-            "local.safety.fio-block-routes.20261102"
+            "local.safety.fio-block-routes.20261102",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -27683,7 +27708,8 @@
             "local.vci_git.20261031",
             "local.safety.fio-routes-2.20261101",
             "local.safety.fio-routes.20261102",
-            "local.safety.fio-block-routes.20261102"
+            "local.safety.fio-block-routes.20261102",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -27693,7 +27719,8 @@
             "local.vci_git.20261031",
             "local.safety.fio-routes-2.20261101",
             "local.safety.fio-routes.20261102",
-            "local.safety.fio-block-routes.20261102"
+            "local.safety.fio-block-routes.20261102",
+            "local.vci_git.de.20261112"
           ]
         },
         {
@@ -27703,7 +27730,8 @@
             "local.vci_git.20261031",
             "local.safety.fio-routes-2.20261101",
             "local.safety.fio-routes.20261102",
-            "local.safety.fio-block-routes.20261102"
+            "local.safety.fio-block-routes.20261102",
+            "local.vci_git.de.20261112"
           ]
         }
       ]
@@ -33064,6 +33092,21 @@
         {
           "path": "evidence/local.vci_git.20261031.json",
           "sha256": "adac56e15a0e91125c618b73c35c6e274311c08c4a0d396b9c502bb6ba6384d3"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.vci_git.de.20261112",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "cf84b8856302900188a085abf8c7836e18f776fc",
+      "retained": [
+        {
+          "path": "evidence/local.vci_git.de.20261112.json",
+          "sha256": "ff3dcdc0d2f6eae9e84555863477c46117c67a91302a440eb623d5aaecd3ab8e"
         }
       ],
       "notRetained": []

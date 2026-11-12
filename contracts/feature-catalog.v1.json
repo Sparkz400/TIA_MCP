@@ -5896,6 +5896,22 @@
         "On this F-CPU a tag_delete item of a standard tag is refused with DependencyCoverageIncomplete (decision of 12 November 2026): TIA refuses to export the generated F-runtime-group OB FOB_RTG1, reported as a know-how protected SCL OB, and in an earlier run of the same day its native cross-references named one source and no references.",
         "Machine LT-PRG2024-03 (second workstation), German TIA V21 installation."
       ]
+    },
+    {
+      "id": "local.vci_git.de.20261112",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "cf84b8856302900188a085abf8c7836e18f776fc",
+        "passedScope": "scripts/qualify_vci_mappings.py --run-native at cf84b885 on the Debug build of 019ae5e8 (src unchanged since), 202/202 steps (artifacts/v2): VCI workspace in the project's editing language on a German TIA V21 installation, mapping add, synchronize both ways, remove, the external Git round trip and the reviewed conflict resolutions with restores, in one owned scratch CPU 1511-1 PN. Reruns local.vci_git.20261031 after the runner compares previews with source shown by bytes and sha256."
+      },
+      "artifacts": [
+        "evidence/local.vci_git.de.20261112.json"
+      ],
+      "limitations": [
+        "A rerun of local.vci_git.20261031 on a German TIA V21 installation; same fixture and limits (local bare Git remote, no network remote or credentials)."
+      ]
     }
   ],
   "features": [
@@ -22006,7 +22022,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.vci_mappings.20261028",
-          "local.vci_git.20261031"
+          "local.vci_git.20261031",
+          "local.vci_git.de.20261112"
         ]
       },
       "availability": {
@@ -22061,7 +22078,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.vci_mappings.20261028",
-          "local.vci_git.20261031"
+          "local.vci_git.20261031",
+          "local.vci_git.de.20261112"
         ]
       },
       "availability": {
@@ -22119,7 +22137,8 @@
         "evidenceIds": [
           "local.vci_mappings.20261028",
           "local.vci_git.20261031",
-          "local.safety.fio-routes.20261101"
+          "local.safety.fio-routes.20261101",
+          "local.vci_git.de.20261112"
         ]
       },
       "availability": {
@@ -29694,7 +29713,8 @@
           "local.vci_git.20261031",
           "local.safety.fio-routes-2.20261101",
           "local.safety.fio-routes.20261102",
-          "local.safety.fio-block-routes.20261102"
+          "local.safety.fio-block-routes.20261102",
+          "local.vci_git.de.20261112"
         ]
       },
       "availability": {

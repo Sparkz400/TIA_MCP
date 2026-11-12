@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "a9c9cb874e72ae0804476cf771b2c3b6aacf6e1b15506c026e8f6802e43cb76b",
-      "bytes": 1912624
+      "sha256": "83614bae5c88a3f13443a60b7c358262cb7765180493a7c267e241844cd6660e",
+      "bytes": 1913803
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -119196,6 +119196,13 @@
           "artifacts": [
             "evidence/local.safety.fio-block-routes.20261102.json"
           ]
+        },
+        {
+          "id": "local.vci_git.de.20261112",
+          "profileSha256": "e25bd8babf4308a43dea2c4d8c169a487286a46b2b1cc2ba7d271b4dfaa6257a",
+          "artifacts": [
+            "evidence/local.vci_git.de.20261112.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -119242,6 +119249,13 @@
           "artifacts": [
             "evidence/local.vci_git.20261031.json"
           ]
+        },
+        {
+          "id": "local.vci_git.de.20261112",
+          "profileSha256": "e25bd8babf4308a43dea2c4d8c169a487286a46b2b1cc2ba7d271b4dfaa6257a",
+          "artifacts": [
+            "evidence/local.vci_git.de.20261112.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -119287,6 +119301,13 @@
           "profileSha256": "fcaed3208f3caf0691fb0940043b20d44a419401f473fa858542ddd9f20e30d5",
           "artifacts": [
             "evidence/local.vci_git.20261031.json"
+          ]
+        },
+        {
+          "id": "local.vci_git.de.20261112",
+          "profileSha256": "e25bd8babf4308a43dea2c4d8c169a487286a46b2b1cc2ba7d271b4dfaa6257a",
+          "artifacts": [
+            "evidence/local.vci_git.de.20261112.json"
           ]
         }
       ],
@@ -119340,6 +119361,13 @@
           "profileSha256": "c4f379e28d6f5998c6b83b077c1f8eddd417d2811fbcec49040b3544f22c709a",
           "artifacts": [
             "evidence/local.safety.fio-routes.20261101.json"
+          ]
+        },
+        {
+          "id": "local.vci_git.de.20261112",
+          "profileSha256": "e25bd8babf4308a43dea2c4d8c169a487286a46b2b1cc2ba7d271b4dfaa6257a",
+          "artifacts": [
+            "evidence/local.vci_git.de.20261112.json"
           ]
         }
       ],
@@ -143354,6 +143382,11 @@
       "sha256": "adac56e15a0e91125c618b73c35c6e274311c08c4a0d396b9c502bb6ba6384d3"
     },
     {
+      "path": "evidence/local.vci_git.de.20261112.json",
+      "state": "observed",
+      "sha256": "ff3dcdc0d2f6eae9e84555863477c46117c67a91302a440eb623d5aaecd3ab8e"
+    },
+    {
       "path": "evidence/local.vci_mappings.20261028.json",
       "state": "observed",
       "sha256": "3d85e1cb639255382159d670644184e182311e62e58e1be12225ed1cfb9a2252"
@@ -144631,6 +144664,10 @@
     {
       "id": "local.vci_git.20261031",
       "profileSha256": "fcaed3208f3caf0691fb0940043b20d44a419401f473fa858542ddd9f20e30d5"
+    },
+    {
+      "id": "local.vci_git.de.20261112",
+      "profileSha256": "e25bd8babf4308a43dea2c4d8c169a487286a46b2b1cc2ba7d271b4dfaa6257a"
     },
     {
       "id": "local.vci_mappings.20261028",
