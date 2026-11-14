@@ -40,8 +40,9 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
         => Call("catalog_query", new { filter, maxItems = Limit(maxItems) }, cancellationToken);
 
     [McpServerTool(Name = "tia_detach", Destructive = false, OpenWorld = false)]
-    [Description("Release the worker's TIA connection. Does not close an existing user-owned TIA process. A worker-owned scratch instance may be disposed.")]
-    public Task<CallToolResult> Detach(CancellationToken cancellationToken) => Call("detach", null, cancellationToken);
+    [Description("Release the worker's TIA connection. A user-owned TIA instance is only detached, never closed. For a worker-owned instance (tia_start), its projects are closed without saving (unsaved edits are discarded and listed in projectsClosed), the connection is disposed and the call waits up to waitForExitSeconds (0..300, default 30) for that Portal process to exit, reporting portalProcessId, processExited and processExitVerified. terminateOwnedIfRunning:true ends that exact owned process if it is still running after the wait; it can never reach another TIA process.")]
+    public Task<CallToolResult> Detach(CancellationToken cancellationToken, int waitForExitSeconds = 30, bool terminateOwnedIfRunning = false)
+        => Call("detach", new { waitForExitSeconds, terminateOwnedIfRunning }, cancellationToken);
 
     [McpServerTool(Name = "project_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Inspect the attached offline project: PLCs, blocks and hardware. Returns bounded results and explicit completeness. Does not connect to a PLC. Filters for large projects: groupPath (block group names from the top, e.g. \"Station 3000/Downholder\", or a group path from software_inspect) and namePrefix (case-insensitive block name prefix) select blocks; includeHardware=false omits device rows, which otherwise also count. With a filter only matching rows count against maxItems. includeBlocks=false lists hardware and PLCs only. compact=true returns short rows: hardware as path (relative to the project), name, typeIdentifier and I/O ranges (io, start, bytes), leaving out items that have neither a type identifier nor I/O addresses; blocks with paths relative to their PLC and without default-valued flags.")]

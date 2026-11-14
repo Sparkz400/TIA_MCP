@@ -141,8 +141,11 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
                     toolsets = ToolGroups.Parse(args[i]); toolsetsGiven = true; break;
                 case "--api-dir": api = Path.GetFullPath(args[i]); break;
                 case "--timeout-seconds":
-                    if (!int.TryParse(args[i], out timeout) || timeout < 5 || timeout > 900)
-                        throw new ArgumentException("--timeout-seconds must be between 5 and 900.");
+                    // Whole seconds; a decimal such as 600.0 (JSON clients often send numbers that way) is accepted and rounded up.
+                    if (!double.TryParse(args[i], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double seconds)
+                        || double.IsNaN(seconds) || seconds < 5 || seconds > 900)
+                        throw new ArgumentException("--timeout-seconds must be a number of seconds between 5 and 900 (got '" + args[i] + "').");
+                    timeout = (int)Math.Ceiling(seconds);
                     break;
                 default: throw new ArgumentException("Unknown option: " + option);
             }

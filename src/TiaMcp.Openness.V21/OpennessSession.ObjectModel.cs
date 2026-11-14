@@ -45,7 +45,8 @@ namespace TiaMcp.Openness.V21
             var project = SelectProject(args);
             if (!string.IsNullOrWhiteSpace(args.Value<string>("projectPath")) &&
                 !string.Equals(args.Value<string>("projectPath"), project.Path?.FullName, StringComparison.OrdinalIgnoreCase))
-                throw new BridgeException("ProjectMismatch", "The supplied projectPath does not identify the selected open project.");
+                throw new BridgeException("ProjectMismatch", "The supplied projectPath does not identify the selected open project.",
+                    new JObject { ["currentProjectPath"] = project.Path?.FullName, ["suppliedProjectPath"] = args.Value<string>("projectPath") });
             var budget = new ScanBudget(50000);
             var candidates = new List<NativeObjectTarget>();
             Action<NativeObjectTarget> add = target =>

@@ -14,13 +14,13 @@ namespace TiaMcp.Host;
 public sealed partial class TiaTools
 {
     [McpServerTool(Name = "project_snapshot_capture", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Save a persistent offline review: native hierarchy plus up to maxBlocks (0..200, default 25) exact standard block XML exports. request accepts projectName, plcPath, maxVisited, maxBlocks, blockPaths, maxRelationshipRoots (0..25, default 5). Captures bounded direct relationships for the first selected blocks. Native metadata is rechecked after exports; sequential content is not atomic. Protected/safety/unavailable content and omitted blocks stay explicit. Returns a content-hash reviewId usable after host restart. No project changes.")]
+    [Description("Save a persistent offline review: native hierarchy plus up to maxBlocks (0..200, default 25) exact standard block XML exports. request accepts projectName, plcPath, maxVisited, maxBlocks, blockPaths, maxRelationshipRoots (0..25, default 5), requireAllContent (refuse instead of saving when any block content is missing), hashProjectFolder (also hash every byte of the saved project folder; slower on large projects). capture.projectFolder reports the saved folder's file count, bytes and a path/size/time hash: the .ap21 file alone does not change on save. Check degraded and degradedReasons: they name failed exports, protected or unsupported blocks and blocks omitted by maxBlocks. A capture whose every export is refused for a read-only project is refused (ReadOnlyProject) instead of saved; capture a project_copy opened read-write. Captures bounded direct relationships for the first selected blocks. Native metadata is rechecked after exports; sequential content is not atomic. Protected/safety/unavailable content and omitted blocks stay explicit. Returns a content-hash reviewId usable after host restart. No project changes.")]
     public async Task<CallToolResult> ProjectSnapshotCapture(JsonElement request, CancellationToken cancellationToken)
     {
         try
         {
             var input = JsonNode.Parse(request.GetRawText())?.AsObject() ?? throw new BridgeException("InvalidRequest", "request must be an object.");
-            var permitted = new HashSet<string>(["projectName", "plcPath", "maxVisited", "maxBlocks", "blockPaths", "maxRelationshipRoots"], StringComparer.Ordinal);
+            var permitted = new HashSet<string>(["projectName", "plcPath", "maxVisited", "maxBlocks", "blockPaths", "maxRelationshipRoots", "requireAllContent", "hashProjectFolder"], StringComparer.Ordinal);
             if (input.Any(p => !permitted.Contains(p.Key))) throw new BridgeException("InvalidRequest", "Unknown snapshot capture field.");
             int maximum = input["maxBlocks"]?.GetValue<int>() ?? 25;
             if (maximum is < 0 or > 200) throw new BridgeException("InvalidRequest", "maxBlocks must be 0..200.");
@@ -76,7 +76,7 @@ public sealed partial class TiaTools
                 documents.Add(row);
                 string language = node["metadata"]?["programmingLanguage"]?.GetValue<string>() ?? "";
                 if (node["metadata"]?["isKnowHowProtected"]?.GetValue<bool>() == true || !new[] { "SCL", "STL", "LAD", "FBD", "DB" }.Contains(language, StringComparer.OrdinalIgnoreCase))
-                { row["reason"] = "Protected/safety block content is outside this review export route."; continue; }
+                { row["reason"] = "Protected/safety block content is outside this review export route."; row["skipped"] = true; continue; }
                 try
                 {
                     var block = JsonNode.Parse((await bridge.CallAsync("block_read", new { blockPath = path,
@@ -98,13 +98,24 @@ public sealed partial class TiaTools
                     row["reason"] = error.Message; row["errorCode"] = error.Code;
                 }
             }
+            var content = ProjectReviewStore.ContentCoverage(documents, allBlocks.Length, selected.Length);
+            // A capture whose every attempted export was refused for a read-only project holds no block content at all;
+            // saving it would let a later compare look clean without comparing any block. Refuse instead.
+            if (content["attemptedBlocks"]!.GetValue<int>() > 0 && content["exportedBlocks"]!.GetValue<int>() == 0
+                && documents.All(row => row?["skipped"] is not null || row?["errorCode"]?.GetValue<string>() == "ReadOnlyProject"))
+                throw new BridgeException("ReadOnlyProject", "Every block export was refused because the project is open read-only, so no block content would be captured. "
+                    + "Remediation: run project_copy, open the copy with project_open (readOnly false) in a fresh tia_start instance and capture that; the original stays untouched.");
+            if (input["requireAllContent"]?.GetValue<bool>() == true && content["degraded"]!.GetValue<bool>())
+                throw new BridgeException("SnapshotContentIncomplete", "requireAllContent is set and block content is incomplete: "
+                    + string.Join(", ", content["degradedReasons"]!.AsArray().Select(r => r!["code"]!.GetValue<string>())) + ". No review was saved.");
             var verification = await bridge.CallAsync("project_model", new { action = "verify", snapshotId }, cancellationToken);
             if (!verification.TryGetProperty("matchesCurrentMetadata", out var matched) || matched.ValueKind != JsonValueKind.True)
                 throw new BridgeException("SnapshotInvalidated", "Native metadata changed during review capture; no persistent snapshot was accepted.");
             var coverage = new JsonObject { ["selectedBlocks"] = selected.Length, ["observedBlocks"] = allBlocks.Length,
                 ["omittedBlocks"] = allBlocks.Length - selected.Length, ["originalSnapshotId"] = snapshotId,
                 ["metadataVerification"] = JsonNode.Parse(verification.GetRawText()), ["nativeContentAtomic"] = false,
-                ["relationshipObservations"] = relationships, ["relationshipCoverageComplete"] = false };
+                ["relationshipObservations"] = relationships, ["relationshipCoverageComplete"] = false, ["content"] = content,
+                ["projectFolder"] = ProjectReviewStore.ProjectFolderManifest(model["project"]!["projectPath"]!.GetValue<string>(), input["hashProjectFolder"]?.GetValue<bool>() == true) };
             return ReviewResult(new ProjectReviewStore(options.ArtifactsDirectory).Save(model, documents, coverage));
         }
         catch (Exception error) when (ReviewError(error)) { return ReviewFailure(error); }

@@ -123,8 +123,17 @@ namespace TiaMcp.Openness.V21
             result["items"] = rows; result["offset"] = offset; result["nextOffset"] = more && rows.Count > 0 ? (JToken)(offset + rows.Count) : null;
             result["metadataRevision"] = revision; result["revisionScope"] = "Only metadata observed in this bounded section; not a whole-project or HMI-content fingerprint.";
             result["observedAtUtc"] = DateTime.UtcNow.ToString("O"); result["payloadBytes"] = bytes;
-            result["coverage"] = new JObject { ["status"] = capture.Status, ["complete"] = capture.Status == "complete", ["truncated"] = capture.Status == "truncated",
-                ["pageComplete"] = !more, ["visited"] = capture.Budget.Used, ["reasons"] = capture.Diagnostics.DeepClone(),
+            // complete means the caller has everything: the capture finished AND no page is left. captureComplete keeps the
+            // capture-only meaning; nextOffset is the paging signal (a consumer once read complete=true on page 1 of 2).
+            var reasons = (JArray)capture.Diagnostics.DeepClone();
+            if (more && rows.Count > 0) reasons.Add(new JObject { ["code"] = "paginationPending", ["reason"] = "More rows remain; request offset " + (offset + rows.Count) + " with the same expectedMetadataRevision." });
+            result["totalItems"] = ordered.Count; result["hasMore"] = more;
+            result["pageCount"] = ordered.Count == 0 ? 0 : (ordered.Count + limit - 1) / limit;
+            result["coverage"] = new JObject { ["status"] = capture.Status, ["complete"] = capture.Status == "complete" && !more,
+                ["captureComplete"] = capture.Status == "complete", ["truncated"] = capture.Status == "truncated",
+                ["pageComplete"] = !more, ["hasMore"] = more, ["totalItems"] = ordered.Count,
+                ["visited"] = capture.Budget.Used, ["visitedScope"] = "Native objects touched by the traversal, including containers and skipped objects; totalItems counts the rows of this section.",
+                ["reasons"] = reasons,
                 ["scope"] = "This section and its explicitly requested details only; native proxies are never cached." };
             if (capture.ClassicScreenScopes != null) result["coverage"]["screenScopes"] = capture.ClassicScreenScopes.DeepClone();
             if (section == "resources")
@@ -145,12 +154,19 @@ namespace TiaMcp.Openness.V21
         private void HmiValidateIdentity(Project project, JObject supplied)
         {
             if (supplied == null) return;
+            // The refusal carries the current identity, so a caller can re-resolve the same hmiPath/objectPath without an
+            // extra discovery round trip. It never retries by itself: the caller decides whether the new copy is the right one.
+            JObject Current() => new JObject { ["current"] = new JObject { ["projectPath"] = project.Path?.FullName, ["projectCopyId"] = HmiProjectCopyId(project),
+                ["sessionGeneration"] = _hmiSessionGeneration }, ["supplied"] = new JObject { ["projectPath"] = supplied["projectPath"]?.DeepClone(),
+                ["projectCopyId"] = supplied["projectCopyId"]?.DeepClone(), ["sessionGeneration"] = supplied["sessionGeneration"]?.DeepClone(),
+                ["hmiPath"] = supplied["hmiPath"]?.DeepClone(), ["objectPath"] = supplied["objectPath"]?.DeepClone(), ["family"] = supplied["family"]?.DeepClone() },
+                ["remediation"] = "Inspect the target again with hmi_inspect on the open project and use the returned identity; confirm it is the project copy you meant before retrying a write." };
             if (supplied.Value<string>("projectPath") is string path && !string.Equals(path, project.Path?.FullName, StringComparison.OrdinalIgnoreCase))
-                throw new BridgeException("ProjectMismatch", "The HMI identity belongs to a different project copy.");
+                throw new BridgeException("ProjectMismatch", "The HMI identity belongs to a different project copy.", Current());
             if (supplied.Value<string>("projectCopyId") is string copy && copy != HmiProjectCopyId(project))
-                throw new BridgeException("ProjectMismatch", "The HMI project copy identity does not match the selected open project.");
+                throw new BridgeException("ProjectMismatch", "The HMI project copy identity does not match the selected open project.", Current());
             if (supplied.Value<string>("sessionGeneration") is string session && session != _hmiSessionGeneration)
-                throw new BridgeException("StaleHmiIdentity", "The HMI identity predates the current attachment/project generation. Inspect the target again.");
+                throw new BridgeException("StaleHmiIdentity", "The HMI identity predates the current attachment/project generation. Inspect the target again.", Current());
         }
         private JObject HmiIdentity(Project project, HmiDiscoveredTarget target, string kind, string path, string name)
             => new JObject { ["schemaVersion"] = 2, ["projectPath"] = project.Path?.FullName, ["projectCopyId"] = HmiProjectCopyId(project),
