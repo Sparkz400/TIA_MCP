@@ -182,8 +182,11 @@ namespace TiaMcp.Openness.V21
             EnsureProjectOffline(project);
             using (SharedMutationExclusive("TIA MCP: checkpoint and apply " + change.Kind))
             {
-                if (MeasureChange(change, "stale-revision-fingerprint", () => EngineeringFingerprint(change, project)) != change.BaseFingerprint)
-                    throw new BridgeException("StaleRevision", "Project or affected objects changed since preparation. Prepare a new preview; no write was applied.");
+                string currentFingerprint = MeasureChange(change, "stale-revision-fingerprint", () => EngineeringFingerprint(change, project));
+                if (currentFingerprint != change.BaseFingerprint)
+                    throw new BridgeException("StaleRevision", "Project or affected objects changed since preparation. Prepare a new preview; no write was applied.",
+                        new JObject { ["changeId"] = change.Id, ["preparedFingerprint"] = change.BaseFingerprint, ["currentFingerprint"] = currentFingerprint,
+                            ["remediation"] = "Call change_prepare again with the same payload; the new preview is bound to the current state." });
                 var compileOnlyPlc = change.Kind == "plc_compile" ? SelectPlc(change.Selector) : null;
                 if (compileOnlyPlc != null) PlcCompilation.Prepare(change.Payload, change.Selector.Value<string>("plcPath"), compileOnlyPlc.Path, compileOnlyPlc.Software.GetService<ICompilable>());
                 else if (IsCompileOnlyKind(change.Kind)) CompileOnlyScope(change, project);

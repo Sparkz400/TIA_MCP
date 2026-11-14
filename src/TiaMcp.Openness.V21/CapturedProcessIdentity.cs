@@ -6,7 +6,8 @@ using Newtonsoft.Json.Linq;
 
 namespace TiaMcp.Openness.V21
 {
-    // Only an OS query handle is owned here. Disposing it never closes or terminates TIA.
+    // Only an OS query handle is owned here. Disposing it never closes or terminates TIA; Terminate is called only for a
+    // worker-owned instance whose caller explicitly asked for it.
     internal sealed class CapturedProcessIdentity : IDisposable
     {
         private Process _process;
@@ -60,6 +61,22 @@ namespace TiaMcp.Openness.V21
             }
             return new JObject { ["state"] = _failure == null ? "available" : "unavailable", ["reason"] = _failure,
                 ["process"] = _identity?.DeepClone(), ["osProcessIdentityVerified"] = _failure == null };
+        }
+
+        // Waits on the retained handle, so a reused PID can never be mistaken for the captured process.
+        internal bool? WaitForExit(int milliseconds)
+        {
+            if (_process == null) return null;
+            try { return _process.WaitForExit(milliseconds); }
+            catch (Exception error) when (error is InvalidOperationException || error is Win32Exception || error is SystemException) { return null; }
+        }
+
+        // Terminates exactly the captured process through its retained handle. Only for worker-owned instances, on request.
+        internal bool Terminate(int waitMilliseconds)
+        {
+            if (_process == null) return false;
+            try { if (!_process.HasExited) _process.Kill(); return _process.WaitForExit(waitMilliseconds); }
+            catch (Exception error) when (error is InvalidOperationException || error is Win32Exception || error is NotSupportedException) { return false; }
         }
 
         public void Dispose()

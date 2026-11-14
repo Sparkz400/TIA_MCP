@@ -60,7 +60,12 @@ namespace TiaMcp.Simulator.V8
             var result = Envelope();
             result["available"] = SimulationRuntimeManager.IsRuntimeManagerAvailable;
             result["runtimeVersion"] = SimulationRuntimeManager.Version;
-            result["networkMode"] = SimulationRuntimeManager.NetworkMode.ToString();
+            string mode = SimulationRuntimeManager.NetworkMode.ToString();
+            result["networkMode"] = mode;
+            result["tcpIpReady"] = SimulationNetworkAdmission.Refusal(mode, "TCPIP", "TCPIP") == null;
+            result["tcpIpRequiredMode"] = "TCPIPSingleAdapter";
+            result["plcsimAdapters"] = PlcsimAdapters();
+            if (mode != "TCPIPSingleAdapter") result["tcpIpRemediation"] = TcpIpRemediation;
             result["instances"] = new JArray(SimulationRuntimeManager.RegisteredInstanceInfo.Select(info => new JObject {
                 ["id"] = info.ID, ["name"] = info.Name, ["selected"] = _instances.ContainsKey(info.ID),
                 ["owned"] = _instances.ContainsKey(info.ID) && _instances[info.ID].Owned }));
@@ -84,7 +89,8 @@ namespace TiaMcp.Simulator.V8
             // V8 derives an instance's interface from the machine-wide mode, which is never assigned here. TCP/IP is
             // admitted only in the operator's existing single-adapter mode; every later admission compares the live interface.
             if (communication == "TCPIP" && SimulationNetworkAdmission.Refusal(SimulationRuntimeManager.NetworkMode.ToString(), "TCPIP", "TCPIP") != null)
-                throw new SimulatorException("TcpIpModeRequired", TcpIpMessage);
+                throw new SimulatorException("TcpIpModeRequired", TcpIpMessage, new JObject { ["networkMode"] = SimulationRuntimeManager.NetworkMode.ToString(),
+                    ["requiredMode"] = "TCPIPSingleAdapter", ["plcsimAdapters"] = PlcsimAdapters(), ["remediation"] = TcpIpRemediation });
             string name = "TiaMcp_" + Guid.NewGuid().ToString("N");
             string storage = Path.Combine(root, name);
             if (storage.Length > 180) throw new SimulatorException("InvalidRequest", "Use a shorter artifact directory; instance storage must remain below 180 characters.");
@@ -742,6 +748,26 @@ namespace TiaMcp.Simulator.V8
             if (selected.Owned && !string.Equals(selected.Instance.StoragePath, selected.Storage, StringComparison.OrdinalIgnoreCase))
                 throw new SimulatorException("SimulationTargetMismatch", "The owned instance storage changed. No action was performed.");
             return selected;
+        }
+
+        private const string TcpIpRemediation = "Set PLCSIM Advanced's machine-wide mode yourself: open the PLCSIM Advanced Control Panel, under Online Access choose PLCSIM Virtual Eth. Adapter and TCP/IP Single Adapter (pick the adapter), then call sim_status until tcpIpReady is true. The switch affects every PLCSIM instance on this PC, so running instances should be stopped first. This adapter reads the mode but never changes it.";
+
+        // Windows network interfaces of PLCSIM's virtual Ethernet adapter with their IPv4 addresses; observation only.
+        private static JArray PlcsimAdapters()
+        {
+            var rows = new JArray();
+            try
+            {
+                foreach (var nic in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
+                {
+                    if (!SimulationNetworkAdmission.PlcsimAdapter(nic.Description) && !SimulationNetworkAdmission.PlcsimAdapter(nic.Name)) continue;
+                    rows.Add(new JObject { ["name"] = nic.Name, ["description"] = nic.Description, ["status"] = nic.OperationalStatus.ToString(),
+                        ["ipv4"] = new JArray(nic.GetIPProperties().UnicastAddresses.Where(a => a.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                            .Select(a => new JObject { ["address"] = a.Address.ToString(), ["mask"] = a.IPv4Mask?.ToString() })) });
+                }
+            }
+            catch (System.Net.NetworkInformation.NetworkInformationException error) { rows.Add(new JObject { ["error"] = error.Message }); }
+            return rows;
         }
 
         private const string TcpIpMessage = "TCP/IP instances require PLCSIM's existing TCP/IP single-adapter mode. This adapter never changes shared network configuration.";

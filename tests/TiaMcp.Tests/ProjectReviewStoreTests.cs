@@ -212,6 +212,55 @@ internal static class ProjectReviewStoreTests
         return uploads.Commit(status.UploadId).ArtifactRef!;
     }
 
+    internal static Task DegradedCaptureIsVisible()
+    {
+        using var files = new Fixture();
+        var refused = new JsonArray(new JsonObject { ["objectPath"] = BlockPath, ["status"] = "unavailable", ["errorCode"] = "ReadOnlyProject",
+            ["reason"] = "The operation is not permitted in a read-only context." });
+        var content = ProjectReviewStore.ContentCoverage(refused, 3, 1);
+        Check.Equal(true, content["degraded"]!.GetValue<bool>());
+        Check.Equal(1, content["failedBlocks"]!.GetValue<int>());
+        Check.Equal(0, content["exportedBlocks"]!.GetValue<int>());
+        var codes = content["degradedReasons"]!.AsArray().Select(r => r!["code"]!.GetValue<string>()).ToArray();
+        Check.Equal("BlocksOmittedByMaxBlocks,ReadOnlyProject", string.Join(",", codes.Order(StringComparer.Ordinal)));
+        var saved = files.Store.Save(Model(), refused, new JsonObject { ["content"] = content });
+        Check.Equal(true, saved["degraded"]!.GetValue<bool>());
+        Check.Equal(true, saved["summary"]!.GetValue<string>().Contains("ReadOnlyProject (1)"));
+        var complete = ProjectReviewStore.ContentCoverage(Documents(Xml), 1, 1);
+        Check.Equal(false, complete["degraded"]!.GetValue<bool>());
+        return Task.CompletedTask;
+    }
+
+    internal static Task ProjectFolderManifestTracksSaves()
+    {
+        using var files = new Fixture();
+        string folder = Path.Combine(files.Root, "Example"); Directory.CreateDirectory(Path.Combine(folder, "System"));
+        string project = Path.Combine(folder, "Example.ap21");
+        File.WriteAllText(project, "fixed"); File.WriteAllText(Path.Combine(folder, "System", "PEData.plf"), "one");
+        var first = ProjectReviewStore.ProjectFolderManifest(project, true);
+        Check.Equal(2, first["fileCount"]!.GetValue<int>());
+        File.WriteAllText(Path.Combine(folder, "System", "PEData.plf"), "two");
+        var second = ProjectReviewStore.ProjectFolderManifest(project, true);
+        Check.Equal(false, first["contentSha256"]!.GetValue<string>() == second["contentSha256"]!.GetValue<string>());
+        Check.Equal(true, second["contentSha256"]!.GetValue<string>() == ProjectReviewStore.ProjectFolderManifest(project, true)["contentSha256"]!.GetValue<string>());
+        Check.Equal(true, ProjectReviewStore.ProjectFolderManifest(project, false)["contentSha256"] is null);
+        return Task.CompletedTask;
+    }
+
+    internal static Task VolatileMetadataIsNotAChange()
+    {
+        using var files = new Fixture();
+        JsonObject With(JsonObject metadata) { var model = Model(); model["nodes"]![1]!["metadata"] = metadata; return model; }
+        string before = files.Store.Save(With(new JsonObject { ["isConsistent"] = true, ["modified"] = "2026-11-14T07:00:00Z" }), Documents(Xml), new JsonObject())["reviewId"]!.GetValue<string>();
+        string touched = files.Store.Save(With(new JsonObject { ["isConsistent"] = true, ["modified"] = "2026-11-14T08:00:00Z" }), Documents(Xml), new JsonObject())["reviewId"]!.GetValue<string>();
+        var comparison = files.Store.Compare(before, touched);
+        Check.Equal(0, comparison["totalChanges"]!.GetValue<int>());
+        Check.Equal(1, comparison["volatileOnlyChanges"]!.GetValue<int>());
+        string changed = files.Store.Save(With(new JsonObject { ["isConsistent"] = false, ["modified"] = "2026-11-14T09:00:00Z" }), Documents(Xml), new JsonObject())["reviewId"]!.GetValue<string>();
+        Check.Equal(1, files.Store.Compare(before, changed)["totalChanges"]!.GetValue<int>());
+        return Task.CompletedTask;
+    }
+
     private static JsonObject Model() => new() {
         ["schemaVersion"] = "project-model.v1", ["project"] = new JsonObject { ["host"] = "machine", ["projectPath"] = "example.ap21" },
         ["nodes"] = new JsonArray(new JsonObject { ["kind"] = "project", ["objectPath"] = RootPath, ["name"] = "Example" },

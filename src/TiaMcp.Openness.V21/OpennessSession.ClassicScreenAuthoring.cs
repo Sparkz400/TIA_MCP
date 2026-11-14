@@ -44,6 +44,43 @@ namespace TiaMcp.Openness.V21
             }
         }
 
+        // Read-only: the same family-specific preservation capture change_prepare runs for kind, without a change record,
+        // so expectedContentHash can be read instead of provoked with a failed prepare. Nothing is mutated or saved.
+        private JObject HmiContentFingerprint(JObject args)
+        {
+            var project = SelectProject(args);
+            var identity = args["target"] as JObject ?? throw new BridgeException("InvalidRequest", "An exact HMI identity (target) is required.");
+            string kind = ChangeText(args, "kind", 64);
+            if (!kind.StartsWith("hmi_", StringComparison.Ordinal) || kind == "hmi_compile")
+                throw new BridgeException("InvalidRequest", "kind must be the HMI change kind you will prepare, for example hmi_screen_create; the hash depends on its scope policy.");
+            HmiValidateIdentity(project, identity);
+            EnsureProjectOffline(project);
+            using (SharedMutationExclusive("TIA MCP: read HMI content fingerprint"))
+            {
+                if (kind == "hmi_classic_screen_edit") _hmiLeaseObservations = new HmiLeaseObservations();
+                HmiResolveNativeTarget(project, identity);
+                var change = new EngineeringChange { Id = Guid.NewGuid().ToString("N"), Kind = kind,
+                    Directory = Path.Combine(ChangeText(args, "artifactDirectory", 4096), "fingerprint-" + Guid.NewGuid().ToString("N")),
+                    Payload = new JObject { ["target"] = identity.DeepClone(), ["operation"] = args["operation"]?.DeepClone() } };
+                Directory.CreateDirectory(change.Directory);
+                var manifest = CaptureHmiEngineeringScope(change, project, "fingerprint");
+                // Same acceptance as change_prepare (RequireHmiScope): no native failure, and either a complete capture or only
+                // the kind's standing notes missing with the hash equal to the observed artifacts. nativeFailure is a JSON null when absent.
+                bool failed = manifest["nativeFailure"] is JObject;
+                bool accepted = !failed && !string.IsNullOrWhiteSpace(manifest.Value<string>("contentHash"))
+                    && (HmiEngineeringRules.StandingNotes(kind) == null ? manifest.Value<bool>("complete")
+                        : HmiEngineeringRules.ScopeAccepted(kind, manifest) && manifest.Value<string>("contentHash") == manifest.Value<string>("observedArtifactsHash"));
+                return new JObject { ["kind"] = kind, ["target"] = identity.DeepClone(), ["contentHash"] = manifest["contentHash"]?.DeepClone(),
+                    ["usableAsExpectedContentHash"] = accepted, ["complete"] = manifest["complete"]?.DeepClone(), ["scopeAccepted"] = accepted,
+                    ["scopeAcceptance"] = manifest["scopeAcceptance"]?.DeepClone(), ["missingCoverage"] = manifest["missingCoverage"]?.DeepClone(),
+                    ["status"] = manifest["status"]?.DeepClone(), ["nativeFailure"] = manifest["nativeFailure"]?.DeepClone(),
+                    ["artifactCount"] = (manifest["artifacts"] as JObject)?.Count ?? 0,
+                    ["manifest"] = ChangeArtifact(Path.Combine(change.Directory, Directory.GetDirectories(change.Directory).Select(d => Path.GetFileName(d)).FirstOrDefault() ?? "", "manifest.json")),
+                    ["note"] = "complete is false when only the kind's standing notes are missing; scopeAccepted then says the hash still authorizes this kind. change_prepare recaptures and refuses with StaleRevision if content changed in between.",
+                    ["nativeMutationPerformed"] = false, ["runtimeVerified"] = false };
+            }
+        }
+
         // No TIA mutation, no generated control implementation. Composition starts from captured native objects.
         private JObject ClassicScreenCompose(JObject args)
         {

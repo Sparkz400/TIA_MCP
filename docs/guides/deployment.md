@@ -62,7 +62,7 @@ Every MCP client connection owns separate workers and session state. Do not poin
 | `--artifacts <dir>` | `artifacts` below the checkout or bundle root | Artifact store: projects, checkpoints, uploads, reports and journals | `-ArtifactsDirectory` |
 | `--api-dir <dir>` | The V21 PublicAPI path Siemens registers, else the setup default below `C:\Program Files` | TIA Openness PublicAPI directory for the engineering worker and native translation import | `-TiaApiDirectory` |
 | `--sim-api-dir <dir>` | The worker's own lookup | PLCSIM Advanced API directory, forwarded to both workers | `-SimulatorApiDirectory` |
-| `--timeout-seconds <n>` | `120` (launcher: `300`) | Deadline of one native worker call; 5 to 900. Simulator waits must end 5 s before it ([simulation](simulation.md#operations)) | `-TimeoutSeconds` |
+| `--timeout-seconds <n>` | `120` (launcher: `300`) | Deadline of one native worker call; 5 to 900 seconds (a decimal is rounded up). Simulator waits must end 5 s before it ([simulation](simulation.md#operations)) | `-TimeoutSeconds` |
 | `--toolsets <groups>` | All tools | Comma-separated [tool groups](../reference/mcp-surface.md#tool-groups---toolsets), or `all`; once | `-Toolsets` |
 | `--git-executable <exe>` | None; VCI Git tools refuse with `GitNotConfigured` | Absolute path of an installed Git | `-GitExecutable` |
 | `--git-remote <repo>` | None; `vci_push` and `vci_fetch` refuse with `GitRemoteNotConfigured` | The one [Git remote](../reference/vci-host-workflow.md#remote-delivery): an absolute path or `file:///` URL of a bare repository; requires `--git-executable`; once | None |
