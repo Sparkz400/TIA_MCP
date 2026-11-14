@@ -325,7 +325,7 @@ The seal binds the exact prepared change, whose preview hash covers its kind and
 payload, so one sealed envelope never serves another change.
 
 The Host uses Microsoft's
-[System.Security.Cryptography.ProtectedData 10.0.15](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/10.0.15).
+[System.Security.Cryptography.ProtectedData 11.0.0](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/11.0.0).
 The [DPAPI sample](https://github.com/dotnet/docs/blob/main/standard/security/snippets/how-to-use-data-protection/net/csharp/sample.cs)
 and [ACL-at-creation API](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesystemaclextensions.create?view=net-10.0)
 underpin the platform usage. Package metadata, license and notices are retained in
