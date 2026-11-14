@@ -687,6 +687,12 @@
       ]
     },
     {
+      "featureId": "project_archive",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
       "featureId": "project_copy",
       "obligations": [
         "X01"
