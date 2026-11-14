@@ -133,6 +133,7 @@ internal static class ToolTitles
         ["plc_loadable_generate"] = "Generate a PLC loadable file",
         ["plc_online_compare"] = "Compare PLC online and offline",
         ["plc_station_upload"] = "Upload a PLCSIM station",
+        ["project_archive"] = "Archive a project",
         ["project_copy"] = "Copy a project",
         ["project_health_report"] = "Report project health",
         ["project_index"] = "Manage an offline project index",

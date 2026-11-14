@@ -50,6 +50,11 @@ public sealed partial class TiaTools
     public Task<CallToolResult> ProjectOpen(string path, CancellationToken cancellationToken, bool readOnly = false)
         => Call("project_open", new { path, readOnly }, cancellationToken);
 
+    [McpServerTool(Name = "project_archive", Destructive = false, OpenWorld = false)]
+    [Description("Archive the saved state of an open project as a new .zap21 file under the host's archives artifacts (Project.Archive). Works in a worker-owned or attached session. The project is never saved, closed or changed; unsaved edits are refused (UnsavedProject). mode: compressed (default) or discardRestorableDataAndCompressed (smaller; TIA regenerates the discarded data). Returns the archive path, size and SHA-256; restore it with project_retrieve.")]
+    public Task<CallToolResult> ProjectArchive(CancellationToken cancellationToken, string? projectName = null, string mode = "compressed")
+        => Call("project_archive", new { projectName, mode, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "archives") }, cancellationToken);
+
     [McpServerTool(Name = "project_copy", Destructive = false, OpenWorld = false)]
     [Description("Copy the saved state of an open project into a new unique directory under the host's copies artifacts, in a worker-owned instance started with tia_start: archive, retrieve as a secondary project, verify name and location, close the copy. The source stays open and is never saved or changed; unsaved source edits are refused. Returns the copy's path and identity plus the archive hash; open it with project_open in a fresh instance.")]
     public Task<CallToolResult> ProjectCopy(CancellationToken cancellationToken, string? projectName = null)
