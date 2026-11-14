@@ -285,11 +285,20 @@ namespace TiaMcp.Openness.V21
                     if (change.Kind == TagTableImportRules.Kind) VerifyScopedTagImport(change);
                     if (new[] { "graphical_typed_edit", "graphical_operand_set", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "graph_import" }.Contains(change.Kind))
                     {
-                        var plc = SelectPlc(change.Selector);
-                        string readback = Path.Combine(change.Directory, "after-structured-edit.xml");
-                        FindBlockByName(plc, change.BlockNames[0], true, change).Item.Export(new FileInfo(readback), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-                        change.Readbacks.Add(new JObject { ["role"] = "structured-edit-readback", ["artifact"] = ChangeArtifact(readback) });
-                        EngineeringSources.RequireNativePreservation(EngineeringSources.ReadXml(File.ReadAllText(change.InputPath)), EngineeringSources.ReadXml(File.ReadAllText(readback)));
+                        // A batch reads back every item's block against that item's own requested XML.
+                        var targets = change.BatchMembers ?? new List<EngineeringChange> { change };
+                        for (int index = 0; index < targets.Count; index++)
+                        {
+                            var target = targets[index];
+                            var plc = SelectPlc(target.Selector);
+                            string readback = Path.Combine(target.Directory, "after-structured-edit.xml");
+                            FindBlockByName(plc, target.BlockNames[0], true, target).Item.Export(new FileInfo(readback), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                            var row = new JObject { ["role"] = "structured-edit-readback", ["artifact"] = ChangeArtifact(readback) };
+                            if (change.BatchMembers != null) row["index"] = index;
+                            change.Readbacks.Add(row);
+                            try { EngineeringSources.RequireNativePreservation(EngineeringSources.ReadXml(File.ReadAllText(target.InputPath)), EngineeringSources.ReadXml(File.ReadAllText(readback))); }
+                            catch (BridgeException error) when (change.BatchMembers != null) { throw new BridgeException(error.Code, "items[" + index + "]: " + error.Message, error.Details); }
+                        }
                         change.Stages.Add("native_preservation_verified");
                     }
                     if (change.Kind == "graphical_typed_edit") VerifyTypedInstanceReadbacks(change);
@@ -1422,7 +1431,7 @@ namespace TiaMcp.Openness.V21
                     if (!block.Item.IsConsistent)
                         throw new BridgeException("FingerprintUnavailable", "The target block " + name + " is inconsistent; its native backup and fingerprint cannot be established. Compile it first (plc_compile) or read its generated source. Nothing was changed.",
                             new JObject { ["blockPath"] = block.Path, ["fallback"] = new JObject { ["tool"] = "block_read", ["format"] = "generatedSource" } });
-                    if (!change.PreflightOnly)
+                    if (!change.PreflightOnly || ChangeBatchRules.IsStructured(change.Kind))
                     {
                         string backup = Path.Combine(change.Directory, "before-" + Guid.NewGuid().ToString("N") + ".xml");
                         block.Item.Export(new FileInfo(backup), ExportOptions.WithDefaults, DocumentInfoOptions.None);
@@ -1949,6 +1958,8 @@ namespace TiaMcp.Openness.V21
         private static void ValidatePreparedFiles(EngineeringChange change)
         {
             foreach (var member in change.HmiScreenMembers) ValidatePreparedFiles(member);
+            // Batch items keep their own requested files (structured edits); each must be unchanged since its preview.
+            if (change.BatchMembers != null) foreach (var member in change.BatchMembers) ValidatePreparedFiles(member);
             if (change.InputPath != null && (!File.Exists(change.InputPath) || ChangeFileHash(change.InputPath) != change.InputHash))
                 throw new BridgeException("ArtifactChanged", "Prepared import/source artifact changed after preview.");
             if (change.TagTableEvidence?["before"] is JArray tables)

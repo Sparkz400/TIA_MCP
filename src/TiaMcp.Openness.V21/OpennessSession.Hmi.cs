@@ -108,12 +108,18 @@ namespace TiaMcp.Openness.V21
             string revision = ChangeHash(new JArray(ordered.Select(e => e.Row)).ToString(Formatting.None));
             if (args.Value<string>("expectedMetadataRevision") is string expected && revision != expected)
                 throw new BridgeException("HmiMetadataChanged", "Observed metadata changed between pages; capture again from offset zero.");
+            // rowMode=compact keeps each row's path and contentSha256 but drops its identity and attribute body: enough to diff two
+            // captures by hash and fetch only the changed rows in full. metadataRevision is computed from the full rows above.
+            string rowMode = args.Value<string>("rowMode") ?? "full";
+            if (rowMode != "full" && rowMode != "compact") throw new BridgeException("InvalidRequest", "rowMode must be full or compact.");
             var rows = new JArray(); int bytes = 0;
             foreach (var entry in ordered.Skip(offset).Take(limit))
             {
-                int count = Encoding.UTF8.GetByteCount(entry.Row.ToString(Formatting.None));
+                var row = UniformHmiRow(entry);
+                if (rowMode == "compact") row = CompactHmiRow(row);
+                int count = Encoding.UTF8.GetByteCount(row.ToString(Formatting.None));
                 if (bytes + count > maxBytes) break;
-                rows.Add(UniformHmiRow(entry)); bytes += count;
+                rows.Add(row); bytes += count;
             }
             bool more = offset + rows.Count < ordered.Count;
             if (more && rows.Count == 0) { capture.Status = "truncated"; capture.Diagnostics.Add(new JObject { ["code"] = "HmiRowTooLarge", ["reason"] = "The next row exceeds maxBytes; request a larger byte limit." }); }
@@ -121,6 +127,12 @@ namespace TiaMcp.Openness.V21
             result["projectCopyId"] = HmiProjectCopyId(project); result["sessionGeneration"] = _hmiSessionGeneration;
             result["section"] = section; result["target"] = target == null ? null : HmiDeviceView(project, target);
             result["items"] = rows; result["offset"] = offset; result["nextOffset"] = more && rows.Count > 0 ? (JToken)(offset + rows.Count) : null;
+            result["rowMode"] = rowMode;
+            // One hash over every row's contentSha256 in path order (all pages): two captures of the same section and roots compare
+            // with one value. It is not the preservation contentHash change_prepare needs (hmi_content_fingerprint returns that).
+            var rowHashes = ordered.Select(e => e.Row.Value<string>("contentSha256")).ToArray();
+            if (rowHashes.Length > 0 && rowHashes.All(h => h != null))
+                result["sectionContentSha256"] = ChangeHash(string.Join("\n", ordered.Select(e => e.Identity.Value<string>("objectPath") + " " + e.Row.Value<string>("contentSha256"))));
             result["metadataRevision"] = revision; result["revisionScope"] = "Only metadata observed in this bounded section; not a whole-project or HMI-content fingerprint.";
             result["observedAtUtc"] = DateTime.UtcNow.ToString("O"); result["payloadBytes"] = bytes;
             // complete means the caller has everything: the capture finished AND no page is left. captureComplete keeps the
@@ -162,6 +174,16 @@ namespace TiaMcp.Openness.V21
             if (row["kind"] == null || row["kind"].Type == JTokenType.Null) row["kind"] = identity?["kind"]?.DeepClone();
             if (row["name"] == null || row["name"].Type == JTokenType.Null) row["name"] = identity?["name"]?.DeepClone();
             return row;
+        }
+
+        private static JObject CompactHmiRow(JObject row)
+        {
+            var compact = new JObject();
+            // No per-row identity: path is the object path and the response's target carries the shared identity fields once.
+            foreach (string key in new[] { "path", "parentPath", "name", "kind", "composition", "nativeType", "contentSha256" })
+                if (row[key] != null) compact[key] = row[key].DeepClone();
+            compact["compact"] = true;
+            return compact;
         }
 
         private string HmiProjectCopyId(Project project) => ChangeHash((project.Path?.FullName ?? "unsaved:" + project.Name).ToUpperInvariant());

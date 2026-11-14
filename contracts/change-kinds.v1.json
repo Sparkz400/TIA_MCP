@@ -1,0 +1,1839 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "0.4.184",
+  "generatedBy": "scripts/change_kinds.py",
+  "note": "fields are the payload names the documentation uses for the kind; requiredness is checked by the worker at change_prepare. Batchable kinds also accept {\"items\": [payload, ...]} (docs/guides/engineering-workflows.md#items-on-other-kinds).",
+  "kinds": {
+    "block_attributes_set": {
+      "featureId": "change.block_attributes_set",
+      "title": "Set reviewed header or OB attributes on one standard block",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`blockName` or `blockPath`, `attributes: {...}`",
+      "fields": [
+        "blockName",
+        "blockPath",
+        "attributes"
+      ],
+      "description": "Writes `HeaderAuthor`, `HeaderFamily`, `HeaderName`, `HeaderVersion` on one standard, unprotected block; OBs also accept `PriorityNumber`, `CyclicTime`, `PhaseOffset` and `ProcessImagePartNumber`. Native attribute metadata must also report each one as writable.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "block_delete": {
+      "featureId": "change.block_delete",
+      "title": "Delete one exact standard block",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`blockName` or `blockPath`, optional `dependencyPolicy: \"rejectReferenced\"`",
+      "fields": [
+        "blockName",
+        "blockPath",
+        "dependencyPolicy"
+      ],
+      "description": "Deletes one standard, unprotected block only after conservative dependency checks at prepare and apply. The policy defaults to `rejectReferenced`; no cascade deletion is available.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "block_import_xml": {
+      "featureId": "change.block_import_xml",
+      "title": "Import explicit native standard blocks",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`xml`, `expectedBlockNames: [...]`",
+      "fields": [
+        "xml",
+        "expectedBlockNames"
+      ],
+      "description": "Native SimaticML import for standard FB/FC/OB/DBs; also supports exported LAD/FBD XML round trips. Absolute I/O operands are checked against owned F-I/O before import, including graphical edits and project-ward VCI block imports; an unqualified XML I/O type or offset refuses on a PLC with F-I/O.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "block_number_set": {
+      "featureId": "change.block_number_set",
+      "title": "Set an explicit number on one standard block",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`blockName` or `blockPath`, `number` (1-65535)",
+      "fields": [
+        "blockName",
+        "blockPath",
+        "number"
+      ],
+      "description": "Sets `AutoNumber=false` and `Number` on one standard, unprotected block and reads both back. A number used by another block of the same kind (FB, FC, OB or DB) in the PLC is rejected.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "block_protect": {
+      "featureId": "change.block_protect",
+      "title": "Know-how protect one exact standard block",
+      "qualification": "verified",
+      "documented": false
+    },
+    "block_rename": {
+      "featureId": "change.block_rename",
+      "title": "Rename one exact standard block",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`blockName` or `blockPath`, `newName`",
+      "fields": [
+        "blockName",
+        "blockPath",
+        "newName"
+      ],
+      "description": "Renames one standard, unprotected block and verifies old/new names in the selected namespace. Compile checks affected references.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "block_unprotect": {
+      "featureId": "change.block_unprotect",
+      "title": "Remove know-how protection from one exact standard block",
+      "qualification": "verified",
+      "documented": false
+    },
+    "block_write_protection_set": {
+      "featureId": "change.block_write_protection_set",
+      "title": "Define, change, enable or disable write protection of one exact standard block",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`blockName` or `blockPath`, `action: \"define\"`, `\"change\"`, `\"enable\"` or `\"disable\"`, `credential`, `newCredential` (only for `change`), optional `vaultName`",
+      "fields": [
+        "blockName",
+        "blockPath",
+        "action",
+        "credential",
+        "newCredential",
+        "change",
+        "vaultName"
+      ],
+      "description": "Native `PlcBlockWriteProtectionProvider` with `IsDefined`/`IsProtected` readback on one standard unprotected block. V21 cannot remove a defined password; `disable` only turns protection off. Same credential route and refusals as above; write protection needs its own credential (`resourceId: \"write\"`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "call_connection_set": {
+      "featureId": "change.call_connection_set",
+      "title": "Rewire an isolated graphical call argument to an existing Access",
+      "qualification": "unverified",
+      "documented": true,
+      "payload": "`blockName` or `blockPath`, `networkId`, `callUid`, `parameterName`, `targetAccessUid`",
+      "fields": [
+        "blockName",
+        "blockPath",
+        "networkId",
+        "callUid",
+        "parameterName",
+        "targetAccessUid"
+      ],
+      "description": "Reconnects one isolated LAD/FBD call parameter to an existing simple symbolic Access in the same network. Unavailable on V21: TIA imports a network only when every Access is wired exactly once, so prepare refuses every move between existing Accesses with `AccessWiringUnsupported`.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "call_parameter_set": {
+      "featureId": "change.call_parameter_set",
+      "title": "Edit one native FC or FB symbolic argument",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`blockName` or `blockPath`, `networkId`, `callUid`, `parameterName`, `components: [...]`",
+      "fields": [
+        "blockName",
+        "blockPath",
+        "networkId",
+        "callUid",
+        "parameterName",
+        "components"
+      ],
+      "description": "Changes a single simple symbolic call argument in standard SCL/LAD/FBD. Graphical shared Access nodes and compound expressions are rejected.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "cax_import": {
+      "featureId": "change.cax_import",
+      "title": "Import one AML file through native CAx",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`importOption: \"MoveToParkingLot\"`, `\"RetainTiaDevice\"` or `\"OverwriteTiaDevice\"`; `amlRef` (an `automationml:` record) or `path` inside the Host artifact directory plus `expectedSha256`",
+      "fields": [
+        "importOption",
+        "amlRef",
+        "automationml",
+        "path",
+        "expectedSha256"
+      ],
+      "description": "Imports one hash-pinned AML file through Siemens `CaxProvider.Import`, only in a worker-owned TIA instance: Siemens refuses CAx import inside exclusive access, so apply releases its lease around that call. Requires `compile=true` (device project). Parking-lot and retain imports must leave existing configured hardware rows exact; overwrite is recorded for review only. See [native CAx](../reference/automationml-workflow.md#native-cax-export-and-import). Verified (`local.cax_import.20261028`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "certificate_assign": {
+      "featureId": "change.certificate_assign",
+      "title": "Assign or unassign a local certificate through a native certificate attribute",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath` (store owner CPU), `targetPath` (that CPU or a subitem), `attributeName` (native read-write attribute ending in `Certificate`, for example the web server or OPC UA server certificate), `certificateId` (`null` unassigns), `expectedCertificateId`",
+      "fields": [
+        "hardwarePath",
+        "targetPath",
+        "attributeName",
+        "Certificate",
+        "certificateId",
+        "null",
+        "expectedCertificateId"
+      ],
+      "description": "Refuses when the current assignment differs from `expectedCertificateId`; `SetAttribute` and Id readback. Attribute names are discovered at runtime, not taken from V21 metadata.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "certificate_create": {
+      "featureId": "change.certificate_create",
+      "title": "Create a device certificate in a CPU local certificate store from a usage template",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath` (CPU with a local certificate store), `usage` (`Tls`, `OpcUaClient`, `OpcUaClientServer`, `OpcUaServer`, `WebServer`), `subjectCommonName`, `subjectAlternativeNames: [{ type: \"Dns\"/\"Email\"/\"Uri\"/\"IP\", value }]`, `validFromUtc`, `validUntilUtc`",
+      "fields": [
+        "hardwarePath",
+        "usage",
+        "Tls",
+        "OpcUaClient",
+        "OpcUaClientServer",
+        "OpcUaServer",
+        "WebServer",
+        "subjectCommonName",
+        "subjectAlternativeNames",
+        "validFromUtc",
+        "validUntilUtc"
+      ],
+      "description": "`GetCertificateTemplate(usage)` with exactly these names and UTC validity, then `Certificates.Create`. TIA chooses the issuer. The public export of the new certificate must read back the request. Refused while the global certificate store is enabled. Verified (`local.access.qualify.rerun.20261028`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "certificate_delete": {
+      "featureId": "change.certificate_delete",
+      "title": "Delete an unreferenced certificate from a CPU local certificate store",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath`, `certificateId`",
+      "fields": [
+        "hardwarePath",
+        "certificateId"
+      ],
+      "description": "Deletes a local certificate only when no certificate attribute, runtime-managed supported service or UMC trusted id on its device references it and every such reference was readable. Program and online references are not scanned.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "certificate_import": {
+      "featureId": "change.certificate_import",
+      "title": "Import one public certificate into a CPU local certificate store",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath`, `uploadRef` (committed artifact upload), `format: \"der\"` or `\"pem\"`",
+      "fields": [
+        "hardwarePath",
+        "uploadRef",
+        "format"
+      ],
+      "description": "The Host converts the upload to exact public DER; PFX/PKCS#12, PKCS#7, private keys, surplus data and any other field (including a password) refuse. `Certificates.Import(FileInfo)` of the hash-pinned copy; readback requires one new certificate without a private key and the same SHA-256. Import does not establish trust.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "connection_create": {
+      "featureId": "change.connection_create",
+      "title": "Create one configured communication connection between exact endpoints",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath` (owner exposing `CommunicationManagement`), `connectionType`, `localInterfacePath`, optional `localNodeName`, `partnerTargetPath`, `partnerInterfacePath`, optional `partnerNodeName`",
+      "fields": [
+        "hardwarePath",
+        "CommunicationManagement",
+        "connectionType",
+        "localInterfacePath",
+        "localNodeName",
+        "partnerTargetPath",
+        "partnerInterfacePath",
+        "partnerNodeName"
+      ],
+      "description": "Creates one connection of an explicit V21 type (`S7Connection`, `TcpConnection`, `UdpConnection`, `IsoConnection`, `IsoOnTcpConnection`, `FdlConnection`, `PtpConnection`, `HmiConnection`) through `ConnectionComposition.Create<T>`. Verifies native type/endpoint equality and an unchanged rest of the owner's connection table. Unspecified partners are not supported; compile is mandatory.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "connection_delete": {
+      "featureId": "change.connection_delete",
+      "title": "Delete exactly one configured communication connection",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath`, `connectionName`, optional `connectionId`",
+      "fields": [
+        "hardwarePath",
+        "connectionName",
+        "connectionId"
+      ],
+      "description": "Deletes exactly one connection of the owner, matched by `LocalConnectionName` and optional `LocalConnectionId`. Program/HMI consumers are not scanned; the mandatory device compile is the only consumer check.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "connection_set": {
+      "featureId": "change.connection_set",
+      "title": "Set allowlisted attributes of one configured communication connection",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath`, `connectionName`, optional `connectionId`, `attributes: {...}`",
+      "fields": [
+        "hardwarePath",
+        "connectionName",
+        "connectionId",
+        "attributes"
+      ],
+      "description": "Writes only `LocalActiveEstablishment`, `PartnerActiveEstablishment`, `LocalPort`, `PartnerPort`, `PartnerAddress`, `LocalTsap`, `PartnerTsap`, `LocalLsap`, `PartnerLsap`, each also native read/write. Names and IDs stay read-only. Compile is mandatory.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "constant_create": {
+      "featureId": "change.constant_create",
+      "title": "Create one user constant in an existing tag table",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`tagTableName` or `tagTablePath`, `name`, `dataTypeName`, `value`",
+      "fields": [
+        "tagTableName",
+        "tagTablePath",
+        "name",
+        "dataTypeName",
+        "value"
+      ],
+      "description": "Creates one user constant in an existing table with the same scope-wide name collision check and exact readback.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "constant_delete": {
+      "featureId": "change.constant_delete",
+      "title": "Delete one unreferenced existing user constant",
+      "qualification": "verified",
+      "documented": false
+    },
+    "constant_set": {
+      "featureId": "change.constant_set",
+      "title": "Edit attributes of one existing user constant",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`tagTableName` or `tagTablePath`, `memberName`, `attributes: {...}`",
+      "fields": [
+        "tagTableName",
+        "tagTablePath",
+        "memberName",
+        "attributes"
+      ],
+      "description": "Edits an existing user constant's exposed writable `Name`, `DataTypeName` and/or `Value`. System constants are excluded.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "db_snapshot_create": {
+      "featureId": "change.db_snapshot_create",
+      "title": "Store an owned PLCSIM instance's DB actual values as the DB snapshot",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`blockPath` (standard GlobalDB/InstanceDB/ArrayDB), `downloadTicket`",
+      "fields": [
+        "blockPath",
+        "downloadTicket"
+      ],
+      "description": "Owned PLCSIM only: goes online on the `plc_online_compare` route, `ValueService.CreateSnapshot()` stores the instance's actual values as the DB snapshot in the project, then offline. The previous snapshot export is backed up and the readback export must differ. No ticket refuses with `PhysicalPlcRefused`. Verified on one global DB in PLCSIM (`local.online.snapshots.20261029`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "db_snapshot_load_actual": {
+      "featureId": "change.db_snapshot_load_actual",
+      "title": "Load a reviewed DB snapshot as actual values into an owned PLCSIM instance",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`snapshotRecordId` from `db_snapshot_capture`, `acknowledgeActualValueWrite: true`, `downloadTicket`",
+      "fields": [
+        "snapshotRecordId",
+        "acknowledgeActualValueWrite",
+        "downloadTicket"
+      ],
+      "description": "Owned PLCSIM only: `ValueService.LoadSnapshotAsActualValues()` writes the stored snapshot into the instance. The Host binds the DB path, project path and snapshot hash from the reopened review; the stored snapshot must still hash equal at prepare and apply (`DbSnapshotChanged`). Apply requires `compile=false` and `save=false`. CPU values are not read back and the checkpoint cannot undo them. Verified on one global DB in PLCSIM (`local.online.snapshots.20261029`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "device_compile": {
+      "featureId": "change.device_compile",
+      "title": "Checkpoint and compile one device (station hardware and software)",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`devicePath` (exact device path of the device compiler inventory, `/projects/<project>/devices/<device>`)",
+      "fields": [
+        "devicePath"
+      ],
+      "description": "Checkpointed compilation of one device's hardware and software, `compile=true`; no other mutation.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "drive_motor_configure": {
+      "featureId": "change.drive_motor_configure",
+      "title": "Project a motor without a Siemens code number into one drive data set",
+      "qualification": "verified",
+      "documented": false
+    },
+    "drive_parameter_set": {
+      "featureId": "change.drive_parameter_set",
+      "title": "Write explicit scalar parameters on one offline drive object",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath`, `driveObjectNumber`, `parameters: [{ name, expected, value }]`",
+      "fields": [
+        "hardwarePath",
+        "driveObjectNumber",
+        "parameters"
+      ],
+      "description": "Requires Startdrive. Writes 1..200 scalar parameters on one offline drive object; each `expected` must equal the value object `drive_observe` reports. BICO, Safety Integrated and commissioning/reset/identification parameters are refused; listed parameters are read back, dependent recalculation is not. See [drives](drives.md).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "drive_telegram_set": {
+      "featureId": "change.drive_telegram_set",
+      "title": "Change, insert or erase one telegram of an offline drive object",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath`, `driveObjectNumber`, `operation` (`change`, `insert`, `erase`), `telegramType`, `expectedTelegrams` (that drive object's `snapshot.telegrams` from `drive_observe`); plus `telegramNumber` (change, insert `SupplementaryTelegram`) or `inputSize` and `outputSize` (insert `AdditionalTelegram`, in `Telegram.GetSize` units)",
+      "fields": [
+        "hardwarePath",
+        "driveObjectNumber",
+        "operation",
+        "change",
+        "insert",
+        "erase",
+        "telegramType",
+        "expectedTelegrams",
+        "telegramNumber",
+        "SupplementaryTelegram",
+        "inputSize",
+        "outputSize",
+        "AdditionalTelegram"
+      ],
+      "description": "Requires Startdrive and `compile=true` (device project). Changes the number of the only main or supplementary telegram, or inserts/erases the only supplementary or additional telegram, after Startdrive's `CanChangeTelegram`/`CanInsert*` check. Safety telegrams are refused; torque/edge telegrams, size changes and PKW are not supported. Startdrive assigns addresses during the write, so the preview shows the current rows; apply reads back every telegram row, reports the I/O address shift and fails into checkpoint recovery on a collateral telegram change or an address overlap. Existing overlaps refuse at prepare. TO connections and tags are not rebound. Not natively qualified.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "graph_import": {
+      "featureId": "change.graph_import",
+      "title": "Import one validated GRAPH v6 document",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`graphRef` (retained GRAPH document) or `path` (inside the Host artifact directory), `expectedBlockNames: [one name]`",
+      "fields": [
+        "graphRef",
+        "path",
+        "expectedBlockNames"
+      ],
+      "description": "Imports one GRAPH v6 block document through the `block_import_xml` route. The Host refuses documents with reader errors, unsupported grammar or empty Interlock/Supervision modules (`EmptyNativeCondition`) first. Requires `compile=true`; the compiled block must re-export unchanged beyond `DocumentInfo` before saving. See the [GRAPH workflow](../reference/graph-host-workflow.md#native-export-and-import). To add, remove or rename steps and transitions, set comments/titles or set contact-series conditions, first run the Host-only `graph_edit` tool on a retained document and import its result handle ([typed edits](../reference/graph-host-workflow.md#typed-edits)); added steps/transitions can fail the exact readback. Verified (`local.graph_changes.20261028`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "graphical_network_insert": {
+      "featureId": "change.graphical_network_insert",
+      "title": "Insert a native LAD/FBD compile unit while preserving peer networks",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`blockName` or `blockPath`, `afterNetworkId`, `compileUnitXml`",
+      "fields": [
+        "blockName",
+        "blockPath",
+        "afterNetworkId",
+        "compileUnitXml"
+      ],
+      "description": "Inserts one complete native `SW.Blocks.CompileUnit` after an existing same-language LAD/FBD network. All incoming object IDs must be explicit and unused.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "graphical_network_patch": {
+      "featureId": "change.graphical_network_patch",
+      "title": "Patch explicit native LAD/FBD instruction and wire fragments",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`blockName` or `blockPath`, `networkId`, optional `upsertXml: [...]`, optional `removeUids: [...]`",
+      "fields": [
+        "blockName",
+        "blockPath",
+        "networkId",
+        "upsertXml",
+        "removeUids"
+      ],
+      "description": "Inserts/replaces explicitly identified native `Access`, `Part`, `Call` or `Wire` fragments; removes explicitly identified supported nodes. The resulting network must retain valid unique UIds and connector references.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "graphical_operand_set": {
+      "featureId": "change.graphical_operand_set",
+      "title": "Replace a supported existing LAD/FBD scalar operand",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`blockName` or `blockPath`, `networkId`, `accessUid`, `components: [...]`",
+      "fields": [
+        "blockName",
+        "blockPath",
+        "networkId",
+        "accessUid",
+        "components"
+      ],
+      "description": "Changes selected existing symbolic operand components in a standard LAD/FBD network. See the narrow scope below.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "graphical_typed_edit": {
+      "featureId": "change.graphical_typed_edit",
+      "title": "Build and inspect typed LAD/FBD networks with explicit declarations",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "Wrapper `model` plus exact `blockPath` or new-block scope/namespace; optional explicit `instances`",
+      "fields": [
+        "model",
+        "blockPath",
+        "instances"
+      ],
+      "description": "Versioned LAD power flow or FBD dataflow, exact declarations and hash-bound native profiles. Boolean/comparison/call/timer/counter families (MOVE, arithmetic, TONR and edge detectors are accepted but have no captured profile yet), supported edits/insertion/creation and coordinated instance effects use mandatory compile and complete native readback. See [typed builders](typed-lad-fbd-builders.md) for the supported target matrix and separate qualification gates.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "group_create": {
+      "featureId": "change.group_create",
+      "title": "Create a user folder in an explicit native group",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`groupKind: \"blocks\"`, `\"types\"` or `\"tags\"`, `groupPath`, `name`, optional `scopePath`",
+      "fields": [
+        "groupKind",
+        "groupPath",
+        "name",
+        "scopePath"
+      ],
+      "description": "Creates a user group below the exact existing parent `groupPath`.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "group_delete": {
+      "featureId": "change.group_delete",
+      "title": "Delete an exact empty user folder",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`groupKind`, `groupPath`, `dependencyPolicy: \"rejectReferenced\"`, optional `scopePath`",
+      "fields": [
+        "groupKind",
+        "groupPath",
+        "dependencyPolicy",
+        "scopePath"
+      ],
+      "description": "Deletes only an empty existing user group.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "group_rename": {
+      "featureId": "change.group_rename",
+      "title": "Rename an exact user folder",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`groupKind`, `groupPath`, `name`, optional `scopePath`",
+      "fields": [
+        "groupKind",
+        "groupPath",
+        "name",
+        "scopePath"
+      ],
+      "description": "Renames the exact existing user group to `name`; generated/root groups are excluded.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "hardware_add": {
+      "featureId": "change.hardware_add",
+      "title": "Create a catalog-selected engineering device",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`typeIdentifier`, `itemName`, `deviceName`, optional `configureScratchSecurity: true`, optional `failsafeRuntimeAccess: true`",
+      "fields": [
+        "typeIdentifier",
+        "itemName",
+        "deviceName",
+        "configureScratchSecurity",
+        "failsafeRuntimeAccess"
+      ],
+      "description": "Creates a device with the exact installed catalog identifier. The security option is restricted to newly created CPUs in the current worker-owned scratch project. `failsafeRuntimeAccess` (only with `configureScratchSecurity`) gives the generated runtime user \"Full access including fail-safe\" instead of \"Full access\", which an F-CPU compile requires.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "hardware_address_set": {
+      "featureId": "change.hardware_address_set",
+      "title": "Change one exact native configured I/O start address",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath`, `ioType`, `oldStartAddress`, `startAddress`",
+      "fields": [
+        "hardwarePath",
+        "ioType",
+        "oldStartAddress",
+        "startAddress"
+      ],
+      "description": "Changes the start byte of exactly one configured I/O range; `ioType` must match the native inventory value. Length is preserved. Ownership and overlaps are checked again at apply time.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "hardware_attributes": {
+      "featureId": "change.hardware_attributes",
+      "title": "Write reviewed typed hardware attributes",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath`, `attributes: {...}`",
+      "fields": [
+        "hardwarePath",
+        "attributes"
+      ],
+      "description": "Writes only the bridge's reviewed attribute subset when native metadata also permits read/write, and the item type's [capability profile](network-inspection.md#module-capability-profiles) declares it writable when one exists.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "hardware_channel_attributes": {
+      "featureId": "change.hardware_channel_attributes",
+      "title": "Change one explicitly selected native channel",
+      "qualification": "verified",
+      "documented": false
+    },
+    "hardware_cpu_memory_bytes": {
+      "featureId": "change.hardware_cpu_memory_bytes",
+      "title": "Set CPU system and clock memory bytes",
+      "qualification": "verified",
+      "documented": false
+    },
+    "hardware_cpu_parameters": {
+      "featureId": "change.hardware_cpu_parameters",
+      "title": "Set reviewed CPU parameters",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath`, `attributes: {...}` with any of `CycleMaximumCycleTime`, `CycleMinimumCycleTime`, `CycleEnableMinimumCycleTime`, `CycleCommunicationLoad`, `StartupActionAfterPowerOn`, `StartupComparisonPresetToActualModule`, `StartupConfigurationTimeout`, `TimeSynchronizationNtpV2`, `TimeOfDayLocalTimeZone`, `TimeOfDayActivateDaylightSavingTime`, `PlcAccessControlConfiguration`; optional `protectionLevel` (`ReadAccess`, `HMIAccess` or `NoAccess`) with `credential` (the full-access password's `protected-credential-reference.v1`, [binding](../reference/protected-credentials.md#change-apply-credential-route)) and optional `vaultName`; `attributes` may be empty when `protectionLevel` is given",
+      "fields": [
+        "hardwarePath",
+        "attributes",
+        "CycleMaximumCycleTime",
+        "CycleMinimumCycleTime",
+        "CycleEnableMinimumCycleTime",
+        "CycleCommunicationLoad",
+        "StartupActionAfterPowerOn",
+        "StartupComparisonPresetToActualModule",
+        "StartupConfigurationTimeout",
+        "TimeSynchronizationNtpV2",
+        "TimeOfDayLocalTimeZone",
+        "TimeOfDayActivateDaylightSavingTime",
+        "PlcAccessControlConfiguration",
+        "protectionLevel",
+        "ReadAccess",
+        "HMIAccess",
+        "NoAccess",
+        "credential",
+        "vaultName"
+      ],
+      "description": "Writes only reviewed CPU parameters the item declares, with before/after preview, typed readback, device compile and configured-hardware preservation; unchanged requests refuse. `CycleMinimumCycleTime` exists only while `CycleEnableMinimumCycleTime` is true (enabling needs a value). Request the daylight-saving flag together with a zone that changes it. `PlcAccessControlConfiguration` takes only an enabled mode's exact name. Entering an access-level mode needs `protectionLevel` and `credential` in the same change, because V21 compiles those modes only with the full-access password; the Host routes it to that one apply. Full access (with or without fail-safe), a level outside an access-level mode, a missing credential and any other payload field refuse at prepare. V21 refuses the level while UMAC runtime access is enabled on the device, as on every owned scratch CPU, so the protection level is not natively qualified ([record](../verification/cpu-protection-20261030.md)). The other parameters are natively qualified on CPU 1511-1 PN V4.1 ([record](../verification/plcsim-openness-gaps-20261029.md)).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "hardware_delete": {
+      "featureId": "change.hardware_delete",
+      "title": "Delete an eligible non-software-bearing module",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath`",
+      "fields": [
+        "hardwarePath"
+      ],
+      "description": "Deletes a non-built-in pluggable item. CPUs, HMIs and containers holding software are excluded.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "hardware_move": {
+      "featureId": "change.hardware_move",
+      "title": "Move a pluggable module to a validated slot in its current rack",
+      "qualification": "verified",
+      "documented": false
+    },
+    "hardware_plug": {
+      "featureId": "change.hardware_plug",
+      "title": "Plug a catalog-selected module into a valid slot",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath`, `typeIdentifier`, `name`, `positionNumber`",
+      "fields": [
+        "hardwarePath",
+        "typeIdentifier",
+        "name",
+        "positionNumber"
+      ],
+      "description": "Uses `CanPlugNew` and `PlugNew` for a selected parent/slot.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "hardware_port_connect": {
+      "featureId": "change.hardware_port_connect",
+      "title": "Connect two exact network ports",
+      "qualification": "verified",
+      "documented": false
+    },
+    "hardware_port_disconnect": {
+      "featureId": "change.hardware_port_disconnect",
+      "title": "Disconnect two exact network ports",
+      "qualification": "verified",
+      "documented": false
+    },
+    "hardware_replace": {
+      "featureId": "change.hardware_replace",
+      "title": "Replace a pluggable module's type with an exact catalog type",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath`, `typeIdentifier`, optional `acceptLoss: true`, optional `acceptAddressChange: true` with `acknowledgedTags: [...]`",
+      "fields": [
+        "hardwarePath",
+        "typeIdentifier",
+        "acceptLoss",
+        "acceptAddressChange",
+        "acknowledgedTags"
+      ],
+      "description": "Changes one pluggable module's type with `DeviceItem.ChangeType` to an exact installed catalog identifier. Built-in and software-bearing items are excluded. The preview lists the subtree's addresses and child items; lost ones fail after the write (checkpoint restore) unless `acceptLoss` is true. Lost port interconnections always fail. With `acceptAddressChange`, addresses may move or resize: tags on the module's addresses must be named exactly in `acknowledgedTags` (else `AddressReferenced`), and the readback maps old to new ranges. See [network inspection](network-inspection.md#address-changing-replacement).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "hardware_shared_device_access": {
+      "featureId": "change.hardware_shared_device_access",
+      "title": "Set the shared-device access of one IO-device module",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath` (a module or submodule of an assigned IO device), `accessType` (`PLC` with `assignmentTargetPath`, or `OutsideOfProject`), optional `externalIoControllers` (with `OutsideOfProject`)",
+      "fields": [
+        "hardwarePath",
+        "accessType",
+        "PLC",
+        "assignmentTargetPath",
+        "OutsideOfProject",
+        "externalIoControllers"
+      ],
+      "description": "Sets `SharedDeviceAccessConfigured` and `SharedDeviceAssignmentTarget`, from which V21 derives the read-only `SharedDeviceAccessType`. A direct PLC-to-PLC move is refused (set `OutsideOfProject` first). Address ranges keep their type, start and length with at most one owner among the station's I/O-system PLCs, except that `OutsideOfProject` releases the subtree's addresses and `PLC` brings them back owned by the target. See [shared devices](network-inspection.md#shared-devices).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "hardware_transfer_area_create": {
+      "featureId": "change.hardware_transfer_area_create",
+      "title": "Create a controller-device transfer area on an I-device interface",
+      "qualification": "verified",
+      "documented": false
+    },
+    "hardware_transfer_area_delete": {
+      "featureId": "change.hardware_transfer_area_delete",
+      "title": "Delete a transfer area of an I-device interface",
+      "qualification": "verified",
+      "documented": false
+    },
+    "hmi_classic_import": {
+      "featureId": "change.hmi_classic_import",
+      "title": "Import a Classic screen or tag table, or set a screen BackColor",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "The `hmi_engineering` payload of `classic_xml_import` (exact Classic screen or tag table, `xml`) or `scalar_property_set` (exact Classic screen, `properties: { BackColor }`)",
+      "fields": [
+        "xml",
+        "properties"
+      ],
+      "description": "The `hmi_engineering` bodies past the preservation gate: compile after the checkpoint, import with `ImportOptions.Override`, target readback, every other export unchanged, compiler errors and warnings unchanged. Admitted in production on `classic-comfort` (natively qualified 1 November, `local.hmi.classic-import.route.20261101`); templates, popups, slide-ins, global elements and the rest stay refused. See [HMI engineering](hmi-engineering.md).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads",
+      "schema": "hmi-engineering.v1.schema.json"
+    },
+    "hmi_classic_screen_edit": {
+      "featureId": "change.hmi_classic_screen_edit",
+      "title": "Edit an existing Classic RT Advanced screen with bounded screen preservation",
+      "qualification": "unverified",
+      "documented": false,
+      "schema": "hmi-engineering.v1.schema.json"
+    },
+    "hmi_compile": {
+      "featureId": "change.hmi_compile",
+      "title": "Checkpoint and compile one HMI target",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`target: { family, hmiPath }` from `library_query` `hmi_targets`",
+      "fields": [
+        "target"
+      ],
+      "description": "Checkpointed compilation of one HMI target, `compile=true`: Classic HMI software, or the owning device for Unified.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads",
+      "schema": "hmi-engineering.v1.schema.json"
+    },
+    "hmi_dynamization_create": {
+      "featureId": "change.hmi_dynamization_create",
+      "title": "Bind a Unified screen item property to an HMI tag",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "The `hmi_engineering` payload of `dynamization_set` (an exact Unified screen item, one `bindings` entry)",
+      "fields": [
+        "bindings"
+      ],
+      "description": "Creates one tag dynamization through the `hmi_engineering` body with the same compile and preservation rules; a PLC-backed tag needs its proven owner. Admitted in production on `unified-comfort` and `unified-pc` (natively qualified 2 November, `local.hmi.dynamization.route.20261102`). See [HMI engineering](hmi-engineering.md).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads",
+      "schema": "hmi-engineering.v1.schema.json"
+    },
+    "hmi_engineering": {
+      "featureId": "change.hmi_engineering",
+      "title": "Guarded HMI engineering allowlist",
+      "qualification": "unverified",
+      "documented": true,
+      "payload": "`schemaVersion: 1`, `operation`, exact HMI `target`, `expectedContentHash`, plus the operation's fields ([schema](../../contracts/hmi-engineering.v1.schema.json))",
+      "fields": [
+        "schemaVersion",
+        "operation",
+        "target",
+        "expectedContentHash"
+      ],
+      "description": "Classic `BackColor`/whole-object XML import; Unified tags, external PLC tags (root tags and global DB members), integrated connections, discrete/analog alarms, data/alarm logs, runtime settings (`StartScreen`), screens, screen items, tag dynamizations, event handlers (bounded raw script, never executed), item properties, faceplate placement and bindings. Every operation stays behind the closed HMI preservation gate; Classic `classic_xml_import`/`BackColor` and Unified `external_tag_create` have their own kinds below. See [HMI engineering](hmi-engineering.md). Not natively qualified.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads",
+      "schema": "hmi-engineering.v1.schema.json"
+    },
+    "hmi_event_handler_create": {
+      "featureId": "change.hmi_event_handler_create",
+      "title": "Add a script event handler to a Unified screen or item",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "The `hmi_engineering` payload of `event_handler_set` (an exact Unified screen or item, `eventType`, `script`)",
+      "fields": [
+        "eventType",
+        "script"
+      ],
+      "description": "Creates one script event handler through the `hmi_engineering` body with the same compile and preservation rules; the script is stored with CRLF line ends and never executed. Admitted in production on `unified-comfort` and `unified-pc` (natively qualified 2 November, `local.hmi.event-handler.route.20261102`). See [HMI engineering](hmi-engineering.md).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads",
+      "schema": "hmi-engineering.v1.schema.json"
+    },
+    "hmi_external_tag_create": {
+      "featureId": "change.hmi_external_tag_create",
+      "title": "Create a PLC-backed Unified HMI tag",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "The `hmi_engineering` payload of `external_tag_create`",
+      "fields": [],
+      "description": "Creates one PLC-backed Unified tag through the `hmi_engineering` body, with the same compile and preservation rules as `hmi_classic_import`. Admitted in production on `unified-comfort` and `unified-pc` (natively qualified 1 November, `local.hmi.external-tag.route.20261101`). See [HMI engineering](hmi-engineering.md).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads",
+      "schema": "hmi-engineering.v1.schema.json"
+    },
+    "hmi_screen_create": {
+      "featureId": "change.hmi_screen_create",
+      "title": "Create a Unified HMI screen or screen item",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "The `hmi_engineering` payload of `screen_create` (the HMI itself, a new name, Width and Height equal to an existing screen's) or `item_create` (an exact screen, a new name, an allowlisted `itemType`, a rectangle within the screen)",
+      "fields": [
+        "itemType"
+      ],
+      "description": "Creates one Unified screen or screen item through the `hmi_engineering` body, with the same compile and preservation rules as `hmi_external_tag_create`; only the created node's typed subtree may appear. Admitted in production on `unified-comfort` and `unified-pc` (natively qualified 2 November, `local.hmi.screen-create.route.20261102`). See [HMI engineering](hmi-engineering.md).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads",
+      "schema": "hmi-engineering.v1.schema.json"
+    },
+    "hmi_text_list_import": {
+      "featureId": "change.hmi_text_list_import",
+      "title": "Import a reviewed Unified text-list candidate",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`schemaVersion: 1`, the Unified `hmiDevice` `target`, `expectedContentHash`, `recordId` of an `hmi_text_list_author` or `hmi_text_list_generate_set` record, `outputId` for a set",
+      "fields": [
+        "schemaVersion",
+        "hmiDevice",
+        "target",
+        "expectedContentHash",
+        "recordId",
+        "outputId"
+      ],
+      "description": "Imports one retained candidate pair with `HmiTextListComposition.Import`. The Host refuses content V21 would change; the candidate lists must read back exactly and every other list and HMI node unchanged; compiler errors and warnings must not change. Admitted in production for `unified-comfort` and `unified-pc` (natively qualified 31 October, `local.hmi.text-list-import.route.20261031`); see [text-list authoring](../reference/unified-text-list-authoring.md#importing-a-candidate-into-a-project).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads",
+      "schema": "hmi-engineering.v1.schema.json"
+    },
+    "instance_db_create": {
+      "featureId": "change.instance_db_create",
+      "title": "Create one instance DB of an exact FB or IEC edge system FB",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`name`, `instanceOfName`, optional `number` (1-65535, else auto-numbered), optional `groupPath`",
+      "fields": [
+        "name",
+        "instanceOfName",
+        "number",
+        "groupPath"
+      ],
+      "description": "`PlcBlockComposition.CreateInstanceDB` of one new instance DB in the standard PLC program scope. `instanceOfName` names exactly one unprotected standard FB of that scope; `R_TRIG`/`F_TRIG` are refused because TIA deletes an unreferenced instance DB of them when it compiles; timer/counter storage (`IEC_TIMER`/`IEC_COUNTER`) keeps the `source_upsert` route. Name and DB-number collisions in the PLC, software units and namespaces refuse. Requires `compile=true`; name, number and `InstanceOfName` are read back after creation and again after compile and save. Natively qualified for a user FB instance DB (`local.plc_object_mutations.rerun.20261028`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "library_archive": {
+      "featureId": "change.library_archive",
+      "title": "Library archive",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_cleanup": {
+      "featureId": "change.library_cleanup",
+      "title": "Library cleanup of unused type versions",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`source` (project library `libraryId`, `revision`), `types: [typeGuid]` and/or `folderPaths: [\"/types/...\"]`, `cleanUpMode: \"PreserveDefaultVersionOfUnusedTypes\"` or `\"DeleteUnusedTypes\"`",
+      "fields": [
+        "source",
+        "libraryId",
+        "revision",
+        "types",
+        "folderPaths",
+        "cleanUpMode"
+      ],
+      "description": "Native `ProjectLibrary.CleanUpLibrary`. The preview lists every version and type it may delete: committed, no use in any project software, not in a master copy, no retained dependent. Incomplete use search refuses. Apply fails if any other library version disappears. Natively qualified for `PreserveDefaultVersionOfUnusedTypes` on selected types (`local.library_preservation.20261028`); `DeleteUnusedTypes` and folder selections are not exercised. See [library management](library-management.md#implemented-operation-groups).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "library_copy_elements": {
+      "featureId": "change.library_copy_elements",
+      "title": "Library copy elements",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_create": {
+      "featureId": "change.library_create",
+      "title": "Library create",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_create_master_copy": {
+      "featureId": "change.library_create_master_copy",
+      "title": "Library create master copy",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_create_type": {
+      "featureId": "change.library_create_type",
+      "title": "Library create type",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_delete": {
+      "featureId": "change.library_delete",
+      "title": "Library delete",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_discard_version": {
+      "featureId": "change.library_discard_version",
+      "title": "Library discard version",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_edit_version": {
+      "featureId": "change.library_edit_version",
+      "title": "Library edit version",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_harmonize": {
+      "featureId": "change.library_harmonize",
+      "title": "Library harmonize project names and paths",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`source`, `target: { projectName, plcPath }`, `types` and/or `folderPaths`, `harmonizeNames` and/or `harmonizePaths: true`",
+      "fields": [
+        "source",
+        "target",
+        "types",
+        "folderPaths",
+        "harmonizeNames",
+        "harmonizePaths"
+      ],
+      "description": "Native `HarmonizeProject` for PLC block and data types in one PLC. The preview lists each instance's current and expected name and group path; name collisions refuse. Apply reads back exact names, paths and version links and an unchanged rest of the PLC. Renaming a typed FB also changes the exports that name it (instance DB, calling OB, a parent's multi-instance member). Natively qualified for names (`local.library_preservation.20261028`); differing paths are not constructible in V21.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "library_instantiate": {
+      "featureId": "change.library_instantiate",
+      "title": "Library instantiate",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_integrate": {
+      "featureId": "change.library_integrate",
+      "title": "Library integrate",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_organize": {
+      "featureId": "change.library_organize",
+      "title": "Library organize",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_publish": {
+      "featureId": "change.library_publish",
+      "title": "Library publish",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_release_version": {
+      "featureId": "change.library_release_version",
+      "title": "Library release version",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_save": {
+      "featureId": "change.library_save",
+      "title": "Library save",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_set_default": {
+      "featureId": "change.library_set_default",
+      "title": "Library set default",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_type_policy": {
+      "featureId": "change.library_type_policy",
+      "title": "Library type policy",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_update_project": {
+      "featureId": "change.library_update_project",
+      "title": "Library update project",
+      "qualification": "verified",
+      "documented": false
+    },
+    "library_upgrade": {
+      "featureId": "change.library_upgrade",
+      "title": "Library upgrade",
+      "qualification": "verified",
+      "documented": false
+    },
+    "network_configure": {
+      "featureId": "change.network_configure",
+      "title": "Change an offline network node or subnet relation",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath`, optional `nodeName`, optional `subnetName` or `disconnect: true`, optional `attributes: {...}`",
+      "fields": [
+        "hardwarePath",
+        "nodeName",
+        "subnetName",
+        "disconnect",
+        "attributes"
+      ],
+      "description": "Configures an offline network node, connects it to an existing/new subnet, or disconnects it. Apply verifies configured-hardware preservation: only the selected node's requested attributes and subnet may change; `compile` stays optional.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "network_io_assign": {
+      "featureId": "change.network_io_assign",
+      "title": "Assign or disconnect one native remote-I/O connector",
+      "qualification": "verified",
+      "documented": false
+    },
+    "network_mrp_set": {
+      "featureId": "change.network_mrp_set",
+      "title": "Set the media redundancy role and MRP domain of a PROFINET interface",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`hardwarePath` (a PROFINET interface), `role` (`NotInRing`, `Manager`, `Client`, `ManagerAuto`), optional `domainName`, optional `createDomain: true`",
+      "fields": [
+        "hardwarePath",
+        "role",
+        "NotInRing",
+        "Manager",
+        "Client",
+        "ManagerAuto",
+        "domainName",
+        "createDomain"
+      ],
+      "description": "Sets the `MediaRedundancyRole` of the interface's one MRP instance and optionally moves it into a named MRP domain of its subnet (created first with `createDomain`). A ring role needs both ring ports, and a role that would link a ring port to a non-ring port is refused (`NetworkPrerequisite`). Ring ports stay; close the ring with `hardware_port_connect`. See [media redundancy](network-inspection.md#media-redundancy-mrp).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "opcua_reference_namespace_delete": {
+      "featureId": "change.opcua_reference_namespace_delete",
+      "title": "Delete one OPC UA reference namespace",
+      "qualification": "unverified",
+      "documented": true,
+      "payload": "`namespaceName`",
+      "fields": [
+        "namespaceName"
+      ],
+      "description": "Backup `Export`, then `Delete()`. The preview names any generated interface that may disappear with the namespace.",
+      "source": "docs/reference/opc-ua-workflow.md#prepared-native-engineering-changes"
+    },
+    "opcua_reference_namespace_import": {
+      "featureId": "change.opcua_reference_namespace_import",
+      "title": "Import one OPC UA reference namespace from a supplied file",
+      "qualification": "unverified",
+      "documented": true,
+      "payload": "`namespaceName`, `mode`, `path`, `expectedSha256`",
+      "fields": [
+        "namespaceName",
+        "mode",
+        "path",
+        "expectedSha256"
+      ],
+      "description": "`ReferenceNamespaces.Create(name, file)` or `ReferenceNamespace.Import(file)`. Readback gives `Enabled`, `GenerateNodes`, `GeneratedInterfaceName`, `UseStringNodeIds` and an export.",
+      "source": "docs/reference/opc-ua-workflow.md#prepared-native-engineering-changes"
+    },
+    "opcua_role_mapping_set": {
+      "featureId": "change.opcua_role_mapping_set",
+      "title": "Create or remove one OPC UA role mapping with explicit namespace permissions",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`action: \"create\"` with `roleName`, `definedInNamespace`, optional `projectRole` and `namespacePermissions: [...]`; or `action: \"remove\"` with `roleName`",
+      "fields": [
+        "action",
+        "roleName",
+        "definedInNamespace",
+        "projectRole",
+        "namespacePermissions"
+      ],
+      "description": "Creates one role mapping with all six permission booleans set explicitly for each listed namespace, or removes one mapping. Passwords, certificates and any other fields are refused.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "opcua_server_interface_delete": {
+      "featureId": "change.opcua_server_interface_delete",
+      "title": "Delete one user-defined OPC UA server interface",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`interfaceName`",
+      "fields": [
+        "interfaceName"
+      ],
+      "description": "Deletes one user-defined server interface after a backup export and verifies that it is gone.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "opcua_server_interface_enable": {
+      "featureId": "change.opcua_server_interface_enable",
+      "title": "Enable or disable one user-defined OPC UA server interface",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`interfaceName`, `enabled: true` or `false`",
+      "fields": [
+        "interfaceName",
+        "enabled",
+        "false"
+      ],
+      "description": "Sets and reads back the `Enabled` flag of one user-defined server interface.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "opcua_server_interface_import": {
+      "featureId": "change.opcua_server_interface_import",
+      "title": "Import one user-defined OPC UA server interface from a supplied file",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`interfaceName`, `mode: \"create\"` or `\"replace\"`, absolute `path`, `expectedSha256`",
+      "fields": [
+        "interfaceName",
+        "mode",
+        "path",
+        "expectedSha256"
+      ],
+      "description": "Creates or replaces one user-defined OPC UA server interface from a hash-bound copy of the file (16 MiB max). It exports a backup first and the native interface afterwards. SIMATIC and generated companion interfaces are refused. See [OPC UA prepared changes](../reference/opc-ua-workflow.md#prepared-native-engineering-changes).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "opcua_server_settings_set": {
+      "featureId": "change.opcua_server_settings_set",
+      "title": "Set the CPU OPC UA server state, port, certificate acceptance, purchased runtime license and Alarms and Conditions from exact expected values",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "Each `{ expected, value }`: `serverEnabled`, `runtimeLicense` (`NoLicense`, `SimaticOpcUaS71500Small`/`Medium`/`Large`), and while the server is on `port` (1..65535), `autoAcceptClientCertificates` and `alarmsAndConditions`; outer `plcPath`",
+      "fields": [
+        "serverEnabled",
+        "runtimeLicense",
+        "NoLicense",
+        "SimaticOpcUaS71500Small",
+        "Medium",
+        "Large",
+        "port",
+        "autoAcceptClientCertificates",
+        "alarmsAndConditions",
+        "plcPath"
+      ],
+      "description": "Turns the CPU's OPC UA server on or off, records its purchased runtime license and sets its port, automatic client-certificate acceptance and Alarms and Conditions, then reads them back. An active server compiles only when a user holds the `OPCUAServerAccess` device right, granted first with `umac_role_set`. `guestAccess` is refused (`UnsupportedCapability`). Device compile required. See [OPC UA prepared changes](../reference/opc-ua-workflow.md#prepared-native-engineering-changes).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "plc_alarm_class_import": {
+      "featureId": "change.plc_alarm_class_import",
+      "title": "Import project alarm classes from a supplied DAT",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`artifactPath` (.dat), `expectedSha256`",
+      "fields": [
+        "artifactPath",
+        "expectedSha256"
+      ],
+      "description": "Project-wide alarm class import; compiles every device.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "plc_alarm_instance_text_import": {
+      "featureId": "change.plc_alarm_instance_text_import",
+      "title": "Import PLC alarm instance texts from a supplied XLSX",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`artifactPath` (.xlsx), `expectedSha256`, optional `scopePath`",
+      "fields": [
+        "artifactPath",
+        "expectedSha256",
+        "scopePath"
+      ],
+      "description": "Updates texts of existing alarm instances in one PLC or software unit, all workbook languages.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "plc_alarm_text_list_import": {
+      "featureId": "change.plc_alarm_text_list_import",
+      "title": "Import PLC alarm user text lists from a supplied XLSX",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`artifactPath` (.xlsx), `expectedSha256`, `importOption: \"None\"` or `\"Override\"`, `expectedTextListNames: [...]`, optional `scopePath`",
+      "fields": [
+        "artifactPath",
+        "expectedSha256",
+        "importOption",
+        "expectedTextListNames",
+        "scopePath"
+      ],
+      "description": "Native PLC alarm user text-list import into one PLC or software unit. See [PLC alarm and ProDiag imports](#plc-alarm-and-prodiag-imports).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "plc_compile": {
+      "featureId": "change.plc_compile",
+      "title": "Checkpoint and compile explicitly selected PLC software",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "Empty `{}`; exact top-level `plcPath`",
+      "fields": [
+        "plcPath"
+      ],
+      "description": "Checkpointed PLC-software compilation, `compile=true`; no parameter writes/imports. Generated native state may change.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "plc_supervision_import": {
+      "featureId": "change.plc_supervision_import",
+      "title": "Import ProDiag supervisions from a supplied XLSX",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`artifactPath` (.xlsx), `expectedSha256`, `importOption: \"None\"` or `\"Override\"`, optional `scopePath`",
+      "fields": [
+        "artifactPath",
+        "expectedSha256",
+        "importOption",
+        "scopePath"
+      ],
+      "description": "Global ProDiag supervision workbook of one PLC or software unit.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "plc_supervision_settings_import": {
+      "featureId": "change.plc_supervision_settings_import",
+      "title": "Import project ProDiag supervision settings from a supplied DAT",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`artifactPath` (.dat), `expectedSha256`",
+      "fields": [
+        "artifactPath",
+        "expectedSha256"
+      ],
+      "description": "Project-wide ProDiag supervision settings import; compiles every device.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "plc_type_import_xml": {
+      "featureId": "change.plc_type_import_xml",
+      "title": "Import explicit PLC type XML",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`xml`, `expectedTypeNames: [...]`",
+      "fields": [
+        "xml",
+        "expectedTypeNames"
+      ],
+      "description": "Native `SW.Types.PlcStruct` XML import. Protected existing types are rejected.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "project_attributes_set": {
+      "featureId": "change.project_attributes_set",
+      "title": "Set reviewed project attributes",
+      "qualification": "unverified",
+      "documented": true,
+      "payload": "`attributes: {...}` with any of `Author`, `Copyright`, `Family`, `Version`",
+      "fields": [
+        "attributes",
+        "Author",
+        "Copyright",
+        "Family",
+        "Version"
+      ],
+      "description": "Project-scoped string attributes that native attribute info reports readable and writable; preview shows before/requested values and apply records verified readback. `Comment` is multilingual and not writable here.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "project_compile": {
+      "featureId": "change.project_compile",
+      "title": "Checkpoint and compile every device of the project",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "Empty `{}`",
+      "fields": [],
+      "description": "Checkpointed compilation of every device of the project in inventory order, `compile=true`; the target list must equal the preview at dispatch.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "project_languages_set": {
+      "featureId": "change.project_languages_set",
+      "title": "Change project active, reference and editing languages",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "Any of `addActive: [...]`, `removeActive: [...]`, `referenceLanguage`, `editingLanguage` (culture names such as `\"en-US\"`)",
+      "fields": [
+        "addActive",
+        "removeActive",
+        "referenceLanguage",
+        "editingLanguage"
+      ],
+      "description": "Languages must be supported by the project. Removing the current or requested reference/editing language is refused, and both must be active afterwards. Apply adds, sets, then removes, and verifies the full active/reference/editing readback. Removing a language can discard its texts; the checkpoint archive is the way back.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "project_simulation_enable": {
+      "featureId": "change.project_simulation_enable",
+      "title": "Change project simulation compilation settings",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`enabled: true` or `false`",
+      "fields": [
+        "enabled",
+        "false"
+      ],
+      "description": "Sets only `IsSimulationDuringBlockCompilationEnabled`, with checkpoint and a compile of every device: the setting changes how every PLC compiles, so no `plcPath` is needed in a project with several PLCs. Does not start or download to a simulator.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "safety_drive_tags": {
+      "featureId": "change.safety_drive_tags",
+      "title": "Create Bool safety tags on a drive's PROFIsafe telegram 30 bits",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`safetyAcknowledged: true`, `hardwarePath`, `driveObjectNumber` or `driveObjectIndex`, `tagTableName` (root group), `bits: [{ word: \"status\" or \"control\", bit: 0..15, name }]` (1..32)",
+      "fields": [
+        "safetyAcknowledged",
+        "hardwarePath",
+        "driveObjectNumber",
+        "driveObjectIndex",
+        "tagTableName",
+        "bits"
+      ],
+      "description": "Creates one Bool safety tag per named bit of one drive object's PROFIsafe telegram 30 status word (S_ZSW1, input) or control word (S_STW1, output) on the owning F-PLC, at the addresses Startdrive reports (see `drive_inventory`). Word bit 0..7 is byte n+1, bit 8..15 byte n of the word at `%IW`/`%QW` n (S7 words are big-endian), so status bit 0 of a telegram at `%IW0` is `%I1.0`; the preview lists each address. The route gives no bit a meaning: take the bit assignment from the drive's Safety Integrated documentation. Word tags are not offered (`tags` is refused with `InvalidRequest`): the F-compiler refuses a Word access to a drive's F-I/O. Refuses other telegrams, a name in use, a bit an existing tag already covers (`AddressInUse`, also a Word tag an earlier version created; delete it in TIA first) and addresses outside an F-I/O range of this drive the PLC owns; reads each tag back as a safety tag and compiles the device. Generic tag routes refuse these addresses with `SafetyBoundary`. Verified (`local.safety.drive-tags-bool.20261112`): an F-FBD network of the main safety block reads a created status bit and writes a created control bit and compiles.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "safety_fparameter_set": {
+      "featureId": "change.safety_fparameter_set",
+      "title": "Set allowlisted F-parameters of F-I/O owned by one safety PLC",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`safetyAcknowledged: true`, `parameters: [{ hardwarePath, name, expected, value }]` (1..64)",
+      "fields": [
+        "safetyAcknowledged",
+        "parameters"
+      ],
+      "description": "Writes the F-parameters the [F-parameter allowlist](#f-parameter-allowlist) qualifies for the F-I/O's module type, on F-I/O owned by the selected safety PLC (its central F-source address and solely owned I/O addresses). `expected` must equal the current value; an F-destination address used or planned by another F-I/O refuses (`AddressConflict`). The safety program must already be logged in if protected. The preview shows before/after and the F-I/O `Failsafe_*Signature*` attributes; apply reads back the values and signatures, needs `compile=true` (whole-project device compile) and verifies configured-hardware preservation. It changes the safety signatures and does not validate, approve, assign PROFIsafe addresses or download. Verified for `Failsafe_FDestinationAddress` (`local.safety_changes.20261028`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "safety_import_xml": {
+      "featureId": "change.safety_import_xml",
+      "title": "Import eligible user F-block XML with native protection",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`xml`, `expectedBlockNames: [...]`, `safetyAcknowledged: true`",
+      "fields": [
+        "xml",
+        "expectedBlockNames",
+        "safetyAcknowledged"
+      ],
+      "description": "Dedicated import for consistent, exportable user F-blocks on a safety-enabled PLC with the required existing login state.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "simulation_download_online": {
+      "featureId": "change.simulation_download_online",
+      "title": "Download a changed program online to an existing owned PLCSIM instance",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`downloadTicket`, `softwareScope` (`all` or `changes`), `dataBlockValues` (`keepActualValues` or `reinitialize`), `allowStop`, optional `runtimeCredentialMetadataPath`, `credentialMetadataPath`",
+      "fields": [
+        "downloadTicket",
+        "softwareScope",
+        "all",
+        "changes",
+        "dataBlockValues",
+        "keepActualValues",
+        "reinitialize",
+        "allowStop",
+        "runtimeCredentialMetadataPath",
+        "credentialMetadataPath"
+      ],
+      "description": "Owned PLCSIM only: compiles the PLC and downloads its software online to the instance whose generated card came from it, through `DownloadProvider` on PN/IE / PLCSIM (1). Apply with `compile=false` and `save=false`. Every download configuration is answered from the options or refused; a CPU found in RUN is restarted. A CPU write the checkpoint cannot undo. See [simulation](simulation.md#changed-programs-on-an-existing-owned-instance).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "software_unit_create": {
+      "featureId": "change.software_unit_create",
+      "title": "Create one PLC software unit with an optional namespace preset",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`name`, optional `namespacePreset`; outer `plcPath`",
+      "fields": [
+        "name",
+        "namespacePreset",
+        "plcPath"
+      ],
+      "description": "Creates one standard software unit and reads back its name and preset. Name collisions with any unit are refused; master-copy instantiation and rename are the kinds below.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "software_unit_create_from": {
+      "featureId": "change.software_unit_create_from",
+      "title": "Create one software unit from a unit master copy",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`libraryId` (from `library_open`/`library_list`), `masterCopyPath` (from `library_query`), `name`, optional `onNameConflict: \"refuse\"` (default) or `\"rename\"`; outer `plcPath`",
+      "fields": [
+        "libraryId",
+        "masterCopyPath",
+        "name",
+        "onNameConflict",
+        "plcPath"
+      ],
+      "description": "Creates one standard unit from a master copy holding exactly one software unit (`PlcUnitComposition.CreateFrom`) and renames it to `name`. When the template's unit name already exists in the PLC, `refuse` refuses at prepare and `rename` inserts with `MasterCopyMode.Rename`. A unit master copy describes only the unit, and `Rename` also renames the copy's members whose names exist in the PLC (observed: block `UnitFb` became `UnitFb_1`, a default tag table `_3` became `_4`). The `createdUnitMembers` readback lists the new unit's blocks, types and tag tables and every `<existing name>_<n>` rename; a renamed block or type fails the apply after the compile (`MutationVerificationFailed`, checkpoint recovery through `change_restore`), a renamed tag table is only reported. So a same-PLC copy works for units without blocks or types. A tag or constant of the copy created as `<name>(<n>)` beside an existing `<name>` (as `library_instantiate` would) fails the same way. The unit's tag tables come along unread, so the master copy is refused at prepare (`SafetyBoundary`) while the PLC owns, or may own, any F-I/O address range, as a tag-table master copy is. A master copy's name and creation date changing after prepare refuses with `StaleRevision`.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "software_unit_delete": {
+      "featureId": "change.software_unit_delete",
+      "title": "Delete one empty, unreferenced software unit",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`unitPath`, optional `dependencyPolicy: \"rejectReferenced\"`",
+      "fields": [
+        "unitPath",
+        "dependencyPolicy"
+      ],
+      "description": "Deletes one empty standard unit (no blocks, types, tags/constants, user groups, external sources or user text lists). It is refused while any unit relation names it; empty tag tables and the unit's own relations go with it and are listed in the preview.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "software_unit_publication_set": {
+      "featureId": "change.software_unit_publication_set",
+      "title": "Set the publication (Access) of one block or PLC data type in a software unit",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`objectPath`, `attributes: { \"Access\": \"Published\" }` or `\"Unpublished\"`",
+      "fields": [
+        "objectPath",
+        "attributes"
+      ],
+      "description": "Writes the native `Access` (`UnitAccessType`) attribute of one exact unit block or PLC data type when metadata declares it readable and writable, then reads it back. OBs and protected, safety, generated or PLC-root objects are refused.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "software_unit_relation_set": {
+      "featureId": "change.software_unit_relation_set",
+      "title": "Add or remove one SoftwareUnit relation between two exact software units",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`unitPath`, `relatedUnitPath`, `relationType: \"SoftwareUnit\"`, `action: \"add\"` or `\"remove\"`",
+      "fields": [
+        "unitPath",
+        "relatedUnitPath",
+        "relationType",
+        "action"
+      ],
+      "description": "Adds or removes one relation between two exact standard units of the same PLC. Duplicates, self-relations and relations that would close a cycle are refused; `NonUnitDB`/`TODB` relations are not supported.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "software_unit_rename": {
+      "featureId": "change.software_unit_rename",
+      "title": "Rename one unreferenced software unit",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`unitPath`, `name`",
+      "fields": [
+        "unitPath",
+        "name"
+      ],
+      "description": "Renames one standard unit (`PlcUnitBase.Name`) and reads the unit back under the new name. Refused while any unit relation names the unit (`DependencyExists`, listed like `software_unit_delete`), for a name in use and for the current name.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "source_upsert": {
+      "featureId": "change.source_upsert",
+      "title": "Generate explicit SCL/STL blocks",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`language: \"SCL\"` or `\"STL\"`/`\"AWL\"`, `source`, `expectedBlockNames: [...]`",
+      "fields": [
+        "language",
+        "source",
+        "expectedBlockNames"
+      ],
+      "description": "Creates or updates the explicitly declared FB/FC/OB/DB set through an external source. Existing block languages must be preserved. Absolute references overlapping owned F-I/O refuse before generation because TIA may create implicit safety tags; the lexical scan conservatively includes comments and quoted text.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "tag_create": {
+      "featureId": "change.tag_create",
+      "title": "Create one PLC tag in an existing tag table",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`tagTableName` or `tagTablePath`, `name`, `dataTypeName`, `logicalAddress`",
+      "fields": [
+        "tagTableName",
+        "tagTablePath",
+        "name",
+        "dataTypeName",
+        "logicalAddress"
+      ],
+      "description": "Creates one tag in an existing table. Names already used by a tag or constant in the software scope are rejected. An absolute I/O address inside the address range of an F-I/O the PLC owns refuses at prepare with `SafetyBoundary` (TIA would make it a safety tag), before anything is created; a created tag TIA still reports as a safety tag fails verification. Readback is exact, so use native spelling such as `%M0.0`. The F-I/O refusal of `tag_create`, `tag_set`, `tag_table_import_xml`, project-ward `vci_synchronize` and tag-table `library_instantiate` was rechecked natively on an F-CPU with ET 200SP F-DI (`local.safety.fio-routes.20261101`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "tag_delete": {
+      "featureId": "change.tag_delete",
+      "title": "Delete one unreferenced existing PLC tag",
+      "qualification": "verified",
+      "documented": false
+    },
+    "tag_set": {
+      "featureId": "change.tag_set",
+      "title": "Edit attributes of one existing PLC tag",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`tagTableName` or `tagTablePath`, `memberName`, `attributes: {...}`; or `items: [{tagTableName or tagTablePath, memberName, attributes}]` ([many edits in one change](#many-tag-edits-in-one-change))",
+      "fields": [
+        "tagTableName",
+        "tagTablePath",
+        "memberName",
+        "attributes",
+        "items"
+      ],
+      "description": "Edits an existing tag's exposed writable `Name`, `DataTypeName` and/or `LogicalAddress`. A new `LogicalAddress` inside the address range of an F-I/O the PLC owns refuses at prepare with `SafetyBoundary`; nothing is written. With `items`, 1 to 500 such edits in one software scope share one fingerprint check, checkpoint archive, compile and save; a refusal on any item refuses the whole change before a write. A safety tag is refused (`SafetyBoundary`) with one exception: a single `tag_set` with `safetyAcknowledged: true` and `attributes` holding only `Name` [renames it](#renaming-a-safety-tag).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "tag_table_create": {
+      "featureId": "change.tag_table_create",
+      "title": "Create an empty PLC tag table",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`tagTableName`, optional `scopePath`, `groupPath`",
+      "fields": [
+        "tagTableName",
+        "scopePath",
+        "groupPath"
+      ],
+      "description": "Creates one empty tag table; the name must be free in the software scope across all tag-table groups (case-insensitive).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "tag_table_delete": {
+      "featureId": "change.tag_table_delete",
+      "title": "Delete an empty PLC tag table",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`tagTableName` or `tagTablePath`",
+      "fields": [
+        "tagTableName",
+        "tagTablePath"
+      ],
+      "description": "Deletes one empty user tag table (no tags, no user constants); the default tag table is refused with `DefaultTagTable`, a non-empty table with `TagTableNotEmpty`.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "tag_table_import_xml": {
+      "featureId": "change.tag_table_import_xml",
+      "title": "Import explicit native tag tables",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`xml`, `expectedTableNames: [...]`; or `tagTableName`, `tags: [...]` ([row form](#tag-rows-and-the-hardware-cross-check))",
+      "fields": [
+        "xml",
+        "expectedTableNames",
+        "tagTableName",
+        "tags"
+      ],
+      "description": "Native `SW.Tags.PlcTagTable` import. Tag collisions outside the previewed tables are rejected, and so is any imported tag on an absolute I/O address inside the address range of an F-I/O the PLC owns (`SafetyBoundary` at prepare, before anything is imported).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "tag_table_rename": {
+      "featureId": "change.tag_table_rename",
+      "title": "Rename a PLC tag table",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`tagTableName` or `tagTablePath`, `newName`",
+      "fields": [
+        "tagTableName",
+        "tagTablePath",
+        "newName"
+      ],
+      "description": "Renames one tag table; its members stay, and `newName` must be free in the software scope.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "testsuite_application_import": {
+      "featureId": "change.testsuite_application_import",
+      "title": "Strictly import Test Suite application test cases or sets from a file",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`sourcePath` (absolute `.tat` or `.ttst`), `expectedTestCaseNames: [...]` (optional for `.ttst`), `expectedTestSetNames: [...]` (`.ttst` only)",
+      "fields": [
+        "sourcePath",
+        "expectedTestCaseNames",
+        "expectedTestSetNames"
+      ],
+      "description": "Strict Test Suite application import (`ImportOptions.None`, no `IgnoreInvalidObject`): existing names refuse, the file is copied byte-exact and the native return plus `Find` readback must match the reviewed names. Sets nothing as scope and runs nothing. See [Test Suite application tests](../reference/testsuite-production-jobs.md#ts-05-application-tests).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "testsuite_system_import": {
+      "featureId": "change.testsuite_system_import",
+      "title": "Strictly import Test Suite system test cases from a file",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`sourcePath` (absolute `.tst`), `expectedTestCaseNames: [...]`",
+      "fields": [
+        "sourcePath",
+        "expectedTestCaseNames"
+      ],
+      "description": "Strict Test Suite system-test import (`SystemTestCaseComposition.LoadFromFile`, `ImportOptions.None`, no `IgnoreInvalidObject`): existing names refuse, the file is copied byte-exact and the native return plus `Find` readback must match the reviewed names. Sets no OPC UA scope and runs nothing. See [Test Suite system tests](../reference/testsuite-production-jobs.md#ts-06-system-tests).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "to_child_create": {
+      "featureId": "change.to_child_create",
+      "title": "Create an output cam, cam track or measuring input under an owner technology object",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`ownerPath`, `composition` (`OutputCams` or `MeasuringInputs`), `name`, `typeIdentifier`, `version`",
+      "fields": [
+        "ownerPath",
+        "composition",
+        "OutputCams",
+        "MeasuringInputs",
+        "name",
+        "typeIdentifier",
+        "version"
+      ],
+      "description": "Creates one output cam/cam track or measuring input under an existing owner and verifies it at its child path. Verified (`local.technology_changes.20261028`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "to_connect": {
+      "featureId": "change.to_connect",
+      "title": "Connect one technology connection slot to exact hardware or a tag",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`technologyPath` or unique `name`, `role` (`actor`, `sensor` + `sensorIndex`, `torque`, `encoder`, `measuringInput`, `outputCam`), one target: `hardwarePath` (module or PROFIdrive telegram), `hardwarePath` + `channelType`/`channelIoType`/`channelNumber`, `hardwarePath` + `channelIndex` (measuring input), `tagName`, `inputHardwarePath` + `outputHardwarePath`, `dbMemberPath`, `inputAddress`/`outputAddress`, or a drive's `hardwarePath` + `driveObjectNumber`/`driveObjectIndex` + `telegramType` (Startdrive); optional `connectOption` (`Default`, `AllowAllModules`) with the two-module, address and telegram targets",
+      "fields": [
+        "technologyPath",
+        "name",
+        "role",
+        "actor",
+        "sensor",
+        "sensorIndex",
+        "torque",
+        "encoder",
+        "measuringInput",
+        "outputCam",
+        "hardwarePath",
+        "channelType",
+        "channelIoType",
+        "channelNumber",
+        "channelIndex",
+        "tagName",
+        "inputHardwarePath",
+        "outputHardwarePath",
+        "dbMemberPath",
+        "inputAddress",
+        "outputAddress",
+        "driveObjectNumber",
+        "driveObjectIndex",
+        "telegramType",
+        "connectOption",
+        "Default",
+        "AllowAllModules"
+      ],
+      "description": "Connects one slot through the matching V21 `Connect` overload ([role/target matrix](#technology-connections)); a pair without one refuses at prepare with `UnsupportedTarget`. Apply reads back `IsConnected` and the reported module/channel/tag; the preview, fingerprint and `technologyAfter` reuse the `technology_read` connection rows. Requires `compile=true`. Verified (`local.technology_changes.20261028`, `local.composite_rebind.20261028`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "to_create": {
+      "featureId": "change.to_create",
+      "title": "Create a technology object by native type/version",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`name`, `typeIdentifier`, `version`, optional `parameters: {...}`, optional `unprofiledAcknowledged: true`",
+      "fields": [
+        "name",
+        "typeIdentifier",
+        "version",
+        "parameters",
+        "unprofiledAcknowledged"
+      ],
+      "description": "Creates a native technology object and applies requested initial scalar parameters within the same recovery checkpoint before its first compile. The CPU/type/version pair must be recorded as accepted in the [technology version profiles](#technology-version-profiles); a recorded refusal refuses with its native text and any other pair needs `unprofiledAcknowledged`. Parameter names, native types and exposed write access can be checked only after creation. The PLC's first motion object needs `compile=true`: the preview flags `firstMotionObject` and `change_apply` refuses `compile=false` with `CompileRequired` before the checkpoint (see [technology version profiles](#technology-version-profiles); rechecked natively, `local.technology.first-motion.20261101`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "to_delete": {
+      "featureId": "change.to_delete",
+      "title": "Delete a technology object with checkpoint",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`technologyPath` or unique `name`",
+      "fields": [
+        "technologyPath",
+        "name"
+      ],
+      "description": "Deletes an existing technology object after an XML backup and project checkpoint.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "to_disconnect": {
+      "featureId": "change.to_disconnect",
+      "title": "Disconnect one technology connection slot",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`technologyPath` or unique `name`, `role` (+ `sensorIndex`)",
+      "fields": [
+        "technologyPath",
+        "name",
+        "role",
+        "sensorIndex"
+      ],
+      "description": "Disconnects one connected slot and verifies `IsConnected=false`. Requires `compile=true`; a TO that is invalid unconnected fails compilation and needs recovery. Verified (`local.technology_changes.20261028`, `local.composite_rebind.20261028`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "to_parameters": {
+      "featureId": "change.to_parameters",
+      "title": "Write supported scalar technology parameters",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`technologyPath` or unique `name`, `parameters: {...}`",
+      "fields": [
+        "technologyPath",
+        "name",
+        "parameters"
+      ],
+      "description": "Up to 500 scalar TO parameters with known read/write access and explicit native types; see the scalar-write boundary below.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "type_delete": {
+      "featureId": "change.type_delete",
+      "title": "Delete one unreferenced existing UDT",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`typeName` or `typePath`, `dependencyPolicy: \"rejectReferenced\"`",
+      "fields": [
+        "typeName",
+        "typePath",
+        "dependencyPolicy"
+      ],
+      "description": "Deletes one unprotected UDT only after the conservative offline dependency scan succeeds.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "type_rename": {
+      "featureId": "change.type_rename",
+      "title": "Rename one exact existing UDT",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`typeName` or `typePath`, `newName`",
+      "fields": [
+        "typeName",
+        "typePath",
+        "newName"
+      ],
+      "description": "Native rename of one unprotected UDT within its existing group, software scope and namespace.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "type_source_upsert": {
+      "featureId": "change.type_source_upsert",
+      "title": "Generate explicit PLC types",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`source`, `expectedTypeNames: [...]`",
+      "fields": [
+        "source",
+        "expectedTypeNames"
+      ],
+      "description": "SCL source containing only complete `TYPE` declarations.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "umac_role_set": {
+      "featureId": "change.umac_role_set",
+      "title": "Create a custom UMAC role, change its function rights or its project-user assignment",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`action: \"create\"` with `roleName`; `\"grant\"`/`\"revoke\"` with `roleName`, `engineeringRights: [...]` and/or `deviceRights: [{ device, identifier }]`; `\"assign\"`/`\"unassign\"` with `roleName`, `userName`",
+      "fields": [
+        "action",
+        "roleName",
+        "engineeringRights",
+        "deviceRights",
+        "userName"
+      ],
+      "description": "Changes custom project roles only. System roles, the anonymous user, passwords, aliases, activation and authentication are refused. A grant naming an unavailable device right is refused with `ObjectNotFound` whose details list the device's available rights (for example `OPCUAServerAccess`). The change is refused if an engineering function right would no longer be held by any active project user. Read-back must equal the previewed `umacAfter` exactly. Device compile required.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "vci_conflict_resolve": {
+      "featureId": "change.vci_conflict_resolve",
+      "title": "Resolve a two-sided VCI conflict from a reviewed three-way plan",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`workspacePath`, `objectPath`, `comparisonRef` (a `vci_package_compare` record), `packageId`, `take: \"native\"`, `\"remote\"` or `\"merged\"`; `mergedRecordRef` for `merged`",
+      "fields": [
+        "workspacePath",
+        "objectPath",
+        "comparisonRef",
+        "packageId",
+        "take",
+        "mergedRecordRef",
+        "merged"
+      ],
+      "description": "Resolves one reviewed `divergentChange` row (project side = native, workspace side = remote). The Host binds the exact remote package hashes and the bytes to write; the workspace package must equal the reviewed remote side and a fresh export of the object must hash to the reviewed native side (`contentSha256` from `vci_workspace_inspect`). `native`: `Synchronize(ProjectToWorkspace)`. `remote`/`merged`: writes the bound document, then `Synchronize(WorkspaceToProject)` with `compile=true`; a tag-table document with a tag on an F-I/O address refuses at prepare (`SafetyBoundary`). Reads back `Equal`. See [two-sided conflicts](../reference/vci-package-workflow.md#two-sided-conflict-resolution). Verified (`local.vci_git.20261031`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "vci_mapping_add": {
+      "featureId": "change.vci_mapping_add",
+      "title": "Map one exact object into a VCI workspace by export or by connecting existing files",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`workspacePath`, `objectPath`, `mode: \"export\"` or `\"connect\"`, `directory` (relative, `\"\"` for the root), `fileName`, `format` (from `GetSupportedFileFormats`)",
+      "fields": [
+        "workspacePath",
+        "objectPath",
+        "mode",
+        "directory",
+        "fileName",
+        "format",
+        "GetSupportedFileFormats"
+      ],
+      "description": "`ExportObject` writes a new package (existing package files refuse) and must read back `Equal`; `ConnectObject` maps existing files. Objects mapped anywhere and packages owned by another mapping refuse. Verified (`local.vci_mappings.20261028`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "vci_mapping_remove": {
+      "featureId": "change.vci_mapping_remove",
+      "title": "Remove one object's VCI mapping",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`workspacePath`, `objectPath`",
+      "fields": [
+        "workspacePath",
+        "objectPath"
+      ],
+      "description": "`MappedObject.Delete()`; the object stays. Package files are backed up first. Verified (`local.vci_mappings.20261028`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "vci_synchronize": {
+      "featureId": "change.vci_synchronize",
+      "title": "Synchronize mapped VCI objects in one explicit direction",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`workspacePath`, `direction: \"ProjectToWorkspace\"` or `\"WorkspaceToProject\"`, `objectPath` or `allMappedObjects: true` (project-to-workspace only, 1..200)",
+      "fields": [
+        "workspacePath",
+        "direction",
+        "objectPath",
+        "allMappedObjects"
+      ],
+      "description": "`MappedObject.Synchronize`; status before and after, each mapping must read back `Equal`. Two-sided changes refuse (`VciConflict`). Workspace-ward: only the previewed package files may change (backed up first). Project-ward: workspace files must stay identical, direct-mutation guards apply, `compile=true` required; for a tag table, a package tag on an absolute I/O address inside the address range of an F-I/O the PLC owns refuses at prepare (`SafetyBoundary`), as for `tag_table_import_xml`. Verified (`local.vci_mappings.20261028`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "vci_workspace_create": {
+      "featureId": "change.vci_workspace_create",
+      "title": "Create a native VCI workspace with an explicit root and language",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`groupPath` (from `vci_workspace_inspect`), `name`, `rootPath` (absolute, absent or empty), `language` (exact active project culture)",
+      "fields": [
+        "groupPath",
+        "name",
+        "rootPath",
+        "language"
+      ],
+      "description": "`WorkspaceComposition.Create(name, root, culture)`; reads back name, root and language. The language is fixed afterwards. Roots overlapping the project directory, the artifact store or another workspace root, drive roots and links are refused. See [VCI workspace changes](../reference/vci-package-workflow.md#native-workspace-changes). Verified (`local.access.qualify.rerun.20261028`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "vci_workspace_delete": {
+      "featureId": "change.vci_workspace_delete",
+      "title": "Delete one native VCI workspace and its mappings",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`workspacePath`",
+      "fields": [
+        "workspacePath"
+      ],
+      "description": "`Workspace.Delete()`; the preview lists the mappings removed with it. All root files are backed up first; whether TIA removes them is reported. Verified (`local.access.qualify.rerun.20261028`).",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "webserver_page_set": {
+      "featureId": "change.webserver_page_set",
+      "title": "Set the CPU system web page flag and default web application from exact expected values",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`webServerActive: { expected, value }`, `systemWebPages: { expected, value }` and/or `defaultApplication: { expected, value }` (application name or `null`); outer `plcPath`",
+      "fields": [
+        "webServerActive",
+        "systemWebPages",
+        "defaultApplication",
+        "null",
+        "plcPath"
+      ],
+      "description": "Sets the CPU's `WebserverActivate` attribute (where writable), its `EnableSystemWebPages` flag and/or the default web application. `expected` must match the current value; page settings need web serving active, now or through `webServerActive` in the same change. Read-back must equal the previewed `webServerAfter` exactly. Device compile required; nothing is downloaded.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    },
+    "webserver_user_pages_generate": {
+      "featureId": "change.webserver_user_pages_generate",
+      "title": "Generate user-defined web page data blocks from an explicit page directory",
+      "qualification": "verified",
+      "documented": true,
+      "payload": "`htmlDirectory`, `defaultPage` (relative), `applicationName`, `override: false`; or `override: true` with `overrideBlocks: [...]`; outer `plcPath`",
+      "fields": [
+        "htmlDirectory",
+        "defaultPage",
+        "applicationName",
+        "override",
+        "overrideBlocks",
+        "plcPath"
+      ],
+      "description": "Generates the user-defined page DBs with `WebserverUserDefinedPages.GenerateBlocks` from a copy of the directory taken at prepare. The returned blocks are the affected set. With `override: true` the overwritten existing blocks must equal `overrideBlocks`. Generated block internals are never edited. PLC compile required.",
+      "source": "docs/guides/engineering-workflows.md#supported-payloads"
+    }
+  }
+}
