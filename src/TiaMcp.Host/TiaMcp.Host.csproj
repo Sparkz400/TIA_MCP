@@ -16,8 +16,8 @@
   <ItemGroup>
     <InternalsVisibleTo Include="TiaMcp.Inventory.Tests" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="ModelContextProtocol" Version="2.3.1" />
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.14" />
+    <PackageReference Include="ModelContextProtocol" Version="2.4.0" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.15" />
     <ProjectReference Include="..\TiaMcp.Core\TiaMcp.Core.csproj" />
     <ProjectReference Include="..\TiaMcp.Translations\TiaMcp.Translations.csproj" />
     <ProjectReference Include="..\TiaMcp.OpcUa\TiaMcp.OpcUa.csproj" />
