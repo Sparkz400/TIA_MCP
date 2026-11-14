@@ -38,6 +38,7 @@ value with `New-McpConfiguration.ps1 -Toolsets core,simulation` (or `Start-TiaMc
 | `vci` | `vci_*` |
 | `cax` | `automationml_*`, `cax_export` |
 | `graph` | `graph_*` |
+| `physical` | `plc_physical_*`: route listing, online compare, station upload and download to a real PLC. Registered only when the Host runs with `--physical-plc-online` |
 | `reviews` | Supplied-evidence reviews and inspections: `access_*`, `addin_*`, `composite_*`, `connection_*`, `drive_*`, `multiuser_*`, `public_certificate_*`, `certificate_*`, `safety_*`, `software_unit_*`, `technology_profile_*`, `teamcenter_*`, `web_*` |
 
 A Host without native workers (`--no-native-workers` or the portable package) still lists native

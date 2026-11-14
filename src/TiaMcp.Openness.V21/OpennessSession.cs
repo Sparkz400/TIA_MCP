@@ -140,6 +140,12 @@ namespace TiaMcp.Openness.V21
                 case "catalog_query": return CatalogQuery(arguments);
                 case "scratch_create": return ScratchCreate(arguments);
                 case "project_open": return ProjectOpen(arguments);
+                case "project_close": return ProjectClose(arguments);
+                case "plc_physical_targets": return PhysicalTargets(arguments);
+                case "plc_physical_online_compare": return PhysicalOnlineCompare(arguments);
+                case "plc_physical_station_upload": return PhysicalStationUpload(arguments);
+                case "plc_physical_download": return PhysicalDownload(arguments);
+                case "project_open_copy": return ProjectOpenCopy(arguments);
                 case "project_retrieve": return ProjectRetrieve(arguments);
                 case "plc_compare": return PlcCompare(arguments);
                 case "software_inspect": return SoftwareInspect(arguments);
@@ -482,9 +488,12 @@ namespace TiaMcp.Openness.V21
                 string language = selected.Block.Item.ProgrammingLanguage.ToString();
                 bool source = selected.Block.Item is DataBlock || language == "SCL" || language == "STL";
                 throw new BridgeException("BlockExportUnavailable", "TIA did not export the inconsistent block as XML: " + ex.Message +
-                    (source ? " Read its generated source with block_read format=generatedSource; that does not change it." : " Its language has no generated-source form; compile with plc_compile to list unresolved symbols."),
-                    new JObject { ["blockConsistent"] = false, ["programmingLanguage"] = language, ["generatedSourceAvailable"] = source,
-                        ["fallback"] = source ? new JObject { ["tool"] = "block_read", ["format"] = "generatedSource" } : new JObject { ["tool"] = "change_prepare", ["kind"] = "plc_compile" } });
+                    (source ? " Read its generated source with block_read format=generatedSource; that does not change it."
+                        : " Read it as a SIMATIC SD document with block_read format=simaticSd (it keeps the unresolved operands and does not change the block), and compile with plc_compile to list unresolved symbols."),
+                    new JObject { ["blockConsistent"] = false, ["programmingLanguage"] = language, ["generatedSourceAvailable"] = source, ["simaticSdAvailable"] = true,
+                        // Natively observed on 14 November 2026: ExportAsDocuments exports an inconsistent LAD block, unresolved global operand included.
+                        ["fallback"] = source ? new JObject { ["tool"] = "block_read", ["format"] = "generatedSource" } : new JObject { ["tool"] = "block_read", ["format"] = "simaticSd" },
+                        ["diagnose"] = new JObject { ["tool"] = "change_prepare", ["kind"] = "plc_compile" } });
             }
             var file = new FileInfo(destination);
             var result = Envelope();
@@ -812,7 +821,7 @@ namespace TiaMcp.Openness.V21
             Version parsed;
             return Version.TryParse((version ?? "").TrimStart('V', 'v'), out parsed) ? parsed : new Version(0, 0);
         }
-        private void EnsureAttached() { if (_portal == null) throw new BridgeException("NotAttached", "Attach to or explicitly start a TIA V21 instance first."); }
+        private void EnsureAttached() { if (_portal == null) throw new BridgeException("NotAttached", "Attach to or explicitly start a TIA V21 instance first.", new JObject { ["remediation"] = "Call tia_start (a new owned instance) or tia_attach (a running TIA), then repeat the call." }); }
         private void EnsureDetached() { if (_portal != null) throw new BridgeException("AlreadyAttached", "Detach the current session before attaching to or starting another instance."); }
 
         private static string ArtifactDirectory(JObject args)

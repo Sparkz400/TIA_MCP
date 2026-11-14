@@ -14,7 +14,7 @@ records the available CFC/DCC prerequisites and the native qualification still n
 
 ## Can I use it on a production PLC or plant?
 
-No. Use it only with offline projects, copies, scratch projects and simulators you own. The simulation workflow operates on adapter-owned PLCSIM instances and does not expose physical PLC download, force or CPU control.
+No. Use it only with offline projects, copies, scratch projects and simulators you own. The simulation workflow operates on adapter-owned PLCSIM instances. Online compare, station upload and download to a real PLC exist only behind the off-by-default `--physical-plc-online` Host option, are not qualified on physical hardware and are meant for a commissioning bench or test rig you own, not a running plant ([real PLCs](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/physical-plc-online.md)). Force and CPU mode control are not exposed.
 
 ## Is it production-ready?
 

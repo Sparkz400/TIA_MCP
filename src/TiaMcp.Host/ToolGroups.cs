@@ -14,7 +14,7 @@ public static class ToolGroups
         ("qualification_", Qualification),
         ("feature_catalog", Base), ("host_build_identity", Base), ("artifact_", Base),
         ("project_model", "explorer"), ("project_snapshot_", "explorer"),
-        ("plc_online_compare", "simulation"), ("plc_station_upload", "simulation"), ("sim_", "simulation"), ("simulation_", "simulation"), ("db_snapshot_", "simulation"),
+        ("plc_physical_", "physical"), ("plc_online_compare", "simulation"), ("plc_station_upload", "simulation"), ("sim_", "simulation"), ("simulation_", "simulation"), ("db_snapshot_", "simulation"),
         ("tia_", "core"), ("project_", "core"), ("target_capabilities", "core"), ("object_resolve", "core"), ("fixture_sources", "core"),
         ("change_", "core"), ("engineering_", "core"), ("block_", "core"), ("call_graph", "core"), ("instance_lookup", "core"),
         ("symbol_trace", "core"), ("tag_table_", "core"), ("type_read", "core"), ("xref_query", "core"), ("software_inspect", "core"),

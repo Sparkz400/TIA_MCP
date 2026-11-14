@@ -70,6 +70,7 @@ Every MCP client connection owns separate workers and session state. Do not poin
 | `--ua-client-identity <name>` | None | `default` or a 32-character lowercase hex name of a [protected OPC UA client identity](../reference/opcua-runtime.md#protected-persistent-client-identity); once | `-UaClientIdentity` |
 | `--diagnose` | Off | Prints worker information, TIA discovery and read-only Openness registration status as JSON, then exits; no MCP server | `-Diagnose` (`Start-TiaMcp.ps1` only) |
 | `--check-openness-registration` | Off | Prints the configured worker's saved-identity check without starting any worker or TIA; exit 0 for a match, 2 otherwise. Not with `--diagnose`, `--addin-handoff` or `--no-native-workers` | `-CheckOpennessRegistration` (`Start-TiaMcp.ps1` only; not with `-InteractiveSession`) |
+| `--physical-plc-online` | Off | Registers the `physical` tools (`plc_physical_*`: route listing, online compare, station upload and download to a **real** PLC) and lets the V21 worker run them. Unqualified on physical hardware; read [real PLCs](../reference/physical-plc-online.md) first | None |
 | `--no-native-workers` | Off; always on in the portable package | Native calls return `NativeWorkersDisabled` without starting a worker | None |
 | `--addin-handoff` | Off | Runs the [Add-In selection receiver](../reference/addin-selections.md); not with `--diagnose` | None |
 | `--addin-enrollment <file>` | None | Enrollment file written by `scripts/Publish-AddIn.ps1`; requires `--addin-handoff`; once | None |

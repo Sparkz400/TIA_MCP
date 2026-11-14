@@ -687,6 +687,42 @@
       ]
     },
     {
+      "featureId": "project_close",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "project_open_copy",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "plc_physical_targets",
+      "obligations": [
+        "D09"
+      ]
+    },
+    {
+      "featureId": "plc_physical_online_compare",
+      "obligations": [
+        "D09"
+      ]
+    },
+    {
+      "featureId": "plc_physical_station_upload",
+      "obligations": [
+        "D09"
+      ]
+    },
+    {
+      "featureId": "plc_physical_download",
+      "obligations": [
+        "D09"
+      ]
+    },
+    {
       "featureId": "project_copy",
       "obligations": [
         "X01"

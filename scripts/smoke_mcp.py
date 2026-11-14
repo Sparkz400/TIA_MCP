@@ -21,7 +21,7 @@ class Client:
         self.process = subprocess.Popen(
             command if command is not None else [str(executable), "--timeout-seconds", str(timeout), *(extra_arguments or [])],
             cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            text=True, encoding="utf-8", bufsize=1,
+            text=True, encoding="utf-8", errors="replace", bufsize=1,
         )
         self.output_reader = threading.Thread(target=self._read_output, daemon=True)
         self.error_reader = threading.Thread(target=self._read_errors, daemon=True)

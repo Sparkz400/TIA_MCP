@@ -20,7 +20,7 @@ namespace TiaMcp.Openness.V21
         // before execution, including failed/partially committed mutations.
         private void ObserveIndexOperation(string operation)
         {
-            if (new[] { "attach", "start", "detach", "project_open", "project_retrieve", "project_copy", "project_upgrade", "scratch_create", "change_restore", "plc_station_upload" }.Contains(operation)) InvalidateHmiSession();
+            if (new[] { "attach", "start", "detach", "project_open", "project_close", "project_open_copy", "project_retrieve", "project_copy", "project_upgrade", "scratch_create", "change_restore", "plc_station_upload" }.Contains(operation)) InvalidateHmiSession();
             switch (operation)
             {
                 case "hmi_inspect": case "hmi_references": case "hmi_capabilities": case "hmi_content_fingerprint": return;

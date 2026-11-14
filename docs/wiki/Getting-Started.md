@@ -68,7 +68,7 @@ External Git delivery (`vci_push`, `vci_fetch`) needs `--git-executable` and one
 
 Fingerprint reuse: `--enable-fingerprint-reuse` lets consecutive changes reuse the project-wide fingerprint read while TIA reports the project in the same saved state. It is off by default; see [fingerprint reuse](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#fingerprint-reuse-between-changes) for what it relies on.
 
-The launcher scripts do not pass `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--disable-library-integrate-apply`, `--enable-fingerprint-reuse`, `--library-limits-file`, `--git-remote` or `--git-allow-network-remote`; start the Host directly for those. `Start-TiaMcp.ps1` adds `--no-native-workers` itself, but only for offline bundles. Every option, its default and its range is listed under [Host options](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#host-options). Qualification-only options such as `--hmi-change-qualification`, `--hmi-text-list-qualification` and `--safety-fparameter-discovery` exist for the native qualification runners, not for normal use.
+The launcher scripts do not pass `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--disable-library-integrate-apply`, `--enable-fingerprint-reuse`, `--library-limits-file`, `--git-remote`, `--git-allow-network-remote` or `--physical-plc-online` (online access to real PLCs, off by default and unqualified; see [real PLCs](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/physical-plc-online.md)); start the Host directly for those. `Start-TiaMcp.ps1` adds `--no-native-workers` itself, but only for offline bundles. Every option, its default and its range is listed under [Host options](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#host-options). Qualification-only options such as `--hmi-change-qualification`, `--hmi-text-list-qualification` and `--safety-fparameter-discovery` exist for the native qualification runners, not for normal use.
 
 Vendor libraries can have additional CPU, tag-table and product requirements.
 Check the [PAL/DMC intake and prerequisite review](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/vendor-intake-review-20261025.md)
@@ -83,11 +83,13 @@ Configure a stdio server with your actual checkout path:
   "mcpServers": {
     "tia-v21": {
       "command": "C:\\path\\to\\TIA_MCP\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
-      "args": ["--timeout-seconds", "300"]
+      "args": ["--timeout-seconds", "300", "--toolsets", "core,explorer,simulation"]
     }
   }
 }
 ```
+
+`--toolsets` keeps the tool list small: name only the [groups](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md#tool-groups---toolsets) you use (for example add `hmi`, `runtime`, `library`, `watch` or `diagnostics`). Without it the Host advertises about 330 tools, roughly 600 KB of tool definitions per session.
 
 Then ask the client: *Use `tia_discover` to list the available TIA Portal sessions.* For a command-line check, run `python .\scripts\smoke_mcp.py`.
 

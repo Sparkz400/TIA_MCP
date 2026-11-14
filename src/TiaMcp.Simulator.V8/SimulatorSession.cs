@@ -119,6 +119,8 @@ namespace TiaMcp.Simulator.V8
                 result["poweredOn"] = false;
                 result["creationId"] = creationId;
                 result["creationReceiptPath"] = SimulationCreationJournal.PathFor(root, creationId);
+                if (communication == "TCPIP") result["plcsimAdapters"] = PlcsimAdapters();
+                result["lifecycle"] = "Next: simulation_download with downloadTicket, then sim_state powerOn/run. The instance's address comes from the downloaded hardware configuration (instance.controllerAddresses after the download). Keep creationId: after the creating worker exits, sim_select with instanceId, expected name and this creationId re-adopts ownership; sim_release with deleteOwned powers the instance off and removes it.";
                 _instances.Add(selected.Id, selected);
                 return result;
             }
@@ -792,6 +794,9 @@ namespace TiaMcp.Simulator.V8
                 result["operatingState"] = selected.Instance.OperatingState.ToString();
                 result["communicationInterface"] = selected.Instance.CommunicationInterface.ToString();
                 result["cpuType"] = selected.Instance.CPUType.ToString();
+                // Addresses come from the downloaded hardware configuration; a fresh instance has none until simulation_download.
+                try { result["controllerAddresses"] = new JArray(selected.Instance.ControllerIP ?? new string[0]); }
+                catch (Exception ex) { result["controllerAddresses"] = null; result["controllerAddressesReason"] = ex.Message; }
                 try { result["licenseStatus"] = selected.Instance.LicenseStatus.ToString(); }
                 catch (Exception ex) { result["licenseStatus"] = "unverified"; result["licenseReason"] = ex.Message; }
                 result["licenseStatusBasis"] = "Current runtime license status only; this property does not prove an available floating-license entitlement for an Off CPU.";

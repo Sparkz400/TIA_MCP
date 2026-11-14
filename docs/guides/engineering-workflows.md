@@ -333,8 +333,11 @@ These kinds take `{"items": [<one payload of that kind>, ...]}` with 1 to 100 it
 in one software scope, and an optional `scopePath` beside `items` that every item
 inherits: `constant_set`, `tag_create`, `constant_create`, `tag_delete`,
 `constant_delete`, `tag_table_create`, `tag_table_rename`, `block_rename`,
-`block_attributes_set`, `type_rename`, `block_number_set`, `group_create` and
-`group_rename`. Any other field beside `items` is refused, and so is `items` on any
+`block_attributes_set`, `type_rename`, `block_number_set`, `group_create`,
+`group_rename` and `block_delete`. A `block_delete` batch scans dependencies per item against the
+unchanged project, so a block that another block of the same batch references is still refused: delete the
+referencing block in an earlier change. `call_parameter_set` and the graphical edits are not batched yet: their
+structured readback runs once per change. Any other field beside `items` is refused, and so is `items` on any
 other kind.
 
 ```json
@@ -472,7 +475,7 @@ A block that is already inconsistent stops `source_upsert` at prepare (`Fingerpr
 
 ## Unresolved symbols
 
-When a block references a tag, block, data type or constant that no longer exists, TIA may refuse to export it as XML. `block_read` then returns `BlockExportUnavailable` with the block's language. SCL, STL and DB blocks can still be read with `format: "generatedSource"`, which does not change them; graphical blocks have no textual form.
+When a block references a tag, block, data type or constant that no longer exists, TIA may refuse to export it as XML. `block_read` then returns `BlockExportUnavailable` with the block's language. SCL, STL and DB blocks can still be read with `format: "generatedSource"`, which does not change them. LAD and FBD blocks have no generated source, but `format: "simaticSd"` exports them as SIMATIC SD documents with the unresolved operands and does not change them (natively checked on an inconsistent LAD block, 14 November 2026).
 
 Every compile result lists `compile.unresolvedSymbols`: each undefined name with its kind, compile target and the location of the message. The list comes from TIA's English compiler messages, so other UI languages list nothing. The worker never picks a replacement. Map each name explicitly: for example, a door or interlock signal needs the confirmed address and type from whoever owns the machine. Then recreate the symbol through an ordinary change such as `tag_table_import_xml`, which also works beside an inconsistent block. Each repair symbol is therefore a journaled change of its own; delete it later with `tag_delete` if it was only needed to make the block editable. Natively checked on 7 November 2026 (`local.unresolved-symbols.20261107`).
 

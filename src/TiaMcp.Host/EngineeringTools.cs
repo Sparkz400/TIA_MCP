@@ -45,8 +45,18 @@ public sealed partial class TiaTools
         bool trustOwnedSimulationCertificate = false)
         => Call("plc_station_upload", new { downloadTicket, runtimeCredentialMetadataPath, trustOwnedSimulationCertificate, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "uploads") }, cancellationToken);
 
+    [McpServerTool(Name = "project_open_copy", Destructive = false, OpenWorld = false)]
+    [Description("Swap the one open project of a worker-owned instance for a read-write copy of its saved state under the host's copies artifacts, and leave the copy open. A read-write project is archived, closed and retrieved; a read-only one (which TIA cannot archive) is closed and its saved folder copied. The original files are never written. Use it after opening a real project with readOnly:true when a tool needs a writable project (block exports in project_snapshot_capture, which does this itself with fromTemporaryCopy). Unsaved edits are refused.")]
+    public Task<CallToolResult> ProjectOpenCopy(CancellationToken cancellationToken, string? projectName = null)
+        => Call("project_open_copy", new { projectName, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "copies") }, cancellationToken);
+
+    [McpServerTool(Name = "project_close", Destructive = true, OpenWorld = false)]
+    [Description("Close one open project in a worker-owned instance (tia_start) without saving, so another project can be opened in the same Portal. Refused in a session attached to a user-owned TIA. Unsaved edits are refused (UnsavedProject) unless discardUnsaved is true; they are then lost. Never saves.")]
+    public Task<CallToolResult> ProjectClose(CancellationToken cancellationToken, string? projectName = null, bool discardUnsaved = false)
+        => Call("project_close", new { projectName, discardUnsaved }, cancellationToken);
+
     [McpServerTool(Name = "project_open", Destructive = false, OpenWorld = false)]
-    [Description("Open an exact existing .ap21 project on the TIA host in an empty worker-owned instance started with tia_start. Does not upgrade, save or download it. Use a copied/test project for validation edits. readOnly=true opens it as a secondary (read-only) project: inventory and inspection reads work, TIA refuses exports (block/type/tag-table reads and other export-based tools) and every mutation is refused, both with ReadOnlyProject. If project login is required, prompt for the target's local username and password through TIA authentication; this tool accepts no raw credentials. Follow the server authentication instructions.")]
+    [Description("Open an exact existing .ap21 project on the TIA host in an empty worker-owned instance: call tia_start first (NotAttached otherwise) and project_close a previously opened project (ProjectIsolationRequired otherwise). Does not upgrade, save or download it. Use a copied/test project for validation edits. readOnly=true opens it as a secondary (read-only) project: inventory and inspection reads work, TIA refuses exports (block/type/tag-table reads and other export-based tools) and every mutation is refused, both with ReadOnlyProject. If project login is required, prompt for the target's local username and password through TIA authentication; this tool accepts no raw credentials. Follow the server authentication instructions.")]
     public Task<CallToolResult> ProjectOpen(string path, CancellationToken cancellationToken, bool readOnly = false)
         => Call("project_open", new { path, readOnly }, cancellationToken);
 

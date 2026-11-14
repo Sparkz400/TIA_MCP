@@ -49,6 +49,7 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/UnresolvedSymbolRules.cs" Link="UnresolvedSymbolRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/IntentRules.cs" Link="IntentRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ChangeMilestoneRules.cs" Link="ChangeMilestoneRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/PhysicalDownloadRules.cs" Link="PhysicalDownloadRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/WorkerLoop.cs" Link="WorkerLoop.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/CanonicalJson.cs" Link="CanonicalJson.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/CompilationEvidenceRules.cs" Link="CompilationEvidenceRules.cs" />

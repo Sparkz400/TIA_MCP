@@ -91,7 +91,7 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
         if (skipped > 0) reasons.Add(new JsonObject { ["code"] = "ContentOutsideExportRoute", ["blocks"] = skipped,
             ["reason"] = "Know-how protected, safety or unsupported-language blocks are not exported by this route." });
         if (observedBlocks > selectedBlocks) reasons.Add(new JsonObject { ["code"] = "BlocksOmittedByMaxBlocks", ["blocks"] = observedBlocks - selectedBlocks,
-            ["reason"] = "Only maxBlocks blocks (at most 200) are exported; select others with blockPaths in another capture." });
+            ["reason"] = "Only maxBlocks blocks (at most 200) are exported; page on with blockOffset (capture.content.nextBlockOffset) or select blocks with blockPaths." });
         return new JsonObject { ["observedBlocks"] = observedBlocks, ["selectedBlocks"] = selectedBlocks, ["attemptedBlocks"] = selectedBlocks - skipped,
             ["exportedBlocks"] = exported, ["failedBlocks"] = failed.Length, ["skippedBlocks"] = skipped,
             ["omittedBlocks"] = observedBlocks - selectedBlocks, ["degraded"] = reasons.Count > 0, ["degradedReasons"] = reasons };

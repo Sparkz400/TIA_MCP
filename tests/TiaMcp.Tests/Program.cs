@@ -183,6 +183,7 @@ internal static partial class Program
             ("Project reviews search native tokens and report bounded health findings", ProjectReviewStoreTests.SearchHealthAndBounds),
             ("Imported reviews retain exact bytes and survive upload release", ProjectReviewStoreTests.ImportedReviewPersistence),
             ("Project reviews make a degraded block capture visible", ProjectReviewStoreTests.DegradedCaptureIsVisible),
+            ("Real-PLC downloads answer only from explicit acknowledgements", PhysicalDownloadRulesTests.AnswersOnlyFromAcknowledgements),
             ("Project review compare ignores volatile metadata timestamps", ProjectReviewStoreTests.VolatileMetadataIsNotAChange),
             ("Project folder manifest changes when a saved project file changes", ProjectReviewStoreTests.ProjectFolderManifestTracksSaves),
             ("Imported reviews reject forged signatures and malformed identity", ProjectReviewStoreTests.ImportedReviewValidation),
