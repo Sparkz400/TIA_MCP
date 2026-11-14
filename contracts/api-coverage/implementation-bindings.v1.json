@@ -332,8 +332,8 @@
     },
     {
       "path": "contracts/hmi-inspection.v1.schema.json",
-      "sha256": "5baeb11561afa2c2b4c0b3e19653ac118f8476a79452760462e1f41eb8e360c7",
-      "bytes": 8159
+      "sha256": "befbea98c6539f173f33a59ca134e4169e6fbe8f3a9925363b5d402deaaf2de8",
+      "bytes": 8199
     },
     {
       "path": "contracts/hmi-library-handoff.v1.schema.json",
@@ -1997,8 +1997,8 @@
     },
     {
       "path": "src/TiaMcp.Host/HmiTools.cs",
-      "sha256": "55cc2d1e15d3a036414bed7106d6780bd3cd33db4bb14a99ae2a985209623058",
-      "bytes": 9832
+      "sha256": "643d9c86348ab8d50d47e3f7ca480c3b6dd200a1329dfb687e038588bebf4054",
+      "bytes": 9860
     },
     {
       "path": "src/TiaMcp.Host/HostOptions.cs",
@@ -2897,8 +2897,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Hmi.cs",
-      "sha256": "ea0929a76e74e6819ec58814f2cf7cbdae9b0a2ef4980eb70cdc04d84404b3f2",
-      "bytes": 60068
+      "sha256": "ea98fc950f1900c36f65ce4b1df06e98d781c9f477264a9028fc9d704d4905a8",
+      "bytes": 60192
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiBehaviors.cs",
