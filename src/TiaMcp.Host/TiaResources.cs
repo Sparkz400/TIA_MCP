@@ -18,6 +18,8 @@ public sealed class TiaResources(HostOptions options)
     public const string ArtifactTemplate = "tia://artifacts/{+path}";
     public const string ReviewTemplate = "tia://project-reviews/{reviewId}";
     public const string FeatureTemplate = "tia://feature-catalog/{featureId}";
+    public const string ContractTemplate = "tia://contracts/{name}";
+    private const string ContractPrefix = "TiaMcp.PublicContracts.";
     internal const int MaxBytes = 4 * 1024 * 1024;
     private const int MaxCompletions = 100;
     private static readonly Lazy<FeatureCatalog> Catalog = new(FeatureCatalog.LoadBundled);
@@ -47,6 +49,29 @@ public sealed class TiaResources(HostOptions options)
         if (!Regex.IsMatch(reviewId, "\\A[a-f0-9]{64}\\z")) throw new McpException("reviewId must be the exact 64-character content hash.");
         return Encoding.UTF8.GetString(Read("project-reviews/" + reviewId + ".json", reviewId).Bytes);
     }
+
+    [McpServerResource(UriTemplate = "tia://contracts", Name = "contracts", Title = "Contract index", MimeType = "application/json")]
+    [Description("The machine-readable contracts this Host ships: JSON Schemas of tool requests and results, and change-kinds.v1.json, which lists every change_prepare kind with its documented payload fields. Read one with tia://contracts/{name}.")]
+    public static string ContractIndex() => JsonSerializer.Serialize(new
+    {
+        contracts = ContractNames(),
+        changeKinds = "tia://contracts/change-kinds.v1.json",
+        note = "change-kinds.v1.json is generated from the feature catalog and the documentation tables; its field lists name the documented payload fields, the worker decides which are required."
+    });
+
+    [McpServerResource(UriTemplate = ContractTemplate, Name = "contract", Title = "Contract", MimeType = "application/json")]
+    [Description("One shipped contract by file name, for example hmi-inspection.v1.schema.json, hmi-engineering.v1.schema.json or change-kinds.v1.json (every change kind with its documented payload fields).")]
+    public static string Contract(string name)
+    {
+        if (!Regex.IsMatch(name ?? "", "\\A[a-z0-9][a-z0-9.-]*\\.json\\z")) throw new McpException("name must be a contract file name such as change-kinds.v1.json.");
+        using var stream = typeof(TiaResources).Assembly.GetManifestResourceStream(ContractPrefix + name)
+            ?? throw new McpException("ResourceNotFound: no shipped contract named " + name + "; tia://contracts lists them.");
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+        return reader.ReadToEnd();
+    }
+
+    internal static string[] ContractNames() => typeof(TiaResources).Assembly.GetManifestResourceNames()
+        .Where(n => n.StartsWith(ContractPrefix, StringComparison.Ordinal)).Select(n => n.Substring(ContractPrefix.Length)).Order(StringComparer.Ordinal).ToArray();
 
     [McpServerResource(UriTemplate = "tia://feature-catalog", Name = "feature-catalog", Title = "Feature catalog summary", MimeType = "application/json")]
     [Description("Every bundled catalog feature with its tools, implementation and qualification status. feature_catalog or the feature template returns a feature's full contract and evidence.")]
@@ -97,6 +122,7 @@ public sealed class TiaResources(HostOptions options)
         var root = context.Services!.GetRequiredService<HostOptions>().ArtifactsDirectory;
         var values = (request.Ref as ResourceTemplateReference)?.Uri switch
         {
+            ContractTemplate when request.Argument.Name == "name" => ContractNames(),
             FeatureTemplate when request.Argument.Name == "featureId" => Catalog.Value.Features.Select(f => f.GetProperty("featureId").GetString()!),
             ArtifactTemplate when request.Argument.Name == "path" => ArtifactPaths(root),
             ReviewTemplate when request.Argument.Name == "reviewId" => ArtifactPaths(Path.Combine(root, "project-reviews"))

@@ -334,10 +334,13 @@ in one software scope, and an optional `scopePath` beside `items` that every ite
 inherits: `constant_set`, `tag_create`, `constant_create`, `tag_delete`,
 `constant_delete`, `tag_table_create`, `tag_table_rename`, `block_rename`,
 `block_attributes_set`, `type_rename`, `block_number_set`, `group_create`,
-`group_rename` and `block_delete`. A `block_delete` batch scans dependencies per item against the
-unchanged project, so a block that another block of the same batch references is still refused: delete the
-referencing block in an earlier change. `call_parameter_set` and the graphical edits are not batched yet: their
-structured readback runs once per change. Any other field beside `items` is refused, and so is `items` on any
+`group_rename`, `block_delete`, `call_parameter_set`, `graphical_operand_set`, `graphical_network_patch` and
+`graphical_network_insert`. A `block_delete` batch scans dependencies per item against the unchanged project, so a
+block that another block of the same batch references is still refused: delete the referencing block in an earlier
+change. The call and graphical edits take one item per block (two items naming one block are refused); each item's
+block is read back against its own requested XML after the shared compile. `graphical_typed_edit`, `graph_import` and
+`call_connection_set` are not batched. Every kind's documented payload fields are listed in
+[`contracts/change-kinds.v1.json`](../../contracts/change-kinds.v1.json), also served as `tia://contracts/change-kinds.v1.json`. Any other field beside `items` is refused, and so is `items` on any
 other kind.
 
 ```json

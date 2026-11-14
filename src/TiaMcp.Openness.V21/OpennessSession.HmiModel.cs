@@ -21,6 +21,8 @@ namespace TiaMcp.Openness.V21
             "AlarmClasses", "DiscreteAlarms", "AnalogAlarms", "HmiAlarmAuditClass", "OpcUaAlarmTypes", "AlarmLogs", "DataLogs", "AuditTrails",
             "Scripts", "HmiTextLists", "HmiGraphicLists", "HmiSystemTextLists", "PlantObjectTags", "RuntimeSettings" };
 
+        private static readonly string[] HmiSystemModelRoots = { "SystemTags", "HmiSystemTextLists", "OpcUaAlarmTypes" };
+
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void HmiUnifiedModel(Project project, HmiDiscoveredTarget target, JObject args, HmiCapture capture)
         {
@@ -32,6 +34,9 @@ namespace TiaMcp.Openness.V21
                     throw new BridgeException("InvalidRequest", "modelRoots must be a nonempty array of: " + string.Join(", ", HmiModelRoots) + ".");
                 roots = HmiModelRoots.Where(requested.Contains).ToArray();
             }
+            // excludeSystem leaves out the roots TIA generates for every HMI (system tags, system text lists, OPC UA alarm types),
+            // which made up most rows of a near-empty HMI.
+            if (args.Value<bool?>("excludeSystem") == true) roots = roots.Where(r => !HmiSystemModelRoots.Contains(r)).ToArray();
             var walk = new HmiModelWalk(capture.Budget);
             walk.Capture((Siemens.Engineering.HmiUnified.HmiSoftware)target.Software, target.Path, roots);
             foreach (var error in walk.Errors) if (capture.Diagnostics.Count < 100) capture.Diagnostics.Add(error);

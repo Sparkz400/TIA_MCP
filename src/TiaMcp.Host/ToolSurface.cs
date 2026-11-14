@@ -128,8 +128,10 @@ internal static class ToolSurface
             // Sent before dispatch so a broken transport fails the call before any native work starts.
             await context.Server.NotifyProgressAsync(progress, new ProgressNotificationValue { Progress = 0, Message = tool + " started" }, cancellationToken: token);
             using var done = CancellationTokenSource.CreateLinkedTokenSource(token);
+            var stage = ToolProgress.Begin();
             var heartbeat = Heartbeat(HeartbeatInterval, tool, done.Token,
-                async (beat, message) => await context.Server.NotifyProgressAsync(progress, new ProgressNotificationValue { Progress = beat, Message = message }));
+                async (beat, message) => await context.Server.NotifyProgressAsync(progress, new ProgressNotificationValue { Progress = beat,
+                    Message = stage.Stage is { } current ? message + ": " + current : message }));
             try { return await next(context, token); }
             finally { done.Cancel(); await heartbeat; }
         });

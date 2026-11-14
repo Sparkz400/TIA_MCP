@@ -66,7 +66,9 @@ namespace TiaMcp.Openness.V21
                 var member = change.BatchMembers[index];
                 var probe = new EngineeringChange
                 {
-                    Id = member.Id, Kind = member.Kind, Payload = (JObject)change.Payload["items"][index].DeepClone(), Directory = member.Directory,
+                    Id = member.Id, Kind = member.Kind, Payload = (JObject)change.Payload["items"][index].DeepClone(),
+                    // A structured edit re-exports and re-edits its block; it must not overwrite the item's prepared input.
+                    Directory = ChangeBatchRules.IsStructured(member.Kind) ? Directory.CreateDirectory(Path.Combine(member.Directory, "preflight-" + Guid.NewGuid().ToString("N").Substring(0, 8))).FullName : member.Directory,
                     ProjectPath = member.ProjectPath, ProjectName = member.ProjectName, Selector = (JObject)change.Selector.DeepClone(),
                     State = "preparing", PreparedProcessId = member.PreparedProcessId, PreflightOnly = true
                 };
@@ -118,6 +120,7 @@ namespace TiaMcp.Openness.V21
             {
                 case "constant_set": case "tag_delete": case "constant_delete":
                     return member.GroupPath + "/" + member.ObjectNames[0] + "\n" + member.Payload.Value<string>("memberName");
+                case "call_parameter_set": case "graphical_operand_set": case "graphical_network_patch": case "graphical_network_insert":
                 case "block_rename": case "block_attributes_set": case "block_number_set": case "block_delete": return "block\n" + member.Namespace + "\n" + member.BlockNames[0];
                 case "type_rename": return "type\n" + member.Namespace + "\n" + member.ObjectNames[0];
                 case "tag_table_rename": return "tagTable\n" + member.ObjectNames[0];
