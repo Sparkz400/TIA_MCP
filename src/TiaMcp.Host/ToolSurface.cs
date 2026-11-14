@@ -68,7 +68,7 @@ internal static class ToolSurface
             // JsonElement has an unconstrained SDK schema. Clients must see the same
             // object contract that ObjectArguments enforces at the Host boundary.
             string? objectArgument = name == "change_prepare" ? "payload"
-                : new[] { "hmi_classic_screen_capture", "hmi_classic_screen_compose", "hmi_inspect", "hmi_references", "hmi_capabilities" }.Contains(name) ? "request" : null;
+                : new[] { "hmi_classic_screen_capture", "hmi_classic_screen_compose", "hmi_content_fingerprint", "hmi_inspect", "hmi_references", "hmi_capabilities" }.Contains(name) ? "request" : null;
             var input = JsonNode.Parse(tool.ProtocolTool.InputSchema.GetRawText())!.AsObject();
             var structured = StructuredArguments(input, objectArgument);
             if (structured.Length > 0)

@@ -53,12 +53,29 @@ first access. The project opened in 7.8 s, and finding the PLC took 2.4 s on a c
 | Safety scratch (F-CPU, safety program, know-how protected F-blocks, PROFIsafe drive) | 212 | 12.0 s / 0.75 s | 11.7 s / 0.71 s | 1.05× |
 
 - Warm is the median of rounds 2–4, and single rounds vary by up to about ±25%.
-- The safety scratch has few blocks and tags, so its time is dominated by hardware and unit nodes, which still read per property.
+- The safety scratch has few blocks and tags, so its time is dominated by hardware and unit nodes, which still read per property. Batching the hardware items too did not help ([14 November](#hardware-items-tried-on-14-november)).
 - The run does not show which native types fell back, if any. Revision equality shows only that the results are the same.
+
+## Hardware items, tried on 14 November
+
+The same batching was tried for hardware items (`DeviceItem` `Name`, `PositionNumber`, `Classification`,
+`IsBuiltIn`, `IsPlugged` in one `GetAttributes` call, in the capture and the index walk) and **not kept**.
+`scripts/qualify_batched_capture.py` compared a worker built from `501a2fb9` with the candidate on the same three
+projects: every `metadataRevision` was identical, but nothing got faster. Capture times in ms, round 1 cold:
+
+| Project | Baseline | Hardware batched | Warm median ratio |
+|---|---|---|---|
+| Probe, 2,582 nodes | 12,510 / 2,952 / 2,810 / 2,538 | 10,089 / 2,841 / 3,367 / 3,246 | 0.87× |
+| Probe, 1,290 nodes | 6,121 / 987 / 1,107 / 1,091 | 7,092 / 1,135 / 1,099 / 1,113 | 0.98× |
+| Safety scratch, 212 nodes | 10,755 / 791 / 560 / 516 | 12,274 / 940 / 875 / 713 | 0.64× |
+
+So the hardware part of a capture is not spent on per-property reads; `GetService<SoftwareContainer>` per item and
+TIA's object loading are the remaining suspects and were not measured. Report:
+`artifacts/batched-capture/20261114T071843Z/report.json`.
 
 ## Not covered
 
-- Hardware items, data types, technology objects, HMI and library nodes still read per property.
+- Data types, technology objects, HMI and library nodes still read per property.
 - Cold capture is dominated by TIA loading objects.
 - Single runs on one workstation; no larger or customer-shaped project was timed.
 
@@ -67,3 +84,4 @@ Retained artifacts:
 - `artifacts/read-cost-probe/20261112T072505Z/` (probe reports)
 - `artifacts/read-cost-probe/20261112T074327Z/` (second fixture)
 - `artifacts/batched-capture/20261112T081332Z/report.json`
+- `artifacts/batched-capture/20261114T071843Z/report.json` (hardware items, not kept)

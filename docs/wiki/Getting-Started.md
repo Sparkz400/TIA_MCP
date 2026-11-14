@@ -43,6 +43,8 @@ Requirements:
   - The mode is machine-wide: while PLCSIM is in TCP/IP mode, Softbus instances refuse power-on, RUN and writes
     (`SoftbusRequired`), and the discovery before `sim_create` needs Softbus, so switch *Online Access* back to
     Softbus for the other simulation work
+  - `sim_status` reports `tcpIpReady`, the PLCSIM adapters with their addresses and the exact Control Panel step
+    while the mode is wrong; TIA MCP never switches the mode itself
 - .NET 10 SDK and .NET Framework 4.8 reference assemblies
 - PowerShell 7, Python 3.13 and Node.js 24 for the development checks
 

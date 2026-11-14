@@ -123,13 +123,14 @@ namespace TiaMcp.Openness.V21
                 case "attach": return Attach(arguments);
                 case "start": return Start();
                 case "session_status": return Status();
-                case "detach": return Detach();
+                case "detach": return Detach(arguments);
                 case "project_inventory": return Inventory(arguments);
                 case "project_properties": return ProjectProperties(arguments);
                 case "project_archive": return ProjectArchive(arguments);
                 case "device_inventory_capture": return DeviceInventoryCapture(arguments);
                 case "hmi_inspect": return HmiInspect(arguments);
                 case "hmi_classic_screen_capture": return ClassicScreenCapture(arguments);
+                case "hmi_content_fingerprint": return HmiContentFingerprint(arguments);
                 case "hmi_classic_screen_compose": return ClassicScreenCompose(arguments);
                 case "hmi_references": return HmiReferences(arguments);
                 case "hmi_capabilities": return HmiCapabilities(arguments);
@@ -298,13 +299,46 @@ namespace TiaMcp.Openness.V21
             return result;
         }
 
-        private JObject Detach()
+        // For a worker-owned instance: close its projects without saving (dispose discards them anyway), dispose the
+        // connection, then wait on the retained process handle for the Portal to exit and report what happened. Siemens
+        // ends a headless instance after its last client detaches, but not always promptly, so the wait is explicit.
+        // A user-owned instance is only detached, never closed or waited on.
+        private JObject Detach(JObject args = null)
         {
-            bool disposedOwnedConnection = _ownsPortal && _portal != null;
+            bool owned = _ownsPortal && _portal != null;
+            int waitSeconds = args?.Value<int?>("waitForExitSeconds") ?? 30;
+            if (waitSeconds < 0 || waitSeconds > 300) throw new BridgeException("InvalidRequest", "waitForExitSeconds must be 0..300.");
+            bool terminate = args?.Value<bool?>("terminateOwnedIfRunning") == true;
+            int? pid = _processId;
+            var identity = owned ? _portalProcessIdentity : null;
+            var closed = new JArray(); var closeFailures = new JArray();
+            if (owned && _ownedQualificationPortal == null)
+                foreach (var project in _portal.Projects.ToArray())
+                {
+                    string name = project.Name; bool modified = project.IsModified;
+                    try { project.Close(); closed.Add(new JObject { ["name"] = name, ["unsavedEditsDiscarded"] = modified }); }
+                    catch (Exception error) { closeFailures.Add(new JObject { ["name"] = name, ["error"] = error.Message }); }
+                }
+            if (owned) _portalProcessIdentity = null; // kept for the wait below; DetachPortalConnection would dispose it
             DetachPortalConnection();
             var result = Status();
-            result["disposedOwnedPortalConnection"] = disposedOwnedConnection;
-            result["processExitVerified"] = false;
+            result["disposedOwnedPortalConnection"] = owned;
+            result["portalProcessId"] = pid;
+            result["projectsClosed"] = closed;
+            if (closeFailures.Count > 0) result["projectCloseFailures"] = closeFailures;
+            if (!owned) { result["processExitVerified"] = false; result["processExited"] = null; return result; }
+            try
+            {
+                bool? exited = identity?.WaitForExit(waitSeconds * 1000);
+                bool terminated = false;
+                if (exited == false && terminate) { terminated = identity.Terminate(30000); exited = terminated; }
+                result["processExited"] = exited;
+                result["processExitVerified"] = exited == true;
+                result["terminated"] = terminated;
+                if (exited == false) result["remediation"] = "The owned Portal (PID " + pid + ") is still running after " + waitSeconds + " s. Call tia_detach again only after tia_start in a new session, or pass terminateOwnedIfRunning:true next time; it never touches a user-owned TIA.";
+                if (exited == null) result["remediation"] = "The owned Portal's process identity was not captured, so its exit could not be observed.";
+            }
+            finally { identity?.Dispose(); }
             return result;
         }
 

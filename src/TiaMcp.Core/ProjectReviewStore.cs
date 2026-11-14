@@ -33,6 +33,70 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
         return bytes;
     }
 
+    // Fields TIA rewrites on save or touch without a content change; comparing them makes every save look like an edit.
+    public static readonly string[] VolatileMetadataFields = ["modified", "created", "lastModified", "modificationTime", "modifiedDate", "updateId", "UpdateId"];
+
+    private static JsonNode? StableMetadata(JsonNode? metadata)
+    {
+        if (metadata is not JsonObject obj) return metadata;
+        var copy = (JsonObject)obj.DeepClone();
+        foreach (string field in VolatileMetadataFields) copy.Remove(field);
+        return copy;
+    }
+
+    // The saved state of a TIA project lives in its whole folder: the .ap21 file itself does not change on save. The
+    // metadata hash (relative path, size, last write time) is cheap; the content hash reads every file and is opt-in.
+    public static JsonObject ProjectFolderManifest(string projectFilePath, bool includeContent)
+    {
+        var folder = new DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(projectFilePath)) ?? throw new BridgeException("InvalidSnapshot", "The project path has no folder."));
+        if (!folder.Exists) return new JsonObject { ["status"] = "unavailable", ["reason"] = "The project folder is not readable from the Host." };
+        var files = folder.EnumerateFiles("*", new EnumerationOptions { RecurseSubdirectories = true, AttributesToSkip = FileAttributes.ReparsePoint })
+            .Select(f => (file: f, relative: Path.GetRelativePath(folder.FullName, f.FullName).Replace(Path.DirectorySeparatorChar, '/')))
+            .OrderBy(f => f.relative, StringComparer.Ordinal).ToArray();
+        using var metadata = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        using var content = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        long bytes = 0; int unreadable = 0;
+        var buffer = new byte[1 << 20];
+        foreach (var (file, relative) in files)
+        {
+            bytes += file.Length;
+            metadata.AppendData(Encoding.UTF8.GetBytes(relative + "\n" + file.Length + "\n" + file.LastWriteTimeUtc.Ticks + "\n"));
+            if (!includeContent) continue;
+            content.AppendData(Encoding.UTF8.GetBytes(relative + "\n" + file.Length + "\n"));
+            try
+            {
+                using var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+                int read; while ((read = stream.Read(buffer, 0, buffer.Length)) > 0) content.AppendData(buffer, 0, read);
+            }
+            catch (IOException) { unreadable++; content.AppendData(Encoding.UTF8.GetBytes("<unreadable>\n")); }
+            catch (UnauthorizedAccessException) { unreadable++; content.AppendData(Encoding.UTF8.GetBytes("<unreadable>\n")); }
+        }
+        var result = new JsonObject { ["status"] = "observed", ["fileCount"] = files.Length, ["totalBytes"] = bytes,
+            ["metadataSha256"] = Convert.ToHexStringLower(metadata.GetHashAndReset()),
+            ["contentSha256"] = includeContent ? Convert.ToHexStringLower(content.GetHashAndReset()) : null,
+            ["unreadableFiles"] = includeContent ? unreadable : null,
+            ["scope"] = "Saved files of the project folder only: unsaved edits in an open project are not included. metadataSha256 covers relative path, size and last write time; contentSha256 (hashProjectFolder) covers bytes. The .ap21 file alone does not change on save and is not a project-state hash." };
+        return result;
+    }
+
+    // What block content a capture holds, so a degraded capture is visible at the top level of the result.
+    public static JsonObject ContentCoverage(JsonArray documents, int observedBlocks, int selectedBlocks)
+    {
+        int exported = documents.Count(row => Text(row, "status") == "exported");
+        int skipped = documents.Count(row => row?["skipped"] is not null);
+        var failed = documents.Where(row => Text(row, "status") != "exported" && row?["skipped"] is null).ToArray();
+        var reasons = new JsonArray();
+        foreach (var group in failed.GroupBy(row => row?["errorCode"]?.GetValue<string>() ?? "ExportUnavailable").OrderBy(g => g.Key, StringComparer.Ordinal))
+            reasons.Add(new JsonObject { ["code"] = group.Key, ["blocks"] = group.Count(), ["reason"] = Text(group.First(), "reason") });
+        if (skipped > 0) reasons.Add(new JsonObject { ["code"] = "ContentOutsideExportRoute", ["blocks"] = skipped,
+            ["reason"] = "Know-how protected, safety or unsupported-language blocks are not exported by this route." });
+        if (observedBlocks > selectedBlocks) reasons.Add(new JsonObject { ["code"] = "BlocksOmittedByMaxBlocks", ["blocks"] = observedBlocks - selectedBlocks,
+            ["reason"] = "Only maxBlocks blocks (at most 200) are exported; select others with blockPaths in another capture." });
+        return new JsonObject { ["observedBlocks"] = observedBlocks, ["selectedBlocks"] = selectedBlocks, ["attemptedBlocks"] = selectedBlocks - skipped,
+            ["exportedBlocks"] = exported, ["failedBlocks"] = failed.Length, ["skippedBlocks"] = skipped,
+            ["omittedBlocks"] = observedBlocks - selectedBlocks, ["degraded"] = reasons.Count > 0, ["degradedReasons"] = reasons };
+    }
+
     public JsonObject Save(JsonObject model, JsonArray documents, JsonObject capture)
     {
         if (Text(model, "schemaVersion") != "project-model.v1")
@@ -62,8 +126,15 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
             ["nodeCount"] = nodes.Count,
             ["exportedBlocks"] = documents.Count(row => Text(row, "status") == "exported" && Text(nodes[Text(row, "objectPath")], "kind") == "block"),
             ["exportedTypes"] = documents.Count(row => Text(row, "status") == "exported" && Text(nodes[Text(row, "objectPath")], "kind") == "type"),
-            ["capture"] = capture.DeepClone(), ["wholeProjectContentComplete"] = false };
+            ["capture"] = capture.DeepClone(), ["wholeProjectContentComplete"] = false,
+            ["degraded"] = capture["content"]?["degraded"]?.DeepClone(), ["degradedReasons"] = capture["content"]?["degradedReasons"]?.DeepClone(),
+            ["summary"] = Summary(capture["content"] as JsonObject) };
     }
+
+    private static string Summary(JsonObject? content) => content is null ? "Block content coverage was not recorded." :
+        $"{content["exportedBlocks"]} of {content["observedBlocks"]} blocks exported" + (content["degraded"]?.GetValue<bool>() == true
+            ? "; DEGRADED: " + string.Join("; ", content["degradedReasons"]!.AsArray().Select(r => $"{r!["code"]} ({r["blocks"]})")) + ". A compare covers exported block content only."
+            : "; block content complete for this capture.") + " Whole-project content (types, hardware, HMI) is never complete in a review.";
 
     public JsonObject Read(string id)
     {
@@ -90,7 +161,7 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
         var a = NativeNodes(aModel).ToDictionary(pair => Relative(pair.Key, aRoot), pair => pair.Value, StringComparer.Ordinal);
         var b = NativeNodes(bModel).ToDictionary(pair => Relative(pair.Key, bRoot), pair => pair.Value, StringComparer.Ordinal);
         var aDocs = Documents(before, aRoot); var bDocs = Documents(after, bRoot);
-        var changes = new JsonArray(); int unknownContent = 0, contentCompared = 0, unknownTypes = 0, typesCompared = 0;
+        var changes = new JsonArray(); int unknownContent = 0, contentCompared = 0, unknownTypes = 0, typesCompared = 0, volatileOnly = 0;
         foreach (string path in a.Keys.Union(b.Keys).Order(StringComparer.Ordinal))
         {
             a.TryGetValue(path, out var oldNode); b.TryGetValue(path, out var newNode);
@@ -101,8 +172,10 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
             else
             {
                 var fields = new JsonArray();
-                foreach (string field in new[] { "name", "kind", "access", "metadata" })
+                foreach (string field in new[] { "name", "kind", "access" })
                     if (!JsonNode.DeepEquals(oldNode[field], newNode[field])) fields.Add(field);
+                if (!JsonNode.DeepEquals(StableMetadata(oldNode["metadata"]), StableMetadata(newNode["metadata"]))) fields.Add("metadata");
+                else if (!JsonNode.DeepEquals(oldNode["metadata"], newNode["metadata"])) volatileOnly++;
                 aDocs.TryGetValue(path, out var oldDoc); bDocs.TryGetValue(path, out var newDoc);
                 bool block = Text(oldNode, "kind") == "block" || Text(newNode, "kind") == "block";
                 bool type = Text(oldNode, "kind") == "type" || Text(newNode, "kind") == "type";
@@ -140,7 +213,12 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
             ["observedImpactPaths"] = impactAnalysis["paths"]!.DeepClone(), ["impactTraversal"] = impactAnalysis["coverage"]!.DeepClone(),
             ["beforeCoverage"] = aModel["coverage"]?.DeepClone(), ["afterCoverage"] = bModel["coverage"]?.DeepClone(),
             ["wholeProjectEquivalent"] = false,
-            ["comparisonPolicy"] = "Exact relative native paths; no rename inference. XML ignores only top-level DocumentInfo/Created. Whitespace, IDs, namespaces, comments and unknown payload remain significant. Scope absence is not proof of deletion." };
+            ["volatileMetadataFields"] = new JsonArray(VolatileMetadataFields.Select(f => (JsonNode)f).ToArray()),
+            ["volatileOnlyChanges"] = volatileOnly,
+            ["degraded"] = unknownContent > 0 || unknownTypes > 0 || before["degraded"]?.GetValue<bool>() == true || after["degraded"]?.GetValue<bool>() == true
+                || before["capture"]?["content"]?["degraded"]?.GetValue<bool>() == true || after["capture"]?["content"]?["degraded"]?.GetValue<bool>() == true,
+            ["degradedReason"] = unknownContent > 0 || unknownTypes > 0 ? $"{unknownContent} blocks and {unknownTypes} types have no exported content on at least one side; their content was not compared." : null,
+            ["comparisonPolicy"] = "Exact relative native paths; no rename inference. Metadata timestamps and update counters (volatileMetadataFields) are not compared; a node whose only difference is one of them is counted in volatileOnlyChanges, not listed. XML ignores only top-level DocumentInfo/Created. Whitespace, IDs, namespaces, comments and unknown payload remain significant. Scope absence is not proof of deletion." };
     }
 
     private static readonly string[] ImpactKinds = ["calls", "dependsOn", "hmiBinding", "instanceOf", "libraryVersion", "reads", "usesType", "writes"];

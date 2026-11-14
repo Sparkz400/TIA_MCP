@@ -3924,6 +3924,13 @@
       ]
     },
     {
+      "featureId": "hmi_content_fingerprint",
+      "obligations": [
+        "X07",
+        "X08"
+      ]
+    },
+    {
       "featureId": "hmi_classic_screen_compose",
       "obligations": [
         "X07",
