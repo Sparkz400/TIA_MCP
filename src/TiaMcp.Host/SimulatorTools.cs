@@ -46,7 +46,7 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_tags", new { instanceId, filter, maxItems, refresh }, cancellationToken);
 
     [McpServerTool(Name = "sim_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Read typed values from an exact selected simulated instance. signals is an array of {symbol,type}; supported types include bool, int8..uint64, float, double, string, wstring. Returns identity, timestamps and quality.")]
+    [Description("Read typed values from an exact selected simulated instance. signals is an array of {symbol,type}; supported types include bool, int8..uint64, float, double, string, wstring. Returns identity, timestamps and quality. One runtime call per symbol: use sim_read_signals for up to 64 numeric/bool symbols in one call; sim_read is the route for string and wstring.")]
     public Task<CallToolResult> Read(int instanceId, JsonElement signals, CancellationToken cancellationToken)
         => Call("sim_read", new { instanceId, signals = Array(signals) }, cancellationToken);
 
@@ -66,7 +66,7 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_write_signals", new { instanceId, writes = Array(writes) }, cancellationToken);
 
     [McpServerTool(Name = "sim_area_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Read the process image of a selected PLCSIM instance by address: area input, output or marker, byte offset, and either length (1-1024 bytes, default 1) or bit (0-7) for one bit. Returns the bytes (or the bit) and the area size; ranges beyond the area are refused before the read.")]
+    [Description("Read the process image of a selected PLCSIM instance by address: area input, output or marker, byte offset, and either length (1-1024 bytes, default 1) or bit (0-7) for one bit. Returns the bytes (or the bit) and the area size; ranges beyond the area are refused before the read. PLCSIM V8 exposes no byte access to data blocks: read DB members symbolically with sim_read (for example \"MyDb\".Member).")]
     public Task<CallToolResult> AreaRead(int instanceId, string area, int offset, CancellationToken cancellationToken, int? length = null, int? bit = null)
         => Call("sim_area_read", new { instanceId, area, offset, length, bit }, cancellationToken);
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.182",
+  "catalogVersion": "0.4.183",
   "targetTiaVersions": [
     21
   ],
@@ -6447,6 +6447,261 @@
       "acceptanceCriteria": [
         "AC-identity",
         "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "project_close",
+      "domain": "project",
+      "title": "Close a project in a worker-owned instance without saving",
+      "mcpTools": [
+        "project_close"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Project.Close."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Worker-owned instances only; a user-owned TIA is never changed.",
+          "Unsaved edits are refused unless discardUnsaved is true; nothing is ever saved."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "A saved project open in a worker-owned instance started with tia_start"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "project_open_copy",
+      "domain": "project",
+      "title": "Swap the open project for a read-write copy of its saved state",
+      "mcpTools": [
+        "project_open_copy"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Project.Archive, Project.Close and ProjectComposition.Retrieve(..., ProjectOpenMode.Primary)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Needs exactly one open, saved project in a worker-owned instance; it archives it, closes it and leaves the retrieved copy open.",
+          "The original project's files are never written; the copy lives under the Host's copies artifacts.",
+          "A read-only (secondary) source is closed and its saved folder copied file by file, because V21 refuses Project.Archive on a secondary project (natively observed on 14 November 2026: 'The operation is not permitted in a read-only context')."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "A saved project open in a worker-owned instance started with tia_start"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "plc_physical_targets",
+      "domain": "simulation",
+      "title": "List routes and configured addresses for a real PLC",
+      "mcpTools": [
+        "plc_physical_targets"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "OnlineProvider.Configuration modes, PcInterfaces and TargetInterfaces; NetworkInterface node Address attributes."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Registered only with --physical-plc-online; not qualified on a physical PLC.",
+          "PLCSIM interfaces are refused; logins and passwords are never answered; TLS is trusted only for a user-supplied certificate SHA-256.",
+          "Nothing goes online."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Host started with --physical-plc-online",
+        "A worker-owned instance started with tia_start",
+        "A physical PLC reachable through a named PG/PC interface"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "plc_physical_online_compare",
+      "domain": "simulation",
+      "title": "Compare a PLC's software with a real PLC online",
+      "mcpTools": [
+        "plc_physical_online_compare"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "OnlineProvider.GoOnline/GoOffline and PlcSoftware.CompareToOnline over an explicit ConfigurationTargetInterface."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Registered only with --physical-plc-online; not qualified on a physical PLC.",
+          "PLCSIM interfaces are refused; logins and passwords are never answered; TLS is trusted only for a user-supplied certificate SHA-256.",
+          "expectedAddress must be an address the project configures for the CPU."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Host started with --physical-plc-online",
+        "A worker-owned instance started with tia_start",
+        "A physical PLC reachable through a named PG/PC interface"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "plc_physical_station_upload",
+      "domain": "simulation",
+      "title": "Upload a station from a real PLC into a new project",
+      "mcpTools": [
+        "plc_physical_station_upload"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "StationUploadProvider.StationUpload with ConfigurationAddressComposition.Create(expectedAddress)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Registered only with --physical-plc-online; not qualified on a physical PLC.",
+          "PLCSIM interfaces are refused; logins and passwords are never answered; TLS is trusted only for a user-supplied certificate SHA-256.",
+          "Uploads only into a new project in an empty owned instance; missing products are reported, not uploaded."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Host started with --physical-plc-online",
+        "A worker-owned instance started with tia_start",
+        "A physical PLC reachable through a named PG/PC interface"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "plc_physical_download",
+      "domain": "simulation",
+      "title": "Download software to a real PLC with explicit acknowledgements",
+      "mcpTools": [
+        "plc_physical_download"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "DownloadProvider.Download with typed pre/post download configuration callbacks."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Registered only with --physical-plc-online; not qualified on a physical PLC.",
+          "PLCSIM interfaces are refused; logins and passwords are never answered; TLS is trusted only for a user-supplied certificate SHA-256.",
+          "Requires acknowledgeLiveTarget, expectedPlcName and a saved project; stop and data block reinitialization need explicit acknowledgements (PhysicalDownloadRules), every other question stops the download.",
+          "The operating state after the download is not observed; a failed download can leave a partial program."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Host started with --physical-plc-online",
+        "A worker-owned instance started with tia_start",
+        "A physical PLC reachable through a named PG/PC interface"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
         "AC-evidence"
       ]
     },
@@ -15941,7 +16196,8 @@
           "Bounded sequential native observations; metadata recheck does not certify atomic content. Exact captured paths only; missing content and dependency coverage remain unknown. Offline comparison preserves XML whitespace, IDs, namespaces and unknown payload; only DocumentInfo/Created is ignored.",
           "The 18 October PLC library-instance observation retains exact per-object FB/FC/PLC-type service identity with distinct no-service, unsupported and unavailable states. Linked GUID pairs are detached one-read observations; complete library/dependency coverage, export correspondence and runtime instance identity are not inferred. Synthetic-shape and Framework helper checks do not compile or qualify Siemens callers; the new native capture route still needs SDK and native acceptance. Historical evidence is unchanged.",
           "Saved PLC library-instance observations now retain direct dependency version GUID lists from the same captured version. Observed empty lists remain distinct from unavailable observations. Each list is bounded to 1000 entries; a separate shared 20000 collection/iterator-read budget spans the capture and is exposed in limits, usage and partial provider coverage. Budget exhaustion publishes no partial list and does not discard the known owner GUID pair. Duplicate and self references remain original observations, not complete dependency closure or export/object association. Portable and actual Framework helper checks use synthetic Siemens shapes; native callers still require SDK compilation and qualification. Historical evidence is unchanged.",
-          "14 November 2026 (not curated evidence): a capture whose every block export is refused for a read-only project is refused (ReadOnlyProject) instead of saved; other captures report degraded, degradedReasons, summary, capture.content counts and capture.projectFolder (file count, bytes, path/size/time hash; byte hash with hashProjectFolder); requireAllContent refuses incomplete content. Checked once on an owned 205-block fixture opened read-only and read-write."
+          "14 November 2026 (not curated evidence): a capture whose every block export is refused for a read-only project is refused (ReadOnlyProject) instead of saved; other captures report degraded, degradedReasons, summary, capture.content counts and capture.projectFolder (file count, bytes, path/size/time hash; byte hash with hashProjectFolder); requireAllContent refuses incomplete content. Checked once on an owned 205-block fixture opened read-only and read-write.",
+          "14 November 2026 (follow-up): fromTemporaryCopy captures from a read-write copy made by project_open_copy; blockOffset pages through blocks beyond maxBlocks with capture.content.nextBlockOffset."
         ]
       },
       "qualification": {

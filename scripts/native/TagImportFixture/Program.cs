@@ -37,7 +37,7 @@ internal static class Program
     }
     [MethodImpl(MethodImplOptions.NoInlining)] static void Run(string[] args)
     {
-        if (args.Length != 2 || !new[] { "seed", "drift", "consume", "safety-telegram", "safety-bit-tag" }.Contains(args[0])) throw new Exception("Expected seed|drift|consume|safety-telegram|safety-bit-tag authorization.json");
+        if (args.Length != 2 || !new[] { "seed", "seed-lad", "drift", "consume", "safety-telegram", "safety-bit-tag" }.Contains(args[0])) throw new Exception("Expected seed|seed-lad|drift|consume|safety-telegram|safety-bit-tag authorization.json");
         string receipt = Path.GetFullPath(args[1]); var auth = JObject.Parse(File.ReadAllText(receipt));
         string projectPath = Path.GetFullPath(auth.Value<string>("projectPath"));
         if (auth.Value<bool?>("ownsPortalProcess") != true || auth.Value<string>("creationTool") != "tia_create_scratch"
@@ -59,6 +59,17 @@ internal static class Program
                 Console.WriteLine("Moved one unrelated scratch tag to " + untouched.LogicalAddress + " for stale-state verification."); return;
             }
             if (args[0] == "consume") { Consume(plc, Path.GetDirectoryName(receipt)); return; }
+            if (args[0] == "seed-lad")
+            {
+                // Graphical recovery probe: a LAD block whose XML names a global tag that does not exist. The XML lies next to the
+                // receipt (written by the runner); it is imported as is and must end up inconsistent.
+                string xml = Path.Combine(Path.GetDirectoryName(receipt), "broken-lad.xml");
+                plc.BlockGroup.Blocks.Import(new FileInfo(xml), ImportOptions.Override);
+                var lad = plc.BlockGroup.Blocks.Find(auth.Value<string>("ladBlockName")) ?? throw new Exception("Imported LAD block missing");
+                try { Compile(lad); } catch (EngineeringException) { }
+                if (lad.IsConsistent) throw new Exception("Fixture did not create the intended inconsistent LAD block");
+                Console.WriteLine("Seeded an inconsistent LAD block " + lad.Name + " (" + lad.ProgrammingLanguage + ")."); return;
+            }
             var signals = plc.TagTableGroup.TagTables.Create("Signals"); signals.Tags.Create("Existing", "Bool", "%M50.0");
             plc.TagTableGroup.TagTables.Create("Other").Tags.Create("Untouched", "Bool", "%M51.0");
             string file = Path.Combine(Path.GetDirectoryName(receipt), "broken.scl");

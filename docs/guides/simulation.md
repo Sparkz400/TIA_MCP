@@ -59,6 +59,20 @@ The simulator MCP tool names match the `sim_*` bridge operations below. Engineer
 | `sim_storage` | `instanceId`, `artifactDirectory`, `action` (`archive`, `retrieve`), and for retrieve `archivePath` and `expectedSha256`. Archives or restores an owned, powered-off instance's virtual memory card. |
 | `sim_release` | `instanceId`, optional `deleteOwned`. Releases the worker's interface; without `deleteOwned` it is refused with `SimulationCaptureModeActive` while a cycle-synchronous capture holds the instance, and otherwise retries a capture-mode restore that failed. Explicit `deleteOwned:true` powers off and unregisters only an instance created by this worker. Storage files are retained. |
 
+Choosing a read or write tool:
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| A few symbols, any type including `string`/`wstring` | `sim_read`, `sim_write` | One runtime call per symbol |
+| Up to 64 bool/integer/float symbols at once | `sim_read_signals`, `sim_write_signals` | One `ReadSignals`/`WriteSignals` call; validated before the call |
+| Raw input, output or marker bytes or bits by address | `sim_area_read`, `sim_area_write` | Writes: inputs and markers of owned instances only |
+| Data block members | `sim_read`/`sim_read_signals` with the symbol (`"MyDb".Member`) | PLCSIM V8 has no byte access to data blocks, so DB offsets cannot be read by address |
+
+Lifecycle of an owned instance: `tia_start` and `project_open` (or `tia_create_scratch`), `sim_create` (keep its `creationId`),
+`simulation_download` with the `downloadTicket`, then `sim_state` power on and run, and reads, writes or tests. After the
+creating worker exits, `sim_select` with the instance ID, expected name and `creationId` re-adopts ownership; without
+`creationId` a selection is read-only. `sim_release` with `deleteOwned` powers off and removes the instance.
+
 Runtime action calls require an instance created or explicitly selected by the current worker. Reads and observation (`sim_read`, `sim_read_signals`, `sim_tags`, `sim_area_read`, `sim_observe`, reading `sim_time`) work on any selected instance. Everything that writes or changes the instance (`sim_state`, `sim_write`, `sim_write_signals`, `sim_area_write`, scenario writes and `virtualTime` in `sim_test`, setting `sim_time`, `sim_event`, `sim_record`, `sim_storage`) needs one this worker created or adopted with its `creationId`; otherwise it fails with `OwnedInstanceRequired`.
 
 A simulator call still running when the Host's bridge timeout (`--timeout-seconds`, default 120) expires faults the simulator bridge until the Host restarts, so the Host refuses waits that cannot end 5 s before it with `InvalidRequest`: the `sim_observe` window, the `sim_state` `timeoutMs` (twice it for `powerOn`, whose failure is followed by a power-off) and `sim_test`, whose 90 s execution cap needs `--timeout-seconds` of at least 105. Cancelling a tool call does not interrupt the simulator call; it runs to completion. The worker verifies that the recorded ID/name still exists; it does not substitute another instance if an ID is reused. Power-on, RUN, writes, scenarios and `sim_identity` require the network mode that matches the interface recorded at creation: Softbus instances need existing local `Softbus` mode and a Softbus interface (otherwise `SoftbusRequired`); `TCPIP` instances need existing TCP/IP single-adapter mode and a TCP/IP interface (otherwise `TcpIpModeRequired`, also when the operator switches back to Softbus mid-window). PLCSIM V8 derives an instance's interface from the machine-wide mode, so the worker only compares it. Selections without a creation receipt stay Softbus-only. This adapter never changes shared adapter bindings/network mode or IP addresses and never uses remote instance discovery or an online physical-PLC download API. Engineering-side provisioning (`simulation_download`, credential provisioning) admits the network mode recorded in the ticket, Softbus or TCP/IP; only the discovery before `sim_create` requires Softbus.

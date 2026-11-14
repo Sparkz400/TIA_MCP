@@ -113,7 +113,7 @@ namespace TiaMcp.Openness.V21
             {
                 int count = Encoding.UTF8.GetByteCount(entry.Row.ToString(Formatting.None));
                 if (bytes + count > maxBytes) break;
-                rows.Add(entry.Row); bytes += count;
+                rows.Add(UniformHmiRow(entry)); bytes += count;
             }
             bool more = offset + rows.Count < ordered.Count;
             if (more && rows.Count == 0) { capture.Status = "truncated"; capture.Diagnostics.Add(new JObject { ["code"] = "HmiRowTooLarge", ["reason"] = "The next row exceeds maxBytes; request a larger byte limit." }); }
@@ -148,6 +148,20 @@ namespace TiaMcp.Openness.V21
             result["diagnostics"] = capture.Diagnostics; result["artifacts"] = capture.Artifacts;
             result["scriptsExecuted"] = false; result["runtimeVerified"] = false;
             return result;
+        }
+
+        // Every section's rows get the same top-level path, kind, name and identity (screens used to carry path null with the
+        // real path under identity.objectPath). Section-specific fields stay as they were; metadataRevision is computed
+        // from the native rows before this, so it is unchanged.
+        private static JObject UniformHmiRow(HmiNativeEntry entry)
+        {
+            var row = (JObject)entry.Row.DeepClone();
+            var identity = row["identity"] as JObject ?? entry.Identity;
+            if (row["identity"] == null && identity != null) row["identity"] = identity.DeepClone();
+            if (row["path"] == null || row["path"].Type == JTokenType.Null) row["path"] = identity?["objectPath"]?.DeepClone();
+            if (row["kind"] == null || row["kind"].Type == JTokenType.Null) row["kind"] = identity?["kind"]?.DeepClone();
+            if (row["name"] == null || row["name"].Type == JTokenType.Null) row["name"] = identity?["name"]?.DeepClone();
+            return row;
         }
 
         private string HmiProjectCopyId(Project project) => ChangeHash((project.Path?.FullName ?? "unsaved:" + project.Name).ToUpperInvariant());

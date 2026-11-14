@@ -118,7 +118,7 @@ namespace TiaMcp.Openness.V21
             {
                 case "constant_set": case "tag_delete": case "constant_delete":
                     return member.GroupPath + "/" + member.ObjectNames[0] + "\n" + member.Payload.Value<string>("memberName");
-                case "block_rename": case "block_attributes_set": case "block_number_set": return "block\n" + member.Namespace + "\n" + member.BlockNames[0];
+                case "block_rename": case "block_attributes_set": case "block_number_set": case "block_delete": return "block\n" + member.Namespace + "\n" + member.BlockNames[0];
                 case "type_rename": return "type\n" + member.Namespace + "\n" + member.ObjectNames[0];
                 case "tag_table_rename": return "tagTable\n" + member.ObjectNames[0];
                 case "group_rename": return ChangeBatchRules.GroupTarget(member.Kind, member.Payload);

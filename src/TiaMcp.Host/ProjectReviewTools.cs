@@ -14,18 +14,24 @@ namespace TiaMcp.Host;
 public sealed partial class TiaTools
 {
     [McpServerTool(Name = "project_snapshot_capture", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Save a persistent offline review: native hierarchy plus up to maxBlocks (0..200, default 25) exact standard block XML exports. request accepts projectName, plcPath, maxVisited, maxBlocks, blockPaths, maxRelationshipRoots (0..25, default 5), requireAllContent (refuse instead of saving when any block content is missing), hashProjectFolder (also hash every byte of the saved project folder; slower on large projects). capture.projectFolder reports the saved folder's file count, bytes and a path/size/time hash: the .ap21 file alone does not change on save. Check degraded and degradedReasons: they name failed exports, protected or unsupported blocks and blocks omitted by maxBlocks. A capture whose every export is refused for a read-only project is refused (ReadOnlyProject) instead of saved; capture a project_copy opened read-write. Captures bounded direct relationships for the first selected blocks. Native metadata is rechecked after exports; sequential content is not atomic. Protected/safety/unavailable content and omitted blocks stay explicit. Returns a content-hash reviewId usable after host restart. No project changes.")]
+    [Description("Save a persistent offline review: native hierarchy plus up to maxBlocks (0..200, default 25) exact standard block XML exports. request accepts projectName, plcPath, maxVisited, maxBlocks, blockPaths, maxRelationshipRoots (0..25, default 5), requireAllContent (refuse instead of saving when any block content is missing), hashProjectFolder (also hash every byte of the saved project folder; slower on large projects). capture.projectFolder reports the saved folder's file count, bytes and a path/size/time hash: the .ap21 file alone does not change on save. Check degraded and degradedReasons: they name failed exports, protected or unsupported blocks and blocks omitted by maxBlocks. A capture whose every export is refused for a read-only project is refused (ReadOnlyProject) instead of saved; pass fromTemporaryCopy:true to archive the open project, close it and capture a read-write copy instead (the original stays unchanged and the copy stays open). blockOffset pages through blocks beyond maxBlocks; capture.content.nextBlockOffset gives the next page. Captures bounded direct relationships for the first selected blocks. Native metadata is rechecked after exports; sequential content is not atomic. Protected/safety/unavailable content and omitted blocks stay explicit. Returns a content-hash reviewId usable after host restart. No project changes.")]
     public async Task<CallToolResult> ProjectSnapshotCapture(JsonElement request, CancellationToken cancellationToken)
     {
         try
         {
             var input = JsonNode.Parse(request.GetRawText())?.AsObject() ?? throw new BridgeException("InvalidRequest", "request must be an object.");
-            var permitted = new HashSet<string>(["projectName", "plcPath", "maxVisited", "maxBlocks", "blockPaths", "maxRelationshipRoots", "requireAllContent", "hashProjectFolder"], StringComparer.Ordinal);
+            var permitted = new HashSet<string>(["projectName", "plcPath", "maxVisited", "maxBlocks", "blockPaths", "maxRelationshipRoots", "requireAllContent", "hashProjectFolder", "fromTemporaryCopy", "blockOffset"], StringComparer.Ordinal);
             if (input.Any(p => !permitted.Contains(p.Key))) throw new BridgeException("InvalidRequest", "Unknown snapshot capture field.");
             int maximum = input["maxBlocks"]?.GetValue<int>() ?? 25;
             if (maximum is < 0 or > 200) throw new BridgeException("InvalidRequest", "maxBlocks must be 0..200.");
             int relationshipRoots = input["maxRelationshipRoots"]?.GetValue<int>() ?? 5;
             if (relationshipRoots is < 0 or > 25) throw new BridgeException("InvalidRequest", "maxRelationshipRoots must be 0..25.");
+            JsonObject? temporaryCopy = null;
+            if (input["fromTemporaryCopy"]?.GetValue<bool>() == true)
+                temporaryCopy = JsonNode.Parse((await bridge.CallAsync("project_open_copy", new { projectName = input["projectName"]?.GetValue<string>(),
+                    artifactDirectory = Path.Combine(options.ArtifactsDirectory, "copies") }, cancellationToken)).GetRawText())!.AsObject();
+            int blockOffset = input["blockOffset"]?.GetValue<int>() ?? 0;
+            if (blockOffset < 0) throw new BridgeException("InvalidRequest", "blockOffset must be 0 or more.");
             var captureArgs = new JsonObject { ["action"] = "capture", ["lifetimeSeconds"] = 900,
                 ["artifactDirectory"] = Path.Combine(options.ArtifactsDirectory, "project-explorer") };
             foreach (string name in new[] { "projectName", "plcPath", "maxVisited" })
@@ -45,7 +51,7 @@ public sealed partial class TiaTools
                 if (paths.Length != requested.Count || paths.Length > maximum || requested.Any(p => !allBlocks.Any(n => n!["objectPath"]!.GetValue<string>() == p)))
                     throw new BridgeException("InvalidRequest", "blockPaths must be unique exact block paths within this capture and within maxBlocks.");
             }
-            var selected = allBlocks.Where(n => requested is null || requested.Contains(n!["objectPath"]!.GetValue<string>())).Take(maximum).ToArray();
+            var selected = allBlocks.Where(n => requested is null || requested.Contains(n!["objectPath"]!.GetValue<string>())).Skip(requested is null ? blockOffset : 0).Take(maximum).ToArray();
             var relationships = new JsonArray();
             foreach (var node in selected.Take(relationshipRoots))
             {
@@ -99,12 +105,17 @@ public sealed partial class TiaTools
                 }
             }
             var content = ProjectReviewStore.ContentCoverage(documents, allBlocks.Length, selected.Length);
+            if (requested is null)
+            {
+                content["blockOffset"] = blockOffset;
+                content["nextBlockOffset"] = blockOffset + selected.Length < allBlocks.Length ? blockOffset + selected.Length : null;
+            }
             // A capture whose every attempted export was refused for a read-only project holds no block content at all;
             // saving it would let a later compare look clean without comparing any block. Refuse instead.
             if (content["attemptedBlocks"]!.GetValue<int>() > 0 && content["exportedBlocks"]!.GetValue<int>() == 0
                 && documents.All(row => row?["skipped"] is not null || row?["errorCode"]?.GetValue<string>() == "ReadOnlyProject"))
                 throw new BridgeException("ReadOnlyProject", "Every block export was refused because the project is open read-only, so no block content would be captured. "
-                    + "Remediation: run project_copy, open the copy with project_open (readOnly false) in a fresh tia_start instance and capture that; the original stays untouched.");
+                    + "Remediation: repeat the capture with fromTemporaryCopy:true; it captures a read-write copy and leaves the original unchanged.");
             if (input["requireAllContent"]?.GetValue<bool>() == true && content["degraded"]!.GetValue<bool>())
                 throw new BridgeException("SnapshotContentIncomplete", "requireAllContent is set and block content is incomplete: "
                     + string.Join(", ", content["degradedReasons"]!.AsArray().Select(r => r!["code"]!.GetValue<string>())) + ". No review was saved.");
@@ -115,6 +126,9 @@ public sealed partial class TiaTools
                 ["omittedBlocks"] = allBlocks.Length - selected.Length, ["originalSnapshotId"] = snapshotId,
                 ["metadataVerification"] = JsonNode.Parse(verification.GetRawText()), ["nativeContentAtomic"] = false,
                 ["relationshipObservations"] = relationships, ["relationshipCoverageComplete"] = false, ["content"] = content,
+                ["temporaryCopy"] = temporaryCopy is null ? null : new JsonObject { ["source"] = temporaryCopy["source"]?.DeepClone(),
+                    ["copy"] = temporaryCopy["project"]?.DeepClone(), ["archive"] = temporaryCopy["archive"]?.DeepClone(),
+                    ["note"] = "Captured from a temporary read-write copy; the original project was closed unchanged and the copy stays open." },
                 ["projectFolder"] = ProjectReviewStore.ProjectFolderManifest(model["project"]!["projectPath"]!.GetValue<string>(), input["hashProjectFolder"]?.GetValue<bool>() == true) };
             return ReviewResult(new ProjectReviewStore(options.ArtifactsDirectory).Save(model, documents, coverage));
         }

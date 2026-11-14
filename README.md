@@ -200,9 +200,13 @@ separate claims. Consult [current status](docs/STATUS.md), the
 [release matrix](docs/plans/release-matrix.v1.json) and the [TODO](docs/TODO.md).
 
 Changes can partially fail and require recovery from their checkpoint; they are
-not transactions across Siemens calls. The public simulation workflow operates
-on adapter-owned simulator instances and does not expose physical PLC download,
-force or CPU control. Keep project exports and credentials private.
+not transactions across Siemens calls. The simulation workflow operates on
+adapter-owned simulator instances. Online access to real PLCs (compare, station
+upload, download) exists only behind the off-by-default `--physical-plc-online`
+Host option, is not qualified on physical hardware and never answers logins or
+passwords; force and CPU mode control are not exposed
+([real PLCs](docs/reference/physical-plc-online.md)). Keep project exports and
+credentials private.
 
 ## Development checks
 

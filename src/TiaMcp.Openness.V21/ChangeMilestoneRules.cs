@@ -24,7 +24,8 @@ namespace TiaMcp.Openness.V21
                 Row("checkpointSaved", Step(Has("prechange_project_saved"), mutated)),
                 Row("recoveryArchiveCreated", Step(Has("recovery_archive_created"), mutated)),
                 Row("projectChanged", Step(mutated, compiled)),
-                Row("readbackVerified", readback ? "done" : state == "applied" ? (Has("compile_only_requested") ? "skipped" : "notRecorded") : Step(false, saved)),
+                ReadbackRow(readback ? "done" : state == "applied" ? (Has("compile_only_requested") ? "skipped" : "notRecorded") : Step(false, saved),
+                    stages.Select(st => (string)st).FirstOrDefault(st => st != null && (st.EndsWith("_verified", StringComparison.Ordinal) || st.EndsWith("_verified_after_save", StringComparison.Ordinal) || st.EndsWith("verified_content", StringComparison.Ordinal)))),
                 Row("compiled", compilation == null && state == "applied" ? "skipped" : Step(compiled, saved)),
                 Row("compilerSucceeded", compilation?["compilerSucceeded"] == null ? "unknown" : compilation.Value<bool>("compilerSucceeded") ? "yes" : "no"),
                 Row("saved", Step(saved, false)));
@@ -76,5 +77,17 @@ namespace TiaMcp.Openness.V21
         }
 
         private static JObject Row(string name, string status) => new JObject { ["milestone"] = name, ["status"] = status };
+
+        // The same status values as before, with the reason a user otherwise had to look up: notRecorded is not a failure.
+        private static JObject ReadbackRow(string status, string stage)
+        {
+            var row = Row("readbackVerified", status);
+            row["reason"] = status == "done" ? "Read back after the write (stage " + stage + ")."
+                : status == "notRecorded" ? "This change kind checks its result inside the write (for example that the imported objects exist) and records no separate content readback; the compile and the saved project are the remaining checks."
+                : status == "skipped" ? "A compile-only change writes nothing to read back."
+                : status == "pending" ? "Runs after the write."
+                : "The change stopped before a readback.";
+            return row;
+        }
     }
 }

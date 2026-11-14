@@ -7,6 +7,10 @@ namespace TiaMcp.Openness.V21
 {
     internal static class Program
     {
+        // Set from --physical-plc-online. Kept here, not on OpennessSession: Main must not touch a type that loads Siemens
+        // assemblies before the resolver is installed.
+        internal static bool PhysicalPlcOnline;
+
         [STAThread]
         private static int Main(string[] args)
         {
@@ -49,6 +53,7 @@ namespace TiaMcp.Openness.V21
                     else if (args[i] == "--api-dir" && i + 1 < args.Length) apiDirectory = args[++i];
                     else if (args[i] == "--sim-api-dir" && i + 1 < args.Length) simulatorApiDirectory = args[++i];
                     else if (args[i] == "--component-qualification") componentQualification = true;
+                    else if (args[i] == "--physical-plc-online") PhysicalPlcOnline = true;
                     else if (args[i] == "--testsuite-scope-probe") testSuiteScopeProbe = true;
                     else if (args[i] == "--translation-qualification") translationQualification = true;
                     else if (args[i] == "--enable-library-integrate-apply") libraryIntegrateApply = true;

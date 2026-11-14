@@ -14,6 +14,12 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Added
 
+- Online access to real PLCs behind the off-by-default `--physical-plc-online` Host option, in the new `physical` tool group: `plc_physical_targets`, `plc_physical_online_compare`, `plc_physical_station_upload` and `plc_physical_download`. Routes are explicit, logins are never answered, TLS is trusted only for a user-supplied certificate hash, and a download answers TIA's questions only from explicit acknowledgements. Not qualified on a physical PLC.
+- `project_close` closes a project in a worker-owned instance without saving; `project_open_copy` swaps the open project for a read-write copy of its saved state.
+- `project_snapshot_capture` takes `fromTemporaryCopy` (capture a read-write copy of a read-only project) and `blockOffset` (page through blocks beyond `maxBlocks`).
+- `block_delete` accepts `items` (one checkpoint, compile and save for many deletions).
+- `sim_create` and selections report the instance's `controllerAddresses` and the instance lifecycle.
+
 - `hmi_content_fingerprint` reads the HMI native-content hash `change_prepare` needs as `expectedContentHash`, with `complete`, `scopeAccepted` and the missing coverage, without preparing a change (user feedback on v0.9.0).
 - `project_snapshot_capture` reports `degraded`, `degradedReasons`, a one-line `summary` and per-capture block counts (`capture.content`), a project-folder manifest (`capture.projectFolder`; full content hash with `hashProjectFolder`), and takes `requireAllContent`.
 - `sim_status` reports `tcpIpReady`, the PLCSIM virtual adapters and a remediation; `TcpIpModeRequired` carries the same details.
@@ -178,6 +184,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   (`local.hardware_changes.refusals.20261102`, [record](docs/verification/hardware-refusals-20261102.md)).
 
 ### Changed
+
+- `hmi_inspect` rows of every section carry top-level `path`, `kind`, `name` and `identity`.
+- The `readbackVerified` milestone carries a `reason`; `notRecorded` explains that the kind checks its result inside the write.
+- `project_open` and other `NotAttached`/`ProjectIsolationRequired` refusals carry a `remediation` and the open projects.
 
 - `hmi_inspect` `coverage.complete` is true only on the last page of a complete capture; `captureComplete` keeps the old meaning, and `totalItems`, `hasMore`, `pageCount` and a `paginationPending` reason were added. A consumer that stopped at `complete: true` lost every row after page 1.
 - `project_snapshot_capture` refuses (`ReadOnlyProject`) instead of saving a review when every block export was refused because the project is open read-only.

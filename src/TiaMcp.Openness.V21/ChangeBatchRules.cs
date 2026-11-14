@@ -18,13 +18,16 @@ namespace TiaMcp.Openness.V21
         // stricter rule to be independent: block_number_set (no two items may take one number of one block kind),
         // group_create (no two items may create one name under one parent; a parent another item creates does not exist yet
         // and refuses at that item's own prepare) and group_rename (as before, and no item's group may lie inside another
-        // item's, whose rename would move its path). Deletions of blocks, types and groups (dependency scans, nesting) and
-        // the import kinds (already multi-object) are not batched.
+        // item's, whose rename would move its path). block_delete is batched: each item's dependency scan runs against the
+        // unchanged project, so a block referenced by another block of the same batch is still refused (delete the
+        // referencing block in an earlier change); the result never depends on the order of deletes. Deletions of types and
+        // groups (nesting), the call and graphical edits (their structured readback runs once per change, not per item)
+        // and the import kinds (already multi-object) are not batched.
         internal static readonly string[] Kinds =
         {
             "constant_set", "tag_create", "constant_create", "tag_delete", "constant_delete",
             "tag_table_create", "tag_table_rename", "block_rename", "block_attributes_set", "type_rename",
-            "block_number_set", "group_create", "group_rename",
+            "block_number_set", "group_create", "group_rename", "block_delete",
         };
 
         internal static bool HasItems(JObject payload) => payload?["items"] != null && payload["items"].Type != JTokenType.Null;

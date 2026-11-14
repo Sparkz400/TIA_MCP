@@ -13,6 +13,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
     public TiaMcp.Core.VersionControl.GitRemote? GitRemote { get; init; }
     public string? UaClientIdentity { get; init; }
     public bool NoNativeWorkers { get; init; }
+    public bool PhysicalPlcOnline { get; init; }
     public bool CheckOpennessRegistration { get; init; }
     // Selected --toolsets groups; null advertises every tool.
     public IReadOnlySet<string>? Toolsets { get; init; }
@@ -67,6 +68,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         var noNativeWorkers = false;
 #endif
         var componentQualification = false;
+        var physicalPlcOnline = false;
         var testSuiteScopeProbe = false;
         var testSuiteQualification = false;
         var translationQualification = false;
@@ -82,6 +84,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         {
             var option = args[i];
             if (option == "--no-native-workers") { noNativeWorkers = true; continue; }
+            if (option == "--physical-plc-online") { physicalPlcOnline = true; continue; }
             if (option == "--addin-handoff") { addInHandoff = true; continue; }
             if (option == "--git-allow-network-remote") { gitAllowNetworkRemote = true; continue; }
             if (option == "--enable-library-integrate-apply") { enableLibraryIntegrateApplyGiven = true; continue; } // the default; kept for existing launch configurations
@@ -191,7 +194,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             try { remote = TiaMcp.Core.VersionControl.GitRemote.Parse(gitRemote, gitAllowNetworkRemote); }
             catch (BridgeException error) { throw new ArgumentException("--git-remote: " + error.Message); }
         }
-        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { CheckOpennessRegistration = checkOpennessRegistration, UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, FingerprintReuse = fingerprintReuse, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, GitRemote = remote, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, SafetyFParameterDiscovery = safetyFParameterDiscovery, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint, HmiTextListQualificationProfile = hmiTextListQualification, HmiChangeQualificationProfile = hmiChangeQualification, TiaVersion = tiaVersion };
+        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { PhysicalPlcOnline = physicalPlcOnline, CheckOpennessRegistration = checkOpennessRegistration, UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, FingerprintReuse = fingerprintReuse, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, GitRemote = remote, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, SafetyFParameterDiscovery = safetyFParameterDiscovery, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint, HmiTextListQualificationProfile = hmiTextListQualification, HmiChangeQualificationProfile = hmiChangeQualification, TiaVersion = tiaVersion };
     }
 
     private static PackageIntakeLimits ReadLibraryLimits(string path)

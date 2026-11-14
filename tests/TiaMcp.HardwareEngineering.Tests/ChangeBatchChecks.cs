@@ -19,7 +19,7 @@ internal static class ChangeBatchChecks
         Check(!ChangeBatchRules.IsBatch("tag_set", Batch(Create("A"))), "tag_set keeps its own batch route");
         Check(!ChangeBatchRules.IsBatch("source_upsert", new JObject { ["source"] = "x" }) && !ChangeBatchRules.IsBatch("block_delete", new JObject { ["items"] = JValue.CreateNull() }),
               "a payload without items is never a batch");
-        foreach (string kind in new[] { "block_delete", "type_delete", "group_delete", "source_upsert", "tag_table_import_xml", "hardware_attributes", "plc_compile" })
+        foreach (string kind in new[] { "call_parameter_set", "type_delete", "group_delete", "source_upsert", "tag_table_import_xml", "hardware_attributes", "plc_compile" })
             Check(Refused(() => ChangeBatchRules.IsBatch(kind, Batch(Create("A")))) == "InvalidRequest", kind + " refuses items");
 
         // Shape.

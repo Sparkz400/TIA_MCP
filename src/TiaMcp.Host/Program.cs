@@ -24,6 +24,7 @@ try
     // The V19 adapter takes no V21 worker options (HostOptions refuses the qualification and library ones for it).
     if (options.TiaVersion == 21 && options.SimulatorApiDirectory is not null) workerArguments.AddRange(["--sim-api-dir", options.SimulatorApiDirectory]);
     if (options.ComponentQualification) workerArguments.Add("--component-qualification");
+    if (options.TiaVersion == 21 && options.PhysicalPlcOnline) workerArguments.Add("--physical-plc-online");
     if (options.TestSuiteScopeProbe) workerArguments.Add("--testsuite-scope-probe");
     if (options.TranslationQualification) workerArguments.Add("--translation-qualification");
     if (options.HmiTextListQualificationProfile is { } profile) workerArguments.AddRange(["--hmi-text-list-qualification", profile]);
@@ -101,6 +102,7 @@ try
             if (options.WatchQualificationPoint is not null) mcp.WithTools<WatchQualificationTools>();
             if (options.WatchQualificationPoint is not null && options.ComponentQualification) mcp.WithTools<WatchAuthoringQualificationTools>();
             if (options.ComponentQualification) mcp.WithTools<ComponentQualificationTools>();
+            if (options.PhysicalPlcOnline) mcp.WithTools<PhysicalPlcTools>();
             if (options.TestSuiteScopeProbe) mcp.WithTools<TestSuiteScopeProbeTools>();
 #if TESTSUITE_QUALIFICATION
             if (options.TestSuiteQualification) mcp.WithTools<TestSuiteQualificationTools>();
