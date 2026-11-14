@@ -25,7 +25,7 @@ namespace TiaMcp.Openness.V21
             {
                 case "hmi_inspect": case "hmi_references": case "hmi_capabilities": case "hmi_content_fingerprint": return;
                 case "project_index": case "project_model": case "bridge_info": case "discover": case "session_status": case "addin_owner_context":
-                case "project_inventory": case "project_properties": case "device_inventory_capture": case "block_read": case "xref_query": case "catalog_query":
+                case "project_inventory": case "project_properties": case "project_archive": case "device_inventory_capture": case "block_read": case "xref_query": case "catalog_query":
                 case "software_inspect": case "type_read": case "tag_table_read": case "block_interface":
                 case "hardware_inspect": case "connection_inspect": case "cax_export": case "technology_read": case "safety_inspect": case "call_graph": case "plc_alarm_inspect": case "hardware_gsd_export":
                 case "access_inspect": case "certificate_inspect": case "web_inspect": case "vci_workspace_inspect": case "opcua_engineering_inspect": case "opcua_engineering_export": case "safety_validation_inspect": case "safety_printout": case "drive_observe":

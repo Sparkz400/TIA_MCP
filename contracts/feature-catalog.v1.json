@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.182",
+  "catalogVersion": "0.4.183",
   "targetTiaVersions": [
     21
   ],
@@ -6356,6 +6356,50 @@
       "acceptanceCriteria": [
         "AC-identity",
         "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "project_archive",
+      "domain": "project",
+      "title": "Archive an open project's saved state as a .zap21 file",
+      "mcpTools": [
+        "project_archive"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Project.Archive(DirectoryInfo, string, ProjectArchivationMode) with Compressed or DiscardRestorableDataAndCompressed; the same call the change checkpoints and project_copy use."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Unsaved edits are refused (UnsavedProject) because the project is never saved; the archive holds the last saved state.",
+          "The archive is written under the Host's archives artifacts with a unique name; no other destination is accepted.",
+          "Not a shared mutation: no admission record is written, because the project is not changed. A lost reply leaves at most an unreferenced archive file.",
+          "Archiving a read-only (secondary) project and protected (UMAC) projects are unprobed.",
+          "Native check on 14 November 2026 (not curated evidence): an owned 196-block fixture archived in 3.2 s, the archive was retrieved with project_retrieve in a fresh Portal and listed by project_inventory, the fixture folder hash was unchanged, and an unknown mode was refused (InvalidRequest)."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "A saved project open in a worker-owned or attached session"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
         "AC-evidence"
       ]
     },

@@ -174,6 +174,41 @@ namespace TiaMcp.Openness.V21
             return count;
         }
 
+        // Write the saved state of an open project to a new .zap21 archive under the artifacts directory. The project is
+        // never saved, closed or changed; unsaved edits are refused because Archive would not contain them.
+        private JObject ProjectArchive(JObject args)
+        {
+            EnsureAttached();
+            var project = SelectProject(args);
+            if (project.IsModified) throw new BridgeException("UnsavedProject", "project_archive archives the saved state and never saves the project; save or discard its edits first.");
+            string mode = args.Value<string>("mode") ?? "compressed";
+            ProjectArchivationMode native;
+            switch (mode)
+            {
+                case "compressed": native = ProjectArchivationMode.Compressed; break;
+                case "discardRestorableDataAndCompressed": native = ProjectArchivationMode.DiscardRestorableDataAndCompressed; break;
+                default: throw new BridgeException("InvalidRequest", "mode must be compressed or discardRestorableDataAndCompressed.");
+            }
+            string root = ArtifactDirectory(args);
+            string name = SafeFileName(project.Name) + "_" + DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_" + Guid.NewGuid().ToString("N").Substring(0, 8) + ".zap21";
+            string archive = Path.Combine(root, name);
+            if (File.Exists(archive) || Directory.Exists(archive)) throw new BridgeException("ArtifactExists", "The planned archive already exists.");
+            var result = Envelope();
+            result["project"] = ProjectInfo(project);
+            result["mode"] = mode;
+            var started = System.Diagnostics.Stopwatch.StartNew();
+            project.Archive(new DirectoryInfo(root), name, native);
+            if (!File.Exists(archive)) throw new BridgeException("ArchiveFailed", "TIA did not produce the archive.", result);
+            if (project.IsModified) throw new BridgeException("ArchiveChangedProject", "The project reports unsaved edits after archiving; it was not saved.", result);
+            var artifact = FileArtifact(new FileInfo(archive), "application/octet-stream");
+            result["archive"] = artifact;
+            result["durationMs"] = started.ElapsedMilliseconds;
+            result["archived"] = true;
+            result["projectSaved"] = false;
+            result["note"] = "Restore it with project_retrieve (archivePath and this sha256) into a new directory.";
+            return result;
+        }
+
         // Archive the saved source, retrieve it as a secondary project into a fresh owned directory and close that
         // copy again. Project.SaveAs is not used: it saves unsaved edits and moves the open project to the new location.
         private JObject ProjectCopy(JObject args)

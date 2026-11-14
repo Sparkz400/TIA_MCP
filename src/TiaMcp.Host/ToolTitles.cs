@@ -138,6 +138,7 @@ internal static class ToolTitles
         ["plc_physical_online_compare"] = "Compare with a real PLC online",
         ["plc_physical_station_upload"] = "Upload a station from a real PLC",
         ["plc_physical_download"] = "Download to a real PLC",
+        ["project_archive"] = "Archive a project",
         ["project_copy"] = "Copy a project",
         ["project_open_copy"] = "Open a temporary project copy",
         ["project_health_report"] = "Report project health",

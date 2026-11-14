@@ -126,6 +126,7 @@ namespace TiaMcp.Openness.V21
                 case "detach": return Detach(arguments);
                 case "project_inventory": return Inventory(arguments);
                 case "project_properties": return ProjectProperties(arguments);
+                case "project_archive": return ProjectArchive(arguments);
                 case "device_inventory_capture": return DeviceInventoryCapture(arguments);
                 case "hmi_inspect": return HmiInspect(arguments);
                 case "hmi_classic_screen_capture": return ClassicScreenCapture(arguments);
@@ -229,6 +230,7 @@ namespace TiaMcp.Openness.V21
                 Capability("scratch_create", "conditional", "Only a worker-owned empty TIA instance can create a uniquely named scratch project, one catalog-verified CPU and fixed SCL fixtures."),
                 Capability("project_open", "conditional", "Existing .ap21 files can be opened in an empty worker-owned instance; no automatic upgrade. readOnly opens a secondary project on which every mutation is refused."),
                 Capability("project_upgrade", "conditional", "Upgrades an owned copy of a V14-V20 project folder or archive to V21 with OpenWithUpgrade/RetrieveWithUpgrade; the source is hashed before and after and never opened. V13 and older are refused before any native call."),
+                Capability("project_archive", "conditional", "Writes the saved open project to a new .zap21 archive under the artifacts directory with Project.Archive; the project is never saved or changed and unsaved edits are refused."),
                 Capability("project_copy", "conditional", "Archives the saved open project and retrieves it into a new owned directory as a closed copy; the source is never saved or changed."),
                 Capability("plc_compare", "conditional", "Bounded offline PlcSoftware.CompareTo tree against another PLC in the project or an open library; no online compare."),
                 Capability("software_inspect", "conditional", "Tags/constants, types, software/safety units, block/DB interfaces and TO parameters via exposed services and native XML."),
