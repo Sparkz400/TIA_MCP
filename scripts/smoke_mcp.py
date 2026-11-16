@@ -45,13 +45,18 @@ class Client:
     def _host_exited(self, reason):
         # Let the stderr reader drain, so the startup failure (bad option, missing worker) is part of the message.
         self.exited = True
-        self.error_reader.join(timeout=2)
-        code = self.process.poll()
+        # Harnesses that build a client with Client.__new__ set only the attributes they use.
+        reader = getattr(self, "error_reader", None)
+        if reader is not None:
+            reader.join(timeout=2)
+        poll = getattr(self.process, "poll", None)
+        code = poll() if poll is not None else None
         status = f"exit code {code}" if code is not None else "process still running"
-        return HostExited(f"MCP host exited {reason} ({status}): " + "\n".join(self.errors[-10:]))
+        return HostExited(f"MCP host exited {reason} ({status}): " + "\n".join(getattr(self, "errors", [])[-10:]))
 
     def _send(self, message):
-        if self.exited or self.process.poll() is not None:
+        # Only a Host already seen gone refuses here; a dead pipe fails on the write and a closed stdout on the read.
+        if getattr(self, "exited", False):
             raise self._host_exited("before the request was sent")
         try:
             self.process.stdin.write(json.dumps(message) + "\n")
@@ -76,7 +81,7 @@ class Client:
             try:
                 line = self.lines.get(timeout=max(0.01, deadline - time.monotonic()))
             except queue.Empty:
-                if self.process.poll() is not None:
+                if getattr(self.process, "poll", lambda: None)() is not None:
                     raise self._host_exited(f"while {method} was pending") from None
                 raise TimeoutError(f"MCP host sent no response to {method} within {self.timeout + 15} s.") from None
             if line is None:
