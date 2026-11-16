@@ -53,7 +53,9 @@ namespace TiaMcp.Openness.V21
             var id = Guid.NewGuid().ToString("N");
             var directory = Path.Combine(ArtifactDirectory(args), "change-" + id);
             // Old preparations no worker holds can never be applied; remove them (see StaleChangeDirectories for what is kept).
-            StaleChangeDirectories.Sweep(ArtifactDirectory(args), new HashSet<string>(_changes.Keys, StringComparer.Ordinal), DateTime.UtcNow);
+            // Only the Host's own changes directory asks for it; coordinator workspaces read their prepared inner journals later.
+            if (args.Value<bool?>("pruneStalePreparations") == true)
+                StaleChangeDirectories.Sweep(ArtifactDirectory(args), new HashSet<string>(_changes.Keys, StringComparer.Ordinal), DateTime.UtcNow);
             Directory.CreateDirectory(directory);
             var change = new EngineeringChange
             {

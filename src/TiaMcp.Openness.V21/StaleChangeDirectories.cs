@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace TiaMcp.Openness.V21
 {
-    /// <summary>Removes change directories that can never be applied: preparations (state prepared or prepare_failed) that no
+    /// <summary>Removes change directories that can never be applied: preparations (state prepared) that no
     /// worker holds in memory anymore. change_apply needs the in-memory change of the worker that prepared it, so such a
     /// directory is dead once that worker is gone. A change that ever reached checkpointing, applying, applied, restoring,
     /// restored, recovery_required, not_applied or rolled_back is never touched: change_status, change_restore and admission
@@ -19,7 +19,8 @@ namespace TiaMcp.Openness.V21
         internal static readonly TimeSpan MinimumAge = TimeSpan.FromHours(24);
         internal const int MaxPerSweep = 200;
         private static readonly Regex Name = new Regex("\\Achange-[0-9a-f]{32}\\z", RegexOptions.CultureInvariant);
-        private static readonly string[] Prunable = { "prepared", "prepare_failed" };
+        // prepare_failed keeps only its journal on purpose (the failure record); it is not pruned.
+        private static readonly string[] Prunable = { "prepared" };
 
         /// <summary>Whether a journal (and its last write) lets the directory be removed. Pure, for tests.</summary>
         internal static bool CanPrune(JObject journal, DateTime journalWrittenUtc, DateTime nowUtc, ISet<string> heldIds)

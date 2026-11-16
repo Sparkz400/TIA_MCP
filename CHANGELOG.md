@@ -17,7 +17,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 - **Payload schemas (16 November, v0.9.0 feedback):** `tia://change-payloads/{kind}` gives the JSON Schema of `change_prepare.payload` for every change kind, from the new [`change-payloads.v1.schema.json`](contracts/change-payloads.v1.schema.json) (derived from the worker parsers and audited against them); `tia://contracts/{name}` serves every bundled contract, including the `hmi_inspect` request (`hmi-inspection.v1.schema.json`).
 - **Smaller HMI pages:** `hmi_inspect` takes `rowMode` (`full`, `compact`, `hash`), `excludeSystem` for `section=model`, and a page limit up to 1000; it returns `page` (limits, bytes, `stoppedBy`) first and `modelContentHash` over the whole walked model. Not run natively yet.
 - **Change detail levels:** `change_prepare`, `change_apply` and `change_status` take `detail` (`summary`, `standard`, `full`); `standard` reduces HMI preservation artifact maps to a count and hash. Change summaries carry `stageTimings`, and every tool result carries `_meta["tiaMcp/durationMs"]`.
-- **Lock owners:** `tia_session_status` lists every visible TIA Portal with its open project (`portals`), and a writable `project_open` of a project another Portal holds is refused with `ProjectLocked`, naming that Portal. Not run natively yet.
+- **Lock owners:** `tia_session_status` lists every visible TIA Portal with its open project (`portals`), and when TIA refuses a `project_open` while another Portal has the project open, the error is `ProjectLocked`, naming that Portal. Not run natively yet.
 - **Capture progress:** `project_snapshot_capture` reports each step and block as progress (with a `progressToken`), returns `reviewUri`, names each degraded reason's text in `summary`, and explains `nodeCount` (`nodeCountScope`).
 - **Call and graphical batches:** `call_parameter_set`, `call_connection_set`, `graphical_operand_set`, `graphical_network_patch` and `graphical_network_insert` take `items`, one item per block, each read back against its own prepared document. Not run natively yet.
 
@@ -195,7 +195,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 - `--timeout-seconds` accepts up to 3600 s (was 900), in the Host and the launcher scripts.
 - A failed `simulation_download` reports `ticketState` (`reusable`, `spent`, `unusable`) and a remediation; `FreshSimulationStorageRequired` says the ticket was spent.
 - An explicit HMI `target.kind` that the operation or `hmi_inspect` section cannot take is refused before the preservation capture.
-- `change_prepare` removes change directories older than 24 h that never got past preparation and that no worker holds; each removal is logged to `pruned-changes.jsonl`.
+- A Host `change_prepare` removes change directories still `prepared` after 24 h that no worker holds (they can never be applied); each removal is logged to `pruned-changes.jsonl`, and `prepare_failed` journals are kept.
 - The reference client (`scripts/smoke_mcp.py`) fails at once with the Host's stderr when the Host exits before or while answering.
 
 - `hmi_inspect` rows of every section carry top-level `path`, `kind`, `name` and `identity`.

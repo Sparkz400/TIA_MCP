@@ -56,7 +56,7 @@ public sealed partial class TiaTools
         => Call("project_close", new { projectName, discardUnsaved }, cancellationToken);
 
     [McpServerTool(Name = "project_open", Destructive = false, OpenWorld = false)]
-    [Description("Open an exact existing .ap21 project on the TIA host in an empty worker-owned instance: call tia_start first (NotAttached otherwise) and project_close a previously opened project (ProjectIsolationRequired otherwise). A writable open of a project another TIA Portal has open is refused with ProjectLocked, naming the holder's processId (lockOwners); open it readOnly, use project_open_copy, or close it there. Does not upgrade, save or download it. Use a copied/test project for validation edits. readOnly=true opens it as a secondary (read-only) project: inventory and inspection reads work, TIA refuses exports (block/type/tag-table reads and other export-based tools) and every mutation is refused, both with ReadOnlyProject. If project login is required, prompt for the target's local username and password through TIA authentication; this tool accepts no raw credentials. Follow the server authentication instructions.")]
+    [Description("Open an exact existing .ap21 project on the TIA host in an empty worker-owned instance: call tia_start first (NotAttached otherwise) and project_close a previously opened project (ProjectIsolationRequired otherwise). When TIA refuses the open and another TIA Portal has the project open, the error is ProjectLocked, naming that Portal's processId (lockOwners) beside TIA's own message; open it readOnly, use project_open_copy, or close it there. Does not upgrade, save or download it. Use a copied/test project for validation edits. readOnly=true opens it as a secondary (read-only) project: inventory and inspection reads work, TIA refuses exports (block/type/tag-table reads and other export-based tools) and every mutation is refused, both with ReadOnlyProject. If project login is required, prompt for the target's local username and password through TIA authentication; this tool accepts no raw credentials. Follow the server authentication instructions.")]
     public Task<CallToolResult> ProjectOpen(string path, CancellationToken cancellationToken, bool readOnly = false)
         => Call("project_open", new { path, readOnly }, cancellationToken);
 
@@ -240,8 +240,8 @@ public sealed partial class TiaTools
             { return Failure(error as BridgeException ?? new BridgeException("InvalidCertificateImport", "The certificate upload could not be read.")); }
         // Only the launch option widens safety_fparameter_set beyond the qualified allowlist; no client argument can.
         if (kind == "safety_fparameter_set" && options.SafetyFParameterDiscovery)
-            return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, intent = intentArgument, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes"), fParameterDiscovery = true }, cancellationToken);
-        return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, intent = intentArgument, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes") }, cancellationToken);
+            return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, intent = intentArgument, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes"), fParameterDiscovery = true, pruneStalePreparations = true }, cancellationToken);
+        return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, intent = intentArgument, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes"), pruneStalePreparations = true }, cancellationToken);
     }
 
     [McpServerTool(Name = "change_apply", Destructive = true, OpenWorld = false)]

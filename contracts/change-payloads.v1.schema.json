@@ -551,33 +551,65 @@
        "type": "object",
        "properties": {
         "HeaderAuthor": {
-         "type": "string"
+         "type": [
+          "string",
+          "number",
+          "boolean"
+         ]
         },
         "HeaderFamily": {
-         "type": "string"
+         "type": [
+          "string",
+          "number",
+          "boolean"
+         ]
         },
         "HeaderName": {
-         "type": "string"
+         "type": [
+          "string",
+          "number",
+          "boolean"
+         ]
         },
         "HeaderVersion": {
-         "type": "string"
+         "type": [
+          "string",
+          "number",
+          "boolean"
+         ]
         },
         "PriorityNumber": {
-         "type": "integer"
+         "type": [
+          "string",
+          "number",
+          "boolean"
+         ]
         },
         "CyclicTime": {
-         "type": "integer"
+         "type": [
+          "string",
+          "number",
+          "boolean"
+         ]
         },
         "PhaseOffset": {
-         "type": "integer"
+         "type": [
+          "string",
+          "number",
+          "boolean"
+         ]
         },
         "ProcessImagePartNumber": {
-         "type": "integer"
+         "type": [
+          "string",
+          "number",
+          "boolean"
+         ]
         }
        },
        "additionalProperties": false,
        "minProperties": 1,
-       "description": "Header attributes; PriorityNumber, CyclicTime, PhaseOffset and ProcessImagePartNumber for OBs only."
+       "description": "Header attributes; PriorityNumber, CyclicTime, PhaseOffset and ProcessImagePartNumber for OBs only. Value types follow the installed Siemens attribute types."
       },
       "items": {
        "type": "null"
@@ -606,33 +638,65 @@
           "type": "object",
           "properties": {
            "HeaderAuthor": {
-            "type": "string"
+            "type": [
+             "string",
+             "number",
+             "boolean"
+            ]
            },
            "HeaderFamily": {
-            "type": "string"
+            "type": [
+             "string",
+             "number",
+             "boolean"
+            ]
            },
            "HeaderName": {
-            "type": "string"
+            "type": [
+             "string",
+             "number",
+             "boolean"
+            ]
            },
            "HeaderVersion": {
-            "type": "string"
+            "type": [
+             "string",
+             "number",
+             "boolean"
+            ]
            },
            "PriorityNumber": {
-            "type": "integer"
+            "type": [
+             "string",
+             "number",
+             "boolean"
+            ]
            },
            "CyclicTime": {
-            "type": "integer"
+            "type": [
+             "string",
+             "number",
+             "boolean"
+            ]
            },
            "PhaseOffset": {
-            "type": "integer"
+            "type": [
+             "string",
+             "number",
+             "boolean"
+            ]
            },
            "ProcessImagePartNumber": {
-            "type": "integer"
+            "type": [
+             "string",
+             "number",
+             "boolean"
+            ]
            }
           },
           "additionalProperties": false,
           "minProperties": 1,
-          "description": "Header attributes; PriorityNumber, CyclicTime, PhaseOffset and ProcessImagePartNumber for OBs only."
+          "description": "Header attributes; PriorityNumber, CyclicTime, PhaseOffset and ProcessImagePartNumber for OBs only. Value types follow the installed Siemens attribute types."
          },
          "items": false
         },
@@ -1558,7 +1622,7 @@
     "uploadRef": {
      "type": "string",
      "minLength": 1,
-     "maxLength": 512
+     "maxLength": 8192
     },
     "format": {
      "enum": [
@@ -7092,12 +7156,12 @@
     "comparisonRef": {
      "type": "string",
      "minLength": 1,
-     "maxLength": 512
+     "maxLength": 4096
     },
     "packageId": {
      "type": "string",
      "minLength": 1,
-     "maxLength": 128
+     "maxLength": 4096
     },
     "take": {
      "enum": [

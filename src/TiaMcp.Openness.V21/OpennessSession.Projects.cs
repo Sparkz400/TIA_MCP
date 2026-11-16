@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -64,15 +65,21 @@ namespace TiaMcp.Openness.V21
             var file = new FileInfo(Path.GetFullPath(path));
             if (!file.Exists) throw new BridgeException("ProjectNotFound", "The .ap21 project file does not exist on this host.");
             bool readOnly = args.Value<bool?>("readOnly") == true;
-            // A primary open of a project another Portal holds fails natively without naming the holder; name it first.
-            if (!readOnly)
+            Project project;
+            try { project = readOnly ? _portal.Projects.Open(file, null, ProjectOpenMode.Secondary) : _portal.Projects.Open(file); }
+            catch (Exception error) when (!(error is BridgeException))
             {
-                var holders = ProjectLockRules.Holders(file.FullName, VisiblePortals(), _processId);
-                if (holders.Count > 0)
-                    throw new BridgeException("ProjectLocked", "Another TIA Portal (process " + string.Join(", ", holders.Select(h => h.ProcessId)) + ") has this project open.",
-                        ProjectLockRules.Refusal(file.FullName, holders));
+                // TIA decides whether the open is possible; when it fails, name any other Portal that has the project open,
+                // since the native exception does not. Without such a Portal the native failure is reported unchanged.
+                IReadOnlyList<ProjectLockRules.PortalView> holders;
+                try { holders = ProjectLockRules.Holders(file.FullName, VisiblePortals(), _processId); }
+                catch (Exception) { throw error; }
+                if (holders.Count == 0) throw;
+                var details = ProjectLockRules.Refusal(file.FullName, holders);
+                details["nativeMessage"] = error.Message;
+                throw new BridgeException("ProjectLocked", "TIA could not open the project, and another TIA Portal (process " + string.Join(", ", holders.Select(h => h.ProcessId))
+                    + ") has it open: " + error.Message, details);
             }
-            var project = readOnly ? _portal.Projects.Open(file, null, ProjectOpenMode.Secondary) : _portal.Projects.Open(file);
             // Mutation refusal keys on the native IsPrimary state, so a read-only request must read back as secondary.
             if (readOnly && project.IsPrimary)
             {

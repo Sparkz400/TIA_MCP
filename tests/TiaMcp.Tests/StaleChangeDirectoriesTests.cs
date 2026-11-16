@@ -36,14 +36,15 @@ internal static class StaleChangeDirectoriesTests
             Directory.CreateDirectory(Path.Combine(root, "change-not-a-guid"));
             int removed = StaleChangeDirectories.Sweep(root, new HashSet<string>([held], StringComparer.Ordinal), now);
             bool Exists(string id) => Directory.Exists(Path.Combine(root, "change-" + id));
-            Check.Equal(2, removed);
+            Check.Equal(1, removed);
             Check.Equal(false, Exists(prepared));
-            Check.Equal(false, Exists(failed));
+            // prepare_failed keeps its journal as the failure record.
+            Check.Equal(true, Exists(failed));
             Check.Equal(true, Exists(recent) && Exists(held) && Exists(keyed) && kept.All(Exists));
             Check.Equal(true, Directory.Exists(Path.Combine(root, "change-not-a-guid")));
             var log = File.ReadAllLines(Path.Combine(root, "pruned-changes.jsonl")).Select(JObject.Parse).ToArray();
-            Check.Equal(2, log.Length);
-            Check.Equal(true, log.Select(r => r.Value<string>("changeId")).OrderBy(x => x).SequenceEqual(new[] { prepared, failed }.OrderBy(x => x)));
+            Check.Equal(1, log.Length);
+            Check.Equal(prepared, log[0].Value<string>("changeId"));
             // A missing directory is not an error.
             Check.Equal(0, StaleChangeDirectories.Sweep(Path.Combine(root, "missing"), new HashSet<string>(), now));
             // A journal whose changeId does not match its directory is left alone.
