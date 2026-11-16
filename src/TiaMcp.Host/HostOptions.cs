@@ -7,6 +7,9 @@ namespace TiaMcp.Host;
 public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, string? ApiDirectory, int TimeoutSeconds, bool Diagnose,
     string SimulatorWorkerPath, string? SimulatorApiDirectory)
 {
+    /// <summary>Upper bound of --timeout-seconds. One hour covers large HMI preservation captures and project upgrades;
+    /// a native call that outlasts it still ends as TimeoutOutcomeUnknown, never as a replay.</summary>
+    public const int MaxTimeoutSeconds = 3600;
     public PackageIntakeLimits LibraryLimits { get; init; } = new();
     public string? GitExecutable { get; init; }
     // The one remote vci_push/vci_fetch use; local unless --git-allow-network-remote.
@@ -146,8 +149,8 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
                 case "--timeout-seconds":
                     // Whole seconds; a decimal such as 600.0 (JSON clients often send numbers that way) is accepted and rounded up.
                     if (!double.TryParse(args[i], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double seconds)
-                        || double.IsNaN(seconds) || seconds < 5 || seconds > 900)
-                        throw new ArgumentException("--timeout-seconds must be a number of seconds between 5 and 900 (got '" + args[i] + "').");
+                        || double.IsNaN(seconds) || seconds < 5 || seconds > MaxTimeoutSeconds)
+                        throw new ArgumentException("--timeout-seconds must be a number of seconds between 5 and " + MaxTimeoutSeconds + " (got '" + args[i] + "').");
                     timeout = (int)Math.Ceiling(seconds);
                     break;
                 default: throw new ArgumentException("Unknown option: " + option);

@@ -64,6 +64,14 @@ namespace TiaMcp.Openness.V21
             var file = new FileInfo(Path.GetFullPath(path));
             if (!file.Exists) throw new BridgeException("ProjectNotFound", "The .ap21 project file does not exist on this host.");
             bool readOnly = args.Value<bool?>("readOnly") == true;
+            // A primary open of a project another Portal holds fails natively without naming the holder; name it first.
+            if (!readOnly)
+            {
+                var holders = ProjectLockRules.Holders(file.FullName, VisiblePortals(), _processId);
+                if (holders.Count > 0)
+                    throw new BridgeException("ProjectLocked", "Another TIA Portal (process " + string.Join(", ", holders.Select(h => h.ProcessId)) + ") has this project open.",
+                        ProjectLockRules.Refusal(file.FullName, holders));
+            }
             var project = readOnly ? _portal.Projects.Open(file, null, ProjectOpenMode.Secondary) : _portal.Projects.Open(file);
             // Mutation refusal keys on the native IsPrimary state, so a read-only request must read back as secondary.
             if (readOnly && project.IsPrimary)

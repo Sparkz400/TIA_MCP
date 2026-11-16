@@ -122,8 +122,10 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
         byte[] data = JsonSerializer.SerializeToUtf8Bytes(review, BridgeProtocol.Json);
         if (data.Length > MaxBytes) throw new BridgeException("ArtifactCapacity", "Review exceeds 64 MiB.");
         string output = Publish(data), id = Hash(data);
-        return new JsonObject { ["reviewId"] = id, ["artifact"] = new JsonObject { ["path"] = output, ["bytes"] = data.Length, ["sha256"] = id },
+        // reviewUri is readable over MCP resources/read by remote clients that cannot open Host paths (reviews up to 4 MiB).
+        return new JsonObject { ["reviewId"] = id, ["reviewUri"] = "tia://project-reviews/" + id, ["artifact"] = new JsonObject { ["path"] = output, ["bytes"] = data.Length, ["sha256"] = id },
             ["nodeCount"] = nodes.Count,
+            ["nodeCountScope"] = "Distinct native object nodes in the saved review's model, the same set the review document holds (the model is re-exported after relationship observation, so it includes nodes those observations added). Native traversal counts (visited) count every object touched, containers and skipped objects included, and are larger.",
             ["exportedBlocks"] = documents.Count(row => Text(row, "status") == "exported" && Text(nodes[Text(row, "objectPath")], "kind") == "block"),
             ["exportedTypes"] = documents.Count(row => Text(row, "status") == "exported" && Text(nodes[Text(row, "objectPath")], "kind") == "type"),
             ["capture"] = capture.DeepClone(), ["wholeProjectContentComplete"] = false,
@@ -133,7 +135,8 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
 
     private static string Summary(JsonObject? content) => content is null ? "Block content coverage was not recorded." :
         $"{content["exportedBlocks"]} of {content["observedBlocks"]} blocks exported" + (content["degraded"]?.GetValue<bool>() == true
-            ? "; DEGRADED: " + string.Join("; ", content["degradedReasons"]!.AsArray().Select(r => $"{r!["code"]} ({r["blocks"]})")) + ". A compare covers exported block content only."
+            ? "; DEGRADED: " + string.Join("; ", content["degradedReasons"]!.AsArray().Select(r => $"{r!["code"]} ({r["blocks"]} block(s))"
+                + (r["reason"]?.GetValue<string>() is { Length: > 0 } reason ? ": " + reason.TrimEnd('.') : ""))) + ". A compare covers exported block content only."
             : "; block content complete for this capture.") + " Whole-project content (types, hardware, HMI) is never complete in a review.";
 
     public JsonObject Read(string id)

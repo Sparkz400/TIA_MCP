@@ -51,7 +51,8 @@ internal static class Program
             throw new Exception("Guard mutated retained observation.");
         var queryFactory = type.GetMethod("WatchInstanceAnalysisQuery", BindingFlags.Static | BindingFlags.NonPublic);
         var query = (JObject)queryFactory.Invoke(null, new object[] { "Project", "/PLC", "/PLC/blocks/Instance" });
-        var limit = type.GetMethod("Limit", BindingFlags.Static | BindingFlags.NonPublic);
+        // The shared traversal (V19 and V21) owns the analysis budget since the worker loop was shared.
+        var limit = type.Assembly.GetType("TiaMcp.Openness.V21.OpennessTraversal", true).GetMethod("Limit", BindingFlags.Static | BindingFlags.NonPublic);
         int admitted = (int)limit.Invoke(null, new object[] { query, 500 });
         if (admitted != 2000) throw new Exception("Watch generation query violates shared analysis budget.");
         passed++;

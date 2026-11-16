@@ -123,16 +123,54 @@ internal static class ToolSurface
             if (context.Params?.Arguments is { } arguments && JsonArguments.TryGetValue(context.Params.Name, out var structured))
                 foreach (var argument in structured)
                     if (arguments.TryGetValue(argument, out var value) && StructuredValue(value) is { } parsed) arguments[argument] = parsed;
-            if (context.Params?.ProgressToken is not { } progress) return await next(context, token);
+            var started = Stopwatch.GetTimestamp();
+            if (context.Params?.ProgressToken is not { } progress) return Timed(await next(context, token), started);
             var tool = context.Params.Name;
             // Sent before dispatch so a broken transport fails the call before any native work starts.
             await context.Server.NotifyProgressAsync(progress, new ProgressNotificationValue { Progress = 0, Message = tool + " started" }, cancellationToken: token);
             using var done = CancellationTokenSource.CreateLinkedTokenSource(token);
-            var heartbeat = Heartbeat(HeartbeatInterval, tool, done.Token,
-                async (beat, message) => await context.Server.NotifyProgressAsync(progress, new ProgressNotificationValue { Progress = beat, Message = message }));
-            try { return await next(context, token); }
-            finally { done.Cancel(); await heartbeat; }
+            // Heartbeats and the tool's own step messages share one counter, because MCP progress values must increase.
+            var sink = new ProgressSink((value, message) => context.Server.NotifyProgressAsync(progress, new ProgressNotificationValue { Progress = value, Message = message }));
+            var heartbeat = Heartbeat(HeartbeatInterval, tool, done.Token, (_, message) => sink.Send(message));
+            CurrentProgress.Value = sink;
+            try { return Timed(await next(context, token), started); }
+            finally { CurrentProgress.Value = null; done.Cancel(); await heartbeat; }
         });
+
+    private static readonly AsyncLocal<ProgressSink?> CurrentProgress = new();
+
+    /// <summary>Sends a step message as a progress notification of the current tool call, when its client sent a progressToken.
+    /// A lost notification never changes the call's outcome.</summary>
+    internal static async Task ReportProgress(string message)
+    {
+        if (CurrentProgress.Value is { } sink)
+            try { await sink.Send(message); } catch (Exception) { }
+    }
+
+    internal sealed class ProgressSink(Func<int, string, Task> notify)
+    {
+        private readonly SemaphoreSlim gate = new(1, 1);
+        private int value;
+        public int Value => value;
+
+        // Serialized, so notifications leave in the order of their increasing values.
+        public async Task Send(string message)
+        {
+            await gate.WaitAsync();
+            try { await notify(++value, message); }
+            finally { gate.Release(); }
+        }
+    }
+
+    internal const string DurationMeta = "tiaMcp/durationMs";
+
+    /// <summary>Wall-clock time of the whole tool call, Host queueing included, in the result's _meta, so declared
+    /// output schemas (some closed with additionalProperties:false) stay valid.</summary>
+    internal static CallToolResult Timed(CallToolResult result, long started)
+    {
+        (result.Meta ??= new JsonObject())[DurationMeta] = (long)Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+        return result;
+    }
 
     // Keeps clients that reset their request timeout on progress from abandoning long native calls.
     internal static async Task Heartbeat(TimeSpan interval, string tool, CancellationToken stop, Func<int, string, Task> notify)

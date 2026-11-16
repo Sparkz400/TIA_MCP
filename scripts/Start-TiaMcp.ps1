@@ -5,7 +5,7 @@ param(
     [string]$GitExecutable,
     [string]$UaClientIdentity,
     [ValidatePattern('^[a-z]+(,[a-z]+)*$')][string]$Toolsets,
-    [ValidateRange(5,900)][int]$TimeoutSeconds = 300,
+    [ValidateRange(5,3600)][int]$TimeoutSeconds = 300,
     [switch]$StrictBundle,
     [switch]$InteractiveSession,
     [switch]$Diagnose,

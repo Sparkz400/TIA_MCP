@@ -96,7 +96,8 @@ Then ask the client: *Use `tia_discover` to list the available TIA Portal sessio
 After updating a package or rebuilding, ask for `host_build_identity`: it shows which Host and worker files the running Host started with and whether they changed since. A new build is only in use after the client restarts the Host ([reporting progress](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#reporting-progress)).
 
 Large HMI screen imports can need more than five minutes. Use a longer Host and
-client timeout for that workflow; the [HMI guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#screen-failure-recovery-without-closing-tia)
+client timeout for that workflow (`--timeout-seconds` accepts 5 to 3600; set the client's tool
+timeout longer, or let it send a `progressToken` so the Host's progress heartbeats keep it waiting); the [HMI guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#screen-failure-recovery-without-closing-tia)
 gives the settings and explains recovery without repeatedly reopening TIA.
 If a call is cancelled or times out anyway, TIA finishes it: later calls return
 `PreviousOperationRunning` until it does, and then the Host continues without a

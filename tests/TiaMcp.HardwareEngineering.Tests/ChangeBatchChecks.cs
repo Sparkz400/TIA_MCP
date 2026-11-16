@@ -19,8 +19,14 @@ internal static class ChangeBatchChecks
         Check(!ChangeBatchRules.IsBatch("tag_set", Batch(Create("A"))), "tag_set keeps its own batch route");
         Check(!ChangeBatchRules.IsBatch("source_upsert", new JObject { ["source"] = "x" }) && !ChangeBatchRules.IsBatch("block_delete", new JObject { ["items"] = JValue.CreateNull() }),
               "a payload without items is never a batch");
-        foreach (string kind in new[] { "call_parameter_set", "type_delete", "group_delete", "source_upsert", "tag_table_import_xml", "hardware_attributes", "plc_compile" })
+        foreach (string kind in new[] { "graphical_typed_edit", "graph_import", "type_delete", "group_delete", "source_upsert", "tag_table_import_xml", "hardware_attributes", "plc_compile" })
             Check(Refused(() => ChangeBatchRules.IsBatch(kind, Batch(Create("A")))) == "InvalidRequest", kind + " refuses items");
+        foreach (string kind in ChangeBatchRules.StructuredKinds)
+            Check(ChangeBatchRules.Kinds.Contains(kind), kind + " batches, one item per block");
+        ChangeBatchRules.RequireDistinctBlocks(new[] { "\nMotor", "\nPump", "NS\nMotor" });
+        Check(Refused(() => ChangeBatchRules.RequireDistinctBlocks(new[] { "\nMotor", "\nPump", "\nmotor" })) == "InvalidRequest"
+              && Message(() => ChangeBatchRules.RequireDistinctBlocks(new[] { "\nMotor", "\nMotor" }))!.Contains("items[0] and items[1] edit the same block"),
+              "call and graphical items on one block are refused, since each replaces the whole block");
 
         // Shape.
         var members = ChangeBatchRules.Members(new JObject { ["scopePath"] = "/plc", ["items"] = new JArray(Create("A"), Create("B")) });

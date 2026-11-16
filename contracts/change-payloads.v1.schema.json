@@ -1,0 +1,7503 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://tia-mcp.local/contracts/change-payloads.v1.schema.json",
+ "title": "change_prepare payloads by change kind",
+ "description": "One payload schema per change kind in $defs, keyed by kind; x-external-payloads names kinds whose payload another contract defines. Derived from the worker's payload parsers; the worker stays authoritative and checks more than a schema can (native identities, allowlists that depend on the target, cross-field rules). Kinds with additionalProperties true ignore unknown fields in the worker; strict kinds refuse them. Top-level change_prepare arguments (projectName, plcPath, scopePath, intent) are not part of the payload. Only the kinds whose schema has a batch branch take payload.items. Strings are refused when blank or whitespace-only, and integers must be JSON integers (5, not 5.0); a schema cannot say either. Length caps on selector paths are client-side guidance.",
+ "x-change-kinds": [
+  "block_attributes_set",
+  "block_delete",
+  "block_import_xml",
+  "block_number_set",
+  "block_protect",
+  "block_rename",
+  "block_unprotect",
+  "block_write_protection_set",
+  "call_connection_set",
+  "call_parameter_set",
+  "cax_import",
+  "certificate_assign",
+  "certificate_create",
+  "certificate_delete",
+  "certificate_import",
+  "connection_create",
+  "connection_delete",
+  "connection_set",
+  "constant_create",
+  "constant_delete",
+  "constant_set",
+  "db_snapshot_create",
+  "db_snapshot_load_actual",
+  "device_compile",
+  "drive_motor_configure",
+  "drive_parameter_set",
+  "drive_telegram_set",
+  "graph_import",
+  "graphical_network_insert",
+  "graphical_network_patch",
+  "graphical_operand_set",
+  "graphical_typed_edit",
+  "group_create",
+  "group_delete",
+  "group_rename",
+  "hardware_add",
+  "hardware_address_set",
+  "hardware_attributes",
+  "hardware_channel_attributes",
+  "hardware_cpu_memory_bytes",
+  "hardware_cpu_parameters",
+  "hardware_delete",
+  "hardware_move",
+  "hardware_plug",
+  "hardware_port_connect",
+  "hardware_port_disconnect",
+  "hardware_replace",
+  "hardware_shared_device_access",
+  "hardware_transfer_area_create",
+  "hardware_transfer_area_delete",
+  "hmi_classic_import",
+  "hmi_classic_screen_edit",
+  "hmi_compile",
+  "hmi_dynamization_create",
+  "hmi_engineering",
+  "hmi_event_handler_create",
+  "hmi_external_tag_create",
+  "hmi_screen_create",
+  "hmi_text_list_import",
+  "instance_db_create",
+  "library_archive",
+  "library_cleanup",
+  "library_copy_elements",
+  "library_create",
+  "library_create_master_copy",
+  "library_create_type",
+  "library_delete",
+  "library_discard_version",
+  "library_edit_version",
+  "library_harmonize",
+  "library_instantiate",
+  "library_integrate",
+  "library_organize",
+  "library_publish",
+  "library_release_version",
+  "library_save",
+  "library_set_default",
+  "library_type_policy",
+  "library_update_project",
+  "library_upgrade",
+  "network_configure",
+  "network_io_assign",
+  "network_mrp_set",
+  "opcua_reference_namespace_delete",
+  "opcua_reference_namespace_import",
+  "opcua_role_mapping_set",
+  "opcua_server_interface_delete",
+  "opcua_server_interface_enable",
+  "opcua_server_interface_import",
+  "opcua_server_settings_set",
+  "plc_alarm_class_import",
+  "plc_alarm_instance_text_import",
+  "plc_alarm_text_list_import",
+  "plc_compile",
+  "plc_supervision_import",
+  "plc_supervision_settings_import",
+  "plc_type_import_xml",
+  "project_attributes_set",
+  "project_compile",
+  "project_languages_set",
+  "project_simulation_enable",
+  "safety_drive_tags",
+  "safety_fparameter_set",
+  "safety_import_xml",
+  "simulation_download_online",
+  "software_unit_create",
+  "software_unit_create_from",
+  "software_unit_delete",
+  "software_unit_publication_set",
+  "software_unit_relation_set",
+  "software_unit_rename",
+  "source_upsert",
+  "tag_create",
+  "tag_delete",
+  "tag_set",
+  "tag_table_create",
+  "tag_table_delete",
+  "tag_table_import_xml",
+  "tag_table_rename",
+  "testsuite_application_import",
+  "testsuite_system_import",
+  "to_child_create",
+  "to_connect",
+  "to_create",
+  "to_delete",
+  "to_disconnect",
+  "to_parameters",
+  "type_delete",
+  "type_rename",
+  "type_source_upsert",
+  "umac_role_set",
+  "vci_conflict_resolve",
+  "vci_mapping_add",
+  "vci_mapping_remove",
+  "vci_synchronize",
+  "vci_workspace_create",
+  "vci_workspace_delete",
+  "webserver_page_set",
+  "webserver_user_pages_generate"
+ ],
+ "x-external-payloads": {
+  "graphical_typed_edit": {
+   "contract": "typed-graphical-change.schema.json"
+  },
+  "hmi_classic_import": {
+   "contract": "hmi-engineering.v1.schema.json"
+  },
+  "hmi_classic_screen_edit": {
+   "contract": "hmi-engineering.v1.schema.json"
+  },
+  "hmi_dynamization_create": {
+   "contract": "hmi-engineering.v1.schema.json"
+  },
+  "hmi_engineering": {
+   "contract": "hmi-engineering.v1.schema.json"
+  },
+  "hmi_event_handler_create": {
+   "contract": "hmi-engineering.v1.schema.json"
+  },
+  "hmi_external_tag_create": {
+   "contract": "hmi-engineering.v1.schema.json"
+  },
+  "hmi_screen_create": {
+   "contract": "hmi-engineering.v1.schema.json"
+  },
+  "library_archive": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/17/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_cleanup": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/18/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_copy_elements": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/2/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_create": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/0/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_create_master_copy": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/7/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_create_type": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/6/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_delete": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/14/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_discard_version": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/10/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_edit_version": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/8/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_harmonize": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/19/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_instantiate": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/3/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_integrate": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/5/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_organize": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/13/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_publish": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/15/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_release_version": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/9/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_save": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/16/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_set_default": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/11/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_type_policy": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/12/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_update_project": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/4/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  },
+  "library_upgrade": {
+   "contract": "library-operation.v1.schema.json",
+   "pointer": "/allOf/1/then/properties/payload",
+   "note": "Payload branch of the library operation contract; its $defs and urn references resolve within that contract set."
+  }
+ },
+ "$defs": {
+  "common.scope": {
+   "type": "object",
+   "properties": {
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Software-unit or PLC scope path from inventory."
+    },
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 2048
+    },
+    "namespace": {
+     "type": "string",
+     "maxLength": 256,
+     "description": "\"\" selects the root namespace."
+    }
+   },
+   "additionalProperties": true
+  },
+  "common.blockSelector": {
+   "description": "blockName (<=128), or blockPath from inventory (with scopePath/namespace).",
+   "anyOf": [
+    {
+     "required": [
+      "blockName"
+     ]
+    },
+    {
+     "required": [
+      "blockPath"
+     ]
+    }
+   ],
+   "properties": {
+    "blockName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "blockPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "namespace": {
+     "type": "string",
+     "maxLength": 256,
+     "description": "\"\" selects the root namespace."
+    },
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 2048
+    }
+   }
+  },
+  "common.typeSelector": {
+   "anyOf": [
+    {
+     "required": [
+      "typeName"
+     ]
+    },
+    {
+     "required": [
+      "typePath"
+     ]
+    }
+   ],
+   "properties": {
+    "typeName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "typePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "namespace": {
+     "type": "string",
+     "maxLength": 256,
+     "description": "\"\" selects the root namespace."
+    }
+   }
+  },
+  "common.tableSelector": {
+   "anyOf": [
+    {
+     "required": [
+      "tagTableName"
+     ]
+    },
+    {
+     "required": [
+      "tagTablePath"
+     ]
+    }
+   ],
+   "properties": {
+    "tagTableName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "tagTablePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 2048
+    },
+    "namespace": {
+     "const": "",
+     "description": "Tag tables have no namespace."
+    }
+   }
+  },
+  "common.technologySelector": {
+   "description": "technologyPath, or the technology object's name.",
+   "anyOf": [
+    {
+     "required": [
+      "technologyPath"
+     ]
+    },
+    {
+     "required": [
+      "name"
+     ]
+    }
+   ],
+   "properties": {
+    "technologyPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "name": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    }
+   }
+  },
+  "common.driveObject": {
+   "description": "Exactly one of driveObjectNumber and driveObjectIndex.",
+   "oneOf": [
+    {
+     "required": [
+      "driveObjectNumber"
+     ],
+     "not": {
+      "required": [
+       "driveObjectIndex"
+      ]
+     }
+    },
+    {
+     "required": [
+      "driveObjectIndex"
+     ],
+     "not": {
+      "required": [
+       "driveObjectNumber"
+      ]
+     }
+    }
+   ],
+   "properties": {
+    "driveObjectNumber": {
+     "type": "integer"
+    },
+    "driveObjectIndex": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    }
+   }
+  },
+  "common.credential": {
+   "type": "object",
+   "properties": {
+    "schemaVersion": {
+     "const": "protected-credential-reference.v1"
+    },
+    "vaultId": {
+     "type": "string",
+     "pattern": "^[a-f0-9]{32}$"
+    },
+    "credentialId": {
+     "type": "string",
+     "pattern": "^[a-f0-9]{32}$"
+    },
+    "bindingSha256": {
+     "type": "string",
+     "pattern": "^[a-f0-9]{64}$"
+    },
+    "cipherSha256": {
+     "type": "string",
+     "pattern": "^[a-f0-9]{64}$"
+    }
+   },
+   "required": [
+    "schemaVersion",
+    "vaultId",
+    "credentialId",
+    "bindingSha256",
+    "cipherSha256"
+   ],
+   "additionalProperties": false,
+   "description": "A protected credential reference from the credential CLI; never a secret."
+  },
+  "common.vaultName": {
+   "type": "string",
+   "pattern": "^(default|[a-f0-9]{32})$"
+  },
+  "common.rejectReferenced": {
+   "const": "rejectReferenced",
+   "description": "The only policy: refuse when the object is referenced."
+  },
+  "common.dependencyPolicyRequired": {
+   "const": "rejectReferenced"
+  },
+  "common.artifactImport": {
+   "type": "object",
+   "properties": {
+    "artifactPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute Host path."
+    },
+    "expectedSha256": {
+     "type": "string",
+     "pattern": "^[a-f0-9]{64}$"
+    }
+   },
+   "required": [
+    "artifactPath",
+    "expectedSha256"
+   ],
+   "additionalProperties": true
+  },
+  "block_attributes_set": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.blockSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "attributes": {
+       "type": "object",
+       "properties": {
+        "HeaderAuthor": {
+         "type": "string"
+        },
+        "HeaderFamily": {
+         "type": "string"
+        },
+        "HeaderName": {
+         "type": "string"
+        },
+        "HeaderVersion": {
+         "type": "string"
+        },
+        "PriorityNumber": {
+         "type": "integer"
+        },
+        "CyclicTime": {
+         "type": "integer"
+        },
+        "PhaseOffset": {
+         "type": "integer"
+        },
+        "ProcessImagePartNumber": {
+         "type": "integer"
+        }
+       },
+       "additionalProperties": false,
+       "minProperties": 1,
+       "description": "Header attributes; PriorityNumber, CyclicTime, PhaseOffset and ProcessImagePartNumber for OBs only."
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "attributes"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.blockSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "attributes": {
+          "type": "object",
+          "properties": {
+           "HeaderAuthor": {
+            "type": "string"
+           },
+           "HeaderFamily": {
+            "type": "string"
+           },
+           "HeaderName": {
+            "type": "string"
+           },
+           "HeaderVersion": {
+            "type": "string"
+           },
+           "PriorityNumber": {
+            "type": "integer"
+           },
+           "CyclicTime": {
+            "type": "integer"
+           },
+           "PhaseOffset": {
+            "type": "integer"
+           },
+           "ProcessImagePartNumber": {
+            "type": "integer"
+           }
+          },
+          "additionalProperties": false,
+          "minProperties": 1,
+          "description": "Header attributes; PriorityNumber, CyclicTime, PhaseOffset and ProcessImagePartNumber for OBs only."
+         },
+         "items": false
+        },
+        "required": [
+         "attributes"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "block_delete": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.blockSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "dependencyPolicy": {
+       "$ref": "#/$defs/common.rejectReferenced"
+      },
+      "items": {
+       "type": "null"
+      }
+     }
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.blockSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "dependencyPolicy": {
+          "$ref": "#/$defs/common.rejectReferenced"
+         },
+         "items": false
+        }
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "block_import_xml": {
+   "type": "object",
+   "properties": {
+    "xml": {
+     "type": "string",
+     "maxLength": 2097152
+    },
+    "xmlRef": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 512,
+     "description": "Committed upload or artifact reference instead of inline xml."
+    },
+    "expectedBlockNames": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 100,
+     "uniqueItems": true,
+     "items": {
+      "type": "string",
+      "minLength": 1
+     }
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 2048
+    },
+    "namespace": {
+     "type": "string",
+     "maxLength": 256
+    },
+    "blockPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    }
+   },
+   "required": [
+    "expectedBlockNames"
+   ],
+   "additionalProperties": true,
+   "oneOf": [
+    {
+     "required": [
+      "xml"
+     ]
+    },
+    {
+     "required": [
+      "xmlRef"
+     ]
+    }
+   ],
+   "not": {
+    "anyOf": [
+     {
+      "required": [
+       "sourceRef"
+      ]
+     },
+     {
+      "required": [
+       "xmlRef",
+       "inputReference"
+      ]
+     },
+     {
+      "required": [
+       "items"
+      ]
+     }
+    ]
+   }
+  },
+  "block_number_set": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.blockSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "number": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 65535
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "number"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.blockSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "number": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+         },
+         "items": false
+        },
+        "required": [
+         "number"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "block_protect": {
+   "type": "object",
+   "properties": {
+    "blockName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "blockPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "namespace": {
+     "type": "string",
+     "maxLength": 256
+    },
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 2048
+    },
+    "vaultName": {
+     "$ref": "#/$defs/common.vaultName"
+    },
+    "credential": {
+     "$ref": "#/$defs/common.credential"
+    }
+   },
+   "required": [
+    "credential"
+   ],
+   "additionalProperties": false,
+   "anyOf": [
+    {
+     "required": [
+      "blockName"
+     ]
+    },
+    {
+     "required": [
+      "blockPath"
+     ]
+    }
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "block_rename": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.blockSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "newName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "newName"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.blockSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "newName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "items": false
+        },
+        "required": [
+         "newName"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "block_unprotect": {
+   "type": "object",
+   "properties": {
+    "blockName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "blockPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "namespace": {
+     "type": "string",
+     "maxLength": 256
+    },
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 2048
+    },
+    "vaultName": {
+     "$ref": "#/$defs/common.vaultName"
+    },
+    "credential": {
+     "$ref": "#/$defs/common.credential"
+    }
+   },
+   "required": [
+    "credential"
+   ],
+   "additionalProperties": false,
+   "anyOf": [
+    {
+     "required": [
+      "blockName"
+     ]
+    },
+    {
+     "required": [
+      "blockPath"
+     ]
+    }
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "block_write_protection_set": {
+   "type": "object",
+   "properties": {
+    "blockName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "blockPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "namespace": {
+     "type": "string",
+     "maxLength": 256
+    },
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 2048
+    },
+    "vaultName": {
+     "$ref": "#/$defs/common.vaultName"
+    },
+    "credential": {
+     "$ref": "#/$defs/common.credential"
+    },
+    "action": {
+     "enum": [
+      "define",
+      "change",
+      "enable",
+      "disable"
+     ]
+    },
+    "newCredential": {
+     "$ref": "#/$defs/common.credential"
+    }
+   },
+   "required": [
+    "credential",
+    "action"
+   ],
+   "additionalProperties": false,
+   "anyOf": [
+    {
+     "required": [
+      "blockName"
+     ]
+    },
+    {
+     "required": [
+      "blockPath"
+     ]
+    }
+   ],
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "action": {
+        "const": "change"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "newCredential"
+      ]
+     },
+     "else": {
+      "not": {
+       "required": [
+        "newCredential"
+       ]
+      }
+     }
+    }
+   ],
+   "description": "newCredential (same vault, different credential) only with action=change.",
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "call_connection_set": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.blockSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "networkId": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 32
+      },
+      "callUid": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 32
+      },
+      "parameterName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "targetAccessUid": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 32
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "networkId",
+      "callUid",
+      "parameterName",
+      "targetAccessUid"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.blockSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "networkId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+         },
+         "callUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+         },
+         "parameterName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "targetAccessUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+         },
+         "items": false
+        },
+        "required": [
+         "networkId",
+         "callUid",
+         "parameterName",
+         "targetAccessUid"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch of 1..100 edits of distinct blocks (each item replaces its whole block) plus optional scopePath."
+  },
+  "call_parameter_set": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.blockSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "networkId": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 32
+      },
+      "callUid": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 32
+      },
+      "parameterName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "components": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 128,
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F]*$"
+       }
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "networkId",
+      "callUid",
+      "parameterName",
+      "components"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.blockSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "networkId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+         },
+         "callUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+         },
+         "parameterName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "components": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {
+           "type": "string",
+           "minLength": 1,
+           "maxLength": 128,
+           "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F]*$"
+          }
+         },
+         "items": false
+        },
+        "required": [
+         "networkId",
+         "callUid",
+         "parameterName",
+         "components"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch of 1..100 edits of distinct blocks (each item replaces its whole block) plus optional scopePath."
+  },
+  "cax_import": {
+   "type": "object",
+   "properties": {
+    "amlRef": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 512
+    },
+    "path": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute Host path."
+    },
+    "expectedSha256": {
+     "type": "string",
+     "pattern": "^[a-f0-9]{64}$"
+    },
+    "importOption": {
+     "enum": [
+      "MoveToParkingLot",
+      "RetainTiaDevice",
+      "OverwriteTiaDevice"
+     ]
+    }
+   },
+   "required": [
+    "importOption"
+   ],
+   "additionalProperties": true,
+   "oneOf": [
+    {
+     "required": [
+      "amlRef"
+     ]
+    },
+    {
+     "required": [
+      "path",
+      "expectedSha256"
+     ]
+    }
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "certificate_assign": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "targetPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "attributeName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128,
+     "pattern": "^[A-Za-z][A-Za-z0-9_]*Certificate$"
+    },
+    "certificateId": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0,
+     "maximum": 4294967295
+    },
+    "expectedCertificateId": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0,
+     "maximum": 4294967295
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "targetPath",
+    "attributeName",
+    "certificateId",
+    "expectedCertificateId"
+   ],
+   "additionalProperties": false,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "certificate_create": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "usage": {
+     "enum": [
+      "Tls",
+      "OpcUaClient",
+      "OpcUaClientServer",
+      "OpcUaServer",
+      "WebServer"
+     ]
+    },
+    "subjectCommonName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 64
+    },
+    "subjectAlternativeNames": {
+     "type": "array",
+     "maxItems": 32,
+     "items": {
+      "type": "object",
+      "properties": {
+       "type": {
+        "enum": [
+         "IP",
+         "Dns",
+         "Email",
+         "Uri"
+        ]
+       },
+       "value": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+       }
+      },
+      "required": [
+       "type",
+       "value"
+      ],
+      "additionalProperties": false
+     }
+    },
+    "validFromUtc": {
+     "type": "string",
+     "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "validUntilUtc": {
+     "type": "string",
+     "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "usage",
+    "subjectCommonName",
+    "subjectAlternativeNames",
+    "validFromUtc",
+    "validUntilUtc"
+   ],
+   "additionalProperties": false,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "certificate_delete": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "certificateId": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 4294967295
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "certificateId"
+   ],
+   "additionalProperties": false,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "certificate_import": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "uploadRef": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 512
+    },
+    "format": {
+     "enum": [
+      "der",
+      "pem"
+     ]
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "uploadRef",
+    "format"
+   ],
+   "additionalProperties": false,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "connection_create": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "connectionType": {
+     "enum": [
+      "S7Connection",
+      "TcpConnection",
+      "UdpConnection",
+      "IsoConnection",
+      "IsoOnTcpConnection",
+      "FdlConnection",
+      "PtpConnection",
+      "HmiConnection"
+     ]
+    },
+    "localInterfacePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "localNodeName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "partnerTargetPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "partnerInterfacePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "partnerNodeName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "connectionType",
+    "localInterfacePath",
+    "partnerTargetPath",
+    "partnerInterfacePath"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "connection_delete": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "connectionName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 256
+    },
+    "connectionId": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 64
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "connectionName"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "connection_set": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "connectionName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 256
+    },
+    "connectionId": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 64
+    },
+    "attributes": {
+     "type": "object",
+     "minProperties": 1,
+     "propertyNames": {
+      "enum": [
+       "LocalActiveEstablishment",
+       "PartnerActiveEstablishment",
+       "LocalPort",
+       "PartnerPort",
+       "PartnerAddress",
+       "LocalTsap",
+       "PartnerTsap",
+       "LocalLsap",
+       "PartnerLsap"
+      ]
+     }
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "connectionName",
+    "attributes"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "constant_create": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.tableSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "dataTypeName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 256
+      },
+      "value": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 1024
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "name",
+      "dataTypeName",
+      "value"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.tableSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "dataTypeName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+         },
+         "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+         },
+         "items": false
+        },
+        "required": [
+         "name",
+         "dataTypeName",
+         "value"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "constant_delete": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.tableSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "memberName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "dependencyPolicy": {
+       "$ref": "#/$defs/common.dependencyPolicyRequired"
+      },
+      "items": {
+       "type": "null"
+      },
+      "safetyAcknowledged": false
+     },
+     "required": [
+      "memberName",
+      "dependencyPolicy"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.tableSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "memberName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "dependencyPolicy": {
+          "$ref": "#/$defs/common.dependencyPolicyRequired"
+         },
+         "items": false,
+         "safetyAcknowledged": false
+        },
+        "required": [
+         "memberName",
+         "dependencyPolicy"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "constant_set": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.tableSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "memberName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "attributes": {
+       "type": "object",
+       "properties": {
+        "Name": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 128
+        },
+        "DataTypeName": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 256
+        },
+        "Value": {
+         "type": "string"
+        }
+       },
+       "additionalProperties": false,
+       "minProperties": 1
+      },
+      "items": {
+       "type": "null"
+      },
+      "safetyAcknowledged": false
+     },
+     "required": [
+      "memberName",
+      "attributes"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.tableSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "memberName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "attributes": {
+          "type": "object",
+          "properties": {
+           "Name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+           },
+           "DataTypeName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+           },
+           "Value": {
+            "type": "string"
+           }
+          },
+          "additionalProperties": false,
+          "minProperties": 1
+         },
+         "items": false,
+         "safetyAcknowledged": false
+        },
+        "required": [
+         "memberName",
+         "attributes"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "db_snapshot_create": {
+   "type": "object",
+   "properties": {
+    "downloadTicket": {
+     "type": "string",
+     "minLength": 1
+    },
+    "blockPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "projectPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute Host path."
+    },
+    "runtimeCredentialMetadataPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute Host path."
+    }
+   },
+   "required": [
+    "downloadTicket",
+    "blockPath"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "db_snapshot_load_actual": {
+   "type": "object",
+   "properties": {
+    "snapshotRecordId": {
+     "type": "string",
+     "pattern": "^[0-9a-f]{64}$"
+    },
+    "downloadTicket": {
+     "type": "string",
+     "minLength": 1
+    },
+    "acknowledgeActualValueWrite": {
+     "const": true
+    },
+    "blockPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    }
+   },
+   "required": [
+    "snapshotRecordId",
+    "downloadTicket",
+    "acknowledgeActualValueWrite"
+   ],
+   "additionalProperties": true,
+   "description": "The Host binds the reviewed snapshot; blockPath, if given, must match the record.",
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "device_compile": {
+   "type": "object",
+   "properties": {
+    "devicePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    }
+   },
+   "required": [
+    "devicePath"
+   ],
+   "additionalProperties": false,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "drive_motor_configure": {
+   "allOf": [
+    {
+     "$ref": "#/$defs/common.driveObject"
+    }
+   ],
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "driveObjectNumber": {
+     "type": "integer"
+    },
+    "driveObjectIndex": {
+     "type": "integer"
+    },
+    "driveDataSet": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 31
+    },
+    "motorType": {
+     "enum": [
+      "InductionMotor",
+      "SynchronousMotor"
+     ]
+    },
+    "entries": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 64,
+     "items": {
+      "type": "object",
+      "properties": {
+       "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 64
+       },
+       "expected": {
+        "type": "string"
+       },
+       "value": {}
+      },
+      "required": [
+       "name",
+       "expected",
+       "value"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "driveDataSet",
+    "entries"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "drive_parameter_set": {
+   "allOf": [
+    {
+     "$ref": "#/$defs/common.driveObject"
+    }
+   ],
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "driveObjectNumber": {
+     "type": "integer"
+    },
+    "driveObjectIndex": {
+     "type": "integer"
+    },
+    "parameters": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 200,
+     "items": {
+      "type": "object",
+      "properties": {
+       "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+       },
+       "expected": {},
+       "value": {}
+      },
+      "required": [
+       "name",
+       "expected",
+       "value"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "parameters"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "drive_telegram_set": {
+   "allOf": [
+    {
+     "$ref": "#/$defs/common.driveObject"
+    },
+    {
+     "if": {
+      "required": [
+       "operation"
+      ],
+      "properties": {
+       "operation": {
+        "const": "resize"
+       }
+      }
+     },
+     "then": {
+      "allOf": [
+       {
+        "required": [
+         "direction",
+         "size",
+         "keepOriginalAddress"
+        ]
+       },
+       {
+        "not": {
+         "anyOf": [
+          {
+           "required": [
+            "telegramNumber"
+           ]
+          },
+          {
+           "required": [
+            "inputSize"
+           ]
+          },
+          {
+           "required": [
+            "outputSize"
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "properties": {
+         "telegramType": {
+          "enum": [
+           "MainTelegram",
+           "SupplementaryTelegram",
+           "AdditionalTelegram"
+          ]
+         }
+        }
+       }
+      ]
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "operation"
+      ],
+      "properties": {
+       "operation": {
+        "const": "erase"
+       }
+      }
+     },
+     "then": {
+      "allOf": [
+       {
+        "not": {
+         "anyOf": [
+          {
+           "required": [
+            "direction"
+           ]
+          },
+          {
+           "required": [
+            "size"
+           ]
+          },
+          {
+           "required": [
+            "keepOriginalAddress"
+           ]
+          },
+          {
+           "required": [
+            "telegramNumber"
+           ]
+          },
+          {
+           "required": [
+            "inputSize"
+           ]
+          },
+          {
+           "required": [
+            "outputSize"
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "properties": {
+         "telegramType": {
+          "enum": [
+           "SupplementaryTelegram",
+           "AdditionalTelegram",
+           "TorqueTelegram"
+          ]
+         }
+        }
+       }
+      ]
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "operation"
+      ],
+      "properties": {
+       "operation": {
+        "const": "change"
+       }
+      }
+     },
+     "then": {
+      "allOf": [
+       {
+        "required": [
+         "telegramNumber"
+        ]
+       },
+       {
+        "not": {
+         "anyOf": [
+          {
+           "required": [
+            "direction"
+           ]
+          },
+          {
+           "required": [
+            "size"
+           ]
+          },
+          {
+           "required": [
+            "keepOriginalAddress"
+           ]
+          },
+          {
+           "required": [
+            "inputSize"
+           ]
+          },
+          {
+           "required": [
+            "outputSize"
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "properties": {
+         "telegramType": {
+          "enum": [
+           "MainTelegram",
+           "SupplementaryTelegram"
+          ]
+         }
+        }
+       }
+      ]
+     }
+    },
+    {
+     "if": {
+      "allOf": [
+       {
+        "required": [
+         "operation"
+        ],
+        "properties": {
+         "operation": {
+          "const": "insert"
+         }
+        }
+       },
+       {
+        "required": [
+         "telegramType"
+        ],
+        "properties": {
+         "telegramType": {
+          "const": "AdditionalTelegram"
+         }
+        }
+       }
+      ]
+     },
+     "then": {
+      "allOf": [
+       {
+        "required": [
+         "inputSize",
+         "outputSize"
+        ]
+       },
+       {
+        "not": {
+         "anyOf": [
+          {
+           "required": [
+            "direction"
+           ]
+          },
+          {
+           "required": [
+            "size"
+           ]
+          },
+          {
+           "required": [
+            "keepOriginalAddress"
+           ]
+          },
+          {
+           "required": [
+            "telegramNumber"
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "if": {
+      "allOf": [
+       {
+        "required": [
+         "operation"
+        ],
+        "properties": {
+         "operation": {
+          "const": "insert"
+         }
+        }
+       },
+       {
+        "not": {
+         "properties": {
+          "telegramType": {
+           "const": "AdditionalTelegram"
+          }
+         }
+        }
+       }
+      ]
+     },
+     "then": {
+      "allOf": [
+       {
+        "required": [
+         "telegramNumber"
+        ]
+       },
+       {
+        "not": {
+         "anyOf": [
+          {
+           "required": [
+            "direction"
+           ]
+          },
+          {
+           "required": [
+            "size"
+           ]
+          },
+          {
+           "required": [
+            "keepOriginalAddress"
+           ]
+          },
+          {
+           "required": [
+            "inputSize"
+           ]
+          },
+          {
+           "required": [
+            "outputSize"
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "properties": {
+         "telegramType": {
+          "enum": [
+           "SupplementaryTelegram",
+           "TorqueTelegram"
+          ]
+         }
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "driveObjectNumber": {
+     "type": "integer"
+    },
+    "driveObjectIndex": {
+     "type": "integer"
+    },
+    "operation": {
+     "enum": [
+      "change",
+      "insert",
+      "erase",
+      "resize"
+     ]
+    },
+    "telegramType": {
+     "enum": [
+      "MainTelegram",
+      "SupplementaryTelegram",
+      "AdditionalTelegram",
+      "TorqueTelegram"
+     ]
+    },
+    "expectedTelegrams": {
+     "type": "array"
+    },
+    "direction": {
+     "enum": [
+      "input",
+      "output"
+     ]
+    },
+    "size": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    },
+    "keepOriginalAddress": {
+     "type": "boolean"
+    },
+    "telegramNumber": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    },
+    "inputSize": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    },
+    "outputSize": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "operation",
+    "telegramType",
+    "expectedTelegrams"
+   ],
+   "additionalProperties": false,
+   "description": "resize adds direction, size and keepOriginalAddress; change and insert add telegramNumber, except insert of AdditionalTelegram, which adds inputSize and outputSize.",
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "graph_import": {
+   "type": "object",
+   "properties": {
+    "graphRef": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 512
+    },
+    "path": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute Host path."
+    },
+    "expectedBlockNames": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 100,
+     "uniqueItems": true,
+     "items": {
+      "type": "string",
+      "minLength": 1
+     }
+    }
+   },
+   "required": [
+    "expectedBlockNames"
+   ],
+   "additionalProperties": false,
+   "oneOf": [
+    {
+     "required": [
+      "graphRef"
+     ]
+    },
+    {
+     "required": [
+      "path"
+     ]
+    }
+   ],
+   "description": "A GRAPH workflow document by reference; the Host validates it and inlines the XML.",
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "graphical_network_insert": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.blockSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "compileUnitXml": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 1048576
+      },
+      "afterNetworkId": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 32
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "compileUnitXml",
+      "afterNetworkId"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.blockSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "compileUnitXml": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1048576
+         },
+         "afterNetworkId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+         },
+         "items": false
+        },
+        "required": [
+         "compileUnitXml",
+         "afterNetworkId"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch of 1..100 edits of distinct blocks (each item replaces its whole block) plus optional scopePath."
+  },
+  "graphical_network_patch": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.blockSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "networkId": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 32
+      },
+      "upsertXml": {
+       "type": "array",
+       "maxItems": 100,
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1048576
+       }
+      },
+      "removeUids": {
+       "type": "array",
+       "maxItems": 100,
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 32
+       }
+      },
+      "renumberUids": {
+       "type": "boolean"
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "networkId"
+     ],
+     "anyOf": [
+      {
+       "required": [
+        "upsertXml"
+       ],
+       "properties": {
+        "upsertXml": {
+         "minItems": 1
+        }
+       }
+      },
+      {
+       "required": [
+        "removeUids"
+       ],
+       "properties": {
+        "removeUids": {
+         "minItems": 1
+        }
+       }
+      }
+     ],
+     "description": "upsertXml and removeUids together hold 1..100 entries."
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.blockSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "networkId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+         },
+         "upsertXml": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+           "type": "string",
+           "minLength": 1,
+           "maxLength": 1048576
+          }
+         },
+         "removeUids": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+           "type": "string",
+           "minLength": 1,
+           "maxLength": 32
+          }
+         },
+         "renumberUids": {
+          "type": "boolean"
+         },
+         "items": false
+        },
+        "required": [
+         "networkId"
+        ],
+        "anyOf": [
+         {
+          "required": [
+           "upsertXml"
+          ],
+          "properties": {
+           "upsertXml": {
+            "minItems": 1
+           }
+          }
+         },
+         {
+          "required": [
+           "removeUids"
+          ],
+          "properties": {
+           "removeUids": {
+            "minItems": 1
+           }
+          }
+         }
+        ],
+        "description": "upsertXml and removeUids together hold 1..100 entries."
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch of 1..100 edits of distinct blocks (each item replaces its whole block) plus optional scopePath."
+  },
+  "graphical_operand_set": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.blockSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "networkId": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 32
+      },
+      "accessUid": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 32
+      },
+      "components": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 128,
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F]*$"
+       }
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "networkId",
+      "accessUid",
+      "components"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.blockSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "networkId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+         },
+         "accessUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+         },
+         "components": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {
+           "type": "string",
+           "minLength": 1,
+           "maxLength": 128,
+           "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F]*$"
+          }
+         },
+         "items": false
+        },
+        "required": [
+         "networkId",
+         "accessUid",
+         "components"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch of 1..100 edits of distinct blocks (each item replaces its whole block) plus optional scopePath."
+  },
+  "group_create": {
+   "oneOf": [
+    {
+     "type": "object",
+     "properties": {
+      "groupPath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 2048
+      },
+      "groupKind": {
+       "enum": [
+        "blocks",
+        "types",
+        "tags"
+       ]
+      },
+      "scopePath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 4096
+      },
+      "name": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "groupPath",
+      "groupKind",
+      "name"
+     ],
+     "additionalProperties": true
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "type": "object",
+        "properties": {
+         "groupPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+         },
+         "groupKind": {
+          "enum": [
+           "blocks",
+           "types",
+           "tags"
+          ]
+         },
+         "scopePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+         },
+         "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "items": false
+        },
+        "required": [
+         "groupPath",
+         "groupKind",
+         "name"
+        ],
+        "additionalProperties": true
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "group_delete": {
+   "type": "object",
+   "properties": {
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 2048
+    },
+    "groupKind": {
+     "enum": [
+      "blocks",
+      "types",
+      "tags"
+     ]
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "dependencyPolicy": {
+     "$ref": "#/$defs/common.dependencyPolicyRequired"
+    }
+   },
+   "required": [
+    "groupPath",
+    "groupKind",
+    "dependencyPolicy"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "group_rename": {
+   "oneOf": [
+    {
+     "type": "object",
+     "properties": {
+      "groupPath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 2048
+      },
+      "groupKind": {
+       "enum": [
+        "blocks",
+        "types",
+        "tags"
+       ]
+      },
+      "scopePath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 4096
+      },
+      "name": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "groupPath",
+      "groupKind",
+      "name"
+     ],
+     "additionalProperties": true
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "type": "object",
+        "properties": {
+         "groupPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+         },
+         "groupKind": {
+          "enum": [
+           "blocks",
+           "types",
+           "tags"
+          ]
+         },
+         "scopePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+         },
+         "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "items": false
+        },
+        "required": [
+         "groupPath",
+         "groupKind",
+         "name"
+        ],
+        "additionalProperties": true
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "hardware_add": {
+   "type": "object",
+   "properties": {
+    "typeIdentifier": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 256
+    },
+    "deviceName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "itemName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "configureScratchSecurity": {
+     "type": "boolean"
+    },
+    "failsafeRuntimeAccess": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "typeIdentifier",
+    "deviceName",
+    "itemName"
+   ],
+   "additionalProperties": true,
+   "description": "failsafeRuntimeAccess needs configureScratchSecurity.",
+   "allOf": [
+    {
+     "if": {
+      "required": [
+       "failsafeRuntimeAccess"
+      ],
+      "properties": {
+       "failsafeRuntimeAccess": {
+        "const": true
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "configureScratchSecurity"
+      ],
+      "properties": {
+       "configureScratchSecurity": {
+        "const": true
+       }
+      }
+     }
+    }
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_address_set": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "ioType": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 32,
+     "description": "AddressIoType name, e.g. Input or Output."
+    },
+    "oldStartAddress": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    },
+    "startAddress": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "ioType",
+    "oldStartAddress",
+    "startAddress"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_attributes": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "attributes": {
+     "type": "object",
+     "propertyNames": {
+      "enum": [
+       "Name",
+       "Author",
+       "Comment",
+       "InformationText",
+       "PlantDesignation",
+       "LocationIdentifier",
+       "AdditionalInformation",
+       "ChannelActivation",
+       "MeasuringType",
+       "MeasuringRange",
+       "InputDelay",
+       "SubstituteValue",
+       "DigitalInputDelay",
+       "InterfaceOperatingMode"
+      ]
+     }
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "attributes"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_channel_attributes": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "channelType": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 64
+    },
+    "channelIoType": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 64
+    },
+    "channelNumber": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    },
+    "attributes": {
+     "type": "object",
+     "minProperties": 1,
+     "maxProperties": 10,
+     "propertyNames": {
+      "enum": [
+       "ChannelActivation",
+       "MeasuringType",
+       "MeasuringRange",
+       "InputDelay",
+       "SubstituteValue",
+       "DigitalInputDelay",
+       "Smoothing",
+       "OperatingMode",
+       "HardwareInterruptRisingEdgeActive",
+       "HardwareInterruptRisingEdgeInterrupt"
+      ]
+     }
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "channelType",
+    "channelIoType",
+    "channelNumber",
+    "attributes"
+   ],
+   "additionalProperties": true,
+   "description": "HardwareInterruptRisingEdgeInterrupt names an OB.",
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_cpu_memory_bytes": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "attributes": {
+     "type": "object",
+     "properties": {
+      "SystemMemoryByte": {
+       "type": "boolean"
+      },
+      "ClockMemoryByte": {
+       "type": "boolean"
+      },
+      "SystemMemoryByteAddress": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 65535
+      },
+      "ClockMemoryByteAddress": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 65535
+      }
+     },
+     "additionalProperties": false,
+     "minProperties": 1,
+     "allOf": [
+      {
+       "if": {
+        "required": [
+         "SystemMemoryByte"
+        ],
+        "properties": {
+         "SystemMemoryByte": {
+          "const": false
+         }
+        }
+       },
+       "then": {
+        "not": {
+         "required": [
+          "SystemMemoryByteAddress"
+         ]
+        }
+       }
+      },
+      {
+       "if": {
+        "required": [
+         "ClockMemoryByte"
+        ],
+        "properties": {
+         "ClockMemoryByte": {
+          "const": false
+         }
+        }
+       },
+       "then": {
+        "not": {
+         "required": [
+          "ClockMemoryByteAddress"
+         ]
+        }
+       }
+      }
+     ]
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "attributes"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_cpu_parameters": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "attributes": {
+     "type": "object",
+     "description": "CPU parameter attributes; {} when only protectionLevel is set.",
+     "propertyNames": {
+      "enum": [
+       "CycleMaximumCycleTime",
+       "CycleMinimumCycleTime",
+       "CycleEnableMinimumCycleTime",
+       "CycleCommunicationLoad",
+       "StartupActionAfterPowerOn",
+       "StartupComparisonPresetToActualModule",
+       "StartupConfigurationTimeout",
+       "TimeSynchronizationNtpV2",
+       "TimeOfDayLocalTimeZone",
+       "TimeOfDayActivateDaylightSavingTime",
+       "PlcAccessControlConfiguration"
+      ]
+     },
+     "additionalProperties": {
+      "type": [
+       "string",
+       "number",
+       "boolean"
+      ]
+     },
+     "properties": {
+      "PlcAccessControlConfiguration": {
+       "enum": [
+        "EnabledWithAccessControl",
+        "EnabledWithAccessControlViaAccessLevel",
+        "EnabledWithAccessControlAndCentralUser",
+        "EnabledWithAccessControlViaAccessLevelAndCentralUsers",
+        "EnabledWithAccessControlAndLocalWithCentralUsers",
+        "EnabledWithAccessControlViaAccessLevelAndLocalWithCentralUsers"
+       ]
+      }
+     }
+    },
+    "protectionLevel": {
+     "enum": [
+      "ReadAccess",
+      "HMIAccess",
+      "NoAccess"
+     ]
+    },
+    "vaultName": {
+     "$ref": "#/$defs/common.vaultName"
+    },
+    "credential": {
+     "$ref": "#/$defs/common.credential"
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "attributes"
+   ],
+   "additionalProperties": false,
+   "dependentRequired": {
+    "protectionLevel": [
+     "credential"
+    ],
+    "credential": [
+     "protectionLevel"
+    ],
+    "vaultName": [
+     "protectionLevel"
+    ]
+   },
+   "if": {
+    "not": {
+     "required": [
+      "protectionLevel"
+     ]
+    }
+   },
+   "then": {
+    "properties": {
+     "attributes": {
+      "minProperties": 1
+     }
+    }
+   },
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_delete": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    }
+   },
+   "required": [
+    "hardwarePath"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_move": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "positionNumber": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "positionNumber"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_plug": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "typeIdentifier": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 256
+    },
+    "name": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "positionNumber": {
+     "type": "integer"
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "typeIdentifier",
+    "name",
+    "positionNumber"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_port_connect": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "partnerHardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "partnerHardwarePath"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_port_disconnect": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "partnerHardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "partnerHardwarePath"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_replace": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "typeIdentifier": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 256
+    },
+    "acceptLoss": {
+     "type": "boolean"
+    },
+    "acceptAddressChange": {
+     "type": "boolean"
+    },
+    "acknowledgedTags": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "typeIdentifier"
+   ],
+   "additionalProperties": true,
+   "if": {
+    "required": [
+     "acknowledgedTags"
+    ]
+   },
+   "then": {
+    "required": [
+     "acceptAddressChange"
+    ],
+    "properties": {
+     "acceptAddressChange": {
+      "const": true
+     }
+    }
+   },
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_shared_device_access": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "accessType": {
+     "enum": [
+      "PLC",
+      "OutsideOfProject"
+     ]
+    },
+    "assignmentTargetPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "externalIoControllers": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 32
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "accessType"
+   ],
+   "additionalProperties": true,
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "accessType": {
+        "const": "PLC"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "assignmentTargetPath"
+      ],
+      "not": {
+       "required": [
+        "externalIoControllers"
+       ]
+      }
+     },
+     "else": {
+      "not": {
+       "required": [
+        "assignmentTargetPath"
+       ]
+      }
+     }
+    }
+   ],
+   "description": "The worker adds ioDeviceInterfacePath and addressControllerOwnerPaths; do not send them.",
+   "dependentRequired": {
+    "ioDeviceInterfacePath": [
+     "externalIoControllers"
+    ]
+   },
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_transfer_area_create": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "name": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "name"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hardware_transfer_area_delete": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "name": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "name"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hmi_compile": {
+   "type": "object",
+   "properties": {
+    "target": {
+     "type": "object",
+     "properties": {
+      "family": {
+       "enum": [
+        "classic",
+        "unified"
+       ]
+      },
+      "hmiPath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "family",
+      "hmiPath"
+     ],
+     "additionalProperties": true
+    }
+   },
+   "required": [
+    "target"
+   ],
+   "additionalProperties": false,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "hmi_text_list_import": {
+   "type": "object",
+   "properties": {
+    "schemaVersion": {
+     "type": "integer",
+     "const": 1
+    },
+    "target": {
+     "type": "object",
+     "properties": {
+      "projectCopyId": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 4096
+      },
+      "sessionGeneration": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 4096
+      },
+      "hmiPath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 4096
+      },
+      "objectPath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 4096
+      },
+      "family": {
+       "const": "unified"
+      },
+      "kind": {
+       "const": "hmiDevice"
+      }
+     },
+     "required": [
+      "projectCopyId",
+      "sessionGeneration",
+      "hmiPath",
+      "objectPath",
+      "family",
+      "kind"
+     ],
+     "additionalProperties": true,
+     "description": "The Unified HMI device identity from hmi_inspect; objectPath equals hmiPath."
+    },
+    "expectedContentHash": {
+     "type": "string",
+     "pattern": "^[a-f0-9]{64}$"
+    },
+    "recordId": {
+     "type": "string",
+     "pattern": "^[a-f0-9]{64}$"
+    },
+    "outputId": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   },
+   "required": [
+    "schemaVersion",
+    "target",
+    "expectedContentHash",
+    "recordId"
+   ],
+   "additionalProperties": false,
+   "description": "outputId selects one output of a generated text-list set record."
+  },
+  "instance_db_create": {
+   "type": "object",
+   "properties": {
+    "name": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "instanceOfName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "number": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 65535
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 2048
+    }
+   },
+   "required": [
+    "name",
+    "instanceOfName"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "network_configure": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "nodeName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "attributes": {
+     "type": "object",
+     "properties": {
+      "Address": {
+       "type": "string",
+       "pattern": "^(\\d{1,3}\\.){3}\\d{1,3}$"
+      },
+      "SubnetMask": {
+       "type": "string",
+       "pattern": "^(\\d{1,3}\\.){3}\\d{1,3}$"
+      },
+      "RouterAddress": {
+       "type": "string",
+       "pattern": "^(\\d{1,3}\\.){3}\\d{1,3}$"
+      }
+     },
+     "additionalProperties": true,
+     "propertyNames": {
+      "enum": [
+       "Address",
+       "SubnetMask",
+       "RouterAddress",
+       "UseRouter",
+       "UseIpProtocol",
+       "IpProtocolSelection",
+       "PnDeviceName",
+       "PnDeviceNameAutoGeneration",
+       "PnDeviceNameSetDirectly",
+       "DhcpClientId"
+      ]
+     }
+    },
+    "subnetName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "disconnect": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "hardwarePath"
+   ],
+   "additionalProperties": true,
+   "description": "nodeName is required when the interface has more than one node; subnetName or disconnect, not both.",
+   "not": {
+    "anyOf": [
+     {
+      "required": [
+       "subnetName",
+       "disconnect"
+      ],
+      "properties": {
+       "disconnect": {
+        "const": true
+       }
+      }
+     },
+     {
+      "required": [
+       "items"
+      ]
+     }
+    ]
+   }
+  },
+  "network_io_assign": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "connectorIndex": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    },
+    "disconnect": {
+     "type": "boolean"
+    },
+    "sharedDevice": {
+     "type": "boolean"
+    },
+    "controllerHardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "controllerIndex": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    },
+    "createIoSystemName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "sharedSubmodules": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 64,
+     "items": {
+      "type": "string"
+     },
+     "uniqueItems": true
+    },
+    "remainingOwnerPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "expectedServerModule": {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "typeIdentifier": {
+       "const": "OrderNumber:6ES7 193-6PA00-0AA0/V1.2"
+      },
+      "containerHardwarePath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 4096,
+       "description": "hardwarePath from device_inventory."
+      },
+      "positionNumber": {
+       "const": 1
+      },
+      "attributes": {
+       "type": "object",
+       "required": [
+        "AdditionalInformation",
+        "Author",
+        "Comment",
+        "LocationIdentifier",
+        "Name",
+        "PlantDesignation"
+       ],
+       "additionalProperties": false,
+       "properties": {
+        "AdditionalInformation": {
+         "type": "string",
+         "maxLength": 4096
+        },
+        "Author": {
+         "type": "string",
+         "maxLength": 4096
+        },
+        "Comment": {
+         "type": "string",
+         "maxLength": 4096
+        },
+        "LocationIdentifier": {
+         "type": "string",
+         "maxLength": 4096
+        },
+        "Name": {
+         "type": "string",
+         "maxLength": 4096
+        },
+        "PlantDesignation": {
+         "type": "string",
+         "maxLength": 4096
+        }
+       }
+      }
+     },
+     "additionalProperties": false,
+     "required": [
+      "name",
+      "typeIdentifier",
+      "containerHardwarePath",
+      "positionNumber",
+      "attributes"
+     ]
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "connectorIndex"
+   ],
+   "additionalProperties": true,
+   "description": "controllerHardwarePath and controllerIndex unless disconnect; createIoSystemName only when the controller has no I/O system. The worker adds the owner paths.",
+   "allOf": [
+    {
+     "if": {
+      "required": [
+       "disconnect"
+      ],
+      "properties": {
+       "disconnect": {
+        "const": true
+       }
+      }
+     },
+     "then": {
+      "not": {
+       "anyOf": [
+        {
+         "required": [
+          "controllerHardwarePath"
+         ]
+        },
+        {
+         "required": [
+          "controllerIndex"
+         ]
+        },
+        {
+         "required": [
+          "createIoSystemName"
+         ]
+        },
+        {
+         "required": [
+          "expectedServerModule"
+         ]
+        }
+       ]
+      }
+     },
+     "else": {
+      "required": [
+       "controllerHardwarePath",
+       "controllerIndex"
+      ]
+     }
+    },
+    {
+     "if": {
+      "anyOf": [
+       {
+        "required": [
+         "sharedSubmodules"
+        ]
+       },
+       {
+        "required": [
+         "remainingOwnerPath"
+        ]
+       }
+      ]
+     },
+     "then": {
+      "required": [
+       "sharedDevice"
+      ],
+      "properties": {
+       "sharedDevice": {
+        "const": true
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "remainingOwnerPath"
+      ]
+     },
+     "then": {
+      "required": [
+       "disconnect"
+      ],
+      "properties": {
+       "disconnect": {
+        "const": true
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "sharedDevice"
+      ],
+      "properties": {
+       "sharedDevice": {
+        "const": true
+       }
+      }
+     },
+     "then": {
+      "not": {
+       "anyOf": [
+        {
+         "required": [
+          "expectedServerModule"
+         ]
+        }
+       ]
+      }
+     }
+    },
+    {
+     "if": {
+      "allOf": [
+       {
+        "required": [
+         "sharedDevice"
+        ],
+        "properties": {
+         "sharedDevice": {
+          "const": true
+         }
+        }
+       },
+       {
+        "not": {
+         "required": [
+          "disconnect"
+         ],
+         "properties": {
+          "disconnect": {
+           "const": true
+          }
+         }
+        }
+       }
+      ]
+     },
+     "then": {
+      "required": [
+       "sharedSubmodules"
+      ]
+     }
+    },
+    {
+     "if": {
+      "not": {
+       "required": [
+        "sharedDevice"
+       ],
+       "properties": {
+        "sharedDevice": {
+         "const": true
+        }
+       }
+      }
+     },
+     "then": {
+      "not": {
+       "anyOf": [
+        {
+         "required": [
+          "sharedAddressControllerOwnerPaths"
+         ]
+        }
+       ]
+      }
+     }
+    }
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "network_mrp_set": {
+   "type": "object",
+   "properties": {
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "role": {
+     "enum": [
+      "NotInRing",
+      "Manager",
+      "Client",
+      "ManagerAuto"
+     ]
+    },
+    "domainName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "createDomain": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "hardwarePath",
+    "role"
+   ],
+   "additionalProperties": true,
+   "if": {
+    "required": [
+     "createDomain"
+    ],
+    "properties": {
+     "createDomain": {
+      "const": true
+     }
+    }
+   },
+   "then": {
+    "required": [
+     "domainName"
+    ]
+   },
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "opcua_reference_namespace_delete": {
+   "type": "object",
+   "properties": {
+    "namespaceName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    }
+   },
+   "required": [
+    "namespaceName"
+   ],
+   "additionalProperties": false,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "opcua_reference_namespace_import": {
+   "type": "object",
+   "properties": {
+    "namespaceName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "mode": {
+     "enum": [
+      "create",
+      "replace"
+     ]
+    },
+    "path": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute Host path."
+    },
+    "expectedSha256": {
+     "type": "string",
+     "pattern": "^[a-fA-F0-9]{64}$"
+    }
+   },
+   "required": [
+    "namespaceName",
+    "mode",
+    "path",
+    "expectedSha256"
+   ],
+   "additionalProperties": false,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "opcua_role_mapping_set": {
+   "oneOf": [
+    {
+     "type": "object",
+     "properties": {
+      "action": {
+       "const": "remove"
+      },
+      "roleName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      }
+     },
+     "required": [
+      "action",
+      "roleName"
+     ],
+     "additionalProperties": false
+    },
+    {
+     "type": "object",
+     "properties": {
+      "action": {
+       "const": "create"
+      },
+      "roleName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "definedInNamespace": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 1024
+      },
+      "projectRole": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "namespacePermissions": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 64,
+       "items": {
+        "type": "object",
+        "properties": {
+         "namespaceUri": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+         },
+         "Browse": {
+          "type": "boolean"
+         },
+         "Read": {
+          "type": "boolean"
+         },
+         "Write": {
+          "type": "boolean"
+         },
+         "Call": {
+          "type": "boolean"
+         },
+         "ReceiveEvents": {
+          "type": "boolean"
+         },
+         "ReadRolePermissions": {
+          "type": "boolean"
+         }
+        },
+        "required": [
+         "namespaceUri",
+         "Browse",
+         "Read",
+         "Write",
+         "Call",
+         "ReceiveEvents",
+         "ReadRolePermissions"
+        ],
+        "additionalProperties": false
+       }
+      }
+     },
+     "required": [
+      "action",
+      "roleName",
+      "definedInNamespace",
+      "namespacePermissions"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "opcua_server_interface_delete": {
+   "type": "object",
+   "properties": {
+    "interfaceName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    }
+   },
+   "required": [
+    "interfaceName"
+   ],
+   "additionalProperties": false,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "opcua_server_interface_enable": {
+   "type": "object",
+   "properties": {
+    "interfaceName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "enabled": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "interfaceName",
+    "enabled"
+   ],
+   "additionalProperties": false,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "opcua_server_interface_import": {
+   "type": "object",
+   "properties": {
+    "interfaceName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "mode": {
+     "enum": [
+      "create",
+      "replace"
+     ]
+    },
+    "path": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute XML file, at most 16 MiB."
+    },
+    "expectedSha256": {
+     "type": "string",
+     "pattern": "^[a-fA-F0-9]{64}$"
+    }
+   },
+   "required": [
+    "interfaceName",
+    "mode",
+    "path",
+    "expectedSha256"
+   ],
+   "additionalProperties": false,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "opcua_server_settings_set": {
+   "type": "object",
+   "properties": {
+    "serverEnabled": {
+     "type": "object",
+     "properties": {
+      "expected": {
+       "type": "boolean"
+      },
+      "value": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "expected",
+      "value"
+     ],
+     "additionalProperties": false
+    },
+    "port": {
+     "type": "object",
+     "properties": {
+      "expected": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 65535
+      },
+      "value": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 65535
+      }
+     },
+     "required": [
+      "expected",
+      "value"
+     ],
+     "additionalProperties": false
+    },
+    "guestAccess": false,
+    "autoAcceptClientCertificates": {
+     "type": "object",
+     "properties": {
+      "expected": {
+       "type": "boolean"
+      },
+      "value": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "expected",
+      "value"
+     ],
+     "additionalProperties": false
+    },
+    "runtimeLicense": {
+     "type": "object",
+     "properties": {
+      "expected": {
+       "enum": [
+        "NoLicense",
+        "SimaticOpcUaS71500Small",
+        "SimaticOpcUaS71500Medium",
+        "SimaticOpcUaS71500Large"
+       ]
+      },
+      "value": {
+       "enum": [
+        "NoLicense",
+        "SimaticOpcUaS71500Small",
+        "SimaticOpcUaS71500Medium",
+        "SimaticOpcUaS71500Large"
+       ]
+      }
+     },
+     "required": [
+      "expected",
+      "value"
+     ],
+     "additionalProperties": false
+    },
+    "alarmsAndConditions": {
+     "type": "object",
+     "properties": {
+      "expected": {
+       "type": "boolean"
+      },
+      "value": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "expected",
+      "value"
+     ],
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false,
+   "minProperties": 1,
+   "description": "Each setting is {expected, value}: the observed value guards the write.",
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "plc_alarm_class_import": {
+   "type": "object",
+   "properties": {
+    "artifactPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute .dat file."
+    },
+    "expectedSha256": {
+     "type": "string",
+     "pattern": "^[a-fA-F0-9]{64}$"
+    }
+   },
+   "required": [
+    "artifactPath",
+    "expectedSha256"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "anyOf": [
+     {
+      "required": [
+       "importOption"
+      ]
+     },
+     {
+      "required": [
+       "scopePath"
+      ]
+     },
+     {
+      "required": [
+       "items"
+      ]
+     }
+    ]
+   }
+  },
+  "plc_alarm_instance_text_import": {
+   "type": "object",
+   "properties": {
+    "artifactPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute .xlsx file."
+    },
+    "expectedSha256": {
+     "type": "string",
+     "pattern": "^[a-fA-F0-9]{64}$"
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    }
+   },
+   "required": [
+    "artifactPath",
+    "expectedSha256"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "anyOf": [
+     {
+      "required": [
+       "importOption"
+      ]
+     },
+     {
+      "required": [
+       "items"
+      ]
+     }
+    ]
+   }
+  },
+  "plc_alarm_text_list_import": {
+   "type": "object",
+   "properties": {
+    "artifactPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute .xlsx file."
+    },
+    "expectedSha256": {
+     "type": "string",
+     "pattern": "^[a-fA-F0-9]{64}$"
+    },
+    "importOption": {
+     "enum": [
+      "None",
+      "Override"
+     ]
+    },
+    "expectedTextListNames": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 100,
+     "uniqueItems": true,
+     "items": {
+      "type": "string",
+      "minLength": 1
+     }
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    }
+   },
+   "required": [
+    "artifactPath",
+    "expectedSha256",
+    "importOption",
+    "expectedTextListNames"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "plc_compile": {
+   "type": "object",
+   "maxProperties": 0,
+   "description": "Exactly {}; top-level plcPath is required and selects the PLC.",
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "plc_supervision_import": {
+   "type": "object",
+   "properties": {
+    "artifactPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute .xlsx file."
+    },
+    "expectedSha256": {
+     "type": "string",
+     "pattern": "^[a-fA-F0-9]{64}$"
+    },
+    "importOption": {
+     "enum": [
+      "None",
+      "Override"
+     ]
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    }
+   },
+   "required": [
+    "artifactPath",
+    "expectedSha256",
+    "importOption"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "plc_supervision_settings_import": {
+   "type": "object",
+   "properties": {
+    "artifactPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute .dat file."
+    },
+    "expectedSha256": {
+     "type": "string",
+     "pattern": "^[a-fA-F0-9]{64}$"
+    }
+   },
+   "required": [
+    "artifactPath",
+    "expectedSha256"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "anyOf": [
+     {
+      "required": [
+       "importOption"
+      ]
+     },
+     {
+      "required": [
+       "scopePath"
+      ]
+     },
+     {
+      "required": [
+       "items"
+      ]
+     }
+    ]
+   }
+  },
+  "plc_type_import_xml": {
+   "type": "object",
+   "properties": {
+    "xml": {
+     "type": "string",
+     "maxLength": 2097152,
+     "minLength": 1
+    },
+    "expectedTypeNames": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 100,
+     "uniqueItems": true,
+     "items": {
+      "type": "string",
+      "minLength": 1
+     }
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 2048
+    },
+    "namespace": {
+     "type": "string",
+     "maxLength": 256
+    }
+   },
+   "required": [
+    "xml",
+    "expectedTypeNames"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "project_attributes_set": {
+   "type": "object",
+   "properties": {
+    "attributes": {
+     "type": "object",
+     "properties": {
+      "Author": {
+       "type": "string"
+      },
+      "Copyright": {
+       "type": "string"
+      },
+      "Family": {
+       "type": "string"
+      },
+      "Version": {
+       "type": "string"
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "required": [
+    "attributes"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "project_compile": {
+   "type": "object",
+   "maxProperties": 0,
+   "description": "Exactly {}.",
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "project_languages_set": {
+   "type": "object",
+   "properties": {
+    "addActive": {
+     "type": "array",
+     "minItems": 0,
+     "maxItems": 64,
+     "items": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "description": "Culture name, e.g. en-US."
+     }
+    },
+    "removeActive": {
+     "type": "array",
+     "minItems": 0,
+     "maxItems": 64,
+     "items": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "description": "Culture name, e.g. en-US."
+     }
+    },
+    "referenceLanguage": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 32
+    },
+    "editingLanguage": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 32
+    }
+   },
+   "additionalProperties": true,
+   "anyOf": [
+    {
+     "required": [
+      "addActive"
+     ]
+    },
+    {
+     "required": [
+      "removeActive"
+     ]
+    },
+    {
+     "required": [
+      "referenceLanguage"
+     ]
+    },
+    {
+     "required": [
+      "editingLanguage"
+     ]
+    }
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "project_simulation_enable": {
+   "type": "object",
+   "properties": {
+    "enabled": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "enabled"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "safety_drive_tags": {
+   "allOf": [
+    {
+     "$ref": "#/$defs/common.driveObject"
+    }
+   ],
+   "type": "object",
+   "properties": {
+    "safetyAcknowledged": {
+     "const": true
+    },
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "driveObjectNumber": {
+     "type": "integer"
+    },
+    "driveObjectIndex": {
+     "type": "integer"
+    },
+    "tagTableName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "bits": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 32,
+     "items": {
+      "type": "object",
+      "properties": {
+       "word": {
+        "enum": [
+         "status",
+         "control"
+        ]
+       },
+       "bit": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 15
+       },
+       "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+       }
+      },
+      "required": [
+       "word",
+       "bit",
+       "name"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "safetyAcknowledged",
+    "hardwarePath",
+    "tagTableName",
+    "bits"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "anyOf": [
+     {
+      "required": [
+       "tags"
+      ]
+     },
+     {
+      "required": [
+       "items"
+      ]
+     }
+    ]
+   }
+  },
+  "safety_fparameter_set": {
+   "type": "object",
+   "properties": {
+    "safetyAcknowledged": {
+     "const": true
+    },
+    "parameters": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 64,
+     "items": {
+      "type": "object",
+      "properties": {
+       "hardwarePath": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "description": "hardwarePath from device_inventory."
+       },
+       "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+       },
+       "expected": {},
+       "value": {}
+      },
+      "required": [
+       "hardwarePath",
+       "name",
+       "expected",
+       "value"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "safetyAcknowledged",
+    "parameters"
+   ],
+   "additionalProperties": false,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "safety_import_xml": {
+   "type": "object",
+   "properties": {
+    "xml": {
+     "type": "string",
+     "maxLength": 2097152
+    },
+    "expectedBlockNames": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 100,
+     "uniqueItems": true,
+     "items": {
+      "type": "string",
+      "minLength": 1
+     }
+    },
+    "safetyAcknowledged": {
+     "const": true
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 2048
+    },
+    "namespace": {
+     "type": "string",
+     "maxLength": 256
+    },
+    "blockPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    }
+   },
+   "required": [
+    "xml",
+    "expectedBlockNames",
+    "safetyAcknowledged"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "simulation_download_online": {
+   "type": "object",
+   "properties": {
+    "downloadTicket": {
+     "type": "string",
+     "minLength": 1
+    },
+    "softwareScope": {
+     "enum": [
+      "all",
+      "changes"
+     ]
+    },
+    "dataBlockValues": {
+     "enum": [
+      "keepActualValues",
+      "reinitialize"
+     ]
+    },
+    "allowStop": {
+     "type": "boolean"
+    },
+    "hardware": {
+     "type": "boolean"
+    },
+    "runtimeCredentialMetadataPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute Host path."
+    },
+    "credentialMetadataPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute Host path."
+    }
+   },
+   "required": [
+    "downloadTicket",
+    "softwareScope",
+    "dataBlockValues",
+    "allowStop"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   },
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "dataBlockValues": {
+        "const": "reinitialize"
+       }
+      },
+      "required": [
+       "dataBlockValues"
+      ]
+     },
+     "then": {
+      "properties": {
+       "allowStop": {
+        "const": true
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "hardware"
+      ],
+      "properties": {
+       "hardware": {
+        "const": true
+       }
+      }
+     },
+     "then": {
+      "properties": {
+       "softwareScope": {
+        "const": "all"
+       },
+       "allowStop": {
+        "const": true
+       }
+      }
+     }
+    }
+   ]
+  },
+  "software_unit_create": {
+   "type": "object",
+   "properties": {
+    "name": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "namespacePreset": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    }
+   },
+   "required": [
+    "name"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "software_unit_create_from": {
+   "type": "object",
+   "properties": {
+    "name": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "libraryId": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 64
+    },
+    "masterCopyPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "onNameConflict": {
+     "enum": [
+      "refuse",
+      "rename"
+     ],
+     "default": "refuse"
+    }
+   },
+   "required": [
+    "name",
+    "libraryId",
+    "masterCopyPath"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "software_unit_delete": {
+   "type": "object",
+   "properties": {
+    "unitPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "dependencyPolicy": {
+     "$ref": "#/$defs/common.rejectReferenced"
+    }
+   },
+   "required": [
+    "unitPath"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "software_unit_publication_set": {
+   "type": "object",
+   "properties": {
+    "objectPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "attributes": {
+     "type": "object",
+     "properties": {
+      "Access": {
+       "enum": [
+        "Published",
+        "Unpublished"
+       ]
+      }
+     },
+     "required": [
+      "Access"
+     ],
+     "additionalProperties": false
+    }
+   },
+   "required": [
+    "objectPath",
+    "attributes"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "software_unit_relation_set": {
+   "type": "object",
+   "properties": {
+    "unitPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "relatedUnitPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "relationType": {
+     "const": "SoftwareUnit"
+    },
+    "action": {
+     "enum": [
+      "add",
+      "remove"
+     ]
+    }
+   },
+   "required": [
+    "unitPath",
+    "relatedUnitPath",
+    "relationType",
+    "action"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "software_unit_rename": {
+   "type": "object",
+   "properties": {
+    "unitPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "name": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    }
+   },
+   "required": [
+    "unitPath",
+    "name"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "source_upsert": {
+   "type": "object",
+   "properties": {
+    "language": {
+     "enum": [
+      "SCL",
+      "STL",
+      "AWL",
+      "SIMATIC_SD",
+      "scl",
+      "stl",
+      "awl",
+      "simatic_sd"
+     ],
+     "description": "Compared case-insensitively."
+    },
+    "source": {
+     "type": "string",
+     "maxLength": 2097152
+    },
+    "sourceRef": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 512,
+     "description": "A committed upload or artifact reference instead of inline source; the Host inlines its exact text."
+    },
+    "expectedBlockNames": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 100,
+     "uniqueItems": true,
+     "items": {
+      "type": "string",
+      "minLength": 1
+     }
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 2048
+    },
+    "namespace": {
+     "type": "string",
+     "maxLength": 256
+    },
+    "blockPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    }
+   },
+   "required": [
+    "language",
+    "expectedBlockNames"
+   ],
+   "additionalProperties": true,
+   "oneOf": [
+    {
+     "required": [
+      "source"
+     ]
+    },
+    {
+     "required": [
+      "sourceRef"
+     ]
+    }
+   ],
+   "not": {
+    "anyOf": [
+     {
+      "required": [
+       "xmlRef"
+      ]
+     },
+     {
+      "required": [
+       "sourceRef",
+       "inputReference"
+      ]
+     },
+     {
+      "required": [
+       "items"
+      ]
+     }
+    ]
+   },
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "language": {
+        "enum": [
+         "SIMATIC_SD",
+         "simatic_sd"
+        ]
+       }
+      }
+     },
+     "then": {
+      "properties": {
+       "expectedBlockNames": {
+        "maxItems": 1
+       }
+      }
+     }
+    }
+   ]
+  },
+  "tag_create": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.tableSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "dataTypeName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 256
+      },
+      "logicalAddress": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 1024
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "name",
+      "dataTypeName",
+      "logicalAddress"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.tableSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "dataTypeName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+         },
+         "logicalAddress": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+         },
+         "items": false
+        },
+        "required": [
+         "name",
+         "dataTypeName",
+         "logicalAddress"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "tag_delete": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.tableSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "memberName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "dependencyPolicy": {
+       "$ref": "#/$defs/common.dependencyPolicyRequired"
+      },
+      "items": {
+       "type": "null"
+      },
+      "safetyAcknowledged": false
+     },
+     "required": [
+      "memberName",
+      "dependencyPolicy"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.tableSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "memberName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "dependencyPolicy": {
+          "$ref": "#/$defs/common.dependencyPolicyRequired"
+         },
+         "items": false,
+         "safetyAcknowledged": false
+        },
+        "required": [
+         "memberName",
+         "dependencyPolicy"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "tag_set": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.tableSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "memberName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "attributes": {
+       "type": "object",
+       "properties": {
+        "Name": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 128
+        },
+        "DataTypeName": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 256
+        },
+        "LogicalAddress": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 1024
+        }
+       },
+       "additionalProperties": false,
+       "minProperties": 1
+      },
+      "safetyAcknowledged": {
+       "const": true
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "memberName",
+      "attributes"
+     ],
+     "dependentSchemas": {
+      "safetyAcknowledged": {
+       "properties": {
+        "attributes": {
+         "required": [
+          "Name"
+         ],
+         "maxProperties": 1
+        }
+       }
+      }
+     }
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 500,
+       "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "memberName",
+         "attributes"
+        ],
+        "anyOf": [
+         {
+          "required": [
+           "tagTableName"
+          ]
+         },
+         {
+          "required": [
+           "tagTablePath"
+          ]
+         }
+        ],
+        "properties": {
+         "tagTableName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "tagTablePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+         },
+         "memberName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "attributes": {
+          "type": "object",
+          "properties": {
+           "Name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+           },
+           "DataTypeName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+           },
+           "LogicalAddress": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+           }
+          },
+          "additionalProperties": false,
+          "minProperties": 1
+         }
+        }
+       }
+      },
+      "scopePath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One tag edit, or a batch of up to 500. safetyAcknowledged only for renaming a safety tag with Name alone."
+  },
+  "tag_table_create": {
+   "oneOf": [
+    {
+     "type": "object",
+     "properties": {
+      "tagTableName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "scopePath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 4096
+      },
+      "groupPath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 2048
+      },
+      "items": {
+       "type": "null"
+      },
+      "tagTablePath": false,
+      "namespace": {
+       "const": ""
+      }
+     },
+     "required": [
+      "tagTableName"
+     ],
+     "additionalProperties": true
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "type": "object",
+        "properties": {
+         "tagTableName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "scopePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+         },
+         "groupPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+         },
+         "items": false,
+         "tagTablePath": false,
+         "namespace": {
+          "const": ""
+         }
+        },
+        "required": [
+         "tagTableName"
+        ],
+        "additionalProperties": true
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "tag_table_delete": {
+   "allOf": [
+    {
+     "$ref": "#/$defs/common.tableSelector"
+    }
+   ],
+   "type": "object",
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "tag_table_import_xml": {
+   "description": "Either the XML form or the row form; mixing them is refused.",
+   "oneOf": [
+    {
+     "type": "object",
+     "properties": {
+      "xml": {
+       "type": "string",
+       "maxLength": 2097152,
+       "minLength": 1
+      },
+      "expectedTableNames": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "uniqueItems": true,
+       "items": {
+        "type": "string",
+        "minLength": 1
+       }
+      },
+      "scopePath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 4096
+      },
+      "groupPath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 2048
+      },
+      "tags": false,
+      "namespace": {
+       "const": ""
+      }
+     },
+     "required": [
+      "xml",
+      "expectedTableNames"
+     ],
+     "additionalProperties": true
+    },
+    {
+     "type": "object",
+     "properties": {
+      "tagTableName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "tags": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 2000,
+       "items": {
+        "type": "object",
+        "properties": {
+         "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "dataType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "logicalAddress": {
+          "type": "string",
+          "pattern": "^\\s*%?[IQMEAiqmea]([0-9]{1,6}\\.[0-7]|[BWDLbwdl][0-9]{1,6})\\s*$"
+         },
+         "comment": {
+          "type": [
+           "string",
+           "null"
+          ],
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F]*$"
+         }
+        },
+        "required": [
+         "name",
+         "dataType",
+         "logicalAddress"
+        ],
+        "additionalProperties": false
+       }
+      },
+      "commentCulture": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 32
+      },
+      "scopePath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 4096
+      },
+      "groupPath": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 2048
+      }
+     },
+     "required": [
+      "tagTableName",
+      "tags"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "tag_table_rename": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.tableSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "newName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "newName"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.tableSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "newName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "items": false
+        },
+        "required": [
+         "newName"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "testsuite_application_import": {
+   "type": "object",
+   "properties": {
+    "sourcePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute .tat or .ttst file, at most 16 MiB.",
+     "pattern": "\\.([tT][aA][tT]|[tT][tT][sS][tT])$"
+    },
+    "expectedTestCaseNames": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 100,
+     "uniqueItems": true,
+     "items": {
+      "type": "string",
+      "minLength": 1
+     }
+    },
+    "expectedTestSetNames": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 100,
+     "uniqueItems": true,
+     "items": {
+      "type": "string",
+      "minLength": 1
+     }
+    }
+   },
+   "required": [
+    "sourcePath"
+   ],
+   "additionalProperties": true,
+   "description": ".tat requires expectedTestCaseNames and forbids expectedTestSetNames; .ttst requires expectedTestSetNames.",
+   "not": {
+    "required": [
+     "items"
+    ]
+   },
+   "if": {
+    "properties": {
+     "sourcePath": {
+      "pattern": "\\.[tT][aA][tT]$"
+     }
+    }
+   },
+   "then": {
+    "required": [
+     "expectedTestCaseNames"
+    ],
+    "not": {
+     "required": [
+      "expectedTestSetNames"
+     ]
+    }
+   },
+   "else": {
+    "required": [
+     "expectedTestSetNames"
+    ]
+   }
+  },
+  "testsuite_system_import": {
+   "type": "object",
+   "properties": {
+    "sourcePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute .tst file.",
+     "pattern": "\\.[tT][sS][tT]$"
+    },
+    "expectedTestCaseNames": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 100,
+     "uniqueItems": true,
+     "items": {
+      "type": "string",
+      "minLength": 1
+     }
+    }
+   },
+   "required": [
+    "sourcePath",
+    "expectedTestCaseNames"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "to_child_create": {
+   "type": "object",
+   "properties": {
+    "name": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "composition": {
+     "enum": [
+      "OutputCams",
+      "MeasuringInputs"
+     ]
+    },
+    "ownerPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "typeIdentifier": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "version": {
+     "type": "string",
+     "pattern": "^[0-9]+(\\.[0-9]+){1,3}$"
+    }
+   },
+   "required": [
+    "name",
+    "composition",
+    "ownerPath",
+    "typeIdentifier",
+    "version"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "to_connect": {
+   "allOf": [
+    {
+     "$ref": "#/$defs/common.technologySelector"
+    },
+    {
+     "if": {
+      "properties": {
+       "role": {
+        "const": "sensor"
+       }
+      },
+      "required": [
+       "role"
+      ]
+     },
+     "then": {
+      "required": [
+       "sensorIndex"
+      ]
+     },
+     "else": {
+      "not": {
+       "required": [
+        "sensorIndex"
+       ]
+      }
+     }
+    }
+   ],
+   "type": "object",
+   "properties": {
+    "role": {
+     "enum": [
+      "actor",
+      "sensor",
+      "torque",
+      "encoder",
+      "measuringInput",
+      "outputCam"
+     ]
+    },
+    "sensorIndex": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    },
+    "hardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "channelIndex": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "telegramType": {
+     "enum": [
+      "MainTelegram",
+      "SupplementaryTelegram",
+      "TorqueTelegram"
+     ]
+    },
+    "tagName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "inputHardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "outputHardwarePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "hardwarePath from device_inventory."
+    },
+    "dbMemberPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 1024
+    },
+    "inputAddress": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    },
+    "outputAddress": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    },
+    "connectOption": {
+     "enum": [
+      "Default",
+      "AllowAllModules"
+     ]
+    },
+    "channelType": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 64
+    },
+    "channelIoType": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 64
+    },
+    "channelNumber": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    },
+    "driveObjectNumber": {
+     "type": "integer"
+    },
+    "driveObjectIndex": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    }
+   },
+   "required": [
+    "role"
+   ],
+   "description": "Exactly one connection target: hardwarePath (optionally with channel fields, channelIndex, or telegramType plus a drive object handle), tagName, inputHardwarePath with outputHardwarePath, dbMemberPath, or inputAddress/outputAddress. sensorIndex for role sensor only.",
+   "not": {
+    "required": [
+     "items"
+    ]
+   },
+   "dependentRequired": {
+    "telegramType": [
+     "hardwarePath"
+    ]
+   }
+  },
+  "to_create": {
+   "type": "object",
+   "properties": {
+    "name": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "typeIdentifier": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "version": {
+     "type": "string",
+     "pattern": "^[0-9]+(\\.[0-9]+){1,3}$"
+    },
+    "unprofiledAcknowledged": {
+     "type": "boolean"
+    },
+    "parameters": {
+     "type": "object",
+     "maxProperties": 500,
+     "additionalProperties": {
+      "type": [
+       "string",
+       "number",
+       "boolean"
+      ]
+     }
+    }
+   },
+   "required": [
+    "name",
+    "typeIdentifier",
+    "version"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "anyOf": [
+     {
+      "required": [
+       "technologyPath"
+      ]
+     },
+     {
+      "required": [
+       "items"
+      ]
+     }
+    ]
+   }
+  },
+  "to_delete": {
+   "allOf": [
+    {
+     "$ref": "#/$defs/common.technologySelector"
+    }
+   ],
+   "type": "object",
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "to_disconnect": {
+   "allOf": [
+    {
+     "$ref": "#/$defs/common.technologySelector"
+    },
+    {
+     "if": {
+      "properties": {
+       "role": {
+        "const": "sensor"
+       }
+      },
+      "required": [
+       "role"
+      ]
+     },
+     "then": {
+      "required": [
+       "sensorIndex"
+      ]
+     },
+     "else": {
+      "not": {
+       "required": [
+        "sensorIndex"
+       ]
+      }
+     }
+    }
+   ],
+   "type": "object",
+   "properties": {
+    "role": {
+     "enum": [
+      "actor",
+      "sensor",
+      "torque",
+      "encoder",
+      "measuringInput",
+      "outputCam"
+     ]
+    },
+    "sensorIndex": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 2147483647
+    }
+   },
+   "required": [
+    "role"
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "to_parameters": {
+   "allOf": [
+    {
+     "$ref": "#/$defs/common.technologySelector"
+    }
+   ],
+   "type": "object",
+   "properties": {
+    "parameters": {
+     "type": "object",
+     "maxProperties": 500,
+     "additionalProperties": {
+      "type": [
+       "string",
+       "number",
+       "boolean"
+      ]
+     }
+    }
+   },
+   "required": [
+    "parameters"
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "type_delete": {
+   "allOf": [
+    {
+     "$ref": "#/$defs/common.typeSelector"
+    }
+   ],
+   "type": "object",
+   "properties": {
+    "dependencyPolicy": {
+     "$ref": "#/$defs/common.dependencyPolicyRequired"
+    }
+   },
+   "required": [
+    "dependencyPolicy"
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "type_rename": {
+   "oneOf": [
+    {
+     "allOf": [
+      {
+       "$ref": "#/$defs/common.typeSelector"
+      }
+     ],
+     "type": "object",
+     "properties": {
+      "newName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "items": {
+       "type": "null"
+      }
+     },
+     "required": [
+      "newName"
+     ]
+    },
+    {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 100,
+       "items": {
+        "allOf": [
+         {
+          "$ref": "#/$defs/common.typeSelector"
+         }
+        ],
+        "type": "object",
+        "properties": {
+         "newName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+         },
+         "items": false
+        },
+        "required": [
+         "newName"
+        ]
+       }
+      },
+      "scopePath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      }
+     },
+     "required": [
+      "items"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+  },
+  "type_source_upsert": {
+   "type": "object",
+   "properties": {
+    "source": {
+     "type": "string",
+     "maxLength": 2097152,
+     "minLength": 1
+    },
+    "expectedTypeNames": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 100,
+     "uniqueItems": true,
+     "items": {
+      "type": "string",
+      "minLength": 1
+     }
+    },
+    "scopePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 2048
+    },
+    "namespace": {
+     "type": "string",
+     "maxLength": 256
+    }
+   },
+   "required": [
+    "source",
+    "expectedTypeNames"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "umac_role_set": {
+   "oneOf": [
+    {
+     "type": "object",
+     "properties": {
+      "action": {
+       "const": "create"
+      },
+      "roleName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      }
+     },
+     "required": [
+      "action",
+      "roleName"
+     ],
+     "additionalProperties": false
+    },
+    {
+     "type": "object",
+     "properties": {
+      "action": {
+       "enum": [
+        "assign",
+        "unassign"
+       ]
+      },
+      "roleName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "userName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      }
+     },
+     "required": [
+      "action",
+      "roleName",
+      "userName"
+     ],
+     "additionalProperties": false
+    },
+    {
+     "type": "object",
+     "properties": {
+      "action": {
+       "enum": [
+        "grant",
+        "revoke"
+       ]
+      },
+      "roleName": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128
+      },
+      "engineeringRights": {
+       "type": "array",
+       "maxItems": 64,
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+       },
+       "minItems": 1
+      },
+      "deviceRights": {
+       "type": "array",
+       "maxItems": 64,
+       "items": {
+        "type": "object",
+        "properties": {
+         "device": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+         },
+         "identifier": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+         }
+        },
+        "required": [
+         "device",
+         "identifier"
+        ],
+        "additionalProperties": false
+       }
+      }
+     },
+     "required": [
+      "action",
+      "roleName"
+     ],
+     "additionalProperties": false,
+     "anyOf": [
+      {
+       "required": [
+        "engineeringRights"
+       ]
+      },
+      {
+       "required": [
+        "deviceRights"
+       ],
+       "properties": {
+        "deviceRights": {
+         "minItems": 1
+        }
+       }
+      }
+     ]
+    }
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "vci_conflict_resolve": {
+   "type": "object",
+   "properties": {
+    "workspacePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "objectPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "comparisonRef": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 512
+    },
+    "packageId": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "take": {
+     "enum": [
+      "native",
+      "remote",
+      "merged"
+     ]
+    },
+    "mergedRecordRef": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   },
+   "required": [
+    "workspacePath",
+    "objectPath",
+    "comparisonRef",
+    "packageId",
+    "take"
+   ],
+   "additionalProperties": false,
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "take": {
+        "const": "merged"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "mergedRecordRef"
+      ],
+      "properties": {
+       "mergedRecordRef": {
+        "type": "string",
+        "minLength": 1
+       }
+      }
+     },
+     "else": {
+      "properties": {
+       "mergedRecordRef": {
+        "type": "null"
+       }
+      }
+     }
+    }
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "vci_mapping_add": {
+   "type": "object",
+   "properties": {
+    "workspacePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "mode": {
+     "enum": [
+      "export",
+      "connect"
+     ]
+    },
+    "directory": {
+     "type": "string",
+     "maxLength": 240
+    },
+    "fileName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "format": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 64
+    },
+    "objectPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    }
+   },
+   "required": [
+    "workspacePath",
+    "mode",
+    "directory",
+    "fileName",
+    "format",
+    "objectPath"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "vci_mapping_remove": {
+   "type": "object",
+   "properties": {
+    "workspacePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "objectPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    }
+   },
+   "required": [
+    "workspacePath",
+    "objectPath"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "vci_synchronize": {
+   "type": "object",
+   "properties": {
+    "workspacePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "direction": {
+     "enum": [
+      "ProjectToWorkspace",
+      "WorkspaceToProject"
+     ]
+    },
+    "objectPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "allMappedObjects": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "workspacePath",
+    "direction"
+   ],
+   "additionalProperties": true,
+   "allOf": [
+    {
+     "if": {
+      "required": [
+       "allMappedObjects"
+      ],
+      "properties": {
+       "allMappedObjects": {
+        "const": true
+       }
+      }
+     },
+     "then": {
+      "not": {
+       "required": [
+        "objectPath"
+       ]
+      }
+     },
+     "else": {
+      "required": [
+       "objectPath"
+      ]
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "direction": {
+        "const": "WorkspaceToProject"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "objectPath"
+      ]
+     }
+    }
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "vci_workspace_create": {
+   "type": "object",
+   "properties": {
+    "groupPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    },
+    "name": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "language": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 32
+    },
+    "rootPath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 240
+    }
+   },
+   "required": [
+    "groupPath",
+    "name",
+    "language",
+    "rootPath"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "vci_workspace_delete": {
+   "type": "object",
+   "properties": {
+    "workspacePath": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096
+    }
+   },
+   "required": [
+    "workspacePath"
+   ],
+   "additionalProperties": true,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "webserver_page_set": {
+   "type": "object",
+   "properties": {
+    "webServerActive": {
+     "type": "object",
+     "properties": {
+      "expected": {
+       "type": "boolean"
+      },
+      "value": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "expected",
+      "value"
+     ],
+     "additionalProperties": false
+    },
+    "systemWebPages": {
+     "type": "object",
+     "properties": {
+      "expected": {
+       "type": "boolean"
+      },
+      "value": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "expected",
+      "value"
+     ],
+     "additionalProperties": false
+    },
+    "defaultApplication": {
+     "type": "object",
+     "properties": {
+      "expected": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "minLength": 1,
+       "maxLength": 256
+      },
+      "value": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "minLength": 1,
+       "maxLength": 256
+      }
+     },
+     "required": [
+      "expected",
+      "value"
+     ],
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false,
+   "minProperties": 1,
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  },
+  "webserver_user_pages_generate": {
+   "type": "object",
+   "properties": {
+    "htmlDirectory": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 4096,
+     "description": "Absolute directory."
+    },
+    "defaultPage": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 1024
+    },
+    "applicationName": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "override": {
+     "type": "boolean"
+    },
+    "overrideBlocks": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 100,
+     "uniqueItems": true,
+     "items": {
+      "type": "string",
+      "minLength": 1
+     }
+    }
+   },
+   "required": [
+    "htmlDirectory",
+    "defaultPage",
+    "applicationName",
+    "override"
+   ],
+   "additionalProperties": false,
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "override": {
+        "const": true
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "overrideBlocks"
+      ]
+     },
+     "else": {
+      "not": {
+       "required": [
+        "overrideBlocks"
+       ]
+      }
+     }
+    }
+   ],
+   "not": {
+    "required": [
+     "items"
+    ]
+   }
+  }
+ }
+}

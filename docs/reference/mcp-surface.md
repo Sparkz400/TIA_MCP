@@ -100,11 +100,18 @@ worker and are listed whatever `--toolsets` selects.
 | `tia://feature-catalog` | Every catalog feature with its tools, implementation and qualification status (JSON) |
 | `tia://feature-catalog/{featureId}` | One feature with its criteria and evidence, as `feature_catalog` returns it |
 | `tia://artifacts/{+path}` | A file under the artifact directory, by path relative to it, at most 4 MiB; JSON, XML, CSV, Markdown, HTML and text files as text, others as bytes |
-| `tia://project-reviews/{reviewId}` | A saved `project-review.v1` document, at most 4 MiB, verified against its content-hash ID |
+| `tia://project-reviews/{reviewId}` | A saved `project-review.v1` document, at most 4 MiB, verified against its content-hash ID; `project_snapshot_capture` returns it as `reviewUri` |
+| `tia://contracts` | The names and URIs of every bundled JSON Schema contract |
+| `tia://contracts/{name}` | One bundled contract by file name, for example `hmi-inspection.v1.schema.json` (the `hmi_inspect` request) |
+| `tia://change-payloads` | Every `change_prepare` kind with the URI of its payload schema |
+| `tia://change-payloads/{kind}` | The JSON Schema of `change_prepare.payload` for one kind, self-contained; for HMI, library and typed graphical kinds it names the contract and JSON pointer that define the payload |
 
 Artifact and review reads go through the same checks as `artifact_read`: the file must lie under
 the artifact directory and no part of its path may be a link or junction. Larger files are read in
-chunks with `artifact_read`. A missing file, review or feature is `ResourceNotFound`. The project
+chunks with `artifact_read`. The payload schemas come from
+[`change-payloads.v1.schema.json`](../../contracts/change-payloads.v1.schema.json), which was derived from the
+worker's payload parsers and checked against them; the worker stays authoritative and also checks what a
+schema cannot express (native identities, target-dependent allowlists, blank strings). A missing file, review or feature is `ResourceNotFound`. The project
 explorer view (`ui://tia-project-explorer/view.html`) is listed only to clients that negotiate MCP
 Apps support.
 
@@ -112,7 +119,7 @@ Apps support.
 
 `completion/complete` suggests up to 100 values for the resource template parameters: feature IDs
 from the bundled catalog, artifact paths from a bounded walk of the artifact directory that skips
-links, junctions and hidden files, and the IDs of saved reviews. It lists names only, never file
+links, junctions and hidden files, the IDs of saved reviews, contract names and change kinds. It lists names only, never file
 contents. Prompt arguments are free text, so they get no suggestions; the Host keeps no list of
 open projects without asking the native worker.
 
@@ -130,10 +137,17 @@ that text and cannot vouch that it holds nothing sensitive.
 ## Progress
 
 A `tools/call` request that carries a `progressToken` gets one progress notification before the
-tool starts and then one every 10 seconds until it returns. The notifications report elapsed time
-only, not a percentage. They let clients that reset their request timeout on progress keep waiting
+tool starts and then one every 10 seconds until it returns. The notifications report elapsed time,
+not a percentage; `project_snapshot_capture` also reports its steps (hierarchy captured, block n of m,
+metadata recheck). Progress values strictly increase across both kinds of notification. They let clients that reset their request timeout on progress keep waiting
 for long native calls such as compiles, exports or simulator startup. Notifications never follow
 the result, and a failed notification never changes the outcome of the call.
+
+## Durations
+
+Every tool result carries the whole call's wall-clock time, Host queueing included, in
+`_meta["tiaMcp/durationMs"]`. It sits in `_meta` so that declared output schemas stay unchanged. Change
+results also carry `stageTimings` with each worker phase's `elapsedMs`.
 
 ## Version
 

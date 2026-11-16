@@ -21,14 +21,34 @@ namespace TiaMcp.Openness.V21
         // item's, whose rename would move its path). block_delete is batched: each item's dependency scan runs against the
         // unchanged project, so a block referenced by another block of the same batch is still refused (delete the
         // referencing block in an earlier change); the result never depends on the order of deletes. Deletions of types and
-        // groups (nesting), the call and graphical edits (their structured readback runs once per change, not per item)
-        // and the import kinds (already multi-object) are not batched.
+        // groups (nesting), typed graphical edits (their instance readbacks are per change) and the import kinds (already
+        // multi-object) are not batched. The call and graphical edits re-import their whole block, so their items must edit
+        // distinct blocks (RequireDistinctBlocks); the structured readback then runs per item against its own prepared document.
+        internal static readonly string[] StructuredKinds =
+            { "graphical_operand_set", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set" };
+
         internal static readonly string[] Kinds =
         {
             "constant_set", "tag_create", "constant_create", "tag_delete", "constant_delete",
             "tag_table_create", "tag_table_rename", "block_rename", "block_attributes_set", "type_rename",
             "block_number_set", "group_create", "group_rename", "block_delete",
+            "graphical_operand_set", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set",
         };
+
+        /// <summary>Call and graphical items: one item per block. Each item replaces its whole block with its prepared document,
+        /// so a second item on the same block would overwrite the first.</summary>
+        /// <param name="blocks">Per item the resolved block identity (namespace and name).</param>
+        internal static void RequireDistinctBlocks(IReadOnlyList<string> blocks)
+        {
+            var seen = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            for (int index = 0; index < blocks.Count; index++)
+            {
+                if (seen.TryGetValue(blocks[index], out int first))
+                    throw new BridgeException("InvalidRequest", "items[" + first + "] and items[" + index + "] edit the same block. Call and graphical edits replace the whole block, "
+                        + "so batch items need distinct blocks; make the other edits of that block separate changes. Nothing was written.");
+                seen.Add(blocks[index], index);
+            }
+        }
 
         internal static bool HasItems(JObject payload) => payload?["items"] != null && payload["items"].Type != JTokenType.Null;
 

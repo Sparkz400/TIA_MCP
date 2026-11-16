@@ -43,6 +43,19 @@ Check("HMI scalar request accepts only the operation-specific property allowlist
         var request = Scalar(); request["properties"] = new JObject { [key] = "arbitrary" }; Reject(() => HmiEngineeringRules.RequireRequest(request));
     }
 });
+Check("An explicit target.kind must be one the operation's native prepare accepts, before any capture", () => {
+    var item = Scalar(); item["target"]["kind"] = "hmiScreenItem"; HmiEngineeringRules.RequireRequest(item);
+    var wrong = Scalar(); wrong["target"]["kind"] = "hmiTag"; Reject(() => HmiEngineeringRules.RequireRequest(wrong));
+    var device = Scalar(); device["target"]["kind"] = "hmiDevice"; Reject(() => HmiEngineeringRules.RequireRequest(device));
+    Assert(HmiEngineeringRules.TargetKinds("screen_create", "unified").SequenceEqual(new[] { "hmiDevice" }));
+    Assert(HmiEngineeringRules.TargetKinds("item_create", "unified").SequenceEqual(new[] { "hmiScreen" }));
+    Assert(HmiEngineeringRules.TargetKinds("tag_create", "unified").SequenceEqual(new[] { "hmiTagTable" }));
+    Assert(HmiEngineeringRules.TargetKinds("scalar_property_set", "classic").SequenceEqual(new[] { "hmiScreen" }));
+    Assert(HmiEngineeringRules.TargetKinds("object_properties_set", "unified").Contains("hmiModelNode"));
+    foreach (string operation in HmiEngineeringRules.Operations) Assert(HmiEngineeringRules.TargetKinds(operation, "unified").Length > 0);
+    try { HmiEngineeringRules.RequireTargetKind("item_create", "unified", "hmiDevice"); throw new Exception("Expected a refusal."); }
+    catch (ArgumentException error) { Assert(error.Message.Contains("hmiScreen") && error.Message.Contains("hmiDevice")); }
+});
 Check("A caller cannot turn native qualification on or substitute metadata revision", () => {
     foreach (string field in new[] { "qualified", "force", "preservationVerified", "metadataRevision" }) {
         var request = Scalar(); request[field] = true; Reject(() => HmiEngineeringRules.RequireRequest(request));

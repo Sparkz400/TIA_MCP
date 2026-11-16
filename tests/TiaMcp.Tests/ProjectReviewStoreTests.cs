@@ -225,7 +225,11 @@ internal static class ProjectReviewStoreTests
         Check.Equal("BlocksOmittedByMaxBlocks,ReadOnlyProject", string.Join(",", codes.Order(StringComparer.Ordinal)));
         var saved = files.Store.Save(Model(), refused, new JsonObject { ["content"] = content });
         Check.Equal(true, saved["degraded"]!.GetValue<bool>());
-        Check.Equal(true, saved["summary"]!.GetValue<string>().Contains("ReadOnlyProject (1)"));
+        // The human summary names each reason with its block count and its text, not just the code.
+        var text = saved["summary"]!.GetValue<string>();
+        Check.Equal(true, text.Contains("ReadOnlyProject (1 block(s))"));
+        Check.Equal(true, text.Contains("Only maxBlocks blocks"));
+        Check.Equal("tia://project-reviews/" + saved["reviewId"]!.GetValue<string>(), saved["reviewUri"]!.GetValue<string>());
         var complete = ProjectReviewStore.ContentCoverage(Documents(Xml), 1, 1);
         Check.Equal(false, complete["degraded"]!.GetValue<bool>());
         return Task.CompletedTask;

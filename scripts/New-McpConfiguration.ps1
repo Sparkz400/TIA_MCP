@@ -8,7 +8,7 @@ param(
     [string]$UaClientIdentity,
     [ValidatePattern('^[a-z]+(,[a-z]+)*$')][string]$Toolsets,
     [ValidateSet('Direct','InteractiveUser')][string]$SessionMode = 'Direct',
-    [ValidateRange(5,900)][int]$TimeoutSeconds = 300,
+    [ValidateRange(5,3600)][int]$TimeoutSeconds = 300,
     [ValidateRange(1,120)][int]$ConnectTimeoutSeconds = 15,
     [switch]$StrictBundle
 )

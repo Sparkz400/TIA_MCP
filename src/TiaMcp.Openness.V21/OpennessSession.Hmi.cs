@@ -62,6 +62,8 @@ namespace TiaMcp.Openness.V21
             return value.Value<int>();
         }
 
+        internal const int HmiMaxPageLimit = 1000;
+
         private JObject HmiInspect(JObject args)
         {
             if (args.Value<int?>("schemaVersion") is int version && version != 1) throw new BridgeException("UnsupportedSchemaVersion", "HMI inspection request schemaVersion must be 1.");
@@ -72,8 +74,20 @@ namespace TiaMcp.Openness.V21
             string section = args.Value<string>("section") ?? "devices";
             if (!new[] { "devices", "connections", "tags", "screens", "items", "alarms", "scripts", "resources", "model" }.Contains(section))
                 throw new BridgeException("InvalidRequest", "Unknown HMI inspection section.");
-            int limit = HmiBound(args, "limit", 100, 1, 200), offset = HmiBound(args, "offset", 0, 0, 50000);
+            int limit = HmiBound(args, "limit", 100, 1, HmiMaxPageLimit), offset = HmiBound(args, "offset", 0, 0, 50000);
             int maxBytes = HmiBound(args, "maxBytes", 262144, 4096, 1048576);
+            string rowMode;
+            try
+            {
+                rowMode = HmiInspectionRules.RowMode(args.Value<string>("rowMode"), section);
+                var selector = args["target"] as JObject ?? args["identity"] as JObject;
+                if (section != "devices" && selector != null)
+                    HmiInspectionRules.RequireTargetKind(selector.Value<string>("kind"), section,
+                        selector.Value<string>("objectPath") == null || selector.Value<string>("objectPath") == selector.Value<string>("hmiPath"));
+            }
+            catch (ArgumentException error) { throw new BridgeException("InvalidRequest", error.Message); }
+            if (args.Value<bool?>("excludeSystem") == true && section != "model")
+                throw new BridgeException("InvalidRequest", "excludeSystem applies to section=model only.");
             var capture = new HmiCapture(HmiBound(args, "maxVisited", 5000, 1, 50000));
             HmiDiscoveredTarget target = null;
             HmiValidateIdentity(project, args["target"] as JObject ?? args["identity"] as JObject ?? args);
@@ -108,20 +122,34 @@ namespace TiaMcp.Openness.V21
             string revision = ChangeHash(new JArray(ordered.Select(e => e.Row)).ToString(Formatting.None));
             if (args.Value<string>("expectedMetadataRevision") is string expected && revision != expected)
                 throw new BridgeException("HmiMetadataChanged", "Observed metadata changed between pages; capture again from offset zero.");
-            var rows = new JArray(); int bytes = 0;
+            var rows = new JArray(); int bytes = 0; bool stoppedByBytes = false;
             foreach (var entry in ordered.Skip(offset).Take(limit))
             {
-                int count = Encoding.UTF8.GetByteCount(entry.Row.ToString(Formatting.None));
-                if (bytes + count > maxBytes) break;
-                rows.Add(UniformHmiRow(entry)); bytes += count;
+                var row = HmiInspectionRules.ShapeRow(UniformHmiRow(entry), rowMode);
+                int count = Encoding.UTF8.GetByteCount(row.ToString(Formatting.None));
+                if (bytes + count > maxBytes) { stoppedByBytes = true; break; }
+                rows.Add(row); bytes += count;
             }
             bool more = offset + rows.Count < ordered.Count;
             if (more && rows.Count == 0) { capture.Status = "truncated"; capture.Diagnostics.Add(new JObject { ["code"] = "HmiRowTooLarge", ["reason"] = "The next row exceeds maxBytes; request a larger byte limit." }); }
             var result = Envelope(); result["schemaVersion"] = 1; result["projectPath"] = project.Path?.FullName;
             result["projectCopyId"] = HmiProjectCopyId(project); result["sessionGeneration"] = _hmiSessionGeneration;
-            result["section"] = section; result["target"] = target == null ? null : HmiDeviceView(project, target);
+            result["section"] = section;
+            // First, so a client sees why a page is short before reading rows: the bounds applied and which one ended the page.
+            result["page"] = new JObject { ["rowMode"] = rowMode, ["limit"] = limit, ["maxBytes"] = maxBytes, ["payloadBytes"] = bytes, ["returned"] = rows.Count,
+                ["totalItems"] = ordered.Count, ["stoppedBy"] = stoppedByBytes ? "maxBytes" : more ? "limit" : "end",
+                ["excludeSystem"] = section == "model" ? (JToken)(args.Value<bool?>("excludeSystem") == true) : null };
+            result["target"] = target == null ? null : HmiDeviceView(project, target);
             result["items"] = rows; result["offset"] = offset; result["nextOffset"] = more && rows.Count > 0 ? (JToken)(offset + rows.Count) : null;
             result["metadataRevision"] = revision; result["revisionScope"] = "Only metadata observed in this bounded section; not a whole-project or HMI-content fingerprint.";
+            if (section == "model")
+            {
+                // One hash over every row of the walked model scope (all pages), from the per-row contentSha256 the preservation
+                // manifest uses. Equal hashes mean equal typed readback of the same roots; still not a native export or runtime proof.
+                result["modelContentHash"] = ChangeHash(string.Join("\n", ordered.Select(e => e.Identity.Value<string>("objectPath") + "\t" + e.Row.Value<string>("contentSha256"))));
+                result["modelContentHashScope"] = "Typed readback of the walked roots" + (args.Value<bool?>("excludeSystem") == true ? " without system tags and system text lists" : "")
+                    + (exact != null ? " under objectPath " + exact : "") + "; complete only when coverage.captureComplete is true.";
+            }
             result["observedAtUtc"] = DateTime.UtcNow.ToString("O"); result["payloadBytes"] = bytes;
             // complete means the caller has everything: the capture finished AND no page is left. captureComplete keeps the
             // capture-only meaning; nextOffset is the paging signal (a consumer once read complete=true on page 1 of 2).

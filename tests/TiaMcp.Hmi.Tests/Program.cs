@@ -108,4 +108,23 @@ Check(HmiCompilerDiagnostics.IsComplete(CaptureDiagnostics(new[] { Diagnostic("I
 var nativeError = CaptureDiagnostics(new[] { Diagnostic("Error") });
 Check(HmiCompilerDiagnostics.IsComplete(nativeError) && nativeError[0].Value<string>("state") == "Error", "Capture completeness retains native errors and does not imply compile success.");
 ClassicScreenInventoryTests.Run(Check);
+// Row modes: compact and hash keep identity and a content hash; full rows are unchanged.
+var modelRow = new JObject { ["path"] = "/HMI/screens/Main", ["kind"] = "hmiModelNode", ["name"] = "Main", ["parentPath"] = "/HMI", ["nativeType"] = "HmiScreen",
+    ["identity"] = new JObject { ["objectPath"] = "/HMI/screens/Main" }, ["attributes"] = new JObject { ["Width"] = 1280 }, ["contentSha256"] = new string('a', 64) };
+Check(HmiInspectionRules.RowMode(null, "model") == "full" && ReferenceEquals(HmiInspectionRules.ShapeRow(modelRow, "full"), modelRow), "rowMode defaults to full rows, unchanged.");
+var compactRow = HmiInspectionRules.ShapeRow(modelRow, "compact");
+Check(compactRow["attributes"] == null && compactRow.Value<string>("contentSha256") == new string('a', 64) && compactRow["identity"] != null && compactRow.Value<string>("parentPath") == "/HMI", "Compact rows drop attributes and keep identity and the row hash.");
+var hashRow = HmiInspectionRules.ShapeRow(modelRow, "hash");
+Check(hashRow.Properties().Select(p => p.Name).SequenceEqual(new[] { "path", "kind", "contentSha256" }), "Hash rows carry only path, kind and the row hash.");
+var tagRow = new JObject { ["path"] = "/HMI/tags/T", ["kind"] = "hmiTag", ["properties"] = new JObject { ["DataType"] = "Int" } };
+Check(HmiInspectionRules.ShapeRow(tagRow, "hash").Value<string>("contentSha256").Length == 64 && HmiInspectionRules.ShapeRow(tagRow, "hash").Value<string>("contentSha256") == HmiInspectionRules.ShapeRow((JObject)tagRow.DeepClone(), "compact").Value<string>("contentSha256"), "Rows without contentSha256 get a stable hash of the full row.");
+try { HmiInspectionRules.RowMode("tiny", "model"); Check(false, "An unknown rowMode is refused."); } catch (ArgumentException) { count++; }
+// target.kind belongs to the requested section.
+HmiInspectionRules.RequireTargetKind("hmiDevice", "tags", false); HmiInspectionRules.RequireTargetKind(null, "tags", false);
+HmiInspectionRules.RequireTargetKind("hmiTagTable", "tags", false); HmiInspectionRules.RequireTargetKind("hmiScreen", "items", false);
+HmiInspectionRules.RequireTargetKind("hmiModelNode", "model", false); HmiInspectionRules.RequireTargetKind("hmiScreen", "model", true);
+count++;
+foreach (var (kind, section) in new[] { ("hmiTag", "screens"), ("hmiModelNode", "tags"), ("hmiScreen", "model"), ("hmiBogus", "alarms") })
+    try { HmiInspectionRules.RequireTargetKind(kind, section, false); Check(false, kind + " must be refused for section " + section + "."); }
+    catch (ArgumentException error) { Check(error.Message.Contains(kind), "The refusal names the wrong kind."); }
 Console.WriteLine($"{count} HMI inspection contract checks passed. Native qualification remains separate.");

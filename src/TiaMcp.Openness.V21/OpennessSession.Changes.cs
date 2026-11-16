@@ -52,6 +52,8 @@ namespace TiaMcp.Openness.V21
             var payload = args["payload"] as JObject ?? throw new BridgeException("InvalidRequest", "payload must be an object.");
             var id = Guid.NewGuid().ToString("N");
             var directory = Path.Combine(ArtifactDirectory(args), "change-" + id);
+            // Old preparations no worker holds can never be applied; remove them (see StaleChangeDirectories for what is kept).
+            StaleChangeDirectories.Sweep(ArtifactDirectory(args), new HashSet<string>(_changes.Keys, StringComparer.Ordinal), DateTime.UtcNow);
             Directory.CreateDirectory(directory);
             var change = new EngineeringChange
             {
@@ -286,10 +288,20 @@ namespace TiaMcp.Openness.V21
                     if (new[] { "graphical_typed_edit", "graphical_operand_set", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "graph_import" }.Contains(change.Kind))
                     {
                         var plc = SelectPlc(change.Selector);
-                        string readback = Path.Combine(change.Directory, "after-structured-edit.xml");
-                        FindBlockByName(plc, change.BlockNames[0], true, change).Item.Export(new FileInfo(readback), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-                        change.Readbacks.Add(new JObject { ["role"] = "structured-edit-readback", ["artifact"] = ChangeArtifact(readback) });
-                        EngineeringSources.RequireNativePreservation(EngineeringSources.ReadXml(File.ReadAllText(change.InputPath)), EngineeringSources.ReadXml(File.ReadAllText(readback)));
+                        // A batch reads back every item's block against that item's prepared document; its items edit distinct blocks.
+                        var targets = change.BatchMembers ?? new List<EngineeringChange> { change };
+                        for (int index = 0; index < targets.Count; index++)
+                        {
+                            var target = targets[index];
+                            string readback = Path.Combine(target.Directory, "after-structured-edit.xml");
+                            FindBlockByName(plc, target.BlockNames[0], true, change).Item.Export(new FileInfo(readback), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                            var row = new JObject { ["role"] = "structured-edit-readback", ["artifact"] = ChangeArtifact(readback) };
+                            if (change.BatchMembers != null) { row["index"] = index; row["blockName"] = target.BlockNames[0]; }
+                            change.Readbacks.Add(row);
+                            try { EngineeringSources.RequireNativePreservation(EngineeringSources.ReadXml(File.ReadAllText(target.InputPath)), EngineeringSources.ReadXml(File.ReadAllText(readback))); }
+                            catch (Exception error) when (change.BatchMembers != null)
+                            { throw BatchItemFailure(error, index, "All items were written; this item's block reads back differently from its prepared document. Recover from the checkpoint."); }
+                        }
                         change.Stages.Add("native_preservation_verified");
                     }
                     if (change.Kind == "graphical_typed_edit") VerifyTypedInstanceReadbacks(change);
@@ -566,6 +578,9 @@ namespace TiaMcp.Openness.V21
                     if (language != "LAD" && language != "FBD" && !(change.Kind == "call_parameter_set" && language == "SCL")) throw new BridgeException("UnsupportedLanguage", "Graphical editing requires standard LAD/FBD; call_parameter_set also supports exported SCL calls.");
                     change.BlockNames = new[] { name };
                     PrepareBlockTargets(change, plc, false, true, effects);
+                    // A batch preflight rechecks the target only: it exports no backup and must not overwrite the item's prepared
+                    // requested.xml. The batch's stale-revision fingerprint already proved the block unchanged since preparation.
+                    if (change.PreflightOnly) break;
                     string backup = change.Backups[0]["artifact"].Value<string>("path");
                     var document = EngineeringSources.ReadXml(File.ReadAllText(backup));
                     try

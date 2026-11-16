@@ -106,6 +106,8 @@ namespace TiaMcp.Openness.V21
         // The cross-item rules: no object edited twice, no name or block number produced twice, no renamed group inside another.
         private static void RequireIndependentItems(List<EngineeringChange> members)
         {
+            if (members.Count > 0 && ChangeBatchRules.StructuredKinds.Contains(members[0].Kind, StringComparer.Ordinal))
+                ChangeBatchRules.RequireDistinctBlocks(members.Select(m => (m.Namespace ?? "") + "\n" + m.BlockNames[0]).ToArray());
             bool numbers = members.Count > 0 && members[0].Kind == "block_number_set";
             ChangeBatchRules.RequireDistinct(members.Select(m => (BatchTarget(m), BatchProduced(m))), numbers ? "BlockNumberCollision" : "ObjectExists", numbers ? "block number" : "name");
             ChangeBatchRules.RequireUnnested(members.Select(m => ChangeBatchRules.GroupTarget(m.Kind, m.Payload)).ToArray());

@@ -149,6 +149,59 @@ namespace TiaMcp.Openness.V21
             return null;
         }
 
+        internal static readonly string[] RowModes = { "full", "compact", "hash" };
+
+        /// <summary>full: every observed field (default). compact: identity, path, kind, name, parentPath, nativeType and contentSha256.
+        /// hash: path, kind and contentSha256 only. Rows without contentSha256 (sections other than model) get the hash of their full row.</summary>
+        internal static string RowMode(string requested, string section)
+        {
+            string mode = requested ?? "full";
+            if (!RowModes.Contains(mode, StringComparer.Ordinal)) throw new ArgumentException("rowMode must be full, compact or hash.");
+            return mode;
+        }
+
+        internal static JObject ShapeRow(JObject row, string mode)
+        {
+            if (mode == "full") return row;
+            string hash = row.Value<string>("contentSha256") ?? Sha256(row.ToString(Newtonsoft.Json.Formatting.None));
+            if (mode == "hash") return new JObject { ["path"] = row["path"]?.DeepClone(), ["kind"] = row["kind"]?.DeepClone(), ["contentSha256"] = hash };
+            var compact = new JObject();
+            foreach (string name in new[] { "identity", "path", "kind", "name", "parentPath", "nativeType", "screenRole" })
+                if (row[name] != null) compact[name] = row[name].DeepClone();
+            compact["contentSha256"] = hash;
+            return compact;
+        }
+
+        private static string Sha256(string text)
+        {
+            using (var sha = System.Security.Cryptography.SHA256.Create())
+                return string.Concat(sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(text)).Select(b => b.ToString("x2")));
+        }
+
+        /// <summary>hmi_inspect: a full target identity names one object; its kind must belong to the requested section. A device
+        /// identity selects the HMI for any section; a screen may select the items section (its screenPath); hmiModelNode is model only.</summary>
+        internal static void RequireTargetKind(string kind, string section, bool isDevicePath)
+        {
+            if (kind == null || kind == "hmiDevice" || isDevicePath) return;
+            if (section == "model") { if (kind == "hmiModelNode") return; }
+            else if (kind == "hmiModelNode") { }
+            else if (section == "items" && kind == "hmiScreen") return;
+            else
+            {
+                string owner;
+                try { owner = Section(kind); }
+                catch (ArgumentException) { throw new ArgumentException("Unknown HMI target.kind " + kind + "."); }
+                if (owner == section) return;
+            }
+            throw new ArgumentException("target.kind " + kind + " does not belong to section " + section + "; use section "
+                + (kind == "hmiModelNode" ? "model" : SafeSection(kind) ?? "devices") + " or a device identity.");
+        }
+
+        private static string SafeSection(string kind)
+        {
+            try { return Section(kind); } catch (ArgumentException) { return null; }
+        }
+
         internal static string Section(string kind)
         {
             switch (kind)

@@ -55,6 +55,16 @@ executed portable checks separately from native work.
 
 Call `project_snapshot_capture` with a `request` object. It accepts `projectName`, `plcPath`, `maxVisited`, `maxBlocks` (0–200, default 25), `blockPaths` (unique exact native paths) and `maxRelationshipRoots` (0–25, default 5). Relationship queries cover the first selected blocks in exact-path order, with at most 500 nodes and 1,000 edges per root. Protected/safety or unsupported block languages are recorded as unavailable. Excluded blocks remain omitted, never implicitly equal.
 
+The result's `summary` names each degraded reason with its block count and its text. `reviewUri`
+(`tia://project-reviews/{reviewId}`) lets a remote client read a review of up to 4 MiB as an MCP resource;
+larger reviews are read in chunks with `artifact_read`. A client that sends a `progressToken` gets a progress
+notification per step: hierarchy captured, each block as it is exported, and the metadata recheck.
+
+Counts: `nodeCount` is the number of distinct object nodes in the saved review's model, the same set the
+review document holds. The model is exported again after the relationship observations, so it includes the
+nodes they added. Native traversal counts (`visited` in the capture metadata) count every object touched,
+containers and skipped objects included, and are therefore larger.
+
 Capture checks native metadata again after the exports and refuses a changed metadata revision. Sequential exports are not an atomic content snapshot. Coverage and separate observation times remain in the result. Limits are 16 MiB per XML document, 40 MiB of selected export input, 64 MiB per saved review and 1 GiB for the review store. Archive selected artifacts manually before exceeding the store limit.
 
 Call `project_snapshot_compare` with `beforeId`, `afterId` and optional `allowDifferentProjectCopy` (default false). Cross-project comparison requires explicit opt-in and matches exact paths relative to each project root; it does not guess renames. Added/removed paths are changes to the captured scope, not proof of project creation/deletion. The report distinguishes metadata, interface, network logic and full-document changes. It retains direct observed incoming dependencies and adds bounded dependency paths with explicitly incomplete impact coverage.

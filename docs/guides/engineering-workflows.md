@@ -56,6 +56,10 @@ Every change result and `change_status` carry `progress`:
 
 `change_status` with `progressOnly: true` reads the progress receipt while a change runs. It reports `currentPhase` with its elapsed time, and a `phaseFingerprint` that changes only when the state or a phase changes. An unchanged fingerprint means there is nothing new to tell the user.
 
+The summary also carries `stageTimings`: each worker phase with its `state` and `elapsedMs`. Every tool result, change or not, carries the whole call's wall-clock time in `_meta["tiaMcp/durationMs"]`, Host queueing included.
+
+MCP progress notifications are sent only when the client puts a `progressToken` in the call's `_meta`: a `started` notification before dispatch, then a heartbeat every 10 s until the result. Clients that reset their request timeout on progress need the token for calls longer than their timeout. Without it, the Host sends nothing until the result. The native deadline is `--timeout-seconds` (5 to 3600 s); set the client's tool timeout longer than that.
+
 `host_build_identity` reports which build the connected Host runs: process start, product version and the SHA-256 of the Host and worker executables when the Host started and now. A rebuilt or replaced file shows as `changedOnDisk`, and `runningMatchesDisk` is false. Building or packaging a new version never updates a running Host; only a restart does, after which the report shows the new hashes.
 
 Concise reports keep these apart, for example:
@@ -336,9 +340,13 @@ inherits: `constant_set`, `tag_create`, `constant_create`, `tag_delete`,
 `block_attributes_set`, `type_rename`, `block_number_set`, `group_create`,
 `group_rename` and `block_delete`. A `block_delete` batch scans dependencies per item against the
 unchanged project, so a block that another block of the same batch references is still refused: delete the
-referencing block in an earlier change. `call_parameter_set` and the graphical edits are not batched yet: their
-structured readback runs once per change. Any other field beside `items` is refused, and so is `items` on any
-other kind.
+referencing block in an earlier change. `call_parameter_set`, `call_connection_set`, `graphical_operand_set`,
+`graphical_network_patch` and `graphical_network_insert` also take `items`, one item per block: each item replaces
+its whole block with its prepared document, so two items on one block are refused (`InvalidRequest`). After apply,
+every item's block is read back against its own prepared document (`structured-edit-readback` rows carry `index`
+and `blockName`); a mismatch names the item and leaves the change `recovery_required`. These five batches are
+implemented and covered offline only; their native qualification is open. `graphical_typed_edit` and
+`graph_import` are not batched. Any other field beside `items` is refused, and so is `items` on any other kind.
 
 ```json
 {

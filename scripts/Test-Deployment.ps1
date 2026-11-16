@@ -41,7 +41,9 @@ foreach ($path in @('relative/path','C:relative','\root-relative','\\?\C:\device
     Assert-Rejected { & $generator -BundlePath 'C:\TiaMcp' -GitExecutable $path } 'Unsafe Git executable path accepted.'
 }
 foreach ($alias in @('-oProxyCommand=test','host;command',"host`ncommand",'a@b@c','a@','@host')) { Assert-Rejected { & $generator -BundlePath 'C:\TiaMcp' -SshHost $alias } 'Invalid SSH destination accepted.' }
-Assert-Rejected { & $generator -BundlePath 'C:\TiaMcp' -TimeoutSeconds 901 } 'Out-of-range bridge timeout accepted.'
+Assert-Rejected { & $generator -BundlePath 'C:\TiaMcp' -TimeoutSeconds 3601 } 'Out-of-range bridge timeout accepted.'
+$longest = & $generator -BundlePath 'C:\TiaMcp' -TimeoutSeconds 3600 | ConvertFrom-Json
+Assert-Check ($longest.mcpServers.'tia-v21'.args -contains '3600') 'The longest bridge timeout (3600 s) was not accepted.'
 Assert-Rejected { & $generator -BundlePath 'C:\TiaMcp' -ConnectTimeoutSeconds 0 } 'Out-of-range SSH timeout accepted.'
 Assert-Check ($local.mcpServers.'tia-v21'.args -notcontains '-InteractiveSession') 'Direct mode silently enabled an interactive session.'
 $interactive = (& $generator -BundlePath 'C:\TIA MCP' -SshHost 'tia-vm' -SessionMode InteractiveUser -StrictBundle) | ConvertFrom-Json

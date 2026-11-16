@@ -10,6 +10,10 @@ import time
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
+class HostExited(RuntimeError):
+    """The Host ended or closed its input before answering. The message starts "MCP host exited" and carries its last stderr lines."""
+
+
 class Client:
     def __init__(self, executable, timeout, extra_arguments=None, command=None):
         self.timeout = timeout
@@ -18,6 +22,7 @@ class Client:
         self.errors = []
         self.tool_calls = []  # Curated evidence records which tools answered without error.
         self.output_schemas = None  # Advertised outputSchema per tool, loaded before the first tools/call.
+        self.exited = False  # Set once the Host is gone, so later requests fail at once instead of waiting out the timeout.
         self.process = subprocess.Popen(
             command if command is not None else [str(executable), "--timeout-seconds", str(timeout), *(extra_arguments or [])],
             cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -37,9 +42,25 @@ class Client:
         for line in self.process.stderr:
             self.errors.append(line.rstrip())
 
+    def _host_exited(self, reason):
+        # Let the stderr reader drain, so the startup failure (bad option, missing worker) is part of the message.
+        self.exited = True
+        self.error_reader.join(timeout=2)
+        code = self.process.poll()
+        status = f"exit code {code}" if code is not None else "process still running"
+        return HostExited(f"MCP host exited {reason} ({status}): " + "\n".join(self.errors[-10:]))
+
+    def _send(self, message):
+        if self.exited or self.process.poll() is not None:
+            raise self._host_exited("before the request was sent")
+        try:
+            self.process.stdin.write(json.dumps(message) + "\n")
+            self.process.stdin.flush()
+        except (BrokenPipeError, OSError, ValueError) as error:
+            raise self._host_exited(f"while it was being written to ({type(error).__name__})") from error
+
     def notify(self, method, params=None):
-        self.process.stdin.write(json.dumps({"jsonrpc": "2.0", "method": method, "params": params or {}}) + "\n")
-        self.process.stdin.flush()
+        self._send({"jsonrpc": "2.0", "method": method, "params": params or {}})
 
     def request(self, method, params=None):
         # The change tools answer with a summary by default; qualification runners read full previews and journals.
@@ -49,13 +70,17 @@ class Client:
         if method == "tools/call" and self.output_schemas is None:
             self.output_schemas = {tool["name"]: tool["outputSchema"] for tool in self.request("tools/list")["tools"] if "outputSchema" in tool}
         self.sequence += 1
-        self.process.stdin.write(json.dumps({"jsonrpc": "2.0", "id": self.sequence, "method": method, "params": params or {}}) + "\n")
-        self.process.stdin.flush()
+        self._send({"jsonrpc": "2.0", "id": self.sequence, "method": method, "params": params or {}})
         deadline = time.monotonic() + self.timeout + 15
         while True:
-            line = self.lines.get(timeout=max(0.01, deadline - time.monotonic()))
+            try:
+                line = self.lines.get(timeout=max(0.01, deadline - time.monotonic()))
+            except queue.Empty:
+                if self.process.poll() is not None:
+                    raise self._host_exited(f"while {method} was pending") from None
+                raise TimeoutError(f"MCP host sent no response to {method} within {self.timeout + 15} s.") from None
             if line is None:
-                raise RuntimeError("MCP host exited: " + "\n".join(self.errors[-10:]))
+                raise self._host_exited(f"before answering {method}")
             response = json.loads(line)
             if response.get("id") != self.sequence:
                 continue
