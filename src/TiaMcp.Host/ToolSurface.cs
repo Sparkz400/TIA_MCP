@@ -123,7 +123,8 @@ internal static class ToolSurface
             if (context.Params?.Arguments is { } arguments && JsonArguments.TryGetValue(context.Params.Name, out var structured))
                 foreach (var argument in structured)
                     if (arguments.TryGetValue(argument, out var value) && StructuredValue(value) is { } parsed) arguments[argument] = parsed;
-            if (context.Params?.ProgressToken is not { } progress) return await next(context, token);
+            var started = Stopwatch.GetTimestamp();
+            if (context.Params?.ProgressToken is not { } progress) return Timed(await next(context, token), started);
             var tool = context.Params.Name;
             // Sent before dispatch so a broken transport fails the call before any native work starts.
             await context.Server.NotifyProgressAsync(progress, new ProgressNotificationValue { Progress = 0, Message = tool + " started" }, cancellationToken: token);
@@ -132,9 +133,19 @@ internal static class ToolSurface
             var heartbeat = Heartbeat(HeartbeatInterval, tool, done.Token,
                 async (beat, message) => await context.Server.NotifyProgressAsync(progress, new ProgressNotificationValue { Progress = beat,
                     Message = stage.Stage is { } current ? message + ": " + current : message }));
-            try { return await next(context, token); }
+            try { return Timed(await next(context, token), started); }
             finally { done.Cancel(); await heartbeat; }
         });
+
+    internal const string DurationMeta = "tiaMcp/durationMs";
+
+    /// <summary>Wall-clock time of the whole tool call, Host queueing included, in the result's _meta, so declared
+    /// output schemas (some closed with additionalProperties:false) stay valid.</summary>
+    internal static CallToolResult Timed(CallToolResult result, long started)
+    {
+        (result.Meta ??= new JsonObject())[DurationMeta] = (long)Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+        return result;
+    }
 
     // Keeps clients that reset their request timeout on progress from abandoning long native calls.
     internal static async Task Heartbeat(TimeSpan interval, string tool, CancellationToken stop, Func<int, string, Task> notify)

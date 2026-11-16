@@ -302,8 +302,16 @@ namespace TiaMcp.Openness.V21
                 result["disconnectBehavior"] = "Dispose this connection and publicly close its exact worker-created scope-probe UI process. The qualification controller must independently verify its exit through the original retained handle.";
             result["projects"] = _portal == null ? new JArray() : new JArray(_portal.Projects.Select(p => { var info = ProjectInfo(p); info["readOnly"] = !p.IsPrimary; info["isModified"] = p.IsModified; info["lastModified"] = p.LastModified.ToString("O"); return info; }));
             result["capabilities"] = Capabilities();
+            // Every visible Portal and the project it holds: one Portal opens a project primary at a time, so this names
+            // the lock owner when several Hosts or a user's TIA share the machine.
+            try { result["portals"] = ProjectLockRules.Portals(VisiblePortals(), _processId, _ownsPortal); }
+            catch (Exception error) { result["portals"] = null; result["portalsUnavailable"] = error.Message; }
+            result["writerRule"] = "One Portal opens a project primary (writable) at a time; other Hosts open it readOnly or work on project_open_copy.";
             return result;
         }
+
+        private static IEnumerable<ProjectLockRules.PortalView> VisiblePortals() => PortalProcesses.Discover()
+            .Select(p => new ProjectLockRules.PortalView { ProcessId = p.ProcessId, Mode = p.Mode, ProjectPath = p.ProjectPath });
 
         // For a worker-owned instance: close its projects without saving (dispose discards them anyway), dispose the
         // connection, then wait on the retained process handle for the Portal to exit and report what happened. Siemens

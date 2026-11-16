@@ -27,6 +27,11 @@ namespace TiaMcp.Simulation
 
         internal static string Interface(JObject marker) => marker.Value<string>("communicationInterface") ?? "Softbus";
 
+        /// <summary>A ticket names one owned, fresh instance and expires 15 minutes after sim_create; a download spends it once it claims the instance's storage.</summary>
+        internal const string InvalidTicketRemediation = "A ticket is valid for 15 minutes after sim_create and only for that instance and its storage; call sim_create for a fresh owned instance and pass its new downloadTicket.";
+        internal const string ReusableTicketRemediation = "Nothing was written to the instance: fix the cause (for example the compiler errors in the report) and call simulation_download again with the same ticket while it is valid (15 minutes after sim_create).";
+        internal const string SpentTicketRemediation = "The ticket is spent: its instance holds a download claim or memory card, which is never replaced. Release it with sim_release (deleteOwned:true), call sim_create for a fresh instance and download with its new ticket.";
+
         internal static string Encode(JObject marker) => Convert.ToBase64String(ProtectedData.Protect(
             Encoding.UTF8.GetBytes(marker.ToString(Newtonsoft.Json.Formatting.None)), Entropy, DataProtectionScope.CurrentUser));
 

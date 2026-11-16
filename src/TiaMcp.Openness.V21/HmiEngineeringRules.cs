@@ -49,6 +49,33 @@ namespace TiaMcp.Model
         // hmi_classic_import imports only these whole objects; templates, popups, slide-ins, global elements and the rest stay closed.
         internal static readonly string[] ClassicImportTypes = { "Siemens.Engineering.Hmi.Screen.Screen", "Siemens.Engineering.Hmi.Tag.TagTable" };
 
+        /// <summary>The target kinds each operation's native prepare accepts (its HmiTargetMismatch checks), so a wrong kind is refused
+        /// before the minutes-long preservation capture. Only an explicit target.kind is checked here; a missing one keeps resolving natively.</summary>
+        internal static string[] TargetKinds(string operation, string family)
+        {
+            switch (operation)
+            {
+                case "tag_create": case "external_tag_create": return new[] { "hmiTagTable" };
+                case "connection_create": case "object_create": case "screen_create": return new[] { "hmiDevice" };
+                case "object_properties_set": return new[] { "hmiAlarm", "hmiModelNode" };
+                case "item_create": return new[] { "hmiScreen" };
+                case "event_handler_set": return new[] { "hmiScreen", "hmiScreenItem" };
+                case "classic_xml_import": return new[] { "hmiScreen", "hmiTagTable" };
+                case "scalar_property_set": return family == "classic" ? new[] { "hmiScreen" } : new[] { "hmiScreenItem" };
+                case "item_properties_set": case "item_place": case "existing_binding_set": case "explicit_binding_set": case "dynamization_set":
+                    return new[] { "hmiScreenItem" };
+                default: throw new ArgumentException("Unknown HMI engineering operation.");
+            }
+        }
+
+        internal static void RequireTargetKind(string operation, string family, string kind)
+        {
+            var kinds = TargetKinds(operation, family);
+            if (!kinds.Contains(kind, StringComparer.Ordinal))
+                throw new ArgumentException(operation + (operation == "scalar_property_set" ? " on a " + family + " HMI" : "") + " takes target.kind "
+                    + string.Join(" or ", kinds) + " (an exact identity from hmi_inspect), not " + kind + ".");
+        }
+
         internal static void RequireRequest(JObject payload)
         {
             if (payload == null || payload.Value<int?>("schemaVersion") != 1) throw new ArgumentException("HMI engineering requires payload.schemaVersion=1.");
@@ -68,6 +95,7 @@ namespace TiaMcp.Model
             if (ScreenOperations.Contains(operation) && Text(target, "family") != "unified")
                 throw new ArgumentException(operation + " uses documented Unified screen compositions; Classic screens use classic_xml_import.");
             foreach (string key in new[] { "projectCopyId", "sessionGeneration", "hmiPath", "objectPath" }) Text(target, key, 4096);
+            if (target.Value<string>("kind") is string targetKind) RequireTargetKind(operation, Text(target, "family"), targetKind);
             string hash = Text(payload, "expectedContentHash");
             if (hash.Length != 64 || hash.Any(c => !Uri.IsHexDigit(c))) throw new ArgumentException("expectedContentHash must be the full native-content SHA-256; metadataRevision is insufficient.");
             if (operation == "tag_create")

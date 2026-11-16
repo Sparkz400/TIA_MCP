@@ -149,6 +149,30 @@ namespace TiaMcp.Openness.V21
             return null;
         }
 
+        /// <summary>hmi_inspect: a full target identity names one object; its kind must belong to the requested section. A device
+        /// identity selects the HMI for any section; a screen may select the items section (its screenPath); hmiModelNode is model only.</summary>
+        internal static void RequireTargetKind(string kind, string section, bool isDevicePath)
+        {
+            if (kind == null || kind == "hmiDevice" || isDevicePath) return;
+            if (section == "model") { if (kind == "hmiModelNode") return; }
+            else if (kind == "hmiModelNode") { }
+            else if (section == "items" && kind == "hmiScreen") return;
+            else
+            {
+                string owner;
+                try { owner = Section(kind); }
+                catch (ArgumentException) { throw new ArgumentException("Unknown HMI target.kind " + kind + "."); }
+                if (owner == section) return;
+            }
+            throw new ArgumentException("target.kind " + kind + " does not belong to section " + section + "; use section "
+                + (kind == "hmiModelNode" ? "model" : SafeSection(kind) ?? "devices") + " or a device identity.");
+        }
+
+        private static string SafeSection(string kind)
+        {
+            try { return Section(kind); } catch (ArgumentException) { return null; }
+        }
+
         internal static string Section(string kind)
         {
             switch (kind)

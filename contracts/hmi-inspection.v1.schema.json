@@ -21,7 +21,7 @@
     "target": {"$ref": "#/$defs/selector"},
     "identity": {"$ref": "hmi-identity.v2.schema.json"},
     "artifactDirectory": {"type": "string"},
-    "limit": {"type": "integer", "minimum": 1, "maximum": 200},
+    "limit": {"type": "integer", "minimum": 1, "maximum": 1000, "description": "Rows per page, default 100; maxBytes still bounds a page (page.stoppedBy says which bound ended it)."},
     "offset": {"type": "integer", "minimum": 0, "maximum": 50000},
     "maxVisited": {"type": "integer", "minimum": 1, "maximum": 50000},
     "maxBytes": {"type": "integer", "minimum": 4096, "maximum": 1048576}
@@ -36,13 +36,15 @@
       "type": "object", "required": ["schemaVersion", "projectPath", "projectCopyId", "sessionGeneration", "section", "target", "items", "coverage", "metadataRevision", "diagnostics", "scriptsExecuted"],
       "properties": {
         "schemaVersion": {"const": 1}, "projectPath": {"type": ["string", "null"]}, "projectCopyId": {"type": "string"}, "sessionGeneration": {"type": "string"}, "section": {"enum": ["devices", "connections", "tags", "screens", "items", "alarms", "scripts", "resources", "model"]},
-        "target": {"type": ["object", "null"]}, "items": {"type": "array", "maxItems": 200, "items": {"$ref": "#/$defs/row"}},
+        "target": {"type": ["object", "null"]}, "items": {"type": "array", "maxItems": 1000, "items": {"anyOf": [{"$ref": "#/$defs/row"}, {"$ref": "#/$defs/compactRow"}]}},
+        "page": {"type": "object", "required": ["rowMode", "limit", "maxBytes", "payloadBytes", "returned", "totalItems", "stoppedBy"], "properties": {"rowMode": {"enum": ["full", "compact"]}, "limit": {"type": "integer"}, "maxBytes": {"type": "integer"}, "payloadBytes": {"type": "integer", "minimum": 0}, "returned": {"type": "integer", "minimum": 0}, "totalItems": {"type": "integer", "minimum": 0}, "stoppedBy": {"enum": ["end", "limit", "maxBytes"]}, "excludeSystem": {"type": ["boolean", "null"]}}},
         "coverage": {"type": "object", "required": ["status", "complete", "truncated", "visited"], "properties": {"status": {"enum": ["complete", "truncated", "unsupported", "unavailable", "failed"]}, "complete": {"type": "boolean", "description": "True only when the capture is complete and no page is left (nextOffset null)."}, "captureComplete": {"type": "boolean", "description": "The capture finished without truncation or failure; says nothing about paging."}, "pageComplete": {"type": "boolean"}, "hasMore": {"type": "boolean"}, "totalItems": {"type": "integer", "minimum": 0}, "truncated": {"type": "boolean"}, "visited": {"type": "integer", "minimum": 0}, "visitedScope": {"type": "string"}, "screenScopes": {"type": "array", "maxItems": 6, "items": {"$ref": "#/$defs/classicScreenScope"}}}},
         "metadataRevision": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "rowMode": {"enum": ["full", "compact"]}, "sectionContentSha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "offset": {"type": "integer", "minimum": 0}, "nextOffset": {"type": ["integer", "null"], "description": "The paging signal: request this offset next; null on the last page."}, "totalItems": {"type": "integer", "minimum": 0}, "hasMore": {"type": "boolean"}, "pageCount": {"type": "integer", "minimum": 0},
         "diagnostics": {"type": "array", "items": {"type": "object"}}, "artifacts": {"type": "array", "items": {"type": "object"}}, "scriptsExecuted": {"const": false}, "runtimeVerified": {"const": false}
       }
     },
     "row": {"type": "object", "required": ["identity", "kind", "name", "parentPath", "source"], "properties": {"identity": {"$ref": "hmi-identity.v2.schema.json"}, "kind": {"enum": ["hmiDevice", "hmiConnection", "hmiTagTable", "hmiTag", "hmiScreen", "hmiScreenItem", "hmiScreenLayer", "hmiAlarm", "hmiScript", "hmiResource", "hmiModelNode"]}, "name": {"type": ["string", "null"]}, "parentPath": {"type": "string"}, "screenRole": {"enum":["regular","template","popup","slideIn","globalElements","overview"]}, "nativeType": {"type": ["string", "null"]}, "properties": {"type": "object"}, "source": {"type": "object"}, "nativeSources": {"type": "array", "maxItems": 32}, "nativeSourceCoverage": {"$ref": "#/$defs/sourceCoverage"}}},
+    "compactRow": {"type": "object", "required": ["path"], "properties": {"path": {"type": "string"}, "name": {"type": ["string", "null"]}, "kind": {"type": "string"}, "contentSha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}, "description": "rowMode compact: no identity or attribute body; fetch the row in full for its identity."},
     "classicScreenScope": {"type":"object","additionalProperties":false,"required":["role","property","path","status","observed"],"properties":{"role":{"enum":["regular","template","popup","slideIn","globalElements","overview"]},"property":{"enum":["ScreenFolder","ScreenTemplateFolder","ScreenPopupFolder","ScreenSlideinFolder","ScreenGlobalElements","ScreenOverview"]},"path":{"type":"string","minLength":1},"status":{"enum":["complete","absent","unavailable","truncated"]},"observed":{"type":"integer","minimum":0,"maximum":50000}}},
     "sourceCoverage": {
       "type": "object",

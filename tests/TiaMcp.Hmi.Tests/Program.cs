@@ -108,4 +108,12 @@ Check(HmiCompilerDiagnostics.IsComplete(CaptureDiagnostics(new[] { Diagnostic("I
 var nativeError = CaptureDiagnostics(new[] { Diagnostic("Error") });
 Check(HmiCompilerDiagnostics.IsComplete(nativeError) && nativeError[0].Value<string>("state") == "Error", "Capture completeness retains native errors and does not imply compile success.");
 ClassicScreenInventoryTests.Run(Check);
+// target.kind belongs to the requested section.
+HmiInspectionRules.RequireTargetKind("hmiDevice", "tags", false); HmiInspectionRules.RequireTargetKind(null, "tags", false);
+HmiInspectionRules.RequireTargetKind("hmiTagTable", "tags", false); HmiInspectionRules.RequireTargetKind("hmiScreen", "items", false);
+HmiInspectionRules.RequireTargetKind("hmiModelNode", "model", false); HmiInspectionRules.RequireTargetKind("hmiScreen", "model", true);
+count++;
+foreach (var (kind, section) in new[] { ("hmiTag", "screens"), ("hmiModelNode", "tags"), ("hmiScreen", "model"), ("hmiBogus", "alarms") })
+    try { HmiInspectionRules.RequireTargetKind(kind, section, false); Check(false, kind + " must be refused for section " + section + "."); }
+    catch (ArgumentException error) { Check(error.Message.Contains(kind), "The refusal names the wrong kind."); }
 Console.WriteLine($"{count} HMI inspection contract checks passed. Native qualification remains separate.");

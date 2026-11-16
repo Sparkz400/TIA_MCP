@@ -10,10 +10,13 @@ internal static class Program
 {
     private static int Main()
     {
-        // The same override the builds take from MSBuild's TiaApiDirectory property.
+        // The same overrides the builds take from MSBuild's TiaApiDirectory and SimulatorApiDirectory properties.
+        // OpennessSession's type initializer reaches the PLCSIM V8 API, which lives outside the TIA PublicAPI folder.
         string api = Environment.GetEnvironmentVariable("TiaApiDirectory") ?? @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48";
+        string simulator = Environment.GetEnvironmentVariable("SimulatorApiDirectory") ?? @"C:\Program Files (x86)\Common Files\Siemens\PLCSIMADV\API\8.0";
         AppDomain.CurrentDomain.AssemblyResolve += (_, e) => {
-            string path = Path.Combine(api, new AssemblyName(e.Name).Name + ".dll");
+            string name = new AssemblyName(e.Name).Name;
+            string path = Path.Combine(name.StartsWith("Siemens.Simatic.Simulation.", StringComparison.Ordinal) ? simulator : api, name + ".dll");
             return File.Exists(path) ? Assembly.LoadFrom(path) : null;
         };
         int passed = CanonicalVectors(Assembly.Load("TiaMcp.Openness.V21"));

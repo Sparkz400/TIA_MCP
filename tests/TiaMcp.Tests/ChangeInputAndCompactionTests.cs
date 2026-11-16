@@ -159,6 +159,43 @@ internal static class ChangeInputAndCompactionTests
         return Task.CompletedTask;
     }
 
+    // detail=standard: the full view, with every HMI preservation artifact map reduced to its count and hash; stageTimings in summaries.
+    internal static Task DetailLevelsReduceHmiArtifactMaps()
+    {
+        JsonObject Map(int count) => new(Enumerable.Range(0, count).Select(i => KeyValuePair.Create<string, JsonNode?>("/HMI/screens/S" + i,
+            new JsonObject { ["path"] = "C:/artifacts/hmi/s" + i + ".xml", ["bytes"] = 10, ["sha256"] = new string('a', 64) })));
+        var view = new JsonObject
+        {
+            ["changeId"] = "c4", ["state"] = "prepared", ["previewHash"] = "h4",
+            ["preview"] = new JsonObject { ["kind"] = "hmi_screen_create", ["hmiEvidence"] = new JsonObject { ["baseline"] = new JsonObject { ["artifacts"] = Map(40), ["complete"] = true } } },
+            ["hmiEvidence"] = new JsonObject { ["baseline"] = new JsonObject { ["artifacts"] = Map(40) }, ["after"] = new JsonObject { ["artifacts"] = Map(41) } },
+            ["readbacks"] = new JsonArray(new JsonObject { ["artifacts"] = Map(2) }),
+            ["phaseTimings"] = new JsonArray(new JsonObject { ["phase"] = "capture", ["state"] = "completed", ["elapsedMilliseconds"] = 1234, ["startedAtUtc"] = "t" }),
+        };
+        var full = view.ToJsonString();
+        var standard = ChangeResultCompaction.AtLevel(view, "standard")!.AsObject();
+        Check.Equal(full, view.ToJsonString());
+        Check.Equal("standard", standard["responseDetail"]!.GetValue<string>());
+        Check.Equal(40, standard["hmiEvidence"]!["baseline"]!["artifacts"]!["artifactCount"]!.GetValue<int>());
+        Check.Equal(41, standard["hmiEvidence"]!["after"]!["artifacts"]!["artifactCount"]!.GetValue<int>());
+        Check.Equal(40, standard["preview"]!["hmiEvidence"]!["baseline"]!["artifacts"]!["artifactCount"]!.GetValue<int>());
+        Check.Equal(true, standard["preview"]!["hmiEvidence"]!["baseline"]!["complete"]!.GetValue<bool>());
+        Check.Equal(64, standard["hmiEvidence"]!["baseline"]!["artifacts"]!["artifactsSha256"]!.GetValue<string>().Length);
+        // Artifact lists outside hmiEvidence keep their paths.
+        Check.Equal(2, standard["readbacks"]![0]!["artifacts"]!.AsObject().Count);
+        Check.Equal(false, standard["hmiEvidence"]!.ToJsonString().Contains("C:/artifacts/hmi/s39.xml", StringComparison.Ordinal));
+        Check.Equal(full, ChangeResultCompaction.AtLevel(view, "full")!.ToJsonString());
+        var summary = ChangeResultCompaction.AtLevel(view, "summary")!;
+        Check.Equal(1234, summary["stageTimings"]![0]!["elapsedMs"]!.GetValue<int>());
+        Check.Equal(null, summary["stageTimings"]![0]!["startedAtUtc"]);
+        Check.Equal("summary", ChangeResultCompaction.DetailLevel(null, false));
+        Check.Equal("full", ChangeResultCompaction.DetailLevel(null, true));
+        Check.Equal("standard", ChangeResultCompaction.DetailLevel("standard", true));
+        try { ChangeResultCompaction.DetailLevel("everything", false); throw new InvalidOperationException("An unknown detail level was accepted."); }
+        catch (ArgumentException) { }
+        return Task.CompletedTask;
+    }
+
     // tag_set with payload.items: the summary lists every edit although other arrays stop at MaxArray.
     internal static Task TagBatchSummariesListEveryItem()
     {

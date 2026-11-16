@@ -24,7 +24,11 @@ namespace TiaMcp.Openness.V21
         {
             JObject marker;
             try { marker = SimulationTicket.Decode(args.Value<string>("downloadTicket")); }
-            catch (Exception ex) { throw new BridgeException("InvalidSimulationTicket", ex.Message); }
+            catch (Exception ex)
+            {
+                throw new BridgeException("InvalidSimulationTicket", ex.Message + " " + SimulationTicket.InvalidTicketRemediation,
+                    new JObject { ["ticketState"] = "unusable", ["remediation"] = SimulationTicket.InvalidTicketRemediation });
+            }
             var plc = SelectPlc(args);
             var simulationSettings = plc.Project.GetService<PlcSimulationSettingsProvider>();
             if (simulationSettings == null || !simulationSettings.IsSimulationDuringBlockCompilationEnabled)
@@ -67,7 +71,9 @@ namespace TiaMcp.Openness.V21
                 if ((version >> 16) != 8) throw new BridgeException("SimulatorVersionMismatch", "PLCSIM Advanced runtime V8 is required.");
                 instance = VerifySimulationInstance(marker);
                 if (Directory.Exists(card) || File.Exists(card) || File.Exists(reportPath) || File.Exists(claimPath))
-                    throw new BridgeException("FreshSimulationStorageRequired", "This instance already contains a memory card or download report. Create a fresh owned instance; existing files are never replaced.");
+                    throw new BridgeException("FreshSimulationStorageRequired", "This instance already contains a memory card or download report, so its ticket was spent by an earlier download (completed or failed after its claim). "
+                        + SimulationTicket.SpentTicketRemediation, new JObject { ["ticketState"] = "spent", ["remediation"] = SimulationTicket.SpentTicketRemediation,
+                            ["reportPath"] = File.Exists(reportPath) ? reportPath : null });
                 // Compile the selected in-memory engineering state. No save, online
                 // access, physical download or password/safety acknowledgement occurs.
                 var compiler = plc.Software.GetService<ICompilable>();
@@ -151,6 +157,9 @@ namespace TiaMcp.Openness.V21
                 report["failure"] = new JObject { ["message"] = bridge?.Message ?? ex.Message, ["exceptionType"] = ex.GetType().FullName };
                 report["retrySafe"] = !claimed && !File.Exists(claimPath) && !Directory.Exists(card) && !File.Exists(card) && !File.Exists(reportPath);
                 report["storageRetained"] = storage;
+                // What the caller can do with this ticket now: a failure before the claim leaves it reusable until it expires.
+                report["ticketState"] = report.Value<bool>("retrySafe") ? "reusable" : "spent";
+                report["remediation"] = report.Value<bool>("retrySafe") ? SimulationTicket.ReusableTicketRemediation : SimulationTicket.SpentTicketRemediation;
                 if (claimed)
                 {
                     try { File.WriteAllText(reportPath, report.ToString(Formatting.Indented), new UTF8Encoding(false)); }

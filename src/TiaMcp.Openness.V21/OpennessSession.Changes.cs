@@ -52,6 +52,10 @@ namespace TiaMcp.Openness.V21
             var payload = args["payload"] as JObject ?? throw new BridgeException("InvalidRequest", "payload must be an object.");
             var id = Guid.NewGuid().ToString("N");
             var directory = Path.Combine(ArtifactDirectory(args), "change-" + id);
+            // Old preparations no worker holds can never be applied; remove them (see StaleChangeDirectories for what is kept).
+            // Only the Host's own changes directory asks for it; coordinator workspaces read their prepared inner journals later.
+            if (args.Value<bool?>("pruneStalePreparations") == true)
+                StaleChangeDirectories.Sweep(ArtifactDirectory(args), new HashSet<string>(_changes.Keys, StringComparer.Ordinal), DateTime.UtcNow);
             Directory.CreateDirectory(directory);
             var change = new EngineeringChange
             {

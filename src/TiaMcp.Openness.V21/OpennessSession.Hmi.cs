@@ -62,6 +62,8 @@ namespace TiaMcp.Openness.V21
             return value.Value<int>();
         }
 
+        internal const int HmiMaxPageLimit = 1000;
+
         private JObject HmiInspect(JObject args)
         {
             if (args.Value<int?>("schemaVersion") is int version && version != 1) throw new BridgeException("UnsupportedSchemaVersion", "HMI inspection request schemaVersion must be 1.");
@@ -72,8 +74,20 @@ namespace TiaMcp.Openness.V21
             string section = args.Value<string>("section") ?? "devices";
             if (!new[] { "devices", "connections", "tags", "screens", "items", "alarms", "scripts", "resources", "model" }.Contains(section))
                 throw new BridgeException("InvalidRequest", "Unknown HMI inspection section.");
-            int limit = HmiBound(args, "limit", 100, 1, 200), offset = HmiBound(args, "offset", 0, 0, 50000);
+            int limit = HmiBound(args, "limit", 100, 1, HmiMaxPageLimit), offset = HmiBound(args, "offset", 0, 0, 50000);
             int maxBytes = HmiBound(args, "maxBytes", 262144, 4096, 1048576);
+            // rowMode=compact keeps each row's path and contentSha256 but drops its identity and attribute body: enough to diff two
+            // captures by hash and fetch only the changed rows in full. Checked before the capture, which can take minutes.
+            string rowMode = args.Value<string>("rowMode") ?? "full";
+            if (rowMode != "full" && rowMode != "compact") throw new BridgeException("InvalidRequest", "rowMode must be full or compact.");
+            try
+            {
+                var selector = args["target"] as JObject ?? args["identity"] as JObject;
+                if (section != "devices" && selector != null)
+                    HmiInspectionRules.RequireTargetKind(selector.Value<string>("kind"), section,
+                        selector.Value<string>("objectPath") == null || selector.Value<string>("objectPath") == selector.Value<string>("hmiPath"));
+            }
+            catch (ArgumentException error) { throw new BridgeException("InvalidRequest", error.Message); }
             var capture = new HmiCapture(HmiBound(args, "maxVisited", 5000, 1, 50000));
             HmiDiscoveredTarget target = null;
             HmiValidateIdentity(project, args["target"] as JObject ?? args["identity"] as JObject ?? args);
@@ -108,24 +122,26 @@ namespace TiaMcp.Openness.V21
             string revision = ChangeHash(new JArray(ordered.Select(e => e.Row)).ToString(Formatting.None));
             if (args.Value<string>("expectedMetadataRevision") is string expected && revision != expected)
                 throw new BridgeException("HmiMetadataChanged", "Observed metadata changed between pages; capture again from offset zero.");
-            // rowMode=compact keeps each row's path and contentSha256 but drops its identity and attribute body: enough to diff two
-            // captures by hash and fetch only the changed rows in full. metadataRevision is computed from the full rows above.
-            string rowMode = args.Value<string>("rowMode") ?? "full";
-            if (rowMode != "full" && rowMode != "compact") throw new BridgeException("InvalidRequest", "rowMode must be full or compact.");
-            var rows = new JArray(); int bytes = 0;
+            // metadataRevision is computed from the full rows above, whatever rowMode returns.
+            var rows = new JArray(); int bytes = 0; bool stoppedByBytes = false;
             foreach (var entry in ordered.Skip(offset).Take(limit))
             {
                 var row = UniformHmiRow(entry);
                 if (rowMode == "compact") row = CompactHmiRow(row);
                 int count = Encoding.UTF8.GetByteCount(row.ToString(Formatting.None));
-                if (bytes + count > maxBytes) break;
+                if (bytes + count > maxBytes) { stoppedByBytes = true; break; }
                 rows.Add(row); bytes += count;
             }
             bool more = offset + rows.Count < ordered.Count;
             if (more && rows.Count == 0) { capture.Status = "truncated"; capture.Diagnostics.Add(new JObject { ["code"] = "HmiRowTooLarge", ["reason"] = "The next row exceeds maxBytes; request a larger byte limit." }); }
             var result = Envelope(); result["schemaVersion"] = 1; result["projectPath"] = project.Path?.FullName;
             result["projectCopyId"] = HmiProjectCopyId(project); result["sessionGeneration"] = _hmiSessionGeneration;
-            result["section"] = section; result["target"] = target == null ? null : HmiDeviceView(project, target);
+            result["section"] = section;
+            // First, so a client sees why a page is short before reading rows: the bounds applied and which one ended the page.
+            result["page"] = new JObject { ["rowMode"] = rowMode, ["limit"] = limit, ["maxBytes"] = maxBytes, ["payloadBytes"] = bytes, ["returned"] = rows.Count,
+                ["totalItems"] = ordered.Count, ["stoppedBy"] = stoppedByBytes ? "maxBytes" : more ? "limit" : "end",
+                ["excludeSystem"] = section == "model" ? (JToken)(args.Value<bool?>("excludeSystem") == true) : null };
+            result["target"] = target == null ? null : HmiDeviceView(project, target);
             result["items"] = rows; result["offset"] = offset; result["nextOffset"] = more && rows.Count > 0 ? (JToken)(offset + rows.Count) : null;
             result["rowMode"] = rowMode;
             // One hash over every row's contentSha256 in path order (all pages): two captures of the same section and roots compare

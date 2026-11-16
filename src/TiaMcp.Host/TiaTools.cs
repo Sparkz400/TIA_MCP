@@ -27,7 +27,7 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
     }
 
     [McpServerTool(Name = "tia_session_status", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Read the worker's current TIA attachment and open project identities.")]
+    [Description("Read the worker's current TIA attachment and open project identities, and portals: every TIA Portal process visible on this machine (processId, mode, the project it has open, thisWorker, ownedByThisWorker). One Portal opens a project writable at a time, so portals names the lock owner when several Hosts or a user's TIA share the machine; other Hosts use readOnly or project_open_copy.")]
     public Task<CallToolResult> Status(CancellationToken cancellationToken) => Call("session_status", null, cancellationToken);
 
     [McpServerTool(Name = "tia_start", Destructive = false, OpenWorld = false)]

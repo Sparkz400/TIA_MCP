@@ -9,6 +9,8 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <ProjectReference Include="../../src/TiaMcp.Core/TiaMcp.Core.csproj" />
     <Compile Include="../../src/TiaMcp.Openness.V21/OfflineEvidence.cs" Link="OfflineEvidence.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ProjectLockRules.cs" Link="ProjectLockRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/StaleChangeDirectories.cs" Link="StaleChangeDirectories.cs" />
     <Compile Include="../../src/TiaMcp.Simulator.V8/SimulationRuntimeControl.cs" Link="SimulationRuntimeControl.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/AlarmWorkbook.cs" Link="AlarmWorkbook.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/DependencyRules.cs" Link="DependencyRules.cs" />

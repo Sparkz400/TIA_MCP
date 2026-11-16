@@ -56,6 +56,10 @@ Every change result and `change_status` carry `progress`:
 
 `change_status` with `progressOnly: true` reads the progress receipt while a change runs. It reports `currentPhase` with its elapsed time, and a `phaseFingerprint` that changes only when the state or a phase changes. An unchanged fingerprint means there is nothing new to tell the user.
 
+The summary also carries `stageTimings`: each worker phase with its `state` and `elapsedMs`. Every tool result, change or not, carries the whole call's wall-clock time in `_meta["tiaMcp/durationMs"]`, Host queueing included.
+
+MCP progress notifications are sent only when the client puts a `progressToken` in the call's `_meta`: a `started` notification before dispatch, then a heartbeat every 10 s until the result. Clients that reset their request timeout on progress need the token for calls longer than their timeout. Without it, the Host sends nothing until the result. The native deadline is `--timeout-seconds` (5 to 3600 s); set the client's tool timeout longer than that.
+
 `host_build_identity` reports which build the connected Host runs: process start, product version and the SHA-256 of the Host and worker executables when the Host started and now. A rebuilt or replaced file shows as `changedOnDisk`, and `runningMatchesDisk` is false. Building or packaging a new version never updates a running Host; only a restart does, after which the report shows the new hashes.
 
 Concise reports keep these apart, for example:

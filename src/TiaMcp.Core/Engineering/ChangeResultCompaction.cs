@@ -57,12 +57,70 @@ public static class ChangeResultCompaction
             foreach (string name in new[] { "kind", "state", "previewHash", "stages", "failure", "primaryFailure", "recoveryFailure", "recoveryArchive" })
                 if (journal[name] is { } value && result[name] is null) result[name] = Bound(value.DeepClone());
         if (view["readbacks"] is JsonArray readbacks && readbacks.Count > 0) result["readbackCount"] = readbacks.Count;
-        result["omitted"] = new JsonArray(view.Select(p => p.Key).Where(k => result[k] is null && k is not ("preview" or "compile" or "journal" or "readbacks"))
+        if ((view["phaseTimings"] ?? journal?["phaseTimings"]) is JsonArray phases && phases.Count > 0) result["stageTimings"] = StageTimings(phases);
+        result["omitted"] = new JsonArray(view.Select(p => p.Key).Where(k => result[k] is null && k is not ("preview" or "compile" or "journal" or "readbacks" or "phaseTimings"))
             .Concat(preview is null ? Array.Empty<string>() : new[] { "preview (full)" }).Select(k => (JsonNode)k).ToArray());
         result["responseDetail"] = "summary";
         result["fullEvidence"] = "The full preview, compiler messages and readback evidence are retained in journalPath. Pass includeDetails=true, or call change_status(includeDetails=true).";
         return result;
     }
+
+    public static readonly string[] DetailLevels = ["summary", "standard", "full"];
+
+    /// <summary>includeDetails=true is the full view; detail, when given, wins. Unknown levels are refused.</summary>
+    public static string DetailLevel(string? detail, bool includeDetails) => detail switch
+    {
+        null => includeDetails ? "full" : "summary",
+        "summary" or "standard" or "full" => detail,
+        _ => throw new ArgumentException("detail must be summary, standard or full."),
+    };
+
+    /// <summary>A change view at the requested level: summary (Compact), standard (the full view whose HMI preservation
+    /// artifact maps become a count and a hash, with the manifest file as the reference), or full (unchanged).</summary>
+    public static JsonNode? AtLevel(JsonNode? node, string level) => level switch
+    {
+        "summary" => Compact(node),
+        "standard" => Standard(node),
+        _ => node,
+    };
+
+    public static JsonNode? Standard(JsonNode? node)
+    {
+        if (node is not JsonObject view || view["responseDetail"] is not null) return node;
+        var result = view.DeepClone().AsObject();
+        int replaced = ReplaceArtifactMaps(result, insideHmiEvidence: false);
+        result["responseDetail"] = "standard";
+        if (replaced > 0)
+            result["fullEvidence"] = "HMI preservation artifact maps are reduced to artifactCount and artifactsSha256; the manifests in the change directory and detail=full keep every artifact with its path and hash.";
+        return result;
+    }
+
+    // Under hmiEvidence, every artifacts map ({objectPath: {path, bytes, sha256, ...}}) becomes its count and the SHA-256 of its JSON.
+    private static int ReplaceArtifactMaps(JsonNode? node, bool insideHmiEvidence)
+    {
+        int replaced = 0;
+        if (node is JsonObject item)
+        {
+            foreach (var (name, value) in item.ToArray())
+            {
+                if (insideHmiEvidence && name == "artifacts" && value is JsonObject map && map.Count > 0 && map.All(entry => entry.Value is JsonObject artifact && artifact["sha256"] is not null))
+                {
+                    item["artifacts"] = new JsonObject { ["artifactCount"] = map.Count,
+                        ["artifactsSha256"] = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(map.ToJsonString()))), ["omitted"] = true };
+                    replaced++;
+                }
+                else replaced += ReplaceArtifactMaps(value, insideHmiEvidence || name == "hmiEvidence");
+            }
+        }
+        else if (node is JsonArray list) foreach (var value in list) replaced += ReplaceArtifactMaps(value, insideHmiEvidence);
+        return replaced;
+    }
+
+    // Worker phase timings as {phase, state, elapsedMs}; start and finish timestamps stay in the full view and progress.json.
+    internal static JsonArray StageTimings(JsonArray phases) => new(phases.OfType<JsonObject>().Take(MaxArray).Select(phase => (JsonNode)new JsonObject
+    {
+        ["phase"] = phase["phase"]?.DeepClone(), ["state"] = phase["state"]?.DeepClone(), ["elapsedMs"] = phase["elapsedMilliseconds"]?.DeepClone(),
+    }).ToArray());
 
     // Requested source/XML and other long values become length and hash, so the client can match them to what it sent.
     private static JsonObject Payload(JsonObject payload)

@@ -28,6 +28,7 @@ TYPED_TOOLS = {'artifact_read', 'artifact_upload_begin', 'artifact_upload_chunk'
                'testsuite_style_job_status', 'testsuite_style_job_stop_request', 'testsuite_style_job_mark_interrupted'}
 REFUSAL = {'error': {'code': 'Refused', 'message': 'refused'}}
 ARTIFACT_TEMPLATE, FEATURE_TEMPLATE, REVIEW_TEMPLATE = 'tia://artifacts/{+path}', 'tia://feature-catalog/{featureId}', 'tia://project-reviews/{reviewId}'
+CONTRACT_TEMPLATE, PAYLOAD_TEMPLATE = 'tia://contracts/{name}', 'tia://change-payloads/{kind}'
 CANARY = 'surface-canary-7f3a'
 PROMPT_ARGUMENTS = {'safe_change': {'goal': 'rename tag Start to StartButton'}, 'project_health': {},
                     'block_test': {'behavior': 'Motor_On follows Start'}, 'diagnose_fault': {'symptom': 'conveyor stops'}}
@@ -137,7 +138,31 @@ def main():
         resource_templates = client.request('resources/templates/list')['resourceTemplates']
         resources = client.request('resources/list')['resources']
         templates = {template['uriTemplate'] for template in resource_templates}
-        check(templates == {ARTIFACT_TEMPLATE, FEATURE_TEMPLATE, REVIEW_TEMPLATE}, 'Artifact, saved-review and feature resource templates listed')
+        check(templates == {ARTIFACT_TEMPLATE, FEATURE_TEMPLATE, REVIEW_TEMPLATE, CONTRACT_TEMPLATE, PAYLOAD_TEMPLATE},
+              'Artifact, saved-review, feature, contract and change-payload resource templates listed')
+        check({'tia://contracts', 'tia://change-payloads'} <= {resource['uri'] for resource in resources}, 'Contract and payload indexes listed as resources')
+        def read_json(uri):
+            return json.loads(client.request('resources/read', {'uri': uri})['contents'][0]['text'])
+        index = read_json('tia://contracts')
+        on_disk = sorted(path.name for path in (ROOT / 'contracts').glob('*.json'))
+        check(index['contracts'] == on_disk and index['changePayloads'] == 'tia://change-payloads', 'Every shipped contract is listed under tia://contracts')
+        check(read_json('tia://contracts/hmi-inspection.v1.schema.json') == json.loads((ROOT / 'contracts/hmi-inspection.v1.schema.json').read_text(encoding='utf-8')),
+              'A contract resource returns the exact bundled schema')
+        payload_index = read_json('tia://change-payloads')['kinds']
+        check({k['kind'] for k in payload_index} == change_kinds, 'Every change kind has a payload schema resource')
+        for item in payload_index:
+            schema = read_json(item['uri'])
+            if 'contractUri' in schema:
+                check(schema['contract'] in on_disk and schema['kind'] == item['kind'], item['kind'] + ' names the contract that defines its payload')
+            else:
+                Draft202012Validator.check_schema(schema)
+                check(schema['$ref'] == '#/$defs/' + item['kind'], item['kind'] + ' payload schema is a self-contained valid JSON Schema')
+        tag_delete = Draft202012Validator(read_json('tia://change-payloads/tag_delete'))
+        check(tag_delete.is_valid({'tagTableName': 'Tags', 'memberName': 'Start', 'dependencyPolicy': 'rejectReferenced'})
+              and not tag_delete.is_valid({'tagTableName': 'Tags', 'memberName': 'Start'}), 'tag_delete schema requires the explicit dependency policy')
+        for uri in ('tia://change-payloads/no_such_kind', 'tia://contracts/../README.md', 'tia://contracts/missing.schema.json'):
+            response, _ = raw(client, 'resources/read', {'uri': uri})
+            check('error' in response and 'result' not in response, 'Resource read refused: ' + uri)
         check('tia://feature-catalog' in {resource['uri'] for resource in resources}, 'Feature catalog summary listed as a resource')
         summary = json.loads(client.request('resources/read', {'uri': 'tia://feature-catalog'})['contents'][0]['text'])
         check(summary['catalogVersion'] == catalog['catalogVersion'] and len(summary['features']) == len(catalog['features']), 'Catalog summary lists every feature')
@@ -159,6 +184,9 @@ def main():
         check(complete({'type': 'ref/resource', 'uri': FEATURE_TEMPLATE}, 'featureId', 'feature_cat') == ['feature_catalog'], 'Feature ID completes from the catalog')
         check(complete({'type': 'ref/resource', 'uri': REVIEW_TEMPLATE}, 'reviewId', '') == [], 'No saved reviews, no review completions')
         check(complete({'type': 'ref/prompt', 'name': 'safe_change'}, 'project', '') == [], 'Free-text prompt arguments get no invented completions')
+        check(complete({'type': 'ref/resource', 'uri': PAYLOAD_TEMPLATE}, 'kind', 'tag_tab') == ['tag_table_create', 'tag_table_delete', 'tag_table_import_xml', 'tag_table_rename'],
+              'Change kinds complete for the payload template')
+        check('hmi-inspection.v1.schema.json' in complete({'type': 'ref/resource', 'uri': CONTRACT_TEMPLATE}, 'name', 'hmi-insp'), 'Contract names complete')
 
         check(initialized['capabilities'].get('logging') is not None, 'Logging capability advertised')
         client.request('logging/setLevel', {'level': 'info'})
@@ -204,6 +232,8 @@ def main():
         check(progress and all(item['progressToken'] == 'surface-1' for item in progress) and progress[0]['progress'] == 0,
               'Progress-token call announces itself before its result')
         check(not response['result'].get('isError'), 'Progress filter leaves the tool result unchanged')
+        check([item['progress'] for item in progress] == sorted({item['progress'] for item in progress}), 'Progress values strictly increase')
+        check(isinstance(response['result'].get('_meta', {}).get('tiaMcp/durationMs'), int), 'Results carry the call duration in _meta')
         response, notes = raw_call(client, 'feature_catalog', {'featureId': 'feature_catalog'})
         check(not any(note.get('method') == 'notifications/progress' for note in notes), 'No progress after completion and none without a token')
     finally:

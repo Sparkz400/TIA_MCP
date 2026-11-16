@@ -123,6 +123,12 @@ def check_contracts():
     kinds |= library_kinds
     recorded_kinds = {row["changeKind"] for row in features.values() if row["changeKind"]}
     assert recorded_kinds == kinds, "Prepared mutation kind lacks an exact contract"
+    payloads = json.loads((ROOT / "contracts/change-payloads.v1.schema.json").read_text(encoding="utf-8"))
+    inline, external = {k for k in payloads["$defs"] if not k.startswith("common.")}, set(payloads["x-external-payloads"])
+    assert set(payloads["x-change-kinds"]) == kinds == inline | external and not inline & external, \
+        "Every change kind needs exactly one payload schema: " + str(sorted(kinds ^ (inline | external)))
+    for kind, target in payloads["x-external-payloads"].items():
+        assert (ROOT / "contracts" / target["contract"]).is_file(), kind + " names a missing payload contract"
     for identifier, feature in features.items():
         assert re.fullmatch(r"[a-z0-9_]+(?:\.[a-z0-9_]+)*", identifier), identifier
         assert feature["acceptanceCriteria"] and set(feature["acceptanceCriteria"]) <= criteria, identifier
