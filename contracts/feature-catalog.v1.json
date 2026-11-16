@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.184",
+  "catalogVersion": "0.4.185",
   "targetTiaVersions": [
     21
   ],
@@ -10292,7 +10292,7 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) for one LAD and one FBD operand edit (local.milestones.reopen.20261028); software units, namespaces and safety blocks are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "16 November 2026 (not curated evidence): takes items, one item per block; each item's block is read back against its own prepared document. Offline tests only."
+          "14 November 2026: accepts items (one block per item; shared checkpoint, compile and save; structured readback per item). Natively checked for graphical_operand_set on two LAD blocks; not curated evidence."
         ]
       },
       "qualification": {
@@ -12149,7 +12149,7 @@
           "Software-unit routes, dependency behavior and broader CPU/instruction profiles still require native qualification.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "16 November 2026 (not curated evidence): takes items, one item per block; each item's block is read back against its own prepared document. Offline tests only."
+          "14 November 2026: accepts items (one block per item; shared checkpoint, compile and save; structured readback per item). Natively checked for graphical_operand_set on two LAD blocks; not curated evidence."
         ]
       },
       "qualification": {
@@ -12203,7 +12203,7 @@
           "One explicit FlgNet/v5 compile unit with unique object IDs and matching network language; existing native content remains unchanged. No implicit ID rewriting or instruction synthesis.",
           "This new route has no recorded native compile, save/reopen, recovery or runtime qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "16 November 2026 (not curated evidence): takes items, one item per block; each item's block is read back against its own prepared document. Offline tests only."
+          "14 November 2026: accepts items (one block per item; shared checkpoint, compile and save; structured readback per item). Natively checked for graphical_operand_set on two LAD blocks; not curated evidence."
         ]
       },
       "qualification": {
@@ -12258,7 +12258,7 @@
           "Shared graphical Access nodes, expression/indirect operands and safety scopes are rejected. Instance/multi-instance XML remains unchanged; symbol names alone do not prove exact target identity.",
           "Native SCL FC, FB global-instance and FB multi-instance input-argument edits passed exact preservation, guarded checkpoint recovery and fresh applied/recovered save-reopen checks on the recorded PLC-root profile only.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "16 November 2026 (not curated evidence): takes items, one item per block; each item's block is read back against its own prepared document. Offline tests only."
+          "14 November 2026: accepts items (one block per item; shared checkpoint, compile and save; structured readback per item). Natively checked for graphical_operand_set on two LAD blocks; not curated evidence."
         ]
       },
       "qualification": {
@@ -12310,8 +12310,7 @@
         "limitations": [
           "One existing two-endpoint call-parameter-to-Access wire in FlgNet/v5. Branched, unresolved and native expression connections are rejected; shared Access definitions are never rewritten.",
           "Prepare refuses every move that would leave an Access unwired or on two wires (AccessWiringUnsupported), which on V21 is every move between existing Accesses; no native apply route exists.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "16 November 2026 (not curated evidence): takes items, one item per block; each item's block is read back against its own prepared document. Offline tests only."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
@@ -15870,7 +15869,8 @@
           "Classic screen inventory now includes templates, popups, slide-ins, global elements and overview with explicit roles and bounded per-scope coverage. Offline traversal/model/schema tests and SDK compilation do not establish native profile or item-parser qualification for these added roles.",
           "Opt-in section=model (Unified only, optional modelRoots) walks the public V21 HmiSoftware object model (Screens, ScreenGroups, TagTables, TagTableGroups, SystemTags, Connections, AlarmClasses, Discrete/AnalogAlarms, HmiAlarmAuditClass, OpcUaAlarmTypes, AlarmLogs, DataLogs, AuditTrails, Scripts, text/graphic/system text lists, PlantObjectTags, RuntimeSettings) through typed properties, GetAttributeInfos/GetAttribute and GetCompositionInfos/GetComposition: one hmiModelNode row per composition member (items, dynamizations, event handlers, logging tags, thresholds, interface entries, ...) with parts and MultilingualText inline, IHmiScript code as SHA-256 only and sensitive attribute names excluded. Bounded by maxVisited, the 8 MiB retained-row bound and paging; truncation is explicit. Compiled against the V21 PublicAPI only; not natively qualified. Payloads without a public getter are not observed.",
           "14 November 2026 (user feedback on v0.9.0, not curated evidence): coverage.complete is true only on the last page of a complete capture; captureComplete keeps the capture-only meaning, and totalItems, hasMore, pageCount and a paginationPending reason were added. Checked once on a seeded Unified PC fixture: model 99 rows in 5 pages of 20 and screens 2 rows in 2 pages each report complete=false until the last page; ProjectMismatch now carries the current and supplied identity.",
-          "16 November 2026 (not curated evidence): rowMode (full, compact, hash), excludeSystem for section=model, limit up to 1000, a page summary first and modelContentHash; an explicit target.kind must belong to the section. Offline tests only."
+          "14 November 2026: excludeSystem, rowMode compact and sectionContentSha256 for smaller model reads.",
+          "16 November 2026 (not curated evidence): page (limits, bytes, stoppedBy) first, limit up to 1000, and an explicit target.kind that does not belong to the section is refused before the capture. Offline tests only."
         ]
       },
       "qualification": {
@@ -16208,7 +16208,8 @@
           "Saved PLC library-instance observations now retain direct dependency version GUID lists from the same captured version. Observed empty lists remain distinct from unavailable observations. Each list is bounded to 1000 entries; a separate shared 20000 collection/iterator-read budget spans the capture and is exposed in limits, usage and partial provider coverage. Budget exhaustion publishes no partial list and does not discard the known owner GUID pair. Duplicate and self references remain original observations, not complete dependency closure or export/object association. Portable and actual Framework helper checks use synthetic Siemens shapes; native callers still require SDK compilation and qualification. Historical evidence is unchanged.",
           "14 November 2026 (not curated evidence): a capture whose every block export is refused for a read-only project is refused (ReadOnlyProject) instead of saved; other captures report degraded, degradedReasons, summary, capture.content counts and capture.projectFolder (file count, bytes, path/size/time hash; byte hash with hashProjectFolder); requireAllContent refuses incomplete content. Checked once on an owned 205-block fixture opened read-only and read-write.",
           "14 November 2026 (follow-up): fromTemporaryCopy captures from a read-write copy made by project_open_copy; blockOffset pages through blocks beyond maxBlocks with capture.content.nextBlockOffset.",
-          "16 November 2026 (not curated evidence): progress notifications per step and block with a progressToken, reviewUri, reason text in summary and nodeCountScope. Host only; offline tests."
+          "14 November 2026: stage progress (with a progressToken) and remoteAccess (tia:// resource URI up to 4 MiB, otherwise the artifact_read route).",
+          "16 November 2026 (not curated evidence): summary names each degraded reason's text; nodeCountScope explains nodeCount. Host only; offline tests."
         ]
       },
       "qualification": {

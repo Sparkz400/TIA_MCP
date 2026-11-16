@@ -14,7 +14,7 @@ namespace TiaMcp.Host;
 public sealed partial class TiaTools
 {
     [McpServerTool(Name = "project_snapshot_capture", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Save a persistent offline review: native hierarchy plus up to maxBlocks (0..200, default 25) exact standard block XML exports. request accepts projectName, plcPath, maxVisited, maxBlocks, blockPaths, maxRelationshipRoots (0..25, default 5), requireAllContent (refuse instead of saving when any block content is missing), hashProjectFolder (also hash every byte of the saved project folder; slower on large projects). capture.projectFolder reports the saved folder's file count, bytes and a path/size/time hash: the .ap21 file alone does not change on save. Check degraded and degradedReasons: they name failed exports, protected or unsupported blocks and blocks omitted by maxBlocks. A capture whose every export is refused for a read-only project is refused (ReadOnlyProject) instead of saved; pass fromTemporaryCopy:true to archive the open project, close it and capture a read-write copy instead (the original stays unchanged and the copy stays open). blockOffset pages through blocks beyond maxBlocks; capture.content.nextBlockOffset gives the next page. Captures bounded direct relationships for the first selected blocks. Native metadata is rechecked after exports; sequential content is not atomic. Protected/safety/unavailable content and omitted blocks stay explicit. Returns a content-hash reviewId usable after host restart and reviewUri (tia://project-reviews/{reviewId}) for remote clients; a review over 4 MiB is read with artifact_read. With a progressToken, progress notifications name each block as it is exported. No project changes.")]
+    [Description("Save a persistent offline review: native hierarchy plus up to maxBlocks (0..200, default 25) exact standard block XML exports. Reports its stage (hierarchy, block n of N, verification) in progress notifications when the client sends a progressToken, and returns remoteAccess with the review's tia:// resource URI. request accepts projectName, plcPath, maxVisited, maxBlocks, blockPaths, maxRelationshipRoots (0..25, default 5), requireAllContent (refuse instead of saving when any block content is missing), hashProjectFolder (also hash every byte of the saved project folder; slower on large projects). capture.projectFolder reports the saved folder's file count, bytes and a path/size/time hash: the .ap21 file alone does not change on save. Check degraded and degradedReasons: they name failed exports, protected or unsupported blocks and blocks omitted by maxBlocks. A capture whose every export is refused for a read-only project is refused (ReadOnlyProject) instead of saved; pass fromTemporaryCopy:true to archive the open project, close it and capture a read-write copy instead (the original stays unchanged and the copy stays open). blockOffset pages through blocks beyond maxBlocks; capture.content.nextBlockOffset gives the next page. Captures bounded direct relationships for the first selected blocks. Native metadata is rechecked after exports; sequential content is not atomic. Protected/safety/unavailable content and omitted blocks stay explicit. Returns a content-hash reviewId usable after host restart. No project changes.")]
     public async Task<CallToolResult> ProjectSnapshotCapture(JsonElement request, CancellationToken cancellationToken)
     {
         try
@@ -36,6 +36,7 @@ public sealed partial class TiaTools
                 ["artifactDirectory"] = Path.Combine(options.ArtifactsDirectory, "project-explorer") };
             foreach (string name in new[] { "projectName", "plcPath", "maxVisited" })
                 if (input[name] is not null) captureArgs[name] = input[name]!.DeepClone();
+            ToolProgress.Stage("capturing the project hierarchy");
             var captured = JsonNode.Parse((await bridge.CallAsync("project_model", captureArgs, cancellationToken)).GetRawText())!.AsObject();
             string snapshotId = captured["snapshotId"]?.GetValue<string>() ?? throw new BridgeException("InvalidSnapshot", "Native capture did not return a snapshot identity.");
             var export = JsonNode.Parse((await bridge.CallAsync("project_model", new { action = "export", snapshotId,
@@ -52,7 +53,6 @@ public sealed partial class TiaTools
                     throw new BridgeException("InvalidRequest", "blockPaths must be unique exact block paths within this capture and within maxBlocks.");
             }
             var selected = allBlocks.Where(n => requested is null || requested.Contains(n!["objectPath"]!.GetValue<string>())).Skip(requested is null ? blockOffset : 0).Take(maximum).ToArray();
-            await ToolSurface.ReportProgress($"project_snapshot_capture: hierarchy captured ({allBlocks.Length} blocks observed, {selected.Length} selected)");
             var relationships = new JsonArray();
             foreach (var node in selected.Take(relationshipRoots))
             {
@@ -78,8 +78,8 @@ public sealed partial class TiaTools
             foreach (var node in selected)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                ToolProgress.Stage("exporting block " + (documents.Count + 1) + " of " + selected.Length);
                 string path = node!["objectPath"]!.GetValue<string>();
-                await ToolSurface.ReportProgress($"project_snapshot_capture: block {documents.Count + 1} of {selected.Length}: {path}");
                 var row = new JsonObject { ["objectPath"] = path, ["status"] = "unavailable" };
                 documents.Add(row);
                 string language = node["metadata"]?["programmingLanguage"]?.GetValue<string>() ?? "";
@@ -121,7 +121,7 @@ public sealed partial class TiaTools
             if (input["requireAllContent"]?.GetValue<bool>() == true && content["degraded"]!.GetValue<bool>())
                 throw new BridgeException("SnapshotContentIncomplete", "requireAllContent is set and block content is incomplete: "
                     + string.Join(", ", content["degradedReasons"]!.AsArray().Select(r => r!["code"]!.GetValue<string>())) + ". No review was saved.");
-            await ToolSurface.ReportProgress("project_snapshot_capture: rechecking native metadata");
+            ToolProgress.Stage("verifying that the project did not change during the capture");
             var verification = await bridge.CallAsync("project_model", new { action = "verify", snapshotId }, cancellationToken);
             if (!verification.TryGetProperty("matchesCurrentMetadata", out var matched) || matched.ValueKind != JsonValueKind.True)
                 throw new BridgeException("SnapshotInvalidated", "Native metadata changed during review capture; no persistent snapshot was accepted.");
@@ -133,7 +133,16 @@ public sealed partial class TiaTools
                     ["copy"] = temporaryCopy["project"]?.DeepClone(), ["archive"] = temporaryCopy["archive"]?.DeepClone(),
                     ["note"] = "Captured from a temporary read-write copy; the original project was closed unchanged and the copy stays open." },
                 ["projectFolder"] = ProjectReviewStore.ProjectFolderManifest(model["project"]!["projectPath"]!.GetValue<string>(), input["hashProjectFolder"]?.GetValue<bool>() == true) };
-            return ReviewResult(new ProjectReviewStore(options.ArtifactsDirectory).Save(model, documents, coverage));
+            var saved = new ProjectReviewStore(options.ArtifactsDirectory).Save(model, documents, coverage);
+            // A client on another machine cannot open the Host path: name the resource and the chunked route.
+            string reviewId = saved["reviewId"]!.GetValue<string>();
+            long reviewBytes = saved["artifact"]!["bytes"]!.GetValue<long>();
+            saved["remoteAccess"] = new JsonObject { ["resourceUri"] = "tia://project-reviews/" + reviewId,
+                ["resourceReadable"] = reviewBytes <= TiaResources.MaxBytes,
+                ["artifactPath"] = "project-reviews/" + reviewId + ".json",
+                ["note"] = reviewBytes <= TiaResources.MaxBytes ? "Read it with resources/read on resourceUri."
+                    : "The review exceeds the 4 MiB resource limit; read it in 64 KiB chunks with artifact_read on artifactPath." };
+            return ReviewResult(saved);
         }
         catch (Exception error) when (ReviewError(error)) { return ReviewFailure(error); }
     }

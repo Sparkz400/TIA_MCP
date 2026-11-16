@@ -143,9 +143,9 @@ def main():
         check({'tia://contracts', 'tia://change-payloads'} <= {resource['uri'] for resource in resources}, 'Contract and payload indexes listed as resources')
         def read_json(uri):
             return json.loads(client.request('resources/read', {'uri': uri})['contents'][0]['text'])
-        contracts = read_json('tia://contracts')['contracts']
-        on_disk = sorted(path.name for path in (ROOT / 'contracts').glob('*.schema.json'))
-        check([c['name'] for c in contracts] == on_disk, 'Every bundled contract is listed under tia://contracts')
+        index = read_json('tia://contracts')
+        on_disk = sorted(path.name for path in (ROOT / 'contracts').glob('*.json'))
+        check(index['contracts'] == on_disk and index['changePayloads'] == 'tia://change-payloads', 'Every shipped contract is listed under tia://contracts')
         check(read_json('tia://contracts/hmi-inspection.v1.schema.json') == json.loads((ROOT / 'contracts/hmi-inspection.v1.schema.json').read_text(encoding='utf-8')),
               'A contract resource returns the exact bundled schema')
         payload_index = read_json('tia://change-payloads')['kinds']

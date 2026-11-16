@@ -229,7 +229,6 @@ internal static class ProjectReviewStoreTests
         var text = saved["summary"]!.GetValue<string>();
         Check.Equal(true, text.Contains("ReadOnlyProject (1 block(s))"));
         Check.Equal(true, text.Contains("Only maxBlocks blocks"));
-        Check.Equal("tia://project-reviews/" + saved["reviewId"]!.GetValue<string>(), saved["reviewUri"]!.GetValue<string>());
         var complete = ProjectReviewStore.ContentCoverage(Documents(Xml), 1, 1);
         Check.Equal(false, complete["degraded"]!.GetValue<bool>());
         return Task.CompletedTask;

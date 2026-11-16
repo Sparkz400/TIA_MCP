@@ -8,42 +8,15 @@ using ModelContextProtocol.Server;
 
 namespace TiaMcp.Host;
 
-/// <summary>The bundled JSON contracts as MCP resources, and one payload schema per change_prepare kind, so clients need not guess
-/// the free-form change_prepare.payload and hmi_inspect.request shapes.</summary>
+/// <summary>One payload schema per change_prepare kind, from change-payloads.v1.schema.json, so clients need not guess the
+/// free-form change_prepare.payload. The contract files themselves are tia://contracts/{name} (TiaResources).</summary>
 [McpServerResourceType]
 public sealed class ContractResources
 {
-    public const string ContractTemplate = "tia://contracts/{name}";
     public const string PayloadTemplate = "tia://change-payloads/{kind}";
     internal const string PayloadContract = "change-payloads.v1.schema.json";
-    private const string Prefix = "TiaMcp.Contracts.";
 
-    private static readonly Lazy<string[]> Names = new(() => typeof(ContractResources).Assembly.GetManifestResourceNames()
-        .Where(name => name.StartsWith(Prefix, StringComparison.Ordinal)).Select(name => name[Prefix.Length..]).Order(StringComparer.Ordinal).ToArray());
-    private static readonly Lazy<JsonObject> Payloads = new(() => JsonNode.Parse(Text(PayloadContract))!.AsObject());
-
-    internal static IReadOnlyList<string> ContractNames => Names.Value;
-
-    internal static string Text(string name)
-    {
-        if (!Regex.IsMatch(name, "\\A[a-z0-9][a-z0-9.-]*\\.schema\\.json\\z") || !Names.Value.Contains(name, StringComparer.Ordinal))
-            throw new McpProtocolException("ContractNotFound: no bundled contract " + name + "; read tia://contracts for the list.", McpErrorCode.ResourceNotFound);
-        using var stream = typeof(ContractResources).Assembly.GetManifestResourceStream(Prefix + name)!;
-        using var reader = new StreamReader(stream);
-        return reader.ReadToEnd();
-    }
-
-    [McpServerResource(UriTemplate = "tia://contracts", Name = "contracts", Title = "Bundled JSON contracts", MimeType = "application/json")]
-    [Description("Names and tia://contracts/{name} URIs of every bundled JSON Schema contract (requests, results, reviews, payloads).")]
-    public static string Index() => JsonSerializer.Serialize(new
-    {
-        contracts = Names.Value.Select(name => new { name, uri = "tia://contracts/" + name }),
-        changePayloads = "tia://change-payloads",
-    });
-
-    [McpServerResource(UriTemplate = ContractTemplate, Name = "contract", Title = "Bundled JSON contract", MimeType = "application/schema+json")]
-    [Description("One bundled JSON Schema contract by file name, e.g. hmi-inspection.v1.schema.json (the hmi_inspect request) or change-payloads.v1.schema.json.")]
-    public static string Contract(string name) => Text(name);
+    private static readonly Lazy<JsonObject> Payloads = new(() => JsonNode.Parse(TiaResources.Contract(PayloadContract))!.AsObject());
 
     [McpServerResource(UriTemplate = "tia://change-payloads", Name = "change-payloads", Title = "change_prepare payload schemas", MimeType = "application/json")]
     [Description("Every change_prepare kind with the URI of its payload schema. Read tia://change-payloads/{kind} before preparing a change of that kind.")]
@@ -117,7 +90,6 @@ public sealed class ContractResources
     /// <summary>completion/complete for the contract and payload templates.</summary>
     internal static IEnumerable<string>? Completions(string? template, string argument) => (template, argument) switch
     {
-        (ContractTemplate, "name") => Names.Value,
         (PayloadTemplate, "kind") => Payloads.Value["x-change-kinds"]!.AsArray().Select(kind => kind!.GetValue<string>()),
         _ => null,
     };

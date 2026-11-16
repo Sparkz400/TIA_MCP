@@ -55,10 +55,10 @@ executed portable checks separately from native work.
 
 Call `project_snapshot_capture` with a `request` object. It accepts `projectName`, `plcPath`, `maxVisited`, `maxBlocks` (0–200, default 25), `blockPaths` (unique exact native paths) and `maxRelationshipRoots` (0–25, default 5). Relationship queries cover the first selected blocks in exact-path order, with at most 500 nodes and 1,000 edges per root. Protected/safety or unsupported block languages are recorded as unavailable. Excluded blocks remain omitted, never implicitly equal.
 
-The result's `summary` names each degraded reason with its block count and its text. `reviewUri`
-(`tia://project-reviews/{reviewId}`) lets a remote client read a review of up to 4 MiB as an MCP resource;
-larger reviews are read in chunks with `artifact_read`. A client that sends a `progressToken` gets a progress
-notification per step: hierarchy captured, each block as it is exported, and the metadata recheck.
+The result's `summary` names each degraded reason with its block count and its text. `remoteAccess` gives a
+remote client the review's `tia://project-reviews/{reviewId}` resource (up to 4 MiB) or the chunked `artifact_read`
+route. A client that sends a `progressToken` sees the current stage (hierarchy, block n of N, verification) in the
+progress heartbeats.
 
 Counts: `nodeCount` is the number of distinct object nodes in the saved review's model, the same set the
 review document holds. The model is exported again after the relationship observations, so it includes the

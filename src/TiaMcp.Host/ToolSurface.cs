@@ -129,38 +129,13 @@ internal static class ToolSurface
             // Sent before dispatch so a broken transport fails the call before any native work starts.
             await context.Server.NotifyProgressAsync(progress, new ProgressNotificationValue { Progress = 0, Message = tool + " started" }, cancellationToken: token);
             using var done = CancellationTokenSource.CreateLinkedTokenSource(token);
-            // Heartbeats and the tool's own step messages share one counter, because MCP progress values must increase.
-            var sink = new ProgressSink((value, message) => context.Server.NotifyProgressAsync(progress, new ProgressNotificationValue { Progress = value, Message = message }));
-            var heartbeat = Heartbeat(HeartbeatInterval, tool, done.Token, (_, message) => sink.Send(message));
-            CurrentProgress.Value = sink;
+            var stage = ToolProgress.Begin();
+            var heartbeat = Heartbeat(HeartbeatInterval, tool, done.Token,
+                async (beat, message) => await context.Server.NotifyProgressAsync(progress, new ProgressNotificationValue { Progress = beat,
+                    Message = stage.Stage is { } current ? message + ": " + current : message }));
             try { return Timed(await next(context, token), started); }
-            finally { CurrentProgress.Value = null; done.Cancel(); await heartbeat; }
+            finally { done.Cancel(); await heartbeat; }
         });
-
-    private static readonly AsyncLocal<ProgressSink?> CurrentProgress = new();
-
-    /// <summary>Sends a step message as a progress notification of the current tool call, when its client sent a progressToken.
-    /// A lost notification never changes the call's outcome.</summary>
-    internal static async Task ReportProgress(string message)
-    {
-        if (CurrentProgress.Value is { } sink)
-            try { await sink.Send(message); } catch (Exception) { }
-    }
-
-    internal sealed class ProgressSink(Func<int, string, Task> notify)
-    {
-        private readonly SemaphoreSlim gate = new(1, 1);
-        private int value;
-        public int Value => value;
-
-        // Serialized, so notifications leave in the order of their increasing values.
-        public async Task Send(string message)
-        {
-            await gate.WaitAsync();
-            try { await notify(++value, message); }
-            finally { gate.Release(); }
-        }
-    }
 
     internal const string DurationMeta = "tiaMcp/durationMs";
 
