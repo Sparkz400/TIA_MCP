@@ -66,7 +66,9 @@ Choosing a read or write tool:
 | A few symbols, any type including `string`/`wstring` | `sim_read`, `sim_write` | One runtime call per symbol |
 | Up to 64 bool/integer/float symbols at once | `sim_read_signals`, `sim_write_signals` | One `ReadSignals`/`WriteSignals` call; validated before the call |
 | Raw input, output or marker bytes or bits by address | `sim_area_read`, `sim_area_write` | Writes: inputs and markers of owned instances only |
-| Data block members | `sim_read`/`sim_read_signals` with the symbol (`"MyDb".Member`) | PLCSIM V8 has no byte access to data blocks, so DB offsets cannot be read by address |
+| Data block members | `sim_read`/`sim_read_signals` with the symbol (`"MyDb".Member` or `MyDb.Member`) | PLCSIM V8 has no byte access to data blocks, so DB offsets cannot be read by address. `sim_tags` `offset`/`bit` can all be 0 for an optimized DB; use the symbol, or `index`/`parentIndex` to place a member |
+
+Symbols are matched to the tag list's spelling: PLCSIM resolves only the spelling its tag list uses, which can be unquoted (`MyDb.Member`) where TIA quotes (`"MyDb".Member`). A symbol that is not in the tag list as given is matched without quotes, ignoring case, itself or by its longest listed prefix at a `.` or `[`; with no single match it is passed to PLCSIM unchanged.
 
 Lifecycle of an owned instance: `tia_start` and `project_open` (or `tia_create_scratch`), `sim_create` (keep its `creationId`),
 `simulation_download` with the `downloadTicket`, then `sim_state` power on and run, and reads, writes or tests. After the
@@ -93,12 +95,13 @@ Releasing a client interface and shutting down the worker do not power off or un
 ## Loading an engineering program
 
 The supported sequence is create → download → power-on → inspect tags → RUN → read/write/test → stop/power-off → owned cleanup.
+For a protected scratch CPU it is create → download → `project_save` → provision → power-on → RUN: `simulation_download` compiles the in-memory project and can leave it modified (`saveRequiredBeforeProvisioning`), and provisioning refuses an unsaved project with `UnsavedProject`.
 
 For a protected generated scratch program, optional credential provisioning runs between download and normal power-on. It is a separate operation with a persistent `.provision.claim`, exact ownership and original-card checks, validated credential lineage, and a singleton local PLCSIM target on the network mode recorded in the ticket (Softbus or TCP/IP). It does not accept raw passwords or arbitrary target addresses. The PLCSIM engineering interface becomes visible only while the virtual CPU is powered; route discovery therefore occurs during bounded recovery startup. Runtime-created `retain.pms` is recorded separately and is never included retroactively in the original generated-card revision. A failed attempt requires a fresh owned instance. Attempt fifteen qualified provisioning and the protected baseline on this machine; attempt seventeen reconfirmed it on the retained binary lineage below.
 
 A `TCPIP` ticket (from `sim_create` with `communicationInterface: "TCPIP"`, while PLCSIM is already in TCP/IP single-adapter mode) is admitted by memory-card generation and provisioning on the same terms. Provisioning then goes online only through the sole PN/IE PG/PC interface whose name contains *PLCSIM Virtual Ethernet Adapter*, never another network card. TIA's TCP/IP discovery can keep showing the empty CPU by its MAC address instead of an IP. The owned empty CPU therefore qualifies as the one new `S7-1500 (PLCSIM)` device that appeared after its startup; it gets the documented bootstrap address 192.168.0.1/24, and the instance must read that address back. If discovery never shows the address, the target is decided by the MAC it showed before the bootstrap (`runtimeTargetIdentity.basis: tcpipMacIdentity`) and rechecked by MAC before and after going online; the device must also present an S7-1500 TLS certificate before the credential is opened. Only the operator sets the network mode and the adapter's own address. `plc_online_compare`, `plc_station_upload`, `simulation_download_online` and the discovery baseline stay Softbus-only. The real-server runs of 29 October used this route (`local.runtime.plcsim-tcpip.20261029`).
 
-TLS verification rejects trust by default. Explicit `trustOwnedEmptyCpuCertificate: true` authorizes first-use trust only during this owned empty CPU's provisioning attempt. The worker revalidates ownership and the local route, requires one untruncated certificate within its UTC validity dates, pins its SHA-256 within that attempt and rejects a later change. This is caller-authorized first-use trust; `certificateIdentityIndependentlyVerified` remains false. Matching certificate subjects or validity dates do not authenticate identity. The Python runners require matching authorization, target, date and pin evidence before continuing, then independently recheck the restored original card. The user explicitly authorized this scoped first-use trust, and attempt fifteen verified the route with the protected baseline. This does not qualify arbitrary targets or another machine.
+TLS verification rejects trust by default. Explicit `trustOwnedEmptyCpuCertificate: true` authorizes first-use trust only during this owned empty CPU's provisioning attempt. The worker revalidates ownership and the local route, requires one untruncated certificate within its UTC validity dates, pins its SHA-256 within that attempt and rejects a later change. This is caller-authorized first-use trust; `certificateIdentityIndependentlyVerified` remains false. The authorization is scoped to one attempt on one owned empty CPU, not to a certificate: a recreated instance generates a different certificate, and the same flag trusts it. When the user approved a specific hash, ask again, naming the new hash, before the next attempt. Matching certificate subjects or validity dates do not authenticate identity. The Python runners require matching authorization, target, date and pin evidence before continuing, then independently recheck the restored original card. The user explicitly authorized this scoped first-use trust, and attempt fifteen verified the route with the protected baseline. This does not qualify arbitrary targets or another machine.
 
 `sim_create` issues a CurrentUser DPAPI ticket valid for 15 minutes. The engineering worker verifies the ticket against the instance's ownership marker and independently opens the local V8 runtime interface. Instance ID, name, storage path, powered-off state and the network mode recorded in the ticket must match. A caller-provided name or IP alone is not sufficient.
 
@@ -353,6 +356,24 @@ matches its manifest, the rest of the storage matches the baseline inventory by 
 the attempt's own files and PLCSIM's runtime files are new), the checkpoint stream never opened
 or armed the credential, and an observer project is absent or empty; otherwise it stays held
 ([rule and evidence](../verification/provision-release-20261102.md)).
+
+After a failed attempt, `simulation_provision_status` lists every attempt (newest first, or one
+`admissionId`) with its stage (`held`, `released`, `provisioned`, `notProvisioned`), its scratch
+project, owned storage and instance name, what that storage holds, and the exact next calls.
+`simulation_provision_recover` runs steps 1–3 below in one call: it refuses first while an open
+project has unsaved edits (detaching discards them) and stops at the first failure or a held
+reconciliation. The steps back to a provisioned instance are:
+
+1. `tia_detach`, then `tia_start` for an empty owned Portal.
+2. `simulation_provision_reconcile` with the admission ID. A later write on the scratch is refused with `ResourceBusy`
+   until then; its `blockingAdmissions` name the admission and this tool.
+3. `project_open` the scratch project again.
+4. The failed instance cannot be provisioned again (`SimulationProvisionAlreadyAttempted` or
+   `SimulationProvisionStorageCollision`): `sim_release` with `deleteOwned:true`, then `sim_create` for a fresh instance and ticket.
+5. `simulation_download`, `project_save`, then `simulation_provision_scratch_credential` with the new ticket.
+
+Steps 4 and 5 stay separate calls: a fresh instance presents a new certificate, so the user's TLS
+authorization is needed again.
 
 ## Licensing
 

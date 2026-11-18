@@ -27,7 +27,8 @@ namespace TiaMcp.Simulator.V8
         {
             var selected = Get(args);
             var signals = BatchSignals(args["signals"], false);
-            var batch = signals.Select(s => new SDataValueByName { Name = s.Symbol, DataValue = new SDataValue { Type = Primitives[s.Type] } }).ToArray();
+            ResolveNames(selected.Instance, signals);
+            var batch = signals.Select(s => new SDataValueByName { Name = NativeName(selected.Instance, s), DataValue = new SDataValue { Type = Primitives[s.Type] } }).ToArray();
             var result = Envelope(selected);
             // An item's code stays OK when the call throws before filling it; the whole batch is then bad.
             string failure = null;
@@ -56,7 +57,11 @@ namespace TiaMcp.Simulator.V8
             EnsureAdmitted(selected);
             var writes = BatchSignals(args["writes"], true);
             RefuseOutputs(selected, writes);
-            var batch = writes.Select(s => new SDataValueByName { Name = s.Symbol, DataValue = Pack(s) }).ToArray();
+            ResolveNames(selected.Instance, writes);
+            // "Db".A and Db.A are distinct as given but the same tag: one batch may not write it twice.
+            if (writes.Select(w => w.Native).Distinct(StringComparer.OrdinalIgnoreCase).Count() != writes.Count)
+                throw new SimulatorException("InvalidRequest", "Two writes name the same tag in different spellings; a batch writes each tag once.");
+            var batch = writes.Select(s => new SDataValueByName { Name = NativeName(selected.Instance, s), DataValue = Pack(s) }).ToArray();
             string failure = null;
             try { selected.Instance.WriteSignals(ref batch); }
             catch (Exception ex) { failure = ErrorCode(ex); }

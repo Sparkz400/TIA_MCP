@@ -35,15 +35,11 @@ public sealed class EngineeringMutationAdmissionStore
         using var held = PackageStorage.Lock(lockPath);
         var pendingAdmissions = RecordsUnderLock(artifacts).Where(r => r.State is "dispatchIntent" or "outcomeUnknown").ToArray();
         bool Blocks(string owned) => keys.Any(key => EngineeringResourceKey.Overlaps(owned, key));
-        string[] admissions = pendingAdmissions.Where(r => r.ResourceKeys.Any(Blocks)).Select(r => r.Id).ToArray();
+        var blocking = pendingAdmissions.Where(r => r.ResourceKeys.Any(Blocks)).ToArray();
+        string[] admissions = blocking.Select(r => r.Id).ToArray();
         string[] operations = new EngineeringOperationStore(artifacts).PendingResourcesUnderLock().Where(x => Blocks(x.Key)).Select(x => x.Id).Distinct().ToArray();
         string[] windows = ComponentQualificationWindowStore.PendingResourcesUnderLock(artifacts).Where(x => Blocks(x.Key)).Select(x => x.Id).Distinct().ToArray();
-        if (admissions.Length + operations.Length + windows.Length > 0)
-            throw new BridgeOperationException("ResourceBusy", "An unreconciled engineering operation or mutation admission owns a requested resource. Inspect and reconcile the recorded owner; do not retry the write.",
-                JsonSerializer.SerializeToElement(new {
-                    blockingAdmissionIds = admissions, blockingOperationIds = operations, blockingComponentWindowIds = windows,
-                    statusTool = "engineering_operation_status", reconciliationTool = "engineering_admission_reconcile", automaticRetryAllowed = false
-                }, BridgeProtocol.Json));
+        if (admissions.Length + operations.Length + windows.Length > 0) throw Busy(blocking, operations, windows);
         string id = Guid.NewGuid().ToString("N");
         var record = new EngineeringMutationAdmission(id, 0, "dispatchIntent", scope, requestSha256, keys, null, DateTimeOffset.UtcNow, null, []);
         string staging = PackageStorage.Under(directory, ".preparing-" + id);
@@ -51,6 +47,40 @@ public sealed class EngineeringMutationAdmissionStore
         PackageStorage.PublishDirectory(staging, PackageStorage.Under(directory, id));
         return record;
     }
+
+    private static BridgeOperationException Busy(EngineeringMutationAdmission[] blocking, string[] operations, string[] windows) =>
+        new("ResourceBusy", "An unreconciled engineering operation or mutation admission owns a requested resource. Inspect and reconcile the recorded owner; do not retry the write.",
+            JsonSerializer.SerializeToElement(new {
+                blockingAdmissionIds = blocking.Select(r => r.Id).ToArray(), blockingOperationIds = operations, blockingComponentWindowIds = windows,
+                blockingAdmissions = blocking.Select(r => new { admissionId = r.Id, operation = r.Scope.Operation, state = r.State,
+                    reconciliationTool = ReconciliationTool(r.Scope.Operation), remediation = Remediation(r.Scope.Operation) }).ToArray(),
+                statusTool = "engineering_operation_status", reconciliationTool = "engineering_admission_reconcile", automaticRetryAllowed = false
+            }, BridgeProtocol.Json));
+
+    /// <summary>project_save is not an admitted mutation (a failed save would have no reconciliation adapter), but saving a project
+    /// that an unresolved admission holds changes the saved state its reconciliation compares (a provisioning attempt requires the
+    /// project to be last saved before its archive). So it is refused while any unresolved admission holds a project.</summary>
+    public void RefuseWhileAProjectIsHeld()
+    {
+        using var held = PackageStorage.Lock(lockPath);
+        var blocking = RecordsUnderLock(artifacts).Where(r => r.State is "dispatchIntent" or "outcomeUnknown" && r.Scope.Resources.Any(x => x.Kind == "project")).ToArray();
+        if (blocking.Length > 0) throw Busy(blocking, [], []);
+    }
+
+    /// <summary>Every admission record of one operation still in the store (archived finished records are left out).</summary>
+    public IReadOnlyList<EngineeringMutationAdmission> List(string operation)
+    {
+        using var held = PackageStorage.Lock(lockPath);
+        return RecordsUnderLock(artifacts).Where(r => r.Scope.Operation == operation).ToArray();
+    }
+
+    /// <summary>The tool that releases an admission of this operation; a failed credential provisioning has its own.</summary>
+    public static string ReconciliationTool(string operation) =>
+        operation == "simulation_provision_scratch_credential" ? "simulation_provision_reconcile" : "engineering_admission_reconcile";
+
+    private static string? Remediation(string operation) => operation == "simulation_provision_scratch_credential"
+        ? "A credential-provisioning attempt on this scratch project ended outcomeUnknown. simulation_provision_recover with this admissionId (tia_detach, tia_start, simulation_provision_reconcile, project_open), then the fresh-instance steps simulation_provision_status lists."
+        : null;
 
     public EngineeringMutationAdmission Read(string id)
     { using var held = PackageStorage.Lock(lockPath); return ReadUnderLock(artifacts, id); }

@@ -523,7 +523,7 @@ class CliTests(unittest.TestCase):
 
 class BaselineCliTests(unittest.TestCase):
     def run_baseline(self, root, provision=False, provision_overrides=None, restored_card_error=False,
-                     trust=False, expected_card_verifications=None, download_overrides=None, created_overrides=None):
+                     trust=False, expected_card_verifications=None, download_overrides=None, created_overrides=None, golden=False):
         project = root / "TiaMcpScratch_Test.ap21"
         metadata, journal = root / "credential.json", root / "journal.json"
         for path in (project, metadata, journal):
@@ -561,6 +561,8 @@ class BaselineCliTests(unittest.TestCase):
                     result = copy.deepcopy(self.prepared_save)
                 elif tool == "change_apply":
                     result = copy.deepcopy(self.applied_save)
+                elif tool == "project_save":
+                    result = {"project": {"path": str(project)}, "saved": True, "isModifiedAfter": False, "modifiedBefore": True}
                 elif tool == "simulation_provision_scratch_credential":
                     result = {"completed": True, "credentialProvisioned": True, "instanceId": 0, "instanceName": "owned",
                               "originalProgramRevision": "a" * 64, "operatingState": "Off", "protectionDisabled": False,
@@ -598,6 +600,8 @@ class BaselineCliTests(unittest.TestCase):
             args.append("--provision-runtime-credential")
         if trust:
             args.append("--trust-owned-empty-cpu-certificate")
+        if golden:
+            args.append("--golden-path-checks")
         with mock.patch.object(validate_simulation, "Client", return_value=Client()) as factory, \
                 mock.patch.object(validate_simulation, "verify_memory_card", side_effect=verify_card) as verifier:
             exit_code = validate_simulation.main(args)
@@ -623,6 +627,31 @@ class BaselineCliTests(unittest.TestCase):
             by_tool = dict(requests)
             self.assertEqual(by_tool["simulation_download"], by_tool["simulation_provision_scratch_credential"])
             self.assertEqual(1, len(by_tool["simulation_provision_scratch_credential"]["credentialLineageJournalPaths"]))
+
+    def test_a_host_that_reports_the_save_uses_project_save(self):
+        with temporary_directory() as directory:
+            exit_code, report, events, _ = self.run_baseline(pathlib.Path(directory), provision=True,
+                download_overrides={"saveRequiredBeforeProvisioning": True, "projectModifiedAfter": True})
+            self.assertEqual(0, exit_code)
+            index = events.index("simulation_download")
+            self.assertEqual(["simulation_download", "verify_memory_card", "project_save", "simulation_provision_scratch_credential"], events[index:index + 4])
+            self.assertNotIn("change_prepare", events)
+            self.assertEqual("project_save", report["generatedProjectSave"]["route"])
+        with temporary_directory() as directory:
+            exit_code, report, events, _ = self.run_baseline(pathlib.Path(directory), provision=True,
+                download_overrides={"saveRequiredBeforeProvisioning": False, "projectModifiedAfter": False})
+            self.assertEqual(0, exit_code)
+            self.assertNotIn("project_save", events)
+            self.assertNotIn("change_prepare", events)
+
+    def test_golden_path_checks_read_quoted_symbols_and_record_identity(self):
+        with temporary_directory() as directory:
+            exit_code, report, events, requests = self.run_baseline(pathlib.Path(directory), golden=True)
+            self.assertEqual(0, exit_code)
+            self.assertEqual("host_build_identity", events[0])
+            quoted = [arguments for tool, arguments in requests if tool == "sim_read"][1]["signals"]
+            self.assertTrue(all(signal["symbol"].startswith('"TiaMcp_TestIO".') for signal in quoted))
+            self.assertEqual(4, len(report["quotedSymbols"]))
 
     def test_default_uses_normal_startup_without_provisioning(self):
         with temporary_directory() as directory:

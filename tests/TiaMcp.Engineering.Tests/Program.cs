@@ -80,6 +80,7 @@ await WatchInterruptionMatrixChecks.Run();
 await WatchExpandedEditChecks.Run();
 await MutationAdmissionChecks.Run();
 await ProvisionReconciliationChecks.Run();
+await UnifiedRuntimeChecks.Run();
 await AdmissionReconciliationChecks.Run();
 await ProductionAdapterChecks.Run();
 await WatchAuthoringChecks.Run();

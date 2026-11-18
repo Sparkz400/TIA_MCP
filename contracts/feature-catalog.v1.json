@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.185",
+  "catalogVersion": "0.4.187",
   "targetTiaVersions": [
     21
   ],
@@ -6486,6 +6486,360 @@
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
         "A saved project open in a worker-owned instance started with tia_start"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "project_save",
+      "domain": "project",
+      "title": "Save a project in a worker-owned instance",
+      "mcpTools": [
+        "project_save"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Project.Save."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Worker-owned instances only; a user-owned TIA is never saved.",
+          "Read-only projects, projects with an unresolved change and any unresolved admission holding a project are refused; no recovery archive is taken."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "A project open in a worker-owned instance started with tia_start"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "simulation_provision_status",
+      "domain": "simulation",
+      "title": "List provisioning attempts with their stage and the next calls",
+      "mcpTools": [
+        "simulation_provision_status"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Managed admission store and owned storage folders; no native call."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Reads the Host's admission records and the storage folders they name; does not check PLCSIM registrations (sim_status does) or the project.",
+          "Next calls are a plan; a new provisioning attempt needs the user's TLS authorization again."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Reads only local Host records."
+        ]
+      },
+      "prerequisites": [
+        "An artifact root with simulation_provision_scratch_credential admissions"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "simulation_provision_recover",
+      "domain": "simulation",
+      "title": "Recover from a held provisioning attempt in one call",
+      "mcpTools": [
+        "simulation_provision_recover"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Composes tia_detach, tia_start, simulation_provision_reconcile and project_open."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Refused while any open project has unsaved edits (detaching discards them); stops at the first failure or a held reconciliation.",
+          "Never powers, downloads, provisions, saves or replays; a fresh instance and a new provisioning attempt stay separate calls."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an empty worker-owned TIA instance for the reconciliation, which this call starts."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "A held (dispatchIntent or outcomeUnknown) provisioning admission"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_unified_credential_binding",
+      "domain": "runtime",
+      "title": "Build the credential binding for a Unified runtime GraphQL login",
+      "mcpTools": [
+        "runtime_unified_credential_binding"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "WinCC Unified GraphQL System Manual 11/2025 (installed with WinCC Unified Runtime): login, activeAlarms, loggedAlarms and acknowledgeAlarms through https://<host>/graphql/."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Endpoint https://<host name>/graphql/ only; localhost and 127.0.0.1 are refused as the server refuses them.",
+          "The certificate pin is supplied trust, not a discovered identity."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Builds a local binding only."
+        ]
+      },
+      "prerequisites": [
+        "None"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_unified_connect",
+      "domain": "runtime",
+      "title": "Log in to a WinCC Unified PC Runtime GraphQL server",
+      "mcpTools": [
+        "runtime_unified_connect"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "WinCC Unified GraphQL System Manual 11/2025 (installed with WinCC Unified Runtime): login, activeAlarms, loggedAlarms and acknowledgeAlarms through https://<host>/graphql/."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Explicit leaf-certificate pin, host name and validity; password only from the protected credential store, never returned; login errors carry no server text.",
+          "Sessions live in Host memory; the server ends idle sessions (autoLoggOffSec). Reads the user's UMC language and the alarm fields by schema introspection."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Needs a running Unified PC Runtime; not natively run yet."
+        ]
+      },
+      "prerequisites": [
+        "A WinCC Unified PC Runtime project running, its web server certificate's SHA-256 and a UMC user with GraphQL read access (read/write access to acknowledge)",
+        "A protected credential created with the local credential CLI for the binding"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_unified_alarms",
+      "domain": "runtime",
+      "title": "Read active and logged alarms of a Unified runtime",
+      "mcpTools": [
+        "runtime_unified_alarms"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "WinCC Unified GraphQL System Manual 11/2025 (installed with WinCC Unified Runtime): login, activeAlarms, loggedAlarms and acknowledgeAlarms through https://<host>/graphql/."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "languages default to the UMC user's language, never to the server's en-US default; a user without one must pass languages.",
+          "Selects only fields the server's schema has; texts keyed by language; active rows carry the acknowledge path (System::Tag:Alarm) and instanceID. No subscriptions."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Needs a running Unified PC Runtime; not natively run yet."
+        ]
+      },
+      "prerequisites": [
+        "A WinCC Unified PC Runtime project running, its web server certificate's SHA-256 and a UMC user with GraphQL read access (read/write access to acknowledge)",
+        "A protected credential created with the local credential CLI for the binding"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_unified_alarm_acknowledge",
+      "domain": "runtime",
+      "title": "Acknowledge alarms of a Unified runtime on this PC",
+      "mcpTools": [
+        "runtime_unified_alarm_acknowledge"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "WinCC Unified GraphQL System Manual 11/2025 (installed with WinCC Unified Runtime): login, activeAlarms, loggedAlarms and acknowledgeAlarms through https://<host>/graphql/."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Requires acknowledgeWrite and an endpoint whose host name resolves only to this PC; acknowledges by fully qualified path, refuses plain names.",
+          "1..64 alarm instances per call with the server's item results; never resets, shelves, enables or disables alarms."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Needs a running Unified PC Runtime; not natively run yet."
+        ]
+      },
+      "prerequisites": [
+        "A WinCC Unified PC Runtime project running, its web server certificate's SHA-256 and a UMC user with GraphQL read access (read/write access to acknowledge)",
+        "A protected credential created with the local credential CLI for the binding"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_unified_status",
+      "domain": "runtime",
+      "title": "Show a Unified runtime session",
+      "mcpTools": [
+        "runtime_unified_status"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Host session state only."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Does not contact the server."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Reads Host memory only."
+        ]
+      },
+      "prerequisites": [
+        "None"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_unified_disconnect",
+      "domain": "runtime",
+      "title": "Drop a Unified runtime session",
+      "mcpTools": [
+        "runtime_unified_disconnect"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Host session state only."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Drops the token; the server ends the session after its idle time."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Changes Host memory only."
+        ]
+      },
+      "prerequisites": [
+        "None"
       ],
       "acceptanceCriteria": [
         "AC-identity",

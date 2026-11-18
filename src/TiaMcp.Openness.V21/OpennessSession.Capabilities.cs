@@ -122,6 +122,8 @@ namespace TiaMcp.Openness.V21
                         blocked: safetyScope, blocker: alarmBlocker);
                     if (kind == "plc")
                     {
+                        AddTargetFeature(features, "plc_loadable_generate", ProbeCapabilityService<Siemens.Engineering.SW.Loader.LoadableProvider>(plc.Software, "plc", probes), "partial",
+                            "Native loadable file of exact blocks or software units. Siemens documents LoadableProvider only for CPU 1518 and its subtypes from firmware V2.8; on other CPUs the service is absent and the tool refuses with UnsupportedCapability.");
                         var opcUa = ProbeCapabilityService<OpcUaProvider>(plc.Software, "plc", probes);
                         if (opcUa.Status != "available") opcUa = ProbeOwningHardwareService<OpcUaProvider>(plc.Software, probes);
                         foreach (string feature in OpcUaPayloadFields.Keys)

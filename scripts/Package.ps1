@@ -77,7 +77,7 @@ $files = @(Get-ChildItem -LiteralPath $bundleRoot -Recurse -File | Sort-Object F
     @{path=$_.FullName.Substring($bundleRoot.Length + 1).Replace('\','/');bytes=$_.Length;sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()}
 })
 @{schemaVersion=1;createdAtUtc=[DateTime]::UtcNow.ToString('O');productVersion=$productVersion;frameworkDependent=$true;configuration=$Configuration;bundleKind=$bundleKind;
-    sourceInputManifestSha256=$outputs.inputManifestSha256;files=$files} |
+    sourceInputManifestSha256=$outputs.inputManifestSha256;sourceCommit=$inputs.sourceCommit;sourceTreeDirty=$inputs.sourceTreeDirty;files=$files} |
     ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $bundleRoot 'manifest.json') -Encoding UTF8
 & (Join-Path $bundleRoot 'scripts/Verify-TiaMcpBundle.ps1') -BundlePath $bundleRoot -Strict | Out-Host
 Compress-Archive -Path "$bundleRoot/*" -DestinationPath ($bundleRoot + '.zip') -CompressionLevel Optimal

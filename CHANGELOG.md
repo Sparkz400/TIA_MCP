@@ -14,6 +14,11 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Added
 
+- `project_save` saves an open project in a worker-owned instance (no recovery archive; read-only projects and unresolved changes are refused), the step between `simulation_download` and credential provisioning (catalog `0.4.186`, unverified).
+- `host_build_identity` reports the `sourceCommit` and `sourceTreeDirty` a bundle was packaged from; isolated builds and bundle manifests now record them.
+- `target_capabilities` reports `plc_loadable_generate` per PLC from a `LoadableProvider` probe.
+- `simulation_provision_status` lists credential-provisioning attempts with their stage and the exact next calls; `simulation_provision_recover` runs detach, an empty owned Portal, the reconciliation and the reopen in one call (catalog `0.4.187`, unverified).
+- **WinCC Unified runtime alarms:** `runtime_unified_*` logs in to a Unified PC Runtime's GraphQL server with a protected credential and a pinned certificate, reads active and logged alarms in the UMC user's language and acknowledges alarms by their qualified path on a runtime on this PC after an explicit acknowledgement ([reference](docs/reference/unified-runtime-alarms.md)). Not run natively yet.
 - `call_parameter_set`, `graphical_operand_set`, `graphical_network_patch` and `graphical_network_insert` accept `items` (one block per item, one checkpoint, compile and save, a structured readback per item).
 - `hmi_inspect` takes `excludeSystem` (section=model without system tags, system text lists and OPC UA alarm types) and `rowMode: "compact"` (path and `contentSha256` only), and returns `sectionContentSha256` for model rows.
 - `project_snapshot_capture` reports its stage in progress notifications and returns `remoteAccess` with the review's `tia://` resource URI or the chunked `artifact_read` route.
@@ -195,6 +200,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Changed
 
+- `simulation_download` reports `projectModifiedAfter`, `saveRequiredBeforeProvisioning` and `nextStep`; `UnsavedProject` from provisioning, `SimulationProvisionStorageCollision` and `SimulationRegistrationsPresent` carry remediations; `ResourceBusy` lists `blockingAdmissions` with each operation and its reconciliation tool (`simulation_provision_reconcile` for a failed provisioning).
+- `tia_detach` reports PLCSIM instances that stay registered (`plcsimRegistrations`) when the worker used the PLCSIM API.
+- Change views carry `projectSave` (`isModifiedAtPrepare`, `savedBeforeApply`, `savedAfterApply`), since `preview.isModified` stays the prepare-time state.
+- `project_inventory` explains `completeness.complete` (always false) versus `scopeComplete`; the `sim_tags`, provisioning TLS-trust and `plc_loadable_generate` descriptions state their limits.
 - `--timeout-seconds` accepts up to 3600 s (was 900), in the Host and the launcher scripts.
 - A failed `simulation_download` reports `ticketState` (`reusable`, `spent`, `unusable`) and a remediation; `FreshSimulationStorageRequired` says the ticket was spent.
 - An explicit HMI `target.kind` that the operation or `hmi_inspect` section cannot take is refused before the preservation capture.
@@ -299,6 +308,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   ([hashes stored before RFC 8785](docs/reference/engineering-capture-identities.md#hashes-stored-before-rfc-8785)).
 
 ### Fixed
+
+- **Quoted simulator symbols:** `"Db".A` returned `DoesNotExist` when the PLCSIM tag list spells it `Db.A`; symbolic reads and writes now pass the tag list's spelling. Not run natively yet.
 
 - **Clearer dependency refusal on an F-CPU:** when TIA refuses to export a block during the delete dependency scan, `DependencyCoverageIncomplete` now names the block's programming language, know-how protection and consistency. On a PLC with a safety program this is the generated `FOB_RTG1` (a know-how protected SCL OB), whose native cross-references name no references either, so `tag_delete`, `constant_delete`, `type_delete` and `block_delete` stay refused there by decision (`local.safety.drive-tags-bool.20261112`).
 

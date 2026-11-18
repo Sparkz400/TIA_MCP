@@ -13,7 +13,8 @@ namespace TiaMcp.Openness.V21
         private static string SimulationProvisionCheckpointPath(string storage, bool projectModified)
         {
             if (projectModified)
-                throw new BridgeException("UnsavedProject", "Provisioning requires a saved scratch project for its full recovery archive. No automatic save is performed.");
+                throw new BridgeException("UnsavedProject", "Provisioning requires a saved scratch project for its full recovery archive. No automatic save is performed. Call project_save, then retry with the same downloadTicket while it is valid.",
+                    new JObject { ["remediation"] = "project_save, then simulation_provision_scratch_credential with the same downloadTicket while it is valid (15 minutes after sim_create; otherwise a fresh instance). This refusal writes no provisioning claim. If you took a simulation_discovery_baseline for this call, take a new one before the retry: a refused call can use it up." });
             const string name = "before-provision.zap21";
             EngineeringPaths.ValidateProjectArchivePath(storage, name);
             string archive = Path.Combine(storage, name), staging = Path.Combine(storage, Path.GetFileNameWithoutExtension(name));
@@ -38,7 +39,8 @@ namespace TiaMcp.Openness.V21
                 SimulationTicket.VerifyPlainDirectory(child);
             }
             else if (entries.Length != 0)
-                throw new BridgeException("SimulationProvisionStorageCollision", "A staging or restoration destination already exists. Existing files and directories are never overwritten.");
+                throw new BridgeException("SimulationProvisionStorageCollision", "A staging or restoration destination already exists. Existing files and directories are never overwritten.",
+                    new JObject { ["path"] = path, ["remediation"] = "An earlier provisioning attempt used this owned instance's storage, and its ticket cannot be reused. simulation_provision_status lists the attempt and the exact next calls (simulation_provision_recover when its admission is held, then a fresh instance)." });
         }
 
         private static void SimulationProvisionProjectCheckpoint(Project project, JObject baseline, Action<string> checkpoint)

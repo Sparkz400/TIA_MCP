@@ -48,7 +48,9 @@ namespace TiaMcp.Openness.V21
             Action guard = () =>
             {
                 if (SimulationRuntimeManager.RegisteredInstanceInfo.Length != 0)
-                    throw new BridgeException("SimulationRegistrationsPresent", "The discovery baseline must be observed while no PLCSIM instance is registered.");
+                    throw new BridgeException("SimulationRegistrationsPresent", "The discovery baseline must be observed while no PLCSIM instance is registered.",
+                        new JObject { ["registered"] = RegisteredSimulationInstances(),
+                            ["remediation"] = "sim_status, then sim_release with deleteOwned:true for each instance this Host created (tia_detach does not release them); release others in PLCSIM. Then take the baseline again." });
                 if (provider.State != OnlineState.Offline)
                     throw new BridgeException("OfflineRequired", "The scratch CPU must remain offline during the discovery baseline.");
             };

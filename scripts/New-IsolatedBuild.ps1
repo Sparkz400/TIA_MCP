@@ -30,7 +30,17 @@ foreach ($record in $records) {
         throw "Source changed during snapshot: $($record.path). Retry a new isolated build."
     }
 }
-@{schemaVersion=1;createdAtUtc=[DateTime]::UtcNow.ToString('O');configuration=$Configuration;bundleKind=$bundleKind;files=$records} |
+# The commit the snapshot was taken from, for host_build_identity. sourceTreeDirty: the working tree had changes beside that
+# commit, so the copied files may differ from it. Both stay null without git or outside a clone.
+$sourceCommit = $null; $sourceTreeDirty = $null
+try {
+    $head = & git -C $repoRoot rev-parse HEAD 2>$null
+    if ($LASTEXITCODE -eq 0 -and "$head" -match '^[0-9a-f]{40}$') {
+        $status = & git -C $repoRoot status --porcelain 2>$null
+        if ($LASTEXITCODE -eq 0) { $sourceCommit = "$head"; $sourceTreeDirty = [bool]$status }
+    }
+} catch { $sourceCommit = $null; $sourceTreeDirty = $null }
+@{schemaVersion=1;createdAtUtc=[DateTime]::UtcNow.ToString('O');configuration=$Configuration;bundleKind=$bundleKind;sourceCommit=$sourceCommit;sourceTreeDirty=$sourceTreeDirty;files=$records} |
     ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $buildRoot 'build-inputs.json') -Encoding UTF8
 $env:DOTNET_CLI_HOME = Join-Path $repoRoot '.dotnet'
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'

@@ -41,17 +41,17 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_state", new { instanceId, action, timeoutMs }, cancellationToken, action == "powerOn" ? 2 * timeoutMs : timeoutMs);
 
     [McpServerTool(Name = "sim_tags", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Inspect exposed simulation symbols after a program is loaded. Returns bounded native tag metadata; this is separate from offline tag tables.")]
+    [Description("Inspect exposed simulation symbols after a program is loaded. Returns bounded native tag metadata; this is separate from offline tag tables. symbol is the spelling the instance's tag list uses; the symbolic read and write tools also accept TIA's quoted form (\"Db\".Member for Db.Member). index and parentIndex locate a member in the tag list. offset and bit are PLCSIM's own fields and only meaningful for standard (non-optimized) access: members of an optimized DB can all report 0 (seen on PLCSIM Advanced V8), so address them by symbol.")]
     public Task<CallToolResult> Tags(int instanceId, CancellationToken cancellationToken, string? filter = null, int maxItems = 200, bool refresh = true)
         => Call("sim_tags", new { instanceId, filter, maxItems, refresh }, cancellationToken);
 
     [McpServerTool(Name = "sim_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Read typed values from an exact selected simulated instance. signals is an array of {symbol,type}; supported types include bool, int8..uint64, float, double, string, wstring. Returns identity, timestamps and quality. One runtime call per symbol: use sim_read_signals for up to 64 numeric/bool symbols in one call; sim_read is the route for string and wstring.")]
+    [Description("Read typed values from an exact selected simulated instance. signals is an array of {symbol,type}; supported types include bool, int8..uint64, float, double, string, wstring. Returns identity, timestamps and quality. Quoting may differ from the tag list (\"Db\".A or Db.A): a symbol is matched to the tag list's spelling and passed unchanged when there is no single match. One runtime call per symbol: use sim_read_signals for up to 64 numeric/bool symbols in one call; sim_read is the route for string and wstring.")]
     public Task<CallToolResult> Read(int instanceId, JsonElement signals, CancellationToken cancellationToken)
         => Call("sim_read", new { instanceId, signals = Array(signals) }, cancellationToken);
 
     [McpServerTool(Name = "sim_write", Destructive = true, OpenWorld = false)]
-    [Description("Write typed simulation stimuli to a local simulated instance this session created or adopted (otherwise OwnedInstanceRequired). writes is an array of {symbol,type,value}. A symbol whose area in the instance's tag list is the output area is refused with InvalidRequest before anything is written: the program writes the outputs. Writes affect the simulated program and may be overwritten by its scan.")]
+    [Description("Write typed simulation stimuli to a local simulated instance this session created or adopted (otherwise OwnedInstanceRequired). writes is an array of {symbol,type,value}; quoting may differ from the tag list, as in sim_read. A symbol whose area in the instance's tag list is the output area is refused with InvalidRequest before anything is written: the program writes the outputs. Writes affect the simulated program and may be overwritten by its scan.")]
     public Task<CallToolResult> Write(int instanceId, JsonElement writes, CancellationToken cancellationToken)
         => Call("sim_write", new { instanceId, writes = Array(writes) }, cancellationToken);
 

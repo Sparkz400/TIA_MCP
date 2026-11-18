@@ -217,6 +217,23 @@ namespace TiaMcp.Simulation
             });
         }
 
+        /// <summary>The spelling PLCSIM's tag list uses for a symbol whose quoting differs from it: TIA writes "Tag".A, a V8 tag list may
+        /// list Tag.A, and PLCSIM resolves names only in its own spelling (the other one fails with DoesNotExist). An exact entry is kept;
+        /// otherwise the symbol without quotes is matched, ignoring case, against the entries without quotes, itself or by its longest
+        /// entry prefix at a member or element boundary. Without exactly one match the symbol is returned unchanged, so PLCSIM decides.</summary>
+        public static string TagListSpelling(string symbol, IEnumerable<string> tagNames)
+        {
+            var names = tagNames.Where(n => !string.IsNullOrEmpty(n)).ToList();
+            if (names.Contains(symbol, StringComparer.Ordinal)) return symbol;
+            var byKey = names.GroupBy(n => n.Replace("\"", ""), StringComparer.OrdinalIgnoreCase).ToDictionary(g => g.Key, g => g.Distinct(StringComparer.Ordinal).ToList(), StringComparer.OrdinalIgnoreCase);
+            string key = symbol.Replace("\"", "");
+            if (byKey.TryGetValue(key, out var exact)) return exact.Count == 1 ? exact[0] : symbol;
+            for (int i = key.Length - 1; i > 0; i--)
+                if ((key[i] == '.' || key[i] == '[') && byKey.TryGetValue(key.Substring(0, i), out var prefix))
+                    return prefix.Count == 1 ? prefix[0] + key.Substring(i) : symbol;
+            return symbol;
+        }
+
         private static bool Given(JObject item, string name) => item[name] != null && item[name].Type != JTokenType.Null;
 
         private static int UInt16(JObject item, string name, int minimum) => Number(item, name, minimum, ushort.MaxValue);

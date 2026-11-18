@@ -205,8 +205,10 @@ adapter-owned simulator instances. Online access to real PLCs (compare, station
 upload, download) exists only behind the off-by-default `--physical-plc-online`
 Host option, is not qualified on physical hardware and never answers logins or
 passwords; force and CPU mode control are not exposed
-([real PLCs](docs/reference/physical-plc-online.md)). Keep project exports and
-credentials private.
+([real PLCs](docs/reference/physical-plc-online.md)). Alarms of a WinCC Unified PC
+Runtime can be read, and acknowledged only on a runtime on the same PC after an
+explicit acknowledgement ([Unified alarms](docs/reference/unified-runtime-alarms.md));
+nothing else is written to an HMI runtime. Keep project exports and credentials private.
 
 ## Development checks
 

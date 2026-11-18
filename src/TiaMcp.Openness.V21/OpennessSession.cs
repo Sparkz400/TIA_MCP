@@ -142,6 +142,7 @@ namespace TiaMcp.Openness.V21
                 case "scratch_create": return ScratchCreate(arguments);
                 case "project_open": return ProjectOpen(arguments);
                 case "project_close": return ProjectClose(arguments);
+                case "project_save": return ProjectSave(arguments);
                 case "plc_physical_targets": return PhysicalTargets(arguments);
                 case "plc_physical_online_compare": return PhysicalOnlineCompare(arguments);
                 case "plc_physical_station_upload": return PhysicalStationUpload(arguments);
@@ -340,6 +341,7 @@ namespace TiaMcp.Openness.V21
             result["portalProcessId"] = pid;
             result["projectsClosed"] = closed;
             if (closeFailures.Count > 0) result["projectCloseFailures"] = closeFailures;
+            result["plcsimRegistrations"] = RegisteredSimulationInstancesAfterDetach();
             if (!owned) { result["processExitVerified"] = false; result["processExited"] = null; return result; }
             try
             {
@@ -476,6 +478,7 @@ namespace TiaMcp.Openness.V21
             result["completeness"] = new JObject { ["complete"] = false, ["scopeComplete"] = !budget.Truncated && !walk.Truncated && warnings.Count == 0,
                 ["truncated"] = budget.Truncated || walk.Truncated, ["maxItems"] = max, ["visitedItems"] = walk.Used,
                 ["scope"] = "Device items, configured address ranges and exposed program blocks including units/system groups; no online data.",
+                ["meaning"] = "complete is always false here: an inventory never covers the project content listed under gaps. scopeComplete is the answer for this call: true when every item in scope was listed, with no truncation and no warnings.",
                 ["gaps"] = new JArray("Use software_inspect for tags and PLC data types", "Use hardware_inspect for exposed channel details", "Use technology_read for TO parameters", "Use safety_inspect for safety administration", "Library internals", "No transactional snapshot or project revision token") };
             return result;
         }

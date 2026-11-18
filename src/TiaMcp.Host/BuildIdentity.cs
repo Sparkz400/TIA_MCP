@@ -39,12 +39,27 @@ public static class BuildIdentity
             ["hostProcessId"] = Environment.ProcessId, ["hostStartedAtUtc"] = Started.ToString("O"),
             ["productVersion"] = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
             ["files"] = files,
-            ["bundle"] = manifest is not null && System.IO.File.Exists(manifest)
-                ? new JsonObject { ["root"] = root, ["manifestSha256"] = Hash(manifest) } : null,
+            ["bundle"] = manifest is not null && System.IO.File.Exists(manifest) ? Bundle(root!, manifest) : null,
             ["runningMatchesDisk"] = !changed,
             ["note"] = changed
                 ? "A binary changed on disk after this Host started. This Host still runs the build it started with; a worker started later would load the new file. Restart the Host to run one consistent build."
                 : "The running Host and its configured workers match the files on disk. Compare sha256Now with a build's own hashes to tell which build that is; building or packaging elsewhere does not update this Host." };
+    }
+
+    /// <summary>The bundle's manifest hash and the source it was packaged from. sourceCommit is null for bundles packaged before it
+    /// was recorded or without git; the random suffix of a bundle's folder name is not a commit.</summary>
+    internal static JsonObject Bundle(string root, string manifest)
+    {
+        var bundle = new JsonObject { ["root"] = root, ["manifestSha256"] = Hash(manifest), ["sourceCommit"] = null, ["sourceTreeDirty"] = null, ["createdAtUtc"] = null };
+        try
+        {
+            if (JsonNode.Parse(System.IO.File.ReadAllText(manifest)) is JsonObject parsed)
+                foreach (string name in new[] { "sourceCommit", "sourceTreeDirty", "createdAtUtc", "productVersion" })
+                    if (parsed[name] is JsonValue value) bundle[name] = value.DeepClone();
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or System.Text.Json.JsonException) { bundle["manifestReadError"] = e.Message; }
+        if (bundle["sourceCommit"] is null) bundle["sourceCommitNote"] = "This bundle records no source commit (packaged before it was recorded, or without git). Its folder name's suffix is random, not a commit.";
+        return bundle;
     }
 
     private static string? Hash(string path)

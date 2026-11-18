@@ -2007,7 +2007,20 @@ namespace TiaMcp.Openness.V21
             view["fingerprintContent"] = FingerprintContentView(change);
             view["progressPath"] = Path.Combine(change.Directory, "progress.json");
             view["progress"] = ChangeMilestoneRules.From(change.State, change.Stages, change.Compilation);
+            view["projectSave"] = ProjectSaveView(change, (JObject)view["progress"]);
             return change.Kind == "hmi_classic_screen_edit" && !includeDetails ? ClassicScreenReceipts.Compact(view) : view;
+        }
+
+        // preview.isModified is fixed at change_prepare (the preview is hash-bound); this says what apply saved since.
+        // Read from the progress milestones (checkpointSaved, saved), so every kind's save stages count the same way there and here.
+        private static JObject ProjectSaveView(EngineeringChange change, JObject progress)
+        {
+            string Milestone(string name) => (progress?["milestones"] as JArray)?.OfType<JObject>().FirstOrDefault(m => m.Value<string>("milestone") == name)?.Value<string>("status");
+            return new JObject {
+                ["isModifiedAtPrepare"] = change.Preview?["isModified"]?.DeepClone(),
+                ["savedBeforeApply"] = Milestone("checkpointSaved") == "done",
+                ["savedAfterApply"] = Milestone("saved") == "done",
+                ["note"] = "preview.isModified is the state at change_prepare. savedBeforeApply is the checkpointSave of change_apply, which writes the in-memory edits before its recovery archive; savedAfterApply is its final save." };
         }
 
         // How often this change's fingerprints read the whole project and how often they reused the last read of the same saved state.
