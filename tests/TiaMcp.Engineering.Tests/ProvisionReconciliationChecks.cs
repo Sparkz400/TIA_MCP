@@ -29,6 +29,22 @@ internal static class ProvisionReconciliationChecks
         catch (BridgeOperationException error) { admissionId = error.Details!.Value.GetProperty("mutationAdmission").GetProperty("admissionId").GetString()!; }
         var store = new EngineeringMutationAdmissionStore(root);
         Check(store.Read(admissionId).State == "outcomeUnknown", "Failed provisioning leaves an outcomeUnknown admission");
+        // A later write on the same scratch is refused, naming this admission and the provisioning reconciliation route.
+        try { store.Acquire(scope with { ScopeSha256 = new('e', 64) }, new('a', 64)); throw new Exception("Expected ResourceBusy"); }
+        catch (BridgeOperationException error) when (error.Code == "ResourceBusy")
+        {
+            var blocking = error.Details!.Value.GetProperty("blockingAdmissions").EnumerateArray().Single(x => x.GetProperty("admissionId").GetString() == admissionId);
+            Check(blocking.GetProperty("reconciliationTool").GetString() == "simulation_provision_reconcile" &&
+                blocking.GetProperty("remediation").GetString()!.Contains("simulation_provision_reconcile"), "ResourceBusy routes a failed provisioning to simulation_provision_reconcile");
+        }
+        // Saving the scratch now would change the saved state the reconciliation compares, so project_save is refused before dispatch.
+        int callsBeforeSave = native.Calls.Count;
+        try { await dispatcher.CallAsync("project_save", new { }); throw new Exception("Expected ResourceBusy for project_save"); }
+        catch (BridgeOperationException error) when (error.Code == "ResourceBusy")
+        {
+            Check(error.Details!.Value.GetProperty("blockingAdmissionIds").EnumerateArray().Any(x => x.GetString() == admissionId), "project_save is refused while a provisioning admission holds the project");
+        }
+        Check(native.Calls.Count == callsBeforeSave, "A refused project_save never reaches the worker");
 
         void Report(string name, string hash) => File.WriteAllText(Path.Combine(storage, name),
             new JsonObject { ["recoveryBaseline"] = new JsonObject { ["nativeScope"] = new JsonObject { ["scopeSha256"] = hash } } }.ToJsonString());
@@ -68,8 +84,44 @@ internal static class ProvisionReconciliationChecks
         try { store.Acquire(scope with { ScopeSha256 = new('e', 64) }, new('a', 64)); throw new Exception("Expected ResourceBusy"); }
         catch (BridgeException error) when (error.Code == "ResourceBusy") { passed++; }
 
-        var released = await Reconcile(_ => { });
-        Check(released.GetProperty("released").GetBoolean(), "Full fresh match releases the admission");
+        // simulation_provision_status finds the held attempt from the Host's records and lists the recovery first.
+        var status = SimulationProvisionRecovery.Status(root);
+        var attempt = status["attempts"]!.AsArray().Single(a => a!["admissionId"]!.GetValue<string>() == admissionId)!;
+        Check(attempt["stage"]!.GetValue<string>() == "held" && attempt["projectPath"]!.GetValue<string>() == project &&
+            attempt["storagePath"]!.GetValue<string>() == storage && attempt["storage"]!["provisionReports"]!.GetValue<int>() == 2 &&
+            attempt["nextSteps"]![0]!["tool"]!.GetValue<string>() == "simulation_provision_recover" &&
+            attempt["nextSteps"]!.AsArray().Any(x => x!["tool"]!.GetValue<string>() == "project_save"), "Status names the held attempt, its storage and the exact next calls");
+        await Reject(() => Task.FromResult(SimulationProvisionRecovery.Status(root, maxItems: 0)), "InvalidRequest");
+
+        // simulation_provision_recover refuses before detaching while an open project has unsaved edits.
+        native.Session = new JsonObject { ["attached"] = true, ["projects"] = new JsonArray(new JsonObject { ["name"] = "p", ["path"] = project, ["isModified"] = true }) };
+        int callsBefore = native.Calls.Count;
+        await Reject(() => SimulationProvisionRecovery.Recover(dispatcher, root, admissionId, CancellationToken.None), "UnsavedProject");
+        Check(!native.Calls.Skip(callsBefore).Contains("detach"), "Recover never detaches over unsaved edits");
+        // A held reconciliation stops after it: detach, start and reconcile ran, the project is not reopened.
+        native.Session = new JsonObject { ["attached"] = true, ["projects"] = new JsonArray() };
+        native.Verification = new JsonObject { ["scopeSha256"] = scopeHash, ["processId"] = 456, ["nativeMutationInvoked"] = false,
+            ["archiveHashMatches"] = true, ["cardManifestMatches"] = true, ["projectFingerprintMatches"] = false, ["projectSavedBeforeArchive"] = true,
+            ["storageMatchesBaseline"] = true, ["credentialNeverArmed"] = true, ["observerProjectEmpty"] = true, ["observerProjectAbsent"] = false };
+        callsBefore = native.Calls.Count;
+        var heldRecovery = await SimulationProvisionRecovery.Recover(dispatcher, root, admissionId, CancellationToken.None);
+        var recoveryCalls = native.Calls.Skip(callsBefore).ToArray();
+        Check(heldRecovery["recovered"]!.GetValue<bool>() == false && heldRecovery["held"]!.GetValue<bool>() &&
+            heldRecovery["stoppedAt"]!.GetValue<string>() == "simulation_provision_reconcile" &&
+            recoveryCalls.SequenceEqual(new[] { "session_status", "detach", "start", "simulation_provision_reconcile_verify" }), "A held reconciliation stops recovery before reopening");
+        Check(store.Read(admissionId).State == "outcomeUnknown", "A held recovery leaves the admission held");
+
+        // A full match: recover releases the admission and reopens the scratch project.
+        native.Verification["projectFingerprintMatches"] = true;
+        callsBefore = native.Calls.Count;
+        var recovered = await SimulationProvisionRecovery.Recover(dispatcher, root, admissionId, CancellationToken.None);
+        Check(recovered["recovered"]!.GetValue<bool>() && native.Calls.Skip(callsBefore).Last() == "project_open" &&
+            native.Opened == project && recovered["status"]!["stage"]!.GetValue<string>() == "released", "Recover releases the admission and reopens the scratch project");
+        Check(!native.Calls.Any(c => c is "sim_create" or "simulation_download" or "simulation_provision_scratch_credential" or "project_save"),
+            "Recover never creates, downloads, provisions or saves");
+        await Reject(() => SimulationProvisionRecovery.Recover(dispatcher, root, admissionId, CancellationToken.None), "InvalidOperationState");
+        Check(SimulationProvisionRecovery.Status(root, admissionId)["attempts"]![0]!["nextSteps"]![0]!["tool"]!.GetValue<string>() == "project_open",
+            "A released attempt starts the fresh-instance steps");
         var record = store.Read(admissionId);
         Check(record.State == "reconciled" && record.Reconciliation.Count == 3 &&
             record.Reconciliation.Single(r => r.ResourceKey == EngineeringResourceKey.ForPath("project", project)).Disposition == "unchanged" &&
@@ -100,6 +152,8 @@ internal static class ProvisionReconciliationChecks
         internal List<string> Calls { get; } = [];
         internal List<JsonObject> Requests { get; } = [];
         internal JsonObject Verification = new();
+        internal JsonObject Session = new() { ["attached"] = false, ["projects"] = new JsonArray() };
+        internal string? Opened;
         public Task<JsonElement> CallAsync(string operation, object? arguments = null, CancellationToken cancellationToken = default)
         {
             Calls.Add(operation);
@@ -110,9 +164,18 @@ internal static class ProvisionReconciliationChecks
                 "mutation_begin" => new { leaseToken = "synthetic-lease", scope },
                 "mutation_end" => new { released = true },
                 "simulation_provision_reconcile_verify" => Verification.DeepClone(),
+                "session_status" => Session.DeepClone(),
+                "detach" or "start" => new { },
+                "project_open" => Open(arguments),
                 _ => throw new Exception("Unexpected native operation: " + operation)
             };
             return Task.FromResult(JsonSerializer.SerializeToElement(value, BridgeProtocol.Json));
+        }
+
+        private object Open(object? arguments)
+        {
+            Opened = JsonSerializer.SerializeToNode(arguments, BridgeProtocol.Json)!["path"]!.GetValue<string>();
+            return new { opened = true };
         }
     }
 }

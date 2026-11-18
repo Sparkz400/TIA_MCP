@@ -62,6 +62,7 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/SimulationOnlineLogin.cs" Link="SimulationOnlineLogin.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/SimulationTlsPin.cs" Link="SimulationTlsPin.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/NativeRuntimeLifetime.cs" Link="NativeRuntimeLifetime.cs" />
+    <Compile Include="../../src/TiaMcp.Host/BuildIdentity.cs" Link="BuildIdentity.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/CapturedProcessIdentity.cs" Link="CapturedProcessIdentity.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.AddInOwner.cs" Link="OpennessSession.AddInOwner.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ObjectIdentity.cs" Link="ObjectIdentity.cs" />

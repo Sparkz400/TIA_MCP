@@ -57,6 +57,7 @@ try
             if (options.AddInHandoff) builder.Services.AddHostedService<AddInHandoffService>();
             builder.Services.AddSingleton<TiaMcp.Core.Inventory.InventoryStore>();
             builder.Services.AddSingleton<PhysicalRuntimeSessions>();
+            builder.Services.AddSingleton<UnifiedRuntimeSessions>();
             builder.Services.AddSingleton<OpcUaRuntimeSessions>();
             builder.Services.AddSingleton(services => new RuntimeCaptures(services.GetRequiredService<PhysicalRuntimeSessions>(), options, TimeProvider.System, simulator.Bridge));
             builder.Services.AddSingleton<TiaMcp.Core.Inventory.IInventoryIdentityFactory, TiaMcp.Core.Inventory.SiemensWebIdentityFactory>();
@@ -73,6 +74,7 @@ try
                 .WithTools<TranslationTools>()
                 .WithTools<TranslationNativeTools>()
                 .WithTools<OpcUaTools>()
+                .WithTools<UnifiedRuntimeTools>()
                 .WithTools<VciTools>()
                 .WithTools<GraphTools>()
     .WithTools<AutomationMlTools>()

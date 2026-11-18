@@ -46,6 +46,41 @@ def scenario(signals):
     ]
 
 
+def save_before_provisioning(call, download):
+    """Provisioning refuses an unsaved project. A Host that reports saveRequiredBeforeProvisioning saves with project_save
+    (nothing when false); an older Host, which does not report it, saves through a compile-only change as before."""
+    required = download.get("saveRequiredBeforeProvisioning")
+    if required is None:
+        return {"route": "plc_compile change", **save_generated_scratch_project(call, download)}
+    if required is not True:
+        return {"route": "notRequired", "projectModifiedAfter": download.get("projectModifiedAfter")}
+    saved = call("project_save")
+    if saved.get("saved") is not True or saved.get("isModifiedAfter") is not False:
+        raise RuntimeError("project_save did not leave the scratch project saved.")
+    if saved.get("project", {}).get("path") != download.get("project", {}).get("path"):
+        raise RuntimeError("project_save saved another project than the downloaded scratch.")
+    return {"route": "project_save", "saved": saved}
+
+
+def quoted_symbol_check(call, instance_id, signals, observed):
+    """The same signals in TIA's quoted spelling ("Db".Member) must read the same values as the tag list's spelling."""
+    quoted = []
+    for signal in signals:
+        head, _, member = signal["symbol"].replace('"', "").partition(".")
+        quoted.append({**signal, "symbol": '"' + head + '".' + member})
+    again = call("sim_read", {"instanceId": instance_id, "signals": quoted})
+    by_symbol = {value["symbol"]: value for value in again["values"]}
+    first = {value["symbol"]: value for value in observed["values"]}
+    result = []
+    for plain, spelled in zip(signals, quoted):
+        value = by_symbol.get(spelled["symbol"], {})
+        if value.get("quality") != "good":
+            raise RuntimeError("Quoted symbol " + spelled["symbol"] + " did not read: " + str(value.get("errorCode")))
+        result.append({"tagList": plain["symbol"], "quoted": spelled["symbol"], "value": value.get("value"),
+                       "sameTypeAsTagList": first[plain["symbol"]]["type"] == value.get("type")})
+    return result
+
+
 def checked_values(observed, signals):
     values = observed["values"]
     expected = {(signal["symbol"], signal["type"]) for signal in signals}
@@ -65,6 +100,8 @@ def main(argv=None):
     parser.add_argument("--worker", type=pathlib.Path, help="Explicit engineering worker build for an isolated host run.")
     parser.add_argument("--sim-worker", type=pathlib.Path, help="Explicit simulator worker build for an isolated host run.")
     parser.add_argument("--provision-runtime-credential", action="store_true", help="Explicitly checkpoint/compile/save generated scratch state, then provision this owned simulator before normal power-on.")
+    parser.add_argument("--golden-path-checks", action="store_true",
+                        help="Also record host_build_identity, read the test signals in TIA's quoted spelling and record tia_detach's plcsimRegistrations (Hosts from 18 November 2026 on).")
     parser.add_argument("--trust-owned-empty-cpu-certificate", action="store_true",
                         help="Authorize first-use TLS trust only for this owned empty CPU, pinned within this attempt; requires --provision-runtime-credential.")
     args = parser.parse_args(argv)
@@ -84,6 +121,7 @@ def main(argv=None):
               "provisionRuntimeCredential": args.provision_runtime_credential,
               "trustOwnedEmptyCpuCertificate": args.trust_owned_empty_cpu_certificate,
               "host": str(args.host.resolve()), "hostArguments": host_arguments,
+              "goldenPathChecks": args.golden_path_checks,
               "steps": [], "cleanup": [], "completed": False, "simulationVerified": False}
     client = Client(args.host.resolve(), 300, host_arguments)
     instance_id = None
@@ -106,6 +144,8 @@ def main(argv=None):
     try:
         client.request("initialize", {"protocolVersion": "2025-11-25", "capabilities": {}, "clientInfo": {"name": "tia-simulation-validation", "version": "0.2.0"}})
         client.notify("notifications/initialized")
+        if args.golden_path_checks:
+            report["hostBuild"] = call("host_build_identity")
         call("tia_start")
         attached = True
         opened = call("project_open", {"path": str(project)})
@@ -129,7 +169,7 @@ def main(argv=None):
                 provision_arguments["trustOwnedEmptyCpuCertificate"] = True
             if download.get("project", {}).get("path") != str(project):
                 raise RuntimeError("Generated-state save must target the exact opened scratch project.")
-            report["generatedProjectSave"] = save_generated_scratch_project(call, download)
+            report["generatedProjectSave"] = save_before_provisioning(call, download)
             provisioned = call("simulation_provision_scratch_credential", provision_arguments)
             report["credentialProvisioning"] = verify_credential_provisioning(provisioned, download,
                 trust_owned_empty_cpu_certificate=args.trust_owned_empty_cpu_certificate)
@@ -148,6 +188,8 @@ def main(argv=None):
             signals.append({"symbol": matching[0], "type": kind})
         observed = call("sim_read", {"instanceId": instance_id, "signals": signals})
         checked_values(observed, signals)
+        if args.golden_path_checks:
+            report["quotedSymbols"] = quoted_symbol_check(call, instance_id, signals, observed)
         call("sim_write", {"instanceId": instance_id, "writes": [{**signals[0], "value": False}, {**signals[2], "value": 0}]})
         readback = call("sim_read", {"instanceId": instance_id, "signals": signals})
         values = checked_values(readback, signals)
@@ -183,7 +225,9 @@ def main(argv=None):
                 report["completed"] = False
         if attached:
             try:
-                call("tia_detach", cleanup=True)
+                detached = call("tia_detach", cleanup=True)
+                if args.golden_path_checks:
+                    report["detachPlcsimRegistrations"] = detached.get("plcsimRegistrations")
             except Exception as error:
                 report["detachFailure"] = str(error)
                 report["completed"] = False

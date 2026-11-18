@@ -699,6 +699,60 @@
       ]
     },
     {
+      "featureId": "project_save",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "simulation_provision_status",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "simulation_provision_recover",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "runtime_unified_credential_binding",
+      "obligations": [
+        "X13"
+      ]
+    },
+    {
+      "featureId": "runtime_unified_connect",
+      "obligations": [
+        "X13"
+      ]
+    },
+    {
+      "featureId": "runtime_unified_alarms",
+      "obligations": [
+        "X13"
+      ]
+    },
+    {
+      "featureId": "runtime_unified_alarm_acknowledge",
+      "obligations": [
+        "X13"
+      ]
+    },
+    {
+      "featureId": "runtime_unified_status",
+      "obligations": [
+        "X13"
+      ]
+    },
+    {
+      "featureId": "runtime_unified_disconnect",
+      "obligations": [
+        "X13"
+      ]
+    },
+    {
       "featureId": "project_open_copy",
       "obligations": [
         "X01"

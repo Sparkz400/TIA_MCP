@@ -67,6 +67,9 @@ internal static class AdmissionReconciliationChecks
         catch (BridgeOperationException error) when (error.Code == "ResourceBusy") {
             Check(error.Details!.Value.GetProperty("blockingAdmissionIds").EnumerateArray().Any(x => x.GetString() == admissionId), "ResourceBusy identifies the actual retained admission");
             Check(error.Details.Value.GetProperty("automaticRetryAllowed").GetBoolean() == false, "ResourceBusy never suggests replaying the write");
+            var blocking = error.Details.Value.GetProperty("blockingAdmissions").EnumerateArray().Single(x => x.GetProperty("admissionId").GetString() == admissionId);
+            Check(blocking.GetProperty("operation").GetString() == "change_apply" && blocking.GetProperty("reconciliationTool").GetString() == "engineering_admission_reconcile",
+                "ResourceBusy names each blocking admission's operation and its reconciliation tool");
         }
 
         var released = await Reconcile(_ => { });

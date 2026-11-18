@@ -148,6 +148,12 @@ namespace TiaMcp.Openness.V21
                 report["completed"] = true;
                 report["completedAtUtc"] = DateTime.UtcNow.ToString("O");
                 File.WriteAllText(reportPath, report.ToString(Formatting.Indented), new UTF8Encoding(false));
+                // The compile above runs on the in-memory state and can leave the project modified; provisioning refuses an unsaved
+                // project, so say so here instead of at the next call. Returned only: the retained report, which provisioning hashes, is unchanged.
+                bool modifiedAfter = plc.Project.IsModified;
+                report["projectModifiedAfter"] = modifiedAfter;
+                report["saveRequiredBeforeProvisioning"] = modifiedAfter;
+                if (modifiedAfter) report["nextStep"] = "project_save, then simulation_provision_scratch_credential (it refuses an unsaved project with UnsavedProject).";
                 return report;
             }
             catch (Exception ex)
@@ -208,6 +214,27 @@ namespace TiaMcp.Openness.V21
         {
             _simulationRuntimeLifetime.RegisterShutdown(ShutdownSimulationRuntime);
         }
+
+        // tia_detach leaves PLCSIM instances registered (they belong to the simulator worker or to PLCSIM itself), and a later
+        // simulation_discovery_baseline refuses while any is. Report them, but only when this worker already uses the PLCSIM API.
+        private JObject RegisteredSimulationInstancesAfterDetach()
+        {
+            var report = new JObject { ["checked"] = _simulationRuntimeLifetime.Registered };
+            if (!_simulationRuntimeLifetime.Registered)
+            {
+                report["note"] = "This worker did not use the PLCSIM API, so registrations were not read; sim_status lists them.";
+                return report;
+            }
+            try { report["instances"] = RegisteredSimulationInstances(); }
+            catch (Exception error) { report["checked"] = false; report["error"] = error.Message; return report; }
+            if (((JArray)report["instances"]).Count > 0)
+                report["remediation"] = "Detaching does not release PLCSIM instances, and simulation_discovery_baseline refuses while any is registered (SimulationRegistrationsPresent). sim_status, then sim_release with deleteOwned:true for each instance this Host created; release others in PLCSIM.";
+            return report;
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        private static JArray RegisteredSimulationInstances() =>
+            new JArray(SimulationRuntimeManager.RegisteredInstanceInfo.Select(info => new JObject { ["id"] = info.ID, ["name"] = info.Name }));
 
         // Kept behind simulation-only entry points so PLC-only sessions never
         // load or initialize the optional PLCSIM API while disposing the worker.

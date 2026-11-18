@@ -183,6 +183,24 @@ internal static class SimulationRuntimeControlTests
         return Task.CompletedTask;
     }
 
+    // TIA's quoting ("Tag".A) and an unquoted V8 tag list (Tag.A) name the same tag; PLCSIM resolves only its own spelling.
+    internal static Task SymbolsTakeTheTagListSpelling()
+    {
+        string[] names = ["MC7_Probe_IO.A", "SigDb.VInt", "SigDb.Arr", "\"QuotedDb\".X", "Dup.A", "DUP.A"];
+        Check.Equal("MC7_Probe_IO.A", SimulationRuntimeControl.TagListSpelling("\"MC7_Probe_IO\".A", names));
+        Check.Equal("MC7_Probe_IO.A", SimulationRuntimeControl.TagListSpelling("MC7_Probe_IO.A", names));
+        Check.Equal("SigDb.VInt", SimulationRuntimeControl.TagListSpelling("\"sigdb\".vint", names));
+        // An element of a listed entry keeps its index; a quoted tag list is matched from the unquoted form too.
+        Check.Equal("SigDb.Arr[3]", SimulationRuntimeControl.TagListSpelling("\"SigDb\".Arr[3]", names));
+        Check.Equal("\"QuotedDb\".X", SimulationRuntimeControl.TagListSpelling("QuotedDb.X", names));
+        // No match, an ambiguous match, or only a partial segment leaves the symbol to PLCSIM unchanged.
+        Check.Equal("\"Missing\".X", SimulationRuntimeControl.TagListSpelling("\"Missing\".X", names));
+        Check.Equal("\"Dup\".A", SimulationRuntimeControl.TagListSpelling("\"Dup\".A", names));
+        Check.Equal("\"SigDbX\".VInt", SimulationRuntimeControl.TagListSpelling("\"SigDbX\".VInt", names));
+        Check.Equal("\"SigDb\".VInt", SimulationRuntimeControl.TagListSpelling("\"SigDb\".VInt", []));
+        return Task.CompletedTask;
+    }
+
     internal static Task EventTimesAreUtc()
     {
         // The native shape: an Unspecified V8 event time already holds UTC and only gains its zone; a Local one is converted.

@@ -17,6 +17,9 @@ namespace TiaMcp.Openness.V21
             if (_shutdown == null) _shutdown = shutdown;
         }
 
+        /// <summary>True once a native runtime was used and has a shutdown pending, so reading its state loads nothing new.</summary>
+        internal bool Registered => _shutdown != null;
+
         public void Dispose()
         {
             if (_disposed) return;

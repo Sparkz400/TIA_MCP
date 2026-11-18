@@ -18,6 +18,7 @@ public sealed partial class WatchTableDispatcher
             var request = JsonSerializer.SerializeToNode(arguments, BridgeProtocol.Json)!.AsObject();
             return Element(admissions.Read(Text(request, "admissionId")));
         }
+        if (operation == "project_save") admissions.RefuseWhileAProjectIsHeld();
         if (!EngineeringMutationAdmissionStore.IsMutation(operation)) return await native.CallAsync(operation, arguments, token);
         var args = JsonSerializer.SerializeToNode(arguments ?? new { }, BridgeProtocol.Json)!.AsObject();
         // Preserve legacy artifact subdirectories, but bind them to this coordinator's ownership root.

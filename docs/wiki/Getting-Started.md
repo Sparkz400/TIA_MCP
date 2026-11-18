@@ -14,7 +14,7 @@ Point a stdio MCP client at `artifacts/host-only/bin/TiaMcp.Host/release/TiaMcp.
 
 For OPC UA trust that survives Host restarts, explicitly create a protected client identity and add `--ua-client-identity <name>` to the Host arguments. Setup, public certificate export and rotation are described in the [OPC UA identity workflow](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/opcua-runtime.md#protected-persistent-client-identity). The option needs a Windows user profile; it does not configure server trust or resume sessions.
 
-For a relocatable ZIP, run `./scripts/Package.ps1 -Offline`. It writes the bundle, hashes, notices and an MCP configuration; the bundle name and its manifest carry the product version. See [portable deployment](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#portable-package-without-siemens). Version tags attach the same verified ZIP to a draft GitHub release that the maintainer publishes ([releasing](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/releasing.md)).
+For a relocatable ZIP, run `./scripts/Package.ps1 -Offline`. It writes the bundle, hashes, notices and an MCP configuration; the bundle name and its manifest carry the product version, and the manifest the source commit (`sourceCommit`, `sourceTreeDirty`). See [portable deployment](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#portable-package-without-siemens). Version tags attach the same verified ZIP to a draft GitHub release that the maintainer publishes ([releasing](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/releasing.md)).
 
 ## On an engineering workstation
 
@@ -93,7 +93,7 @@ Configure a stdio server with your actual checkout path:
 
 Then ask the client: *Use `tia_discover` to list the available TIA Portal sessions.* For a command-line check, run `python .\scripts\smoke_mcp.py`.
 
-After updating a package or rebuilding, ask for `host_build_identity`: it shows which Host and worker files the running Host started with and whether they changed since. A new build is only in use after the client restarts the Host ([reporting progress](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#reporting-progress)).
+After updating a package or rebuilding, ask for `host_build_identity`: it shows which Host and worker files the running Host started with, whether they changed since, and for a package the source commit it was built from (`bundle.sourceCommit`; bundles from before 18 November 2026 record none, and the suffix of a bundle's folder name is random, not a commit). A new build is only in use after the client restarts the Host ([reporting progress](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#reporting-progress)).
 
 Large HMI screen imports can need more than five minutes. Use a longer Host and
 client timeout for that workflow (`--timeout-seconds` accepts 5 to 3600; set the client's tool

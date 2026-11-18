@@ -18,7 +18,7 @@ public static class ChangeResultCompaction
     [
         "origin", "observedAtUtc", "processId", "changeId", "state", "previewHash", "journalPath", "progressPath", "progress", "stages",
         "failure", "primaryFailure", "recoveryFailure", "recoveryDirectory", "recoveryArchive", "recoveryArchiveSha256", "previousStateArchive",
-        "afterFingerprint", "automaticRetryAllowed", "recoveredFromDisk", "note",
+        "afterFingerprint", "automaticRetryAllowed", "recoveredFromDisk", "note", "projectSave",
     ];
 
     private static readonly string[] PreviewFields =

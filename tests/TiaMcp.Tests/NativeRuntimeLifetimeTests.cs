@@ -9,10 +9,13 @@ internal static class NativeRuntimeLifetimeTests
         int calls = 0;
         var lifetime = new NativeRuntimeLifetime();
         Action shutdown = () => calls++;
+        Check.Equal(false, lifetime.Registered);
         lifetime.RegisterShutdown(shutdown);
         lifetime.RegisterShutdown(shutdown);
+        Check.Equal(true, lifetime.Registered);
         Check.Equal(0, calls);
         lifetime.Dispose();
+        Check.Equal(false, lifetime.Registered);
         lifetime.Dispose();
         Check.Equal(1, calls);
         return Task.CompletedTask;

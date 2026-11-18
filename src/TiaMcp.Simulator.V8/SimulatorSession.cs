@@ -571,6 +571,7 @@ namespace TiaMcp.Simulator.V8
 
         private static JArray Capture(Selection selected, List<Signal> signals)
         {
+            ResolveNames(selected.Instance, signals);
             var values = new JArray();
             foreach (var signal in signals)
             {
@@ -591,6 +592,7 @@ namespace TiaMcp.Simulator.V8
 
         private static JArray ApplyWrites(Selection selected, List<Signal> signals)
         {
+            ResolveNames(selected.Instance, signals);
             var completed = new JArray();
             foreach (var signal in signals)
             {
@@ -663,9 +665,31 @@ namespace TiaMcp.Simulator.V8
             }
         }
 
+        // The name PLCSIM resolves: the caller's symbol in the tag list's spelling (quoting). The tag list is read once per request; an
+        // empty one is refreshed once when a symbol is quoted, since only quoting can differ. A failed lookup passes the symbols unchanged.
+        private static void ResolveNames(IInstance instance, IEnumerable<Signal> signals)
+        {
+            var pending = signals.Where(s => s.Native == null).ToList();
+            if (pending.Count == 0) return;
+            try
+            {
+                var tags = instance.TagInfos;
+                if ((tags == null || tags.Length == 0) && pending.Any(s => s.Symbol.IndexOf('"') >= 0)) { instance.UpdateTagList(ETagListDetails.IOMCTDB); tags = instance.TagInfos; }
+                var names = tags?.Select(t => t.Name).ToList() ?? new List<string>();
+                foreach (var signal in pending) signal.Native = SimulationRuntimeControl.TagListSpelling(signal.Symbol, names);
+            }
+            catch (Exception) { foreach (var signal in pending) signal.Native = signal.Symbol; }
+        }
+
+        private static string NativeName(IInstance instance, Signal signal)
+        {
+            if (signal.Native == null) ResolveNames(instance, new[] { signal });
+            return signal.Native;
+        }
+
         private static JToken ReadValue(IInstance instance, Signal signal)
         {
-            string s = signal.Symbol;
+            string s = NativeName(instance, signal);
             switch (signal.Type)
             {
                 case "bool": return new JValue(instance.ReadBool(s));
@@ -687,7 +711,7 @@ namespace TiaMcp.Simulator.V8
 
         private static void WriteValue(IInstance instance, Signal signal)
         {
-            string s = signal.Symbol; var v = signal.Value;
+            string s = NativeName(instance, signal); var v = signal.Value;
             switch (signal.Type)
             {
                 case "bool": instance.WriteBool(s, v.Value<bool>()); break;
@@ -879,6 +903,6 @@ namespace TiaMcp.Simulator.V8
         private sealed class Selection { internal IInstance Instance; internal int Id; internal string Name; internal bool Owned; internal string Storage;
             internal string CreationRoot; internal JObject CreationReceipt; internal EOperatingMode? CaptureRestoreMode, CaptureMode;
             internal bool CaptureHeld; internal WatchBuffer Watch; internal RecordArm Records; }
-        private sealed class Signal { internal string Symbol; internal string Type; internal JToken Value; }
+        private sealed class Signal { internal string Symbol; internal string Type; internal JToken Value; internal string Native; }
     }
 }

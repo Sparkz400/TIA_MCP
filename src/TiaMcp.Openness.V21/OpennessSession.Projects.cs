@@ -113,6 +113,35 @@ namespace TiaMcp.Openness.V21
             return result;
         }
 
+        // Save one open project of a worker-owned instance. Edits made outside a change (simulation_download compiles in
+        // memory, a scratch project created by the worker) otherwise had no save route but a compile-only change. A user-owned
+        // TIA is never saved here; an unresolved change on the project refuses, because saving would persist its partial edits
+        // and make its recovery archive the only way back.
+        private JObject ProjectSave(JObject args)
+        {
+            EnsureAttached();
+            if (!_ownsPortal) throw new BridgeException("OwnedSessionRequired", "project_save saves projects only in a worker-owned instance started with tia_start; save a user-owned project through a change (checkpointSave) or in TIA.");
+            var project = SelectProject(args);
+            if (!project.IsPrimary) throw new BridgeException("ReadOnlyProject", "The project is open read-only (secondary) and cannot be saved. Use project_open_copy for a writable copy.",
+                new JObject { ["project"] = ProjectInfo(project) });
+            RequireNoUnresolvedChange(project, null);
+            var result = Envelope();
+            result["project"] = ProjectInfo(project);
+            bool modified = project.IsModified;
+            result["modifiedBefore"] = modified;
+            if (modified)
+            {
+                _projectContent.Clear();
+                InvalidateHmiObservations();
+                project.Save();
+            }
+            result["saved"] = modified;
+            result["isModifiedAfter"] = project.IsModified;
+            result["note"] = modified ? "The in-memory edits are now the saved state; no recovery archive was taken. Use change_prepare/change_apply when the edit itself needs a checkpoint."
+                : "The project had no unsaved edits; nothing was written.";
+            return result;
+        }
+
         // Replace the one open project of a worker-owned instance by a read-write copy of its saved state. A primary project
         // is archived, closed and retrieved; a read-only (secondary) one, which V21 cannot archive, is closed and its saved
         // folder copied. Unsaved edits are refused; the copy is left open as the primary project. The original files are never written; work that needs a writable project

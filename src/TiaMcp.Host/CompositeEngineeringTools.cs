@@ -44,7 +44,7 @@ public sealed class CompositeEngineeringTools(IBridgeClient bridge, HostOptions 
     }
 
     [McpServerTool(Name = "host_build_identity", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Report which build this Host is running: its process start time, product version, the SHA-256 of the Host and configured worker executables when the Host started and now, and the bundle manifest hash when it runs from a package. changedOnDisk marks a binary replaced or rebuilt after start; runningMatchesDisk is false then, and a newly built or packaged binary must never be described as loaded until the Host was restarted and reports it. Starts no worker and changes nothing.")]
+    [Description("Report which build this Host is running: its process start time, product version, the SHA-256 of the Host and configured worker executables when the Host started and now, and, when it runs from a package, the bundle manifest hash with the sourceCommit and sourceTreeDirty the bundle was packaged from (null for bundles packaged before this was recorded or without git; a bundle folder name's suffix is random, not a commit). changedOnDisk marks a binary replaced or rebuilt after start; runningMatchesDisk is false then, and a newly built or packaged binary must never be described as loaded until the Host was restarted and reports it. Starts no worker and changes nothing.")]
     public CallToolResult HostBuildIdentity() => Result(BuildIdentity.Report(options.WorkerPath, options.SimulatorWorkerPath), false);
 
     [McpServerTool(Name = "composite_engineering_rebind_plan", ReadOnly = true, Destructive = false, OpenWorld = false)]
