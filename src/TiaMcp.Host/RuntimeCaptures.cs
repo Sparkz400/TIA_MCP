@@ -150,6 +150,7 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
                     var signal=plan.Signals[index];
                     lastReadCycle=cycle;accountedThrough=cycle;
                     var (result,error)=sample[index];
+                    if(plan.Request.Simulator is null && result is null && error is null)break;
                     try { writer.Append(new(writer.Rows,"read",signal.SelectionId,cycle,scheduled,Elapsed(),clock.GetUtcNow(),result,error,0)); }
                     catch(BridgeException failure) when(failure.Code is "RuntimeCaptureByteLimit" or "RuntimeCaptureValueLimit") {writer.RecordDroppedResult();throw;}
                     if(writer.ReadAttempts>=plan.Request.MaximumSamples){reason="sampleLimit";finish=true;break;}
@@ -189,10 +190,11 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
         try
         {
             var items=await sessions.ReadValues(plan.Request.AttemptId,plan.Signals.Select(x=>x.SelectionId).ToArray(),plan.Request.Representation,token,plan.Handoff);
-            return items.Select(x=>x.Result is not null?(JsonSerializer.Serialize(x.Result,BridgeProtocol.Json),(string?)null):((string?)null,ReadFailure(new BridgeException(x.ErrorCode!,"Symbol read refused.")))).ToArray();
+            return items.Select(x=>x is null?((string?)null,(string?)null):x.Result is not null?(JsonSerializer.Serialize(x.Result,BridgeProtocol.Json),(string?)null):((string?)null,ReadFailure(new BridgeException(x.ErrorCode!,"Symbol read refused.")))).ToArray();
         }
         // A request-level failure is every signal's failure for this cycle.
-        catch(OperationCanceledException) { return plan.Signals.Select(_=>((string?)null,(string?)"RuntimeCancelled")).ToArray(); }
+        // A cancelled cycle (stop, deadline) is one cancelled in-flight read: the first signal's row, as before; the others were never read.
+        catch(OperationCanceledException) { return plan.Signals.Select((_,i)=>((string?)null,i==0?"RuntimeCancelled":null)).ToArray(); }
         catch(Exception failure) { string code=ReadFailure(failure);return plan.Signals.Select(_=>((string?)null,(string?)code)).ToArray(); }
     }
     /// <summary>Restores the operating mode recorded at begin; free-running captures never changed it.</summary>

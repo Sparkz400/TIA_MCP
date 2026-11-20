@@ -58,8 +58,8 @@ public sealed record OpcUaSubscriptionProgress(string State, string? TerminalRea
 internal static class OpcUaSubscriptionContracts
 {
     internal static void Require([System.Diagnostics.CodeAnalysis.DoesNotReturnIf(false)] bool condition) { if (!condition) throw OpcUaRuntimeClient.Error("UaSubscriptionInvalid"); }
-    /// <summary>Notifications one Publish message may carry: 0 in a request means one (the original behaviour, which the offline
-    /// qualification oracles still pin); up to <see cref="MaximumPerPublish"/> can be asked for. One row keeps one message's exact envelope.</summary>
+    /// <summary>Notifications one Publish message may carry: 0 in a request means one (the original behaviour; the qualifiers'
+    /// gap, duplicate and recovery scenarios depend on one notification per message); up to <see cref="MaximumPerPublish"/> can be asked for. One row keeps one message's exact envelope.</summary>
     internal const int DefaultPerPublish = 1, MaximumPerPublish = 32;
     internal static int PerPublish(OpcUaSubscriptionRequest r) => r.MaximumNotificationsPerPublish == 0 ? DefaultPerPublish : r.MaximumNotificationsPerPublish;
     internal static void Validate(OpcUaSubscriptionRequest r)
