@@ -160,13 +160,15 @@ namespace TiaMcp.Openness.V21
     {
         /// <param name="symbolNames">Every tag, user constant and system constant name of the target scope (TIA keeps them unique there).</param>
         /// <param name="tags">Every tag of every software scope of the PLC (root, software units, safety units) with its logical address.</param>
-        internal static void Require(IEnumerable<string> symbolNames, IEnumerable<(string Name, string Address)> tags, string name, string address)
+        /// <returns>The first collision (ObjectExists for a name, AddressInUse for an address with the covering tag), or null.</returns>
+        internal static (string Code, string Message, string Tag, string Address)? Find(IEnumerable<string> symbolNames, IEnumerable<(string Name, string Address)> tags, string name, string address)
         {
             if (symbolNames.Any(existing => string.Equals(existing, name, StringComparison.OrdinalIgnoreCase)))
-                throw new BridgeException("ObjectExists", "A tag, constant or system constant named " + name + " already exists in the PLC's tag tables.");
+                return ("ObjectExists", "A tag, constant or system constant named " + name + " already exists in the PLC's tag tables.", null, null);
             foreach (var tag in tags)
                 if (TagAddressRules.IoOverlaps(tag.Address, address))
-                    throw new BridgeException("AddressInUse", "The existing tag " + tag.Name + " (" + tag.Address + ") already covers " + address + ".");
+                    return ("AddressInUse", "The existing tag " + tag.Name + " (" + tag.Address + ") already covers " + address + ".", tag.Name, tag.Address);
+            return null;
         }
     }
 

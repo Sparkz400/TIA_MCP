@@ -122,11 +122,16 @@ internal static class SafetyDriveGuardChecks
         // safety_drive_tags collisions over every scope.
         var names = new[] { "Tag1", "UnitConstant" };
         var tags = new[] { ("Tag1", "%I10.0"), ("UnitTag", "%IW20") };
-        SafetyTagCollisionRules.Require(names, tags, "New", "%I10.1"); count++; Console.WriteLine("PASS a free name and address are admitted");
-        Refuse(() => SafetyTagCollisionRules.Require(names, tags, "tag1", "%I11.0"), "ObjectExists", "a name in the target scope refuses, case-insensitively");
-        Refuse(() => SafetyTagCollisionRules.Require(names, tags, "unitconstant", "%I11.0"), "ObjectExists", "a constant name refuses as well");
-        Refuse(() => SafetyTagCollisionRules.Require(names, tags, "New", "%I10.0"), "AddressInUse", "an address of an existing tag refuses");
-        Refuse(() => SafetyTagCollisionRules.Require(names, tags, "New", "%I20.3"), "AddressInUse", "an address inside a word of a tag in another scope refuses");
+        Check(SafetyTagCollisionRules.Find(names, tags, "New", "%I10.1") == null, "a free name and address are admitted");
+        void Collides(string name, string address, string code, string tag, string label)
+        {
+            var found = SafetyTagCollisionRules.Find(names, tags, name, address);
+            Check(found != null && found.Value.Code == code && found.Value.Tag == tag, label);
+        }
+        Collides("tag1", "%I11.0", "ObjectExists", null, "a name in the target scope collides, case-insensitively");
+        Collides("unitconstant", "%I11.0", "ObjectExists", null, "a constant name collides as well");
+        Collides("New", "%I10.0", "AddressInUse", "Tag1", "an address of an existing tag collides and names the tag");
+        Collides("New", "%I20.3", "AddressInUse", "UnitTag", "an address inside a word of a tag in another scope collides");
 
         // Prepared-change eviction.
         var now = new DateTime(2026, 11, 20, 12, 0, 0, DateTimeKind.Utc);

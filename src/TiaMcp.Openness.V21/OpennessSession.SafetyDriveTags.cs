@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
+using Siemens.Engineering.HW;
 using Siemens.Engineering.MC.Drives;
 using Siemens.Engineering.MC.Drives.Enums;
 using Siemens.Engineering.SW.Tags;
@@ -42,7 +43,9 @@ namespace TiaMcp.Openness.V21
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static bool HasSafetyTelegram(DeviceItem item)
         {
-            var container = item.GetService<DriveObjectContainer>();
+            DriveObjectContainer container;
+            try { container = item.GetService<DriveObjectContainer>(); } catch (Exception) { return false; } // an item that is no drive
+            // An unreadable telegram list of a present drive throws; the caller then treats the item as safety hardware.
             return container != null && container.DriveObjects.Any(drive => drive.Telegrams.Any(telegram => telegram.Type == TelegramType.SafetyTelegram));
         }
 
@@ -99,7 +102,10 @@ namespace TiaMcp.Openness.V21
                     throw new BridgeException("SafetyBoundary", "The address " + address + " is not in an F-I/O range of this drive that the selected F-PLC owns. Nothing was written.",
                         new JObject { ["logicalAddress"] = address, ["fIoPath"] = fIo, ["drivePath"] = device });
                 // Every collision is found here, before ApplySafetyDriveTags creates the first tag.
-                SafetyTagCollisionRules.Require(symbolNames, existing, name, address);
+                var collision = SafetyTagCollisionRules.Find(symbolNames, existing, name, address);
+                if (collision != null)
+                    throw collision.Value.Tag == null ? new BridgeException(collision.Value.Code, collision.Value.Message)
+                        : new BridgeException(collision.Value.Code, collision.Value.Message, new JObject { ["logicalAddress"] = address, ["existingTag"] = collision.Value.Tag, ["existingAddress"] = collision.Value.Address });
                 rows.Add(new JObject { ["word"] = word, ["signal"] = status ? "S_ZSW1" : "S_STW1", ["bit"] = bit, ["name"] = name,
                     ["dataType"] = "Bool", ["logicalAddress"] = address, ["fIoPath"] = fIo });
             }

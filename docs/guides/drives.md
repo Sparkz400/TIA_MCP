@@ -111,19 +111,11 @@ offline project:
 - Refused: BICO interconnections, unavailable values, Safety Integrated
   parameters (p9300..p10999) and commissioning, reset, save and motor
   identification parameters (p0009, p0010, p0970..p0972, p0976, p0977, p1900,
-  p1910, p1960, p3900), telegram selection (p0922, p60022), the macro and
-  automatic-calculation switches (p0015, p0340), the data-set switch-over
-  (p0802..p0804) and the PROFINET identity (p8920..p8925).
-- Prepare and apply check every value against the parameter's declared minimum and
-  maximum before the first write (`InvalidRequest`); a limit Startdrive does not
-  report proves nothing and admits. `drive_motor_configure` checks its entries
-  the same way through the drive parameter of the entry's number.
+  p1910, p1960, p3900).
 - Apply writes every value, then reads each back; a difference fails with
-  `MutationVerificationFailed`. A read-only parameter fails at the native setter;
-  the writes already made are then restored (best effort). Both leave the change
-  in recovery with the usual checkpoint archive.
-- Startdrive may recalculate dependent parameters. Apply reads the listed
-  parameters back and records every other parameter whose value changed in the
-  change's readbacks (`drive-parameter-side-effects`, `drive-motor-side-effects`).
+  `MutationVerificationFailed`. A read-only parameter fails at the native setter.
+  Both leave the change in recovery with the usual checkpoint archive.
+- Startdrive may recalculate dependent parameters. Only the listed parameters are
+  read back; observe before and after and compare with `drive_profile_review`.
 - `compile=true` compiles all project devices. Nothing is written online,
   downloaded or copied RAM-to-ROM.
