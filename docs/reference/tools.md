@@ -65,7 +65,7 @@ release. A deprecated tool names the release that deprecated it and its replacem
 
 | Tool | Feature | Support | Toolset | 1.0 contract | Host option | Also in |
 | --- | --- | --- | --- | --- | --- | --- |
-| `connection_inspect` | Inspect configured communication connections and native endpoints | limited | reviews | frozen |  |  |
+| `connection_inspect` | Inspect configured communication connections and native endpoints | limited | core | frozen |  |  |
 | `connection_review` | Compare supplied connection observations and explicit endpoints | limited | reviews | frozen |  |  |
 | `connection_review_page` | Reopen retained connection differences and declared consumers | limited | reviews | frozen |  |  |
 
@@ -108,7 +108,7 @@ release. A deprecated tool names the release that deprecated it and its replacem
 | Tool | Feature | Support | Toolset | 1.0 contract | Host option | Also in |
 | --- | --- | --- | --- | --- | --- | --- |
 | `drive_inventory` | Read a joined drive, telegram, tag and technology-object inventory | limited | reviews | frozen |  |  |
-| `drive_observe` | Read offline SINAMICS drive objects, parameters and telegrams | limited | reviews | frozen |  |  |
+| `drive_observe` | Read offline SINAMICS drive objects, parameters and telegrams | limited | core | frozen |  |  |
 | `servo_call_plan` | Plan coordinated servo wrapper calls per drive | limited | reviews | frozen |  |  |
 
 ## engineering
@@ -289,7 +289,7 @@ release. A deprecated tool names the release that deprecated it and its replacem
 
 | Tool | Feature | Support | Toolset | 1.0 contract | Host option | Also in |
 | --- | --- | --- | --- | --- | --- | --- |
-| `certificate_inspect` | Read native CPU certificate stores and syslog servers as public data | limited | reviews | frozen |  |  |
+| `certificate_inspect` | Read native CPU certificate stores and syslog servers as public data | limited | core | frozen |  |  |
 | `public_certificate_review` | Inspect public certificates and compare supplied associations | limited | reviews | frozen |  |  |
 | `public_certificate_review_page` | Inspect retained public certificate review | limited | reviews | frozen |  |  |
 
@@ -372,7 +372,7 @@ release. A deprecated tool names the release that deprecated it and its replacem
 | --- | --- | --- | --- | --- | --- | --- |
 | `safety_evidence_report` | Reopen exact safety evidence signatures, issues and changes | limited | reviews | frozen |  |  |
 | `safety_evidence_review` | Compare supplied safety observations and retain supporting evidence | limited | reviews | frozen |  |  |
-| `safety_inspect` | Read native safety groups and signatures | limited | reviews | frozen |  |  |
+| `safety_inspect` | Read native safety groups and signatures | limited | core | frozen |  |  |
 | `safety_printout` | Print the safety printout and activation-test reports to files | limited | reviews | frozen |  |  |
 | `safety_validation_inspect` | Read F-I/O F-parameters and Safety Validation Assistant activation tests | limited | reviews | frozen |  |  |
 
@@ -380,7 +380,7 @@ release. A deprecated tool names the release that deprecated it and its replacem
 
 | Tool | Feature | Support | Toolset | 1.0 contract | Host option | Also in |
 | --- | --- | --- | --- | --- | --- | --- |
-| `access_inspect` | Read native UMAC, PLC protection and legacy web users without secrets | limited | reviews | frozen |  |  |
+| `access_inspect` | Read native UMAC, PLC protection and legacy web users without secrets | limited | core | frozen |  |  |
 | `access_review` | Compare supplied public grants and explicit monitoring policy | limited | reviews | frozen |  |  |
 | `access_review_page` | Inspect retained supplied public access review | limited | reviews | frozen |  |  |
 | `runtime_handoff_artifact_read` | Download exact handoff evidence and reports | limited | runtime | frozen |  |  |
@@ -472,11 +472,11 @@ release. A deprecated tool names the release that deprecated it and its replacem
 | `testsuite_application_plan_prepare` | Retain a bounded application-test run review on an owned PLCSIM instance | limited | testsuite | frozen | `--testsuite-qualification` |  |
 | `testsuite_result_import` | Inspect supplied Test Suite results against a saved review | limited | testsuite | frozen |  |  |
 | `testsuite_result_review` | Reopen and page retained supplied Test Suite findings | limited | testsuite | frozen |  |  |
-| `testsuite_style_job_execute_next` | Execute one style run through native qualification gates | unavailable_target | testsuite | experimental |  |  |
+| `testsuite_style_job_execute_next` | Execute one style run through native qualification gates | unavailable_target | hidden | experimental |  |  |
 | `testsuite_style_job_mark_interrupted` | Retain an interrupted style outcome as unknown | unavailable_target | testsuite | experimental |  |  |
 | `testsuite_style_job_prepare` | Prepare an immutable durable style queue | shipped | testsuite | frozen |  |  |
-| `testsuite_style_job_reconcile` | Gate independent style resource reconciliation | unavailable_target | testsuite | experimental |  |  |
-| `testsuite_style_job_recover` | Gate explicit style checkpoint recovery | unavailable_target | testsuite | experimental |  |  |
+| `testsuite_style_job_reconcile` | Gate independent style resource reconciliation | unavailable_target | hidden | experimental |  |  |
+| `testsuite_style_job_recover` | Gate explicit style checkpoint recovery | unavailable_target | hidden | experimental |  |  |
 | `testsuite_style_job_results` | Retrieve and revalidate retained style results | shipped | testsuite | frozen |  |  |
 | `testsuite_style_job_status` | Reopen durable style progress | shipped | testsuite | frozen |  |  |
 | `testsuite_style_job_stop_request` | Persist stop between style runs | shipped | testsuite | frozen |  |  |
@@ -554,4 +554,4 @@ release. A deprecated tool names the release that deprecated it and its replacem
 | --- | --- | --- | --- | --- | --- | --- |
 | `web_application_review` | Review supplied web application configuration and ZIP files | limited | reviews | frozen |  |  |
 | `web_application_review_page` | Inspect retained web application review | limited | reviews | frozen |  |  |
-| `web_inspect` | Read native CPU web server and web application configuration | limited | reviews | frozen |  |  |
+| `web_inspect` | Read native CPU web server and web application configuration | limited | core | frozen |  |  |

@@ -68,7 +68,7 @@ External Git delivery (`vci_push`, `vci_fetch`) needs `--git-executable` and one
 
 Fingerprint reuse: `--enable-fingerprint-reuse` lets consecutive changes reuse the project-wide fingerprint read while TIA reports the project in the same saved state. It is off by default; see [fingerprint reuse](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#fingerprint-reuse-between-changes) for what it relies on.
 
-The launcher scripts do not pass `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--disable-library-integrate-apply`, `--enable-fingerprint-reuse`, `--library-limits-file`, `--git-remote`, `--git-allow-network-remote` or `--physical-plc-online` (online access to real PLCs, off by default and unqualified; see [real PLCs](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/physical-plc-online.md)); start the Host directly for those. `Start-TiaMcp.ps1` adds `--no-native-workers` itself, but only for offline bundles. Every option, its default and its range is listed under [Host options](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#host-options). Qualification-only options such as `--hmi-change-qualification`, `--hmi-text-list-qualification` and `--safety-fparameter-discovery` exist for the native qualification runners, not for normal use.
+The launcher scripts do not pass `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--disable-library-integrate-apply`, `--enable-fingerprint-reuse`, `--library-limits-file`, `--git-remote`, `--git-allow-network-remote` or `--physical-plc-online` (online access to real PLCs, off by default and unqualified; see [real PLCs](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/physical-plc-online.md)); start the Host directly for those. `Start-TiaMcp.ps1` adds `--no-native-workers` itself, but only for offline bundles. Every option, its default and its range is listed under [Host options](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#host-options). Safety writes (`safety_import_xml`, `safety_fparameter_set`, `safety_drive_tags`, a safety tag rename) are refused by the Host unless it is started with `--enable-safety-changes`; the `safetyAcknowledged` flag a client sends is not an authorization. If the connection to a worker breaks, the next call starts a fresh worker once the old one has exited (it has to attach and open its project again). Qualification-only options such as `--hmi-change-qualification`, `--hmi-text-list-qualification` and `--safety-fparameter-discovery` exist for the native qualification runners, not for normal use.
 
 Vendor libraries can have additional CPU, tag-table and product requirements.
 Check the [PAL/DMC intake and prerequisite review](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/vendor-intake-review-20261025.md)
@@ -89,7 +89,7 @@ Configure a stdio server with your actual checkout path:
 }
 ```
 
-`--toolsets` keeps the tool list small: name only the [groups](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md#tool-groups---toolsets) you use (for example add `hmi`, `runtime`, `library`, `watch` or `diagnostics`). Without it the Host advertises about 330 tools, roughly 600 KB of tool definitions per session.
+`--toolsets` chooses which tool [groups](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md#tool-groups---toolsets) the Host advertises: name the groups you use (for example add `hmi`, `runtime`, `library`, `watch` or `diagnostics`). Without it the Host advertises only the `base` and `core` groups (sessions, projects, changes and the native reads), which keeps the tool list small; `--toolsets all` advertises every tool, about 330 and roughly 600 KB of tool definitions per session.
 
 Then ask the client: *Use `tia_discover` to list the available TIA Portal sessions.* For a command-line check, run `python .\scripts\smoke_mcp.py`.
 
@@ -99,6 +99,7 @@ Large HMI screen imports can need more than five minutes. Use a longer Host and
 client timeout for that workflow (`--timeout-seconds` accepts 5 to 3600; set the client's tool
 timeout longer, or let it send a `progressToken` so the Host's progress heartbeats keep it waiting); the [HMI guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/hmi-engineering.md#screen-failure-recovery-without-closing-tia)
 gives the settings and explains recovery without repeatedly reopening TIA.
+`--timeout-seconds` is the deadline of an ordinary call. Long operations (opening, copying or upgrading a project, `change_apply`, attaching behind the Openness dialog) get `--long-timeout-seconds` (default 900) instead, and `--queue-timeout-seconds` (default: `--timeout-seconds`) only bounds how long a call waits behind a running one; a call that gave up waiting sent nothing.
 If a call is cancelled or times out anyway, TIA finishes it: later calls return
 `PreviousOperationRunning` until it does, and then the Host continues without a
 restart ([interrupted calls](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#prepare-apply-inspect)).
@@ -109,7 +110,7 @@ preparation has separate transfer-security prerequisites. The
 [fixture preparation guide](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/hmi-fixture-preparation.md)
 describes the operator handoff, saved-state checks and owned-editor cleanup.
 
-The Host advertises about 300 tools. If your client limits tools per server, add `"--toolsets", "core,simulation"` (or other groups) to `args`. The server also offers workflow prompts such as `safe_change` and `block_test`. Groups, prompts, resources, completions, logging and progress notifications are described in [MCP surface](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md).
+The Host advertises only the `base` and `core` tools unless you add groups (`"--toolsets", "core,simulation"`) or `"--toolsets", "all"` to `args`. The server also offers workflow prompts such as `safe_change` and `block_test`. Groups, prompts, resources, completions, logging and progress notifications are described in [MCP surface](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md).
 
 ## Next steps
 
