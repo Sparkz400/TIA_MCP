@@ -88,7 +88,31 @@ public static class PlcsimTargetBindingChecks
         Fails(() => WebRuntimeProtocol.ChangeOperatingMode(id, "hold"), "RuntimeOperatingModeInvalid");
         Fails(() => WebRuntimeProtocol.Write(id, symbol with { Representation = "raw" }, Json("[1]")), "RuntimeWriteInvalid");
         Check(WebRuntimeProtocol.MutationPermission("PlcProgram.Write") == "write_value" && WebRuntimeProtocol.MutationPermission("Plc.RequestChangeOperatingMode") == "change_operating_mode", "Documented permissions");
-        Fails(() => WebRuntimeProtocol.MutationPermission("Alarms.Acknowledge"), "RuntimeMethodUnsupported");
+        Check(WebRuntimeProtocol.MutationPermission("Alarms.Acknowledge") == "acknowledge_alarms", "Documented acknowledge_alarms permission");
+        Fails(() => WebRuntimeProtocol.MutationPermission("Plc.CreateBackup"), "RuntimeMethodUnsupported"); // a ticket creator, not a boolean mutation
+        Check(JsonElement.DeepEquals(WebRuntimeProtocol.AcknowledgeAlarm(id, "9979413824317259784"),
+            Json($$$"""{"jsonrpc":"2.0","id":"{{{id}}}","method":"Alarms.Acknowledge","params":{"id":"9979413824317259784"}}""")), "Documented Alarms.Acknowledge shape");
+        Fails(() => WebRuntimeProtocol.AcknowledgeAlarm(id, "1\" , \"x\":2"), "RuntimeAlarmIdInvalid");
+        Check(JsonElement.DeepEquals(WebRuntimeProtocol.AlarmById(id, "en-US", "12"),
+            Json($$$"""{"jsonrpc":"2.0","id":"{{{id}}}","method":"Alarms.Browse","params":{"language":"en-US","alarm_id":"12"}}""")), "Documented single-alarm Alarms.Browse");
+        Check(JsonElement.DeepEquals(WebRuntimeProtocol.TicketRequest(id, "serviceData", 49),
+            Json($$$"""{"jsonrpc":"2.0","id":"{{{id}}}","method":"Modules.DownloadServiceData","params":{"hwid":49}}""")), "Documented service-data ticket request");
+        Check(!WebRuntimeProtocol.TicketRequest(id, "backup").TryGetProperty("params", out _) && !WebRuntimeProtocol.TicketRequest(id, "profiling").TryGetProperty("params", out _), "Backup and profiling take no parameters");
+        Fails(() => WebRuntimeProtocol.TicketRequest(id, "serviceData"), "RuntimeTicketSelectionInvalid");
+        Fails(() => WebRuntimeProtocol.TicketRequest(id, "backup", 1), "RuntimeTicketSelectionInvalid");
+        Fails(() => WebRuntimeProtocol.TicketRequest(id, "restore"), "RuntimeTicketKindUnsupported");
+        Check(WebRuntimeProtocol.TicketKind("backup") == ("Plc.CreateBackup", "backup_plc") && WebRuntimeProtocol.TicketKind("serviceData").Permission == "download_service_data" &&
+            WebRuntimeProtocol.TicketKind("profiling") == ("PlcProgram.DownloadProfilingData", "read_value"), "Documented ticket methods and permissions");
+        ReadOnlyMemory<byte> Reply(string body) => Encoding.UTF8.GetBytes($$$"""{"jsonrpc":"2.0","id":"{{{id}}}",{{{body}}}}""");
+        Check(WebRuntimeProtocol.TicketResult(Reply("\"result\":\"NDU2Nzg5MDEyMzQ1Njc4OTAxMjM0\""), id) is ("created", null, "NDU2Nzg5MDEyMzQ1Njc4OTAxMjM0"), "A ticket string is returned");
+        Check(WebRuntimeProtocol.TicketResult(Reply("\"error\":{\"code\":1004}"), id) is ("plcNotInStop", 1004, null), "Backup refuses outside STOP explicitly");
+        Fails(() => WebRuntimeProtocol.TicketResult(Reply("\"result\":\"a&b=c\""), id), "RuntimeResponseInvalid"); // would add a query parameter
+        Fails(() => WebRuntimeProtocol.TicketResult(Reply("\"result\":true"), id), "RuntimeResponseInvalid");
+        Check(WebRuntimeProtocol.AlarmState(Reply("\"result\":{\"entries\":[{\"id\":\"12\",\"acknowledgement\":{\"state\":\"not_acknowledged\"}}]}"), id, "12") is ("read", null, "not_acknowledged"), "Alarm acknowledgement state is read");
+        Check(WebRuntimeProtocol.AlarmState(Reply("\"result\":{\"entries\":[{\"id\":\"12\"}]}"), id, "12") is ("read", null, null), "An alarm without an acknowledgement object has nothing to acknowledge");
+        Check(WebRuntimeProtocol.AlarmState(Reply("\"result\":{\"entries\":[]}"), id, "12") is ("alarmNotListed", null, null), "An empty list is not an acknowledgement");
+        Check(WebRuntimeProtocol.AlarmState(Reply("\"error\":{\"code\":800}"), id, "12") is ("invalidAlarmId", 800, null), "Error 800 is an invalid alarm id");
+        Fails(() => WebRuntimeProtocol.AlarmState(Reply("\"result\":{\"entries\":[{\"id\":\"13\"}]}"), id, "12"), "RuntimeResponseInvalid");
         ReadOnlyMemory<byte> Response(string body) => Encoding.UTF8.GetBytes($$$"""{"jsonrpc":"2.0","id":"{{{id}}}",{{{body}}}}""");
         Check(WebRuntimeProtocol.MutationResult(Response("\"result\":true"), id) is ("accepted", null), "True acknowledges the request");
         Check(WebRuntimeProtocol.MutationResult(Response("\"error\":{\"code\":2}"), id) is ("permissionDenied", 2), "Provider denial stays explicit");
