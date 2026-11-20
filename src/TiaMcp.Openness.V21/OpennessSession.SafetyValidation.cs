@@ -113,14 +113,15 @@ namespace TiaMcp.Openness.V21
         // An F-I/O exposes Failsafe_FDestinationAddress, as safety_validation_inspect and safety_fparameter_set select them.
         private static bool IsFIo(DeviceItem item) => item.GetAttributeInfos().Any(info => info.Name == "Failsafe_FDestinationAddress");
 
-        // The item, an ancestor or a subitem is F-I/O or carries a PROFIsafe drive telegram. F-I/O attribute metadata that cannot be read counts as
-        // no F-I/O, as in FIoAddressRanges (some native items throw there); a drive's unreadable telegrams count as safety. Not natively verified: whether TIA itself already refuses these edits while the safety program is locked.
+        // The item, an ancestor or a subitem is F-I/O or carries a PROFIsafe drive telegram. This gate fails closed: F-I/O metadata or drive
+        // telegrams that cannot be read count as safety, since F-I/O cannot be excluded (unlike FIoAddressRanges, where the IsSafety readback is the
+        // backstop). Not natively verified: which native items throw on GetAttributeInfos, and whether TIA itself already refuses these edits.
         private static void EnsureNoSafetyHardware(DeviceItem item) => SafetyHardwareRules.Require(
             SafetyHardwareRules.FirstSafety(item, entry => entry.DeviceItems.Cast<DeviceItem>(), entry => entry.Parent as DeviceItem, IsSafetyHardware, entry => entry.Name), "this hardware edit");
 
         private static bool IsSafetyHardware(DeviceItem item)
         {
-            try { if (IsFIo(item)) return true; } catch (Exception) { }
+            try { if (IsFIo(item)) return true; } catch (Exception) { return true; } // unreadable F-I/O metadata: F-I/O cannot be excluded
             try { return Startdrive(() => HasSafetyTelegram(item)); }
             catch (BridgeException error) when (error.Code == "UnsupportedCapability") { return false; } // no Startdrive installed: no drive telegrams
             catch (Exception) { return true; } // a drive whose telegrams cannot be read: a PROFIsafe telegram cannot be excluded
