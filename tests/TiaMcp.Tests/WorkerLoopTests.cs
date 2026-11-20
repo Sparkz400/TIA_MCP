@@ -18,6 +18,45 @@ namespace TiaMcp.Tests
             return Task.CompletedTask;
         }
 
+        private static JObject Big(string operation, bool success = true) => new JObject { ["protocolVersion"] = 1, ["id"] = "1", ["success"] = success,
+            ["result"] = new JObject { ["changeId"] = "chg-1", ["state"] = "applied", ["previewHash"] = "abc", ["journalPath"] = "j.json",
+                ["stages"] = new JArray("apply", "compile"), ["preview"] = new JObject { ["payload"] = new string('x', WorkerLoop.MaxResponseBytes) } } };
+
+        // A write that already happened is answered with its summary; a read that is too large is still refused.
+        internal static Task OversizeWriteIsSummarizedAndOversizeReadIsRefused()
+        {
+            var write = JObject.Parse(WorkerLoop.Frame("1", "change_apply", Big("change_apply")));
+            Check.Equal(true, write.Value<bool>("success"));
+            var result = (JObject)write["result"]!;
+            Check.Equal("chg-1", result.Value<string>("changeId"));
+            Check.Equal("applied", result.Value<string>("state"));
+            Check.Equal("oversizeSummary", result.Value<string>("responseDetail"));
+            Check.Equal(true, result["omitted"]!.Values<string>().Contains("preview"));
+            Check.Equal(true, System.Text.Encoding.UTF8.GetByteCount(write.ToString()) < WorkerLoop.MaxResponseBytes);
+            var read = JObject.Parse(WorkerLoop.Frame("1", "software_inspect", Big("software_inspect")));
+            Check.Equal(false, read.Value<bool>("success"));
+            Check.Equal("ResponseTooLarge", read["error"]!.Value<string>("code"));
+            var failed = JObject.Parse(WorkerLoop.Frame("1", "change_apply", Big("change_apply", false)));
+            Check.Equal("ResponseTooLarge", failed["error"]!.Value<string>("code"));
+            var small = new JObject { ["protocolVersion"] = 1, ["id"] = "1", ["success"] = true, ["result"] = new JObject { ["a"] = 1 } };
+            Check.Equal(small.ToString(Newtonsoft.Json.Formatting.None), WorkerLoop.Frame("1", "change_apply", small));
+            return Task.CompletedTask;
+        }
+
+        // Status calls skip the full collect, but a run of them is still cut by one, and any other operation collects.
+        internal static Task LightOperationsCollectOnlyEveryTenth()
+        {
+            int light = 0;
+            Check.Equal(true, WorkerLoop.ShouldCollect("block_read", ref light));
+            Check.Equal(true, WorkerLoop.ShouldCollect(null!, ref light));
+            for (int i = 0; i < WorkerLoop.LightOperationsPerCollect; i++) Check.Equal(false, WorkerLoop.ShouldCollect("session_status", ref light));
+            Check.Equal(true, WorkerLoop.ShouldCollect("session_status", ref light));
+            Check.Equal(false, WorkerLoop.ShouldCollect("bridge_info", ref light));
+            Check.Equal(true, WorkerLoop.ShouldCollect("project_inventory", ref light));
+            Check.Equal(0, light);
+            return Task.CompletedTask;
+        }
+
         internal static async Task BoundedLineRefusesPartialFrames()
         {
             Check.Equal("{}", WorkerLoop.ReadBoundedLine(new StringReader("{}\n{")));

@@ -92,6 +92,7 @@ namespace TiaMcp.Openness.V21
                     return result;
                 }
                 if (action == "status") return _projectModels.Header(id);
+                if (action == "blocks") return _projectModels.Blocks(id, _modelSessionGeneration);
                 if (action == "verify")
                 {
                     var exact = args["reference"] as JObject;
@@ -129,7 +130,7 @@ namespace TiaMcp.Openness.V21
                     VerifyProjectModel(id, true);
                     return action == "details" ? ProjectModelDetails(id, node, reference, args) : ProjectModelRelationships(id, node, reference, args);
                 }
-                throw new BridgeException("InvalidRequest", "action must be capture, children, search, details, relationships, verify, status, release or export.");
+                throw new BridgeException("InvalidRequest", "action must be capture, children, search, details, relationships, verify, status, release, export or blocks.");
             }
             catch (ProjectModelStore.ModelException error) { throw new BridgeException(error.Code, error.Message); }
         }
