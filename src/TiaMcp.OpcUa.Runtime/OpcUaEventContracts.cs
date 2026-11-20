@@ -40,7 +40,7 @@ internal static class OpcUaEventContracts
                 foreach(string status in item.SelectClauseResults??[])OpcUaSubscriptionContracts.Status(status);
             }
         }
-        Require(e.Events is null || plan.Request.Events is not null && (e.Kind is "publish" or "republish") && e.Events.Length<=1);
+        Require(e.Events is null || plan.Request.Events is not null && (e.Kind is "publish" or "republish") && e.Events.Length<=OpcUaSubscriptionContracts.PerPublish(plan.Request));
         foreach(var notification in e.Events??[])
         {
             Require(notification.ClientHandle==plan.Request.Nodes.Length+1 && notification.MonitoredItemId>0 && notification.Fields.Length==Fields.Length);

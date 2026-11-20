@@ -359,8 +359,13 @@ def main():
             persistent_selection=call(c,'browse',dict(attemptId=persistent_attempt,symbol='"MyDB".Counter',children=False))
             call(c,'read',dict(attemptId=persistent_attempt,selectionId=persistent_selection['selectionId']))
             call(c,'disconnect',dict(attemptId=persistent_attempt))
-            observed=state['connectionIds'][first:]
-            check(len(observed)>=10 and len(observed)==len(set(observed)),'Every RPC uses a fresh connection even when the peer ignores Connection close')
+            observed=state['connectionIds'][first:];methods=state['calls'][first:]
+            # Login, logout and discovery never share a connection even when the peer ignores Connection close; read-class requests
+            # (session info, permissions, browse, read) share one pinned keep-alive connection.
+            read_class={'Api.GetSessionInfo','Api.GetPermissions','PlcProgram.Browse','PlcProgram.Read'}
+            fresh=[c for m,c in zip(methods,observed) if m not in read_class];shared=[c for m,c in zip(methods,observed) if m in read_class]
+            check(len(observed)>=10 and len(fresh)==len(set(fresh)) and len(set(shared))==1 and shared[0] not in fresh,
+                  'Login, logout and discovery use fresh connections; read-class requests share one keep-alive connection')
         finally:persistent.shutdown();persistent.server_close()
 
         for mode in ['redirect','largeMethods','longVersion','loginDenied','lostLogin','lostLogout']:
@@ -479,7 +484,9 @@ def main():
                 check(status['state']=='notConnected' and len(state['calls'])==count,'TLS refuses '+name+' before HTTP or secret dispatch')
             finally:extra.shutdown();extra.server_close()
         check(all(state['loginCorrect']),'Every login uses exact protected password with no borrowed token')
-        check(all(state['connectionClose']),'Every request avoids reuse of a stale pooled connection')
+        # Login, logout and discovery ask the peer to close; read-class requests deliberately share one pinned keep-alive connection.
+        fresh_class={'Api.Login','Api.Logout','Api.Browse','Api.Version','Api.GetQuantityStructures','Api.GetAuthenticationMode'}
+        check(all(close for request,close in zip(state['requests'],state['connectionClose']) if request['method'] in fresh_class),'Login, logout and discovery requests avoid reuse of a stale pooled connection')
         check(all(not request['tlsSessionReused'] for request in state['requests']),'Every RPC uses a full TLS handshake rather than a resumed peer identity')
         check(set(state['calls'])<={'Api.Browse','Api.Login','Api.Logout','Api.GetPermissions','PlcProgram.Browse','PlcProgram.Read','Syslog.Browse','Api.Version','Api.GetQuantityStructures','Api.GetAuthenticationMode','Api.GetSessionInfo'},'No write, arbitrary RPC or inventory-token route')
         for path in (out/'store').rglob('*'):

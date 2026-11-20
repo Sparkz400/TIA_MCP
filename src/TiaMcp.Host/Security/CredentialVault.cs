@@ -104,6 +104,18 @@ internal sealed partial class CredentialVault
         if (state.Pins is not null) throw Error("CredentialAdmissionRequired");
         Decrypt(record, header, consumer);
     }
+    /// <summary>The refusals of <see cref="Use"/> without decrypting: for a per-request state check, where the secret is not needed.</summary>
+    internal void Check(CredentialReference reference, CredentialBinding expected)
+    {
+        // No vault lock: every file is published by an atomic replace and read through a handle that allows it, so this sees a state
+        // that was complete at some moment, and a Retire that returned is always seen. A store with no header is not created here.
+        CheckDirectory();
+        if (!File.Exists(Path.Combine(root, "vault.json"))) throw Error("CredentialUnavailable");
+        var header = Header(); var record = Read(reference, expected, header);
+        var state = ReadLifecycle(record.Reference);
+        if (state.State == "retired") throw Error("CredentialRetired");
+        if (state.Pins is not null) throw Error("CredentialAdmissionRequired");
+    }
     internal CredentialStatus Retire(CredentialReference reference, CredentialBinding expected)
     {
         using var held = Lock(); var record = Read(reference, expected, Header());
@@ -254,7 +266,7 @@ internal sealed partial class CredentialVault
     }
     internal static byte[] ReadBounded(string path, int maximum)
     {
-        using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete);
         if (file.Length is < 1 || file.Length > maximum) throw Error("CredentialInputInvalid");
         byte[] bytes = new byte[(int)file.Length]; file.ReadExactly(bytes);
         if (file.ReadByte() != -1) throw Error("CredentialInputInvalid");

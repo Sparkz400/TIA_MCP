@@ -57,53 +57,54 @@ def chain(root, capture_id, reference=None):
 
 def mixed(plan, rows, observations):
     request = plan["request"]
-    require(len(observations) == request["maximumSamples"], "observation count")
-    require(len(request["selectionIds"]) == 64, "64 signals")
+    signals = len(request["selectionIds"])
+    require(signals == 64, "64 signals")
+    # One batched Read request per capture cycle answers every signal: one observation per cycle, 64 rows sharing its timing.
+    require(len(observations) * signals == request["maximumSamples"], "observation count")
     cursor = cycle = timestamp = 0
     for index, observation in enumerate(observations):
         number = index + 1
-        if index % 64 == 0:
-            timestamp = max(timestamp, cycle * 100)
+        timestamp = max(timestamp, cycle * 100)
         started = timestamp
-        timestamp += 351 if number % 997 == 0 else 1
+        timestamp += 351 if number % 7 == 0 else 1
         error = "RuntimeTimeout" if number % 17 == 0 else "RuntimeTransportFailure" if number % 29 == 0 else None
         require(observation["number"] == number and observation["started"] == started and
                 observation["completed"] == timestamp and observation["error"] == error, "independent acquisition ledger timing/error")
-        row = rows[cursor]
-        cursor += 1
-        require(row["kind"] == "read" and row["selectionId"] == request["selectionIds"][index % 64], "exact signal acquisition order")
-        require(row["cycle"] == cycle and row["scheduledMilliseconds"] == cycle * 100 and row["elapsedMilliseconds"] == timestamp,
-                "independent monotonic schedule")
-        require(row["errorCode"] == error and row["skippedPolls"] == 0, "explicit read quality")
-        if error:
-            require(row["readResultJson"] is None and observation["responseMember"] is None, "failed read has no substituted value")
-        else:
-            result = decode(row["readResultJson"])
-            require(result["selection"] == plan["signals"][index % 64]["selection"], "retained signal metadata/context")
-            require(result["elapsedMilliseconds"] == timestamp - started, "read elapsed duration")
-            for flag in ["atomicAcrossSignals", "scanSynchronized", "programMatchVerified", "deviceIdentityVerified", "nativeQualified"]:
-                require(result[flag] is False, "pressure does not promote evidence")
-            if number % 31 == 0:
-                require(result["status"] == "invalidAddress" and result["providerErrorCode"] == 201 and result["value"] is None,
-                        "provider failure remains valueless")
-                require("not retained" not in row["readResultJson"], "provider text omitted")
+        for signal in range(signals):
+            row = rows[cursor]
+            cursor += 1
+            require(row["kind"] == "read" and row["selectionId"] == request["selectionIds"][signal], "exact signal acquisition order")
+            require(row["cycle"] == cycle and row["scheduledMilliseconds"] == cycle * 100 and row["elapsedMilliseconds"] == timestamp,
+                    "independent monotonic schedule")
+            require(row["errorCode"] == error and row["skippedPolls"] == 0, "explicit read quality")
+            if error:
+                require(row["readResultJson"] is None and observation["responseMember"] is None, "failed read has no substituted value")
             else:
-                expected = {0: 18446744073709551615, 1: -9223372036854775808,
-                            2: Decimal("1.234567890123456789e-100"), 3: {"nested": [True, None, "text", 42]},
-                            4: "x" * 1024, 5: False}[number % 6]
-                require(result["status"] == "read" and result["providerErrorCode"] is None and result["value"] == expected,
-                        "exact independent mixed value")
-                if number % 6 == 2:
-                    require("1.234567890123456789e-100" in row["readResultJson"], "decimal source lexeme")
-        if number % 64 == 0 or number == len(observations):
-            missed = timestamp // 100 - cycle
-            if missed > 0:
-                gap = rows[cursor]
-                cursor += 1
-                require(gap["kind"] == "gap" and gap["cycle"] == cycle and gap["skippedPolls"] == missed and
-                        gap["elapsedMilliseconds"] == timestamp and gap["selectionId"] is None and
-                        gap["readResultJson"] is None and gap["errorCode"] is None, "independent skipped-slot accounting")
-            cycle = timestamp // 100 + 1
+                result = decode(row["readResultJson"])
+                require(result["selection"] == plan["signals"][signal]["selection"], "retained signal metadata/context")
+                require(result["elapsedMilliseconds"] == timestamp - started, "read elapsed duration")
+                for flag in ["atomicAcrossSignals", "scanSynchronized", "programMatchVerified", "deviceIdentityVerified", "nativeQualified"]:
+                    require(result[flag] is False, "pressure does not promote evidence")
+                if number % 31 == 0:
+                    require(result["status"] == "invalidAddress" and result["providerErrorCode"] == 201 and result["value"] is None,
+                            "provider failure remains valueless")
+                    require("not retained" not in row["readResultJson"], "provider text omitted")
+                else:
+                    expected = {0: 18446744073709551615, 1: -9223372036854775808,
+                                2: Decimal("1.234567890123456789e-100"), 3: {"nested": [True, None, "text", 42]},
+                                4: "x" * 1024, 5: False}[number % 6]
+                    require(result["status"] == "read" and result["providerErrorCode"] is None and result["value"] == expected,
+                            "exact independent mixed value")
+                    if number % 6 == 2:
+                        require("1.234567890123456789e-100" in row["readResultJson"], "decimal source lexeme")
+        missed = timestamp // 100 - cycle
+        if missed > 0:
+            gap = rows[cursor]
+            cursor += 1
+            require(gap["kind"] == "gap" and gap["cycle"] == cycle and gap["skippedPolls"] == missed and
+                    gap["elapsedMilliseconds"] == timestamp and gap["selectionId"] is None and
+                    gap["readResultJson"] is None and gap["errorCode"] is None, "independent skipped-slot accounting")
+        cycle = timestamp // 100 + 1
     require(cursor == len(rows), "no replay or extra rows")
 
 
@@ -148,7 +149,7 @@ def audit(root, controls=True):
             exported = decode(Path(case["exportPath"]).read_bytes())
             require(exported["rows"] == rows, "export equals exact committed chain")
             require(exported["capture"]["snapshotRef"] == case["snapshotRef"], "export exact snapshot identity")
-            checked.append({"kind": "mixed", "rows": len(rows), "attempts": len(observations), "skippedPolls": progress["skippedPolls"]})
+            checked.append({"kind": "mixed", "rows": len(rows), "attempts": len(observations) * 64, "skippedPolls": progress["skippedPolls"]})
             if controls:
                 mutations = mutation_controls(plan, rows, observations)
         elif case["kind"] == "workerChurn":

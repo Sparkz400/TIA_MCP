@@ -17,7 +17,7 @@ internal static class EventChecks
         await using var captures=new OpcUaRuntimeSubscriptions(sessions,root);
         string attempt=Id();await sessions.Connect(attempt,server.Selection);
         string capture=Id();
-        await captures.Start(capture,new(attempt,[FixtureServer.Node("int64")],DurationSeconds:8,MaximumNotifications:3,Events:new(FixtureServer.Node("fixture"),500)),default);
+        await captures.Start(capture,new(attempt,[FixtureServer.Node("int64")],MaximumNotificationsPerPublish:1,DurationSeconds:8,MaximumNotifications:3,Events:new(FixtureServer.Node("fixture"),500)),default);
         await Wait(async()=>Json(await captures.Status(capture,default)).GetProperty("recordedProgress").GetProperty("rows").GetInt64()>0);
         server.EmitEvent(1,100);server.EmitEvent(2,700);server.EmitEvent(3,900);
         await Wait(async()=>Json(await captures.Status(capture,default)).GetProperty("state").GetString()!="running");
@@ -53,7 +53,7 @@ internal static class EventChecks
             server.Mode=mode is "overflow" or "recovery" or "repeatedId"?"normal":mode;
             attempt=Id();await sessions.Connect(attempt,server.Selection);capture=Id();
             bool several=mode is "subscriptionDuplicate" or "subscriptionGap" or "overflow" or "recovery" or "repeatedId";
-            await captures.Start(capture,new(attempt,[],DurationSeconds:3,KeepAliveCount:1,MaximumNotifications:several?100:1,
+            await captures.Start(capture,new(attempt,[],MaximumNotificationsPerPublish:1,DurationSeconds:3,KeepAliveCount:1,MaximumNotifications:several?100:1,
                 MaximumReconnectAttempts:mode=="recovery"?1:0,Events:new(FixtureServer.Node("fixture"),mode=="overflow"?(ushort)1000:(ushort)0)),default);
             await Wait(async()=>Json(await captures.Status(capture,default)).GetProperty("recordedProgress").GetProperty("rows").GetInt64()>0);
             if(mode=="recovery")server.DropPublishResponses=1;
@@ -88,6 +88,7 @@ internal static class EventChecks
         await Wait(async()=>Json(await captures.Status(capture,default)).GetProperty("state").GetString()!="running");
         var unsupported=ReadRows(captures,Json(await captures.Status(capture,default)));
         check(unsupported.Any(r=>r.Event.ErrorCode=="UaEventNotifierUnavailable") && !unsupported.Any(r=>r.Event.Kind=="created"),"Non-event source refused before subscription creation");
+        check((await sessions.Status(attempt)).State=="connected","A client-side event refusal after a normal reply leaves the session connected");
         await sessions.Disconnect(attempt);
     }
     private static JsonNode FirstEvent(JsonObject[] segments)=>segments.SelectMany(s=>s["rows"]!.AsArray()).Select(r=>r!["event"]!).First(e=>e["events"] is JsonArray a && a.Count>0)["events"]![0]!;

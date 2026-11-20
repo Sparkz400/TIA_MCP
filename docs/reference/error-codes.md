@@ -684,7 +684,7 @@ A `detail` code may change in a minor release; branch on it only together with i
 | `RuntimeSessionNotFound` | detail | TiaMcp.Host |
 | `RuntimeSessionStillConnected` | detail | TiaMcp.Host |
 | `RuntimeSessionUnavailable` | stable | TiaMcp.Host |
-| `RuntimeSymbolMetadataChanged` | stable | TiaMcp.Host |
+| `RuntimeSymbolMetadataChanged` | stable | TiaMcp.Core |
 | `RuntimeTargetNotOwnedPlcsim` | stable | TiaMcp.Core, TiaMcp.Openness.V21 |
 | `RuntimeTimingInvalid` | detail | TiaMcp.Core |
 | `RuntimeTlsUnverified` | detail | TiaMcp.Core |

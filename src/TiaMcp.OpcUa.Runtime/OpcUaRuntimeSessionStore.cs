@@ -10,6 +10,8 @@ using static TiaMcp.OpcUa.Runtime.OpcUaRuntimeClient;
 namespace TiaMcp.OpcUa.Runtime;
 
 public delegate void OpcUaCredentialConsumer(OpcUaRuntimeSelection selection, Action<byte[]> consume);
+/// <summary>Refuses unless the selection's credential is still usable (not retired or pinned); nothing is decrypted.</summary>
+public delegate void OpcUaCredentialCheck(OpcUaRuntimeSelection selection);
 
 /// <summary>Durable local ownership; records contain neither authentication tokens nor private keys.</summary>
 public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
@@ -20,10 +22,15 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
     private readonly X509Certificate2 certificate;
     private readonly bool protectedIdentity;
     private readonly OpcUaCredentialConsumer credentialConsumer;
+    private readonly OpcUaCredentialCheck credentialCheck;
     private readonly FileStream owner;
     private readonly SemaphoreSlim gate = new(1);
     private readonly Dictionary<string, Live> live = new(StringComparer.Ordinal);
     private readonly Dictionary<string,string> acquisition = new(StringComparer.Ordinal);
+    // Parsed records, valid while the file's size and write time are unchanged: a request re-reads nothing, an outside edit still shows.
+    private readonly Dictionary<string,(OpcUaRuntimeStatus Record,long Length,DateTime Written)> recordCache = new(StringComparer.Ordinal);
+    // Sessions already detached from `live` whose remote close is still running outside the gate.
+    private readonly HashSet<string> closing = new(StringComparer.Ordinal);
     private readonly CancellationTokenSource stop = new();
     private readonly Task idle;
     private bool disposed;
@@ -31,12 +38,15 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
     private static readonly JsonSerializerOptions Json = new(BridgeProtocol.Json) { MaxDepth = 24 };
 
     // The Host retains ownership of a supplied certificate and its protected-store lease.
-    public OpcUaRuntimeSessionStore(string directory, OpcUaCredentialConsumer? credentialConsumer = null, X509Certificate2? protectedClientCertificate = null)
+    public OpcUaRuntimeSessionStore(string directory, OpcUaCredentialConsumer? credentialConsumer = null, X509Certificate2? protectedClientCertificate = null,
+        OpcUaCredentialCheck? credentialCheck = null)
     {
         root = Path.GetFullPath(directory); Plain(root); Directory.CreateDirectory(root); Plain(root);
         var ownerPath = Path.Combine(root, "owner.lock"); Plain(ownerPath);
         owner = new FileStream(ownerPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
         this.credentialConsumer = credentialConsumer ?? ((_, _) => throw Error("UaProtectedCredentialUnavailable"));
+        // Without a dedicated check the consumer is called with a no-op: the same refusals, at the cost of a decrypt.
+        this.credentialCheck = credentialCheck ?? (selection => this.credentialConsumer(selection, _ => { }));
         protectedIdentity = protectedClientCertificate is not null;
         try
         {
@@ -125,9 +135,9 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
             // Bounded retention: the oldest resolved records make room for a new attempt; unresolved records are never removed.
             var retired = records.Where(r => Terminal(r.State)).OrderBy(r => r.UpdatedAt).Take(records.Length - 1023).ToArray();
             if (records.Length - retired.Length >= 1024) throw Error("UaSessionCapacity");
-            foreach (var old in retired) File.Delete(PathFor(old.AttemptId));
+            foreach (var old in retired) { File.Delete(PathFor(old.AttemptId)); recordCache.Remove(old.AttemptId); }
             if (records.Any(r => r.Selection.Endpoint == selection.Endpoint && !Terminal(r.State))) throw Error("UaEndpointSessionUnresolved");
-            if (selection.Authentication == "username") credentialConsumer(selection, _ => { });
+            if (selection.Authentication == "username") credentialCheck(selection);
             var status = new OpcUaRuntimeStatus("opcua-runtime-session.v1", attemptId, hostId, selection,
                 "connecting", null, false, DateTimeOffset.UtcNow);
             Save(status, true);
@@ -140,14 +150,17 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
                 if (selection.Authentication == "anonymous") await client.Connect(null, deadline.Token);
                 else
                 {
-                    string? failure = null;
-                    credentialConsumer(selection, bytes => {
-                        try { client.Connect(bytes, deadline.Token).GetAwaiter().GetResult(); }
-                        catch (Exception e) { failure = Code(e); }
-                    });
-                    if (failure is not null) throw Error(failure);
+                    // The secret is copied out under the vault lock and the network call runs after it is released, so a
+                    // slow server cannot hold other vault users past their bounded wait. The copy is pinned and zeroed.
+                    byte[]? secret = null;
+                    try
+                    {
+                        credentialConsumer(selection, bytes => { secret = GC.AllocateUninitializedArray<byte>(bytes.Length, pinned: true); bytes.CopyTo(secret, 0); });
+                        await client.Connect(secret, deadline.Token);
+                    }
+                    finally { if (secret is not null) CryptographicOperations.ZeroMemory(secret); }
                 }
-                status = status with { State = "connected", PeerVerified = client.PeerVerified, UpdatedAt = DateTimeOffset.UtcNow };
+                status = status with { State = "connected", PeerVerified = client.PeerVerified, SessionTimeoutMs = client.SessionTimeoutMs, UpdatedAt = DateTimeOffset.UtcNow };
             }
             catch (Exception e)
             {
@@ -215,8 +228,9 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
     }
     private bool Current(string attemptId, OpcUaRuntimeClient client, out Live entry) =>
         live.TryGetValue(attemptId, out entry!) && entry.Client == client;
-    // A complete, normal server reply or a client-side refusal before dispatch: the session itself is unaffected.
-    private static bool Answered(Exception e) => e is BridgeException { Code: "UaBrowseDenied" or "UaNamespaceUnavailable" or "UaWriteValueInvalid" or "UaNodeInvalid" };
+    // A complete, normal server reply or a client-side refusal (before dispatch, or of an already received normal reply): the session itself is unaffected.
+    private static bool Answered(Exception e) => e is BridgeException { Code: "UaBrowseDenied" or "UaNamespaceUnavailable" or "UaWriteValueInvalid" or "UaNodeInvalid" or
+        "UaResponseLimit" or "UaEventNotifierUnavailable" or "UaEventFilterRejected" };
     private async Task<T> Use<T>(string attemptId, Func<OpcUaRuntimeClient, CancellationToken, Task<T>> action, CancellationToken ct, string? acquisitionId = null)
     {
         Id(attemptId);
@@ -244,11 +258,13 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
                 // server (or a capture poll) cannot hold other vault users (block protection) past their bounded wait.
                 if (entry.Status.Selection.Authentication == "username")
                 {
-                    try { credentialConsumer(entry.Status.Selection, _ => { }); }
+                    try { credentialCheck(entry.Status.Selection); }
                     // The vault stayed busy past its bounded wait before anything was sent: the session stays as it is.
                     catch (BridgeException busy) when (busy.Code == "CredentialStoreBusy") { vaultBusy = true; throw Error("UaCredentialStoreBusy"); }
                 }
-                return await action(entry.Client, deadline.Token);
+                var result = await action(entry.Client, deadline.Token);
+                entry.Client.Touch();
+                return result;
             }
             catch (Exception e) when (!vaultBusy && !Answered(e))
             {
@@ -299,9 +315,9 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
             try
             {
                 if(ClientCertificateState(certificate)!="current")throw Error("UaClientIdentityTimeInvalid");
-                if(status.Selection.Authentication=="username")
-                    credentialConsumer(status.Selection,_=>transfer=entry.Client.Reconnect(deadline.Token).GetAwaiter().GetResult());
-                else transfer=await entry.Client.Reconnect(deadline.Token);
+                // The client already holds its identity: only the credential's state is checked, never decrypted again.
+                if(status.Selection.Authentication=="username")credentialCheck(status.Selection);
+                transfer=await entry.Client.Reconnect(deadline.Token);
                 status=status with {State="connected",ErrorCode=null,OperationErrorCode=null,UpdatedAt=DateTimeOffset.UtcNow};
             }
             catch(Exception e)
@@ -350,6 +366,12 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
             return result;
         } finally {client.Lock.Release();}
     }
+    /// <summary>When the oldest live session of this store was opened; null with none. Results returned by a live session can still be read.</summary>
+    public async Task<DateTimeOffset?> OldestLiveSession(CancellationToken ct = default)
+    {
+        await gate.WaitAsync(ct);
+        try { return live.Count == 0 ? null : live.Values.Min(x => x.Client.Created); } finally { gate.Release(); }
+    }
     public async Task<OpcUaRuntimeStatus> Status(string attemptId, CancellationToken ct = default)
     {
         Id(attemptId); using var deadline = Deadline(ct); await gate.WaitAsync(deadline.Token);
@@ -362,20 +384,54 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
         var client = await Enter(attemptId, deadline.Token);
         try
         {
+            Live? entry; OpcUaRuntimeStatus status;
             await gate.WaitAsync(deadline.Token);
-            try { Open(); if(acquisition.ContainsKey(attemptId))throw Error("UaSessionAcquisitionBusy"); return await Close(attemptId, acknowledgeUnknown); } finally { gate.Release(); }
+            try
+            {
+                Open(); if (acquisition.ContainsKey(attemptId)) throw Error("UaSessionAcquisitionBusy");
+                status = Load(attemptId);
+                if (closing.Contains(attemptId)) return Observe(status); // another close is already running
+                if (Terminal(status.State) && !live.ContainsKey(attemptId)) return status;
+                // Detached under the gate; the remote close (up to ten seconds) runs after it is released.
+                if (live.Remove(attemptId, out entry)) { status = entry.Status; closing.Add(attemptId); }
+            }
+            finally { gate.Release(); }
+            return await CloseOutside(attemptId, status, entry, acknowledgeUnknown, null);
         }
         finally { client?.Lock.Release(); }
     }
-    private async Task<OpcUaRuntimeStatus> Close(string attemptId, bool acknowledgeUnknown)
+    /// <summary>Closes a session already detached from <c>live</c> without the gate, then publishes the outcome under it.</summary>
+    private async Task<OpcUaRuntimeStatus> CloseOutside(string attemptId, OpcUaRuntimeStatus status, Live? entry, bool acknowledgeUnknown, string? expiredCode)
+    {
+        bool closed = false;
+        try
+        {
+            if (entry is not null) closed = await entry.Client.Close();
+            // Unbounded wait: the outcome must be published, and no gate holder waits for a session lock.
+            await gate.WaitAsync();
+            try
+            {
+                // Never overwrite a record something else already settled.
+                var current = Load(attemptId);
+                if (Terminal(current.State)) return current;
+                status = Outcome(status, closed, acknowledgeUnknown, expiredCode); Save(status); return status;
+            }
+            finally { gate.Release(); }
+        }
+        finally { await gate.WaitAsync(); try { closing.Remove(attemptId); } finally { gate.Release(); } }
+    }
+    private static OpcUaRuntimeStatus Outcome(OpcUaRuntimeStatus status, bool closed, bool acknowledgeUnknown, string? expiredCode) =>
+        // A session unused past the server's own timeout is gone there whether or not the close could confirm it.
+        status with { State = closed || expiredCode is not null ? "closed" : acknowledgeUnknown ? "abandonedRemoteUnknown" : "remoteSessionUnknown",
+            ErrorCode = closed ? null : expiredCode ?? "UaRemoteCloseUnconfirmed", UpdatedAt = DateTimeOffset.UtcNow };
+    /// <summary>Shutdown only: closes under the gate the caller already holds.</summary>
+    private async Task<OpcUaRuntimeStatus> CloseHeld(string attemptId)
     {
         var status = Load(attemptId);
         if (Terminal(status.State) && !live.ContainsKey(attemptId)) return status;
         bool closed = false;
         if (live.Remove(attemptId, out var entry)) { status = entry.Status; closed = await entry.Client.Close(); }
-        status = status with { State = closed ? "closed" : acknowledgeUnknown ? "abandonedRemoteUnknown" : "remoteSessionUnknown",
-            ErrorCode = closed ? null : "UaRemoteCloseUnconfirmed", UpdatedAt = DateTimeOffset.UtcNow };
-        Save(status); return status;
+        status = Outcome(status, closed, false, null); Save(status); return status;
     }
     private OpcUaRuntimeStatus Observe(OpcUaRuntimeStatus status) =>
         Terminal(status.State) || live.ContainsKey(status.AttemptId) ? status :
@@ -388,20 +444,31 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
             using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
             while (await timer.WaitForNextTickAsync(stop.Token))
             {
+                var retire = new List<(string Id, Live Entry, string? Expired)>();
                 await gate.WaitAsync(stop.Token);
                 try
                 {
-                    // Only sessions that are already dead close here, after the same two-minute grace. An unused healthy session is
-                    // left to the server's session timeout, so connect -> online-compare bind -> write is not cut off locally.
-                    // A busy session is skipped, never awaited under the gate.
-                    foreach (var (id, entry) in live.Where(x => !acquisition.ContainsKey(x.Key) && !x.Value.Client.Usable &&
-                        DateTimeOffset.UtcNow - x.Value.Client.LastUsed > TimeSpan.FromMinutes(2)).ToArray())
+                    // A dead session closes after a two-minute grace. A healthy one is left alone for the server's own (revised) session
+                    // timeout, so connect -> online-compare bind -> write is not cut off locally; past it the server has dropped the
+                    // session, and it stops holding a capacity slot and the endpoint. A busy session is skipped, never awaited under the gate.
+                    foreach (var (id, entry) in live.Where(x => !acquisition.ContainsKey(x.Key)).ToArray())
                     {
+                        var unused = DateTimeOffset.UtcNow - entry.Client.LastUsed;
+                        bool dead = !entry.Client.Usable && unused > TimeSpan.FromMinutes(2);
+                        bool timedOut = unused > entry.Client.SessionTimeout + TimeSpan.FromMilliseconds(OpcUaRuntimeClient.TimeoutMs);
+                        if (!dead && !timedOut) continue;
                         if (!entry.Client.Lock.Wait(0)) continue;
-                        try { await Close(id, false); } finally { entry.Client.Lock.Release(); }
+                        live.Remove(id); closing.Add(id); retire.Add((id, entry, timedOut ? "UaSessionTimedOut" : null));
                     }
                 }
                 finally { gate.Release(); }
+                foreach (var (id, entry, expired) in retire)
+                {
+                    // One entry's failed publication (disk) must not strand the rest of the batch outside `live` with their locks held.
+                    try { await CloseOutside(id, entry.Status, entry, false, expired); }
+                    catch { idleFailed = true; }
+                    finally { entry.Client.Lock.Release(); }
+                }
             }
         }
         catch (OperationCanceledException) when (stop.IsCancellationRequested) { }
@@ -422,7 +489,7 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
             foreach (var id in live.Keys.ToArray())
             {
                 var captured = live[id];
-                try { await Close(id, false); }
+                try { await CloseHeld(id); }
                 catch { failed = true; }
                 finally
                 {
@@ -445,22 +512,33 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
     private OpcUaRuntimeStatus Load(string id)
     {
         Id(id); var path = PathFor(id); Plain(path);
-        if (!File.Exists(path) || new FileInfo(path).Length > 65_536) throw Error("UaSessionRecordInvalid");
+        var info = new FileInfo(path);
+        if (!info.Exists || info.Length > 65_536) throw Error("UaSessionRecordInvalid");
+        if (recordCache.TryGetValue(id, out var cached) && cached.Length == info.Length && cached.Written == info.LastWriteTimeUtc) return cached.Record;
         var record = JsonSerializer.Deserialize<OpcUaRuntimeStatus>(File.ReadAllBytes(path), Json);
         if (record is null || record.SchemaVersion != "opcua-runtime-session.v1" || record.AttemptId != id ||
             record.State is not ("connecting" or "connected" or "remoteSessionUnknown" or "closed" or "notConnected" or "abandonedRemoteUnknown"))
             throw Error("UaSessionRecordInvalid");
-        Validate(record.Selection); return record;
+        Validate(record.Selection);
+        recordCache[id] = (record, info.Length, info.LastWriteTimeUtc);
+        return record;
     }
     private void Save(OpcUaRuntimeStatus record, bool create = false)
     {
         var path = PathFor(record.AttemptId); Plain(root); Plain(path);
+        recordCache.Remove(record.AttemptId);
         byte[] data = JsonSerializer.SerializeToUtf8Bytes(record, Json);
         if (data.Length > 65_536) throw Error("UaSessionRecordInvalid");
         string temp = Path.Combine(root, record.AttemptId + ".tmp"); Plain(temp);
-        using (var output = new FileStream(temp, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.WriteThrough))
-        { output.Write(data); output.Flush(true); }
-        File.Move(temp, path, !create);
+        // A temporary left by an earlier failed Save (disk full) must not make this attempt permanently unsaveable.
+        File.Delete(temp);
+        try
+        {
+            using (var output = new FileStream(temp, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.WriteThrough))
+            { output.Write(data); output.Flush(true); }
+            File.Move(temp, path, !create);
+        }
+        catch { try { File.Delete(temp); } catch { } throw; }
     }
     private static void Plain(string path)
     {

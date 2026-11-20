@@ -135,7 +135,7 @@ def main():
         names += ["uint64Array", "int64Matrix", "emptyArray", "stringArray", "byteStrings", "doubleMatrix"]
         nodes = [dict(namespaceUri=ready["namespaceUri"], identifierType="string", identifier=name) for name in names]
         capture = uuid.uuid4().hex
-        request = dict(attemptId=attempt,nodes=nodes+[dict(nodes[0],identifier="absent")],publishingIntervalMilliseconds=100,samplingIntervalMilliseconds=100,queueSize=16,durationSeconds=10,maximumNotifications=len(names))
+        request = dict(attemptId=attempt,nodes=nodes+[dict(nodes[0],identifier="absent")],publishingIntervalMilliseconds=100,samplingIntervalMilliseconds=100,queueSize=16,durationSeconds=10,maximumNotifications=len(names),maximumNotificationsPerPublish=32)
         check_unknown_subscription_inputs(c, request, fixture, out / "store", check, report.setdefault("inputGuardResponses", []))
         call(c,"subscription_start",dict(captureId=capture,request=request))
         def ended(identifier):
