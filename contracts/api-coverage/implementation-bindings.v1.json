@@ -82,7 +82,7 @@
     },
     {
       "path": "contracts/change-kinds.v1.json",
-      "sha256": "3c74529bd1f2234803655a055dbcfbcc77e38eef12e9d9fd0f9543d29271dd59",
+      "sha256": "3de98b3465356b6c4ae535642f3e58a67f49c7cb2e6dfefb5f28eb73b9d62d0e",
       "bytes": 101299
     },
     {
@@ -71768,8 +71768,8 @@
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
           "name": "Call",
-          "line": 239,
-          "endLine": 247,
+          "line": 266,
+          "endLine": 274,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
