@@ -418,7 +418,10 @@ namespace TiaMcp.Openness.V21
             string projectBase = "/projects/" + Segment(project.Name) + "/";
             int omittedHardware = 0;
             // Filtered results take maxItems only for matches; the walk has its own bound so later stations are reached.
-            var walk = filter.Active || !includeHardware || !includeBlocks || compact ? new ScanBudget(MemberWalkLimit) : budget;
+            // blockOffset (internal, used by block_export): skip that many matching blocks in walk order, so a caller can page past maxItems.
+            int blocksToSkip = args.Value<int?>("blockOffset") ?? 0;
+            if (blocksToSkip < 0 || blocksToSkip > MemberWalkLimit) throw new BridgeException("InvalidRequest", "blockOffset must be between 0 and " + MemberWalkLimit + ".");
+            var walk = filter.Active || !includeHardware || !includeBlocks || compact || blocksToSkip > 0 ? new ScanBudget(MemberWalkLimit) : budget;
             foreach (var entry in DeviceItems(project, walk))
             {
                 var item = entry.Item;
@@ -457,6 +460,7 @@ namespace TiaMcp.Openness.V21
                 foreach (var block in AllBlocks(new PlcSelection { Project = project, Software = software, Path = plcPath }, walk))
                 {
                     if (!filter.Matches(block.Path, block.Item.Name)) continue;
+                    if (blocksToSkip > 0) { blocksToSkip--; continue; }
                     if (walk != budget && !budget.Take()) break;
                     var row = BlockInfo(block, plcPath, BatchedAttributeReads.Block(block.Item));
                     if (compact)
