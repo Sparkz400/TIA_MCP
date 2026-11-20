@@ -92,6 +92,19 @@ internal static class ProjectModelTests
         return Task.CompletedTask;
     }
 
+    // Two slots; a Dictionary reuses a freed slot, so evicting its first key dropped the newest snapshot instead of the oldest.
+    internal static Task OldestSnapshotIsEvicted()
+    {
+        var store = new ProjectModelStore();
+        string Capture() => (string)store.Capture(Fixture())["snapshotId"]!;
+        string a = Capture(), b = Capture(), c = Capture();
+        Expect("ModelNotFound", () => store.Get(a));
+        string d = Capture();
+        Expect("ModelNotFound", () => store.Get(b));
+        Check.Equal(true, store.Get(c)["snapshotId"]!.ToString() == c && store.Get(d)["snapshotId"]!.ToString() == d);
+        return Task.CompletedTask;
+    }
+
     internal static Task InvalidAncestryAndBudgets()
     {
         var fixture = Fixture(); fixture["nodes"]![1]!["parentId"] = "missing";
