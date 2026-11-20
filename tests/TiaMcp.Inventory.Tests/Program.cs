@@ -642,6 +642,30 @@ Refused(() => resources.Review("../exports/plan"), "Review ID that is not a cont
 var names = TiaResources.ArtifactPaths(resourceRoot).ToList();
 Check(names.Contains("exports/plan.json") && !names.Any(name => name.StartsWith("linked", StringComparison.Ordinal)), "Completion lists root files and never walks a junction");
 Directory.Delete(link);
+// Tool results: one serialization feeds the text block and the structured content; refusals never expose a path.
+{
+    var ok = ToolResult.Of(new { value = 1, name = "a" });
+    Check(ok.IsError == false && ok.StructuredContent is JsonElement { ValueKind: JsonValueKind.Object } && ((TextContentBlock)ok.Content[0]).Text == ok.StructuredContent!.Value.GetRawText()
+        && ((TextContentBlock)ok.Content[0]).Text == "{\"value\":1,\"name\":\"a\"}", "A result carries the same JSON as text and structured content");
+    Check(((TextContentBlock)ToolResult.FromJson("{\"a\": [1, 2]}").Content[0]).Text == "{\"a\": [1, 2]}", "A worker response is passed through unchanged");
+    var pathLeak = ToolResult.Guard(() => throw new FileNotFoundException("Could not find file 'D:/secret/projects/plant.zap21'."), "XFailed");
+    var leakText = ((TextContentBlock)pathLeak.Content[0]).Text;
+    Check(pathLeak.IsError == true && leakText.Contains("\"code\":\"XFailed\"") && !leakText.Contains("secret") && leakText.Contains(ToolResult.FileFailure), "An IOException refusal keeps its code and hides the path");
+    var noAccess = ToolResult.Guard(() => throw new UnauthorizedAccessException("Access to the path 'C:/Users/me/x' is noAccess."), "XFailed", null, false);
+    Check(!((TextContentBlock)noAccess.Content[0]).Text.Contains("Users") && ((TextContentBlock)noAccess.Content[0]).Text.Contains("\"nativeAccessAttempted\":false"), "A permission refusal hides the path and keeps the native flag");
+    var coded = ToolResult.Guard(() => throw new BridgeOperationException("StaleRevision", "Changed.", JsonDocument.Parse("{\"current\":3}").RootElement), "XFailed");
+    Check(((TextContentBlock)coded.Content[0]).Text == "{\"error\":{\"code\":\"StaleRevision\",\"message\":\"Changed.\",\"details\":{\"current\":3}}}", "A coded refusal keeps its code, message and details");
+    Check(((TextContentBlock)ToolResult.Guard(() => throw new System.Xml.XmlException("bad xml"), "XmlFailed").Content[0]).Text.Contains("XmlFailed"), "A malformed XML refusal is coded");
+    bool escaped = false;
+    try { ToolResult.Guard(() => throw new NotSupportedException("defect"), "XFailed"); } catch (NotSupportedException) { escaped = true; }
+    Check(escaped, "A defect is not turned into a refusal");
+    var selectorFile = Path.Combine(output, "selector.json");
+    TranslationQualificationTools.WriteSelector(selectorFile, [1, 2, 3]);
+    TranslationQualificationTools.WriteSelector(selectorFile, [1, 2, 3]);
+    Check(File.ReadAllBytes(selectorFile).SequenceEqual(new byte[] { 1, 2, 3 }), "A retried prepare accepts the identical selector");
+    Fails(() => TranslationQualificationTools.WriteSelector(selectorFile, [9]), "TranslationSelectorConflict");
+    Check(File.ReadAllBytes(selectorFile).SequenceEqual(new byte[] { 1, 2, 3 }), "A different selector never overwrites the first");
+}
 Console.WriteLine("Export artifacts: " + output);
 Console.WriteLine($"PASS Inventory: {checks} checks, 30000 rows / {pages} pages; protocol fixtures, exports and host guards. No physical hardware qualification.");
 

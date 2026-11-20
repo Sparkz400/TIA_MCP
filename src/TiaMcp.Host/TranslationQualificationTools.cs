@@ -81,8 +81,7 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
         var candidate = workflow.Candidate(reviewRef, reviewHash, approval["recordSha256"]!.GetValue<string>());
         var operation = Runner.Prepare(candidate["recordRef"]!.GetValue<string>(), candidate["recordSha256"]!.GetValue<string>(), observation, idempotencyKey);
         string folder = Path.Combine(Root, "translation-qualification"); Directory.CreateDirectory(folder);
-        using (var file = new FileStream(Path.Combine(folder, operation.Id + ".json"), FileMode.CreateNew, FileAccess.Write, FileShare.Read))
-        { file.Write(TranslationWorkerAdapter.JsonBytes(new { plcPath, operation.PlanSha256, sourceCulture, targetCulture, plcPaths, categoryIds })); file.Flush(true); }
+        WriteSelector(Path.Combine(folder, operation.Id + ".json"), TranslationWorkerAdapter.JsonBytes(new { plcPath, operation.PlanSha256, sourceCulture, targetCulture, plcPaths, categoryIds }));
         var binaries = new TranslationProductionRegistry(AppContext.BaseDirectory, options.WorkerPath, TranslationNativeTools.ApiDirectory(options)).Binaries();
         var binding = new TranslationImportArtifacts(Root).Read<TranslationImportBinding>(operation.Plan.Inputs[0]);
         TranslationAdmissionKey? admissionKey = null; string? admissionRefusal = null;
@@ -91,6 +90,20 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
             binding.Candidate.Sha256, binding.Baseline.Scope), binaries); }
         catch (BridgeException error) when (error.Code == "TranslationAdmissionScopeUnqualified") { admissionRefusal = error.Message; }
         return new { operation, capture, review, approval, candidate, edits, admissionKey, admissionKeySha256 = admissionKey is null ? null : HashJson(admissionKey), admissionRefusal };
+    }
+    /// <summary>Writes the selector once. A retried prepare after a lost response meets the same operation and the same bytes and succeeds; different bytes are never overwritten.</summary>
+    internal static void WriteSelector(string path, byte[] bytes)
+    {
+        try
+        {
+            using var file = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+            file.Write(bytes); file.Flush(true);
+        }
+        catch (IOException) when (File.Exists(path))
+        {
+            if (!File.ReadAllBytes(path).AsSpan().SequenceEqual(bytes))
+                throw new BridgeException("TranslationSelectorConflict", "This operation already has a different qualification selector; it is never overwritten.");
+        }
     }
     [McpServerTool(Name = "qualification_translation_apply", Destructive = true, OpenWorld = false)]
     [Description("Explicit qualification runtime only: one durable import lifecycle; optional exact retained response-loss, pre-checkpoint or pre-dispatch interruption case.")]

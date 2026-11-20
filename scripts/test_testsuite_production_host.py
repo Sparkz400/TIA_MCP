@@ -86,10 +86,11 @@ def main():
         unicode_request = copy.deepcopy(fixture['request'])
         unicode_request['executionProfile'] = 'profile-😀-e\u0301-\ufffd'
         unicode_review = client.tool('testsuite_style_plan_prepare', {'request': unicode_request})
-        check(unicode_review['completePlan']['executionProfile'] == unicode_request['executionProfile'], 'Valid Unicode profile retained exactly')
+        check(client.tool('testsuite_style_plan_review', unicode_review['review'])['executionProfile'] == unicode_request['executionProfile'], 'Valid Unicode profile retained exactly')
+        check('completePlan' not in unicode_review, 'The prepare response carries the review reference, not a second copy of the plan')
         artifact = review['review']
         full = client.tool('testsuite_style_plan_review', artifact)
-        check(full == review['completePlan'] and len(full['runs']) == 1, 'Complete review reopens exactly')
+        check(len(full['runs']) == 1 and full['executionProfile'] == fixture['request']['executionProfile'], 'Complete review reopens exactly')
         prepare = {**artifact, 'reviewedSha256': artifact['sha256'], 'idempotencyKey': 'host-restart-job'}
         before_invalid = files()
         for invalid in ('bad\u0000', 'bad\n', 'bad\ufffe', 'bad\uffff'):

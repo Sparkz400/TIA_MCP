@@ -34,7 +34,7 @@ public sealed partial class TiaTools
         var definitions = StyleCaptures(input.Definitions);
         var jobs = StyleJobs();
         var review = jobs.Review(definitions, input.Runs, input.Target, input.ExecutionProfile);
-        return new { review, completePlan = jobs.ReadReview(review), qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
+        return new { review, qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
     });
 
     [McpServerTool(Name = "testsuite_application_plan_prepare", Destructive = false, OpenWorld = false)]
@@ -46,7 +46,7 @@ public sealed partial class TiaTools
         var jobs = StyleJobs();
         var review = jobs.Review(definitions, input.Runs, input.Target, input.ExecutionProfile,
             new TestSuiteApplicationBinding(input.ExecutionMode, input.SimulatorTicket, input.WholeGroup));
-        return new { review, completePlan = jobs.ReadReview(review), qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
+        return new { review, qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
     });
 
     [McpServerTool(Name = "testsuite_application_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
@@ -63,7 +63,7 @@ public sealed partial class TiaTools
         var jobs = StyleJobs();
         var review = jobs.Review(definitions, input.Runs, input.Target, input.ExecutionProfile,
             new TestSuiteApplicationBinding("endpoint", input.SimulatorTicket, input.WholeGroup) { ServerAddress = input.ServerAddress });
-        return new { review, completePlan = jobs.ReadReview(review), qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
+        return new { review, qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
     });
 
     [McpServerTool(Name = "testsuite_system_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
