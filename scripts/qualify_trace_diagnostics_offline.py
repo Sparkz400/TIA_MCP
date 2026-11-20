@@ -111,8 +111,12 @@ def run(host, output, samples_path):
                                       "clientInfo": {"name": "offline-trace-diagnostics", "version": "1"}})
         client.notify("notifications/initialized")
         listed = {t["name"]: t for t in client.request("tools/list")["tools"]}
-        for name in ("diagnostic_plan", "diagnostic_watch_plan", "trace_capabilities", "trace_prepare", "trace_read", "trace_analyze", "trace_compare", "diagnostic_report_export", "diagnostic_replan", "trace_check_readback"):
-            assert listed[name]["annotations"]["readOnlyHint"] is True
+        # Tools that persist plans, measurements or reports are not read-only (PR #315).
+        for name in ("trace_capabilities", "trace_compare", "trace_check_readback"):
+            assert listed[name]["annotations"]["readOnlyHint"] is True, name
+        for name in ("diagnostic_plan", "diagnostic_watch_plan", "trace_prepare", "trace_read", "trace_analyze", "diagnostic_report_export", "diagnostic_replan"):
+            assert listed[name]["annotations"]["readOnlyHint"] is False, name
+            assert listed[name]["annotations"]["destructiveHint"] is False, name
         assert listed['project_snapshot_import']['annotations']['readOnlyHint'] is False
         retained_review = import_review(raw)
         type_before = alarm_type_review()

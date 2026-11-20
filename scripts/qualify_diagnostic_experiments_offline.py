@@ -99,8 +99,10 @@ def run(host, output, samples_path):
     try:
         start()
         tools = {row["name"]: row for row in client.request("tools/list")["tools"]}
-        for name in ("diagnostic_experiment_plan", "diagnostic_experiment_review"):
-            check(tools[name]["annotations"]["readOnlyHint"] is True, name + " is offline read-only")
+        check(tools["diagnostic_experiment_review"]["annotations"]["readOnlyHint"] is True, "diagnostic_experiment_review is offline read-only")
+        # The plan persists an immutable case, so it is not read-only (PR #315).
+        check(tools["diagnostic_experiment_plan"]["annotations"]["readOnlyHint"] is False
+              and tools["diagnostic_experiment_plan"]["annotations"]["destructiveHint"] is False, "diagnostic_experiment_plan persists, non-destructive")
         raw = base64.b64decode(samples["alarmBindingReviewArtifactBase64"], validate=True)
         uploaded = upload(raw)
         review = client.tool("project_snapshot_import", dict(uploadRef=uploaded["artifactRef"]))
