@@ -106,6 +106,20 @@ namespace TiaMcp.Openness.V21
 
         private BlockSelection CanonicalSelectBlock(JObject args)
         {
+            // An exact blockPath alone is found by descending its group chain; the lookup over every object of the PLC (and its
+            // uniqueness and error handling) stays for names, scopes, namespaces and paths this does not find.
+            string exactPath = args.Value<string>("blockPath");
+            if (!string.IsNullOrWhiteSpace(exactPath) && string.IsNullOrWhiteSpace(args.Value<string>("blockName")) && string.IsNullOrWhiteSpace(args.Value<string>("scopePath"))
+                && string.IsNullOrWhiteSpace(args.Value<string>("projectPath")) && string.IsNullOrWhiteSpace(args.Value<string>("namespace"))
+                && ObjectIdentity.PlcPath(exactPath) is string exactPlc && (string.IsNullOrWhiteSpace(args.Value<string>("plcPath")) || args.Value<string>("plcPath") == exactPlc))
+            {
+                var project = SelectProject(args);
+                var direct = (JObject)args.DeepClone();
+                direct["plcPath"] = exactPlc;
+                var plc = SelectPlc(project, direct);
+                var found = ResolveBlockPath(plc, exactPath);
+                if (found != null) return new BlockSelection { Project = project, PlcPath = plc.Path, Block = found };
+            }
             var effective = (JObject)args.DeepClone();
             effective["kind"] = "block";
             effective["objectPath"] = args["blockPath"];

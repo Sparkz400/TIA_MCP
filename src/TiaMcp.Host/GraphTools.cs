@@ -16,7 +16,7 @@ public sealed class GraphTools(IBridgeClient bridge, HostOptions options)
         string? plcPath = null, string? projectName = null, string? scopePath = null)
     {
         JsonElement read;
-        try { read = await bridge.CallAsync("block_read", new { projectName, plcPath, blockPath, blockName, scopePath, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "exports") }, cancellationToken); }
+        try { read = await bridge.CallAsync("block_read", new { projectName, plcPath, blockPath, blockName, scopePath, includeXml = false, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "exports") }, cancellationToken); }
         catch (BridgeException error) { return Run(_ => throw error); }
         return Run(s =>
         {

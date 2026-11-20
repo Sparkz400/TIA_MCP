@@ -7,7 +7,7 @@ OB55/56/57 counter qualification has since passed. Configuration-event subscript
 observation passed; software delivery passed on 7 November and hardware delivery on 8 November through the new
 hardware download ([record](../verification/plcsim-hardware-download-20261108.md)). Data-record responses, timespan/bus capture modes and residual Web API routes remain software work.
 The 3 November offline follow-up adds SingleStep_P/CP/CT/CPT capture selection and bounded
-Syslog.Browse reads; native mode/CPU qualification remains open. Do not repeat the completed event adapter.
+Syslog.Browse reads; its native TCP/IP run passed on 8 November ([record](../verification/plcsim-syslog-20261108.md)); a physical CPU stays open. Do not repeat the completed event adapter.
 
 Feasibility record for the TODO box [X13 other Siemens interfaces](../TODO.md#work-outside-the-matrix)
 (ledger obligation X13, roadmap package AC-24). It gives one row per public SDK or workflow
@@ -40,7 +40,7 @@ uninstall entry with that display name and version.
 
 ## Summary
 
-34 rows: **11 feasible** (4 implemented, 7 now), **17 blocked**, **6 boundary**. X13 itself owns
+34 rows: **11 feasible** (7 implemented, 4 now), **17 blocked**, **6 boundary**. X13 itself owns
 the rows marked X13 in the owner column; the other rows belong to obligations that already track
 them and are listed so the table covers every interface on this PC.
 
@@ -55,7 +55,7 @@ Their residuals are rows 2–7 and 10–14.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | PLCSIM Advanced API, integrated surface | PLCSIM Advanced V8.0 Upd1; `Siemens.Simatic.Simulation.Runtime.Api.x64.dll` 8.0.0.1 (file 80.0.299.0) | Yes: Programming Manual V8.0, 11/2025, A5E53246567-AE, and `SimulationRuntimeApi.h` | Nothing: instances, power and state, tags, I/O by address and name, signals and areas, virtual time and scaling, OB40/82/83/86 events, storage, memory reset, `SingleStep_C` capture and `sim_observe` are in the catalog | Feasible, implemented (verified) | L03 | `ADV/s7-plcsim_advanced_function_manual_API_en-US.pdf`; `src/TiaMcp.Simulator.V8/`; catalog `sim_*`; [PLCSIM gaps](../verification/plcsim-openness-gaps-20261029.md) |
 | 2 | PLCSIM acyclic data records | Same API | Yes: §9.11.2 `ReadRecordDone`/`WriteRecordDone` (p. 192) and the `OnDataRecordRead`/`OnDataRecordWrite` events | `sim_record` answers a user program's `RDREC`/`WRREC` (SFB 52/53) from a reviewed response table and logs every request | Feasible, implemented | X13 | API manual Table 9-192; `SimulatorSession.Records.cs`; catalog `sim_record` |
-| 3 | PLCSIM status, profile and update interrupts | Same API | Yes: `StatusEvent` (OB55), `ProfileEvent` (OB57, p. 200), `UpdateEvent` (OB56, p. 201) | `sim_event` has no profile or update type; its status event was answered `NotSupportedByModule` on a central module (OB55 serves distributed modules), so a distributed-module case is open | Feasible now | X13 | API manual Table 9-193; `SimulatorRuntimeControl.cs` event switch; catalog `sim_event` limitations |
+| 3 | PLCSIM status, profile and update interrupts | Same API | Yes: `StatusEvent` (OB55), `ProfileEvent` (OB57, p. 200), `UpdateEvent` (OB56, p. 201) | `sim_event` injects `statusEvent`, `updateEvent` and `profileEvent` (`SimulatorRuntimeControl.cs`); each raised its OB55/56/57 counter on six distributed ET 200SP modules, and a central module or an IODevice target is refused (`local.plcsim.extended-events.20261102`, [record](../verification/local-completion-20261102.md)) | Feasible, implemented | X13 | API manual Table 9-193; `SimulatorRuntimeControl.cs` event switch; catalog `sim_event` limitations |
 | 4 | PLCSIM cycle-control modes and partner synchronisation | Same API | Yes: §9.7 cycle control (p. 174), §9.12.1.1 synchronise simulation partner (p. 204) | The repo uses `SingleStep_C` and `TimespanSynchronized_C`; `SingleStep_P`, `_CP`, `_CT`, `_CPT`, `_Bus` and the other time-synchronised modes step per process image partition or bus cycle | Feasible now | X13 | API manual §9.7; `SimulatorSession.cs` |
 | 5 | PLCSIM configuration-change events | Same API | Yes: `OnSoftwareConfigurationChanged` (p. 216), `OnIPAddressChanged` (p. 218), `OnHardwareConfigChanged` (p. 222) | `sim_observe` subscribes all three; its `watch` start/collect buffers them across other tool calls, so a download made by another call is reported | Feasible, implemented | X13 | API manual §9.12.1; `SimulatorSession.Signals.cs`; catalog `sim_observe` |
 | 6 | PLCSIM remote runtime manager | Same API | Yes: §8.1 `OpenPort`, `RemoteConnect`, `RunAutodiscover` (p. 68); §10 `IRemoteRuntimeManager` (p. 234) | Drives PLCSIM on another Windows host. The manual warns that an open port accepts any runtime manager on the network (TLS with temporary self-signed certificates, no client authentication) | Blocked: a second Windows host (the VMware guest, L05) and a decision on opening a network port | X13 | API manual §8.1 note |
@@ -127,9 +127,8 @@ inside the Add-In sandbox, no capability of their own), `Siemens.Engineering.Win
 Each line: what to build, then how to qualify it. All PLCSIM rows reuse the owned-instance gate,
 so a foreign or released instance is refused before any API call.
 
-1. **Row 3, status, profile and update interrupts.** Add `profileEvent` and `updateEvent` to
-   `sim_event` next to `statusEvent`, in `SimulationRuntimeControl` and the worker's event switch.
-   Qualify like OB40: an ET 200SP IO device on the owned instance, OB55/OB56/OB57 counters read
+1. **Row 3, status, profile and update interrupts.** Done: `sim_event` has `statusEvent`, `updateEvent` and `profileEvent`
+   (`local.plcsim.extended-events.20261102`). Qualified like OB40: an ET 200SP IO device on the owned instance, OB55/OB56/OB57 counters read
    back with `sim_read`, and a module that does not support the event recorded with its refusal.
 2. **Row 5, configuration-change events.** Subscribe the three events in `sim_observe`'s bounded
    window. Qualify with a `simulation_download_online` and an IP change inside one window,
@@ -138,8 +137,8 @@ so a foreign or released instance is refused before any API call.
    answers a pending `RDREC`/`WRREC` with a bounded payload and status. Qualify with a scratch FB
    calling `RDREC` and `WRREC` on a configured module: data and status round trip, a
    deliberate error status, and a request left unanswered until its timeout.
-4. **Row 16, unused Web API read methods.** `Syslog.Browse` is implemented with offline checks;
-   native qualification remains open. Add service-data and profiling-data
+4. **Row 16, unused Web API read methods.** `Syslog.Browse` is implemented and ran natively on the owned TCP/IP instance on 8 November
+   (`local.runtime.plcsim-tcpip.syslog.20261108`, [record](../verification/plcsim-syslog-20261108.md)). Add service-data and profiling-data
    downloads to `runtime_web_*`, offered only when `Api.Browse` lists them. Qualify in the
    real-server runner on the owned TCP/IP instance; record each method PLCSIM does not list as
    a B05 row. The state-changing methods (`Plc.CreateBackup`, `Alarms.Acknowledge`, setters)
