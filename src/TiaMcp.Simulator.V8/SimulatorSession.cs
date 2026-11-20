@@ -434,6 +434,8 @@ namespace TiaMcp.Simulator.V8
                 {
                     selected.CaptureMode = (EOperatingMode)Enum.Parse(typeof(EOperatingMode), mode);
                     selected.Instance.OperatingMode = selected.CaptureMode.Value;
+                    selected.CaptureBusSteps = 0;
+                    var bus = Control(() => SimulationRuntimeControl.CaptureBus(args));
                     // Confirm the first selected synchronization point before sampling advances it. A time-synchronised mode,
                     // like virtual time, may report none on entry; one minimal span then reaches it.
                     var entered = selected.Instance.WaitForOnSyncPointReachedEvent(SyncTimeoutMs);
@@ -442,6 +444,13 @@ namespace TiaMcp.Simulator.V8
                         selected.Instance.StartProcessing(1000000);
                         entered = selected.Instance.WaitForOnSyncPointReachedEvent(SyncTimeoutMs);
                         result["entryRequiredStartProcessing"] = true;
+                    }
+                    // SingleStep_Bus advances only when the partner passes a bus time stamp, so a missing entry sync point takes one step.
+                    if (entered.ErrorCode != ERuntimeErrorCode.OK && bus != null)
+                    {
+                        selected.Instance.RunToNextSyncPoint(bus.Value.IoSystemId, ++selected.CaptureBusSteps * bus.Value.CycleNanoseconds);
+                        entered = selected.Instance.WaitForOnSyncPointReachedEvent(SyncTimeoutMs);
+                        result["entryRequiredBusStep"] = true;
                     }
                     result["syncPoint"] = SyncPoint(entered);
                 }
@@ -467,7 +476,11 @@ namespace TiaMcp.Simulator.V8
             if (synchronous)
             {
                 // A time-synchronised sample processes exactly the requested CPU time, then holds at the next sync point.
-                if (span != null) selected.Instance.StartProcessing(span.Value); else selected.Instance.RunToNextSyncPoint();
+                var bus = Control(() => SimulationRuntimeControl.CaptureBus(args));
+                if (span != null) selected.Instance.StartProcessing(span.Value);
+                // SingleStep_Bus: the capture plays the bus partner, passing the I/O system and a time stamp that grows by one bus cycle per step.
+                else if (bus != null) selected.Instance.RunToNextSyncPoint(bus.Value.IoSystemId, ++selected.CaptureBusSteps * bus.Value.CycleNanoseconds);
+                else selected.Instance.RunToNextSyncPoint();
                 result["syncPoint"] = SyncPoint(selected.Instance.WaitForOnSyncPointReachedEvent(SyncTimeoutMs));
             }
             else result["syncPoint"] = null;
@@ -1015,7 +1028,7 @@ namespace TiaMcp.Simulator.V8
 
         private sealed class Selection { internal IInstance Instance; internal int Id; internal string Name; internal bool Owned; internal string Storage;
             internal string CreationRoot; internal JObject CreationReceipt; internal EOperatingMode? CaptureRestoreMode, CaptureMode;
-            internal bool CaptureHeld; internal WatchBuffer Watch; internal RecordArm Records; }
+            internal bool CaptureHeld; internal ulong CaptureBusSteps; internal WatchBuffer Watch; internal RecordArm Records; }
         private sealed class Signal { internal string Symbol; internal string Type; internal JToken Value; internal string Native; }
     }
 }

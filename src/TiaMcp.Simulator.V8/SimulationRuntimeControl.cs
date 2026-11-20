@@ -27,10 +27,25 @@ namespace TiaMcp.Simulation
             if (timespan != span) throw new ArgumentException(timespan ? "A TimespanSynchronized mode needs spanMilliseconds." : "spanMilliseconds applies only to a TimespanSynchronized mode.");
             if (span && (args["spanMilliseconds"].Type != JTokenType.Integer || args.Value<long>("spanMilliseconds") < 1 || args.Value<long>("spanMilliseconds") > 60000))
                 throw new ArgumentException("spanMilliseconds must be an integer from 1 to 60000.");
+            bool bus = mode == "SingleStep_Bus";
+            if (bus != (Given(args, "ioSystemId") || Given(args, "busCycleMicroseconds")))
+                throw new ArgumentException(bus ? "SingleStep_Bus needs ioSystemId and busCycleMicroseconds." : "ioSystemId and busCycleMicroseconds apply only to SingleStep_Bus.");
+            if (bus)
+            {
+                if (!Given(args, "ioSystemId") || !Given(args, "busCycleMicroseconds") || args["ioSystemId"].Type != JTokenType.Integer || args["busCycleMicroseconds"].Type != JTokenType.Integer)
+                    throw new ArgumentException("SingleStep_Bus needs integer ioSystemId and busCycleMicroseconds.");
+                long io = args.Value<long>("ioSystemId"), cycle = args.Value<long>("busCycleMicroseconds");
+                if (io < 1 || io > 32 && io < 100 || io > 115) throw new ArgumentException("ioSystemId must be 1..32 (PROFIBUS) or 100..115 (PROFINET).");
+                if (cycle < 1 || cycle > 1000000) throw new ArgumentException("busCycleMicroseconds must be an integer from 1 to 1000000.");
+            }
             return mode;
         }
 
-        private static readonly string[] CaptureModes = { "SingleStep_C", "SingleStep_P", "SingleStep_CP", "SingleStep_CT", "SingleStep_CPT",
+        /// <summary>The I/O system and the bus time stamp step (ns) one SingleStep_Bus sample passes to RunToNextSyncPoint; null for the other modes.</summary>
+        internal static (uint IoSystemId, ulong CycleNanoseconds)? CaptureBus(JObject args) =>
+            CaptureMode(args) == "SingleStep_Bus" ? ((uint)args.Value<long>("ioSystemId"), (ulong)args.Value<long>("busCycleMicroseconds") * 1000UL) : ((uint, ulong)?)null;
+
+        private static readonly string[] CaptureModes = { "SingleStep_C", "SingleStep_P", "SingleStep_CP", "SingleStep_CT", "SingleStep_CPT", "SingleStep_Bus",
             "TimespanSynchronized_C", "TimespanSynchronized_P", "TimespanSynchronized_CP" };
 
         /// <summary>The CPU time one time-synchronised sample advances, in nanoseconds; null for the other modes.</summary>

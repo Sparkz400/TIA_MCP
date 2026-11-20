@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "plcsim-process-image-fixture.v1",
+  "purpose": "An owned CPU 1511-1 PN program whose cyclic interrupt OB30 is assigned to process image partition 1, so SingleStep_P and TimespanSynchronized_P have a partition update to stop at. The OB1-only fixture of 7 and 8 November 2026 had none and both modes ended sessionUnavailable after their first sync point.",
+  "authoring": "Authored text, not a native export. The runner scripts/qualify_plcsim_process_image.py builds the project from these files in an owned scratch; nothing here was imported or run natively.",
+  "steps": [
+    { "kind": "source_upsert", "file": "PipDb.scl", "language": "SCL", "blocks": ["PipDb"] },
+    { "kind": "block_import_xml", "file": "PipCyclic.xml", "blocks": ["PipCyclic"] },
+    { "kind": "source_upsert", "file": "Main.scl", "language": "SCL", "blocks": ["Main"] },
+    { "kind": "block_attributes_set", "blockName": "PipCyclic", "attributes": { "CyclicTime": 100000, "ProcessImagePartNumber": 1 } }
+  ],
+  "signals": [
+    { "member": "Ob1Count", "type": "int32", "datatype": "DInt", "role": "Incremented once per OB1 scan." },
+    { "member": "Ob30Count", "type": "int32", "datatype": "DInt", "role": "Incremented once per OB30 start, i.e. per update of process image partition 1." }
+  ],
+  "expectations": {
+    "SingleStep_P": "durationLimit, and Ob30Count differs between successive rows.",
+    "TimespanSynchronized_P": "durationLimit, and Ob30Count differs between successive rows.",
+    "controls": ["SingleStep_C", "SingleStep_CP", "TimespanSynchronized_C", "TimespanSynchronized_CP"]
+  },
+  "unverified": [
+    "That block_import_xml keeps SecondaryType CyclicInterrupt on OB30 in this program (it did in qualify_plcsim_gaps.py for the other interrupt OBs).",
+    "That CyclicTime is in microseconds and that block_attributes_set may write ProcessImagePartNumber on a cyclic OB (the tool's allowlist names both; no native run wrote them).",
+    "That an OB assignment alone gives PLCSIM a partition to synchronise on. No tool writes the process image of an I/O module's addresses, so the partition stays empty; if the modes still stall, the module assignment is the next thing to author.",
+    "Partition-synchronous stepping needs SYNC_PI/SYNC_PO only for isochronous OBs (API manual 9.12.1.1); this fixture has none, so SingleStep_Bus stays unqualified."
+  ]
+}

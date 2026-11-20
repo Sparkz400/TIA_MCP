@@ -17,7 +17,11 @@
     "simulatorSource": {
       "type": "object",
       "additionalProperties": false,
-      "allOf": [{"if": {"required": ["syncMode"]}, "then": {"properties": {"cycleSynchronous": {"const": true}}}}],
+      "allOf": [
+        {"if": {"required": ["syncMode"]}, "then": {"properties": {"cycleSynchronous": {"const": true}}}},
+        {"if": {"required": ["syncMode"], "properties": {"syncMode": {"pattern": "^TimespanSynchronized_"}}}, "then": {"required": ["spanMilliseconds"]}, "else": {"not": {"required": ["spanMilliseconds"]}}},
+        {"if": {"required": ["syncMode"], "properties": {"syncMode": {"const": "SingleStep_Bus"}}}, "then": {"required": ["ioSystemId", "busCycleMicroseconds"]}, "else": {"not": {"anyOf": [{"required": ["ioSystemId"]}, {"required": ["busCycleMicroseconds"]}]}}}
+      ],
       "required": [
         "instanceId",
         "instanceName",
@@ -80,8 +84,26 @@
           "type": "boolean"
         },
         "syncMode": {
-          "enum": ["SingleStep_C", "SingleStep_P", "SingleStep_CP", "SingleStep_CT", "SingleStep_CPT"],
+          "enum": ["SingleStep_C", "SingleStep_P", "SingleStep_CP", "SingleStep_CT", "SingleStep_CPT", "SingleStep_Bus",
+                   "TimespanSynchronized_C", "TimespanSynchronized_P", "TimespanSynchronized_CP"],
           "description": "Optional synchronization mode; requires cycleSynchronous true. Omission retains SingleStep_C."
+        },
+        "spanMilliseconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60000,
+          "description": "CPU time each sample processes; required by the TimespanSynchronized modes and refused for the others."
+        },
+        "ioSystemId": {
+          "type": "integer",
+          "oneOf": [{"minimum": 1, "maximum": 32}, {"minimum": 100, "maximum": 115}],
+          "description": "SingleStep_Bus only: the I/O system (PROFIBUS 1..32, PROFINET 100..115) whose bus cycle the capture plays."
+        },
+        "busCycleMicroseconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000,
+          "description": "SingleStep_Bus only: the bus time stamp grows by this much per sample."
         }
       }
     },

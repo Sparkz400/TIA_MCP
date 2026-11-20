@@ -1,0 +1,7 @@
+ORGANIZATION_BLOCK "Main"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+BEGIN
+    "PipDb".Ob1Count := "PipDb".Ob1Count + 1;
+END_ORGANIZATION_BLOCK
+

@@ -25,9 +25,21 @@ internal static class SimulationRuntimeControlTests
             Check.Equal<long?>(10000000L, SimulationRuntimeControl.CaptureSpanNanoseconds(timespan));
         }
         Check.Equal<long?>(null, SimulationRuntimeControl.CaptureSpanNanoseconds(JObject.Parse("{cycleSynchronous:true,syncMode:'SingleStep_CP'}")));
+        // SingleStep_Bus passes the I/O system and a time stamp step of one bus cycle; the others pass nothing.
+        var bus = JObject.Parse("{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:100,busCycleMicroseconds:250}");
+        Check.Equal("SingleStep_Bus", SimulationRuntimeControl.CaptureMode(bus));
+        Check.Equal<(uint, ulong)?>((100u, 250000UL), SimulationRuntimeControl.CaptureBus(bus));
+        Check.Equal<(uint, ulong)?>(null, SimulationRuntimeControl.CaptureBus(JObject.Parse("{cycleSynchronous:true,syncMode:'SingleStep_CP'}")));
+        foreach (int io in new[] { 1, 32, 100, 115 })
+            Check.Equal("SingleStep_Bus", SimulationRuntimeControl.CaptureMode(new JObject { ["cycleSynchronous"] = true, ["syncMode"] = "SingleStep_Bus", ["ioSystemId"] = io, ["busCycleMicroseconds"] = 1 }));
         foreach (string input in new[] { "{cycleSynchronous:'true'}", "{cycleSynchronous:true,syncMode:1}",
             "{syncMode:'SingleStep_C'}", "{cycleSynchronous:false,syncMode:'SingleStep_C'}",
             "{cycleSynchronous:true,syncMode:'SingleStep_Bus'}", "{cycleSynchronous:true,syncMode:'TimespanSynchronized_C'}",
+            "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:100}", "{cycleSynchronous:true,syncMode:'SingleStep_Bus',busCycleMicroseconds:250}",
+            "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:0,busCycleMicroseconds:250}", "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:33,busCycleMicroseconds:250}",
+            "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:99,busCycleMicroseconds:250}", "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:116,busCycleMicroseconds:250}",
+            "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:100,busCycleMicroseconds:0}", "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:100,busCycleMicroseconds:1000001}",
+            "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:100.5,busCycleMicroseconds:250}", "{cycleSynchronous:true,syncMode:'SingleStep_CP',ioSystemId:100,busCycleMicroseconds:250}",
             "{cycleSynchronous:true,syncMode:'TimespanSynchronized_C',spanMilliseconds:0}", "{cycleSynchronous:true,syncMode:'TimespanSynchronized_P',spanMilliseconds:60001}",
             "{cycleSynchronous:true,syncMode:'TimespanSynchronized_CP',spanMilliseconds:1.5}", "{cycleSynchronous:true,syncMode:'SingleStep_C',spanMilliseconds:10}",
             "{cycleSynchronous:true,spanMilliseconds:10}", "{cycleSynchronous:true,syncMode:'TimespanSynchronized_CT',spanMilliseconds:10}",
