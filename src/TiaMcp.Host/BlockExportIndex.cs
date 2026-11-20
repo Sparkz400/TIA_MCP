@@ -17,7 +17,8 @@ internal static class BlockExportIndex
     internal static IReadOnlyList<JsonElement> Select(JsonElement inventory, IReadOnlyCollection<string> kinds, string? plcPath, int offset, int maxBlocks) =>
         [.. Matching(inventory, kinds, plcPath).Skip(offset).Take(maxBlocks)];
 
-    /// <summary>One block: identity, the two file names inside the export directory, or why it has none.</summary>
+    /// <summary>One block: identity, the two file names inside the export directory, or why it has none. read is a block_read result
+    /// or one entry of a batched block_read (blockPaths).</summary>
     internal static JsonObject Row(JsonElement block, JsonElement? read, string? errorCode, string? errorMessage)
     {
         string plc = block.GetProperty("plcPath").GetString()!, path = block.GetProperty("path").GetString()!;
@@ -33,7 +34,8 @@ internal static class BlockExportIndex
         row["xml"] = Path.GetFileName(result.GetProperty("artifact").GetProperty("path").GetString());
         row["bytes"] = result.GetProperty("artifact").GetProperty("bytes").GetInt64();
         if (result.TryGetProperty("textArtifact", out var text)) row["text"] = Path.GetFileName(text.GetProperty("path").GetString());
-        if (result.TryGetProperty("networks", out var networks)) row["networks"] = networks.GetArrayLength();
+        // block_read lists the networks; a batched entry already holds their count.
+        if (result.TryGetProperty("networks", out var networks)) row["networks"] = networks.ValueKind == JsonValueKind.Array ? networks.GetArrayLength() : networks.GetInt32();
         if (result.TryGetProperty("textUnavailable", out var unavailable)) row["textUnavailable"] = unavailable.GetProperty("reason").GetString();
         return row;
     }

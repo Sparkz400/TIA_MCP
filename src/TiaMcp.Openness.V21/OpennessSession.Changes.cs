@@ -2080,9 +2080,8 @@ namespace TiaMcp.Openness.V21
             File.WriteAllText(temporary, data.ToString(Formatting.Indented), new UTF8Encoding(false));
             if (File.Exists(change.Journal)) TiaMcp.Core.JournalFileReplacement.Replace(temporary, change.Journal); else File.Move(temporary, change.Journal);
             // A completed phase can precede the terminal state transition. Refresh
-            // diagnostic progress after committing that transition as well.
-            if (change.Kind == "hmi_classic_screen_edit")
-                try { SaveChangeProgress(change); } catch (IOException) { /* The durable journal remains authoritative. */ }
+            // diagnostic progress after every journal commit, so progress.json carries the current state, terminal states included.
+            try { SaveChangeProgress(change); } catch (Exception error) when (error is IOException || error is UnauthorizedAccessException) { /* The durable journal remains authoritative. */ }
         }
 
         private static JObject ChangeObject(JObject args, string name) => args[name] as JObject ?? throw new BridgeException("InvalidRequest", name + " must be an object.");

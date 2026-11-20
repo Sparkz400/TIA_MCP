@@ -39,110 +39,116 @@ public sealed partial class TiaTools
             ToolProgress.Stage("capturing the project hierarchy");
             var captured = JsonNode.Parse((await bridge.CallAsync("project_model", captureArgs, cancellationToken)).GetRawText())!.AsObject();
             string snapshotId = captured["snapshotId"]?.GetValue<string>() ?? throw new BridgeException("InvalidSnapshot", "Native capture did not return a snapshot identity.");
-            var export = JsonNode.Parse((await bridge.CallAsync("project_model", new { action = "export", snapshotId,
-                artifactDirectory = Path.Combine(options.ArtifactsDirectory, "project-explorer") }, cancellationToken)).GetRawText())!.AsObject();
-            var model = JsonNode.Parse(ProjectReviewStore.ReadArtifact(options.ArtifactsDirectory, export["artifact"]!.AsObject()))!.AsObject();
-            var allBlocks = model["nodes"]!.AsArray().Where(n => n?["kind"]?.GetValue<string>() == "block")
-                .OrderBy(n => n!["objectPath"]!.GetValue<string>(), StringComparer.Ordinal).ToArray();
-            HashSet<string>? requested = null;
-            if (input["blockPaths"] is not null)
+            try
             {
-                var paths = input["blockPaths"]!.AsArray().Select(n => n!.GetValue<string>()).ToArray();
-                requested = paths.ToHashSet(StringComparer.Ordinal);
-                if (paths.Length != requested.Count || paths.Length > maximum || requested.Any(p => !allBlocks.Any(n => n!["objectPath"]!.GetValue<string>() == p)))
-                    throw new BridgeException("InvalidRequest", "blockPaths must be unique exact block paths within this capture and within maxBlocks.");
-            }
-            var selected = allBlocks.Where(n => requested is null || requested.Contains(n!["objectPath"]!.GetValue<string>())).Skip(requested is null ? blockOffset : 0).Take(maximum).ToArray();
-            var relationships = new JsonArray();
-            foreach (var node in selected.Take(relationshipRoots))
-            {
-                var reference = new JsonObject { ["schemaVersion"] = "project-model.v1", ["snapshotId"] = snapshotId,
-                    ["sessionGeneration"] = model["sessionGeneration"]!.DeepClone(),
-                    ["projectPath"] = model["project"]!["projectPath"]!.DeepClone(),
-                    ["nodeId"] = node!["nodeId"]!.DeepClone(), ["objectPath"] = node["objectPath"]!.DeepClone() };
-                var observed = JsonNode.Parse((await bridge.CallAsync("project_model", new JsonObject {
-                    ["action"] = "relationships", ["reference"] = reference, ["direction"] = "both",
-                    ["depth"] = 1, ["maxNodes"] = 500, ["maxEdges"] = 1000 }, cancellationToken)).GetRawText())!.AsObject();
-                var observation = new JsonObject { ["objectPath"] = node["objectPath"]!.DeepClone() };
-                foreach (string key in new[] { "status", "retainedForExport", "coverage", "nativeCoverage", "warnings", "truncated" })
-                    if (observed[key] is not null) observation[key] = observed[key]!.DeepClone();
-                relationships.Add(observation);
-            }
-            if (relationships.Count > 0)
-            {
-                export = JsonNode.Parse((await bridge.CallAsync("project_model", new { action = "export", snapshotId,
+                // Only the block nodes are listed here: the whole model is exported and parsed once, after the relationship pass.
+                var listing = JsonNode.Parse((await bridge.CallAsync("project_model", new { action = "blocks", snapshotId }, cancellationToken)).GetRawText())!.AsObject();
+                var allBlocks = listing["blocks"]!.AsArray()
+                    .OrderBy(n => n!["objectPath"]!.GetValue<string>(), StringComparer.Ordinal).ToArray();
+                HashSet<string>? requested = null;
+                if (input["blockPaths"] is not null)
+                {
+                    var paths = input["blockPaths"]!.AsArray().Select(n => n!.GetValue<string>()).ToArray();
+                    requested = paths.ToHashSet(StringComparer.Ordinal);
+                    if (paths.Length != requested.Count || paths.Length > maximum || requested.Any(p => !allBlocks.Any(n => n!["objectPath"]!.GetValue<string>() == p)))
+                        throw new BridgeException("InvalidRequest", "blockPaths must be unique exact block paths within this capture and within maxBlocks.");
+                }
+                var selected = allBlocks.Where(n => requested is null || requested.Contains(n!["objectPath"]!.GetValue<string>())).Skip(requested is null ? blockOffset : 0).Take(maximum).ToArray();
+                var relationships = new JsonArray();
+                foreach (var node in selected.Take(relationshipRoots))
+                {
+                    var reference = new JsonObject { ["schemaVersion"] = "project-model.v1", ["snapshotId"] = snapshotId,
+                        ["sessionGeneration"] = listing["sessionGeneration"]!.DeepClone(),
+                        ["projectPath"] = listing["projectPath"]!.DeepClone(),
+                        ["nodeId"] = node!["nodeId"]!.DeepClone(), ["objectPath"] = node["objectPath"]!.DeepClone() };
+                    var observed = JsonNode.Parse((await bridge.CallAsync("project_model", new JsonObject {
+                        ["action"] = "relationships", ["reference"] = reference, ["direction"] = "both",
+                        ["depth"] = 1, ["maxNodes"] = 500, ["maxEdges"] = 1000 }, cancellationToken)).GetRawText())!.AsObject();
+                    var observation = new JsonObject { ["objectPath"] = node["objectPath"]!.DeepClone() };
+                    foreach (string key in new[] { "status", "retainedForExport", "coverage", "nativeCoverage", "warnings", "truncated" })
+                        if (observed[key] is not null) observation[key] = observed[key]!.DeepClone();
+                    relationships.Add(observation);
+                }
+                var export = JsonNode.Parse((await bridge.CallAsync("project_model", new { action = "export", snapshotId,
                     artifactDirectory = Path.Combine(options.ArtifactsDirectory, "project-explorer") }, cancellationToken)).GetRawText())!.AsObject();
-                model = JsonNode.Parse(ProjectReviewStore.ReadArtifact(options.ArtifactsDirectory, export["artifact"]!.AsObject()))!.AsObject();
-            }
-            var documents = new JsonArray(); long totalBytes = 0;
-            foreach (var node in selected)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                ToolProgress.Stage("exporting block " + (documents.Count + 1) + " of " + selected.Length);
-                string path = node!["objectPath"]!.GetValue<string>();
-                var row = new JsonObject { ["objectPath"] = path, ["status"] = "unavailable" };
-                documents.Add(row);
-                string language = node["metadata"]?["programmingLanguage"]?.GetValue<string>() ?? "";
-                if (node["metadata"]?["isKnowHowProtected"]?.GetValue<bool>() == true || !new[] { "SCL", "STL", "LAD", "FBD", "DB" }.Contains(language, StringComparer.OrdinalIgnoreCase))
-                { row["reason"] = "Protected/safety block content is outside this review export route."; row["skipped"] = true; continue; }
-                try
+                var model = JsonNode.Parse(ProjectReviewStore.ReadArtifact(options.ArtifactsDirectory, export["artifact"]!.AsObject()))!.AsObject();
+                var documents = new JsonArray(); long totalBytes = 0;
+                foreach (var node in selected)
                 {
-                    var block = JsonNode.Parse((await bridge.CallAsync("block_read", new { blockPath = path,
-                        artifactDirectory = Path.Combine(options.ArtifactsDirectory, "exports") }, cancellationToken)).GetRawText())!.AsObject();
-                    if (block["block"]?["path"]?.GetValue<string>() != path)
-                        throw new BridgeException("SnapshotIdentityMismatch", "Export resolved a different native block.");
-                    var artifact = block["artifact"]!.AsObject();
-                    byte[] bytes = ProjectReviewStore.ReadArtifact(options.ArtifactsDirectory, artifact, 16 * 1024 * 1024);
-                    totalBytes += bytes.Length;
-                    if (totalBytes > 40L * 1024 * 1024) throw new BridgeException("ArtifactCapacity", "Selected block exports exceed 40 MiB.");
-                    string xml;
-                    using (var reader = new StreamReader(new MemoryStream(bytes), Encoding.UTF8, true)) xml = reader.ReadToEnd();
-                    row["xml"] = xml; row["status"] = "exported"; row["artifact"] = artifact.DeepClone();
-                    row["utf8Sha256"] = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(xml)));
+                    cancellationToken.ThrowIfCancellationRequested();
+                    ToolProgress.Stage("exporting block " + (documents.Count + 1) + " of " + selected.Length);
+                    string path = node!["objectPath"]!.GetValue<string>();
+                    var row = new JsonObject { ["objectPath"] = path, ["status"] = "unavailable" };
+                    documents.Add(row);
+                    string language = node["programmingLanguage"]?.GetValue<string>() ?? "";
+                    if (node["isKnowHowProtected"]?.GetValue<bool>() == true || !new[] { "SCL", "STL", "LAD", "FBD", "DB" }.Contains(language, StringComparer.OrdinalIgnoreCase))
+                    { row["reason"] = "Protected/safety block content is outside this review export route."; row["skipped"] = true; continue; }
+                    try
+                    {
+                        var block = JsonNode.Parse((await bridge.CallAsync("block_read", new { blockPath = path, includeXml = false,
+                            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "exports") }, cancellationToken)).GetRawText())!.AsObject();
+                        if (block["block"]?["path"]?.GetValue<string>() != path)
+                            throw new BridgeException("SnapshotIdentityMismatch", "Export resolved a different native block.");
+                        var artifact = block["artifact"]!.AsObject();
+                        byte[] bytes = ProjectReviewStore.ReadArtifact(options.ArtifactsDirectory, artifact, 16 * 1024 * 1024);
+                        totalBytes += bytes.Length;
+                        if (totalBytes > 40L * 1024 * 1024) throw new BridgeException("ArtifactCapacity", "Selected block exports exceed 40 MiB.");
+                        string xml;
+                        using (var reader = new StreamReader(new MemoryStream(bytes), Encoding.UTF8, true)) xml = reader.ReadToEnd();
+                        row["xml"] = xml; row["status"] = "exported"; row["artifact"] = artifact.DeepClone();
+                        row["utf8Sha256"] = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(xml)));
+                    }
+                    catch (BridgeOperationException error)
+                    {
+                        // A completed read error is retained. Lost transport remains terminal and aborts capture.
+                        row["reason"] = error.Message; row["errorCode"] = error.Code;
+                    }
                 }
-                catch (BridgeOperationException error)
+                var content = ProjectReviewStore.ContentCoverage(documents, allBlocks.Length, selected.Length);
+                if (requested is null)
                 {
-                    // A completed read error is retained. Lost transport remains terminal and aborts capture.
-                    row["reason"] = error.Message; row["errorCode"] = error.Code;
+                    content["blockOffset"] = blockOffset;
+                    content["nextBlockOffset"] = blockOffset + selected.Length < allBlocks.Length ? blockOffset + selected.Length : null;
                 }
+                // A capture whose every attempted export was refused for a read-only project holds no block content at all;
+                // saving it would let a later compare look clean without comparing any block. Refuse instead.
+                if (content["attemptedBlocks"]!.GetValue<int>() > 0 && content["exportedBlocks"]!.GetValue<int>() == 0
+                    && documents.All(row => row?["skipped"] is not null || row?["errorCode"]?.GetValue<string>() == "ReadOnlyProject"))
+                    throw new BridgeException("ReadOnlyProject", "Every block export was refused because the project is open read-only, so no block content would be captured. "
+                        + "Remediation: repeat the capture with fromTemporaryCopy:true; it captures a read-write copy and leaves the original unchanged.");
+                if (input["requireAllContent"]?.GetValue<bool>() == true && content["degraded"]!.GetValue<bool>())
+                    throw new BridgeException("SnapshotContentIncomplete", "requireAllContent is set and block content is incomplete: "
+                        + string.Join(", ", content["degradedReasons"]!.AsArray().Select(r => r!["code"]!.GetValue<string>())) + ". No review was saved.");
+                ToolProgress.Stage("verifying that the project did not change during the capture");
+                var verification = await bridge.CallAsync("project_model", new { action = "verify", snapshotId }, cancellationToken);
+                if (!verification.TryGetProperty("matchesCurrentMetadata", out var matched) || matched.ValueKind != JsonValueKind.True)
+                    throw new BridgeException("SnapshotInvalidated", "Native metadata changed during review capture; no persistent snapshot was accepted.");
+                var coverage = new JsonObject { ["selectedBlocks"] = selected.Length, ["observedBlocks"] = allBlocks.Length,
+                    ["omittedBlocks"] = allBlocks.Length - selected.Length, ["originalSnapshotId"] = snapshotId,
+                    ["metadataVerification"] = JsonNode.Parse(verification.GetRawText()), ["nativeContentAtomic"] = false,
+                    ["relationshipObservations"] = relationships, ["relationshipCoverageComplete"] = false, ["content"] = content,
+                    ["temporaryCopy"] = temporaryCopy is null ? null : new JsonObject { ["source"] = temporaryCopy["source"]?.DeepClone(),
+                        ["copy"] = temporaryCopy["project"]?.DeepClone(), ["archive"] = temporaryCopy["archive"]?.DeepClone(),
+                        ["note"] = "Captured from a temporary read-write copy; the original project was closed unchanged and the copy stays open." },
+                    ["projectFolder"] = ProjectReviewStore.ProjectFolderManifest(model["project"]!["projectPath"]!.GetValue<string>(), input["hashProjectFolder"]?.GetValue<bool>() == true) };
+                var saved = new ProjectReviewStore(options.ArtifactsDirectory).Save(model, documents, coverage);
+                // A client on another machine cannot open the Host path: name the resource and the chunked route.
+                string reviewId = saved["reviewId"]!.GetValue<string>();
+                long reviewBytes = saved["artifact"]!["bytes"]!.GetValue<long>();
+                saved["remoteAccess"] = new JsonObject { ["resourceUri"] = "tia://project-reviews/" + reviewId,
+                    ["resourceReadable"] = reviewBytes <= TiaResources.MaxBytes,
+                    ["artifactPath"] = "project-reviews/" + reviewId + ".json",
+                    ["note"] = reviewBytes <= TiaResources.MaxBytes ? "Read it with resources/read on resourceUri."
+                        : "The review exceeds the 4 MiB resource limit; read it in 64 KiB chunks with artifact_read on artifactPath." };
+                return ReviewResult(saved);
             }
-            var content = ProjectReviewStore.ContentCoverage(documents, allBlocks.Length, selected.Length);
-            if (requested is null)
+            finally
             {
-                content["blockOffset"] = blockOffset;
-                content["nextBlockOffset"] = blockOffset + selected.Length < allBlocks.Length ? blockOffset + selected.Length : null;
+                // The capture holds one of the worker's two snapshot slots for its whole lifetime; free it on every path. A failed release
+                // (lost transport, a call still running) must not hide the result or the error that is already on its way.
+                try { await bridge.CallAsync("project_model", new { action = "release", snapshotId }, CancellationToken.None); }
+                catch (BridgeException) { }
             }
-            // A capture whose every attempted export was refused for a read-only project holds no block content at all;
-            // saving it would let a later compare look clean without comparing any block. Refuse instead.
-            if (content["attemptedBlocks"]!.GetValue<int>() > 0 && content["exportedBlocks"]!.GetValue<int>() == 0
-                && documents.All(row => row?["skipped"] is not null || row?["errorCode"]?.GetValue<string>() == "ReadOnlyProject"))
-                throw new BridgeException("ReadOnlyProject", "Every block export was refused because the project is open read-only, so no block content would be captured. "
-                    + "Remediation: repeat the capture with fromTemporaryCopy:true; it captures a read-write copy and leaves the original unchanged.");
-            if (input["requireAllContent"]?.GetValue<bool>() == true && content["degraded"]!.GetValue<bool>())
-                throw new BridgeException("SnapshotContentIncomplete", "requireAllContent is set and block content is incomplete: "
-                    + string.Join(", ", content["degradedReasons"]!.AsArray().Select(r => r!["code"]!.GetValue<string>())) + ". No review was saved.");
-            ToolProgress.Stage("verifying that the project did not change during the capture");
-            var verification = await bridge.CallAsync("project_model", new { action = "verify", snapshotId }, cancellationToken);
-            if (!verification.TryGetProperty("matchesCurrentMetadata", out var matched) || matched.ValueKind != JsonValueKind.True)
-                throw new BridgeException("SnapshotInvalidated", "Native metadata changed during review capture; no persistent snapshot was accepted.");
-            var coverage = new JsonObject { ["selectedBlocks"] = selected.Length, ["observedBlocks"] = allBlocks.Length,
-                ["omittedBlocks"] = allBlocks.Length - selected.Length, ["originalSnapshotId"] = snapshotId,
-                ["metadataVerification"] = JsonNode.Parse(verification.GetRawText()), ["nativeContentAtomic"] = false,
-                ["relationshipObservations"] = relationships, ["relationshipCoverageComplete"] = false, ["content"] = content,
-                ["temporaryCopy"] = temporaryCopy is null ? null : new JsonObject { ["source"] = temporaryCopy["source"]?.DeepClone(),
-                    ["copy"] = temporaryCopy["project"]?.DeepClone(), ["archive"] = temporaryCopy["archive"]?.DeepClone(),
-                    ["note"] = "Captured from a temporary read-write copy; the original project was closed unchanged and the copy stays open." },
-                ["projectFolder"] = ProjectReviewStore.ProjectFolderManifest(model["project"]!["projectPath"]!.GetValue<string>(), input["hashProjectFolder"]?.GetValue<bool>() == true) };
-            var saved = new ProjectReviewStore(options.ArtifactsDirectory).Save(model, documents, coverage);
-            // A client on another machine cannot open the Host path: name the resource and the chunked route.
-            string reviewId = saved["reviewId"]!.GetValue<string>();
-            long reviewBytes = saved["artifact"]!["bytes"]!.GetValue<long>();
-            saved["remoteAccess"] = new JsonObject { ["resourceUri"] = "tia://project-reviews/" + reviewId,
-                ["resourceReadable"] = reviewBytes <= TiaResources.MaxBytes,
-                ["artifactPath"] = "project-reviews/" + reviewId + ".json",
-                ["note"] = reviewBytes <= TiaResources.MaxBytes ? "Read it with resources/read on resourceUri."
-                    : "The review exceeds the 4 MiB resource limit; read it in 64 KiB chunks with artifact_read on artifactPath." };
-            return ReviewResult(saved);
         }
         catch (Exception error) when (ReviewError(error)) { return ReviewFailure(error); }
     }

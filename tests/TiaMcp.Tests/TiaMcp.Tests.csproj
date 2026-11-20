@@ -67,6 +67,7 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/CapturedProcessIdentity.cs" Link="CapturedProcessIdentity.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.AddInOwner.cs" Link="OpennessSession.AddInOwner.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ObjectIdentity.cs" Link="ObjectIdentity.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/BlockPathChain.cs" Link="BlockPathChain.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/CapabilityRules.cs" Link="CapabilityRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelStore.cs" Link="ProjectModelStore.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelProviders.cs" Link="ProjectModelProviders.cs" />

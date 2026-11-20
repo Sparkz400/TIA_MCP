@@ -89,29 +89,95 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
         string directory = Path.Combine(options.ArtifactsDirectory, "exports");
         try
         {
-            var inventory = await bridge.CallAsync("project_inventory", new { projectName, maxItems = 2000, groupPath, namePrefix, includeHardware = false }, cancellationToken);
+            var inventory = await ExportSelection(projectName, groupPath, namePrefix, offset, cancellationToken);
             return Result(BlockExportIndex.Build(inventory, wanted, plcPath, offset, maxBlocks, directory,
-                await ExportRows(BlockExportIndex.Select(inventory, wanted, plcPath, offset, maxBlocks), culture, directory, cancellationToken)).ToJsonString(BridgeProtocol.Json), false);
+                await ExportRows(BlockExportIndex.Select(inventory, wanted, plcPath, offset, maxBlocks), projectName, culture, directory, cancellationToken)).ToJsonString(BridgeProtocol.Json), false);
         }
         catch (BridgeException error) { return Failure(error); }
     }
 
-    private async Task<List<System.Text.Json.Nodes.JsonObject>> ExportRows(IReadOnlyList<JsonElement> blocks, string? culture, string directory, CancellationToken cancellationToken)
+    // The selection of a paged run: the first page reads the inventory, the following pages (offset > 0) reuse it for a short time instead of
+    // walking the project again. It is a snapshot, like the rest of a run: a block that changed meanwhile is a skipped row, not a wrong file.
+    private static readonly object SelectionLock = new();
+    private static (IBridgeClient Owner, string Key, DateTime At, JsonElement Inventory)? _selection;
+    internal static readonly TimeSpan SelectionLifetime = TimeSpan.FromMinutes(10);
+
+    private async Task<JsonElement> ExportSelection(string? projectName, string? groupPath, string? namePrefix, int offset, CancellationToken cancellationToken)
     {
-        var rows = new List<System.Text.Json.Nodes.JsonObject>();
-        foreach (var block in blocks)
+        string key = JsonSerializer.Serialize(new { projectName, groupPath, namePrefix });
+        lock (SelectionLock)
+            if (offset > 0 && _selection is { } cached && ReferenceEquals(cached.Owner, bridge) && cached.Key == key && DateTime.UtcNow - cached.At < SelectionLifetime) return cached.Inventory;
+        var inventory = await PagedInventory(projectName, groupPath, namePrefix, cancellationToken);
+        lock (SelectionLock) _selection = (bridge, key, DateTime.UtcNow, inventory);
+        return inventory;
+    }
+
+    internal const int InventoryPageItems = 2000, MaxInventoryPages = 100;
+
+    // project_inventory returns at most 2000 blocks per call. Further pages skip the blocks already read (blockOffset, in walk order), so every
+    // match is gathered before the selection is sorted; completeness.truncated stays true only when the walk or the page cap cut the listing.
+    private async Task<JsonElement> PagedInventory(string? projectName, string? groupPath, string? namePrefix, CancellationToken cancellationToken)
+    {
+        var first = await bridge.CallAsync("project_inventory", new { projectName, maxItems = InventoryPageItems, groupPath, namePrefix, includeHardware = false }, cancellationToken);
+        if (!first.GetProperty("completeness").GetProperty("truncated").GetBoolean()) return first;
+        var merged = System.Text.Json.Nodes.JsonNode.Parse(first.GetRawText())!.AsObject();
+        var blocks = merged["blocks"]!.AsArray();
+        var seen = blocks.Select(block => block!["path"]!.GetValue<string>()).ToHashSet(StringComparer.Ordinal);
+        var page = first;
+        bool complete = false;
+        for (int pages = 1; pages < MaxInventoryPages; pages++)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (block.GetProperty("isKnowHowProtected").GetBoolean()) { rows.Add(BlockExportIndex.Row(block, null, "ProtectedObject", "Know-how protected; not exported.")); continue; }
-            try
-            {
-                rows.Add(BlockExportIndex.Row(block, await bridge.CallAsync("block_read", new { blockPath = block.GetProperty("path").GetString(), render = "text", culture,
-                    artifactDirectory = directory }, cancellationToken), null, null));
-            }
-            // One unreadable block must not cost the rest of the batch.
-            catch (BridgeException error) { rows.Add(BlockExportIndex.Row(block, null, error.Code, error.Message)); }
+            // Only a page cut by maxItems has more to read; a walk cut (walkTruncated) cannot be continued by skipping.
+            if (page.TryGetProperty("filter", out var filter) && filter.TryGetProperty("walkTruncated", out var walkCut) && walkCut.GetBoolean()) break;
+            page = await bridge.CallAsync("project_inventory", new { projectName, maxItems = InventoryPageItems, groupPath, namePrefix, includeHardware = false, blockOffset = blocks.Count }, cancellationToken);
+            foreach (var block in page.GetProperty("blocks").EnumerateArray())
+                if (seen.Add(block.GetProperty("path").GetString()!)) blocks.Add(System.Text.Json.Nodes.JsonNode.Parse(block.GetRawText()));
+            if (!page.GetProperty("completeness").GetProperty("truncated").GetBoolean()) { complete = true; break; }
         }
-        return rows;
+        merged["completeness"]!["truncated"] = !complete;
+        merged["completeness"]!["scopeComplete"] = complete && page.GetProperty("completeness").GetProperty("scopeComplete").GetBoolean();
+        return JsonDocument.Parse(merged.ToJsonString()).RootElement;
+    }
+
+    // Blocks per worker call: the worker selects the PLC once and finds each block by its path; one call stays far below the call timeout.
+    internal const int ExportChunk = 20;
+
+    private async Task<List<System.Text.Json.Nodes.JsonObject>> ExportRows(IReadOnlyList<JsonElement> blocks, string? projectName, string? culture, string directory, CancellationToken cancellationToken)
+    {
+        // Rows stay in the order of the selection; the blocks to export are gathered per PLC, in calls of at most ExportChunk paths.
+        var rows = new System.Text.Json.Nodes.JsonObject?[blocks.Count];
+        var byPlc = new Dictionary<string, List<int>>(StringComparer.Ordinal);
+        for (int i = 0; i < blocks.Count; i++)
+        {
+            if (blocks[i].GetProperty("isKnowHowProtected").GetBoolean()) rows[i] = BlockExportIndex.Row(blocks[i], null, "ProtectedObject", "Know-how protected; not exported.");
+            else
+            {
+                string plc = blocks[i].GetProperty("plcPath").GetString()!;
+                if (!byPlc.TryGetValue(plc, out var indexes)) byPlc[plc] = indexes = [];
+                indexes.Add(i);
+            }
+        }
+        foreach (var (plcPath, indexes) in byPlc)
+            foreach (var chunk in indexes.Chunk(ExportChunk))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                try
+                {
+                    var response = await bridge.CallAsync("block_read", new { projectName, plcPath, blockPaths = chunk.Select(i => blocks[i].GetProperty("path").GetString()).ToArray(),
+                        render = "text", culture, includeXml = false, artifactDirectory = directory }, cancellationToken);
+                    var entries = response.GetProperty("results").EnumerateArray().ToDictionary(entry => entry.GetProperty("path").GetString()!, StringComparer.Ordinal);
+                    foreach (int i in chunk)
+                    {
+                        if (!entries.TryGetValue(blocks[i].GetProperty("path").GetString()!, out var entry)) throw new BridgeException("InvalidResponse", "The worker answered a block export without an entry for every block.");
+                        rows[i] = entry.GetProperty("ok").GetBoolean() ? BlockExportIndex.Row(blocks[i], entry, null, null)
+                            : BlockExportIndex.Row(blocks[i], null, entry.GetProperty("error").GetProperty("code").GetString(), entry.GetProperty("error").GetProperty("message").GetString());
+                    }
+                }
+                // A refused call (a completed error) is each block's skipped row. A lost transport, timeout, faulted bridge or a call still
+                // running is not: it ends the batch, so no block is reported skipped, the next offset stays put and the run is never "complete".
+                catch (BridgeOperationException error) { foreach (int i in chunk) rows[i] = BlockExportIndex.Row(blocks[i], null, error.Code, error.Message); }
+            }
+        return [.. rows.Select(row => row!)];
     }
 
     [McpServerTool(Name = "plc_io_map", ReadOnly = true, Destructive = false, OpenWorld = false)]
