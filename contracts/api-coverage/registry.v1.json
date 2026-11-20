@@ -3273,6 +3273,26 @@
       ]
     },
     {
+      "featureId": "runtime_web_download",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_web_backup",
+      "obligations": [
+        "D16",
+        "L03"
+      ]
+    },
+    {
+      "featureId": "runtime_web_alarm_acknowledge",
+      "obligations": [
+        "D16",
+        "L03"
+      ]
+    },
+    {
       "featureId": "runtime_web_status",
       "obligations": [
         "D16"

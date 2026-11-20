@@ -145,6 +145,14 @@ internal static class SimulationNetworkAdmissionTests
             int start = ua.IndexOf("Name = \"" + tool + "\"", StringComparison.Ordinal), gate = ua.IndexOf("await targets.Require(bindingSha256, \"ua:\" + attemptId", Math.Max(start, 0), StringComparison.Ordinal);
             Check.Equal(true, start >= 0 && gate > start && gate < ua.IndexOf(send, start, StringComparison.Ordinal));
         }
+        // Every state-changing Web API tool (writes, RUN/STOP, alarm acknowledgement, backup) takes the owned-PLCSIM gate before its session call.
+        string web = Source("TiaMcp.Host", "PhysicalRuntimeTools.cs");
+        foreach (var (tool, send) in new[] { ("runtime_web_write", "sessions.Write("), ("runtime_web_operating_mode", "sessions.ChangeOperatingMode("),
+            ("runtime_web_alarm_acknowledge", "sessions.AcknowledgeAlarm("), ("runtime_web_backup", "sessions.Backup(") })
+        {
+            int start = web.IndexOf("Name=\"" + tool + "\"", StringComparison.Ordinal), gate = web.IndexOf("await Gate(attemptId,bindingSha256,", Math.Max(start, 0), StringComparison.Ordinal);
+            Check.Equal(true, start >= 0 && gate > start && gate < web.IndexOf(send, start, StringComparison.Ordinal));
+        }
         string system = Source("TiaMcp.Openness.V21", "OpennessSession.TestSuiteSystem.cs");
         int guard = system.IndexOf("SimulationNetworkAdmission.EndpointRefusal(SimulationNetworkRoute.Adapter(serverAddress), SimulationTicket.Interface(SimulationTicket.Decode(ticket)))", StringComparison.Ordinal);
         Check.Equal(true, guard > system.IndexOf("private JObject TestSuiteOwnedEndpoint(", StringComparison.Ordinal) && guard < system.IndexOf("return simulator;", StringComparison.Ordinal));

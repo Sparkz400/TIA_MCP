@@ -277,7 +277,7 @@ public static class WebRuntimeProtocol
     // Gated owned-PLCSIM mutations, kept out of the read-only builder: Siemens Web API PlcProgram.Write (write_value) and
     // Plc.RequestChangeOperatingMode (change_operating_mode), docs/plans/expansion-plans/physical-plc-runtime.md [W13]/[W14].
     private static readonly Dictionary<string, string> MutationPermissions = new(StringComparer.Ordinal)
-        { ["PlcProgram.Write"] = "write_value", ["Plc.RequestChangeOperatingMode"] = "change_operating_mode" };
+        { ["PlcProgram.Write"] = "write_value", ["Plc.RequestChangeOperatingMode"] = "change_operating_mode", ["Alarms.Acknowledge"] = "acknowledge_alarms" };
 
     public static string MutationPermission(string method) =>
         method is not null && MutationPermissions.TryGetValue(method, out var permission) ? permission : throw Error("RuntimeMethodUnsupported");
@@ -295,6 +295,99 @@ public static class WebRuntimeProtocol
         Id(requestId);
         if (mode is not ("run" or "stop")) throw Error("RuntimeOperatingModeInvalid");
         return Mutation("Plc.RequestChangeOperatingMode", requestId, new Dictionary<string, object> { ["mode"] = mode });
+    }
+
+    /// <summary>Alarms.Acknowledge takes the alarm's `id` (Siemens S7-1500 Web server function manual 11/2023, A5E03484625-AK, 5.9.3, p. 221).
+    /// The manual calls it the "acknowledgement ID" but only lists the Alarms.Browse entry `id` (Table 5-53); that is what is sent.</summary>
+    public static JsonElement AcknowledgeAlarm(string requestId, string alarmId)
+    {
+        Id(requestId); AlarmId(alarmId);
+        return Mutation("Alarms.Acknowledge", requestId, new Dictionary<string, object> { ["id"] = alarmId });
+    }
+
+    /// <summary>Alarms.Browse for one alarm: language and alarm_id (5.9.2, Table 5-50, p. 216). Used to check and read back an acknowledgement.</summary>
+    public static JsonElement AlarmById(string requestId, string language, string alarmId)
+    {
+        Id(requestId); AlarmId(alarmId);
+        if (language is null || language.Length is < 2 or > 35 || language.Any(c => !char.IsAsciiLetterOrDigit(c) && c != '-')) throw Error("RuntimeDiagnosticSelectionInvalid");
+        return Request("Alarms.Browse", requestId, new Dictionary<string, object> { ["language"] = language, ["alarm_id"] = alarmId });
+    }
+
+    /// <summary>The acknowledgement state of the one alarm an Alarms.Browse(alarm_id) answered: "acknowledged", "not_acknowledged", null when the
+    /// alarm has no acknowledgement object (nothing to acknowledge), or a provider status (for example invalidAlarmId for error 800).</summary>
+    public static (string Status, int? ProviderErrorCode, string? Acknowledgement) AlarmState(ReadOnlyMemory<byte> response, string requestId, string alarmId)
+    {
+        using var document = Response(response, requestId);
+        if (document.RootElement.TryGetProperty("error", out var error))
+        {
+            int code = error.GetProperty("code").GetInt32();
+            return (code == 800 ? "invalidAlarmId" : ProviderStatus(code), code, null);
+        }
+        var result = document.RootElement.GetProperty("result");
+        if (result.ValueKind != JsonValueKind.Object || !result.TryGetProperty("entries", out var entries) || entries.ValueKind != JsonValueKind.Array ||
+            entries.GetArrayLength() > 1) throw Error("RuntimeResponseInvalid");
+        if (entries.GetArrayLength() == 0) return ("alarmNotListed", null, null);
+        var entry = entries[0];
+        if (entry.ValueKind != JsonValueKind.Object || !entry.TryGetProperty("id", out var id) || id.ValueKind != JsonValueKind.String || id.GetString() != alarmId)
+            throw Error("RuntimeResponseInvalid");
+        if (!entry.TryGetProperty("acknowledgement", out var ack)) return ("read", null, null);
+        if (ack.ValueKind != JsonValueKind.Object || !ack.TryGetProperty("state", out var state) || state.ValueKind != JsonValueKind.String ||
+            state.GetString() is not ("acknowledged" or "not_acknowledged")) throw Error("RuntimeResponseInvalid");
+        return ("read", null, state.GetString());
+    }
+
+    // Ticket-creating methods (Siemens manual 11/2023, 5.3 Ticket mechanism, p. 164; 5.6.5 p. 194; 5.9.6 p. 228; 5.10.1 p. 229). The result is a ticket
+    // string redeemed once at GET /api/ticket?id=...; Api.CloseTicket(id) (5.3.2, p. 170) frees it. Plc.RestoreBackup is not implemented.
+    private static readonly Dictionary<string, (string Method, string Permission)> TicketKinds = new(StringComparer.Ordinal)
+    {
+        ["serviceData"] = ("Modules.DownloadServiceData", "download_service_data"),
+        ["profiling"] = ("PlcProgram.DownloadProfilingData", "read_value"),
+        ["backup"] = ("Plc.CreateBackup", "backup_plc")
+    };
+    public static (string Method, string Permission) TicketKind(string kind) =>
+        kind is not null && TicketKinds.TryGetValue(kind, out var known) ? known : throw Error("RuntimeTicketKindUnsupported");
+
+    /// <summary>serviceData needs hwid (the module's hardware ID); profiling and backup take no parameters.</summary>
+    public static JsonElement TicketRequest(string requestId, string kind, long? hwid = null)
+    {
+        Id(requestId); var (method, _) = TicketKind(kind);
+        if ((kind == "serviceData") != hwid is not null || hwid is < 0 or > 0xFFFF) throw Error("RuntimeTicketSelectionInvalid");
+        var body = new Dictionary<string, object> { ["jsonrpc"] = "2.0", ["id"] = requestId, ["method"] = method };
+        if (hwid is not null) body["params"] = new Dictionary<string, object> { ["hwid"] = hwid.Value };
+        return JsonSerializer.SerializeToElement(body);
+    }
+
+    public static JsonElement CloseTicket(string requestId, string ticket)
+    {
+        Id(requestId); Ticket(ticket);
+        return JsonSerializer.SerializeToElement(new Dictionary<string, object> { ["jsonrpc"] = "2.0", ["id"] = requestId, ["method"] = "Api.CloseTicket",
+            ["params"] = new Dictionary<string, object> { ["id"] = ticket } });
+    }
+
+    public static (string Status, int? ProviderErrorCode, string? Ticket) TicketResult(ReadOnlyMemory<byte> response, string requestId)
+    {
+        using var document = Response(response, requestId);
+        if (document.RootElement.TryGetProperty("error", out var error))
+        {
+            int code = error.GetProperty("code").GetInt32();
+            return (code switch { 2 => "permissionDenied", 4 or 600 => "resourceUnavailable", 7 => "partnerNotAccessible", 1000 or 1001 => "backupBusy",
+                1004 => "plcNotInStop", 1100 => "invalidHardwareId", _ => ProviderStatus(code) }, code, null);
+        }
+        var result = document.RootElement.GetProperty("result");
+        if (result.ValueKind != JsonValueKind.String) throw Error("RuntimeResponseInvalid");
+        string ticket = result.GetString()!; Ticket(ticket);
+        return ("created", null, ticket);
+    }
+
+    /// <summary>A ticket becomes part of a URL query: only base64 and URL-safe characters, so nothing from the CPU can add a parameter or a path.</summary>
+    public static void Ticket(string ticket)
+    {
+        if (ticket is not { Length: >= 4 and <= 512 } || ticket.Any(c => !char.IsAsciiLetterOrDigit(c) && c is not ('+' or '/' or '=' or '-' or '_')))
+            throw Error("RuntimeResponseInvalid");
+    }
+    private static void AlarmId(string id)
+    {
+        if (id is not { Length: >= 1 and <= 64 } || id.Any(c => !char.IsAsciiLetterOrDigit(c) && c is not ('-' or '_'))) throw Error("RuntimeAlarmIdInvalid");
     }
 
     /// <summary>Boolean true only acknowledges the request; callers read back. Provider errors stay explicit and are never retried.</summary>

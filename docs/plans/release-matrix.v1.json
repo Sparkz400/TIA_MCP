@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.189",
-    "catalogSha256": "95829b4a58af0f7eaa9b850b3697f4203d2dbde32a1ab3b4eca4c9bc774b99e2",
+    "catalogSha256": "99a9203fec356edd2250aef09b5d657b7cc6ae39a5e3a85ee26fc5f45984591b",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "5c4786dd1c89d694fbb8dd6cedda08b781fd52cfb05022cdeda06a2770ef8125"
   },
@@ -12,19 +12,19 @@
     21
   ],
   "summary": {
-    "features": 515,
+    "features": 518,
     "support": {
       "deferred": 1,
       "limited": 344,
       "shipped": 133,
       "unavailable_target": 12,
-      "unqualified": 25
+      "unqualified": 28
     },
     "cells": {
       "blocked": 72,
       "bound": 2184,
       "deferred": 3,
-      "open": 71
+      "open": 81
     },
     "openCellsByOwner": {
       "D06": {
@@ -34,6 +34,10 @@
       "D09": {
         "role": "Online diagnostics",
         "open": 8
+      },
+      "D12": {
+        "role": "Security and web",
+        "open": 10
       },
       "D16": {
         "role": "Physical runtime",
@@ -23381,6 +23385,101 @@
             "local.runtime.plcsim-tcpip.route-gate.20261101",
             "local.runtime.plcsim-tcpip.20261102"
           ]
+        }
+      ]
+    },
+    {
+      "featureId": "runtime_web_download",
+      "domain": "runtime",
+      "mcpTools": [
+        "runtime_web_download"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "D12"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "runtime_web_backup",
+      "domain": "runtime",
+      "mcpTools": [
+        "runtime_web_backup"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "D12"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preview",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-recovery",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "runtime_web_alarm_acknowledge",
+      "domain": "runtime",
+      "mcpTools": [
+        "runtime_web_alarm_acknowledge"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "D12"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preview",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-recovery",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
         }
       ]
     },
