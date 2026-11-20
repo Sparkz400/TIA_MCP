@@ -93,6 +93,61 @@ The worker changes below are covered by offline tests only.
 
 Kept as they are (the user's "worked well" list): `host_build_identity` with `runningMatchesDisk`, structured error codes, DPAPI credential handling that never returns a secret, the `simulation_download` manifest and hashes, and the `change_prepare`/`change_apply` recovery archive flow.
 
+## Field findings from a physical download (20 November)
+
+A user working against a physical PLC drove TIA Portal V21 through Openness and the editor directly, not
+through this server, and reported where they lost time. Nothing here is reproduced on an owned fixture yet, so
+these are observations, not Openness gaps; an item moves to the [gap register](reference/openness-gaps.md) only
+with evidence from an owned fixture.
+
+- [x] **P1 — Who holds a Portal's Openness access:** a stale download helper attached to a Portal delayed
+  `Attach()` by about three minutes per attempt, and nothing named it. Done on 20 November (offline):
+  `tia_discover` and `tia_attach` list `attachedSessions`, the other Openness clients of each Portal from the public
+  `TiaPortalProcess.AttachedSessions` (process ID, name, path, whether the process still runs, `isActive` while it is
+  in a call, attach time, utilization, access level, trust authority). `tia_attach` takes `waitForIdleSeconds`
+  (0..60): it waits for other clients to finish their call and otherwise refuses with `OpennessClientBusy`, naming
+  them; a failed attach lists them beside TIA's message. Another client is never disconnected and no process is
+  ended (`TiaPortalSession.Dispose` would disconnect it; the worker IL guard now refuses any session access
+  outside the process boundary). Native run open (below).
+- [ ] **P1 — TLS challenge not raised on a physical download:** reported: `DownloadProvider.Download()` to a
+  physical CPU completed the TLS handshake, then the connection closed and the download failed without the
+  `TlsVerificationConfiguration` callback being raised, while the editor showed its connect prompt for the same
+  certificate and then connected. Correct subject alternative names, a certificate chain, an import into the
+  local certificate store through `LocalCertificateManager` and the issuing CA in the user's trusted roots made no
+  difference. `plc_physical_download` pins the certificate only inside that callback
+  (`OpennessSession.PhysicalOnline.cs`), so if this reproduces, `trustedCertificateSha256` cannot take effect on such
+  a CPU and the download fails with an empty `onlineChallenges`. The challenge does arrive on PLCSIM (owned
+  provisioning). Reproduce on an owned bench PLC as part of the real-PLC online access qualification under the 14 November feedback above (B05); if it holds,
+  record it as an Openness gap and make the refusal say that no challenge was raised.
+- [ ] **P2 — Download pre-check as data:** the user read the editor's load preview (each entry, its status,
+  message and action) from screenshots, and drove the editor with keyboard shortcuts and synthetic clicks, which
+  were unreliable. `plc_physical_download` already returns every pre- and post-download prompt with its type,
+  message and selection, and configures the PG/PC interface and address (`PhysicalRoute`), but only from a real
+  download; there is no check that stops before anything is loaded. Find out whether the public API can produce the
+  pre-download configurations without loading; if not, record the gap. Driving the editor's user interface stays out
+  of scope.
+- [x] **P2 — Opening a UMAC-protected project:** the user found that `ProjectComposition.Open(FileInfo, UmacDelegate,
+  ProjectOpenMode)` works with `UmacCredentials.Name` and `SetPassword(SecureString)` in the callback. `project_open`
+  passed no callback, so it could not open such a project. Done on 20 November (offline): `project_open` takes
+  `umacUserName`, `umacUserType` and `umacCredential`, a protected credential bound to the exact project path and
+  user; the Host seals the stored password for that one open and the worker answers TIA's callback once, never
+  retrying a refused password ([route](reference/protected-credentials.md#project-open-umac-route)). Native run open
+  (below).
+- [x] **P3 — `set NAME=value && ...` in cmd:** cmd keeps the space before `&&` in the value, so an account name
+  passed this way did not match and was reported as deactivated. Noted in the [FAQ](wiki/FAQ.md).
+- [x] **Native runs of the 20 November changes:** run on 20 November ([record](verification/feedback-20261120.md)):
+  a second Host saw the first Host's worker in `attachedSessions`, `isActive: true` during its scratch creation, and
+  `waitForIdleSeconds: 3` refused with `OpennessClientBusy`; a UMAC-protected scratch opened with the stored project
+  administrator credential read-write and read-only, a wrong password failed with `UmacLoginFailed` after one login
+  request (TIA words it as a deactivated account; the account was not locked), and an unprotected scratch reported
+  `loginRequested: false`. Still open: a client whose process has exited, a plain attach behind a busy client, a
+  global (UMC) user and `UmacLoginRejected`. Originally planned: `attachedSessions` with a second Openness client attached to a
+  Portal, idle and in a long call (does `isActive` hold for the whole call; does a client whose process was killed
+  still appear, and with `processRunning: false`?), `waitForIdleSeconds` refusing and then succeeding (the worker IL guard
+  already passed on the built worker, offline). A UMAC-protected owned scratch project opened with a project user and with
+  a global user, read-only and read-write, a wrong password (`UmacLoginFailed` or `UmacLoginRejected`, exactly one
+  login attempt) and an unprotected project with a credential (`loginRequested: false`).
+
 ## Code audit follow-ups (9 November)
 
 A whole-repository audit on 9 November found 34 items; all but the ones below landed with it (bridge queueing and held cleanups,

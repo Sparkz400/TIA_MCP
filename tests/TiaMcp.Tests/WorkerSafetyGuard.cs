@@ -18,6 +18,8 @@ internal static class WorkerSafetyGuard
 {
     private const string Boundary = "TiaMcp.Openness.V21.PortalProcesses";
     private const string ProcessType = "Siemens.Engineering.TiaPortalProcess";
+    // TiaPortalSession.Dispose disconnects another Openness client: sessions are read only inside the boundary.
+    private const string SessionType = "Siemens.Engineering.TiaPortalSession";
     private const string OwnedBoundary = "TiaMcp.Openness.V21.OwnedQualificationPortal";
     private const string PortalType = "Siemens.Engineering.TiaPortal";
     private static readonly IReadOnlyDictionary<short, OpCode> OpCodesByValue = typeof(OpCodes)
@@ -83,6 +85,8 @@ internal static class WorkerSafetyGuard
                 var signature = method.DecodeSignature(names, null);
                 if (Mentions(signature, processType))
                     violations.Add(methodName + " exposes a raw process descriptor in its signature.");
+                if (!inside && Mentions(signature, SessionType))
+                    violations.Add(methodName + " exposes another client's Openness session outside " + boundary + ".");
                 if (method.RelativeVirtualAddress == 0) continue;
                 var il = pe.GetMethodBody(method.RelativeVirtualAddress).GetILBytes() ?? [];
                 foreach (var instruction in TokenInstructions(il))
@@ -93,13 +97,18 @@ internal static class WorkerSafetyGuard
                         violations.Add($"{methodName} IL_{instruction.Offset:x4} invokes disposal: {target.Description}.");
                     else if (!inside && !owned && target.Description.Contains(processType, StringComparison.Ordinal))
                         violations.Add($"{methodName} IL_{instruction.Offset:x4} accesses a raw process descriptor outside {boundary}: {target.Description}.");
+                    else if (!inside && target.Description.Contains(SessionType, StringComparison.Ordinal))
+                        violations.Add($"{methodName} IL_{instruction.Offset:x4} accesses another client's Openness session outside {boundary}: {target.Description}.");
                 }
             }
             foreach (var fieldHandle in type.GetFields())
             {
                 var field = metadata.GetFieldDefinition(fieldHandle);
-                if (field.DecodeSignature(names, null).Contains(processType, StringComparison.Ordinal))
+                var fieldType = field.DecodeSignature(names, null);
+                if (fieldType.Contains(processType, StringComparison.Ordinal))
                     violations.Add(owner + "." + metadata.GetString(field.Name) + " retains a raw process descriptor in a field.");
+                if (fieldType.Contains(SessionType, StringComparison.Ordinal))
+                    violations.Add(owner + "." + metadata.GetString(field.Name) + " retains another client's Openness session in a field.");
             }
         }
         if (!boundaryFound) violations.Add("Required descriptor boundary is missing: " + boundary + ".");

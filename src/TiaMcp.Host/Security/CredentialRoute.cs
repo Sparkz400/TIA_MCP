@@ -10,9 +10,11 @@ namespace TiaMcp.Host;
 internal sealed record CredentialRouteSlot(string Slot, string VaultName, CredentialReference Reference, CredentialBinding Binding);
 
 /// <summary>
-/// Hands credential-store secrets to exactly one admitted worker change apply. It sits between the admission dispatcher and
-/// the worker: the worker names the public slots in its mutation_begin reply, the Host validates and seals them before
-/// admission, and only mutation_dispatch for that lease carries the sealed envelopes. No secret enters tool arguments.
+/// Hands credential-store secrets to exactly one admitted worker change apply, or to one project_open with a UMAC login. It
+/// sits between the admission dispatcher and the worker: for a change apply the worker names the public slots in its
+/// mutation_begin reply, the Host validates and seals them before admission, and only mutation_dispatch for that lease
+/// carries the sealed envelopes; for project_open the Host seals the login to a fresh nonce, the path and the user
+/// (SealProjectLogin). No secret enters tool arguments.
 /// </summary>
 internal sealed class CredentialRoute(IBridgeClient inner, Func<string, CredentialVault>? vaults = null) : IBridgeClient
 {
@@ -24,6 +26,12 @@ internal sealed class CredentialRoute(IBridgeClient inner, Func<string, Credenti
 
     public async Task<JsonElement> CallAsync(string operation, object? arguments = null, CancellationToken cancellationToken = default)
     {
+        if (operation == "project_open")
+        {
+            var request = SealProjectLogin(arguments, out byte[]? envelope);
+            try { return await inner.CallAsync(operation, request, cancellationToken); }
+            finally { if (envelope is not null) CryptographicOperations.ZeroMemory(envelope); }
+        }
         if (operation == "mutation_begin")
         {
             Clear();
@@ -100,6 +108,52 @@ internal sealed class CredentialRoute(IBridgeClient inner, Func<string, Credenti
         }
         catch { foreach (var (_, bytes) in sealedSlots) CryptographicOperations.ZeroMemory(bytes); throw; }
     }
+
+    // project_open of a UMAC-protected project: the tool argument names a public reference, user and type. The Host derives the
+    // binding from the exact full project path, checks the reference against it, and seals the password to a fresh nonce,
+    // that path and user, so the worker receives only an envelope for this one open (docs/reference/protected-credentials.md).
+    private object? SealProjectLogin(object? arguments, out byte[]? envelope)
+    {
+        envelope = null;
+        if (JsonSerializer.SerializeToNode(arguments, BridgeProtocol.Json) is not JsonObject request || request["umac"] is not JsonObject umac) return arguments;
+        string path;
+        try { path = Path.GetFullPath(Text(request["path"], 32767)); }
+        catch (Exception error) when (error is ArgumentException or NotSupportedException or PathTooLongException) { throw new BridgeException("InvalidRequest", "project_open needs an absolute .ap21 path for a UMAC login."); }
+        string user = Text(umac["userName"], 256), type = Text(umac["userType"], 16), vaultName = umac["vaultName"] is null ? "default" : Text(umac["vaultName"], 32);
+        if (user.Any(char.IsControl) || type is not ("project" or "global")) throw ProtectedCredentialGuard.Error("CredentialInputInvalid");
+        CredentialReference reference;
+        try { reference = umac["reference"].Deserialize<CredentialReference>(CredentialVault.Json) ?? throw ProtectedCredentialGuard.Error("CredentialInputInvalid"); }
+        catch (JsonException) { throw ProtectedCredentialGuard.Error("CredentialInputInvalid"); }
+        ProtectedCredentialGuard.ValidateReference(reference);
+        var binding = ProjectLoginBinding(path, user, type);
+        string expected = ProtectedCredentialGuard.BindingHash(binding);
+        if (reference.BindingSha256 != expected)
+            throw new BridgeOperationException("CredentialContextMismatch", "The credential reference is not bound to this exact project path, UMAC user and user type. Create a credential with the expected binding; no secret was read.",
+                JsonSerializer.SerializeToElement(new { expectedBinding = binding, expectedBindingSha256 = expected }, BridgeProtocol.Json));
+        string nonce = Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant();
+        byte[]? sealedLogin = null; bool password = true;
+        try
+        {
+            open(vaultName).Use(reference, binding, secret =>
+            {
+                if (password = CredentialRouteEnvelope.IsPassword(secret))
+                    sealedLogin = CredentialRouteEnvelope.Seal(secret, CredentialRouteEnvelope.ProjectOpenEntropy(nonce, path, user, type, reference.CredentialId, reference.BindingSha256));
+            });
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { throw ProtectedCredentialGuard.Error("CredentialUnavailable"); }
+        if (!password) throw ProtectedCredentialGuard.Error("CredentialFormatInvalid");
+        envelope = sealedLogin ?? throw ProtectedCredentialGuard.Error("CredentialUnavailable");
+        request["umac"] = new JsonObject { ["userName"] = user, ["userType"] = type, ["credentialId"] = reference.CredentialId, ["bindingSha256"] = reference.BindingSha256,
+            ["nonce"] = nonce, ["envelope"] = Convert.ToBase64String(envelope) };
+        return request;
+    }
+
+    /// <summary>The binding a UMAC project login credential is created with; the V21 worker derives the same (RoutedCredentials.UmacBinding).</summary>
+    internal static CredentialBinding ProjectLoginBinding(string projectPath, string userName, string userType) =>
+        new(new("siemensTiaPortalV21", projectPath, projectPath, "projectUmac", userName), "projectUmac", userType == "global" ? "globalUser" : "projectUser");
+
+    private static string Text(JsonNode? node, int max) => node is JsonValue value && value.TryGetValue<string>(out var text) && text.Length > 0 && text.Length <= max ? text
+        : throw ProtectedCredentialGuard.Error("CredentialInputInvalid");
 
     private void Clear()
     {

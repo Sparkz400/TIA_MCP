@@ -681,6 +681,12 @@
       ]
     },
     {
+      "featureId": "project_open.umac_login",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
       "featureId": "project_retrieve",
       "obligations": [
         "X01"

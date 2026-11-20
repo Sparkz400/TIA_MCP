@@ -253,10 +253,12 @@ namespace TiaMcp.Openness.V21
         private JObject Discover()
         {
             var processes = new JArray();
-            foreach (var process in PortalProcesses.Discover())
+            foreach (var process in PortalProcesses.Discover(includeSessions: true))
             {
-                processes.Add(new JObject { ["processId"] = process.ProcessId, ["mode"] = process.Mode,
-                    ["executablePath"] = process.ExecutablePath, ["projectPath"] = process.ProjectPath });
+                var row = new JObject { ["processId"] = process.ProcessId, ["mode"] = process.Mode,
+                    ["executablePath"] = process.ExecutablePath, ["projectPath"] = process.ProjectPath };
+                AddClients(row, process.Sessions, process.SessionsUnavailable);
+                processes.Add(row);
             }
             var result = Envelope();
             result["processes"] = processes;
@@ -267,13 +269,20 @@ namespace TiaMcp.Openness.V21
         {
             EnsureDetached();
             int id = RequiredInteger(args, "processId");
+            int? waitForIdle = OpennessClientRules.WaitSeconds(args["waitForIdleSeconds"]);
+            if (waitForIdle != null) WaitForIdlePortal(id, waitForIdle.Value);
             var identity = CapturedProcessIdentity.Capture(id);
             try { _portal = PortalProcesses.Attach(id); }
-            catch { identity.Dispose(); throw; }
+            catch (Exception error) { identity.Dispose(); throw AttachFailure(id, error); }
             _portalProcessIdentity = identity;
             _processId = id;
             _ownsPortal = false;
-            return Status();
+            var result = Status();
+            IReadOnlyList<OpennessClientRules.SessionView> sessions = null; string unavailable = null;
+            try { sessions = PortalProcesses.AttachedSessions(id, out unavailable); }
+            catch (Exception error) { unavailable = error.Message; }
+            AddClients(result, sessions, unavailable);
+            return result;
         }
 
         private JObject Start()

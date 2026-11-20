@@ -174,6 +174,7 @@ RecoveryChecks.Run(Path.Combine(output, "recovery"));
 UaIdentityChecks.Run(Path.Combine(output, "ua-identity"), Check);
 RouteChecks.Run(Path.Combine(output, "route"), Check);
 WorkerRouteChecks.Run(Path.Combine(output, "worker-route"), Check);
+ProjectLoginChecks.Run(Path.Combine(output, "project-login"), Check);
 await RuntimeSessionChecks.Run(Path.Combine(output, "runtime-sessions"), Check);
 await RuntimeWebSessionChecks.Run(Path.Combine(output, "runtime-web-sessions"), Check);
 await SimulatorToolChecks.Run(Check);

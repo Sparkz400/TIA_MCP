@@ -8,7 +8,8 @@ using System.Text;
 
 namespace TiaMcp.Security
 {
-    /// <summary>Seals one credential-store secret for one admitted worker change apply. Compiled into both the Host and the V21 worker.</summary>
+    /// <summary>Seals one credential-store secret for one admitted worker change apply, or for one project_open with a UMAC login.
+    /// Compiled into both the Host and the V21 worker.</summary>
     internal static class CredentialRouteEnvelope
     {
         internal const int MaxPasswordBytes = 4096;
@@ -16,10 +17,17 @@ namespace TiaMcp.Security
 
         // The lease token is fresh for every admission, so an envelope opens for one dispatch of one exact change, slot and reference.
         // Each field carries its length, so two different field lists never share an entropy, whatever characters they hold.
-        internal static byte[] Entropy(string leaseToken, string changeId, string previewHash, string slot, string credentialId, string bindingSha256)
+        internal static byte[] Entropy(string leaseToken, string changeId, string previewHash, string slot, string credentialId, string bindingSha256) =>
+            Fields("TiaMcp.CredentialRoute.v2", "change_apply", leaseToken, changeId, previewHash, slot, credentialId, bindingSha256);
+
+        // project_open with a UMAC login: its own domain, and a fresh Host nonce per call in place of a lease token.
+        internal static byte[] ProjectOpenEntropy(string nonce, string projectPath, string userName, string userType, string credentialId, string bindingSha256) =>
+            Fields("TiaMcp.ProjectOpenUmac.v1", "project_open", nonce, projectPath, userName, userType, credentialId, bindingSha256);
+
+        private static byte[] Fields(params string[] fields)
         {
             var text = new StringBuilder();
-            foreach (string field in new[] { "TiaMcp.CredentialRoute.v2", "change_apply", leaseToken, changeId, previewHash, slot, credentialId, bindingSha256 })
+            foreach (string field in fields)
                 text.Append((field ?? throw new ArgumentNullException(nameof(field))).Length.ToString(CultureInfo.InvariantCulture)).Append(':').Append(field);
             return Strict.GetBytes(text.ToString());
         }

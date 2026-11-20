@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.187",
+  "catalogVersion": "0.4.188",
   "targetTiaVersions": [
     21
   ],
@@ -5948,7 +5948,8 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "20 November 2026 (not curated evidence): each process lists attachedSessions, the other Openness clients of that Portal from TiaPortalProcess.AttachedSessions, with whether each is in a call and whether its process still runs. Checked once natively on 20 November (isActive true during another Host's call; docs/verification/feedback-20261120.md)."
         ]
       },
       "qualification": {
@@ -6032,7 +6033,8 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "20 November 2026 (not curated evidence): the result lists attachedSessions; waitForIdleSeconds waits for other Openness clients to finish their call and otherwise refuses with OpennessClientBusy. Another client is never disconnected. Checked once natively on 20 November with a second Host's busy owned Portal (docs/verification/feedback-20261120.md)."
         ]
       },
       "qualification": {
@@ -6248,7 +6250,8 @@
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "Qualification covers the default primary open only; readOnly=true is the separate unverified feature project_open.read_only.",
-          "16 November 2026 (not curated evidence): when TIA refuses the open and another Portal has the project open, the error is ProjectLocked naming that Portal. Offline tests only."
+          "16 November 2026 (not curated evidence): when TIA refuses the open and another Portal has the project open, the error is ProjectLocked naming that Portal. Offline tests only.",
+          "20 November 2026 (not curated evidence): the UMAC login (umacUserName, umacUserType, umacCredential) is the separate unverified feature project_open.umac_login."
         ]
       },
       "qualification": {
@@ -6293,7 +6296,7 @@
           "readOnly=true opens the project as a secondary project; if TIA reports it as primary the worker closes it unsaved and fails with ReadOnlyOpenUnverified.",
           "The worker refuses mutations on any non-primary project through its shared offline-engineering precondition (ReadOnlyProject): change_prepare/apply/restore, library changes, simulation, translation, watch and component routes. Export-based reads (block, type and tag-table reads and other exports) are refused by TIA there and reported as ReadOnlyProject; inventory and inspection reads remain available.",
           "Natively qualified (local.project_settings.20261028): readOnly opens the copy as the only, secondary project; inventory and inspection reads work, TIA itself refuses exports there (reported as ReadOnlyProject) and the worker refuses changes with ReadOnlyProject.",
-          "No UMAC delegate is passed; protected projects that require login are not opened read-only."
+          "Without umacCredential no UMAC delegate is passed; a protected project opens only through project_open.umac_login, which is unverified."
         ]
       },
       "qualification": {
@@ -6315,6 +6318,48 @@
       "acceptanceCriteria": [
         "AC-identity",
         "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "project_open.umac_login",
+      "domain": "project",
+      "title": "Open a UMAC-protected V21 project with a stored credential",
+      "mcpTools": [
+        "project_open"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 ProjectComposition.Open(FileInfo, UmacDelegate) and Open(FileInfo, UmacDelegate, ProjectOpenMode); UmacCredentials.Name, Type and SetPassword(SecureString)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "umacUserName, umacUserType and umacCredential (a protected-credential-reference.v1 bound to the exact full project path, UMAC user and user type) open a protected project; the Host seals the stored password for that one open (project open UMAC route) and no raw password is accepted.",
+          "TIA's login callback is answered once; a second request fails with UmacLoginRejected and a refused first answer with UmacLoginFailed, so a wrong password is never resent.",
+          "20 November 2026 (not curated evidence): Host route, envelope and worker half covered by managed tests with current-user DPAPI. Checked once natively on 20 November with a project administrator on an owned protected scratch: read-write and read-only open, a wrong password (UmacLoginFailed after one request, account not locked) and an unprotected project (docs/verification/feedback-20261120.md). Global (UMC) users are not checked. The V19 adapter refuses it."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "An empty worker-owned instance started with tia_start",
+        "A protected credential created with the local credential-store CLI"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
         "AC-evidence"
       ]
     },

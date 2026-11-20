@@ -114,6 +114,7 @@ namespace TiaMcp.Openness.V19
         private JObject Attach(JObject args)
         {
             EnsureDetached();
+            RefuseV21Options(args, "waitForIdleSeconds");
             int id = RequiredInteger(args, "processId");
             var native = TiaPortal.GetProcesses();
             for (int i = 0; i < native.Count; i++)
@@ -176,6 +177,7 @@ namespace TiaMcp.Openness.V19
         private JObject ProjectOpen(JObject args)
         {
             EnsureAttached();
+            RefuseV21Options(args, "umac");
             if (!_ownsPortal || _portal.Projects.Count != 0)
                 throw new BridgeException("ProjectIsolationRequired", "project_open requires an empty worker-owned instance started with tia_start.");
             string path = args.Value<string>("path");
