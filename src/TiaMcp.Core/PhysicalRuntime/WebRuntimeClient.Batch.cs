@@ -12,6 +12,7 @@ public sealed partial class WebRuntimeClient
     // The CPU refused or ignored a JSON-RPC batch: not an error of the session, so it never escapes.
     private sealed class BatchRefused : Exception;
     private const int MaximumSymbolsPerBatch = 16;
+    private bool batchTentative;
 
     /// <summary>The current metadata check and read of one symbol: a symbol whose metadata changed since selection is never read.</summary>
     public async Task<WebRuntimeReadResult> CurrentAsync(WebRuntimeSymbol selection, CancellationToken cancellationToken)
@@ -34,13 +35,22 @@ public sealed partial class WebRuntimeClient
         for (int from = 0; from < selections.Count; from += perBatch)
         {
             int count = Math.Min(perBatch, selections.Count - from);
+            bool tentative = false;
             if (batchSupport >= 0 && await TryBatch(selections, from, count, items, cancellationToken)) continue;
-            for (int i = from; i < from + count; i++)
+            // A first batch that died on the wire (a CPU that drops what it does not understand) is only tentatively unsupported:
+            // if reading symbol by symbol fails too, it was an outage, and a batch is tried again later.
+            tentative = batchSupport == -1 && batchTentative;
+            try
             {
-                try { items[i] = new(await CurrentAsync(selections[i], cancellationToken), null); }
-                catch (BridgeException failure) when (failure.Code is "RuntimeSymbolMetadataChanged" or "RuntimeBrowseFailed" or "RuntimeMetadataInvalid" or "RuntimeResponseInvalid" or "RuntimeProviderRejected")
-                { items[i] = new(null, failure.Code); }
+                for (int i = from; i < from + count; i++)
+                {
+                    try { items[i] = new(await CurrentAsync(selections[i], cancellationToken), null); }
+                    catch (BridgeException failure) when (failure.Code is "RuntimeSymbolMetadataChanged" or "RuntimeBrowseFailed" or "RuntimeMetadataInvalid" or "RuntimeResponseInvalid" or "RuntimeProviderRejected")
+                    { items[i] = new(null, failure.Code); }
+                }
             }
+            catch when (tentative) { batchSupport = 0; batchTentative = false; throw; }
+            batchTentative = false;
         }
         return items;
     }
@@ -87,9 +97,10 @@ public sealed partial class WebRuntimeClient
             batchSupport = 1;
             return true;
         }
-        catch (BatchRefused) { batchSupport = -1; return false; }
-        // Until a batch has been answered once, an HTTP refusal may be the CPU not taking one.
-        catch (BridgeException failure) when (failure.Code == "RuntimeHttpFailure" && batchSupport == 0) { batchSupport = -1; return false; }
+        catch (BatchRefused) { batchSupport = -1; batchTentative = false; return false; }
+        // Until a batch has been answered once, a refusal or a dropped connection may be the CPU not taking one.
+        catch (BridgeException failure) when (failure.Code is "RuntimeHttpFailure" or "RuntimeTransportFailure" && batchSupport == 0)
+        { batchSupport = -1; batchTentative = true; return false; }
         // Too big as one request or one reply (large arrays): this group is read symbol by symbol.
         catch (BridgeException failure) when (failure.Code is "RuntimeRequestLimit" or "RuntimeResponseLimit") { return false; }
     }

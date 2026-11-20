@@ -314,6 +314,14 @@ internal sealed partial class FixtureServer : StandardServer
                     StatusCode = StatusCodes.Good, Timestamp = SourceTime };
                 folder.AddChild(variable);
             }
+            // Sixteen 60,000-byte values: each fits the 1 MiB output limit, all sixteen read together do not. They hang off no folder, so
+            // "every fixture value" reads and browses are unchanged; they are reachable by their node id only.
+            for (int i = 0; i < 16; i++)
+                AddPredefinedNode(SystemContext, new BaseDataVariableState(null) { NodeId = new NodeId("big" + i.ToString("00"), NamespaceIndex),
+                    BrowseName = new QualifiedName("big" + i.ToString("00"), NamespaceIndex), DisplayName = "big" + i.ToString("00"),
+                    TypeDefinitionId = VariableTypeIds.BaseDataVariableType, DataType = DataTypeIds.ByteString, ValueRank = ValueRanks.Scalar,
+                    Value = new byte[60_000], AccessLevel = AccessLevels.CurrentRead, UserAccessLevel = AccessLevels.CurrentRead,
+                    StatusCode = StatusCodes.Good, Timestamp = SourceTime });
             AddPredefinedNode(SystemContext, folder);
             AddRootNotifier(folder);
             CreateMethodsAndAlarm(refs);

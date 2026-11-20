@@ -83,7 +83,7 @@ public sealed class OpcUaRuntimeCaptures(OpcUaRuntimeSessionStore sessions, stri
     }
     private async Task Poll(RuntimeCapturePlan plan,RuntimeCaptureStore.Writer writer,Running entry)
     {
-        long started=clock.GetTimestamp(), cycle=0, lastReadCycle=-1,accountedThrough=-1; string reason="durationLimit";int reconnects=0;
+        long started=clock.GetTimestamp(), cycle=0, lastReadCycle=-1,accountedThrough=-1; string reason="durationLimit";int reconnects=0;bool perNode=false;
         using var duration=new CancellationTokenSource(TimeSpan.FromSeconds(plan.Request.DurationSeconds),clock);
         using var deadline=CancellationTokenSource.CreateLinkedTokenSource(entry.Stop.Token,duration.Token);
         double durationMilliseconds=plan.Request.DurationSeconds*1000d;
@@ -143,24 +143,40 @@ public sealed class OpcUaRuntimeCaptures(OpcUaRuntimeSessionStore sessions, stri
                 else if(!Expired())
                 {
                     lastReadCycle=cycle;accountedThrough=cycle;
-                    string?[] results=new string?[budget];string? error=null;
-                    try
+                    string?[] results=new string?[budget],errors=new string?[budget];int rows=budget;
+                    async Task<string> ReadSerialized(OpcUaRuntimeNode[] subset,int index)
                     {
-                        var read=await sessions.ReadAcquisition(plan.Request.AttemptId,plan.CaptureId,nodes.Take(budget).ToArray(),deadline.Token);
-                        if(read.Items.Count!=budget)throw new BridgeException("UaResponseInvalid","The batched read did not answer every node.");
-                        for(int i=0;i<budget;i++)results[i]=JsonSerializer.Serialize(read with {Items=[read.Items[i]]},BridgeProtocol.Json);
+                        var read=await sessions.ReadAcquisition(plan.Request.AttemptId,plan.CaptureId,subset,deadline.Token);
+                        if(read.Items.Count!=subset.Length)throw new BridgeException("UaResponseInvalid","The batched read did not answer every node.");
+                        return JsonSerializer.Serialize(read with {Items=[read.Items[index]]},BridgeProtocol.Json);
                     }
-                    catch(OperationCanceledException) { error="UaCancelled"; }
-                    catch(Exception failure) { error=OpcUaCaptureContracts.ReadError(failure); }
-                    // A failed request leaves one failed row (for the first node) and ends the cycle, as a failed read always did.
-                    for(int i=0;i<(error is null?budget:1);i++)
+                    if(!perNode)
+                        try
+                        {
+                            var read=await sessions.ReadAcquisition(plan.Request.AttemptId,plan.CaptureId,nodes.Take(budget).ToArray(),deadline.Token);
+                            if(read.Items.Count!=budget)throw new BridgeException("UaResponseInvalid","The batched read did not answer every node.");
+                            for(int i=0;i<budget;i++)results[i]=JsonSerializer.Serialize(read with {Items=[read.Items[i]]},BridgeProtocol.Json);
+                        }
+                        // The cycle's answers together passed the output limit that each node had to itself: this capture reads node by node from now on.
+                        catch(BridgeException tooLarge) when(tooLarge.Code=="UaResponseLimit" && budget>1) { perNode=true; }
+                        catch(OperationCanceledException) { errors[0]="UaCancelled";rows=1; }
+                        catch(Exception failure) { errors[0]=OpcUaCaptureContracts.ReadError(failure);rows=1; }
+                    if(perNode)
+                        for(int i=0;i<budget;i++)
+                        {
+                            try { results[i]=await ReadSerialized([nodes[i]],0); }
+                            catch(OperationCanceledException) { errors[i]="UaCancelled";rows=i+1;break; }
+                            catch(Exception failure) { errors[i]=OpcUaCaptureContracts.ReadError(failure);rows=i+1;break; }
+                        }
+                    // A failed request leaves one failed row (for the first node it failed on) and ends the cycle, as a failed read always did.
+                    for(int i=0;i<rows;i++)
                     {
                         string selectionId=OpcUaCaptureContracts.SelectionId(nodes[i]);
-                        try { writer.Append(new(writer.Rows,"read",selectionId,cycle,scheduled,Elapsed(),clock.GetUtcNow(),results[i],error,0)); }
+                        try { writer.Append(new(writer.Rows,"read",selectionId,cycle,scheduled,Elapsed(),clock.GetUtcNow(),results[i],errors[i],0)); }
                         catch(BridgeException failure) when(failure.Code is "RuntimeCaptureByteLimit" or "RuntimeCaptureValueLimit") {writer.RecordDroppedResult();throw;}
-                        if(error is not null)
+                        if(errors[i] is not null)
                         {
-                            if(writer.ReadAttempts<plan.Request.MaximumSamples && await Recover(error))break; // Continue at the next scheduled cycle; the failed read is never replaced.
+                            if(writer.ReadAttempts<plan.Request.MaximumSamples && await Recover(errors[i]!))break; // Continue at the next scheduled cycle; the failed read is never replaced.
                             reason=deadline.IsCancellationRequested?"durationLimit":"sessionUnavailable";finish=true;break;
                         }
                         if(writer.ReadAttempts>=plan.Request.MaximumSamples){reason="sampleLimit";finish=true;break;}

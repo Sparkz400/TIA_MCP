@@ -26,8 +26,9 @@ internal static class StoreLifecycleChecks
         {
             string lost = Id(); var connected = await store.Connect(lost, slowTimeout.Selection);
             check(connected.State == "connected" && connected.SessionTimeoutMs == 1000, "A server-revised one-second session timeout is recorded");
+            // Between detaching the session and publishing its outcome the status reads remoteSessionUnknown: wait for the outcome.
             var wait = Stopwatch.StartNew(); string state = "connected";
-            while (state == "connected" && wait.Elapsed < TimeSpan.FromSeconds(30)) { await Task.Delay(250); state = (await store.Status(lost)).State; }
+            while (state != "closed" && wait.Elapsed < TimeSpan.FromSeconds(30)) { await Task.Delay(250); state = (await store.Status(lost)).State; }
             var retired = await store.Status(lost);
             check(retired.State == "closed" && retired.ErrorCode is null or "UaSessionTimedOut" && slowTimeout.SessionCount == 0, "A session unused past its revised timeout is retired as closed (" + retired.ErrorCode + ")");
             string fresh = Id();

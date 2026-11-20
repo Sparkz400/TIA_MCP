@@ -103,10 +103,10 @@ internal static class SubscriptionChecks
             var fitted=await End(subscriptions,fits);
             check(fitted.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="durationLimit" && !Events(subscriptions,fitted).Any(x=>x.Kind=="failure"),
                 "The default keep-alive count survives a server revision to 1000 ms");
-            // One Publish message may carry several notifications (the default allows 32); one row keeps that message's exact envelope.
+            // One Publish message may carry several notifications when asked for (up to 32; the default is one); one row keeps that message's exact envelope.
             server.Mode="normal";string bundled=Id();
             var threeNodes=new[]{FixtureServer.Node("int64"),FixtureServer.Node("bool"),FixtureServer.Node("uncertain")};
-            await subscriptions.Start(bundled,new(attempt,threeNodes,KeepAliveCount:1,DurationSeconds:2,MaximumNotifications:100),default);
+            await subscriptions.Start(bundled,new(attempt,threeNodes,KeepAliveCount:1,DurationSeconds:2,MaximumNotifications:100,MaximumNotificationsPerPublish:32),default);
             var bundledEnd=await End(subscriptions,bundled);
             check(Events(subscriptions,bundledEnd).Any(x=>x.Kind=="publish" && x.Notifications?.Length==3) && bundledEnd.GetProperty("recordedProgress").GetProperty("notifications").GetInt32()==3,
                 "A single Publish carries all three initial notifications in one retained row");
@@ -114,11 +114,13 @@ internal static class SubscriptionChecks
                 Json(await subscriptions.Export(bundledEnd.GetProperty("snapshotRef").GetString()!,"json",default)).ValueKind==JsonValueKind.Object,"A multi-notification message reopens and exports with its counters verified");
             // A message larger than the remaining budget is kept up to the budget and says how many it omitted.
             string cut=Id();
-            await subscriptions.Start(cut,new(attempt,threeNodes,KeepAliveCount:1,DurationSeconds:2,MaximumNotifications:2),default);
+            await subscriptions.Start(cut,new(attempt,threeNodes,KeepAliveCount:1,DurationSeconds:2,MaximumNotifications:2,MaximumNotificationsPerPublish:32),default);
             var cutEnd=await End(subscriptions,cut);
             check(cutEnd.GetProperty("recordedProgress").GetProperty("notifications").GetInt32()==2 && cutEnd.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="notificationLimit" &&
                 Events(subscriptions,cutEnd).Any(x=>x.OmittedNotifications==1 && x.Notifications?.Length==2),"A message past the notification budget keeps the budget and records the omitted count");
             check(Json(await subscriptions.Status(cut,default)).GetProperty("recordedProgress").GetProperty("notifications").GetInt32()==2,"The budget-cut chain reopens with exact counters");
+            var runningWorkers=(System.Collections.IDictionary)typeof(OpcUaRuntimeSubscriptions).GetField("running",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!.GetValue(subscriptions)!;
+            check(runningWorkers.Count==1,"Finished subscription workers leave the worker dictionary when the next one starts ("+runningWorkers.Count+")");
             // A server that sends more than the requested per-message bound is refused, not split.
             server.Mode="subscriptionOversize";string hostile=Id();
             await subscriptions.Start(hostile,new(attempt,threeNodes,KeepAliveCount:1,DurationSeconds:2,MaximumNotifications:10,MaximumNotificationsPerPublish:2),default);

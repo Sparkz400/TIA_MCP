@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Security.Cryptography;
 using System.Text.Json;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
@@ -112,23 +111,8 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
     [Description("Export an immutable verified UA capture snapshotRef as json or csv with companion JSON. Original decoded read payloads, exact UA node/session selections, gaps, terminal state and quality/timing limits remain retained. Download hashed artifacts through artifact_read. No subscription data, synchronized samples, behavioral verdicts or native qualification. Separate 512 MiB retained capture-store limit; no eviction.")]
     public Task<CallToolResult> CaptureExport(string snapshotRef, CancellationToken cancellationToken, string format = "json") =>
         Run(() => sessions.Captures.Export(snapshotRef, format, cancellationToken));
-    /// <summary>At most 128 KiB goes inline (the reply carries it twice); a larger result is written whole as a content-addressed artifact.</summary>
-    private const int InlineLimitBytes = 128 * 1024;
-    private object Bounded<T>(T result, string kind, int count, Func<OpcUaRuntimeSpill, T> spilled) where T : notnull
-    {
-        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json);
-        if (bytes.Length <= InlineLimitBytes) return result;
-        string hash = Convert.ToHexStringLower(SHA256.HashData(bytes)), relative = $"runtime-ua-results/ua-{kind}-{hash[..32]}.json";
-        string full = Path.Combine(options.ArtifactsDirectory, relative);
-        if (!File.Exists(full))
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(full)!);
-            string temp = full + "." + Guid.NewGuid().ToString("N") + ".tmp";
-            try { File.WriteAllBytes(temp, bytes); File.Move(temp, full, true); }
-            finally { File.Delete(temp); }
-        }
-        return spilled(new(relative, hash, bytes.Length, count));
-    }
+    private object Bounded<T>(T result, string kind, int count, Func<OpcUaRuntimeSpill, T> spilled) where T : notnull =>
+        UaResultSpill.Bounded(options.ArtifactsDirectory, result, kind, count, spilled);
     private static async Task<CallToolResult> Run(Func<Task<object>> action)
     {
         try { return Format(await action()); }

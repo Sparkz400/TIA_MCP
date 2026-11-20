@@ -456,7 +456,9 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
                 finally { gate.Release(); }
                 foreach (var (id, entry, expired) in retire)
                 {
+                    // One entry's failed publication (disk) must not strand the rest of the batch outside `live` with their locks held.
                     try { await CloseOutside(id, entry.Status, entry, false, expired); }
+                    catch { idleFailed = true; }
                     finally { entry.Client.Lock.Release(); }
                 }
             }

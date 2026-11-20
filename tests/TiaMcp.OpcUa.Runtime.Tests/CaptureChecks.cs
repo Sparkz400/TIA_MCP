@@ -55,6 +55,21 @@ internal static class CaptureChecks
             check(items[7].GetProperty("sourceTimestamp").ValueKind==JsonValueKind.Null && items[7].GetProperty("serverTimestamp").ValueKind==JsonValueKind.Null,"UA capture missing clocks remain null");
             check(items[0].GetProperty("sourcePicoseconds").GetInt32()==12 && items[0].GetProperty("serverPicoseconds").GetInt32()==34,"UA capture picoseconds preserved");
             check(items[8].GetProperty("encoding").GetString()=="array","UA capture array retained");
+            // Sixteen nodes whose answers together pass the 1 MiB output limit, though each is far below it: the capture reads node by node.
+            string bigCapture=Id();var bigNodes=Enumerable.Range(0,16).Select(i=>FixtureServer.Node("big"+i.ToString("00"))).ToArray();
+            int bigAudit=server.Audit.Count;
+            await captures.Start(bigCapture,new(attempt,bigNodes,100,10,32),default);
+            var bigStatus=await End(captures,bigCapture);
+            var bigRows=Json(captures.Page(bigStatus.GetProperty("snapshotRef").GetString()!,0,200)).GetProperty("rows").EnumerateArray().Where(x=>x.GetProperty("kind").GetString()=="read").ToArray();
+            int bigReads=server.Audit.ToArray().Skip(bigAudit).Select(Json).Count(x=>x.GetProperty("operation").GetString()=="Read");
+            // Rows over the page budget are omitted from pages (and keep no error); the capture itself must end at its sample limit with every attempt answered.
+            var bigProgress=bigStatus.GetProperty("recordedProgress");
+            check(bigProgress.GetProperty("readAttempts").GetInt64()==32 && bigProgress.GetProperty("terminalReason").GetString()=="sampleLimit" &&
+                !bigRows.Any(x=>x.TryGetProperty("errorCode",out var code) && code.ValueKind!=JsonValueKind.Null) && bigReads>=17 && bigReads<=40,
+                "A cycle past the output limit falls back to one Read per node without a failed row ("+bigReads+" reads)");
+            check((await sessions.Status(attempt)).State=="connected","The output limit refusal leaves the session connected");
+            var runningWorkers=(System.Collections.IDictionary)typeof(OpcUaRuntimeCaptures).GetField("running",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!.GetValue(captures)!;
+            check(runningWorkers.Count==1,"Finished capture workers leave the worker dictionary when the next capture starts ("+runningWorkers.Count+")");
             string reference=status.GetProperty("snapshotRef").GetString()!;
             var exported=Json(await captures.Export(reference,"csv",default));
             foreach(var artifact in exported.GetProperty("artifacts").EnumerateArray())

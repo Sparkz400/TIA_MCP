@@ -58,8 +58,9 @@ public sealed record OpcUaSubscriptionProgress(string State, string? TerminalRea
 internal static class OpcUaSubscriptionContracts
 {
     internal static void Require([System.Diagnostics.CodeAnalysis.DoesNotReturnIf(false)] bool condition) { if (!condition) throw OpcUaRuntimeClient.Error("UaSubscriptionInvalid"); }
-    /// <summary>Notifications one Publish message may carry: 0 in a request means this default. One row keeps one message's exact envelope.</summary>
-    internal const int DefaultPerPublish = 32;
+    /// <summary>Notifications one Publish message may carry: 0 in a request means one (the original behaviour, which the offline
+    /// qualification oracles still pin); up to <see cref="MaximumPerPublish"/> can be asked for. One row keeps one message's exact envelope.</summary>
+    internal const int DefaultPerPublish = 1, MaximumPerPublish = 32;
     internal static int PerPublish(OpcUaSubscriptionRequest r) => r.MaximumNotificationsPerPublish == 0 ? DefaultPerPublish : r.MaximumNotificationsPerPublish;
     internal static void Validate(OpcUaSubscriptionRequest r)
     {
@@ -74,7 +75,7 @@ internal static class OpcUaSubscriptionContracts
             r.KeepAliveCount is >= 1 and <= 10 && r.LifetimeCount >= 3*r.KeepAliveCount && r.LifetimeCount <= 1000 &&
             r.DurationSeconds is >= 1 and <= 3600 && r.MaximumNotifications is >= 1 and <= 100000 &&
             r.MaximumBytes is >= (1L<<20) and <= (64L<<20) && r.MaximumRepublish is >= 0 and <= 64 &&
-            r.MaximumNotificationsPerPublish is >= 0 and <= DefaultPerPublish);
+            r.MaximumNotificationsPerPublish is >= 0 and <= MaximumPerPublish);
     }
     // A quiet Publish waits one keep-alive period inside the ten-second session deadline, which also covers the store gate
     // and a shared-vault turn of up to 5 s. Retained plans are not rechecked, so older evidence still reopens.

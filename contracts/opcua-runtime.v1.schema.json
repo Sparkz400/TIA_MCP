@@ -47,7 +47,8 @@
         "physicalQualified": {"const": false},
         "programIdentityVerified": {"const": false},
         "secretsReturned": {"const": false},
-        "operationErrorCode": {"type": ["string", "null"], "maxLength": 128}
+        "operationErrorCode": {"type": ["string", "null"], "maxLength": 128},
+        "sessionTimeoutMs": {"type": "integer", "minimum": 1, "description": "The server's revised session timeout; absent in records written before it was recorded."}
       }
     },
     "value": {
@@ -83,8 +84,16 @@
         "attemptId": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
         "startedAt": {"type": "string", "format": "date-time"},
         "completedAt": {"type": "string", "format": "date-time"},
-        "items": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/value"}}
-      }
+        "items": {"type": "array", "minItems": 0, "maxItems": 64, "items": {"$ref": "#/$defs/value"}},
+        "spill": {
+          "type": "object", "additionalProperties": false, "required": ["artifact", "sha256", "bytes", "count"],
+          "description": "Set only when the complete result is a hashed artifact for artifact_read (a result over 128 KiB); items is then empty.",
+          "properties": {"artifact": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "bytes": {"type": "integer", "minimum": 1}, "count": {"type": "integer", "minimum": 1}}
+        }
+      },
+      "if": {"required": ["spill"]},
+      "then": {"properties": {"items": {"maxItems": 0}}},
+      "else": {"properties": {"items": {"minItems": 1}}}
     }
   }
 }

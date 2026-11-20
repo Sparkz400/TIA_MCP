@@ -109,6 +109,20 @@ internal static class RuntimeWebSessionChecks
                 check(refused.State == "notConnected" && refused.ErrorCode == "RuntimeTlsUnverified" && !refused.PeerVerified,
                     "A pin mismatch reports RuntimeTlsUnverified (" + refused.ErrorCode + ")");
             }
+            // A CPU that drops the connection on a batch: the first cycle falls back to reading symbol by symbol, and a batch is not retried.
+            await using (var sessions = new PhysicalRuntimeSessions(new HostOptions("", Path.Combine(output, "batch-drop"), null, 5, false, "", null)))
+            {
+                string d = Id(); first.DropBatches = true;
+                check((await sessions.Connect(d, Login(first.Endpoint, first.Pin), default)).State == "connected", "A session connects for the dropped-batch check");
+                string sd = JsonSerializer.SerializeToElement(await sessions.Browse(d, "\"DB\".Counter", false, default)).GetProperty("selectionId").GetString()!;
+                int posts = first.BatchPosts;
+                var viaSingles = await sessions.ReadValues(d, [sd], "simple", default);
+                var again = await sessions.ReadValues(d, [sd], "simple", default);
+                first.DropBatches = false;
+                check(viaSingles[0].Result is { Status: "read" } && again[0].Result is { Status: "read" } && first.BatchPosts - posts == 1,
+                    "A batch the CPU drops falls back to single reads and is not asked again (" + (first.BatchPosts - posts) + " batch posts)");
+                check((await sessions.Disconnect(d, default)).State == "closed", "The dropped-batch session logs out");
+            }
             string corrupt = Path.Combine(output, "corrupt");
             await using (var sessions = new PhysicalRuntimeSessions(new HostOptions("", corrupt, null, 5, false, "", null)))
             {
@@ -135,7 +149,7 @@ internal static class RuntimeWebSessionChecks
         internal TaskCompletionSource ReadEntered = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal readonly ConcurrentQueue<string> Calls = new();
         internal int Handshakes, Requests, BatchPosts;
-        internal volatile bool BatchSupported = true, ChangedMetadata;
+        internal volatile bool BatchSupported = true, ChangedMetadata, DropBatches;
 
         internal FakeWebApi()
         {
@@ -187,6 +201,7 @@ internal static class RuntimeWebSessionChecks
                     if (json.RootElement.ValueKind == JsonValueKind.Array)
                     {
                         Interlocked.Increment(ref BatchPosts);
+                        if (DropBatches) return; // a CPU that closes the connection on what it does not understand
                         // A CPU without batch support answers with one error object; otherwise the replies come back in reverse order.
                         if (!BatchSupported) reply = JsonSerializer.SerializeToUtf8Bytes(new { jsonrpc = "2.0", id = (string?)null, error = new { code = -32600, message = "invalid request" } });
                         else
