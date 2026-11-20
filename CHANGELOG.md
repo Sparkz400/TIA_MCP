@@ -202,6 +202,11 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Changed
 
+- **Breaking (tool surface cleanup):** `testsuite_style_plan_prepare`, `testsuite_application_plan_prepare` and `testsuite_system_plan_prepare` no longer return `completePlan`, a second copy of the reviewed plan. Read it with `testsuite_style_plan_review` and the returned `review` reference.
+- `project_model` is the one explorer tool. The eight `project_model_*` tools (`capture`, `children`, `search`, `details`, `relationships`, `verify`, `release`, `export`) and `project_index` stay callable with unchanged requests and results, but are deprecated and described in one line each; they will be removed in a later major release. The per-workflow `*_artifact_read` and `*_list` tools stay: they revalidate the retained input chain of their record, which the generic `artifact_read` does not.
+- Every Host tool result is built by one helper: the same JSON is serialized and parsed once and sent as the text block and as `structuredContent`, as the MCP specification recommends. Results are unchanged on the wire.
+- The longest tool descriptions (`change_prepare` 5.0 KB to 1.8 KB, `hmi_component_review`, `hmi_text_list_author`, `hmi_text_list_generate_set`, `hmi_inspect`, `diagnostic_plan`, `project_snapshot_capture`, `project_open`, `plc_station_upload`, `block_read`, `runtime_capture_start`) keep what a model needs to call the tool; the removed prose is in [tool notes](docs/reference/tool-notes.md). A test keeps every description within 1900 characters.
+- `host_build_identity`, `drive_inventory` and `servo_call_plan` moved out of `CompositeEngineeringTools` into the Host's discovery and drive tool files. Names, groups and results are unchanged.
 - `simulation_download` reports `projectModifiedAfter`, `saveRequiredBeforeProvisioning` and `nextStep`; `UnsavedProject` from provisioning, `SimulationProvisionStorageCollision` and `SimulationRegistrationsPresent` carry remediations; `ResourceBusy` lists `blockingAdmissions` with each operation and its reconciliation tool (`simulation_provision_reconcile` for a failed provisioning).
 - `tia_detach` reports PLCSIM instances that stay registered (`plcsimRegistrations`) when the worker used the PLCSIM API.
 - Change views carry `projectSave` (`isModifiedAtPrepare`, `savedBeforeApply`, `savedAfterApply`), since `preview.isModified` stays the prepare-time state.
@@ -311,6 +316,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- The review tools for connections, multiuser and Teamcenter observations, access, add-in selections, HMI components, DB snapshots, drive profiles, safety evidence, software units, technology profiles, saved project reviews and `project_model`, and `composite_engineering_capture`, no longer return the raw message of a file or permission error, which named absolute paths on the Host machine. They return a fixed message with the same error code.
+- `drive_inventory`, `servo_call_plan`, the Test Suite style job tools and `project_model` answer a file, JSON or XML failure with a coded `error` result instead of the SDK's generic error.
+- `qualification_translation_prepare` can be retried with the same idempotency key after a lost response: an identical selector file is accepted, a different one is refused with `TranslationSelectorConflict` and never overwritten.
 - **Quoted simulator symbols:** `"Db".A` returned `DoesNotExist` when the PLCSIM tag list spells it `Db.A`; symbolic reads and writes now pass the tag list's spelling. Not run natively yet.
 
 - **Clearer dependency refusal on an F-CPU:** when TIA refuses to export a block during the delete dependency scan, `DependencyCoverageIncomplete` now names the block's programming language, know-how protection and consistency. On a PLC with a safety program this is the generated `FOB_RTG1` (a know-how protected SCL OB), whose native cross-references name no references either, so `tag_delete`, `constant_delete`, `type_delete` and `block_delete` stay refused there by decision (`local.safety.drive-tags-bool.20261112`).

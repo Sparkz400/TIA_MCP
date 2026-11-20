@@ -12,16 +12,16 @@ node ui/project-explorer/pack.mjs artifacts/project-explorer-native-live.snapsho
 
 The completed local delivery is `artifacts/project-explorer/native-viewer.html` (real native PLC/hardware details and LAD/FBD previews) and `artifacts/project-explorer/hmi-native-viewer.html` (real Classic Comfort screen details; the provider reports native screen rendering unsupported). These are historical snapshots, with their capture time and freshness shown. The exact final worker HTML is `artifacts/project-explorer-final-native-complete.html`. The frozen runnable MCP package is `artifacts/releases/tia-mcp-v21_20261008_125230_8b2f8ce9` with adjacent `.zip` and `.mcp.json`; its hashes and native checks are recorded in [qualification](../verification/project-explorer-qualification.md).
 
-For live inspection, start the normal MCP host in the authorized engineering user's session, explicitly attach to the intended TIA process, and invoke:
+The eight `project_model_*` tools remain as deprecated aliases of the `project_model` actions. For live inspection, start the normal MCP host in the authorized engineering user's session, explicitly attach to the intended TIA process, and invoke:
 
 ```json
-{"name":"project_model_capture","arguments":{"request":{"projectName":"Exact open project name","maxVisited":50000,"maxDepth":64,"maxBytes":33554432,"lifetimeSeconds":900}}}
+{"name":"project_model","arguments":{"request":{"action":"capture","projectName":"Exact open project name","maxVisited":50000,"maxDepth":64,"maxBytes":33554432,"lifetimeSeconds":900}}}
 ```
 
 The response supplies the project copy, host, session generation, snapshot identity, native capture interval, roots and scoped coverage. Use its `snapshotId` for children/search, and the exact returned reference for details and relationships. Export a portable viewer through the same host:
 
 ```json
-{"name":"project_model_export","arguments":{"request":{"snapshotId":"returned snapshot ID","format":"html"}}}
+{"name":"project_model","arguments":{"request":{"action":"export","snapshotId":"returned snapshot ID","format":"html"}}}
 ```
 
 The artifact manifest contains a host-owned path, byte length and SHA-256. Use `artifact_read` to transfer it from a VM in bounded chunks; client files are not remote project paths. `format: "json"` exports the underlying document. Browser graph exports provide SVG or PNG plus a JSON manifest containing timestamp, filters, coverage and evidence.
@@ -33,9 +33,9 @@ Clients advertising the MCP Apps extension and `text/html;profile=mcp-app` recei
 VS Code 1.144.0 passed the full roundtrip with the production Host and a native capture on 1 November 2026 ([record](../verification/explorer-desktop-20261101.md)); VS Code 1.140.0 had passed [desktop rendering and retained-snapshot interaction checks](../verification/explorer-desktop-20261025.md) on 25 October. To qualify another product, register the engineering Host as a stdio server in it, then record each step with its product name and version:
 
 1. **Negotiated resource loading.** `tools/list` exposes `_meta.ui.resourceUri` only after the product advertises MCP Apps; the product loads `ui://tia-project-explorer/view.html` with no network requests (check the product's developer console).
-2. **Exact selection roundtrip.** After `project_model_capture`, select a block in the embedded tree, send the selection, and confirm the agent's next `project_model_details` call carries all six reference fields unchanged and matches an independent `block_read`.
+2. **Exact selection roundtrip.** After a `project_model` capture, select a block in the embedded tree, send the selection, and confirm the agent's next `project_model` details call carries all six reference fields unchanged and matches an independent `block_read`.
 3. **Stale and disconnected states.** Run `tia_detach`, then reuse the selection: the view shows the stale/disconnected state and the call returns `SessionMismatch`, `StaleSelection`, `SnapshotInvalidated` or `ModelInvalidated`, never another object.
-4. **Artifact fallback.** In the same product with MCP Apps disabled (or in a product without it), the same capture returns structured results and `project_model_export` HTML that opens offline.
+4. **Artifact fallback.** In the same product with MCP Apps disabled (or in a product without it), the same capture returns structured results and `project_model` HTML export that opens offline.
 
 Keep screenshots and the product's MCP log with the record. Browser protocol fixtures (`browser-native.mjs`) do not substitute for this check.
 

@@ -1,5 +1,7 @@
 # Bounded offline metadata index
 
+**Deprecated:** `project_model` (capture, search, verify, release) covers this; `project_index` stays callable and will be removed in a later major release.
+
 `project_index` captures exposed identities once, then serves stable searchable pages without repeatedly traversing Siemens objects. The public tool takes a `request` object. The worker holds plain metadata only, never retained native object proxies.
 
 ```json
