@@ -23,6 +23,7 @@ internal static class Program
             ("Add-In detached selection identity and retention", AddInSelectionTests.Run),
             ("Hierarchy and exact selection", ProjectModelTests.HierarchyAndExactSelection),
             ("Cursor, lifetime and session binding", ProjectModelTests.CursorLifetimeAndSession),
+            ("Oldest snapshot is evicted, not a reused slot", ProjectModelTests.OldestSnapshotIsEvicted),
             ("Invalid ancestry and budgets", ProjectModelTests.InvalidAncestryAndBudgets),
             ("Bounded graph and separate content freshness", ProjectModelTests.GraphsAndSeparateFreshness),
             ("Complete graph serialization remains bounded with unresolved evidence", ProjectModelTests.GraphSerializedByteLimit),

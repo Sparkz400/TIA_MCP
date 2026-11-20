@@ -665,6 +665,7 @@ count += TagBatchChecks.Run();
 count += ChangeBatchChecks.Run();
 count += SafetyTagRenameChecks.Run();
 count += DriveObjectChecks.Run();
+count += SafetyDriveGuardChecks.Run();
 // A project-wide setting compiles every device: one PLC's compile left the other PLC inconsistent and its fingerprint unavailable (sl2).
 foreach (var kind in new[] { "project_simulation_enable", "safety_import_xml", "safety_fparameter_set", "hardware_plug", "connection_create", "certificate_create", "opcua_server_settings_set", "network_mrp_set", "hardware_shared_device_access" })
     if (!CompileOnlyRules.CompilesEveryDevice(kind)) throw new Exception("Device-compiled kind compiles one PLC: " + kind); else count++;

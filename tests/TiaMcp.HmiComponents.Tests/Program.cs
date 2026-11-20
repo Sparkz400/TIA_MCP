@@ -421,7 +421,7 @@ var capacityRequest = Mutate(p => p["reason"] = "Fresh request under exhausted r
 int releasedCount = uploaded.Count;
 foreach (var file in capacityRequest["files"]!.AsArray()) file!["uploadRef"] = Upload(Convert.FromBase64String(fileBytes[(string)file["id"]!]), (string)file["fileName"]!);
 string capacityInput = Input(capacityRequest);
-string incomplete = Path.Combine(root, "hmi-component-reviews", "incomplete.tmp");
+string incomplete = Path.Combine(root, "hmi-component-reviews", "incomplete.partial"); // Not .tmp: a stale .tmp is swept under the writer lock, which the content-store test covers.
 try
 {
     using (var stream = new FileStream(incomplete, FileMode.CreateNew, FileAccess.Write)) stream.SetLength(512L * 1024 * 1024);

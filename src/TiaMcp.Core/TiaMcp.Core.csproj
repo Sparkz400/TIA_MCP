@@ -14,5 +14,6 @@
     <!-- Offline suites shorten the store lock wait and the archive bound for their contention and growth checks. -->
     <InternalsVisibleTo Include="TiaMcp.Engineering.Tests" />
     <InternalsVisibleTo Include="TiaMcp.ComponentWindow.Tests" />
+    <InternalsVisibleTo Include="TiaMcp.Translations" />
   </ItemGroup>
 </Project>

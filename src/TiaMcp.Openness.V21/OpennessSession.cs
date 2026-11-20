@@ -418,7 +418,10 @@ namespace TiaMcp.Openness.V21
             string projectBase = "/projects/" + Segment(project.Name) + "/";
             int omittedHardware = 0;
             // Filtered results take maxItems only for matches; the walk has its own bound so later stations are reached.
-            var walk = filter.Active || !includeHardware || !includeBlocks || compact ? new ScanBudget(MemberWalkLimit) : budget;
+            // blockOffset (internal, used by block_export): skip that many matching blocks in walk order, so a caller can page past maxItems.
+            int blocksToSkip = args.Value<int?>("blockOffset") ?? 0;
+            if (blocksToSkip < 0 || blocksToSkip > MemberWalkLimit) throw new BridgeException("InvalidRequest", "blockOffset must be between 0 and " + MemberWalkLimit + ".");
+            var walk = filter.Active || !includeHardware || !includeBlocks || compact || blocksToSkip > 0 ? new ScanBudget(MemberWalkLimit) : budget;
             foreach (var entry in DeviceItems(project, walk))
             {
                 var item = entry.Item;
@@ -457,8 +460,9 @@ namespace TiaMcp.Openness.V21
                 foreach (var block in AllBlocks(new PlcSelection { Project = project, Software = software, Path = plcPath }, walk))
                 {
                     if (!filter.Matches(block.Path, block.Item.Name)) continue;
+                    if (blocksToSkip > 0) { blocksToSkip--; continue; }
                     if (walk != budget && !budget.Take()) break;
-                    var row = BlockInfo(block, plcPath);
+                    var row = BlockInfo(block, plcPath, BatchedAttributeReads.Block(block.Item));
                     if (compact)
                     {
                         // Relative to plcPath + "/blocks/"; the usual flag values are left out.
@@ -497,10 +501,15 @@ namespace TiaMcp.Openness.V21
             string render = args.Value<string>("render");
             if (render != null && render != "text") throw new BridgeException("InvalidRequest", "render accepts only text.");
             if (render != null && args.Value<string>("format") != null) throw new BridgeException("InvalidRequest", "render=text reads the native XML export; it cannot be combined with format.");
+            if (args["blockPaths"] != null) return BlockReadBatch(args, render);
             if (args.Value<string>("format") != null) return FormatRead(args, "block", "blockPath", "blockName");
-            var selected = SelectBlock(args);
+            // includeXml=false: the caller reads the artifact itself, so the export is not sent over the pipe a second time.
+            return ExportBlock(SelectBlock(args), render, args.Value<string>("culture"), args.Value<bool?>("includeXml") ?? true, ArtifactDirectory(args));
+        }
+
+        private JObject ExportBlock(BlockSelection selected, string render, string culture, bool includeXml, string directory)
+        {
             if (selected.Block.Item.IsKnowHowProtected) throw new BridgeException("ProtectedObject", "The selected block is know-how protected.");
-            string directory = ArtifactDirectory(args);
             string destination = Path.Combine(directory, "block-" + Guid.NewGuid().ToString("N") + ".xml");
             if (File.Exists(destination)) throw new BridgeException("ArtifactExists", "Refusing to overwrite an existing export.");
             try { selected.Block.Item.Export(new FileInfo(destination), ExportOptions.WithDefaults); }
@@ -520,16 +529,17 @@ namespace TiaMcp.Openness.V21
             var file = new FileInfo(destination);
             var result = Envelope();
             result["project"] = ProjectInfo(selected.Project);
-            result["block"] = BlockInfo(selected.Block, selected.PlcPath);
+            result["block"] = BlockInfo(selected.Block, selected.PlcPath, BatchedAttributeReads.Block(selected.Block.Item));
             result["artifact"] = FileArtifact(file);
             // Large XML stays on disk, and can be read independently of MCP response limits.
-            if (file.Length <= 512 * 1024) result["xml"] = File.ReadAllText(destination);
-            result["completeness"] = new JObject { ["complete"] = true, ["scope"] = "Native block XML export", ["xmlIncluded"] = file.Length <= 512 * 1024,
+            bool inlineXml = includeXml && file.Length <= 512 * 1024;
+            if (inlineXml) result["xml"] = File.ReadAllText(destination);
+            result["completeness"] = new JObject { ["complete"] = true, ["scope"] = "Native block XML export", ["xmlIncluded"] = inlineXml,
                 ["note"] = "Native XML is retained unchanged. No normalized semantic model or revision guarantee is implied." };
             if (render == "text")
             {
                 // The export is the result; a text rendering that fails must not lose it.
-                try { AddNetworkText(result, ReadExportedXml(destination), args.Value<string>("culture"), Path.ChangeExtension(destination, ".txt")); }
+                try { AddNetworkText(result, ReadExportedXml(destination), culture, Path.ChangeExtension(destination, ".txt")); }
                 catch (Exception ex) when (ex is System.Xml.XmlException || ex is InvalidOperationException || ex is IOException)
                 { result["textUnavailable"] = new JObject { ["reason"] = ex.Message, ["read"] = "artifact.path holds the complete native XML" }; }
             }

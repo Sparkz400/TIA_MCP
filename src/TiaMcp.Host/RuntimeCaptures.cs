@@ -17,7 +17,11 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
         internal string Reason = "stopped";
         internal string? Failure;
         internal Task Work = Task.CompletedTask;
+        internal int? InstanceId;
     }
+    /// <summary>Pause between attempts to end a cycle-synchronous capture while the simulator bridge is still busy.</summary>
+    public TimeSpan EndRetryDelay { get; set; } = TimeSpan.FromSeconds(2);
+    private const int EndAttempts = 4;
     private readonly TimeProvider clock=timeProvider??TimeProvider.System;
     private readonly RuntimeCaptureStore store = new(options.ArtifactsDirectory,timeProvider);
     private readonly Dictionary<string,Running> running = new(StringComparer.Ordinal);
@@ -39,6 +43,7 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
                     throw Error("RuntimeCaptureRequestChanged");
                 return Observe(captureId);
             }
+            Prune();
             if (running.Values.Count(x=>!x.Work.IsCompleted)>=4 || running.Values.Any(x=>!x.Work.IsCompleted && x.AttemptId==request.AttemptId))
                 throw Error("RuntimeCaptureSessionBusy");
             bool plcsim = request.Simulator is not null;
@@ -53,11 +58,44 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
             if (plcsim) await simulator!.CallAsync("sim_capture_begin",SimulatorCaptureContracts.Arguments(request),CancellationToken.None);
             RuntimeCaptureStore.Writer writer;
             try { writer = store.Create(plan); } catch { await EndSimulator(request); throw; }
-            var entry = new Running(request.AttemptId); running.Add(captureId,entry);
+            var entry = new Running(request.AttemptId){InstanceId=request.Simulator?.InstanceId}; running.Add(captureId,entry);
             entry.Work = Task.Run(()=>Poll(plan,writer,entry));
             return Observe(captureId);
         }
         finally { gate.Release(); }
+    }
+    // Finished captures without a local failure are only evidence on disk; their status needs nothing from memory. A failed one keeps its entry for the failure text.
+    private void Prune()
+    {
+        foreach(var id in running.Where(x=>x.Value.Work.IsCompleted && x.Value.Failure is null).Select(x=>x.Key).ToArray())
+        { running[id].Stop.Dispose(); running.Remove(id); }
+    }
+    /// <summary>sim_release through the Host: refused while a live capture holds the instance; otherwise the worker may also end a capture hold
+    /// that a failed end left behind (the Host has no live capture to protect). Not natively verified.</summary>
+    public async Task<object> ReleaseSimulator(int instanceId,bool deleteOwned,CancellationToken cancellationToken)
+    {
+        if(simulator is null)throw Error("RuntimeCaptureSourceUnavailable");
+        await gate.WaitAsync(cancellationToken);
+        try
+        {
+            if(running.Values.Any(x=>!x.Work.IsCompleted && x.InstanceId==instanceId))
+                throw new BridgeException("SimulationCaptureModeActive","A Host capture is still running on this instance. Stop it with runtime_capture_stop first; nothing was sent.");
+            return await simulator.CallAsync("sim_release",new{instanceId,deleteOwned,restoreHeldCapture=true},CancellationToken.None);
+        }
+        finally{gate.Release();}
+    }
+    /// <summary>Deletes a finished capture's retained evidence; a running capture is refused.</summary>
+    public async Task<object> Delete(string captureId,CancellationToken cancellationToken)
+    {
+        await gate.WaitAsync(cancellationToken);
+        try
+        {
+            if(running.TryGetValue(captureId,out var entry) && !entry.Work.IsCompleted)throw Error("RuntimeCaptureSessionBusy");
+            store.Delete(captureId);
+            if(running.Remove(captureId,out var gone))gone.Stop.Dispose();
+            return new{captureId,deleted=true,note="Local capture evidence was removed. Exports and diagnostic acquisitions that cite its snapshotRef no longer resolve."};
+        }
+        finally{gate.Release();}
     }
     public async Task<object> Status(string captureId,CancellationToken cancellationToken)
     { await gate.WaitAsync(cancellationToken); try { return Observe(captureId); } finally { gate.Release(); } }
@@ -88,7 +126,7 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
         {
             if(disposed)throw Error("RuntimeCaptureHostStopping");
             if(running.Values.Any(x=>!x.Work.IsCompleted && x.AttemptId==creationId))throw Error("RuntimeCaptureSessionBusy");
-            // Native calls are never cancelled: a cancelled bridge call faults the simulator worker for every later tool.
+            // Native calls are never cancelled: a cancelled bridge call is parked and every later call is refused with PreviousOperationRunning until it finishes.
             return DiagnosticPlcsimWrites.Receipt(arguments,association,await simulator.CallAsync("sim_write_owned",arguments,CancellationToken.None));
         }
         finally{gate.Release();}
@@ -154,7 +192,7 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
                     try { writer.Append(new(writer.Rows,"read",signal.SelectionId,cycle,scheduled,Elapsed(),clock.GetUtcNow(),result,error,0)); }
                     catch(BridgeException failure) when(failure.Code is "RuntimeCaptureByteLimit" or "RuntimeCaptureValueLimit") {writer.RecordDroppedResult();throw;}
                     if(writer.ReadAttempts>=plan.Request.MaximumSamples){reason="sampleLimit";finish=true;break;}
-                    if(error is not (null or "RuntimeTimeout" or "RuntimeTransportFailure" or "RuntimeCancelled")) {reason="sessionUnavailable";finish=true;break;}
+                    if(error is not (null or "RuntimeTimeout" or "RuntimeTransportFailure" or "RuntimeCancelled" or "QueueTimeout" or "PreviousOperationRunning")) {reason="sessionUnavailable";finish=true;break;}
                 }
                 RecordElapsedGaps();
                 cycle=Math.Max(cycle+1,accountedThrough+1);
@@ -179,7 +217,7 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
             if(!await EndSimulator(plan.Request))entry.Failure??="PlcsimOperatingModeRestoreFailed";
         }
     }
-    // Native calls are never cancelled: a cancelled bridge call faults the simulator worker for every later tool.
+    // Native calls are never cancelled: a cancelled bridge call is parked and every later call is refused with PreviousOperationRunning until it finishes.
     private async Task<(string? Result,string? Error)[]> SimulatorSample(RuntimeCapturePlan plan)
     {
         try { return SimulatorCaptureContracts.Reads(plan.Request,await simulator!.CallAsync("sim_capture_sample",SimulatorCaptureContracts.Arguments(plan.Request),CancellationToken.None)); }
@@ -201,8 +239,14 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
     private async Task<bool> EndSimulator(RuntimeCaptureRequest request)
     {
         if(request.Simulator is not { CycleSynchronous: true })return true;
-        try { await simulator!.CallAsync("sim_capture_end",SimulatorCaptureContracts.Arguments(request),CancellationToken.None);return true; }
-        catch { return false; }
+        for(int attempt=1;;attempt++)
+        {
+            try { await simulator!.CallAsync("sim_capture_end",SimulatorCaptureContracts.Arguments(request),CancellationToken.None);return true; }
+            // The shared bridge may still be busy (a long sim_test or observe): the end was not sent, so try again once it settles.
+            catch(BridgeException error) when(attempt<EndAttempts && !disposed && error.Code is "QueueTimeout" or "PreviousOperationRunning" or "SimulationOperatingModeNotRestored")
+            { try { await Task.Delay(EndRetryDelay,clock); } catch(OperationCanceledException){return false;} }
+            catch { return false; }
+        }
     }
     private static string ReadFailure(Exception failure) => failure is BridgeException error && error.Code is
         "RuntimeTimeout" or "RuntimeTransportFailure" or "RuntimeCancelled" or "RuntimePermissionDenied" or "RuntimeSessionUnavailable" or

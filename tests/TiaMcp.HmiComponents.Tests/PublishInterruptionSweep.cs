@@ -48,7 +48,8 @@ internal static class PublishInterruptionSweep
                 if (partialWrite) { string stale = order[boundary].Hash + ".00000000000000000000000000000000.tmp"; File.WriteAllBytes(Path.Combine(trialStore, stale), new byte[] { 1, 2, 3 }); temporaries.Add(stale); }
                 var restarted = call(new HmiComponentWorkflowStore(trial));
                 check(JsonNode.DeepEquals(restarted, expected), label + ": restart returns the uninterrupted result after boundary " + (boundary + 1) + (partialWrite ? " with a stale temporary file" : ""));
-                check(Temporaries(trialStore).SetEquals(temporaries), label + ": restart after boundary " + (boundary + 1) + " leaves no temporary file of its own");
+                // The restart publishes under the writer lock, which sweeps the residue of the killed write; the baseline is empty, so nothing remains.
+                check(Temporaries(trialStore).SetEquals(baselineTemporaries), label + ": restart after boundary " + (boundary + 1) + " sweeps the stale temporary file and leaves none of its own");
                 var after = Hashes(trialStore);
                 check(after.Count == expectedFiles.Count && after.All(p => expectedFiles.TryGetValue(p.Key, out string? h) && h == p.Value),
                     label + ": reconciled store equals the uninterrupted store, nothing duplicated or replayed (boundary " + (boundary + 1) + ", extra: " +
