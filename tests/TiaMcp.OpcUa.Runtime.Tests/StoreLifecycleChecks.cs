@@ -36,6 +36,20 @@ internal static class StoreLifecycleChecks
             await store.Disconnect(fresh);
         }
         slowTimeout.SessionTimeoutOverrideMs = null;
+        // The parsed record is cached by file size and write time: requests keep working from it, and an outside edit is still refused.
+        await using (var store = new OpcUaRuntimeSessionStore(Path.Combine(output, "lifecycle-cache")))
+        {
+            string id = Id(); await store.Connect(id, server.Selection);
+            check((await store.Read(id, [FixtureServer.Node("bool")])).Items.Count == 1 && (await store.Read(id, [FixtureServer.Node("bool")])).Items.Count == 1, "Repeated requests work from the cached record");
+            string path = Path.Combine(output, "lifecycle-cache", id + ".json");
+            File.WriteAllText(path, File.ReadAllText(path).Replace("\"errorCode\":null", "\"errorCode\":\"UaTamper\""));
+            await Task.Delay(50);
+            string? code = null;
+            try { await store.Read(id, [FixtureServer.Node("bool")]); } catch (BridgeException e) { code = e.Code; }
+            check(code == "UaSessionRecordChanged", "A record edited outside the store is refused despite the cache (" + code + ")");
+            File.WriteAllText(path, File.ReadAllText(path).Replace("\"errorCode\":\"UaTamper\"", "\"errorCode\":null"));
+            await store.Disconnect(id);
+        }
         // A slow remote close of one session does not hold the store gate for the others.
         slowClose.CloseDelayMs = 3000;
         await using (var store = new OpcUaRuntimeSessionStore(Path.Combine(output, "lifecycle-close")))

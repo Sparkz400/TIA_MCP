@@ -78,11 +78,11 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
     [McpServerTool(Name = "runtime_ua_browse", ReadOnly = true, Destructive = false, OpenWorld = true, UseStructuredContent = true, OutputSchemaType = typeof(OpcUaRuntimeBrowseResult))]
     [Description("Browse bounded immediate hierarchical references in this Host's owned UA session, using exact namespace URI and canonical numeric/string/guid/opaque identifier. At most 256 references and 16 pages; truncation and continuation cleanup are explicit. A result over 128 KiB is not returned inline: references is empty and spill names the complete result as a hashed artifact for artifact_read. External server references are unsupported, not followed.")]
     public Task<CallToolResult> Browse(string attemptId, OpcUaRuntimeNode node, CancellationToken cancellationToken, int maximum = 256) =>
-        Run(async () => { var r = await sessions.Store.Browse(attemptId, node, maximum, cancellationToken); return Bounded(r, "browse", r.References.Count, x => r with { References = [], Spill = x }); });
+        Run(async () => { var r = await sessions.Store.Browse(attemptId, node, maximum, cancellationToken); return await Bounded(r, "browse", r.References.Count, x => r with { References = [], Spill = x }); });
     [McpServerTool(Name = "runtime_ua_read", ReadOnly = true, Destructive = false, OpenWorld = true, UseStructuredContent = true, OutputSchemaType = typeof(OpcUaRuntimeReadResult))]
     [Description("Read 1..64 explicit UA node identities after rechecking namespace/server/start identity (in the same request). A result over 128 KiB is not returned inline: items is empty and spill names the complete result as a hashed artifact for artifact_read. Returns exact scalar or bounded array/matrix type/value encoding, raw status and Good/Uncertain/Bad quality, nullable original source/server timestamps and per-item errors. Int64/UInt64 use exact decimal strings. Arrays retain observed row-major dimensions and up to 4096 exact elements; structures remain unsupported. No fabricated quality/timestamps, device/program identity guarantee or writes.")]
     public Task<CallToolResult> Read(string attemptId, OpcUaRuntimeNode[] nodes, CancellationToken cancellationToken) =>
-        Run(async () => { var r = await sessions.Store.Read(attemptId, nodes, cancellationToken); return Bounded(r, "read", r.Items.Count, x => r with { Items = [], Spill = x }); });
+        Run(async () => { var r = await sessions.Store.Read(attemptId, nodes, cancellationToken); return await Bounded(r, "read", r.Items.Count, x => r with { Items = [], Spill = x }); });
     [McpServerTool(Name = "runtime_ua_status", ReadOnly = true, Destructive = false, OpenWorld = false, UseStructuredContent = true, OutputSchemaType = typeof(OpcUaRuntimeStatus))]
     [Description("Read retained UA attempt state without network traffic. Host restart preserves hostEndedRemoteUnknown; session tokens are not persisted or adopted. A separately protected client certificate does not resume sessions or acquisition.")]
     public Task<CallToolResult> Status(string attemptId, CancellationToken cancellationToken) =>
@@ -111,8 +111,8 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
     [Description("Export an immutable verified UA capture snapshotRef as json or csv with companion JSON. Original decoded read payloads, exact UA node/session selections, gaps, terminal state and quality/timing limits remain retained. Download hashed artifacts through artifact_read. No subscription data, synchronized samples, behavioral verdicts or native qualification. Separate 512 MiB retained capture-store limit; no eviction.")]
     public Task<CallToolResult> CaptureExport(string snapshotRef, CancellationToken cancellationToken, string format = "json") =>
         Run(() => sessions.Captures.Export(snapshotRef, format, cancellationToken));
-    private object Bounded<T>(T result, string kind, int count, Func<OpcUaRuntimeSpill, T> spilled) where T : notnull =>
-        UaResultSpill.Bounded(options.ArtifactsDirectory, result, kind, count, spilled);
+    private async Task<object> Bounded<T>(T result, string kind, int count, Func<OpcUaRuntimeSpill, T> spilled) where T : notnull =>
+        UaResultSpill.Bounded(options.ArtifactsDirectory, result, kind, count, spilled, await sessions.Store.OldestLiveSession());
     private static async Task<CallToolResult> Run(Func<Task<object>> action)
     {
         try { return Format(await action()); }

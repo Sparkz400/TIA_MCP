@@ -2067,8 +2067,8 @@
     },
     {
       "path": "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
-      "sha256": "cc28e4febd051be02da80eb9a3d463c880f329818b7a86e9cf60d0f8b4fc3026",
-      "bytes": 22493
+      "sha256": "9582dccde1bb6c334db31c8ada99b1c31cf5f016ef2e3fa2c5b8dda2920a9c19",
+      "bytes": 22559
     },
     {
       "path": "src/TiaMcp.Host/OpcUaSubscriptionTools.cs",
@@ -2187,8 +2187,8 @@
     },
     {
       "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
-      "sha256": "46f6b43075ade28eb34dbcb53a5b87141b24865c333f31b4956892d29b36eda8",
-      "bytes": 19409
+      "sha256": "d38a0c37392394db6308bd681dc941ba8bf9989f9ffa884e881c5e3e09b96f76",
+      "bytes": 19793
     },
     {
       "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
@@ -2312,8 +2312,8 @@
     },
     {
       "path": "src/TiaMcp.Host/UaResultSpill.cs",
-      "sha256": "b6f9bc0aa2c3ca91223dfc0c6f2bc1785f6891cb9b43e15b297fe8402fe563eb",
-      "bytes": 1414
+      "sha256": "6c856dfdc2b15de7cc0fd1ce8788df92b248178e95a7136577c81f122e3cebc1",
+      "bytes": 2789
     },
     {
       "path": "src/TiaMcp.Host/UnifiedRuntimeSessions.cs",
@@ -2402,13 +2402,13 @@
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs",
-      "sha256": "b5d0e45a2689090c2f69e2f490be283f1827fee7e514dbe3d0bcd69281e6ac13",
-      "bytes": 26981
+      "sha256": "404d3c9c089e49a297db780a6cad753891e7cb2530465a50afa289a1b9fb6536",
+      "bytes": 27051
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
-      "sha256": "cf77b7c93013ccbb9087ee6bc888843cdeed36f9b42eff5881074f3a55b88421",
-      "bytes": 35591
+      "sha256": "3b4460957d3f0b661bd4b4cde2ee047addea579763f2ade14ec96eccb7cc5e25",
+      "bytes": 36610
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSubscriptions.cs",
@@ -6276,7 +6276,7 @@
           "name": "Read",
           "line": 84,
           "endLine": 85,
-          "sha256": "917234d6731bab72b2fc1eaa164472eab6346d5269294d30069e730f660884c0"
+          "sha256": "b0aa506ce6dc7818b61cb4efdb0824733614088d7f16078a2491bf210a6ad276"
         },
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
@@ -6302,8 +6302,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 135,
-          "endLine": 143,
+          "line": 139,
+          "endLine": 147,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -9498,8 +9498,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 123,
-          "endLine": 134,
+          "line": 127,
+          "endLine": 138,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {
@@ -11679,7 +11679,7 @@
           "name": "Read",
           "line": 84,
           "endLine": 85,
-          "sha256": "917234d6731bab72b2fc1eaa164472eab6346d5269294d30069e730f660884c0"
+          "sha256": "b0aa506ce6dc7818b61cb4efdb0824733614088d7f16078a2491bf210a6ad276"
         },
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
@@ -11705,8 +11705,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 135,
-          "endLine": 143,
+          "line": 139,
+          "endLine": 147,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -13095,8 +13095,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 123,
-          "endLine": 134,
+          "line": 127,
+          "endLine": 138,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {
@@ -18912,7 +18912,7 @@
           "name": "Read",
           "line": 84,
           "endLine": 85,
-          "sha256": "917234d6731bab72b2fc1eaa164472eab6346d5269294d30069e730f660884c0"
+          "sha256": "b0aa506ce6dc7818b61cb4efdb0824733614088d7f16078a2491bf210a6ad276"
         },
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
@@ -18938,8 +18938,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 135,
-          "endLine": 143,
+          "line": 139,
+          "endLine": 147,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -23660,7 +23660,7 @@
           "name": "Read",
           "line": 84,
           "endLine": 85,
-          "sha256": "917234d6731bab72b2fc1eaa164472eab6346d5269294d30069e730f660884c0"
+          "sha256": "b0aa506ce6dc7818b61cb4efdb0824733614088d7f16078a2491bf210a6ad276"
         },
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
@@ -23686,8 +23686,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 135,
-          "endLine": 143,
+          "line": 139,
+          "endLine": 147,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -27781,8 +27781,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 123,
-          "endLine": 134,
+          "line": 127,
+          "endLine": 138,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {
@@ -37729,8 +37729,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 123,
-          "endLine": 134,
+          "line": 127,
+          "endLine": 138,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {
@@ -48570,7 +48570,7 @@
           "name": "Read",
           "line": 84,
           "endLine": 85,
-          "sha256": "917234d6731bab72b2fc1eaa164472eab6346d5269294d30069e730f660884c0"
+          "sha256": "b0aa506ce6dc7818b61cb4efdb0824733614088d7f16078a2491bf210a6ad276"
         },
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
@@ -48596,8 +48596,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 135,
-          "endLine": 143,
+          "line": 139,
+          "endLine": 147,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -50207,7 +50207,7 @@
           "name": "Read",
           "line": 84,
           "endLine": 85,
-          "sha256": "917234d6731bab72b2fc1eaa164472eab6346d5269294d30069e730f660884c0"
+          "sha256": "b0aa506ce6dc7818b61cb4efdb0824733614088d7f16078a2491bf210a6ad276"
         },
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
@@ -50233,8 +50233,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 135,
-          "endLine": 143,
+          "line": 139,
+          "endLine": 147,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -53148,8 +53148,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 123,
-          "endLine": 134,
+          "line": 127,
+          "endLine": 138,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {
@@ -55272,7 +55272,7 @@
         "name": "Browse",
         "line": 80,
         "endLine": 81,
-        "sha256": "820d1af72b712f27d5998b65f76c42f7dd605409043e242c9ca7efcf6af31f65"
+        "sha256": "5d4e5f135e6efa64314985329ef73901d991dfc9333eeaf7f07f18ad3eff8287"
       },
       "bridgeOperations": [],
       "localCallNames": [
@@ -55287,7 +55287,7 @@
           "name": "Browse",
           "line": 80,
           "endLine": 81,
-          "sha256": "820d1af72b712f27d5998b65f76c42f7dd605409043e242c9ca7efcf6af31f65"
+          "sha256": "5d4e5f135e6efa64314985329ef73901d991dfc9333eeaf7f07f18ad3eff8287"
         },
         {
           "path": "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
@@ -55332,7 +55332,7 @@
           "name": "Browse",
           "line": 80,
           "endLine": 81,
-          "sha256": "820d1af72b712f27d5998b65f76c42f7dd605409043e242c9ca7efcf6af31f65"
+          "sha256": "5d4e5f135e6efa64314985329ef73901d991dfc9333eeaf7f07f18ad3eff8287"
         },
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
@@ -60383,7 +60383,7 @@
         "name": "Read",
         "line": 84,
         "endLine": 85,
-        "sha256": "917234d6731bab72b2fc1eaa164472eab6346d5269294d30069e730f660884c0"
+        "sha256": "b0aa506ce6dc7818b61cb4efdb0824733614088d7f16078a2491bf210a6ad276"
       },
       "bridgeOperations": [],
       "localCallNames": [
@@ -60398,7 +60398,7 @@
           "name": "Read",
           "line": 84,
           "endLine": 85,
-          "sha256": "917234d6731bab72b2fc1eaa164472eab6346d5269294d30069e730f660884c0"
+          "sha256": "b0aa506ce6dc7818b61cb4efdb0824733614088d7f16078a2491bf210a6ad276"
         },
         {
           "path": "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
@@ -60576,7 +60576,7 @@
           "name": "Read",
           "line": 84,
           "endLine": 85,
-          "sha256": "917234d6731bab72b2fc1eaa164472eab6346d5269294d30069e730f660884c0"
+          "sha256": "b0aa506ce6dc7818b61cb4efdb0824733614088d7f16078a2491bf210a6ad276"
         },
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
@@ -60602,8 +60602,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 135,
-          "endLine": 143,
+          "line": 139,
+          "endLine": 147,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -65746,7 +65746,7 @@
           "name": "Browse",
           "line": 80,
           "endLine": 81,
-          "sha256": "820d1af72b712f27d5998b65f76c42f7dd605409043e242c9ca7efcf6af31f65"
+          "sha256": "5d4e5f135e6efa64314985329ef73901d991dfc9333eeaf7f07f18ad3eff8287"
         },
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
@@ -81813,8 +81813,8 @@
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Check",
           "line": 108,
-          "endLine": 114,
-          "sha256": "cd53e5302ec047b6070ac879c4d572190cd271e682636d262bbbd42e941a77dd"
+          "endLine": 118,
+          "sha256": "2adb5383c2ae3658b7b627c551b0765f50419b1753a8b23195263d2efa19385d"
         },
         {
           "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -83956,8 +83956,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 123,
-          "endLine": 134,
+          "line": 127,
+          "endLine": 138,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {
@@ -90560,8 +90560,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 123,
-          "endLine": 134,
+          "line": 127,
+          "endLine": 138,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {

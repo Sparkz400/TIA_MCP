@@ -145,6 +145,15 @@ string copiedRoot = Path.Combine(output, "copied-vault"); var copied = new Crede
 foreach (var path in Directory.EnumerateFiles(root)) { if (Path.GetFileName(path) == ".lock") continue; string target = Path.Combine(copiedRoot, Path.GetFileName(path)); File.Copy(path, target); var acl = new FileSecurity(); acl.SetSecurityDescriptorSddlForm(new FileInfo(path).GetAccessControl().GetSecurityDescriptorSddlForm(AccessControlSections.Access | AccessControlSections.Owner), AccessControlSections.Access | AccessControlSections.Owner); new FileInfo(target).SetAccessControl(acl); }
 Reject(() => copied.Inspect(first.Reference, binding), "CredentialUnavailable", "Copied store cannot silently rebind to a different path");
 vault.Check(first.Reference, binding); Check(true, "A state check passes for an active credential");
+{
+    // A state check needs no vault lock: it completes while a consumer holds the lock, and still refuses a different binding.
+    var entered = new ManualResetEventSlim(); var release = new ManualResetEventSlim();
+    var holder = Task.Run(() => vault.Use(first.Reference, binding, _ => { entered.Set(); release.Wait(10000); }));
+    entered.Wait(10000);
+    var clock = Stopwatch.StartNew(); vault.Check(first.Reference, binding); long took = clock.ElapsedMilliseconds;
+    release.Set(); holder.Wait();
+    Check(took < 2000, "A state check completes while another consumer holds the vault lock (" + took + " ms)");
+}
 Reject(() => vault.Check(first.Reference, binding with { Purpose = "other" }), "CredentialContextMismatch", "A state check refuses a different expected binding");
 var beforeRetire = File.ReadAllBytes(recordPath); var retired = vault.Retire(first.Reference, binding);
 Check(retired.State == "retired" && !retired.DecryptionVerified && !retired.SecretReturned, "Retirement reports only local disabled use");
