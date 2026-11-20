@@ -112,7 +112,7 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
         return inventory;
     }
 
-    // Blocks per worker call: the worker exports them in one pass over their PLC, and one call stays far below the call timeout.
+    // Blocks per worker call: the worker selects the PLC once and finds each block by its path; one call stays far below the call timeout.
     internal const int ExportChunk = 20;
 
     private async Task<List<System.Text.Json.Nodes.JsonObject>> ExportRows(IReadOnlyList<JsonElement> blocks, string? projectName, string? culture, string directory, CancellationToken cancellationToken)

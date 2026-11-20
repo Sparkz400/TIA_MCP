@@ -12,13 +12,21 @@ namespace TiaMcp.Openness.V21
         // One bridge call exports at most this many blocks, so it stays far below the Host's call timeout.
         internal const int BlockExportBatchLimit = 50;
 
+        // What one batch has already read: the scopes of the PLC and, per group, its blocks by path. The paths of a batch mostly share a
+        // group, so each group is listed once instead of once per path.
+        private sealed class BlockLookup
+        {
+            internal List<SoftwareScope> Scopes;
+            internal readonly Dictionary<string, Dictionary<string, BlockEntry>> Groups = new Dictionary<string, Dictionary<string, BlockEntry>>(StringComparer.Ordinal);
+        }
+
         /// <summary>Finds a block by its exact path by descending the group chain of the path, reading only the groups on the way and the
         /// names of the blocks in the last one. null when the path is not a plain block path or names no block there; the caller then
-        /// falls back to the full lookup, which keeps its error behavior.</summary>
-        private static BlockEntry ResolveBlockPath(PlcSelection plc, string path)
+        /// falls back to the full lookup, which keeps its error behavior. Without a lookup the last group is read until the block is found.</summary>
+        private static BlockEntry ResolveBlockPath(PlcSelection plc, string path, BlockLookup lookup = null)
         {
-            var budget = new ScanBudget(50000);
-            foreach (var scope in SoftwareScopes(plc, budget))
+            if (lookup != null && lookup.Scopes == null) lookup.Scopes = SoftwareScopes(plc, new ScanBudget(50000));
+            foreach (var scope in lookup != null ? lookup.Scopes : SoftwareScopes(plc, new ScanBudget(50000)))
             {
                 string root = scope.Path + "/blocks";
                 string[] chain = BlockPathChain.Groups(path, root);
@@ -31,8 +39,25 @@ namespace TiaMcp.Openness.V21
                     root += "/groups/" + segment;
                 }
                 if (group == null) continue;
-                foreach (var block in group.Blocks)
-                    if (ObjectIdentity.ObjectPath(root, block.Name, block.Namespace) == path) return new BlockEntry { Item = block, Path = path };
+                if (lookup == null)
+                {
+                    foreach (var block in group.Blocks)
+                        if (ObjectIdentity.ObjectPath(root, block.Name, block.Namespace) == path) return new BlockEntry { Item = block, Path = path };
+                    continue;
+                }
+                Dictionary<string, BlockEntry> listed;
+                if (!lookup.Groups.TryGetValue(root, out listed))
+                {
+                    listed = new Dictionary<string, BlockEntry>(StringComparer.Ordinal);
+                    foreach (var block in group.Blocks)
+                    {
+                        string blockPath = ObjectIdentity.ObjectPath(root, block.Name, block.Namespace);
+                        listed[blockPath] = new BlockEntry { Item = block, Path = blockPath };
+                    }
+                    lookup.Groups[root] = listed;
+                }
+                BlockEntry found;
+                if (listed.TryGetValue(path, out found)) return found;
             }
             return null;
         }
@@ -54,6 +79,7 @@ namespace TiaMcp.Openness.V21
             var effective = (JObject)args.DeepClone();
             effective["plcPath"] = plcPath;
             var plc = SelectPlc(project, effective);
+            var lookup = new BlockLookup();
             var results = new JArray();
             foreach (string path in paths)
             {
@@ -61,7 +87,7 @@ namespace TiaMcp.Openness.V21
                 results.Add(entry);
                 try
                 {
-                    var found = ResolveBlockPath(plc, path);
+                    var found = ResolveBlockPath(plc, path, lookup);
                     var selected = found != null ? new BlockSelection { Project = project, PlcPath = plc.Path, Block = found }
                         : SelectBlock(new JObject { ["blockPath"] = path, ["plcPath"] = plc.Path, ["projectName"] = args["projectName"] });
                     var exported = ExportBlock(selected, render, args.Value<string>("culture"), false, directory);

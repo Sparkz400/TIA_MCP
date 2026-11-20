@@ -486,8 +486,14 @@ Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties
     File.WriteAllText(modelFile, "{\"project\":{\"projectPath\":\"C:\\\\P\\\\P.ap21\"},\"nodes\":[],\"edges\":[]}");
     var modelBytes = File.ReadAllBytes(modelFile);
     string modelHash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(modelBytes));
+    Directory.CreateDirectory(Path.Combine(ExportRoot(), "exports"));
+    string blockFile = Path.Combine(ExportRoot(), "exports", "block-a.xml");
+    File.WriteAllText(blockFile, "<Document/>");
+    var blockBytes = File.ReadAllBytes(blockFile);
+    string blockHash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(blockBytes));
     Func<bool, Func<string, JsonElement, JsonElement>> capture = matches => (operation, arguments) =>
     {
+        if (operation == "block_read") return JsonDocument.Parse("{\"block\":{\"path\":\"" + plc + "/blocks/A\"},\"artifact\":{\"path\":" + JsonSerializer.Serialize(blockFile) + ",\"bytes\":" + blockBytes.Length + ",\"sha256\":\"" + blockHash + "\"}}").RootElement;
         if (operation != "project_model") throw new InvalidOperationException(operation);
         return JsonDocument.Parse(arguments.GetProperty("action").GetString() switch
         {
@@ -502,10 +508,13 @@ Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties
     };
     calls.Clear();
     bridgeHandler = capture(false);
-    var invalidated = JsonNode.Parse(Text(await blockTools.ProjectSnapshotCapture(JsonDocument.Parse("{\"maxBlocks\":0}").RootElement, default)))!.AsObject();
-    var actions = calls.Select(c => c.Arguments.GetProperty("action").GetString()).ToList();
-    Check(invalidated["error"]!["code"]!.GetValue<string>() == "SnapshotInvalidated" && actions.Count(a => a == "export") == 1 && actions.Last() == "release" && actions.Count(a => a == "release") == 1
-        && actions.IndexOf("export") > actions.IndexOf("blocks"), "A refused capture exports the model once and still releases its snapshot");
+    var invalidated = JsonNode.Parse(Text(await blockTools.ProjectSnapshotCapture(JsonDocument.Parse("{\"maxBlocks\":1}").RootElement, default)))!.AsObject();
+    var actions = calls.Select(c => c.Operation == "block_read" ? "block_read" : c.Arguments.GetProperty("action").GetString()).ToList();
+    Check(invalidated["error"]!["code"]!.GetValue<string>() == "SnapshotInvalidated" && string.Join(",", actions) == "capture,blocks,relationships,export,block_read,verify,release",
+        "A capture lists the blocks, observes relationships, exports the model once, reads the block and verifies; a refused one still releases its snapshot");
+    Check(calls.Single(c => c.Operation == "block_read").Arguments.GetProperty("includeXml").GetBoolean() == false
+        && calls.Single(c => c.Arguments.TryGetProperty("action", out var action) && action.GetString() == "relationships").Arguments.GetProperty("reference").GetProperty("sessionGeneration").GetString() == "g",
+        "The snapshot reads blocks without inline XML and binds relationships to the listed session generation");
     calls.Clear();
     bridgeHandler = (operation, arguments) => arguments.GetProperty("action").GetString() == "export" ? throw new BridgeException("TimeoutOutcomeUnknown", "timed out")
         : arguments.GetProperty("action").GetString() == "release" ? throw new BridgeException("PreviousOperationRunning", "busy") : capture(true)(operation, arguments);
