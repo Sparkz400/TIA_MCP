@@ -572,7 +572,8 @@ Test("CLI Git remote is local by default and needs an explicit option for creden
 });
 Test("CLI toolsets select named groups and refuse unknown, empty or repeated values", work =>
 {
-    Equal(null, HostOptions.Parse([]).Toolsets);
+    // Without --toolsets only base and core are advertised; --toolsets all widens to every group.
+    Equal("core", string.Join(",", HostOptions.Parse([]).Toolsets!));
     Equal(null, HostOptions.Parse(["--toolsets", "all"]).Toolsets);
     var selected = HostOptions.Parse(["--toolsets", "core, opcua"]).Toolsets!;
     Equal(2, selected.Count); Equal(true, selected.Contains("core") && selected.Contains("opcua"));
@@ -589,10 +590,37 @@ Test("CLI toolsets select named groups and refuse unknown, empty or repeated val
     Equal("explorer", ToolGroups.Of("project_model_search")); Equal("core", ToolGroups.Of("project_open"));
     Equal("simulation", ToolGroups.Of("plc_station_upload")); Equal("core", ToolGroups.Of("plc_compare"));
     Equal("reviews", ToolGroups.Of("software_unit_review")); Equal("core", ToolGroups.Of("software_inspect"));
+    // Native reads are core, not reviews; style-job tools that always refuse are hidden even from --toolsets all.
+    foreach (var read in new[] { "safety_inspect", "access_inspect", "connection_inspect", "web_inspect", "certificate_inspect", "drive_observe" }) Equal("core", ToolGroups.Of(read));
+    Equal("reviews", ToolGroups.Of("safety_evidence_review")); Equal("reviews", ToolGroups.Of("access_review"));
+    Equal(true, ToolGroups.Advertised("safety_inspect", ToolGroups.Default)); Equal(false, ToolGroups.Advertised("access_review", ToolGroups.Default));
+    foreach (var hidden in new[] { "testsuite_style_job_execute_next", "testsuite_style_job_recover", "testsuite_style_job_reconcile" })
+        Equal(false, ToolGroups.Advertised(hidden, null));
+    Equal(true, ToolGroups.Advertised("testsuite_style_job_results", null));
+    Equal(false, ToolGroups.Selectable.Contains("hidden"));
     Equal(true, ToolGroups.Advertised("artifact_read", selected)); Equal(true, ToolGroups.Advertised("qualification_watch_compete", selected));
     Equal(false, ToolGroups.Advertised("hmi_inspect", selected)); Equal(true, ToolGroups.Advertised("hmi_inspect", null));
     try { ToolGroups.Advertised("unmapped_tool", null); throw new Exception("An unmapped tool was advertised."); }
     catch (InvalidOperationException error) when (error.Message.Contains("belongs to no --toolsets group")) { }
+});
+Test("CLI timeouts: long and queue waits are separate options with the same bounds", work =>
+{
+    var defaults = HostOptions.Parse([]);
+    Equal(120, defaults.TimeoutSeconds); Equal(900, defaults.LongTimeoutSeconds); Equal<int?>(null, defaults.QueueTimeoutSeconds);
+    var given = HostOptions.Parse(["--long-timeout-seconds", "1800", "--queue-timeout-seconds", "30.2"]);
+    Equal(1800, given.LongTimeoutSeconds); Equal<int?>(31, given.QueueTimeoutSeconds);
+    foreach (var option in new[] { "--long-timeout-seconds", "--queue-timeout-seconds" })
+    {
+        try { HostOptions.Parse([option, "4"]); }
+        catch (ArgumentException error) when (error.Message.StartsWith(option + " must be", StringComparison.Ordinal)) { continue; }
+        throw new Exception(option + " accepted 4 seconds.");
+    }
+});
+Test("CLI --enable-safety-changes is off by default and V21-only", work =>
+{
+    Equal(false, HostOptions.Parse([]).EnableSafetyChanges); Equal(true, HostOptions.Parse(["--enable-safety-changes"]).EnableSafetyChanges);
+    try { HostOptions.Parse(["--tia-version", "19", "--enable-safety-changes"]); throw new Exception("V19 accepted --enable-safety-changes."); }
+    catch (ArgumentException error) when (error.Message.Contains("V21-only")) { }
 });
 Test("CLI --tia-version 19 selects the read-only V19 worker and surface and refuses V21-only options", work =>
 {

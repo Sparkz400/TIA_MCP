@@ -55,7 +55,7 @@ public sealed partial class TiaTools
         return new { review, completePlan = jobs.ReadReview(review), qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
     });
 
-    [McpServerTool(Name = "testsuite_application_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "testsuite_application_inventory", ReadOnly = false, Destructive = false, OpenWorld = false)]
     [Description("List the project's Test Suite application group: test cases with their GetScope target, test sets and counts, bounded by maxItems with explicit truncation. export=true also saves each listed case as .tat (TestCase.SaveToFile) under the Host export directory with SHA-256; sets have no Openness export route. No import, SetScope or execution.")]
     public Task<CallToolResult> TestSuiteApplicationInventory(CancellationToken cancellationToken, string? projectName = null, int maxItems = 200, bool export = false)
         => Call("testsuite_application_inventory", new { projectName, maxItems = Limit(maxItems), export, artifactDirectory = ExportDirectory }, cancellationToken);
@@ -72,7 +72,7 @@ public sealed partial class TiaTools
         return new { review, completePlan = jobs.ReadReview(review), qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
     });
 
-    [McpServerTool(Name = "testsuite_system_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "testsuite_system_inventory", ReadOnly = false, Destructive = false, OpenWorld = false)]
     [Description("List the project's Test Suite system group: test cases with their OPC UA server address, interface type and interface folder, and the count, bounded by maxItems with explicit truncation. export=true also saves each listed case as .tst (SystemTestCase.SaveToFile) under the Host export directory with SHA-256. No import, SetScope or execution.")]
     public Task<CallToolResult> TestSuiteSystemInventory(CancellationToken cancellationToken, string? projectName = null, int maxItems = 200, bool export = false)
         => Call("testsuite_system_inventory", new { projectName, maxItems = Limit(maxItems), export, artifactDirectory = ExportDirectory }, cancellationToken);

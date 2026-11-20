@@ -174,13 +174,14 @@ internal sealed class BridgeFixture : IAsyncDisposable
     private readonly string _eventsPath;
     public BridgeClient Client { get; }
 
-    public BridgeFixture(int timeoutSeconds = 10, bool delegateConnection = false)
+    public BridgeFixture(int timeoutSeconds = 10, bool delegateConnection = false, int? queueTimeoutSeconds = null, int longTimeoutSeconds = 900)
     {
         Directory.CreateDirectory(_directory);
         _eventsPath = Path.Combine(_directory, "events.jsonl");
         List<string> arguments = [Assembly.GetExecutingAssembly().Location, "--fake-worker", "--events", _eventsPath];
         if (delegateConnection) arguments.Add("--delegate-connection");
-        Client = new BridgeClient(new BridgeOptions(DotnetPath(), TimeoutSeconds: timeoutSeconds, WorkerPrefixArguments: arguments));
+        Client = new BridgeClient(new BridgeOptions(DotnetPath(), TimeoutSeconds: timeoutSeconds, WorkerPrefixArguments: arguments,
+            QueueTimeoutSeconds: queueTimeoutSeconds, LongTimeoutSeconds: longTimeoutSeconds));
     }
 
     public static string DotnetPath()
@@ -223,15 +224,15 @@ internal sealed class BridgeFixture : IAsyncDisposable
         Check.Equal(0, events.Count(item => item.Operation == "mustNotRun"));
     }
 
-    public async Task AssertTerminalAsync(string operation)
+    /// <summary>A lost connection never replays the request; once the old worker exited, the next call starts a fresh one.</summary>
+    public async Task AssertRecoversAsync(string operation)
     {
-        await Check.BridgeError("BridgeFaulted", () => Client.CallAsync("mustNotRun"));
-        await Check.BridgeError("BridgeFaulted", () => Client.CallAsync(operation));
         await WaitForAsync(() => Events().Any(item => item.Kind == "stopped"), "worker EOF exit");
+        await Client.CallAsync("echo");
         var events = Events();
-        Check.Equal(1, events.Count(item => item.Kind == "started"));
+        Check.Equal(2, events.Count(item => item.Kind == "started"));
         Check.Equal(1, events.Count(item => item.Kind == "request" && item.Operation == operation));
-        Check.Equal(0, events.Count(item => item.Operation == "mustNotRun"));
+        Check.Equal(1, events.Count(item => item.Kind == "request" && item.Operation == "echo"));
     }
 
     public async ValueTask DisposeAsync()

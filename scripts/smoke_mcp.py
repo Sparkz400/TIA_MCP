@@ -14,6 +14,15 @@ class HostExited(RuntimeError):
     """The Host ended or closed its input before answering. The message starts "MCP host exited" and carries its last stderr lines."""
 
 
+def all_toolsets(command):
+    """The Host advertises only base and core by default; harnesses exercise every tool, so they ask for all of them
+    unless the command already names its own toolsets. A launcher script takes -Toolsets, the Host executable --toolsets."""
+    if any(str(part).lower() in ("--toolsets", "-toolsets") for part in command):
+        return list(command)
+    launcher = any(str(part).lower().endswith("start-tiamcp.ps1") for part in command)
+    return [*command, *(("-Toolsets", "all") if launcher else ("--toolsets", "all"))]
+
+
 class Client:
     def __init__(self, executable, timeout, extra_arguments=None, command=None):
         self.timeout = timeout
@@ -24,7 +33,7 @@ class Client:
         self.output_schemas = None  # Advertised outputSchema per tool, loaded before the first tools/call.
         self.exited = False  # Set once the Host is gone, so later requests fail at once instead of waiting out the timeout.
         self.process = subprocess.Popen(
-            command if command is not None else [str(executable), "--timeout-seconds", str(timeout), *(extra_arguments or [])],
+            command if command is not None else all_toolsets([str(executable), "--timeout-seconds", str(timeout), *(extra_arguments or [])]),
             cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, encoding="utf-8", errors="replace", bufsize=1,
         )
