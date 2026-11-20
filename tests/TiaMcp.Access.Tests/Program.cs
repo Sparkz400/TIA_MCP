@@ -123,7 +123,7 @@ foreach(string key in new[]{"input","reportArtifact"})
 var wide=Mutate(p=>{var e=p["before"]!["entities"]!.AsArray();e[0]!["inherits"]=new JsonArray(Enumerable.Range(0,10).Select(i=>(JsonNode?)JsonValue.Create("wide"+i)).ToArray());for(int i=0;i<10;i++)e.Add(Entity("wide"+i,"role",new JsonArray(Enumerable.Range(0,64).Select(j=>(JsonNode?)Right(i+":"+j+new string('x',250))).ToArray())));});
 var wideUpload=Upload(wide);var wideReceipt=store.Review(id,wideUpload.Ref);var widePage=store.Page((string)wideReceipt["recordId"]!,"assessments");
 Check((bool)widePage["rows"]![0]!["omitted"]!&&JsonSerializer.SerializeToUtf8Bytes(widePage,BridgeProtocol.Json).Length<128*1024,"Oversized assessment explicitly omitted from bounded page");
-string filler=Path.Combine(root,"access-reviews","capacity.tmp");using(var f=File.Create(filler))f.SetLength(512L*1024*1024);var fresh=Upload(Mutate(p=>p["afterKind"]="observation"));Reject(()=>store.Review(id,fresh.Ref),"Incomplete files count toward retention limit","ArtifactCapacity");File.Delete(filler);
+string filler=Path.Combine(root,"access-reviews","capacity.partial");using(var f=File.Create(filler))f.SetLength(512L*1024*1024);var fresh=Upload(Mutate(p=>p["afterKind"]="observation"));Reject(()=>store.Review(id,fresh.Ref),"Incomplete files count toward retention limit","ArtifactCapacity");File.Delete(filler);
 File.WriteAllText(Path.Combine(root,"mcp-fixture.json"),JsonSerializer.Serialize(new {artifactRoot=root,reviewId=id,packet},BridgeProtocol.Json));
 RuntimeHandoffChecks.Run(root, id, record, packet, Check);
 RuntimeHandoffWorkflowChecks.Run(root);
