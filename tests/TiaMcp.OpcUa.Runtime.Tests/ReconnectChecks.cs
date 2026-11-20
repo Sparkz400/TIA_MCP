@@ -119,7 +119,7 @@ internal static class ReconnectChecks
             int created=Count("SubscriptionCreated"),activated=Count("FixtureActivateSession");
             try
             {
-                await subscriptions.Start(capture,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool")],DurationSeconds:5,MaximumNotifications:2,MaximumReconnectAttempts:enabled?2:0),default);
+                await subscriptions.Start(capture,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool")],MaximumNotificationsPerPublish:1,DurationSeconds:5,MaximumNotifications:2,MaximumReconnectAttempts:enabled?2:0),default);
                 await Wait(async()=>Json(await subscriptions.Status(capture,default)).GetProperty("state").GetString()!="running");
                 var status=Json(await subscriptions.Status(capture,default));string snapshot=status.GetProperty("snapshotRef").GetString()!;
                 var rows=Json(subscriptions.Page(snapshot,0,200)).GetProperty("rows").EnumerateArray().ToArray();
@@ -175,7 +175,7 @@ internal static class ReconnectChecks
             await using var subscriptions=new OpcUaRuntimeSubscriptions(sessions,root);
             await sessions.Connect(attempt,selected);int activated=server.ActivationRequests;
             busyAt=calls+2; // The second vault use of the capture: a read after the first sample, or the first Publish after creation.
-            if(subscription)await subscriptions.Start(capture,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool")],DurationSeconds:5,MaximumNotifications:2,MaximumReconnectAttempts:1),default);
+            if(subscription)await subscriptions.Start(capture,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool")],MaximumNotificationsPerPublish:1,DurationSeconds:5,MaximumNotifications:2,MaximumReconnectAttempts:1),default);
             else await polling.Start(capture,new(attempt,[FixtureServer.Node("bool")],100,8,4,MaximumReconnectAttempts:1),default);
             Task<object> Status()=>subscription?subscriptions.Status(capture,default):polling.Status(capture,default);
             await Wait(async()=>Json(await Status()).GetProperty("state").GetString()!="running");
@@ -203,7 +203,7 @@ internal static class ReconnectChecks
             await sessions.Connect(attempt,server.Selection);server.DropPublishResponses=1;server.Mode="subscriptionGapAfterRecovery";
             try
             {
-                await subscriptions.Start(capture,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool"),FixtureServer.Node("text")],DurationSeconds:8,MaximumRepublish:2,MaximumReconnectAttempts:2),default);
+                await subscriptions.Start(capture,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool"),FixtureServer.Node("text")],MaximumNotificationsPerPublish:1,DurationSeconds:8,MaximumRepublish:2,MaximumReconnectAttempts:2),default);
                 await Wait(async()=>Json(await subscriptions.Status(capture,default)).GetProperty("state").GetString()!="running");
                 var status=Json(await subscriptions.Status(capture,default));
                 check(status.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="sequenceGapLimit","Unavailable recovery probe consumes budget without inventing lost messages");
@@ -223,7 +223,7 @@ internal static class ReconnectChecks
             if(mode=="transferRefused")server.Mode="transferRefused";
             try
             {
-                await subscriptions.Start(capture,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool")],DurationSeconds:5,MaximumNotifications:2,MaximumReconnectAttempts:2),default);
+                await subscriptions.Start(capture,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool")],MaximumNotificationsPerPublish:1,DurationSeconds:5,MaximumNotifications:2,MaximumReconnectAttempts:2),default);
                 await Wait(async()=>Json(await subscriptions.Status(capture,default)).GetProperty("state").GetString()!="running");
                 var status=Json(await subscriptions.Status(capture,default));string snapshot=status.GetProperty("snapshotRef").GetString()!;
                 var rows=Json(subscriptions.Page(snapshot,0,200)).GetProperty("rows").EnumerateArray().Select(r=>r.GetProperty("event")).ToArray();

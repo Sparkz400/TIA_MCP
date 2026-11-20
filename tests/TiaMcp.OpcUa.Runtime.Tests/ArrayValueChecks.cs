@@ -54,8 +54,8 @@ internal static class ArrayValueChecks
             finally { server.Mode = "normal"; }
             string capture = Id();
             JsonElement poll;
-            // Exercise the gap rows a slower packaged runner can legitimately retain.
-            server.ReadDelayMs = 25;
+            // Exercise the gap rows a slower packaged runner can legitimately retain: the one batched read per cycle outlasts the 100 ms interval.
+            server.ReadDelayMs = 250;
             try
             {
                 await captures.Start(capture, new(attempt, nodes, 100, 10, MaximumSamples: names.Length), default);
@@ -80,7 +80,7 @@ internal static class ArrayValueChecks
                 .First(r => r.SelectionId == OpcUaCaptureContracts.SelectionId(FixtureServer.Node("int64Matrix")));
             RetainedControls(plan, original, check);
             string subscription = Id();
-            await subscriptions.Start(subscription, new(attempt, nodes, DurationSeconds: 10, MaximumNotifications: names.Length), default);
+            await subscriptions.Start(subscription, new(attempt, nodes, MaximumNotificationsPerPublish:1,DurationSeconds: 10, MaximumNotifications: names.Length), default);
             var status = await End(() => subscriptions.Status(subscription, default));
             check(status.GetProperty("recordedProgress").GetProperty("remoteCleanupConfirmed").GetBoolean(), "Array subscription cleanup confirmed");
             subscriptionRef = status.GetProperty("snapshotRef").GetString()!;

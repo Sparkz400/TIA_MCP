@@ -358,6 +358,11 @@
             "null"
           ],
           "maxLength": 128
+        },
+        "sessionTimeoutMs": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The server's revised session timeout; absent in records written before it was recorded."
         }
       }
     },

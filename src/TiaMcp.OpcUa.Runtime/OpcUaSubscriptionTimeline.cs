@@ -106,6 +106,8 @@ internal sealed class OpcUaSubscriptionTimeline(OpcUaSubscriptionPlan plan)
             Require(created is null ? failed : e.SubscriptionId==created.SubscriptionId);
             deleted=true;Cleanup=e.StatusCode=="0x00000000";
         }
+        // A message cut at the notification budget is the last one: it reaches the limit exactly.
+        Require(e.OmittedNotifications==0 || Notifications+OpcUaSubscriptionContracts.Count(e)==plan.Request.MaximumNotifications);
         Rows++;Elapsed=row.ElapsedMilliseconds;Notifications+=OpcUaSubscriptionContracts.Count(e);Duplicates+=e.Duplicate?1:0;Missing+=e.MissingCount;
         Require(Notifications<=plan.Request.MaximumNotifications);
     }

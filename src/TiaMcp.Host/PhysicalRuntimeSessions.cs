@@ -261,12 +261,29 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         string[] permissions = await entry.Client.PermissionsAsync(cancellationToken);
         if (entry.Client.Profile.HasNoPermissions == true || !permissions.Contains(permission, StringComparer.Ordinal)) throw Error("RuntimePermissionDenied");
     }
-    private static async Task<WebRuntimeReadResult> Current(Live entry, WebRuntimeSymbol selection, string representation, CancellationToken cancellationToken)
+    private static Task<WebRuntimeReadResult> Current(Live entry, WebRuntimeSymbol selection, string representation, CancellationToken cancellationToken) =>
+        entry.Client.CurrentAsync(selection with { Representation = representation }, cancellationToken);
+
+    /// <summary>One capture cycle: every selection is read under one session check and one batched request (the CPU's own answer decides
+    /// whether a batch is used at all). A symbol-level failure is that symbol's item; a request-level failure throws for the whole cycle.</summary>
+    public async Task<WebRuntimeBatchItem[]> ReadValues(string attemptId, string[] selectionIds, string representation, CancellationToken cancellationToken, RuntimeCaptureHandoff? handoff = null)
     {
-        var current = await entry.Client.BrowseAsync(selection.Symbol, false, cancellationToken);
-        var refreshed = WebRuntimeProtocol.Symbol(entry.Client.Context, selection.Symbol, representation, current[0]);
-        if (refreshed.MetadataSha256 != selection.MetadataSha256) throw Error("RuntimeSymbolMetadataChanged");
-        return await entry.Client.ReadAsync(refreshed, cancellationToken);
+        foreach (var id in selectionIds) Id(id);
+        if (representation is not ("simple" or "raw")) throw Error("RuntimeRepresentationUnsupported");
+        Live entry = await Enter(attemptId, cancellationToken);
+        try
+        {
+            var selections = selectionIds.Select(id => entry.Selections.TryGetValue(id, out var s) ? s with { Representation = representation } : throw Error("RuntimeSelectionUnavailable")).ToArray();
+            if (handoff is not null) RuntimeCaptureHandoffs.ValidateRead(Path.GetDirectoryName(root)!, handoff, CaptureSession(entry.Status));
+            WebRuntimeBatchItem[]? values = null;
+            await Use(entry, async () =>
+            {
+                if (entry.Client.Profile.HasNoPermissions == true) throw Error("RuntimePermissionDenied");
+                values = await entry.Client.ReadBatchAsync(selections, cancellationToken);
+            }, cancellationToken);
+            return values!;
+        }
+        finally { entry.Lock.Release(); }
     }
 
     public async Task<WebRuntimeDiagnosticResult> Diagnostics(string attemptId, string kind, string? language, int? count, CancellationToken cancellationToken)
@@ -375,7 +392,7 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         {
             // Only the credential's state is checked under the vault lock; the session's requests run after it is released,
             // so a slow PLC cannot hold other vault users (block protection) past their bounded wait.
-            Vault(login).Use(login.Credential, Binding(login.Endpoint, login.PeerCertificateSha256, login.User, login.Mode), _ => { });
+            Vault(login).Check(login.Credential, Binding(login.Endpoint, login.PeerCertificateSha256, login.User, login.Mode));
             if (await FailureAsync(async () =>
             {
                 await entry.Client.VerifySessionAsync(login.User,login.Mode,cancellationToken);
