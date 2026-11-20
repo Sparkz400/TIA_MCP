@@ -7,7 +7,7 @@ import subprocess
 import sys
 import zipfile
 
-from smoke_mcp import Client
+from smoke_mcp import Client, all_toolsets
 from smoke_package import verify_catalog
 
 
@@ -80,7 +80,7 @@ def run(bundle, configuration, archive, output, git_executable):
 
     def exercise(command):
         nonlocal client
-        client = Client(None, 60, command=command)
+        client = Client(None, 60, command=all_toolsets(command))
         initialized = client.request('initialize', dict(protocolVersion='2025-11-25',
             capabilities={'extensions': {'io.modelcontextprotocol/ui': {'mimeTypes': ['text/html;profile=mcp-app']}}},
             clientInfo=dict(name='offline-bundle', version='1')))

@@ -191,6 +191,7 @@ await RuntimeSessionChecks.Run(Path.Combine(output, "runtime-sessions"), Check);
 await RuntimeWebSessionChecks.Run(Path.Combine(output, "runtime-web-sessions"), Check);
 UaResultSpillChecks.Run(output, Check);
 await SimulatorToolChecks.Run(Check);
+await SafetyChangeChecks.Run(Check);
 File.WriteAllText(Path.Combine(output, "verification.json"), JsonSerializer.Serialize(new { completed=true, nativeExecuted=false, currentUserDpapiExecuted=true, crossUserProfileTested=false, count=checks.Count, checks }, CredentialVault.Json));
 Console.WriteLine($"PASS protected credential storage: {checks.Count} checks; actual current-user DPAPI/ACL, no native provider. Receipts retained at {output}");
 
