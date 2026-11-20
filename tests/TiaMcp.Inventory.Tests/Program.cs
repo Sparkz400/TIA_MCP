@@ -666,6 +666,14 @@ Directory.Delete(link);
     Fails(() => TranslationQualificationTools.WriteSelector(selectorFile, [9]), "TranslationSelectorConflict");
     Check(File.ReadAllBytes(selectorFile).SequenceEqual(new byte[] { 1, 2, 3 }), "A different selector never overwrites the first");
 }
+// A description is what a model needs to call the tool; version history and edge cases live in docs/reference/tool-notes.md.
+{
+    var overBudget = typeof(ToolSurface).Assembly.GetTypes().SelectMany(type => type.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
+        .Where(method => System.Reflection.CustomAttributeExtensions.GetCustomAttribute<ModelContextProtocol.Server.McpServerToolAttribute>(method) is not null
+            && System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>(method) is { Description.Length: > 1900 })
+        .Select(method => method.Name + "=" + System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>(method)!.Description.Length).ToArray();
+    Check(overBudget.Length == 0, "Tool descriptions stay within 1900 characters: " + string.Join(", ", overBudget));
+}
 Console.WriteLine("Export artifacts: " + output);
 Console.WriteLine($"PASS Inventory: {checks} checks, 30000 rows / {pages} pages; protocol fixtures, exports and host guards. No physical hardware qualification.");
 
