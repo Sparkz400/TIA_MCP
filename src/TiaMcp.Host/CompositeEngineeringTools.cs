@@ -14,38 +14,8 @@ public sealed class CompositeEngineeringTools(IBridgeClient bridge, HostOptions 
 
     [McpServerTool(Name = "composite_engineering_capture", ReadOnly = false, Destructive = false, OpenWorld = false)]
     [Description("Produce one composite phase (reviewId, automationMlRef, connections, drives, technology) from native read-only captures of the open project bound to an exact saved reviewId: cax_export AML, connection_inspect, drive_observe and technology_read for each saved technology object, each retained through its existing review workflow as a single observed state. Every capture reports native, unavailable (operation or product absent) or failed, with per-record refusals; at most 32 component records, truncation explicit. A response for another project refuses the whole capture. Use the phase as before/after of composite_engineering_review. No mutation; native qualification, freshness and complete coverage remain unverified.")]
-    public async Task<CallToolResult> Capture(string reviewId, CancellationToken cancellationToken)
-    {
-        object result; bool failed = false;
-        try { result = await CompositeEngineeringCapture.Capture(bridge, options.ArtifactsDirectory, reviewId, options.LibraryLimits, cancellationToken); }
-        catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or ArgumentException or JsonException or InvalidOperationException)
-        { failed = true; result = new { error = new { code = e is BridgeException b ? b.Code : "CompositeCaptureFailed", message = e.Message } }; }
-        return Result(result, failed);
-    }
-
-    [McpServerTool(Name = "drive_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("One read-only drive inventory of the open project: every SINAMICS drive object with its telegrams (number, input/output byte ranges), the PLC tags whose addresses overlap each telegram range, and the technology objects whose resolved hardware connections reach the drive. Joins use native paths and addresses, never names. coverage reports drives, tags and technology objects per source; noDrivesConfirmed is true only for a complete Startdrive read with no drive. blockers lists every gap or ambiguity (partial or unavailable coverage, tags in several PLCs on one telegram, a tag spanning telegrams, a technology object resolving to several drives, several technology objects on one drive); dependent writes must not proceed while writeReady is false. Read-only; changes nothing.")]
-    public async Task<CallToolResult> DriveInventoryRead(CancellationToken cancellationToken, string? projectName = null)
-    {
-        object result; bool failed = false;
-        try { result = await DriveInventory.Capture(bridge, projectName, cancellationToken); }
-        catch (BridgeException e) { failed = true; result = new { error = new { code = e.Code, message = e.Message } }; }
-        return Result(result, failed);
-    }
-
-    [McpServerTool(Name = "servo_call_plan", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Plan, never apply, one caller FB that calls an existing servo wrapper FB once per reviewed drive: one multi-instance and one fault Bool output per drive, wired to the drive's own status and control tags from drive_inventory. request: plcPath, callerName, wrapperName, parameters {status, control, reset, ss1, fault} naming the wrapper's own parameters (checked against its native interface; nothing is guessed from names), resetExpression and ss1Expression (one SCL expression each, applied as confirmed design), optional faultNaming containing {instance}, drives [{hardwarePath, instanceName}]. blockers lists every gap: drive_inventory blockers, missing or mistyped wrapper parameters, not exactly one status/control tag per drive, duplicate drives or names, and any other block already writing a selected drive's control tag (symbol_trace). When writeReady, change holds the source_upsert payload to prepare and apply with compile=true.")]
-    public async Task<CallToolResult> ServoCallPlanRead(JsonElement request, CancellationToken cancellationToken)
-    {
-        object result; bool failed = false;
-        try { result = await ServoCallPlan.Plan(bridge, System.Text.Json.Nodes.JsonNode.Parse(request.GetRawText())?.AsObject() ?? throw new BridgeException("InvalidRequest", "request must be an object."), Path.Combine(options.ArtifactsDirectory, "exports"), cancellationToken); }
-        catch (BridgeException e) { failed = true; result = new { error = new { code = e.Code, message = e.Message } }; }
-        return Result(result, failed);
-    }
-
-    [McpServerTool(Name = "host_build_identity", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Report which build this Host is running: its process start time, product version, the SHA-256 of the Host and configured worker executables when the Host started and now, and, when it runs from a package, the bundle manifest hash with the sourceCommit and sourceTreeDirty the bundle was packaged from (null for bundles packaged before this was recorded or without git; a bundle folder name's suffix is random, not a commit). changedOnDisk marks a binary replaced or rebuilt after start; runningMatchesDisk is false then, and a newly built or packaged binary must never be described as loaded until the Host was restarted and reports it. Starts no worker and changes nothing.")]
-    public CallToolResult HostBuildIdentity() => Result(BuildIdentity.Report(options.WorkerPath, options.SimulatorWorkerPath), false);
+    public Task<CallToolResult> Capture(string reviewId, CancellationToken cancellationToken) => ToolResult.GuardAsync(async () =>
+        await CompositeEngineeringCapture.Capture(bridge, options.ArtifactsDirectory, reviewId, options.LibraryLimits, cancellationToken), "CompositeCaptureFailed");
 
     [McpServerTool(Name = "composite_engineering_rebind_plan", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Plan, never apply, technology-object hardware rebinds for a revalidated composite handle: each before-phase declared TO hardware connection that is missing, disconnected, unknown or unresolved after, whose target has one declared replacement (model correspondence, or AML correspondence through declared hardware mappings in both phases), becomes a to_connect change payload (technologyPath, role, sensorIndex, hardwarePath and carried-over channel selector). Payloads appear only when this build's catalog has the to_connect change kind; otherwise entries say changeKindUnavailable. At most 200 entries. Each change still needs change_prepare/apply with its own preview, checkpoint and compile.")]
@@ -71,21 +41,7 @@ public sealed class CompositeEngineeringTools(IBridgeClient bridge, HostOptions 
     [Description("Discover 1..20 composite records, including incomplete or verification-failed publications. Revalidate each completed candidate and its dependencies. Limits: 128 records, 512 MiB, 1024 entries including incomplete files. Sorted record-ID offsets are discovery-only; relist after additions. Never resumes or retries an interrupted publication.")]
     public CallToolResult List(int offset = 0, int count = 20) => Run(s => s.List(offset, count));
 
-    private CallToolResult Run(Func<CompositeEngineeringWorkflowStore, object> action)
-    {
-        object result; bool failed = false;
-        try { result = action(new(options.ArtifactsDirectory, options.LibraryLimits)); }
-        catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or ArgumentException or JsonException or InvalidOperationException)
-        {
-            failed = true; result = new { error = new { code = e is BridgeException b ? b.Code : "CompositeWorkflowFailed",
-                message = e is BridgeException ? e.Message : "Composite input, retained integrity or publication failed. No native action occurred.", nativeAccessAttempted = false } };
-        }
-        return Result(result, failed);
-    }
-
-    private static CallToolResult Result(object result, bool failed)
-    {
-        string json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<CompositeEngineeringWorkflowStore, object> action) =>
+        ToolResult.Guard(() => action(new(options.ArtifactsDirectory, options.LibraryLimits)), "CompositeWorkflowFailed",
+            "Composite input, retained integrity or publication failed. No native action occurred.", false);
 }

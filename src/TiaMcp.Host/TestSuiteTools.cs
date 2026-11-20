@@ -21,16 +21,10 @@ public sealed partial class TiaTools
     private sealed record SystemPlanRequest(NativeTargetObservation Target, string ExecutionProfile, string SimulatorTicket,
         string ServerAddress, bool WholeGroup, StyleDefinitionInput[] Definitions, TestSuiteStyleSelection[] Runs);
     private TestSuiteStyleJobs StyleJobs() => new(options.ArtifactsDirectory);
-    private static CallToolResult StyleResult(Func<object> action)
-    {
-        try { return Result(JsonSerializer.Serialize(action(), BridgeProtocol.Json), false); }
-        catch (BridgeException error) { return Result(JsonSerializer.Serialize(new { error = new { code = error.Code, message = error.Message } }, BridgeProtocol.Json), true); }
-    }
-    private static async Task<CallToolResult> StyleResultAsync(Func<Task<TestSuiteStyleJobStatus>> action)
-    {
-        try { return Result(JsonSerializer.Serialize(await action(), BridgeProtocol.Json), false); }
-        catch (BridgeException error) { return Result(JsonSerializer.Serialize(new { error = new { code = error.Code, message = error.Message } }, BridgeProtocol.Json), true); }
-    }
+    private const string StyleFailure = "Test Suite input or a retained artifact could not be processed. No native action occurred.";
+    private static CallToolResult StyleResult(Func<object> action) => ToolResult.Guard(action, "TestSuiteJobFailed", StyleFailure);
+    private static Task<CallToolResult> StyleResultAsync(Func<Task<TestSuiteStyleJobStatus>> action) =>
+        ToolResult.GuardAsync(async () => await action(), "TestSuiteJobFailed", StyleFailure);
 
     [McpServerTool(Name = "testsuite_style_plan_prepare", Destructive = false, OpenWorld = false)]
     [Description("Retain a complete bounded offline style review. request contains target: exact captured NativeTargetObservation; executionProfile; definitions:[{manifest,originalArtifact:{relativePath,sha256}}]; runs:[{selectedDefinitionIds,excludedDefinitionIds}]. Original files must be under this Host's artifact root. Maximum 32 runs, 1000 definitions, 32 MiB originals. Retains exact requested scope, closure, immutable original bytes, effects, checkpoint and verification obligations. Caller observations do not establish native product/license/scope qualification.")]
@@ -40,7 +34,7 @@ public sealed partial class TiaTools
         var definitions = StyleCaptures(input.Definitions);
         var jobs = StyleJobs();
         var review = jobs.Review(definitions, input.Runs, input.Target, input.ExecutionProfile);
-        return new { review, completePlan = jobs.ReadReview(review), qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
+        return new { review, qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
     });
 
     [McpServerTool(Name = "testsuite_application_plan_prepare", Destructive = false, OpenWorld = false)]
@@ -52,7 +46,7 @@ public sealed partial class TiaTools
         var jobs = StyleJobs();
         var review = jobs.Review(definitions, input.Runs, input.Target, input.ExecutionProfile,
             new TestSuiteApplicationBinding(input.ExecutionMode, input.SimulatorTicket, input.WholeGroup));
-        return new { review, completePlan = jobs.ReadReview(review), qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
+        return new { review, qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
     });
 
     [McpServerTool(Name = "testsuite_application_inventory", ReadOnly = false, Destructive = false, OpenWorld = false)]
@@ -69,7 +63,7 @@ public sealed partial class TiaTools
         var jobs = StyleJobs();
         var review = jobs.Review(definitions, input.Runs, input.Target, input.ExecutionProfile,
             new TestSuiteApplicationBinding("endpoint", input.SimulatorTicket, input.WholeGroup) { ServerAddress = input.ServerAddress });
-        return new { review, completePlan = jobs.ReadReview(review), qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
+        return new { review, qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
     });
 
     [McpServerTool(Name = "testsuite_system_inventory", ReadOnly = false, Destructive = false, OpenWorld = false)]

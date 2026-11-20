@@ -33,16 +33,6 @@ public sealed class RuntimeHandoffTools(HostOptions options)
     [Description("Discover 1..20 retained handoff records, including incomplete or verification-failed publications, plus retained/pending observation-file counts. Completed candidates revalidate original dependencies. Limits: 128 review records, 512 MiB and 2048 entries including incomplete files. Record-ID ordering; relist after additions. Never resumes interrupted work or replays an unknown native mutation.")]
     public CallToolResult List(int offset = 0, int count = 20) => Run(s => s.List(offset, count));
 
-    private CallToolResult Run(Func<RuntimeHandoffWorkflowStore, object> action)
-    {
-        object result; bool failed = false;
-        try { result = action(new(options.ArtifactsDirectory, options.LibraryLimits)); }
-        catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or ArgumentException or JsonException or InvalidOperationException)
-        {
-            failed = true; result = new { error = new { code = e is BridgeException b ? b.Code : "HandoffWorkflowFailed",
-                message = e is BridgeException ? e.Message : "Public handoff input, retained integrity or publication failed. No native action occurred.", nativeAccessAttempted = false } };
-        }
-        string json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<RuntimeHandoffWorkflowStore, object> action) =>
+        ToolResult.Guard(() => action(new(options.ArtifactsDirectory, options.LibraryLimits)), "HandoffWorkflowFailed", "Public handoff input, retained integrity or publication failed. No native action occurred.", false);
 }

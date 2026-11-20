@@ -17,13 +17,6 @@ public sealed class PublicCertificateTools(HostOptions options)
     [McpServerTool(Name = "public_certificate_review_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Reopen a retained public-certificate review and revalidate original public input, exact saved owner and deterministic evaluation time. section: summary/observations; 1..200 rows within 128 KiB. artifact_read downloads complete public originals/reports. Missing certificate bytes, supplied associations and matching expected fingerprints do not establish native identity or endpoint trust.")]
     public CallToolResult Page(string recordId, string section = "summary", int offset = 0, int count = 50) => Run(s => s.Page(recordId, section, offset, count));
-    private CallToolResult Run(Func<PublicCertificateWorkflowStore, JsonObject> action)
-    {
-        object result; bool failed = false;
-        try { result = action(new(options.ArtifactsDirectory)); }
-        catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException)
-        { failed = true; result = new { error = new { code = (e as BridgeException)?.Code ?? "PublicCertificateReviewFailed", message = e is BridgeException ? e.Message : "Public certificate review failed.", nativeAccessAttempted = false } }; }
-        string json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<PublicCertificateWorkflowStore, JsonObject> action) =>
+        ToolResult.Guard(() => action(new(options.ArtifactsDirectory)), "PublicCertificateReviewFailed", "Public certificate review failed.", false);
 }

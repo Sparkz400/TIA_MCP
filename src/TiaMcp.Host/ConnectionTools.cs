@@ -17,13 +17,6 @@ public sealed class ConnectionTools(HostOptions options)
     [McpServerTool(Name = "connection_review_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Reopen an immutable supplied connection review by recordId; revalidate original, saved review and derived report after restart. section: summary/observations/comparisons/consumers/matches; 1..200 rows within 128 KiB. Exact original/report downloads use artifact_read. Coverage is supplied evidence, not completeness or native compatibility certification.")]
     public CallToolResult Page(string recordId, string section = "summary", int offset = 0, int count = 50) => Run(s => s.Page(recordId, section, offset, count));
-    private CallToolResult Run(Func<ConnectionWorkflowStore, JsonObject> action)
-    {
-        object result; bool failed = false;
-        try { result = action(new(options.ArtifactsDirectory)); }
-        catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException)
-        { failed = true; result = new { error = new { code = (e as BridgeException)?.Code ?? "ConnectionReviewFailed", message = e.Message, nativeAccessAttempted = false } }; }
-        string json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<ConnectionWorkflowStore, JsonObject> action) =>
+        ToolResult.Guard(() => action(new(options.ArtifactsDirectory)), "ConnectionReviewFailed", null, false);
 }

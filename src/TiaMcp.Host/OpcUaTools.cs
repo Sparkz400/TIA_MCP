@@ -47,20 +47,7 @@ public sealed class OpcUaTools(HostOptions options)
     public CallToolResult ReadArtifact(string artifactRef, long offset = 0, int count = 65536) =>
         Run(s => s.ReadArtifact(artifactRef, offset, count));
 
-    private CallToolResult Run(Func<OpcUaWorkflowStore, object> action)
-    {
-        try { return Format(action(new OpcUaWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits)), false); }
-        catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException or ArgumentException or JsonException or InvalidOperationException)
-        {
-            return Format(new { error = new { code = (error as BridgeException)?.Code ?? "OpcUaWorkflowFailed",
-                message = error is BridgeException ? error.Message : "Offline OPC UA input, retained integrity or publication failed. No native action occurred.",
-                details = (error as BridgeOperationException)?.Details } }, true);
-        }
-    }
-
-    private static CallToolResult Format(object value, bool error)
-    {
-        string json = JsonSerializer.Serialize(value, BridgeProtocol.Json);
-        return new CallToolResult { IsError = error, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<OpcUaWorkflowStore, object> action) =>
+        ToolResult.Guard(() => action(new OpcUaWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits)), "OpcUaWorkflowFailed",
+            "Offline OPC UA input, retained integrity or publication failed. No native action occurred.");
 }

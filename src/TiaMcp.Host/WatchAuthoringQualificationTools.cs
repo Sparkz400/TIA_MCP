@@ -34,14 +34,7 @@ public sealed class WatchAuthoringQualificationTools(IBridgeClient bridge, HostO
     // Refusals such as ResourceBusy or InvalidOperationState reach the client typed, as from every engineering tool.
     private async Task<CallToolResult> Call(string operation, object arguments, CancellationToken cancellationToken)
     {
-        string json; bool failed = false;
-        try { json = (await bridge.CallAsync(operation, arguments, cancellationToken)).GetRawText(); }
-        catch (BridgeException error)
-        {
-            failed = true;
-            json = JsonSerializer.Serialize(new { error = new { code = error.Code, message = error.Message,
-                details = (error as BridgeOperationException)?.Details } }, BridgeProtocol.Json);
-        }
-        return new CallToolResult { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
+        try { return ToolResult.Of(await bridge.CallAsync(operation, arguments, cancellationToken)); }
+        catch (BridgeException error) { return ToolResult.Failure(error, "BridgeError"); }
     }
 }

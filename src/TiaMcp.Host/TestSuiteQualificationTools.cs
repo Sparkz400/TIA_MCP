@@ -86,10 +86,8 @@ public sealed class TestSuiteQualificationTools(IBridgeClient bridge, HostOption
     // Typed result like TestSuiteScopeProbeTools: a thrown BridgeException (such as QualificationResponseLost) would reach the client as the SDK's generic message without its code.
     private static async Task<CallToolResult> Typed(Func<Task<object>> call)
     {
-        string json; bool failed = false;
-        try { json = JsonSerializer.Serialize(await call(), BridgeProtocol.Json); }
-        catch (BridgeException error) { json = JsonSerializer.Serialize(new { error = new { code = error.Code, message = error.Message } }, BridgeProtocol.Json); failed = true; }
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
+        try { return ToolResult.Of(await call()); }
+        catch (BridgeException error) { return ToolResult.Failure(error, "BridgeError"); }
     }
 }
 #endif

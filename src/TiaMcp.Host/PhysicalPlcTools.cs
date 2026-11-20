@@ -46,17 +46,9 @@ public sealed class PhysicalPlcTools(IBridgeClient bridge, HostOptions options)
 
     private async Task<CallToolResult> Call(string operation, object? arguments, CancellationToken cancellationToken)
     {
-        try { return Result((await bridge.CallAsync(operation, arguments, cancellationToken)).GetRawText(), false); }
-        catch (BridgeException error)
-        {
-            return Result(JsonSerializer.Serialize(new { error = new { code = error.Code, message = error.Message, details = (error as BridgeOperationException)?.Details } }, BridgeProtocol.Json), true);
-        }
+        try { return ToolResult.Of(await bridge.CallAsync(operation, arguments, cancellationToken)); }
+        catch (BridgeException error) { return ToolResult.Failure(error, "BridgeError"); }
     }
-
-    private static CallToolResult Result(string json, bool isError) => new()
-    {
-        IsError = isError, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json)
-    };
 
     private static int Limit(int value) => value is >= 1 and <= 2000 ? value : throw new McpException("maxItems must be between 1 and 2000.");
 }

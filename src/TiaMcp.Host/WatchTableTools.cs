@@ -15,12 +15,9 @@ public sealed class WatchMonitorTools(IBridgeClient bridge, SimulatorClient simu
     public async Task<CallToolResult> Monitor(string tableName, int instanceId, string instanceName, string creationId, CancellationToken cancellationToken,
         string? projectName = null, string? plcPath = null, string group = "root", bool forceTable = false, int offset = 0, int count = 32, int samples = 1, int intervalMs = 500)
     {
-        string json; bool error = false;
-        try { json = (await WatchTableMonitor.Run(bridge, simulator.Bridge, tableName, projectName, plcPath, group, forceTable, instanceId, instanceName, creationId,
-            offset, count, samples, intervalMs, cancellationToken)).ToJsonString(BridgeProtocol.Json); }
-        catch (BridgeException ex)
-        { json = JsonSerializer.Serialize(new { error = new { code = ex.Code, message = ex.Message, details = (ex as BridgeOperationException)?.Details } }, BridgeProtocol.Json); error = true; }
-        return new CallToolResult { IsError = error, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
+        try { return ToolResult.Of(await WatchTableMonitor.Run(bridge, simulator.Bridge, tableName, projectName, plcPath, group, forceTable, instanceId, instanceName, creationId,
+            offset, count, samples, intervalMs, cancellationToken)); }
+        catch (BridgeException ex) { return ToolResult.Failure(ex, "BridgeError"); }
     }
 }
 

@@ -21,13 +21,6 @@ public sealed class SafetyEvidenceTools(HostOptions options)
     [Description("Reopen a retained safety comparison and revalidate originals, saved selection and derived report after restart or upload release. section: summary/observations/signatures/issues/changes; 1..200 rows within 128 KiB. Oversized rows are explicitly omitted; artifact_read retrieves complete originals/report. Equal observations or signatures do not approve a safety program or authorize mutations or test execution.")]
     public CallToolResult Page(string recordId, string section = "summary", int offset = 0, int count = 50) => Run(s => s.Page(recordId, section, offset, count));
 
-    private CallToolResult Run(Func<SafetyEvidenceWorkflowStore, JsonObject> action)
-    {
-        object result; bool failed = false;
-        try { result = action(new(options.ArtifactsDirectory)); }
-        catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException)
-        { failed = true; result = new { error = new { code = (e as BridgeException)?.Code ?? "SafetyEvidenceReviewFailed", message = e.Message, nativeAccessAttempted = false } }; }
-        string json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<SafetyEvidenceWorkflowStore, JsonObject> action) =>
+        ToolResult.Guard(() => action(new(options.ArtifactsDirectory)), "SafetyEvidenceReviewFailed", null, false);
 }

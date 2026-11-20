@@ -14,7 +14,7 @@ namespace TiaMcp.Host;
 public sealed partial class TiaTools
 {
     [McpServerTool(Name = "project_snapshot_capture", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Save a persistent offline review: native hierarchy plus up to maxBlocks (0..200, default 25) exact standard block XML exports. Reports its stage (hierarchy, block n of N, verification) in progress notifications when the client sends a progressToken, and returns remoteAccess with the review's tia:// resource URI. request accepts projectName, plcPath, maxVisited, maxBlocks, blockPaths, maxRelationshipRoots (0..25, default 5), requireAllContent (refuse instead of saving when any block content is missing), hashProjectFolder (also hash every byte of the saved project folder; slower on large projects). capture.projectFolder reports the saved folder's file count, bytes and a path/size/time hash: the .ap21 file alone does not change on save. Check degraded and degradedReasons: they name failed exports, protected or unsupported blocks and blocks omitted by maxBlocks. A capture whose every export is refused for a read-only project is refused (ReadOnlyProject) instead of saved; pass fromTemporaryCopy:true to archive the open project, close it and capture a read-write copy instead (the original stays unchanged and the copy stays open). blockOffset pages through blocks beyond maxBlocks; capture.content.nextBlockOffset gives the next page. Captures bounded direct relationships for the first selected blocks. Native metadata is rechecked after exports; sequential content is not atomic. Protected/safety/unavailable content and omitted blocks stay explicit. Returns a content-hash reviewId usable after host restart. No project changes.")]
+    [Description("Save a persistent offline review: native hierarchy plus up to maxBlocks (0..200, default 25) exact block XML exports. Returns a content-hash reviewId that survives a Host restart and remoteAccess with its tia:// resource URI; progress notifications report the stage when the client sends a progressToken. request: projectName, plcPath, maxVisited, maxBlocks, blockOffset (page beyond maxBlocks with capture.content.nextBlockOffset), blockPaths, maxRelationshipRoots (0..25, default 5), requireAllContent (refuse instead of saving with missing content), hashProjectFolder (hash every byte of the saved folder; slower), fromTemporaryCopy:true (a read-only project whose exports are all refused is otherwise refused with ReadOnlyProject; this archives the open project, closes it and captures a read-write copy, leaving the original unchanged and the copy open). Check degraded and degradedReasons for failed, protected, unsupported or omitted blocks. Metadata is rechecked after the exports; sequential content is not atomic. No project changes.")]
     public async Task<CallToolResult> ProjectSnapshotCapture(JsonElement request, CancellationToken cancellationToken)
     {
         try
@@ -175,13 +175,12 @@ public sealed partial class TiaTools
     { try { return ReviewResult(new ProjectReviewStore(options.ArtifactsDirectory).Health(reviewId, offset, maxItems,
         testSuiteResults is null ? null : TestSuiteStyleJobs.Parse<EngineeringArtifactReference[]>(Encoding.UTF8.GetBytes(testSuiteResults.Value.GetRawText())))); } catch (Exception e) when (ReviewError(e)) { return ReviewFailure(e); } }
 
-    private static bool ReviewError(Exception e) => e is BridgeException or IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or ArgumentException or System.Xml.XmlException;
+    private static bool ReviewError(Exception e) => ToolResult.IsRefusal(e);
     private static CallToolResult ReviewResult(JsonObject result)
     {
         result["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy;
         result["sourceAuthenticityVerified"] = false;
-        return Result(result.ToJsonString(), false);
+        return ToolResult.Of(result);
     }
-    private static CallToolResult ReviewFailure(Exception e) => Result(JsonSerializer.Serialize(new { error = new {
-        code = (e as BridgeException)?.Code ?? "ProjectReviewFailed", message = e.Message } }, BridgeProtocol.Json), true);
+    private static CallToolResult ReviewFailure(Exception e) => ToolResult.Failure(e, "ProjectReviewFailed");
 }

@@ -68,6 +68,7 @@ listed as lost. Prose records per run are under [verification](#verification).
 ## Reference
 
 - [MCP surface](reference/mcp-surface.md): `--toolsets` groups, tool titles, output schemas, prompts, resources, completions, logging and progress
+- [Tool notes](reference/tool-notes.md): version history, bounds and edge cases moved out of the longest tool descriptions
 - [Target capabilities](reference/capabilities.md), [object identities and scopes](reference/object-model.md)
 - [TIA Portal V19 adapter](reference/tia-v19-adapter.md): the read-only V19 worker behind Host `--tia-version 19`
 - [Engineering coverage](reference/engineering-coverage.md), [native explorer extraction](reference/project-explorer-native.md)

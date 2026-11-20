@@ -20,14 +20,8 @@ public sealed class TestSuiteScopeProbeTools(IBridgeClient bridge, HostOptions o
                 throw new BridgeException("InvalidRequest", "An isolated scope-probe Host and prepare/read action are required.");
             var result = await bridge.CallAsync("testsuite_scope_probe", new { action, projectPath,
                 artifactDirectory = Path.Combine(options.ArtifactsDirectory, "scope-probe") }, cancellationToken);
-            return Result(result.GetRawText(), false);
+            return ToolResult.Of(result);
         }
-        catch (BridgeException error)
-        {
-            return Result(JsonSerializer.Serialize(new { error = new { code = error.Code, message = error.Message } }, BridgeProtocol.Json), true);
-        }
+        catch (BridgeException error) { return ToolResult.Failure(error, "BridgeError"); }
     }
-
-    private static CallToolResult Result(string json, bool isError) =>
-        new() { IsError = isError, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
 }

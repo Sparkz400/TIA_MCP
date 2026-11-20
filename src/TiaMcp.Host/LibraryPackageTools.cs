@@ -55,16 +55,8 @@ public sealed class LibraryPackageTools(HostOptions options)
     private PackageStore Packages() => new(options.ArtifactsDirectory, options.LibraryLimits);
     private static CallToolResult Run(Func<object> action)
     {
-        try { return Format(action(), false); }
+        try { return ToolResult.Of(action()); }
         catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException or ArgumentException or OperationCanceledException)
-        {
-            return Format(new { error = new { code = (error as BridgeException)?.Code ?? (error is OperationCanceledException ? "OperationCancelled" : "PackageInvalid"),
-                message = error.Message, details = (error as BridgeOperationException)?.Details } }, true);
-        }
-    }
-    private static CallToolResult Format(object value, bool error)
-    {
-        var json = JsonSerializer.Serialize(value, BridgeProtocol.Json);
-        return new CallToolResult { IsError = error, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
+        { return ToolResult.Failure(error, "PackageInvalid", error.Message); }
     }
 }

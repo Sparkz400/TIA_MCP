@@ -56,14 +56,9 @@ public sealed class GraphTools(IBridgeClient bridge, HostOptions options)
 
     private CallToolResult Run(Func<GraphWorkflowStore, object> action)
     {
-        object result; bool failed = false;
-        try { result = action(new GraphWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits)); }
-        catch (Exception error) when (error is BridgeException or GraphException or IOException or UnauthorizedAccessException or ArgumentException or JsonException or InvalidOperationException)
-        {
-            failed = true; result = new { error = new { code = error is BridgeException bridge ? bridge.Code : error is GraphException graph ? graph.Code : "GraphWorkflowFailed",
-                message = error is BridgeException or GraphException ? error.Message : "GRAPH input, retained integrity or publication failed. No native action occurred." } };
-        }
-        var json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
+        try { return ToolResult.Of(action(new GraphWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits))); }
+        catch (GraphException error) { return ToolResult.Error(error.Code, error.Message); }
+        catch (Exception error) when (ToolResult.IsRefusal(error))
+        { return ToolResult.Failure(error, "GraphWorkflowFailed", "GRAPH input, retained integrity or publication failed. No native action occurred."); }
     }
 }
