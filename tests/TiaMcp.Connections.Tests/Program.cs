@@ -135,7 +135,7 @@ Check((int)maxPage["total"]! == 4096 && maxPage["nextOffset"] is not null && Jso
 var many = Mutate(p => { foreach (string phase in new[] { "before", "after" }) { p[phase]!["connections"] = new JsonArray(Enumerable.Range(0,512).Select(i => (JsonNode?)Connection(i.ToString(),"TCP")).ToArray()); p[phase]!["consumers"] = new JsonArray(); } p["matches"] = new JsonArray(Enumerable.Range(0,512).Select(i => (JsonNode?)new JsonObject { ["beforeId"] = i.ToString(), ["afterId"] = i.ToString() }).ToArray()); });
 var manyUpload=Upload(many);var manyReceipt=store.Review(id,manyUpload.Ref);var manyPage=store.Page((string)manyReceipt["recordId"]!,"observations",0,200);
 Check((int)manyReceipt["summary"]!["matchedCount"]! == 512 && (int)manyPage["total"]! == 1024 && manyPage["nextOffset"] is not null, "Maximum connections and mappings remain navigable");
-string filler=Path.Combine(root,"connection-reviews","capacity.tmp");using(var f=File.Create(filler))f.SetLength(512L*1024*1024);
+string filler=Path.Combine(root,"connection-reviews","capacity.partial");using(var f=File.Create(filler))f.SetLength(512L*1024*1024);
 var different=Upload(Mutate(p=>p["matches"]=new JsonArray()));Reject(()=>store.Review(id,different.Ref),"Incomplete publication counts toward quota","ArtifactCapacity");File.Delete(filler);
 string savedPath=Path.Combine(root,"project-reviews",id+".json");byte[] savedBytes=File.ReadAllBytes(savedPath);File.WriteAllText(savedPath,"tampered");Reject(()=>store.Page(record),"Saved source corruption refuses reopen","ArtifactChanged");File.WriteAllBytes(savedPath,savedBytes);
 File.WriteAllText(Path.Combine(root,"mcp-fixture.json"),JsonSerializer.Serialize(new {artifactRoot=root,reviewId=id,packet},BridgeProtocol.Json));

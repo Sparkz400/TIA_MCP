@@ -42,6 +42,9 @@ public sealed class CompositeEngineeringWorkflowStore
         string id = Guid.NewGuid().ToString("N");
         var receipt = new Receipt(1, id, [new("request.json", request.Length, Hash(request)), new("report.json", report.Length, Hash(report))]);
         byte[] receiptData = JsonSerializer.SerializeToUtf8Bytes(receipt, BridgeProtocol.Json);
+        // At the cap the oldest incomplete record, then the oldest complete one, makes room; nothing else retains a composite handle.
+        RecordRetention.MakeRoom(root, MaxRecords, directory => File.Exists(Path.Combine(directory, "receipt.json")) ? 1 : 0,
+            () => new BridgeException("CompositeCapacity", "Storage exceeds 128 records, including incomplete publications."));
         Inventory(request.LongLength + report.LongLength + 2 * receiptData.Length, 5, 1);
         Directory.CreateDirectory(PathFor(id));
         Write(PathFor(id, "intent.json"), receiptData);
@@ -53,13 +56,14 @@ public sealed class CompositeEngineeringWorkflowStore
             Evaluate(request).AsSpan().SequenceEqual(report), "CompositeIntegrityFailure", "Inputs or retained output changed before publication.");
         Write(PathFor(id, "receipt.json"), receiptData);
         checkpoint?.Invoke("receiptWritten", PathFor(id));
-        return Summary(Load(Reference(id, receiptData)));
+        return Summary(Load(Reference(id, receiptData), reverify: true));
     }
 
-    public object Reopen(string recordRef) => Summary(Load(recordRef));
+    // A reopen, a list, the first page and the first chunk derive the report again; later pages and chunks of a record verified in this process only check its files.
+    public object Reopen(string recordRef) => Summary(Load(recordRef, reverify: true));
 
     public object RebindPlan(string recordRef, bool toConnectAvailable) =>
-        CompositeEngineeringRebind.Plan(artifactsRoot, JsonNode.Parse(Load(recordRef).Report)!.AsObject(), recordRef, toConnectAvailable);
+        CompositeEngineeringRebind.Plan(artifactsRoot, JsonNode.Parse(Load(recordRef, reverify: true).Report)!.AsObject(), recordRef, toConnectAvailable);
 
     public object Page(string recordRef, string section = "mappings", int offset = 0, int count = 50)
     {
@@ -70,7 +74,7 @@ public sealed class CompositeEngineeringWorkflowStore
             "beforeConsumerAssociations" or "afterConsumerAssociations" or "beforeConsumerSavedLinks" or "afterConsumerSavedLinks" or
             "beforeConsumerCandidates" or "afterConsumerCandidates",
             "CompositeInvalidSection", "Select a documented complete report array.");
-        var record = Load(recordRef); var report = JsonNode.Parse(record.Report)!.AsObject();
+        var record = Load(recordRef, reverify: offset == 0); var report = JsonNode.Parse(record.Report)!.AsObject();
         bool consumers = section is "consumerContexts" or "consumerCoverage" || section.Contains("Consumer", StringComparison.Ordinal);
         Require(!consumers || report["consumerContexts"] is JsonArray, "CompositeInvalidSection", "Consumer context sections require a retained v2 or v3 request; v1 records keep their original evaluation.");
         var source = (section switch {
@@ -95,7 +99,7 @@ public sealed class CompositeEngineeringWorkflowStore
     {
         Require(name is "request.json" or "report.json" or "receipt.json", "CompositeArtifactMissing", "Select request.json, report.json or receipt.json.");
         Require(offset >= 0 && count is > 0 and <= 65536, "CompositePageLimit", "Use a nonnegative offset and 1..65536 bytes.");
-        var record = Load(recordRef);
+        var record = Load(recordRef, reverify: offset == 0);
         byte[] bytes = name switch { "request.json" => record.Request, "report.json" => record.Report, _ => record.ReceiptData };
         Require(offset <= bytes.Length, "CompositePageLimit", "Offset exceeds the selected artifact.");
         int length = (int)Math.Min(count, bytes.Length - offset);
@@ -116,7 +120,7 @@ public sealed class CompositeEngineeringWorkflowStore
             {
                 PackageStorage.Id(id); PackageStorage.EnsureNoLinks(directory);
                 if (File.Exists(PathFor(id, "receipt.json")))
-                { reference = Reference(id, Read(PathFor(id, "receipt.json"), ReceiptBytes)); _ = Load(reference); state = "complete"; }
+                { reference = Reference(id, Read(PathFor(id, "receipt.json"), ReceiptBytes)); _ = Load(reference, reverify: true); state = "complete"; }
             }
             catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException)
             { state = "verificationFailed"; errorCode = e is BridgeException b ? b.Code : "CompositeVerificationFailed"; }
@@ -126,7 +130,8 @@ public sealed class CompositeEngineeringWorkflowStore
             ordering = "record-id; relist after additions", nativeQualified = false };
     }
 
-    private Record Load(string reference)
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> Derived = new(StringComparer.Ordinal);
+    private Record Load(string reference, bool reverify = false)
     {
         Require(reference is not null && reference.Length == Prefix.Length + 98, "CompositeInvalidReference", "Use the exact retained composite handle.");
         var parts = reference.Split(':'); Require(parts.Length == 3 && parts[0] == Prefix, "CompositeInvalidReference", "Wrong composite handle.");
@@ -148,8 +153,14 @@ public sealed class CompositeEngineeringWorkflowStore
         foreach (var (artifact, bytes) in new[] { (receipt.Artifacts[0], request), (receipt.Artifacts[1], report) })
             Require(bytes.Length == artifact.Bytes && Hash(bytes) == artifact.Sha256, "CompositeIntegrityFailure", "Retained artifact differs from its receipt.");
         // A review saved before RFC 8785 re-derives its selector keys in the form it was written with.
-        CanonicalJson.Compatible(() =>
-        { Require(Evaluate(request).AsSpan().SequenceEqual(report), "CompositeIntegrityFailure", "Report differs from independently reopened inputs."); return true; });
+        string verified = root + "|" + reference + "|" + receipt.Artifacts[1].Sha256;
+        if (reverify || !Derived.ContainsKey(verified))
+        {
+            CanonicalJson.Compatible(() =>
+            { Require(Evaluate(request).AsSpan().SequenceEqual(report), "CompositeIntegrityFailure", "Report differs from independently reopened inputs."); return true; });
+            if (Derived.Count >= 256) Derived.Clear();
+            Derived[verified] = true;
+        }
         return new(reference, receipt, receiptData, request, report);
     }
 
@@ -188,8 +199,7 @@ public sealed class CompositeEngineeringWorkflowStore
         Require(input.Length is > 0 && input.Length <= limit, "CompositeCapacity", "Input or retained artifact exceeds its byte bound or is empty.");
         var bytes = new byte[(int)input.Length]; input.ReadExactly(bytes); return bytes;
     }
-    private static void Write(string path, byte[] bytes)
-    { PackageStorage.EnsureNoLinks(path); using var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None); output.Write(bytes); output.Flush(true); }
+    private static void Write(string path, byte[] bytes) => PackageStorage.WriteNew(path, bytes);
     private static void Require([DoesNotReturnIf(false)] bool condition, string code, string message)
     { if (!condition) throw new BridgeException(code, message); }
 }

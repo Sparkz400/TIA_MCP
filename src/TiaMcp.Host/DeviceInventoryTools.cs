@@ -29,7 +29,7 @@ public sealed class DeviceInventoryTools(IBridgeClient bridge, HostOptions optio
                 var artifact = result.GetProperty("artifact");
                 string path = artifact.GetProperty("path").GetString()!;
                 // Reuse the artifact-store path/junction boundary before opening the native spool.
-                new ArtifactStore(options.ArtifactsDirectory).Read(path, 0, 1);
+                new ArtifactStore(options.ArtifactsDirectory).ResolveChecked(path);
                 using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
                 if (stream.Length > 48L * 1024 * 1024) throw new BridgeException("InventoryLimit", "Native inventory exceeds the spool limit.");
                 var hash = Convert.ToHexString(SHA256.HashData(stream));

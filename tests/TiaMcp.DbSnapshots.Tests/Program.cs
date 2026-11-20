@@ -130,7 +130,7 @@ Check((bool)page["rows"]![0]!["omitted"]! && JsonSerializer.SerializeToUtf8Bytes
 var maxUpload = Upload(Encoding.UTF8.GetBytes(many)); var maxReceipt = store.Review(id, path, maxUpload.Ref);
 Check((int)store.Page((string)maxReceipt["recordId"]!, "beforeValues", 19800, 200)["rows"]!.AsArray().Count == 200, "Maximum snapshot navigable to last page");
 string saved = Path.Combine(root, "project-reviews", id + ".json"); byte[] savedBytes = File.ReadAllBytes(saved); File.WriteAllText(saved, "tampered"); Reject(() => store.Page(record), "Saved source corruption refuses reopen", "ArtifactChanged"); File.WriteAllBytes(saved, savedBytes);
-string filler = Path.Combine(root, "db-snapshot-reviews", "capacity.tmp"); using (var f = File.Create(filler)) f.SetLength(512L * 1024 * 1024);
+string filler = Path.Combine(root, "db-snapshot-reviews", "capacity.partial"); using (var f = File.Create(filler)) f.SetLength(512L * 1024 * 1024);
 var fresh = Upload(Encoding.UTF8.GetBytes(xml.Replace("TRUE", "FALSE"))); Reject(() => store.Review(id, path, fresh.Ref), "Incomplete files count toward quota", "ArtifactCapacity"); File.Delete(filler);
 File.WriteAllText(Path.Combine(root, "mcp-fixture.json"), JsonSerializer.Serialize(new { artifactRoot = root, reviewId = id, objectPath = path, before = Convert.ToBase64String(before), after = Convert.ToBase64String(Utf16(Encoding.UTF8.GetString(after))) }, BridgeProtocol.Json));
 File.WriteAllText(Path.Combine(root, "verification.json"), JsonSerializer.Serialize(new { completed = true, nativeExecuted = false, count = checks.Count, checks }, BridgeProtocol.Json));
