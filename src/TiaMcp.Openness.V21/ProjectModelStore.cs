@@ -19,6 +19,8 @@ namespace TiaMcp.Indexing
         private readonly Dictionary<string, Snapshot> _snapshots = new Dictionary<string, Snapshot>(StringComparer.Ordinal);
         private readonly Func<DateTime> _clock;
         private readonly byte[] _key = new byte[32];
+        // Creation order for eviction: a Dictionary reuses freed slots, so its key order says nothing about age.
+        private long _sequence;
 
         internal ProjectModelStore(Func<DateTime> clock = null)
         {
@@ -42,7 +44,7 @@ namespace TiaMcp.Indexing
             copy["coverage"] = copy["coverage"] ?? new JArray();
             copy["limits"] = copy["limits"] ?? new JObject { ["maxVisited"] = MaximumNodes, ["maxDepth"] = 64, ["maxBytes"] = MaximumBytes };
             copy["usage"] = copy["usage"] ?? new JObject();
-            var snapshot = new Snapshot(copy);
+            var snapshot = new Snapshot(copy) { Sequence = ++_sequence };
             // A supplied revision is still explicitly scoped to exposed metadata, never native content.
             copy["metadataRevision"] = new JObject {
                 ["value"] = copy["metadataRevision"]?["value"] ?? new JValue(Hash(new JArray(snapshot.Nodes.Values.OrderBy(n => (string)n["nodeId"], StringComparer.Ordinal)).ToString(Formatting.None))),
@@ -53,7 +55,7 @@ namespace TiaMcp.Indexing
             usage["returnedEdges"] = snapshot.Edges.Length;
             AccountDocument(copy);
             foreach (var expired in _snapshots.Where(p => DateTime.Parse((string)p.Value.Document["expiresAtUtc"], CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind) <= now).Select(p => p.Key).ToArray()) Release(expired);
-            while (_snapshots.Count >= 2) Release(_snapshots.Keys.First());
+            while (_snapshots.Count >= 2) Release(_snapshots.OrderBy(p => p.Value.Sequence).First().Key);
             _snapshots.Add((string)copy["snapshotId"], snapshot);
             return (JObject)copy.DeepClone();
         }
@@ -69,6 +71,23 @@ namespace TiaMcp.Indexing
             result["edgeCount"] = snapshot.Edges.Length;
             result["freshness"] = "snapshotOnly";
             return result;
+        }
+
+        // The block nodes alone, so a caller that only selects blocks does not export and parse the whole snapshot.
+        internal JObject Blocks(string id, string sessionGeneration = null)
+        {
+            var snapshot = Find(id, sessionGeneration);
+            return new JObject
+            {
+                ["schemaVersion"] = "project-model.v1", ["snapshotId"] = id,
+                ["sessionGeneration"] = snapshot.Document["sessionGeneration"].DeepClone(),
+                ["projectPath"] = snapshot.Document["project"]["projectPath"].DeepClone(),
+                ["blocks"] = new JArray(snapshot.Nodes.Values.Where(n => (string)n["kind"] == "block").Select(n => new JObject
+                {
+                    ["nodeId"] = n["nodeId"].DeepClone(), ["objectPath"] = n["objectPath"]?.DeepClone(),
+                    ["programmingLanguage"] = n["metadata"]?["programmingLanguage"]?.DeepClone(), ["isKnowHowProtected"] = n["metadata"]?["isKnowHowProtected"]?.DeepClone()
+                }))
+            };
         }
 
         internal bool Release(string id) => id != null && _snapshots.Remove(id);
@@ -129,7 +148,7 @@ namespace TiaMcp.Indexing
             var warnings = (JArray)copy["warnings"];
             const string mixed = "Metadata and content observations were captured separately; this is not an atomic project revision.";
             if (!warnings.Values<string>().Contains(mixed)) warnings.Add(mixed);
-            var replacement = new Snapshot(copy);
+            var replacement = new Snapshot(copy) { Sequence = _snapshots[id].Sequence };
             copy["usage"]["returnedEdges"] = replacement.Edges.Length;
             AccountDocument(copy);
             // Publish atomically only after all bounds and endpoint references pass validation.
@@ -376,6 +395,7 @@ namespace TiaMcp.Indexing
             internal readonly Dictionary<string, string[]> Views = new Dictionary<string, string[]>(StringComparer.Ordinal);
             internal readonly JObject[] Ordered, Edges;
             internal string InvalidatedBy;
+            internal long Sequence;
             internal Snapshot(JObject document)
             {
                 Document = document;
