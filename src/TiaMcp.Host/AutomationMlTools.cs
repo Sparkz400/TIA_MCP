@@ -34,16 +34,6 @@ public sealed class AutomationMlTools(HostOptions options)
     [Description("Discover 1..50 retained AutomationML records, including incomplete and integrity-failed publications. Storage limits 128 records and 2 GiB include failed publications. Sorted record-ID offsets are discovery-only; relist after additions.")]
     public CallToolResult List(int offset = 0, int count = 20) => Run(s => s.List(offset, count));
 
-    private CallToolResult Run(Func<AutomationMlWorkflowStore, object> action)
-    {
-        object result; bool failed = false;
-        try { result = action(new AutomationMlWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits)); }
-        catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException or ArgumentException or JsonException or InvalidOperationException)
-        {
-            failed = true; result = new { error = new { code = error is BridgeException bridge ? bridge.Code : "AutomationMlWorkflowFailed",
-                message = error is BridgeException ? error.Message : "AutomationML input, retained integrity or publication failed. No native action occurred." } };
-        }
-        var json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<AutomationMlWorkflowStore, object> action) =>
+        ToolResult.Guard(() => action(new AutomationMlWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits)), "AutomationMlWorkflowFailed", "AutomationML input, retained integrity or publication failed. No native action occurred.");
 }

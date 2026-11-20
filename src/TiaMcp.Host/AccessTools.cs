@@ -17,13 +17,6 @@ public sealed class AccessTools(HostOptions options)
     [McpServerTool(Name = "access_review_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Reopen a public access review and revalidate its original input and exact saved review. section: summary/observations/assessments/changes; 1..200 rows within 128 KiB. artifact_read retrieves complete retained public metadata. Missing/disabled/unknown grants never prove effective rights or safe removal. No native access.")]
     public CallToolResult Page(string recordId, string section = "summary", int offset = 0, int count = 50) => Run(s => s.Page(recordId, section, offset, count));
-    private CallToolResult Run(Func<AccessWorkflowStore, JsonObject> action)
-    {
-        object result; bool failed = false;
-        try { result = action(new(options.ArtifactsDirectory)); }
-        catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException)
-        { failed = true; result = new { error = new { code = (e as BridgeException)?.Code ?? "AccessReviewFailed", message = e.Message, nativeAccessAttempted = false } }; }
-        string json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<AccessWorkflowStore, JsonObject> action) =>
+        ToolResult.Guard(() => action(new(options.ArtifactsDirectory)), "AccessReviewFailed", null, false);
 }

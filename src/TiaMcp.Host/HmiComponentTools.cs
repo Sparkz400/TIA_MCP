@@ -25,13 +25,6 @@ public sealed class HmiComponentTools(HostOptions options)
     [McpServerTool(Name = "hmi_component_review_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Reopen an immutable component/HMI review by recordId. Revalidate request, all independent files and exact saved reviews. section: summary/components/outputs/bindings/files; v2 adds consumerPaths/consumerCoverage; v3 adds effectChecks; v4 adds derivedEffects/expectationCoverage; v5 adds libraryAssociations/libraryCoverage; v6 adds dependencyAssociations/dependencyCoverage/dependencyIdentities; v7 adds dependencyImpacts/dependencyImpactCoverage. Older records retain original results and reject newer sections. Nonnegative offset and 1..200 rows bounded to 128 KiB. Download original files/full report with artifact_read. No conflict-free report grants native write, preservation or regeneration acceptance.")]
     public CallToolResult Page(string recordId, string section = "summary", int offset = 0, int count = 50) => Run(store => store.Page(recordId, section, offset, count));
-    private CallToolResult Run(Func<HmiComponentWorkflowStore, JsonObject> action)
-    {
-        object result; bool failed = false;
-        try { result = action(new(options.ArtifactsDirectory)); }
-        catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException or System.Xml.XmlException)
-        { failed = true; result = new { error = new { code = (e as BridgeException)?.Code ?? "HmiComponentReviewFailed", message = e.Message, nativeAccessAttempted = false } }; }
-        string json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<HmiComponentWorkflowStore, JsonObject> action) =>
+        ToolResult.Guard(() => action(new(options.ArtifactsDirectory)), "HmiComponentReviewFailed", null, false);
 }

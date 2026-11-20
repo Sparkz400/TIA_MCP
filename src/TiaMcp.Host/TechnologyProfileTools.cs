@@ -17,13 +17,6 @@ public sealed class TechnologyProfileTools(HostOptions options)
     [McpServerTool(Name = "technology_profile_report", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Reopen retained technology evidence with original/source/dependency revalidation after restart. section: summary/observations/relationships/changes/context/sources/consumers/consumerChanges/impactPaths/impactTraversal; v4 also supports encoderConnections/encoderChanges/encoderCoverage. 1..200 rows within 128 KiB. Older records refuse encoder sections. Oversized rows are explicitly omitted; artifact_read retrieves complete originals and report. Source files and referenced drive inputs are reverified after upload release. No native write/target or source-authenticity certification.")]
     public CallToolResult Page(string recordId, string section = "summary", int offset = 0, int count = 50) => Run(s => s.Page(recordId, section, offset, count));
-    private CallToolResult Run(Func<TechnologyProfileWorkflowStore, JsonObject> action)
-    {
-        object result; bool failed = false;
-        try { result = action(new(options.ArtifactsDirectory)); }
-        catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException)
-        { failed = true; result = new { error = new { code = (e as BridgeException)?.Code ?? "TechnologyProfileReviewFailed", message = e.Message, nativeAccessAttempted = false } }; }
-        string json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<TechnologyProfileWorkflowStore, JsonObject> action) =>
+        ToolResult.Guard(() => action(new(options.ArtifactsDirectory)), "TechnologyProfileReviewFailed", null, false);
 }

@@ -64,8 +64,8 @@ public sealed class TranslationNativeTools(IBridgeClient bridge, HostOptions opt
     [Description("Read and integrity-check an exact retained translation operation; never starts a worker, resumes or replays native work.")]
     public CallToolResult Status(string operationId)
     {
-        try { return Format(Runner.Status(operationId), false); }
-        catch (Exception error) when (Handled(error)) { return Failure(error); }
+        try { return ToolResult.Of(Runner.Status(operationId)); }
+        catch (Exception error) when (Handled(error)) { return NativeFailure(error); }
     }
 
     [McpServerTool(Name = "translation_native_recover", Destructive = true, OpenWorld = false)]
@@ -88,23 +88,12 @@ public sealed class TranslationNativeTools(IBridgeClient bridge, HostOptions opt
 
     private static async Task<CallToolResult> Run(Func<Task<object>> action)
     {
-        try { return Format(await action(), false); }
-        catch (Exception error) when (Handled(error)) { return Failure(error); }
+        try { return ToolResult.Of(await action()); }
+        catch (Exception error) when (Handled(error)) { return NativeFailure(error); }
     }
 
-    private static bool Handled(Exception error) => error is BridgeException or IOException or UnauthorizedAccessException or
-        ArgumentException or JsonException or InvalidOperationException or OperationCanceledException;
+    private static CallToolResult NativeFailure(Exception error) => ToolResult.Failure(error, "TranslationNativeFailed",
+        "Translation operation failed. Read retained operation status and reconcile uncertain outcomes; never automatically replay native work.");
 
-    private static CallToolResult Failure(Exception error) => Format(new { error = new {
-        code = (error as BridgeException)?.Code ?? (error is OperationCanceledException ? "OperationCancelled" : "TranslationNativeFailed"),
-        message = error is BridgeException ? error.Message :
-            "Translation operation failed. Read retained operation status and reconcile uncertain outcomes; never automatically replay native work.",
-        details = (error as BridgeOperationException)?.Details } }, true);
-
-    private static CallToolResult Format(object value, bool error)
-    {
-        string json = JsonSerializer.Serialize(value, BridgeProtocol.Json);
-        return new CallToolResult { IsError = error, Content = [new TextContentBlock { Text = json }],
-            StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private static bool Handled(Exception error) => ToolResult.IsRefusal(error) || error is OperationCanceledException;
 }

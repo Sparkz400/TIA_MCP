@@ -78,22 +78,9 @@ public sealed class VciTools(HostOptions options)
     public Task<CallToolResult> FileRead(string recordRef, string relativePath, long offset = 0, int count = 65536) =>
         Run(s => Task.FromResult(s.ReadFile(recordRef, relativePath, offset, count)));
 
-    private async Task<CallToolResult> Run(Func<VciWorkspaceStore, Task<object>> action)
+    private Task<CallToolResult> Run(Func<VciWorkspaceStore, Task<object>> action) => ToolResult.GuardAsync(async () =>
     {
-        try
-        {
-            if (options.GitExecutable is null) throw new BridgeException("GitNotConfigured", "Start the Host with --git-executable and an absolute installed Git path.");
-            return Format(await action(new VciWorkspaceStore(options.ArtifactsDirectory, options.GitExecutable, options.LibraryLimits, options.GitRemote)), false);
-        }
-        catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException or ArgumentException or JsonException or InvalidOperationException)
-        {
-            return Format(new { error = new { code = (error as BridgeException)?.Code ?? "VciWorkflowFailed",
-                message = error is BridgeException ? error.Message : "Local VCI input, integrity or publication failed. Inspect retained records before continuing." } }, true);
-        }
-    }
-    private static CallToolResult Format(object value, bool error)
-    {
-        string json = JsonSerializer.Serialize(value, BridgeProtocol.Json);
-        return new CallToolResult { IsError = error, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+        if (options.GitExecutable is null) throw new BridgeException("GitNotConfigured", "Start the Host with --git-executable and an absolute installed Git path.");
+        return await action(new VciWorkspaceStore(options.ArtifactsDirectory, options.GitExecutable, options.LibraryLimits, options.GitRemote));
+    }, "VciWorkflowFailed", "Local VCI input, integrity or publication failed. Inspect retained records before continuing.");
 }

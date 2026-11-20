@@ -29,4 +29,8 @@ public sealed partial class TiaTools
     [Description("Probe the selected native target's services and typed metadata without mutation, export, compilation or login. selectors accepts kind/objectPath/name/scopePath/plcPath/projectName and maxItems. Separates API availability, bridge implementation, target blockers and unverified qualification. Read/write metadata never bypasses prepared-change validation.")]
     public Task<CallToolResult> TargetCapabilities(JsonElement selectors, CancellationToken cancellationToken)
         => Call("target_capabilities", ObjectArguments(selectors), cancellationToken);
+
+    [McpServerTool(Name = "host_build_identity", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Report which build this Host is running: its process start time, product version, the SHA-256 of the Host and configured worker executables when the Host started and now, and, when it runs from a package, the bundle manifest hash with the sourceCommit and sourceTreeDirty the bundle was packaged from (null for bundles packaged before this was recorded or without git; a bundle folder name's suffix is random, not a commit). changedOnDisk marks a binary replaced or rebuilt after start; runningMatchesDisk is false then, and a newly built or packaged binary must never be described as loaded until the Host was restarted and reports it. Starts no worker and changes nothing.")]
+    public CallToolResult HostBuildIdentity() => ToolResult.Of(BuildIdentity.Report(options.WorkerPath, options.SimulatorWorkerPath));
 }

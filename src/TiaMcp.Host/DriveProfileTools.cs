@@ -17,13 +17,6 @@ public sealed class DriveProfileTools(HostOptions options)
     [McpServerTool(Name = "drive_profile_review_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Reopen retained drive evidence, revalidating original JSON and exact saved review after restart. section: summary/observations/changes; v2 also telegrams/telegramChanges. V1 refuses v2-only sections. 1..200 rows within 128 KiB. artifact_read downloads complete originals/reports; oversized rows are explicitly omitted. Supplied declarations never certify native access, ownership or target compatibility.")]
     public CallToolResult Page(string recordId, string section = "summary", int offset = 0, int count = 50) => Run(s => s.Page(recordId, section, offset, count));
-    private CallToolResult Run(Func<DriveProfileWorkflowStore, JsonObject> action)
-    {
-        object result; bool failed = false;
-        try { result = action(new(options.ArtifactsDirectory)); }
-        catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException)
-        { failed = true; result = new { error = new { code = (e as BridgeException)?.Code ?? "DriveProfileReviewFailed", message = e.Message, nativeAccessAttempted = false } }; }
-        string json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<DriveProfileWorkflowStore, JsonObject> action) =>
+        ToolResult.Guard(() => action(new(options.ArtifactsDirectory)), "DriveProfileReviewFailed", null, false);
 }

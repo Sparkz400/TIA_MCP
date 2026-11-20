@@ -17,13 +17,6 @@ public sealed class SoftwareUnitTools(HostOptions options)
     [McpServerTool(Name = "software_unit_review_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Reopen an immutable software-unit review by recordId after restart; revalidate retained original, saved review and derived report. section: summary/units/objects/relations/dependencies/cycles/collisions/changes; 1..200 rows within 128 KiB. Exact input/report download references work with artifact_read. Supplied coverage never proves whole-project completeness or native compatibility.")]
     public CallToolResult Page(string recordId, string section = "summary", int offset = 0, int count = 50) => Run(s => s.Page(recordId, section, offset, count));
-    private CallToolResult Run(Func<SoftwareUnitWorkflowStore, JsonObject> action)
-    {
-        object result; bool failed = false;
-        try { result = action(new(options.ArtifactsDirectory)); }
-        catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException)
-        { failed = true; result = new { error = new { code = (e as BridgeException)?.Code ?? "UnitReviewFailed", message = e.Message, nativeAccessAttempted = false } }; }
-        string json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<SoftwareUnitWorkflowStore, JsonObject> action) =>
+        ToolResult.Guard(() => action(new(options.ArtifactsDirectory)), "UnitReviewFailed", null, false);
 }

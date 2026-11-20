@@ -67,11 +67,8 @@ public sealed partial class TiaTools
             var result = await bridge.CallAsync("project_model", args, cancellationToken);
             if (action == "export" && format == "html")
                 result = ProjectExplorerArtifacts.CreateViewer(result, options.ArtifactsDirectory);
-            return Result(result.GetRawText(), false);
+            return ToolResult.Of(result);
         }
-        catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or ArgumentException)
-        {
-            return Result(JsonSerializer.Serialize(new { error = new { code = (error as BridgeException)?.Code ?? "ProjectModelFailed", message = error.Message } }, BridgeProtocol.Json), true);
-        }
+        catch (Exception error) when (ToolResult.IsRefusal(error)) { return ToolResult.Failure(error, "ProjectModelFailed"); }
     }
 }

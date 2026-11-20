@@ -125,22 +125,9 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
 
     private static async Task<CallToolResult> RunApply(Func<Task<EngineeringOperationRecord>> action)
     {
-        object value;
-        bool failed = false;
-        try { value = await action(); }
-        catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException or
-            ArgumentException or JsonException or InvalidOperationException or OperationCanceledException)
-        {
-            failed = true;
-            value = new { error = new {
-                code = (error as BridgeException)?.Code ?? (error is OperationCanceledException ? "OperationCancelled" : "TranslationQualificationFailed"),
-                message = error is BridgeException ? error.Message :
-                    "Qualification apply failed. Inspect the retained operation and reconcile uncertain outcomes; never automatically replay native work.",
-                details = (error as BridgeOperationException)?.Details } };
-        }
-        string json = JsonSerializer.Serialize(value, BridgeProtocol.Json);
-        return new CallToolResult { IsError = failed, Content = [new TextContentBlock { Text = json }],
-            StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
+        try { return ToolResult.Of(await action()); }
+        catch (Exception error) when (ToolResult.IsRefusal(error) || error is OperationCanceledException)
+        { return ToolResult.Failure(error, "TranslationQualificationFailed", "Qualification apply failed. Inspect the retained operation and reconcile uncertain outcomes; never automatically replay native work."); }
     }
 
     [McpServerTool(Name = "qualification_translation_recover", Destructive = true, OpenWorld = false)]

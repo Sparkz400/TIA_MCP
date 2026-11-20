@@ -175,13 +175,12 @@ public sealed partial class TiaTools
     { try { return ReviewResult(new ProjectReviewStore(options.ArtifactsDirectory).Health(reviewId, offset, maxItems,
         testSuiteResults is null ? null : TestSuiteStyleJobs.Parse<EngineeringArtifactReference[]>(Encoding.UTF8.GetBytes(testSuiteResults.Value.GetRawText())))); } catch (Exception e) when (ReviewError(e)) { return ReviewFailure(e); } }
 
-    private static bool ReviewError(Exception e) => e is BridgeException or IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or ArgumentException or System.Xml.XmlException;
+    private static bool ReviewError(Exception e) => ToolResult.IsRefusal(e);
     private static CallToolResult ReviewResult(JsonObject result)
     {
         result["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy;
         result["sourceAuthenticityVerified"] = false;
-        return Result(result.ToJsonString(), false);
+        return ToolResult.Of(result);
     }
-    private static CallToolResult ReviewFailure(Exception e) => Result(JsonSerializer.Serialize(new { error = new {
-        code = (e as BridgeException)?.Code ?? "ProjectReviewFailed", message = e.Message } }, BridgeProtocol.Json), true);
+    private static CallToolResult ReviewFailure(Exception e) => ToolResult.Failure(e, "ProjectReviewFailed");
 }

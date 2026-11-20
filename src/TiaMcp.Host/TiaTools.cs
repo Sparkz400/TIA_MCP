@@ -267,21 +267,14 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
     {
         try
         {
-            var result = await bridge.CallAsync(operation, arguments, cancellationToken);
-            return Result(result.GetRawText(), false);
+            return ToolResult.Of(await bridge.CallAsync(operation, arguments, cancellationToken));
         }
         catch (BridgeException error) { return Failure(error); }
     }
 
-    private static CallToolResult Failure(BridgeException error) => Result(JsonSerializer.Serialize(new { error = new { code = error.Code, message = error.Message,
-        details = (error as BridgeOperationException)?.Details } }, BridgeProtocol.Json), true);
+    private static CallToolResult Failure(BridgeException error) => ToolResult.Failure(error, "BridgeError");
 
-    private static CallToolResult Result(string json, bool isError) => new()
-    {
-        IsError = isError,
-        Content = [new TextContentBlock { Text = json }],
-        StructuredContent = JsonSerializer.Deserialize<JsonElement>(json)
-    };
+    private static CallToolResult Result(string json, bool isError) => ToolResult.FromJson(json, isError);
 
     private static int Limit(int value) => value is >= 1 and <= 2000 ? value : throw new McpException("maxItems must be between 1 and 2000.");
     private static void RequireBlock(string? path, string? name)

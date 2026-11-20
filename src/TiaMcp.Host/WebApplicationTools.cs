@@ -17,13 +17,6 @@ public sealed class WebApplicationTools(HostOptions options)
     [McpServerTool(Name = "web_application_review_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Reopen and revalidate retained web application input, exact saved owner and original ZIP bytes. section: summary/observations/configurationChanges/applicationChanges/fileChanges; 1..200 rows within 128 KiB. ZIPs are bounded and re-inspected without scripts/network. artifact_read downloads full untrusted originals/reports. Supplied observations do not establish native identity, generated DBs or deployed state.")]
     public CallToolResult Page(string recordId, string section = "summary", int offset = 0, int count = 50) => Run(s => s.Page(recordId, section, offset, count));
-    private CallToolResult Run(Func<WebApplicationWorkflowStore, JsonObject> action)
-    {
-        object result; bool failed = false;
-        try { result = action(new(options.ArtifactsDirectory)); }
-        catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException)
-        { failed = true; result = new { error = new { code = (e as BridgeException)?.Code ?? "WebApplicationReviewFailed", message = e is BridgeException ? e.Message : "Web application review failed.", nativeAccessAttempted = false } }; }
-        string json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<WebApplicationWorkflowStore, JsonObject> action) =>
+        ToolResult.Guard(() => action(new(options.ArtifactsDirectory)), "WebApplicationReviewFailed", "Web application review failed.", false);
 }

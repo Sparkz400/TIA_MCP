@@ -17,13 +17,6 @@ public sealed class TeamcenterTools(HostOptions options)
     [McpServerTool(Name = "teamcenter_observation_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Reopen and revalidate an immutable supplied Teamcenter observation comparison after Host restart. section: summary/observations/changes/issues/manifests; 1..200 rows within 128 KiB. Original and report bytes are available through artifact_read. Unknown/incomplete queries, version mismatches and local manifest gaps remain visible; supplied data never authorizes engineering work or resolves a native journal.")]
     public CallToolResult Page(string recordId, string section = "summary", int offset = 0, int count = 50) => Run(s => s.Page(recordId, section, offset, count));
-    private CallToolResult Run(Func<TeamcenterReviewStore, JsonObject> action)
-    {
-        object result; bool failed = false;
-        try { result = action(new(options.ArtifactsDirectory)); }
-        catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException)
-        { failed = true; result = new { error = new { code = (e as BridgeException)?.Code ?? "TeamcenterReviewFailed", message = e.Message, nativeAccessAttempted = false } }; }
-        string json = JsonSerializer.Serialize(result, BridgeProtocol.Json);
-        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
-    }
+    private CallToolResult Run(Func<TeamcenterReviewStore, JsonObject> action) =>
+        ToolResult.Guard(() => action(new(options.ArtifactsDirectory)), "TeamcenterReviewFailed", null, false);
 }

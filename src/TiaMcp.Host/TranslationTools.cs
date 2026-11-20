@@ -59,18 +59,8 @@ public sealed class TranslationTools(HostOptions options)
 
     private CallToolResult Run(Func<TranslationWorkflowStore, object> action)
     {
-        try { return Format(action(new TranslationWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits)), false); }
+        try { return ToolResult.Of(action(new TranslationWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits))); }
         catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException or ArgumentException or JsonException)
-        {
-            return Format(new { error = new { code = (error as BridgeException)?.Code ?? "TranslationWorkflowFailed",
-                message = error is BridgeException ? error.Message : "Offline translation input or publication failed. List retained records to inspect incomplete publication; no native action occurred.",
-                details = (error as BridgeOperationException)?.Details } }, true);
-        }
-    }
-
-    private static CallToolResult Format(object value, bool error)
-    {
-        string json = JsonSerializer.Serialize(value, BridgeProtocol.Json);
-        return new CallToolResult { IsError = error, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
+        { return ToolResult.Failure(error, "TranslationWorkflowFailed", "Offline translation input or publication failed. List retained records to inspect incomplete publication; no native action occurred."); }
     }
 }
