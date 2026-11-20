@@ -260,12 +260,14 @@ internal static partial class Program
             ("Bridge held cleanup that times out keeps the bridge usable", BridgeHeldCleanupTimeout),
             ("Bridge cancellation while queued leaves session usable", BridgeQueuedCancellation),
             ("Bridge queued call gives up after the bridge timeout without sending", BridgeQueueTimeout),
+            ("Bridge queue wait is separate from the operation timeout", BridgeSeparateQueueTimeout),
+            ("Bridge long operations get their own timeout", BridgeLongOperationTimeout),
             ("Bridge pre-cancelled call never starts a worker", BridgePreCancelled),
-            ("Bridge mismatched response ID is terminal", () => BridgeTerminalFault("wrongId", "ProtocolMismatch")),
-            ("Bridge mismatched protocol version is terminal", () => BridgeTerminalFault("wrongVersion", "ProtocolMismatch")),
-            ("Bridge malformed response is terminal", () => BridgeTerminalFault("malformed", "InvalidResponse")),
-            ("Bridge disconnect is terminal", () => BridgeTerminalFault("disconnect", "WorkerDisconnected")),
-            ("Bridge truncated response is terminal", () => BridgeTerminalFault("truncated", "WorkerDisconnected")),
+            ("Bridge mismatched response ID is recoverable", () => BridgeTerminalFault("wrongId", "ProtocolMismatch")),
+            ("Bridge mismatched protocol version is recoverable", () => BridgeTerminalFault("wrongVersion", "ProtocolMismatch")),
+            ("Bridge malformed response is recoverable", () => BridgeTerminalFault("malformed", "InvalidResponse")),
+            ("Bridge disconnect is recoverable", () => BridgeTerminalFault("disconnect", "WorkerDisconnected")),
+            ("Bridge truncated response is recoverable", () => BridgeTerminalFault("truncated", "WorkerDisconnected")),
             ("Bridge reports worker exit before connection", BridgeEarlyExit),
             ("Bridge rejects a same-user impostor before sending any request", BridgeImpostor),
             ("Bridge rechecks the launched worker before another request", BridgePeerExit),
@@ -715,6 +717,25 @@ internal static partial class Program
         Check.Equal(0, fixture.Events().Count(e => e.Operation == "mustNotRun"));
     }
 
+    private static async Task BridgeSeparateQueueTimeout()
+    {
+        // Operation timeout 10 s, queue wait 1 s: the queued call gives up first, the running one is untouched.
+        await using var fixture = new BridgeFixture(timeoutSeconds: 10, queueTimeoutSeconds: 1);
+        await fixture.Client.CallAsync("echo");
+        var running = fixture.Client.CallAsync("echo", new { delayMs = 2500 });
+        await BridgeFixture.WaitForAsync(() => fixture.Events().Count(e => e.Kind == "request") == 2, "slow echo request");
+        await Check.BridgeError("QueueTimeout", () => fixture.Client.CallAsync("mustNotRun"));
+        await running;
+        Check.Equal(0, fixture.Events().Count(e => e.Operation == "mustNotRun"));
+    }
+
+    private static async Task BridgeLongOperationTimeout()
+    {
+        await using var fixture = new BridgeFixture(timeoutSeconds: 1, longTimeoutSeconds: 8);
+        await fixture.Client.CallAsync("project_open", new { delayMs = 2500 });
+        await Check.BridgeError("TimeoutOutcomeUnknown", () => fixture.Client.CallAsync("echo", new { delayMs = 2500 }));
+    }
+
     private static async Task BridgeQueuedCancellation()
     {
         await using var fixture = new BridgeFixture();
@@ -744,7 +765,7 @@ internal static partial class Program
     {
         await using var fixture = new BridgeFixture();
         await Check.BridgeError(code, () => fixture.Client.CallAsync(operation));
-        await fixture.AssertTerminalAsync(operation);
+        await fixture.AssertRecoversAsync(operation);
     }
 
     private static async Task BridgeImpostor()

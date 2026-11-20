@@ -6,16 +6,17 @@ The tools themselves are listed by `feature_catalog`.
 
 ## Tool groups (`--toolsets`)
 
-By default the Host advertises every tool, about 300 on a normal build, and the `tools/list`
-reply is about 600 KB, more than half of it [output schemas](#titles-and-output-schemas). Many MCP clients limit the number of tools per server or per request, and every
-advertised tool costs model context. Start the Host with `--toolsets` to advertise only the
-groups a task needs:
+Every tool belongs to one group. Without `--toolsets` the Host advertises the `base` and `core`
+groups only; all groups, about 300 tools on a normal build, make the `tools/list` reply about 600 KB, more
+than half of it [output schemas](#titles-and-output-schemas), and every advertised tool costs model context
+(many MCP clients also limit the number of tools per server or per request). Start the Host with `--toolsets`
+to name the groups a task needs, or `--toolsets all` for every tool:
 
 ```json
 "args": ["--timeout-seconds", "300", "--toolsets", "core,simulation"]
 ```
 
-The value is a comma-separated list of group names, or `all` (the default). Unknown names stop
+The value is a comma-separated list of group names, or `all`; the default is `core`. Unknown names stop
 the Host at startup with the list of valid groups. Hidden tools cannot be called, and the server
 instructions tell the client which groups are advertised. The `base` tools (`feature_catalog`, `host_build_identity`
 and the `artifact_*` upload and download tools) are always advertised, and `qualification_*`
@@ -24,7 +25,7 @@ value with `New-McpConfiguration.ps1 -Toolsets core,simulation` (or `Start-TiaMc
 
 | Group | Tools |
 | --- | --- |
-| `core` | Sessions and projects (`tia_*`, `project_*` except the two groups below), `target_capabilities`, `object_resolve`, the `change_*` workflow, `engineering_*`, block, type, tag-table, hardware, technology-object and cross-reference reads, `plc_compare`, `plc_document_inventory`, `plc_loadable_generate`, `plc_alarm_inspect`, `fixture_sources` |
+| `core` | Sessions and projects (`tia_*`, `project_*` except the two groups below), `target_capabilities`, `object_resolve`, the `change_*` workflow, `engineering_*`, block, type, tag-table, hardware, technology-object and cross-reference reads, `plc_compare`, `plc_document_inventory`, `plc_loadable_generate`, `plc_alarm_inspect`, `fixture_sources`, and the native reads `safety_inspect`, `access_inspect`, `connection_inspect`, `web_inspect`, `certificate_inspect` and `drive_observe` |
 | `explorer` | `project_model*` explorer snapshots and `project_snapshot_*` saved reviews |
 | `simulation` | `sim_*`, `simulation_*`, `plc_online_compare`, `plc_station_upload`, `db_snapshot_*` |
 | `runtime` | `runtime_*` OPC UA, web and capture sessions, `device_*` network inventory |
@@ -39,13 +40,19 @@ value with `New-McpConfiguration.ps1 -Toolsets core,simulation` (or `Start-TiaMc
 | `cax` | `automationml_*`, `cax_export` |
 | `graph` | `graph_*` |
 | `physical` | `plc_physical_*`: route listing, online compare, station upload and download to a real PLC. Registered only when the Host runs with `--physical-plc-online` |
-| `reviews` | Supplied-evidence reviews and inspections: `access_*`, `addin_*`, `composite_*`, `connection_*`, `drive_*`, `multiuser_*`, `public_certificate_*`, `certificate_*`, `safety_*`, `software_unit_*`, `technology_profile_*`, `teamcenter_*`, `web_*` |
+| `reviews` | Supplied-evidence reviews and the other inspections: `access_*`, `addin_*`, `composite_*`, `connection_*`, `drive_*`, `multiuser_*`, `public_certificate_*`, `certificate_*`, `safety_*`, `software_unit_*`, `technology_profile_*`, `teamcenter_*`, `web_*` |
 
 A Host without native workers (`--no-native-workers` or the portable package) still lists native
 tools, which then refuse with `NativeWorkersDisabled`. For supplied-document work there, choose
 the document groups, for example `--toolsets opcua,cax,graph,vci,translation,diagnostics,reviews`.
 These groups still contain a few native tools, such as `opcua_engineering_export` and
 `translation_native_*`.
+
+`testsuite_style_job_execute_next`, `testsuite_style_job_recover` and `testsuite_style_job_reconcile`
+are in no selectable group: they refuse every call until a Test Suite style profile is qualified, so no
+`--toolsets` value advertises them. A Host started with `--enable-safety-changes` admits the safety writes
+(`change_prepare` kinds `safety_import_xml`, `safety_fparameter_set`, `safety_drive_tags` and a safety tag rename);
+without it they are refused with `SafetyChangesDisabled`.
 
 Every registered tool must belong to exactly one group and have a title; the Host refuses to start
 otherwise, so a new tool needs a prefix in `src/TiaMcp.Host/ToolGroups.cs` and a title in

@@ -35,9 +35,9 @@ try
     if (options.TestSuiteQualification) workerArguments.Add("--testsuite-qualification");
 #endif
     var bridge = new BridgeClient(new BridgeOptions(options.WorkerPath, options.ApiDirectory, options.TimeoutSeconds,
-        workerArguments, Disabled: options.NoNativeWorkers));
-    await using var simulator = new SimulatorClient(options);
-    await using (bridge)
+        workerArguments, Disabled: options.NoNativeWorkers, QueueTimeoutSeconds: options.QueueTimeoutSeconds, LongTimeoutSeconds: options.LongTimeoutSeconds));
+    var simulator = new SimulatorClient(options);
+    try
     {
         if (options.Diagnose)
         {
@@ -69,7 +69,7 @@ try
             builder.Services.PostConfigure<ModelContextProtocol.Server.McpServerOptions>(server => ToolSurface.Apply(server, options));
             var mcp = builder.Services.AddMcpServer(server => server.ServerInstructions = AuthenticationInstructions.Text + TiaVersionSurface.Instructions(options) +
                 (options.NoNativeWorkers ? "\nThis Host has native workers disabled. Use supplied-document workflows; native engineering and simulator calls return NativeWorkersDisabled without launching a worker. Network inventory, runtime Web API and OPC UA tools remain separate and require an explicitly selected endpoint and authentication/trust prerequisites." : "") +
-                (options.Toolsets is { } toolsets ? "\nThis Host advertises only the base tools and the toolsets " + string.Join(", ", toolsets.Order(StringComparer.Ordinal)) + ". Other tools are hidden; a user restarts the Host with a wider --toolsets value to use them." : ""))
+                (options.Toolsets is { } toolsets ? "\nThis Host advertises only the base tools and the toolsets " + string.Join(", ", toolsets.Order(StringComparer.Ordinal)) + ". Other tools are hidden; a user restarts the Host with a wider --toolsets value (or --toolsets all) to use them." : ""))
                 .WithStdioServerTransport().WithPrompts<TiaPrompts>().WithRequestFilters(ToolSurface.Configure).WithTools<TiaTools>().WithTools<ArtifactTools>().WithTools<LibraryPackageTools>().WithTools<SimulatorTools>()
                 .WithTools<TranslationTools>()
                 .WithTools<TranslationNativeTools>()
@@ -116,7 +116,8 @@ try
             if (handoffService?.Failed == true) return 1;
         }
     }
-    await simulator.DisposeAsync();
+    // Each worker waits up to BridgeClient.WorkerExitBudgetSeconds for its Portal or PLCSIM manager to close; they are independent, so wait for both at once.
+    finally { await Task.WhenAll(bridge.DisposeAsync().AsTask(), simulator.DisposeAsync().AsTask()); }
     return bridge.WorkerShutdownSucceeded == true && simulator.Bridge.WorkerShutdownSucceeded == true ? 0 : 1;
 }
 catch (Exception exception)

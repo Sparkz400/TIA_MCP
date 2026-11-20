@@ -73,7 +73,7 @@ class PackageSmokeTests(unittest.TestCase):
         code, factory = self.run_smoke()
         self.assertEqual(code, 0)
         self.assertEqual(factory.call_count, 2)
-        self.assertEqual(factory.call_args_list[0].kwargs["command"], ["fixture-launcher", "argument with spaces"])
+        self.assertEqual(factory.call_args_list[0].kwargs["command"], ["fixture-launcher", "argument with spaces", "--toolsets", "all"])
         self.assertEqual(factory.call_args_list[1].args[0], self.bundle / "host/TiaMcp.Host.exe")
         report = json.loads(self.report.read_text())
         self.assertTrue(report["completed"])

@@ -7,11 +7,20 @@ public static class ToolGroups
     public const string Base = "base";
     // Registered only by explicit qualification flags; --toolsets never hides them.
     public const string Qualification = "qualification";
+    // Never advertised: tools that refuse every call until their feature is qualified (a hidden tool cannot be selected with --toolsets).
+    public const string Hidden = "hidden";
+    // What --toolsets selects when the option is absent; "all" is the opt-in for every group (base is always advertised).
+    public static readonly IReadOnlySet<string> Default = new HashSet<string>(["core"], StringComparer.Ordinal);
 
     // First matching prefix wins, so longer prefixes precede the shorter ones they would otherwise fall under.
     private static readonly (string Prefix, string Group)[] Rules =
     [
         ("qualification_", Qualification),
+        // testsuite_style_job_* always refuse through RequireQualification until a style profile is qualified.
+        ("testsuite_style_job_execute_next", "hidden"), ("testsuite_style_job_recover", "hidden"), ("testsuite_style_job_reconcile", "hidden"),
+        // Native reads whose prefix would otherwise file them under reviews; the review tools they feed stay there.
+        ("safety_inspect", "core"), ("access_inspect", "core"), ("connection_inspect", "core"), ("web_inspect", "core"),
+        ("certificate_inspect", "core"), ("drive_observe", "core"),
         ("feature_catalog", Base), ("host_build_identity", Base), ("artifact_", Base),
         ("project_model", "explorer"), ("project_snapshot_", "explorer"),
         ("plc_physical_", "physical"), ("plc_online_compare", "simulation"), ("plc_station_upload", "simulation"), ("sim_", "simulation"), ("simulation_", "simulation"), ("db_snapshot_", "simulation"),
@@ -31,11 +40,11 @@ public static class ToolGroups
 
     /// <summary>Groups a user may name, in documentation order.</summary>
     public static readonly IReadOnlyList<string> Selectable = Rules.Select(rule => rule.Group)
-        .Where(group => group is not (Base or Qualification)).Distinct().ToArray();
+        .Where(group => group is not (Base or Qualification or Hidden)).Distinct().ToArray();
 
     public static string? Of(string tool) => Rules.FirstOrDefault(rule => tool.StartsWith(rule.Prefix, StringComparison.Ordinal)).Group;
 
-    /// <summary>Parses a comma-separated --toolsets value; null means every group.</summary>
+    /// <summary>Parses a comma-separated --toolsets value; null means every group (--toolsets all).</summary>
     public static IReadOnlySet<string>? Parse(string value)
     {
         var names = value.Split(',', StringSplitOptions.TrimEntries);
@@ -51,6 +60,7 @@ public static class ToolGroups
     public static bool Advertised(string tool, IReadOnlySet<string>? selected) => Of(tool) switch
     {
         null => throw new InvalidOperationException("Tool " + tool + " belongs to no --toolsets group; add its prefix to ToolGroups."),
+        Hidden => false,
         Base or Qualification => true,
         var group => selected is null || selected.Contains(group),
     };
