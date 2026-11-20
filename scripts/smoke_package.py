@@ -5,7 +5,7 @@ import json
 import pathlib
 import zipfile
 
-from smoke_mcp import Client
+from smoke_mcp import Client, all_toolsets
 from qualify_deployment import read_catalog, require
 
 
@@ -62,7 +62,7 @@ def main():
         return result
 
     try:
-        client = Client(None, 300, command=[configuration["command"], *configuration["args"]])
+        client = Client(None, 300, command=all_toolsets([configuration["command"], *configuration["args"]]))
         step("launcher MCP initialize", client.request("initialize", {"protocolVersion": "2025-11-25", "capabilities": {}, "clientInfo": {"name": "tia-bundle-smoke", "version": "0.3.0"}}))
         client.notify("notifications/initialized")
         tools = client.request("tools/list")
