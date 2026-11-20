@@ -19,6 +19,7 @@
     <None Include="../../contracts/safety-fparameter-allowlist.v1.json" Link="safety-fparameter-allowlist.v1.json" CopyToOutputDirectory="PreserveNewest" />
     <Compile Include="../../src/TiaMcp.Openness.V21/VciResolutionRules.cs" Link="VciResolutionRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/DriveObjectRules.cs" Link="DriveObjectRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/SafetyDriveGuardRules.cs" Link="SafetyDriveGuardRules.cs" />
     <Compile Include="../../tests/TiaMcp.PlcLibraryIntegration.Tests/BridgeException.cs" Link="BridgeException.cs" />
     <None Update="Fixtures/*.json" CopyToOutputDirectory="PreserveNewest" />
     <EmbeddedResource Include="../../contracts/hardware-catalog-profiles.v1.json" LogicalName="TiaMcp.HardwareCatalogProfiles.v1.json" />

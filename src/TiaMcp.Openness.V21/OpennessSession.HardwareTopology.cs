@@ -85,9 +85,10 @@ namespace TiaMcp.Openness.V21
                     foreach (var tag in table.Item.Tags)
                     {
                         if (!budget.Take()) throw new BridgeException("TraversalLimit", "PLC tag lookup for the address impact is incomplete.");
-                        var address = OfflineEvidence.ParseIoAddress(tag.LogicalAddress);
+                        var attributes = BatchedAttributeReads.Tag(tag);
+                        var address = OfflineEvidence.ParseIoAddress(attributes.LogicalAddress);
                         var range = address == null ? null : ranges.FirstOrDefault(row => row.Address.IoType.ToString() == address.Direction && OfflineEvidence.IoAddressOverlapsNativeRange(address, row.Address.StartAddress, row.Address.Length));
-                        if (range != null) tags.Add(new JObject { ["path"] = table.Path + "/tags/" + Segment(tag.Name), ["logicalAddress"] = tag.LogicalAddress,
+                        if (range != null) tags.Add(new JObject { ["path"] = table.Path + "/tags/" + Segment(attributes.Name), ["logicalAddress"] = attributes.LogicalAddress,
                             ["hardwarePath"] = range.Path, ["ioType"] = range.Address.IoType.ToString(), ["startAddress"] = range.Address.StartAddress, ["lengthBits"] = range.Address.Length });
                     }
             }

@@ -38,6 +38,14 @@ namespace TiaMcp.Openness.V21
             return ranges;
         }
 
+        // Whether the item hosts a drive object with a PROFIsafe telegram.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static bool HasSafetyTelegram(DeviceItem item)
+        {
+            var container = item.GetService<DriveObjectContainer>();
+            return container != null && container.DriveObjects.Any(drive => drive.Telegrams.Any(telegram => telegram.Type == TelegramType.SafetyTelegram));
+        }
+
         [MethodImpl(MethodImplOptions.NoInlining)]
         private JObject SafetyDriveTagPlan(EngineeringChange change, Project project)
         {
@@ -62,7 +70,10 @@ namespace TiaMcp.Openness.V21
             var ranges = FIoAddressRanges(plc);
             var table = plc.Software.TagTableGroup.TagTables.Find(ChangeText(payload, "tagTableName", 128))
                 ?? throw new BridgeException("ObjectNotFound", "tagTableName must name an existing tag table in the PLC's root tag-table group.");
-            var existing = plc.Software.TagTableGroup.TagTables.SelectMany(t => t.Tags).ToList();
+            // Names are unique per scope (tags and constants of every subgroup of the root); addresses collide across the root, software units and safety units.
+            var symbolNames = ScopeSymbolNames(plc.Software.TagTableGroup);
+            var existing = SoftwareScopes(plc, new ScanBudget(50000)).SelectMany(scope => AllTagTables(scope.Tags)).SelectMany(t => t.Tags)
+                .Select(tag => BatchedAttributeReads.Tag(tag)).Select(tag => (tag.Name, Address: tag.LogicalAddress)).ToList();
             var rows = new JArray();
             var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var addresses = new HashSet<string>(StringComparer.Ordinal);
@@ -87,12 +98,8 @@ namespace TiaMcp.Openness.V21
                 if (fIo == null || !(fIo == device || fIo.StartsWith(device + "/", StringComparison.Ordinal)))
                     throw new BridgeException("SafetyBoundary", "The address " + address + " is not in an F-I/O range of this drive that the selected F-PLC owns. Nothing was written.",
                         new JObject { ["logicalAddress"] = address, ["fIoPath"] = fIo, ["drivePath"] = device });
-                if (existing.Any(t => string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase)))
-                    throw new BridgeException("ObjectExists", "A tag named " + name + " already exists in the PLC's root tag tables.");
-                var overlapping = existing.FirstOrDefault(t => TagAddressRules.IoOverlaps(t.LogicalAddress, address));
-                if (overlapping != null)
-                    throw new BridgeException("AddressInUse", "The existing tag " + overlapping.Name + " (" + overlapping.LogicalAddress + ") already covers " + address + ".",
-                        new JObject { ["logicalAddress"] = address, ["existingTag"] = overlapping.Name, ["existingAddress"] = overlapping.LogicalAddress });
+                // Every collision is found here, before ApplySafetyDriveTags creates the first tag.
+                SafetyTagCollisionRules.Require(symbolNames, existing, name, address);
                 rows.Add(new JObject { ["word"] = word, ["signal"] = status ? "S_ZSW1" : "S_STW1", ["bit"] = bit, ["name"] = name,
                     ["dataType"] = "Bool", ["logicalAddress"] = address, ["fIoPath"] = fIo });
             }
