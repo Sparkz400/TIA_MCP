@@ -164,7 +164,7 @@ internal static class RuntimeHandoffWorkflowChecks
         try { Reject(() => store.List(), "Record inventory refuses links", "PackageInvalid"); Check(File.ReadAllText(Path.Combine(peer, "keep")) == "original", "Link refusal preserves target"); }
         finally { Directory.Delete(link); }
         Check(File.ReadAllText(Path.Combine(peer, "keep")) == "original", "Unlink leaves target intact");
-        string filler = Path.Combine(storeRoot, "quota.tmp");
+        string filler = Path.Combine(storeRoot, "quota.partial");
         try
         {
             using (var file = new FileStream(filler, FileMode.CreateNew, FileAccess.Write)) file.SetLength(512L << 20);

@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
@@ -17,6 +19,42 @@ namespace TiaMcp.Simulator.V8
     {
         private readonly Dictionary<int, Selection> _instances = new Dictionary<int, Selection>();
         private bool _initialized;
+        private volatile bool _managerLost;
+        private EventInfo _lostEvent;
+        private Delegate _lostHandler;
+        private int _droppedByManagerLoss;
+
+        // SimulationRuntimeManager.OnRuntimeManagerLost: the Runtime Manager went away, so every selection is stale. The event arrives on a
+        // runtime thread; it only sets a flag and the selections are dropped at the start of the next call. Subscribed by reflection, because
+        // the delegate's signature is not verified natively: any mismatch leaves the worker without the subscription, never without the worker.
+        private void WatchManagerLost()
+        {
+            if (_lostHandler != null) return;
+            try
+            {
+                var lost = typeof(SimulationRuntimeManager).GetEvent("OnRuntimeManagerLost", BindingFlags.Public | BindingFlags.Static);
+                if (lost == null) return;
+                var parameters = lost.EventHandlerType.GetMethod("Invoke").GetParameters().Select(p => Expression.Parameter(p.ParameterType)).ToArray();
+                Action flag = () => _managerLost = true;
+                var handler = Expression.Lambda(lost.EventHandlerType, Expression.Invoke(Expression.Constant(flag)), parameters).Compile();
+                lost.AddEventHandler(null, handler);
+                _lostEvent = lost; _lostHandler = handler;
+            }
+            catch (Exception ex) { Console.Error.WriteLine("Simulator runtime-manager-lost subscription: " + ex.Message); }
+        }
+
+        private void DropLostSelections()
+        {
+            _managerLost = false;
+            _droppedByManagerLoss += _instances.Count;
+            foreach (var selected in _instances.Values)
+            {
+                try { StopWatch(selected); } catch { }
+                try { StopRecords(selected); } catch { }
+                try { selected.Instance.Dispose(); } catch { }
+            }
+            _instances.Clear();
+        }
 
         internal JObject Execute(string operation, JObject args)
         {
@@ -24,6 +62,8 @@ namespace TiaMcp.Simulator.V8
             // or calls license activation, network discovery, or adapter configuration.
             uint version = SimulationRuntimeManager.Version;
             _initialized = true;
+            WatchManagerLost();
+            if (_managerLost) DropLostSelections();
             switch (operation)
             {
                 case "bridge_info":
@@ -51,6 +91,7 @@ namespace TiaMcp.Simulator.V8
                 case "sim_area_read": return AreaRead(args);
                 case "sim_area_write": return AreaWrite(args);
                 case "sim_observe": return Observe(args);
+                case "sim_prune": return Prune(args);
                 default: throw new SimulatorException("UnknownOperation", "Unknown simulator operation: " + operation);
             }
         }
@@ -70,6 +111,12 @@ namespace TiaMcp.Simulator.V8
                 ["id"] = info.ID, ["name"] = info.Name, ["selected"] = _instances.ContainsKey(info.ID),
                 ["owned"] = _instances.ContainsKey(info.ID) && _instances[info.ID].Owned }));
             result["selections"] = new JArray(_instances.Values.Select(Info));
+            // Registered TiaMcp_ instances nobody holds: left by an earlier worker or by a release without deleteOwned. Their storage stays on disk.
+            result["orphanedInstances"] = new JArray(SimulationRuntimeManager.RegisteredInstanceInfo
+                .Where(info => !_instances.ContainsKey(info.ID) && info.Name != null && info.Name.StartsWith("TiaMcp_", StringComparison.Ordinal))
+                .Select(info => new JObject { ["id"] = info.ID, ["name"] = info.Name }));
+            result["orphanedInstancesNote"] = "Re-adopt with sim_select (instanceId, expectedName and the creationId of its receipt under the simulation artifact folder), then sim_release with deleteOwned. Storage folders are deleted only by an explicit sim_prune.";
+            if (_droppedByManagerLoss > 0) result["selectionsDroppedByRuntimeManagerLoss"] = _droppedByManagerLoss;
             result["licensePolicy"] = "No activation API or licensing-dialog confirmation. Explicit bounded PowerOn supplies the licensing result; trial and Test Suite warnings are rejected. LicenseStatus reports current use, not available entitlement.";
             result["downloadRoute"] = "Owned fresh virtual memory card, verified through a CurrentUser DPAPI ticket and independent local runtime identity check.";
             result["timing"] = "Wall-clock polling by default; sim_test virtualTime advances TimespanSynchronized_C spans and sim_time sets the virtual clock. No scan-accurate claim.";
@@ -265,8 +312,13 @@ namespace TiaMcp.Simulator.V8
             int maximum = OptionalInteger(args, "maxItems", 200, 1, 2000);
             string filter = args.Value<string>("filter") ?? "";
             if (filter.Length > 256) throw new SimulatorException("InvalidRequest", "filter is limited to 256 characters.");
+            // symbols (the Host's watch monitor): one exact lookup for up to 64 symbols, quoting and case ignored, instead of one filter each.
+            var symbols = args["symbols"] as JArray;
+            if (symbols != null && (symbols.Count < 1 || symbols.Count > 64 || symbols.Any(x => x.Type != JTokenType.String || x.Value<string>().Length > 512)))
+                throw new SimulatorException("InvalidRequest", "symbols must be 1-64 strings of at most 512 characters.");
+            var exact = symbols == null ? null : new HashSet<string>(symbols.Select(x => x.Value<string>().Replace("\"", "")), StringComparer.OrdinalIgnoreCase);
             if (args.Value<bool?>("refresh") ?? true) selected.Instance.UpdateTagList(ETagListDetails.IOMCTDB);
-            var matches = selected.Instance.TagInfos.Where(t => t.Name.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0).ToArray();
+            var matches = selected.Instance.TagInfos.Where(t => exact != null ? exact.Contains(t.Name.Replace("\"", "")) : t.Name.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0).ToArray();
             var result = Envelope(selected);
             result["tags"] = new JArray(matches.Take(maximum).Select(t => new JObject { ["symbol"] = t.Name,
                 ["dataType"] = t.DataType.ToString(), ["primitiveDataType"] = t.PrimitiveDataType.ToString(),
@@ -464,9 +516,13 @@ namespace TiaMcp.Simulator.V8
         {
             var selected = Get(args);
             bool remove = args.Value<bool?>("deleteOwned") ?? false;
+            // Set by the Host only when it has no live capture on this instance: a hold left by a failed capture end may then be restored here.
+            bool restoreHeld = args.Value<bool?>("restoreHeldCapture") ?? false;
             if (remove)
             {
                 if (!selected.Owned) throw new SimulatorException("OwnedInstanceRequired", "This adapter cannot unregister an instance it did not create.");
+                if (selected.CaptureHeld && !restoreHeld) throw new SimulatorException("SimulationCaptureModeActive", "A cycle-synchronous capture or virtual-time scenario holds this instance.");
+                if (restoreHeld) { try { RestoreCaptureMode(selected); } catch (Exception ex) { Console.Error.WriteLine("Simulator capture mode restore before delete: " + ex.Message); } }
                 if (selected.Instance.OperatingState != EOperatingState.Off) selected.Instance.PowerOff(30000);
                 selected.Instance.UnregisterInstance();
                 if (selected.CreationReceipt != null)
@@ -475,7 +531,7 @@ namespace TiaMcp.Simulator.V8
                     SimulationCreationJournal.Save(selected.CreationRoot, selected.CreationReceipt);
                 }
             }
-            else { RequireNoCapture(selected); RestoreCaptureMode(selected); }
+            else { if (!restoreHeld) RequireNoCapture(selected); RestoreCaptureMode(selected); }
             StopWatch(selected);
             StopRecords(selected);
             selected.Instance.Dispose();
@@ -562,32 +618,77 @@ namespace TiaMcp.Simulator.V8
             report["elapsedMs"] = clock.ElapsedMilliseconds;
             File.WriteAllText(reportPath, report.ToString(Formatting.Indented), new UTF8Encoding(false));
             report["reportPath"] = reportPath;
+            PruneReports(root);
             if (!report.Value<bool>("passed")) throw new SimulatorException("SimulationTestFailed", "Simulation scenario failed or contains bad-quality samples. Inspect the retained report.", report);
             return report;
+        }
+
+        private const int ReportsKept = 50;
+        // Only this adapter's own simulation-test-<hex>.json reports in the scenario folder; the newest ReportsKept stay.
+        private static void PruneReports(string root)
+        {
+            try
+            {
+                var files = new DirectoryInfo(root).GetFiles("simulation-test-*.json").Select(f => (f.FullName, f.LastWriteTimeUtc));
+                foreach (string path in SimulationRuntimeControl.ExcessReports(files, ReportsKept))
+                    try { File.Delete(path); } catch (IOException) { } catch (UnauthorizedAccessException) { }
+            }
+            catch (IOException) { }
         }
 
         private static JObject Sample(Selection selected, List<Signal> signals, Func<long> now) =>
             new JObject { ["elapsedMs"] = now(), ["values"] = Capture(selected, signals) };
 
+        // Scalar signals are read in one ReadSignals call; strings, over-long names and any batch with a bad item fall back to one read per
+        // symbol, which keeps every error attributed to its own signal (PLCSIM rejects a whole batch for one unknown symbol).
         private static JArray Capture(Selection selected, List<Signal> signals)
         {
             ResolveNames(selected.Instance, signals);
+            var batched = BatchRead(selected, signals);
             var values = new JArray();
             foreach (var signal in signals)
             {
-                var value = new JObject { ["symbol"] = signal.Symbol, ["type"] = signal.Type, ["observedAtUtc"] = DateTime.UtcNow.ToString("O") };
-                try
-                {
-                    var observed = ReadValue(selected.Instance, signal);
-                    if ((signal.Type == "float" || signal.Type == "double") && (double.IsNaN(observed.Value<double>()) || double.IsInfinity(observed.Value<double>())))
-                        throw new SimulatorException("NonFiniteValue", "PLC real value is NaN or infinite; JSON capture cannot represent it as a finite number.");
-                    value["value"] = observed; value["quality"] = "good";
-                }
-                catch (Exception ex) { value["quality"] = "bad"; value["error"] = ex.Message; value["errorCode"] = ErrorCode(ex); }
-                value["completedAtUtc"] = DateTime.UtcNow.ToString("O");
-                values.Add(value);
+                JObject done;
+                values.Add(batched.TryGetValue(signal, out done) ? done : ReadOne(selected, signal));
             }
             return values;
+        }
+
+        private static JObject ReadOne(Selection selected, Signal signal)
+        {
+            var value = new JObject { ["symbol"] = signal.Symbol, ["type"] = signal.Type, ["observedAtUtc"] = DateTime.UtcNow.ToString("O") };
+            try
+            {
+                var observed = ReadValue(selected.Instance, signal);
+                if ((signal.Type == "float" || signal.Type == "double") && (double.IsNaN(observed.Value<double>()) || double.IsInfinity(observed.Value<double>())))
+                    throw new SimulatorException("NonFiniteValue", "PLC real value is NaN or infinite; JSON capture cannot represent it as a finite number.");
+                value["value"] = observed; value["quality"] = "good";
+            }
+            catch (Exception ex) { value["quality"] = "bad"; value["error"] = ex.Message; value["errorCode"] = ErrorCode(ex); }
+            value["completedAtUtc"] = DateTime.UtcNow.ToString("O");
+            return value;
+        }
+
+        // Only an all-good, finite batch is used; anything else returns nothing and the caller reads symbol by symbol.
+        private static Dictionary<Signal, JObject> BatchRead(Selection selected, List<Signal> signals)
+        {
+            var result = new Dictionary<Signal, JObject>();
+            var scalars = signals.Where(s => Primitives.ContainsKey(s.Type) && s.Native.Length < 300).ToList();
+            if (scalars.Count < 2) return result;
+            var batch = scalars.Select(s => new SDataValueByName { Name = s.Native, DataValue = new SDataValue { Type = Primitives[s.Type] } }).ToArray();
+            string observedAt = DateTime.UtcNow.ToString("O");
+            try { selected.Instance.ReadSignals(ref batch); } catch (Exception) { return result; }
+            string completedAt = DateTime.UtcNow.ToString("O");
+            var read = new List<JObject>();
+            for (int i = 0; i < scalars.Count; i++)
+            {
+                if (batch[i].ErrorCode != ERuntimeErrorCode.OK) return result;
+                var observed = Unpack(batch[i].DataValue, scalars[i].Type);
+                if ((scalars[i].Type == "float" || scalars[i].Type == "double") && (double.IsNaN((double)observed) || double.IsInfinity((double)observed))) return result;
+                read.Add(new JObject { ["symbol"] = scalars[i].Symbol, ["type"] = scalars[i].Type, ["observedAtUtc"] = observedAt, ["value"] = observed, ["quality"] = "good", ["completedAtUtc"] = completedAt });
+            }
+            for (int i = 0; i < scalars.Count; i++) result[scalars[i]] = read[i];
+            return result;
         }
 
         private static JArray ApplyWrites(Selection selected, List<Signal> signals)
@@ -610,7 +711,18 @@ namespace TiaMcp.Simulator.V8
         // whose tag-list area is Output refuses the whole request, with the code sim_area_write refuses the output area with.
         private static void RefuseOutputs(Selection selected, IEnumerable<Signal> writes)
         {
-            string symbol = SimulationRuntimeControl.OutputSymbol(writes.Select(w => w.Symbol).ToList(), selected.Instance.TagInfos.Select(t => (t.Name, t.Area.ToString())));
+            var symbols = writes.Select(w => w.Symbol).ToList();
+            // A download can add tags after the cached list was read, so the list is refreshed first; if that fails the cached one decides.
+            bool refreshed = false;
+            try { selected.Instance.UpdateTagList(ETagListDetails.IOMCTDB); refreshed = true; } catch (Exception) { }
+            var tags = new List<(string Name, string Area)>();
+            var tagInfos = selected.Instance.TagInfos;
+            if (tagInfos != null) foreach (var t in tagInfos) tags.Add((t.Name, t.Area.ToString()));
+            string symbol = SimulationRuntimeControl.OutputSymbol(symbols, tags);
+            string unlisted = refreshed ? SimulationRuntimeControl.UnlistedSymbol(symbols, tags.Select(t => t.Name)) : null;
+            if (symbol == null && unlisted != null)
+                throw new SimulatorException("InvalidRequest", unlisted + " is not in the instance's tag list (refreshed just now), so it cannot be written. Check the spelling, or that the program with this symbol is downloaded. Nothing was written.",
+                    new JObject { ["symbol"] = unlisted, ["reason"] = "notInTagList" });
             if (symbol != null)
                 throw new SimulatorException("InvalidRequest", symbol + " is in the output area, which the program writes every scan, so outputs are read-only here. Nothing was written.",
                     new JObject { ["symbol"] = symbol, ["area"] = "Output" });
@@ -888,6 +1000,7 @@ namespace TiaMcp.Simulator.V8
 
         public void Dispose()
         {
+            if (_lostEvent != null) { try { _lostEvent.RemoveEventHandler(null, _lostHandler); } catch (Exception) { } _lostEvent = null; _lostHandler = null; }
             // Interface disposal does not unregister/power off CPUs. Cleanup is explicit.
             foreach (var selected in _instances.Values)
             {

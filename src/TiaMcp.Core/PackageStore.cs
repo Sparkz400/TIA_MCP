@@ -33,9 +33,16 @@ public sealed class PackageStore
             throw new BridgeException("InvalidRequest", "Specify exactly one committed artifactRef or explicit hostPath.");
         if (sourceUrl is not null && (sourceUrl.Length > 4096 || !Uri.TryCreate(sourceUrl, UriKind.Absolute, out var uri) || uri.Scheme is not ("https" or "http")))
             throw new BridgeException("InvalidRequest", "sourceUrl must be a bounded HTTP(S) provenance URL; it is not fetched or authenticated.");
-        using var gate = PackageStorage.Lock(Path.Combine(_root, "intake.lock"));
-        string source, label;
+        // The global gate covers admission and the final publication only. The copy and extraction run in this call's own
+        // staging directory (private until published as ready), so uploads, status and library_open are not blocked for their duration.
+        string source, label, id, directory;
         string? expectedHash = null;
+        bool isDirectory;
+        List<InputFile> inputs;
+        IntakeBudget budget;
+        var gate = PackageStorage.Lock(Path.Combine(_root, "intake.lock"));
+        try
+        {
         if (artifactRef is not null)
         {
             var artifact = new ArtifactUploadStore(_artifacts, _limits).ResolveCommittedUnderLock(artifactRef);
@@ -58,17 +65,19 @@ public sealed class PackageStore
         }
         if (Directory.EnumerateDirectories(_packages).Count() >= _limits.MaxPackages)
             throw new BridgeException("PackageLimitExceeded", "Package count limit reached; release unreferenced packages explicitly.");
-        var isDirectory = Directory.Exists(source);
+        isDirectory = Directory.Exists(source);
         if (isDirectory && (_root.Equals(source, StringComparison.OrdinalIgnoreCase) || _root.StartsWith(Path.TrimEndingDirectorySeparator(source) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)))
             throw new BridgeException("PackageInvalid", "A source directory cannot contain the managed intake root.");
-        var budget = new IntakeBudget(_limits, _root, ReservedUploadBytes(), cancellationToken);
-        var inputs = isDirectory ? EnumerateSource(source, budget) : [new InputFile(source, PackageStorage.Relative(label))];
+        budget = new IntakeBudget(_limits, _root, ReservedUploadBytes(), cancellationToken);
+        inputs = isDirectory ? EnumerateSource(source, budget) : [new InputFile(source, PackageStorage.Relative(label))];
         if (!isDirectory) budget.Entry();
         if (inputs.Count == 0) throw new BridgeException("PackageInvalid", "Package directory contains no files.");
-        var id = Guid.NewGuid().ToString("N");
-        var directory = PackageStorage.Under(_packages, id);
+        id = Guid.NewGuid().ToString("N");
+        directory = PackageStorage.Under(_packages, id);
         Directory.CreateDirectory(directory);
         PackageStorage.Save(Path.Combine(directory, "state.json"), new { schemaVersion = 1, packageId = id, state = "staging", createdUtc = DateTimeOffset.UtcNow });
+        }
+        finally { gate.Dispose(); }
         var files = new List<PackageFile>();
         var diagnostics = new List<string>();
         try
@@ -103,9 +112,17 @@ public sealed class PackageStore
             var manifest = new PackageManifest(1, id, "ready", DateTimeOffset.UtcNow, Environment.MachineName,
                 artifactRef is not null ? "upload" : isDirectory ? "hostDirectory" : "hostFile", label, sourceUrl, sourceHash,
                 budget.InputBytes, budget.ExpandedBytes, _limits, sorted, candidates, documents, diagnostics.ToArray());
-            PackageStorage.Save(Path.Combine(directory, "manifest.json"), manifest);
-            PackageStorage.Save(Path.Combine(directory, "references.json"), Array.Empty<string>());
-            PackageStorage.Save(Path.Combine(directory, "state.json"), new { schemaVersion = 1, packageId = id, state = "ready", createdUtc = manifest.CreatedUtc });
+            using (PackageStorage.Lock(Path.Combine(_root, "intake.lock")))
+            {
+                // Stagings that ran side by side were each admitted against the store as it was then; the sum is checked again here.
+                if (Directory.EnumerateDirectories(_packages).Count() > _limits.MaxPackages)
+                    throw new BridgeException("PackageLimitExceeded", "Package count limit reached; release unreferenced packages explicitly.");
+                if (PackageStorage.StoredBytes(_root) > _limits.MaxStoredBytes)
+                    throw new BridgeException("PackageLimitExceeded", "Streamed bytes exceed the configured input, expansion or total storage limit.");
+                PackageStorage.Save(Path.Combine(directory, "manifest.json"), manifest);
+                PackageStorage.Save(Path.Combine(directory, "references.json"), Array.Empty<string>());
+                PackageStorage.Save(Path.Combine(directory, "state.json"), new { schemaVersion = 1, packageId = id, state = "ready", createdUtc = manifest.CreatedUtc });
+            }
             return ToStatus(directory, manifest);
         }
         catch (Exception error)

@@ -11,6 +11,8 @@ namespace TiaMcp.Model
     internal sealed class ClassicScreenDocumentCache
     {
         private readonly Dictionary<string, XDocument> documents = new Dictionary<string, XDocument>(StringComparer.Ordinal);
+        private readonly Queue<string> order = new Queue<string>();
+        private readonly Dictionary<string, int> sizes = new Dictionary<string, int>(StringComparer.Ordinal);
         private long characters;
         internal XDocument Read(string validatedHash, byte[] bytes)
         {
@@ -23,8 +25,16 @@ namespace TiaMcp.Model
             {
                 string validatedXml = new UTF8Encoding(false, true).GetString(bytes).TrimStart('\uFEFF');
                 document = HmiPreservationRules.ReadXml(validatedXml);
-                if (documents.Count >= 128 || characters + validatedXml.Length > 16 * 1024 * 1024) { documents.Clear(); characters = 0; }
-                if (validatedXml.Length <= 16 * 1024 * 1024) { documents.Add(validatedHash, document); characters += validatedXml.Length; }
+                if (validatedXml.Length <= 16 * 1024 * 1024)
+                {
+                    // Evict the oldest documents until this one fits; a full cache keeps what a screen walk is still reusing.
+                    while (order.Count > 0 && (documents.Count >= 128 || characters + validatedXml.Length > 16 * 1024 * 1024))
+                    {
+                        string oldest = order.Dequeue();
+                        documents.Remove(oldest); characters -= sizes[oldest]; sizes.Remove(oldest);
+                    }
+                    documents.Add(validatedHash, document); order.Enqueue(validatedHash); sizes.Add(validatedHash, validatedXml.Length); characters += validatedXml.Length;
+                }
             }
             return new XDocument(document); // Callers cannot poison later compositions.
         }

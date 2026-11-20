@@ -44,13 +44,14 @@ internal static class MonitorChecks
         Equal("Gate_DB.Active", rows[0]!["resolution"]!["symbol"]!.GetValue<string>());
         // Stored configuration travels verbatim; it is never a live value.
         Equal("TRUE", rows[0]!["row"]!["modifyValue"]!.GetValue<string>());
-        // One tag-list lookup per distinct filter, refreshed only on the first; three samples of three distinct symbols.
+        // One exact-symbol tag-list lookup for the whole page (refreshed), never a leaf-name filter per row; three samples of three distinct symbols.
         string[] ops = calls.Select(c => c.Op).ToArray();
         Equal("sim_identity", ops[0]); Equal("watch_read", ops[1]);
         True(ops.All(o => o is "sim_identity" or "watch_read" or "sim_tags" or "sim_read"));
         var lookups = calls.Where(c => c.Op == "sim_tags").ToArray();
-        Equal("Active,Missing,Pair,Text,Speed,Twice", string.Join(",", lookups.Select(c => c.Args["filter"]!.GetValue<string>())));
-        True(lookups[0].Args["refresh"]!.GetValue<bool>() && lookups.Skip(1).All(c => !c.Args["refresh"]!.GetValue<bool>()));
+        Equal(1, lookups.Length);
+        Equal("Gate_DB.Active,Missing,Gate_DB.Pair,Gate_DB.Text,Gate_DB.Speed,Gate_DB.Twice", string.Join(",", lookups[0].Args["symbols"]!.AsArray().Select(s => s!.GetValue<string>())));
+        True(lookups[0].Args["refresh"]!.GetValue<bool>() && lookups[0].Args["filter"] is null);
         var reads = calls.Where(c => c.Op == "sim_read").ToArray();
         Equal(3, reads.Length);
         Equal(3, reads[0].Args["signals"]!.AsArray().Count);
@@ -128,7 +129,7 @@ internal static class MonitorChecks
             return op switch
             {
                 "sim_identity" => new JsonObject { ["origin"] = "PLCSIM Advanced V8/local API", ["communicationInterface"] = "Softbus" },
-                "sim_tags" => new JsonObject { ["tags"] = new JsonArray(Tags.Where(t => t["symbol"]!.GetValue<string>().Contains(args["filter"]!.GetValue<string>(), StringComparison.OrdinalIgnoreCase))
+                "sim_tags" => new JsonObject { ["tags"] = new JsonArray(Tags.Where(t => args["symbols"]!.AsArray().Any(s => s!.GetValue<string>() == t["symbol"]!.GetValue<string>().Replace("\"", "")))
                     .Select(t => (JsonNode?)t.DeepClone()).ToArray()), ["truncated"] = false },
                 "sim_read" => new JsonObject { ["instanceId"] = 7, ["instanceName"] = "owned", ["values"] = new JsonArray(args["signals"]!.AsArray().Select(s => (JsonNode?)new JsonObject {
                     ["symbol"] = foreign ? "Other" : s!["symbol"]!.GetValue<string>(), ["type"] = s!["type"]!.GetValue<string>(),

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.188",
+  "catalogVersion": "0.4.189",
   "targetTiaVersions": [
     21
   ],
@@ -9376,6 +9376,49 @@
         "evidenceIds": [
           "local.sim.creation.20261024"
         ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-simulator-lifecycle",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_prune",
+      "domain": "simulation",
+      "title": "Prune storage and archives this adapter created for unregistered simulators",
+      "mcpTools": [
+        "sim_prune"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "No PLCSIM API call: file retention over the adapter-created storage folders and archives; the registered and selected instances come from SimulationRuntimeManager.RegisteredInstanceInfo."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Opt-in: without delete it only lists. delete:true needs names, olderThanDays or maxTotalMegabytes; at most 200 deletions per call.",
+          "Deletes only the storage folder of an instance whose signed creation receipt says it was unregistered, that is neither registered nor selected, whose ownership marker still matches the receipt and that holds no link; and archives whose receipt still matches their SHA-256 and size. Everything else is listed with its refusal.",
+          "File logic verified offline against temporary folders; not run against a live PLCSIM installation."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
       },
       "availability": {
         "status": "conditional",

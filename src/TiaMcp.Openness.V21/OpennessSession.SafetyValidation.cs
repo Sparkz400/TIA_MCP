@@ -113,6 +113,19 @@ namespace TiaMcp.Openness.V21
         // An F-I/O exposes Failsafe_FDestinationAddress, as safety_validation_inspect and safety_fparameter_set select them.
         private static bool IsFIo(DeviceItem item) => item.GetAttributeInfos().Any(info => info.Name == "Failsafe_FDestinationAddress");
 
+        // The item, an ancestor or a subitem is F-I/O or carries a PROFIsafe drive telegram. F-I/O attribute metadata that cannot be read counts as
+        // no F-I/O, as in FIoAddressRanges (some native items throw there); a drive's unreadable telegrams count as safety. Not natively verified: whether TIA itself already refuses these edits while the safety program is locked.
+        private static void EnsureNoSafetyHardware(DeviceItem item) => SafetyHardwareRules.Require(
+            SafetyHardwareRules.FirstSafety(item, entry => entry.DeviceItems.Cast<DeviceItem>(), entry => entry.Parent as DeviceItem, IsSafetyHardware, entry => entry.Name), "this hardware edit");
+
+        private static bool IsSafetyHardware(DeviceItem item)
+        {
+            try { if (IsFIo(item)) return true; } catch (Exception) { }
+            try { return Startdrive(() => HasSafetyTelegram(item)); }
+            catch (BridgeException error) when (error.Code == "UnsupportedCapability") { return false; } // no Startdrive installed: no drive telegrams
+            catch (Exception) { return true; } // a drive whose telegrams cannot be read: a PROFIsafe telegram cannot be excluded
+        }
+
         // Address ranges of every F-I/O subtree whose addresses the PLC owns or may own (no or an unresolved controller counts),
         // for tag_create. Metadata that cannot be read leaves an item out; the created tag's IsSafety readback stays the backstop.
         private static List<(string IoType, int StartByte, int LengthBits, string Path)> FIoAddressRanges(PlcSelection plc)
@@ -191,9 +204,10 @@ namespace TiaMcp.Openness.V21
             var hardware = DeviceItems(project, budget).ToArray();
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "F-I/O lookup is incomplete.");
             // Every F-I/O not provably on another F-source; an unreadable F-source counts, so the collision check stays conservative.
-            var fIo = hardware.Where(entry => IsFIo(entry.Item)).Where(entry =>
+            var allFIo = hardware.Where(entry => IsFIo(entry.Item)).ToArray();
+            var fIo = allFIo.Where(entry =>
                 { var source = FailsafeValue(entry.Item, "Failsafe_FSourceAddress"); return source?.Type != JTokenType.Integer || JToken.DeepEquals(source, central); }).ToArray();
-            var targets = new List<(HardwareEntry Entry, string Name, object Value)>();
+            var targets = new List<(HardwareEntry Entry, string Name, object Value, object Before)>();
             var result = new JArray();
             foreach (var token in rows)
             {
@@ -224,27 +238,28 @@ namespace TiaMcp.Openness.V21
                 if (Equals(value, before)) throw new BridgeException("InvalidRequest", "The requested value equals the current value: " + path + " " + name);
                 // Preservation compares native scalars, not the JSON input spelling.
                 row["value"] = ChangeScalar(value);
-                targets.Add((entry, name, value));
+                targets.Add((entry, name, value, before));
                 result.Add(new JObject { ["hardwarePath"] = path, ["name"] = name, ["type"] = before.GetType().FullName, ["before"] = ChangeScalar(before), ["after"] = row["value"].DeepClone(),
                     ["moduleTypeIdentifier"] = module, ["qualification"] = FParameterAllowlistRules.Qualified(qualification) ? qualification : new JObject { ["discovery"] = true, ["allowlistRow"] = qualification },
                     ["fParameterSignatures"] = FParameterSignatures(entry.Item) });
             }
+            var sourcePaths = new HashSet<string>(fIo.Select(entry => entry.Path), StringComparer.Ordinal);
             foreach (var target in targets.Where(target => target.Name == "Failsafe_FDestinationAddress"))
             {
-                var conflicts = new JArray();
-                foreach (var other in fIo.Where(other => other.Path != target.Entry.Path))
-                {
-                    var current = FailsafeValue(other.Item, "Failsafe_FDestinationAddress");
-                    if (current?.Type != JTokenType.Integer) throw new BridgeException("DependencyCoverageIncomplete", "An F-destination address is unreadable; collision absence cannot be established: " + other.Path);
-                    // Current and planned addresses both count, so swaps and chained moves refuse rather than pass through a transient duplicate.
-                    if (JToken.DeepEquals(current, ChangeScalar(target.Value)) || targets.Any(peer => peer.Entry.Path == other.Path && peer.Name == target.Name && Equals(peer.Value, target.Value)))
-                        conflicts.Add(other.Path);
-                }
-                if (conflicts.Count != 0) throw new BridgeException("AddressConflict", "The F-destination address is used or planned by another F-I/O on this safety PLC's F-source: " + target.Entry.Path, new JObject { ["conflicts"] = conflicts });
+                var wanted = ChangeScalar(target.Value);
+                bool Planned(HardwareEntry other) => targets.Any(peer => peer.Entry.Path == other.Path && peer.Name == target.Name && Equals(peer.Value, target.Value));
+                (string Path, JToken Current, bool PlannedSame) Row(HardwareEntry other) => (other.Path, FailsafeValue(other.Item, "Failsafe_FDestinationAddress"), Planned(other));
+                var conflicts = FDestinationRules.Duplicates(wanted, fIo.Where(other => other.Path != target.Entry.Path).Select(Row), true);
+                if (conflicts.Count != 0) throw new BridgeException("AddressConflict", "The F-destination address is used or planned by another F-I/O on this safety PLC's F-source: " + target.Entry.Path, new JObject { ["conflicts"] = new JArray(conflicts.ToArray()) });
+                // The rest of the project: another F-source may legitimately reuse an address, so this is reported, not refused.
+                var elsewhere = FDestinationRules.Duplicates(wanted, allFIo.Where(other => !sourcePaths.Contains(other.Path)).Select(Row), false);
+                if (elsewhere.Count != 0)
+                    result.OfType<JObject>().First(row => row.Value<string>("hardwarePath") == target.Entry.Path && row.Value<string>("name") == target.Name)["fDestinationUsedOnOtherFSource"] = new JArray(elsewhere.ToArray());
             }
             if (!write) return result;
             // The whole batch is preflighted before the first setter; a native failure after dispatch still requires checkpoint recovery.
-            foreach (var target in targets) target.Entry.Item.SetAttribute(target.Name, target.Value);
+            // A native failure midway restores the earlier writes (best effort); the checkpoint stays the recovery.
+            CompensatingWrites.Apply(targets, target => target.Entry.Item.SetAttribute(target.Name, target.Value), target => target.Entry.Item.SetAttribute(target.Name, target.Before), target => target.Entry.Path + " " + target.Name);
             result = new JArray();
             foreach (var target in targets)
             {
