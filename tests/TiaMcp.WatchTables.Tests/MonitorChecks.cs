@@ -10,6 +10,7 @@ internal static class MonitorChecks
         ("Monitor resolves rows against the target tag list and samples only reads", Resolution),
         ("Monitor bounds and ownership refuse before any table read", Refusals),
         ("Monitor refuses a sim_read answer for other symbols", ForeignAnswer),
+        ("Monitor parses absolute addresses and refuses what the area read cannot reach", Addresses),
         ("Monitor drops only its own watch_read export folder", Export),
     ];
 
@@ -23,6 +24,11 @@ internal static class MonitorChecks
         Row("PlcWatchTableEntry", "\"Gate_DB\".Speed", null),
         Row("PlcWatchTableEntry", "\"Gate_DB\".Active", null),
         Row("PlcWatchTableEntry", "\"Gate_DB\".Twice", null),
+        Row("PlcWatchTableEntry", null, "%I0.3"),
+        Row("PlcWatchTableEntry", null, "%QB4"),
+        Row("PlcWatchTableEntry", null, "%IW64:P"),
+        Row("PlcWatchTableEntry", null, "%DB1.DBX0.0"),
+        Row("PlcWatchTableEntry", null, "%MD2000"),
     ];
     private static readonly JsonObject[] Tags = [
         Tag("Gate_DB.Active", "Bool", "Bool"), Tag("Gate_DB.Pair", "Struct", "Struct"), Tag("Gate_DB.Text", "String", "Unspecific"),
@@ -32,11 +38,13 @@ internal static class MonitorChecks
     private static void Resolution()
     {
         var (engineering, simulator, calls) = Workers();
-        var result = Run(engineering, simulator, count: 9, samples: 3);
+        var result = Run(engineering, simulator, count: 14, samples: 3);
         var rows = result["rows"]!.AsArray();
         string[] statuses = rows.Select(r => r!["resolution"]!["status"]!.GetValue<string>()).ToArray();
-        Equal("resolved,comment,unresolved,unresolved,unsupportedType,resolved,resolved,resolved,unresolved", string.Join(",", statuses));
-        Equal("absoluteAddressOnly", rows[2]!["resolution"]!["reason"]!.GetValue<string>());
+        Equal("resolved,comment,resolved,unresolved,unsupportedType,resolved,resolved,resolved,unresolved,resolved,resolved,unresolved,unresolved,resolved", string.Join(",", statuses));
+        Equal("marker", rows[2]!["resolution"]!["area"]!.GetValue<string>());
+        Equal("peripheralAddress", rows[11]!["resolution"]!["reason"]!.GetValue<string>());
+        Equal("unsupportedAddress", rows[12]!["resolution"]!["reason"]!.GetValue<string>());
         Equal("notInTargetTagList", rows[3]!["resolution"]!["reason"]!.GetValue<string>());
         Equal("ambiguousInTargetTagList", rows[8]!["resolution"]!["reason"]!.GetValue<string>());
         Equal("string", rows[5]!["resolution"]!["type"]!.GetValue<string>());
@@ -47,7 +55,7 @@ internal static class MonitorChecks
         // One exact-symbol tag-list lookup for the whole page (refreshed), never a leaf-name filter per row; three samples of three distinct symbols.
         string[] ops = calls.Select(c => c.Op).ToArray();
         Equal("sim_identity", ops[0]); Equal("watch_read", ops[1]);
-        True(ops.All(o => o is "sim_identity" or "watch_read" or "sim_tags" or "sim_read"));
+        True(ops.All(o => o is "sim_identity" or "watch_read" or "sim_tags" or "sim_read" or "sim_area_read"));
         var lookups = calls.Where(c => c.Op == "sim_tags").ToArray();
         Equal(1, lookups.Length);
         Equal("Gate_DB.Active,Missing,Gate_DB.Pair,Gate_DB.Text,Gate_DB.Speed,Gate_DB.Twice", string.Join(",", lookups[0].Args["symbols"]!.AsArray().Select(s => s!.GetValue<string>())));
@@ -56,7 +64,17 @@ internal static class MonitorChecks
         Equal(3, reads.Length);
         Equal(3, reads[0].Args["signals"]!.AsArray().Count);
         var sample = result["samples"]!.AsArray()[2]!["values"]!.AsArray();
-        Equal("0,5,6,7", string.Join(",", sample.Select(v => v!["ordinal"]!.GetValue<int>())));
+        Equal("0,2,5,6,7,9,10,13", string.Join(",", sample.Select(v => v!["ordinal"]!.GetValue<int>())));
+        // Area rows: one read per row and sample, raw big-endian bytes, bit as bool, a too-large offset marks only its row; no write op is ever sent.
+        var areaReads = calls.Where(c => c.Op == "sim_area_read").ToArray();
+        Equal(12, areaReads.Length);
+        Equal("marker,input,output", string.Join(",", areaReads.Take(3).Select(c => c.Args["area"]!.GetValue<string>())));
+        Equal(3, areaReads.Where(c => c.Args["bit"] is not null).Count());
+        Equal(258L, sample.Single(v => v!["ordinal"]!.GetValue<int>() == 2)!["value"]!.GetValue<long>());
+        True(sample.Single(v => v!["ordinal"]!.GetValue<int>() == 9)!["value"]!.GetValue<bool>());
+        Equal("bad", sample.Single(v => v!["ordinal"]!.GetValue<int>() == 13)!["quality"]!.GetValue<string>());
+        Equal("InvalidRequest", sample.Single(v => v!["ordinal"]!.GetValue<int>() == 13)!["errorCode"]!.GetValue<string>());
+        True(calls.All(c => !c.Op.Contains("write")));
         True(sample.Where(v => v!["ordinal"]!.GetValue<int>() is 0 or 7).All(v => v!["value"]!.GetValue<bool>()));
         Equal("bad", sample.Single(v => v!["ordinal"]!.GetValue<int>() == 6)!["quality"]!.GetValue<string>());
         True(!result["forced"]!.GetValue<bool>() && !result["modified"]!.GetValue<bool>() && result["readOnly"]!.GetValue<bool>() && !result["programMatchVerified"]!.GetValue<bool>());
@@ -64,9 +82,9 @@ internal static class MonitorChecks
 
         (engineering, simulator, calls) = Workers();
         var page = Run(engineering, simulator, offset: 1, count: 2)["page"]!;
-        Equal(3, page["nextOffset"]!.GetValue<int>()); Equal(9, page["total"]!.GetValue<int>());
-        // A page of rows without symbols reads nothing.
-        True(calls.All(c => c.Op is "sim_identity" or "watch_read"));
+        Equal(3, page["nextOffset"]!.GetValue<int>()); Equal(14, page["total"]!.GetValue<int>());
+        // A page without symbolic rows sends no tag-list lookup or symbol read; its one absolute-address row is an area read.
+        True(calls.All(c => c.Op is "sim_identity" or "watch_read" or "sim_area_read"));
         (engineering, simulator, _) = Workers();
         True(Run(engineering, simulator, offset: 8, count: 64)["page"]!["nextOffset"] is null);
     }
@@ -88,6 +106,23 @@ internal static class MonitorChecks
     {
         var (engineering, simulator, _) = Workers(foreign: true);
         Code("PlcsimResponseInvalid", () => Run(engineering, simulator));
+    }
+
+    private static void Addresses()
+    {
+        foreach (var (address, area, offset, bit, length) in new[] { ("%I0.0", "input", 0, 0, 1), ("%q12.7", "output", 12, 7, 1), ("%MB5", "marker", 5, -1, 1),
+            ("%IW64", "input", 64, -1, 2), ("%QD8", "output", 8, -1, 4), (" %MW10 ", "marker", 10, -1, 2) })
+        {
+            var r = WatchTableMonitor.ResolveAddress(address);
+            Equal("resolved", r["status"]!.GetValue<string>());
+            Equal(area, r["area"]!.GetValue<string>()); Equal(offset, r["offset"]!.GetValue<int>()); Equal(length, r["length"]!.GetValue<int>());
+            Equal(bit, r["bit"]?.GetValue<int>() ?? -1);
+        }
+        foreach (string bad in new[] { "%I0.8", "%IX0.0", "%L0.0", "%MW", "%MW-1", "MW10", "%MW1234567", "%IW64:P", "%DB1.DBW0" })
+            Equal("unresolved", WatchTableMonitor.ResolveAddress(bad)["status"]!.GetValue<string>());
+        // The foreign-instance answer to an area read is refused, never reported as a row error.
+        var (engineering, simulator, _) = Workers(foreign: true);
+        Code("PlcsimResponseInvalid", () => Run(engineering, simulator, offset: 9, count: 1));
     }
 
     private static void Export()
@@ -135,6 +170,10 @@ internal static class MonitorChecks
                     ["symbol"] = foreign ? "Other" : s!["symbol"]!.GetValue<string>(), ["type"] = s!["type"]!.GetValue<string>(),
                     ["value"] = s["type"]!.GetValue<string>() switch { "bool" => (JsonNode?)true, "string" => "text", _ => null },
                     ["quality"] = s["type"]!.GetValue<string>() == "int16" ? "bad" : "good" }).ToArray()) },
+                "sim_area_read" when args["offset"]!.GetValue<int>() > 1000 => throw new BridgeException("InvalidRequest", "beyond the area"),
+                "sim_area_read" => new JsonObject { ["instanceId"] = foreign ? 8 : 7, ["instanceName"] = "owned",
+                    ["value"] = args["bit"] is null ? null : true,
+                    ["bytes"] = args["bit"] is null ? new JsonArray(Enumerable.Range(1, args["length"]!.GetValue<int>()).Select(b => (JsonNode?)b).ToArray()) : null },
                 _ => throw new BridgeException("UnexpectedOperation", op)
             };
         });

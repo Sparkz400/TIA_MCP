@@ -297,8 +297,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "eefc6e28aeb57cecc8f6b9fe97e8ec85637b8e9828f81cc9280567b9cfc6d5ff",
-      "bytes": 1947039
+      "sha256": "9ddc28b9fede3b2875f6343a88d7e41d1e3d9c4464c2305afb3b8e947489bcd8",
+      "bytes": 1947519
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -532,8 +532,8 @@
     },
     {
       "path": "contracts/runtime-capture.v1.schema.json",
-      "sha256": "f177f0f0548cc8ba88cbd919234ae3e470438bcb80ae5bf5fac94d3659f25f5a",
-      "bytes": 25908
+      "sha256": "8c3fbf2be5889bc40a38b22770501dd031d6600144aeafb530e5ec229e886d21",
+      "bytes": 27273
     },
     {
       "path": "contracts/runtime-handoff.v1.schema.json",
@@ -1467,8 +1467,8 @@
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/SimulatorCaptureContracts.cs",
-      "sha256": "c45d676bc4e8e8f90209e18df27f2c730507f201e2dc435c8d9c417501512985",
-      "bytes": 10940
+      "sha256": "c0999f1eaf7820f3e079035b43a0a8e3bf8daf2cf2571b66cf3517d369b5d4e7",
+      "bytes": 11713
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
@@ -1832,8 +1832,8 @@
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
-      "sha256": "664a0f1062c491541be94ba95905e07ca6c8f4040aab0e206a7cd91cfe09dd0b",
-      "bytes": 10315
+      "sha256": "66a7ea9d090030b998fe346a8deedd0ca36f88f28cbb3a1f626475e44364530f",
+      "bytes": 14425
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTablePlanner.cs",
@@ -2132,8 +2132,8 @@
     },
     {
       "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
-      "sha256": "9e9197a38142cb60f68f5459673601f9604568a279250590e696c0c55e65a20f",
-      "bytes": 13235
+      "sha256": "4ebde951ebad4e5a346a4928af098835c02182ceacfb528316bd8e729d73744e",
+      "bytes": 13491
     },
     {
       "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
@@ -2332,8 +2332,8 @@
     },
     {
       "path": "src/TiaMcp.Host/WatchTableTools.cs",
-      "sha256": "1b4beb093bdad5339535506e0aba644b497860c620b185869ff10e7934373e6e",
-      "bytes": 14619
+      "sha256": "27bd8e844c2a8bed8a5ef674d91b573cf0ad065cf43d8c743d490388c0b1cf99",
+      "bytes": 14836
     },
     {
       "path": "src/TiaMcp.Host/WebApplicationTools.cs",
@@ -3682,8 +3682,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationRuntimeControl.cs",
-      "sha256": "6884a3485c78dd474129f2184566101932aaa873fe399717583b38ad628d6436",
-      "bytes": 20502
+      "sha256": "6725f016ad445a430c67c0a1e8fb8c27e73d3d8a306683690a2e51061b9df52a",
+      "bytes": 22039
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationTicket.cs",
@@ -3712,8 +3712,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
-      "sha256": "8a51ff7deb044203c54b80502425ce1cef92addff13d7af3816c40bc3a61a07c",
-      "bytes": 68944
+      "sha256": "4922258d1c5a0432bb509a22e4ddc2a0189f2da4bfdaafc9d94811232034e498",
+      "bytes": 70086
     },
     {
       "path": "src/TiaMcp.Simulator.V8/TiaMcp.Simulator.V8.csproj",
@@ -4286,9 +4286,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -4794,9 +4794,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -5302,9 +5302,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -5789,9 +5789,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -6381,9 +6381,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -6680,9 +6680,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -6958,9 +6958,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -7390,9 +7390,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -7703,9 +7703,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -7981,9 +7981,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -8440,9 +8440,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -8808,9 +8808,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -9162,9 +9162,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -9516,9 +9516,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -9856,9 +9856,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -10147,9 +10147,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -12593,9 +12593,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -13113,9 +13113,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -13628,9 +13628,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -13905,9 +13905,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -14252,9 +14252,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -14746,9 +14746,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -15359,9 +15359,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -15867,9 +15867,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -16433,9 +16433,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -16919,9 +16919,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -17427,9 +17427,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -19759,9 +19759,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -20984,9 +20984,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -21808,9 +21808,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -22079,9 +22079,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -22809,9 +22809,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -23129,9 +23129,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -23697,9 +23697,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -24621,9 +24621,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -25129,9 +25129,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -26119,9 +26119,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -26487,9 +26487,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -26764,9 +26764,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -27092,9 +27092,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -27445,9 +27445,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -27799,9 +27799,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -28139,9 +28139,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -28430,9 +28430,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -29616,9 +29616,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -30124,9 +30124,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -30751,9 +30751,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -31021,9 +31021,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -32727,9 +32727,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -33040,9 +33040,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -33318,9 +33318,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -33617,9 +33617,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -34682,9 +34682,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -35169,9 +35169,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -35593,9 +35593,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -35968,9 +35968,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -36252,9 +36252,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -36522,9 +36522,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -37386,9 +37386,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -37747,9 +37747,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -38094,9 +38094,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -38392,9 +38392,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -43673,9 +43673,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -44364,9 +44364,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -44872,9 +44872,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -50666,9 +50666,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -51020,9 +51020,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -51529,9 +51529,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -51785,9 +51785,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -52069,9 +52069,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -52472,9 +52472,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -52812,9 +52812,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -53166,9 +53166,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -53429,9 +53429,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -53937,9 +53937,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -54277,9 +54277,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -54764,9 +54764,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -55041,9 +55041,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -55340,9 +55340,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -55845,8 +55845,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/SimulatorCaptureContracts.cs",
           "name": "Require",
-          "line": 134,
-          "endLine": 135,
+          "line": 140,
+          "endLine": 141,
           "sha256": "1cea5a47f90ef5982799edb4d94c3c2711e407c56da4b0335833faa6e4851ceb"
         },
         {
@@ -55880,9 +55880,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -56493,9 +56493,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -57009,9 +57009,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -57272,9 +57272,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -57563,9 +57563,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -57973,9 +57973,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -58279,9 +58279,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -58550,9 +58550,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -58961,9 +58961,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -59364,9 +59364,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -59663,9 +59663,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -60039,9 +60039,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -60597,9 +60597,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -60966,9 +60966,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -61579,9 +61579,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -62095,9 +62095,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -62358,9 +62358,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -62649,9 +62649,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -63059,9 +63059,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -63467,8 +63467,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/SimulatorCaptureContracts.cs",
           "name": "Require",
-          "line": 134,
-          "endLine": 135,
+          "line": 140,
+          "endLine": 141,
           "sha256": "1cea5a47f90ef5982799edb4d94c3c2711e407c56da4b0335833faa6e4851ceb"
         },
         {
@@ -63502,9 +63502,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -64809,9 +64809,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -65301,9 +65301,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -65746,9 +65746,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -66052,9 +66052,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -66455,9 +66455,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -66733,9 +66733,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -67137,9 +67137,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -67535,9 +67535,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -67911,9 +67911,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -68280,9 +68280,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -68819,9 +68819,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -69551,9 +69551,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -70223,9 +70223,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -72315,8 +72315,8 @@
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Release",
-              "line": 514,
-              "endLine": 540,
+              "line": 527,
+              "endLine": 553,
               "sha256": "c1995df1beae2f81e23494da78f243134fe32298e0a2a34944361911430a5272"
             }
           ],
@@ -72955,8 +72955,8 @@
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Test",
-              "line": 542,
-              "endLine": 623,
+              "line": 555,
+              "endLine": 636,
               "sha256": "2aa529e408e863dd218cb85de479bf4cdd0138fb545715bfff950dc5fa5a5079"
             }
           ],
@@ -74802,9 +74802,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -75310,9 +75310,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -76153,9 +76153,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -76640,9 +76640,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -77148,9 +77148,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -77635,9 +77635,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -82441,9 +82441,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -82753,9 +82753,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -83023,9 +83023,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -83370,9 +83370,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -83731,9 +83731,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -84092,9 +84092,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -84448,9 +84448,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -84935,9 +84935,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -85506,9 +85506,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -86317,9 +86317,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -86785,9 +86785,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -87552,9 +87552,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -87899,9 +87899,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -88246,9 +88246,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -88516,9 +88516,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -88955,9 +88955,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -89232,9 +89232,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -89509,9 +89509,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -89786,9 +89786,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -90057,9 +90057,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -90334,9 +90334,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -90696,9 +90696,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -90973,9 +90973,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -91251,9 +91251,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -91529,9 +91529,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -91799,9 +91799,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -92076,9 +92076,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -92346,9 +92346,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -92694,9 +92694,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -93555,9 +93555,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -95021,9 +95021,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -95529,9 +95529,9 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
-          "line": 15,
-          "endLine": 62,
-          "sha256": "642d77f9a8aced44011ad63b7ce1746ae13a383652b42b3f5f99c6f2d704bee9"
+          "line": 16,
+          "endLine": 70,
+          "sha256": "dde613674de603b8ca7ce8b168f6c9b0bf6b184dd100a07a3ce2555c17faa44d"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
