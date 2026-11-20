@@ -206,7 +206,7 @@ namespace TiaMcp.Simulation
         /// <summary>The program writes the outputs, so no symbolic write may (as sim_area_write refuses the output area). Returns the first
         /// symbol that PLCSIM's tag list reports in the Output area, itself or as an element or member of an entry there, or null. The reported
         /// area decides, never the name. TIA quotes segments ("Tag".x) and the tag list need not; TIA names are unique regardless of case.
-        /// A symbol missing from the tag list is left to PLCSIM, which resolves names through that same list.</summary>
+        /// A symbol missing from the tag list is not judged here; see UnlistedSymbol.</summary>
         public static string OutputSymbol(IReadOnlyList<string> symbols, IEnumerable<(string Name, string Area)> tags)
         {
             var outputs = new HashSet<string>(tags.Where(t => t.Area == "Output").Select(t => t.Name.Replace("\"", "")), StringComparer.OrdinalIgnoreCase);
@@ -216,6 +216,26 @@ namespace TiaMcp.Simulation
                 return outputs.Contains(key) || Enumerable.Range(1, Math.Max(0, key.Length - 1)).Any(i => (key[i] == '.' || key[i] == '[') && outputs.Contains(key.Substring(0, i)));
             });
         }
+
+        /// <summary>The first symbol the tag list does not know, itself or as an element or member of an entry (same quoting and case rules as
+        /// OutputSymbol), or null. Null as well for an empty list: with no tag list nothing can be judged. Callers pass a freshly refreshed list, so a
+        /// tag added by a download counts as known and a mistyped one is refused before anything is written.</summary>
+        public static string UnlistedSymbol(IReadOnlyList<string> symbols, IEnumerable<string> tagNames)
+        {
+            var keys = new HashSet<string>(tagNames.Where(n => !string.IsNullOrEmpty(n)).Select(n => n.Replace("\"", "")), StringComparer.OrdinalIgnoreCase);
+            if (keys.Count == 0) return null;
+            return symbols.FirstOrDefault(symbol =>
+            {
+                string key = symbol.Replace("\"", "");
+                return !keys.Contains(key) && !Enumerable.Range(1, Math.Max(0, key.Length - 1)).Any(i => (key[i] == '.' || key[i] == '[') && keys.Contains(key.Substring(0, i)));
+            });
+        }
+
+        /// <summary>Reports of virtual or wall-clock scenarios (sim_test) beyond the newest <paramref name="keep"/>: only files this adapter names
+        /// simulation-test-&lt;32 hex&gt;.json, never anything else in the folder.</summary>
+        public static IReadOnlyList<string> ExcessReports(IEnumerable<(string Path, DateTime WrittenUtc)> files, int keep) =>
+            files.Where(f => System.Text.RegularExpressions.Regex.IsMatch(System.IO.Path.GetFileName(f.Path), "^simulation-test-[0-9a-f]{32}\\.json$"))
+                .OrderByDescending(f => f.WrittenUtc).ThenBy(f => f.Path, StringComparer.Ordinal).Skip(Math.Max(0, keep)).Select(f => f.Path).ToList();
 
         /// <summary>The spelling PLCSIM's tag list uses for a symbol whose quoting differs from it: TIA writes "Tag".A, a V8 tag list may
         /// list Tag.A, and PLCSIM resolves names only in its own spelling (the other one fails with DoesNotExist). An exact entry is kept;

@@ -57,7 +57,7 @@ The simulator MCP tool names match the `sim_*` bridge operations below. Engineer
 | `sim_event` | `instanceId`, optional `event`. Lists the configured hardware-interrupt events and injects one interrupt or fault into an owned instance in RUN. |
 | `sim_record` | `instanceId`, `action` (`arm` with `responses`, or `collect` with optional `windowMs`). Answers the program's `RDREC`/`WRREC` on an owned instance from a reviewed response table and logs every request. |
 | `sim_storage` | `instanceId`, `artifactDirectory`, `action` (`archive`, `retrieve`), and for retrieve `archivePath` and `expectedSha256`. Archives or restores an owned, powered-off instance's virtual memory card. |
-| `sim_release` | `instanceId`, optional `deleteOwned`. Releases the worker's interface; without `deleteOwned` it is refused with `SimulationCaptureModeActive` while a cycle-synchronous capture holds the instance, and otherwise retries a capture-mode restore that failed. Explicit `deleteOwned:true` powers off and unregisters only an instance created by this worker. Storage files are retained. |
+| `sim_release` | `instanceId`, optional `deleteOwned`. Releases the worker's interface; it is refused with `SimulationCaptureModeActive` while a Host capture (`runtime_capture_start`) runs on the instance, and otherwise retries a capture-mode restore that failed, also with `deleteOwned`. Explicit `deleteOwned:true` powers off and unregisters only an instance created by this worker. Storage files are retained. |
 
 Choosing a read or write tool:
 

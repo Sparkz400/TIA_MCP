@@ -7,7 +7,7 @@ namespace TiaMcp.Core.WatchTables;
 /// Read only: V21 Openness, the PLCSIM V8 API, the S7-1500 Web API and OPC UA expose no force route, and a write is an assignment, not a force.</summary>
 public static class WatchTableMonitor
 {
-    public const string Note = "Read only. Each sample reads the resolved symbols one after another over the PLCSIM API; values of one sample are not from one scan. " +
+    public const string Note = "Read only. Each sample reads the resolved symbols over the PLCSIM API in one batched call (per symbol where a batch cannot be used); values of one sample are not from one scan. " +
         "ModifyValue, ForceValue and ForceIntention are stored table configuration and are never applied: nothing is modified or forced. " +
         "The instance's program is not compared with the project.";
     private static readonly string[] Scalars = ["bool", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64", "float", "double"];
@@ -17,25 +17,22 @@ public static class WatchTableMonitor
     {
         if (offset < 0 || count is < 1 or > 64 || samples is < 1 or > 20 || intervalMs is < 100 or > 5000)
             throw new BridgeException("InvalidRequest", "offset >= 0, count 1..64, samples 1..20 and intervalMs 100..5000 are required; nothing was read.");
-        // Ownership first: it is the cheap refusal. Native simulator calls are never cancelled; a cancelled bridge call faults the simulator worker.
+        // Ownership first: it is the cheap refusal. Native simulator calls are never cancelled; a cancelled bridge call is parked and later calls are refused with PreviousOperationRunning.
         var identity = await simulator.CallAsync("sim_identity", new { instanceId, instanceName, creationId }, CancellationToken.None);
         var snapshot = await engineering.CallAsync("watch_read", new { tableName, projectName, plcPath, group, targetKind = forceTable ? "forceTable" : null }, token);
         DropExport(snapshot);
         var target = snapshot.GetProperty("target");
         var all = target.GetProperty("rows");
-        var lookups = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
         var rows = new JsonArray(); var resolved = new List<(int Ordinal, string Symbol, string Type)>();
         int end = Math.Min(all.GetArrayLength(), offset + count);
+        // One exact-symbol lookup for the whole page: a leaf-name filter per row hit the 2000-tag cap on common names (a false truncation).
+        var symbols = Enumerable.Range(offset, Math.Max(0, end - offset)).Select(i => Symbol(all[i])).OfType<string>().Distinct(StringComparer.Ordinal).ToArray();
+        JsonElement? found = symbols.Length == 0 ? null
+            : await simulator.CallAsync("sim_tags", new { instanceId, symbols, maxItems = 2000, refresh = true }, CancellationToken.None);
         for (int ordinal = offset; ordinal < end; ordinal++)
         {
             var row = all[ordinal];
-            JsonElement? tags = null;
-            if (Filter(row) is { } filter)
-            {
-                if (!lookups.TryGetValue(filter, out var found))
-                    lookups[filter] = found = await simulator.CallAsync("sim_tags", new { instanceId, filter, maxItems = 2000, refresh = lookups.Count == 0 }, CancellationToken.None);
-                tags = found;
-            }
+            JsonElement? tags = Symbol(row) is null ? null : found;
             var resolution = Resolve(row, tags);
             if (resolution["status"]!.GetValue<string>() == "resolved")
                 resolved.Add((ordinal, resolution["symbol"]!.GetValue<string>(), resolution["type"]!.GetValue<string>()));
@@ -63,6 +60,9 @@ public static class WatchTableMonitor
             ["readOnly"] = true, ["modified"] = false, ["forced"] = false, ["physicalPlc"] = false, ["programMatchVerified"] = false, ["note"] = Note,
         };
     }
+
+    /// <summary>The unquoted symbol of a row for the exact tag-list lookup, or null for a row without a symbol.</summary>
+    public static string? Symbol(JsonElement row) => Text(row, "name") is { } name ? Key(name) : null;
 
     /// <summary>The PLCSIM tag-list filter for a row: the last segment of its unquoted symbol, or null for a row without a symbol.</summary>
     public static string? Filter(JsonElement row)

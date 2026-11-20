@@ -178,8 +178,20 @@ internal static class SimulationRuntimeControlTests
         // A batch with one output among inputs, markers and DB members is refused as a whole, naming that symbol.
         Check.Equal("\"SigOutWord\"", SimulationRuntimeControl.OutputSymbol(["\"SigInByte\"", "\"SigMarker\"", "\"SigDb\".VInt", "\"SigOutWord\""], tags));
         Check.Equal(null, SimulationRuntimeControl.OutputSymbol(["\"SigInByte\"", "\"SigMarker\"", "\"SigDb\".Output", "\"SigDb\".Arr[3]", "T1"], tags));
-        // Only a whole segment is a parent; a symbol missing from the tag list is left to PLCSIM.
+        // Only a whole segment is a parent; OutputSymbol does not judge a symbol missing from the tag list (UnlistedSymbol does).
         Check.Equal(null, SimulationRuntimeControl.OutputSymbol(["\"SigOutWordCopy\"", "\"OutStructDb\".Member", "\"Missing\".X"], tags));
+        // A refreshed tag list refuses what it does not list: itself, as a member or element of an entry (quoting and case ignored) are known.
+        string[] names = tags.Select(t => t.Item1).ToArray();
+        Check.Equal("\"Missing\".X", SimulationRuntimeControl.UnlistedSymbol(["\"SigDb\".VInt", "\"Missing\".X"], names));
+        Check.Equal("\"SigDbX\".VInt", SimulationRuntimeControl.UnlistedSymbol(["\"SigDbX\".VInt"], names));
+        Check.Equal(null, SimulationRuntimeControl.UnlistedSymbol(["\"sigdb\".vint", "\"SigDb\".Arr[3]", "T1", "\"OutStruct\".Member"], names));
+        Check.Equal(null, SimulationRuntimeControl.UnlistedSymbol(["\"Missing\".X"], []));
+        // Only the adapter's own newest reports stay; other files in the folder are never listed for deletion.
+        var now = new DateTime(2026, 11, 20, 12, 0, 0, DateTimeKind.Utc);
+        string Report(int n) => "C:/r/simulation-test-" + n.ToString("x32") + ".json";
+        var files = Enumerable.Range(0, 5).Select(n => (Report(n), now.AddMinutes(n))).Append(("C:/r/notes.json", now.AddDays(-9))).Append(("C:/r/simulation-test-keep.json", now.AddDays(-9))).ToArray();
+        Check.Equal(string.Join(",", Report(1), Report(0)), string.Join(",", SimulationRuntimeControl.ExcessReports(files, 3)));
+        Check.Equal(0, SimulationRuntimeControl.ExcessReports(files, 50).Count);
         return Task.CompletedTask;
     }
 
@@ -234,11 +246,17 @@ internal static class SimulationRuntimeControlTests
             Check.Equal(true, stateGuard > 0 && state.IndexOf(call, StringComparison.Ordinal) > stateGuard);
         string writer = Body(session, "JObject Write(");
         Check.Equal(true, writer.IndexOf("RequireOwned(selected);", StringComparison.Ordinal) is > 0 and var writeGuard && writer.IndexOf("ApplyWrites(", StringComparison.Ordinal) > writeGuard);
-        // sim_test: any step with writes demands ownership before the first runtime call; a non-delete release never ends a held capture.
+        // sim_test: any step with writes demands ownership before the first runtime call; a release ends a held capture only when the Host (which has no live capture then) says so.
         string scenario = Body(session, "JObject Test(");
         Check.Equal(true, scenario.IndexOf("item[\"writes\"] != null) == true) RequireOwned(selected);", StringComparison.Ordinal) is > 0 and var first &&
             first < scenario.IndexOf("EnsureAdmitted(selected)", StringComparison.Ordinal) && first < scenario.IndexOf("ApplyWrites(", StringComparison.Ordinal));
-        Check.Equal(true, Body(session, "JObject Release(").Contains("else { RequireNoCapture(selected); RestoreCaptureMode(selected); }", StringComparison.Ordinal));
+        string release = Body(session, "JObject Release(");
+        Check.Equal(true, release.Contains("else { if (!restoreHeld) RequireNoCapture(selected); RestoreCaptureMode(selected); }", StringComparison.Ordinal)
+            && release.Contains("selected.CaptureHeld && !restoreHeld) throw new SimulatorException(\"SimulationCaptureModeActive\"", StringComparison.Ordinal));
+        // Only RuntimeCaptures sets restoreHeldCapture, and it refuses first while one of its captures is live on that instance.
+        string hostCaptures = File.ReadAllText(Path.Combine(root.FullName, "src", "TiaMcp.Host", "RuntimeCaptures.cs"));
+        Check.Equal(true, hostCaptures.IndexOf("x.InstanceId==instanceId))", StringComparison.Ordinal) is > 0 and var live && hostCaptures.IndexOf("restoreHeldCapture=true", StringComparison.Ordinal) > live);
+        Check.Equal(1, Directory.GetFiles(Path.Combine(root.FullName, "src", "TiaMcp.Host"), "*.cs").Count(f => File.ReadAllText(f).Contains("restoreHeldCapture", StringComparison.Ordinal)));
         // Only a running capture or scenario holds the instance: every restore, also a failed one, ends the hold first, so release can retry it.
         Check.Equal(true, Body(session, "static void RestoreCaptureMode(").Contains("{\n            selected.CaptureHeld = false;\n            if (selected.CaptureRestoreMode == null) return;", StringComparison.Ordinal));
         Check.Equal(true, Body(source, "static void RequireNoCapture(").Contains("if (selected.CaptureHeld) throw", StringComparison.Ordinal));
@@ -261,8 +279,10 @@ internal static class SimulationRuntimeControlTests
             int refusal = body.IndexOf("RefuseOutputs(selected, ", StringComparison.Ordinal);
             Check.Equal(true, refusal > 0 && body.IndexOf(access, StringComparison.Ordinal) > refusal);
         }
-        Check.Equal(true, Body(session, "static void RefuseOutputs(").Contains("selected.Instance.TagInfos.Select(t => (t.Name, t.Area.ToString()))", StringComparison.Ordinal)
-            && Body(session, "static void RefuseOutputs(").Contains("new SimulatorException(\"InvalidRequest\"", StringComparison.Ordinal));
+        // The tag list is refreshed first (a download can add tags), then both the output area and unlisted symbols refuse with InvalidRequest.
+        string refusal2 = Body(session, "static void RefuseOutputs(");
+        Check.Equal(true, refusal2.IndexOf("UpdateTagList(", StringComparison.Ordinal) is > 0 and var refresh && refusal2.IndexOf("selected.Instance.TagInfos", StringComparison.Ordinal) > refresh
+            && refusal2.Contains("UnlistedSymbol(", StringComparison.Ordinal) && refusal2.Contains("new SimulatorException(\"InvalidRequest\"", StringComparison.Ordinal));
         return Task.CompletedTask;
     }
 }

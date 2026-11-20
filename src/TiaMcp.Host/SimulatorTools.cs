@@ -14,10 +14,10 @@ public sealed class SimulatorClient(HostOptions options) : IAsyncDisposable
 }
 
 [McpServerToolType]
-public sealed class SimulatorTools(SimulatorClient simulator, HostOptions options)
+public sealed class SimulatorTools(SimulatorClient simulator, HostOptions options, RuntimeCaptures? captures = null)
 {
     [McpServerTool(Name = "sim_status", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Initialize the installed PLCSIM Advanced V8 API and report local simulated instances/runtime status. Initialization may start Siemens Runtime Manager. Does not activate a trial or connect to physical PLCs.")]
+    [Description("Initialize the installed PLCSIM Advanced V8 API and report local simulated instances/runtime status. Initialization may start Siemens Runtime Manager. orphanedInstances lists registered TiaMcp_ instances this worker does not hold (left by an earlier worker or a deleteOwned-less release): re-adopt with sim_select and the creationId of its receipt, then sim_release with deleteOwned; their storage folders are never deleted automatically. Does not activate a trial or connect to physical PLCs.")]
     public Task<CallToolResult> Status(CancellationToken cancellationToken) => Call("sim_status", new { }, cancellationToken);
 
     [McpServerTool(Name = "sim_create", Destructive = false, OpenWorld = false)]
@@ -46,7 +46,7 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_tags", new { instanceId, filter, maxItems, refresh }, cancellationToken);
 
     [McpServerTool(Name = "sim_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Read typed values from an exact selected simulated instance. signals is an array of {symbol,type}; supported types include bool, int8..uint64, float, double, string, wstring. Returns identity, timestamps and quality. Quoting may differ from the tag list (\"Db\".A or Db.A): a symbol is matched to the tag list's spelling and passed unchanged when there is no single match. One runtime call per symbol: use sim_read_signals for up to 64 numeric/bool symbols in one call; sim_read is the route for string and wstring.")]
+    [Description("Read typed values from an exact selected simulated instance. signals is an array of {symbol,type}; supported types include bool, int8..uint64, float, double, string, wstring. Returns identity, timestamps and quality. Quoting may differ from the tag list (\"Db\".A or Db.A): a symbol is matched to the tag list's spelling and passed unchanged when there is no single match. Numeric/bool symbols are read in one ReadSignals runtime call when all of them read well, otherwise one call per symbol so each error stays with its own symbol; string and wstring are always one call per symbol. sim_read_signals is the strict batch route for up to 64 numeric/bool symbols.")]
     public Task<CallToolResult> Read(int instanceId, JsonElement signals, CancellationToken cancellationToken)
         => Call("sim_read", new { instanceId, signals = Array(signals) }, cancellationToken);
 
@@ -106,24 +106,30 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_storage", new { instanceId, action, archivePath, expectedSha256, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation-archives") }, cancellationToken);
 
     [McpServerTool(Name = "sim_release", Destructive = true, OpenWorld = false)]
-    [Description("Release the adapter's simulation attachment; without deleteOwned it is refused with SimulationCaptureModeActive while a cycle-synchronous capture holds the instance. deleteOwned additionally powers off and removes only an instance created by this adapter; existing selected instances cannot be deleted through this tool.")]
+    [Description("Release the adapter's simulation attachment. Refused with SimulationCaptureModeActive while a Host capture (runtime_capture_start) is still running on the instance; stop it first. When no Host capture is running, a cycle-synchronous mode hold that a failed capture end left behind is restored here (operating mode back to the recorded one) before the release. deleteOwned additionally powers off and removes only an instance created by this adapter; existing selected instances cannot be deleted through this tool.")]
     public Task<CallToolResult> Release(int instanceId, CancellationToken cancellationToken, bool deleteOwned = false)
-        => Call("sim_release", new { instanceId, deleteOwned }, cancellationToken, deleteOwned ? 30000 : 0);
+        => Call("sim_release", new { instanceId, deleteOwned }, cancellationToken, deleteOwned ? 30000 : 0,
+            captures is null ? null : () => captures.ReleaseSimulator(instanceId, deleteOwned, cancellationToken));
 
     private static JsonElement Array(JsonElement value) => value.ValueKind == JsonValueKind.Array ? value : throw new McpException("An array is required.");
     // sim_test: the adapter's 90 s execution cap plus one interval and one sync-point wait it can still run after its last cap check.
     private const int TestWaitMs = 100000, BridgeMarginMs = 5000;
-    // The request's token is never passed on: a cancelled bridge call faults the simulator worker for every later tool. A wait
-    // (waitMs) that outlasts the bridge timeout faults it the same way, so it must end before that timeout.
-    private async Task<CallToolResult> Call(string operation, object args, CancellationToken cancellationToken, int waitMs = 0)
+    // The request's token is never passed on: a cancelled bridge call is parked, and every later call is refused with PreviousOperationRunning until
+    // it finishes. A wait (waitMs) that outlasts the bridge timeout is parked the same way, so it must end before that timeout.
+    private Task<CallToolResult> Call(string operation, object args, CancellationToken cancellationToken, int waitMs = 0, Func<Task<object>>? dispatch = null) => Wrap(async () =>
+    {
+        if (waitMs > options.TimeoutSeconds * 1000 - BridgeMarginMs)
+            throw new BridgeException("InvalidRequest", $"{operation} can wait {waitMs} ms, which does not end {BridgeMarginMs} ms before this Host's {options.TimeoutSeconds} s bridge timeout (--timeout-seconds). Shorten the wait or start the Host with a longer timeout; nothing was sent.");
+        return dispatch is null ? await simulator.Bridge.CallAsync(operation, args, CancellationToken.None) : JsonSerializer.SerializeToElement(await dispatch(), BridgeProtocol.Json);
+    });
+
+    private static async Task<CallToolResult> Wrap(Func<Task<JsonElement>> action)
     {
         string json;
         bool error;
         try
         {
-            if (waitMs > options.TimeoutSeconds * 1000 - BridgeMarginMs)
-                throw new BridgeException("InvalidRequest", $"{operation} can wait {waitMs} ms, which does not end {BridgeMarginMs} ms before this Host's {options.TimeoutSeconds} s bridge timeout (--timeout-seconds). Shorten the wait or start the Host with a longer timeout; nothing was sent.");
-            json = (await simulator.Bridge.CallAsync(operation, args, CancellationToken.None)).GetRawText(); error = false;
+            json = (await action()).GetRawText(); error = false;
         }
         catch (BridgeException ex)
         { json = JsonSerializer.Serialize(new { error = new { code = ex.Code, message = ex.Message, details = (ex as BridgeOperationException)?.Details } }, BridgeProtocol.Json); error = true; }
