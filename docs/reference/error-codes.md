@@ -403,7 +403,7 @@ A `detail` code may change in a minor release; branch on it only together with i
 | `InvalidRecovery` | detail | TiaMcp.Core, TiaMcp.Openness.V21 |
 | `InvalidRequest` | stable | TiaMcp.Core, TiaMcp.Host, TiaMcp.Openness.V19, TiaMcp.Openness.V21, TiaMcp.Simulator.V8 |
 | `InvalidResourceKey` | detail | TiaMcp.Core |
-| `InvalidResponse` | detail | TiaMcp.Core |
+| `InvalidResponse` | detail | TiaMcp.Core, TiaMcp.Host |
 | `InvalidRunPlan` | detail | TiaMcp.Core |
 | `InvalidSafetyEvidence` | detail | TiaMcp.Core, TiaMcp.Host |
 | `InvalidScopeCoverage` | detail | TiaMcp.Core |

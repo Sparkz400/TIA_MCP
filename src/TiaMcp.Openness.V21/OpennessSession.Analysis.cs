@@ -68,11 +68,13 @@ namespace TiaMcp.Openness.V21
                     ["evidence"] = ReferenceJson(reference) });
             }
             var result = AnalysisEnvelope(analysis);
-            result["nodes"] = new JArray(analysis.Blocks.Values.Select(block => BlockInfo(block, analysis.Plc.Path)));
+            // One batched read per block serves both the node rows and the OB roots.
+            var blockValues = analysis.Blocks.Values.Select(block => new { Block = block, Values = BatchedAttributeReads.Block(block.Item) }).ToList();
+            result["nodes"] = new JArray(blockValues.Select(entry => BlockInfo(entry.Block, analysis.Plc.Path, entry.Values)));
             result["edges"] = edges;
             result["unresolvedCalls"] = unresolved;
-            result["obRoots"] = new JArray(analysis.Blocks.Values.Where(block => block.Item is OB).Select(block => new JObject
-            { ["path"] = block.Path, ["name"] = block.Item.Name, ["number"] = block.Item.Number, ["reachableBlockPaths"] = ReachableCalls(block.Path, edges, analysis.MaxItems) }));
+            result["obRoots"] = new JArray(blockValues.Where(entry => entry.Block.Item is OB).Select(entry => new JObject
+            { ["path"] = entry.Block.Path, ["name"] = entry.Values.Name, ["number"] = entry.Values.Number, ["reachableBlockPaths"] = ReachableCalls(entry.Block.Path, edges, analysis.MaxItems) }));
             result["instanceRelationships"] = new JArray(analysis.References.Where(reference => reference.Relation == ReferenceType.InstanceType || reference.Relation == ReferenceType.TypeInstance || IsInstanceAccess(reference.Access)).Select(ReferenceJson));
             result["xmlEvidence"] = ExportAnalysisEvidence(args, analysis, edges.SelectMany(edge => new[] { edge.Value<string>("callerPath"), edge.Value<string>("calleePath"), edge.Value<string>("instancePath") }));
             result["completeness"] = AnalysisCoverage(analysis, "Call edges require native Call, UC or CC access plus a directional Uses/UsedBy relation and resolved block identity.");

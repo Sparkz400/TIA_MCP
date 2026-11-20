@@ -94,10 +94,11 @@ namespace TiaMcp.Openness.V21
                     if (!wants("blocks")) break;
                     if (!filter.Matches(block.Path, block.Item.Name)) continue;
                     if (!take()) { cut("blocks", "Blocks after " + blocks.Count + " are not listed."); break; }
-                    var row = BlockInfo(block, plc.Path);
+                    var values = BatchedAttributeReads.Block(block.Item);
+                    var row = BlockInfo(block, plc.Path, values);
                     row["scopePath"] = scope.Path;
                     row["technologyPath"] = technologyMembership.AddBlock(block.Item, block.Path);
-                    row["identity"] = IdentityInfo(plc.Project, plc.Path, scope.Path, block.Path, "block", block.Item.Name);
+                    row["identity"] = IdentityInfo(plc.Project, plc.Path, scope.Path, block.Path, "block", values.Name);
                     blocks.Add(row);
                 }
                 foreach (var table in TagTables(scope.Tags, scope.Path + "/tags", walk))
@@ -122,18 +123,19 @@ namespace TiaMcp.Openness.V21
                             cut("tagTables", "Tag table " + table.Item.Name + " lists " + tags.Count + " of " + table.Item.Tags.Count + " tags; later tables are not listed.");
                             break;
                         }
+                        var values = BatchedAttributeReads.Tag(tag);
                         if (compact)
                         {
                             // The path is the table path + "/tags/" + the escaped name; external-access flags come with the full form.
-                            var brief = new JObject { ["name"] = tag.Name, ["dataType"] = tag.DataTypeName, ["logicalAddress"] = tag.LogicalAddress };
-                            if (tag.IsSafety) brief["isSafety"] = true;
+                            var brief = new JObject { ["name"] = values.Name, ["dataType"] = values.DataTypeName, ["logicalAddress"] = values.LogicalAddress };
+                            if (values.IsSafety) brief["isSafety"] = true;
                             tags.Add(brief);
                             continue;
                         }
-                        tags.Add(new JObject { ["path"] = table.Path + "/tags/" + Segment(tag.Name), ["name"] = tag.Name,
-                            ["dataType"] = tag.DataTypeName, ["logicalAddress"] = tag.LogicalAddress, ["isSafety"] = tag.IsSafety,
-                            ["externalAccessible"] = tag.ExternalAccessible, ["externalVisible"] = tag.ExternalVisible,
-                            ["externalWritable"] = tag.ExternalWritable });
+                        tags.Add(new JObject { ["path"] = table.Path + "/tags/" + Segment(values.Name), ["name"] = values.Name,
+                            ["dataType"] = values.DataTypeName, ["logicalAddress"] = values.LogicalAddress, ["isSafety"] = values.IsSafety,
+                            ["externalAccessible"] = values.ExternalAccessible, ["externalVisible"] = values.ExternalVisible,
+                            ["externalWritable"] = values.ExternalWritable });
                     }
                     foreach (var constant in table.Item.UserConstants)
                     {

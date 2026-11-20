@@ -10,6 +10,7 @@ using Microsoft.VisualBasic.FileIO;
 using TiaMcp.Core;
 using TiaMcp.Core.Inventory;
 using TiaMcp.Host;
+using ModelContextProtocol.Protocol;
 
 int checks = 0;
 void Check(bool condition, string message) { checks++; if (!condition) throw new Exception(message); }
@@ -421,6 +422,105 @@ Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties
     var last = BlockExportIndex.Build(inventory, kinds, null, 2, 2, exportDirectory, [BlockExportIndex.Row(BlockExportIndex.Select(inventory, kinds, null, 2, 2)[0], null, "ProtectedObject", "protected")]);
     Check(last["nextOffset"] is null && last["completeness"]!["complete"]!.GetValue<bool>(), "The last page is complete and has no next offset");
 }
+// block_export / project_snapshot_capture against a fake bridge: failures of the bridge itself, batching, the cached selection, release.
+{
+    const string plc = "/projects/P/devices/D/items/CPU/plc/CPU";
+    string ExportRoot() => Path.Combine(output, "block-export-host");
+    var hostOptions = new HostOptions("", ExportRoot(), null, 60, false, "", null);
+    string BlockJson(int i, bool isProtected = false) => "{\"path\":\"" + plc + "/blocks/FB" + i.ToString("D3") + "\",\"plcPath\":\"" + plc + "\",\"name\":\"FB" + i.ToString("D3")
+        + "\",\"number\":" + i + ",\"kind\":\"FB\",\"programmingLanguage\":\"SCL\",\"isConsistent\":true,\"isKnowHowProtected\":" + (isProtected ? "true" : "false") + "}";
+    JsonElement Inventory(int count, int protectedAt = -1) => JsonDocument.Parse("{\"project\":{\"name\":\"P\"},\"plcs\":[{\"path\":\"" + plc + "\"}],\"completeness\":{\"truncated\":false},\"blocks\":["
+        + string.Join(",", Enumerable.Range(0, count).Select(i => BlockJson(i, i == protectedAt))) + "]}").RootElement;
+    var calls = new List<(string Operation, JsonElement Arguments)>();
+    Func<string, JsonElement, JsonElement> bridgeHandler = (_, _) => throw new InvalidOperationException();
+    var fake = new FakeBridge((operation, arguments) =>
+    {
+        var element = JsonSerializer.SerializeToElement(arguments, BridgeProtocol.Json);
+        calls.Add((operation, element));
+        return bridgeHandler(operation, element);
+    });
+    var blockTools = new TiaTools(fake, hostOptions);
+    JsonElement Entries(JsonElement arguments, string? failPath = null) => JsonDocument.Parse("{\"results\":[" + string.Join(",", arguments.GetProperty("blockPaths").EnumerateArray().Select(path =>
+        path.GetString() == failPath ? "{\"path\":\"" + path.GetString() + "\",\"ok\":false,\"error\":{\"code\":\"BlockExportUnavailable\",\"message\":\"inconsistent\"}}"
+            : "{\"path\":\"" + path.GetString() + "\",\"ok\":true,\"artifact\":{\"path\":\"C:\\\\x\\\\a.xml\",\"bytes\":5},\"networks\":2}")) + "]}").RootElement;
+    string Text(CallToolResult result) => ((TextContentBlock)result.Content[0]).Text;
+
+    // 45 blocks, one protected: the inventory is read once, the other 44 go out in worker calls of at most 20 paths, without XML.
+    var inventory45 = Inventory(45, 3);
+    bridgeHandler = (operation, arguments) => operation == "project_inventory" ? inventory45 : Entries(arguments, plc + "/blocks/FB007");
+    var page = await blockTools.BlockExport(default, maxBlocks: 500);
+    var exportCalls = calls.Where(c => c.Operation == "block_read").ToArray();
+    var firstPage = JsonNode.Parse(Text(page))!.AsObject();
+    Check(calls.Count(c => c.Operation == "project_inventory") == 1 && exportCalls.Length == 3 && exportCalls.All(c => c.Arguments.GetProperty("blockPaths").GetArrayLength() <= TiaTools.ExportChunk
+        && c.Arguments.GetProperty("includeXml").GetBoolean() == false && c.Arguments.GetProperty("render").GetString() == "text"), "block_export exports blocks in chunks without inline XML after one inventory read");
+    Check(exportCalls.Sum(c => c.Arguments.GetProperty("blockPaths").GetArrayLength()) == 44, "A know-how protected block is not sent to the worker");
+    Check(firstPage["exported"]!.GetValue<int>() == 43 && firstPage["skipped"]!.GetValue<int>() == 2 && firstPage["blocks"]!.AsArray().Count == 45
+        && firstPage["blocks"]!.AsArray()[7]!["skipped"]!["code"]!.GetValue<string>() == "BlockExportUnavailable" && firstPage["blocks"]!.AsArray()[3]!["skipped"]!["code"]!.GetValue<string>() == "ProtectedObject"
+        && firstPage["blocks"]!.AsArray()[0]!["networks"]!.GetValue<int>() == 2 && firstPage["completeness"]!["complete"]!.GetValue<bool>(), "Rows keep the selection order; a block the worker refused is a skipped row with its code");
+
+    // The following pages of the same run reuse the selection; another filter reads the inventory again.
+    calls.Clear();
+    bridgeHandler = (operation, arguments) => operation == "project_inventory" ? inventory45 : Entries(arguments);
+    await blockTools.BlockExport(default, offset: 0, maxBlocks: 10);
+    await blockTools.BlockExport(default, offset: 10, maxBlocks: 10);
+    await blockTools.BlockExport(default, offset: 20, maxBlocks: 10);
+    Check(calls.Count(c => c.Operation == "project_inventory") == 1, "Pages after the firstPage reuse the inventory of the run");
+    await blockTools.BlockExport(default, namePrefix: "FB", offset: 10, maxBlocks: 10);
+    Check(calls.Count(c => c.Operation == "project_inventory") == 2, "A page with other filters does not reuse the cached selection");
+
+    // A refused batch call (a completed error) is each block's skipped row; a lost bridge, timeout or running call fails the call.
+    bridgeHandler = (operation, arguments) => operation == "project_inventory" ? Inventory(3) : throw new BridgeOperationException("PlcNotFound", "No matching PLC software was found.");
+    var refused = JsonNode.Parse(Text(await blockTools.BlockExport(default, maxBlocks: 10)))!.AsObject();
+    Check(refused["skipped"]!.GetValue<int>() == 3 && refused["blocks"]![0]!["skipped"]!["code"]!.GetValue<string>() == "PlcNotFound", "A refused worker call skips its blocks with the worker's code");
+    foreach (string code in new[] { "TimeoutOutcomeUnknown", "PreviousOperationRunning", "BridgeFaulted", "WorkerDisconnected" })
+    {
+        bridgeHandler = (operation, arguments) => operation == "project_inventory" ? Inventory(3) : throw new BridgeException(code, "bridge failure");
+        var failed = await blockTools.BlockExport(default, maxBlocks: 10);
+        var error = JsonNode.Parse(Text(failed))!.AsObject();
+        Check(failed.IsError == true && error["error"]!["code"]!.GetValue<string>() == code && error["blocks"] is null && error["nextOffset"] is null, "A " + code + " ends block_export instead of skipping the remaining blocks");
+    }
+
+    // project_snapshot_capture: the model is exported once, after the relationship pass, and the snapshot is released on every path.
+    Directory.CreateDirectory(Path.Combine(ExportRoot(), "project-explorer"));
+    string modelFile = Path.Combine(ExportRoot(), "project-explorer", "model.json");
+    File.WriteAllText(modelFile, "{\"project\":{\"projectPath\":\"C:\\\\P\\\\P.ap21\"},\"nodes\":[],\"edges\":[]}");
+    var modelBytes = File.ReadAllBytes(modelFile);
+    string modelHash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(modelBytes));
+    Directory.CreateDirectory(Path.Combine(ExportRoot(), "exports"));
+    string blockFile = Path.Combine(ExportRoot(), "exports", "block-a.xml");
+    File.WriteAllText(blockFile, "<Document/>");
+    var blockBytes = File.ReadAllBytes(blockFile);
+    string blockHash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(blockBytes));
+    Func<bool, Func<string, JsonElement, JsonElement>> capture = matches => (operation, arguments) =>
+    {
+        if (operation == "block_read") return JsonDocument.Parse("{\"block\":{\"path\":\"" + plc + "/blocks/A\"},\"artifact\":{\"path\":" + JsonSerializer.Serialize(blockFile) + ",\"bytes\":" + blockBytes.Length + ",\"sha256\":\"" + blockHash + "\"}}").RootElement;
+        if (operation != "project_model") throw new InvalidOperationException(operation);
+        return JsonDocument.Parse(arguments.GetProperty("action").GetString() switch
+        {
+            "capture" => "{\"snapshotId\":\"snap1\"}",
+            "blocks" => "{\"snapshotId\":\"snap1\",\"sessionGeneration\":\"g\",\"projectPath\":\"C:\\\\P\\\\P.ap21\",\"blocks\":[{\"nodeId\":\"n1\",\"objectPath\":\"" + plc + "/blocks/A\",\"programmingLanguage\":\"SCL\",\"isKnowHowProtected\":false}]}",
+            "relationships" => "{\"status\":\"observed\"}",
+            "export" => "{\"artifact\":{\"path\":" + JsonSerializer.Serialize(modelFile) + ",\"bytes\":" + modelBytes.Length + ",\"sha256\":\"" + modelHash + "\"}}",
+            "verify" => "{\"matchesCurrentMetadata\":" + (matches ? "true" : "false") + "}",
+            "release" => "{\"released\":true}",
+            _ => throw new InvalidOperationException(arguments.GetRawText())
+        }).RootElement;
+    };
+    calls.Clear();
+    bridgeHandler = capture(false);
+    var invalidated = JsonNode.Parse(Text(await blockTools.ProjectSnapshotCapture(JsonDocument.Parse("{\"maxBlocks\":1}").RootElement, default)))!.AsObject();
+    var actions = calls.Select(c => c.Operation == "block_read" ? "block_read" : c.Arguments.GetProperty("action").GetString()).ToList();
+    Check(invalidated["error"]!["code"]!.GetValue<string>() == "SnapshotInvalidated" && string.Join(",", actions) == "capture,blocks,relationships,export,block_read,verify,release",
+        "A capture lists the blocks, observes relationships, exports the model once, reads the block and verifies; a refused one still releases its snapshot");
+    Check(calls.Single(c => c.Operation == "block_read").Arguments.GetProperty("includeXml").GetBoolean() == false
+        && calls.Single(c => c.Arguments.TryGetProperty("action", out var action) && action.GetString() == "relationships").Arguments.GetProperty("reference").GetProperty("sessionGeneration").GetString() == "g",
+        "The snapshot reads blocks without inline XML and binds relationships to the listed session generation");
+    calls.Clear();
+    bridgeHandler = (operation, arguments) => arguments.GetProperty("action").GetString() == "export" ? throw new BridgeException("TimeoutOutcomeUnknown", "timed out")
+        : arguments.GetProperty("action").GetString() == "release" ? throw new BridgeException("PreviousOperationRunning", "busy") : capture(true)(operation, arguments);
+    var timedOut = JsonNode.Parse(Text(await blockTools.ProjectSnapshotCapture(JsonDocument.Parse("{\"maxBlocks\":0}").RootElement, default)))!.AsObject();
+    Check(timedOut["error"]!["code"]!.GetValue<string>() == "TimeoutOutcomeUnknown" && calls.Last().Arguments.GetProperty("action").GetString() == "release", "A failed release does not hide the error that ended the capture");
+}
 // plc_io_map: address ranges, the tags inside them and the two kinds of gap.
 {
     Check(IoMap.Parse("a", "T", "Bool", "%I400.3") is { Area: 'I', Byte: 400, Bit: 3, Bytes: 1 } && IoMap.Parse("b", "T", "Word", "%QW470") is { Area: 'Q', Byte: 470, Bit: null, Bytes: 2 }
@@ -585,4 +685,12 @@ sealed class FixtureFactory : IInventoryIdentityFactory
 {
     public FakeHandler Handler = new() { Names = new() { [101] = "Module 0", [12] = "Module 1", [13] = "Module 2" }, UnavailableHardwareId = 13 };
     public SiemensWebIdentity Create(string endpoint, string? token) => new(endpoint, "test-token", Handler);
+}
+sealed class FakeBridge(Func<string, object?, JsonElement> handler) : IBridgeClient
+{
+    public Task<JsonElement> CallAsync(string operation, object? arguments = null, CancellationToken cancellationToken = default)
+    {
+        try { return Task.FromResult(handler(operation, arguments)); }
+        catch (BridgeException error) { return Task.FromException<JsonElement>(error); }
+    }
 }
