@@ -39,8 +39,9 @@ namespace TiaMcp.Openness.V21
         internal static void Require(string safetyLabel, string action)
         {
             if (safetyLabel != null)
-                throw new BridgeException("SafetyBoundary", "The hardware item or its container or subitems include the safety hardware " + safetyLabel + "; " + action +
-                    " is refused because it would change F-I/O or PROFIsafe addressing outside the safety workflows. Nothing was written.");
+                throw new BridgeException("SafetyBoundary", "The hardware item or its container or subitems include " + safetyLabel +
+                    ", which is safety hardware or whose F-I/O or PROFIsafe status cannot be read; " + action +
+                    " is refused because it could change F-I/O or PROFIsafe addressing outside the safety workflows. Nothing was written.");
         }
     }
 

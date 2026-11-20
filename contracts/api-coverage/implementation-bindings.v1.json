@@ -3207,8 +3207,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
-      "sha256": "e2ee153e053f784da9335acbf4619d59fa3b46283ca7b7311c9bbf5efc03f67c",
-      "bytes": 30757
+      "sha256": "f0bae0aacb7abed92c67eba9198b58676611172f88f37617f81c90a9f53be8d3",
+      "bytes": 30881
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ScalarValues.cs",
@@ -3552,8 +3552,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/SafetyDriveGuardRules.cs",
-      "sha256": "c95ab139a59522849d62c406d2a5cd4416fb0ff0568b8f52b338d6066ee2bd4a",
-      "bytes": 12045
+      "sha256": "3d40511b856428bd4fe355423f0efdea6018b1ce4d14ac51ce75e944dee57e6f",
+      "bytes": 12121
     },
     {
       "path": "src/TiaMcp.Openness.V21/SafetyTagRenameRules.cs",
@@ -97421,8 +97421,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -97483,8 +97483,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -97930,8 +97930,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -97978,8 +97978,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -98093,8 +98093,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -98141,8 +98141,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -99208,8 +99208,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -99270,8 +99270,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -99385,8 +99385,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -99433,8 +99433,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -99548,8 +99548,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -99596,8 +99596,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -99711,8 +99711,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -99759,8 +99759,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -101100,8 +101100,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -101492,15 +101492,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -101988,8 +101988,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -102086,15 +102086,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -102341,8 +102341,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -102733,15 +102733,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -103229,8 +103229,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -103327,15 +103327,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -103613,8 +103613,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -104005,15 +104005,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -104501,8 +104501,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -104599,15 +104599,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -104854,8 +104854,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -105246,15 +105246,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -105742,8 +105742,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -105840,15 +105840,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -106095,8 +106095,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -106487,15 +106487,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -106983,8 +106983,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -107081,15 +107081,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -107336,8 +107336,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -107728,15 +107728,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -108224,8 +108224,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -108322,15 +108322,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -108577,8 +108577,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -108969,15 +108969,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -109465,8 +109465,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -109563,15 +109563,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -109818,8 +109818,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -110210,15 +110210,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -110706,8 +110706,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -110804,15 +110804,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -113707,8 +113707,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
@@ -114153,8 +114153,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             },
             {
@@ -114201,8 +114201,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "FParameterSet",
-              "line": 183,
-              "endLine": 271,
+              "line": 184,
+              "endLine": 272,
               "sha256": "f1f136d9ce412394bcef76ec2851ac87cc991e26ec02d04a5ad1b74d8fa0c867"
             }
           ]
@@ -114288,8 +114288,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -114350,8 +114350,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -114794,8 +114794,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -114849,8 +114849,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoBlockContent",
-              "line": 159,
-              "endLine": 163,
+              "line": 160,
+              "endLine": 164,
               "sha256": "7f22c0ce32d684e9a0f52d6ea6dcc6f3cd87bdbf1bc3808ea805ec90730470d0"
             },
             {
@@ -115247,8 +115247,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
@@ -115295,8 +115295,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
               "name": "RejectFIoAddresses",
-              "line": 166,
-              "endLine": 175,
+              "line": 167,
+              "endLine": 176,
               "sha256": "4c904941a5848c31b8d14c90182d0669a4e0498ef9df1c22db617de6f88b2020"
             },
             {
