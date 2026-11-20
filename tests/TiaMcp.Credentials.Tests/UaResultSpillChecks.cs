@@ -33,6 +33,18 @@ internal static class UaResultSpillChecks
         check(Convert.ToHexStringLower(SHA256.HashData(content.ToArray())) == spilled.Spill.Sha256 && content.Count == spilled.Spill.Bytes &&
             restored.Items.Count == 200 && restored.Items[199].Node.Identifier == "n199" && restored.Spill is null, "The spilled artifact is the exact complete result under the hash the reply names");
         var again = (OpcUaRuntimeReadResult)UaResultSpill.Bounded(root, big, "read", 200, x => big with { Items = [], Spill = x });
-        check(again.Spill == spilled.Spill && Directory.EnumerateFiles(Path.Combine(root, "runtime-ua-results")).Count() == 1, "The same result spills to the same content-addressed artifact");
+        // Retention: day-old spills go, a protected (live-session) or fresh one stays, and the cap removes the oldest first.
+        string directory = Path.Combine(root, "runtime-ua-results");
+        string Make(string name, DateTime written, int length = 10) { string p = Path.Combine(directory, name); File.WriteAllBytes(p, new byte[length]); File.SetLastWriteTimeUtc(p, written); return p; }
+        var now = DateTime.UtcNow;
+        string old = Make("ua-read-old.json", now.AddDays(-2)), protectedOld = Make("ua-read-protected.json", now.AddDays(-3)), fresh = Make("ua-read-fresh.json", now.AddHours(-1));
+        UaResultSpill.Prune(directory, Path.Combine(directory, "ua-read-none.json"), now.AddDays(-4), now);
+        check(File.Exists(old) && File.Exists(protectedOld) && File.Exists(fresh), "Spills written since the oldest live session opened are never pruned");
+        UaResultSpill.Prune(directory, Path.Combine(directory, "ua-read-none.json"), now.AddDays(-2.5), now);
+        check(File.Exists(old) && !File.Exists(protectedOld) && File.Exists(fresh), "A spill older than a day is pruned only outside the protected window; a fresh one stays");
+        string kept = Make("ua-read-newest.json", now.AddMinutes(-1), (int)UaResultSpill.MaximumBytes / 2 + 1), big1 = Make("ua-read-big1.json", now.AddHours(-3), (int)UaResultSpill.MaximumBytes / 2 + 1);
+        UaResultSpill.Prune(directory, kept, null, now);
+        check(File.Exists(kept) && !File.Exists(big1) && !File.Exists(protectedOld) && File.Exists(fresh), "The size cap removes the oldest spills first and never the one just written");
+        check(again.Spill == spilled.Spill && File.Exists(Path.Combine(root, again.Spill!.Artifact)), "The same result spills to the same content-addressed artifact");
     }
 }

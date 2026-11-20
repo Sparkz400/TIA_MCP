@@ -33,6 +33,7 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
     internal SemaphoreSlim Lock { get; } = new(1);
     internal bool Usable => session is { Connected: true } && !Unusable;
     internal DateTimeOffset LastUsed { get; private set; } = DateTimeOffset.UtcNow;
+    internal DateTimeOffset Created { get; } = DateTimeOffset.UtcNow;
     internal void Touch() => LastUsed = DateTimeOffset.UtcNow;
     /// <summary>The timeout the server revised the requested one to, in whole milliseconds; the request when the server reported none.</summary>
     internal long SessionTimeoutMs { get; private set; } = SessionTimeoutRequestMs;

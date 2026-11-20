@@ -1090,6 +1090,12 @@
       ]
     },
     {
+      "featureId": "sim_prune",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
       "featureId": "sim_time",
       "obligations": [
         "L03"

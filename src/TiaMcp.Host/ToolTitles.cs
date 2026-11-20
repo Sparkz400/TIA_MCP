@@ -251,6 +251,7 @@ internal static class ToolTitles
         ["sim_event"] = "Inject a PLCSIM interrupt or fault",
         ["sim_record"] = "Answer PLCSIM data record requests",
         ["sim_observe"] = "Observe PLCSIM state and configuration changes",
+        ["sim_prune"] = "Prune PLCSIM storage and archives",
         ["sim_read"] = "Read PLCSIM tags",
         ["sim_read_signals"] = "Read PLCSIM tags in one call",
         ["sim_release"] = "Release a PLCSIM instance",

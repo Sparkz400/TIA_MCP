@@ -32,7 +32,9 @@ public static class SimulatorCaptureContracts
         UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow, RespectRequiredConstructorParameters = true };
     public static readonly string[] ReadErrors = ["PlcsimCaptureReadFailed", "PlcsimResponseInvalid", "SimulationNotSelected",
         "SimulationTargetMismatch", "SimulationOwnershipUnverified", "SimulationCaptureModeInactive", "SimulationSyncPointTimeout",
-        "NativeWorkersDisabled", "BridgeFaulted", "TimeoutOutcomeUnknown", "WorkerDisconnected"];
+        "NativeWorkersDisabled", "BridgeFaulted", "TimeoutOutcomeUnknown", "WorkerDisconnected",
+        // The shared simulator bridge was busy (a long sim_test or observe) or still parked an earlier call: nothing was sent, the capture goes on.
+        "QueueTimeout", "PreviousOperationRunning"];
 
     public static void ValidateRequest(RuntimeCaptureRequest request)
     {

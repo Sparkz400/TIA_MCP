@@ -27,6 +27,8 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
     private readonly SemaphoreSlim gate = new(1);
     private readonly Dictionary<string, Live> live = new(StringComparer.Ordinal);
     private readonly Dictionary<string,string> acquisition = new(StringComparer.Ordinal);
+    // Parsed records, valid while the file's size and write time are unchanged: a request re-reads nothing, an outside edit still shows.
+    private readonly Dictionary<string,(OpcUaRuntimeStatus Record,long Length,DateTime Written)> recordCache = new(StringComparer.Ordinal);
     // Sessions already detached from `live` whose remote close is still running outside the gate.
     private readonly HashSet<string> closing = new(StringComparer.Ordinal);
     private readonly CancellationTokenSource stop = new();
@@ -133,7 +135,7 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
             // Bounded retention: the oldest resolved records make room for a new attempt; unresolved records are never removed.
             var retired = records.Where(r => Terminal(r.State)).OrderBy(r => r.UpdatedAt).Take(records.Length - 1023).ToArray();
             if (records.Length - retired.Length >= 1024) throw Error("UaSessionCapacity");
-            foreach (var old in retired) File.Delete(PathFor(old.AttemptId));
+            foreach (var old in retired) { File.Delete(PathFor(old.AttemptId)); recordCache.Remove(old.AttemptId); }
             if (records.Any(r => r.Selection.Endpoint == selection.Endpoint && !Terminal(r.State))) throw Error("UaEndpointSessionUnresolved");
             if (selection.Authentication == "username") credentialCheck(selection);
             var status = new OpcUaRuntimeStatus("opcua-runtime-session.v1", attemptId, hostId, selection,
@@ -364,6 +366,12 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
             return result;
         } finally {client.Lock.Release();}
     }
+    /// <summary>When the oldest live session of this store was opened; null with none. Results returned by a live session can still be read.</summary>
+    public async Task<DateTimeOffset?> OldestLiveSession(CancellationToken ct = default)
+    {
+        await gate.WaitAsync(ct);
+        try { return live.Count == 0 ? null : live.Values.Min(x => x.Client.Created); } finally { gate.Release(); }
+    }
     public async Task<OpcUaRuntimeStatus> Status(string attemptId, CancellationToken ct = default)
     {
         Id(attemptId); using var deadline = Deadline(ct); await gate.WaitAsync(deadline.Token);
@@ -504,16 +512,21 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
     private OpcUaRuntimeStatus Load(string id)
     {
         Id(id); var path = PathFor(id); Plain(path);
-        if (!File.Exists(path) || new FileInfo(path).Length > 65_536) throw Error("UaSessionRecordInvalid");
+        var info = new FileInfo(path);
+        if (!info.Exists || info.Length > 65_536) throw Error("UaSessionRecordInvalid");
+        if (recordCache.TryGetValue(id, out var cached) && cached.Length == info.Length && cached.Written == info.LastWriteTimeUtc) return cached.Record;
         var record = JsonSerializer.Deserialize<OpcUaRuntimeStatus>(File.ReadAllBytes(path), Json);
         if (record is null || record.SchemaVersion != "opcua-runtime-session.v1" || record.AttemptId != id ||
             record.State is not ("connecting" or "connected" or "remoteSessionUnknown" or "closed" or "notConnected" or "abandonedRemoteUnknown"))
             throw Error("UaSessionRecordInvalid");
-        Validate(record.Selection); return record;
+        Validate(record.Selection);
+        recordCache[id] = (record, info.Length, info.LastWriteTimeUtc);
+        return record;
     }
     private void Save(OpcUaRuntimeStatus record, bool create = false)
     {
         var path = PathFor(record.AttemptId); Plain(root); Plain(path);
+        recordCache.Remove(record.AttemptId);
         byte[] data = JsonSerializer.SerializeToUtf8Bytes(record, Json);
         if (data.Length > 65_536) throw Error("UaSessionRecordInvalid");
         string temp = Path.Combine(root, record.AttemptId + ".tmp"); Plain(temp);

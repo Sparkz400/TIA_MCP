@@ -103,9 +103,10 @@ public sealed class TiaResources(HostOptions options)
             // ArtifactStore applies the root and reparse-point checks; ReadArtifact then verifies the bytes it returns.
             var artifact = new JsonObject { ["path"] = path };
             if (sha256 is not null) artifact["sha256"] = sha256;
-            var probe = new ArtifactStore(options.ArtifactsDirectory).Read(path, 0, 1);
-            if (probe.Bytes > MaxBytes) throw new McpException("The artifact exceeds 4 MiB; read it in chunks with artifact_read.");
-            return (ProjectReviewStore.ReadArtifact(options.ArtifactsDirectory, artifact, MaxBytes), probe.RelativePath);
+            var store = new ArtifactStore(options.ArtifactsDirectory);
+            string full = store.ResolveChecked(path);
+            if (new FileInfo(full).Length > MaxBytes) throw new McpException("The artifact exceeds 4 MiB; read it in chunks with artifact_read.");
+            return (ProjectReviewStore.ReadArtifact(options.ArtifactsDirectory, artifact, MaxBytes), store.Relative(full));
         }
         catch (BridgeException error) { throw Refusal(error); }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException)

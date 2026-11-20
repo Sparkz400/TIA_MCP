@@ -136,7 +136,7 @@ internal static class TextListAuthoringTests
         string legacyId = Retain(JsonSerializer.SerializeToUtf8Bytes(legacyRecord, BridgeProtocol.Json), ".author.json");
         var reopened = store.AuthorTextLists(recordId: legacyId);
         Check((string)reopened["recordId"]! == legacyId && JsonNode.DeepEquals(reopened["files"], legacyRecord["files"]), "Retained record with now-refused content still reopens exactly");
-        string incomplete = Path.Combine(root, "hmi-component-reviews", "partial.tmp");
+        string incomplete = Path.Combine(root, "hmi-component-reviews", "partial.partial");
         var retry = uploads.Begin("again.json", raw.Length, Convert.ToHexStringLower(SHA256.HashData(raw))); uploads.Write(retry.UploadId, 0, Convert.ToBase64String(raw)); string retryRef = uploads.Commit(retry.UploadId).ArtifactRef!;
         string candidatePath = Path.Combine(root, (string)receipt["files"]![0]!["artifact"]!["path"]!); byte[] originalCandidate = File.ReadAllBytes(candidatePath); File.Delete(candidatePath);
         try

@@ -206,7 +206,7 @@ namespace TiaMcp.Simulation
         /// <summary>The program writes the outputs, so no symbolic write may (as sim_area_write refuses the output area). Returns the first
         /// symbol that PLCSIM's tag list reports in the Output area, itself or as an element or member of an entry there, or null. The reported
         /// area decides, never the name. TIA quotes segments ("Tag".x) and the tag list need not; TIA names are unique regardless of case.
-        /// A symbol missing from the tag list is left to PLCSIM, which resolves names through that same list.</summary>
+        /// A symbol missing from the tag list is not judged here; see UnlistedSymbol.</summary>
         public static string OutputSymbol(IReadOnlyList<string> symbols, IEnumerable<(string Name, string Area)> tags)
         {
             var outputs = new HashSet<string>(tags.Where(t => t.Area == "Output").Select(t => t.Name.Replace("\"", "")), StringComparer.OrdinalIgnoreCase);
@@ -216,6 +216,26 @@ namespace TiaMcp.Simulation
                 return outputs.Contains(key) || Enumerable.Range(1, Math.Max(0, key.Length - 1)).Any(i => (key[i] == '.' || key[i] == '[') && outputs.Contains(key.Substring(0, i)));
             });
         }
+
+        /// <summary>The first symbol the tag list does not know, itself or as an element or member of an entry (same quoting and case rules as
+        /// OutputSymbol), or null. Null as well for an empty list: with no tag list nothing can be judged. Callers pass a freshly refreshed list, so a
+        /// tag added by a download counts as known and a mistyped one is refused before anything is written.</summary>
+        public static string UnlistedSymbol(IReadOnlyList<string> symbols, IEnumerable<string> tagNames)
+        {
+            var keys = new HashSet<string>(tagNames.Where(n => !string.IsNullOrEmpty(n)).Select(n => n.Replace("\"", "")), StringComparer.OrdinalIgnoreCase);
+            if (keys.Count == 0) return null;
+            return symbols.FirstOrDefault(symbol =>
+            {
+                string key = symbol.Replace("\"", "");
+                return !keys.Contains(key) && !Enumerable.Range(1, Math.Max(0, key.Length - 1)).Any(i => (key[i] == '.' || key[i] == '[') && keys.Contains(key.Substring(0, i)));
+            });
+        }
+
+        /// <summary>Reports of virtual or wall-clock scenarios (sim_test) beyond the newest <paramref name="keep"/>: only files this adapter names
+        /// simulation-test-&lt;32 hex&gt;.json, never anything else in the folder.</summary>
+        public static IReadOnlyList<string> ExcessReports(IEnumerable<(string Path, DateTime WrittenUtc)> files, int keep) =>
+            files.Where(f => System.Text.RegularExpressions.Regex.IsMatch(System.IO.Path.GetFileName(f.Path), "^simulation-test-[0-9a-f]{32}\\.json$"))
+                .OrderByDescending(f => f.WrittenUtc).ThenBy(f => f.Path, StringComparer.Ordinal).Skip(Math.Max(0, keep)).Select(f => f.Path).ToList();
 
         /// <summary>The spelling PLCSIM's tag list uses for a symbol whose quoting differs from it: TIA writes "Tag".A, a V8 tag list may
         /// list Tag.A, and PLCSIM resolves names only in its own spelling (the other one fails with DoesNotExist). An exact entry is kept;
@@ -244,6 +264,135 @@ namespace TiaMcp.Simulation
             long value = item.Value<long>(name);
             if (value < minimum || value > maximum) throw new ArgumentException(name + " must be between " + minimum + " and " + maximum + ".");
             return (int)value;
+        }
+    }
+
+    internal sealed class PruneCandidate
+    {
+        internal string Kind, Name, FullPath, Refusal;
+        internal DateTime WrittenUtc;
+        internal long Bytes;
+    }
+
+    // Opt-in retention for what this adapter created: the storage folder of an instance whose creation receipt says it was unregistered,
+    // and the archives sim_storage wrote with a receipt that still matches. Anything else, and anything of a registered or selected
+    // instance, is listed with its refusal and never deleted. Pure file logic: the worker passes the receipts and the liveness check.
+    internal static class SimulationStoragePrune
+    {
+        private static readonly System.Text.RegularExpressions.Regex StorageName = new System.Text.RegularExpressions.Regex("^TiaMcp_[0-9a-f]{32}$");
+        private static readonly System.Text.RegularExpressions.Regex ArchiveName = new System.Text.RegularExpressions.Regex("^TiaMcp_[0-9a-f]{32}-[0-9a-f]{32}\\.zip$");
+        private const int MaxEntries = 20000, MaxCandidates = 500;
+
+        internal static List<PruneCandidate> Storage(string root, string markerName, IReadOnlyCollection<JObject> receipts, Func<string, bool> isLive)
+        {
+            var result = new List<PruneCandidate>();
+            if (!Directory.Exists(root)) return result;
+            foreach (var directory in new DirectoryInfo(root).GetDirectories("TiaMcp_*").Where(d => StorageName.IsMatch(d.Name)).OrderBy(d => d.Name, StringComparer.Ordinal).Take(MaxCandidates))
+            {
+                long bytes; DateTime newest;
+                string refusal = StorageRefusal(directory, markerName, receipts, isLive, out bytes, out newest);
+                result.Add(new PruneCandidate { Kind = "instanceStorage", Name = directory.Name, FullPath = directory.FullName, Refusal = refusal, Bytes = bytes, WrittenUtc = newest });
+            }
+            return result;
+        }
+
+        private static string StorageRefusal(DirectoryInfo directory, string markerName, IReadOnlyCollection<JObject> receipts, Func<string, bool> isLive, out long bytes, out DateTime newest)
+        {
+            bytes = 0; newest = directory.LastWriteTimeUtc;
+            if ((directory.Attributes & FileAttributes.ReparsePoint) != 0) return "reparsePoint";
+            if (isLive(directory.Name)) return "registeredOrSelected";
+            var matching = receipts.Where(r => r.Value<string>("instanceName") == directory.Name).ToArray();
+            if (matching.Length != 1) return matching.Length == 0 ? "noCreationReceipt" : "ambiguousCreationReceipt";
+            var receipt = matching[0];
+            if (receipt.Value<string>("stage") != "unregistered" && receipt.Value<string>("stage") != "unregisteredAfterFailure") return "instanceNotUnregistered";
+            try
+            {
+                if (!string.Equals(Path.GetFullPath(receipt.Value<string>("storagePath") ?? ""), directory.FullName, StringComparison.OrdinalIgnoreCase)) return "storagePathMismatch";
+            }
+            catch (ArgumentException) { return "storagePathMismatch"; }
+            var marker = new FileInfo(Path.Combine(directory.FullName, markerName));
+            if (!marker.Exists || marker.Length > 16384 || (marker.Attributes & FileAttributes.ReparsePoint) != 0) return "ownershipMarkerMissing";
+            if (receipt.Value<string>("markerSha256") != Sha256(marker.FullName)) return "ownershipMarkerChanged";
+            int entries = 0;
+            var pending = new Stack<DirectoryInfo>(); pending.Push(directory);
+            while (pending.Count > 0)
+                foreach (var entry in pending.Pop().EnumerateFileSystemInfos())
+                {
+                    if (++entries > MaxEntries) return "tooManyEntries";
+                    if ((entry.Attributes & FileAttributes.ReparsePoint) != 0) return "containsReparsePoint";
+                    var sub = entry as DirectoryInfo;
+                    if (sub != null) pending.Push(sub);
+                    else { bytes += ((FileInfo)entry).Length; if (entry.LastWriteTimeUtc > newest) newest = entry.LastWriteTimeUtc; }
+                }
+            return null;
+        }
+
+        internal static List<PruneCandidate> Archives(string directory)
+        {
+            var result = new List<PruneCandidate>();
+            if (!Directory.Exists(directory)) return result;
+            foreach (var file in new DirectoryInfo(directory).GetFiles("TiaMcp_*.zip").Where(f => ArchiveName.IsMatch(f.Name)).OrderBy(f => f.Name, StringComparer.Ordinal).Take(MaxCandidates))
+                result.Add(new PruneCandidate { Kind = "archive", Name = file.Name, FullPath = file.FullName, Bytes = file.Length, WrittenUtc = file.LastWriteTimeUtc, Refusal = ArchiveRefusal(file) });
+            return result;
+        }
+
+        private static string ArchiveRefusal(FileInfo file)
+        {
+            if ((file.Attributes & FileAttributes.ReparsePoint) != 0) return "reparsePoint";
+            var receiptFile = new FileInfo(file.FullName + ".json");
+            if (!receiptFile.Exists || receiptFile.Length > 65536 || (receiptFile.Attributes & FileAttributes.ReparsePoint) != 0) return "noArchiveReceipt";
+            JObject receipt;
+            try { receipt = JObject.Parse(File.ReadAllText(receiptFile.FullName)); }
+            catch (Exception ex) when (ex is IOException || ex is Newtonsoft.Json.JsonException) { return "archiveReceiptUnreadable"; }
+            try
+            {
+                if (receipt.Value<int?>("schemaVersion") != 1 || !string.Equals(Path.GetFullPath(receipt.Value<string>("archivePath") ?? ""), file.FullName, StringComparison.OrdinalIgnoreCase)
+                    || (receipt.Value<string>("instanceName") ?? "").IndexOf("TiaMcp_", StringComparison.Ordinal) != 0 || receipt.Value<long?>("bytes") != file.Length) return "archiveReceiptMismatch";
+            }
+            catch (ArgumentException) { return "archiveReceiptMismatch"; }
+            return receipt.Value<string>("sha256") == Sha256(file.FullName) ? null : "archiveChanged";
+        }
+
+        // Names choose exactly those candidates (a refused one stays refused); otherwise only eligible ones are chosen, oldest first: every one
+        // older than the cutoff, then the oldest of the rest until the eligible total fits maxTotalBytes.
+        internal static List<PruneCandidate> Select(IEnumerable<PruneCandidate> candidates, ICollection<string> names, DateTime? olderThanUtc, long? maxTotalBytes)
+        {
+            var all = candidates.ToList();
+            if (names != null)
+            {
+                string unknown = names.FirstOrDefault(n => all.All(c => c.Name != n));
+                if (unknown != null) throw new ArgumentException(unknown + " is not a prune candidate of this scope.");
+                return all.Where(c => names.Contains(c.Name)).ToList();
+            }
+            var eligible = all.Where(c => c.Refusal == null).OrderBy(c => c.WrittenUtc).ThenBy(c => c.Name, StringComparer.Ordinal).ToList();
+            var selected = new List<PruneCandidate>();
+            if (olderThanUtc != null) selected.AddRange(eligible.Where(c => c.WrittenUtc < olderThanUtc.Value));
+            if (maxTotalBytes != null)
+            {
+                var rest = eligible.Except(selected).ToList();
+                long total = rest.Sum(c => c.Bytes);
+                foreach (var candidate in rest) { if (total <= maxTotalBytes.Value) break; selected.Add(candidate); total -= candidate.Bytes; }
+            }
+            return selected;
+        }
+
+        /// <summary>Deletes one candidate after checking again that it is eligible and (for storage) not live now; returns the refusal, or null once deleted.</summary>
+        internal static string Delete(PruneCandidate candidate, Func<string, bool> isLive)
+        {
+            if (candidate.Refusal != null) return candidate.Refusal;
+            if (candidate.Kind == "instanceStorage")
+            {
+                if (isLive(candidate.Name)) return "registeredOrSelected";
+                Directory.Delete(candidate.FullPath, true);
+            }
+            else { File.Delete(candidate.FullPath); File.Delete(candidate.FullPath + ".json"); }
+            return null;
+        }
+
+        private static string Sha256(string path)
+        {
+            using (var sha = System.Security.Cryptography.SHA256.Create()) using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                return BitConverter.ToString(sha.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
         }
     }
 }

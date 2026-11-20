@@ -48,6 +48,7 @@ namespace TiaMcp.Openness.V21
             var project = SelectProject(args);
             EnsureProjectOffline(project);
             RequireNoUnresolvedChange(project, null);
+            EvictStalePreparedChanges();
             var kind = ChangeText(args, "kind", 64);
             var payload = args["payload"] as JObject ?? throw new BridgeException("InvalidRequest", "payload must be an object.");
             var id = Guid.NewGuid().ToString("N");
@@ -836,6 +837,8 @@ namespace TiaMcp.Openness.V21
                 {
                     var plc = SelectPlc(change.Selector);
                     preview["parameterChanges"] = FParameterSet(change, project, false);
+                    if (((JArray)preview["parameterChanges"]).OfType<JObject>().Any(row => row["fDestinationUsedOnOtherFSource"] != null))
+                        ((JArray)preview["warnings"]).Add("An F-destination address is also used by an F-I/O on another F-source (see fDestinationUsedOnOtherFSource). PROFIsafe addresses should be unique across the project; the F-compile reports a real duplicate.");
 #if SAFETY_FPARAMETER_DISCOVERY
                     if (change.Selector.Value<bool?>("fParameterDiscovery") == true)
                     {
@@ -998,13 +1001,13 @@ namespace TiaMcp.Openness.V21
                 case "drive_parameter_set":
                     preview["parameterChanges"] = Startdrive(() => DriveParameterSet(change, project, false));
                     effects.Add(new JObject { ["hardwarePath"] = payload["hardwarePath"].DeepClone(), [DriveObjectRules.Handle(payload)] = payload[DriveObjectRules.Handle(payload)].DeepClone(), ["action"] = change.Kind });
-                    ((JArray)preview["warnings"]).Add("Startdrive may recalculate dependent parameters; readback covers only the listed parameters. Compare drive_observe snapshots with drive_profile_review. Offline project only: no online write, download or RAM-to-ROM.");
+                    ((JArray)preview["warnings"]).Add("Startdrive may recalculate dependent parameters. Apply reads the listed parameters back and records every other parameter whose value changed (readbacks role drive-parameter-side-effects). A value outside the parameter's declared limits refuses before anything is written. Offline project only: no online write, download or RAM-to-ROM.");
                     break;
                 case "drive_motor_configure":
                     preview["motorChange"] = Startdrive(() => DriveMotorConfigure(change, project, false));
                     effects.Add(new JObject { ["hardwarePath"] = payload["hardwarePath"].DeepClone(), [DriveObjectRules.Handle(payload)] = payload[DriveObjectRules.Handle(payload)].DeepClone(),
                         ["driveDataSet"] = payload["driveDataSet"].DeepClone(), ["action"] = change.Kind });
-                    ((JArray)preview["warnings"]).Add("Projects a motor without a Siemens code number into one drive data set through Startdrive's HardwareProjection: an optional motor type, then the listed nameplate entries, then ProjectMotorConfiguration. Startdrive recalculates dependent parameters; readback covers only the listed entries. Offline project only: no motor identification, online write, download or RAM-to-ROM.");
+                    ((JArray)preview["warnings"]).Add("Projects a motor without a Siemens code number into one drive data set through Startdrive's HardwareProjection: an optional motor type, then the listed nameplate entries, then ProjectMotorConfiguration. Startdrive recalculates dependent parameters; apply reads the listed entries back and records every other parameter whose value changed (readbacks role drive-motor-side-effects). Offline project only: no motor identification, online write, download or RAM-to-ROM.");
                     break;
                 case "drive_telegram_set":
                     preview["telegramChange"] = Startdrive(() => DriveTelegramSet(change, project, false));
@@ -1839,6 +1842,8 @@ namespace TiaMcp.Openness.V21
         private static void EnsureHardwareDeleteEligible(DeviceItem item)
         {
             if (item.IsBuiltIn) throw new BridgeException("BuiltInHardware", "Built-in hardware items cannot be deleted through this operation.");
+            // hardware_delete, hardware_move and hardware_replace all pass here, at prepare and again at apply.
+            EnsureNoSafetyHardware(item);
             if (HardwareSubtreeHasSoftware(item, 0)) throw new BridgeException("SoftwareBearingHardware", "Deletion of CPUs/HMIs or containers containing software requires a separate device-removal workflow; this operation covers pluggable modules.");
         }
 
@@ -1922,6 +1927,15 @@ namespace TiaMcp.Openness.V21
                         payload[name] = new JObject { ["bytes"] = bytes.Length, ["sha256"] = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant() };
                 }
             return payload;
+        }
+
+        // A prepared change nobody applied would otherwise live until detach. Past the TTL or the count the worker drops it; its journal stays
+        // on disk, and applying it then answers ChangeNotFound, as after a detach.
+        private void EvictStalePreparedChanges()
+        {
+            foreach (var id in PreparedChangeEviction.Select(_changes.Values.Select(change => (change.Id, change.State, change.PreparedUtc)), DateTime.UtcNow, PreparedChangeEviction.Ttl, PreparedChangeEviction.MaxPrepared))
+                _changes.Remove(id);
+            foreach (var key in _changeKeys.Where(p => !_changes.ContainsKey(p.Value)).Select(p => p.Key).ToList()) _changeKeys.Remove(key);
         }
 
         // Called on detach. Unresolved changes stay: if the same TIA process is attached again they still block a checkpoint save.
@@ -2066,9 +2080,8 @@ namespace TiaMcp.Openness.V21
             File.WriteAllText(temporary, data.ToString(Formatting.Indented), new UTF8Encoding(false));
             if (File.Exists(change.Journal)) TiaMcp.Core.JournalFileReplacement.Replace(temporary, change.Journal); else File.Move(temporary, change.Journal);
             // A completed phase can precede the terminal state transition. Refresh
-            // diagnostic progress after committing that transition as well.
-            if (change.Kind == "hmi_classic_screen_edit")
-                try { SaveChangeProgress(change); } catch (IOException) { /* The durable journal remains authoritative. */ }
+            // diagnostic progress after every journal commit, so progress.json carries the current state, terminal states included.
+            try { SaveChangeProgress(change); } catch (Exception error) when (error is IOException || error is UnauthorizedAccessException) { /* The durable journal remains authoritative. */ }
         }
 
         private static JObject ChangeObject(JObject args, string name) => args[name] as JObject ?? throw new BridgeException("InvalidRequest", name + " must be an object.");
@@ -2111,6 +2124,7 @@ namespace TiaMcp.Openness.V21
             internal string InputPath, InputHash, ArchivePath, ArchiveHash, IdempotencyKey, Failure, RecoveryPreviousArchive;
             internal string PrimaryFailure, RecoveryFailure, RecoveryDirectory, ScopePath, GroupPath, Namespace;
             internal int? PreparedProcessId;
+            internal DateTime PreparedUtc = DateTime.UtcNow;
             internal JObject Selector, Payload, Preview, Compilation, RecoveredProject, SafetyAfter, ScratchSecurity, TechnologyAfter, FingerprintCoverage;
             internal JObject HmiEvidence, HmiBeforeManifest, TagTableEvidence, CompileBaseline;
             internal JArray HardwareBeforeManifest;

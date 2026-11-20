@@ -54,8 +54,9 @@ public sealed partial class TranslationWorkflowStore
     public JsonObject Inspect(string captureRef, int pageSize = 100, TranslationInspectionCursor? cursor = null)
     {
         Require(pageSize is > 0 and <= 1000, "TranslationPageLimit", "Inspection page size must be 1..1000.");
-        var record = RequireKind(retained.Load(captureRef), "capture");
-        var workbook = OpenCapture(record);
+        // The capture verifies and opens once, on the first page; a continuation checks its receipt and reuses the opened workbook.
+        var record = RequireKind(cursor is null ? retained.Load(captureRef) : retained.LoadReceipt(captureRef), "capture");
+        var workbook = OpenedCapture(record, cursor is null);
         // Obtain one library row at a time: a shared 1 Mi-character source can
         // otherwise be replicated into every culture before byte paging applies.
         var page = TranslationInspection.Page(workbook, 1, cursor);
@@ -119,13 +120,14 @@ public sealed partial class TranslationWorkflowStore
     public JsonObject ReviewPage(string recordRef, string section = "edits", int pageSize = 100, TranslationReviewCursor? cursor = null)
     {
         Require(pageSize is > 0 and <= 1000, "TranslationPageLimit", "Review page size must be 1..1000.");
-        var record = retained.Load(recordRef);
+        // The review is recomputed on the first page; a continuation checks the receipt and the stored report's digest only.
+        var record = cursor is null ? retained.Load(recordRef) : retained.LoadReceipt(recordRef);
         JsonObject report;
         string artifact;
         if (record.Kind == "review")
         {
             Require(section is "edits" or "issues" or "completeness" or "alarmInheritance", "InvalidTranslationSection", "Review sections: edits, issues, completeness, alarmInheritance.");
-            report = VerifiedReview(record).Report;
+            report = cursor is null ? VerifiedReview(record).Report : ReadObject(record, "review.json");
             artifact = "review.json";
         }
         else
@@ -279,13 +281,12 @@ public sealed partial class TranslationWorkflowStore
     {
         Require(offset >= 0 && count is > 0 and <= 65536, "TranslationPageLimit", "Artifact reads require nonnegative offset and 1..65536 bytes.");
         var (kind, id, name) = ParseRef(artifactRef, true);
-        var record = retained.Load(Reference(kind, id));
-        byte[] bytes = retained.Read(record, name!);
-        Require(offset <= bytes.LongLength, "InvalidTranslationCursor", "Artifact offset is beyond its bytes.");
-        int length = (int)Math.Min(count, bytes.LongLength - offset);
-        return new JsonObject { ["artifactRef"] = artifactRef, ["bytes"] = bytes.Length, ["sha256"] = Sha256(bytes),
-            ["offset"] = offset, ["count"] = length, ["nextOffset"] = offset + length, ["complete"] = offset + length == bytes.LongLength,
-            ["encoding"] = "base64", ["data"] = Convert.ToBase64String(bytes, (int)offset, length) };
+        // The record, its artifacts and ancestry verify once, at offset 0; later chunks check the receipt and the one file's cached digest.
+        var record = offset == 0 ? retained.Load(Reference(kind, id)) : retained.LoadReceipt(Reference(kind, id));
+        var chunk = retained.ReadChunk(record, name!, offset, count);
+        return new JsonObject { ["artifactRef"] = artifactRef, ["bytes"] = chunk.Bytes, ["sha256"] = chunk.Sha256,
+            ["offset"] = offset, ["count"] = chunk.Count, ["nextOffset"] = chunk.NextOffset, ["complete"] = chunk.Complete,
+            ["encoding"] = "base64", ["data"] = chunk.Data };
     }
 
     private JsonObject? Related(string kind, string id)
@@ -325,6 +326,18 @@ public sealed partial class TranslationWorkflowStore
         Require(CanonicalJson.Matches(Text(record.Metadata, "profileSha256"), Node(workbook.Mapping)) && CanonicalJson.Matches(Text(record.Metadata, "projectSha256"), Node(project)),
             "TranslationIntegrityFailure", "Capture profile or project observation differs.");
         CheckMappedTextBudget(workbook);
+        return workbook;
+    }
+
+    // Opened captures are immutable; Inspect only reads them. Keyed by the receipt digest, so another capture never reuses an entry.
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, TranslationWorkbook> Opened = new(StringComparer.Ordinal);
+    private TranslationWorkbook OpenedCapture(TranslationRecord record, bool reopen)
+    {
+        string key = retained.CacheKey(record);
+        if (!reopen && Opened.TryGetValue(key, out var hit)) return hit;
+        var workbook = OpenCapture(record);
+        if (Opened.Count >= 2) Opened.Clear(); // shortcut: crude bound, a workbook is up to 100 MiB expanded; use an LRU if many captures page at once.
+        Opened[key] = workbook;
         return workbook;
     }
 

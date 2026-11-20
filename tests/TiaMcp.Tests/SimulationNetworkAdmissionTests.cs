@@ -132,7 +132,7 @@ internal static class SimulationNetworkAdmissionTests
         var root = new DirectoryInfo(AppContext.BaseDirectory);
         while (root != null && !File.Exists(Path.Combine(root.FullName, "src", "TiaMcp.Host", "PlcsimTargets.cs"))) root = root.Parent;
         string Source(params string[] path) => File.ReadAllText(Path.Combine([root?.FullName ?? throw new InvalidOperationException("Source missing."), "src", .. path]));
-        Check.Equal(true, Source("TiaMcp.Host", "PlcsimTargets.cs").Contains("RequireEndpoint(recorded, endpoint, connectedRoutes.TryGetValue(session, out var connected) ? connected : null, SimulationNetworkRoute.Adapter(endpoint))", StringComparison.Ordinal));
+        Check.Equal(true, Source("TiaMcp.Host", "PlcsimTargets.cs").Contains("RequireEndpoint(recorded, endpoint, connectedRoutes.TryGetValue(session, out var connected) ? connected.Route : null, SimulationNetworkRoute.Adapter(endpoint))", StringComparison.Ordinal));
         // Both connect tools record the route their session opens on, under the key their write gates read.
         Check.Equal(true, Source("TiaMcp.Host", "PhysicalRuntimeTools.cs").Contains("targets.Connect(\"web:\"+attemptId,login.Endpoint,", StringComparison.Ordinal)
             && Source("TiaMcp.Host", "PhysicalRuntimeTools.cs").Contains("targets.Require(bindingSha256,\"web:\"+attemptId,", StringComparison.Ordinal));
