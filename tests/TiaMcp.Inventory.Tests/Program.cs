@@ -480,6 +480,27 @@ Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties
         Check(failed.IsError == true && error["error"]!["code"]!.GetValue<string>() == code && error["blocks"] is null && error["nextOffset"] is null, "A " + code + " ends block_export instead of skipping the remaining blocks");
     }
 
+    // More than 2000 matches: the inventory is read page by page (blockOffset), every match is reachable and complete is true only at the end.
+    JsonElement InventoryPage(int total, int offset, bool walkCut = false)
+    {
+        int count = Math.Min(TiaTools.InventoryPageItems, total - offset);
+        bool more = offset + count < total || walkCut;
+        return JsonDocument.Parse("{\"project\":{\"name\":\"P\"},\"plcs\":[{\"path\":\"" + plc + "\"}],\"completeness\":{\"truncated\":" + (more ? "true" : "false") + ",\"scopeComplete\":" + (more ? "false" : "true")
+            + "},\"filter\":{\"walkTruncated\":" + (walkCut ? "true" : "false") + "},\"blocks\":[" + string.Join(",", Enumerable.Range(offset, count).Select(i => BlockJson(i))) + "]}").RootElement;
+    }
+    calls.Clear();
+    bridgeHandler = (operation, arguments) => operation == "project_inventory" ? InventoryPage(4500, arguments.TryGetProperty("blockOffset", out var skip) ? skip.GetInt32() : 0) : Entries(arguments);
+    var last = JsonNode.Parse(Text(await blockTools.BlockExport(default, offset: 4400, maxBlocks: 500, namePrefix: "paged")))!.AsObject();
+    Check(calls.Where(c => c.Operation == "project_inventory").Select(c => c.Arguments.TryGetProperty("blockOffset", out var skip) ? skip.GetInt32() : 0).SequenceEqual(new[] { 0, 2000, 4000 })
+        && last["matchedBlocks"]!.GetValue<int>() == 4500 && last["blocks"]!.AsArray().Count == 100 && last["nextOffset"] is null
+        && last["completeness"]!["inventoryComplete"]!.GetValue<bool>() && last["completeness"]!["complete"]!.GetValue<bool>(), "block_export pages the inventory so every match is reachable and the last page is complete");
+    var middle = JsonNode.Parse(Text(await blockTools.BlockExport(default, offset: 1000, maxBlocks: 500, namePrefix: "paged")))!.AsObject();
+    Check(middle["nextOffset"]!.GetValue<int>() == 1500 && !middle["completeness"]!["complete"]!.GetValue<bool>(), "A page before the end reports the next offset");
+    // A walk cut cannot be continued: the listing stays incomplete and no page claims otherwise.
+    bridgeHandler = (operation, arguments) => operation == "project_inventory" ? InventoryPage(2500, arguments.TryGetProperty("blockOffset", out var skip) ? skip.GetInt32() : 0, walkCut: arguments.TryGetProperty("blockOffset", out _)) : Entries(arguments);
+    var cut = JsonNode.Parse(Text(await blockTools.BlockExport(default, offset: 0, maxBlocks: 500, namePrefix: "cut")))!.AsObject();
+    Check(!cut["completeness"]!["inventoryComplete"]!.GetValue<bool>() && !cut["completeness"]!["complete"]!.GetValue<bool>() && cut["matchedBlocks"]!.GetValue<int>() == 2500, "A cut walk leaves the inventory incomplete");
+
     // project_snapshot_capture: the model is exported once, after the relationship pass, and the snapshot is released on every path.
     Directory.CreateDirectory(Path.Combine(ExportRoot(), "project-explorer"));
     string modelFile = Path.Combine(ExportRoot(), "project-explorer", "model.json");
