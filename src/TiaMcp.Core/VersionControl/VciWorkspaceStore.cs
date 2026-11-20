@@ -519,11 +519,7 @@ public sealed partial class VciWorkspaceStore
         var bytes = new byte[checked((int)input.Length)]; input.ReadExactly(bytes); return bytes;
     }
     private static void WriteNew<T>(string path, T value) => WriteBytes(path, JsonSerializer.SerializeToUtf8Bytes(value, BridgeProtocol.Json));
-    private static void WriteBytes(string path, byte[] bytes)
-    {
-        PackageStorage.EnsureNoLinks(path);
-        using var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None); output.Write(bytes); output.Flush(true);
-    }
+    private static void WriteBytes(string path, byte[] bytes) => PackageStorage.WriteNew(path, bytes);
     private static VciStoredArtifact Artifact(string directory, string name)
     { string path = PackageStorage.Under(directory, name); return new(name, PackageStorage.FileHash(path), new FileInfo(path).Length); }
     private static void VerifyArtifacts(string directory, VciStoredArtifact[] artifacts, params string[] names)

@@ -922,8 +922,8 @@
     },
     {
       "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
-      "sha256": "029a4d43928f4d967baad174d655e652a0af4b786f379071683f211b4fb28b87",
-      "bytes": 17607
+      "sha256": "9fd4ca9af17cb7eb439cfff8cfef798592e43b46a144b4111e21bf18d92a9b19",
+      "bytes": 17468
     },
     {
       "path": "src/TiaMcp.Core/BridgeClient.cs",
@@ -947,8 +947,8 @@
     },
     {
       "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
-      "sha256": "74422e74e8d703fb6c95e7bfee60568a009fd24535654dbfd2f38a87997c9ed9",
-      "bytes": 17108
+      "sha256": "72903de109bea72223614cd5ec221a836677e8b4fa54e86d860dd35c54e5451c",
+      "bytes": 16969
     },
     {
       "path": "src/TiaMcp.Core/ConnectionWorkflowStore.cs",
@@ -1412,8 +1412,8 @@
     },
     {
       "path": "src/TiaMcp.Core/PackageStorage.cs",
-      "sha256": "c37a418fa2f052de30bead16a5d59c8acc190c3216e0d266f7634c48b65cb00c",
-      "bytes": 15269
+      "sha256": "23b4d54a19170d72ad2f4ba3493e72e9cc74fbcc0a2d871eddc482f2cf1e762d",
+      "bytes": 16864
     },
     {
       "path": "src/TiaMcp.Core/PackageStore.cs",
@@ -1667,8 +1667,8 @@
     },
     {
       "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
-      "sha256": "925ccbf8efd6753b34ddf321623cc1aa4b7bddbfe7a23581fb0b0ab6a19adbbd",
-      "bytes": 30485
+      "sha256": "d67cf2a658f6a4dee68fde020852799d64f8b4557fde827b0d3f1e231f20c5e8",
+      "bytes": 30126
     },
     {
       "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleOperation.cs",
@@ -1697,8 +1697,8 @@
     },
     {
       "path": "src/TiaMcp.Core/TiaMcp.Core.csproj",
-      "sha256": "15567090037e71e15afd8a331678880c8b87c631ca69fdf67370bc602c4147f0",
-      "bytes": 1175
+      "sha256": "13300e82d2212bc3ad3e5888c77e193a2c9a4e64d2824f6a78e4af27433ec176",
+      "bytes": 1232
     },
     {
       "path": "src/TiaMcp.Core/UnifiedRuntime/UnifiedAlarmRules.cs",
@@ -1772,8 +1772,8 @@
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
-      "sha256": "5a4521b804e98a002663dcc0d5685a0eab76c7688da263e25383433ea81da179",
-      "bytes": 46353
+      "sha256": "d364e68b391b1145ea9c5c4ab8799cacdc76aec26aaed785ab54037da06a815c",
+      "bytes": 46194
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchAuthoringProfile.cs",
@@ -3872,8 +3872,8 @@
     },
     {
       "path": "src/TiaMcp.Translations/TranslationRetention.cs",
-      "sha256": "62b7281f97e61231690c04559ad12428908676e5861324bd7815d871ca840b08",
-      "bytes": 16281
+      "sha256": "104a878bfea9228c5171cf15732f2803bf25b21fa45a41c0a8a17230b153d4e7",
+      "bytes": 15919
     },
     {
       "path": "src/TiaMcp.Translations/TranslationReview.cs",
@@ -6263,15 +6263,15 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 560,
-          "endLine": 562,
+          "line": 556,
+          "endLine": 558,
           "sha256": "47813a22194b79be57ce0e5f2441107eb591fab2b4c7a9f196a86e68dec6605c"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 563,
-          "endLine": 584,
+          "line": 559,
+          "endLine": 580,
           "sha256": "a9666569798c01bdcf0468ae1ed8896b5c1ec7c4a85b2537f4f1927d88e8b070"
         },
         {
@@ -7203,15 +7203,15 @@
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
           "name": "Write",
           "line": 214,
-          "endLine": 215,
-          "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
+          "endLine": 214,
+          "sha256": "59ef459d3a56a5bdbba52f863776b066025d024019afbc74bce1342ee1bb0e37"
         },
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Write",
           "line": 202,
-          "endLine": 203,
-          "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
+          "endLine": 202,
+          "sha256": "59ef459d3a56a5bdbba52f863776b066025d024019afbc74bce1342ee1bb0e37"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
@@ -18804,15 +18804,15 @@
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
           "name": "Write",
           "line": 214,
-          "endLine": 215,
-          "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
+          "endLine": 214,
+          "sha256": "59ef459d3a56a5bdbba52f863776b066025d024019afbc74bce1342ee1bb0e37"
         },
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Write",
           "line": 202,
-          "endLine": 203,
-          "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
+          "endLine": 202,
+          "sha256": "59ef459d3a56a5bdbba52f863776b066025d024019afbc74bce1342ee1bb0e37"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
@@ -23284,15 +23284,15 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 560,
-          "endLine": 562,
+          "line": 556,
+          "endLine": 558,
           "sha256": "47813a22194b79be57ce0e5f2441107eb591fab2b4c7a9f196a86e68dec6605c"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 563,
-          "endLine": 584,
+          "line": 559,
+          "endLine": 580,
           "sha256": "a9666569798c01bdcf0468ae1ed8896b5c1ec7c4a85b2537f4f1927d88e8b070"
         },
         {
@@ -47050,15 +47050,15 @@
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
           "name": "Write",
           "line": 214,
-          "endLine": 215,
-          "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
+          "endLine": 214,
+          "sha256": "59ef459d3a56a5bdbba52f863776b066025d024019afbc74bce1342ee1bb0e37"
         },
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Write",
           "line": 202,
-          "endLine": 203,
-          "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
+          "endLine": 202,
+          "sha256": "59ef459d3a56a5bdbba52f863776b066025d024019afbc74bce1342ee1bb0e37"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
@@ -48194,15 +48194,15 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 560,
-          "endLine": 562,
+          "line": 556,
+          "endLine": 558,
           "sha256": "47813a22194b79be57ce0e5f2441107eb591fab2b4c7a9f196a86e68dec6605c"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 563,
-          "endLine": 584,
+          "line": 559,
+          "endLine": 580,
           "sha256": "a9666569798c01bdcf0468ae1ed8896b5c1ec7c4a85b2537f4f1927d88e8b070"
         },
         {
@@ -48293,15 +48293,15 @@
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
           "name": "Write",
           "line": 214,
-          "endLine": 215,
-          "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
+          "endLine": 214,
+          "sha256": "59ef459d3a56a5bdbba52f863776b066025d024019afbc74bce1342ee1bb0e37"
         },
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Write",
           "line": 202,
-          "endLine": 203,
-          "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
+          "endLine": 202,
+          "sha256": "59ef459d3a56a5bdbba52f863776b066025d024019afbc74bce1342ee1bb0e37"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
@@ -49831,15 +49831,15 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 560,
-          "endLine": 562,
+          "line": 556,
+          "endLine": 558,
           "sha256": "47813a22194b79be57ce0e5f2441107eb591fab2b4c7a9f196a86e68dec6605c"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 563,
-          "endLine": 584,
+          "line": 559,
+          "endLine": 580,
           "sha256": "a9666569798c01bdcf0468ae1ed8896b5c1ec7c4a85b2537f4f1927d88e8b070"
         },
         {
@@ -54677,8 +54677,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Bind",
-          "line": 594,
-          "endLine": 599,
+          "line": 590,
+          "endLine": 595,
           "sha256": "2355cc1337f420b357129abab379d7c3dc3a77b0df4b2b7d2e6df39cce143bfb"
         },
         {
@@ -55418,15 +55418,15 @@
         {
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
           "name": "Require",
-          "line": 216,
-          "endLine": 217,
+          "line": 215,
+          "endLine": 216,
           "sha256": "e2285f0ef01fdbf622af2727b97b02ef2c15804235fe0ef443ae5ea9d9ccb344"
         },
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Require",
-          "line": 204,
-          "endLine": 205,
+          "line": 203,
+          "endLine": 204,
           "sha256": "e2285f0ef01fdbf622af2727b97b02ef2c15804235fe0ef443ae5ea9d9ccb344"
         },
         {
@@ -55516,8 +55516,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Require",
-          "line": 552,
-          "endLine": 552,
+          "line": 548,
+          "endLine": 548,
           "sha256": "b3c06feff9f81e929816aeb6b4af28deaf08fdfd2ec287ebb7e7591f67b33e64"
         },
         {
@@ -60184,15 +60184,15 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 560,
-          "endLine": 562,
+          "line": 556,
+          "endLine": 558,
           "sha256": "47813a22194b79be57ce0e5f2441107eb591fab2b4c7a9f196a86e68dec6605c"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 563,
-          "endLine": 584,
+          "line": 559,
+          "endLine": 580,
           "sha256": "a9666569798c01bdcf0468ae1ed8896b5c1ec7c4a85b2537f4f1927d88e8b070"
         },
         {
@@ -63040,15 +63040,15 @@
         {
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
           "name": "Require",
-          "line": 216,
-          "endLine": 217,
+          "line": 215,
+          "endLine": 216,
           "sha256": "e2285f0ef01fdbf622af2727b97b02ef2c15804235fe0ef443ae5ea9d9ccb344"
         },
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Require",
-          "line": 204,
-          "endLine": 205,
+          "line": 203,
+          "endLine": 204,
           "sha256": "e2285f0ef01fdbf622af2727b97b02ef2c15804235fe0ef443ae5ea9d9ccb344"
         },
         {
@@ -63138,8 +63138,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Require",
-          "line": 552,
-          "endLine": 552,
+          "line": 548,
+          "endLine": 548,
           "sha256": "b3c06feff9f81e929816aeb6b4af28deaf08fdfd2ec287ebb7e7591f67b33e64"
         },
         {
@@ -63524,15 +63524,15 @@
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
           "name": "Write",
           "line": 214,
-          "endLine": 215,
-          "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
+          "endLine": 214,
+          "sha256": "59ef459d3a56a5bdbba52f863776b066025d024019afbc74bce1342ee1bb0e37"
         },
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Write",
           "line": 202,
-          "endLine": 203,
-          "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
+          "endLine": 202,
+          "sha256": "59ef459d3a56a5bdbba52f863776b066025d024019afbc74bce1342ee1bb0e37"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
@@ -68694,15 +68694,15 @@
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
           "name": "Write",
           "line": 214,
-          "endLine": 215,
-          "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
+          "endLine": 214,
+          "sha256": "59ef459d3a56a5bdbba52f863776b066025d024019afbc74bce1342ee1bb0e37"
         },
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Write",
           "line": 202,
-          "endLine": 203,
-          "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
+          "endLine": 202,
+          "sha256": "59ef459d3a56a5bdbba52f863776b066025d024019afbc74bce1342ee1bb0e37"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",

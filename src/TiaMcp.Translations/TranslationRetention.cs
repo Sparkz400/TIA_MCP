@@ -31,19 +31,12 @@ internal sealed class TranslationRetention
         foreach (var kind in Kinds) Directory.CreateDirectory(PathFor(kind));
     }
 
-    // A short holder is waited out, as PackageStorage.Lock does for the other stores; only a longer hold refuses.
-    internal static TimeSpan LockWait = TimeSpan.FromSeconds(5);
-
+    // A short holder is waited out with the same bounded wait as PackageStorage.Lock; only a longer hold refuses.
     internal IDisposable Lock()
     {
         string path = PathFor("workflow.lock");
-        var elapsed = System.Diagnostics.Stopwatch.StartNew();
-        while (true)
-        {
-            try { return new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
-            catch (IOException) when (elapsed.Elapsed < LockWait) { Thread.Sleep(25); }
-            catch (IOException) { throw new BridgeException("TranslationStoreBusy", "Another offline translation publication is active. Retry the same request after it completes."); }
-        }
+        try { return PackageStorage.WaitForLock(() => new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None), System.Diagnostics.Stopwatch.StartNew(), PackageStorage.LockWait); }
+        catch (IOException) { throw new BridgeException("TranslationStoreBusy", "Another offline translation publication is active. Retry the same request after it completes."); }
     }
 
     /// <summary>Identity of a completed record for in-process caches: its digest and its directory.</summary>
@@ -232,10 +225,7 @@ internal sealed class TranslationRetention
     private static void WriteNew(string path, byte[] bytes)
     {
         NoLinks(path);
-        string staging = path + ".pending";
-        using (var stream = new FileStream(staging, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-        { stream.Write(bytes); stream.Flush(true); }
-        File.Move(staging, path, false);
+        PackageStorage.WriteStaged(path, bytes);
     }
 
     private void CheckQuota(long additionalBytes)

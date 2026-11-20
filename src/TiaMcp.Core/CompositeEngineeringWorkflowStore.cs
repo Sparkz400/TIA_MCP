@@ -199,8 +199,7 @@ public sealed class CompositeEngineeringWorkflowStore
         Require(input.Length is > 0 && input.Length <= limit, "CompositeCapacity", "Input or retained artifact exceeds its byte bound or is empty.");
         var bytes = new byte[(int)input.Length]; input.ReadExactly(bytes); return bytes;
     }
-    private static void Write(string path, byte[] bytes)
-    { PackageStorage.EnsureNoLinks(path); using var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None); output.Write(bytes); output.Flush(true); }
+    private static void Write(string path, byte[] bytes) => PackageStorage.WriteNew(path, bytes);
     private static void Require([DoesNotReturnIf(false)] bool condition, string code, string message)
     { if (!condition) throw new BridgeException(code, message); }
 }

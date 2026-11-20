@@ -324,14 +324,8 @@ public sealed class TestSuiteStyleJobs
         string path = PackageStorage.Under(root, relative); Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         if (!File.Exists(path))
         {
-            string temp = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
-            try
-            {
-                using (var stream = new FileStream(temp, FileMode.CreateNew, FileAccess.Write, FileShare.None)) { stream.Write(bytes); stream.Flush(true); }
-                try { File.Move(temp, path, false); }
-                catch (IOException) when (File.Exists(path)) { } // Another writer published the same content; the temp is removed below.
-            }
-            finally { PackageStorage.TryDelete(temp); }
+            try { PackageStorage.WriteStaged(path, bytes); }
+            catch (IOException) when (File.Exists(path)) { } // Another writer published the same content.
         }
         var result = new EngineeringArtifactReference(relative, hash); VerifyArtifact(result); return result;
     }

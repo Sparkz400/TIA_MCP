@@ -86,11 +86,37 @@ internal static class PackageStorage
     /// <summary>The one bounded lock-file wait (also the credential vault's): only a sharing or lock violation is retried.</summary>
     internal static FileStream WaitForLock(Func<FileStream> open, System.Diagnostics.Stopwatch elapsed, TimeSpan bound)
     {
-        while (true)
+        // Lock files have no waitable handle, so a holder is polled; the delay backs off from 1 ms to 50 ms (a short holder is
+        // noticed at once, a long one is not hammered) and never sleeps past the bound.
+        for (int delay = 1; ; delay = Math.Min(delay * 2, 50))
         {
             try { return open(); }
-            catch (IOException error) when (error.HResult is unchecked((int)0x80070020) or unchecked((int)0x80070021) && elapsed.Elapsed < bound) { Thread.Sleep(25); }
+            catch (IOException error) when (error.HResult is unchecked((int)0x80070020) or unchecked((int)0x80070021) && elapsed.Elapsed < bound)
+            { Thread.Sleep((int)Math.Max(1, Math.Min(delay, (bound - elapsed.Elapsed).TotalMilliseconds))); }
         }
+    }
+
+    /// <summary>Creates <paramref name="path"/> (never overwrites), writes and flushes it to disk. For records whose completion is
+    /// marked by a later receipt, so a partial file is never mistaken for a finished one.</summary>
+    internal static void WriteNew(string path, byte[] bytes)
+    {
+        EnsureNoLinks(path);
+        using var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+        output.Write(bytes); output.Flush(true);
+    }
+
+    /// <summary>Like <see cref="WriteNew"/>, but the content appears under <paramref name="path"/> only complete: written to a private
+    /// temporary file and moved without overwriting (an <see cref="IOException"/> when the name exists). The temporary file never outlives the call.</summary>
+    internal static void WriteStaged(string path, byte[] bytes)
+    {
+        EnsureNoLinks(path);
+        string temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            using (var output = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None)) { output.Write(bytes); output.Flush(true); }
+            File.Move(temporary, path, false);
+        }
+        finally { TryDelete(temporary); }
     }
 
     // Revision 0 of an operation, admission or component window (a dispatch intent) is published by this rename: write-through.
