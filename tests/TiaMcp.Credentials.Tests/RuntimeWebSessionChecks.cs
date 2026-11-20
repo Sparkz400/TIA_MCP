@@ -136,7 +136,7 @@ internal static class RuntimeWebSessionChecks
     }
 
     /// <summary>Minimal JSON-RPC Web API over pinned loopback TLS: a connection serves requests until the client asks it to close; batches optional.</summary>
-    private sealed class FakeWebApi : IAsyncDisposable
+    internal sealed class FakeWebApi : IAsyncDisposable
     {
         private readonly TcpListener listener = new(IPAddress.Loopback, 0);
         private readonly X509Certificate2 certificate;
@@ -150,6 +150,11 @@ internal static class RuntimeWebSessionChecks
         internal readonly ConcurrentQueue<string> Calls = new();
         internal int Handshakes, Requests, BatchPosts;
         internal volatile bool BatchSupported = true, ChangedMetadata, DropBatches;
+        // Ticket methods, permissions, the CPU mode, one alarm and the ticket end point (RuntimeWebTicketChecks).
+        internal volatile string[] Extra = [], Grants = ["read_value"];
+        internal volatile string Mode = "stop", AlarmAck = "not_acknowledged", TicketMode = "ok";
+        internal byte[] TicketBody = [];
+        internal readonly ConcurrentQueue<string> TicketGets = new(), TicketHeaders = new(), ClosedTickets = new();
 
         internal FakeWebApi()
         {
@@ -192,7 +197,9 @@ internal static class RuntimeWebSessionChecks
                         head.Add(one[0]);
                     }
                     string headers = Encoding.ASCII.GetString(head.ToArray());
-                    int length = int.Parse(Regex.Match(headers, @"Content-Length:\s*(\d+)", RegexOptions.IgnoreCase).Groups[1].Value);
+                    var lengthHeader = Regex.Match(headers, @"Content-Length:\s*(\d+)", RegexOptions.IgnoreCase);
+                    int length = lengthHeader.Success ? int.Parse(lengthHeader.Groups[1].Value) : 0;
+                    if (headers.StartsWith("GET /api/ticket?id=", StringComparison.Ordinal)) { await ServeTicket(ssl, headers); return; }
                     bool close = Regex.IsMatch(headers, @"Connection:\s*close", RegexOptions.IgnoreCase);
                     var body = new byte[length]; await ssl.ReadExactlyAsync(body);
                     Interlocked.Increment(ref Requests);
@@ -221,19 +228,43 @@ internal static class RuntimeWebSessionChecks
             catch (Exception) { } // A refused handshake (wrong pin) ends the connection here.
         }
 
+        /// <summary>The ticket end point: always closes the connection after one answer.</summary>
+        private async Task ServeTicket(SslStream ssl, string headers)
+        {
+            TicketGets.Enqueue(headers[..headers.IndexOf("\r\n", StringComparison.Ordinal)]); TicketHeaders.Enqueue(headers);
+            string head = TicketMode switch
+            {
+                "redirect" => "HTTP/1.1 302 Found\r\nLocation: https://127.0.0.1:1/elsewhere\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
+                "error" => "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
+                "noLength" => "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nConnection: close\r\n\r\n",
+                _ => "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: " + TicketBody.Length + "\r\nConnection: close\r\n\r\n"
+            };
+            await ssl.WriteAsync(Encoding.ASCII.GetBytes(head));
+            if (TicketMode is "ok" or "noLength") await ssl.WriteAsync(TicketBody);
+            await ssl.FlushAsync();
+        }
+
         private async Task<object> Answer(JsonElement request)
         {
             string method = request.GetProperty("method").GetString()!, id = request.GetProperty("id").GetString()!;
             Calls.Enqueue(method);
             object? result = method switch
             {
-                "Api.Browse" => new[] { "Api.Login", "Api.Logout", "Api.GetPermissions", "PlcProgram.Browse", "PlcProgram.Read", "Api.GetSessionInfo" }.Select(n => new { name = n }),
+                "Api.Browse" => new[] { "Api.Login", "Api.Logout", "Api.GetPermissions", "PlcProgram.Browse", "PlcProgram.Read", "Api.GetSessionInfo" }.Concat(Extra).Select(n => new { name = n }),
                 "Api.Login" => new { token = "fixture-token-" + id },
                 "Api.GetSessionInfo" => new { username = "reader", authentication_mode = "local" },
-                "Api.GetPermissions" => new[] { new { name = "read_value" } },
+                "Api.GetPermissions" => Grants.Select(n => new { name = n }),
                 "PlcProgram.Browse" => new[] { new { name = "Counter", datatype = ChangedMetadata ? "dint" : "int" } },
                 "PlcProgram.Read" => 7,
                 "Api.Logout" => true,
+                "Modules.DownloadServiceData" => "VGlja2V0LVNlcnZpY2U",
+                "PlcProgram.DownloadProfilingData" => "VGlja2V0LVByb2Y",
+                "Plc.CreateBackup" => "VGlja2V0LUJhY2t1cA==", // the padding must be escaped in the query
+                "Plc.ReadOperatingMode" => Mode,
+                "Api.CloseTicket" => CloseTicket(request),
+                "Alarms.Browse" => new { entries = new[] { new { id = request.GetProperty("params").GetProperty("alarm_id").GetString(), acknowledgement = new { state = AlarmAck } } },
+                    last_modified = "2026-11-20T10:00:00Z", count_current = 1, count_max = 5000 },
+                "Alarms.Acknowledge" => Acknowledge(),
                 _ => null
             };
             if (method == "PlcProgram.Read")
@@ -244,6 +275,9 @@ internal static class RuntimeWebSessionChecks
             }
             return new { jsonrpc = "2.0", id, result };
         }
+
+        private bool CloseTicket(JsonElement request) { ClosedTickets.Enqueue(request.GetProperty("params").GetProperty("id").GetString()!); return true; }
+        private bool Acknowledge() { AlarmAck = "acknowledged"; return true; }
 
         public async ValueTask DisposeAsync()
         {

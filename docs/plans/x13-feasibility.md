@@ -138,12 +138,14 @@ so a foreign or released instance is refused before any API call.
    answers a pending `RDREC`/`WRREC` with a bounded payload and status. Qualify with a scratch FB
    calling `RDREC` and `WRREC` on a configured module: data and status round trip, a
    deliberate error status, and a request left unanswered until its timeout.
-4. **Row 16, unused Web API read methods.** `Syslog.Browse` is implemented with offline checks;
-   native qualification remains open. Add service-data and profiling-data
-   downloads to `runtime_web_*`, offered only when `Api.Browse` lists them. Qualify in the
-   real-server runner on the owned TCP/IP instance; record each method PLCSIM does not list as
-   a B05 row. The state-changing methods (`Plc.CreateBackup`, `Alarms.Acknowledge`, setters)
-   follow later behind the write gate, each with its own D16 contract.
+4. **Row 16, unused Web API read methods.** `Syslog.Browse`, service-data and profiling-data downloads
+   (`runtime_web_download`), `Plc.CreateBackup` (`runtime_web_backup`) and `Alarms.Acknowledge`
+   (`runtime_web_alarm_acknowledge`) are implemented with offline checks against a loopback fake
+   of the Siemens manual; the downloads are offered only when `Api.Browse` lists the method and
+   `Api.CloseTicket`, and backup and acknowledgement sit behind the owned-PLCSIM write gate.
+   Native qualification remains open for all of them: qualify in the real-server runner on the
+   owned TCP/IP instance; record each method PLCSIM does not list as a B05 row. Still not built:
+   `Plc.RestoreBackup`, the setters, file, data-log, clock and web-application methods.
 5. **Row 4, further cycle-control modes.** SingleStep_C/P/CP/CT/CPT selection is implemented and ran natively on
    7 November (`local.plcsim.capture-modes.20261107`): C, CP, CT and CPT captured fully, P stalled after one sync point on an OB1-only
    fixture, and every capture restored the operating mode. TimespanSynchronized_C/P/CP ran natively on 8 November (`local.plcsim.timespan-capture.20261108`, [record](../verification/plcsim-timespan-capture-20261108.md)): C and CP captured fully with a 10 ms span, P stalled like SingleStep_P. Qualify with a step
