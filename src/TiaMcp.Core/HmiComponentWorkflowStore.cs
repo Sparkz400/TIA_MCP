@@ -89,7 +89,18 @@ public sealed partial class HmiComponentWorkflowStore(string artifactsRoot)
         AddFiles(report, files);
         var input = Publish(bytes, ".input", HmiComponentReview.InputLimit);
         var envelope = new JsonObject { ["schemaVersion"] = "hmi-component-review-record." + Version(request), ["input"] = input, ["report"] = report };
-        return Summary(envelope, Publish(JsonSerializer.SerializeToUtf8Bytes(envelope, BridgeProtocol.Json), ".json", ReportLimit));
+        var published = Publish(JsonSerializer.SerializeToUtf8Bytes(envelope, BridgeProtocol.Json), ".json", ReportLimit);
+        MarkVerified((string)published["sha256"]!); // The report was just built from exactly these retained inputs.
+        return Summary(envelope, published);
+    }
+    // A record id is the digest of its immutable record. The first page of a section (offset 0) rebuilds the report from its retained
+    // request, files and saved reviews; continuation pages slice the stored report, whose bytes ReadArtifact still checks against the id.
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> Verified = new(StringComparer.Ordinal);
+    private string VerifiedKey(string recordId) => Path.GetFullPath(artifactsRoot) + "|" + recordId;
+    private void MarkVerified(string recordId)
+    {
+        if (Verified.Count >= 256) Verified.Clear();
+        Verified[VerifiedKey(recordId)] = true;
     }
     public JsonObject Page(string recordId, string section = "summary", int offset = 0, int count = 50)
     {
@@ -104,11 +115,15 @@ public sealed partial class HmiComponentWorkflowStore(string artifactsRoot)
         if (!JsonNode.DeepEquals(input, Reference(inputHash, ".input"))) throw HmiComponentReview.Error("Expected a retained input reference.");
         var request = HmiComponentReview.Parse(ProjectReviewStore.ReadArtifact(artifactsRoot, input, HmiComponentReview.InputLimit));
         if ((string?)record["schemaVersion"] != "hmi-component-review-record." + Version(request)) throw HmiComponentReview.Error("Record and request versions differ.");
-        var expected = Build(request); AddFiles(expected, HmiComponentReview.Files(request));
-        if (!JsonNode.DeepEquals(expected, record["report"])) throw new BridgeException("ArtifactChanged", "Report differs from its retained request, files or saved reviews.");
+        if (offset == 0 || !Verified.ContainsKey(VerifiedKey(recordId)))
+        {
+            var expected = Build(request); AddFiles(expected, HmiComponentReview.Files(request));
+            if (!JsonNode.DeepEquals(expected, record["report"])) throw new BridgeException("ArtifactChanged", "Report differs from its retained request, files or saved reviews.");
+            MarkVerified(recordId);
+        }
         var result = Summary(record, artifact);
         if (section == "summary") return result;
-        var source = expected[section] as JsonArray ?? throw HmiComponentReview.Error("This section is unavailable in the retained review version.");
+        var source = record["report"]![section] as JsonArray ?? throw HmiComponentReview.Error("This section is unavailable in the retained review version.");
         if (offset > source.Count) throw HmiComponentReview.Error("Offset exceeds the selected section.");
         var rows = new JsonArray(); int next = offset, used = 0;
         while (next < source.Count && rows.Count < count)

@@ -198,14 +198,27 @@ internal static class PackageStorage
         string path = Under(root, hash + extension);
         if (!File.Exists(path))
         {
+            // Every writer holds .write.lock, so a .tmp seen here is the residue of a crashed publication, not one in flight.
+            foreach (var stale in new DirectoryInfo(root).EnumerateFiles("*.tmp")) TryDelete(stale.FullName);
             if (new DirectoryInfo(root).EnumerateFiles().Sum(f => f.Length) + bytes.Length > cap)
                 throw new BridgeException("ArtifactCapacity", label + " retention exceeds " + (cap >> 20) + " MiB, including incomplete files.");
             string temporary = Under(root, hash + "." + Guid.NewGuid().ToString("N") + ".tmp");
-            using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None)) { stream.Write(bytes); stream.Flush(true); }
-            PublishFile(temporary, path);
+            try
+            {
+                using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None)) { stream.Write(bytes); stream.Flush(true); }
+                PublishFile(temporary, path);
+            }
+            finally { TryDelete(temporary); } // Gone after a successful rename; a failed write or publication must not leave a counted file.
         }
         _ = ProjectReviewStore.ReadArtifact(artifactsRoot, artifact, limit);
         return artifact;
+    }
+
+    /// <summary>Best-effort removal of a private temporary file; a locked or missing file is left for the next sweep.</summary>
+    internal static void TryDelete(string path)
+    {
+        try { File.Delete(path); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }
     }
 
     internal static T Load<T>(string path)

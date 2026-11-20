@@ -63,6 +63,7 @@ internal static class BlockExportIndex
             }
         };
         Directory.CreateDirectory(directory);
+        TiaMcp.Core.ExportRetention.Prune(directory);
         string index = Path.Combine(directory, "block-export-" + Guid.NewGuid().ToString("N") + ".json");
         File.WriteAllText(index, result.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
         result["index"] = index;

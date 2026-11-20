@@ -457,9 +457,17 @@ public sealed partial class VciWorkspaceStore
     private FileStream Lock() => PackageStorage.Lock(PackageStorage.Under(root, "store.lock"));
     private (string Id, string Path) NewEntry()
     {
-        Require(Directory.EnumerateDirectories(records).Take(MaxRecords).Count() < MaxRecords, "VciStorageLimit", "The retained VCI record limit is 128.");
+        // At the cap an incomplete record, then the oldest untouched preview, makes room; records with receipts or journals stay.
+        RecordRetention.MakeRoom(records, MaxRecords, EvictionRank, () => new BridgeException("VciStorageLimit", "The retained VCI record limit is 128 and every record holds receipts or journals."));
         _ = TreeFiles(root, MaxStoreBytes - 2 * MaxTreeBytes);
         string id = Guid.NewGuid().ToString("N"), path = DirectoryFor(id); Directory.CreateDirectory(path); return (id, path);
+    }
+    private static int EvictionRank(string directory)
+    {
+        string[] receipts = ["comparison-receipt.json", "manifest-receipt.json", "export.json", "fetch.json", "push.json", "commit.json"];
+        if (receipts.Any(name => File.Exists(Path.Combine(directory, name))) || HasCommitIntent(directory) || Directory.Exists(Path.Combine(directory, "fork-journal")) ||
+            File.Exists(Path.Combine(directory, "push-journal", "0001.json")) || File.Exists(Path.Combine(directory, "fetch-journal", "0001.json"))) return -1;
+        return File.Exists(Path.Combine(directory, "review.json")) ? 1 : 0;
     }
     private GitWorkspaceRunner Runner(IGitOperationJournal? journal = null)
     {

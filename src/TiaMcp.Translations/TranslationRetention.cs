@@ -31,11 +31,23 @@ internal sealed class TranslationRetention
         foreach (var kind in Kinds) Directory.CreateDirectory(PathFor(kind));
     }
 
+    // A short holder is waited out, as PackageStorage.Lock does for the other stores; only a longer hold refuses.
+    internal static TimeSpan LockWait = TimeSpan.FromSeconds(5);
+
     internal IDisposable Lock()
     {
-        try { return new FileStream(PathFor("workflow.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
-        catch (IOException) { throw new BridgeException("TranslationStoreBusy", "Another offline translation publication is active. Retry the same request after it completes."); }
+        string path = PathFor("workflow.lock");
+        var elapsed = System.Diagnostics.Stopwatch.StartNew();
+        while (true)
+        {
+            try { return new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
+            catch (IOException) when (elapsed.Elapsed < LockWait) { Thread.Sleep(25); }
+            catch (IOException) { throw new BridgeException("TranslationStoreBusy", "Another offline translation publication is active. Retry the same request after it completes."); }
+        }
     }
+
+    /// <summary>Identity of a completed record for in-process caches: its digest and its directory.</summary>
+    internal string CacheKey(TranslationRecord record) => PathFor(record.Kind, record.Id) + "|" + record.RecordSha256;
 
     internal static string Reference(string kind, string id) => $"translation:{kind}:{id}";
     internal static string Reference(TranslationRecord record) => Reference(record.Kind, record.Id);
@@ -110,6 +122,19 @@ internal sealed class TranslationRetention
         var (kind, id, _) = ParseRef(reference);
         Require(depth <= 64, "TranslationDependencyLimit", "Retained ancestry exceeds 64 levels. Start a new review from the current capture with an explicitly supplied proposal batch.");
         Require(active.Add(reference), "TranslationIntegrityFailure", "Invalid retained dependency cycle.");
+        var record = LoadReceipt(reference);
+        foreach (var artifact in record.Artifacts) _ = Read(record, artifact.Name);
+        foreach (var input in record.Inputs)
+            Require(Load(input.RecordRef, active, depth + 1).RecordSha256 == input.RecordSha256,
+                "TranslationIntegrityFailure", "Retained review input differs. Create a new capture and review.");
+        active.Remove(reference);
+        return record;
+    }
+
+    /// <summary>The receipt of a completed record, checked against its own digest; no artifact or ancestor is read.</summary>
+    internal TranslationRecord LoadReceipt(string reference)
+    {
+        var (kind, id, _) = ParseRef(reference);
         Require(Exists(kind, id), "TranslationNotFound", "Translation record does not exist.");
         string receipt = PathFor(kind, id, "receipt.json");
         Require(File.Exists(receipt), "TranslationPublicationIncomplete", "Publication has no completion receipt. Retained files are not a completed candidate. List the record to inspect publication state; use a new review for a retry.");
@@ -119,12 +144,23 @@ internal sealed class TranslationRetention
             "TranslationIntegrityFailure", "Retained translation receipt identity or digest differs.");
         Require(record.Artifacts.Select(a => a.Name).Distinct(StringComparer.Ordinal).Count() == record.Artifacts.Length,
             "TranslationIntegrityFailure", "Duplicate retained artifact.");
-        foreach (var artifact in record.Artifacts) _ = Read(record, artifact.Name);
-        foreach (var input in record.Inputs)
-            Require(Load(input.RecordRef, active, depth + 1).RecordSha256 == input.RecordSha256,
-                "TranslationIntegrityFailure", "Retained review input differs. Create a new capture and review.");
-        active.Remove(reference);
         return record;
+    }
+
+    /// <summary>One chunk of an artifact checked against the receipt through ArtifactStore, whose digest cache hashes the file
+    /// at offset 0 only; later chunks of the same file version just stat it.</summary>
+    internal ArtifactChunk ReadChunk(TranslationRecord record, string name, long offset, int count)
+    {
+        ParseRef(ArtifactRef(record, name), true);
+        var artifact = record.Artifacts.SingleOrDefault(a => a.Name == name);
+        Require(artifact is not null, "TranslationArtifactNotFound", "Artifact is not part of this completed publication.");
+        Require(offset <= artifact.Bytes, "InvalidTranslationCursor", "Artifact offset is beyond its bytes.");
+        ArtifactChunk chunk;
+        try { chunk = new ArtifactStore(root).Read(PathFor(record.Kind, record.Id, name), offset, count); }
+        catch (BridgeException ex) when (ex.Code == "ArtifactUnavailable") { throw new BridgeException("TranslationIntegrityFailure", "A retained input is missing."); }
+        Require(chunk.Bytes == artifact.Bytes && chunk.Sha256 == artifact.Sha256,
+            "TranslationIntegrityFailure", "Retained artifact differs from its immutable receipt. Create a new capture and review.");
+        return chunk;
     }
 
     internal byte[] Read(TranslationRecord record, string name)

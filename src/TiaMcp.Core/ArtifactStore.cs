@@ -18,27 +18,7 @@ public sealed class ArtifactStore(string root)
     {
         if (offset < 0 || count is < 1 or > 65536)
             throw new BridgeException("InvalidRequest", "offset must be nonnegative and count must be between 1 and 65536 bytes.");
-        var full = Resolve(path);
-        // Junctions/symlinks cannot be used to turn this tool into unrestricted filesystem access.
-        for (FileSystemInfo? item = new FileInfo(full); item is not null; item = item switch
-        {
-            FileInfo file => file.Directory,
-            DirectoryInfo directory => directory.Parent,
-            _ => null
-        })
-        {
-            FileAttributes attributes;
-            try { attributes = File.GetAttributes(item.FullName); }
-            catch (Exception error) when (IsUnavailable(error))
-            {
-                // FileSystemInfo.Attributes returns -1 for a missing item, which
-                // includes every flag and falsely identifies it as a reparse
-                // point. Journal replacement can expose this transient state.
-                throw new BridgeException("ArtifactUnavailable", "The artifact path is missing, being replaced or temporarily locked during inspection. A read may be attempted again; no engineering operation is retried.");
-            }
-            if ((attributes & FileAttributes.ReparsePoint) != 0)
-                throw new BridgeException("ArtifactPathDenied", "Artifact transfer does not follow symbolic links or junctions.");
-        }
+        var full = ResolveChecked(path);
         // Permit atomic journal replacement while retaining this handle's immutable
         // contents; reads must never block a concurrent engineering outcome journal.
         using var stream = OpenRead(full);
@@ -61,6 +41,37 @@ public sealed class ArtifactStore(string root)
         return new(Path.GetRelativePath(_root, full), length, hash, offset, buffer.Length, offset + buffer.Length,
             offset + buffer.Length == length, "base64", Convert.ToBase64String(buffer));
     }
+
+    /// <summary><see cref="Resolve"/> plus the existence and symbolic-link/junction checks of <see cref="Read"/>, without opening or hashing the file.
+    /// For callers that only need the path boundary; the caller verifies content itself.</summary>
+    public string ResolveChecked(string path)
+    {
+        var full = Resolve(path);
+        // Junctions/symlinks cannot be used to turn this tool into unrestricted filesystem access.
+        for (FileSystemInfo? item = new FileInfo(full); item is not null; item = item switch
+        {
+            FileInfo file => file.Directory,
+            DirectoryInfo directory => directory.Parent,
+            _ => null
+        })
+        {
+            FileAttributes attributes;
+            try { attributes = File.GetAttributes(item.FullName); }
+            catch (Exception error) when (IsUnavailable(error))
+            {
+                // FileSystemInfo.Attributes returns -1 for a missing item, which
+                // includes every flag and falsely identifies it as a reparse
+                // point. Journal replacement can expose this transient state.
+                throw new BridgeException("ArtifactUnavailable", "The artifact path is missing, being replaced or temporarily locked during inspection. A read may be attempted again; no engineering operation is retried.");
+            }
+            if ((attributes & FileAttributes.ReparsePoint) != 0)
+                throw new BridgeException("ArtifactPathDenied", "Artifact transfer does not follow symbolic links or junctions.");
+        }
+        return full;
+    }
+
+    /// <summary>The path of <paramref name="full"/> relative to the root, as <see cref="ArtifactChunk.RelativePath"/> reports it.</summary>
+    public string Relative(string full) => Path.GetRelativePath(_root, full);
 
     /// <summary>The full path of <paramref name="path"/> (absolute, or relative to the root) when it lies strictly below the root; links are not checked.</summary>
     public string Resolve(string path) => TryResolve(path)

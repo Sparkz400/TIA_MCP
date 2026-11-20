@@ -47,31 +47,51 @@ public sealed class AutomationMlWorkflowStore
     {
         Require(count is > 0 and <= 200 && offset >= 0 && section is { Length: > 0 and <= 1024 } && section.StartsWith('/'),
             "AutomationMlPageLimit", "Use an exact array pointer and 1..200 rows, within a 128 KiB response budget.");
-        var record = Load(recordRef); JsonNode? node = JsonNode.Parse(record.Files["report.json"]);
-        var parts = section[1..].Split('/');
-        Require(parts.Length <= 12, "AutomationMlInvalidSection", "Array pointer is too deep.");
-        foreach (var part in parts)
+        var (receipt, id) = LoadReceipt(recordRef);
+        // A page needs only the stored report: its hash is checked against the receipt (once per file version, not per page).
+        var reportArtifact = receipt.Artifacts.Single(a => a.Name == "report.json"); var entry = ReportOf(id, reportArtifact);
+        lock (entry)
         {
-            if (node is JsonObject obj) node = obj[part];
-            else if (node is JsonArray array && int.TryParse(part, out int index) && index >= 0 && index < array.Count && index.ToString() == part) node = array[index];
-            else throw new BridgeException("AutomationMlInvalidSection", "Use an exact report array pointer, such as /objects.");
+            JsonNode? node = entry.Node;
+            var parts = section[1..].Split('/');
+            Require(parts.Length <= 12, "AutomationMlInvalidSection", "Array pointer is too deep.");
+            foreach (var part in parts)
+            {
+                if (node is JsonObject obj) node = obj[part];
+                else if (node is JsonArray array && int.TryParse(part, out int index) && index >= 0 && index < array.Count && index.ToString() == part) node = array[index];
+                else throw new BridgeException("AutomationMlInvalidSection", "Use an exact report array pointer, such as /objects.");
+            }
+            Require(node is JsonArray, "AutomationMlInvalidSection", "Selected report value is not an array.");
+            var source = (JsonArray)node; Require(offset <= source.Count, "AutomationMlPageLimit", "Offset exceeds this array.");
+            var (rows, next) = ReportPageRows.Read(source, offset, count, PageBytes - 4096, "Row exceeds page budget; download report.json.");
+            var result = new { recordRef, reportSha256 = reportArtifact.Sha256,
+                section, offset, total = source.Count, rows, nextOffset = next == source.Count ? (int?)null : next, nativeQualified = false };
+            Require(JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length <= PageBytes,
+                "AutomationMlPageLimit", "Encoded page exceeds 128 KiB; reduce count or download report.json.");
+            return result;
         }
-        Require(node is JsonArray, "AutomationMlInvalidSection", "Selected report value is not an array.");
-        var source = (JsonArray)node; Require(offset <= source.Count, "AutomationMlPageLimit", "Offset exceeds this array.");
-        var (rows, next) = ReportPageRows.Read(source, offset, count, PageBytes - 4096, "Row exceeds page budget; download report.json.");
-        var result = new { recordRef, reportSha256 = record.Receipt.Artifacts.Single(a => a.Name == "report.json").Sha256,
-            section, offset, total = source.Count, rows, nextOffset = next == source.Count ? (int?)null : next, nativeQualified = false };
-        Require(JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length <= PageBytes,
-            "AutomationMlPageLimit", "Encoded page exceeds 128 KiB; reduce count or download report.json.");
-        return result;
+    }
+    private sealed record ReportEntry(JsonNode Node, long Length, DateTime Written);
+    // Parsed reports are immutable (write-once, hash-pinned); a changed length or write time is re-verified from the file.
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, ReportEntry> Reports = new(StringComparer.Ordinal);
+    private ReportEntry ReportOf(string id, Artifact artifact)
+    {
+        string path = PathFor(id, artifact.Name), key = path + "|" + artifact.Sha256; var info = new FileInfo(path);
+        if (Reports.TryGetValue(key, out var hit) && info.Exists && info.Length == hit.Length && info.LastWriteTimeUtc == hit.Written) return hit;
+        var bytes = Read(path, AutomationMlDocument.MaxReportBytes);
+        Require(bytes.Length == artifact.Bytes && Hash(bytes) == artifact.Sha256, "AutomationMlIntegrityFailure", "Retained artifact changed.");
+        var entry = new ReportEntry(JsonNode.Parse(bytes)!, info.Length, info.LastWriteTimeUtc);
+        if (Reports.Count >= 4) Reports.Clear(); // shortcut: crude bound, reports reach 64 MiB; use an LRU if many records are paged at once.
+        Reports[key] = entry; return entry;
     }
     public object ReadArtifact(string recordRef, string name, long offset = 0, int count = 65536)
     {
-        var record = Load(recordRef);
-        Artifact? artifact = name == "receipt.json" ? new(name, Read(PathFor(record.Receipt.Id, name), 65536).Length, recordRef.Split(':')[2])
-            : record.Receipt.Artifacts.SingleOrDefault(a => a.Name == name);
+        // The whole record verifies once, at offset 0; later chunks check the receipt and use ArtifactStore's digest of the one file.
+        var receipt = offset == 0 ? Load(recordRef).Receipt : LoadReceipt(recordRef).Receipt;
+        Artifact? artifact = name == "receipt.json" ? new(name, Read(PathFor(receipt.Id, name), 65536).Length, recordRef.Split(':')[2])
+            : receipt.Artifacts.SingleOrDefault(a => a.Name == name);
         Require(artifact is not null, "AutomationMlArtifactMissing", "Use an artifact name returned by this record.");
-        var result = JsonSerializer.SerializeToElement(new ArtifactStore(root).Read(PathFor(record.Receipt.Id, name), offset, count), BridgeProtocol.Json);
+        var result = JsonSerializer.SerializeToElement(new ArtifactStore(root).Read(PathFor(receipt.Id, name), offset, count), BridgeProtocol.Json);
         Require(result.GetProperty("sha256").GetString() == artifact.Sha256 && result.GetProperty("bytes").GetInt64() == artifact.Bytes,
             "AutomationMlIntegrityFailure", "Artifact changed during transfer.");
         return new { sha256 = artifact.Sha256, bytes = artifact.Bytes, offset, count = result.GetProperty("count").GetInt32(),
@@ -107,19 +127,7 @@ public sealed class AutomationMlWorkflowStore
     { var record = Load(reference); Require(record.Receipt.Kind == "document", "AutomationMlInvalidReference", "Comparison inputs must be retained documents."); return record; }
     private Record Load(string reference, int depth = 0)
     {
-        Require(reference is { Length: 110 } && depth <= 1, "AutomationMlInvalidReference", "Use an exact Host-issued AutomationML record handle.");
-        var parts = reference.Split(':'); Require(parts.Length == 3 && parts[0] == "automationml", "AutomationMlInvalidReference", "Wrong record handle.");
-        string id = PackageStorage.Id(parts[1]), hash = PackageStorage.Hash(parts[2]);
-        Require(parts[2] == hash, "AutomationMlInvalidReference", "Record digests use canonical lowercase hex.");
-        var receiptBytes = Read(PathFor(id, "receipt.json"), 65536);
-        Require(Hash(receiptBytes) == hash && Read(PathFor(id, "intent.json"), 65536).AsSpan().SequenceEqual(receiptBytes), "AutomationMlIntegrityFailure", "Retained receipt changed.");
-        var receipt = JsonSerializer.Deserialize<Receipt>(receiptBytes, BridgeProtocol.Json);
-        Require(receipt is not null && receipt.SchemaVersion == 1 && receipt.Id == id && receipt.Kind is "document" or "comparison" && receipt.Inputs is not null,
-            "AutomationMlIntegrityFailure", "Invalid retained record.");
-        var names = receipt.Kind == "document" ? new[] { "original.aml", "report.json" } : ["report.json"];
-        Require(receipt.Artifacts is not null && receipt.Artifacts.All(a => a is not null) &&
-            receipt.Artifacts.Select(a => a.Name).Order().SequenceEqual(names.Order()) && receipt.Inputs.Length == (receipt.Kind == "document" ? 0 : 2),
-            "AutomationMlIntegrityFailure", "Unexpected retained artifacts or inputs.");
+        var (receipt, id) = LoadReceipt(reference, depth);
         var files = new Dictionary<string, byte[]>();
         foreach (var artifact in receipt.Artifacts)
         {
@@ -129,6 +137,27 @@ public sealed class AutomationMlWorkflowStore
         foreach (string input in receipt.Inputs)
             Require(Load(input, depth + 1).Receipt.Kind == "document", "AutomationMlIntegrityFailure", "Comparison input is not a retained document.");
         return new(reference, receipt, files);
+    }
+    /// <summary>The receipt of a handle, verified against its digest and intent and checked for shape; no artifact or input is read.</summary>
+    private (Receipt Receipt, string Id) LoadReceipt(string reference, int depth = 0)
+    {
+        Require(reference is { Length: 110 } && depth <= 1, "AutomationMlInvalidReference", "Use an exact Host-issued AutomationML record handle.");
+        var parts = reference.Split(':'); Require(parts.Length == 3 && parts[0] == "automationml", "AutomationMlInvalidReference", "Wrong record handle.");
+        string id = PackageStorage.Id(parts[1]), hash = PackageStorage.Hash(parts[2]);
+        Require(parts[2] == hash, "AutomationMlInvalidReference", "Record digests use canonical lowercase hex.");
+        byte[] receiptBytes;
+        try { receiptBytes = Read(PathFor(id, "receipt.json"), 65536); }
+        catch (Exception error) when (error is FileNotFoundException or DirectoryNotFoundException)
+        { throw new BridgeException("AutomationMlRecordNotFound", "The retained record does not exist; storage evicts the oldest unreferenced records at 128. Inspect the document again."); }
+        Require(Hash(receiptBytes) == hash && Read(PathFor(id, "intent.json"), 65536).AsSpan().SequenceEqual(receiptBytes), "AutomationMlIntegrityFailure", "Retained receipt changed.");
+        var receipt = JsonSerializer.Deserialize<Receipt>(receiptBytes, BridgeProtocol.Json);
+        Require(receipt is not null && receipt.SchemaVersion == 1 && receipt.Id == id && receipt.Kind is "document" or "comparison" && receipt.Inputs is not null,
+            "AutomationMlIntegrityFailure", "Invalid retained record.");
+        var names = receipt.Kind == "document" ? new[] { "original.aml", "report.json" } : ["report.json"];
+        Require(receipt.Artifacts is not null && receipt.Artifacts.All(a => a is not null) &&
+            receipt.Artifacts.Select(a => a.Name).Order().SequenceEqual(names.Order()) && receipt.Inputs.Length == (receipt.Kind == "document" ? 0 : 2),
+            "AutomationMlIntegrityFailure", "Unexpected retained artifacts or inputs.");
+        return (receipt, id);
     }
     private Record Publish(string kind, string[] inputs, Dictionary<string, byte[]> files)
     {
@@ -141,13 +170,30 @@ public sealed class AutomationMlWorkflowStore
             if (Directory.Exists(path)) pending.Push(path); else stored += new FileInfo(path).Length;
             Require(stored + additional <= StoreBytes, "AutomationMlCapacity", "AutomationML storage exceeds 2 GiB.");
         }
-        Require(Directory.EnumerateDirectories(root).Take(MaxRecords).Count() < MaxRecords, "AutomationMlCapacity", "AutomationML storage retains at most 128 records.");
+        // At the cap the oldest incomplete, comparison or unreferenced document record is evicted; a document that a retained
+        // comparison or composite review names stays, so a store full of referenced records still refuses.
+        RecordRetention.MakeRoom(root, MaxRecords, Evictable, () => new BridgeException("AutomationMlCapacity", "AutomationML storage retains at most 128 records and every one is referenced."));
         string id = Guid.NewGuid().ToString("N"); Directory.CreateDirectory(PathFor(id));
         var receipt = new Receipt(1, id, kind, inputs, files.Select(f => new Artifact(f.Key, f.Value.Length, Hash(f.Value))).ToArray());
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(receipt, BridgeProtocol.Json); Write(PathFor(id, "intent.json"), bytes);
         foreach (var file in files) Write(PathFor(id, file.Key), file.Value);
         foreach (string input in inputs) _ = Document(input);
         Write(PathFor(id, "receipt.json"), bytes); return new("automationml:" + id + ":" + Hash(bytes), receipt, files);
+    }
+    // Eviction rank: 0 incomplete, 1 comparison, 2 document that nothing retained names; -1 keeps the record.
+    private int Evictable(string directory)
+    {
+        string receipt = Path.Combine(directory, "receipt.json");
+        if (!File.Exists(receipt)) return 0;
+        try
+        {
+            var parsed = JsonSerializer.Deserialize<Receipt>(Read(receipt, 65536), BridgeProtocol.Json);
+            if (parsed?.Kind == "comparison") return 1;
+            string needle = "automationml:" + Path.GetFileName(directory) + ":";
+            return !RecordRetention.Mentions(root, "receipt.json", needle, 65536) &&
+                !RecordRetention.Mentions(Path.Combine(Path.GetDirectoryName(root)!, "composite-engineering-reviews"), "request.json", needle, 16 << 20) ? 2 : -1;
+        }
+        catch (Exception error) when (error is BridgeException or IOException or JsonException or UnauthorizedAccessException) { return -1; }
     }
     private static object Summary(Record record)
     {

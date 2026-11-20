@@ -130,9 +130,12 @@ internal static class CompositeWorkflowTests
         try
         {
             for (int i = 0; i < 128; i++) { string path = Path.Combine(storeRoot, Guid.NewGuid().ToString("N")); Directory.CreateDirectory(path); extraDirectories.Add(path); }
-            Reject(() => store.Review(uploadRef), "Abandoned record directories count toward record quota", "CompositeCapacity");
+            // At the cap, abandoned (incomplete) record directories are evicted instead of refusing every later review.
+            var evicting = Json(store.Review(uploadRef));
+            Check(Directory.EnumerateDirectories(storeRoot).Count() <= 128 && extraDirectories.Any(p => !Directory.Exists(p)), "Abandoned record directories are evicted at the record cap");
+            Directory.Delete(Path.Combine(storeRoot, ((string)evicting["recordRef"]!).Split(':')[1]), true);
         }
-        finally { foreach (string path in extraDirectories) Directory.Delete(path); }
+        finally { foreach (string path in extraDirectories) if (Directory.Exists(path)) Directory.Delete(path); }
         var extraFiles = new List<string>();
         try
         {
