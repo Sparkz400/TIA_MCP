@@ -19,6 +19,18 @@ internal static class RuntimeCapturePlcsimChecks
         Check(!JsonSerializer.SerializeToElement(Request(true).Simulator,BridgeProtocol.Json).TryGetProperty("syncMode",out _),
             "Omitted syncMode preserves historical capture-plan bytes");
 
+        // SingleStep_Bus: the plan carries the I/O system and bus cycle, and begin, every sample and restore pass them to the worker.
+        {
+            await using var f=new Fixture(root);
+            var original=Request(true);var request=original with{Simulator=original.Simulator! with{SyncMode="SingleStep_Bus",IoSystemId=100,BusCycleMicroseconds=1000}};
+            await f.Captures.Start(f.Id,request,CancellationToken.None);var status=await f.Ended();
+            var simulator=status.GetProperty("plan").GetProperty("request").GetProperty("simulator");
+            Check(simulator.GetProperty("syncMode").GetString()=="SingleStep_Bus" && simulator.GetProperty("ioSystemId").GetInt32()==100 && simulator.GetProperty("busCycleMicroseconds").GetInt32()==1000,
+                "Retained plan identifies the bus partner parameters");
+            Check(f.Simulator.Modes.Count==4 && f.Simulator.Modes.All(m=>m=="SingleStep_Bus") && f.Simulator.IoSystems.All(i=>i==100) && f.Simulator.Calls[^1]=="sim_capture_end:sync",
+                "Begin, every sample and restore carry SingleStep_Bus and its I/O system");
+        }
+
         foreach(string mode in new[]{"SingleStep_C","SingleStep_P","SingleStep_CP","SingleStep_CT","SingleStep_CPT"})
         {
             await using var f=new Fixture(root);
@@ -120,6 +132,10 @@ internal static class RuntimeCapturePlcsimChecks
             foreach(var (mode,span) in new (string?,int?)[]{("TimespanSynchronized_P",0),("TimespanSynchronized_CP",60001),("SingleStep_C",10),(null,10)})
                 await Fails(()=>f.Captures.Start(f.Id,plain with{Simulator=plain.Simulator! with{CycleSynchronous=true,SyncMode=mode,SpanMilliseconds=span}},CancellationToken.None),"PlcsimCaptureInvalid");
             await Fails(()=>f.Captures.Start(f.Id,plain with{Simulator=plain.Simulator! with{SyncMode="SingleStep_CP"}},CancellationToken.None),"PlcsimCaptureInvalid");
+            // SingleStep_Bus needs an I/O system (1..32 or 100..115) and a bus cycle of 1..1000000 us; no other mode takes them.
+            foreach(var (mode,io,cycle) in new (string,int?,int?)[]{("SingleStep_Bus",null,null),("SingleStep_Bus",100,null),("SingleStep_Bus",null,1000),("SingleStep_Bus",0,1000),("SingleStep_Bus",33,1000),
+                ("SingleStep_Bus",99,1000),("SingleStep_Bus",116,1000),("SingleStep_Bus",100,0),("SingleStep_Bus",100,1000001),("SingleStep_CP",100,1000),("SingleStep_C",null,1000)})
+                await Fails(()=>f.Captures.Start(f.Id,plain with{Simulator=plain.Simulator! with{CycleSynchronous=true,SyncMode=mode,IoSystemId=io,BusCycleMicroseconds=cycle}},CancellationToken.None),"PlcsimCaptureInvalid");
             await Fails(()=>f.Captures.Start(f.Id,plain with{Representation="raw"},CancellationToken.None),"PlcsimCaptureInvalid");
             await Fails(()=>f.Captures.Start(f.Id,plain with{Simulator=null},CancellationToken.None),"PlcsimCaptureInvalid");
             await Fails(()=>f.Captures.Start(f.Id,plain with{Source=null},CancellationToken.None),"PlcsimCaptureInvalid");
@@ -127,6 +143,63 @@ internal static class RuntimeCapturePlcsimChecks
             await Fails(()=>f.Captures.Start(f.Id,plain with{ReviewId=new string('a',64),HandoffRef="runtime-handoff:"+new string('b',32)+":"+new string('c',64)},CancellationToken.None),"PlcsimCaptureInvalid");
             await using var unwired=new RuntimeCaptures(new PhysicalRuntimeSessions(TimeProvider.System,[]),new("",Path.Combine(root,Guid.NewGuid().ToString("N")),null,5,false,"",null),TimeProvider.System);
             await Fails(()=>unwired.Start(Guid.NewGuid().ToString("N"),plain,CancellationToken.None),"RuntimeCaptureSourceUnavailable");
+        }
+        // A busy shared bridge (a long sim_test or observe) is a gap in the capture, never the end of it.
+        foreach(string busy in new[]{"QueueTimeout","PreviousOperationRunning"})
+        {
+            await using var f=new Fixture(root);int failed=0;
+            f.Simulator.Before=op=>op=="sim_capture_sample" && Interlocked.Increment(ref failed)==1?throw new BridgeOperationException(busy,"busy"):Task.CompletedTask;
+            await f.Captures.Start(f.Id,Request(false),CancellationToken.None);var status=await f.Ended();var rows=f.Rows(status);
+            Check(rows[0].GetProperty("errorCode").GetString()==busy && rows[2].GetProperty("errorCode").ValueKind==JsonValueKind.Null &&
+                status.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="sampleLimit","Bridge queue error is a transient gap: "+busy);
+        }
+        // The end of a cycle-synchronous capture is retried while the bridge is busy; a hold that still cannot be ended is released through sim_release.
+        await using(var f=new Fixture(root))
+        {
+            f.Captures.EndRetryDelay=TimeSpan.FromMilliseconds(1);int ends=0;
+            f.Simulator.Before=op=>op=="sim_capture_end" && Interlocked.Increment(ref ends)<=2?throw new BridgeOperationException("PreviousOperationRunning","busy"):Task.CompletedTask;
+            await f.Captures.Start(f.Id,Request(true),CancellationToken.None);var status=await f.Ended();
+            await Task.Delay(100);status=JsonSerializer.SerializeToElement(await f.Captures.Status(f.Id,CancellationToken.None),BridgeProtocol.Json);
+            Check(ends==3 && status.GetProperty("localFailure").ValueKind==JsonValueKind.Null,"A busy bridge delays the capture end, which then succeeds");
+        }
+        await using(var f=new Fixture(root))
+        {
+            f.Captures.EndRetryDelay=TimeSpan.FromMilliseconds(1);int ends=0;
+            f.Simulator.Before=op=>op=="sim_capture_end"?Task.FromException(new BridgeOperationException("QueueTimeout","busy")).ContinueWith(t=>{Interlocked.Increment(ref ends);return t;}).Unwrap():Task.CompletedTask;
+            await f.Captures.Start(f.Id,Request(true),CancellationToken.None);var status=await f.Ended();
+            for(int wait=0;wait<2000 && status.GetProperty("localFailure").ValueKind==JsonValueKind.Null;wait++){await Task.Delay(5);status=JsonSerializer.SerializeToElement(await f.Captures.Status(f.Id,CancellationToken.None),BridgeProtocol.Json);}
+            Check(ends==4 && status.GetProperty("localFailure").GetString()=="PlcsimOperatingModeRestoreFailed","The capture end is retried a bounded number of times, then stays visible");
+            f.Simulator.Before=null;
+            await f.Captures.ReleaseSimulator(7,false,CancellationToken.None);
+            Check(f.Simulator.Calls[^1]=="sim_release" && f.Simulator.LastRestoreHeld==true,"sim_release restores a hold when no Host capture is live");
+        }
+        await using(var f=new Fixture(root))
+        {
+            var sampled=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            f.Simulator.Before=op=>{if(op=="sim_capture_sample")sampled.TrySetResult();return Task.CompletedTask;};
+            await f.Captures.Start(f.Id,Request(true,100000,60,"SingleStep_C"),CancellationToken.None);await sampled.Task.WaitAsync(TimeSpan.FromSeconds(10));
+            await Fails(()=>f.Captures.ReleaseSimulator(7,false,CancellationToken.None),"SimulationCaptureModeActive");
+            await Fails(()=>f.Captures.ReleaseSimulator(7,true,CancellationToken.None),"SimulationCaptureModeActive");
+            await Fails(()=>f.Captures.Delete(f.Id,CancellationToken.None),"RuntimeCaptureSessionBusy");
+            Check(!f.Simulator.Calls.Contains("sim_release"),"A live Host capture keeps sim_release and delete away from its instance");
+            await f.Captures.ReleaseSimulator(8,false,CancellationToken.None);
+            Check(f.Simulator.Calls[^1]=="sim_release","Another instance is released");
+            await f.Captures.Stop(f.Id,CancellationToken.None);
+        }
+        // Finished captures leave the in-memory table and can be deleted from the store.
+        await using(var f=new Fixture(root))
+        {
+            await f.Captures.Start(f.Id,Request(false),CancellationToken.None);await f.Ended();
+            string second=Guid.NewGuid().ToString("N");
+            await f.Captures.Start(second,Request(false) with{AttemptId=Guid.NewGuid().ToString("N")},CancellationToken.None);
+            var table=(System.Collections.IDictionary)typeof(RuntimeCaptures).GetField("running",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance)!.GetValue(f.Captures)!;
+            Check(table.Count==1 && table.Contains(second),"A finished capture is pruned from the running table");
+            string folder=Path.Combine(f.Root,"runtime-captures",f.Id);
+            Check(Directory.Exists(folder),"The pruned capture's evidence stays on disk");
+            await f.Captures.Delete(f.Id,CancellationToken.None);
+            Check(!Directory.Exists(folder),"Delete removes a finished capture's evidence");
+            bool gone=false;try{await f.Captures.Status(f.Id,CancellationToken.None);}catch(IOException){gone=true;}
+            Check(gone,"A deleted capture no longer reopens");
         }
         Console.WriteLine($"PASS PLCSIM capture source: {checks} checks; fake simulator worker, no native execution.");
         return checks;
@@ -165,15 +238,19 @@ internal static class RuntimeCapturePlcsimChecks
     {
         internal readonly List<string> Calls=[];
         internal readonly List<string?> Modes=[];
+        internal readonly List<int?> IoSystems=[];
         internal Func<string,Task>? Before;
         internal string? Symbol;
         internal bool BadCounter;
+        internal bool? LastRestoreHeld;
         private long samples;
         public async Task<JsonElement> CallAsync(string operation,object? arguments=null,CancellationToken cancellationToken=default)
         {
-            var args=JsonSerializer.SerializeToElement(arguments,BridgeProtocol.Json);bool sync=args.GetProperty("cycleSynchronous").GetBoolean();
+            var args=JsonSerializer.SerializeToElement(arguments,BridgeProtocol.Json);bool sync=args.TryGetProperty("cycleSynchronous",out var cycle) && cycle.GetBoolean();
             lock(Calls)Calls.Add(operation+(sync?":sync":""));
-            lock(Modes)Modes.Add(args.GetProperty("syncMode").GetString());
+            lock(Modes)Modes.Add(args.TryGetProperty("syncMode",out var mode)?mode.GetString():null);
+            lock(IoSystems)IoSystems.Add(args.TryGetProperty("ioSystemId",out var io) && io.ValueKind==JsonValueKind.Number?io.GetInt32():null);
+            if(operation=="sim_release")LastRestoreHeld=args.GetProperty("restoreHeldCapture").GetBoolean();
             if(Before is not null)await Before(operation);
             if(operation!="sim_capture_sample")return JsonSerializer.SerializeToElement(new{instanceId=7},BridgeProtocol.Json);
             long n=Interlocked.Increment(ref samples);string now=DateTime.UtcNow.ToString("O");var values=new JsonArray();

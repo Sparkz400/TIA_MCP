@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
 using Siemens.Engineering.MC.Drives;
@@ -33,6 +34,7 @@ namespace TiaMcp.Openness.V21
             var projection = DriveProjection(driveObject);
             var before = DriveMotorEntries(projection, dataSet);
             var names = new HashSet<string>(StringComparer.Ordinal);
+            var checks = new List<(string Name, int Number, object Value)>();
             var result = new JObject { ["driveDataSet"] = dataSet, ["motorType"] = typeName, ["entries"] = new JArray() };
             foreach (var token in rows)
             {
@@ -48,10 +50,17 @@ namespace TiaMcp.Openness.V21
                     throw new BridgeException(write ? "PreviewStale" : "ExpectedValueMismatch", "The current value of " + name + " differs from expected; nothing was written.",
                         new JObject { ["name"] = name, ["current"] = current });
                 // The value is converted to the entry's native type here, so a type mismatch refuses before anything is written.
-                ConvertChangeValue(row["value"], entry.Value?.GetType() ?? typeof(string));
+                checks.Add((name, (int)entry.Number, ConvertChangeValue(row["value"], entry.Value?.GetType() ?? typeof(string))));
                 ((JArray)result["entries"]).Add(new JObject { ["name"] = name, ["number"] = entry.Number, ["unit"] = entry.Unit, ["before"] = current, ["after"] = row["value"].DeepClone() });
             }
+            // The entries are the drive parameters of their numbers: a value provably outside a parameter's declared limits refuses before anything is written.
+            var limited = new Dictionary<int, DriveParameter>();
+            try { limited = DriveWriteRules.FirstPerNumber(driveObject.Parameters.Cast<DriveParameter>(), parameter => parameter.Number, new HashSet<int>(checks.Select(check => check.Number))); }
+            catch (Exception) { /* Limits that cannot be read prove nothing. */ }
+            foreach (var check in checks)
+                if (limited.TryGetValue(check.Number, out var limit)) DriveWriteRules.RequireWithinLimits(check.Name, check.Value, DriveLimit(() => limit.MinValue), DriveLimit(() => limit.MaxValue));
             if (!write) return result;
+            var sideBefore = DriveSnapshot(driveObject, out bool beforeComplete);
             // The motor type comes first: it decides which entries the configuration holds. Every entry is preflighted above.
             if (typeName != null) projection.SetMotorType((MotorType)Enum.Parse(typeof(MotorType), typeName), dataSet);
             var configuration = projection.GetCurrentMotorConfiguration(dataSet)
@@ -75,6 +84,11 @@ namespace TiaMcp.Openness.V21
                 readback.Add(new JObject { ["name"] = name, ["value"] = actual });
             }
             result["readback"] = readback;
+            var sideAfter = DriveSnapshot(driveObject, out bool afterComplete);
+            // Written entries are excluded by parameter number: a motor entry's name need not match the drive parameter's name.
+            var written = new HashSet<int>(checks.Select(check => check.Number));
+            var skip = new HashSet<string>(sideBefore.Keys.Union(sideAfter.Keys).Where(key => { var match = Regex.Match(key, @"^[pr](\d+)"); return match.Success && int.TryParse(match.Groups[1].Value, out int number) && written.Contains(number); }), StringComparer.Ordinal);
+            change.Readbacks.Add(new JObject { ["role"] = "drive-motor-side-effects", ["sideEffects"] = DriveWriteRules.SideEffects(sideBefore, sideAfter, skip, beforeComplete && afterComplete) });
             return result;
         }
 

@@ -20,7 +20,7 @@ def main():
     missing = root / 'intentionally-absent-native-worker.exe'
     assert not missing.exists()
     names = {'testsuite_style_' + name for name in ('plan_prepare', 'plan_review', 'job_prepare', 'job_status',
-        'job_stop_request', 'job_execute_next', 'job_results', 'job_mark_interrupted', 'job_recover', 'job_reconcile')}
+        'job_stop_request', 'job_results', 'job_mark_interrupted')}
     checks, shutdowns = [], []
 
     def check(condition, label):
@@ -47,6 +47,16 @@ def main():
         response = client.request('tools/call', {'name': tool, 'arguments': arguments})
         check(response.get('isError') and response['structuredContent']['error']['code'] == code, code)
 
+    def hidden(client, tool, arguments):
+        # Until a style profile is qualified the Host does not advertise these tools (ToolGroups "hidden"), so the call never reaches the adapter.
+        check(tool not in {t['name'] for t in client.request('tools/list')['tools']}, tool + ' is not advertised')
+        try:
+            client.request('tools/call', {'name': tool, 'arguments': arguments})
+        except RuntimeError as error:
+            check(isinstance(error.args[0], dict) and error.args[0].get('code') == -32602, tool + ' is refused as an unknown tool')
+            return
+        raise AssertionError(tool + ' was callable')
+
     def reject_malformed_json(client, request):
         # The installed MCP SDK rejects malformed UTF-16 before invoking the tool.
         try:
@@ -59,7 +69,7 @@ def main():
     client = connect()
     try:
         tools = client.request('tools/list')['tools']
-        check(names <= {t['name'] for t in tools}, 'Ten Test Suite MCP tools registered')
+        check(names <= {t['name'] for t in tools}, 'Seven Test Suite MCP tools registered (execute_next, recover and reconcile stay hidden until a profile is qualified)')
         check('qualification_testsuite_scope_probe' not in {t['name'] for t in tools}, 'Scope-probe tool is absent from normal Hosts')
         check(not any(t['name'].startswith('qualification_testsuite_') for t in tools), 'Assisted qualification tools are absent without the dedicated session flag')
         review = client.tool('testsuite_style_plan_prepare', {'request': fixture['request']})
@@ -99,9 +109,9 @@ def main():
         job = client.tool('testsuite_style_job_prepare', prepare)
         check(client.tool('testsuite_style_job_prepare', prepare)['job']['id'] == job['job']['id'], 'MCP preparation idempotent')
         action = {'jobId': job['job']['id'], 'reviewedSha256': artifact['sha256'], 'operationId': job['operations'][0]['id'], 'expectedRevision': 0}
-        reject(client, 'testsuite_style_job_execute_next', action, 'TestSuiteProfileUnqualified')
-        reject(client, 'testsuite_style_job_recover', {**action, 'destinations': []}, 'TestSuiteProfileUnqualified')
-        reject(client, 'testsuite_style_job_reconcile', action, 'RecoveryRequired')
+        hidden(client, 'testsuite_style_job_execute_next', action)
+        hidden(client, 'testsuite_style_job_recover', {**action, 'destinations': []})
+        hidden(client, 'testsuite_style_job_reconcile', action)
         check(client.tool('testsuite_style_job_status', {'jobId': action['jobId']})['operations'][0]['revision'] == 0, 'Native refusals do not acquire or change operation')
         result = client.tool('testsuite_style_job_results', {'jobId': action['jobId'], 'operationId': action['operationId']})
         check(result['result'] is None and result['raw'] is None, 'No passing results invented')
@@ -114,8 +124,8 @@ def main():
         # Typed before worker launch; close() then asserts that no worker ran.
         reject(client, 'qualification_testsuite_scope_probe', {'action': 'run', 'projectPath': 'D:\\not-a-native-project.ap21'}, 'InvalidRequest')
         other = client.tool('testsuite_style_job_prepare', {**prepare, 'idempotencyKey': 'scope-probe-gate-job'})
-        reject(client, 'testsuite_style_job_execute_next', {**action, 'jobId': other['job']['id'],
-            'operationId': other['operations'][0]['id'], 'expectedRevision': 0}, 'TestSuiteProfileUnqualified')
+        hidden(client, 'testsuite_style_job_execute_next', {**action, 'jobId': other['job']['id'],
+            'operationId': other['operations'][0]['id'], 'expectedRevision': 0})
     finally:
         close(client)
     client = connect()
@@ -130,7 +140,7 @@ def main():
     try:
         status = client.tool('testsuite_style_job_status', {'jobId': action['jobId']})
         check(status['stopRequested'] and status['nextOperationId'] is None, 'Stop survives actual Host restart')
-        reject(client, 'testsuite_style_job_execute_next', {**action, 'expectedRevision': status['operations'][0]['revision']}, 'RecoveryRequired')
+        hidden(client, 'testsuite_style_job_execute_next', {**action, 'expectedRevision': status['operations'][0]['revision']})
     finally:
         close(client)
     args.report.parent.mkdir(parents=True, exist_ok=True)

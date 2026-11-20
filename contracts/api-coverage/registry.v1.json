@@ -1090,6 +1090,12 @@
       ]
     },
     {
+      "featureId": "sim_prune",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
       "featureId": "sim_time",
       "obligations": [
         "L03"
@@ -3261,6 +3267,26 @@
     },
     {
       "featureId": "runtime_web_operating_mode",
+      "obligations": [
+        "D16",
+        "L03"
+      ]
+    },
+    {
+      "featureId": "runtime_web_download",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_web_backup",
+      "obligations": [
+        "D16",
+        "L03"
+      ]
+    },
+    {
+      "featureId": "runtime_web_alarm_acknowledge",
       "obligations": [
         "D16",
         "L03"

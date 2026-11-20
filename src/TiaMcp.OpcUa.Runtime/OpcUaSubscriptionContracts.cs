@@ -16,7 +16,8 @@ public sealed record OpcUaSubscriptionRequest(string AttemptId,
     int MaximumRepublish = 16,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? DiagnosticBindingId = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] int MaximumReconnectAttempts = 0,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), JsonConverter(typeof(OpcUaEventSelectionConverter))] OpcUaEventSelection? Events = null);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), JsonConverter(typeof(OpcUaEventSelectionConverter))] OpcUaEventSelection? Events = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] int MaximumNotificationsPerPublish = 0);
 
 // Strictness is scoped to this new request; shared node contracts and existing
 // manual-read/polling deserialization keep their established behavior.
@@ -46,7 +47,8 @@ public sealed record OpcUaSubscriptionEvent(string Kind, uint SubscriptionId,
     OpcUaSubscriptionCreated? Created = null, string? ErrorCode = null,
     uint? GapFrom = null, uint? GapTo = null, long MissingCount = 0,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] OpcUaReconnectEvent? Reconnect = null,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] OpcUaEventNotification[]? Events = null);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] OpcUaEventNotification[]? Events = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] long OmittedNotifications = 0);
 public sealed record OpcUaSubscriptionRow(long Sequence, double ElapsedMilliseconds, DateTimeOffset ObservedUtc,
     OpcUaSubscriptionEvent Event);
 public sealed record OpcUaSubscriptionProgress(string State, string? TerminalReason, double ElapsedMilliseconds,
@@ -56,6 +58,10 @@ public sealed record OpcUaSubscriptionProgress(string State, string? TerminalRea
 internal static class OpcUaSubscriptionContracts
 {
     internal static void Require([System.Diagnostics.CodeAnalysis.DoesNotReturnIf(false)] bool condition) { if (!condition) throw OpcUaRuntimeClient.Error("UaSubscriptionInvalid"); }
+    /// <summary>Notifications one Publish message may carry: 0 in a request means one (the original behaviour; the qualifiers'
+    /// gap, duplicate and recovery scenarios depend on one notification per message); up to <see cref="MaximumPerPublish"/> can be asked for. One row keeps one message's exact envelope.</summary>
+    internal const int DefaultPerPublish = 1, MaximumPerPublish = 32;
+    internal static int PerPublish(OpcUaSubscriptionRequest r) => r.MaximumNotificationsPerPublish == 0 ? DefaultPerPublish : r.MaximumNotificationsPerPublish;
     internal static void Validate(OpcUaSubscriptionRequest r)
     {
         Require(r is not null && ProtectedCredentialGuard.IsId(r.AttemptId) && r.Nodes is { Length: <= 64 } && (r.Nodes.Length>0 || r.Events is not null));
@@ -68,7 +74,8 @@ internal static class OpcUaSubscriptionContracts
             r.SamplingIntervalMilliseconds is >= 0 and <= 60000 && r.QueueSize is >= 1 and <= 1024 &&
             r.KeepAliveCount is >= 1 and <= 10 && r.LifetimeCount >= 3*r.KeepAliveCount && r.LifetimeCount <= 1000 &&
             r.DurationSeconds is >= 1 and <= 3600 && r.MaximumNotifications is >= 1 and <= 100000 &&
-            r.MaximumBytes is >= (1L<<20) and <= (64L<<20) && r.MaximumRepublish is >= 0 and <= 64);
+            r.MaximumBytes is >= (1L<<20) and <= (64L<<20) && r.MaximumRepublish is >= 0 and <= 64 &&
+            r.MaximumNotificationsPerPublish is >= 0 and <= MaximumPerPublish);
     }
     // A quiet Publish waits one keep-alive period inside the ten-second session deadline, which also covers the store gate
     // and a shared-vault turn of up to 5 s. Retained plans are not rechecked, so older evidence still reopens.
@@ -116,7 +123,7 @@ internal static class OpcUaSubscriptionContracts
         foreach(var n in e.Notifications??[]) { Require(n.ClientHandle>=1 && n.ClientHandle<=p.Request.Nodes.Length && n.MonitoredItemId>0 && n.Value.Node==p.Request.Nodes[n.ClientHandle-1]); ValidateValue(p,n.Value); Require(n.Overflow==((Status(n.Value.StatusCode)&0x00000480)==0x00000480)); }
         bool message=e.Kind is "publish" or "republish";
         if(!message)Require(e.SequenceNumber is null && e.PublishTime is null && !e.KeepAlive && !e.Duplicate && !e.MoreNotifications &&
-            e.AvailableSequenceNumbers is null && e.AcknowledgedSequenceNumbers is null && e.AcknowledgementResults is null && e.Notifications is null && e.StatusChanges is null);
+            e.AvailableSequenceNumbers is null && e.AcknowledgedSequenceNumbers is null && e.AcknowledgementResults is null && e.Notifications is null && e.StatusChanges is null && e.OmittedNotifications==0);
         if(e.Kind=="created")
         {
             var c=e.Created; Require(c is not null && c.SubscriptionId>0 && c.SubscriptionId==e.SubscriptionId &&
@@ -129,7 +136,7 @@ internal static class OpcUaSubscriptionContracts
         }
         else Require(e.Created is null);
         if(message)Require(e.SubscriptionId>0 && e.SequenceNumber>0 && e.PublishTime is not null && e.Notifications is not null && e.StatusChanges is not null &&
-            e.Notifications.Length+(e.Events?.Length??0)<=1 && (!e.KeepAlive || e.Notifications.Length==0 && (e.Events?.Length??0)==0 && e.StatusChanges.Length==0 && !e.Duplicate));
+            e.Notifications.Length+(e.Events?.Length??0)<=PerPublish(p.Request) && e.OmittedNotifications>=0 && (e.OmittedNotifications==0 || !e.Duplicate && !e.KeepAlive) && (!e.KeepAlive || e.Notifications.Length==0 && (e.Events?.Length??0)==0 && e.StatusChanges.Length==0 && !e.Duplicate));
         if(e.Kind=="publish")Require(e.AvailableSequenceNumbers is not null && e.AcknowledgedSequenceNumbers is not null && e.AcknowledgementResults is not null && e.RequestedSequenceNumber is null);
         if(e.Kind=="republish")Require(e.RequestedSequenceNumber==e.SequenceNumber && !e.KeepAlive && !e.MoreNotifications &&
             e.AvailableSequenceNumbers is null && e.AcknowledgedSequenceNumbers is null && e.AcknowledgementResults is null);

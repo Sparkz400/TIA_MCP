@@ -15,16 +15,16 @@ public sealed partial class TiaTools
     public CallToolResult DiagnosticUaBindingPlan(string experimentId, JsonElement request)
         => DiagnosticResult(() => new DiagnosticUaBindings(options.ArtifactsDirectory).Plan(experimentId, DiagnosticRequest(request)));
 
-    [McpServerTool(Name = "diagnostic_plan", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "diagnostic_plan", ReadOnly = false, Destructive = false, OpenWorld = false)]
     [Description("Plan an offline diagnosis from a saved reviewId and report, and persist it as an immutable case; no native access. Optional inputs: searchTerms/hypotheses, blockPath, instance {dbPath, memberPath}, signals [{id, role, reason, hypothesisIds, storagePath, memberPath}], context/observations, autoSignals {seeds [{scope: LocalVariable|GlobalVariable, components, reason}], maxSignals, maxDepth}, testSuiteFinding {relativePath, sha256, index} (verifies a retained Test Suite receipt and selects its exact captured block; unresolved or cross-review findings refuse), alarmContext {reviewId, nodeId, objectPath} and alarmBindings [{id, signalId, operand {nodeId, objectPath}, edgeIndices}]. Instance selection stays explicit; other candidates are ranked, never chosen. Unsupported source and aliases remain gaps; online addresses are not verified, and an alarm binding is not Siemens or runtime alarm proof. See docs/guides/trace-diagnostics.md and docs/reference/tool-notes.md#diagnostic_plan.")]
     public CallToolResult DiagnosticPlan(JsonElement request) => DiagnosticResult(() => new DiagnosticPlanner(options.ArtifactsDirectory).Plan(DiagnosticRequest(request)));
 
-    [McpServerTool(Name = "diagnostic_watch_plan", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "diagnostic_watch_plan", ReadOnly = false, Destructive = false, OpenWorld = false)]
     [Description("Plan offline watch rows from an immutable diagnostic_plan.id and its retained saved review. request:{tableName,tiaVersion,maxRows?:1..64,externalStorage?:[{objectPath,reason}]}. tiaVersion is explicit caller-supplied, unverified metadata. Exact selected instance and justified signals required; each external storage needs a separate allowance. Returns bounded summary and hashed artifact for artifact_read; preserves unresolved signals, provenance and row omissions. Selected alarm evidence and operand associations are revalidated and retained in the downloadable envelope; unresolved explicit alarmBindings refuse with AlarmBindingUnresolved. No native XML, live addresses, worker access or native apply eligibility.")]
     public CallToolResult DiagnosticWatchPlan(string planId, JsonElement request)
         => DiagnosticResult(() => new DiagnosticWatchPlanning(options.ArtifactsDirectory).Plan(planId, DiagnosticRequest(request)));
 
-    [McpServerTool(Name = "diagnostic_experiment_plan", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "diagnostic_experiment_plan", ReadOnly = false, Destructive = false, OpenWorld = false)]
     [Description("Compose a retained offline diagnostic experiment from exact diagnostic_plan planId. request:{reason,watch:{diagnostic_watch_plan request},trace:{trace_prepare request}}. Revalidate saved source, exact instance, selected alarm operands and Test Suite finding; derive justified watch rows and a manual trace specification together. Retains original inputs and explicit unresolved evidence. No native acquisition, online authority, automatic equipment selection or assertion admission.")]
     public CallToolResult DiagnosticExperimentPlan(string planId, JsonElement request)
         => DiagnosticResult(() => new DiagnosticExperiments(options.ArtifactsDirectory).Plan(planId, DiagnosticRequest(request)));
@@ -48,11 +48,11 @@ public sealed partial class TiaTools
     [Description("Return offline trace route decisions, implementation and qualification separately. No target probe. TIA Openness ordinary trace creation is not established. Siemens SIMATIC AX CLI is a documented separate PLC-job route, with missing bridge/target/readback qualification. Manual specification is partial fulfillment. Long-term/project/drive/safety remain separate families. Polling cannot guarantee one-scan events.")]
     public CallToolResult TraceCapabilities() => DiagnosticResult(TracePlanning.Capabilities);
 
-    [McpServerTool(Name = "trace_prepare", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "trace_prepare", ReadOnly = false, Destructive = false, OpenWorld = false)]
     [Description("Persist a reviewable manual trace specification. planId is diagnostic_plan.id. request: backend:'manual', family:'ordinaryPlc', exact reviewId, settings:{task,sampleEvery,preSamples,postSamples,rationale,trigger:{signalId,kind:risingEdge|fallingEdge|above|below,threshold for numeric}}. Retained declarations and explicit alarmBindings are revalidated; unresolved bindings refuse with AlarmBindingUnresolved. Counts/settings are requested, not verified device limits. No native apply, transfer, arm or capture. Returns all pending native validations and preservation/recovery instructions.")]
     public CallToolResult TracePrepare(string planId, JsonElement request) => DiagnosticResult(() => new TracePlanning(options.ArtifactsDirectory).Prepare(planId, DiagnosticRequest(request)));
 
-    [McpServerTool(Name = "trace_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "trace_read", ReadOnly = false, Destructive = false, OpenWorld = false)]
     [Description("Import exactly one host-owned hashed artifact {path,sha256} or committed uploadRef against exact tracePlanId (uploaded bytes are retained independently): trace-measurement.v1 or trace-measurement.v2 JSON, or v1 UTF-8 CSV with explicit csvOptions (delimiter,decimalSeparator,headerRecord,timeColumn,timeUnit,columns:[{signalId,column,unit}],mode,clock,programIdentity,quality; optional missingValues/settingsReadbackEvidence). Supports <=10000 samples; preserves negative pre-trigger times and units. Rejects decimal precision loss. No native Siemens binary decoder or automatic CSV dialect qualification. Native originals/readback evidence retained; polling cannot claim atomic/scan-synchronized quality. v2 retains explicit clock domains/epochs, per-reading status/error/timestamps, absent readings, irregular/reset times and capture completeness. v2 JSON is retained byte-exactly; no v2 CSV coercion. See docs/reference/diagnostic-measurement-quality.md. Offline only.")]
     public CallToolResult TraceRead(string tracePlanId, JsonElement? artifact = null, JsonElement? csvOptions = null, string? uploadRef = null) => DiagnosticResult(() =>
     {
@@ -63,11 +63,11 @@ public sealed partial class TiaTools
             : measurements.ImportUpload(tracePlanId, uploadRef, csv);
     });
 
-    [McpServerTool(Name = "trace_analyze", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "trace_analyze", ReadOnly = false, Destructive = false, OpenWorld = false)]
     [Description("Analyze a trace_read measurementId offline against original declarative hypothesis predictions. Conditions are {signalId,op:eq|ne|lt|le|gt|ge,value}, ANDed within when/expect. Reports supported/contradicted sample predictions or unresolved, bounded transition intervals, gaps and uncertainty. No script evaluation, causal proof or claim that an unreproduced fault is fixed. Persists an exportable report with original clock, program label, mode and time unit; supplied identities and clock synchronization remain unverified. v2 counts usable observations but all behavioral verdicts remain unresolved; bad/uncertain/missing/error values never enter statistics, and changes cannot bridge gaps, resets, epochs or missing timing.")]
     public CallToolResult TraceAnalyze(string measurementId) => DiagnosticResult(() => new TraceMeasurements(options.ArtifactsDirectory).Analyze(measurementId));
 
-    [McpServerTool(Name = "diagnostic_report_export", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "diagnostic_report_export", ReadOnly = false, Destructive = false, OpenWorld = false)]
     [Description("Export a retained trace_analyze, trace_compare or runtime_capture_analyze reportId as json, markdown or html. JSON preserves the exact original bytes; readable exports include findings, acquisition context, limits, report hash and complete source JSON. HTML is self-contained with escaped text and no scripts/network resources. Returns hashed artifacts for artifact_read; 8 MiB per output and existing diagnostic retention bounds apply. Historical missing context stays explicit. v1 presents retained results without rerun. v2 rederives original source chains and exports a complete diagnostic-quality-report.v2 with original JSON bytes, statuses and times. No native access, source authentication, clock synchronization, causality or fix proof.")]
     public CallToolResult DiagnosticReportExport(string reportId, string format)
         => DiagnosticResult(() => new DiagnosticReportExport(options.ArtifactsDirectory).Export(reportId, format));
@@ -77,7 +77,7 @@ public sealed partial class TiaTools
     public CallToolResult TraceCompare(string beforeMeasurementId, string afterMeasurementId, JsonElement options)
         => DiagnosticResult(() => new TraceComparison(DiagnosticArtifactsRoot).Compare(beforeMeasurementId, afterMeasurementId, DiagnosticRequest(options)));
 
-    [McpServerTool(Name = "diagnostic_replan", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "diagnostic_replan", ReadOnly = false, Destructive = false, OpenWorld = false)]
     [Description("Reuse a diagnostic case on a new source review or machine instance with explicit revalidation. request requires reviewId, blockPath, instance:{dbPath,memberPath}, reason, signalMappings:[{id,storagePath,memberPath,reason}] covering all prior signal IDs. Every identity/declaration is resolved anew; changed types fail. Hypotheses and the selected role template are retained with lineage; the template is resolved from the current catalog and target observability remains unverified. Optional testSuiteFinding must be supplied anew and verified for the new review; old Test Suite evidence stays only in the previous case lineage. Optional alarmContext also requires fresh explicit selection for this review; omitted alarm evidence stays only in predecessor lineage. Optional alarmBindings also requires fresh explicit selections and alarmContext; old operand associations are never inherited automatically. No blind instance-name replacement or native access.")]
     public CallToolResult DiagnosticReplan(string planId, JsonElement request)
         => DiagnosticResult(() => new DiagnosticReplanner(options.ArtifactsDirectory).Replan(planId, DiagnosticRequest(request)));

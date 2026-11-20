@@ -114,6 +114,8 @@ namespace TiaMcp.Openness.V21
                         var block = blocks[0]; string blockPath = block.Identity.Value<string>("objectPath");
                         if (!exported.TryGetValue(blockPath, out var parsed) && exported.Count < 32)
                         {
+                            // A failed or over-budget export is remembered as null, so the next tag on this block does not export it natively again.
+                            exported[blockPath] = null;
                             try
                             {
                                 var file = NewInspectionArtifact(args, "hmi-plc-declarations"); ((DataBlock)block.Native).Export(file, ExportOptions.WithDefaults);
@@ -122,7 +124,7 @@ namespace TiaMcp.Openness.V21
                                 exportedBytes += file.Length;
                                 using (var reader = XmlReader.Create(file.FullName, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 16 * 1024 * 1024 }))
                                     parsed = Tuple.Create(OfflineEvidence.NormalizeInterface(XDocument.Load(reader, LoadOptions.SetLineInfo), capture.Budget.Take, () => capture.Budget.Truncated = true), artifact);
-                                exported.Add(blockPath, parsed);
+                                exported[blockPath] = parsed;
                             }
                             catch (Exception error) { capture.Diagnostics.Add(HmiDiagnostic("HMI binding declaration export " + blockPath, error)); capture.Status = "unavailable"; continue; }
                         }

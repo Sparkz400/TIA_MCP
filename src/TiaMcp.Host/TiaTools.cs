@@ -68,6 +68,7 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
     {
         RequireBlock(blockPath, blockName);
         if (render is not (null or "text")) throw new McpException("render accepts only text.");
+        ExportRetention.Prune(Path.Combine(options.ArtifactsDirectory, "exports"));
         var result = await Call("block_read", new { projectName, plcPath, blockPath, blockName, scopePath, format, render, culture,
             artifactDirectory = Path.Combine(options.ArtifactsDirectory, "exports") }, cancellationToken);
         return includeXml ? result : WithoutLargeXml(result, render == "text");

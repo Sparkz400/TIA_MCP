@@ -149,8 +149,10 @@ def run(host, output, samples_path):
         tools = {row["name"]: row for row in client.request("tools/list")["tools"]}
         for name in ("trace_read", "trace_analyze", "trace_compare", "diagnostic_experiment_review",
                      "diagnostic_experiment_compare_runs", "diagnostic_experiment_report_export", "diagnostic_report_export"):
-            check(tools[name]["annotations"]["readOnlyHint"] is True and "v2" in tools[name]["description"],
-                  name + " exposes v2 read-only route")
+            # trace_read, trace_analyze and diagnostic_report_export persist results, so they are not read-only (PR #315).
+            persists = name in ("trace_read", "trace_analyze", "diagnostic_report_export")
+            check(tools[name]["annotations"]["readOnlyHint"] is not persists and tools[name]["annotations"]["destructiveHint"] is False
+                  and "v2" in tools[name]["description"], name + " exposes v2 route with correct read-only hint")
         check(any("trace-measurement.v2" in item for item in client.tool("trace_capabilities", {})["measurementFormats"]),
               "Offline capability discovery lists explicit v2 quality route")
         review = uploaded_call("project_snapshot_import", {}, base64.b64decode(samples["reviewArtifactBase64"], validate=True))

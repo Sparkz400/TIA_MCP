@@ -261,12 +261,29 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         string[] permissions = await entry.Client.PermissionsAsync(cancellationToken);
         if (entry.Client.Profile.HasNoPermissions == true || !permissions.Contains(permission, StringComparer.Ordinal)) throw Error("RuntimePermissionDenied");
     }
-    private static async Task<WebRuntimeReadResult> Current(Live entry, WebRuntimeSymbol selection, string representation, CancellationToken cancellationToken)
+    private static Task<WebRuntimeReadResult> Current(Live entry, WebRuntimeSymbol selection, string representation, CancellationToken cancellationToken) =>
+        entry.Client.CurrentAsync(selection with { Representation = representation }, cancellationToken);
+
+    /// <summary>One capture cycle: every selection is read under one session check and one batched request (the CPU's own answer decides
+    /// whether a batch is used at all). A symbol-level failure is that symbol's item; a request-level failure throws for the whole cycle.</summary>
+    public async Task<WebRuntimeBatchItem[]> ReadValues(string attemptId, string[] selectionIds, string representation, CancellationToken cancellationToken, RuntimeCaptureHandoff? handoff = null)
     {
-        var current = await entry.Client.BrowseAsync(selection.Symbol, false, cancellationToken);
-        var refreshed = WebRuntimeProtocol.Symbol(entry.Client.Context, selection.Symbol, representation, current[0]);
-        if (refreshed.MetadataSha256 != selection.MetadataSha256) throw Error("RuntimeSymbolMetadataChanged");
-        return await entry.Client.ReadAsync(refreshed, cancellationToken);
+        foreach (var id in selectionIds) Id(id);
+        if (representation is not ("simple" or "raw")) throw Error("RuntimeRepresentationUnsupported");
+        Live entry = await Enter(attemptId, cancellationToken);
+        try
+        {
+            var selections = selectionIds.Select(id => entry.Selections.TryGetValue(id, out var s) ? s with { Representation = representation } : throw Error("RuntimeSelectionUnavailable")).ToArray();
+            if (handoff is not null) RuntimeCaptureHandoffs.ValidateRead(Path.GetDirectoryName(root)!, handoff, CaptureSession(entry.Status));
+            WebRuntimeBatchItem[]? values = null;
+            await Use(entry, async () =>
+            {
+                if (entry.Client.Profile.HasNoPermissions == true) throw Error("RuntimePermissionDenied");
+                values = await entry.Client.ReadBatchAsync(selections, cancellationToken);
+            }, cancellationToken);
+            return values!;
+        }
+        finally { entry.Lock.Release(); }
     }
 
     public async Task<WebRuntimeDiagnosticResult> Diagnostics(string attemptId, string kind, string? language, int? count, CancellationToken cancellationToken)
@@ -277,6 +294,100 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         {
             WebRuntimeDiagnosticResult? result = null;
             await Use(entry, async () => result = await entry.Client.DiagnosticAsync(kind, language, count, cancellationToken), cancellationToken);
+            return result!;
+        }
+        finally { entry.Lock.Release(); }
+    }
+
+    private string ArtifactsRoot => Path.GetDirectoryName(root)!;
+
+    /// <summary>Service data or profiling data through the Web API ticket mechanism, stored as a content-addressed artifact (see <see cref="RuntimeWebDownloads"/>).
+    /// A read: the CPU computes the data and may be loaded by it, and service data holds the one service-data ticket of all users until it is closed.</summary>
+    public Task<object> Download(string attemptId, string kind, long? hwid, CancellationToken cancellationToken) =>
+        kind is "serviceData" or "profiling" ? Ticketed(attemptId, kind, hwid, false, cancellationToken) : throw Error("RuntimeTicketKindUnsupported");
+
+    /// <summary>Plc.CreateBackup after the caller verified the binding. Needs an observed STOP first; the open ticket then keeps the CPU out of RUN until it is closed.</summary>
+    public Task<object> Backup(string attemptId, CancellationToken cancellationToken) => Ticketed(attemptId, "backup", null, true, cancellationToken);
+
+    private async Task<object> Ticketed(string attemptId, string kind, long? hwid, bool requireStop, CancellationToken cancellationToken)
+    {
+        var (_, permission) = WebRuntimeProtocol.TicketKind(kind);
+        _ = WebRuntimeProtocol.TicketRequest(new('0',32), kind, hwid); // Refuse a bad selection before session or credential use.
+        Live entry = await Enter(attemptId, cancellationToken);
+        try
+        {
+            object? result = null;
+            await Use(entry, async () =>
+            {
+                await Permitted(entry, permission, cancellationToken);
+                if (requireStop)
+                {
+                    var before = await entry.Client.DiagnosticAsync("operatingMode", null, null, cancellationToken);
+                    if (!IsMode(before, "stop")) { result = new { attemptId, kind, state = "preconditionMismatch", dispatched = false, before }; return; }
+                }
+                result = await RunTicket(entry, attemptId, kind, hwid, cancellationToken);
+            }, cancellationToken);
+            return result!;
+        }
+        finally { entry.Lock.Release(); }
+    }
+
+    /// <summary>One ticket: requested once, redeemed once, closed always (with its own bounded token, so a cancelled caller still frees it). A lost reply to the
+    /// ticket request leaves the outcome unknown; nothing is retried.</summary>
+    private async Task<object> RunTicket(Live entry, string attemptId, string kind, long? hwid, CancellationToken cancellationToken)
+    {
+        DateTimeOffset started = DateTimeOffset.UtcNow;
+        (string Status, int? Code, string? Ticket) ticket;
+        try { ticket = await entry.Client.RequestTicketAsync(kind, hwid, cancellationToken); }
+        catch (BridgeException error) { return new { attemptId, kind, state = "unknown", dispatched = true, errorCode = error.Code }; }
+        if (ticket.Status != "created")
+            return new { attemptId, kind, state = ticket.Status == "unsupported" ? "unsupported" : "refused", dispatched = ticket.Status != "unsupported", status = ticket.Status, providerErrorCode = ticket.Code };
+        string temporary = RuntimeWebDownloads.NewTemporary(ArtifactsRoot); string? errorCode = null, stored = null, sha256 = null; long bytes = 0; bool closed = false;
+        try
+        {
+            (bytes, sha256) = await entry.Client.DownloadTicketAsync(ticket.Ticket!, RuntimeWebDownloads.Limit(kind), temporary, cancellationToken);
+            stored = RuntimeWebDownloads.Promote(ArtifactsRoot, kind, temporary, sha256);
+        }
+        catch (BridgeException error) { errorCode = error.Code; }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+        { errorCode = "RuntimeArtifactWriteFailed"; try { File.Delete(temporary); } catch (IOException) { } catch (UnauthorizedAccessException) { } }
+        finally
+        {
+            try { closed = await entry.Client.CloseTicketAsync(ticket.Ticket!, CancellationToken.None); } catch (BridgeException) { }
+        }
+        return new { attemptId, kind, state = errorCode is null ? "downloaded" : "failed", dispatched = true, errorCode, ticketClosed = closed,
+            artifact = stored is null ? null : new { path = stored, sha256, bytes, readWith = "artifact_read" }, maximumBytes = RuntimeWebDownloads.Limit(kind),
+            requestStartedUtc = started, completedUtc = DateTimeOffset.UtcNow,
+            note = closed ? null : "The ticket close was not confirmed. A service-data ticket blocks other users and a backup ticket keeps the CPU out of RUN until the ticket is closed or the session ends." };
+    }
+
+    /// <summary>Alarms.Acknowledge after the caller verified the binding: the alarm must currently be listed as not_acknowledged; the request goes out once and the alarm is read back.</summary>
+    public async Task<object> AcknowledgeAlarm(string attemptId, string language, string alarmId, CancellationToken cancellationToken)
+    {
+        _ = WebRuntimeProtocol.AcknowledgeAlarm(new('0',32), alarmId); _ = WebRuntimeProtocol.AlarmById(new('0',32), language, alarmId);
+        Live entry = await Enter(attemptId, cancellationToken);
+        try
+        {
+            object? result = null;
+            await Use(entry, async () =>
+            {
+                await Permitted(entry, "acknowledge_alarms", cancellationToken);
+                var before = await entry.Client.AlarmStateAsync(language, alarmId, cancellationToken);
+                if (before.Acknowledgement != "not_acknowledged")
+                { result = new { attemptId, alarmId, state = before.Status == "read" ? (before.Acknowledgement is null ? "notAcknowledgeable" : "alreadyAcknowledged") : before.Status, dispatched = false, before }; return; }
+                string dispatch = "unknown"; int? code = null; string? errorCode = null; (string Status, int? ProviderErrorCode, string? Acknowledgement)? after = null;
+                try
+                {
+                    (dispatch, code) = await entry.Client.MutateAsync(WebRuntimeProtocol.AcknowledgeAlarm(Guid.NewGuid().ToString("N"), alarmId), cancellationToken);
+                    if (dispatch == "accepted") after = await entry.Client.AlarmStateAsync(language, alarmId, cancellationToken);
+                }
+                // A lost response leaves the outcome unknown and a failed readback unobserved; both are reported, never retried.
+                catch (BridgeException error) { errorCode = error.Code; }
+                bool acknowledged = after is { Status: "read", Acknowledgement: "acknowledged" };
+                result = new { attemptId, alarmId, state = acknowledged ? "acknowledged" : dispatch == "unsupported" ? "unsupported" : "incomplete", dispatched = dispatch != "unsupported",
+                    dispatch, providerErrorCode = code, errorCode, before, readback = after, readbackMatches = acknowledged,
+                    note = "An acknowledged outgoing alarm may leave the list, which reads back as alarmNotListed and is not confirmation." };
+            }, cancellationToken);
             return result!;
         }
         finally { entry.Lock.Release(); }
@@ -375,7 +486,7 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         {
             // Only the credential's state is checked under the vault lock; the session's requests run after it is released,
             // so a slow PLC cannot hold other vault users (block protection) past their bounded wait.
-            Vault(login).Use(login.Credential, Binding(login.Endpoint, login.PeerCertificateSha256, login.User, login.Mode), _ => { });
+            Vault(login).Check(login.Credential, Binding(login.Endpoint, login.PeerCertificateSha256, login.User, login.Mode));
             if (await FailureAsync(async () =>
             {
                 await entry.Client.VerifySessionAsync(login.User,login.Mode,cancellationToken);
@@ -425,7 +536,7 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
             "RuntimeAuthenticationDenied" or "RuntimeTransportFailure" or "RuntimeTimeout" or "RuntimeCancelled" or
             "RuntimeTlsUnverified" or "RuntimeHttpFailure" or "RuntimeSessionExpired" or "RuntimeBrowseFailed" or
             "RuntimeDiscoveryFailed" or "RuntimeRequestLimit" or "RuntimeLoginResponseInvalid" or "RuntimeProviderRejected" or "RuntimeSecretEchoRejected"
-            or "RuntimeProfileInvalid" or "RuntimeSessionIdentityMismatch"
+            or "RuntimeProfileInvalid" or "RuntimeSessionIdentityMismatch" or "RuntimeDownloadLimit"
             ? e.Code : "RuntimeOperationFailed";
     private static CredentialVault Vault(RuntimeLoginSelection login) => CredentialVault.Existing(CredentialVault.UserRoot(login.VaultName));
     private RuntimeSessionStatus Observe(RuntimeSessionStatus status) => live.ContainsKey(status.AttemptId) || Resolved(status.State) ? status :

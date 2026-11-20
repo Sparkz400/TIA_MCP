@@ -18,8 +18,14 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
     public bool NoNativeWorkers { get; init; }
     public bool PhysicalPlcOnline { get; init; }
     public bool CheckOpennessRegistration { get; init; }
-    // Selected --toolsets groups; null advertises every tool.
+    // Selected --toolsets groups; null (--toolsets all) advertises every tool. Parse defaults to ToolGroups.Default.
     public IReadOnlySet<string>? Toolsets { get; init; }
+    // Operations that outlast an ordinary call (project open, compile-backed change_apply, attach) use max(TimeoutSeconds, this).
+    public int LongTimeoutSeconds { get; init; } = 900;
+    // How long a call waits behind a running one before QueueTimeout; null uses TimeoutSeconds.
+    public int? QueueTimeoutSeconds { get; init; }
+    // Off by default: the safety writes (safety_import_xml, safety_fparameter_set, safety_drive_tags, a safety tag rename) are refused Host-side.
+    public bool EnableSafetyChanges { get; init; }
     public bool AddInHandoff { get; init; }
     // Combined PLC library_integrate apply of the verified shapes runs by default (decision of 29 October 2026); --disable-library-integrate-apply turns it off.
     public bool LibraryIntegrateApply { get; init; } = true;
@@ -80,8 +86,11 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         string? hmiTextListQualification = null;
         string? hmiChangeQualification = null;
         string? runtimeQualificationPoint = null;
-        IReadOnlySet<string>? toolsets = null;
+        IReadOnlySet<string>? toolsets = ToolGroups.Default;
         var toolsetsGiven = false;
+        var longTimeout = 900;
+        int? queueTimeout = null;
+        var enableSafetyChanges = false;
         var libraryLimits = new PackageIntakeLimits();
         for (var i = 0; i < args.Length; i++)
         {
@@ -93,6 +102,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             if (option == "--enable-library-integrate-apply") { enableLibraryIntegrateApplyGiven = true; continue; } // the default; kept for existing launch configurations
             if (option == "--disable-library-integrate-apply") { libraryIntegrateApply = false; continue; }
             if (option == "--enable-fingerprint-reuse") { fingerprintReuse = true; continue; }
+            if (option == "--enable-safety-changes") { enableSafetyChanges = true; continue; }
             if (option == "--diagnose") { diagnose = true; continue; }
             if (option == "--check-openness-registration") { checkOpennessRegistration = true; continue; }
             if (option == "--component-qualification") { componentQualification = true; continue; }
@@ -146,13 +156,9 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
                     if (toolsetsGiven) throw new ArgumentException("--toolsets may be given once.");
                     toolsets = ToolGroups.Parse(args[i]); toolsetsGiven = true; break;
                 case "--api-dir": api = Path.GetFullPath(args[i]); break;
-                case "--timeout-seconds":
-                    // Whole seconds; a decimal such as 600.0 (JSON clients often send numbers that way) is accepted and rounded up.
-                    if (!double.TryParse(args[i], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double seconds)
-                        || double.IsNaN(seconds) || seconds < 5 || seconds > MaxTimeoutSeconds)
-                        throw new ArgumentException("--timeout-seconds must be a number of seconds between 5 and " + MaxTimeoutSeconds + " (got '" + args[i] + "').");
-                    timeout = (int)Math.Ceiling(seconds);
-                    break;
+                case "--timeout-seconds": timeout = ParseSeconds(option, args[i]); break;
+                case "--long-timeout-seconds": longTimeout = ParseSeconds(option, args[i]); break;
+                case "--queue-timeout-seconds": queueTimeout = ParseSeconds(option, args[i]); break;
                 default: throw new ArgumentException("Unknown option: " + option);
             }
         }
@@ -184,7 +190,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         if (addInEnrollment is not null && !addInHandoff) throw new ArgumentException("--addin-enrollment requires --addin-handoff.");
         if (enableLibraryIntegrateApplyGiven && !libraryIntegrateApply)
             throw new ArgumentException("--enable-library-integrate-apply and --disable-library-integrate-apply exclude each other.");
-        if (tiaVersion == 19 && (componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || safetyFParameterDiscovery ||
+        if (tiaVersion == 19 && (componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || safetyFParameterDiscovery || enableSafetyChanges ||
             watchQualificationPoint is not null || runtimeQualificationPoint is not null || hmiTextListQualification is not null || hmiChangeQualification is not null ||
             addInHandoff || enableLibraryIntegrateApplyGiven || !libraryIntegrateApply || fingerprintReuse))
             throw new ArgumentException("--tia-version 19 runs the read-only V19 adapter; qualification modes, Add-In handoff, library apply and fingerprint reuse options are V21-only.");
@@ -197,7 +203,16 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             try { remote = TiaMcp.Core.VersionControl.GitRemote.Parse(gitRemote, gitAllowNetworkRemote); }
             catch (BridgeException error) { throw new ArgumentException("--git-remote: " + error.Message); }
         }
-        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { PhysicalPlcOnline = physicalPlcOnline, CheckOpennessRegistration = checkOpennessRegistration, UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, FingerprintReuse = fingerprintReuse, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, GitRemote = remote, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, SafetyFParameterDiscovery = safetyFParameterDiscovery, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint, HmiTextListQualificationProfile = hmiTextListQualification, HmiChangeQualificationProfile = hmiChangeQualification, TiaVersion = tiaVersion };
+        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { PhysicalPlcOnline = physicalPlcOnline, CheckOpennessRegistration = checkOpennessRegistration, UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, FingerprintReuse = fingerprintReuse, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, GitRemote = remote, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, SafetyFParameterDiscovery = safetyFParameterDiscovery, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint, HmiTextListQualificationProfile = hmiTextListQualification, HmiChangeQualificationProfile = hmiChangeQualification, TiaVersion = tiaVersion, LongTimeoutSeconds = longTimeout, QueueTimeoutSeconds = queueTimeout, EnableSafetyChanges = enableSafetyChanges };
+    }
+
+    // Whole seconds; a decimal such as 600.0 (JSON clients often send numbers that way) is accepted and rounded up.
+    private static int ParseSeconds(string option, string value)
+    {
+        if (!double.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double seconds)
+            || double.IsNaN(seconds) || seconds < 5 || seconds > MaxTimeoutSeconds)
+            throw new ArgumentException(option + " must be a number of seconds between 5 and " + MaxTimeoutSeconds + " (got '" + value + "').");
+        return (int)Math.Ceiling(seconds);
     }
 
     private static PackageIntakeLimits ReadLibraryLimits(string path)

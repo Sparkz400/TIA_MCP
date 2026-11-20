@@ -16,9 +16,14 @@ public sealed record WebRuntimeProfile(JsonElement? ApiVersion, string QuantityP
     DateTimeOffset? PasswordExpiresUtc, bool? PasswordExpirationWarning, bool? HasNoPermissions);
 
 /// <summary>One owned, pinned HTTPS session. Callers serialize access and persist intent before Login/Logout.</summary>
-public sealed class WebRuntimeClient : IDisposable
+public sealed partial class WebRuntimeClient : IDisposable
 {
+    // Login, logout and mutations use a fresh connection per request and are never retried. Read-class requests share one pinned
+    // keep-alive connection (created on first use, dropped before any mutation); its certificate pin is checked once, at its handshake.
     private readonly HttpClient client;
+    private HttpClient? readClient;
+    internal static readonly TimeSpan KeepAliveLifetime = TimeSpan.FromMinutes(5);
+    private int batchSupport; // 0 unknown, 1 proven by a batch reply, -1 the CPU refused or ignored a JSON-RPC batch
     private string? token;
     private bool loginAttempted;
     private bool disposed;
@@ -36,9 +41,14 @@ public sealed class WebRuntimeClient : IDisposable
     public WebRuntimeClient(WebRuntimeContext context)
     {
         WebRuntimeProtocol.Validate(context); Context = context;
+        client = NewClient(TimeSpan.Zero);
+    }
+
+    private HttpClient NewClient(TimeSpan connectionLifetime)
+    {
         var handler = new SocketsHttpHandler { AllowAutoRedirect = false, UseProxy = false, UseCookies = false,
             AutomaticDecompression = DecompressionMethods.None, MaxConnectionsPerServer = 1,
-            PooledConnectionLifetime = TimeSpan.Zero };
+            PooledConnectionLifetime = connectionLifetime };
         // A resumed TLS session can retain an old certificate despite a new TCP connection.
         handler.SslOptions.AllowTlsResume = false;
         // Explicit leaf pin is the trust anchor. Name, validity and server usage still have to match.
@@ -54,8 +64,11 @@ public sealed class WebRuntimeClient : IDisposable
             PeerVerified = valid;
             return valid;
         };
-        client = new HttpClient(handler) { Timeout = Timeout.InfiniteTimeSpan };
+        return new HttpClient(handler) { Timeout = Timeout.InfiniteTimeSpan };
     }
+    private HttpClient ReadClient() => readClient ??= NewClient(KeepAliveLifetime);
+    /// <summary>Closes the keep-alive connection: what follows (a mutation, a logout) starts on a fresh connection that can never be a silent retry.</summary>
+    private void DropReadConnection() { var old = readClient; readClient = null; old?.Dispose(); }
 
     public async Task ProbeAsync(CancellationToken cancellationToken)
     {
@@ -173,7 +186,7 @@ public sealed class WebRuntimeClient : IDisposable
         if (!Methods.Contains("Api.GetSessionInfo")) return;
         try
         {
-            var info = await Query("Api.GetSessionInfo", cancellationToken);
+            var info = await Query("Api.GetSessionInfo", cancellationToken, keepAlive: true);
             if (info.ValueKind != JsonValueKind.Object || !info.TryGetProperty("username",out var username) ||
                 username.ValueKind != JsonValueKind.String || username.GetString() != user)
                 throw Error("RuntimeSessionIdentityMismatch");
@@ -215,26 +228,26 @@ public sealed class WebRuntimeClient : IDisposable
         }
     }
 
-    private async Task<JsonElement> Query(string method, CancellationToken cancellationToken)
+    private async Task<JsonElement> Query(string method, CancellationToken cancellationToken, bool keepAlive = false)
     {
         string id = Id();
         return await Exchange(Request(method,id),bytes =>
         {
             using var response = WebRuntimeProtocol.Response(bytes,id);
             return Result(response).Clone();
-        },cancellationToken);
+        },cancellationToken,keepAlive);
     }
 
     public async Task<string[]> PermissionsAsync(CancellationToken cancellationToken)
     {
         Active(); string id = Id();
-        return await Exchange(WebRuntimeProtocol.Discover(id, permissions: true), bytes => WebRuntimeProtocol.Names(bytes, id), cancellationToken);
+        return await Exchange(WebRuntimeProtocol.Discover(id, permissions: true), bytes => WebRuntimeProtocol.Names(bytes, id), cancellationToken, keepAlive: true);
     }
 
     public async Task<JsonElement> BrowseAsync(string? symbol, bool children, CancellationToken cancellationToken)
     {
         Active(); string id = Id();
-        return await Exchange(WebRuntimeProtocol.Browse(id, symbol, children), bytes => WebRuntimeProtocol.BrowseResult(bytes, id, children), cancellationToken);
+        return await Exchange(WebRuntimeProtocol.Browse(id, symbol, children), bytes => WebRuntimeProtocol.BrowseResult(bytes, id, children), cancellationToken, keepAlive: true);
     }
 
     public async Task<WebRuntimeReadResult> ReadAsync(WebRuntimeSymbol selection, CancellationToken cancellationToken)
@@ -242,7 +255,7 @@ public sealed class WebRuntimeClient : IDisposable
         Active(); var request = WebRuntimeProtocol.Read(Context, selection, Id());
         DateTimeOffset start = DateTimeOffset.UtcNow; long tick = Stopwatch.GetTimestamp();
         return await Exchange(request.Body, bytes => WebRuntimeProtocol.ReadResult(Context, request, bytes, start,
-            DateTimeOffset.UtcNow, Stopwatch.GetElapsedTime(tick)), cancellationToken);
+            DateTimeOffset.UtcNow, Stopwatch.GetElapsedTime(tick)), cancellationToken, keepAlive: true);
     }
 
     public async Task<WebRuntimeDiagnosticResult> DiagnosticAsync(string kind, string? language, int? count, CancellationToken cancellationToken)
@@ -253,7 +266,7 @@ public sealed class WebRuntimeClient : IDisposable
         // Not advertised by Api.Browse means unsupported on this session; nothing is sent.
         if (!Methods.Contains(method)) return new(Context, kind, method, null, "unsupported", null, null, null, null, start, start, 0);
         return await Exchange(body, bytes => WebRuntimeProtocol.DiagnosticResult(Context, kind, body, bytes, start,
-            DateTimeOffset.UtcNow, Stopwatch.GetElapsedTime(tick)), cancellationToken);
+            DateTimeOffset.UtcNow, Stopwatch.GetElapsedTime(tick)), cancellationToken, keepAlive: true);
     }
 
     /// <summary>One gated mutation body from WebRuntimeProtocol; nothing is sent unless the session advertised the method. Never retried.</summary>
@@ -262,12 +275,14 @@ public sealed class WebRuntimeClient : IDisposable
         Active(); string method = body.GetProperty("method").GetString()!, id = body.GetProperty("id").GetString()!;
         _ = WebRuntimeProtocol.MutationPermission(method);
         if (!Methods.Contains(method)) return ("unsupported", null);
+        DropReadConnection();
         return await Exchange(body, bytes => WebRuntimeProtocol.MutationResult(bytes, id), cancellationToken);
     }
 
     public async Task LogoutAsync(CancellationToken cancellationToken)
     {
         if (token is null) throw Error("RuntimeRemoteSessionUnknown");
+        DropReadConnection();
         string id = Id();
         try
         {
@@ -281,11 +296,15 @@ public sealed class WebRuntimeClient : IDisposable
         finally { token = null; }
     }
 
-    private async Task<T> Exchange<T>(JsonElement body, Func<ReadOnlyMemory<byte>, T> parse, CancellationToken cancellationToken)
+    /// <summary>One HTTP exchange. <paramref name="body"/> is a request object or, for a read batch, an array of them. A keep-alive exchange
+    /// reuses the pinned read connection; any other asks the peer to close and never reuses a connection.</summary>
+    private async Task<T> Exchange<T>(JsonElement body, Func<ReadOnlyMemory<byte>, T> parse, CancellationToken cancellationToken, bool keepAlive = false)
     {
         ObjectDisposedException.ThrowIf(disposed, this);
         byte[] requestBytes = JsonSerializer.SerializeToUtf8Bytes(body);
-        byte[] buffer = new byte[WebRuntimeProtocol.MaximumResponseBytes + 1];
+        // Pooled instead of a fresh 256 KiB (large object heap) array per request; the part written is cleared before it goes back.
+        byte[] buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(WebRuntimeProtocol.MaximumResponseBytes + 1);
+        int length = 0;
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         deadline.CancelAfter(TimeSpan.FromSeconds(10));
         try
@@ -295,26 +314,25 @@ public sealed class WebRuntimeClient : IDisposable
                 { Content = new ByteArrayContent(requestBytes), Version = HttpVersion.Version11, VersionPolicy = HttpVersionPolicy.RequestVersionExact };
             request.Content.Headers.ContentType = new("application/json");
             // The request header asks the peer to close; zero pool lifetime separately prevents local reuse.
-            request.Headers.ConnectionClose = true;
+            if (!keepAlive) request.Headers.ConnectionClose = true;
             if (token is not null) request.Headers.Add("X-Auth-Token", token);
-            if (body.GetProperty("method").GetString() == "Api.Login") LoginDispatched = true;
-            using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, deadline.Token).ConfigureAwait(false);
+            if (body.ValueKind == JsonValueKind.Object && body.GetProperty("method").GetString() == "Api.Login") LoginDispatched = true;
+            using var response = await (keepAlive ? ReadClient() : client).SendAsync(request, HttpCompletionOption.ResponseHeadersRead, deadline.Token).ConfigureAwait(false);
             if (!PeerVerified) throw Error("RuntimeTlsUnverified");
             if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden) throw Error("RuntimeAuthenticationDenied");
             if (!response.IsSuccessStatusCode) throw Error("RuntimeHttpFailure");
             if (response.Content.Headers.ContentLength > WebRuntimeProtocol.MaximumResponseBytes) throw Error("RuntimeResponseLimit");
             using var stream = await response.Content.ReadAsStreamAsync(deadline.Token).ConfigureAwait(false);
-            int length = 0;
-            while (length < buffer.Length)
+            int limit = WebRuntimeProtocol.MaximumResponseBytes + 1;
+            while (length < limit)
             {
-                int read = await stream.ReadAsync(buffer.AsMemory(length), deadline.Token).ConfigureAwait(false);
+                int read = await stream.ReadAsync(buffer.AsMemory(length, limit - length), deadline.Token).ConfigureAwait(false);
                 if (read == 0) break;
                 length += read;
             }
             if (length > WebRuntimeProtocol.MaximumResponseBytes) throw Error("RuntimeResponseLimit");
             if (token is not null)
             {
-                using var inspected = WebRuntimeProtocol.Response(buffer.AsMemory(0,length),body.GetProperty("id").GetString()!);
                 void RefuseToken(JsonElement node)
                 {
                     if (node.ValueKind == JsonValueKind.String && node.GetString()!.Contains(token,StringComparison.Ordinal)) throw Error("RuntimeSecretEchoRejected");
@@ -326,7 +344,23 @@ public sealed class WebRuntimeClient : IDisposable
                     }
                 }
                 // Error bodies are already discarded by the parsers; inspect only publicly returned results.
-                if (inspected.RootElement.TryGetProperty("result",out var resultNode)) RefuseToken(resultNode);
+                if (body.ValueKind == JsonValueKind.Object)
+                {
+                    using var inspected = WebRuntimeProtocol.Response(buffer.AsMemory(0,length),body.GetProperty("id").GetString()!);
+                    if (inspected.RootElement.TryGetProperty("result",out var resultNode)) RefuseToken(resultNode);
+                }
+                else
+                {
+                    // A batch reply: every element's result is inspected; its shape is validated by the parser.
+                    try
+                    {
+                        using var inspected = JsonDocument.Parse(buffer.AsMemory(0,length), new JsonDocumentOptions { MaxDepth = 32 });
+                        if (inspected.RootElement.ValueKind == JsonValueKind.Array)
+                            foreach (var element in inspected.RootElement.EnumerateArray())
+                                if (element.ValueKind == JsonValueKind.Object && element.TryGetProperty("result",out var resultNode)) RefuseToken(resultNode);
+                    }
+                    catch (JsonException) { throw Error("RuntimeResponseInvalid"); }
+                }
             }
             T result = parse(buffer.AsMemory(0, length)); lastUse = Stopwatch.GetTimestamp(); return result;
         }
@@ -334,7 +368,12 @@ public sealed class WebRuntimeClient : IDisposable
         // A refused peer certificate (pin, name, validity or usage) surfaces as a failed TLS handshake, not as a cable fault.
         catch (HttpRequestException e) { throw Error(Tls(e) ? "RuntimeTlsUnverified" : "RuntimeTransportFailure"); }
         catch (IOException) { throw Error("RuntimeTransportFailure"); }
-        finally { CryptographicOperations.ZeroMemory(requestBytes); CryptographicOperations.ZeroMemory(buffer); }
+        finally
+        {
+            CryptographicOperations.ZeroMemory(requestBytes);
+            CryptographicOperations.ZeroMemory(buffer.AsSpan(0, length));
+            System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
+        }
     }
 
     private static bool Tls(Exception? e)
@@ -353,5 +392,5 @@ public sealed class WebRuntimeClient : IDisposable
         return response.RootElement.GetProperty("result");
     }
     private static BridgeException Error(string code) => new(code, "Runtime request refused or incomplete. No remote text, password or token is returned; do not automatically retry login/logout.");
-    public void Dispose() { disposed = true; token = null; client.Dispose(); }
+    public void Dispose() { disposed = true; token = null; client.Dispose(); DropReadConnection(); }
 }

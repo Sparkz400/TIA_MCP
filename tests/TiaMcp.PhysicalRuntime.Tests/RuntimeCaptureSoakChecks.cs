@@ -268,7 +268,7 @@ internal static partial class RuntimeCaptureSoakChecks
             Root = root; StoreRoot = Path.Combine(root, "store"); this.workers = workers;
             ledger = new StreamWriter(new FileStream(Path.Combine(root, File.Exists(Path.Combine(root, "failure-intent.json")) ?
                 "recovery-ledger.jsonl" : "acquisition-ledger.jsonl"), FileMode.CreateNew, FileAccess.Write, FileShare.Read));
-            Sessions = new(TimeProvider.System, signals);
+            Sessions = new(TimeProvider.System, signals) { PerSignalReads = true };
             Captures = new(Sessions, new("", StoreRoot, null, 5, false, "", null), TimeProvider.System);
             Sessions.ResponseMember = Response;
             Sessions.BeforeRead = async (number, token) =>

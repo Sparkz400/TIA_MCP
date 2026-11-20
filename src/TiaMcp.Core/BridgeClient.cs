@@ -8,8 +8,10 @@ using Microsoft.Win32.SafeHandles;
 
 namespace TiaMcp.Core;
 
+/// <summary>TimeoutSeconds bounds one ordinary operation; operations in <see cref="BridgeClient.LongOperations"/> get
+/// max(TimeoutSeconds, LongTimeoutSeconds). QueueTimeoutSeconds (default TimeoutSeconds) is only the wait behind another running call.</summary>
 public sealed record BridgeOptions(string WorkerPath, string? ApiDirectory = null, int TimeoutSeconds = 120,
-    IReadOnlyList<string>? WorkerPrefixArguments = null, bool Disabled = false);
+    IReadOnlyList<string>? WorkerPrefixArguments = null, bool Disabled = false, int? QueueTimeoutSeconds = null, int LongTimeoutSeconds = 900);
 
 public interface IBridgeClient
 {
@@ -20,10 +22,18 @@ public interface IBridgeClient
 public sealed record LateBridgeResponse(string Operation, string RequestId, bool Succeeded, string? ErrorCode, DateTimeOffset ReceivedAt);
 
 /// <summary>One serialized engineering session. A cancelled or timed-out request keeps running in the worker and is never
-/// replayed: later calls are refused until its response arrives, which is then recorded. A broken transport is terminal.</summary>
+/// replayed: later calls are refused until its response arrives, which is then recorded. After a broken transport the next call
+/// starts a fresh worker once the old one has exited (never while it still runs); the old worker's state is gone.</summary>
 public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncDisposable
 {
     public const int WorkerExitBudgetSeconds = 120;
+    // Worker operations that legitimately outlast an ordinary call: project open/copy/upgrade, compile-backed changes, attach behind the Openness dialog.
+    public static readonly IReadOnlySet<string> LongOperations = new HashSet<string>(StringComparer.Ordinal)
+    {
+        "attach", "start", "project_open", "project_open_copy", "project_copy", "project_archive", "project_upgrade", "project_retrieve",
+        "change_apply", "change_restore", "scratch_create", "simulation_download", "simulation_provision_scratch_credential", "plc_station_upload", "plc_online_compare",
+    };
+    private const int RecoveryExitGraceSeconds = 5;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private NamedPipeServerStream? _pipe;
     private BoundedLineReader? _reader;
@@ -45,13 +55,14 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
         var id = Guid.NewGuid().ToString("N");
         var frame = BridgeProtocol.EncodeRequest(id, operation, arguments); // Rejects an oversized request before waiting.
         // A queued call has sent nothing, so giving up here is always safe.
-        if (!await _gate.WaitAsync(TimeSpan.FromSeconds(options.TimeoutSeconds), cancellationToken))
-            throw new BridgeException("QueueTimeout", $"{operation} waited {options.TimeoutSeconds} s for the engineering worker: another bridge call is still running; nothing was sent.");
+        int queueSeconds = options.QueueTimeoutSeconds ?? options.TimeoutSeconds;
+        if (!await _gate.WaitAsync(TimeSpan.FromSeconds(queueSeconds), cancellationToken))
+            throw new BridgeException("QueueTimeout", $"{operation} waited {queueSeconds} s for the engineering worker: another bridge call is still running; nothing was sent.");
         try
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
             if (options.Disabled) throw new BridgeException("NativeWorkersDisabled", "This Host disables Siemens engineering and simulator workers. Use supplied-document tools, or use an engineering package on a Siemens-equipped workstation.");
-            if (_faulted) throw new BridgeException("BridgeFaulted", "The previous operation lost its connection or timed out. Its outcome may be unknown. Inspect TIA and restart this MCP host before continuing; no request was retried.");
+            if (_faulted) await RecoverFaultedAsync();
             await SettleInterruptedAsync(operation, id, frame);
             // Owner discovery observes an existing connection; it must not create one.
             if (operation == "addin_owner_context" && _pipe is null)
@@ -65,7 +76,7 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
     private async Task<JsonElement> SendAsync(string operation, string id, string frame, CancellationToken cancellationToken)
     {
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            deadline.CancelAfter(TimeSpan.FromSeconds(options.TimeoutSeconds));
+            deadline.CancelAfter(TimeSpan.FromSeconds(LongOperations.Contains(operation) ? Math.Max(options.TimeoutSeconds, options.LongTimeoutSeconds) : options.TimeoutSeconds));
             bool sent = false, interrupted = false;
             try
             {
@@ -108,6 +119,22 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
             }
     }
 
+    // Under the gate. A lost connection leaves the old worker to exit on EOF; once it has, the next call may start a fresh one.
+    // The old worker's TIA attachment, open projects and held leases are gone with it, and its previous request is never replayed.
+    private async Task RecoverFaultedAsync()
+    {
+        if (_worker is { HasExited: false } running)
+        {
+            using var grace = new CancellationTokenSource(TimeSpan.FromSeconds(RecoveryExitGraceSeconds));
+            try { await running.WaitForExitAsync(grace.Token); } catch (OperationCanceledException) { }
+        }
+        if (_worker is { HasExited: false } alive)
+            throw new BridgeException("BridgeFaulted", $"The previous operation lost its connection or timed out and its worker (process {alive.Id}) is still running. Its outcome may be unknown. " +
+                "Wait for it to exit, inspect TIA, then call again to start a fresh worker; no request was retried and the worker is never terminated.");
+        _faulted = false; _inflight = null; _inflightOperation = _inflightId = null; _deferred.Clear(); _reader = null;
+        Console.Error.WriteLine(JsonSerializer.Serialize(new { bridgeRecovered = new { previousWorkerExited = true } }));
+    }
+
     // Under the gate: refuse while an interrupted request still runs; once it ended, record its response or fault the bridge.
     // A held cleanup (the interrupted dispatch's lease release) is delivered first, right after the late response.
     private async Task SettleInterruptedAsync(string operation, string id, string frame)
@@ -135,7 +162,7 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
             _faulted = true;
             if (_pipe is not null) await _pipe.DisposeAsync();
             _pipe = null;
-            throw new BridgeException("BridgeFaulted", "The interrupted operation lost its connection before responding. Its outcome may be unknown. Inspect TIA and restart this MCP host before continuing; no request was sent.", ex);
+            throw new BridgeException("BridgeFaulted", "The interrupted operation lost its connection before responding. Its outcome may be unknown. Inspect TIA; the next call starts a fresh worker once the old one has exited. No request was sent.", ex);
         }
         var cleanups = _deferred.ToArray(); _deferred.Clear();
         for (int i = 0; i < cleanups.Length; i++)
@@ -146,7 +173,7 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
             catch (BridgeException error) { cleanupError = error.Code; }
             Console.Error.WriteLine(JsonSerializer.Serialize(new { bridgeDeferredCleanup = new { operation = cleanups[i].Operation, errorCode = cleanupError } }));
             if (_faulted)
-                throw new BridgeException("BridgeFaulted", $"The held {cleanups[i].Operation} lost its connection. Its outcome may be unknown. Inspect TIA and restart this MCP host before continuing; no further request was sent.");
+                throw new BridgeException("BridgeFaulted", $"The held {cleanups[i].Operation} lost its connection. Its outcome may be unknown. Inspect TIA; the next call starts a fresh worker once the old one has exited. No further request was sent.");
             if (_inflight is not null)
             {
                 // The cleanup itself still runs: hold the rest again and refuse or settle this call like any other.

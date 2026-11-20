@@ -25,9 +25,21 @@ internal static class SimulationRuntimeControlTests
             Check.Equal<long?>(10000000L, SimulationRuntimeControl.CaptureSpanNanoseconds(timespan));
         }
         Check.Equal<long?>(null, SimulationRuntimeControl.CaptureSpanNanoseconds(JObject.Parse("{cycleSynchronous:true,syncMode:'SingleStep_CP'}")));
+        // SingleStep_Bus passes the I/O system and a time stamp step of one bus cycle; the others pass nothing.
+        var bus = JObject.Parse("{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:100,busCycleMicroseconds:250}");
+        Check.Equal("SingleStep_Bus", SimulationRuntimeControl.CaptureMode(bus));
+        Check.Equal<(uint, ulong)?>((100u, 250000UL), SimulationRuntimeControl.CaptureBus(bus));
+        Check.Equal<(uint, ulong)?>(null, SimulationRuntimeControl.CaptureBus(JObject.Parse("{cycleSynchronous:true,syncMode:'SingleStep_CP'}")));
+        foreach (int io in new[] { 1, 32, 100, 115 })
+            Check.Equal("SingleStep_Bus", SimulationRuntimeControl.CaptureMode(new JObject { ["cycleSynchronous"] = true, ["syncMode"] = "SingleStep_Bus", ["ioSystemId"] = io, ["busCycleMicroseconds"] = 1 }));
         foreach (string input in new[] { "{cycleSynchronous:'true'}", "{cycleSynchronous:true,syncMode:1}",
             "{syncMode:'SingleStep_C'}", "{cycleSynchronous:false,syncMode:'SingleStep_C'}",
             "{cycleSynchronous:true,syncMode:'SingleStep_Bus'}", "{cycleSynchronous:true,syncMode:'TimespanSynchronized_C'}",
+            "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:100}", "{cycleSynchronous:true,syncMode:'SingleStep_Bus',busCycleMicroseconds:250}",
+            "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:0,busCycleMicroseconds:250}", "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:33,busCycleMicroseconds:250}",
+            "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:99,busCycleMicroseconds:250}", "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:116,busCycleMicroseconds:250}",
+            "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:100,busCycleMicroseconds:0}", "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:100,busCycleMicroseconds:1000001}",
+            "{cycleSynchronous:true,syncMode:'SingleStep_Bus',ioSystemId:100.5,busCycleMicroseconds:250}", "{cycleSynchronous:true,syncMode:'SingleStep_CP',ioSystemId:100,busCycleMicroseconds:250}",
             "{cycleSynchronous:true,syncMode:'TimespanSynchronized_C',spanMilliseconds:0}", "{cycleSynchronous:true,syncMode:'TimespanSynchronized_P',spanMilliseconds:60001}",
             "{cycleSynchronous:true,syncMode:'TimespanSynchronized_CP',spanMilliseconds:1.5}", "{cycleSynchronous:true,syncMode:'SingleStep_C',spanMilliseconds:10}",
             "{cycleSynchronous:true,spanMilliseconds:10}", "{cycleSynchronous:true,syncMode:'TimespanSynchronized_CT',spanMilliseconds:10}",
@@ -178,8 +190,108 @@ internal static class SimulationRuntimeControlTests
         // A batch with one output among inputs, markers and DB members is refused as a whole, naming that symbol.
         Check.Equal("\"SigOutWord\"", SimulationRuntimeControl.OutputSymbol(["\"SigInByte\"", "\"SigMarker\"", "\"SigDb\".VInt", "\"SigOutWord\""], tags));
         Check.Equal(null, SimulationRuntimeControl.OutputSymbol(["\"SigInByte\"", "\"SigMarker\"", "\"SigDb\".Output", "\"SigDb\".Arr[3]", "T1"], tags));
-        // Only a whole segment is a parent; a symbol missing from the tag list is left to PLCSIM.
+        // Only a whole segment is a parent; OutputSymbol does not judge a symbol missing from the tag list (UnlistedSymbol does).
         Check.Equal(null, SimulationRuntimeControl.OutputSymbol(["\"SigOutWordCopy\"", "\"OutStructDb\".Member", "\"Missing\".X"], tags));
+        // A refreshed tag list refuses what it does not list: itself, as a member or element of an entry (quoting and case ignored) are known.
+        string[] names = tags.Select(t => t.Item1).ToArray();
+        Check.Equal("\"Missing\".X", SimulationRuntimeControl.UnlistedSymbol(["\"SigDb\".VInt", "\"Missing\".X"], names));
+        Check.Equal("\"SigDbX\".VInt", SimulationRuntimeControl.UnlistedSymbol(["\"SigDbX\".VInt"], names));
+        Check.Equal(null, SimulationRuntimeControl.UnlistedSymbol(["\"sigdb\".vint", "\"SigDb\".Arr[3]", "T1", "\"OutStruct\".Member"], names));
+        Check.Equal(null, SimulationRuntimeControl.UnlistedSymbol(["\"Missing\".X"], []));
+        // Only the adapter's own newest reports stay; other files in the folder are never listed for deletion.
+        var now = new DateTime(2026, 11, 20, 12, 0, 0, DateTimeKind.Utc);
+        string Report(int n) => "C:/r/simulation-test-" + n.ToString("x32") + ".json";
+        var files = Enumerable.Range(0, 5).Select(n => (Report(n), now.AddMinutes(n))).Append(("C:/r/notes.json", now.AddDays(-9))).Append(("C:/r/simulation-test-keep.json", now.AddDays(-9))).ToArray();
+        Check.Equal(string.Join(",", Report(1), Report(0)), string.Join(",", SimulationRuntimeControl.ExcessReports(files, 3)));
+        Check.Equal(0, SimulationRuntimeControl.ExcessReports(files, 50).Count);
+        return Task.CompletedTask;
+    }
+
+    // sim_prune: only storage of an unregistered, receipt-backed instance and unchanged receipted archives are ever deletable.
+    internal static Task StoragePruneNeverTouchesLiveOrForeignStorage()
+    {
+        string root = Path.Combine(Path.GetTempPath(), "sim-prune-" + Guid.NewGuid().ToString("N"));
+        string archives = Path.Combine(root, "archives");
+        Directory.CreateDirectory(archives);
+        try
+        {
+            const string marker = ".tiamcp-instance.json";
+            string Name() => "TiaMcp_" + Guid.NewGuid().ToString("N");
+            string Sha(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(path))).ToLowerInvariant();
+            var receipts = new List<JObject>();
+            string Instance(string stage, bool receipt = true, bool changedMarker = false, int bytes = 10, int ageDays = 0)
+            {
+                string name = Name(), folder = Path.Combine(root, name);
+                Directory.CreateDirectory(folder);
+                File.WriteAllText(Path.Combine(folder, marker), "{\"m\":1}");
+                File.WriteAllBytes(Path.Combine(folder, "card.bin"), new byte[bytes]);
+                if (receipt) receipts.Add(new JObject { ["instanceName"] = name, ["stage"] = stage, ["storagePath"] = folder, ["markerSha256"] = Sha(Path.Combine(folder, marker)) });
+                if (changedMarker) File.WriteAllText(Path.Combine(folder, marker), "{\"m\":2}");
+                File.SetLastWriteTimeUtc(Path.Combine(folder, "card.bin"), DateTime.UtcNow.AddDays(-ageDays));
+                File.SetLastWriteTimeUtc(Path.Combine(folder, marker), DateTime.UtcNow.AddDays(-ageDays));
+                Directory.SetLastWriteTimeUtc(folder, DateTime.UtcNow.AddDays(-ageDays));
+                return name;
+            }
+            string old = Instance("unregistered", bytes: 100, ageDays: 30), failed = Instance("unregisteredAfterFailure", bytes: 100, ageDays: 20), recent = Instance("unregistered", bytes: 100);
+            string registered = Instance("unregistered"), ready = Instance("ready"), noReceipt = Instance("unregistered", receipt: false), tampered = Instance("unregistered", changedMarker: true);
+            Directory.CreateDirectory(Path.Combine(root, "other-folder"));
+            var storage = SimulationStoragePrune.Storage(root, marker, receipts, n => n == registered);
+            string Refusal(string name) => storage.Single(c => c.Name == name).Refusal ?? "";
+            Check.Equal("", Refusal(old)); Check.Equal("", Refusal(failed)); Check.Equal("", Refusal(recent));
+            Check.Equal("registeredOrSelected", Refusal(registered)); Check.Equal("instanceNotUnregistered", Refusal(ready));
+            Check.Equal("noCreationReceipt", Refusal(noReceipt)); Check.Equal("ownershipMarkerChanged", Refusal(tampered));
+            Check.Equal(7, storage.Count);
+            // Age, then size: the oldest eligible go first; nothing refused is ever selected.
+            Check.Equal(string.Join(",", old, failed), string.Join(",", SimulationStoragePrune.Select(storage, null, DateTime.UtcNow.AddDays(-10), null).Select(c => c.Name)));
+            Check.Equal(old, string.Join(",", SimulationStoragePrune.Select(storage, null, null, 0).Take(1).Select(c => c.Name)));
+            Check.Equal(0, SimulationStoragePrune.Select(storage, null, null, 100000).Count);
+            Check.Equal(3, SimulationStoragePrune.Select(storage, null, null, 0).Count);
+            // Named choice keeps a refused candidate refused; an unknown name is not accepted.
+            var named = SimulationStoragePrune.Select(storage, new[] { registered, recent }, null, null);
+            Check.Equal("registeredOrSelected", SimulationStoragePrune.Delete(named.Single(c => c.Name == registered), n => n == registered));
+            try { SimulationStoragePrune.Select(storage, new[] { "other-folder" }, null, null); throw new InvalidOperationException("unknown name accepted"); } catch (ArgumentException) { }
+            // The liveness check is repeated just before the delete.
+            Check.Equal("registeredOrSelected", SimulationStoragePrune.Delete(storage.Single(c => c.Name == recent), n => n == recent));
+            Check.Equal(true, Directory.Exists(Path.Combine(root, recent)));
+            Check.Equal(null, SimulationStoragePrune.Delete(storage.Single(c => c.Name == old), n => false));
+            Check.Equal(false, Directory.Exists(Path.Combine(root, old)));
+            foreach (string kept in new[] { registered, ready, noReceipt, tampered, "other-folder" }) Check.Equal(true, Directory.Exists(Path.Combine(root, kept)));
+            // A link inside a folder makes it ineligible and is never followed.
+            string linked = Instance("unregistered"), target = Path.Combine(root, "link-target");
+            Directory.CreateDirectory(target);
+            using (var mklink = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe", "/c mklink /J \"" + Path.Combine(root, linked, "junction") + "\" \"" + target + "\"") { CreateNoWindow = true, UseShellExecute = false })!)
+            {
+                mklink.WaitForExit(10000);
+                if (Directory.Exists(Path.Combine(root, linked, "junction")))
+                    Check.Equal("containsReparsePoint", SimulationStoragePrune.Storage(root, marker, receipts, n => false).Single(c => c.Name == linked).Refusal);
+            }
+            // Archives need their receipt, unchanged.
+            string Archive(bool receipt, bool changed = false)
+            {
+                string path = Path.Combine(archives, Name() + "-" + Guid.NewGuid().ToString("N") + ".zip");
+                File.WriteAllBytes(path, new byte[] { 1, 2, 3, 4 });
+                if (receipt) File.WriteAllText(path + ".json", new JObject { ["schemaVersion"] = 1, ["archivePath"] = path, ["instanceName"] = "TiaMcp_x", ["sha256"] = Sha(path), ["bytes"] = 4 }.ToString());
+                if (changed) File.WriteAllBytes(path, new byte[] { 9, 9, 9, 9 });
+                return Path.GetFileName(path);
+            }
+            string good = Archive(true), bare = Archive(false), edited = Archive(true, changed: true);
+            File.WriteAllText(Path.Combine(archives, "notes.zip"), "x");
+            var found = SimulationStoragePrune.Archives(archives);
+            Check.Equal(3, found.Count);
+            Check.Equal(null, found.Single(c => c.Name == good).Refusal);
+            Check.Equal("noArchiveReceipt", found.Single(c => c.Name == bare).Refusal);
+            Check.Equal("archiveChanged", found.Single(c => c.Name == edited).Refusal);
+            Check.Equal(null, SimulationStoragePrune.Delete(found.Single(c => c.Name == good), n => true));
+            Check.Equal(false, File.Exists(Path.Combine(archives, good)) || File.Exists(Path.Combine(archives, good + ".json")));
+            Check.Equal(true, File.Exists(Path.Combine(archives, bare)) && File.Exists(Path.Combine(archives, edited)) && File.Exists(Path.Combine(archives, "notes.zip")));
+            Check.Equal(0, SimulationStoragePrune.Storage(Path.Combine(root, "missing"), marker, receipts, n => false).Count);
+        }
+        finally
+        {
+            // A junction is removed on its own first: a recursive delete refuses to cross it.
+            foreach (string junction in Directory.Exists(root) ? Directory.GetDirectories(root, "junction", SearchOption.AllDirectories) : []) { try { Directory.Delete(junction); } catch (IOException) { } }
+            try { Directory.Delete(root, true); } catch (IOException) { }
+        }
         return Task.CompletedTask;
     }
 
@@ -234,11 +346,17 @@ internal static class SimulationRuntimeControlTests
             Check.Equal(true, stateGuard > 0 && state.IndexOf(call, StringComparison.Ordinal) > stateGuard);
         string writer = Body(session, "JObject Write(");
         Check.Equal(true, writer.IndexOf("RequireOwned(selected);", StringComparison.Ordinal) is > 0 and var writeGuard && writer.IndexOf("ApplyWrites(", StringComparison.Ordinal) > writeGuard);
-        // sim_test: any step with writes demands ownership before the first runtime call; a non-delete release never ends a held capture.
+        // sim_test: any step with writes demands ownership before the first runtime call; a release ends a held capture only when the Host (which has no live capture then) says so.
         string scenario = Body(session, "JObject Test(");
         Check.Equal(true, scenario.IndexOf("item[\"writes\"] != null) == true) RequireOwned(selected);", StringComparison.Ordinal) is > 0 and var first &&
             first < scenario.IndexOf("EnsureAdmitted(selected)", StringComparison.Ordinal) && first < scenario.IndexOf("ApplyWrites(", StringComparison.Ordinal));
-        Check.Equal(true, Body(session, "JObject Release(").Contains("else { RequireNoCapture(selected); RestoreCaptureMode(selected); }", StringComparison.Ordinal));
+        string release = Body(session, "JObject Release(");
+        Check.Equal(true, release.Contains("else { if (!restoreHeld) RequireNoCapture(selected); RestoreCaptureMode(selected); }", StringComparison.Ordinal)
+            && release.Contains("selected.CaptureHeld && !restoreHeld) throw new SimulatorException(\"SimulationCaptureModeActive\"", StringComparison.Ordinal));
+        // Only RuntimeCaptures sets restoreHeldCapture, and it refuses first while one of its captures is live on that instance.
+        string hostCaptures = File.ReadAllText(Path.Combine(root.FullName, "src", "TiaMcp.Host", "RuntimeCaptures.cs"));
+        Check.Equal(true, hostCaptures.IndexOf("x.InstanceId==instanceId))", StringComparison.Ordinal) is > 0 and var live && hostCaptures.IndexOf("restoreHeldCapture=true", StringComparison.Ordinal) > live);
+        Check.Equal(1, Directory.GetFiles(Path.Combine(root.FullName, "src", "TiaMcp.Host"), "*.cs").Count(f => File.ReadAllText(f).Contains("restoreHeldCapture", StringComparison.Ordinal)));
         // Only a running capture or scenario holds the instance: every restore, also a failed one, ends the hold first, so release can retry it.
         Check.Equal(true, Body(session, "static void RestoreCaptureMode(").Contains("{\n            selected.CaptureHeld = false;\n            if (selected.CaptureRestoreMode == null) return;", StringComparison.Ordinal));
         Check.Equal(true, Body(source, "static void RequireNoCapture(").Contains("if (selected.CaptureHeld) throw", StringComparison.Ordinal));
@@ -261,8 +379,10 @@ internal static class SimulationRuntimeControlTests
             int refusal = body.IndexOf("RefuseOutputs(selected, ", StringComparison.Ordinal);
             Check.Equal(true, refusal > 0 && body.IndexOf(access, StringComparison.Ordinal) > refusal);
         }
-        Check.Equal(true, Body(session, "static void RefuseOutputs(").Contains("selected.Instance.TagInfos.Select(t => (t.Name, t.Area.ToString()))", StringComparison.Ordinal)
-            && Body(session, "static void RefuseOutputs(").Contains("new SimulatorException(\"InvalidRequest\"", StringComparison.Ordinal));
+        // The tag list is refreshed first (a download can add tags), then both the output area and unlisted symbols refuse with InvalidRequest.
+        string refusal2 = Body(session, "static void RefuseOutputs(");
+        Check.Equal(true, refusal2.IndexOf("UpdateTagList(", StringComparison.Ordinal) is > 0 and var refresh && refusal2.IndexOf("selected.Instance.TagInfos", StringComparison.Ordinal) > refresh
+            && refusal2.Contains("UnlistedSymbol(", StringComparison.Ordinal) && refusal2.Contains("new SimulatorException(\"InvalidRequest\"", StringComparison.Ordinal));
         return Task.CompletedTask;
     }
 }

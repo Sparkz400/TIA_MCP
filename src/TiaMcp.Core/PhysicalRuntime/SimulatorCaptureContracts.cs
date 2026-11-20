@@ -9,7 +9,9 @@ namespace TiaMcp.Core.PhysicalRuntime;
 public sealed record SimulatorCaptureSignal(string Symbol, string Type, string Datatype);
 public sealed record SimulatorCaptureSource(int InstanceId, string InstanceName, SimulatorCaptureSignal[] Signals, bool CycleSynchronous = false,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? SyncMode = null,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? SpanMilliseconds = null);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? SpanMilliseconds = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? IoSystemId = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? BusCycleMicroseconds = null);
 public sealed record SimulatorSyncPoint(long Count, long TimeSinceSameSyncPointNanoseconds, long TimeSinceAnySyncPointNanoseconds);
 public sealed record SimulatorCaptureRead(int InstanceId, string InstanceName, string Symbol, string Type, string Status, JsonElement? Value,
     string? ProviderErrorCode, DateTimeOffset RequestStartedUtc, DateTimeOffset ResponseReceivedUtc, SimulatorSyncPoint? SyncPoint)
@@ -32,7 +34,9 @@ public static class SimulatorCaptureContracts
         UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow, RespectRequiredConstructorParameters = true };
     public static readonly string[] ReadErrors = ["PlcsimCaptureReadFailed", "PlcsimResponseInvalid", "SimulationNotSelected",
         "SimulationTargetMismatch", "SimulationOwnershipUnverified", "SimulationCaptureModeInactive", "SimulationSyncPointTimeout",
-        "NativeWorkersDisabled", "BridgeFaulted", "TimeoutOutcomeUnknown", "WorkerDisconnected"];
+        "NativeWorkersDisabled", "BridgeFaulted", "TimeoutOutcomeUnknown", "WorkerDisconnected",
+        // The shared simulator bridge was busy (a long sim_test or observe) or still parked an earlier call: nothing was sent, the capture goes on.
+        "QueueTimeout", "PreviousOperationRunning"];
 
     public static void ValidateRequest(RuntimeCaptureRequest request)
     {
@@ -44,11 +48,14 @@ public static class SimulatorCaptureContracts
             signals.Length == request.SelectionIds.Length && signals.All(s => s is not null) &&
             signals.Select(s => s.Symbol).Distinct(StringComparer.Ordinal).Count() == signals.Length);
         Require(source!.SyncMode is null || source.CycleSynchronous && source.SyncMode is
-            "SingleStep_C" or "SingleStep_P" or "SingleStep_CP" or "SingleStep_CT" or "SingleStep_CPT"
+            "SingleStep_C" or "SingleStep_P" or "SingleStep_CP" or "SingleStep_CT" or "SingleStep_CPT" or "SingleStep_Bus"
             or "TimespanSynchronized_C" or "TimespanSynchronized_P" or "TimespanSynchronized_CP");
         // A time-synchronised mode advances each sample by spanMilliseconds of CPU time; no other mode takes a span.
         bool timespan = source.SyncMode?.StartsWith("TimespanSynchronized_", StringComparison.Ordinal) == true;
         Require(timespan ? source.SpanMilliseconds is >= 1 and <= 60000 : source.SpanMilliseconds is null);
+        // SingleStep_Bus plays the bus partner: it passes the I/O system (PROFIBUS 1..32, PROFINET 100..115) and a time stamp that grows by one bus cycle per sample.
+        if (source.SyncMode == "SingleStep_Bus") Require(source.IoSystemId is (>= 1 and <= 32) or (>= 100 and <= 115) && source.BusCycleMicroseconds is >= 1 and <= 1000000);
+        else Require(source.IoSystemId is null && source.BusCycleMicroseconds is null);
         foreach (var signal in source!.Signals)
             Require(Text(signal.Symbol, 512) && signal.Type is not null && Datatypes.TryGetValue(signal.Type, out var allowed) &&
                 allowed.Contains(signal.Datatype, StringComparer.OrdinalIgnoreCase));
@@ -62,6 +69,7 @@ public static class SimulatorCaptureContracts
     public static object Arguments(RuntimeCaptureRequest request) => new { instanceId = request.Simulator!.InstanceId,
         instanceName = request.Simulator.InstanceName, creationId = request.AttemptId, cycleSynchronous = request.Simulator.CycleSynchronous,
         syncMode = request.Simulator.SyncMode, spanMilliseconds = request.Simulator.SpanMilliseconds,
+        ioSystemId = request.Simulator.IoSystemId, busCycleMicroseconds = request.Simulator.BusCycleMicroseconds,
         signals = request.Simulator.Signals.Select(s => new { symbol = s.Symbol, type = s.Type }) };
 
     public static void ValidatePlan(RuntimeCapturePlan plan) =>

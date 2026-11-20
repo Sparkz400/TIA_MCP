@@ -114,6 +114,9 @@ try
         await CaptureChecks.Run(server, output, Check);
         Save("capture-server-audit",server.Audit.ToArray());
         server.Audit.Clear();
+        var lifecycleTimeout = await Start("lifecycle-timeout"); var lifecycleClose = await Start("lifecycle-close");
+        await StoreLifecycleChecks.Run(server, lifecycleTimeout, lifecycleClose, output, Check);
+        server.Audit.Clear();
         await using (var store = Store("healthy"))
         {
             string id = Id();
@@ -304,23 +307,28 @@ try
             await store.Disconnect(id);
         }
         var second = await Start("second");
-        foreach (string fault in new[] { "delete", "corrupt", "publish", "terminal" })
+        foreach (string fault in new[] { "delete", "corrupt", "publish", "stale", "terminal" })
         {
             var store = Store("cleanup-" + fault); string id1 = Id(), id2 = Id();
             await store.Connect(id1, server.Selection); await store.Connect(id2, second.Selection);
             string path = Path.Combine(output, "cleanup-" + fault, id1 + ".json");
             if (fault == "delete") File.Delete(path);
             if (fault == "corrupt") File.WriteAllText(path, "{");
-            if (fault == "publish") File.WriteAllText(Path.ChangeExtension(path, ".tmp"), "owned collision");
+            // A temporary that cannot be removed (a directory) blocks the publication; a stale temporary file is simply replaced.
+            if (fault == "publish") Directory.CreateDirectory(Path.ChangeExtension(path, ".tmp"));
+            if (fault == "stale") File.WriteAllText(Path.ChangeExtension(path, ".tmp"), "stale temporary of an earlier failed save");
             if (fault == "terminal")
             {
                 var record = JsonSerializer.Deserialize<OpcUaRuntimeStatus>(File.ReadAllText(path), BridgeProtocol.Json)!;
                 File.WriteAllText(path, JsonSerializer.Serialize(record with { State = "closed" }, BridgeProtocol.Json));
             }
             int firstBefore = server.SessionCount, secondBefore = second.SessionCount;
-            if (fault == "terminal") await store.DisposeAsync();
+            if (fault is "terminal" or "stale") await store.DisposeAsync();
             else await Refused(async () => await store.DisposeAsync(), "UaCleanupPublicationFailed", fault + " cleanup publication failure remains explicit");
             Check(server.SessionCount == firstBefore - 1 && second.SessionCount == secondBefore - 1, fault + " closes both original live sessions despite corrupt record");
+            if (fault == "stale")
+                Check(!File.Exists(Path.ChangeExtension(path, ".tmp")) && JsonSerializer.Deserialize<OpcUaRuntimeStatus>(File.ReadAllText(path), BridgeProtocol.Json)!.State == "closed",
+                    "A stale temporary of an earlier failed save does not block the next save");
             using var owner = new FileStream(Path.Combine(output, "cleanup-" + fault, "owner.lock"), FileMode.Open, FileAccess.ReadWrite, FileShare.None);
             Check(owner.CanWrite, fault + " releases original owner lock");
         }
@@ -348,17 +356,18 @@ try
             await store.Connect(id1, server.Selection);
             Check(server.LastRequestedSessionTimeout == 600_000, "The client asks for a session timeout that outlives a long bind");
             await store.Connect(id2, second.Selection);
-            File.WriteAllText(Path.Combine(output, "idle-publication", id1 + ".tmp"), "owned collision");
+            Directory.CreateDirectory(Path.Combine(output, "idle-publication", id1 + ".tmp")); // an unremovable temporary blocks the publication
             // Test-only inactivity trigger; the actual timer, server session and failing publication are real.
             var liveField = typeof(OpcUaRuntimeSessionStore).GetField("live", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
             var entries = (System.Collections.IDictionary)liveField.GetValue(store)!;
             var entry = entries[id1]!;
             var clientObject = entry.GetType().GetProperty("Client")!.GetValue(entry)!;
-            clientObject.GetType().GetProperty("LastUsed", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
-                .SetValue(clientObject, DateTimeOffset.UtcNow.AddMinutes(-3));
-            // An unused but healthy session is never closed locally; only a dead one is swept.
+            var lastUsed = clientObject.GetType().GetProperty("LastUsed", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+            lastUsed.SetValue(clientObject, DateTimeOffset.UtcNow.AddSeconds(-30)); // inside the server's revised 60 s session timeout
+            // An unused but healthy session is not closed locally before the server's own timeout; only a dead one is swept.
             await Task.Delay(1500);
             Check(server.SessionCount > 0 && (await store.Status(id1)).State == "connected", "An unused healthy session survives the idle sweep");
+            lastUsed.SetValue(clientObject, DateTimeOffset.UtcNow.AddMinutes(-3));
             clientObject.GetType().GetMethod("Invalidate", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
                 .Invoke(clientObject, [false]);
             int first = server.SessionCount, other = second.SessionCount;

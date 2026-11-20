@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.188",
+  "catalogVersion": "0.4.189",
   "targetTiaVersions": [
     21
   ],
@@ -9395,6 +9395,49 @@
       ]
     },
     {
+      "featureId": "sim_prune",
+      "domain": "simulation",
+      "title": "Prune storage and archives this adapter created for unregistered simulators",
+      "mcpTools": [
+        "sim_prune"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "No PLCSIM API call: file retention over the adapter-created storage folders and archives; the registered and selected instances come from SimulationRuntimeManager.RegisteredInstanceInfo."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Opt-in: without delete it only lists. delete:true needs names, olderThanDays or maxTotalMegabytes; at most 200 deletions per call.",
+          "Deletes only the storage folder of an instance whose signed creation receipt says it was unregistered, that is neither registered nor selected, whose ownership marker still matches the receipt and that holds no link; and archives whose receipt still matches their SHA-256 and size. Everything else is listed with its refusal.",
+          "File logic verified offline against temporary folders; not run against a live PLCSIM installation."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-simulator-lifecycle",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "sim_time",
       "domain": "simulation",
       "title": "Read and set the virtual clock of an owned simulated CPU",
@@ -17938,7 +17981,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Read only, PLCSIM Advanced instances this Host created or adopted only. Rows resolve by symbol against the instance's own tag list; comment rows, absolute-address-only rows, symbols missing or ambiguous in the tag list and types without a typed PLCSIM read (Struct, Char, WChar, ...) are reported, not read.",
+          "Read only, PLCSIM Advanced instances this Host created or adopted only. Rows resolve by symbol against the instance's own tag list; comment rows, symbols missing or ambiguous in the tag list and types without a typed PLCSIM read (Struct, Char, WChar, ...) are reported, not read. Absolute-address rows (%I, %Q, %M as bit, B, W or D) are read from the process image with sim_area_read as raw bytes and an unsigned big-endian value (not natively run; the display format is not applied); peripheral (:P), data block and other addresses stay unresolved.",
           "1..64 rows per page, 1..20 samples 100..5000 ms apart; the reads of one sample are sequential, not scan-consistent. MonitorTrigger is not honoured; TIA must be offline for the table read. No physical PLC, Web API or OPC UA route, and the instance's program is not compared with the project.",
           "Forcing is not provided: V21 Openness, the PLCSIM Advanced V8 Runtime API, the S7-1500 Web API and OPC UA expose no force route (docs/plans/live-monitoring-forcing-plan.md). Stored ModifyValue, ForceValue and ForceIntention are never applied."
         ]
@@ -25971,7 +26014,7 @@
         "status": "partial",
         "limitations": [
           "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance (ID, name, creationId, storage, marker digest, addresses); Windows' best route to that address must also leave through the PLCSIM Virtual Ethernet Adapter, both when the session connected and at the request, so a session opened to a physical PLC stays refused after the adapter becomes the best route. Physical PLCs, host names and a route through another network card (where a physical PLC can hold the same address) fail with RuntimeTargetNotOwnedPlcsim, an undetermined route with RuntimeTargetRouteUnverified, before anything is sent. Requires acknowledgeModeChange and an exact expected current mode (run/stop) different from the requested mode; otherwise nothing is sent.",
-          "Boolean success only acknowledges the request; Plc.ReadOperatingMode is observed for about 5 s and readbackMatches reports the outcome. Never retried; selector or CPU conditions may refuse. HOLD, STARTUP and R/H redundancy_id are not exposed. Web API alarm acknowledgment (Alarms.Acknowledge) is not implemented: its parameters and alarm acknowledgment state are not represented in the verified protocol. PLCSIM Advanced exposes its web server and OPC UA server only with TCP/IP communication; this adapter never reconfigures an instance, so a reachable bound endpoint needs an owned instance already configured for it.",
+          "Boolean success only acknowledges the request; Plc.ReadOperatingMode is observed for about 5 s and readbackMatches reports the outcome. Never retried; selector or CPU conditions may refuse. HOLD, STARTUP and R/H redundancy_id are not exposed. Alarm acknowledgment is the separate runtime_web_alarm_acknowledge tool. PLCSIM Advanced exposes its web server and OPC UA server only with TCP/IP communication; this adapter never reconfigures an instance, so a reachable bound endpoint needs an owned instance already configured for it.",
           "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8 or a CPU web/OPC UA server."
         ]
       },
@@ -25987,6 +26030,132 @@
         "status": "conditional",
         "reasons": [
           "Connected owned runtime_web session to a bound owned PLCSIM endpoint whose firmware advertises Plc.RequestChangeOperatingMode and grants change_operating_mode."
+        ]
+      },
+      "prerequisites": [
+        "runtime_plcsim_bind binding of the session endpoint",
+        "Windows current-user credential vault for authenticated connection"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_web_download",
+      "domain": "runtime",
+      "title": "Download service data or profiling data through the Web API",
+      "mcpTools": [
+        "runtime_web_download"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Documented Siemens Web API Modules.DownloadServiceData (download_service_data, hwid) and PlcProgram.DownloadProfilingData (read_value), each a ticket redeemed once at /api/ticket and closed with Api.CloseTicket; sent only when the session advertised the method and Api.CloseTicket."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Offered only when the session advertised the method and Api.CloseTicket and holds the permission; otherwise unsupported or a permission refusal before any ticket request. The ticket is requested once, redeemed once and always closed with its own bounded request; a lost ticket reply leaves the outcome unknown and a close that is not confirmed is reported (service data holds the CPU's single service-data ticket for all users).",
+          "The file is streamed to a content-addressed artifact under runtime-web-downloads: at most 64 MiB each, at most 8 files and 1 GiB in total, oldest evicted first; the cap is enforced while reading. The content is not parsed or interpreted and may contain project information. Both exports load the CPU: nothing schedules them.",
+          "Exercised only against a loopback fake Web API that models the Siemens manual (11/2023); not verified against a real PLC or PLCSIM Advanced."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Connected owned runtime_web session whose firmware advertises Modules.DownloadServiceData or PlcProgram.DownloadProfilingData (V3.1) and Api.CloseTicket and grants download_service_data or read_value."
+        ]
+      },
+      "prerequisites": [
+        "Windows current-user credential vault for authenticated connection"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_web_backup",
+      "domain": "runtime",
+      "title": "Create a CPU configuration backup on an owned PLCSIM instance through the Web API",
+      "mcpTools": [
+        "runtime_web_backup"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Documented Siemens Web API Plc.CreateBackup (backup_plc), a ticket redeemed once at /api/ticket and closed with Api.CloseTicket; sent only when the session advertised it."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance, routed through the PLCSIM Virtual Ethernet Adapter when the session connected and at the request; physical PLCs, host names and other routes fail with RuntimeTargetNotOwnedPlcsim (RuntimeTargetRouteUnverified when undetermined) before anything is sent. Requires acknowledgeBackup, the backup_plc permission, an advertised Plc.CreateBackup and Api.CloseTicket and an observed Plc.ReadOperatingMode of stop; the mode is never changed. An open backup ticket keeps the CPU out of RUN until it is closed, so the ticket is always closed and an unconfirmed close is reported.",
+          "The file is streamed to a content-addressed artifact under runtime-web-downloads: at most 256 MiB, at most 8 files and 1 GiB in total, oldest evicted first. The backup is not parsed, checked or compared with the program and contains the project configuration. No restore (Plc.RestoreBackup), no F-CPU collective-signature handling and no automatic retry.",
+          "Exercised only against a loopback fake Web API that models the Siemens manual (11/2023); not verified against a real PLC or PLCSIM Advanced."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Connected owned runtime_web session to a bound owned PLCSIM endpoint in STOP whose firmware advertises Plc.CreateBackup (V3.0) and Api.CloseTicket and grants backup_plc."
+        ]
+      },
+      "prerequisites": [
+        "runtime_plcsim_bind binding of the session endpoint",
+        "Windows current-user credential vault for authenticated connection"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_web_alarm_acknowledge",
+      "domain": "runtime",
+      "title": "Acknowledge one alarm on an owned PLCSIM instance through the Web API",
+      "mcpTools": [
+        "runtime_web_alarm_acknowledge"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Documented Siemens Web API Alarms.Acknowledge (acknowledge_alarms, id); the alarm state is checked and read back through Alarms.Browse with alarm_id."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance, routed through the PLCSIM Virtual Ethernet Adapter when the session connected and at the request; physical PLCs, host names and other routes fail with RuntimeTargetNotOwnedPlcsim (RuntimeTargetRouteUnverified when undetermined) before anything is sent. Requires acknowledgeAlarm, the acknowledge_alarms permission, language and the id of an Alarms.Browse entry; the alarm must currently be listed as not_acknowledged, otherwise nothing is sent. The manual calls the parameter an acknowledgement ID but lists only the Browse entry id; that is what is sent.",
+          "Sent once and never retried, then read back once; an acknowledged alarm that left the list reads back as alarmNotListed and is not confirmation. One alarm per call; no bulk acknowledgement, no filters.",
+          "Exercised only against a loopback fake Web API that models the Siemens manual (11/2023); not verified against a real PLC or PLCSIM Advanced."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Connected owned runtime_web session to a bound owned PLCSIM endpoint whose firmware advertises Alarms.Acknowledge and Alarms.Browse and grants acknowledge_alarms."
         ]
       },
       "prerequisites": [
@@ -26113,9 +26282,9 @@
           "Optional explicit diagnostic-case mappings retain re-resolved source declarations and observed types; online address equivalence and running-program identity remain unverified.",
           "Optional retained handoff binding checks original evidence and owned session context before reads; historical export remains available. Identity, effective rights and operation/assertion admission remain unverified.",
           "source plcsim polls only an exact PLCSIM Advanced V8 instance this Host created or adopted (attemptId is its creationId; ID, name and creation receipt are rechecked by the worker for every call); unowned instances are refused. Caller-declared datatypes must fit the typed read and are what diagnostic mappings compare; PLCSIM tag metadata is not read.",
-          "cycleSynchronous switches the running owned instance to the optional syncMode (SingleStep_C by default, or SingleStep_P/CP/CT/CPT, or TimespanSynchronized_C/P/CP with spanMilliseconds of CPU time per sample), steps to one sync point per sample, reads every signal while the CPU holds there and restores the recorded operating mode on stop, failure or Host shutdown. A lost simulator worker or faulted bridge cannot restore it; an unconfirmed restore is reported as localFailure PlcsimOperatingModeRestoreFailed.",
+          "cycleSynchronous switches the running owned instance to the optional syncMode (SingleStep_C by default, or SingleStep_P/CP/CT/CPT, or SingleStep_Bus with ioSystemId and busCycleMicroseconds (compiled against the V8 API, not run natively), or TimespanSynchronized_C/P/CP with spanMilliseconds of CPU time per sample), steps to one sync point per sample, reads every signal while the CPU holds there and restores the recorded operating mode on stop, failure or Host shutdown. A lost simulator worker or faulted bridge cannot restore it; an unconfirmed restore is reported as localFailure PlcsimOperatingModeRestoreFailed.",
           "PLCSIM rows retain per-row sync-point evidence, but capture status, analysis and diagnostic acquisition keep atomicAcrossSignals and scanSynchronized false; Project Explorer Open capture accepts Web captures only. Compiled against the installed PLCSIM Advanced V8 API only; not natively qualified.",
-          "syncMode requires cycleSynchronous; omitted mode preserves historical plan bytes. Each sample verifies the selected operating mode before advancing. CP/CT/CPT/P sync points need not be full scans; CT/CPT use the existing overwritten minimum cycle time. Bus modes are not offered. Natively (local.plcsim.capture-modes.20261107): C, CP, CT and CPT captured a full 2 s window; P stalled after its first sync point on an OB1-only fixture without a process image partition (sessionUnavailable), and every capture, that one included, restored the previous operating mode. The time-synchronised modes ran natively (local.plcsim.timespan-capture.20261108): C and CP captured a full 2 s window with a 10 ms span, P stalled like SingleStep_P on the same fixture, and each restored the operating mode."
+          "syncMode requires cycleSynchronous; omitted mode preserves historical plan bytes. Each sample verifies the selected operating mode before advancing. CP/CT/CPT/P sync points need not be full scans; CT/CPT use the existing overwritten minimum cycle time. SingleStep_Bus passes a bus time stamp of one bus cycle per step to RunToNextSyncPoint(ioSystemId, timestamp); the API has no other time-synchronised modes. Natively (local.plcsim.capture-modes.20261107): C, CP, CT and CPT captured a full 2 s window; P stalled after its first sync point on an OB1-only fixture without a process image partition (sessionUnavailable), and every capture, that one included, restored the previous operating mode. The time-synchronised modes ran natively (local.plcsim.timespan-capture.20261108): C and CP captured a full 2 s window with a 10 ms span, P stalled like SingleStep_P on the same fixture, and each restored the operating mode."
         ]
       },
       "qualification": {

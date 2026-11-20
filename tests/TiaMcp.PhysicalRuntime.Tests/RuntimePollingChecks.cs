@@ -267,8 +267,34 @@ namespace TiaMcp.Host
         internal List<(string SelectionId,long Started)> Reads=[];
         internal Func<int,CancellationToken,Task>? BeforeRead;
         internal Func<int,string>? ResponseMember;
+        /// <summary>Real-clock harnesses whose oracles model one observed read per signal: answer a cycle by reading each signal in turn.</summary>
+        internal bool PerSignalReads;
         internal PhysicalRuntimeSessions(TimeProvider clock,RuntimeCaptureSignal[] signals){this.clock=clock;Signals=signals;}
         public Task<(RuntimeCaptureSession Session, RuntimeCaptureSignal[] Signals)> CaptureContext(string attemptId,string[] ids,string representation,CancellationToken cancellationToken)=>Task.FromResult<(RuntimeCaptureSession, RuntimeCaptureSignal[])>((null!, ids.Select(id=>Signals.Single(s=>s.SelectionId==id)).ToArray()));
+        // One batched request per capture cycle, as in the production class: one entry in Reads, every selection answered from it.
+        public async Task<WebRuntimeBatchItem[]> ReadValues(string attemptId,string[] selectionIds,string representation,CancellationToken token,RuntimeCaptureHandoff? handoff = null)
+        {
+            if(PerSignalReads)
+            {
+                var singles=new WebRuntimeBatchItem[selectionIds.Length];
+                for(int i=0;i<singles.Length;i++)
+                {
+                    try { singles[i]=new(await ReadValue(attemptId,selectionIds[i],representation,token,handoff),null); }
+                    catch(BridgeException failure) { singles[i]=new(null,failure.Code); }
+                    catch(OperationCanceledException) { singles[i]=new(null,"RuntimeCancelled"); break; }
+                }
+                return singles;
+            }
+            int number;lock(Reads){Reads.Add((string.Join(",",selectionIds),clock.GetTimestamp()));number=Reads.Count;}
+            var start=clock.GetUtcNow();long timestamp=clock.GetTimestamp();
+            if(BeforeRead is not null)await BeforeRead(number,token);
+            return selectionIds.Select(selectionId=>
+            {
+                var signal=Signals.Single(s=>s.SelectionId==selectionId);
+                string id=Guid.NewGuid().ToString("N");var request=WebRuntimeProtocol.Read(signal.Selection!.Context,signal.Selection,id);
+                return new WebRuntimeBatchItem(WebRuntimeProtocol.ReadResult(signal.Selection.Context,request,Encoding.UTF8.GetBytes("{\"jsonrpc\":\"2.0\",\"id\":\""+id+"\","+(ResponseMember?.Invoke(number)??"\"result\":true")+"}"),start,clock.GetUtcNow(),clock.GetElapsedTime(timestamp)),null);
+            }).ToArray();
+        }
         public async Task<WebRuntimeReadResult> ReadValue(string attemptId,string selectionId,string representation,CancellationToken token,RuntimeCaptureHandoff? handoff = null)
         {
             int number;lock(Reads){Reads.Add((selectionId,clock.GetTimestamp()));number=Reads.Count;}

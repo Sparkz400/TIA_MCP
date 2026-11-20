@@ -254,11 +254,19 @@ public sealed partial class TiaTools
             try { request = TiaMcp.Core.Security.PublicCertificateReview.ImportPayload(payload, new ArtifactUploadStore(options.ArtifactsDirectory).ResolveCommitted); }
             catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException)
             { return Failure(error as BridgeException ?? new BridgeException("InvalidCertificateImport", "The certificate upload could not be read.")); }
+        // safetyAcknowledged is a client-supplied flag, so it gates nothing: only the launch option admits a safety write
+        // (and the discovery build, which is itself a launch option, for safety_fparameter_set).
+        if (IsSafetyWrite(kind, payload) && !options.EnableSafetyChanges && !(kind == "safety_fparameter_set" && options.SafetyFParameterDiscovery))
+            return Failure(new BridgeException("SafetyChangesDisabled", kind + " writes the safety program and is refused by this Host: safety changes are off unless the Host is launched with --enable-safety-changes. Nothing was prepared or changed."));
         // Only the launch option widens safety_fparameter_set beyond the qualified allowlist; no client argument can.
         if (kind == "safety_fparameter_set" && options.SafetyFParameterDiscovery)
             return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, intent = intentArgument, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes"), fParameterDiscovery = true, pruneStalePreparations = true }, cancellationToken);
         return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, intent = intentArgument, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes"), pruneStalePreparations = true }, cancellationToken);
     }
+
+    private static bool IsSafetyWrite(string kind, JsonElement payload) => kind is "safety_import_xml" or "safety_fparameter_set" or "safety_drive_tags"
+        // The one generic safety edit: a tag_set that renames a safety tag (it is asked for with safetyAcknowledged).
+        || kind == "tag_set" && payload.ValueKind == JsonValueKind.Object && payload.TryGetProperty("safetyAcknowledged", out _);
 
     [McpServerTool(Name = "change_apply", Destructive = true, OpenWorld = false)]
     [Description("Apply a prepared offline change exactly once using its previewHash and unique idempotencyKey. checkpointSave explicitly saves current edits before the recovery archive. A failed hmi_classic_screen_edit attempts one in-place restore of the original screen under the same exclusive lease: peers must be unchanged, original XML and compiler diagnostics must match, and save/readback must verify. Reports rolled_back (new preparation allowed), not_applied (failure before import, unchanged screen scope), or recovery_required (recovery unverified). Other change kinds retain their existing recovery rules. Never retries the candidate, downloads or changes runtime values. For a lost response inspect change_status; a verified terminal Classic screen admission can be reconciled in the still-open project. Returns a summary (state, stages, failures, compile error/warning counts with introduced/resolved findings and error messages, recovery and artifact paths) unless includeDetails=true; change_status(includeDetails=true) returns the full view.")]
@@ -299,6 +307,31 @@ public sealed partial class TiaTools
         return Compacted(await Call("change_status", new { changeId, includeDetails = level != "summary", artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes") }, cancellationToken), level);
     }
 
+    // A poll must not re-parse a journal of up to 64 MiB just for its state: the result is kept per journal file and reused while its
+    // length and write time are unchanged (the worker replaces the journal atomically at each stage). The worker could drop this read
+    // by writing the state into progress.json on every transition; it does so only for hmi_classic_screen_edit today.
+    private static readonly Dictionary<string, (long Length, long Ticks, string? State, bool Finished)> JournalStates = new(StringComparer.Ordinal);
+
+    private static (string? State, bool Finished) JournalState(string journal, string changeId)
+    {
+        var info = new FileInfo(journal);
+        if (!info.Exists || info.Length > 64 * 1024 * 1024) return (null, false);
+        lock (JournalStates)
+        {
+            if (JournalStates.TryGetValue(journal, out var cached) && cached.Length == info.Length && cached.Ticks == info.LastWriteTimeUtc.Ticks)
+                return (cached.State, cached.Finished);
+            var recorded = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(journal))!.AsObject();
+            if (recorded["changeId"]?.GetValue<string>() != changeId) throw new IOException("Journal belongs to a different change.");
+            var state = recorded["state"]?.GetValue<string>();
+            string? terminal = state is "applied" or "rolled_back" or "not_applied" or "recovery_required" ? state : null;
+            bool finished = terminal is not null && (terminal != "recovery_required" || (recorded["stages"] is System.Text.Json.Nodes.JsonArray stages
+                && stages.Any(s => s?.GetValue<string>() == "change_finished_with_failure")));
+            if (JournalStates.Count >= 256) JournalStates.Clear();
+            JournalStates[journal] = (info.Length, info.LastWriteTimeUtc.Ticks, terminal, finished);
+            return (terminal, finished);
+        }
+    }
+
     private CallToolResult ChangeProgress(string changeId)
     {
         try
@@ -309,19 +342,11 @@ public sealed partial class TiaTools
             if (new FileInfo(path).Length > 1024 * 1024) throw new IOException("Progress receipt exceeds 1 MiB.");
             var data = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(path))!.AsObject();
             if (data["changeId"]?.GetValue<string>() != changeId) throw new IOException("Progress receipt belongs to a different change.");
-            string journal = Path.Combine(Path.GetDirectoryName(path)!, "journal.json");
-            if (File.Exists(journal) && new FileInfo(journal).Length <= 64 * 1024 * 1024)
+            if (JournalState(Path.Combine(Path.GetDirectoryName(path)!, "journal.json"), changeId) is (string state, bool finished))
             {
-                var recorded = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(journal))!.AsObject();
-                if (recorded["changeId"]?.GetValue<string>() != changeId) throw new IOException("Journal belongs to a different change.");
-                var state = recorded["state"]?.GetValue<string>();
-                if (state is "applied" or "rolled_back" or "not_applied" or "recovery_required")
-                {
-                    data["state"] = state;
-                    data["stateSource"] = "journal";
-                    data["operationFinished"] = state != "recovery_required" || (recorded["stages"] is System.Text.Json.Nodes.JsonArray stages
-                        && stages.Any(s => s?.GetValue<string>() == "change_finished_with_failure"));
-                }
+                data["state"] = state;
+                data["stateSource"] = "journal";
+                data["operationFinished"] = finished;
             }
             data["progressAvailable"] = true; data["outcomeVerified"] = false; data["automaticRetryAllowed"] = false;
             // #219: equal fingerprints mean nothing new to report; elapsed time of the running phase is recomputed per poll.

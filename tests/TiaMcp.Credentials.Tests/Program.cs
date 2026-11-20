@@ -144,10 +144,22 @@ finally { File.Move(headerPath + ".held", headerPath); }
 string copiedRoot = Path.Combine(output, "copied-vault"); var copied = new CredentialVault(copiedRoot);
 foreach (var path in Directory.EnumerateFiles(root)) { if (Path.GetFileName(path) == ".lock") continue; string target = Path.Combine(copiedRoot, Path.GetFileName(path)); File.Copy(path, target); var acl = new FileSecurity(); acl.SetSecurityDescriptorSddlForm(new FileInfo(path).GetAccessControl().GetSecurityDescriptorSddlForm(AccessControlSections.Access | AccessControlSections.Owner), AccessControlSections.Access | AccessControlSections.Owner); new FileInfo(target).SetAccessControl(acl); }
 Reject(() => copied.Inspect(first.Reference, binding), "CredentialUnavailable", "Copied store cannot silently rebind to a different path");
+vault.Check(first.Reference, binding); Check(true, "A state check passes for an active credential");
+{
+    // A state check needs no vault lock: it completes while a consumer holds the lock, and still refuses a different binding.
+    var entered = new ManualResetEventSlim(); var release = new ManualResetEventSlim();
+    var holder = Task.Run(() => vault.Use(first.Reference, binding, _ => { entered.Set(); release.Wait(10000); }));
+    entered.Wait(10000);
+    var clock = Stopwatch.StartNew(); vault.Check(first.Reference, binding); long took = clock.ElapsedMilliseconds;
+    release.Set(); holder.Wait();
+    Check(took < 2000, "A state check completes while another consumer holds the vault lock (" + took + " ms)");
+}
+Reject(() => vault.Check(first.Reference, binding with { Purpose = "other" }), "CredentialContextMismatch", "A state check refuses a different expected binding");
 var beforeRetire = File.ReadAllBytes(recordPath); var retired = vault.Retire(first.Reference, binding);
 Check(retired.State == "retired" && !retired.DecryptionVerified && !retired.SecretReturned, "Retirement reports only local disabled use");
 Check(File.ReadAllBytes(recordPath).SequenceEqual(beforeRetire), "Retirement preserves encrypted recovery generation");
 Check(vault.Retire(first.Reference, binding) == retired && Probe() == "retired", "Retirement is idempotent and persists across processes");
+Reject(() => vault.Check(first.Reference, binding), "CredentialRetired", "A state check refuses a retired credential without decrypting");
 Reject(() => vault.Use(first.Reference, binding, _ => throw new Exception("consumer called")), "CredentialRetired", "Retired reference cannot be consumed");
 string lifecyclePath = Path.Combine(root, first.Reference.CredentialId + ".state.json");
 try { File.Move(lifecyclePath, lifecyclePath + ".held"); Reject(() => vault.Inspect(first.Reference, binding), "CredentialUnavailable", "Lost lifecycle state cannot reactivate a retired reference"); }
@@ -177,7 +189,10 @@ WorkerRouteChecks.Run(Path.Combine(output, "worker-route"), Check);
 ProjectLoginChecks.Run(Path.Combine(output, "project-login"), Check);
 await RuntimeSessionChecks.Run(Path.Combine(output, "runtime-sessions"), Check);
 await RuntimeWebSessionChecks.Run(Path.Combine(output, "runtime-web-sessions"), Check);
+await RuntimeWebTicketChecks.Run(Path.Combine(output, "runtime-web-tickets"), Check);
+UaResultSpillChecks.Run(output, Check);
 await SimulatorToolChecks.Run(Check);
+await SafetyChangeChecks.Run(Check);
 File.WriteAllText(Path.Combine(output, "verification.json"), JsonSerializer.Serialize(new { completed=true, nativeExecuted=false, currentUserDpapiExecuted=true, crossUserProfileTested=false, count=checks.Count, checks }, CredentialVault.Json));
 Console.WriteLine($"PASS protected credential storage: {checks.Count} checks; actual current-user DPAPI/ACL, no native provider. Receipts retained at {output}");
 
