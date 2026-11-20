@@ -103,9 +103,9 @@ namespace TiaMcp.Openness.V21
                         new JObject { ["logicalAddress"] = address, ["fIoPath"] = fIo, ["drivePath"] = device });
                 // Every collision is found here, before ApplySafetyDriveTags creates the first tag.
                 var collision = SafetyTagCollisionRules.Find(symbolNames, existing, name, address);
+                if (collision != null && collision.Value.Tag == null) throw new BridgeException("ObjectExists", collision.Value.Message);
                 if (collision != null)
-                    throw collision.Value.Tag == null ? new BridgeException(collision.Value.Code, collision.Value.Message)
-                        : new BridgeException(collision.Value.Code, collision.Value.Message, new JObject { ["logicalAddress"] = address, ["existingTag"] = collision.Value.Tag, ["existingAddress"] = collision.Value.Address });
+                    throw new BridgeException("AddressInUse", collision.Value.Message, new JObject { ["logicalAddress"] = address, ["existingTag"] = collision.Value.Tag, ["existingAddress"] = collision.Value.Address });
                 rows.Add(new JObject { ["word"] = word, ["signal"] = status ? "S_ZSW1" : "S_STW1", ["bit"] = bit, ["name"] = name,
                     ["dataType"] = "Bool", ["logicalAddress"] = address, ["fIoPath"] = fIo });
             }
