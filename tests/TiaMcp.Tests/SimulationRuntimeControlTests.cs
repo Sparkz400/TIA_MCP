@@ -195,6 +195,94 @@ internal static class SimulationRuntimeControlTests
         return Task.CompletedTask;
     }
 
+    // sim_prune: only storage of an unregistered, receipt-backed instance and unchanged receipted archives are ever deletable.
+    internal static Task StoragePruneNeverTouchesLiveOrForeignStorage()
+    {
+        string root = Path.Combine(Path.GetTempPath(), "sim-prune-" + Guid.NewGuid().ToString("N"));
+        string archives = Path.Combine(root, "archives");
+        Directory.CreateDirectory(archives);
+        try
+        {
+            const string marker = ".tiamcp-instance.json";
+            string Name() => "TiaMcp_" + Guid.NewGuid().ToString("N");
+            string Sha(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(path))).ToLowerInvariant();
+            var receipts = new List<JObject>();
+            string Instance(string stage, bool receipt = true, bool changedMarker = false, int bytes = 10, int ageDays = 0)
+            {
+                string name = Name(), folder = Path.Combine(root, name);
+                Directory.CreateDirectory(folder);
+                File.WriteAllText(Path.Combine(folder, marker), "{\"m\":1}");
+                File.WriteAllBytes(Path.Combine(folder, "card.bin"), new byte[bytes]);
+                if (receipt) receipts.Add(new JObject { ["instanceName"] = name, ["stage"] = stage, ["storagePath"] = folder, ["markerSha256"] = Sha(Path.Combine(folder, marker)) });
+                if (changedMarker) File.WriteAllText(Path.Combine(folder, marker), "{\"m\":2}");
+                File.SetLastWriteTimeUtc(Path.Combine(folder, "card.bin"), DateTime.UtcNow.AddDays(-ageDays));
+                File.SetLastWriteTimeUtc(Path.Combine(folder, marker), DateTime.UtcNow.AddDays(-ageDays));
+                Directory.SetLastWriteTimeUtc(folder, DateTime.UtcNow.AddDays(-ageDays));
+                return name;
+            }
+            string old = Instance("unregistered", bytes: 100, ageDays: 30), failed = Instance("unregisteredAfterFailure", bytes: 100, ageDays: 20), recent = Instance("unregistered", bytes: 100);
+            string registered = Instance("unregistered"), ready = Instance("ready"), noReceipt = Instance("unregistered", receipt: false), tampered = Instance("unregistered", changedMarker: true);
+            Directory.CreateDirectory(Path.Combine(root, "other-folder"));
+            var storage = SimulationStoragePrune.Storage(root, marker, receipts, n => n == registered);
+            string Refusal(string name) => storage.Single(c => c.Name == name).Refusal ?? "";
+            Check.Equal("", Refusal(old)); Check.Equal("", Refusal(failed)); Check.Equal("", Refusal(recent));
+            Check.Equal("registeredOrSelected", Refusal(registered)); Check.Equal("instanceNotUnregistered", Refusal(ready));
+            Check.Equal("noCreationReceipt", Refusal(noReceipt)); Check.Equal("ownershipMarkerChanged", Refusal(tampered));
+            Check.Equal(7, storage.Count);
+            // Age, then size: the oldest eligible go first; nothing refused is ever selected.
+            Check.Equal(string.Join(",", old, failed), string.Join(",", SimulationStoragePrune.Select(storage, null, DateTime.UtcNow.AddDays(-10), null).Select(c => c.Name)));
+            Check.Equal(old, string.Join(",", SimulationStoragePrune.Select(storage, null, null, 0).Take(1).Select(c => c.Name)));
+            Check.Equal(0, SimulationStoragePrune.Select(storage, null, null, 100000).Count);
+            Check.Equal(3, SimulationStoragePrune.Select(storage, null, null, 0).Count);
+            // Named choice keeps a refused candidate refused; an unknown name is not accepted.
+            var named = SimulationStoragePrune.Select(storage, new[] { registered, recent }, null, null);
+            Check.Equal("registeredOrSelected", SimulationStoragePrune.Delete(named.Single(c => c.Name == registered), n => n == registered));
+            try { SimulationStoragePrune.Select(storage, new[] { "other-folder" }, null, null); throw new InvalidOperationException("unknown name accepted"); } catch (ArgumentException) { }
+            // The liveness check is repeated just before the delete.
+            Check.Equal("registeredOrSelected", SimulationStoragePrune.Delete(storage.Single(c => c.Name == recent), n => n == recent));
+            Check.Equal(true, Directory.Exists(Path.Combine(root, recent)));
+            Check.Equal(null, SimulationStoragePrune.Delete(storage.Single(c => c.Name == old), n => false));
+            Check.Equal(false, Directory.Exists(Path.Combine(root, old)));
+            foreach (string kept in new[] { registered, ready, noReceipt, tampered, "other-folder" }) Check.Equal(true, Directory.Exists(Path.Combine(root, kept)));
+            // A link inside a folder makes it ineligible and is never followed.
+            string linked = Instance("unregistered"), target = Path.Combine(root, "link-target");
+            Directory.CreateDirectory(target);
+            using (var mklink = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe", "/c mklink /J \"" + Path.Combine(root, linked, "junction") + "\" \"" + target + "\"") { CreateNoWindow = true, UseShellExecute = false })!)
+            {
+                mklink.WaitForExit(10000);
+                if (Directory.Exists(Path.Combine(root, linked, "junction")))
+                    Check.Equal("containsReparsePoint", SimulationStoragePrune.Storage(root, marker, receipts, n => false).Single(c => c.Name == linked).Refusal);
+            }
+            // Archives need their receipt, unchanged.
+            string Archive(bool receipt, bool changed = false)
+            {
+                string path = Path.Combine(archives, Name() + "-" + Guid.NewGuid().ToString("N") + ".zip");
+                File.WriteAllBytes(path, new byte[] { 1, 2, 3, 4 });
+                if (receipt) File.WriteAllText(path + ".json", new JObject { ["schemaVersion"] = 1, ["archivePath"] = path, ["instanceName"] = "TiaMcp_x", ["sha256"] = Sha(path), ["bytes"] = 4 }.ToString());
+                if (changed) File.WriteAllBytes(path, new byte[] { 9, 9, 9, 9 });
+                return Path.GetFileName(path);
+            }
+            string good = Archive(true), bare = Archive(false), edited = Archive(true, changed: true);
+            File.WriteAllText(Path.Combine(archives, "notes.zip"), "x");
+            var found = SimulationStoragePrune.Archives(archives);
+            Check.Equal(3, found.Count);
+            Check.Equal(null, found.Single(c => c.Name == good).Refusal);
+            Check.Equal("noArchiveReceipt", found.Single(c => c.Name == bare).Refusal);
+            Check.Equal("archiveChanged", found.Single(c => c.Name == edited).Refusal);
+            Check.Equal(null, SimulationStoragePrune.Delete(found.Single(c => c.Name == good), n => true));
+            Check.Equal(false, File.Exists(Path.Combine(archives, good)) || File.Exists(Path.Combine(archives, good + ".json")));
+            Check.Equal(true, File.Exists(Path.Combine(archives, bare)) && File.Exists(Path.Combine(archives, edited)) && File.Exists(Path.Combine(archives, "notes.zip")));
+            Check.Equal(0, SimulationStoragePrune.Storage(Path.Combine(root, "missing"), marker, receipts, n => false).Count);
+        }
+        finally
+        {
+            // A junction is removed on its own first: a recursive delete refuses to cross it.
+            foreach (string junction in Directory.Exists(root) ? Directory.GetDirectories(root, "junction", SearchOption.AllDirectories) : []) { try { Directory.Delete(junction); } catch (IOException) { } }
+            try { Directory.Delete(root, true); } catch (IOException) { }
+        }
+        return Task.CompletedTask;
+    }
+
     // TIA's quoting ("Tag".A) and an unquoted V8 tag list (Tag.A) name the same tag; PLCSIM resolves only its own spelling.
     internal static Task SymbolsTakeTheTagListSpelling()
     {

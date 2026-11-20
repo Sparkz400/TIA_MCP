@@ -17,7 +17,7 @@ public sealed class SimulatorClient(HostOptions options) : IAsyncDisposable
 public sealed class SimulatorTools(SimulatorClient simulator, HostOptions options, RuntimeCaptures? captures = null)
 {
     [McpServerTool(Name = "sim_status", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Initialize the installed PLCSIM Advanced V8 API and report local simulated instances/runtime status. Initialization may start Siemens Runtime Manager. orphanedInstances lists registered TiaMcp_ instances this worker does not hold (left by an earlier worker or a deleteOwned-less release): re-adopt with sim_select and the creationId of its receipt, then sim_release with deleteOwned; their storage folders are never deleted automatically. Does not activate a trial or connect to physical PLCs.")]
+    [Description("Initialize the installed PLCSIM Advanced V8 API and report local simulated instances/runtime status. Initialization may start Siemens Runtime Manager. orphanedInstances lists registered TiaMcp_ instances this worker does not hold (left by an earlier worker or a deleteOwned-less release): re-adopt with sim_select and the creationId of its receipt, then sim_release with deleteOwned; their storage folders are only deleted by an explicit sim_prune. Does not activate a trial or connect to physical PLCs.")]
     public Task<CallToolResult> Status(CancellationToken cancellationToken) => Call("sim_status", new { }, cancellationToken);
 
     [McpServerTool(Name = "sim_create", Destructive = false, OpenWorld = false)]
@@ -110,6 +110,12 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
     public Task<CallToolResult> Release(int instanceId, CancellationToken cancellationToken, bool deleteOwned = false)
         => Call("sim_release", new { instanceId, deleteOwned }, cancellationToken, deleteOwned ? 30000 : 0,
             captures is null ? null : () => captures.ReleaseSimulator(instanceId, deleteOwned, cancellationToken));
+
+    [McpServerTool(Name = "sim_prune", Destructive = true, OpenWorld = false)]
+    [Description("Opt-in retention of what this adapter created. scope storage lists the storage folders of owned instances; scope archives lists the sim_storage archives. Without delete it only lists every candidate with bytes, age, whether it is eligible (and the refusal if not) and whether the given criteria select it. With delete:true it deletes only the selected eligible ones: pass names (exact candidate names), or olderThanDays (1-3650) and/or maxTotalMegabytes (0-1048576; the oldest eligible go until the eligible total fits); names cannot be combined with the others, and delete without any of them is refused with InvalidRequest. At most 200 per call. A storage folder is eligible only when the instance's signed creation receipt says it was unregistered (sim_release deleteOwned), the instance is neither registered nor selected, its ownership marker still matches the receipt and it holds no link; an archive only when its receipt still matches its SHA-256 and size. Storage of a registered, running or selected instance, an orphaned instance and anything this adapter did not create are listed with a refusal and never deleted. Deleted archives can no longer be retrieved.")]
+    public Task<CallToolResult> Prune(string scope, CancellationToken cancellationToken, JsonElement? names = null, int? olderThanDays = null, int? maxTotalMegabytes = null, bool delete = false)
+        => Call("sim_prune", new { scope, names, olderThanDays, maxTotalMegabytes, delete,
+            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation"), archiveDirectory = Path.Combine(options.ArtifactsDirectory, "simulation-archives") }, cancellationToken);
 
     private static JsonElement Array(JsonElement value) => value.ValueKind == JsonValueKind.Array ? value : throw new McpException("An array is required.");
     // sim_test: the adapter's 90 s execution cap plus one interval and one sync-point wait it can still run after its last cap check.
