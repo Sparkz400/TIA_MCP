@@ -107,9 +107,36 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
         string key = JsonSerializer.Serialize(new { projectName, groupPath, namePrefix });
         lock (SelectionLock)
             if (offset > 0 && _selection is { } cached && ReferenceEquals(cached.Owner, bridge) && cached.Key == key && DateTime.UtcNow - cached.At < SelectionLifetime) return cached.Inventory;
-        var inventory = await bridge.CallAsync("project_inventory", new { projectName, maxItems = 2000, groupPath, namePrefix, includeHardware = false }, cancellationToken);
+        var inventory = await PagedInventory(projectName, groupPath, namePrefix, cancellationToken);
         lock (SelectionLock) _selection = (bridge, key, DateTime.UtcNow, inventory);
         return inventory;
+    }
+
+    internal const int InventoryPageItems = 2000, MaxInventoryPages = 100;
+
+    // project_inventory returns at most 2000 blocks per call. Further pages skip the blocks already read (blockOffset, in walk order), so every
+    // match is gathered before the selection is sorted; completeness.truncated stays true only when the walk or the page cap cut the listing.
+    private async Task<JsonElement> PagedInventory(string? projectName, string? groupPath, string? namePrefix, CancellationToken cancellationToken)
+    {
+        var first = await bridge.CallAsync("project_inventory", new { projectName, maxItems = InventoryPageItems, groupPath, namePrefix, includeHardware = false }, cancellationToken);
+        if (!first.GetProperty("completeness").GetProperty("truncated").GetBoolean()) return first;
+        var merged = System.Text.Json.Nodes.JsonNode.Parse(first.GetRawText())!.AsObject();
+        var blocks = merged["blocks"]!.AsArray();
+        var seen = blocks.Select(block => block!["path"]!.GetValue<string>()).ToHashSet(StringComparer.Ordinal);
+        var page = first;
+        bool complete = false;
+        for (int pages = 1; pages < MaxInventoryPages; pages++)
+        {
+            // Only a page cut by maxItems has more to read; a walk cut (walkTruncated) cannot be continued by skipping.
+            if (page.TryGetProperty("filter", out var filter) && filter.TryGetProperty("walkTruncated", out var walkCut) && walkCut.GetBoolean()) break;
+            page = await bridge.CallAsync("project_inventory", new { projectName, maxItems = InventoryPageItems, groupPath, namePrefix, includeHardware = false, blockOffset = blocks.Count }, cancellationToken);
+            foreach (var block in page.GetProperty("blocks").EnumerateArray())
+                if (seen.Add(block.GetProperty("path").GetString()!)) blocks.Add(System.Text.Json.Nodes.JsonNode.Parse(block.GetRawText()));
+            if (!page.GetProperty("completeness").GetProperty("truncated").GetBoolean()) { complete = true; break; }
+        }
+        merged["completeness"]!["truncated"] = !complete;
+        merged["completeness"]!["scopeComplete"] = complete && page.GetProperty("completeness").GetProperty("scopeComplete").GetBoolean();
+        return JsonDocument.Parse(merged.ToJsonString()).RootElement;
     }
 
     // Blocks per worker call: the worker selects the PLC once and finds each block by its path; one call stays far below the call timeout.
