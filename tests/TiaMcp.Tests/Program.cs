@@ -173,6 +173,7 @@ internal static partial class Program
             ("Simulator I/Q/M area access is bounded before any runtime call", SimulationRuntimeControlTests.AreaAccessIsBoundedBeforeTheRuntimeCall),
             ("Simulator signal batches carry primitive values with distinct written symbols", SimulationRuntimeControlTests.SignalBatchesCarryPrimitiveValues),
             ("Symbolic simulator writes refuse a symbol whose tag-list area is Output", SimulationRuntimeControlTests.SymbolicOutputWritesAreRefusedByTheirTagListArea),
+            ("Simulator storage pruning deletes only unregistered receipt-backed storage and unchanged archives", SimulationRuntimeControlTests.StoragePruneNeverTouchesLiveOrForeignStorage),
             ("Simulator symbols take the tag-list spelling whatever their quoting", SimulationRuntimeControlTests.SymbolsTakeTheTagListSpelling),
             ("Simulator observation event times are explicit UTC", SimulationRuntimeControlTests.EventTimesAreUtc),
             ("Simulator state changes, writes, scenario writes, time, event, storage, batch and area writes require an owned instance, symbolic writes refuse outputs first", SimulationRuntimeControlTests.WritesRequireAnOwnedInstance),

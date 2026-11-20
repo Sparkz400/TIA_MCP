@@ -708,7 +708,7 @@ A `detail` code may change in a minor release; branch on it only together with i
 | `SharedCallOperand` | detail | TiaMcp.Openness.V21 |
 | `SharedInstanceRejected` | detail | TiaMcp.Openness.V21 |
 | `SignalUnobservable` | stable | TiaMcp.Core |
-| `SimulationCaptureModeActive` | stable | TiaMcp.Simulator.V8 |
+| `SimulationCaptureModeActive` | stable | TiaMcp.Host, TiaMcp.Simulator.V8 |
 | `SimulationCaptureModeInactive` | detail | TiaMcp.Simulator.V8 |
 | `SimulationCompilationDisabled` | detail | TiaMcp.Openness.V21 |
 | `SimulationConfigurationPasswordRequired` | stable | TiaMcp.Simulator.V8 |

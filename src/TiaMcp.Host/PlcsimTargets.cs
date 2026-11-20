@@ -21,14 +21,26 @@ public sealed class PlcsimTargets(SimulatorClient simulator, IBridgeClient engin
 
     // The adapter each runtime session's endpoint was routed through when it connected (null if undetermined or it changed during the
     // connect), keyed by "web:"/"ua:" and the attemptId. Sessions never survive a Host restart, so memory is enough.
-    private readonly ConcurrentDictionary<string, string?> connectedRoutes = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, (string? Route, long Order)> connectedRoutes = new(StringComparer.Ordinal);
+    private long connectOrder;
+    private const int RoutesKept = 512;
+
+    /// <summary>Drops a session's recorded route, for a session that was disconnected.</summary>
+    public void Forget(string session) => connectedRoutes.TryRemove(session, out _);
 
     /// <summary>Runs one session connect and records the route it was opened on; the first attempt of a session ID is the one kept.</summary>
     public async Task<T> Connect<T>(string session, string endpoint, Func<Task<T>> connect)
     {
         string? before = SimulationNetworkRoute.Adapter(endpoint);
         try { return await connect(); }
-        finally { string? after = SimulationNetworkRoute.Adapter(endpoint); connectedRoutes.TryAdd(session, before == after ? before : null); }
+        finally
+        {
+            string? after = SimulationNetworkRoute.Adapter(endpoint);
+            connectedRoutes.TryAdd(session, (before == after ? before : null, Interlocked.Increment(ref connectOrder)));
+            // Sessions end without notice; only the newest RoutesKept routes are kept, far more than live sessions.
+            if (connectedRoutes.Count > RoutesKept)
+                foreach (var old in connectedRoutes.OrderBy(x => x.Value.Order).Take(connectedRoutes.Count - RoutesKept)) connectedRoutes.TryRemove(old.Key, out _);
+        }
     }
 
     /// <summary>Refuses unless the endpoint is a controller address of the bound instance, routed through the PLCSIM adapter both when the session
@@ -36,11 +48,11 @@ public sealed class PlcsimTargets(SimulatorClient simulator, IBridgeClient engin
     public async Task Require(string bindingSha256, string session, string endpoint)
     {
         var recorded = PlcsimTargetBindings.Read(options.ArtifactsDirectory, bindingSha256);
-        PlcsimTargetBindings.RequireEndpoint(recorded, endpoint, connectedRoutes.TryGetValue(session, out var connected) ? connected : null, SimulationNetworkRoute.Adapter(endpoint));
+        PlcsimTargetBindings.RequireEndpoint(recorded, endpoint, connectedRoutes.TryGetValue(session, out var connected) ? connected.Route : null, SimulationNetworkRoute.Adapter(endpoint));
         PlcsimTargetBindings.RequireSameInstance(recorded, await Observe(recorded.InstanceId, recorded.InstanceName, recorded.CreationId));
     }
 
-    // Native simulator calls are never cancelled: a cancelled bridge call faults the simulator worker for every later tool.
+    // Native simulator calls are never cancelled: a cancelled bridge call is parked and every later call is refused with PreviousOperationRunning until it finishes.
     private async Task<PlcsimTargetBinding> Observe(int instanceId, string instanceName, string creationId) => PlcsimTargetBindings.Observed(
         await simulator.Bridge.CallAsync("sim_identity", new { instanceId, instanceName, creationId }, CancellationToken.None),
         instanceId, instanceName, creationId, DateTimeOffset.UtcNow);

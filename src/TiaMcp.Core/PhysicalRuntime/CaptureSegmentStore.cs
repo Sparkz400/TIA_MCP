@@ -25,6 +25,9 @@ public abstract class CaptureSegmentStore<TPlan,TProgress,TRow> : IDisposable wh
     private readonly object quotaGate = new();
     private readonly object headGate = new();
     private readonly Dictionary<string,long> reservations = new(StringComparer.Ordinal);
+    // File bytes at the last tree walk (under quotaGate); null forces a walk. Live captures are covered by their reservations, so a stale
+    // total can only be too high, except after a capture ends or an export is written: those reset it.
+    private long? walkedBytes;
     private readonly LinkedList<Verified> verified = new();
     protected static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web) {
         PropertyNameCaseInsensitive = false, UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
@@ -55,6 +58,16 @@ public abstract class CaptureSegmentStore<TPlan,TProgress,TRow> : IDisposable wh
     protected abstract object Summary(Snapshot snapshot, bool live, string? localFailure, bool pinned = false);
 
     public bool Exists(string id) => Directory.Exists(PathFor(id));
+    /// <summary>Removes one finished capture's directory (plan, segments, exports). The caller guarantees no writer is live for it.</summary>
+    public void Delete(string id)
+    {
+        lock (quotaGate)
+        {
+            Require(Exists(id),Code("IdentityInvalid")); Require(!reservations.ContainsKey(id),Code("Capacity"));
+            PackageStorage.DeleteOwned(root,PathFor(id)); walkedBytes = null;
+        }
+        lock (verified) for (var node = verified.First; node is not null;) { var next = node.Next; if (node.Value.Snapshot.Reference.Split(':')[1] == id) verified.Remove(node); node = next; }
+    }
     public TPlan Plan(string id) => Decode<TPlan>(Read(PathFor(id,"plan.json"),PlanBytes),Code("IntegrityFailure"));
     protected T Create<T>(TPlan plan, Func<string,long,T> writer)
     {
@@ -66,6 +79,7 @@ public abstract class CaptureSegmentStore<TPlan,TProgress,TRow> : IDisposable wh
             Require(!Exists(id),Code("Exists")); Capacity(MaximumBytes(plan));
             Require(Directory.EnumerateDirectories(root).Take(65).Count() < 64,Code("Capacity"));
             Directory.CreateDirectory(PathFor(id)); WriteNew(PathFor(id,"plan.json"),bytes);
+            walkedBytes = walkedBytes is { } known ? known + bytes.Length : null;
             string reference = Reference(id,0,Hash(bytes)); Head(id,reference);
             reservations.Add(id,MaximumBytes(plan));
             return writer(reference,bytes.Length);
@@ -98,6 +112,7 @@ public abstract class CaptureSegmentStore<TPlan,TProgress,TRow> : IDisposable wh
         lock (quotaGate)
         {
             Capacity((MaximumBytes(snapshot.Plan)+PlanBytes) * (format == "csv" ? 3 : 1) + (timeline is null ? 0 : Encoding.UTF8.GetByteCount(timeline)));
+            walkedBytes = null; // The files written below are not in the cached total, also when the export fails midway.
             string id = CaptureId(snapshot.Plan), exportId = Guid.NewGuid().ToString("N"); var artifacts = new List<object>();
             // Taken before the export's own temporary file exists, which would otherwise read as an uncommitted tail.
             byte[] summary = Encode(Summary(snapshot,live,null,true));
@@ -212,7 +227,10 @@ public abstract class CaptureSegmentStore<TPlan,TProgress,TRow> : IDisposable wh
     }
     private void Capacity(long additional)
     {
-        long bytes = additional+reservations.Values.Sum(); int entries = 0;
+        long reserved = additional+reservations.Values.Sum();
+        // Walked again before refusing, so a cleanup outside this process never leaves the store "full" on a stale total.
+        if (walkedBytes is { } known && known + reserved <= MaximumStoreBytes) return;
+        long bytes = reserved; int entries = 0; walkedBytes = null;
         var pending = new Stack<string>(); pending.Push(root);
         while (pending.TryPop(out string? directory)) foreach (string path in Directory.EnumerateFileSystemEntries(directory))
         {
@@ -220,6 +238,7 @@ public abstract class CaptureSegmentStore<TPlan,TProgress,TRow> : IDisposable wh
             if (Directory.Exists(path)) pending.Push(path); else bytes += new FileInfo(path).Length;
             Require(bytes <= MaximumStoreBytes,Code("Capacity"));
         }
+        walkedBytes = bytes - reserved;
     }
     private static object Artifact(string path)
     { using var stream = new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.Read); return new { path, bytes=stream.Length, sha256=Convert.ToHexStringLower(SHA256.HashData(stream)) }; }
@@ -273,7 +292,7 @@ public abstract class CaptureSegmentStore<TPlan,TProgress,TRow> : IDisposable wh
         {
             if(Ended)return;
             try { Publish("ended",reason,elapsed); }
-            finally { Ended=true;lock(store.quotaGate)store.reservations.Remove(id); }
+            finally { Ended=true;lock(store.quotaGate){store.reservations.Remove(id);store.walkedBytes=null;} }
         }
         private void Publish(string state,string? reason,double elapsed)
         {
