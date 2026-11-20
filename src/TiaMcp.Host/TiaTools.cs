@@ -11,7 +11,7 @@ namespace TiaMcp.Host;
 public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
 {
     [McpServerTool(Name = "tia_discover", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("List running TIA Portal V21 instances. Does not start TIA or connect to a PLC.")]
+    [Description("List running TIA Portal V21 instances. Each process lists attachedSessions: the other Openness clients attached to it (processId, processName, processPath, processRunning, isActive = in the middle of a call, attachedAtUtc, utilizationSeconds, accessLevel, trustAuthority). Does not start TIA or connect to a PLC.")]
     public Task<CallToolResult> Discover(CancellationToken cancellationToken) => Call("discover", null, cancellationToken);
 
     [McpServerTool(Name = "tia_capabilities", ReadOnly = true, Destructive = false, OpenWorld = false)]
@@ -19,11 +19,17 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
     public Task<CallToolResult> Capabilities(CancellationToken cancellationToken) => Call("bridge_info", null, cancellationToken);
 
     [McpServerTool(Name = "tia_attach", Destructive = false, OpenWorld = false)]
-    [Description("Attach to an explicitly selected running V21 process. Siemens may display its own Openness access dialog. Does not change the project or connect online.")]
-    public Task<CallToolResult> Attach([Description("Process ID returned by tia_discover.")] int processId, CancellationToken cancellationToken)
+    [Description("Attach to an explicitly selected running V21 process. Siemens may display its own Openness access dialog. Does not change the project or connect online. The result lists attachedSessions, the other Openness clients of that Portal. An attach has been reported to wait while another client is in the middle of a call (isActive). waitForIdleSeconds (0..60) checks first: if another client is still in a call after that many seconds, the attach is refused with OpennessClientBusy naming it (busyClients; processRunning:false marks a client whose process has exited) and nothing is attached. Without it the attach behaves as before. This tool never disconnects another client or ends its process.")]
+    public Task<CallToolResult> Attach([Description("Process ID returned by tia_discover.")] int processId, CancellationToken cancellationToken,
+        [Description("Seconds (0..60) to wait for other Openness clients of this Portal to finish their call before attaching; omit to attach without the check.")] int? waitForIdleSeconds = null)
     {
         if (processId <= 0) throw new McpException("processId must be positive.");
-        return Call("attach", new { processId }, cancellationToken);
+        if (waitForIdleSeconds is < 0 or > 60) throw new McpException("waitForIdleSeconds must be from 0 to 60.");
+        // The wait runs inside one bridge call, so it must end well before the Host's call timeout to refuse cleanly.
+        if (waitForIdleSeconds is { } wait && wait > options.TimeoutSeconds - 15)
+            throw new McpException($"waitForIdleSeconds must be at most {Math.Max(0, options.TimeoutSeconds - 15)} with this Host's --timeout-seconds {options.TimeoutSeconds}.");
+        if (waitForIdleSeconds is not null && options.TiaVersion == 19) throw new McpException("waitForIdleSeconds is V21-only; the V19 adapter attaches without the check.");
+        return Call("attach", new { processId, waitForIdleSeconds }, cancellationToken);
     }
 
     [McpServerTool(Name = "tia_session_status", ReadOnly = true, Destructive = false, OpenWorld = false)]

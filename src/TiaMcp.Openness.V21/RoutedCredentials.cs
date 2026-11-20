@@ -71,6 +71,53 @@ namespace TiaMcp.Openness.V21
                 ?? throw new BridgeException("CredentialContextMismatch", "The routed credential for " + slot + " does not open for this exact apply, change and reference.");
         }
 
+        // project_open of a UMAC-protected project (docs/reference/protected-credentials.md#project-open-umac-route). The binding
+        // names the exact project file and UMAC user, so a credential serves one user of one project path only.
+        internal const string UmacPurpose = "projectUmac";
+
+        internal static string UmacSubject(string userType) => userType == "global" ? "globalUser" : userType == "project" ? "projectUser"
+            : throw new BridgeException("CredentialInputInvalid", "umac.userType must be project or global.");
+
+        internal static JObject UmacBinding(string projectPath, string userName, string userType) => new JObject {
+            ["resource"] = new JObject { ["provider"] = "siemensTiaPortalV21", ["authority"] = projectPath, ["ownerId"] = projectPath, ["resourceKind"] = UmacPurpose, ["resourceId"] = userName },
+            ["purpose"] = UmacPurpose, ["subjectId"] = UmacSubject(userType) };
+
+        internal sealed class UmacLogin
+        {
+            internal string UserName, UserType, CredentialId, BindingSha256, Nonce;
+            internal byte[] Envelope;
+        }
+
+        /// <summary>The sealed login the Host put in project_open's umac argument; null when there is none.</summary>
+        internal static UmacLogin ParseUmac(JToken token)
+        {
+            if (token == null || token.Type == JTokenType.Null) return null;
+            var umac = token as JObject;
+            string[] fields = { "bindingSha256", "credentialId", "envelope", "nonce", "userName", "userType" };
+            if (umac == null || !umac.Properties().Select(p => p.Name).OrderBy(n => n, StringComparer.Ordinal).SequenceEqual(fields) || umac.Properties().Any(p => p.Value.Type != JTokenType.String))
+                throw new BridgeException("CredentialRouteInvalid", "umac must be the Host's sealed login; pass umacCredential to project_open, never a password.");
+            var login = new UmacLogin { UserName = umac.Value<string>("userName"), UserType = umac.Value<string>("userType"), CredentialId = umac.Value<string>("credentialId"),
+                BindingSha256 = umac.Value<string>("bindingSha256"), Nonce = umac.Value<string>("nonce") };
+            UmacSubject(login.UserType);
+            if (string.IsNullOrWhiteSpace(login.UserName) || login.UserName.Length > 256 || login.UserName.Any(char.IsControl) || !LowerHex(login.CredentialId, 32) ||
+                !LowerHex(login.BindingSha256, 64) || !LowerHex(login.Nonce, 32))
+                throw new BridgeException("CredentialRouteInvalid", "The sealed UMAC login is malformed.");
+            try { login.Envelope = Convert.FromBase64String(umac.Value<string>("envelope")); }
+            catch (FormatException) { throw new BridgeException("CredentialRouteInvalid", "The sealed UMAC login envelope is malformed."); }
+            return login;
+        }
+
+        /// <summary>Opens the login's password for this exact project path; the envelope is cleared either way.</summary>
+        internal static SecureString OpenUmac(UmacLogin login, string projectPath)
+        {
+            try
+            {
+                return CredentialRouteEnvelope.Open(login.Envelope, CredentialRouteEnvelope.ProjectOpenEntropy(login.Nonce, projectPath, login.UserName, login.UserType, login.CredentialId, login.BindingSha256))
+                    ?? throw new BridgeException("CredentialContextMismatch", "The sealed UMAC login does not open for this exact project path (" + projectPath + ") and user; nothing was opened.");
+            }
+            finally { Array.Clear(login.Envelope, 0, login.Envelope.Length); }
+        }
+
         internal static bool LowerHex(string value, int length) => value != null && value.Length == length && value.All(c => c >= '0' && c <= '9' || c >= 'a' && c <= 'f');
     }
 }

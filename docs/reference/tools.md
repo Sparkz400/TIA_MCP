@@ -277,7 +277,7 @@ release. A deprecated tool names the release that deprecated it and its replacem
 | `project_archive` | Archive an open project's saved state as a .zap21 file | unqualified | core | experimental |  |  |
 | `project_close` | Close a project in a worker-owned instance without saving | unqualified | core | experimental |  |  |
 | `project_copy` | Copy an open project's saved state to a new owned directory | limited | core | frozen |  |  |
-| `project_open` | Open an exact V21 project in an owned session | shipped | core | frozen |  | `project_open.read_only` |
+| `project_open` | Open an exact V21 project in an owned session | shipped | core | frozen |  | `project_open.read_only`, `project_open.umac_login` |
 | `project_open_copy` | Swap the open project for a read-write copy of its saved state | unqualified | core | experimental |  |  |
 | `project_properties` | Read project metadata, history, languages and text categories | limited | core | frozen |  |  |
 | `project_retrieve` | Retrieve a hash-verified checkpoint to a new directory | shipped | core | frozen |  |  |

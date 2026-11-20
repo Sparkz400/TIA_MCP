@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Security;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
@@ -65,21 +66,47 @@ namespace TiaMcp.Openness.V21
             var file = new FileInfo(Path.GetFullPath(path));
             if (!file.Exists) throw new BridgeException("ProjectNotFound", "The .ap21 project file does not exist on this host.");
             bool readOnly = args.Value<bool?>("readOnly") == true;
+            // A UMAC login arrives only as the Host's sealed envelope (CredentialRoute); it opens for this exact path and user.
+            var login = RoutedCredentials.ParseUmac(args["umac"]);
             Project project;
-            try { project = readOnly ? _portal.Projects.Open(file, null, ProjectOpenMode.Secondary) : _portal.Projects.Open(file); }
-            catch (Exception error) when (!(error is BridgeException))
+            int umacCallbacks = 0;
+            SecureString password = login == null ? null : RoutedCredentials.OpenUmac(login, file.FullName);
+            UmacDelegate answer = null;
+            if (password != null)
+                answer = credentials =>
+                {
+                    // One answer per open: a refused password is never resent, so a wrong one cannot loop or lock the account.
+                    if (++umacCallbacks > 1)
+                        throw new BridgeException("UmacLoginRejected", "TIA asked for the project login again, so the stored password for " + login.UserName + " was not accepted. It was not retried.");
+                    credentials.Type = login.UserType == "global" ? UmacUserType.Global : UmacUserType.Project;
+                    credentials.Name = login.UserName;
+                    credentials.SetPassword(password);
+                };
+            try { project = readOnly ? _portal.Projects.Open(file, answer, ProjectOpenMode.Secondary) : answer == null ? _portal.Projects.Open(file) : _portal.Projects.Open(file, answer); }
+            catch (BridgeException) { throw; }
+            catch (Exception error)
             {
                 // TIA decides whether the open is possible; when it fails, name any other Portal that has the project open,
                 // since the native exception does not. Without such a Portal the native failure is reported unchanged.
                 IReadOnlyList<ProjectLockRules.PortalView> holders;
                 try { holders = ProjectLockRules.Holders(file.FullName, VisiblePortals(), _processId); }
                 catch (Exception) { throw error; }
-                if (holders.Count == 0) throw;
+                if (holders.Count == 0)
+                {
+                    // TIA never asked for the login: the failure is not about it and is reported unchanged.
+                    if (login == null || umacCallbacks == 0) throw;
+                    var umacDetails = new JObject { ["nativeMessage"] = error.Message, ["umac"] = UmacReport(login, umacCallbacks),
+                        ["remediation"] = "Check the user name, user type and stored password against the project's UMAC users. TIA V21 words a wrong password as a deactivated account; the password was sent once and not retried, and a later open with the right password still succeeds." };
+                    string umacMessage = "TIA did not open the project with the stored login for " + login.UserName + ": " + error.Message;
+                    if (umacCallbacks > 1) throw new BridgeException("UmacLoginRejected", umacMessage, umacDetails);
+                    throw new BridgeException("UmacLoginFailed", umacMessage, umacDetails);
+                }
                 var details = ProjectLockRules.Refusal(file.FullName, holders);
                 details["nativeMessage"] = error.Message;
                 throw new BridgeException("ProjectLocked", "TIA could not open the project, and another TIA Portal (process " + string.Join(", ", holders.Select(h => h.ProcessId))
                     + ") has it open: " + error.Message, details);
             }
+            finally { password?.Dispose(); }
             // Mutation refusal keys on the native IsPrimary state, so a read-only request must read back as secondary.
             if (readOnly && project.IsPrimary)
             {
@@ -91,8 +118,16 @@ namespace TiaMcp.Openness.V21
             result["opened"] = true;
             result["readOnly"] = !project.IsPrimary;
             result["saved"] = false;
+            if (login != null) result["umac"] = UmacReport(login, umacCallbacks);
             return result;
         }
+
+        // Public facts of a UMAC login: who, which stored credential, and whether TIA asked for it (an unprotected project does not).
+        private static JObject UmacReport(RoutedCredentials.UmacLogin login, int callbacks) => new JObject
+        {
+            ["userName"] = login.UserName, ["userType"] = login.UserType, ["credentialId"] = login.CredentialId,
+            ["loginRequested"] = callbacks > 0, ["loginRequests"] = callbacks,
+        };
 
         // Close one project in a worker-owned instance so another can be opened without restarting the Portal. A user-owned
         // TIA is never touched. Unsaved edits are refused unless discardUnsaved is set; nothing is ever saved here.

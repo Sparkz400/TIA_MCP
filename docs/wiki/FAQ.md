@@ -59,6 +59,14 @@ Run `.\scripts\Probe-Environment.ps1` and follow [environment diagnostics](https
 
 Siemens saves approval for an executable's path, modification time and hash. Rebuilding or moving it changes that identity; separate helpers also need their own registration. Engineering-bundle setup registers the final worker, and approved updates refresh the entry for that path. `Start-TiaMcp.ps1 -CheckOpennessRegistration` identifies missing or stale registration without starting TIA. See [registration diagnostics and setup](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/openness-application-registration.md#why-tia-still-asks). HMI support limits remain separate from authorization.
 
+## `tia_attach` hangs or TIA reports the project as already open
+
+An attach can wait while another Openness client of that Portal is in the middle of a call, and a project opens writable in one Portal only. `tia_discover` lists each Portal's other Openness clients (`attachedSessions`: `isActive` while one is in a call, `processRunning: false` when its process has exited), and `tia_attach` with `waitForIdleSeconds` refuses with `OpennessClientBusy` instead of waiting behind a busy client. A project held by another Portal fails `project_open` with `ProjectLocked`, naming that Portal. The server never disconnects another client or closes another Portal; end a stale one yourself. See the [tool reference](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/tools.md).
+
+## A user name set in `cmd` is reported as deactivated
+
+In `cmd`, `set NAME=value && next-command` stores `value ` with the space before `&&`, so the name no longer matches its account. Write `set "NAME=value" && next-command`, or use PowerShell (`$env:NAME = 'value'`).
+
 ## Is this a Siemens product?
 
 No. TIA MCP is independent and not affiliated with, endorsed or supported by Siemens AG. Siemens, TIA Portal, SIMATIC, STEP 7, WinCC and PLCSIM are trademarks of Siemens AG.

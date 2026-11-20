@@ -204,12 +204,64 @@ Web API and OPC UA logins use the seam inside the Host.
 Existing generated scratch CPU credentials keep their separate native format and
 restrictions. Do not pass these references as scratch simulation metadata.
 
+## Project open UMAC route
+
+`project_open` opens a UMAC-protected project with a stored password. The credential is bound to
+the exact full project path, the UMAC user name and the user type (`project` or `global`):
+
+```json
+{
+  "resource": {
+    "provider": "siemensTiaPortalV21",
+    "authority": "C:\Projects\Line\Line.ap21",
+    "ownerId": "C:\Projects\Line\Line.ap21",
+    "resourceKind": "projectUmac",
+    "resourceId": "Engineer"
+  },
+  "purpose": "projectUmac",
+  "subjectId": "projectUser"
+}
+```
+
+`subjectId` is `projectUser` for a project user and `globalUser` for a global (UMC) user. The path is
+the full path as Windows resolves it on the TIA host, so a project moved or copied elsewhere needs a new
+credential. Call `project_open` with `path`, `umacUserName`, `umacUserType` and `umacCredential`
+(the reference); `vaultName` is optional.
+
+The Host derives the binding from those arguments and checks the reference against it before anything
+is read; a mismatch refuses with `CredentialContextMismatch` and `details.expectedBinding`. It then
+decrypts the secret under the vault lock and seals it again with DPAPI CurrentUser under its own entropy:
+the `TiaMcp.ProjectOpenUmac.v1` domain, a fresh random nonce, the path, user name, user type, credential
+ID and binding hash, each prefixed with its length. The plaintext buffer is pinned and cleared at once.
+The tool argument holds only the public reference; the worker receives the user, credential ID, nonce and
+envelope over the verified pipe, opens the password into a read-only `SecureString` for this exact path and
+user, and passes it to `ProjectComposition.Open(FileInfo, UmacDelegate)` (or the overload with
+`ProjectOpenMode.Secondary` for `readOnly`). The `SecureString` is disposed when the open returns.
+The nonce only keeps envelopes of different calls apart; unlike a change apply lease, the worker does not record it,
+so single use rests on the Host sending each envelope once over the verified pipe.
+
+TIA's login callback is answered once. If TIA asks again, the password was not accepted and is not
+resent, so a wrong password cannot repeat and lock the account: the open fails with `UmacLoginRejected`,
+or with `UmacLoginFailed` when TIA refuses the first answer. An unprotected project never asks, and the
+result says so (`umac.loginRequested: false`). The other refusals are those of the change apply route
+(`CredentialUnavailable`, `CredentialRetired`, `CredentialFormatInvalid`, `CredentialStoreBusy`).
+
+TIA V21 words a wrong password as a deactivated account. In the native run the account was not locked by
+one wrong attempt: the right password opened the project straight after it.
+
+**Status.** The Host route, the envelope and the worker half are covered by managed tests with real DPAPI.
+Checked once natively on 20 November with a project administrator on an owned protected scratch: read-write
+and read-only opens, a wrong password and an unprotected project ([record](../verification/feedback-20261120.md)).
+Global (UMC) users are not checked, and the feature stays unverified until curated evidence exists. The V19
+adapter refuses it.
+
 ## Change apply credential route
 
 Block protection changes (`block_protect`, `block_unprotect` and
 `block_write_protection_set`) and the CPU protection level (`hardware_cpu_parameters`
 with `protectionLevel`, see [engineering workflows](../guides/engineering-workflows.md))
-take a vault secret through this route. No other path hands a vault secret to a worker.
+take a vault secret through this route. The only other path that hands a vault secret to a worker is
+the [project open UMAC route](#project-open-umac-route).
 
 **Create one credential per block and protection.** The worker derives the expected
 binding from the exact target; copy `plcPath` and the block `path` from `project_inventory`:
