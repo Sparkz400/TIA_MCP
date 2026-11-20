@@ -3,8 +3,9 @@
 NOT YET RUN natively. The fixture is fixtures/plcsim-process-image: an owned scratch CPU 1511-1 PN with OB1 and a cyclic
 interrupt OB30 assigned to process image partition 1, each counting its starts in PipDb. The program is downloaded to a fresh
 owned instance, provisioned and started like the D09 runner. Each partition mode (and the C and CP modes as controls) captures
-both counters for 2 s; a mode passes when the capture ends durationLimit, the counter of OB30 differs between successive rows
-(decoded independently from the retained segments) and the previous operating mode is back. The instance is released.
+both counters for 2 s; every mode runs before the verdict. A mode passes when the capture ends durationLimit and the previous
+operating mode is back; the two partition modes must also show the counter of OB30 differing between successive rows (decoded
+independently from the retained segments). The instance is released.
 """
 from __future__ import annotations
 
@@ -20,6 +21,7 @@ from library_native_harness import Harness, require
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "fixtures" / "plcsim-process-image"
 MODES = ("SingleStep_P", "TimespanSynchronized_P", "SingleStep_C", "SingleStep_CP", "TimespanSynchronized_C", "TimespanSynchronized_CP")
+PARTITION_MODES = ("SingleStep_P", "TimespanSynchronized_P")
 SPAN_MS = 10
 LIMITATIONS = [
     "One owned PLCSIM Advanced V8 CPU 1511 instance on Softbus; OB30 is assigned to process image partition 1, no I/O module is, and no isochronous OB exists.",
@@ -108,11 +110,17 @@ def body(h):
             ob30 = series(h.directory, capture_id, selections[1])
             changes = sum(1 for a, b in zip(ob30, ob30[1:]) if a != b)
             restored = h.stage("operating mode after the %s capture" % mode, mode_of)
-            # Recorded before the check, so a mode that stalls still leaves its reason in the report.
             h.report["captureModes"][mode] = {"rows": progress["rows"], "terminalReason": progress["terminalReason"], "ob30Values": len(ob30),
-                                              "ob30Changes": changes, "restoredOperatingMode": restored}
-            require(progress["terminalReason"] == "durationLimit" and not status["localFailure"] and changes > 0 and restored == initial,
-                    "%s did not step on OB30: %s" % (mode, h.report["captureModes"][mode]))
+                                              "ob30Changes": changes, "restoredOperatingMode": restored, "localFailure": status["localFailure"]}
+        # Every mode runs before the verdict, so one stalled partition mode does not hide the others. Only the partition modes must
+        # show OB30 starts between rows; the C and CP controls need only complete and restore the operating mode.
+        failed = []
+        for mode in MODES:
+            result = h.report["captureModes"][mode]
+            stepped = result["ob30Changes"] > 0 or mode not in PARTITION_MODES
+            if not (result["terminalReason"] == "durationLimit" and not result["localFailure"] and stepped and result["restoredOperatingMode"] == initial):
+                failed.append("%s: %s" % (mode, result))
+        require(not failed, "Modes that did not complete, step on OB30 or restore the operating mode: " + "; ".join(failed))
     finally:
         released = h.stage("sim_release", lambda: h.tool("sim_release", {"instanceId": instance["id"], "deleteOwned": True}))
         require(released.get("unregistered") is True, "The owned instance was not released")
