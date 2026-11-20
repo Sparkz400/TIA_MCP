@@ -326,6 +326,11 @@
             "null"
           ],
           "maxLength": 128
+        },
+        "sessionTimeoutMs": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The server's revised session timeout; absent in records written before it was recorded."
         }
       }
     },
@@ -408,6 +413,12 @@
           "maximum": 3,
           "default": 0,
           "description": "Opt-in same-session reactivation attempts across the entire capture. No new session, subscription transfer or Host-restart replay."
+        },
+        "maximumNotificationsPerPublish": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32,
+          "description": "Notifications one Publish message may carry; omitted means 1. A row keeps one message exactly; a message over this bound is refused."
         },
         "events": {
           "anyOf": [
@@ -547,6 +558,12 @@
           "maximum": 3,
           "default": 0,
           "description": "Opt-in same-session reactivation attempts across the entire capture. No new session, subscription transfer or Host-restart replay."
+        },
+        "maximumNotificationsPerPublish": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32,
+          "description": "Notifications one Publish message may carry; omitted means 32. A row keeps one message exactly; a message over this bound is refused."
         },
         "events": {
           "$ref": "#/$defs/eventSelection"
@@ -902,7 +919,7 @@
               "items": {
                 "$ref": "#/$defs/notification"
               },
-              "maxItems": 1,
+              "maxItems": 32,
               "minItems": 0
             },
             {
@@ -1000,6 +1017,11 @@
           "type": "integer",
           "minimum": 0
         },
+        "omittedNotifications": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Notifications of this message cut at the notification budget; the message is the last one and the budget is reached exactly."
+        },
         "reconnect": {
           "$ref": "#/$defs/reconnectEvent"
         },
@@ -1008,7 +1030,7 @@
           "items": {
             "$ref": "#/$defs/eventNotification"
           },
-          "maxItems": 1,
+          "maxItems": 32,
           "minItems": 0
         }
       },
@@ -1198,7 +1220,7 @@
                 "items": {
                   "$ref": "#/$defs/notification"
                 },
-                "maxItems": 1,
+                "maxItems": 32,
                 "minItems": 0
               },
               "statusChanges": {

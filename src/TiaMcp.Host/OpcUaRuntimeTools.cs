@@ -76,13 +76,13 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
     public Task<CallToolResult> Connect(string attemptId, OpcUaRuntimeSelection selection, CancellationToken cancellationToken) =>
         Run(async () => await targets.Connect("ua:" + attemptId, selection.Endpoint, () => sessions.Store.Connect(attemptId, selection, cancellationToken)));
     [McpServerTool(Name = "runtime_ua_browse", ReadOnly = true, Destructive = false, OpenWorld = true, UseStructuredContent = true, OutputSchemaType = typeof(OpcUaRuntimeBrowseResult))]
-    [Description("Browse bounded immediate hierarchical references in this Host's owned UA session, using exact namespace URI and canonical numeric/string/guid/opaque identifier. At most 256 references and 16 pages; truncation and continuation cleanup are explicit. External server references are unsupported, not followed.")]
+    [Description("Browse bounded immediate hierarchical references in this Host's owned UA session, using exact namespace URI and canonical numeric/string/guid/opaque identifier. At most 256 references and 16 pages; truncation and continuation cleanup are explicit. A result over 128 KiB is not returned inline: references is empty and spill names the complete result as a hashed artifact for artifact_read. External server references are unsupported, not followed.")]
     public Task<CallToolResult> Browse(string attemptId, OpcUaRuntimeNode node, CancellationToken cancellationToken, int maximum = 256) =>
-        Run(async () => await sessions.Store.Browse(attemptId, node, maximum, cancellationToken));
+        Run(async () => { var r = await sessions.Store.Browse(attemptId, node, maximum, cancellationToken); return await Bounded(r, "browse", r.References.Count, x => r with { References = [], Spill = x }); });
     [McpServerTool(Name = "runtime_ua_read", ReadOnly = true, Destructive = false, OpenWorld = true, UseStructuredContent = true, OutputSchemaType = typeof(OpcUaRuntimeReadResult))]
-    [Description("Read 1..64 explicit UA node identities after rechecking namespace/server/start identity. Returns exact scalar or bounded array/matrix type/value encoding, raw status and Good/Uncertain/Bad quality, nullable original source/server timestamps and per-item errors. Int64/UInt64 use exact decimal strings. Arrays retain observed row-major dimensions and up to 4096 exact elements; structures remain unsupported. No fabricated quality/timestamps, device/program identity guarantee or writes.")]
+    [Description("Read 1..64 explicit UA node identities after rechecking namespace/server/start identity (in the same request). A result over 128 KiB is not returned inline: items is empty and spill names the complete result as a hashed artifact for artifact_read. Returns exact scalar or bounded array/matrix type/value encoding, raw status and Good/Uncertain/Bad quality, nullable original source/server timestamps and per-item errors. Int64/UInt64 use exact decimal strings. Arrays retain observed row-major dimensions and up to 4096 exact elements; structures remain unsupported. No fabricated quality/timestamps, device/program identity guarantee or writes.")]
     public Task<CallToolResult> Read(string attemptId, OpcUaRuntimeNode[] nodes, CancellationToken cancellationToken) =>
-        Run(async () => await sessions.Store.Read(attemptId, nodes, cancellationToken));
+        Run(async () => { var r = await sessions.Store.Read(attemptId, nodes, cancellationToken); return await Bounded(r, "read", r.Items.Count, x => r with { Items = [], Spill = x }); });
     [McpServerTool(Name = "runtime_ua_status", ReadOnly = true, Destructive = false, OpenWorld = false, UseStructuredContent = true, OutputSchemaType = typeof(OpcUaRuntimeStatus))]
     [Description("Read retained UA attempt state without network traffic. Host restart preserves hostEndedRemoteUnknown; session tokens are not persisted or adopted. A separately protected client certificate does not resume sessions or acquisition.")]
     public Task<CallToolResult> Status(string attemptId, CancellationToken cancellationToken) =>
@@ -92,7 +92,7 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
     public Task<CallToolResult> Disconnect(string attemptId, CancellationToken cancellationToken, bool acknowledgeUnknown = false) =>
         Run(async () => await sessions.Store.Disconnect(attemptId, acknowledgeUnknown, cancellationToken));
     [McpServerTool(Name = "runtime_ua_capture_start", ReadOnly = false, Destructive = false, OpenWorld = true)]
-    [Description("Start bounded sequential polling of 1..64 explicit namespace-URI UA nodes on this Host's existing encrypted owned attemptId. Supply caller-retained 32-lowercase-hex captureId and request:{attemptId,nodes,intervalMilliseconds:100..60000,durationSeconds:1..3600,maximumSamples:1..100000,maximumBytes:1048576..67108864,maximumReconnectAttempts:0..3 (default 0)}. Opt-in recovery reactivates only the same owned session after transport failure; attempts and downtime are retained. Every read rechecks session identity and credential. Retains original decoded type/value/status/quality/source/server times and picoseconds as exact JSON; skipped polling slots and failed reads remain explicit. Same captureId observes its original intent without replay; changed intent refuses. At most one capture per session and four workers. No subscription transfer, replacement sessions, writes, interpolation, atomic samples, source authentication or independent program/address association.")]
+    [Description("Start bounded polling of 1..64 explicit namespace-URI UA nodes (one Read request per cycle for all of them) on this Host's existing encrypted owned attemptId. Supply caller-retained 32-lowercase-hex captureId and request:{attemptId,nodes,intervalMilliseconds:100..60000,durationSeconds:1..3600,maximumSamples:1..100000,maximumBytes:1048576..67108864,maximumReconnectAttempts:0..3 (default 0)}. Opt-in recovery reactivates only the same owned session after transport failure; attempts and downtime are retained. Every cycle rechecks session identity (in the same Read) and the credential state. Retains original decoded type/value/status/quality/source/server times and picoseconds as exact JSON; skipped polling slots and failed reads remain explicit. Same captureId observes its original intent without replay; changed intent refuses. At most one capture per session and four workers. No subscription transfer, replacement sessions, writes, interpolation, atomic samples, source authentication or independent program/address association.")]
     public Task<CallToolResult> CaptureStart(string captureId, OpcUaCaptureRequest request, CancellationToken cancellationToken) =>
         Run(() => sessions.Captures.Start(captureId, request, cancellationToken));
     [McpServerTool(Name = "runtime_ua_capture_status", ReadOnly = true, Destructive = false, OpenWorld = false)]
@@ -111,10 +111,16 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
     [Description("Export an immutable verified UA capture snapshotRef as json or csv with companion JSON. Original decoded read payloads, exact UA node/session selections, gaps, terminal state and quality/timing limits remain retained. Download hashed artifacts through artifact_read. No subscription data, synchronized samples, behavioral verdicts or native qualification. Separate 512 MiB retained capture-store limit; no eviction.")]
     public Task<CallToolResult> CaptureExport(string snapshotRef, CancellationToken cancellationToken, string format = "json") =>
         Run(() => sessions.Captures.Export(snapshotRef, format, cancellationToken));
+    private async Task<object> Bounded<T>(T result, string kind, int count, Func<OpcUaRuntimeSpill, T> spilled) where T : notnull =>
+        UaResultSpill.Bounded(options.ArtifactsDirectory, result, kind, count, spilled, await sessions.Store.OldestLiveSession());
     private static async Task<CallToolResult> Run(Func<Task<object>> action)
     {
         try { return Format(await action()); }
-        catch (Exception e) { return Format(new { error = new { code = e is BridgeException b ? b.Code : "UaOperationFailed",
+        catch (Exception e)
+        {
+            // The client sees only the fixed code; the type (never the message, which may carry remote text) goes to stderr, not the MCP stdout.
+            if (e is not BridgeException) Console.Error.WriteLine($"runtime_ua tool failed: {e.GetType().FullName}");
+            return Format(new { error = new { code = e is BridgeException b ? b.Code : "UaOperationFailed",
             message = "OPC UA operation refused or incomplete; no remote error text or secret returned." } }, true); }
     }
     private static CallToolResult Format(object value, bool error = false)

@@ -18,6 +18,7 @@ namespace TiaMcp.Openness.V21
             int oldStart = RequiredIoByteAddress(payload, "oldStartAddress");
             int start = RequiredIoByteAddress(payload, "startAddress");
             var item = ChangeHardware(project, payload);
+            EnsureNoSafetyHardware(item.Item);
             var ranges = item.Item.Addresses.Where(address => address.IoType.ToString() == ioType && address.StartAddress == oldStart).ToArray();
             if (ranges.Length != 1) throw new BridgeException("AmbiguousTarget", "ioType and oldStartAddress must identify exactly one configured address range on hardwarePath.");
             var selected = ranges[0];

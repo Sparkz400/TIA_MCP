@@ -20,7 +20,7 @@ public sealed partial class TiaTools
         try
         {
             string path = json["artifact"]!["path"]!.GetValue<string>(), sha256 = json["artifact"]!["sha256"]!.GetValue<string>();
-            new ArtifactStore(options.ArtifactsDirectory).Read(path, 0, 1); // Artifact-root and link boundary before the Host opens a native file.
+            new ArtifactStore(options.ArtifactsDirectory).ResolveChecked(path); // Artifact-root and link boundary before the Host opens a native file.
             json["automationml"] = JsonSerializer.SerializeToNode(new AutomationMlWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits).InspectFile(path, sha256), BridgeProtocol.Json);
         }
         catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException or JsonException or InvalidOperationException)
@@ -47,8 +47,7 @@ public sealed partial class TiaTools
             else
             {
                 string path = args["path"]?.GetValue<string>() ?? throw new BridgeException("InvalidRequest", "cax_import requires amlRef, or path plus expectedSha256.");
-                var read = JsonSerializer.SerializeToElement(new ArtifactStore(options.ArtifactsDirectory).Read(path, 0, 1), BridgeProtocol.Json);
-                args["path"] = Path.Combine(Path.GetFullPath(options.ArtifactsDirectory), read.GetProperty("relativePath").GetString()!);
+                args["path"] = new ArtifactStore(options.ArtifactsDirectory).ResolveChecked(path);
             }
         }
         catch (InvalidOperationException) { throw new BridgeException("InvalidRequest", "amlRef and path must be strings."); }

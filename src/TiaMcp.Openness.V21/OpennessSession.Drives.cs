@@ -286,10 +286,31 @@ namespace TiaMcp.Openness.V21
             return result;
         }
 
-        // Safety Integrated (p9300..p10999) and commissioning, reset, save and motor identification
-        // parameters trigger drive functions; they need dedicated workflows, not a scalar write.
-        private static bool DriveParameterProtected(int number)
-            => number >= 9300 && number <= 10999 || Array.IndexOf(new[] { 9, 10, 970, 971, 972, 976, 977, 1900, 1910, 1960, 3900 }, number) >= 0;
+        // The parameters a scalar write must not touch: DriveWriteRules.Protected lists them and why.
+        private static bool DriveParameterProtected(int number) => DriveWriteRules.Protected(number);
+
+        // A limit Startdrive cannot read proves nothing, so it is null and RequireWithinLimits admits.
+        private static object DriveLimit(Func<object> read)
+        {
+            try { return read(); } catch (Exception) { return null; }
+        }
+
+        // Every parameter value of the drive object by name (the written ones included), for the before/after diff of side effects.
+        // Never throws: a failed or oversized read marks the snapshot incomplete instead of failing the write.
+        private static Dictionary<string, JToken> DriveSnapshot(DriveObject driveObject, out bool complete)
+        {
+            var values = new Dictionary<string, JToken>(StringComparer.Ordinal); int visited = 0; complete = true;
+            try
+            {
+                foreach (var parameter in driveObject.Parameters)
+                {
+                    if (++visited > 50000) { complete = false; break; }
+                    values[parameter.Name] = DriveValue(parameter, out _);
+                }
+            }
+            catch (Exception) { complete = false; }
+            return values;
+        }
 
         private DriveObject ChangeDriveObject(Project project, JObject payload) => ChangeDriveObject(project, payload, out _);
 
@@ -325,7 +346,7 @@ namespace TiaMcp.Openness.V21
             var rows = change.Payload["parameters"] as JArray;
             if (rows == null || rows.Count == 0 || rows.Count > 200) throw new BridgeException("InvalidRequest", "parameters must list 1..200 drive parameters.");
             var names = new HashSet<string>(StringComparer.Ordinal);
-            var targets = new List<DriveParameter>(); var values = new List<object>(); var result = new JArray();
+            var targets = new List<DriveParameter>(); var values = new List<object>(); var befores = new List<object>(); var result = new JArray();
             foreach (var token in rows)
             {
                 var row = token as JObject;
@@ -339,12 +360,17 @@ namespace TiaMcp.Openness.V21
                 if (current.Value<string>("kind") != "scalar") throw new BridgeException("UnsupportedParameterValue", "Only scalar drive parameter values can be written; BICO interconnections and unavailable values are refused: " + name);
                 if (!JToken.DeepEquals(current, row["expected"]))
                     throw new BridgeException(write ? "PreviewStale" : "ExpectedValueMismatch", "The current value of " + name + " differs from expected; nothing was written.", new JObject { ["name"] = name, ["current"] = current });
-                targets.Add(parameter); values.Add(ConvertChangeValue(row["value"], before.GetType()));
+                var converted = ConvertChangeValue(row["value"], before.GetType());
+                // Every row is checked before the first write, so an out-of-range value cannot leave earlier rows written.
+                DriveWriteRules.RequireWithinLimits(name, converted, DriveLimit(() => parameter.MinValue), DriveLimit(() => parameter.MaxValue));
+                targets.Add(parameter); values.Add(converted); befores.Add(before);
                 result.Add(new JObject { ["name"] = name, ["number"] = parameter.Number, ["arrayIndex"] = parameter.ArrayIndex, ["before"] = current, ["after"] = row["value"].DeepClone() });
             }
             if (!write) return result;
-            // The whole batch is preflighted before the first setter; a native failure after dispatch still requires checkpoint recovery.
-            for (int i = 0; i < targets.Count; i++) targets[i].Value = values[i];
+            // The whole batch is preflighted before the first setter; a native failure after dispatch restores the earlier writes (best effort)
+            // and still requires checkpoint recovery.
+            var sideBefore = DriveSnapshot(driveObject, out bool beforeComplete);
+            CompensatingWrites.Apply(Enumerable.Range(0, targets.Count).ToList(), i => targets[i].Value = values[i], i => targets[i].Value = befores[i], i => rows[i].Value<string>("name"));
             result = new JArray();
             for (int i = 0; i < targets.Count; i++)
             {
@@ -353,6 +379,8 @@ namespace TiaMcp.Openness.V21
                 if (!JToken.DeepEquals(expected, actual)) throw new BridgeException("MutationVerificationFailed", "Drive parameter readback differs from the request: " + rows[i].Value<string>("name"));
                 result.Add(new JObject { ["name"] = rows[i].Value<string>("name"), ["value"] = actual });
             }
+            var sideAfter = DriveSnapshot(driveObject, out bool afterComplete);
+            change.Readbacks.Add(new JObject { ["role"] = "drive-parameter-side-effects", ["sideEffects"] = DriveWriteRules.SideEffects(sideBefore, sideAfter, names, beforeComplete && afterComplete) });
             return result;
         }
 

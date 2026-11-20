@@ -13,13 +13,14 @@ def verify_subscription(rows, attempt, expected_count=14):
     require(len(created["items"]) == expected_count + 1 and created["items"][-1]["statusCode"] == "0x80340000" and created["items"][-1]["monitoredItemId"] == 0, "independent per-item failure")
     require(all(i["revisedSamplingInterval"] == 200 and i["revisedQueueSize"] == 4 for i in created["items"][:-1]), "independent revised item settings")
     messages = [e for e in events if e["kind"] == "publish"]
-    require([e["sequenceNumber"] for e in messages] == list(range(1, expected_count + 1)), "independent original sequence oracle")
-    require(all(not e["duplicate"] and not e["keepAlive"] and len(e["notifications"]) == 1 for e in messages), "one original notification per service")
+    # A Publish message carries up to maximumNotificationsPerPublish (default 32) notifications; one row keeps one message exactly.
+    require([e["sequenceNumber"] for e in messages] == list(range(1, len(messages) + 1)) and messages, "independent original sequence oracle")
+    require(all(not e["duplicate"] and not e["keepAlive"] and 1 <= len(e["notifications"]) <= 32 for e in messages), "bounded original notifications per service")
+    require(sum(len(e["notifications"]) for e in messages) == expected_count, "every selected signal notified once")
     require(all(e["acknowledgedSequenceNumbers"] == [index] and e["acknowledgementResults"] == ["0x00000000"] for index, e in enumerate(messages[1:], 1)), "independent previous-message acknowledgement oracle")
     values = [n["value"] for e in messages for n in e["notifications"]]
     verify_values(dict(attemptId=attempt, startedAt=rows[0]["observedUtc"], completedAt=rows[-1]["observedUtc"], items=values))
-    for e in messages:
-        n = e["notifications"][0]
+    for n in (n for e in messages for n in e["notifications"]):
         item = created["items"][n["clientHandle"] - 1]
         require(item["node"] == n["value"]["node"] and item["monitoredItemId"] == n["monitoredItemId"] and not n["overflow"], "original client/server item association")
     require(events[-1]["kind"] == "deleted" and events[-1]["statusCode"] == "0x00000000" and events[-1]["subscriptionId"] == created["subscriptionId"], "independent owned subscription deletion")

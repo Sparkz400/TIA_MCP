@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.188",
+  "catalogVersion": "0.4.189",
   "generatedBy": "scripts/change_kinds.py",
   "note": "fields are the payload names the documentation uses for the kind; requiredness is checked by the worker at change_prepare. Batchable kinds also accept {\"items\": [payload, ...]} (docs/guides/engineering-workflows.md#items-on-other-kinds).",
   "kinds": {

@@ -34,6 +34,8 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
                 return Observe(captureId);
             }
             OpcUaSubscriptionContracts.RequireKeepAlive(request.PublishingIntervalMilliseconds,request.KeepAliveCount);
+            // Finished workers leave the dictionary; one that recorded a local failure stays so Status keeps reporting it.
+            foreach(var (id,done) in running.Where(x=>x.Value.Work.IsCompleted && x.Value.Failure is null).ToArray()){running.Remove(id);done.Stop.Dispose();}
             if(running.Values.Count(x=>!x.Work.IsCompleted)>=4)throw OpcUaRuntimeClient.Error("UaSubscriptionCapacity");
             if (request.DiagnosticBindingId is { } bindingId)
                 _ = new DiagnosticUaBindings(artifactsRoot).ValidateForCapture(bindingId, request.AttemptId, request.Nodes);
@@ -73,6 +75,14 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
         double Elapsed()=>System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
         bool Expired()=>entry.Stop.IsCancellationRequested || Elapsed()>=plan.Request.DurationSeconds*1000d;
         void Append(OpcUaSubscriptionEvent e)=>writer.Append(new(writer.Rows,Elapsed(),DateTimeOffset.UtcNow,e));
+        // A message bigger than the remaining notification budget is kept up to the budget and says how many it omitted; it ends the run.
+        OpcUaSubscriptionEvent Fit(OpcUaSubscriptionEvent m)
+        {
+            long room=plan.Request.MaximumNotifications-writer.Notifications,count=OpcUaSubscriptionContracts.Count(m);
+            if(count<=room)return m;
+            var values=(m.Notifications??[]).Take((int)room).ToArray();var events=(m.Events??[]).Take((int)room-values.Length).ToArray();
+            return m with {Notifications=values,Events=events.Length>0?events:null,OmittedNotifications=count-room};
+        }
         var seen=new HashSet<uint>();var missingRanges=new List<(uint From,long Count)>(); var acknowledgements=new HashSet<uint>(); uint expected=1;int republished=0;
         int reconnects=0;bool recovering=false,recreate=false;
         using var duration=new CancellationTokenSource(TimeSpan.FromSeconds(plan.Request.DurationSeconds));
@@ -123,7 +133,7 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
                     if(recovered.Kind=="republish")
                     {
                         missingRanges.Add((expected,1));Append(new("gap",subscription,GapFrom:expected,GapTo:expected,MissingCount:1));
-                        Append(recovered with {Duplicate=!seen.Add(expected)});acknowledgements.Add(expected);expected=Next(expected);
+                        Append(Fit(recovered with {Duplicate=!seen.Add(expected)}));acknowledgements.Add(expected);expected=Next(expected);
                         if(recovered.StatusChanges is {Length:>0}){reason="serverStatusChanged";break;}
                         if(writer.Notifications>=plan.Request.MaximumNotifications){reason="notificationLimit";break;}
                     }
@@ -138,7 +148,7 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
                     throw OpcUaRuntimeClient.Error("UaSubscriptionSequenceInvalid");
                 bool duplicate=!message.KeepAlive && !seen.Add(sequence);
                 if(ahead && gap>0){missingRanges.Add((expected,(long)gap));Append(new("gap",subscription,GapFrom:expected,GapTo:Previous(sequence),MissingCount:(long)gap));}
-                Append(message with {Duplicate=duplicate});
+                Append(Fit(message with {Duplicate=duplicate}));
                 if(message.StatusChanges is {Length:>0}){reason="serverStatusChanged";writer.Flush(Elapsed());break;}
                 if(!message.KeepAlive)acknowledgements.Add(sequence);
                 bool limit=writer.Notifications>=plan.Request.MaximumNotifications;
@@ -152,7 +162,7 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
                         var recovered=await sessions.Republish(plan.Request.AttemptId,plan.CaptureId,missing,CancellationToken.None);republished++;attempted++;
                         if(recovered.Kind=="republish")
                         {
-                            bool repeated=!seen.Add(missing);Append(recovered with {Duplicate=repeated});acknowledgements.Add(missing);
+                            bool repeated=!seen.Add(missing);Append(Fit(recovered with {Duplicate=repeated}));acknowledgements.Add(missing);
                             if(recovered.StatusChanges is {Length:>0}){reason="serverStatusChanged";limit=true;break;}
                             if(writer.Notifications>=plan.Request.MaximumNotifications){limit=true;break;}
                         }

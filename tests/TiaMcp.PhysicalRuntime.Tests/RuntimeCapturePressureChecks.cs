@@ -15,11 +15,11 @@ internal static class RuntimeCapturePressureChecks
         var elapsed=Stopwatch.StartNew();
         await using(var f=new RuntimePollingChecks.PollFixture(root,64))
         {
-            const int attempts=32768;
+            const int attempts=32768,cycles=attempts/64; // one batched read request per cycle answers all 64 signals
             f.Clock.AdvanceShortDelays=true;
             var observations=new List<object>();
             f.Sessions.BeforeRead=(number,_)=>{
-                long started=f.Clock.GetTimestamp();int delay=number%997==0?351:1;
+                long started=f.Clock.GetTimestamp();int delay=number%7==0?351:1;
                 f.Clock.Advance(delay);
                 string? error=number%17==0?"RuntimeTimeout":number%29==0?"RuntimeTransportFailure":null;
                 observations.Add(new{number,started,completed=f.Clock.GetTimestamp(),error,responseMember=error is null?Response(number):null});
@@ -30,7 +30,7 @@ internal static class RuntimeCapturePressureChecks
             var request=new RuntimeCaptureRequest(f.Attempt,f.Sessions.Signals.Select(s=>s.SelectionId).ToArray(),100,3600,attempts,64L<<20);
             await f.Captures.Start(f.Id,request,CancellationToken.None);
             var status=await f.Ended(90);var progress=status.GetProperty("recordedProgress");
-            Check(progress.GetProperty("terminalReason").GetString()=="sampleLimit" && progress.GetProperty("readAttempts").GetInt64()==attempts,"Mixed 64-signal load retains all 32768 attempted reads");
+            Check(progress.GetProperty("terminalReason").GetString()=="sampleLimit" && progress.GetProperty("readAttempts").GetInt64()==attempts && f.Sessions.Reads.Count==cycles,"Mixed 64-signal load retains all 32768 attempted reads from 512 batched requests");
             Check(progress.GetProperty("skippedPolls").GetInt64()>90 && progress.GetProperty("droppedReadResults").GetInt64()==0,"Repeated slow reads retain skipped slots without dropping accepted results");
             Check(f.Clock.ActiveTimers==0 && status.GetProperty("localFailure").ValueKind==JsonValueKind.Null,"Sustained completion releases timers without a storage error");
             string reference=status.GetProperty("snapshotRef").GetString()!;
@@ -38,17 +38,17 @@ internal static class RuntimeCapturePressureChecks
             string path=exported.GetProperty("artifacts")[0].GetProperty("path").GetString()!;
             using var document=JsonDocument.Parse(File.ReadAllBytes(path));
             var rows=document.RootElement.GetProperty("rows").EnumerateArray().Where(r=>r.GetProperty("kind").GetString()=="read").ToArray();
-            Check(rows.Length==attempts && rows.Select(r=>r.GetProperty("selectionId").GetString()).SequenceEqual(f.Sessions.Reads.Select(r=>r.SelectionId)),"All selected signals retain acquisition order through export");
-            Check(rows.Count(r=>r.GetProperty("errorCode").GetString()=="RuntimeTimeout")==Enumerable.Range(1,attempts).Count(n=>n%17==0),"Timeouts retain explicit error rows");
-            Check(rows.Count(r=>r.GetProperty("errorCode").GetString()=="RuntimeTransportFailure")==Enumerable.Range(1,attempts).Count(n=>n%17!=0 && n%29==0),"Transport failures retain distinct error rows");
+            Check(rows.Length==attempts && rows.Select(r=>r.GetProperty("selectionId").GetString()).SequenceEqual(Enumerable.Range(0,cycles).SelectMany(_=>request.SelectionIds)),"All selected signals retain acquisition order through export");
+            Check(rows.Count(r=>r.GetProperty("errorCode").GetString()=="RuntimeTimeout")==Enumerable.Range(1,cycles).Count(n=>n%17==0)*64,"Timeouts retain explicit error rows");
+            Check(rows.Count(r=>r.GetProperty("errorCode").GetString()=="RuntimeTransportFailure")==Enumerable.Range(1,cycles).Count(n=>n%17!=0 && n%29==0)*64,"Transport failures retain distinct error rows");
             Check(rows.Where(r=>r.GetProperty("readResultJson").ValueKind!=JsonValueKind.Null).Any(r=>r.GetProperty("readResultJson").GetString()!.Contains("18446744073709551615")),"Large exact integers survive mixed load");
             var before=Directory.GetFiles(Path.Combine(f.Root,"runtime-captures",f.Id),"*.segment").ToDictionary(p=>p,File.ReadAllBytes);
             _=await f.Captures.Start(f.Id,request,CancellationToken.None);
-            Check(f.Sessions.Reads.Count==attempts && before.All(p=>File.ReadAllBytes(p.Key).SequenceEqual(p.Value)),"Repeated completed intent neither replays acquisition nor rewrites segments");
+            Check(f.Sessions.Reads.Count==cycles && before.All(p=>File.ReadAllBytes(p.Key).SequenceEqual(p.Value)),"Repeated completed intent neither replays acquisition nor rewrites segments");
             var ledgerPath=Path.Combine(root,"mixed-observations.json");
             File.WriteAllText(ledgerPath,JsonSerializer.Serialize(observations,BridgeProtocol.Json));
             File.WriteAllText(Path.Combine(root,"mixed-status.json"),status.GetRawText());
-            cases.Add(new{kind="mixed",captureRoot=f.Root,captureId=f.Id,snapshotRef=reference,exportPath=path,ledgerPath,attempts,signalCount=64});
+            cases.Add(new{kind="mixed",captureRoot=f.Root,captureId=f.Id,snapshotRef=reference,exportPath=path,ledgerPath,attempts,cycles,signalCount=64});
             f.Id=Guid.NewGuid().ToString("N");
             await f.Start(maximumSamples:1);
             var healthy=await f.Ended();

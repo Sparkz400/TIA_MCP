@@ -65,7 +65,18 @@ public sealed class TestSuiteStyleJobs
     }
 
     // A review retained before RFC 8785 re-derives with the form it was written with.
-    public TestSuiteStyleReview ReadReview(EngineeringArtifactReference review) => CanonicalJson.Compatible(() => ReadReviewExact(review));
+    public TestSuiteStyleReview ReadReview(EngineeringArtifactReference review)
+    {
+        // A verified review is immutable (content-addressed and checked against every retained input), so a status poll
+        // re-verifies the run bundles (up to 32 x 32 MiB) only the first time. Records are never mutated by callers.
+        string key = root + "|" + review.RelativePath + "|" + review.Sha256;
+        if (VerifiedReviews.TryGetValue(key, out var known)) return known;
+        var value = CanonicalJson.Compatible(() => ReadReviewExact(review));
+        if (VerifiedReviews.Count >= 16) VerifiedReviews.Clear(); // shortcut: crude bound; the Host creates this class per call, so the cache is static.
+        VerifiedReviews[key] = value;
+        return value;
+    }
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, TestSuiteStyleReview> VerifiedReviews = new(StringComparer.Ordinal);
     private TestSuiteStyleReview ReadReviewExact(EngineeringArtifactReference review)
     {
         var value = Read<TestSuiteStyleReview>(review);
@@ -313,10 +324,8 @@ public sealed class TestSuiteStyleJobs
         string path = PackageStorage.Under(root, relative); Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         if (!File.Exists(path))
         {
-            string temp = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
-            using (var stream = new FileStream(temp, FileMode.CreateNew, FileAccess.Write, FileShare.None)) { stream.Write(bytes); stream.Flush(true); }
-            try { File.Move(temp, path, false); }
-            catch (IOException) when (File.Exists(path)) { File.Delete(temp); }
+            try { PackageStorage.WriteStaged(path, bytes); }
+            catch (IOException) when (File.Exists(path)) { } // Another writer published the same content.
         }
         var result = new EngineeringArtifactReference(relative, hash); VerifyArtifact(result); return result;
     }

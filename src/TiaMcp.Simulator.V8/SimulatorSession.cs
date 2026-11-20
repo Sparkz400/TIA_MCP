@@ -91,6 +91,7 @@ namespace TiaMcp.Simulator.V8
                 case "sim_area_read": return AreaRead(args);
                 case "sim_area_write": return AreaWrite(args);
                 case "sim_observe": return Observe(args);
+                case "sim_prune": return Prune(args);
                 default: throw new SimulatorException("UnknownOperation", "Unknown simulator operation: " + operation);
             }
         }
@@ -114,7 +115,7 @@ namespace TiaMcp.Simulator.V8
             result["orphanedInstances"] = new JArray(SimulationRuntimeManager.RegisteredInstanceInfo
                 .Where(info => !_instances.ContainsKey(info.ID) && info.Name != null && info.Name.StartsWith("TiaMcp_", StringComparison.Ordinal))
                 .Select(info => new JObject { ["id"] = info.ID, ["name"] = info.Name }));
-            result["orphanedInstancesNote"] = "Re-adopt with sim_select (instanceId, expectedName and the creationId of its receipt under the simulation artifact folder), then sim_release with deleteOwned. Storage folders are never deleted automatically.";
+            result["orphanedInstancesNote"] = "Re-adopt with sim_select (instanceId, expectedName and the creationId of its receipt under the simulation artifact folder), then sim_release with deleteOwned. Storage folders are deleted only by an explicit sim_prune.";
             if (_droppedByManagerLoss > 0) result["selectionsDroppedByRuntimeManagerLoss"] = _droppedByManagerLoss;
             result["licensePolicy"] = "No activation API or licensing-dialog confirmation. Explicit bounded PowerOn supplies the licensing result; trial and Test Suite warnings are rejected. LicenseStatus reports current use, not available entitlement.";
             result["downloadRoute"] = "Owned fresh virtual memory card, verified through a CurrentUser DPAPI ticket and independent local runtime identity check.";
