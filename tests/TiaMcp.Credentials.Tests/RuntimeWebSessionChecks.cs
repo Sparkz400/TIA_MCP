@@ -73,6 +73,34 @@ internal static class RuntimeWebSessionChecks
                     "A read on another session completes while one session's read is in flight (" + clock.ElapsedMilliseconds + " ms)");
                 check((await pending).Status == "read", "The slow read still completes");
                 first.ReadDelayMs = 0;
+
+                // A capture cycle: one session check and one batched request for every symbol, on a connection that stays open.
+                string s2 = Select(await sessions.Browse(a, "\"DB\".Other", false, default)), s3 = Select(await sessions.Browse(a, "\"DB\".Third", false, default));
+                string[] cycle = [sa, s2, s3];
+                await sessions.ReadValues(a, cycle, "simple", default); // the first cycle may open the connection
+                int requests = first.Requests, handshakes = first.Handshakes;
+                var callsBefore = first.Calls.ToArray();
+                var batch = await sessions.ReadValues(a, cycle, "simple", default);
+                var delta = first.Calls.ToArray().Skip(callsBefore.Length).ToArray();
+                check(batch.Length == 3 && batch.All(x => x.Result is { Status: "read" } r && r.Value!.Value.GetInt32() == 7 && x.ErrorCode is null),
+                    "A batched cycle returns every symbol's read, matched by id although the replies come back reversed");
+                check(first.Requests - requests == 2 && first.Handshakes == handshakes && delta.Count(c => c == "Api.GetSessionInfo") == 1 &&
+                    delta.Count(c => c == "PlcProgram.Browse") == 3 && delta.Count(c => c == "PlcProgram.Read") == 3,
+                    "Three symbols cost one session check and one batch request on the open connection (" + (first.Requests - requests) + " requests)");
+                for (int i = 0; i < 5; i++) await sessions.ReadValues(a, cycle, "simple", default);
+                check(first.Handshakes == handshakes, "Repeated cycles reuse the pinned keep-alive connection: no new TLS handshake");
+                first.ChangedMetadata = true;
+                var changed = await sessions.ReadValues(a, cycle, "simple", default);
+                first.ChangedMetadata = false;
+                check(changed.All(x => x.Result is null && x.ErrorCode == "RuntimeSymbolMetadataChanged"), "Metadata that changed since selection refuses each symbol inside the batch");
+                // A CPU that does not take a batch is read symbol by symbol, and asked about batches only once.
+                second.BatchSupported = false;
+                string t2 = Select(await sessions.Browse(b, "\"DB\".Other", false, default));
+                int posts = second.BatchPosts;
+                var plain = await sessions.ReadValues(b, [sb, t2], "simple", default);
+                var again = await sessions.ReadValues(b, [sb, t2], "simple", default);
+                check(plain.All(x => x.Result is { Status: "read" }) && again.All(x => x.Result is { Status: "read" }) && second.BatchPosts - posts == 1,
+                    "A CPU that refuses a batch is read symbol by symbol and not asked again (" + (second.BatchPosts - posts) + " batch posts)");
                 check((await sessions.Disconnect(a, default)).State == "closed" && (await sessions.Disconnect(b, default)).State == "closed", "Both sessions log out");
 
                 // A flipped certificate pin is a TLS refusal, not a transport failure.
@@ -93,7 +121,7 @@ internal static class RuntimeWebSessionChecks
         finally { Directory.Delete(vaultRoot, true); }
     }
 
-    /// <summary>Minimal JSON-RPC Web API over pinned loopback TLS; one request per connection, as the client asks.</summary>
+    /// <summary>Minimal JSON-RPC Web API over pinned loopback TLS: a connection serves requests until the client asks it to close; batches optional.</summary>
     private sealed class FakeWebApi : IAsyncDisposable
     {
         private readonly TcpListener listener = new(IPAddress.Loopback, 0);
@@ -106,6 +134,8 @@ internal static class RuntimeWebSessionChecks
         internal volatile bool DenyRead;
         internal TaskCompletionSource ReadEntered = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal readonly ConcurrentQueue<string> Calls = new();
+        internal int Handshakes, Requests, BatchPosts;
+        internal volatile bool BatchSupported = true, ChangedMetadata;
 
         internal FakeWebApi()
         {
@@ -138,40 +168,66 @@ internal static class RuntimeWebSessionChecks
             {
                 using var ssl = new SslStream(tcp.GetStream());
                 await ssl.AuthenticateAsServerAsync(new SslServerAuthenticationOptions { ServerCertificate = certificate });
-                var head = new List<byte>(); var one = new byte[1];
-                while (head.Count < 4 || !(head[^4] == '\r' && head[^3] == '\n' && head[^2] == '\r' && head[^1] == '\n'))
+                Interlocked.Increment(ref Handshakes);
+                while (true)
                 {
-                    if (await ssl.ReadAsync(one) == 0) return;
-                    head.Add(one[0]);
+                    var head = new List<byte>(); var one = new byte[1];
+                    while (head.Count < 4 || !(head[^4] == '\r' && head[^3] == '\n' && head[^2] == '\r' && head[^1] == '\n'))
+                    {
+                        if (await ssl.ReadAsync(one) == 0) return;
+                        head.Add(one[0]);
+                    }
+                    string headers = Encoding.ASCII.GetString(head.ToArray());
+                    int length = int.Parse(Regex.Match(headers, @"Content-Length:\s*(\d+)", RegexOptions.IgnoreCase).Groups[1].Value);
+                    bool close = Regex.IsMatch(headers, @"Connection:\s*close", RegexOptions.IgnoreCase);
+                    var body = new byte[length]; await ssl.ReadExactlyAsync(body);
+                    Interlocked.Increment(ref Requests);
+                    using var json = JsonDocument.Parse(body);
+                    byte[] reply;
+                    if (json.RootElement.ValueKind == JsonValueKind.Array)
+                    {
+                        Interlocked.Increment(ref BatchPosts);
+                        // A CPU without batch support answers with one error object; otherwise the replies come back in reverse order.
+                        if (!BatchSupported) reply = JsonSerializer.SerializeToUtf8Bytes(new { jsonrpc = "2.0", id = (string?)null, error = new { code = -32600, message = "invalid request" } });
+                        else
+                        {
+                            var replies = new List<object>();
+                            foreach (var element in json.RootElement.EnumerateArray()) replies.Add(await Answer(element));
+                            replies.Reverse();
+                            reply = JsonSerializer.SerializeToUtf8Bytes(replies);
+                        }
+                    }
+                    else reply = JsonSerializer.SerializeToUtf8Bytes(await Answer(json.RootElement));
+                    await ssl.WriteAsync(Encoding.ASCII.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + reply.Length + "\r\nConnection: " + (close ? "close" : "keep-alive") + "\r\n\r\n"));
+                    await ssl.WriteAsync(reply); await ssl.FlushAsync();
+                    if (close) return;
                 }
-                int length = int.Parse(Regex.Match(Encoding.ASCII.GetString(head.ToArray()), @"Content-Length:\s*(\d+)", RegexOptions.IgnoreCase).Groups[1].Value);
-                var body = new byte[length]; await ssl.ReadExactlyAsync(body);
-                using var json = JsonDocument.Parse(body);
-                string method = json.RootElement.GetProperty("method").GetString()!, id = json.RootElement.GetProperty("id").GetString()!;
-                Calls.Enqueue(method);
-                object? result = method switch
-                {
-                    "Api.Browse" => new[] { "Api.Login", "Api.Logout", "Api.GetPermissions", "PlcProgram.Browse", "PlcProgram.Read", "Api.GetSessionInfo" }.Select(n => new { name = n }),
-                    "Api.Login" => new { token = "fixture-token-" + id },
-                    "Api.GetSessionInfo" => new { username = "reader", authentication_mode = "local" },
-                    "Api.GetPermissions" => new[] { new { name = "read_value" } },
-                    "PlcProgram.Browse" => new[] { new { name = "Counter", datatype = "int" } },
-                    "PlcProgram.Read" => 7,
-                    "Api.Logout" => true,
-                    _ => null
-                };
-                object? error = null;
-                if (method == "PlcProgram.Read")
-                {
-                    ReadEntered.TrySetResult();
-                    if (ReadDelayMs > 0) await Task.Delay(ReadDelayMs);
-                    if (DenyRead) error = new { code = 2, message = "denied" };
-                }
-                byte[] reply = JsonSerializer.SerializeToUtf8Bytes(error is null ? new { jsonrpc = "2.0", id, result } : (object)new { jsonrpc = "2.0", id, error });
-                await ssl.WriteAsync(Encoding.ASCII.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + reply.Length + "\r\nConnection: close\r\n\r\n"));
-                await ssl.WriteAsync(reply); await ssl.FlushAsync();
             }
             catch (Exception) { } // A refused handshake (wrong pin) ends the connection here.
+        }
+
+        private async Task<object> Answer(JsonElement request)
+        {
+            string method = request.GetProperty("method").GetString()!, id = request.GetProperty("id").GetString()!;
+            Calls.Enqueue(method);
+            object? result = method switch
+            {
+                "Api.Browse" => new[] { "Api.Login", "Api.Logout", "Api.GetPermissions", "PlcProgram.Browse", "PlcProgram.Read", "Api.GetSessionInfo" }.Select(n => new { name = n }),
+                "Api.Login" => new { token = "fixture-token-" + id },
+                "Api.GetSessionInfo" => new { username = "reader", authentication_mode = "local" },
+                "Api.GetPermissions" => new[] { new { name = "read_value" } },
+                "PlcProgram.Browse" => new[] { new { name = "Counter", datatype = ChangedMetadata ? "dint" : "int" } },
+                "PlcProgram.Read" => 7,
+                "Api.Logout" => true,
+                _ => null
+            };
+            if (method == "PlcProgram.Read")
+            {
+                ReadEntered.TrySetResult();
+                if (ReadDelayMs > 0) await Task.Delay(ReadDelayMs);
+                if (DenyRead) return new { jsonrpc = "2.0", id, error = (object)new { code = 2, message = "denied" } };
+            }
+            return new { jsonrpc = "2.0", id, result };
         }
 
         public async ValueTask DisposeAsync()

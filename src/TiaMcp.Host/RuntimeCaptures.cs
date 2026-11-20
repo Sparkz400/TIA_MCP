@@ -142,17 +142,14 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
                 if(scheduled>=durationMilliseconds || Expired())break;
                 bool finish=false;
                 // PLCSIM: one worker call per cycle reads every signal (after stepping one sync point in cycle-synchronous mode).
-                var sample=plan.Request.Simulator is null?null:await SimulatorSample(plan);
+                // One session check and one batched request per cycle for a Web API session. A finished read is always recorded:
+                // expiry is checked before the request, never between the rows of one answered cycle.
+                var sample=plan.Request.Simulator is null?await WebSample(plan,deadline.Token):await SimulatorSample(plan);
                 for(int index=0;index<plan.Signals.Length;index++)
                 {
                     var signal=plan.Signals[index];
-                    if(sample is null && Expired())break;
                     lastReadCycle=cycle;accountedThrough=cycle;
-                    string? result=null,error=null;
-                    if(sample is not null)(result,error)=sample[index];
-                    else try { result=JsonSerializer.Serialize(await sessions.ReadValue(plan.Request.AttemptId,signal.SelectionId,signal.Selection!.Representation,deadline.Token,plan.Handoff),BridgeProtocol.Json); }
-                    catch(OperationCanceledException) { error="RuntimeCancelled"; }
-                    catch(Exception failure) { error=ReadFailure(failure); }
+                    var (result,error)=sample[index];
                     try { writer.Append(new(writer.Rows,"read",signal.SelectionId,cycle,scheduled,Elapsed(),clock.GetUtcNow(),result,error,0)); }
                     catch(BridgeException failure) when(failure.Code is "RuntimeCaptureByteLimit" or "RuntimeCaptureValueLimit") {writer.RecordDroppedResult();throw;}
                     if(writer.ReadAttempts>=plan.Request.MaximumSamples){reason="sampleLimit";finish=true;break;}
@@ -186,6 +183,17 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
     {
         try { return SimulatorCaptureContracts.Reads(plan.Request,await simulator!.CallAsync("sim_capture_sample",SimulatorCaptureContracts.Arguments(plan.Request),CancellationToken.None)); }
         catch(Exception failure) { string code=SimulatorCaptureContracts.ReadError(failure);return plan.Signals.Select(_=>((string?)null,(string?)code)).ToArray(); }
+    }
+    private async Task<(string? Result,string? Error)[]> WebSample(RuntimeCapturePlan plan,CancellationToken token)
+    {
+        try
+        {
+            var items=await sessions.ReadValues(plan.Request.AttemptId,plan.Signals.Select(x=>x.SelectionId).ToArray(),plan.Request.Representation,token,plan.Handoff);
+            return items.Select(x=>x.Result is not null?(JsonSerializer.Serialize(x.Result,BridgeProtocol.Json),(string?)null):((string?)null,ReadFailure(new BridgeException(x.ErrorCode!,"Symbol read refused.")))).ToArray();
+        }
+        // A request-level failure is every signal's failure for this cycle.
+        catch(OperationCanceledException) { return plan.Signals.Select(_=>((string?)null,(string?)"RuntimeCancelled")).ToArray(); }
+        catch(Exception failure) { string code=ReadFailure(failure);return plan.Signals.Select(_=>((string?)null,(string?)code)).ToArray(); }
     }
     /// <summary>Restores the operating mode recorded at begin; free-running captures never changed it.</summary>
     private async Task<bool> EndSimulator(RuntimeCaptureRequest request)
