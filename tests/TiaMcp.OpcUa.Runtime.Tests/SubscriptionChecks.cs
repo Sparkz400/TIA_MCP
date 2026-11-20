@@ -22,7 +22,7 @@ internal static class SubscriptionChecks
         try
         {
             string[] names=["int64","uint64","double","bool","text","bad","uncertain","missingTimes","array","denied","structure","byteArray","byteString","minimumDate","absent"];
-            var request=new OpcUaSubscriptionRequest(attempt,names.Select(FixtureServer.Node).ToArray(),DurationSeconds:10,MaximumNotifications:14);
+            var request=new OpcUaSubscriptionRequest(attempt,names.Select(FixtureServer.Node).ToArray(),MaximumNotificationsPerPublish:1,DurationSeconds:10,MaximumNotifications:14);
             string capture=Id();await subscriptions.Start(capture,request,default);
             var status=await End(subscriptions,capture);var events=Events(subscriptions,status);
             File.WriteAllText(Path.Combine(root,"healthy-status.json"),status.GetRawText());
@@ -55,7 +55,7 @@ internal static class SubscriptionChecks
             // 1000 ms x 5 keep-alives passes the four-second budget inside the ten-second Publish deadline on a quiet signal.
             await Refuse(()=>subscriptions.Start(Id(),request with {PublishingIntervalMilliseconds=1000,KeepAliveCount=5},default),"UaSubscriptionKeepAliveLimit",check);
             check(server.Audit.Count==audit,"Invalid subscription admission sends no services");
-            string active=Id();await subscriptions.Start(active,new(attempt,[FixtureServer.Node("bool")],DurationSeconds:30,KeepAliveCount:1),default);
+            string active=Id();await subscriptions.Start(active,new(attempt,[FixtureServer.Node("bool")],MaximumNotificationsPerPublish:1,DurationSeconds:30,KeepAliveCount:1),default);
             await Refuse(()=>sessions.Read(attempt,[FixtureServer.Node("bool")]),"UaSessionAcquisitionBusy",check);
             await Refuse(()=>sessions.Browse(attempt,FixtureServer.Node("fixture")),"UaSessionAcquisitionBusy",check);
             await Refuse(()=>sessions.Disconnect(attempt),"UaSessionAcquisitionBusy",check);
@@ -69,7 +69,7 @@ internal static class SubscriptionChecks
             foreach(string mode in new[]{"subscriptionGap","subscriptionDuplicate","subscriptionOverflow","subscriptionRepublishUnavailable","subscriptionRepublishStatus","subscriptionStatus","subscriptionBadHandle","subscriptionOversize","subscriptionCreateItemsDenied","subscriptionDeleteDenied"})
             {
                 server.Mode=mode;string id=Id();
-                await subscriptions.Start(id,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool"),FixtureServer.Node("uncertain")],DurationSeconds:2,KeepAliveCount:1,MaximumNotifications:3),default);
+                await subscriptions.Start(id,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool"),FixtureServer.Node("uncertain")],MaximumNotificationsPerPublish:1,DurationSeconds:2,KeepAliveCount:1,MaximumNotifications:3),default);
                 var outcome=await End(subscriptions,id);var rows=Events(subscriptions,outcome);
                 File.WriteAllText(Path.Combine(root,mode+".json"),Json(new{outcome,events=rows}).GetRawText());
                 if(mode=="subscriptionGap")check(rows.Any(x=>x.Kind=="gap" && x.GapFrom==1 && x.GapTo==1 && x.MissingCount==1) && rows.Any(x=>x.Kind=="republish" && x.SequenceNumber==1),"Real Republish repairs injected missing original sequence");
@@ -88,21 +88,44 @@ internal static class SubscriptionChecks
             foreach(int budget in new[]{0,1})
             {
                 server.Mode="subscriptionGap";string id=Id();
-                await subscriptions.Start(id,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool"),FixtureServer.Node("uncertain")],KeepAliveCount:1,DurationSeconds:2,MaximumNotifications:3,MaximumRepublish:budget),default);
+                await subscriptions.Start(id,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool"),FixtureServer.Node("uncertain")],KeepAliveCount:1,MaximumNotificationsPerPublish:1,DurationSeconds:2,MaximumNotifications:3,MaximumRepublish:budget),default);
                 var bound=await End(subscriptions,id);
                 check(bound.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()==(budget==0?"sequenceGapLimit":"notificationLimit"),"Exact retransmission allowance "+budget+" distinguishes exhausted pending gap from complete recovery");
             }
             server.Mode="subscriptionLongKeepAlive";string slow=Id();
-            await subscriptions.Start(slow,new(attempt,[FixtureServer.Node("bool")],DurationSeconds:5,KeepAliveCount:5),default);
+            await subscriptions.Start(slow,new(attempt,[FixtureServer.Node("bool")],MaximumNotificationsPerPublish:1,DurationSeconds:5,KeepAliveCount:5),default);
             var revised=await End(subscriptions,slow);var revisedRows=Events(subscriptions,revised);
             check(revisedRows.Any(x=>x.Kind=="failure" && x.ErrorCode=="UaSubscriptionKeepAliveLimit") && !revisedRows.Any(x=>x.Kind=="publish") &&
                 revised.GetProperty("recordedProgress").GetProperty("remoteCleanupConfirmed").GetBoolean() && (await sessions.Status(attempt)).State=="connected",
                 "A server-revised keep-alive past the Publish budget deletes the subscription before any Publish");
             // The default keep-alive count fits the same 1000 ms revision, as PLCSIM Advanced V8 revises (run rgn1).
-            string fits=Id();await subscriptions.Start(fits,new(attempt,[FixtureServer.Node("bool")],DurationSeconds:3),default);
+            string fits=Id();await subscriptions.Start(fits,new(attempt,[FixtureServer.Node("bool")],MaximumNotificationsPerPublish:1,DurationSeconds:3),default);
             var fitted=await End(subscriptions,fits);
             check(fitted.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="durationLimit" && !Events(subscriptions,fitted).Any(x=>x.Kind=="failure"),
                 "The default keep-alive count survives a server revision to 1000 ms");
+            // One Publish message may carry several notifications (the default allows 32); one row keeps that message's exact envelope.
+            server.Mode="normal";string bundled=Id();
+            var threeNodes=new[]{FixtureServer.Node("int64"),FixtureServer.Node("bool"),FixtureServer.Node("uncertain")};
+            await subscriptions.Start(bundled,new(attempt,threeNodes,KeepAliveCount:1,DurationSeconds:2,MaximumNotifications:100),default);
+            var bundledEnd=await End(subscriptions,bundled);
+            check(Events(subscriptions,bundledEnd).Any(x=>x.Kind=="publish" && x.Notifications?.Length==3) && bundledEnd.GetProperty("recordedProgress").GetProperty("notifications").GetInt32()==3,
+                "A single Publish carries all three initial notifications in one retained row");
+            check(Json(await subscriptions.Status(bundled,default)).GetProperty("snapshotRef").GetString()==bundledEnd.GetProperty("snapshotRef").GetString() &&
+                Json(await subscriptions.Export(bundledEnd.GetProperty("snapshotRef").GetString()!,"json",default)).ValueKind==JsonValueKind.Object,"A multi-notification message reopens and exports with its counters verified");
+            // A message larger than the remaining budget is kept up to the budget and says how many it omitted.
+            string cut=Id();
+            await subscriptions.Start(cut,new(attempt,threeNodes,KeepAliveCount:1,DurationSeconds:2,MaximumNotifications:2),default);
+            var cutEnd=await End(subscriptions,cut);
+            check(cutEnd.GetProperty("recordedProgress").GetProperty("notifications").GetInt32()==2 && cutEnd.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="notificationLimit" &&
+                Events(subscriptions,cutEnd).Any(x=>x.OmittedNotifications==1 && x.Notifications?.Length==2),"A message past the notification budget keeps the budget and records the omitted count");
+            check(Json(await subscriptions.Status(cut,default)).GetProperty("recordedProgress").GetProperty("notifications").GetInt32()==2,"The budget-cut chain reopens with exact counters");
+            // A server that sends more than the requested per-message bound is refused, not split.
+            server.Mode="subscriptionOversize";string hostile=Id();
+            await subscriptions.Start(hostile,new(attempt,threeNodes,KeepAliveCount:1,DurationSeconds:2,MaximumNotifications:10,MaximumNotificationsPerPublish:2),default);
+            var hostileEnd=await End(subscriptions,hostile);
+            check(Events(subscriptions,hostileEnd).Any(x=>x.ErrorCode=="UaResponseLimit") && hostileEnd.GetProperty("recordedProgress").GetProperty("notifications").GetInt32()==0,"More notifications than the requested per-message bound are refused");
+            server.Mode="normal";
+            if((await sessions.Status(attempt)).State!="connected")check(false,"A client-side limit refusal leaves the session connected");
             server.Mode="normal";
             await RetainedControls(root,sessions,capture,status,check);
             StoreLimits(root,status.GetProperty("plan").Deserialize<OpcUaSubscriptionPlan>(BridgeProtocol.Json)!,events.Single(x=>x.Notifications is [{Value.Node.Identifier:"array"}]),check);
@@ -111,7 +134,7 @@ internal static class SubscriptionChecks
             check((uint)next.Invoke(null,[uint.MaxValue])! == 1 && (uint)next.Invoke(null,[1u])! == 2 && (uint)previous.Invoke(null,[1u])! == uint.MaxValue,"Sequence counter wrap excludes zero with independent boundary constants");
             string empty=Id();await subscriptions.Start(empty,new(attempt,[FixtureServer.Node("absent")]),default);
             check((await End(subscriptions,empty)).GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="allItemsFailed","All monitored-item failures remain terminal with no polling fallback");
-            string shutdown=Id();await subscriptions.Start(shutdown,new(attempt,[FixtureServer.Node("bool")],KeepAliveCount:1,DurationSeconds:30),default);await Task.Delay(100);
+            string shutdown=Id();await subscriptions.Start(shutdown,new(attempt,[FixtureServer.Node("bool")],KeepAliveCount:1,MaximumNotificationsPerPublish:1,DurationSeconds:30),default);await Task.Delay(100);
             await subscriptions.DisposeAsync();subscriptions=new(sessions,root);audit=server.Audit.Count;
             check(Json(await subscriptions.Status(shutdown,default)).GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="hostShutdown","Host shutdown finalizes and deletes original subscription");
             check(Json(await subscriptions.Status(capture,default)).GetProperty("snapshotRef").GetString()==status.GetProperty("snapshotRef").GetString(),"Fresh journal owner preserves exact committed snapshot");

@@ -15,7 +15,7 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
     internal const int TimeoutMs = 10_000;
     // An idle session must outlive a 2-5 minute runtime_plcsim_bind; the server revises this down to its own maximum.
     // No keep-alive: it would be background traffic. A session orphaned by a Host crash lives this long at most.
-    internal const int SessionTimeoutMs = 600_000;
+    internal const int SessionTimeoutRequestMs = 600_000;
     internal const int MaxMessageBytes = 1_048_576;
     internal const string Policy = SecurityPolicies.Basic256Sha256;
     private readonly OpcUaRuntimeSelection selection;
@@ -33,6 +33,10 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
     internal SemaphoreSlim Lock { get; } = new(1);
     internal bool Usable => session is { Connected: true } && !Unusable;
     internal DateTimeOffset LastUsed { get; private set; } = DateTimeOffset.UtcNow;
+    internal void Touch() => LastUsed = DateTimeOffset.UtcNow;
+    /// <summary>The timeout the server revised the requested one to, in whole milliseconds; the request when the server reported none.</summary>
+    internal long SessionTimeoutMs { get; private set; } = SessionTimeoutRequestMs;
+    internal TimeSpan SessionTimeout => TimeSpan.FromMilliseconds(SessionTimeoutMs);
 
     internal OpcUaRuntimeClient(OpcUaRuntimeSelection selection, X509Certificate2 clientCertificate, string clientUri, string pkiPath)
     {
@@ -51,7 +55,7 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
             TransportQuotas = new TransportQuotas { OperationTimeout = TimeoutMs, MaxMessageSize = MaxMessageBytes,
                 MaxStringLength = 16_384, MaxByteStringLength = 65_536, MaxArrayLength = 4096, MaxEncodingNestingLevels = 32,
                 ChannelLifetime = 60_000, SecurityTokenLifetime = 60_000 },
-            ClientConfiguration = new ClientConfiguration { DefaultSessionTimeout = SessionTimeoutMs, MinSubscriptionLifetime = 0 }
+            ClientConfiguration = new ClientConfiguration { DefaultSessionTimeout = SessionTimeoutRequestMs, MinSubscriptionLifetime = 0 }
         };
     }
 
@@ -91,21 +95,36 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
         else
         {
             if (passwordJson is null || passwordJson.Length > 32_768) throw Error("UaCredentialInvalid");
-            using var document = JsonDocument.Parse(passwordJson, new JsonDocumentOptions { MaxDepth = 1 });
-            if (document.RootElement.ValueKind != JsonValueKind.String) throw Error("UaCredentialInvalid");
-            passwordBytes = System.Text.Encoding.UTF8.GetBytes(document.RootElement.GetString()!);
+            passwordBytes = DecodePassword(passwordJson);
             identity = new UserIdentity(selection.User, passwordBytes);
         }
         SessionDispatched = true;
         session = await new DefaultSessionFactory(null!).CreateAsync(configuration,
             new ConfiguredEndpoint(null, selected, EndpointConfiguration.Create(configuration)), false, true,
-            "TIA MCP owned read-only", SessionTimeoutMs, identity, null, ct);
+            "TIA MCP owned read-only", SessionTimeoutRequestMs, identity, null, ct);
         PeerVerified = true;
+        RecordRevisedTimeout();
         // No background polling/reconnect, automatic subscriptions or session transfer.
         session.KeepAliveInterval = Timeout.Infinite;
         session.TransferSubscriptionsOnReconnect = false;
         session.DeleteSubscriptionsOnClose = true;
         await VerifyIdentity(ct);
+    }
+
+    /// <summary>The UTF-8 bytes of a JSON string, unescaped without a managed string: a string copy of the password cannot be zeroed.</summary>
+    internal static byte[] DecodePassword(ReadOnlySpan<byte> passwordJson)
+    {
+        Span<byte> unescaped = stackalloc byte[passwordJson.Length]; // never moved by the GC, so no uncleared copy is left behind
+        try
+        {
+            var reader = new Utf8JsonReader(passwordJson);
+            if (!reader.Read() || reader.TokenType != JsonTokenType.String) throw Error("UaCredentialInvalid");
+            int length = reader.CopyString(unescaped);
+            if (reader.Read()) throw Error("UaCredentialInvalid");
+            return unescaped[..length].ToArray();
+        }
+        catch (Exception e) when (e is JsonException or InvalidOperationException) { throw Error("UaCredentialInvalid"); }
+        finally { CryptographicOperations.ZeroMemory(unescaped); }
     }
 
     private bool ValidPinnedLeaf(X509Certificate2 certificate)
@@ -122,17 +141,26 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
         return extended is not null && extended.EnhancedKeyUsages.Cast<Oid>().Any(o => o.Value == "1.3.6.1.5.5.7.3.1");
     }
 
+    // The server's revision of the requested timeout; a missing or non-positive value keeps the request as the bound.
+    private void RecordRevisedTimeout() { if (session is { SessionTimeout: > 0 and < int.MaxValue } s) SessionTimeoutMs = (long)s.SessionTimeout; }
+
     private async Task VerifyIdentity(CancellationToken ct)
     {
-        var response = await Session.ReadAsync(null, 0, TimestampsToReturn.Neither, [
-            new ReadValueId { NodeId = VariableIds.Server_NamespaceArray, AttributeId = Attributes.Value },
-            new ReadValueId { NodeId = VariableIds.Server_ServerArray, AttributeId = Attributes.Value },
-            new ReadValueId { NodeId = VariableIds.Server_ServerStatus_StartTime, AttributeId = Attributes.Value }], ct);
-        if (response.Results.Count != 3 || response.Results.Any(v => !StatusCode.IsGood(v.StatusCode)) ||
-            response.Results[0].Value is not string[] ns || ns.Length is < 1 or > 256 || ns[0] != Namespaces.OpcUa ||
+        var response = await Session.ReadAsync(null, 0, TimestampsToReturn.Neither, IdentityReads(), ct);
+        ApplyIdentity(response.Results, 0);
+    }
+    private static ReadValueIdCollection IdentityReads() => [
+        new ReadValueId { NodeId = VariableIds.Server_NamespaceArray, AttributeId = Attributes.Value },
+        new ReadValueId { NodeId = VariableIds.Server_ServerArray, AttributeId = Attributes.Value },
+        new ReadValueId { NodeId = VariableIds.Server_ServerStatus_StartTime, AttributeId = Attributes.Value }];
+    /// <summary>Checks the three identity values at <paramref name="offset"/> of a Read response, wherever they were batched.</summary>
+    private void ApplyIdentity(IList<DataValue> results, int offset)
+    {
+        if (results.Count < offset + 3 || results.Skip(offset).Take(3).Any(v => !StatusCode.IsGood(v.StatusCode)) ||
+            results[offset].Value is not string[] ns || ns.Length is < 1 or > 256 || ns[0] != Namespaces.OpcUa ||
             ns.Distinct(StringComparer.Ordinal).Count() != ns.Length || ns.Any(x => x.Length > 4096) ||
-            response.Results[1].Value is not string[] servers || servers.Length is < 1 or > 256 ||
-            servers[0] != selection.ApplicationUri || response.Results[2].Value is not DateTime started)
+            results[offset + 1].Value is not string[] servers || servers.Length is < 1 or > 256 ||
+            servers[0] != selection.ApplicationUri || results[offset + 2].Value is not DateTime started)
             throw Error("UaSessionIdentityMismatch");
         if (namespaces is not null && (!namespaces.SequenceEqual(ns) || !serverUris!.SequenceEqual(servers) || startTime != started))
             throw Error("UaSessionIdentityChanged");
@@ -144,8 +172,13 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
         if (nodes is null || nodes.Count is < 1 or > 64) throw Error("UaRequestLimit");
         foreach (var node in nodes) ValidateNode(node);
         var started = DateTimeOffset.UtcNow;
-        await VerifyIdentity(ct);
+        // The identity check rides in the same Read request (one round trip). A full 64-node batch is already 256 operations,
+        // the most this client has sent in one request, so that one keeps a separate identity Read.
+        bool fold = nodes.Count * 4 + 3 <= 256;
+        if (!fold) await VerifyIdentity(ct);
         var requests = new ReadValueIdCollection();
+        if (fold) requests.AddRange(IdentityReads());
+        int offset = fold ? 3 : 0;
         foreach (var node in nodes)
         {
             var id = Resolve(node);
@@ -154,12 +187,13 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
         }
         var response = await Session.ReadAsync(null, 0, TimestampsToReturn.Both, requests, ct);
         if (response.Results.Count != requests.Count) throw Error("UaResponseInvalid");
+        // Nothing of the reply is used when the session identity does not hold (the node ids were resolved against the old namespace table).
+        if (fold) ApplyIdentity(response.Results, 0);
         var values = new List<OpcUaRuntimeValue>();
         for (int i = 0; i < nodes.Count; i++)
         {
-            var value = response.Results[i * 4]; var type = response.Results[i * 4 + 1]; var rank = response.Results[i * 4 + 2];
-            var dimensions = response.Results[i * 4 + 3];
-            values.Add(DecodeValue(nodes[i],value,type,rank,dimensions));
+            int at = offset + i * 4;
+            values.Add(DecodeValue(nodes[i], response.Results[at], response.Results[at + 1], response.Results[at + 2], response.Results[at + 3]));
         }
         var result = new OpcUaRuntimeReadResult(attemptId, started, DateTimeOffset.UtcNow, values);
         CheckOutput(result);
@@ -279,10 +313,11 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
         // Same pinned endpoint description, client certificate and user identity; the server checks the identity matches the owner.
         var old=session!;
         session=await new DefaultSessionFactory(null!).CreateAsync(configuration,old.ConfiguredEndpoint,false,true,
-            "TIA MCP owned read-only",SessionTimeoutMs,old.Identity,null,ct);
+            "TIA MCP owned read-only",SessionTimeoutRequestMs,old.Identity,null,ct);
         session.KeepAliveInterval=Timeout.Infinite;
         session.TransferSubscriptionsOnReconnect=false;
         session.DeleteSubscriptionsOnClose=true;
+        RecordRevisedTimeout();
         Unusable=false;
         try
         {

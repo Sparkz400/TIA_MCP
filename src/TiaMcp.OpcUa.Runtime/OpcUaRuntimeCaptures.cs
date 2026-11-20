@@ -37,6 +37,8 @@ public sealed class OpcUaRuntimeCaptures(OpcUaRuntimeSessionStore sessions, stri
                     throw Error("UaCaptureRequestChanged");
                 return Observe(captureId);
             }
+            // Finished workers leave the dictionary; one that recorded a local failure stays so Status keeps reporting it.
+            foreach(var (id,done) in running.Where(x=>x.Value.Work.IsCompleted && x.Value.Failure is null).ToArray()){running.Remove(id);done.Stop.Dispose();}
             if (running.Values.Count(x=>!x.Work.IsCompleted)>=4 || running.Values.Any(x=>!x.Work.IsCompleted && x.AttemptId==request.AttemptId))
                 throw Error("UaCaptureSessionBusy");
             if (request.DiagnosticBindingId is { } bindingId)
@@ -134,23 +136,35 @@ public sealed class OpcUaRuntimeCaptures(OpcUaRuntimeSessionStore sessions, stri
                 }
                 if(scheduled>=durationMilliseconds || Expired())break;
                 bool finish=false;
-                foreach(var node in plan.UaContext!.Request.Nodes)
+                var nodes=plan.UaContext!.Request.Nodes;
+                // One Read request per cycle for every node still inside the sample budget; the rows stay one per node.
+                int budget=(int)Math.Min(nodes.Length,plan.Request.MaximumSamples-writer.ReadAttempts);
+                if(budget<=0){reason="sampleLimit";finish=true;}
+                else if(!Expired())
                 {
-                    if(Expired())break;
-                    string selectionId=OpcUaCaptureContracts.SelectionId(node);
                     lastReadCycle=cycle;accountedThrough=cycle;
-                    string? result=null,error=null;
-                    try { result=JsonSerializer.Serialize(await sessions.ReadAcquisition(plan.Request.AttemptId,plan.CaptureId,[node],deadline.Token),BridgeProtocol.Json); }
+                    string?[] results=new string?[budget];string? error=null;
+                    try
+                    {
+                        var read=await sessions.ReadAcquisition(plan.Request.AttemptId,plan.CaptureId,nodes.Take(budget).ToArray(),deadline.Token);
+                        if(read.Items.Count!=budget)throw new BridgeException("UaResponseInvalid","The batched read did not answer every node.");
+                        for(int i=0;i<budget;i++)results[i]=JsonSerializer.Serialize(read with {Items=[read.Items[i]]},BridgeProtocol.Json);
+                    }
                     catch(OperationCanceledException) { error="UaCancelled"; }
                     catch(Exception failure) { error=OpcUaCaptureContracts.ReadError(failure); }
-                    try { writer.Append(new(writer.Rows,"read",selectionId,cycle,scheduled,Elapsed(),clock.GetUtcNow(),result,error,0)); }
-                    catch(BridgeException failure) when(failure.Code is "RuntimeCaptureByteLimit" or "RuntimeCaptureValueLimit") {writer.RecordDroppedResult();throw;}
-                    if(error is not null)
+                    // A failed request leaves one failed row (for the first node) and ends the cycle, as a failed read always did.
+                    for(int i=0;i<(error is null?budget:1);i++)
                     {
-                        if(writer.ReadAttempts<plan.Request.MaximumSamples && await Recover(error))break; // Continue at the next scheduled cycle; the failed read is never replaced.
-                        reason=deadline.IsCancellationRequested?"durationLimit":"sessionUnavailable";finish=true;break;
+                        string selectionId=OpcUaCaptureContracts.SelectionId(nodes[i]);
+                        try { writer.Append(new(writer.Rows,"read",selectionId,cycle,scheduled,Elapsed(),clock.GetUtcNow(),results[i],error,0)); }
+                        catch(BridgeException failure) when(failure.Code is "RuntimeCaptureByteLimit" or "RuntimeCaptureValueLimit") {writer.RecordDroppedResult();throw;}
+                        if(error is not null)
+                        {
+                            if(writer.ReadAttempts<plan.Request.MaximumSamples && await Recover(error))break; // Continue at the next scheduled cycle; the failed read is never replaced.
+                            reason=deadline.IsCancellationRequested?"durationLimit":"sessionUnavailable";finish=true;break;
+                        }
+                        if(writer.ReadAttempts>=plan.Request.MaximumSamples){reason="sampleLimit";finish=true;break;}
                     }
-                    if(writer.ReadAttempts>=plan.Request.MaximumSamples){reason="sampleLimit";finish=true;break;}
                 }
                 RecordElapsedGaps();
                 cycle=Math.Max(cycle+1,accountedThrough+1);

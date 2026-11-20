@@ -15,7 +15,9 @@ public sealed class OpcUaRuntimeSessions : IAsyncDisposable
             new CredentialVault(CredentialVault.UaIdentityRoot(options.UaClientIdentity)).OpenUaIdentity();
         try { Store = new(Path.Combine(options.ArtifactsDirectory, "runtime-ua"), (selection, consumer) =>
             CredentialVault.Existing(CredentialVault.UserRoot(selection.VaultName!)).Use(selection.Credential!,
-                OpcUaRuntimeSessionStore.Binding(selection), consumer), identity?.Certificate); }
+                OpcUaRuntimeSessionStore.Binding(selection), consumer), identity?.Certificate,
+            selection => CredentialVault.Existing(CredentialVault.UserRoot(selection.VaultName!)).Check(selection.Credential!,
+                OpcUaRuntimeSessionStore.Binding(selection))); }
         catch { identity?.Dispose(); throw; }
         try { Captures = new(Store, options.ArtifactsDirectory); }
         catch { try { Store.DisposeAsync().AsTask().GetAwaiter().GetResult(); } finally { identity?.Dispose(); } throw; }

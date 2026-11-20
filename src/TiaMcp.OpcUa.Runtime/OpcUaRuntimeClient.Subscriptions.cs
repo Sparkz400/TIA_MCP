@@ -6,6 +6,7 @@ namespace TiaMcp.OpcUa.Runtime;
 internal sealed partial class OpcUaRuntimeClient
 {
     private uint subscriptionId;
+    private int perPublish = 1;
     private OpcUaMonitoredItem[] monitoredItems = [];
     private OpcUaEventMonitoredItem? eventItem;
     internal async Task<OpcUaSubscriptionCreated> CreateSubscription(string attemptId, OpcUaSubscriptionRequest request, CancellationToken ct)
@@ -22,7 +23,8 @@ internal sealed partial class OpcUaRuntimeClient
             eventNotifier=flags;
         }
         var created=await Session.CreateSubscriptionAsync(null,request.PublishingIntervalMilliseconds,
-            request.LifetimeCount,request.KeepAliveCount,1,true,0,ct);
+            request.LifetimeCount,request.KeepAliveCount,(uint)OpcUaSubscriptionContracts.PerPublish(request),true,0,ct);
+        perPublish=OpcUaSubscriptionContracts.PerPublish(request);
         subscriptionId=created.SubscriptionId;
         if(subscriptionId==0) throw Error("UaResponseInvalid");
         // No Subscription is registered with Session: the stack starts no background Publish engine.
@@ -89,7 +91,7 @@ internal sealed partial class OpcUaRuntimeClient
         {
             if(extension.Body is DataChangeNotification changes)
             {
-                if(changes.MonitoredItems.Count+values.Count>1)throw Error("UaResponseLimit");
+                if(changes.MonitoredItems.Count+values.Count>perPublish)throw Error("UaResponseLimit");
                 foreach(var n in changes.MonitoredItems)
                 {
                     var item=monitoredItems.SingleOrDefault(x=>x.ClientHandle==n.ClientHandle);
@@ -104,7 +106,7 @@ internal sealed partial class OpcUaRuntimeClient
             }
             else if(extension.Body is EventNotificationList notifications)
             {
-                if(eventItem is null || (OpcUaSubscriptionContracts.Status(eventItem.StatusCode)&0x80000000)!=0 || notifications.Events.Count+events.Count>1)throw Error("UaSubscriptionNotificationUnsupported");
+                if(eventItem is null || (OpcUaSubscriptionContracts.Status(eventItem.StatusCode)&0x80000000)!=0 || notifications.Events.Count+events.Count>perPublish)throw Error("UaSubscriptionNotificationUnsupported");
                 foreach(var notification in notifications.Events)
                 {
                     if(notification.ClientHandle!=eventItem.ClientHandle || notification.EventFields.Count!=OpcUaEventContracts.Fields.Length)throw Error("UaResponseInvalid");
@@ -115,7 +117,7 @@ internal sealed partial class OpcUaRuntimeClient
             else if(extension.Body is StatusChangeNotification status) statuses.Add($"0x{status.Status.Code:x8}");
             else throw Error("UaSubscriptionNotificationUnsupported");
         }
-        if(values.Count+events.Count>1)throw Error("UaResponseLimit");
+        if(values.Count+events.Count>perPublish)throw Error("UaResponseLimit");
         return new(kind,subscriptionId,message.SequenceNumber,Time(message.PublishTime),message.NotificationData.Count==0,
             Notifications:values.ToArray(),StatusChanges:statuses.ToArray(),Events:events.Count>0?events.ToArray():null);
     }

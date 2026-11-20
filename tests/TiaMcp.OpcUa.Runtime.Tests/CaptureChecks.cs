@@ -38,8 +38,11 @@ internal static class CaptureChecks
             string capture = Id();
             string[] names = ["int64","uint64","double","bool","text","bad","uncertain","missingTimes","array","denied","structure","byteArray","byteString","minimumDate"];
             var request = new OpcUaCaptureRequest(attempt,names.Select(FixtureServer.Node).ToArray(),100,10,names.Length);
+            int auditBeforePoll = server.Audit.Count;
             await captures.Start(capture,request,default);
             var status = await End(captures,capture);
+            check(server.Audit.ToArray().Skip(auditBeforePoll).Select(Json).Count(x=>x.GetProperty("operation").GetString()=="Read")==1,
+                "One cycle of 14 nodes sends one Read request carrying the identity check, not one per node");
             check(status.GetProperty("schemaVersion").GetString()=="opcua-runtime-capture-status.v1","UA capture distinct status schema");
             check(status.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="sampleLimit","UA capture sample limit");
             var rows = Json(captures.Page(status.GetProperty("snapshotRef").GetString()!,0,200)).GetProperty("rows").EnumerateArray().Where(x=>x.GetProperty("kind").GetString()=="read").ToArray();

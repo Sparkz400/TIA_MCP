@@ -104,6 +104,14 @@ internal sealed partial class CredentialVault
         if (state.Pins is not null) throw Error("CredentialAdmissionRequired");
         Decrypt(record, header, consumer);
     }
+    /// <summary>The refusals of <see cref="Use"/> without decrypting: for a per-request state check, where the secret is not needed.</summary>
+    internal void Check(CredentialReference reference, CredentialBinding expected)
+    {
+        using var held = Lock(); var header = Header(); var record = Read(reference, expected, header);
+        var state = ReadLifecycle(record.Reference);
+        if (state.State == "retired") throw Error("CredentialRetired");
+        if (state.Pins is not null) throw Error("CredentialAdmissionRequired");
+    }
     internal CredentialStatus Retire(CredentialReference reference, CredentialBinding expected)
     {
         using var held = Lock(); var record = Read(reference, expected, Header());

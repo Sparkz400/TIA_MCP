@@ -47,6 +47,9 @@ internal sealed partial class FixtureServer : StandardServer
     internal string? AdvertisedEndpoint;
     private ApplicationConfiguration? fixtureConfiguration;
     internal double LastRequestedSessionTimeout;
+    /// <summary>Replaces the client's requested session timeout (the server still clamps it to its own minimum and maximum).</summary>
+    internal double? SessionTimeoutOverrideMs;
+    internal int CloseDelayMs;
     internal int SessionCount => ServerInternal.SessionManager.GetSessions().Count;
     internal readonly TaskCompletionSource ReadEntered = new(TaskCreationOptions.RunContinuationsAsynchronously);
     internal string Endpoint { get; private set; } = "";
@@ -177,9 +180,14 @@ internal sealed partial class FixtureServer : StandardServer
         double timeout,uint maximumResponse,CancellationToken ct)
     {
         LastRequestedSessionTimeout=timeout;
-        var result=await base.CreateSessionAsync(channel,header,client,serverUri,endpointUrl,sessionName,nonce,certificate,timeout,maximumResponse,ct);
+        var result=await base.CreateSessionAsync(channel,header,client,serverUri,endpointUrl,sessionName,nonce,certificate,SessionTimeoutOverrideMs??timeout,maximumResponse,ct);
         if(AdvertisedEndpoint is not null)foreach(var endpoint in result.ServerEndpoints)endpoint.EndpointUrl=AdvertisedEndpoint;
         return result;
+    }
+    public override async Task<CloseSessionResponse> CloseSessionAsync(SecureChannelContext channel,RequestHeader header,bool deleteSubscriptions,CancellationToken ct)
+    {
+        if(CloseDelayMs>0)await Task.Delay(CloseDelayMs,ct);
+        return await base.CloseSessionAsync(channel,header,deleteSubscriptions,ct);
     }
     public override async Task<BrowseResponse> BrowseAsync(SecureChannelContext channel, RequestHeader header, ViewDescription view,
         uint maximum, BrowseDescriptionCollection nodes, CancellationToken ct)

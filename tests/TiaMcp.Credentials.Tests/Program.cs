@@ -144,10 +144,13 @@ finally { File.Move(headerPath + ".held", headerPath); }
 string copiedRoot = Path.Combine(output, "copied-vault"); var copied = new CredentialVault(copiedRoot);
 foreach (var path in Directory.EnumerateFiles(root)) { if (Path.GetFileName(path) == ".lock") continue; string target = Path.Combine(copiedRoot, Path.GetFileName(path)); File.Copy(path, target); var acl = new FileSecurity(); acl.SetSecurityDescriptorSddlForm(new FileInfo(path).GetAccessControl().GetSecurityDescriptorSddlForm(AccessControlSections.Access | AccessControlSections.Owner), AccessControlSections.Access | AccessControlSections.Owner); new FileInfo(target).SetAccessControl(acl); }
 Reject(() => copied.Inspect(first.Reference, binding), "CredentialUnavailable", "Copied store cannot silently rebind to a different path");
+vault.Check(first.Reference, binding); Check(true, "A state check passes for an active credential");
+Reject(() => vault.Check(first.Reference, binding with { Purpose = "other" }), "CredentialContextMismatch", "A state check refuses a different expected binding");
 var beforeRetire = File.ReadAllBytes(recordPath); var retired = vault.Retire(first.Reference, binding);
 Check(retired.State == "retired" && !retired.DecryptionVerified && !retired.SecretReturned, "Retirement reports only local disabled use");
 Check(File.ReadAllBytes(recordPath).SequenceEqual(beforeRetire), "Retirement preserves encrypted recovery generation");
 Check(vault.Retire(first.Reference, binding) == retired && Probe() == "retired", "Retirement is idempotent and persists across processes");
+Reject(() => vault.Check(first.Reference, binding), "CredentialRetired", "A state check refuses a retired credential without decrypting");
 Reject(() => vault.Use(first.Reference, binding, _ => throw new Exception("consumer called")), "CredentialRetired", "Retired reference cannot be consumed");
 string lifecyclePath = Path.Combine(root, first.Reference.CredentialId + ".state.json");
 try { File.Move(lifecyclePath, lifecyclePath + ".held"); Reject(() => vault.Inspect(first.Reference, binding), "CredentialUnavailable", "Lost lifecycle state cannot reactivate a retired reference"); }
