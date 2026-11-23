@@ -14,7 +14,7 @@ namespace TiaMcp.Openness.V21
 
         // What one batch has already read: the scopes of the PLC and, per group, its blocks by path. The paths of a batch mostly share a
         // group, so each group is listed once instead of once per path.
-        private sealed class BlockLookup
+        private sealed class BlockExportLookup
         {
             internal List<SoftwareScope> Scopes;
             internal readonly Dictionary<string, Dictionary<string, BlockEntry>> Groups = new Dictionary<string, Dictionary<string, BlockEntry>>(StringComparer.Ordinal);
@@ -23,7 +23,7 @@ namespace TiaMcp.Openness.V21
         /// <summary>Finds a block by its exact path by descending the group chain of the path, reading only the groups on the way and the
         /// names of the blocks in the last one. null when the path is not a plain block path or names no block there; the caller then
         /// falls back to the full lookup, which keeps its error behavior. Without a lookup the last group is read until the block is found.</summary>
-        private static BlockEntry ResolveBlockPath(PlcSelection plc, string path, BlockLookup lookup = null)
+        private static BlockEntry ResolveBlockPath(PlcSelection plc, string path, BlockExportLookup lookup = null)
         {
             if (lookup != null && lookup.Scopes == null) lookup.Scopes = SoftwareScopes(plc, new ScanBudget(50000));
             foreach (var scope in lookup != null ? lookup.Scopes : SoftwareScopes(plc, new ScanBudget(50000)))
@@ -79,7 +79,7 @@ namespace TiaMcp.Openness.V21
             var effective = (JObject)args.DeepClone();
             effective["plcPath"] = plcPath;
             var plc = SelectPlc(project, effective);
-            var lookup = new BlockLookup();
+            var lookup = new BlockExportLookup();
             var results = new JArray();
             foreach (string path in paths)
             {
