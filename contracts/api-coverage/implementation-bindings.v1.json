@@ -2842,8 +2842,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.BlockExport.cs",
-      "sha256": "ebf5ab6d7c7c0f93eb5397def506707f16945109ab03b9776700a017fa06929f",
-      "bytes": 6741
+      "sha256": "3eabc52611e49d71887448a775997d96a7abdd13903b9ab02d7e7da1ceecef3a",
+      "bytes": 6759
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs",
