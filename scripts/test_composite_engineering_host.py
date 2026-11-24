@@ -53,11 +53,17 @@ def main():
         report['shutdowns'].append(closed)
         check(closed['hostExitCode'] == 0 and not closed['forcedHostStop'] and not closed['workerExits'], 'Clean Host exit without native workers')
 
+    def route(name, arguments):
+        # Since the 0.5.0 surface redesign the record routes are the review_* tools with the record kind.
+        if name in ('reopen', 'list', 'page', 'artifact_read'):
+            return 'review_' + name, {'kind': 'composite_engineering', **(arguments or {})}
+        return 'composite_engineering_' + name, arguments or {}
+
     def call(name, arguments=None):
-        tool = 'composite_engineering_' + name
+        tool, arguments = route(name, arguments)
         contract = schema['x-tool-contracts'][tool]
-        validate(arguments or {}, tool + 'Input')
-        value = client.tool(tool, arguments or {})
+        validate(arguments, tool + 'Input')
+        value = client.tool(tool, arguments)
         validate(value, contract['output']['$ref'].rsplit('/', 1)[1])
         return value
 
@@ -81,7 +87,8 @@ def main():
             assert data, 'Nonterminal chunk must make progress'
 
     def refuse(name, arguments, code):
-        response = client.request('tools/call', {'name': 'composite_engineering_' + name, 'arguments': arguments})
+        tool, arguments = route(name, arguments)
+        response = client.request('tools/call', {'name': tool, 'arguments': arguments})
         value = response['structuredContent']; validate(value, 'error')
         check(response.get('isError') and value['error']['code'] == code, 'Structured offline refusal: ' + name + '/' + code)
 

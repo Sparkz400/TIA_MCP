@@ -43,10 +43,15 @@ def main():
         client = None
         result['shutdowns'].append(closed)
         check(closed['hostExitCode'] == 0 and not closed['forcedHostStop'] and not closed['workerExits'], 'Clean Host exit without native worker')
+    def route(action, arguments):
+        # Since the 0.5.0 surface redesign the record routes are the review_* tools with the record kind.
+        if action in ('reopen', 'list', 'page', 'artifact_read'):
+            return 'review_' + action, {'kind': 'runtime_handoff', **(arguments or {})}
+        return 'runtime_handoff_' + action, arguments or {}
     def call(action, arguments=None):
-        tool = 'runtime_handoff_' + action
-        validate(arguments or {}, tool + 'Input')
-        value = client.tool(tool, arguments or {})
+        tool, arguments = route(action, arguments)
+        validate(arguments, tool + 'Input')
+        value = client.tool(tool, arguments)
         validate(value, schema['x-tool-contracts'][tool]['output']['$ref'].rsplit('/', 1)[1])
         return value
     def upload(raw):
@@ -69,7 +74,8 @@ def main():
                 return bytes(raw)
             assert data
     def refuse(action, arguments, code):
-        response = client.request('tools/call', {'name': 'runtime_handoff_' + action, 'arguments': arguments})
+        tool, arguments = route(action, arguments)
+        response = client.request('tools/call', {'name': tool, 'arguments': arguments})
         check('SECRET-SENTINEL' not in json.dumps(response), 'Failure never echoes forbidden value')
         error = response['structuredContent']
         validate(error, 'handoffError')
