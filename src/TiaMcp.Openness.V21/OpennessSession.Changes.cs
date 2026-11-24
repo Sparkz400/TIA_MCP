@@ -760,7 +760,7 @@ namespace TiaMcp.Openness.V21
             PrepareMutationScope(change, plc, "block", change.BlockNames);
             PrepareBlockTargets(change, plc, false, false, effects);
             string nativeLanguage = language == "AWL" ? "STL" : language;
-            var findOld = BlockLookup(plc, change);
+            var findOld = CreateBlockFinder(plc, change);
             foreach (var name in expected)
             {
                 var old = findOld(name, false);
@@ -794,7 +794,7 @@ namespace TiaMcp.Openness.V21
             change.Namespace = ImportNamespace(document);
             PrepareMutationScope(change, plc, "block", change.BlockNames);
             PrepareBlockTargets(change, plc, safety, false, effects);
-            var findOld = BlockLookup(plc, change);
+            var findOld = CreateBlockFinder(plc, change);
             foreach (var target in targets)
             {
                 var old = findOld(target.Name, false);
@@ -1486,7 +1486,7 @@ namespace TiaMcp.Openness.V21
 
         private void PrepareBlockTargets(EngineeringChange change, PlcSelection plc, bool safety, bool mustExist, JArray effects)
         {
-            var find = BlockLookup(plc, change);
+            var find = CreateBlockFinder(plc, change);
             foreach (var name in change.BlockNames)
             {
                 var block = find(name, mustExist);
@@ -1511,7 +1511,7 @@ namespace TiaMcp.Openness.V21
 
         private void VerifyBlockTargets(EngineeringChange change, PlcSelection plc, bool safety)
         {
-            var find = BlockLookup(plc, change);
+            var find = CreateBlockFinder(plc, change);
             foreach (var name in change.BlockNames)
             {
                 var block = find(name, false);
@@ -1521,7 +1521,7 @@ namespace TiaMcp.Openness.V21
 
         private void VerifyExpectedBlocksExist(EngineeringChange change, PlcSelection plc)
         {
-            var find = BlockLookup(plc, change);
+            var find = CreateBlockFinder(plc, change);
             foreach (var name in change.BlockNames) find(name, true);
         }
 
@@ -1561,10 +1561,10 @@ namespace TiaMcp.Openness.V21
         }
 
         private BlockEntry FindBlockByName(PlcSelection plc, string name, bool required, EngineeringChange change, bool exactGroup = true) =>
-            BlockLookup(plc, change, exactGroup)(name, required);
+            CreateBlockFinder(plc, change, exactGroup)(name, required);
 
         // One walk of the change's software scope; each lookup then refuses an ambiguous or (if required) missing name as a single walk would.
-        private Func<string, bool, BlockEntry> BlockLookup(PlcSelection plc, EngineeringChange change, bool exactGroup = true)
+        private Func<string, bool, BlockEntry> CreateBlockFinder(PlcSelection plc, EngineeringChange change, bool exactGroup = true)
         {
             var budget = new ScanBudget(50000);
             var byName = ScopeBlocks(ResolveSoftwareScope(plc, change.ScopePath), budget)
