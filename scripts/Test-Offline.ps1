@@ -310,8 +310,9 @@ try {
             $run = @($suiteRuns | Where-Object { $_.suite -eq $managedSuite })
             if ($run.Count -ne 1) { throw "Managed suite did not report exactly once: $managedSuite" }
             Get-Content -LiteralPath $run[0].log
-            $LASTEXITCODE = $run[0].exitCode
-            if ($LASTEXITCODE -ne 0) { throw "Managed offline tests failed: $managedSuite" }
+            # Never assign $LASTEXITCODE here: under `& script`, that creates a script-scope copy that shadows the
+            # global one native commands set, and every later `if ($LASTEXITCODE -ne 0)` check would read this value.
+            if ($run[0].exitCode -ne 0) { throw "Managed offline tests failed: $managedSuite" }
             $result.managedSuites += $managedSuite
             $result.managedSuiteSeconds[$managedSuite] = $run[0].seconds
         }
