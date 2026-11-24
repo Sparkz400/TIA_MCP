@@ -1,5 +1,6 @@
 """Exercise the runner's real Git selection with controlled executable search paths."""
 import json
+import re
 import os
 from pathlib import Path
 import shutil
@@ -77,9 +78,11 @@ $managedSuite = 'TiaMcp.Tests'
 Invoke-Expression $body
 $checks = @($ast.FindAll({param($node)
     $node -is [System.Management.Automation.Language.IfStatementAst] -and
-    $node.Extent.Text -eq 'if ($LASTEXITCODE -ne 0) { throw "Managed offline tests failed: $managedSuite" }'
+    $node.Extent.Text -eq 'if ($run[0].exitCode -ne 0) { throw "Managed offline tests failed: $managedSuite" }'
 }, $true))
 if ($checks.Count -ne 1) { throw 'Expected the managed native exit-code guard.' }
+# The runner records each suite's exit code in its run row; the guard reads that row, never an assigned $LASTEXITCODE.
+$run = @([pscustomobject]@{suite=$managedSuite; exitCode=$global:LASTEXITCODE})
 Invoke-Expression $checks[0].Extent.Text
 '''
 
@@ -183,6 +186,19 @@ class ShardPlanTests(unittest.TestCase):
                     # Group 0 (61 s), a (50 s) and group 1 (41 s) are the heaviest units; least-loaded placement separates them.
                     heavy = [plan['group:0'], plan['a'], plan['group:1']]
                     self.assertEqual(3, len(set(heavy)))
+
+
+class ExitCodeScopeTests(unittest.TestCase):
+    """Assigning $LASTEXITCODE in a script invoked with `&` creates a script-scope copy that shadows the global variable
+    native commands set, so every later `if ($LASTEXITCODE -ne 0)` check reads the copy. Test-Offline.ps1 once ignored
+    every check after its managed suites that way."""
+
+    def test_no_script_assigns_lastexitcode_outside_global_scope(self):
+        pattern = re.compile(r'(?<![:\w])\$LASTEXITCODE\s*=(?!=)', re.IGNORECASE)
+        offenders = [f'{path.name}:{number}' for path in sorted(RUNNER.parent.glob('*.ps*1'))
+                     for number, line in enumerate(path.read_text(encoding='utf-8-sig').splitlines(), 1)
+                     if pattern.search(line) and not line.lstrip().startswith('#')]
+        self.assertEqual([], offenders)
 
 
 class SuiteClassificationTests(unittest.TestCase):
