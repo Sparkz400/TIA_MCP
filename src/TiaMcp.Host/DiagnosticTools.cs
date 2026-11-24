@@ -68,7 +68,7 @@ public sealed partial class TiaTools
     public CallToolResult TraceAnalyze(string measurementId) => DiagnosticResult(() => new TraceMeasurements(options.ArtifactsDirectory).Analyze(measurementId));
 
     [McpServerTool(Name = "diagnostic_report_export", ReadOnly = false, Destructive = false, OpenWorld = false)]
-    [Description("Export a retained trace_analyze, trace_compare or runtime_capture_analyze reportId as json, markdown or html. JSON keeps the exact original bytes; readable exports add findings, limits, report hash and source JSON; HTML is self-contained, no scripts or network resources. Returns hashed artifacts for artifact_read, 8 MiB each. v1 shows retained results without rerun. No native access, source authentication, clock synchronization, causality or fix proof.")]
+    [Description("Export a retained trace_analyze, trace_compare or runtime_capture_analyze reportId as json, markdown or html. JSON keeps the exact original bytes; readable exports add findings, limits, report hash and source JSON; HTML is self-contained, no scripts or network resources. Returns hashed artifacts for artifact_read, 8 MiB each. v1 shows retained results without rerun; v2 rederives the original source chains into a complete diagnostic-quality-report.v2. No native access, source authentication, clock synchronization, causality or fix proof.")]
     public CallToolResult DiagnosticReportExport(string reportId, string format)
         => DiagnosticResult(() => new DiagnosticReportExport(options.ArtifactsDirectory).Export(reportId, format));
 
