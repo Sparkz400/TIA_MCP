@@ -437,8 +437,8 @@
     },
     {
       "path": "contracts/mcp-surface.v1.json",
-      "sha256": "39f0cec16cd1f1c1d023013d957d559b470a372428c25da2383dbd2cf0add886",
-      "bytes": 209715
+      "sha256": "4328493d0b298c66bdbae8b89ec5394fcd388556886f8eab1b3cc3ba0581ea8a",
+      "bytes": 1208634
     },
     {
       "path": "contracts/multiuser-observations.v1.schema.json",
@@ -2307,8 +2307,8 @@
     },
     {
       "path": "src/TiaMcp.Host/TiaVersionSurface.cs",
-      "sha256": "71e03891569f34065fa671678ec693243cfac4771aae2d46d16c97907bc85528",
-      "bytes": 4975
+      "sha256": "451484fcf06db2d624a0e85cf6b6253dc58dbc35290679469c1af2bdc5f8517b",
+      "bytes": 5155
     },
     {
       "path": "src/TiaMcp.Host/ToolGroups.cs",
