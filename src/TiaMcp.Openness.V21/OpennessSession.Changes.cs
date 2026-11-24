@@ -500,127 +500,20 @@ namespace TiaMcp.Openness.V21
                     ((JArray)preview["warnings"]).Add("Removing an active language can discard project texts in that language; the recovery archive is the only way back.");
                     break;
                 case "source_upsert":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    string language = ChangeText(payload, "language", 16).ToUpperInvariant();
-                    if (language != "SCL" && language != "STL" && language != "AWL" && language != "SIMATIC_SD") throw new BridgeException("UnsupportedLanguage", "Source writes accept SCL, STL/AWL or explicit new-block SIMATIC_SD documents.");
-                    string source = ChangeText(payload, "source", 2 * 1024 * 1024);
-                    RejectFIoBlockContent(plc, source, false);
-                    string declarationSource = language == "SIMATIC_SD" ? EngineeringSources.SimaticSdDeclarationEnvelope(source) : source;
-                    var declared = EngineeringSources.DeclaredBlocks(declarationSource);
-                    if (language == "SIMATIC_SD" && declared.Length != 1)
-                        throw new BridgeException("UnsupportedSourceDocument", "The native SIMATIC SD route accepts exactly one explicit new block per document; multi-block documents can import partially.");
-                    var expected = ChangeNames(payload, "expectedBlockNames");
-                    if (!new HashSet<string>(declared, StringComparer.Ordinal).SetEquals(expected))
-                        throw new BridgeException("SourceScopeMismatch", "Source block declarations must exactly match expectedBlockNames.", new JObject { ["declared"] = new JArray(declared), ["expected"] = new JArray(expected) });
-                    change.BlockNames = expected;
-                    change.Namespace = EngineeringSources.DeclaredNamespace(declarationSource, false);
-                    PrepareMutationScope(change, plc, "block", change.BlockNames);
-                    PrepareBlockTargets(change, plc, false, false, effects);
-                    string nativeLanguage = language == "AWL" ? "STL" : language;
-                    var findOld = BlockLookup(plc, change);
-                    foreach (var name in expected)
-                    {
-                        var old = findOld(name, false);
-                        if (language == "SIMATIC_SD" && old != null)
-                            throw new BridgeException("TargetAlreadyExists", "SIMATIC_SD source import is limited to explicitly new blocks; use typed edits for existing graphical blocks.");
-                        if (old != null && !(old.Item is DataBlock) && old.Item.ProgrammingLanguage.ToString() != nativeLanguage)
-                            throw new BridgeException("LanguageConversionNotSupported", "Source update must preserve the existing language of " + name + ". Use a dedicated conversion workflow if conversion is intended.");
-                    }
-                    change.InputPath = Path.Combine(change.Directory, language == "SIMATIC_SD" ? "requested.s7dcl" : language == "SCL" ? "requested.scl" : "requested.awl");
-                    File.WriteAllText(change.InputPath, source, new UTF8Encoding(true));
-                    change.InputHash = ChangeFileHash(change.InputPath);
-                    preview["language"] = language;
+                    PrepareSourceUpsert(change, payload, preview, effects);
                     break;
-                }
                 case "block_import_xml":
                 case "safety_import_xml":
                 case "graph_import":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    string xml = ChangeText(payload, "xml", 2 * 1024 * 1024);
-                    var document = EngineeringSources.ReadXml(xml);
-                    var targets = EngineeringSources.BlockDeclarations(document);
-                    var expected = ChangeNames(payload, "expectedBlockNames");
-                    if (!new HashSet<string>(targets.Select(t => t.Name), StringComparer.Ordinal).SetEquals(expected)) throw new BridgeException("XmlScopeMismatch", "Top-level XML blocks must exactly match expectedBlockNames.");
-                    if (change.Kind == "graph_import" && (targets.Length != 1 || targets[0].Language != "GRAPH")) throw new BridgeException("UnsupportedLanguage", "graph_import accepts exactly one GRAPH block per document.");
-                    bool safety = change.Kind == "safety_import_xml";
-                    if (targets.Any(target => target.IsSafety != safety)) throw new BridgeException("SafetyBoundary", "Standard and safety imports use separate workflows, and cannot be mixed or converted.");
-                    if (!safety) RejectFIoBlockContent(plc, xml, true);
-                    if (safety && targets.Any(target => target.Language != "F_LAD" && target.Language != "F_FBD" && target.Language != "F_DB"))
-                        throw new BridgeException("UnsupportedSafetyBlock", "Only user F-LAD, F-FBD and F-DB XML is accepted; F-system and generated call languages are excluded.");
-                    if (safety) { RequireChangeBool(payload, "safetyAcknowledged"); EnsureSafetyWritable(plc.Software); preview["safetyBefore"] = ReadSafety(plc.Software); }
-                    change.BlockNames = expected;
-                    change.Namespace = ImportNamespace(document);
-                    PrepareMutationScope(change, plc, "block", change.BlockNames);
-                    PrepareBlockTargets(change, plc, safety, false, effects);
-                    var findOld = BlockLookup(plc, change);
-                    foreach (var target in targets)
-                    {
-                        var old = findOld(target.Name, false);
-                        if (old != null && old.Item.ProgrammingLanguage.ToString() != target.Language)
-                            throw new BridgeException("LanguageConversionNotSupported", "XML update must retain the existing block language: " + target.Name);
-                    }
-                    ValidateXmlBlockNumbers(document, plc, change);
-                    change.InputPath = Path.Combine(change.Directory, "requested.xml");
-                    File.WriteAllText(change.InputPath, xml, new UTF8Encoding(true));
-                    change.InputHash = ChangeFileHash(change.InputPath);
+                    PrepareBlockXmlImport(change, payload, preview, effects);
                     break;
-                }
                 case "graphical_operand_set":
                 case "graphical_network_patch":
                 case "graphical_network_insert":
                 case "call_parameter_set":
                 case "call_connection_set":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    string name = MutationBlockName(payload, plc);
-                    change.BlockNames = new[] { name };
-                    PrepareMutationScope(change, plc, "block", change.BlockNames);
-                    var block = FindBlockByName(plc, name, true, change);
-                    string language = block.Item.ProgrammingLanguage.ToString();
-                    if (language != "LAD" && language != "FBD" && !(change.Kind == "call_parameter_set" && language == "SCL")) throw new BridgeException("UnsupportedLanguage", "Graphical editing requires standard LAD/FBD; call_parameter_set also supports exported SCL calls.");
-                    change.BlockNames = new[] { name };
-                    PrepareBlockTargets(change, plc, false, true, effects);
-                    string backup = change.Backups[0]["artifact"].Value<string>("path");
-                    var document = EngineeringSources.ReadXml(File.ReadAllText(backup));
-                    try
-                    {
-                        if (change.Kind == "graphical_network_insert")
-                            preview["insertedNetworkId"] = EngineeringSources.InsertGraphicalNetwork(document, payload.Value<string>("afterNetworkId"), ChangeText(payload, "compileUnitXml", 1024 * 1024));
-                        else
-                        {
-                            string networkId = ChangeText(payload, "networkId", 32);
-                            if (change.Kind == "graphical_operand_set")
-                                EngineeringSources.SetGraphicalOperand(document, networkId, ChangeText(payload, "accessUid", 32), ChangeStringArray(payload, "components", 128, 128));
-                            else if (change.Kind == "graphical_network_patch")
-                            {
-                                var originalUids = new HashSet<string>(document.Descendants("SW.Blocks.CompileUnit").Where(e => (string)e.Attribute("ID") == networkId)
-                                    .Descendants().Where(e => e.Name.LocalName != "IdentCon" && e.Name.LocalName != "NameCon").Attributes("UId").Select(a => a.Value), StringComparer.Ordinal);
-                                EngineeringSources.PatchGraphicalNetwork(document, networkId, ChangeStringArray(payload, "upsertXml", 500, 1024 * 1024, true), ChangeStringArray(payload, "removeUids", 500, 32, true));
-                                // Opt-in: predict V21's renumbering so added/removed nodes can read back exactly; the readback check is unchanged.
-                                if (payload.Value<bool?>("renumberUids") == true)
-                                {
-                                    preview["uidRenumbering"] = GraphicalUidRenumbering.Predict(document, networkId, originalUids);
-                                    ((JArray)preview["warnings"]).Add("renumberUids applied V21's predicted UId renumbering (uidRenumbering). It is not natively qualified for patches: a wrong prediction fails closed with NativePreservationMismatch after apply and needs checkpoint recovery. Try it on a project_copy first.");
-                                }
-                            }
-                            else if (change.Kind == "call_parameter_set")
-                                EngineeringSources.SetCallParameterOperand(document, networkId, ChangeText(payload, "callUid", 32), ChangeText(payload, "parameterName", 128), ChangeStringArray(payload, "components", 128, 128));
-                            else EngineeringSources.SetGraphicalCallConnection(document, networkId, ChangeText(payload, "callUid", 32), ChangeText(payload, "parameterName", 128), ChangeText(payload, "targetAccessUid", 32));
-                        }
-                    }
-                    catch (ArgumentException ex) { throw new BridgeException("InvalidGraphicalEdit", ex.Message); }
-                    catch (InvalidOperationException ex) { throw new BridgeException("UnsupportedGraphicalEdit", ex.Message); }
-                    preview["edit"] = payload.DeepClone();
-                    EngineeringSources.BlockDeclarations(document);
-                    RejectFIoBlockContent(plc, document.ToString(SaveOptions.DisableFormatting), true);
-                    change.InputPath = Path.Combine(change.Directory, "requested.xml");
-                    File.WriteAllText(change.InputPath, document.ToString(SaveOptions.DisableFormatting), new UTF8Encoding(true));
-                    change.InputHash = ChangeFileHash(change.InputPath);
-                    ((JArray)preview["warnings"]).Add("Only explicitly selected XML nodes change in the prepared artifact. Untouched interfaces, comments, networks and unknown elements are preserved structurally. Native import/compilation remains authoritative for instruction and pin compatibility.");
+                    PrepareGraphicalXmlEdit(change, payload, preview, effects);
                     break;
-                }
                 case "type_rename":
                 case "type_delete":
                     PrepareTypeEdit(change, preview);
@@ -688,129 +581,24 @@ namespace TiaMcp.Openness.V21
                     PrepareUmacRoleSet(change, project, preview);
                     break;
                 case "type_source_upsert":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    string source = ChangeText(payload, "source", 2 * 1024 * 1024);
-                    change.ObjectNames = ChangeNames(payload, "expectedTypeNames");
-                    change.Namespace = EngineeringSources.DeclaredNamespace(source, true);
-                    if (!new HashSet<string>(EngineeringSources.DeclaredTypes(source), StringComparer.Ordinal).SetEquals(change.ObjectNames))
-                        throw new BridgeException("SourceScopeMismatch", "TYPE declarations must exactly match expectedTypeNames.");
-                    PrepareMutationScope(change, plc, "type", change.ObjectNames);
-                    PrepareTypeTargets(change, plc, effects);
-                    change.InputPath = Path.Combine(change.Directory, "requested.scl");
-                    File.WriteAllText(change.InputPath, source, new UTF8Encoding(true));
-                    change.InputHash = ChangeFileHash(change.InputPath);
+                    PrepareTypeSourceUpsert(change, payload, effects);
                     break;
-                }
                 case "plc_type_import_xml":
                 case "tag_table_import_xml":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    bool types = change.Kind == "plc_type_import_xml";
-                    // Row form of a tag-table import: {tagTableName, tags:[...]} instead of {xml, expectedTableNames}.
-                    bool rows = !types && payload["tags"] != null;
-                    if (rows && (payload["xml"] != null || payload["expectedTableNames"] != null))
-                        throw new BridgeException("InvalidRequest", "Give either xml with expectedTableNames, or tagTableName with tags.");
-                    string xml = rows ? null : ChangeText(payload, "xml", 2 * 1024 * 1024);
-                    change.ObjectNames = rows ? new[] { ChangeText(payload, "tagTableName", 128) } : ChangeNames(payload, types ? "expectedTypeNames" : "expectedTableNames");
-                    if (rows)
-                    {
-                        change.Namespace = "";
-                        PrepareMutationScope(change, plc, "tagTable", change.ObjectNames);
-                        xml = TagRowsXml(change, plc, project, payload, effects);
-                    }
-                    var document = EngineeringSources.ReadXml(xml);
-                    string elementName = types ? "SW.Types.PlcStruct" : "SW.Tags.PlcTagTable";
-                    var declarations = EngineeringSources.NamedXmlObjects(document, elementName);
-                    change.Namespace = types ? ImportNamespace(document) : "";
-                    if (!new HashSet<string>(declarations, StringComparer.Ordinal).SetEquals(change.ObjectNames)) throw new BridgeException("XmlScopeMismatch", "Imported object names must exactly match the expected set.");
-                    if (!rows) PrepareMutationScope(change, plc, types ? "type" : "tagTable", change.ObjectNames);
-                    if (types) PrepareTypeTargets(change, plc, effects);
-                    else
-                    {
-                        TagTableImportRules.Validate(document);
-                        RejectFIoAddresses(plc, TagAddressRules.TagTableAddresses(document));
-                        var allTables = AllTagTables(ResolveSoftwareScope(plc, change.ScopePath).Tags).ToArray();
-                        var importedSymbols = document.Descendants().Where(element => element.Name == "SW.Tags.PlcTag" || element.Name == "SW.Tags.PlcUserConstant")
-                            .Select(element => element.Element("AttributeList")?.Element("Name")?.Value).ToArray();
-                        if (importedSymbols.Any(string.IsNullOrWhiteSpace) || importedSymbols.Distinct(StringComparer.OrdinalIgnoreCase).Count() != importedSymbols.Length)
-                            throw new BridgeException("TagScopeMismatch", "Every imported tag or user constant must have a unique explicit symbolic name.");
-                        var incomingTags = new HashSet<string>(importedSymbols, StringComparer.OrdinalIgnoreCase);
-                        foreach (var table in allTables)
-                        {
-                            if (!change.ObjectNames.Contains(table.Name, StringComparer.OrdinalIgnoreCase))
-                            {
-                                if (table.Tags.Any(tag => incomingTags.Contains(tag.Name)) || table.UserConstants.Any(constant => incomingTags.Contains(constant.Name)) || table.SystemConstants.Any(constant => incomingTags.Contains(constant.Name)))
-                                    throw new BridgeException("TagScopeMismatch", "Imported tag/constant symbols collide with symbols in an unpreviewed table: " + table.Name);
-                                continue;
-                            }
-                            if (table.Tags.Any(tag => tag.IsSafety))
-                                throw new BridgeException("SafetyBoundary", "Generic tag-table import cannot overwrite a table containing native safety tags: " + table.Name);
-                            string path = Path.Combine(change.Directory, "before-tags-" + Guid.NewGuid().ToString("N") + ".xml");
-                            table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-                            TagTableImportRules.RequireExistingMembers(TagTableImportRules.Tables(EngineeringSources.ReadXml(File.ReadAllText(path))).Single(),
-                                TagTableImportRules.Tables(document).Single(t => string.Equals((string)t.Element("AttributeList").Element("Name"), table.Name, StringComparison.OrdinalIgnoreCase)));
-                            change.Backups.Add(new JObject { ["tableName"] = table.Name, ["artifact"] = ChangeArtifact(path) });
-                        }
-                        effects.Add(new JObject { ["importTagTables"] = new JArray(change.ObjectNames) });
-                        // Advisory only: findings or an unreadable hardware configuration never refuse the import.
-                        var crossCheck = TagTableRowRules.CrossCheck(document, () => IoAddressRanges(plc));
-                        preview["hardwareCrossCheck"] = crossCheck;
-                        if (TagTableRowRules.Warning(crossCheck) is string crossCheckWarning) ((JArray)preview["warnings"]).Add(crossCheckWarning);
-                    }
-                    change.InputPath = Path.Combine(change.Directory, "requested.xml");
-                    File.WriteAllText(change.InputPath, xml, new UTF8Encoding(true));
-                    change.InputHash = ChangeFileHash(change.InputPath);
+                    PrepareObjectXmlImport(change, project, payload, preview, effects);
                     break;
-                }
                 case "block_delete":
                 case "block_rename":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    change.BlockNames = new[] { MutationBlockName(payload, plc) };
-                    PrepareMutationScope(change, plc, "block", change.BlockNames);
-                    PrepareBlockTargets(change, plc, false, true, effects);
-                    if (change.Kind == "block_rename")
-                    {
-                        string name = ChangeText(payload, "newName", 128);
-                        if (FindBlockByName(plc, name, false, change, false) != null) throw new BridgeException("ObjectExists", "A block in this software scope already has the requested newName.");
-                        ValidateNamespaceOwnership(change, plc, "block", new[] { name });
-                        effects.Add(new JObject { ["renameTo"] = name });
-                    }
-                    else
-                    {
-                        if (payload["dependencyPolicy"] == null) payload["dependencyPolicy"] = "rejectReferenced";
-                        var target = FindBlockByName(plc, change.BlockNames[0], true, change);
-                        preview["dependencies"] = CheckDeleteDependencies(change, plc, target.Item, target.Item.Name);
-                    }
-                    ((JArray)preview["warnings"]).Add("Callers, instance references and interfaces may be affected. Compile the complete PLC after applying.");
+                    PrepareBlockDeleteOrRename(change, payload, preview, effects);
                     break;
-                }
                 case "block_protect":
                 case "block_unprotect":
                 case "block_write_protection_set":
                     PrepareBlockProtection(change, preview);
                     break;
                 case "hardware_add":
-                {
-                    string identifier = ChangeText(payload, "typeIdentifier", 256);
-                    ValidateCatalogIdentifier(identifier);
-                    string name = ChangeText(payload, "deviceName", 128);
-                    if (EngineeringDevices(project).Any(d => string.Equals(d.Name, name, StringComparison.OrdinalIgnoreCase))) throw new BridgeException("ObjectExists", "Device name already exists.");
-                    ChangeText(payload, "itemName", 128);
-                    effects.Add(new JObject { ["createDevice"] = name, ["typeIdentifier"] = identifier });
-                    bool failsafe = payload.Value<bool?>("failsafeRuntimeAccess") == true;
-                    if (failsafe && payload.Value<bool?>("configureScratchSecurity") != true)
-                        throw new BridgeException("InvalidRequest", "failsafeRuntimeAccess applies only together with configureScratchSecurity.");
-                    if (payload.Value<bool?>("configureScratchSecurity") == true)
-                    {
-                        EnsureCurrentScratchProject(project);
-                        effects.Add(new JObject { ["configureNewCpuSecurity"] = "Protect the new scratch CPU configuration and provision a new password-authenticated runtime user/role with standard full access scoped to that new device. Generated credentials are stored under Windows DPAPI CurrentUser. No existing protection or anonymous access is changed." });
-                        if (failsafe)
-                            effects.Add(new JObject { ["failsafeRuntimeAccess"] = "The generated role receives the F-CPU runtime right Full access including fail-safe instead of Full access, for this new scratch device only." });
-                    }
+                    PrepareHardwareAdd(project, payload, effects);
                     break;
-                }
                 case "hardware_address_set":
                     PrepareHardwareAddress(change, project, preview);
                     break;
@@ -836,23 +624,8 @@ namespace TiaMcp.Openness.V21
                     break;
                 }
                 case "safety_fparameter_set":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    preview["parameterChanges"] = FParameterSet(change, project, false);
-                    if (((JArray)preview["parameterChanges"]).OfType<JObject>().Any(row => row["fDestinationUsedOnOtherFSource"] != null))
-                        ((JArray)preview["warnings"]).Add("An F-destination address is also used by an F-I/O on another F-source (see fDestinationUsedOnOtherFSource). PROFIsafe addresses should be unique across the project; the F-compile reports a real duplicate.");
-#if SAFETY_FPARAMETER_DISCOVERY
-                    if (change.Selector.Value<bool?>("fParameterDiscovery") == true)
-                    {
-                        preview["fParameterDiscovery"] = true;
-                        ((JArray)preview["warnings"]).Add("F-parameter discovery Host: declared-writable F-parameters outside the qualified allowlist are admitted for qualification runs only.");
-                    }
-#endif
-                    preview["safetyBefore"] = ReadSafety(plc.Software);
-                    effects.Add(new JObject { ["plcPath"] = plc.Path, ["action"] = change.Kind });
-                    ((JArray)preview["warnings"]).Add("Changing F-parameters changes the F-parameter signature of each F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns a PROFIsafe address to the physical F-I/O, or downloads anything; that stays with the authorized safety workflow.");
+                    PrepareSafetyFParameterSet(change, project, preview, effects);
                     break;
-                }
                 case "network_io_assign":
                     PrepareIoAssignment(change, project, preview, out _, out _);
                     break;
@@ -910,54 +683,11 @@ namespace TiaMcp.Openness.V21
                     break;
                 }
                 case "network_configure":
-                {
-                    var node = ChangeNode(project, payload);
-                    // No AttributeTarget: the fingerprint already holds every node, so a fresh session can recompute the outcome.
-                    var attributes = payload["attributes"] as JObject ?? new JObject();
-                    foreach (var name in new[] { "Address", "SubnetMask", "RouterAddress" })
-                        if (attributes[name] != null && (!IPAddress.TryParse(attributes.Value<string>(name), out var address) || address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork))
-                            throw new BridgeException("InvalidRequest", name + " must be an IPv4 address.");
-                    preview["attributeChanges"] = PrepareAttributes(node, attributes, NetworkWriteAttributes);
-                    if (payload["subnetName"] != null) ChangeText(payload, "subnetName", 128);
-                    if (payload.Value<bool?>("disconnect") == true && payload["subnetName"] != null) throw new BridgeException("InvalidRequest", "Choose subnetName or disconnect, not both.");
-                    effects.Add(new JObject { ["nodeName"] = node.Name, ["connectedSubnetBefore"] = node.ConnectedSubnet?.Name,
-                        ["connectedSubnetAfter"] = payload["subnetName"]?.DeepClone(), ["disconnect"] = payload.Value<bool?>("disconnect") ?? false });
+                    PrepareNetworkConfigure(project, payload, preview, effects);
                     break;
-                }
                 case "to_create":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    string name = ChangeText(payload, "name", 128);
-                    if (payload["technologyPath"] != null) throw new BridgeException("InvalidRequest", "to_create creates in the PLC root technology group; technologyPath is only supported for existing objects.");
-                    if (FindTechnologyEntry(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", new JObject { ["name"] = name }, false) != null) throw new BridgeException("ObjectExists", "Technology object already exists.");
-                    ChangeText(payload, "typeIdentifier", 128);
-                    if (!Version.TryParse(ChangeText(payload, "version", 32), out _)) throw new BridgeException("InvalidRequest", "version must be a dotted numeric version supported by this CPU.");
-                    preview["technologyProfile"] = AdmitTechnologyVersion(plc, payload);
-                    if (preview["technologyProfile"].Value<string>("outcome") == "unprofiled")
-                        ((JArray)preview["warnings"]).Add("No recorded technology version profile covers this CPU/type/version; unprofiledAcknowledged lets Siemens validate it at creation, and a native refusal requires checkpoint recovery.");
-                    // FindTechnologyEntry above traversed the same tree completely, so the type list is complete.
-                    if (TechnologyVersionProfileRules.FirstMotionObject(payload.Value<string>("typeIdentifier"),
-                            TechnologyObjects(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", new ScanBudget(50000)).Select(entry => entry.Item.OfSystemLibElement).ToArray()))
-                    {
-                        preview["firstMotionObject"] = true;
-                        ((JArray)preview["warnings"]).Add("This is the PLC's first motion technology object; it adds the know-how protected MC_Servo and MC_Interpolator OBs, so change_apply requires compile=true (CompileRequired otherwise).");
-                    }
-                    if (payload["parameters"] != null)
-                    {
-                        var initial = ChangeObject(payload, "parameters");
-                        if (initial.Count > 500) throw new BridgeException("InvalidRequest", "Initial TO parameters are limited to 500 scalar values.");
-                        foreach (var property in initial.Properties())
-                        {
-                            RejectSensitiveName(property.Name);
-                            if (!(property.Value is JValue) || property.Value.Type == JTokenType.Null) throw new BridgeException("InvalidRequest", "Initial TO parameters must be non-null scalars.");
-                        }
-                        preview["initialParameters"] = initial.DeepClone();
-                        ((JArray)preview["warnings"]).Add("Initial parameter names, native types, write access and dependencies can only be checked after native creation. They are applied within the same checkpoint before compilation; failure requires recovery.");
-                    }
-                    effects.Add(new JObject { ["createTechnologyObject"] = name, ["typeIdentifier"] = payload["typeIdentifier"], ["version"] = payload["version"] });
-                    ((JArray)preview["warnings"]).Add("Type/version availability is validated by Siemens during creation; a successful create can still require parameter configuration before compile succeeds.");
+                    PrepareTechnologyCreate(change, payload, preview, effects);
                     break;
-                }
                 case "to_child_create":
                     PrepareTechnologyChildCreate(change, effects);
                     break;
@@ -965,26 +695,8 @@ namespace TiaMcp.Openness.V21
                 case "to_delete":
                 case "to_connect":
                 case "to_disconnect":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    var entry = BindTechnologySelection(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", payload);
-                    var technology = entry.Item;
-                    string beforePath = Path.Combine(change.Directory, "before-to.xml");
-                    // V21 exports no inconsistent object (native, 30 October 2026), and a real axis or encoder stays inconsistent until it is connected.
-                    if (technology.IsConsistent)
-                    {
-                        technology.Export(new FileInfo(beforePath), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-                        change.Backups.Add(ChangeArtifact(beforePath));
-                    }
-                    else ((JArray)preview["warnings"]).Add("The technology object is inconsistent (not compiled) and V21 cannot export it, so no XML backup precedes this write; the project checkpoint archive is the recovery.");
-                    if (change.Kind == "to_parameters")
-                    {
-                        preview["parameterChanges"] = PrepareTechnologyParameters(technology, ChangeObject(payload, "parameters"), out _);
-                    }
-                    else if (change.Kind != "to_delete") PrepareTechnologyConnection(change, project, plc, entry, preview);
-                    effects.Add(new JObject { ["technologyObject"] = technology.Name, ["technologyPath"] = entry.Path, ["action"] = change.Kind });
+                    PrepareTechnologyEdit(change, project, payload, preview, effects);
                     break;
-                }
                 case "db_snapshot_create":
                 case "db_snapshot_load_actual":
                     PrepareDbSnapshotChange(change, preview);
@@ -1029,6 +741,327 @@ namespace TiaMcp.Openness.V21
             return preview;
         }
 
+        private void PrepareSourceUpsert(EngineeringChange change, JObject payload, JObject preview, JArray effects)
+        {
+            var plc = SelectPlc(change.Selector);
+            string language = ChangeText(payload, "language", 16).ToUpperInvariant();
+            if (language != "SCL" && language != "STL" && language != "AWL" && language != "SIMATIC_SD") throw new BridgeException("UnsupportedLanguage", "Source writes accept SCL, STL/AWL or explicit new-block SIMATIC_SD documents.");
+            string source = ChangeText(payload, "source", 2 * 1024 * 1024);
+            RejectFIoBlockContent(plc, source, false);
+            string declarationSource = language == "SIMATIC_SD" ? EngineeringSources.SimaticSdDeclarationEnvelope(source) : source;
+            var declared = EngineeringSources.DeclaredBlocks(declarationSource);
+            if (language == "SIMATIC_SD" && declared.Length != 1)
+                throw new BridgeException("UnsupportedSourceDocument", "The native SIMATIC SD route accepts exactly one explicit new block per document; multi-block documents can import partially.");
+            var expected = ChangeNames(payload, "expectedBlockNames");
+            if (!new HashSet<string>(declared, StringComparer.Ordinal).SetEquals(expected))
+                throw new BridgeException("SourceScopeMismatch", "Source block declarations must exactly match expectedBlockNames.", new JObject { ["declared"] = new JArray(declared), ["expected"] = new JArray(expected) });
+            change.BlockNames = expected;
+            change.Namespace = EngineeringSources.DeclaredNamespace(declarationSource, false);
+            PrepareMutationScope(change, plc, "block", change.BlockNames);
+            PrepareBlockTargets(change, plc, false, false, effects);
+            string nativeLanguage = language == "AWL" ? "STL" : language;
+            var findOld = BlockLookup(plc, change);
+            foreach (var name in expected)
+            {
+                var old = findOld(name, false);
+                if (language == "SIMATIC_SD" && old != null)
+                    throw new BridgeException("TargetAlreadyExists", "SIMATIC_SD source import is limited to explicitly new blocks; use typed edits for existing graphical blocks.");
+                if (old != null && !(old.Item is DataBlock) && old.Item.ProgrammingLanguage.ToString() != nativeLanguage)
+                    throw new BridgeException("LanguageConversionNotSupported", "Source update must preserve the existing language of " + name + ". Use a dedicated conversion workflow if conversion is intended.");
+            }
+            change.InputPath = Path.Combine(change.Directory, language == "SIMATIC_SD" ? "requested.s7dcl" : language == "SCL" ? "requested.scl" : "requested.awl");
+            File.WriteAllText(change.InputPath, source, new UTF8Encoding(true));
+            change.InputHash = ChangeFileHash(change.InputPath);
+            preview["language"] = language;
+        }
+
+        private void PrepareBlockXmlImport(EngineeringChange change, JObject payload, JObject preview, JArray effects)
+        {
+            var plc = SelectPlc(change.Selector);
+            string xml = ChangeText(payload, "xml", 2 * 1024 * 1024);
+            var document = EngineeringSources.ReadXml(xml);
+            var targets = EngineeringSources.BlockDeclarations(document);
+            var expected = ChangeNames(payload, "expectedBlockNames");
+            if (!new HashSet<string>(targets.Select(t => t.Name), StringComparer.Ordinal).SetEquals(expected)) throw new BridgeException("XmlScopeMismatch", "Top-level XML blocks must exactly match expectedBlockNames.");
+            if (change.Kind == "graph_import" && (targets.Length != 1 || targets[0].Language != "GRAPH")) throw new BridgeException("UnsupportedLanguage", "graph_import accepts exactly one GRAPH block per document.");
+            bool safety = change.Kind == "safety_import_xml";
+            if (targets.Any(target => target.IsSafety != safety)) throw new BridgeException("SafetyBoundary", "Standard and safety imports use separate workflows, and cannot be mixed or converted.");
+            if (!safety) RejectFIoBlockContent(plc, xml, true);
+            if (safety && targets.Any(target => target.Language != "F_LAD" && target.Language != "F_FBD" && target.Language != "F_DB"))
+                throw new BridgeException("UnsupportedSafetyBlock", "Only user F-LAD, F-FBD and F-DB XML is accepted; F-system and generated call languages are excluded.");
+            if (safety) { RequireChangeBool(payload, "safetyAcknowledged"); EnsureSafetyWritable(plc.Software); preview["safetyBefore"] = ReadSafety(plc.Software); }
+            change.BlockNames = expected;
+            change.Namespace = ImportNamespace(document);
+            PrepareMutationScope(change, plc, "block", change.BlockNames);
+            PrepareBlockTargets(change, plc, safety, false, effects);
+            var findOld = BlockLookup(plc, change);
+            foreach (var target in targets)
+            {
+                var old = findOld(target.Name, false);
+                if (old != null && old.Item.ProgrammingLanguage.ToString() != target.Language)
+                    throw new BridgeException("LanguageConversionNotSupported", "XML update must retain the existing block language: " + target.Name);
+            }
+            ValidateXmlBlockNumbers(document, plc, change);
+            change.InputPath = Path.Combine(change.Directory, "requested.xml");
+            File.WriteAllText(change.InputPath, xml, new UTF8Encoding(true));
+            change.InputHash = ChangeFileHash(change.InputPath);
+        }
+
+        private void PrepareGraphicalXmlEdit(EngineeringChange change, JObject payload, JObject preview, JArray effects)
+        {
+            var plc = SelectPlc(change.Selector);
+            string name = MutationBlockName(payload, plc);
+            change.BlockNames = new[] { name };
+            PrepareMutationScope(change, plc, "block", change.BlockNames);
+            var block = FindBlockByName(plc, name, true, change);
+            string language = block.Item.ProgrammingLanguage.ToString();
+            if (language != "LAD" && language != "FBD" && !(change.Kind == "call_parameter_set" && language == "SCL")) throw new BridgeException("UnsupportedLanguage", "Graphical editing requires standard LAD/FBD; call_parameter_set also supports exported SCL calls.");
+            change.BlockNames = new[] { name };
+            PrepareBlockTargets(change, plc, false, true, effects);
+            string backup = change.Backups[0]["artifact"].Value<string>("path");
+            var document = EngineeringSources.ReadXml(File.ReadAllText(backup));
+            try
+            {
+                if (change.Kind == "graphical_network_insert")
+                    preview["insertedNetworkId"] = EngineeringSources.InsertGraphicalNetwork(document, payload.Value<string>("afterNetworkId"), ChangeText(payload, "compileUnitXml", 1024 * 1024));
+                else
+                {
+                    string networkId = ChangeText(payload, "networkId", 32);
+                    if (change.Kind == "graphical_operand_set")
+                        EngineeringSources.SetGraphicalOperand(document, networkId, ChangeText(payload, "accessUid", 32), ChangeStringArray(payload, "components", 128, 128));
+                    else if (change.Kind == "graphical_network_patch")
+                    {
+                        var originalUids = new HashSet<string>(document.Descendants("SW.Blocks.CompileUnit").Where(e => (string)e.Attribute("ID") == networkId)
+                            .Descendants().Where(e => e.Name.LocalName != "IdentCon" && e.Name.LocalName != "NameCon").Attributes("UId").Select(a => a.Value), StringComparer.Ordinal);
+                        EngineeringSources.PatchGraphicalNetwork(document, networkId, ChangeStringArray(payload, "upsertXml", 500, 1024 * 1024, true), ChangeStringArray(payload, "removeUids", 500, 32, true));
+                        // Opt-in: predict V21's renumbering so added/removed nodes can read back exactly; the readback check is unchanged.
+                        if (payload.Value<bool?>("renumberUids") == true)
+                        {
+                            preview["uidRenumbering"] = GraphicalUidRenumbering.Predict(document, networkId, originalUids);
+                            ((JArray)preview["warnings"]).Add("renumberUids applied V21's predicted UId renumbering (uidRenumbering). It is not natively qualified for patches: a wrong prediction fails closed with NativePreservationMismatch after apply and needs checkpoint recovery. Try it on a project_copy first.");
+                        }
+                    }
+                    else if (change.Kind == "call_parameter_set")
+                        EngineeringSources.SetCallParameterOperand(document, networkId, ChangeText(payload, "callUid", 32), ChangeText(payload, "parameterName", 128), ChangeStringArray(payload, "components", 128, 128));
+                    else EngineeringSources.SetGraphicalCallConnection(document, networkId, ChangeText(payload, "callUid", 32), ChangeText(payload, "parameterName", 128), ChangeText(payload, "targetAccessUid", 32));
+                }
+            }
+            catch (ArgumentException ex) { throw new BridgeException("InvalidGraphicalEdit", ex.Message); }
+            catch (InvalidOperationException ex) { throw new BridgeException("UnsupportedGraphicalEdit", ex.Message); }
+            preview["edit"] = payload.DeepClone();
+            EngineeringSources.BlockDeclarations(document);
+            RejectFIoBlockContent(plc, document.ToString(SaveOptions.DisableFormatting), true);
+            change.InputPath = Path.Combine(change.Directory, "requested.xml");
+            File.WriteAllText(change.InputPath, document.ToString(SaveOptions.DisableFormatting), new UTF8Encoding(true));
+            change.InputHash = ChangeFileHash(change.InputPath);
+            ((JArray)preview["warnings"]).Add("Only explicitly selected XML nodes change in the prepared artifact. Untouched interfaces, comments, networks and unknown elements are preserved structurally. Native import/compilation remains authoritative for instruction and pin compatibility.");
+        }
+
+        private void PrepareTypeSourceUpsert(EngineeringChange change, JObject payload, JArray effects)
+        {
+            var plc = SelectPlc(change.Selector);
+            string source = ChangeText(payload, "source", 2 * 1024 * 1024);
+            change.ObjectNames = ChangeNames(payload, "expectedTypeNames");
+            change.Namespace = EngineeringSources.DeclaredNamespace(source, true);
+            if (!new HashSet<string>(EngineeringSources.DeclaredTypes(source), StringComparer.Ordinal).SetEquals(change.ObjectNames))
+                throw new BridgeException("SourceScopeMismatch", "TYPE declarations must exactly match expectedTypeNames.");
+            PrepareMutationScope(change, plc, "type", change.ObjectNames);
+            PrepareTypeTargets(change, plc, effects);
+            change.InputPath = Path.Combine(change.Directory, "requested.scl");
+            File.WriteAllText(change.InputPath, source, new UTF8Encoding(true));
+            change.InputHash = ChangeFileHash(change.InputPath);
+        }
+
+        private void PrepareObjectXmlImport(EngineeringChange change, Project project, JObject payload, JObject preview, JArray effects)
+        {
+            var plc = SelectPlc(change.Selector);
+            bool types = change.Kind == "plc_type_import_xml";
+            // Row form of a tag-table import: {tagTableName, tags:[...]} instead of {xml, expectedTableNames}.
+            bool rows = !types && payload["tags"] != null;
+            if (rows && (payload["xml"] != null || payload["expectedTableNames"] != null))
+                throw new BridgeException("InvalidRequest", "Give either xml with expectedTableNames, or tagTableName with tags.");
+            string xml = rows ? null : ChangeText(payload, "xml", 2 * 1024 * 1024);
+            change.ObjectNames = rows ? new[] { ChangeText(payload, "tagTableName", 128) } : ChangeNames(payload, types ? "expectedTypeNames" : "expectedTableNames");
+            if (rows)
+            {
+                change.Namespace = "";
+                PrepareMutationScope(change, plc, "tagTable", change.ObjectNames);
+                xml = TagRowsXml(change, plc, project, payload, effects);
+            }
+            var document = EngineeringSources.ReadXml(xml);
+            string elementName = types ? "SW.Types.PlcStruct" : "SW.Tags.PlcTagTable";
+            var declarations = EngineeringSources.NamedXmlObjects(document, elementName);
+            change.Namespace = types ? ImportNamespace(document) : "";
+            if (!new HashSet<string>(declarations, StringComparer.Ordinal).SetEquals(change.ObjectNames)) throw new BridgeException("XmlScopeMismatch", "Imported object names must exactly match the expected set.");
+            if (!rows) PrepareMutationScope(change, plc, types ? "type" : "tagTable", change.ObjectNames);
+            if (types) PrepareTypeTargets(change, plc, effects);
+            else
+            {
+                TagTableImportRules.Validate(document);
+                RejectFIoAddresses(plc, TagAddressRules.TagTableAddresses(document));
+                var allTables = AllTagTables(ResolveSoftwareScope(plc, change.ScopePath).Tags).ToArray();
+                var importedSymbols = document.Descendants().Where(element => element.Name == "SW.Tags.PlcTag" || element.Name == "SW.Tags.PlcUserConstant")
+                    .Select(element => element.Element("AttributeList")?.Element("Name")?.Value).ToArray();
+                if (importedSymbols.Any(string.IsNullOrWhiteSpace) || importedSymbols.Distinct(StringComparer.OrdinalIgnoreCase).Count() != importedSymbols.Length)
+                    throw new BridgeException("TagScopeMismatch", "Every imported tag or user constant must have a unique explicit symbolic name.");
+                var incomingTags = new HashSet<string>(importedSymbols, StringComparer.OrdinalIgnoreCase);
+                foreach (var table in allTables)
+                {
+                    if (!change.ObjectNames.Contains(table.Name, StringComparer.OrdinalIgnoreCase))
+                    {
+                        if (table.Tags.Any(tag => incomingTags.Contains(tag.Name)) || table.UserConstants.Any(constant => incomingTags.Contains(constant.Name)) || table.SystemConstants.Any(constant => incomingTags.Contains(constant.Name)))
+                            throw new BridgeException("TagScopeMismatch", "Imported tag/constant symbols collide with symbols in an unpreviewed table: " + table.Name);
+                        continue;
+                    }
+                    if (table.Tags.Any(tag => tag.IsSafety))
+                        throw new BridgeException("SafetyBoundary", "Generic tag-table import cannot overwrite a table containing native safety tags: " + table.Name);
+                    string path = Path.Combine(change.Directory, "before-tags-" + Guid.NewGuid().ToString("N") + ".xml");
+                    table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                    TagTableImportRules.RequireExistingMembers(TagTableImportRules.Tables(EngineeringSources.ReadXml(File.ReadAllText(path))).Single(),
+                        TagTableImportRules.Tables(document).Single(t => string.Equals((string)t.Element("AttributeList").Element("Name"), table.Name, StringComparison.OrdinalIgnoreCase)));
+                    change.Backups.Add(new JObject { ["tableName"] = table.Name, ["artifact"] = ChangeArtifact(path) });
+                }
+                effects.Add(new JObject { ["importTagTables"] = new JArray(change.ObjectNames) });
+                // Advisory only: findings or an unreadable hardware configuration never refuse the import.
+                var crossCheck = TagTableRowRules.CrossCheck(document, () => IoAddressRanges(plc));
+                preview["hardwareCrossCheck"] = crossCheck;
+                if (TagTableRowRules.Warning(crossCheck) is string crossCheckWarning) ((JArray)preview["warnings"]).Add(crossCheckWarning);
+            }
+            change.InputPath = Path.Combine(change.Directory, "requested.xml");
+            File.WriteAllText(change.InputPath, xml, new UTF8Encoding(true));
+            change.InputHash = ChangeFileHash(change.InputPath);
+        }
+
+        private void PrepareBlockDeleteOrRename(EngineeringChange change, JObject payload, JObject preview, JArray effects)
+        {
+            var plc = SelectPlc(change.Selector);
+            change.BlockNames = new[] { MutationBlockName(payload, plc) };
+            PrepareMutationScope(change, plc, "block", change.BlockNames);
+            PrepareBlockTargets(change, plc, false, true, effects);
+            if (change.Kind == "block_rename")
+            {
+                string name = ChangeText(payload, "newName", 128);
+                if (FindBlockByName(plc, name, false, change, false) != null) throw new BridgeException("ObjectExists", "A block in this software scope already has the requested newName.");
+                ValidateNamespaceOwnership(change, plc, "block", new[] { name });
+                effects.Add(new JObject { ["renameTo"] = name });
+            }
+            else
+            {
+                if (payload["dependencyPolicy"] == null) payload["dependencyPolicy"] = "rejectReferenced";
+                var target = FindBlockByName(plc, change.BlockNames[0], true, change);
+                preview["dependencies"] = CheckDeleteDependencies(change, plc, target.Item, target.Item.Name);
+            }
+            ((JArray)preview["warnings"]).Add("Callers, instance references and interfaces may be affected. Compile the complete PLC after applying.");
+        }
+
+        private void PrepareHardwareAdd(Project project, JObject payload, JArray effects)
+        {
+            string identifier = ChangeText(payload, "typeIdentifier", 256);
+            ValidateCatalogIdentifier(identifier);
+            string name = ChangeText(payload, "deviceName", 128);
+            if (EngineeringDevices(project).Any(d => string.Equals(d.Name, name, StringComparison.OrdinalIgnoreCase))) throw new BridgeException("ObjectExists", "Device name already exists.");
+            ChangeText(payload, "itemName", 128);
+            effects.Add(new JObject { ["createDevice"] = name, ["typeIdentifier"] = identifier });
+            bool failsafe = payload.Value<bool?>("failsafeRuntimeAccess") == true;
+            if (failsafe && payload.Value<bool?>("configureScratchSecurity") != true)
+                throw new BridgeException("InvalidRequest", "failsafeRuntimeAccess applies only together with configureScratchSecurity.");
+            if (payload.Value<bool?>("configureScratchSecurity") == true)
+            {
+                EnsureCurrentScratchProject(project);
+                effects.Add(new JObject { ["configureNewCpuSecurity"] = "Protect the new scratch CPU configuration and provision a new password-authenticated runtime user/role with standard full access scoped to that new device. Generated credentials are stored under Windows DPAPI CurrentUser. No existing protection or anonymous access is changed." });
+                if (failsafe)
+                    effects.Add(new JObject { ["failsafeRuntimeAccess"] = "The generated role receives the F-CPU runtime right Full access including fail-safe instead of Full access, for this new scratch device only." });
+            }
+        }
+
+        private void PrepareSafetyFParameterSet(EngineeringChange change, Project project, JObject preview, JArray effects)
+        {
+            var plc = SelectPlc(change.Selector);
+            preview["parameterChanges"] = FParameterSet(change, project, false);
+            if (((JArray)preview["parameterChanges"]).OfType<JObject>().Any(row => row["fDestinationUsedOnOtherFSource"] != null))
+                ((JArray)preview["warnings"]).Add("An F-destination address is also used by an F-I/O on another F-source (see fDestinationUsedOnOtherFSource). PROFIsafe addresses should be unique across the project; the F-compile reports a real duplicate.");
+#if SAFETY_FPARAMETER_DISCOVERY
+            if (change.Selector.Value<bool?>("fParameterDiscovery") == true)
+            {
+                preview["fParameterDiscovery"] = true;
+                ((JArray)preview["warnings"]).Add("F-parameter discovery Host: declared-writable F-parameters outside the qualified allowlist are admitted for qualification runs only.");
+            }
+#endif
+            preview["safetyBefore"] = ReadSafety(plc.Software);
+            effects.Add(new JObject { ["plcPath"] = plc.Path, ["action"] = change.Kind });
+            ((JArray)preview["warnings"]).Add("Changing F-parameters changes the F-parameter signature of each F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns a PROFIsafe address to the physical F-I/O, or downloads anything; that stays with the authorized safety workflow.");
+        }
+
+        private void PrepareNetworkConfigure(Project project, JObject payload, JObject preview, JArray effects)
+        {
+            var node = ChangeNode(project, payload);
+            // No AttributeTarget: the fingerprint already holds every node, so a fresh session can recompute the outcome.
+            var attributes = payload["attributes"] as JObject ?? new JObject();
+            foreach (var name in new[] { "Address", "SubnetMask", "RouterAddress" })
+                if (attributes[name] != null && (!IPAddress.TryParse(attributes.Value<string>(name), out var address) || address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork))
+                    throw new BridgeException("InvalidRequest", name + " must be an IPv4 address.");
+            preview["attributeChanges"] = PrepareAttributes(node, attributes, NetworkWriteAttributes);
+            if (payload["subnetName"] != null) ChangeText(payload, "subnetName", 128);
+            if (payload.Value<bool?>("disconnect") == true && payload["subnetName"] != null) throw new BridgeException("InvalidRequest", "Choose subnetName or disconnect, not both.");
+            effects.Add(new JObject { ["nodeName"] = node.Name, ["connectedSubnetBefore"] = node.ConnectedSubnet?.Name,
+                ["connectedSubnetAfter"] = payload["subnetName"]?.DeepClone(), ["disconnect"] = payload.Value<bool?>("disconnect") ?? false });
+        }
+
+        private void PrepareTechnologyCreate(EngineeringChange change, JObject payload, JObject preview, JArray effects)
+        {
+            var plc = SelectPlc(change.Selector);
+            string name = ChangeText(payload, "name", 128);
+            if (payload["technologyPath"] != null) throw new BridgeException("InvalidRequest", "to_create creates in the PLC root technology group; technologyPath is only supported for existing objects.");
+            if (FindTechnologyEntry(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", new JObject { ["name"] = name }, false) != null) throw new BridgeException("ObjectExists", "Technology object already exists.");
+            ChangeText(payload, "typeIdentifier", 128);
+            if (!Version.TryParse(ChangeText(payload, "version", 32), out _)) throw new BridgeException("InvalidRequest", "version must be a dotted numeric version supported by this CPU.");
+            preview["technologyProfile"] = AdmitTechnologyVersion(plc, payload);
+            if (preview["technologyProfile"].Value<string>("outcome") == "unprofiled")
+                ((JArray)preview["warnings"]).Add("No recorded technology version profile covers this CPU/type/version; unprofiledAcknowledged lets Siemens validate it at creation, and a native refusal requires checkpoint recovery.");
+            // FindTechnologyEntry above traversed the same tree completely, so the type list is complete.
+            if (TechnologyVersionProfileRules.FirstMotionObject(payload.Value<string>("typeIdentifier"),
+                    TechnologyObjects(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", new ScanBudget(50000)).Select(entry => entry.Item.OfSystemLibElement).ToArray()))
+            {
+                preview["firstMotionObject"] = true;
+                ((JArray)preview["warnings"]).Add("This is the PLC's first motion technology object; it adds the know-how protected MC_Servo and MC_Interpolator OBs, so change_apply requires compile=true (CompileRequired otherwise).");
+            }
+            if (payload["parameters"] != null)
+            {
+                var initial = ChangeObject(payload, "parameters");
+                if (initial.Count > 500) throw new BridgeException("InvalidRequest", "Initial TO parameters are limited to 500 scalar values.");
+                foreach (var property in initial.Properties())
+                {
+                    RejectSensitiveName(property.Name);
+                    if (!(property.Value is JValue) || property.Value.Type == JTokenType.Null) throw new BridgeException("InvalidRequest", "Initial TO parameters must be non-null scalars.");
+                }
+                preview["initialParameters"] = initial.DeepClone();
+                ((JArray)preview["warnings"]).Add("Initial parameter names, native types, write access and dependencies can only be checked after native creation. They are applied within the same checkpoint before compilation; failure requires recovery.");
+            }
+            effects.Add(new JObject { ["createTechnologyObject"] = name, ["typeIdentifier"] = payload["typeIdentifier"], ["version"] = payload["version"] });
+            ((JArray)preview["warnings"]).Add("Type/version availability is validated by Siemens during creation; a successful create can still require parameter configuration before compile succeeds.");
+        }
+
+        private void PrepareTechnologyEdit(EngineeringChange change, Project project, JObject payload, JObject preview, JArray effects)
+        {
+            var plc = SelectPlc(change.Selector);
+            var entry = BindTechnologySelection(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", payload);
+            var technology = entry.Item;
+            string beforePath = Path.Combine(change.Directory, "before-to.xml");
+            // V21 exports no inconsistent object (native, 30 October 2026), and a real axis or encoder stays inconsistent until it is connected.
+            if (technology.IsConsistent)
+            {
+                technology.Export(new FileInfo(beforePath), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                change.Backups.Add(ChangeArtifact(beforePath));
+            }
+            else ((JArray)preview["warnings"]).Add("The technology object is inconsistent (not compiled) and V21 cannot export it, so no XML backup precedes this write; the project checkpoint archive is the recovery.");
+            if (change.Kind == "to_parameters")
+            {
+                preview["parameterChanges"] = PrepareTechnologyParameters(technology, ChangeObject(payload, "parameters"), out _);
+            }
+            else if (change.Kind != "to_delete") PrepareTechnologyConnection(change, project, plc, entry, preview);
+            effects.Add(new JObject { ["technologyObject"] = technology.Name, ["technologyPath"] = entry.Path, ["action"] = change.Kind });
+        }
+
         private void ApplyEngineeringMutation(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") { ApplyHmiEngineeringMutation(change, project); return; }
@@ -1067,25 +1100,8 @@ namespace TiaMcp.Openness.V21
                     ApplyProjectLanguages(change, project);
                     break;
                 case "source_upsert":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    VerifyBlockTargets(change, plc, false);
-                    RejectFIoBlockContent(plc, File.ReadAllText(change.InputPath), false);
-                    if (payload.Value<string>("language")?.ToUpperInvariant() == "SIMATIC_SD")
-                    {
-                        MutationBlockGroup(change, plc).Blocks.ImportFromDocuments(new DirectoryInfo(change.Directory), Path.GetFileNameWithoutExtension(change.InputPath), ImportDocumentOptions.None);
-                        change.Stages.Add("simatic_sd_imported");
-                        VerifyExpectedBlocksExist(change, plc);
-                        break;
-                    }
-                    var source = MutationSources(change, plc).ExternalSources.CreateFromFile("TiaMcp_" + change.Id, change.InputPath);
-                    change.Stages.Add("external_source_imported");
-                    var group = MutationBlockGroup(change, plc);
-                    if (group is PlcBlockUserGroup userGroup) source.GenerateBlocksFromSource(userGroup, GenerateBlockOption.None);
-                    else source.GenerateBlocksFromSource();
-                    VerifyExpectedBlocksExist(change, plc);
+                    ApplySourceUpsert(change, payload);
                     break;
-                }
                 case "block_import_xml":
                 case "safety_import_xml":
                 case "graph_import":
@@ -1094,17 +1110,8 @@ namespace TiaMcp.Openness.V21
                 case "graphical_network_insert":
                 case "call_parameter_set":
                 case "call_connection_set":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    bool safety = change.Kind == "safety_import_xml";
-                    VerifyBlockTargets(change, plc, safety);
-                    if (safety) EnsureSafetyWritable(plc.Software);
-                    else RejectFIoBlockContent(plc, File.ReadAllText(change.InputPath), true);
-                    MutationBlockGroup(change, plc).Blocks.Import(new FileInfo(change.InputPath), ImportOptions.Override);
-                    VerifyExpectedBlocksExist(change, plc);
-                    if (safety) change.SafetyAfter = ReadSafety(plc.Software);
+                    ApplyBlockXmlImport(change);
                     break;
-                }
                 case "type_rename":
                 case "type_delete":
                     ApplyTypeEdit(change);
@@ -1178,15 +1185,8 @@ namespace TiaMcp.Openness.V21
                     ApplyUmacRoleSet(change, project);
                     break;
                 case "type_source_upsert":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    var source = MutationSources(change, plc).ExternalSources.CreateFromFile("TiaMcp_" + change.Id, change.InputPath);
-                    var group = MutationTypeGroup(change, plc);
-                    if (group is PlcTypeUserGroup userGroup) source.GenerateBlocksFromSource(userGroup, GenerateBlockOption.None);
-                    else source.GenerateBlocksFromSource();
-                    VerifyExpectedTypesExist(change, plc);
+                    ApplyTypeSourceUpsert(change);
                     break;
-                }
                 case "plc_type_import_xml":
                     MutationTypeGroup(change, SelectPlc(change.Selector)).Types.Import(new FileInfo(change.InputPath), ImportOptions.Override);
                     VerifyExpectedTypesExist(change, SelectPlc(change.Selector));
@@ -1198,24 +1198,11 @@ namespace TiaMcp.Openness.V21
                         throw new BridgeException("ImportVerificationFailed", "Not all expected tag tables exist in the selected destination after import.");
                     break;
                 case "block_delete":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    VerifyBlockTargets(change, plc, false);
-                    var target = FindBlockByName(plc, change.BlockNames[0], true, change);
-                    CheckDeleteDependencies(change, plc, target.Item, target.Item.Name);
-                    target.Item.Delete();
-                    if (FindBlockByName(plc, change.BlockNames[0], false, change) != null) throw new BridgeException("MutationVerificationFailed", "Deleted block still exists.");
+                    ApplyBlockDelete(change);
                     break;
-                }
                 case "block_rename":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    VerifyBlockTargets(change, plc, false);
-                    FindBlockByName(plc, change.BlockNames[0], true, change).Item.Name = payload.Value<string>("newName");
-                    if (FindBlockByName(plc, change.BlockNames[0], false, change) != null || FindBlockByName(plc, payload.Value<string>("newName"), false, change) == null)
-                        throw new BridgeException("MutationVerificationFailed", "Block rename did not produce the expected names.");
+                    ApplyBlockRename(change, payload);
                     break;
-                }
                 case "block_protect":
                 case "block_unprotect":
                 case "block_write_protection_set":
@@ -1229,15 +1216,8 @@ namespace TiaMcp.Openness.V21
                     break;
                 }
                 case "hardware_plug":
-                {
-                    var item = ChangeHardware(project, payload).Item;
-                    string identifier = payload.Value<string>("typeIdentifier");
-                    string name = payload.Value<string>("name");
-                    int position = payload.Value<int>("positionNumber");
-                    if (!item.CanPlugNew(identifier, name, position)) throw new BridgeException("IncompatibleHardware", "Requested plug position is no longer available.");
-                    item.PlugNew(identifier, name, position);
+                    ApplyHardwarePlug(project, payload);
                     break;
-                }
                 case "hardware_attributes":
                     ApplyAttributes(change.AttributeTarget, ChangeObject(payload, "attributes"), HardwareWriteAttributes);
                     break;
@@ -1300,30 +1280,11 @@ namespace TiaMcp.Openness.V21
                     break;
                 }
                 case "network_configure":
-                {
-                    var node = ChangeNode(project, payload);
-                    PrepareAttributes(node, payload["attributes"] as JObject ?? new JObject(), NetworkWriteAttributes);
-                    if (payload.Value<bool?>("disconnect") == true) node.DisconnectFromSubnet();
-                    string subnetName = payload.Value<string>("subnetName");
-                    if (subnetName != null)
-                    {
-                        var subnet = project.Subnets.FirstOrDefault(s => string.Equals(s.Name, subnetName, StringComparison.OrdinalIgnoreCase));
-                        if (subnet == null) node.CreateAndConnectToSubnet(subnetName);
-                        // TIA refuses to reconnect a node to the subnet it is already on; the preview reports no subnet change.
-                        else if (!Equals(node.ConnectedSubnet, subnet)) node.ConnectToSubnet(subnet);
-                    }
-                    ApplyAttributes(node, payload["attributes"] as JObject ?? new JObject(), NetworkWriteAttributes);
+                    ApplyNetworkConfigure(project, payload);
                     break;
-                }
                 case "to_create":
-                {
-                    var plc = SelectPlc(change.Selector);
-                    if (FindTechnologyEntry(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", new JObject { ["name"] = payload["name"].DeepClone() }, false) != null) throw new BridgeException("ObjectExists", "Technology object already exists.");
-                    AdmitTechnologyVersion(plc, payload);
-                    var created = plc.Software.TechnologicalObjectGroup.TechnologicalObjects.Create(payload.Value<string>("name"), payload.Value<string>("typeIdentifier"), new Version(payload.Value<string>("version")));
-                    if (payload["parameters"] != null) ApplyTechnologyParameters(created, ChangeObject(payload, "parameters"));
+                    ApplyTechnologyCreate(change, payload);
                     break;
-                }
                 case "to_delete":
                 {
                     var plc = SelectPlc(change.Selector);
@@ -1374,6 +1335,102 @@ namespace TiaMcp.Openness.V21
                     ApplyCertificateChange(change, project);
                     break;
             }
+        }
+
+        private void ApplySourceUpsert(EngineeringChange change, JObject payload)
+        {
+            var plc = SelectPlc(change.Selector);
+            VerifyBlockTargets(change, plc, false);
+            RejectFIoBlockContent(plc, File.ReadAllText(change.InputPath), false);
+            if (payload.Value<string>("language")?.ToUpperInvariant() == "SIMATIC_SD")
+            {
+                MutationBlockGroup(change, plc).Blocks.ImportFromDocuments(new DirectoryInfo(change.Directory), Path.GetFileNameWithoutExtension(change.InputPath), ImportDocumentOptions.None);
+                change.Stages.Add("simatic_sd_imported");
+                VerifyExpectedBlocksExist(change, plc);
+                return;
+            }
+            var source = MutationSources(change, plc).ExternalSources.CreateFromFile("TiaMcp_" + change.Id, change.InputPath);
+            change.Stages.Add("external_source_imported");
+            var group = MutationBlockGroup(change, plc);
+            if (group is PlcBlockUserGroup userGroup) source.GenerateBlocksFromSource(userGroup, GenerateBlockOption.None);
+            else source.GenerateBlocksFromSource();
+            VerifyExpectedBlocksExist(change, plc);
+        }
+
+        private void ApplyBlockXmlImport(EngineeringChange change)
+        {
+            var plc = SelectPlc(change.Selector);
+            bool safety = change.Kind == "safety_import_xml";
+            VerifyBlockTargets(change, plc, safety);
+            if (safety) EnsureSafetyWritable(plc.Software);
+            else RejectFIoBlockContent(plc, File.ReadAllText(change.InputPath), true);
+            MutationBlockGroup(change, plc).Blocks.Import(new FileInfo(change.InputPath), ImportOptions.Override);
+            VerifyExpectedBlocksExist(change, plc);
+            if (safety) change.SafetyAfter = ReadSafety(plc.Software);
+        }
+
+        private void ApplyTypeSourceUpsert(EngineeringChange change)
+        {
+            var plc = SelectPlc(change.Selector);
+            var source = MutationSources(change, plc).ExternalSources.CreateFromFile("TiaMcp_" + change.Id, change.InputPath);
+            var group = MutationTypeGroup(change, plc);
+            if (group is PlcTypeUserGroup userGroup) source.GenerateBlocksFromSource(userGroup, GenerateBlockOption.None);
+            else source.GenerateBlocksFromSource();
+            VerifyExpectedTypesExist(change, plc);
+        }
+
+        private void ApplyBlockDelete(EngineeringChange change)
+        {
+            var plc = SelectPlc(change.Selector);
+            VerifyBlockTargets(change, plc, false);
+            var target = FindBlockByName(plc, change.BlockNames[0], true, change);
+            CheckDeleteDependencies(change, plc, target.Item, target.Item.Name);
+            target.Item.Delete();
+            if (FindBlockByName(plc, change.BlockNames[0], false, change) != null) throw new BridgeException("MutationVerificationFailed", "Deleted block still exists.");
+        }
+
+        private void ApplyBlockRename(EngineeringChange change, JObject payload)
+        {
+            var plc = SelectPlc(change.Selector);
+            VerifyBlockTargets(change, plc, false);
+            FindBlockByName(plc, change.BlockNames[0], true, change).Item.Name = payload.Value<string>("newName");
+            if (FindBlockByName(plc, change.BlockNames[0], false, change) != null || FindBlockByName(plc, payload.Value<string>("newName"), false, change) == null)
+                throw new BridgeException("MutationVerificationFailed", "Block rename did not produce the expected names.");
+        }
+
+        private void ApplyHardwarePlug(Project project, JObject payload)
+        {
+            var item = ChangeHardware(project, payload).Item;
+            string identifier = payload.Value<string>("typeIdentifier");
+            string name = payload.Value<string>("name");
+            int position = payload.Value<int>("positionNumber");
+            if (!item.CanPlugNew(identifier, name, position)) throw new BridgeException("IncompatibleHardware", "Requested plug position is no longer available.");
+            item.PlugNew(identifier, name, position);
+        }
+
+        private void ApplyNetworkConfigure(Project project, JObject payload)
+        {
+            var node = ChangeNode(project, payload);
+            PrepareAttributes(node, payload["attributes"] as JObject ?? new JObject(), NetworkWriteAttributes);
+            if (payload.Value<bool?>("disconnect") == true) node.DisconnectFromSubnet();
+            string subnetName = payload.Value<string>("subnetName");
+            if (subnetName != null)
+            {
+                var subnet = project.Subnets.FirstOrDefault(s => string.Equals(s.Name, subnetName, StringComparison.OrdinalIgnoreCase));
+                if (subnet == null) node.CreateAndConnectToSubnet(subnetName);
+                // TIA refuses to reconnect a node to the subnet it is already on; the preview reports no subnet change.
+                else if (!Equals(node.ConnectedSubnet, subnet)) node.ConnectToSubnet(subnet);
+            }
+            ApplyAttributes(node, payload["attributes"] as JObject ?? new JObject(), NetworkWriteAttributes);
+        }
+
+        private void ApplyTechnologyCreate(EngineeringChange change, JObject payload)
+        {
+            var plc = SelectPlc(change.Selector);
+            if (FindTechnologyEntry(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", new JObject { ["name"] = payload["name"].DeepClone() }, false) != null) throw new BridgeException("ObjectExists", "Technology object already exists.");
+            AdmitTechnologyVersion(plc, payload);
+            var created = plc.Software.TechnologicalObjectGroup.TechnologicalObjects.Create(payload.Value<string>("name"), payload.Value<string>("typeIdentifier"), new Version(payload.Value<string>("version")));
+            if (payload["parameters"] != null) ApplyTechnologyParameters(created, ChangeObject(payload, "parameters"));
         }
 
         private void CaptureTechnologyEvidence(EngineeringChange change)
