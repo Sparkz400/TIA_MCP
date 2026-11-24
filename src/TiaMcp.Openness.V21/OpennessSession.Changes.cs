@@ -336,7 +336,9 @@ namespace TiaMcp.Openness.V21
                     CaptureTechnologyEvidence(change);
                     if (mutationReached) RecoverFailedClassicScreen(change, project);
                     if (change.State != "rolled_back" && change.State != "not_applied")
-                        try { change.AfterFingerprint = EngineeringFingerprint(change, project); } catch { }
+                        try { change.AfterFingerprint = EngineeringFingerprint(change, project); }
+                        // The primary failure is reported either way; the journal names why no after-fingerprint was recorded.
+                        catch (Exception fingerprint) { change.Readbacks.Add(new JObject { ["role"] = "after-fingerprint-failure", ["chain"] = NativeFailureText.Chain(fingerprint) }); }
                     else { change.AttributeTarget = null; change.TagBatchTargets = null; change.BatchMembers = null; }
                     change.Stages.Add("change_finished_with_failure");
                     WriteChangeJournal(change);

@@ -294,11 +294,20 @@ namespace TiaMcp.Openness.V21
             catch (Exception exception)
             {
                 // Read-only: an uncertain step is reconciled from its own journal, never replayed. The primary error is reported either way.
-                try { record = coordinator.Reconcile(); } catch { try { record = coordinator.Status(); } catch { } }
+                // A failed reconcile or status read is journaled with the failure instead of being dropped.
+                var readFailures = new JArray();
+                try { record = coordinator.Reconcile(); }
+                catch (Exception reconcile)
+                {
+                    readFailures.Add(new JObject { ["read"] = "reconcile", ["type"] = reconcile.GetType().FullName, ["message"] = reconcile.Message });
+                    try { record = coordinator.Status(); }
+                    catch (Exception status) { readFailures.Add(new JObject { ["read"] = "status", ["type"] = status.GetType().FullName, ["message"] = status.Message }); }
+                }
                 if (record?["initialCheckpoint"] is JObject checkpoint && ((JArray)change.Journal["checkpoints"]).Count == 0) ((JArray)change.Journal["checkpoints"]).Add(checkpoint.DeepClone());
                 string code = (exception as BridgeException)?.Code ?? (exception as PlcComponentException)?.Code ?? "NativeLibraryError";
                 change.State = "recovery_required"; change.Journal["combinedApply"] = CombinedApplySummary(journal, record, step ?? "start");
                 change.Journal["failure"] = new JObject { ["code"] = code, ["message"] = exception.Message, ["failedStep"] = step ?? "start", ["details"] = (exception as BridgeException)?.Details };
+                if (readFailures.Count > 0) change.Journal["failure"]["recoveryReadFailures"] = readFailures;
                 LibraryJournal(change, "transaction", "failed");
                 throw new BridgeException(code, "Combined apply failed at " + (step ?? "start") + ": " + exception.Message, LibraryChangeView(change));
             }

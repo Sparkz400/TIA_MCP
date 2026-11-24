@@ -38,7 +38,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("ScratchIsolationRequired", "Runtime credential provisioning requires a worker-owned TIA connection to the validated scratch project.");
             JObject marker;
             try { marker = SimulationTicket.Decode(args.Value<string>("downloadTicket")); }
-            catch { throw new BridgeException("InvalidSimulationTicket", "A current owned simulator ticket is required for scratch credential provisioning."); }
+            catch (Exception ex) { throw new BridgeException("InvalidSimulationTicket", "A current owned simulator ticket is required for scratch credential provisioning. " + ex.Message, SimulationTicketCause(ex)); }
             string network = SimulationTicket.Interface(marker);
             var plc = SelectPlc(args);
             var budget = new ScanBudget(50000);

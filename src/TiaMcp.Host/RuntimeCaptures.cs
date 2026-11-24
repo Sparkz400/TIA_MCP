@@ -245,7 +245,8 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
             // The shared bridge may still be busy (a long sim_test or observe): the end was not sent, so try again once it settles.
             catch(BridgeException error) when(attempt<EndAttempts && !disposed && error.Code is "QueueTimeout" or "PreviousOperationRunning" or "SimulationOperatingModeNotRestored")
             { try { await Task.Delay(EndRetryDelay,clock); } catch(OperationCanceledException){return false;} }
-            catch { return false; }
+            // The caller reports the unrestored mode; stderr keeps why (code or type only).
+            catch(Exception error) { Console.Error.WriteLine($"runtime capture: sim_capture_end failed: {(error is BridgeException bridge?bridge.Code:error.GetType().FullName)}");return false; }
         }
     }
     private static string ReadFailure(Exception failure) => failure is BridgeException error && error.Code is
