@@ -85,6 +85,6 @@ public sealed partial class WebRuntimeClient
         catch (OperationCanceledException) { throw Error(cancellationToken.IsCancellationRequested ? "RuntimeCancelled" : "RuntimeTimeout"); }
         catch (HttpRequestException e) { throw Error(Tls(e) ? "RuntimeTlsUnverified" : "RuntimeTransportFailure"); }
         catch (IOException) { throw Error("RuntimeTransportFailure"); }
-        finally { if (!done) try { File.Delete(temporaryPath); } catch (IOException) { } catch (UnauthorizedAccessException) { } }
+        finally { if (!done) PackageStorage.TryDelete(temporaryPath); }
     }
 }

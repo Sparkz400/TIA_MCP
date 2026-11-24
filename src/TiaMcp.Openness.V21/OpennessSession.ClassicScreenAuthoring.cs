@@ -12,7 +12,7 @@ namespace TiaMcp.Openness.V21
 {
     internal sealed partial class OpennessSession
     {
-        private JObject ClassicScreenCapture(JObject args)
+        private JObject CaptureClassicScreen(JObject args)
         {
             var project = SelectProject(args);
             var identity = args["target"] as JObject ?? throw new BridgeException("InvalidRequest", "An exact HMI identity is required.");

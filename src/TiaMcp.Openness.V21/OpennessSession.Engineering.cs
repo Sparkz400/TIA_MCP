@@ -101,7 +101,7 @@ namespace TiaMcp.Openness.V21
                     }
                     item["attributes"] = attributes;
                 }
-                if (network != null) item["nodes"] = new JArray(network.Nodes.Select(NodeSnapshot));
+                if (network != null) item["nodes"] = new JArray(network.Nodes.Select(CaptureNodeSnapshot));
                 output.Add(item);
             }
             result["items"] = output;

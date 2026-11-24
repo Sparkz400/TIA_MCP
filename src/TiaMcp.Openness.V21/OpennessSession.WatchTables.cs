@@ -26,10 +26,10 @@ namespace TiaMcp.Openness.V21
         private JObject WatchRead(JObject args)
         {
             EnsureAttached();
-            using (_portal.ExclusiveAccess("TIA MCP: watch snapshot")) return WatchSnapshot(args, false);
+            using (_portal.ExclusiveAccess("TIA MCP: watch snapshot")) return CaptureWatchSnapshot(args, false);
         }
         // Mutation flows keep write: true so a read-only project is refused before any watch dispatch.
-        private JObject WatchSnapshot(JObject args, bool write = true)
+        private JObject CaptureWatchSnapshot(JObject args, bool write = true)
         {
             var selected = SelectPlc(args); EnsureProjectOffline(selected.Project, write);
             if (args.Value<string>("projectPath") != null && !string.Equals(args.Value<string>("projectPath"), selected.Project.Path.FullName, StringComparison.OrdinalIgnoreCase))
@@ -156,7 +156,7 @@ namespace TiaMcp.Openness.V21
             if (!WatchOwnsScratch(selected.Project)) throw new BridgeException("ProjectIsolationRequired", "First mutation profile requires this worker's newly created owned scratch project.");
             if (selected.Project.IsModified) throw new BridgeException("UnsavedProject", "Save the authored scratch fixture before preparation.");
             _watchLease = _portal.ExclusiveAccess("TIA MCP: durable watch dispatch");
-            try { VerifyWatchSource(args); _watchBefore = WatchSnapshot(args); _watchSelector = (JObject)args.DeepClone(); _watchToken = Guid.NewGuid().ToString("N"); _watchDispatched = false;
+            try { VerifyWatchSource(args); _watchBefore = CaptureWatchSnapshot(args); _watchSelector = (JObject)args.DeepClone(); _watchToken = Guid.NewGuid().ToString("N"); _watchDispatched = false;
                 var result = (JObject)_watchBefore.DeepClone(); result["leaseToken"] = _watchToken; return result; }
             catch { WatchRelease(); throw; }
         }
@@ -166,19 +166,19 @@ namespace TiaMcp.Openness.V21
         {
             WatchCheckLease(args);
             VerifyWatchSource(_watchSelector);
-            EnsureWatchTargetFresh(_watchBefore, WatchSnapshot(_watchSelector));
+            EnsureWatchTargetFresh(_watchBefore, CaptureWatchSnapshot(_watchSelector));
             var project = SelectProject(_watchSelector);
             string directory = ArtifactDirectory(args); string name = "watch-" + Guid.NewGuid().ToString("N").Substring(0, 12) + ".zap21";
             WatchQualificationInterrupt(args, "checkpoint.beforeArchive", project.Path.FullName, null);
             project.Archive(new DirectoryInfo(directory), name, ProjectArchivationMode.Compressed);
             WatchQualificationInterrupt(args, "checkpoint.afterArchive", project.Path.FullName, Path.Combine(directory, name));
-            return new JObject { ["checkpoint"] = FileArtifact(new FileInfo(Path.Combine(directory, name))), ["snapshot"] = WatchSnapshot(_watchSelector) };
+            return new JObject { ["checkpoint"] = FileArtifact(new FileInfo(Path.Combine(directory, name))), ["snapshot"] = CaptureWatchSnapshot(_watchSelector) };
         }
         private JObject WatchApply(JObject args)
         {
             WatchCheckLease(args); if (_watchDispatched) throw new BridgeException("RecoveryRequired", "Native watch dispatch is one-use and cannot replay.");
             VerifyWatchSource(_watchSelector);
-            var current = WatchSnapshot(_watchSelector);
+            var current = CaptureWatchSnapshot(_watchSelector);
             EnsureWatchTargetFresh(_watchBefore, current);
             if (args["lifecycle"] is JObject lifecycle) return WatchLifecycleApply(args, lifecycle);
             string path = args.Value<string>("inputPath");
@@ -208,7 +208,7 @@ namespace TiaMcp.Openness.V21
                     ["projectPath"] = selected.Project.Path.FullName, ["processId"] = _processId, ["saved"] = true, ["automaticReplay"] = false }.ToString());
                 Environment.Exit(73); // qualification-only actual worker loss after saved native effect, before readback/response
             }
-            var after = WatchSnapshot(_watchSelector);
+            var after = CaptureWatchSnapshot(_watchSelector);
             if (after.Value<string>("peerSha256") != _watchBefore.Value<string>("peerSha256") || after["target"].Value<string>("semanticSha256") != WatchTableDocument.SemanticHash(input.ToBytes()))
                 throw new BridgeException("VerificationFailed", "Native readback or peer preservation differs from reviewed input.", after);
             if (((JArray)after["target"]["rows"]).Any(r => r.Value<bool?>("forceIntention") == true))
@@ -216,7 +216,7 @@ namespace TiaMcp.Openness.V21
             WatchQualificationInterrupt(args, "save.before", selected.Project.Path.FullName, null);
             selected.Project.Save();
             WatchQualificationInterrupt(args, "save.after", selected.Project.Path.FullName, null);
-            after = WatchSnapshot(_watchSelector);
+            after = CaptureWatchSnapshot(_watchSelector);
             if (after.Value<string>("peerSha256") != _watchBefore.Value<string>("peerSha256") || after["target"].Value<string>("semanticSha256") != WatchTableDocument.SemanticHash(input.ToBytes()))
                 throw new BridgeException("VerificationFailed", "Saved readback or peer preservation differs from reviewed input.", after);
             after["saved"] = true; after["automaticReplay"] = false; return after;
@@ -292,7 +292,7 @@ namespace TiaMcp.Openness.V21
                 doc.Rename("UnchangedPeer"); doc.SetComment(0, "en-GB", "Unchanged peer {0}");
                 string peerPath = Path.Combine(ArtifactDirectory(args), "peer-seed.xml"); File.WriteAllBytes(peerPath, doc.ToBytes());
                 selected.Software.WatchAndForceTableGroup.WatchTables.Import(new FileInfo(peerPath), ImportOptions.None);
-                selected.Project.Save(); _watchOwnedScratchPaths.Add(selected.Project.Path.FullName); return WatchSnapshot(args);
+                selected.Project.Save(); _watchOwnedScratchPaths.Add(selected.Project.Path.FullName); return CaptureWatchSnapshot(args);
             }
         }
         private bool WatchOwnsScratch(Project project) => _ownsPortal &&

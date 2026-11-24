@@ -60,7 +60,7 @@ namespace TiaMcp.Openness.V21
             foreach (var check in checks)
                 if (limited.TryGetValue(check.Number, out var limit)) DriveWriteRules.RequireWithinLimits(check.Name, check.Value, DriveLimit(() => limit.MinValue), DriveLimit(() => limit.MaxValue));
             if (!write) return result;
-            var sideBefore = DriveSnapshot(driveObject, out bool beforeComplete);
+            var sideBefore = CaptureDriveSnapshot(driveObject, out bool beforeComplete);
             // The motor type comes first: it decides which entries the configuration holds. Every entry is preflighted above.
             if (typeName != null) projection.SetMotorType((MotorType)Enum.Parse(typeof(MotorType), typeName), dataSet);
             var configuration = projection.GetCurrentMotorConfiguration(dataSet)
@@ -84,7 +84,7 @@ namespace TiaMcp.Openness.V21
                 readback.Add(new JObject { ["name"] = name, ["value"] = actual });
             }
             result["readback"] = readback;
-            var sideAfter = DriveSnapshot(driveObject, out bool afterComplete);
+            var sideAfter = CaptureDriveSnapshot(driveObject, out bool afterComplete);
             // Written entries are excluded by parameter number: a motor entry's name need not match the drive parameter's name.
             var written = new HashSet<int>(checks.Select(check => check.Number));
             var skip = new HashSet<string>(sideBefore.Keys.Union(sideAfter.Keys).Where(key => { var match = Regex.Match(key, @"^[pr](\d+)"); return match.Success && int.TryParse(match.Groups[1].Value, out int number) && written.Contains(number); }), StringComparer.Ordinal);

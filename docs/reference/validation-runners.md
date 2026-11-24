@@ -30,8 +30,11 @@ only the shared runtime. Reports are retained under `artifacts/offline-package/`
 without any Siemens assembly: empty API directories, the API presence checks and the developer Openness registration
 switched off, project references dropped. Every use of a Siemens type then fails as CS0246 or CS0234, and the runner
 fails on any other compiler error, such as a duplicate member across partial files, a syntax error or a wrong call into
-the project's own types. The CI job "Worker compile without Siemens" runs it. It cannot see errors inside expressions
-of Siemens types; `scripts/Build.ps1` on an engineering workstation remains the full build.
+the project's own types. It also fails on a CS0246 that names a namespace-level type from a file the worker does not
+compile but whose folder it links from (a forgotten link, as when V19 lost `BatchedAttributeReads`), and on a CS0234
+inside a TiaMcp namespace other than a dropped reference. The CI job "Worker compile without Siemens" runs it. It cannot
+see errors inside expressions of Siemens types; `scripts/Build.ps1` on an engineering workstation remains the full
+build.
 
 Pull requests run the quick package check unless they change the Host, Core, the MCP surface contract or the packaging
 scripts; those, and every run on `main`, nightly and manual, run all packaged workflow stages.

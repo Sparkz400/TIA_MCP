@@ -296,8 +296,12 @@ namespace TiaMcp.Openness.V21
         private static JObject OwnedSimulationMarker(JObject args)
         {
             try { return SimulationTicket.Decode(args.Value<string>("downloadTicket")); }
-            catch { throw new BridgeException("InvalidSimulationTicket", "A current owned simulator ticket from sim_create is required; no other target is accepted."); }
+            catch (Exception ex) { throw new BridgeException("InvalidSimulationTicket", "A current owned simulator ticket from sim_create is required; no other target is accepted. " + ex.Message, SimulationTicketCause(ex)); }
         }
+
+        // Why SimulationTicket.Decode refused a ticket; the error code stays InvalidSimulationTicket.
+        private static JObject SimulationTicketCause(Exception ex) => new JObject {
+            ["ticketState"] = "unusable", ["causeType"] = ex.GetType().FullName, ["cause"] = ex.Message };
 
         private JObject OwnedSimulationReport(JObject marker, string purpose)
         {

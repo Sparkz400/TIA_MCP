@@ -26,6 +26,7 @@
     <!-- The request loop, project selection and bounded traversal: one implementation for both workers. -->
     <Compile Include="../TiaMcp.Openness.V21/WorkerLoop.cs" Link="Shared/WorkerLoop.cs" />
     <Compile Include="../TiaMcp.Openness.V21/OpennessTraversal.cs" Link="Shared/OpennessTraversal.cs" />
+    <Compile Include="../TiaMcp.Openness.V21/BatchedAttributeReads.cs" Link="Shared/BatchedAttributeReads.cs" />
     <Compile Include="../TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs" Link="Shared/ScanBudget.cs" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <Reference Include="Siemens.Engineering">

@@ -38,7 +38,7 @@ namespace TiaMcp.Openness.V21
             {
                 if (File.Exists(marker)) throw new BridgeException("RecoveryRequired", "This negative fixture mutation was already attempted; never replay.");
                 VerifyWatchSource(selector);
-                var before = WatchSnapshot(selector);
+                var before = CaptureWatchSnapshot(selector);
                 if (before["target"].Value<bool?>("exists") != false)
                     throw new BridgeException("InvalidFixture", "Negative trial starts with an independently absent creation destination.");
                 var result = new JObject { ["before"] = before, ["sourceBinding"] = binding.DeepClone(),
@@ -73,7 +73,7 @@ namespace TiaMcp.Openness.V21
                     result["nativeSourceWriteAttempted"] = true;
                     block.HeaderAuthor = "WT05_STALE_SOURCE";
                     selected.Project.Save();
-                    result["changed"] = WatchSnapshot(selector);
+                    result["changed"] = CaptureWatchSnapshot(selector);
                     var changed = CaptureWatchInstance(selector); result["changedCapture"] = changed;
                     if (changed["binding"].Value<string>("blockSha256") == binding.Value<string>("blockSha256"))
                         throw new BridgeException("VerificationFailed", "Saved temporary HeaderAuthor did not change the captured FB export.");
@@ -87,7 +87,7 @@ namespace TiaMcp.Openness.V21
                     try
                     {
                         block.HeaderAuthor = originalAuthor; selected.Project.Save();
-                        result["restored"] = WatchSnapshot(selector); result["restoredCapture"] = CaptureWatchInstance(selector);
+                        result["restored"] = CaptureWatchSnapshot(selector); result["restoredCapture"] = CaptureWatchInstance(selector);
                         VerifyWatchSource(selector);
                         if (!JToken.DeepEquals(before["peers"], result["restored"]["peers"]) ||
                             !JToken.DeepEquals(before["target"]["semanticSha256"], result["restored"]["target"]["semanticSha256"]))

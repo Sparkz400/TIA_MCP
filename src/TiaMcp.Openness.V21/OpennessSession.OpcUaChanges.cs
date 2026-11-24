@@ -47,7 +47,7 @@ namespace TiaMcp.Openness.V21
         private static ServerInterfaceGroup OpcUaGroup(PlcSelection plc) => OpcUaProviderFor(plc.Software)?.CommunicationGroup?.ServerInterfaceGroup
             ?? throw new BridgeException("UnsupportedCapability", "The selected PLC exposes no OPC UA server interface group; an S7-1500 CPU with OPC UA is required.");
 
-        private static JObject OpcUaSnapshot(ServerInterfaceGroup group, ScanBudget budget) => group == null ? null : new JObject
+        private static JObject CaptureOpcUaSnapshot(ServerInterfaceGroup group, ScanBudget budget) => group == null ? null : new JObject
         {
             ["serverInterfaces"] = new JArray(group.ServerInterfaces.TakeWhile(_ => budget.Take()).Select(item => new JObject { ["name"] = item.Name, ["enabled"] = item.Enabled, ["lastModified"] = item.LastModified.ToString("O") })),
             ["simaticInterfaces"] = new JArray(group.SimaticInterfaces.TakeWhile(_ => budget.Take()).Select(item => new JObject { ["name"] = item.Name, ["enabled"] = item.Enabled, ["useStringNodeIds"] = item.UseStringNodeIds, ["lastModified"] = item.LastModified.ToString("O") })),
@@ -86,7 +86,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("StaleRevision", "This TIA process still holds the OPC UA role mappings from before a restored OPC UA change. Close it (tia_detach), start a new one and open the recovered project first.");
             var group = OpcUaGroup(SelectPlc(change.Selector));
             var budget = new ScanBudget(5000);
-            preview["opcUaBefore"] = OpcUaSnapshot(group, budget);
+            preview["opcUaBefore"] = CaptureOpcUaSnapshot(group, budget);
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "The OPC UA server interface group exceeds 5000 entries.");
             var effects = (JArray)preview["effects"];
             ((JArray)preview["warnings"]).Add("OPC UA clients are not discovered: removed or changed nodes, namespaces or role permissions can break them. Mapping validity is established only by native import and PLC compile diagnostics.");

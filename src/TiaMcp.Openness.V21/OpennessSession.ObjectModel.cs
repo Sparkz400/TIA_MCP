@@ -57,33 +57,33 @@ namespace TiaMcp.Openness.V21
                     candidates.Add(target);
             };
             string projectObjectPath = "/projects/" + Segment(project.Name);
-            if (kind == "project" || string.IsNullOrWhiteSpace(kind)) add(ObjectTarget(project, null, null, project, projectObjectPath, "project", project.Name));
+            if (kind == "project" || string.IsNullOrWhiteSpace(kind)) add(BuildObjectTarget(project, null, null, project, projectObjectPath, "project", project.Name));
             if (kind == "hardware" || string.IsNullOrWhiteSpace(kind))
-                foreach (var entry in DeviceItems(project, budget)) add(ObjectTarget(project, null, null, entry.Item, entry.Path, "hardware", entry.Item.Name));
+                foreach (var entry in DeviceItems(project, budget)) add(BuildObjectTarget(project, null, null, entry.Item, entry.Path, "hardware", entry.Item.Name));
             if (kind != "hardware" && kind != "project")
             {
                 var effective = (JObject)args.DeepClone();
                 if (string.IsNullOrWhiteSpace(effective.Value<string>("plcPath"))) effective["plcPath"] = ObjectIdentity.PlcPath(path) ?? ObjectIdentity.PlcPath(scopePath);
                 var plc = SelectPlc(effective);
-                if (kind == "plc" || string.IsNullOrWhiteSpace(kind)) add(ObjectTarget(project, plc, null, plc.Software, plc.Path, "plc", plc.Software.Name));
+                if (kind == "plc" || string.IsNullOrWhiteSpace(kind)) add(BuildObjectTarget(project, plc, null, plc.Software, plc.Path, "plc", plc.Software.Name));
                 foreach (var scope in SoftwareScopes(plc, budget))
                 {
                     if (!string.IsNullOrWhiteSpace(scopePath) && scope.Path != scopePath) continue;
-                    if (scope.Unit != null) add(ObjectTarget(project, plc, scope, scope.Unit, scope.Path, scope.Kind, scope.Name));
+                    if (scope.Unit != null) add(BuildObjectTarget(project, plc, scope, scope.Unit, scope.Path, scope.Kind, scope.Name));
                     if (kind == "block" || string.IsNullOrWhiteSpace(kind))
                         foreach (var block in ScopeBlocks(scope, budget))
                         {
-                            var target = ObjectTarget(project, plc, scope, block.Item, block.Path, "block", block.Item.Name);
+                            var target = BuildObjectTarget(project, plc, scope, block.Item, block.Path, "block", block.Item.Name);
                             target.Block = block; add(target);
                         }
                     if (kind == "type" || string.IsNullOrWhiteSpace(kind))
-                        foreach (var type in ScopeTypes(scope, budget)) add(ObjectTarget(project, plc, scope, type.Item, type.Path, "type", type.Item.Name));
+                        foreach (var type in ScopeTypes(scope, budget)) add(BuildObjectTarget(project, plc, scope, type.Item, type.Path, "type", type.Item.Name));
                     if (kind == "tagTable" || string.IsNullOrWhiteSpace(kind))
-                        foreach (var table in TagTables(scope.Tags, scope.Path + "/tags", budget)) add(ObjectTarget(project, plc, scope, table.Item, table.Path, "tagTable", table.Item.Name));
+                        foreach (var table in TagTables(scope.Tags, scope.Path + "/tags", budget)) add(BuildObjectTarget(project, plc, scope, table.Item, table.Path, "tagTable", table.Item.Name));
                 }
                 if (kind == "technology" || string.IsNullOrWhiteSpace(kind))
                     foreach (var item in TechnologyObjects(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", budget))
-                        add(ObjectTarget(project, plc, null, item.Item, item.Path, "technology", item.Item.Name));
+                        add(BuildObjectTarget(project, plc, null, item.Item, item.Path, "technology", item.Item.Name));
             }
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Object lookup reached 50000 objects; uniqueness is not established.");
             if (candidates.Count == 0) throw new BridgeException("ObjectNotFound", "No object matches all supplied identity selectors.");
@@ -92,7 +92,7 @@ namespace TiaMcp.Openness.V21
             return candidates[0];
         }
 
-        private static NativeObjectTarget ObjectTarget(Project project, PlcSelection plc, SoftwareScope scope, IEngineeringObject target, string path, string kind, string name) => new NativeObjectTarget
+        private static NativeObjectTarget BuildObjectTarget(Project project, PlcSelection plc, SoftwareScope scope, IEngineeringObject target, string path, string kind, string name) => new NativeObjectTarget
         {
             Target = target, Plc = plc, Scope = scope, ScopePath = scope?.Path ?? plc?.Path,
             Identity = IdentityInfo(project, plc?.Path, scope?.Path ?? plc?.Path, path, kind, name)

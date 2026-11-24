@@ -78,7 +78,7 @@ namespace TiaMcp.Openness.V21
             {
                 case "addin_owner_context": return AddInOwnerContext(arguments);
                 case "translation_fixture": return TranslationFixture(arguments);
-                case "translation_capture": return TranslationCapture(arguments);
+                case "translation_capture": return CaptureTranslations(arguments);
                 case "translation_categories": return TranslationCategories(arguments);
                 case "translation_begin": return TranslationBegin(arguments);
                 case "translation_stage": return TranslationStage(arguments);
@@ -122,14 +122,14 @@ namespace TiaMcp.Openness.V21
                 case "discover": return Discover();
                 case "attach": return Attach(arguments);
                 case "start": return Start();
-                case "session_status": return Status();
+                case "session_status": return ReadSessionStatus();
                 case "detach": return Detach(arguments);
                 case "project_inventory": return Inventory(arguments);
                 case "project_properties": return ProjectProperties(arguments);
                 case "project_archive": return ProjectArchive(arguments);
-                case "device_inventory_capture": return DeviceInventoryCapture(arguments);
+                case "device_inventory_capture": return CaptureDeviceInventory(arguments);
                 case "hmi_inspect": return HmiInspect(arguments);
-                case "hmi_classic_screen_capture": return ClassicScreenCapture(arguments);
+                case "hmi_classic_screen_capture": return CaptureClassicScreen(arguments);
                 case "hmi_content_fingerprint": return HmiContentFingerprint(arguments);
                 case "hmi_classic_screen_compose": return ClassicScreenCompose(arguments);
                 case "hmi_references": return HmiReferences(arguments);
@@ -171,7 +171,7 @@ namespace TiaMcp.Openness.V21
                 case "safety_validation_inspect": return SafetyInspect(arguments, validation: true);
                 case "safety_printout": return SafetyPrintoutCapture(arguments);
                 case "call_graph": return CallGraph(arguments);
-                case "instance_lookup": return InstanceLookup(arguments);
+                case "instance_lookup": return LookUpInstances(arguments);
                 case "symbol_trace": return SymbolTrace(arguments);
                 case "change_impact": return ChangeImpact(arguments);
                 case "engineering_read": return EngineeringRead(arguments);
@@ -277,7 +277,7 @@ namespace TiaMcp.Openness.V21
             _portalProcessIdentity = identity;
             _processId = id;
             _ownsPortal = false;
-            var result = Status();
+            var result = ReadSessionStatus();
             IReadOnlyList<OpennessClientRules.SessionView> sessions = null; string unavailable = null;
             try { sessions = PortalProcesses.AttachedSessions(id, out unavailable); }
             catch (Exception error) { unavailable = error.Message; }
@@ -298,10 +298,10 @@ namespace TiaMcp.Openness.V21
             var processObservedAtUtc = DateTime.UtcNow;
             _processId = PortalProcesses.CurrentId(_portal);
             _portalProcessIdentity = CapturedProcessIdentity.Capture(_processId.Value, processObservedAtUtc);
-            return Status();
+            return ReadSessionStatus();
         }
 
-        private JObject Status()
+        private JObject ReadSessionStatus()
         {
             var result = Envelope();
             result["attached"] = _portal != null;
@@ -345,7 +345,7 @@ namespace TiaMcp.Openness.V21
                 }
             if (owned) _portalProcessIdentity = null; // kept for the wait below; DetachPortalConnection would dispose it
             DetachPortalConnection();
-            var result = Status();
+            var result = ReadSessionStatus();
             result["disposedOwnedPortalConnection"] = owned;
             result["portalProcessId"] = pid;
             result["projectsClosed"] = closed;

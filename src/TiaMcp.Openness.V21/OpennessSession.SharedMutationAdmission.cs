@@ -363,7 +363,7 @@ namespace TiaMcp.Openness.V21
             {
                 JObject marker;
                 try { marker = SimulationTicket.Decode(args.Value<string>("downloadTicket")); }
-                catch { throw new BridgeException("InvalidSimulationTicket", "A current ticket-bound owned simulator is required for scope resolution."); }
+                catch (Exception ex) { throw new BridgeException("InvalidSimulationTicket", "A current ticket-bound owned simulator is required for scope resolution. " + ex.Message, SimulationTicketCause(ex)); }
                 var plc = SelectPlc(args); EnsureProjectOffline(plc.Project);
                 add("project", plc.Project.Path.FullName, "simulationCompilationOrCredentialPreparation");
                 add("workspace", marker.Value<string>("storagePath"), "ownedSimulatorStorageAndCard");
