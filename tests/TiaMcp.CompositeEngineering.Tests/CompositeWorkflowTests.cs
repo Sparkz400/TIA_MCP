@@ -92,6 +92,7 @@ internal static class CompositeWorkflowTests
         try { Reject(() => changed.Review(uploadRef), "Changed dependency before receipt prevents publication", "AutomationMlIntegrityFailure"); }
         finally { File.WriteAllBytes(aml, originalAml); }
         Check(interruptedDirectory is not null && !File.Exists(Path.Combine(interruptedDirectory, "receipt.json")), "Rejected publication keeps incomplete intent and artifacts");
+        var interruptedFolders = new List<string>();
         foreach (string phase in new[] { "intentWritten", "requestWritten", "reportWritten", "receiptWritten" })
         {
             string signal = Path.Combine(root, "pause-" + phase + ".txt");
@@ -115,6 +116,7 @@ internal static class CompositeWorkflowTests
                 Check((string)row!["state"]! == (committed ? "complete" : "incomplete"), "Restart discovery never completes an interrupted write: " + phase);
                 if (committed) Check((string)Json(store.Reopen((string)row["recordRef"]!))["state"]! == "complete", "Committed record is recoverable after lost process reply");
                 processes.Add(new { phase, folder, childId = child.Id, childExitCode = child.ExitCode, committed, nativeExecuted = false });
+                interruptedFolders.Add(folder!);
             }
             finally { if (!child.HasExited) { child.Kill(entireProcessTree: true); child.WaitForExit(10000); } File.WriteAllText(Path.Combine(root, "child-" + phase + ".log"), stdout.GetAwaiter().GetResult() + stderr.GetAwaiter().GetResult()); }
         }
@@ -126,6 +128,10 @@ internal static class CompositeWorkflowTests
             Check(JsonNode.DeepEquals(summary, Json(store.Reopen(reference))), "Existing exact handle remains readable when store is over quota");
         }
         finally { File.Delete(quota); }
+        // The cap check below may evict any abandoned record, including the interrupted publications that the independent
+        // Python oracle reads back through workflow-verification.json; park them outside the store until it is done.
+        string parked = Path.Combine(root, "parked-interrupted-publications"); Directory.CreateDirectory(parked);
+        foreach (string folder in interruptedFolders) Directory.Move(folder, Path.Combine(parked, Path.GetFileName(folder)));
         var extraDirectories = new List<string>();
         try
         {
@@ -135,7 +141,12 @@ internal static class CompositeWorkflowTests
             Check(Directory.EnumerateDirectories(storeRoot).Count() <= 128 && extraDirectories.Any(p => !Directory.Exists(p)), "Abandoned record directories are evicted at the record cap");
             Directory.Delete(Path.Combine(storeRoot, ((string)evicting["recordRef"]!).Split(':')[1]), true);
         }
-        finally { foreach (string path in extraDirectories) if (Directory.Exists(path)) Directory.Delete(path); }
+        finally
+        {
+            foreach (string path in extraDirectories) if (Directory.Exists(path)) Directory.Delete(path);
+            foreach (string folder in interruptedFolders) Directory.Move(Path.Combine(parked, Path.GetFileName(folder)), folder);
+            Directory.Delete(parked);
+        }
         var extraFiles = new List<string>();
         try
         {
