@@ -100,55 +100,8 @@ namespace TiaMcp.Openness.V21
                 ["originalCardManifest"] = expectedFiles.DeepClone(),
                 ["opaqueStorageContentsRead"] = false, ["fullStorageBytePreservationVerified"] = false,
                 ["independentAfterStateVerified"] = false };
-            var report = Envelope();
-            report["recoveryBaseline"] = recoveryBaseline;
-            report["origin"] = "TIA Portal V21 Openness / owned PLCSIM Advanced V8 credential provisioning";
-            report["route"] = network == "TCPIP" ? "OnlineProvider.SetPlcMasterSecret via PN/IE / the sole PLCSIM Virtual Ethernet Adapter, existing TCP/IP single-adapter mode only"
-                : "OnlineProvider.SetPlcMasterSecret via PN/IE / PLCSIM (1), local Softbus only";
-            report["project"] = ProjectInfo(plc.Project);
-            report["plcPath"] = plc.Path;
-            report["instanceId"] = marker["instanceId"].DeepClone();
-            report["instanceName"] = marker["instanceName"].DeepClone();
-            report["reportPath"] = reportPath;
-            report["checkpointPath"] = checkpointPath;
-            report["provisioningStrategy"] = "Provision the same owned empty virtual CPU before restoring its unchanged protected program card.";
-            report["preRegistrationDiscoveryBaseline"] = discoveryBaseline?.Evidence.DeepClone();
-            report["stagedProtectedCardPath"] = stagedCard;
-            report["emptyCardBackupPath"] = emptyCardBackup;
-            report["originalProgramCardRestored"] = false;
-            report["emptyStartupVerified"] = false;
-            report["protectedProgramLoadedDuringProvisioning"] = false;
-            report["provisionClaimPath"] = provisionClaimPath;
-            report["provisionClaimRecorded"] = false;
-            report["credentialEvidence"] = credential.Evidence;
-            report["programRevision"] = revision;
-            report["originalProgramRevision"] = revision;
-            report["generatedCardVerified"] = true;
-            report["protectionConfiguration"] = protectionBefore;
-            report["protectionDisabled"] = false;
-            report["credentialProvisioned"] = false;
-            report["protectionProvisioned"] = false;
-            report["completed"] = false;
-            report["runtimeReadbackVerified"] = false;
-            report["runtimeApiLifetime"] = "worker";
-            report["runtimeApiShutdownDeferred"] = true;
-            report["runVerified"] = false;
-            report["secretReturned"] = false;
-            report["stage"] = "runtimePreflight";
-            report["routeApplied"] = false;
-            report["trustOwnedEmptyCpuCertificate"] = trustOwnedEmptyCpuCertificate;
-            report["tlsPinnedCertificateSha256"] = null;
-            report["tlsCertificatePinScope"] = "currentProvisioningAttemptOnly";
-            report["goOnlineAttempted"] = false;
-            report["goOnlineCallReturned"] = false;
-            report["credentialSubmissionAttempted"] = false;
-            report["credentialSubmissionArmed"] = false;
-            report["credentialNativeCallReturned"] = false;
-            // This flag closes diagnostic text access before even attempting to
-            // open the SecureString, including when credential opening fails.
-            report["credentialOpened"] = false;
-            report["cardMoves"] = new JArray();
-            report["cardMoveRetryPolicy"] = "Filesystem-only: Windows access/sharing/lock denial, at most 61 move calls and a 15000 ms retry-admission budget from the first failure. Guard/property/file calls may exceed that budget; no native or credential call is retried.";
+            var report = CreateSimulationProvisionReport(recoveryBaseline, network, plc, marker, reportPath, checkpointPath, discoveryBaseline,
+                stagedCard, emptyCardBackup, provisionClaimPath, credential, revision, protectionBefore, trustOwnedEmptyCpuCertificate);
             var cleanup = new JArray();
             report["cleanup"] = cleanup;
             IInstance instance = null;
@@ -228,49 +181,7 @@ namespace TiaMcp.Openness.V21
                     report["stage"] = "captureRecoveryBaseline";
                     SimulationProvisionProjectCheckpoint(plc.Project, recoveryBaseline, checkpoint);
                     VerifySimulationProvisionIdentity(instance, marker, true);
-                    // Establish absence before this exact owned CPU is started.
-                    // PLCSIM can share Softbus with other simulator products; the
-                    // Advanced registration list alone does not exclude them.
-                    var discoveryObservations = new JArray();
-                    report["preStartupDiscoveryObservations"] = discoveryObservations;
-                    report["preStartupDiscoveryPolicy"] = new JObject {
-                        ["budgetMs"] = SimulationDiscoveryWait.BudgetMs,
-                        ["maximumQueries"] = SimulationDiscoveryWait.MaximumQueries,
-                        ["requiredConsecutiveEmptySnapshots"] = SimulationDiscoveryWait.RequiredEmptySnapshots,
-                        ["scope"] = "Read-only explicit PLCSIM discovery. Every nonempty snapshot remains significant, including unnamed or zero-address entries. Native reads may exceed the wait budget; late snapshots do not authorize startup." };
-                    JObject discoverySnapshot = null;
-                    var preStartupDiscoveryClock = Stopwatch.StartNew();
-                    bool absentBeforeStartup = SimulationDiscoveryWait.ObserveEmpty(
-                        () => {
-                            VerifySimulationProvisionIdentity(instance, marker, true);
-                            if (provider.State != OnlineState.Offline)
-                                throw new BridgeException("OfflineRequired", "The scratch CPU must remain offline during pre-start discovery.");
-                        },
-                        () => {
-                            var beforePc = SimulationPcInterface(provider.Configuration, network);
-                            var beforeDevices = beforePc == null ? null : beforePc.GetAccessibleDevices().Take(65).ToArray();
-                            var unexplained = beforeDevices == null ? null : WithoutSimulationPlaceholder(beforeDevices, AcceptedSimulationPlaceholder(discoveryBaseline), beforeDevices.Length > 64);
-                            bool empty = beforeDevices == null || unexplained.Length == 0;
-                            discoverySnapshot = new JObject { ["observedAtUtc"] = DateTime.UtcNow.ToString("O"),
-                                ["status"] = beforePc == null ? "routeAbsent" : beforeDevices.Length == 0 ? "queriedEmpty" : empty ? "baselinePlaceholderOnly" : "preexistingDevices",
-                                ["baselinePlaceholderExcluded"] = beforeDevices == null ? 0 : beforeDevices.Length - unexplained.Length,
-                                ["mode"] = "PN/IE", ["interfaceName"] = beforePc?.Name, ["interfaceNumber"] = beforePc?.Number,
-                                ["providerState"] = provider.State.ToString(), ["queryPerformed"] = beforePc != null, ["truncated"] = beforeDevices != null && beforeDevices.Length > 64,
-                                ["basis"] = beforePc == null ? "Siemens documents PLCSIM absent from PcInterfaces when not running." : "Successful snapshot on explicit PN/IE / PLCSIM (1); only zero observed devices establishes absence.",
-                                ["accessibleDevices"] = beforeDevices == null ? null : new JArray(beforeDevices.Take(64).Select(device => new JObject {
-                                    ["name"] = device.Name, ["address"] = device.Address, ["macAddress"] = device.MACAddress, ["deviceSeries"] = device.DeviceSeries })) };
-                            return empty;
-                        },
-                        (attempt, empty, consecutive, elapsed) => {
-                            discoverySnapshot["attempt"] = attempt; discoverySnapshot["empty"] = empty;
-                            discoverySnapshot["consecutiveEmptySnapshots"] = consecutive; discoverySnapshot["elapsedMs"] = elapsed;
-                            report["preStartupDiscovery"] = discoverySnapshot;
-                            discoveryObservations.Add(discoverySnapshot.DeepClone());
-                            checkpoint("preStartupDiscoveryObserved");
-                        }, () => preStartupDiscoveryClock.ElapsedMilliseconds, delay => Thread.Sleep(delay));
-                    report["preStartupIsolationVerified"] = absentBeforeStartup;
-                    if (!absentBeforeStartup)
-                        throw new BridgeException("SimulationProvisionIsolationRequired", "Repeated empty PLCSIM discovery snapshots were not obtained within the bounded wait before owned startup. No endpoint was ignored, selected or changed.");
+                    ObserveSimulationProvisionPreStartupAbsence(instance, marker, provider, network, discoveryBaseline, report, checkpoint);
                     VerifySimulationProvisionIdentity(instance, marker, true);
                     ERuntimeErrorCode? license = null;
                     try { license = instance.LicenseStatus; } catch { }
@@ -352,55 +263,7 @@ namespace TiaMcp.Openness.V21
                     report["controllerName"] = instance.ControllerName;
                     string bootstrapped = null, startupMac = null; // Set only when this attempt assigned the bootstrap address.
                     if (ips.Length == 0)
-                    {
-                        // SetIPSuite addresses the already-verified IInstance,
-                        // never an online address or a Windows network adapter.
-                        // Siemens documents this operation for Softbus; it ignores
-                        // the subnet/gateway and remanence flag in that mode.
-                        const string documentedStartupAddress = "192.168.0.1";
-                        var observedBefore = observer.Read(65, network);
-                        var before = WithoutSimulationPlaceholder(observedBefore, AcceptedSimulationPlaceholder(discoveryBaseline), observedBefore.Length > 64);
-                        report["postStartupDiscovery"] = new JObject { ["observedAtUtc"] = DateTime.UtcNow.ToString("O"),
-                            ["accessibleDevices"] = new JArray(observedBefore.Take(64).Select(device => new JObject {
-                                ["name"] = device.Name, ["address"] = device.Address, ["macAddress"] = device.MACAddress, ["deviceSeries"] = device.DeviceSeries })),
-                            ["baselinePlaceholderExcluded"] = observedBefore.Length - before.Length,
-                            ["truncated"] = observedBefore.Length > 64, ["causalTargetVerified"] = false };
-                        // An empty TCP/IP CPU has no IP yet; it then gets the same documented default (/24, on the operator's subnet).
-                        if (before.Length != 1 || !SimulationNetworkAdmission.EmptyStartupEndpoint(network, before[0].Address, before[0].MACAddress, before[0].DeviceSeries, documentedStartupAddress))
-                            throw new BridgeException("SimulationProvisionTargetAmbiguous", "Owned startup did not produce exactly one new S7-1500 endpoint at the documented PLCSIM startup address. No address or credential was submitted.");
-                        string bootstrapAddress = documentedStartupAddress;
-                        report["postStartupDiscovery"]["causalTargetVerified"] = true;
-                        report["targetIdentityBasis"] = "PLCSIM route absent or successfully queried empty (apart from only the exact pre-registration Runtime Manager placeholder, if recorded) before sole owned OFF-to-STOP startup; one new S7-1500 default endpoint observed by a fresh owned discovery-only Portal; exact IInstance address assignment and readback; fresh exact discovery match.";
-                        var originalSuites = instance.ControllerIPSuite4 ?? new SIPSuite4[0];
-                        report["addressBootstrap"] = new JObject {
-                            ["purpose"] = "Align the exact owned virtual CPU with its newly observed default Softbus endpoint after verified absent-to-present startup; no physical or shared adapter configuration.",
-                            ["addressSource"] = "Unique newly observed S7-1500 endpoint, constrained to documented PLCSIM startup default; no alternative address attempted.",
-                            ["interfaceId"] = (uint)EPLCInterface.IE1,
-                            ["originalSuites"] = new JArray(originalSuites.Select(suite => new JObject {
-                                ["address"] = suite.IPAddress.IPString, ["subnetMask"] = suite.SubnetMask.IPString,
-                                ["defaultGateway"] = suite.DefaultGateway.IPString })),
-                            ["assignedAddress"] = bootstrapAddress, ["requestedSubnetMask"] = "255.255.255.0",
-                            ["requestedDefaultGateway"] = "0.0.0.0", ["requestedRemanent"] = false,
-                            ["softbusIgnoresSubnetGatewayAndRemanence"] = network != "TCPIP", ["observedStartupAddress"] = before[0].Address, ["readbackVerified"] = false,
-                            ["scope"] = "Owned simulator runtime only; owned instance is powered off on every exit and its storage is retained." };
-                        VerifySimulationProvisionIdentity(instance, marker, false);
-                        if (instance.OperatingState != EOperatingState.Stop || (instance.ControllerIP ?? new string[0]).Any(SimulationProvisionUsableIPv4))
-                            throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state or initially empty address changed before bootstrap assignment.");
-                        report["stage"] = "assignOwnedBootstrapAddress";
-                        checkpoint("beforeSetOwnedIpSuite");
-                        instance.SetIPSuite((uint)EPLCInterface.IE1, new SIPSuite4 {
-                            IPAddress = new SIP { IPString = bootstrapAddress },
-                            SubnetMask = new SIP { IPString = "255.255.255.0" },
-                            DefaultGateway = new SIP { IPString = "0.0.0.0" } }, false);
-                        checkpoint("afterSetOwnedIpSuite");
-                        VerifySimulationProvisionIdentity(instance, marker, false);
-                        ips = (instance.ControllerIP ?? new string[0]).Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
-                        report["addressBootstrap"]["observedAddresses"] = new JArray(ips);
-                        if (instance.OperatingState != EOperatingState.Stop || ips.Length != 1 || ips[0] != bootstrapAddress)
-                            throw new BridgeException("SimulationProvisionAddressUnavailable", "The exact owned simulator did not read back the requested bootstrap address in STOP. No credential was submitted.");
-                        report["addressBootstrap"]["readbackVerified"] = true;
-                        bootstrapped = bootstrapAddress; startupMac = before[0].MACAddress;
-                    }
+                        BootstrapSimulationProvisionAddress(instance, marker, observer, network, discoveryBaseline, report, checkpoint, ref ips, ref bootstrapped, ref startupMac);
                     report["stage"] = "discoverExactRuntimeAddress";
                     report["controllerAddresses"] = new JArray(ips);
                     // GetAccessibleDevices returns a point-in-time snapshot. After
@@ -476,115 +339,8 @@ namespace TiaMcp.Openness.V21
                         var tls = request as TlsVerificationConfiguration;
                         if (tls != null)
                         {
-                            // Siemens documents NonTrusted as the explicit reject
-                            // decision. Returning it avoids throwing our exception
-                            // through the native callback. Only explicit reviewed
-                            // first-use authorization can establish an attempt pin.
-                            tlsCallbackCount++;
-                            var tlsEvidence = new JObject { ["trustGranted"] = false,
-                                ["certificateIdentityIndependentlyVerified"] = false,
-                                ["attemptPinnedCertificateSha256"] = attemptTlsPin,
-                                ["callerTrustAuthorization"] = trustOwnedEmptyCpuCertificate,
-                                ["authorizationRequested"] = trustOwnedEmptyCpuCertificate,
-                                ["certificateSha256Matched"] = false, ["certificateValidityVerified"] = false,
-                                ["ownedTargetRevalidated"] = false, ["callbackNumber"] = tlsCallbackCount,
-                                ["plannedDecision"] = "NonTrusted", ["publicMetadataOnly"] = true,
-                                ["routeBinding"] = "Observed during the exact owned empty CPU connection; this is transport context, not independent certificate authentication.",
-                                ["trustBasis"] = trustOwnedEmptyCpuCertificate ?
-                                    "Explicit caller authorization for first use of the exact owned empty local Softbus CPU; the observed certificate hash is pinned only within this provisioning attempt." :
-                                    "No first-use certificate trust authorization was supplied; the default decision is NonTrusted." };
-                            report["tlsVerification"] = tlsEvidence;
-                            cleanupCheckpoint("tlsVerificationObserved");
-                            try { tlsEvidence["initialSelection"] = tls.CurrentSelection.ToString(); }
-                            catch (Exception ex) { tlsEvidence["initialSelectionExceptionType"] = ex.GetType().FullName; }
-                            tls.CurrentSelection = TlsVerificationConfigurationSelection.NonTrusted;
-                            tlsEvidence["appliedDecision"] = "NonTrusted";
-                            cleanupCheckpoint("tlsVerificationRejected");
-                            int certificateCount = 0;
-                            string observedSha256 = null;
-                            DateTime certificateNotBefore = DateTime.MinValue;
-                            DateTime certificateNotAfter = DateTime.MinValue;
-                            bool metadataComplete = false;
-                            string certificateSubject = null;
-                            try
-                            {
-                                string plcName = tls.PlcName;
-                                string verificationInfo = tls.VerificationInfo;
-                                tlsEvidence["plcName"] = SimulationProvisionFilterPreCredentialText(plcName ?? "", 512);
-                                tlsEvidence["verificationInfo"] = SimulationProvisionFilterPreCredentialText(verificationInfo ?? "", 2048);
-                                var certificates = tls.Certificates.Take(9).ToArray();
-                                certificateCount = certificates.Length;
-                                tlsEvidence["certificatesTruncated"] = certificates.Length > 8;
-                                var certificateEvidence = new JArray();
-                                tlsEvidence["certificates"] = certificateEvidence;
-                                foreach (var certificate in certificates.Take(8))
-                                    certificateEvidence.Add(SimulationProvisionPublicCertificate(certificate.Certificate));
-                                if (certificates.Length == 1)
-                                {
-                                    observedSha256 = certificateEvidence[0].Value<string>("sha256");
-                                    certificateSubject = certificateEvidence[0].Value<string>("subject");
-                                    certificateNotBefore = DateTime.Parse(certificateEvidence[0].Value<string>("notBeforeUtc"), System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind);
-                                    certificateNotAfter = DateTime.Parse(certificateEvidence[0].Value<string>("notAfterUtc"), System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind);
-                                }
-                                metadataComplete = true;
-                            }
-                            catch (Exception ex)
-                            {
-                                tlsEvidence["metadataExceptionType"] = ex.GetType().FullName;
-                            }
-                            bool ownedTargetVerified = false;
-                            if (trustOwnedEmptyCpuCertificate && metadataComplete && certificateCount == 1 && callbackFailure == null && failure == null)
-                            {
-                                try
-                                {
-                                    VerifySimulationProvisionIdentity(instance, marker, false);
-                                    VerifySimulationProvisionChild(storage, stagedCard, true);
-                                    var callbackIps = (instance.ControllerIP ?? new string[0]).Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
-                                    ownedTargetVerified = explicitRouteApplied && report.Value<string>("stage") == "goOnline" &&
-                                        report.Value<bool>("emptyStartupVerified") && !report.Value<bool>("originalProgramCardRestored") &&
-                                        instance.OperatingState == EOperatingState.Stop && callbackIps.Length == 1 && callbackIps[0] == address;
-                                    // Without an address from discovery, the device reached at the bootstrap address must present an S7-1500 certificate.
-                                    if (runtimeTargetBasis == "tcpipMacIdentity")
-                                    {
-                                        bool series = (certificateSubject ?? "").IndexOf("S7-1500", StringComparison.Ordinal) >= 0;
-                                        tlsEvidence["tcpipMacIdentityCertificateSeriesMatched"] = series;
-                                        ownedTargetVerified = ownedTargetVerified && series;
-                                    }
-                                }
-                                catch (Exception ex) { tlsEvidence["targetRevalidationExceptionType"] = ex.GetType().FullName; }
-                            }
-                            DateTime policyTime = DateTime.UtcNow;
-                            string decision = SimulationTlsPin.Decide(trustOwnedEmptyCpuCertificate, attemptTlsPin, observedSha256, certificateCount,
-                                certificateNotBefore, certificateNotAfter, policyTime, metadataComplete, ownedTargetVerified,
-                                report.Value<bool>("credentialOpened") || report.Value<bool>("credentialSubmissionArmed"),
-                                callbackFailure != null || failure != null || tlsCallbackCount > 8, false);
-                            tlsEvidence["observedCertificateSha256"] = observedSha256;
-                            tlsEvidence["certificateValidityVerified"] = metadataComplete && certificateCount == 1 && certificateNotBefore <= policyTime && policyTime <= certificateNotAfter;
-                            tlsEvidence["certificateValidityBasis"] = "Public certificate UTC validity interval; independent CA or device identity authentication is not claimed.";
-                            tlsEvidence["ownedTargetRevalidated"] = ownedTargetVerified;
-                            tlsEvidence["pinPolicyDecision"] = decision;
-                            cleanupCheckpoint("tlsVerificationMetadata");
-                            if (SimulationTlsPin.Allows(decision) && failure == null)
-                            {
-                                bool firstUse = attemptTlsPin == null;
-                                if (firstUse) attemptTlsPin = observedSha256;
-                                report["tlsPinnedCertificateSha256"] = attemptTlsPin;
-                                tlsEvidence["attemptPinnedCertificateSha256"] = attemptTlsPin;
-                                tlsEvidence["firstUsePinEstablished"] = firstUse;
-                                tlsEvidence["certificateSha256Matched"] = observedSha256 == attemptTlsPin;
-                                tlsEvidence["plannedDecision"] = "Trusted";
-                                tlsEvidence["trustMayHaveBeenGranted"] = true;
-                                cleanupCheckpoint("tlsVerificationTrustIntent");
-                                if (failure == null)
-                                {
-                                    tls.CurrentSelection = TlsVerificationConfigurationSelection.Trusted;
-                                    tlsEvidence["appliedDecision"] = "Trusted";
-                                    tlsEvidence["trustGranted"] = true;
-                                    cleanupCheckpoint("tlsVerificationTrusted");
-                                    if (failure == null) return;
-                                }
-                            }
-                            callbackFailure = callbackFailure ?? new BridgeException("SimulationProvisionAuthenticationRequired", "The isolated TLS challenge was rejected because the explicit owned-empty-CPU trust policy or an attempt certificate, validity, or target check was not satisfied. No user credentials were supplied.");
+                            DecideSimulationProvisionTls(tls, report, cleanupCheckpoint, trustOwnedEmptyCpuCertificate, instance, marker, storage, stagedCard,
+                                explicitRouteApplied, address, runtimeTargetBasis, ref tlsCallbackCount, ref attemptTlsPin, ref callbackFailure, ref failure);
                             return;
                         }
                         // An unrelated authentication challenge is never satisfied
@@ -593,29 +349,7 @@ namespace TiaMcp.Openness.V21
                         return;
                     };
                     configuration.OnlineLegitimation += rejectAuthentication;
-                    // Siemens V21's PLCSIM example applies the target-interface
-                    // overload. These are connection choices exposed by this exact
-                    // scratch CPU's OnlineProvider, not newly discovered devices.
-                    // Never guess a slot name or select the first of several ports.
-                    report["stage"] = "enumeratePlcsimTargetInterfaces";
-                    var targets = pc.TargetInterfaces.Take(17).ToArray();
-                    var targetInventory = new JArray();
-                    report["targetInterfaceInventory"] = targetInventory;
-                    report["targetInterfaceInventoryTruncated"] = targets.Length > 16;
-                    foreach (var candidate in targets.Take(16))
-                    {
-                        var addresses = candidate.Addresses.Take(33).ToArray();
-                        targetInventory.Add(new JObject { ["name"] = candidate.Name,
-                            ["addresses"] = new JArray(addresses.Take(32).Select(item => new JObject {
-                                ["name"] = item.Name, ["address"] = item.Address })),
-                            ["addressesTruncated"] = addresses.Length > 32 });
-                    }
-                    if (targets.Length != 1 || string.IsNullOrWhiteSpace(targets[0].Name))
-                        throw new BridgeException("SimulationProvisionTargetInterfaceAmbiguous", "The exact scratch CPU's PLCSIM (1) connection must expose one uniquely named target interface. No slot is guessed and no alternate route is applied.");
-                    var target = targets[0];
-                    report["routeSelection"]["targetInterface"] = target.Name;
-                    report["routeSelection"]["configurationKind"] = "soleEnumeratedConfigurationTargetInterface";
-                    report["routeSelection"]["targetInterfaceScope"] = "Exact validated scratch CPU OnlineProvider.Configuration / PN/IE / PLCSIM (1); live endpoint identity separately revalidated.";
+                    var target = SelectSimulationProvisionTargetInterface(pc, report);
                     VerifySimulationProvisionIdentity(instance, marker, false);
                     if (instance.OperatingState != EOperatingState.Stop || provider.State != OnlineState.Offline ||
                         !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
@@ -645,33 +379,8 @@ namespace TiaMcp.Openness.V21
                         throw new BridgeException("OfflineRequired", "The worker-owned scratch connection changed before its explicit GoOnline call.");
                     report["goOnlineAttempted"] = true;
                     checkpoint("beforeGoOnline");
-                    OnlineState online;
-                    try { online = provider.GoOnline(); }
-                    catch (Exception first) when (network == "TCPIP") // Softbus never enters this handler.
-                    {
-                        string stateAfter;
-                        try { stateAfter = provider.State.ToString(); } catch { stateAfter = null; }
-                        var challenge = report["onlineChallengeType"];
-                        if (!SimulationNetworkAdmission.GoOnlineRetryAllowed(network, 0, challenge != null && challenge.Type != JTokenType.Null || tlsCallbackCount > 0 || callbackFailure != null,
-                            report.Value<bool>("credentialOpened") || report.Value<bool>("credentialSubmissionArmed") || failure != null, stateAfter))
-                            throw;
-                        const int retryDelayMs = 15000;
-                        report["goOnlineRetry"] = new JObject { ["delayMs"] = retryDelayMs, ["onlineStateAfterFirstAttempt"] = stateAfter,
-                            ["firstAttempt"] = SimulationProvisionExceptionDiagnostics(first, true), ["returned"] = false,
-                            ["policy"] = "TCP/IP only, once: the first GoOnline threw before any online callback, with no credential opened or submitted; the owned target is rechecked before the second call." };
-                        checkpoint("goOnlineRetryScheduled");
-                        Thread.Sleep(retryDelayMs);
-                        VerifySimulationProvisionIdentity(instance, marker, false);
-                        if (instance.OperatingState != EOperatingState.Stop || provider.State != OnlineState.Offline || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
-                            throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state, connection or controller address changed before the GoOnline retry.");
-                        var retryRead = observer.Read(3, network);
-                        var retryChecked = WithoutSimulationPlaceholder(retryRead, AcceptedSimulationPlaceholder(discoveryBaseline), retryRead.Length > 2);
-                        if (retryChecked.Length != 1 || !SimulationNetworkAdmission.SameRuntimeTarget(runtimeTargetBasis, retryChecked[0].Address, retryChecked[0].MACAddress, retryChecked[0].DeviceSeries, address, startupMac))
-                            throw new BridgeException("SimulationProvisionTargetAmbiguous", "The exact PLCSIM accessible target changed before the GoOnline retry.");
-                        checkpoint("beforeGoOnlineRetry");
-                        online = provider.GoOnline();
-                        report["goOnlineRetry"]["returned"] = true;
-                    }
+                    OnlineState online = GoOnlineForSimulationProvision(provider, network, report, checkpoint, instance, marker, address, observer, discoveryBaseline,
+                        runtimeTargetBasis, startupMac, ref tlsCallbackCount, ref callbackFailure, ref failure);
                     report["goOnlineCallReturned"] = true;
                     checkpoint("afterGoOnline");
                     report["goOnlineReturnedState"] = online.ToString();
@@ -741,45 +450,8 @@ namespace TiaMcp.Openness.V21
                 }
                 finally
                 {
-                    if (observer != null)
-                    {
-                        try
-                        {
-                            var stopped = observer.Stop();
-                            cleanup.Add(stopped);
-                            report["discoveryObserver"]["stopped"] = stopped.DeepClone();
-                            if (stopped.Value<bool>("completed") != true && failure == null)
-                                failure = new BridgeException("SimulationProvisionCleanupFailed", "The discovery observer Portal did not close its project and exit.");
-                        }
-                        catch (Exception ex)
-                        {
-                            cleanup.Add(new JObject { ["action"] = "stopDiscoveryObserver", ["completed"] = false, ["exceptionType"] = ex.GetType().FullName });
-                            if (failure == null) failure = new BridgeException("SimulationProvisionCleanupFailed", "The discovery observer Portal could not be stopped.");
-                        }
-                        observer = null;
-                    }
-                    if (provider != null && explicitRouteApplied)
-                    {
-                        try
-                        {
-                            if (provider.State != OnlineState.Offline)
-                            {
-                                cleanupCheckpoint("beforeGoOffline");
-                                provider.GoOffline();
-                                cleanupCheckpoint("afterGoOffline");
-                            }
-                            var finalOnlineState = provider.State;
-                            if (finalOnlineState != OnlineState.Offline)
-                                throw new BridgeException("SimulationProvisionCleanupFailed", "The worker-owned scratch connection did not reach Offline after credential recovery.");
-                            cleanup.Add(new JObject { ["action"] = "disconnectOwnedTiaConnection", ["completed"] = true,
-                                ["onlineState"] = finalOnlineState.ToString() });
-                        }
-                        catch (Exception ex)
-                        {
-                            cleanup.Add(new JObject { ["action"] = "disconnectOwnedTiaConnection", ["completed"] = false, ["exceptionType"] = ex.GetType().FullName });
-                            if (failure == null) failure = new BridgeException("SimulationProvisionCleanupFailed", "The worker-owned TIA online connection could not be released after credential recovery.");
-                        }
-                    }
+                    if (observer != null) StopSimulationProvisionObserver(ref observer, report, cleanup, ref failure);
+                    if (provider != null && explicitRouteApplied) ReleaseSimulationProvisionConnection(provider, cleanup, cleanupCheckpoint, ref failure);
                     if (provisionConfiguration != null && rejectAuthentication != null)
                     {
                         try { provisionConfiguration.OnlineLegitimation -= rejectAuthentication; }
@@ -791,97 +463,11 @@ namespace TiaMcp.Openness.V21
                     }
                     if (instance != null)
                     {
-                        try
-                        {
-                            VerifySimulationProvisionIdentity(instance, marker, false, false);
-                            if (poweredByOperation && instance.OperatingState != EOperatingState.Off)
-                            {
-                                cleanupCheckpoint("beforePowerOff");
-                                instance.PowerOff(60000);
-                                cleanupCheckpoint("afterPowerOff");
-                            }
-                            bool off = instance.OperatingState == EOperatingState.Off;
-                            ownedOffVerified = off;
-                            report["operatingState"] = instance.OperatingState.ToString();
-                            report["instance"] = new JObject { ["id"] = instance.ID, ["name"] = instance.Name,
-                                ["storagePath"] = instance.StoragePath, ["operatingState"] = instance.OperatingState.ToString(),
-                                ["communicationInterface"] = instance.CommunicationInterface.ToString() };
-                            cleanup.Add(new JObject { ["action"] = "powerOff", ["completed"] = off });
-                            if (!off) throw new BridgeException("SimulationProvisionCleanupFailed", "The owned simulator did not reach OFF after credential recovery.");
-                        }
-                        catch (Exception ex)
-                        {
-                            cleanup.Add(new JObject { ["action"] = "powerOff", ["completed"] = false, ["exceptionType"] = ex.GetType().FullName });
-                            if (failure == null) failure = new BridgeException("SimulationProvisionCleanupFailed", "The exact owned simulator could not be verified powered OFF after credential recovery.");
-                        }
+                        PowerOffSimulationProvisionInstance(instance, marker, poweredByOperation, report, cleanup, cleanupCheckpoint, ref ownedOffVerified, ref failure);
                         if (stagingAttempted)
-                        {
-                            try
-                            {
-                                if (!ownedOffVerified)
-                                {
-                                    report["restorationDeferredUntilOwnedOff"] = true;
-                                    throw new BridgeException("SimulationProvisionCardRestoreDeferred", "The protected program remains retained in owned staging because the exact owned CPU could not be verified OFF. No card is moved while startup state is uncertain.");
-                                }
-                                VerifySimulationProvisionIdentity(instance, marker, true, false);
-                                cleanupCheckpoint("beforeRestoreProtectedCard");
-                                // Inspect actual paths, not a post-move flag: a
-                                // filesystem move may have completed before an
-                                // exception or process interruption was observed.
-                                if (Directory.Exists(stagedCard))
-                                {
-                                    VerifySimulationProvisionChild(storage, stagedCard, true);
-                                    if (!JToken.DeepEquals(expectedFiles, SimulationCardFiles(stagedCard)))
-                                        throw new BridgeException("SimulationProvisionCardChanged", "The staged protected card no longer matches the original manifest. Both runtime and staged files are retained for inspection.");
-                                    if (Directory.Exists(card))
-                                    {
-                                        VerifySimulationProvisionChild(storage, card, true);
-                                        VerifySimulationProvisionTree(card);
-                                        VerifySimulationProvisionChild(storage, emptyCardBackup, false);
-                                        cleanupCheckpoint("beforeRetainEmptyCard");
-                                        SimulationProvisionMoveCard(storage, card, emptyCardBackup, expectedFiles, stagedCard, false,
-                                            () => VerifySimulationProvisionIdentity(instance, marker, true, false), moveCheckpoint);
-                                        report["emptyCardRetained"] = true;
-                                        cleanupCheckpoint("afterRetainEmptyCard");
-                                    }
-                                    VerifySimulationProvisionChild(storage, card, false);
-                                    VerifySimulationProvisionIdentity(instance, marker, true, false);
-                                    cleanupCheckpoint("beforeRestoreOriginalCardMove");
-                                    SimulationProvisionMoveCard(storage, stagedCard, card, expectedFiles, stagedCard, true,
-                                        () => VerifySimulationProvisionIdentity(instance, marker, true, false), moveCheckpoint);
-                                    cleanupCheckpoint("afterRestoreOriginalCardMove");
-                                }
-                                VerifySimulationProvisionChild(storage, card, true);
-                                if (!JToken.DeepEquals(expectedFiles, SimulationCardFiles(card)))
-                                    throw new BridgeException("SimulationProvisionCardChanged", "The restored protected card did not match its exact original manifest. Retained storage must be inspected before any startup.");
-                                report["originalProgramCardRestored"] = true;
-                                cleanup.Add(new JObject { ["action"] = "restoreOriginalProtectedCard", ["completed"] = true, ["programRevision"] = revision });
-                                cleanupCheckpoint("afterRestoreProtectedCard");
-                            }
-                            catch (Exception ex)
-                            {
-                                cleanup.Add(new JObject { ["action"] = "restoreOriginalProtectedCard", ["completed"] = false,
-                                    ["exceptionType"] = ex.GetType().FullName, ["hresult"] = ex.HResult });
-                                report["originalProgramCardRestored"] = false;
-                                if (failure == null) failure = ex as BridgeException ?? new BridgeException("SimulationProvisionCardRestoreFailed", "The original protected card could not be verified restored after owned OFF. All staged and runtime-created files are retained; no files were deleted or overwritten.");
-                            }
-                        }
-                        try
-                        {
-                            cleanupCheckpoint("beforeReleaseInterface");
-                            // Off now: release this and the download's interface before anyone unregisters the instance.
-                            RetainSimulationInterface(instance);
-                            var released = ReleaseRetainedSimulationInterfaces();
-                            bool all = released.All(r => r.Value<bool>("released"));
-                            cleanup.Add(new JObject { ["action"] = "releaseInterface", ["completed"] = all, ["interfaces"] = released });
-                            if (!all && failure == null) failure = new BridgeException("SimulationProvisionCleanupFailed", "An owned simulator interface could not be released after credential recovery.");
-                            cleanupCheckpoint("afterReleaseInterface");
-                        }
-                        catch (Exception ex)
-                        {
-                            cleanup.Add(new JObject { ["action"] = "releaseInterface", ["completed"] = false, ["exceptionType"] = ex.GetType().FullName });
-                            if (failure == null) failure = new BridgeException("SimulationProvisionCleanupFailed", "The owned simulator interface could not be released after credential recovery.");
-                        }
+                            RestoreSimulationProvisionCard(instance, marker, storage, card, stagedCard, emptyCardBackup, expectedFiles, revision, ownedOffVerified,
+                                report, cleanup, cleanupCheckpoint, moveCheckpoint, ref failure);
+                        ReleaseSimulationProvisionInterfaces(instance, cleanup, cleanupCheckpoint, ref failure);
                     }
                     if (callbackFailure != null && failure == null) failure = callbackFailure;
                     cleanupCheckpoint("attemptFinalized");
@@ -898,6 +484,484 @@ namespace TiaMcp.Openness.V21
             }
             if (failure != null) throw new BridgeException(failure.Code, failure.Message, report);
             return report;
+        }
+
+        private JObject CreateSimulationProvisionReport(JObject recoveryBaseline, string network, PlcSelection plc, JObject marker, string reportPath, string checkpointPath,
+            SimulationDiscoveryBaseline discoveryBaseline, string stagedCard, string emptyCardBackup, string provisionClaimPath, SimulationCredential credential,
+            string revision, string protectionBefore, bool trustOwnedEmptyCpuCertificate)
+        {
+            var report = Envelope();
+            report["recoveryBaseline"] = recoveryBaseline;
+            report["origin"] = "TIA Portal V21 Openness / owned PLCSIM Advanced V8 credential provisioning";
+            report["route"] = network == "TCPIP" ? "OnlineProvider.SetPlcMasterSecret via PN/IE / the sole PLCSIM Virtual Ethernet Adapter, existing TCP/IP single-adapter mode only"
+                : "OnlineProvider.SetPlcMasterSecret via PN/IE / PLCSIM (1), local Softbus only";
+            report["project"] = ProjectInfo(plc.Project);
+            report["plcPath"] = plc.Path;
+            report["instanceId"] = marker["instanceId"].DeepClone();
+            report["instanceName"] = marker["instanceName"].DeepClone();
+            report["reportPath"] = reportPath;
+            report["checkpointPath"] = checkpointPath;
+            report["provisioningStrategy"] = "Provision the same owned empty virtual CPU before restoring its unchanged protected program card.";
+            report["preRegistrationDiscoveryBaseline"] = discoveryBaseline?.Evidence.DeepClone();
+            report["stagedProtectedCardPath"] = stagedCard;
+            report["emptyCardBackupPath"] = emptyCardBackup;
+            report["originalProgramCardRestored"] = false;
+            report["emptyStartupVerified"] = false;
+            report["protectedProgramLoadedDuringProvisioning"] = false;
+            report["provisionClaimPath"] = provisionClaimPath;
+            report["provisionClaimRecorded"] = false;
+            report["credentialEvidence"] = credential.Evidence;
+            report["programRevision"] = revision;
+            report["originalProgramRevision"] = revision;
+            report["generatedCardVerified"] = true;
+            report["protectionConfiguration"] = protectionBefore;
+            report["protectionDisabled"] = false;
+            report["credentialProvisioned"] = false;
+            report["protectionProvisioned"] = false;
+            report["completed"] = false;
+            report["runtimeReadbackVerified"] = false;
+            report["runtimeApiLifetime"] = "worker";
+            report["runtimeApiShutdownDeferred"] = true;
+            report["runVerified"] = false;
+            report["secretReturned"] = false;
+            report["stage"] = "runtimePreflight";
+            report["routeApplied"] = false;
+            report["trustOwnedEmptyCpuCertificate"] = trustOwnedEmptyCpuCertificate;
+            report["tlsPinnedCertificateSha256"] = null;
+            report["tlsCertificatePinScope"] = "currentProvisioningAttemptOnly";
+            report["goOnlineAttempted"] = false;
+            report["goOnlineCallReturned"] = false;
+            report["credentialSubmissionAttempted"] = false;
+            report["credentialSubmissionArmed"] = false;
+            report["credentialNativeCallReturned"] = false;
+            // This flag closes diagnostic text access before even attempting to
+            // open the SecureString, including when credential opening fails.
+            report["credentialOpened"] = false;
+            report["cardMoves"] = new JArray();
+            report["cardMoveRetryPolicy"] = "Filesystem-only: Windows access/sharing/lock denial, at most 61 move calls and a 15000 ms retry-admission budget from the first failure. Guard/property/file calls may exceed that budget; no native or credential call is retried.";
+            return report;
+        }
+
+        private void ObserveSimulationProvisionPreStartupAbsence(IInstance instance, JObject marker, OnlineProvider provider, string network,
+            SimulationDiscoveryBaseline discoveryBaseline, JObject report, Action<string> checkpoint)
+        {
+            // Establish absence before this exact owned CPU is started.
+            // PLCSIM can share Softbus with other simulator products; the
+            // Advanced registration list alone does not exclude them.
+            var discoveryObservations = new JArray();
+            report["preStartupDiscoveryObservations"] = discoveryObservations;
+            report["preStartupDiscoveryPolicy"] = new JObject {
+                ["budgetMs"] = SimulationDiscoveryWait.BudgetMs,
+                ["maximumQueries"] = SimulationDiscoveryWait.MaximumQueries,
+                ["requiredConsecutiveEmptySnapshots"] = SimulationDiscoveryWait.RequiredEmptySnapshots,
+                ["scope"] = "Read-only explicit PLCSIM discovery. Every nonempty snapshot remains significant, including unnamed or zero-address entries. Native reads may exceed the wait budget; late snapshots do not authorize startup." };
+            JObject discoverySnapshot = null;
+            var preStartupDiscoveryClock = Stopwatch.StartNew();
+            bool absentBeforeStartup = SimulationDiscoveryWait.ObserveEmpty(
+                () => {
+                    VerifySimulationProvisionIdentity(instance, marker, true);
+                    if (provider.State != OnlineState.Offline)
+                        throw new BridgeException("OfflineRequired", "The scratch CPU must remain offline during pre-start discovery.");
+                },
+                () => {
+                    var beforePc = SimulationPcInterface(provider.Configuration, network);
+                    var beforeDevices = beforePc == null ? null : beforePc.GetAccessibleDevices().Take(65).ToArray();
+                    var unexplained = beforeDevices == null ? null : WithoutSimulationPlaceholder(beforeDevices, AcceptedSimulationPlaceholder(discoveryBaseline), beforeDevices.Length > 64);
+                    bool empty = beforeDevices == null || unexplained.Length == 0;
+                    discoverySnapshot = new JObject { ["observedAtUtc"] = DateTime.UtcNow.ToString("O"),
+                        ["status"] = beforePc == null ? "routeAbsent" : beforeDevices.Length == 0 ? "queriedEmpty" : empty ? "baselinePlaceholderOnly" : "preexistingDevices",
+                        ["baselinePlaceholderExcluded"] = beforeDevices == null ? 0 : beforeDevices.Length - unexplained.Length,
+                        ["mode"] = "PN/IE", ["interfaceName"] = beforePc?.Name, ["interfaceNumber"] = beforePc?.Number,
+                        ["providerState"] = provider.State.ToString(), ["queryPerformed"] = beforePc != null, ["truncated"] = beforeDevices != null && beforeDevices.Length > 64,
+                        ["basis"] = beforePc == null ? "Siemens documents PLCSIM absent from PcInterfaces when not running." : "Successful snapshot on explicit PN/IE / PLCSIM (1); only zero observed devices establishes absence.",
+                        ["accessibleDevices"] = beforeDevices == null ? null : new JArray(beforeDevices.Take(64).Select(device => new JObject {
+                            ["name"] = device.Name, ["address"] = device.Address, ["macAddress"] = device.MACAddress, ["deviceSeries"] = device.DeviceSeries })) };
+                    return empty;
+                },
+                (attempt, empty, consecutive, elapsed) => {
+                    discoverySnapshot["attempt"] = attempt; discoverySnapshot["empty"] = empty;
+                    discoverySnapshot["consecutiveEmptySnapshots"] = consecutive; discoverySnapshot["elapsedMs"] = elapsed;
+                    report["preStartupDiscovery"] = discoverySnapshot;
+                    discoveryObservations.Add(discoverySnapshot.DeepClone());
+                    checkpoint("preStartupDiscoveryObserved");
+                }, () => preStartupDiscoveryClock.ElapsedMilliseconds, delay => Thread.Sleep(delay));
+            report["preStartupIsolationVerified"] = absentBeforeStartup;
+            if (!absentBeforeStartup)
+                throw new BridgeException("SimulationProvisionIsolationRequired", "Repeated empty PLCSIM discovery snapshots were not obtained within the bounded wait before owned startup. No endpoint was ignored, selected or changed.");
+        }
+
+        private void BootstrapSimulationProvisionAddress(IInstance instance, JObject marker, SimulationDiscoveryObserver observer, string network,
+            SimulationDiscoveryBaseline discoveryBaseline, JObject report, Action<string> checkpoint, ref string[] ips, ref string bootstrapped, ref string startupMac)
+        {
+            // SetIPSuite addresses the already-verified IInstance,
+            // never an online address or a Windows network adapter.
+            // Siemens documents this operation for Softbus; it ignores
+            // the subnet/gateway and remanence flag in that mode.
+            const string documentedStartupAddress = "192.168.0.1";
+            var observedBefore = observer.Read(65, network);
+            var before = WithoutSimulationPlaceholder(observedBefore, AcceptedSimulationPlaceholder(discoveryBaseline), observedBefore.Length > 64);
+            report["postStartupDiscovery"] = new JObject { ["observedAtUtc"] = DateTime.UtcNow.ToString("O"),
+                ["accessibleDevices"] = new JArray(observedBefore.Take(64).Select(device => new JObject {
+                    ["name"] = device.Name, ["address"] = device.Address, ["macAddress"] = device.MACAddress, ["deviceSeries"] = device.DeviceSeries })),
+                ["baselinePlaceholderExcluded"] = observedBefore.Length - before.Length,
+                ["truncated"] = observedBefore.Length > 64, ["causalTargetVerified"] = false };
+            // An empty TCP/IP CPU has no IP yet; it then gets the same documented default (/24, on the operator's subnet).
+            if (before.Length != 1 || !SimulationNetworkAdmission.EmptyStartupEndpoint(network, before[0].Address, before[0].MACAddress, before[0].DeviceSeries, documentedStartupAddress))
+                throw new BridgeException("SimulationProvisionTargetAmbiguous", "Owned startup did not produce exactly one new S7-1500 endpoint at the documented PLCSIM startup address. No address or credential was submitted.");
+            string bootstrapAddress = documentedStartupAddress;
+            report["postStartupDiscovery"]["causalTargetVerified"] = true;
+            report["targetIdentityBasis"] = "PLCSIM route absent or successfully queried empty (apart from only the exact pre-registration Runtime Manager placeholder, if recorded) before sole owned OFF-to-STOP startup; one new S7-1500 default endpoint observed by a fresh owned discovery-only Portal; exact IInstance address assignment and readback; fresh exact discovery match.";
+            var originalSuites = instance.ControllerIPSuite4 ?? new SIPSuite4[0];
+            report["addressBootstrap"] = new JObject {
+                ["purpose"] = "Align the exact owned virtual CPU with its newly observed default Softbus endpoint after verified absent-to-present startup; no physical or shared adapter configuration.",
+                ["addressSource"] = "Unique newly observed S7-1500 endpoint, constrained to documented PLCSIM startup default; no alternative address attempted.",
+                ["interfaceId"] = (uint)EPLCInterface.IE1,
+                ["originalSuites"] = new JArray(originalSuites.Select(suite => new JObject {
+                    ["address"] = suite.IPAddress.IPString, ["subnetMask"] = suite.SubnetMask.IPString,
+                    ["defaultGateway"] = suite.DefaultGateway.IPString })),
+                ["assignedAddress"] = bootstrapAddress, ["requestedSubnetMask"] = "255.255.255.0",
+                ["requestedDefaultGateway"] = "0.0.0.0", ["requestedRemanent"] = false,
+                ["softbusIgnoresSubnetGatewayAndRemanence"] = network != "TCPIP", ["observedStartupAddress"] = before[0].Address, ["readbackVerified"] = false,
+                ["scope"] = "Owned simulator runtime only; owned instance is powered off on every exit and its storage is retained." };
+            VerifySimulationProvisionIdentity(instance, marker, false);
+            if (instance.OperatingState != EOperatingState.Stop || (instance.ControllerIP ?? new string[0]).Any(SimulationProvisionUsableIPv4))
+                throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state or initially empty address changed before bootstrap assignment.");
+            report["stage"] = "assignOwnedBootstrapAddress";
+            checkpoint("beforeSetOwnedIpSuite");
+            instance.SetIPSuite((uint)EPLCInterface.IE1, new SIPSuite4 {
+                IPAddress = new SIP { IPString = bootstrapAddress },
+                SubnetMask = new SIP { IPString = "255.255.255.0" },
+                DefaultGateway = new SIP { IPString = "0.0.0.0" } }, false);
+            checkpoint("afterSetOwnedIpSuite");
+            VerifySimulationProvisionIdentity(instance, marker, false);
+            ips = (instance.ControllerIP ?? new string[0]).Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
+            report["addressBootstrap"]["observedAddresses"] = new JArray(ips);
+            if (instance.OperatingState != EOperatingState.Stop || ips.Length != 1 || ips[0] != bootstrapAddress)
+                throw new BridgeException("SimulationProvisionAddressUnavailable", "The exact owned simulator did not read back the requested bootstrap address in STOP. No credential was submitted.");
+            report["addressBootstrap"]["readbackVerified"] = true;
+            bootstrapped = bootstrapAddress; startupMac = before[0].MACAddress;
+        }
+
+        private void DecideSimulationProvisionTls(TlsVerificationConfiguration tls, JObject report, Action<string> cleanupCheckpoint, bool trustOwnedEmptyCpuCertificate,
+            IInstance instance, JObject marker, string storage, string stagedCard, bool explicitRouteApplied, string address, string runtimeTargetBasis,
+            ref int tlsCallbackCount, ref string attemptTlsPin, ref BridgeException callbackFailure, ref BridgeException failure)
+        {
+            // Siemens documents NonTrusted as the explicit reject
+            // decision. Returning it avoids throwing our exception
+            // through the native callback. Only explicit reviewed
+            // first-use authorization can establish an attempt pin.
+            tlsCallbackCount++;
+            var tlsEvidence = new JObject { ["trustGranted"] = false,
+                ["certificateIdentityIndependentlyVerified"] = false,
+                ["attemptPinnedCertificateSha256"] = attemptTlsPin,
+                ["callerTrustAuthorization"] = trustOwnedEmptyCpuCertificate,
+                ["authorizationRequested"] = trustOwnedEmptyCpuCertificate,
+                ["certificateSha256Matched"] = false, ["certificateValidityVerified"] = false,
+                ["ownedTargetRevalidated"] = false, ["callbackNumber"] = tlsCallbackCount,
+                ["plannedDecision"] = "NonTrusted", ["publicMetadataOnly"] = true,
+                ["routeBinding"] = "Observed during the exact owned empty CPU connection; this is transport context, not independent certificate authentication.",
+                ["trustBasis"] = trustOwnedEmptyCpuCertificate ?
+                    "Explicit caller authorization for first use of the exact owned empty local Softbus CPU; the observed certificate hash is pinned only within this provisioning attempt." :
+                    "No first-use certificate trust authorization was supplied; the default decision is NonTrusted." };
+            report["tlsVerification"] = tlsEvidence;
+            cleanupCheckpoint("tlsVerificationObserved");
+            try { tlsEvidence["initialSelection"] = tls.CurrentSelection.ToString(); }
+            catch (Exception ex) { tlsEvidence["initialSelectionExceptionType"] = ex.GetType().FullName; }
+            tls.CurrentSelection = TlsVerificationConfigurationSelection.NonTrusted;
+            tlsEvidence["appliedDecision"] = "NonTrusted";
+            cleanupCheckpoint("tlsVerificationRejected");
+            int certificateCount = 0;
+            string observedSha256 = null;
+            DateTime certificateNotBefore = DateTime.MinValue;
+            DateTime certificateNotAfter = DateTime.MinValue;
+            bool metadataComplete = false;
+            string certificateSubject = null;
+            try
+            {
+                string plcName = tls.PlcName;
+                string verificationInfo = tls.VerificationInfo;
+                tlsEvidence["plcName"] = SimulationProvisionFilterPreCredentialText(plcName ?? "", 512);
+                tlsEvidence["verificationInfo"] = SimulationProvisionFilterPreCredentialText(verificationInfo ?? "", 2048);
+                var certificates = tls.Certificates.Take(9).ToArray();
+                certificateCount = certificates.Length;
+                tlsEvidence["certificatesTruncated"] = certificates.Length > 8;
+                var certificateEvidence = new JArray();
+                tlsEvidence["certificates"] = certificateEvidence;
+                foreach (var certificate in certificates.Take(8))
+                    certificateEvidence.Add(SimulationProvisionPublicCertificate(certificate.Certificate));
+                if (certificates.Length == 1)
+                {
+                    observedSha256 = certificateEvidence[0].Value<string>("sha256");
+                    certificateSubject = certificateEvidence[0].Value<string>("subject");
+                    certificateNotBefore = DateTime.Parse(certificateEvidence[0].Value<string>("notBeforeUtc"), System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind);
+                    certificateNotAfter = DateTime.Parse(certificateEvidence[0].Value<string>("notAfterUtc"), System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind);
+                }
+                metadataComplete = true;
+            }
+            catch (Exception ex)
+            {
+                tlsEvidence["metadataExceptionType"] = ex.GetType().FullName;
+            }
+            bool ownedTargetVerified = false;
+            if (trustOwnedEmptyCpuCertificate && metadataComplete && certificateCount == 1 && callbackFailure == null && failure == null)
+            {
+                try
+                {
+                    VerifySimulationProvisionIdentity(instance, marker, false);
+                    VerifySimulationProvisionChild(storage, stagedCard, true);
+                    var callbackIps = (instance.ControllerIP ?? new string[0]).Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
+                    ownedTargetVerified = explicitRouteApplied && report.Value<string>("stage") == "goOnline" &&
+                        report.Value<bool>("emptyStartupVerified") && !report.Value<bool>("originalProgramCardRestored") &&
+                        instance.OperatingState == EOperatingState.Stop && callbackIps.Length == 1 && callbackIps[0] == address;
+                    // Without an address from discovery, the device reached at the bootstrap address must present an S7-1500 certificate.
+                    if (runtimeTargetBasis == "tcpipMacIdentity")
+                    {
+                        bool series = (certificateSubject ?? "").IndexOf("S7-1500", StringComparison.Ordinal) >= 0;
+                        tlsEvidence["tcpipMacIdentityCertificateSeriesMatched"] = series;
+                        ownedTargetVerified = ownedTargetVerified && series;
+                    }
+                }
+                catch (Exception ex) { tlsEvidence["targetRevalidationExceptionType"] = ex.GetType().FullName; }
+            }
+            DateTime policyTime = DateTime.UtcNow;
+            string decision = SimulationTlsPin.Decide(trustOwnedEmptyCpuCertificate, attemptTlsPin, observedSha256, certificateCount,
+                certificateNotBefore, certificateNotAfter, policyTime, metadataComplete, ownedTargetVerified,
+                report.Value<bool>("credentialOpened") || report.Value<bool>("credentialSubmissionArmed"),
+                callbackFailure != null || failure != null || tlsCallbackCount > 8, false);
+            tlsEvidence["observedCertificateSha256"] = observedSha256;
+            tlsEvidence["certificateValidityVerified"] = metadataComplete && certificateCount == 1 && certificateNotBefore <= policyTime && policyTime <= certificateNotAfter;
+            tlsEvidence["certificateValidityBasis"] = "Public certificate UTC validity interval; independent CA or device identity authentication is not claimed.";
+            tlsEvidence["ownedTargetRevalidated"] = ownedTargetVerified;
+            tlsEvidence["pinPolicyDecision"] = decision;
+            cleanupCheckpoint("tlsVerificationMetadata");
+            if (SimulationTlsPin.Allows(decision) && failure == null)
+            {
+                bool firstUse = attemptTlsPin == null;
+                if (firstUse) attemptTlsPin = observedSha256;
+                report["tlsPinnedCertificateSha256"] = attemptTlsPin;
+                tlsEvidence["attemptPinnedCertificateSha256"] = attemptTlsPin;
+                tlsEvidence["firstUsePinEstablished"] = firstUse;
+                tlsEvidence["certificateSha256Matched"] = observedSha256 == attemptTlsPin;
+                tlsEvidence["plannedDecision"] = "Trusted";
+                tlsEvidence["trustMayHaveBeenGranted"] = true;
+                cleanupCheckpoint("tlsVerificationTrustIntent");
+                if (failure == null)
+                {
+                    tls.CurrentSelection = TlsVerificationConfigurationSelection.Trusted;
+                    tlsEvidence["appliedDecision"] = "Trusted";
+                    tlsEvidence["trustGranted"] = true;
+                    cleanupCheckpoint("tlsVerificationTrusted");
+                    if (failure == null) return;
+                }
+            }
+            callbackFailure = callbackFailure ?? new BridgeException("SimulationProvisionAuthenticationRequired", "The isolated TLS challenge was rejected because the explicit owned-empty-CPU trust policy or an attempt certificate, validity, or target check was not satisfied. No user credentials were supplied.");
+            return;
+        }
+
+        private static ConfigurationTargetInterface SelectSimulationProvisionTargetInterface(ConfigurationPcInterface pc, JObject report)
+        {
+            // Siemens V21's PLCSIM example applies the target-interface
+            // overload. These are connection choices exposed by this exact
+            // scratch CPU's OnlineProvider, not newly discovered devices.
+            // Never guess a slot name or select the first of several ports.
+            report["stage"] = "enumeratePlcsimTargetInterfaces";
+            var targets = pc.TargetInterfaces.Take(17).ToArray();
+            var targetInventory = new JArray();
+            report["targetInterfaceInventory"] = targetInventory;
+            report["targetInterfaceInventoryTruncated"] = targets.Length > 16;
+            foreach (var candidate in targets.Take(16))
+            {
+                var addresses = candidate.Addresses.Take(33).ToArray();
+                targetInventory.Add(new JObject { ["name"] = candidate.Name,
+                    ["addresses"] = new JArray(addresses.Take(32).Select(item => new JObject {
+                        ["name"] = item.Name, ["address"] = item.Address })),
+                    ["addressesTruncated"] = addresses.Length > 32 });
+            }
+            if (targets.Length != 1 || string.IsNullOrWhiteSpace(targets[0].Name))
+                throw new BridgeException("SimulationProvisionTargetInterfaceAmbiguous", "The exact scratch CPU's PLCSIM (1) connection must expose one uniquely named target interface. No slot is guessed and no alternate route is applied.");
+            var target = targets[0];
+            report["routeSelection"]["targetInterface"] = target.Name;
+            report["routeSelection"]["configurationKind"] = "soleEnumeratedConfigurationTargetInterface";
+            report["routeSelection"]["targetInterfaceScope"] = "Exact validated scratch CPU OnlineProvider.Configuration / PN/IE / PLCSIM (1); live endpoint identity separately revalidated.";
+            return target;
+        }
+
+        private OnlineState GoOnlineForSimulationProvision(OnlineProvider provider, string network, JObject report, Action<string> checkpoint, IInstance instance,
+            JObject marker, string address, SimulationDiscoveryObserver observer, SimulationDiscoveryBaseline discoveryBaseline, string runtimeTargetBasis,
+            string startupMac, ref int tlsCallbackCount, ref BridgeException callbackFailure, ref BridgeException failure)
+        {
+            OnlineState online;
+            try { online = provider.GoOnline(); }
+            catch (Exception first) when (network == "TCPIP") // Softbus never enters this handler.
+            {
+                string stateAfter;
+                try { stateAfter = provider.State.ToString(); } catch { stateAfter = null; }
+                var challenge = report["onlineChallengeType"];
+                if (!SimulationNetworkAdmission.GoOnlineRetryAllowed(network, 0, challenge != null && challenge.Type != JTokenType.Null || tlsCallbackCount > 0 || callbackFailure != null,
+                    report.Value<bool>("credentialOpened") || report.Value<bool>("credentialSubmissionArmed") || failure != null, stateAfter))
+                    throw;
+                const int retryDelayMs = 15000;
+                report["goOnlineRetry"] = new JObject { ["delayMs"] = retryDelayMs, ["onlineStateAfterFirstAttempt"] = stateAfter,
+                    ["firstAttempt"] = SimulationProvisionExceptionDiagnostics(first, true), ["returned"] = false,
+                    ["policy"] = "TCP/IP only, once: the first GoOnline threw before any online callback, with no credential opened or submitted; the owned target is rechecked before the second call." };
+                checkpoint("goOnlineRetryScheduled");
+                Thread.Sleep(retryDelayMs);
+                VerifySimulationProvisionIdentity(instance, marker, false);
+                if (instance.OperatingState != EOperatingState.Stop || provider.State != OnlineState.Offline || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
+                    throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state, connection or controller address changed before the GoOnline retry.");
+                var retryRead = observer.Read(3, network);
+                var retryChecked = WithoutSimulationPlaceholder(retryRead, AcceptedSimulationPlaceholder(discoveryBaseline), retryRead.Length > 2);
+                if (retryChecked.Length != 1 || !SimulationNetworkAdmission.SameRuntimeTarget(runtimeTargetBasis, retryChecked[0].Address, retryChecked[0].MACAddress, retryChecked[0].DeviceSeries, address, startupMac))
+                    throw new BridgeException("SimulationProvisionTargetAmbiguous", "The exact PLCSIM accessible target changed before the GoOnline retry.");
+                checkpoint("beforeGoOnlineRetry");
+                online = provider.GoOnline();
+                report["goOnlineRetry"]["returned"] = true;
+            }
+            return online;
+        }
+
+        private static void StopSimulationProvisionObserver(ref SimulationDiscoveryObserver observer, JObject report, JArray cleanup, ref BridgeException failure)
+        {
+            try
+            {
+                var stopped = observer.Stop();
+                cleanup.Add(stopped);
+                report["discoveryObserver"]["stopped"] = stopped.DeepClone();
+                if (stopped.Value<bool>("completed") != true && failure == null)
+                    failure = new BridgeException("SimulationProvisionCleanupFailed", "The discovery observer Portal did not close its project and exit.");
+            }
+            catch (Exception ex)
+            {
+                cleanup.Add(new JObject { ["action"] = "stopDiscoveryObserver", ["completed"] = false, ["exceptionType"] = ex.GetType().FullName });
+                if (failure == null) failure = new BridgeException("SimulationProvisionCleanupFailed", "The discovery observer Portal could not be stopped.");
+            }
+            observer = null;
+        }
+
+        private static void ReleaseSimulationProvisionConnection(OnlineProvider provider, JArray cleanup, Action<string> cleanupCheckpoint, ref BridgeException failure)
+        {
+            try
+            {
+                if (provider.State != OnlineState.Offline)
+                {
+                    cleanupCheckpoint("beforeGoOffline");
+                    provider.GoOffline();
+                    cleanupCheckpoint("afterGoOffline");
+                }
+                var finalOnlineState = provider.State;
+                if (finalOnlineState != OnlineState.Offline)
+                    throw new BridgeException("SimulationProvisionCleanupFailed", "The worker-owned scratch connection did not reach Offline after credential recovery.");
+                cleanup.Add(new JObject { ["action"] = "disconnectOwnedTiaConnection", ["completed"] = true,
+                    ["onlineState"] = finalOnlineState.ToString() });
+            }
+            catch (Exception ex)
+            {
+                cleanup.Add(new JObject { ["action"] = "disconnectOwnedTiaConnection", ["completed"] = false, ["exceptionType"] = ex.GetType().FullName });
+                if (failure == null) failure = new BridgeException("SimulationProvisionCleanupFailed", "The worker-owned TIA online connection could not be released after credential recovery.");
+            }
+        }
+
+        private void PowerOffSimulationProvisionInstance(IInstance instance, JObject marker, bool poweredByOperation, JObject report, JArray cleanup,
+            Action<string> cleanupCheckpoint, ref bool ownedOffVerified, ref BridgeException failure)
+        {
+            try
+            {
+                VerifySimulationProvisionIdentity(instance, marker, false, false);
+                if (poweredByOperation && instance.OperatingState != EOperatingState.Off)
+                {
+                    cleanupCheckpoint("beforePowerOff");
+                    instance.PowerOff(60000);
+                    cleanupCheckpoint("afterPowerOff");
+                }
+                bool off = instance.OperatingState == EOperatingState.Off;
+                ownedOffVerified = off;
+                report["operatingState"] = instance.OperatingState.ToString();
+                report["instance"] = new JObject { ["id"] = instance.ID, ["name"] = instance.Name,
+                    ["storagePath"] = instance.StoragePath, ["operatingState"] = instance.OperatingState.ToString(),
+                    ["communicationInterface"] = instance.CommunicationInterface.ToString() };
+                cleanup.Add(new JObject { ["action"] = "powerOff", ["completed"] = off });
+                if (!off) throw new BridgeException("SimulationProvisionCleanupFailed", "The owned simulator did not reach OFF after credential recovery.");
+            }
+            catch (Exception ex)
+            {
+                cleanup.Add(new JObject { ["action"] = "powerOff", ["completed"] = false, ["exceptionType"] = ex.GetType().FullName });
+                if (failure == null) failure = new BridgeException("SimulationProvisionCleanupFailed", "The exact owned simulator could not be verified powered OFF after credential recovery.");
+            }
+        }
+
+        private void RestoreSimulationProvisionCard(IInstance instance, JObject marker, string storage, string card, string stagedCard, string emptyCardBackup,
+            JArray expectedFiles, string revision, bool ownedOffVerified, JObject report, JArray cleanup, Action<string> cleanupCheckpoint,
+            Action<JObject> moveCheckpoint, ref BridgeException failure)
+        {
+            try
+            {
+                if (!ownedOffVerified)
+                {
+                    report["restorationDeferredUntilOwnedOff"] = true;
+                    throw new BridgeException("SimulationProvisionCardRestoreDeferred", "The protected program remains retained in owned staging because the exact owned CPU could not be verified OFF. No card is moved while startup state is uncertain.");
+                }
+                VerifySimulationProvisionIdentity(instance, marker, true, false);
+                cleanupCheckpoint("beforeRestoreProtectedCard");
+                // Inspect actual paths, not a post-move flag: a
+                // filesystem move may have completed before an
+                // exception or process interruption was observed.
+                if (Directory.Exists(stagedCard))
+                {
+                    VerifySimulationProvisionChild(storage, stagedCard, true);
+                    if (!JToken.DeepEquals(expectedFiles, SimulationCardFiles(stagedCard)))
+                        throw new BridgeException("SimulationProvisionCardChanged", "The staged protected card no longer matches the original manifest. Both runtime and staged files are retained for inspection.");
+                    if (Directory.Exists(card))
+                    {
+                        VerifySimulationProvisionChild(storage, card, true);
+                        VerifySimulationProvisionTree(card);
+                        VerifySimulationProvisionChild(storage, emptyCardBackup, false);
+                        cleanupCheckpoint("beforeRetainEmptyCard");
+                        SimulationProvisionMoveCard(storage, card, emptyCardBackup, expectedFiles, stagedCard, false,
+                            () => VerifySimulationProvisionIdentity(instance, marker, true, false), moveCheckpoint);
+                        report["emptyCardRetained"] = true;
+                        cleanupCheckpoint("afterRetainEmptyCard");
+                    }
+                    VerifySimulationProvisionChild(storage, card, false);
+                    VerifySimulationProvisionIdentity(instance, marker, true, false);
+                    cleanupCheckpoint("beforeRestoreOriginalCardMove");
+                    SimulationProvisionMoveCard(storage, stagedCard, card, expectedFiles, stagedCard, true,
+                        () => VerifySimulationProvisionIdentity(instance, marker, true, false), moveCheckpoint);
+                    cleanupCheckpoint("afterRestoreOriginalCardMove");
+                }
+                VerifySimulationProvisionChild(storage, card, true);
+                if (!JToken.DeepEquals(expectedFiles, SimulationCardFiles(card)))
+                    throw new BridgeException("SimulationProvisionCardChanged", "The restored protected card did not match its exact original manifest. Retained storage must be inspected before any startup.");
+                report["originalProgramCardRestored"] = true;
+                cleanup.Add(new JObject { ["action"] = "restoreOriginalProtectedCard", ["completed"] = true, ["programRevision"] = revision });
+                cleanupCheckpoint("afterRestoreProtectedCard");
+            }
+            catch (Exception ex)
+            {
+                cleanup.Add(new JObject { ["action"] = "restoreOriginalProtectedCard", ["completed"] = false,
+                    ["exceptionType"] = ex.GetType().FullName, ["hresult"] = ex.HResult });
+                report["originalProgramCardRestored"] = false;
+                if (failure == null) failure = ex as BridgeException ?? new BridgeException("SimulationProvisionCardRestoreFailed", "The original protected card could not be verified restored after owned OFF. All staged and runtime-created files are retained; no files were deleted or overwritten.");
+            }
+        }
+
+        private void ReleaseSimulationProvisionInterfaces(IInstance instance, JArray cleanup, Action<string> cleanupCheckpoint, ref BridgeException failure)
+        {
+            try
+            {
+                cleanupCheckpoint("beforeReleaseInterface");
+                // Off now: release this and the download's interface before anyone unregisters the instance.
+                RetainSimulationInterface(instance);
+                var released = ReleaseRetainedSimulationInterfaces();
+                bool all = released.All(r => r.Value<bool>("released"));
+                cleanup.Add(new JObject { ["action"] = "releaseInterface", ["completed"] = all, ["interfaces"] = released });
+                if (!all && failure == null) failure = new BridgeException("SimulationProvisionCleanupFailed", "An owned simulator interface could not be released after credential recovery.");
+                cleanupCheckpoint("afterReleaseInterface");
+            }
+            catch (Exception ex)
+            {
+                cleanup.Add(new JObject { ["action"] = "releaseInterface", ["completed"] = false, ["exceptionType"] = ex.GetType().FullName });
+                if (failure == null) failure = new BridgeException("SimulationProvisionCleanupFailed", "The owned simulator interface could not be released after credential recovery.");
+            }
         }
 
         private static void SimulationProvisionMoveCard(string storage, string source, string destination,
