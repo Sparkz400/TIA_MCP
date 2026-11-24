@@ -56,6 +56,8 @@ def main():
         def do_POST(self):
             try:
                 raw=self.rfile.read(int(self.headers.get('Content-Length','0')));body=json.loads(raw)
+                # Like a CPU that does not take a JSON-RPC batch, drop it unanswered and unrecorded; the Host then reads symbol by symbol.
+                if isinstance(body,list):self.close_connection=True;return
                 method=body['method'];state['calls'].append(method);state['connectionIds'].append(self.connection_id)
                 state['requests'].append(dict(method=method,id=body['id'],tlsSessionReused=self.connection.session_reused))
                 state['connectionClose'].append(self.headers.get('Connection','').lower()=='close')

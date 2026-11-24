@@ -19,7 +19,8 @@ public sealed record WebRuntimeProfile(JsonElement? ApiVersion, string QuantityP
 public sealed partial class WebRuntimeClient : IDisposable
 {
     // Login, logout and mutations use a fresh connection per request and are never retried. Read-class requests share one pinned
-    // keep-alive connection (created on first use, dropped before any mutation); its certificate pin is checked once, at its handshake.
+    // keep-alive connection (created on first use, dropped before any mutation and after any reply the peer does not keep the
+    // connection open for); its certificate pin is checked once, at its handshake.
     private readonly HttpClient client;
     private HttpClient? readClient;
     internal static readonly TimeSpan KeepAliveLifetime = TimeSpan.FromMinutes(5);
@@ -305,6 +306,7 @@ public sealed partial class WebRuntimeClient : IDisposable
         // Pooled instead of a fresh 256 KiB (large object heap) array per request; the part written is cleared before it goes back.
         byte[] buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(WebRuntimeProtocol.MaximumResponseBytes + 1);
         int length = 0;
+        bool peerKeepsConnection = true;
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         deadline.CancelAfter(TimeSpan.FromSeconds(10));
         try
@@ -318,6 +320,10 @@ public sealed partial class WebRuntimeClient : IDisposable
             if (token is not null) request.Headers.Add("X-Auth-Token", token);
             if (body.ValueKind == JsonValueKind.Object && body.GetProperty("method").GetString() == "Api.Login") LoginDispatched = true;
             using var response = await (keepAlive ? ReadClient() : client).SendAsync(request, HttpCompletionOption.ResponseHeadersRead, deadline.Token).ConfigureAwait(false);
+            // An HTTP/1.0 reply without keep-alive means the peer closes after it (RFC 9112 9.3), but SocketsHttpHandler still pools that
+            // connection: the next read would race the peer's close and fail as a lost response. Such a connection is never reused.
+            peerKeepsConnection = response.Headers.ConnectionClose != true && (response.Version >= HttpVersion.Version11 ||
+                response.Headers.Connection.Contains("keep-alive", StringComparer.OrdinalIgnoreCase));
             if (!PeerVerified) throw Error("RuntimeTlsUnverified");
             if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden) throw Error("RuntimeAuthenticationDenied");
             if (!response.IsSuccessStatusCode) throw Error("RuntimeHttpFailure");
@@ -370,6 +376,8 @@ public sealed partial class WebRuntimeClient : IDisposable
         catch (IOException) { throw Error("RuntimeTransportFailure"); }
         finally
         {
+            // Also after a refused reply (an oversized body is not read): the response is already disposed here.
+            if (keepAlive && !peerKeepsConnection) DropReadConnection();
             CryptographicOperations.ZeroMemory(requestBytes);
             CryptographicOperations.ZeroMemory(buffer.AsSpan(0, length));
             System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
