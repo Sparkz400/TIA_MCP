@@ -52,6 +52,16 @@ def main():
         server.stdin.write(json.dumps(dict(operation=operation, **arguments)) + "\n"); server.stdin.flush()
         return json.loads(lines.get(timeout=20))
 
+    def services():
+        # Remote evidence for "no UA service": the fixture's request audit, live sessions and in-flight
+        # Publish/Read counters. Its client-certificate log is not service evidence: the Host's OPC UA
+        # stack renews the secure-channel token on its own timer (75% of the 60 s SecurityTokenLifetime,
+        # src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs), and the fixture logs that renewal's certificate
+        # validation without any request. A session older than ~45 s then changed every baseline window.
+        state = fixture("audit")
+        state.pop("clientCertificates")
+        return state
+
     def start_host():
         instance = Client(args.host.resolve(), 30, ["--no-native-workers", "--artifacts", str(root)])
         instance.request("initialize", dict(protocolVersion="2025-11-25", capabilities={}, clientInfo=dict(name="ua-binding", version="1")))
@@ -127,13 +137,13 @@ def main():
                 req.update(intervalMilliseconds=100, maximumSamples=len(nodes))
             else:
                 req.update(maximumNotifications=len(nodes))
-            baseline = fixture("audit")
+            baseline = services()
             for mutation in (dict(attemptId=uuid.uuid4().hex), dict(nodes=list(reversed(nodes)))):
                 rejected = uuid.uuid4().hex
                 call("runtime_ua_" + kind + "_start", dict(captureId=rejected, request={**req, **mutation}), "UaDiagnosticBindingMismatch")
                 store_dir = root / ("runtime-ua-acquisition/runtime-captures" if kind == "capture" else "runtime-ua-subscriptions")
                 check(not (store_dir / rejected).exists(), "Refusal precedes retained capture intent")
-            check(fixture("audit") == baseline, "Binding refusals precede all UA services and session leasing")
+            check(services() == baseline, "Binding refusals precede all UA services and session leasing")
             capture = uuid.uuid4().hex
             call("runtime_ua_" + kind + "_start", dict(captureId=capture, request=req))
             status = complete(kind, capture)
@@ -147,9 +157,9 @@ def main():
             else:
                 check(status["recordedProgress"]["remoteCleanupConfirmed"], "Subscription cleanup independently recorded")
             call("runtime_ua_" + kind + "_export", dict(snapshotRef=status["snapshotRef"], format="json"))
-            baseline = fixture("audit")
+            baseline = services()
             observations.append(qualify_observation(call, check, status["snapshotRef"], root, out / "observations", kind))
-            check(fixture("audit") == baseline, "Observation and readable exports perform no UA services")
+            check(services() == baseline, "Observation and readable exports perform no UA services")
             changed = {**req, "diagnosticBindingId": None}
             call("runtime_ua_" + kind + "_start", dict(captureId=capture, request=changed),
                  "UaCaptureRequestChanged" if kind == "capture" else "UaSubscriptionRequestChanged")
@@ -161,10 +171,10 @@ def main():
             old_request = old_status["plan"]["uaContext"]["request"] if kind == "capture" else old_status["plan"]["request"]
             call("diagnostic_ua_observe", dict(snapshotRef=old_status["snapshotRef"]), "UaDiagnosticBindingRequired")
             check("diagnosticBindingId" not in old_request, "Unbound normalized request preserves original fields")
-            baseline = fixture("audit")
+            baseline = services()
             call("runtime_ua_" + kind + "_start", dict(captureId=old_capture, request=req),
                  "UaCaptureRequestChanged" if kind == "capture" else "UaSubscriptionRequestChanged")
-            check(fixture("audit") == baseline, "Retroactive binding refuses without remote services")
+            check(services() == baseline, "Retroactive binding refuses without remote services")
             retained.append((kind, old_capture, unbound, old_status["snapshotRef"]))
         fixture("mode", value="normal")
         capture=uuid.uuid4().hex
@@ -176,11 +186,11 @@ def main():
             check(time.monotonic()<deadline,"Bounded mixed-event setup");time.sleep(0.05)
         fixture("emitEvent",number=2,severity=700);fixture("emitEvent",number=2,severity=700)
         status=complete("subscription",capture)
-        baseline=fixture("audit")
+        baseline=services()
         observed=qualify_observation(call,check,status["snapshotRef"],root,out/"observations","events")
         document=json.loads(Path(observed["artifact"]["path"]).read_bytes())
         check(sum(len(r["event"].get("events",[])) for r in document["captureSource"]["rows"])==2,"Prebound diagnostic report retains original repeated events alongside signals")
-        check(fixture("audit")==baseline,"Event timeline composition has no remote services")
+        check(services()==baseline,"Event timeline composition has no remote services")
         observations.append(observed);retained.append(("subscription",capture,req,status["snapshotRef"]))
         first_events = status['snapshotRef']
         capture=uuid.uuid4().hex
@@ -191,26 +201,26 @@ def main():
             check(time.monotonic()<deadline,'Second event capture starts within deadline');time.sleep(0.05)
         fixture('emitEvent',number=3,severity=900)
         second_events=complete('subscription',capture)['snapshotRef']
-        before_comparison=fixture('audit')
+        before_comparison=services()
         comparisons=[qualify_comparison(call,check,first_events,second_events,out/'comparisons','events'),
                      qualify_comparison(call,check,observations[0]['snapshotRef'],observations[1]['snapshotRef'],out/'comparisons','polling-subscription')]
-        check(fixture('audit')==before_comparison,'Comparisons, guards and exports perform no UA services')
+        check(services()==before_comparison,'Comparisons, guards and exports perform no UA services')
         for mode in ("subscriptionDuplicate", "subscriptionGap", "subscriptionOverflow", "subscriptionRepublishUnavailable", "subscriptionCreateItemsDenied"):
             fixture("mode", value=mode)
             capture = uuid.uuid4().hex
             req = dict(attemptId=attempt,nodes=nodes,diagnosticBindingId=receipt["id"],durationSeconds=2,keepAliveCount=1,maximumNotifications=100)
             call("runtime_ua_subscription_start", dict(captureId=capture,request=req))
             status = complete("subscription", capture)
-            baseline = fixture("audit")
+            baseline = services()
             observed = qualify_observation(call, check, status["snapshotRef"], root, out / "observations", mode, exact_value=mode != "subscriptionCreateItemsDenied")
             doc = json.loads(Path(observed["artifact"]["path"]).read_bytes())
             field = {"subscriptionDuplicate":"duplicateMessages","subscriptionGap":"gapRows","subscriptionOverflow":"overflowNotifications","subscriptionRepublishUnavailable":"failureEvents","subscriptionCreateItemsDenied":"failureEvents"}[mode]
             check(doc["events"][field] > 0, "Report preserves " + mode)
-            check(fixture("audit") == baseline, "Adverse report processing performs no remote services")
+            check(services() == baseline, "Adverse report processing performs no remote services")
             observations.append(observed)
-            before_comparison=fixture('audit')
+            before_comparison=services()
             comparisons.append(qualify_comparison(call,check,first_events,status['snapshotRef'],out/'comparisons',mode))
-            check(fixture('audit')==before_comparison,'Adverse comparison performs no UA service')
+            check(services()==before_comparison,'Adverse comparison performs no UA service')
             retained.append(("subscription",capture,req,status["snapshotRef"]))
         fixture("mode", value="normal")
         call("runtime_ua_disconnect", dict(attemptId=attempt))
@@ -219,7 +229,7 @@ def main():
         # Raw evidence remains readable if a diagnostic source is absent, while a new binding must revalidate it.
         path = root / "trace-diagnostics" / (receipt["id"] + ".json")
         original = path.read_bytes(); path.unlink()
-        before = fixture("audit")
+        before = services()
         client = start_host()
         for kind, capture, req, reference in retained:
             check(call("runtime_ua_" + kind + "_status", dict(captureId=capture))["snapshotRef"] == reference, "Restart retains original " + kind + " prefix")
@@ -230,7 +240,7 @@ def main():
             call("diagnostic_ua_report_export", dict(reportId=observation["id"], format="json"), "ArtifactUnavailable")
         for comparison in comparisons:
             call('diagnostic_ua_report_export',dict(reportId=comparison['id'],format='json'),'ArtifactUnavailable')
-        check(fixture("audit") == before, "Restart observations never replay services or require missing binding")
+        check(services() == before, "Restart observations never replay services or require missing binding")
         path.write_bytes(original)
         for observation in observations:
             check(call("diagnostic_ua_observe", dict(snapshotRef=observation["snapshotRef"]))["id"] == observation["id"], "Restart produces identical observation from originals")
@@ -238,7 +248,7 @@ def main():
         for comparison in comparisons:
             check(call('diagnostic_ua_compare',comparison['arguments'])['id']==comparison['id'],'Second Host derives the identical comparison')
             call('diagnostic_ua_report_export',dict(reportId=comparison['id'],format='html'))
-        check(fixture("audit") == before, "Restart report revalidation performs no UA service")
+        check(services() == before, "Restart report revalidation performs no UA service")
         report["status"] = "passed"
     except BaseException as error:
         report["error"] = repr(error)
