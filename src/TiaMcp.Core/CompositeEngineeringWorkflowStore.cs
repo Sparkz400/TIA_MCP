@@ -109,7 +109,7 @@ public sealed class CompositeEngineeringWorkflowStore
 
     public object List(int offset = 0, int count = 20)
     {
-        Require(offset >= 0 && count is > 0 and <= 20, "CompositePageLimit", "List 1..20 records at a nonnegative offset.");
+        Require(offset >= 0 && count is > 0 and <= 100, "CompositePageLimit", "List 1..100 records at a nonnegative offset.");
         using var gate = PackageStorage.Lock(Path.Combine(root, "store.lock")); Inventory();
         var directories = Directory.EnumerateDirectories(root).Order(StringComparer.Ordinal).ToArray();
         Require(offset <= directories.Length, "CompositePageLimit", "Offset exceeds retained record inventory.");

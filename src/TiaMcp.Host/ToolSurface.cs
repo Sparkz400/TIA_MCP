@@ -26,18 +26,30 @@ internal static class ToolSurface
     internal static readonly (string Contract, string Review, string Page)[] ReviewContracts =
     [
         ("access-review.v1", "access_review", "access_review_page"),
-        ("addin-selection.v1", "addin_selection_review", "addin_selection_page"),
+        ("addin-selection.v1", "addin_selection_review", "addin_selection_review_page"),
         ("connection-review.v1", "connection_review", "connection_review_page"),
         ("db-snapshot-review.v1", "db_snapshot_review", "db_snapshot_review_page"),
         ("hmi-component-review.v1", "hmi_component_review", "hmi_component_review_page"),
-        ("multiuser-observations.v1", "multiuser_observation_review", "multiuser_observation_page"),
+        ("multiuser-observations.v1", "multiuser_observation_review", "multiuser_observation_review_page"),
         ("public-certificate-review.v1", "public_certificate_review", "public_certificate_review_page"),
-        ("safety-evidence-review.v1", "safety_evidence_review", "safety_evidence_report"),
+        ("safety-evidence-review.v1", "safety_evidence_review", "safety_evidence_review_page"),
         ("software-unit-review.v1", "software_unit_review", "software_unit_review_page"),
-        ("teamcenter-observations.v1", "teamcenter_observation_review", "teamcenter_observation_page"),
-        ("technology-profile-review.v1", "technology_profile_review", "technology_profile_report"),
+        ("teamcenter-observations.v1", "teamcenter_observation_review", "teamcenter_observation_review_page"),
+        ("technology-profile-review.v1", "technology_profile_review", "technology_profile_review_page"),
         ("web-application-review.v1", "web_application_review", "web_application_review_page"),
     ];
+
+    // Record kinds of the review_* tools whose family contract declares their x-tool-contracts outputs.
+    internal static readonly (string Kind, string Contract)[] ReviewKindContracts =
+    [
+        ("automationml", "automationml-workflow.v1"), ("graph", "graph-workflow.v1"), ("opcua", "opc-ua-workflow.v1"), ("vci", "vci-workspace.v1"),
+        ("composite_engineering", "composite-engineering-workflow.v1"), ("runtime_handoff", "runtime-handoff.v1"),
+    ];
+
+    /// <summary>Output schemas up to this many bytes are advertised inline in tools/list; larger ones only through
+    /// tia://output-schemas/{tool}, named in the tool's _meta, so every client does not pay for them on each listing.</summary>
+    internal const int InlineOutputSchemaBytes = 1024;
+    internal const string OutputSchemaMeta = "tiaMcp/outputSchema";
 
     // Every Host refusal is { error: { code, message, ... } } with isError; families add their own detail fields.
     private static JsonObject HostError() => new()
@@ -56,7 +68,7 @@ internal static class ToolSurface
         server.Capabilities ??= new ServerCapabilities();
         (server.Capabilities.Experimental ??= new Dictionary<string, object>())["tiaMcp/featureCatalog"] =
             new JsonObject { ["version"] = FeatureCatalog.LoadBundled().Version };
-        var schemas = OutputSchemas();
+        var schemas = AllOutputSchemas.Value;
         var tools = server.ToolCollection!;
         foreach (var tool in tools.ToArray())
         {
@@ -71,20 +83,38 @@ internal static class ToolSurface
                 : new[] { "hmi_classic_screen_capture", "hmi_classic_screen_compose", "hmi_content_fingerprint", "hmi_inspect", "hmi_references", "hmi_capabilities" }.Contains(name) ? "request" : null;
             var input = JsonNode.Parse(tool.ProtocolTool.InputSchema.GetRawText())!.AsObject();
             var structured = StructuredArguments(input, objectArgument);
-            if (structured.Length > 0)
+            if (structured.Length > 0) JsonArguments[name] = structured;
+            if (structured.Length > 0 | Enumerations(name, input)) tool.ProtocolTool.InputSchema = JsonSerializer.SerializeToElement(input);
+            if (name.StartsWith("review_", StringComparison.Ordinal))
+                (tool.ProtocolTool.Meta ??= new JsonObject())[OutputSchemaMeta] = OutputSchemaResources.Prefix + name + ".{kind}";
+            else
             {
-                JsonArguments[name] = structured;
-                tool.ProtocolTool.InputSchema = JsonSerializer.SerializeToElement(input);
+                if (!schemas.TryGetValue(name, out var schema))
+                {
+                    if (tool.ProtocolTool.OutputSchema is not { } declared) continue;
+                    TypedSchemas[name] = schema = WithError(declared);
+                }
+                // Compact size, as tools/list sends it.
+                bool inline = JsonSerializer.Serialize(schema).Length <= InlineOutputSchemaBytes;
+                tool.ProtocolTool.OutputSchema = inline ? schema : null;
+                if (!inline) (tool.ProtocolTool.Meta ??= new JsonObject())[OutputSchemaMeta] = OutputSchemaResources.Prefix + name;
             }
-            if (schemas.TryGetValue(name, out var schema)) tool.ProtocolTool.OutputSchema = schema;
-            // A typed result declared with OutputSchemaType describes success only; refusals carry the Host error envelope.
-            else if (tool.ProtocolTool.OutputSchema is { } declared) tool.ProtocolTool.OutputSchema = WithError(declared);
         }
         var prompts = server.PromptCollection!;
         foreach (var prompt in prompts.ToArray())
             // The prompts guide V21 workflows (changes, libraries, runtime); a V19 Host has none.
             if (options.TiaVersion == 19 || options.Toolsets is { } selected && !TiaPrompts.Groups[prompt.ProtocolPrompt.Name].All(group => selected.Contains(group)))
                 prompts.Remove(prompt);
+    }
+
+    /// <summary>Declares the closed value sets of string arguments the SDK schema leaves open; true when it changed the schema.</summary>
+    internal static bool Enumerations(string tool, JsonObject input)
+    {
+        if (!tool.StartsWith("review_", StringComparison.Ordinal) || input["properties"] is not JsonObject properties) return false;
+        if (properties["kind"] is JsonObject kind) kind["enum"] = new JsonArray([.. ReviewRecordTools.Kinds.Select(value => (JsonNode)value)]);
+        if (properties["recordType"] is JsonObject type)
+            type["enum"] = new JsonArray([.. ReviewRecordTools.TranslationRecordTypes.Select(value => (JsonNode)value), null]);
+        return true;
     }
 
     // Tool arguments bound to JsonElement, by tool name. Filled by Apply before any call is served.
@@ -162,6 +192,15 @@ internal static class ToolSurface
         catch (Exception) { }
     }
 
+    /// <summary>The contract-derived output schemas keyed by tool name, review_* tools by tool.kind.</summary>
+    internal static readonly Lazy<Dictionary<string, JsonElement>> AllOutputSchemas = new(OutputSchemas);
+    /// <summary>Typed result schemas (OutputSchemaType) with the Host error envelope, filled by Apply for the advertised tools.</summary>
+    internal static readonly System.Collections.Concurrent.ConcurrentDictionary<string, JsonElement> TypedSchemas = new(StringComparer.Ordinal);
+
+    /// <summary>The complete output schema of an advertised tool, or of review_* tool.kind; null when none is declared.</summary>
+    internal static JsonElement? OutputSchemaOf(string name) =>
+        AllOutputSchemas.Value.TryGetValue(name, out var schema) || TypedSchemas.TryGetValue(name, out schema) ? schema : null;
+
     internal static Dictionary<string, JsonElement> OutputSchemas()
     {
         var schemas = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
@@ -169,7 +208,18 @@ internal static class ToolSurface
         {
             var definitions = Definitions(contract, out var document);
             foreach (var (tool, entry) in document["x-tool-contracts"]!.AsObject())
-                schemas.Add(tool, Closure(contract, definitions, entry!["output"]!.DeepClone()));
+                if (!tool.StartsWith("review_", StringComparison.Ordinal)) schemas.Add(tool, Closure(contract, definitions, entry!["output"]!.DeepClone()));
+        }
+        foreach (var (kind, contract) in ReviewKindContracts)
+        {
+            // Served only as resources, never inline, so the 2020-12 prefixItems keyword some of these contracts use is allowed.
+            var definitions = Definitions(contract, out var document);
+            // ReviewRecordTools refuses before the family's store runs (unknown kind, bounds) with the plain Host envelope.
+            definitions["hostError"] = HostError();
+            foreach (var (tool, entry) in document["x-tool-contracts"]!.AsObject())
+                if (tool.StartsWith("review_", StringComparison.Ordinal))
+                    schemas.Add(tool + "." + kind, Closure(contract, definitions,
+                        [entry!["output"]!.DeepClone(), .. ErrorOf(entry), new JsonObject { ["$ref"] = "#/$defs/hostError" }], prefixItems: true));
         }
         foreach (var (contract, review, page) in ReviewContracts)
         {
@@ -183,6 +233,7 @@ internal static class ToolSurface
     private static JsonObject Definitions(string contract, out JsonObject document)
     {
         using var stream = typeof(ToolSurface).Assembly.GetManifestResourceStream("TiaMcp.Contracts." + contract + ".schema.json")
+            ?? typeof(ToolSurface).Assembly.GetManifestResourceStream("TiaMcp.PublicContracts." + contract + ".schema.json")
             ?? throw new InvalidDataException("Embedded output contract " + contract + " is missing.");
         document = JsonNode.Parse(stream)!.AsObject();
         var definitions = document["$defs"]!.AsObject();
@@ -190,8 +241,12 @@ internal static class ToolSurface
         return definitions;
     }
 
+    private static JsonNode[] ErrorOf(JsonNode? entry) => entry?["error"] is { } error ? [error.DeepClone()] : [];
+
+    private static JsonElement Closure(string contract, JsonObject definitions, params JsonNode[] outputs) => Closure(contract, definitions, outputs, false);
+
     // One tool's outputs or its error, with only the definitions they reach, so each schema stays small and self-contained.
-    private static JsonElement Closure(string contract, JsonObject definitions, params JsonNode[] outputs)
+    private static JsonElement Closure(string contract, JsonObject definitions, JsonNode[] outputs, bool prefixItems)
     {
         var root = new JsonObject { ["type"] = "object", ["anyOf"] = new JsonArray([.. outputs, new JsonObject { ["$ref"] = "#/$defs/error" }]) };
         var used = new SortedSet<string>(StringComparer.Ordinal);
@@ -200,7 +255,7 @@ internal static class ToolSurface
             if (node is JsonObject item)
                 foreach (var (key, value) in item)
                 {
-                    if (key == "prefixItems") throw new InvalidDataException(contract + " uses prefixItems, which draft-07 clients reject.");
+                    if (key == "prefixItems" && !prefixItems) throw new InvalidDataException(contract + " uses prefixItems, which draft-07 clients reject.");
                     if (key != "$ref") { pending.Push(value); continue; }
                     var reference = value!.GetValue<string>();
                     if (!reference.StartsWith("#/$defs/", StringComparison.Ordinal))

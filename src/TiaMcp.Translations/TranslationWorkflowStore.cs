@@ -8,8 +8,6 @@ using static TiaMcp.Translations.TranslationRetention;
 namespace TiaMcp.Translations;
 
 public sealed record TranslationProposalBatch(TranslationEdit[] Edits, TranslationReviewOptions? Options = null);
-public sealed record TranslationReviewCursor(string RecordRef, string RecordSha256, string Section, int Offset);
-
 /// <summary>Durable offline workflow. No bridge, Siemens service, native admission or import dependency.</summary>
 public sealed partial class TranslationWorkflowStore
 {
@@ -51,34 +49,38 @@ public sealed partial class TranslationWorkflowStore
         return Summary(record);
     }
 
-    public JsonObject Inspect(string captureRef, int pageSize = 100, TranslationInspectionCursor? cursor = null)
+    public JsonObject Inspect(string captureRef, int offset = 0, int count = 100)
     {
-        Require(pageSize is > 0 and <= 1000, "TranslationPageLimit", "Inspection page size must be 1..1000.");
+        Require(count is > 0 and <= 1000, "TranslationPageLimit", "Inspection pages accept 1..1000 cells.");
+        Require(offset >= 0, "InvalidTranslationCursor", "Inspection offset must be nonnegative.");
         // The capture verifies and opens once, on the first page; a continuation checks its receipt and reuses the opened workbook.
-        var record = RequireKind(cursor is null ? retained.Load(captureRef) : retained.LoadReceipt(captureRef), "capture");
-        var workbook = OpenedCapture(record, cursor is null);
+        var record = RequireKind(offset == 0 ? retained.Load(captureRef) : retained.LoadReceipt(captureRef), "capture");
+        var workbook = OpenedCapture(record, offset == 0);
+        // The engine cursor binds the captured hashes, which the retained capture fixes; the offset alone selects the page.
+        TranslationInspectionCursor? cursor = offset == 0 ? null : new(Text(record.Metadata, "workbookSha256"),
+            Text(record.Metadata, "profileSha256"), Text(record.Metadata, "projectSha256"), offset);
         // Obtain one library row at a time: a shared 1 Mi-character source can
         // otherwise be replicated into every culture before byte paging applies.
         var page = TranslationInspection.Page(workbook, 1, cursor);
-        int offset = page["offset"]!.GetValue<int>();
+        int first = page["offset"]!.GetValue<int>();
         var bounded = new JsonArray();
         int responseBytes = 0;
         var currentPage = page;
-        for (int i = 0; i < pageSize && currentPage["rows"]!.AsArray().Count != 0; ++i)
+        for (int i = 0; i < count && currentPage["rows"]!.AsArray().Count != 0; ++i)
         {
-            var row = BoundedRows(currentPage["rows"]!.AsArray(), 0, 1, ArtifactRef(record, "original.xlsx"), offset + i)[0]!;
+            var row = BoundedRows(currentPage["rows"]!.AsArray(), 0, 1, ArtifactRef(record, "original.xlsx"), first + i)[0]!;
             int bytes = Encoding.UTF8.GetByteCount(row.ToJsonString());
             if (responseBytes + bytes > PageBytes) break;
             bounded.Add(row.DeepClone()); responseBytes += bytes;
-            if (row["omitted"]?.GetValue<bool>() == true || currentPage["nextCursor"] is null || i + 1 == pageSize) break;
+            if (row["omitted"]?.GetValue<bool>() == true || currentPage["nextCursor"] is null || i + 1 == count) break;
             currentPage = TranslationInspection.Page(workbook, 1, Parse<TranslationInspectionCursor>(currentPage["nextCursor"]!.ToJsonString()));
         }
-        int next = offset + bounded.Count;
+        int next = first + bounded.Count;
         page["rows"] = bounded;
         page["captureRef"] = captureRef;
         page["profileArtifactRef"] = ArtifactRef(record, "profile.json");
-        page["nextCursor"] = next == page["totalMappedTargets"]!.GetValue<int>() ? null : Node(new TranslationInspectionCursor(
-            Text(record.Metadata, "workbookSha256"), Text(record.Metadata, "profileSha256"), Text(record.Metadata, "projectSha256"), next));
+        page.Remove("nextCursor");
+        page["nextOffset"] = next == page["totalMappedTargets"]!.GetValue<int>() ? null : next;
         page.Remove("pageSha256");
         page["pageSha256"] = CanonicalJson.Sha256(page);
         return page;
@@ -117,17 +119,19 @@ public sealed partial class TranslationWorkflowStore
         return Summary(record);
     }
 
-    public JsonObject ReviewPage(string recordRef, string section = "edits", int pageSize = 100, TranslationReviewCursor? cursor = null)
+    public JsonObject ReviewPage(string recordRef, string section = "edits", int offset = 0, int count = 100)
     {
-        Require(pageSize is > 0 and <= 1000, "TranslationPageLimit", "Review page size must be 1..1000.");
+        Require(count is > 0 and <= 200, "TranslationPageLimit", "Review pages accept 1..200 entries.");
+        Require(offset >= 0, "InvalidTranslationCursor", "Review offset must be nonnegative.");
         // The review is recomputed on the first page; a continuation checks the receipt and the stored report's digest only.
-        var record = cursor is null ? retained.Load(recordRef) : retained.LoadReceipt(recordRef);
+        bool first = offset == 0;
+        var record = first ? retained.Load(recordRef) : retained.LoadReceipt(recordRef);
         JsonObject report;
         string artifact;
         if (record.Kind == "review")
         {
             Require(section is "edits" or "issues" or "completeness" or "alarmInheritance", "InvalidTranslationSection", "Review sections: edits, issues, completeness, alarmInheritance.");
-            report = cursor is null ? VerifiedReview(record).Report : ReadObject(record, "review.json");
+            report = first ? VerifiedReview(record).Report : ReadObject(record, "review.json");
             artifact = "review.json";
         }
         else
@@ -137,18 +141,15 @@ public sealed partial class TranslationWorkflowStore
             report = ReadObject(record, "reconciliation.json");
             artifact = "reconciliation.json";
         }
-        int offset = cursor?.Offset ?? 0;
-        Require(cursor is null || (cursor.RecordRef == recordRef && cursor.RecordSha256 == record.RecordSha256 && cursor.Section == section),
-            "StaleTranslationCursor", "Cursor belongs to a different immutable review or section.");
         var all = section == "alarmInheritance" && report[section] is null ? new JsonArray() : report[section]!.AsArray();
         Require(offset >= 0 && offset <= all.Count, "InvalidTranslationCursor", "Review offset is outside this section.");
-        var rows = BoundedRows(all, offset, pageSize, ArtifactRef(record, artifact), offset);
+        var rows = BoundedRows(all, offset, count, ArtifactRef(record, artifact), offset);
         int next = offset + rows.Count;
         return new JsonObject { ["recordRef"] = recordRef, ["recordSha256"] = record.RecordSha256,
             ["reviewSha256"] = record.Metadata["reviewSha256"]?.DeepClone(), ["section"] = section,
             ["offset"] = offset, ["total"] = all.Count, ["rows"] = rows,
             ["completeArtifactRef"] = ArtifactRef(record, artifact),
-            ["nextCursor"] = next == all.Count ? null : Node(new TranslationReviewCursor(recordRef, record.RecordSha256, section, next)),
+            ["nextOffset"] = next == all.Count ? null : next,
             ["nativeImportAllowed"] = false };
     }
 

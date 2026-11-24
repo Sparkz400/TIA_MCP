@@ -48,38 +48,37 @@ Test("captured inputs survive release of all committed uploads", () =>
 Test("inspection pages preserve missing empty whitespace and exact multilingual states", () =>
 {
     var f = New(); var capture = f.Capture(f.Changed([f.Edit("K-004", " \t ")]));
-    var rows = new List<JsonNode>(); TranslationInspectionCursor? cursor = null;
+    var rows = new List<JsonNode>(); int? offset = 0;
     do
     {
-        var page = Check.Ok(f.Tools.Inspect(Check.Ref(capture), 2, cursor));
+        var page = Check.Ok(f.Tools.Inspect(Check.Ref(capture), offset.Value, 2));
         rows.AddRange(page["rows"]!.AsArray().Select(n => n!.DeepClone()));
-        cursor = page["nextCursor"] is null ? null : TranslationJson.Parse<TranslationInspectionCursor>(page["nextCursor"]!.ToJsonString());
-    } while (cursor is not null);
+        offset = page["nextOffset"]?.GetValue<int>();
+    } while (offset is not null);
     Check.Equal(12, rows.Count);
     Check.Equal(12, rows.Select(r => Check.S(r, "nativeKey") + ":" + Check.S(r, "culture")).Distinct().Count());
     Check.Equal("missing", Check.S(rows.Single(r => Check.S(r, "nativeKey") == "K-002")["target"]!, "state"));
     Check.Equal("empty", Check.S(rows.Single(r => Check.S(r, "nativeKey") == "K-006")["target"]!, "state"));
     Check.True(rows.Any(r => r["findings"]!.AsArray().Any(v => v!.GetValue<string>() == "whitespace-only")));
 });
-Test("inspection cursors reject newer captures and paging bounds", () =>
+Test("inspection offsets and paging bounds are checked", () =>
 {
-    var f = New(); var first = f.Capture(); var next = f.Capture(project: f.NewIdentity());
-    var page = Check.Ok(f.Tools.Inspect(Check.Ref(first), 1));
-    var cursor = TranslationJson.Parse<TranslationInspectionCursor>(page["nextCursor"]!.ToJsonString());
-    Check.Error("StaleTranslationCursor", f.Tools.Inspect(Check.Ref(next), 1, cursor));
-    foreach (int size in new[] { 0, 1001 }) Check.Error("TranslationPageLimit", f.Tools.Inspect(Check.Ref(first), size));
-    Check.Error("InvalidTranslationCursor", f.Tools.Inspect(Check.Ref(first), 1, cursor with { Offset = -1 }));
+    var f = New(); var first = f.Capture();
+    var page = Check.Ok(f.Tools.Inspect(Check.Ref(first), count: 1));
+    Check.Equal(1, page["nextOffset"]!.GetValue<int>());
+    foreach (int size in new[] { 0, 1001 }) Check.Error("TranslationPageLimit", f.Tools.Inspect(Check.Ref(first), count: size));
+    Check.Error("InvalidTranslationCursor", f.Tools.Inspect(Check.Ref(first), -1, 1));
+    Check.Error("InvalidTranslationCursor", f.Tools.Inspect(Check.Ref(first), 999, 1));
 });
 Test("inspection bounds oversized repeated sources before collecting a full page", () =>
 {
     var f = New(); var capture = f.Capture(f.Changed([f.Edit("K-001", new string('A', 200000), "en-US")], new(UpdateSourceLanguage: true)));
-    var page = Check.Ok(f.Tools.Inspect(Check.Ref(capture), 1000));
+    var page = Check.Ok(f.Tools.Inspect(Check.Ref(capture), count: 1000));
     Check.Equal(1, page["rows"]!.AsArray().Count);
     Check.True(page["rows"]![0]!["omitted"]!.GetValue<bool>());
     Check.True(Encoding.UTF8.GetByteCount(page.ToJsonString()) < 256 * 1024);
-    var cursor = TranslationJson.Parse<TranslationInspectionCursor>(page["nextCursor"]!.ToJsonString());
-    Check.Equal(1, cursor.Offset);
-    var next = Check.Ok(f.Tools.Inspect(Check.Ref(capture), 1000, cursor));
+    Check.Equal(1, page["nextOffset"]!.GetValue<int>());
+    var next = Check.Ok(f.Tools.Inspect(Check.Ref(capture), 1, 1000));
     Check.Equal(1, next["offset"]!.GetValue<int>());
     Check.Equal(1, next["rows"]![0]!["entryIndex"]!.GetValue<int>());
 });
@@ -107,7 +106,7 @@ Test("Host-to-library candidate preserves independent XML peers and Unicode", ()
     var f = New(); var capture = f.Capture();
     const string unicode = " Ω e\u0301 é 東京 😀\r\n\t ";
     var review = f.Prepare(capture, [f.Edit("K-002", "Kühlung aktiviert"), f.Edit("K-004", unicode), f.Edit("K-007", "Betriebsbereit")]);
-    var page = Check.Ok(f.Tools.ReviewPage(Check.Ref(review), pageSize: 2));
+    var page = Check.Ok(f.Tools.ReviewPage(Check.Ref(review), count: 2));
     Check.Equal(2, page["rows"]!.AsArray().Count);
     Check.True(page["rows"]!.AsArray().All(r => r!["edit"]!["approved"]!.GetValue<bool>() == false));
     var candidate = f.Candidate(review);
@@ -139,11 +138,12 @@ Test("review pages bind exact record and section and retain complete report", ()
     var f = New(); var capture = f.Capture();
     var a = f.Prepare(capture, [f.Edit("K-002", "A"), f.Edit("K-004", "B")]);
     var b = f.Prepare(capture, [f.Edit("K-002", "A"), f.Edit("K-004", "C")]);
-    var cursor = TranslationJson.Parse<TranslationReviewCursor>(Check.Ok(f.Tools.ReviewPage(Check.Ref(a), pageSize: 1))["nextCursor"]!.ToJsonString());
-    Check.Error("StaleTranslationCursor", f.Tools.ReviewPage(Check.Ref(b), cursor: cursor));
-    Check.Error("StaleTranslationCursor", f.Tools.ReviewPage(Check.Ref(a), "issues", cursor: cursor));
-    Check.Error("InvalidTranslationCursor", f.Tools.ReviewPage(Check.Ref(a), cursor: cursor with { Offset = 999 }));
-    Check.Error("TranslationPageLimit", f.Tools.ReviewPage(Check.Ref(a), pageSize: 1001));
+    var first = Check.Ok(f.Tools.ReviewPage(Check.Ref(a), count: 1));
+    Check.Equal(1, first["nextOffset"]!.GetValue<int>());
+    Check.Equal(1, Check.Ok(f.Tools.ReviewPage(Check.Ref(b), offset: 1, count: 1))["offset"]!.GetValue<int>());
+    Check.Error("InvalidTranslationCursor", f.Tools.ReviewPage(Check.Ref(a), offset: 999));
+    Check.Error("InvalidTranslationCursor", f.Tools.ReviewPage(Check.Ref(a), offset: -1));
+    Check.Error("TranslationPageLimit", f.Tools.ReviewPage(Check.Ref(a), count: 201));
     Check.Error("TranslationPageLimit", f.Tools.List("review", count: 101));
     Check.Error("TranslationPageLimit", f.Tools.ReadArtifact(Check.Artifact(a, "review.json"), count: 65537));
     var report = JsonNode.Parse(f.Download(Check.Artifact(a, "review.json")))!;
@@ -373,7 +373,7 @@ if (args.Length > 1)
             var profile = TranslationJson.Parse<WorkbookProfile>(File.ReadAllText(Check.S(native, "profilePath")));
             var project = TranslationJson.Parse<EngineeringObjectReference>(native["identity"]!.ToJsonString());
             var capture = f.Capture(bytes, profile, project);
-            var page = Check.Ok(f.Tools.Inspect(Check.Ref(capture), 1000));
+            var page = Check.Ok(f.Tools.Inspect(Check.Ref(capture), count: 1000));
             Check.Equal(native["rows"]!.AsArray().Count, page["rows"]!.AsArray().Count);
             foreach (var expected in native["rows"]!.AsArray())
             {
@@ -411,16 +411,16 @@ T EarlierBuild<T>(Func<T> write)
 }
 // A profile id with '+' gives the profile a different hash in the two forms too.
 WorkbookProfile EarlierProfile(Fixture f) => f.Profile with { Id = "synthetic+bilingual.v1" };
-Test("a capture from before RFC 8785 pages to its end with the cursors it returns", () =>
+Test("a capture from before RFC 8785 pages to its end with the offsets it returns", () =>
 {
     var (f, _, baseline) = EarlierCapture();
-    int rows = 0; TranslationInspectionCursor? cursor = null;
+    int rows = 0; int? offset = 0;
     do
     {
-        var page = Check.Ok(f.Tools.Inspect(Check.Ref(baseline), 2, cursor));
+        var page = Check.Ok(f.Tools.Inspect(Check.Ref(baseline), offset.Value, 2));
         rows += page["rows"]!.AsArray().Count;
-        cursor = page["nextCursor"] is null ? null : TranslationJson.Parse<TranslationInspectionCursor>(page["nextCursor"]!.ToJsonString());
-    } while (cursor is not null);
+        offset = page["nextOffset"]?.GetValue<int>();
+    } while (offset is not null);
     Check.Equal(12, rows);
 });
 Test("a capture from before RFC 8785 reconciles as a baseline with an unchanged profile", () =>

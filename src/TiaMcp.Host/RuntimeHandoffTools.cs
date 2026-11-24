@@ -17,20 +17,16 @@ public sealed class RuntimeHandoffTools(HostOptions options)
     [Description("Retain an offline security/runtime review from a committed runtime-handoff-request.v1 upload (1 byte..128 KiB). Select exact saved review/access/owner references and six observation references returned by runtime_handoff_observation. Compare separate CPU/program/context declarations, baseline/current scoped allowed/denied permissions and invalidation. Unknown required evidence stays unknown. No live admission, native action or capture assertion. Each invocation creates a new record; discover lost responses with runtime_handoff_list.")]
     public CallToolResult Review(string uploadRef) => Run(s => s.Review(uploadRef));
 
-    [McpServerTool(Name = "runtime_handoff_reopen", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Reopen an exact retained security/runtime handoff handle after restart. Verify intent, receipt, original request/report, all six observations and saved access/model dependencies; rebuild the report. Missing or changed evidence refuses. Matching declarations never create a live session or authorize reads, writes, mode changes, download or assertions.")]
+    // Served by review_reopen (ReviewRecordTools).
     public CallToolResult Reopen(string recordRef) => Run(s => s.Reopen(recordRef));
 
-    [McpServerTool(Name = "runtime_handoff_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Page a revalidated handoff report: constraints/permissions/baselineObservations/currentObservations. 1..200 rows within a 128 KiB structured result. Oversized observation rows are explicitly omitted; complete original bytes and report.json remain downloadable. Permission outcomes are separate from public grant declarations. No operation or assertion admission.")]
+    // Served by review_page (ReviewRecordTools).
     public CallToolResult Page(string recordRef, string section = "constraints", int offset = 0, int count = 50) => Run(s => s.Page(recordRef, section, offset, count));
 
-    [McpServerTool(Name = "runtime_handoff_artifact_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Download exact request.json, report.json, receipt.json or baseline.target.json/baseline.program.json/baseline.session.json/current.target.json/current.program.json/current.session.json. 1..65536 bytes per call with exact length and digest. Every call revalidates the complete evidence chain. No arbitrary path, network access, source authentication or native authority.")]
+    // Served by review_artifact_read (ReviewRecordTools).
     public CallToolResult ArtifactRead(string recordRef, string name, long offset = 0, int count = 65536) => Run(s => s.ReadArtifact(recordRef, name, offset, count));
 
-    [McpServerTool(Name = "runtime_handoff_list", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Discover 1..20 retained handoff records, including incomplete or verification-failed publications, plus retained/pending observation-file counts. Completed candidates revalidate original dependencies. Limits: 128 review records, 512 MiB and 2048 entries including incomplete files. Record-ID ordering; relist after additions. Never resumes interrupted work or replays an unknown native mutation.")]
+    // Served by review_list (ReviewRecordTools).
     public CallToolResult List(int offset = 0, int count = 20) => Run(s => s.List(offset, count));
 
     private CallToolResult Run(Func<RuntimeHandoffWorkflowStore, object> action) =>

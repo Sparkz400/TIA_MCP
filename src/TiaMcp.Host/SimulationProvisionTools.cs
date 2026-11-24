@@ -18,7 +18,7 @@ public sealed partial class TiaTools
     }
 
     [McpServerTool(Name = "simulation_provision_recover", Destructive = true, OpenWorld = false)]
-    [Description("Recover from a held (outcomeUnknown) credential-provisioning attempt in one call: tia_detach (refused first with UnsavedProject while any open project has unsaved edits, since detaching discards them), tia_start, simulation_provision_reconcile for admissionId (evidence-checked; a held result stops here with its reasons) and project_open of the scratch project. Reports each step and stops at the first failure. Never powers, downloads, provisions, saves or replays; a fresh instance and a new provisioning attempt (with the user's TLS authorization again) stay separate calls, listed in status.nextSteps.")]
+    [Description("Recover a held (outcomeUnknown) credential-provisioning attempt in one call: tia_detach (refused with UnsavedProject while an open project has unsaved edits), tia_start, simulation_provision_reconcile for admissionId (a held result stops here), project_open of the scratch project. Stops at the first failure. Never powers, downloads, provisions, saves or replays; a new instance and provisioning attempt (with renewed user TLS authorization) are separate calls.")]
     public async Task<CallToolResult> SimulationProvisionRecover(string admissionId, CancellationToken cancellationToken)
     {
         try { return Result(JsonSerializer.Serialize(await SimulationProvisionRecovery.Recover(bridge, options.ArtifactsDirectory, admissionId, cancellationToken), BridgeProtocol.Json), false); }

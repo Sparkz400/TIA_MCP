@@ -100,8 +100,9 @@ try
                 .WithTools<AddInSelectionTools>()
                 .WithTools<MultiuserTools>()
                 .WithTools<TeamcenterTools>()
+                .WithTools<ReviewRecordTools>()
                 .WithResources<ProjectExplorerResources>().WithRequestFilters(ProjectExplorerResources.Configure)
-                .WithResources<TiaResources>().WithResources<ContractResources>().WithCompleteHandler(TiaResources.Complete).WithSetLoggingLevelHandler(clientLogging.SetLevel);
+                .WithResources<TiaResources>().WithResources<ContractResources>().WithResources<OutputSchemaResources>().WithCompleteHandler(TiaResources.Complete).WithSetLoggingLevelHandler(clientLogging.SetLevel);
             if (options.WatchQualificationPoint is not null) mcp.WithTools<WatchQualificationTools>();
             if (options.WatchQualificationPoint is not null && options.ComponentQualification) mcp.WithTools<WatchAuthoringQualificationTools>();
             if (options.ComponentQualification) mcp.WithTools<ComponentQualificationTools>();

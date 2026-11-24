@@ -118,8 +118,8 @@ public sealed class GraphWorkflowStore
     {
         using var gate = PackageStorage.Lock(Path.Combine(root, "store.lock"));
         var directories = Directory.EnumerateDirectories(root).Order(StringComparer.Ordinal).Take(MaxRecords + 1).ToArray();
-        Require(directories.Length <= MaxRecords && offset >= 0 && offset <= directories.Length && count is > 0 and <= 50,
-            "GraphPageLimit", "List 1..50 records within the retained inventory.");
+        Require(directories.Length <= MaxRecords && offset >= 0 && offset <= directories.Length && count is > 0 and <= 100,
+            "GraphPageLimit", "List 1..100 records within the retained inventory.");
         var rows = directories.Skip(offset).Take(count).Select(directory =>
         {
             PackageStorage.EnsureNoLinks(directory); string id = PackageStorage.Id(Path.GetFileName(directory)); string? reference = null; string state = "incomplete";

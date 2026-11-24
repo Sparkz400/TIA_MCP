@@ -29,21 +29,17 @@ public sealed class OpcUaTools(HostOptions options)
     public CallToolResult CompareDependencies(string beforeSetRef, string afterSetRef, string? consumerManifestUploadRef = null) =>
         Run(s => s.CompareDependencies(beforeSetRef, afterSetRef, consumerManifestUploadRef));
 
-    [McpServerTool(Name = "opcua_report_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Page an exact section from an OPC UA record summary, including nested before/after sections. 1..500 rows with 128 KiB row budget; cursor binds record, report hash and section. Oversized rows are explicitly marked omitted and remain downloadable in the complete report artifact. All retained input hashes are verified.")]
-    public CallToolResult ReportPage(string recordRef, string section, int pageSize = 100, OpcUaReportCursor? cursor = null) =>
-        Run(s => s.ReportPage(recordRef, section, pageSize, cursor));
+    // Served by review_page (ReviewRecordTools).
+    public CallToolResult ReportPage(string recordRef, string section, int offset = 0, int count = 100) =>
+        Run(s => s.ReportPage(recordRef, section, offset, count));
 
-    [McpServerTool(Name = "opcua_reopen", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Reopen an immutable OPC UA record after restart. Verify manifest, all artifacts and exact retained inputs before returning bounded summary, pageable sections and download handles. Any change fails closed. Uploaded evidence never establishes native freshness.")]
+    // Served by review_reopen (ReviewRecordTools).
     public CallToolResult Reopen(string recordRef) => Run(s => s.Reopen(recordRef));
 
-    [McpServerTool(Name = "opcua_list", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Discover retained offline OPC UA records and incomplete or integrity-failed publications after restart. Count 1..100, bounded responses. Sorted publication-ID offsets are discovery-only; relist after concurrent additions. Does not retry any native operation.")]
+    // Served by review_list (ReviewRecordTools).
     public CallToolResult List(int offset = 0, int count = 20) => Run(s => s.List(offset, count));
 
-    [McpServerTool(Name = "opcua_artifact_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Download exact original NodeSet, supplied consumer JSON or complete report by Host-issued OPC UA artifact handle, at most 64 KiB per call. Returns SHA-256 and byte offset. Revalidates retained manifest and inputs. No filesystem path input and no overwrite operation.")]
+    // Served by review_artifact_read (ReviewRecordTools).
     public CallToolResult ReadArtifact(string artifactRef, long offset = 0, int count = 65536) =>
         Run(s => s.ReadArtifact(artifactRef, offset, count));
 

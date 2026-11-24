@@ -21,25 +21,26 @@ InventoryRow Row(int i) => new("/devices/d/items/" + i, "Module " + i, "Station"
 var coverage = new InventoryCoverage(true, false, 30000, 50000, []);
 var store = new InventoryStore();
 var snapshot = store.Capture(Enumerable.Range(0, 30000).Select(Row), "project.ap21", coverage, DateTimeOffset.UtcNow);
-var seen = new HashSet<string>(); string? cursor = null; int pages = 0;
+var seen = new HashSet<string>(); int? offset = 0; int pages = 0;
 do
 {
-    var page = store.Page(snapshot.Metadata.SnapshotId, 173, cursor);
+    var page = store.Page(snapshot.Metadata.SnapshotId, offset.Value, 173);
     Check(page.Offset == seen.Count && page.Rows.Length <= 173, "Contiguous bounded pages");
     foreach (var row in page.Rows) Check(seen.Add(row.RowId), "No duplicated rows");
-    cursor = page.NextCursor; pages++;
-} while (cursor != null);
+    offset = page.NextOffset; pages++;
+} while (offset != null);
 Check(seen.Count == 30000 && pages > 170, "Large inventory was not silently truncated");
-var first = store.Page(snapshot.Metadata.SnapshotId, 1);
-var replay = store.Page(snapshot.Metadata.SnapshotId, 1, first.NextCursor);
-Check(replay.Rows.Single().Name == "Module 1", "Cursor replay");
-Fails(() => store.Page(snapshot.Metadata.SnapshotId, 1, first.NextCursor + "x"), "InvalidCursor");
-Fails(() => store.Page(snapshot.Metadata.SnapshotId, 0), "InvalidRequest");
+var first = store.Page(snapshot.Metadata.SnapshotId, count: 1);
+var replay = store.Page(snapshot.Metadata.SnapshotId, first.NextOffset!.Value, 1);
+Check(replay.Rows.Single().Name == "Module 1", "Offset replay");
+Fails(() => store.Page(snapshot.Metadata.SnapshotId, 30001, 1), "InvalidCursor");
+Fails(() => store.Page(snapshot.Metadata.SnapshotId, -1, 1), "InvalidCursor");
+Fails(() => store.Page(snapshot.Metadata.SnapshotId, count: 0), "InvalidRequest");
 var other = store.Capture([Row(7)], "project.ap21", coverage, DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(2)));
 Check(other.Metadata.CapturedAtUtc.Offset == TimeSpan.Zero, "Capture UTC label matches the timestamp offset");
-Fails(() => store.Page(other.Metadata.SnapshotId, 1, first.NextCursor), "InvalidCursor");
+Fails(() => store.Page(other.Metadata.SnapshotId, 2, 1), "InvalidCursor");
 first.Rows[0].Configured["mlfb"] = InventoryField.Read("tampered", "test");
-Check(store.Page(snapshot.Metadata.SnapshotId, 1).Rows[0].Configured["mlfb"].State == "notExposed", "Page cannot mutate snapshot");
+Check(store.Page(snapshot.Metadata.SnapshotId, count: 1).Rows[0].Configured["mlfb"].State == "notExposed", "Page cannot mutate snapshot");
 Fails(() => store.Capture([Row(1), Row(1)], "project.ap21", coverage, DateTimeOffset.UtcNow), "InventoryDuplicateIdentity");
 var row1 = Row(1); row1.Configured["mlfb"] = InventoryField.Read("6ES7 151-1AA00", "project"); row1.Configured["firmware"] = InventoryField.Read("V4.1", "project");
 row1 = row1 with { Actual = new() { ["mlfb"] = InventoryField.Read("6ES7151-1AA00", "online"), ["firmware"] = InventoryField.Read("V4.1.0", "online"),
@@ -691,9 +692,9 @@ Directory.Delete(link);
 {
     var overBudget = typeof(ToolSurface).Assembly.GetTypes().SelectMany(type => type.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
         .Where(method => System.Reflection.CustomAttributeExtensions.GetCustomAttribute<ModelContextProtocol.Server.McpServerToolAttribute>(method) is not null
-            && System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>(method) is { Description.Length: > 1900 })
+            && System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>(method) is { Description.Length: > 600 })
         .Select(method => method.Name + "=" + System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>(method)!.Description.Length).ToArray();
-    Check(overBudget.Length == 0, "Tool descriptions stay within 1900 characters: " + string.Join(", ", overBudget));
+    Check(overBudget.Length == 0, "Tool descriptions stay within 600 characters: " + string.Join(", ", overBudget));
 }
 // MCP tool wrappers against fake bridges and a scripted GraphQL server: no worker, PLC or runtime; the Unified login reads a
 // current-user vault created under the output directory, never the user's own vault.

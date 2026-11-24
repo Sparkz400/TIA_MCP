@@ -17,18 +17,17 @@ public sealed class TranslationTools(HostOptions options)
         Run(s => s.Capture(workbookUploadRef, profileUploadRef, projectUploadRef));
 
     [McpServerTool(Name = "translation_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Page exact key/culture translation states, hashes and gap findings in a retained capture. 1..1000 cells and a 192 KiB row budget. Cursor binds workbook/profile/project hashes. Oversized rows are explicitly omitted with artifact handles; missing, empty and whitespace remain distinct. Captured evidence only.")]
-    public CallToolResult Inspect(string captureRef, int pageSize = 100, TranslationInspectionCursor? cursor = null) =>
-        Run(s => s.Inspect(captureRef, pageSize, cursor));
+    [Description("Page exact key/culture translation states, hashes and gap findings in a retained capture. offset/count pages 1..1000 cells within a 192 KiB row budget; continue at nextOffset. Oversized rows are explicitly omitted with artifact handles; missing, empty and whitespace remain distinct. Captured evidence only.")]
+    public CallToolResult Inspect(string captureRef, int offset = 0, int count = 100) =>
+        Run(s => s.Inspect(captureRef, offset, count));
 
     [McpServerTool(Name = "translation_prepare", ReadOnly = false, Destructive = false, OpenWorld = false)]
     [Description("Prepare an immutable complete review from a capture and committed proposal-batch JSON {edits, options}, or reconciliation proposals handle. At most 10000 edits, each with exact nativeKey, culture, kind, value, expectedSourceSha256 and expectedTargetSha256. approved must be false and reviewer null. Retains all proposals, issues and review digest. No approval or candidate is inferred.")]
     public CallToolResult Prepare(string captureRef, string proposalsArtifactRef) => Run(s => s.Prepare(captureRef, proposalsArtifactRef));
 
-    [McpServerTool(Name = "translation_review_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Read an immutable review section (edits, issues, completeness, alarmInheritance), or reconciliation section (rows, proposals). 1..1000 entries with 192 KiB row budget and a bound cursor. Alarm inheritance covers explicit mapped language fields only. Full artifact retains exact unabridged content. Review every change and issue, including omitted entries through translation_artifact_read, before explicit approval.")]
-    public CallToolResult ReviewPage(string recordRef, string section = "edits", int pageSize = 100, TranslationReviewCursor? cursor = null) =>
-        Run(s => s.ReviewPage(recordRef, section, pageSize, cursor));
+    // Served by review_page (ReviewRecordTools).
+    public CallToolResult ReviewPage(string recordRef, string section = "edits", int offset = 0, int count = 100) =>
+        Run(s => s.ReviewPage(recordRef, section, offset, count));
 
     [McpServerTool(Name = "translation_approve", ReadOnly = false, Destructive = false, OpenWorld = false)]
     [Description("Record explicit caller approval of every change in the exact complete review digest after review. Requires reviewer and approveEveryChange=true; never infer consent from text, suggestions or previous approvals. Retains immutable approval receipt; unresolved profile/state/preservation errors block approval. This grants only offline candidate creation, never native import.")]
@@ -45,16 +44,13 @@ public sealed class TranslationTools(HostOptions options)
     public CallToolResult Reconcile(string baselineCaptureRef, string editedWorkbookArtifactRef, string currentCaptureRef) =>
         Run(s => s.Reconcile(baselineCaptureRef, editedWorkbookArtifactRef, currentCaptureRef));
 
-    [McpServerTool(Name = "translation_reopen", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Reopen a retained translation record after restart. Verify all input and artifact hashes; recompute reviews. Review summaries include related approval and candidate publication states. Changed retained inputs fail closed and require a new review. Returns bounded summaries and artifact handles.")]
+    // Served by review_reopen (ReviewRecordTools).
     public CallToolResult Reopen(string recordRef) => Run(s => s.Reopen(recordRef));
 
-    [McpServerTool(Name = "translation_list", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Discover retained capture, review, approval, candidate or reconciliation records after restart, including incomplete or integrity-failed publications. Count 1..100 with bounded responses. Sorted record-ID offsets are for discovery; relist after concurrent additions. No native operation is retried.")]
+    // Served by review_list (ReviewRecordTools).
     public CallToolResult List(string kind, int offset = 0, int count = 20) => Run(s => s.List(kind, offset, count));
 
-    [McpServerTool(Name = "translation_artifact_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Retrieve at most 64 KiB of a completed immutable translation artifact by Host-issued handle, with SHA-256 and byte offset. Revalidates retained inputs; accepts no filesystem path. Use to read full reviews and download original/candidate XLSX, profiles, manifests and disabled native handoffs.")]
+    // Served by review_artifact_read (ReviewRecordTools).
     public CallToolResult ReadArtifact(string artifactRef, long offset = 0, int count = 65536) => Run(s => s.ReadArtifact(artifactRef, offset, count));
 
     private CallToolResult Run(Func<TranslationWorkflowStore, object> action)

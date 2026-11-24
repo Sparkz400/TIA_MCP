@@ -397,7 +397,7 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
     }
 
     private static void Page(int offset, int count)
-    { if (count is < 1 or > 200 || offset < 0 || offset > int.MaxValue - count) throw new BridgeException("InvalidRequest", "offset must be nonnegative with a representable next page and maxItems 1..200."); }
+    { if (count is < 1 or > 200 || offset < 0 || offset > int.MaxValue - count) throw new BridgeException("InvalidRequest", "offset must be nonnegative with a representable next page and count 1..200."); }
     private static Dictionary<string, JsonObject> NativeNodes(JsonObject model)
     {
         var result = new Dictionary<string, JsonObject>(StringComparer.Ordinal);

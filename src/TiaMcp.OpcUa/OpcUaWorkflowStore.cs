@@ -7,8 +7,6 @@ using TiaMcp.Core;
 
 namespace TiaMcp.OpcUa;
 
-public sealed record OpcUaReportCursor(string RecordRef, string ReportSha256, string Section, int Offset);
-
 /// <summary>Host-owned, write-once offline NodeSet review. No bridge, native API or network dependency.</summary>
 public sealed class OpcUaWorkflowStore
 {
@@ -93,21 +91,18 @@ public sealed class OpcUaWorkflowStore
 
     public JsonObject Reopen(string recordRef) => Summary(Load(recordRef));
 
-    public JsonObject ReportPage(string recordRef, string section, int pageSize = 100, OpcUaReportCursor? cursor = null)
+    public JsonObject ReportPage(string recordRef, string section, int offset = 0, int count = 100)
     {
-        Require(pageSize is > 0 and <= 500, "OpcUaPageLimit", "Report pages accept 1..500 rows with a 128 KiB row budget.");
+        Require(count is > 0 and <= 200, "OpcUaPageLimit", "Report pages accept 1..200 rows with a 128 KiB row budget.");
         var record = Load(recordRef);
         string reportHash = record.Receipt.Artifacts.Single(a => a.Name == "report.json").Sha256;
         var sections = Sections(Report(record));
         Require(section is not null && sections.ContainsKey(section), "OpcUaInvalidSection", "Use an exact array section from the record summary.");
-        Require(cursor is null || cursor.RecordRef == recordRef && cursor.ReportSha256 == reportHash && cursor.Section == section,
-            "OpcUaStaleCursor", "Cursor must bind this exact immutable report and section.");
-        int offset = cursor?.Offset ?? 0;
         var all = sections[section];
-        Require(offset >= 0 && offset <= all.Count, "OpcUaInvalidCursor", "Cursor offset lies outside this section.");
+        Require(offset >= 0 && offset <= all.Count, "OpcUaInvalidCursor", "Offset lies outside this section.");
         var rows = new JsonArray();
         int bytes = 0;
-        for (int i = offset; i < all.Count && rows.Count < pageSize; ++i)
+        for (int i = offset; i < all.Count && rows.Count < count; ++i)
         {
             byte[] raw = Bytes(all[i]);
             JsonNode? row = all[i]?.DeepClone();
@@ -121,7 +116,7 @@ public sealed class OpcUaWorkflowStore
         int next = offset + rows.Count;
         return new JsonObject { ["recordRef"] = record.Ref, ["reportSha256"] = reportHash, ["section"] = section,
             ["offset"] = offset, ["total"] = all.Count, ["rows"] = rows,
-            ["nextCursor"] = next == all.Count ? null : JsonSerializer.SerializeToNode(new OpcUaReportCursor(record.Ref, reportHash, section, next), Json),
+            ["nextOffset"] = next == all.Count ? null : next,
             ["completeArtifactRef"] = record.Ref + ":report.json", ["nativeQualified"] = false,
             ["compatibilityCertified"] = false, ["dependencyClosureComplete"] = false };
     }

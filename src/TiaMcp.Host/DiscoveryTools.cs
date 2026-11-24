@@ -14,9 +14,9 @@ public sealed partial class TiaTools
     [McpServerTool(Name = "feature_catalog", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Query versioned feature contracts, implementation gaps, acceptance criteria and recorded fixture evidence without starting TIA. Evidence applies only to its recorded profiles; use target_capabilities for current-object availability. Supports bounded pagination and exact feature/domain/status filters.")]
     public CallToolResult FeatureCatalogQuery(string? featureId = null, string? domain = null, string? implementationStatus = null,
-        int offset = 0, int maxItems = 100)
+        int offset = 0, int count = 100)
     {
-        try { return Result(JsonSerializer.Serialize(CatalogContracts.Value.Query(featureId, domain, implementationStatus, offset, maxItems), BridgeProtocol.Json), false); }
+        try { return Result(JsonSerializer.Serialize(CatalogContracts.Value.Query(featureId, domain, implementationStatus, offset, count), BridgeProtocol.Json), false); }
         catch (BridgeException error) { return Result(JsonSerializer.Serialize(new { error = new { code = error.Code, message = error.Message } }, BridgeProtocol.Json), true); }
     }
 
@@ -31,6 +31,6 @@ public sealed partial class TiaTools
         => Call("target_capabilities", ObjectArguments(selectors), cancellationToken);
 
     [McpServerTool(Name = "host_build_identity", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Report which build this Host is running: its process start time, product version, the SHA-256 of the Host and configured worker executables when the Host started and now, and, when it runs from a package, the bundle manifest hash with the sourceCommit and sourceTreeDirty the bundle was packaged from (null for bundles packaged before this was recorded or without git; a bundle folder name's suffix is random, not a commit). changedOnDisk marks a binary replaced or rebuilt after start; runningMatchesDisk is false then, and a newly built or packaged binary must never be described as loaded until the Host was restarted and reports it. Starts no worker and changes nothing.")]
+    [Description("Report which build this Host is running: process start time, product version, SHA-256 of the Host and worker executables at start and now and, from a package, the bundle manifest hash with sourceCommit and sourceTreeDirty. changedOnDisk marks a binary replaced after start (runningMatchesDisk false); never describe a newly built or packaged binary as loaded until the Host was restarted and reports it. Starts no worker and changes nothing.")]
     public CallToolResult HostBuildIdentity() => ToolResult.Of(BuildIdentity.Report(options.WorkerPath, options.SimulatorWorkerPath));
 }

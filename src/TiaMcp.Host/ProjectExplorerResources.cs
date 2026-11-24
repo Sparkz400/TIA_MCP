@@ -45,10 +45,12 @@ public sealed class ProjectExplorerResources
             var result = await next(context, token);
             // Clone before annotating: descriptors may be shared between clients.
             result = JsonSerializer.Deserialize<ListToolsResult>(JsonSerializer.Serialize(result))!;
+            // Only a client that renders MCP Apps can call tools from the explorer app, so only it needs the visibility limits.
+            if (!Supported(context.Server)) return result;
             foreach (var tool in result.Tools)
             {
                 tool.Meta ??= new JsonObject();
-                if (Supported(context.Server) && tool.Name is "project_model" or "project_model_capture")
+                if (tool.Name is "project_model" or "project_model_capture")
                     tool.Meta["ui"] = new JsonObject { ["resourceUri"] = Uri };
                 else if (!tool.Name.StartsWith("project_model", StringComparison.Ordinal) && tool.Name != "artifact_read")
                     tool.Meta["ui"] = new JsonObject { ["visibility"] = new JsonArray("model") };

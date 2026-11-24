@@ -3,7 +3,7 @@ namespace TiaMcp.Host;
 /// <summary>Named tool groups for --toolsets. Dependency-free so option parsing and its tests need no MCP SDK.</summary>
 public static class ToolGroups
 {
-    // Always advertised: catalog discovery and artifact transfer serve every other group.
+    // Always advertised: catalog discovery, artifact transfer and the retained-record tools serve every other group.
     public const string Base = "base";
     // Registered only by explicit qualification flags; --toolsets never hides them.
     public const string Qualification = "qualification";
@@ -21,7 +21,7 @@ public static class ToolGroups
         // Native reads whose prefix would otherwise file them under reviews; the review tools they feed stay there.
         ("safety_inspect", "core"), ("access_inspect", "core"), ("connection_inspect", "core"), ("web_inspect", "core"),
         ("certificate_inspect", "core"), ("drive_observe", "core"),
-        ("feature_catalog", Base), ("host_build_identity", Base), ("artifact_", Base),
+        ("feature_catalog", Base), ("host_build_identity", Base), ("artifact_", Base), ("review_", Base),
         ("project_model", "explorer"), ("project_snapshot_", "explorer"),
         ("plc_physical_", "physical"), ("plc_online_compare", "simulation"), ("plc_station_upload", "simulation"), ("sim_", "simulation"), ("simulation_", "simulation"), ("db_snapshot_", "simulation"),
         ("tia_", "core"), ("project_", "core"), ("target_capabilities", "core"), ("object_resolve", "core"), ("fixture_sources", "core"),

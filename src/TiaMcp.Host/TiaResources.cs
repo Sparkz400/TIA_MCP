@@ -129,7 +129,7 @@ public sealed class TiaResources(HostOptions options)
             ArtifactTemplate when request.Argument.Name == "path" => ArtifactPaths(root),
             ReviewTemplate when request.Argument.Name == "reviewId" => ArtifactPaths(Path.Combine(root, "project-reviews"))
                 .Where(name => Regex.IsMatch(name, "\\A[a-f0-9]{64}\\.json\\z")).Select(name => name[..64]),
-            var template => ContractResources.Completions(template, request.Argument.Name) ?? []
+            var template => ContractResources.Completions(template, request.Argument.Name) ?? OutputSchemaResources.Completions(template, request.Argument.Name) ?? []
         };
         var matches = values.Where(value => value.StartsWith(prefix.Replace('\\', '/'), StringComparison.OrdinalIgnoreCase)).Take(MaxCompletions + 1).ToList();
         return ValueTask.FromResult(new CompleteResult { Completion = new Completion

@@ -17,9 +17,9 @@ public sealed class SafetyEvidenceTools(HostOptions options)
         s.Review(reviewId, plcPath, uploadRef, comparisonUploadRef, sources is null || sources.Value.ValueKind == JsonValueKind.Null ? null :
             JsonNode.Parse(sources.Value.GetRawText()) as JsonArray ?? throw new BridgeException("InvalidSafetyEvidence", "Supporting sources must be an array.")));
 
-    [McpServerTool(Name = "safety_evidence_report", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "safety_evidence_review_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Reopen a retained safety comparison and revalidate originals, saved selection and derived report after restart or upload release. section: summary/observations/signatures/issues/changes; 1..200 rows within 128 KiB. Oversized rows are explicitly omitted; artifact_read retrieves complete originals/report. Equal observations or signatures do not approve a safety program or authorize mutations or test execution.")]
-    public CallToolResult Page(string recordId, string section = "summary", int offset = 0, int count = 50) => Run(s => s.Page(recordId, section, offset, count));
+    public CallToolResult Page(string recordRef, string section = "summary", int offset = 0, int count = 50) => Run(s => s.Page(recordRef, section, offset, count));
 
     private CallToolResult Run(Func<SafetyEvidenceWorkflowStore, JsonObject> action) =>
         ToolResult.Guard(() => action(new(options.ArtifactsDirectory)), "SafetyEvidenceReviewFailed", null, false);

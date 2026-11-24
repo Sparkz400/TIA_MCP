@@ -14,7 +14,7 @@ namespace TiaMcp.Host;
 public sealed partial class TiaTools
 {
     [McpServerTool(Name = "project_snapshot_capture", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Save a persistent offline review: native hierarchy plus up to maxBlocks (0..200, default 25) exact block XML exports. Returns a content-hash reviewId that survives a Host restart and remoteAccess with its tia:// resource URI; progress notifications report the stage when the client sends a progressToken. request: projectName, plcPath, maxVisited, maxBlocks, blockOffset (page beyond maxBlocks with capture.content.nextBlockOffset), blockPaths, maxRelationshipRoots (0..25, default 5), requireAllContent (refuse instead of saving with missing content), hashProjectFolder (hash every byte of the saved folder; slower), fromTemporaryCopy:true (a read-only project whose exports are all refused is otherwise refused with ReadOnlyProject; this archives the open project, closes it and captures a read-write copy, leaving the original unchanged and the copy open). Check degraded and degradedReasons for failed, protected, unsupported or omitted blocks. Metadata is rechecked after the exports; sequential content is not atomic. No project changes.")]
+    [Description("Save a persistent offline review: native hierarchy plus up to maxBlocks (0..200, default 25) block XML exports; returns a content-hash reviewId surviving Host restart. request: projectName, plcPath, maxVisited, maxBlocks, blockOffset (continue with nextBlockOffset), blockPaths, requireAllContent, fromTemporaryCopy (read-only project: archives and closes it, captures a read-write copy left open; original unchanged). Check degradedReasons. No project changes.")]
     public async Task<CallToolResult> ProjectSnapshotCapture(JsonElement request, CancellationToken cancellationToken)
     {
         try
@@ -160,19 +160,19 @@ public sealed partial class TiaTools
 
     [McpServerTool(Name = "project_snapshot_compare", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Compare two persistent reviewIds: exact relative paths, metadata and captured native XML interfaces/networks; retain opaque changes and unknown content. Reports bounded static dependency paths with exact edge evidence separately for before and after snapshots. impactDepth 1..5 (default 3), maxImpactPaths 1..200 (default 100), maxImpactEdgeVisits 1..20000 (default 5000). Paths identify review candidates, not runtime effects; incomplete coverage and truncation stay explicit. Different project copies require explicit opt-in. Absence in partial capture never proves deletion. Does not start TIA.")]
-    public CallToolResult ProjectSnapshotCompare(string beforeId, string afterId, bool allowDifferentProjectCopy = false, int offset = 0, int maxItems = 100,
+    public CallToolResult ProjectSnapshotCompare(string beforeId, string afterId, bool allowDifferentProjectCopy = false, int offset = 0, int count = 100,
         int impactDepth = 3, int maxImpactPaths = 100, int maxImpactEdgeVisits = 5000)
-    { try { return ReviewResult(new ProjectReviewStore(options.ArtifactsDirectory).Compare(beforeId, afterId, allowDifferentProjectCopy, offset, maxItems, impactDepth, maxImpactPaths, maxImpactEdgeVisits)); } catch (Exception e) when (ReviewError(e)) { return ReviewFailure(e); } }
+    { try { return ReviewResult(new ProjectReviewStore(options.ArtifactsDirectory).Compare(beforeId, afterId, allowDifferentProjectCopy, offset, count, impactDepth, maxImpactPaths, maxImpactEdgeVisits)); } catch (Exception e) when (ReviewError(e)) { return ReviewFailure(e); } }
 
     [McpServerTool(Name = "project_snapshot_search", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Search saved review metadata and text inside exported native XML, including captured code/comments. Case-insensitive literal query; bounded pages. Saved snapshots survive host restart but do not track live edits. No TIA startup or script execution.")]
-    public CallToolResult ProjectSnapshotSearch(string reviewId, string query, int offset = 0, int maxItems = 50)
-    { try { return ReviewResult(new ProjectReviewStore(options.ArtifactsDirectory).Search(reviewId, query, offset, maxItems)); } catch (Exception e) when (ReviewError(e)) { return ReviewFailure(e); } }
+    public CallToolResult ProjectSnapshotSearch(string reviewId, string query, int offset = 0, int count = 50)
+    { try { return ReviewResult(new ProjectReviewStore(options.ArtifactsDirectory).Search(reviewId, query, offset, count)); } catch (Exception e) when (ReviewError(e)) { return ReviewFailure(e); } }
 
-    [McpServerTool(Name = "project_health_report", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Review a saved reviewId for native inconsistency, protected/unavailable source and exact relationship evidence. Optional testSuiteResults:[{relativePath,sha256}] selects up to 32 distinct retained result-review receipts for this exact review. Revalidates originals/report/JUnit; returns per-packet outcome/coverage summaries and download references in a separate <=128 KiB testSuite section. Counts are execution units/messages, not assertions or unique defects. offset/maxItems page metadata findings only; testsuite_result_review pages supplied findings. Empty or passing selections never establish whole-project health. No compile, physical/safety validation or native qualification.")]
-    public CallToolResult ProjectHealthReport(string reviewId, int offset = 0, int maxItems = 100, JsonElement? testSuiteResults = null)
-    { try { return ReviewResult(new ProjectReviewStore(options.ArtifactsDirectory).Health(reviewId, offset, maxItems,
+    [McpServerTool(Name = "project_health_review", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Review a saved reviewId for native inconsistency, protected/unavailable source and exact relationship evidence. Optional testSuiteResults:[{relativePath,sha256}] selects up to 32 retained result-review receipts, summarized in a separate testSuite section. offset/count page metadata findings only; testsuite_result_review pages supplied findings. Passing selections never establish whole-project health. No compile, physical/safety validation or native qualification.")]
+    public CallToolResult ProjectHealthReview(string reviewId, int offset = 0, int count = 100, JsonElement? testSuiteResults = null)
+    { try { return ReviewResult(new ProjectReviewStore(options.ArtifactsDirectory).Health(reviewId, offset, count,
         testSuiteResults is null ? null : TestSuiteStyleJobs.Parse<EngineeringArtifactReference[]>(Encoding.UTF8.GetBytes(testSuiteResults.Value.GetRawText())))); } catch (Exception e) when (ReviewError(e)) { return ReviewFailure(e); } }
 
     private static bool ReviewError(Exception e) => ToolResult.IsRefusal(e);

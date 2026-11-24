@@ -74,7 +74,7 @@ internal static class RuntimeHandoffWorkflowChecks
         Reject(() => store.ReadArtifact(reference, "intent.json"), "No arbitrary internal artifact download", "HandoffArtifactMissing");
         Reject(() => store.ReadArtifact(reference, "request.json", requestBytes.Length + 1), "Download past end", "HandoffPageLimit");
         Reject(() => store.Reopen(reference.ToUpperInvariant()), "Noncanonical handle", "HandoffInvalidReference");
-        Reject(() => store.List(count: 21), "List page bound", "HandoffPageLimit");
+        Reject(() => store.List(count: 101), "List page bound", "HandoffPageLimit");
         foreach (string name in new[] { "intent.json", "receipt.json", "request.json", "report.json" })
         {
             string path = Path.Combine(directory, name); byte[] saved = File.ReadAllBytes(path); File.AppendAllText(path, " ");
