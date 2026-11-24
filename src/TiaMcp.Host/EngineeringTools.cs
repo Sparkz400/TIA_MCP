@@ -310,7 +310,10 @@ public sealed partial class TiaTools
     // A poll must not re-parse a journal of up to 64 MiB just for its state: the result is kept per journal file and reused while its
     // length and write time are unchanged (the worker replaces the journal atomically at each stage). The worker could drop this read
     // by writing the state into progress.json on every transition; it does so only for hmi_classic_screen_edit today.
-    private static readonly Dictionary<string, (long Length, long Ticks, string? State, bool Finished)> JournalStates = new(StringComparer.Ordinal);
+    // Like git's racy-clean rule, a result is reused only when it was read well after the file's write time: two writes of equal
+    // length within one timestamp tick (not_applied, then rolled_back) would otherwise return the first state forever.
+    private static readonly Dictionary<string, (long Length, long Ticks, long ReadTicks, string? State, bool Finished)> JournalStates = new(StringComparer.Ordinal);
+    private static readonly long JournalRacyTicks = TimeSpan.FromSeconds(2).Ticks;
 
     private static (string? State, bool Finished) JournalState(string journal, string changeId)
     {
@@ -318,8 +321,10 @@ public sealed partial class TiaTools
         if (!info.Exists || info.Length > 64 * 1024 * 1024) return (null, false);
         lock (JournalStates)
         {
-            if (JournalStates.TryGetValue(journal, out var cached) && cached.Length == info.Length && cached.Ticks == info.LastWriteTimeUtc.Ticks)
+            if (JournalStates.TryGetValue(journal, out var cached) && cached.Length == info.Length && cached.Ticks == info.LastWriteTimeUtc.Ticks
+                && cached.ReadTicks - cached.Ticks >= JournalRacyTicks)
                 return (cached.State, cached.Finished);
+            long readTicks = DateTime.UtcNow.Ticks;
             var recorded = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(journal))!.AsObject();
             if (recorded["changeId"]?.GetValue<string>() != changeId) throw new IOException("Journal belongs to a different change.");
             var state = recorded["state"]?.GetValue<string>();
@@ -327,7 +332,7 @@ public sealed partial class TiaTools
             bool finished = terminal is not null && (terminal != "recovery_required" || (recorded["stages"] is System.Text.Json.Nodes.JsonArray stages
                 && stages.Any(s => s?.GetValue<string>() == "change_finished_with_failure")));
             if (JournalStates.Count >= 256) JournalStates.Clear();
-            JournalStates[journal] = (info.Length, info.LastWriteTimeUtc.Ticks, terminal, finished);
+            JournalStates[journal] = (info.Length, info.LastWriteTimeUtc.Ticks, readTicks, terminal, finished);
             return (terminal, finished);
         }
     }

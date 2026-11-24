@@ -2032,8 +2032,8 @@
     },
     {
       "path": "src/TiaMcp.Host/EngineeringTools.cs",
-      "sha256": "77b0c6212802fbef92137f72e6fa087372da05f322562397464954e7504fe93b",
-      "bytes": 59889
+      "sha256": "f3641211866d90e55b1a0a6a1cfd429fa62845d4f1e8ae1fe8c66b68e95e46ac",
+      "bytes": 60372
     },
     {
       "path": "src/TiaMcp.Host/GraphTools.cs",
@@ -3952,8 +3952,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "AccessInspect",
-        "line": 382,
-        "endLine": 383,
+        "line": 387,
+        "endLine": 388,
         "sha256": "b5906a20f69a20a6d11f61d18bf5db195180900641566669c529238005f8bd5c"
       },
       "bridgeOperations": [
@@ -3967,8 +3967,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "AccessInspect",
-          "line": 382,
-          "endLine": 383,
+          "line": 387,
+          "endLine": 388,
           "sha256": "b5906a20f69a20a6d11f61d18bf5db195180900641566669c529238005f8bd5c"
         },
         {
@@ -11562,8 +11562,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "CertificateInspect",
-        "line": 387,
-        "endLine": 388,
+        "line": 392,
+        "endLine": 393,
         "sha256": "9b76c75afcdd764921f0f752fdb2efe6708925922340e1213498bcbeec5e36db"
       },
       "bridgeOperations": [
@@ -11577,8 +11577,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "CertificateInspect",
-          "line": 387,
-          "endLine": 388,
+          "line": 392,
+          "endLine": 393,
           "sha256": "9b76c75afcdd764921f0f752fdb2efe6708925922340e1213498bcbeec5e36db"
         },
         {
@@ -11992,8 +11992,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -12075,8 +12075,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "ChangeRestore",
-        "line": 369,
-        "endLine": 371,
+        "line": 374,
+        "endLine": 376,
         "sha256": "5826259334ca5024078a31947b9beb8cb88011da6c933e1d5ae081740ec820fe"
       },
       "bridgeOperations": [
@@ -12091,8 +12091,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ChangeRestore",
-          "line": 369,
-          "endLine": 371,
+          "line": 374,
+          "endLine": 376,
           "sha256": "5826259334ca5024078a31947b9beb8cb88011da6c933e1d5ae081740ec820fe"
         },
         {
@@ -12213,16 +12213,16 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ChangeProgress",
-          "line": 335,
-          "endLine": 365,
+          "line": 340,
+          "endLine": 370,
           "sha256": "5b6e794e91993254bbf903985282827cf33a93846c9a9b4a706645b8e2185edc"
         },
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "JournalState",
-          "line": 315,
-          "endLine": 333,
-          "sha256": "e6ccb1828f85af21a1ca686071292a3a82dbf1a0afac085fa99ce11cb501d76b"
+          "line": 318,
+          "endLine": 338,
+          "sha256": "a44f27247f6e4b68a947bd37c6bb38b8bd3a4be785519be44776515b95b28f54"
         },
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -12288,8 +12288,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ChangeProgress",
-          "line": 335,
-          "endLine": 365,
+          "line": 340,
+          "endLine": 370,
           "sha256": "5b6e794e91993254bbf903985282827cf33a93846c9a9b4a706645b8e2185edc"
         },
         {
@@ -25245,8 +25245,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -25313,8 +25313,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -28656,8 +28656,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -28724,8 +28724,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         }
       ],
@@ -28768,8 +28768,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -28880,8 +28880,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -29987,8 +29987,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -30099,8 +30099,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -30211,8 +30211,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -31229,8 +31229,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -31297,8 +31297,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         }
       ],
@@ -31338,8 +31338,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -31406,8 +31406,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -31745,8 +31745,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -31820,8 +31820,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -33498,8 +33498,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -33566,8 +33566,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -33785,8 +33785,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -33853,8 +33853,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         }
       ],
@@ -34885,8 +34885,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -34953,8 +34953,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         }
       ],
@@ -40360,8 +40360,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -40428,8 +40428,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         }
       ],
@@ -71864,8 +71864,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "SafetyInspect",
-        "line": 377,
-        "endLine": 378,
+        "line": 382,
+        "endLine": 383,
         "sha256": "b2bdc3a91c6ad93c11d6b24246fab7ed9ab8b5fd10b98cab49603128c607499e"
       },
       "bridgeOperations": [
@@ -71879,8 +71879,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "SafetyInspect",
-          "line": 377,
-          "endLine": 378,
+          "line": 382,
+          "endLine": 383,
           "sha256": "b2bdc3a91c6ad93c11d6b24246fab7ed9ab8b5fd10b98cab49603128c607499e"
         },
         {
@@ -71990,8 +71990,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "SafetyPrintout",
-        "line": 407,
-        "endLine": 408,
+        "line": 412,
+        "endLine": 413,
         "sha256": "d531ccc1a0839cdd5dd855ddc0ebb213859fcfe2f4d20d09869854061dc6a4f8"
       },
       "bridgeOperations": [
@@ -72005,8 +72005,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "SafetyPrintout",
-          "line": 407,
-          "endLine": 408,
+          "line": 412,
+          "endLine": 413,
           "sha256": "d531ccc1a0839cdd5dd855ddc0ebb213859fcfe2f4d20d09869854061dc6a4f8"
         },
         {
@@ -72116,8 +72116,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "SafetyValidationInspect",
-        "line": 402,
-        "endLine": 403,
+        "line": 407,
+        "endLine": 408,
         "sha256": "10eea11f4a3b29ffa29d5a154e8c92eee0a260b699747c8b843b0a23b0a52430"
       },
       "bridgeOperations": [
@@ -72131,8 +72131,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "SafetyValidationInspect",
-          "line": 402,
-          "endLine": 403,
+          "line": 407,
+          "endLine": 408,
           "sha256": "10eea11f4a3b29ffa29d5a154e8c92eee0a260b699747c8b843b0a23b0a52430"
         },
         {
@@ -77338,8 +77338,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -77406,8 +77406,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 409,
-          "endLine": 409,
+          "line": 414,
+          "endLine": 414,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         }
       ],
@@ -94110,8 +94110,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "VciWorkspaceInspect",
-        "line": 397,
-        "endLine": 398,
+        "line": 402,
+        "endLine": 403,
         "sha256": "134981bcd3e7a67153b5837b6327dbf37dacffb002a7ec55c60c8d01e7b54d3d"
       },
       "bridgeOperations": [
@@ -94125,8 +94125,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "VciWorkspaceInspect",
-          "line": 397,
-          "endLine": 398,
+          "line": 402,
+          "endLine": 403,
           "sha256": "134981bcd3e7a67153b5837b6327dbf37dacffb002a7ec55c60c8d01e7b54d3d"
         },
         {
@@ -96896,8 +96896,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "WebInspect",
-        "line": 392,
-        "endLine": 393,
+        "line": 397,
+        "endLine": 398,
         "sha256": "8191bfa9de6f2b5b0c84b44bd6f872985be461ba3fcb05030517f8dc9f17814b"
       },
       "bridgeOperations": [
@@ -96911,8 +96911,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "WebInspect",
-          "line": 392,
-          "endLine": 393,
+          "line": 397,
+          "endLine": 398,
           "sha256": "8191bfa9de6f2b5b0c84b44bd6f872985be461ba3fcb05030517f8dc9f17814b"
         },
         {
