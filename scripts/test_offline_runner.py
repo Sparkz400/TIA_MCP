@@ -185,5 +185,32 @@ class ShardPlanTests(unittest.TestCase):
                     self.assertEqual(3, len(set(heavy)))
 
 
+class SuiteClassificationTests(unittest.TestCase):
+    """Every managed test project must be run offline, built offline, or named by the workstation runner; a new project
+    that is none of these would never be compiled anywhere automated."""
+
+    @staticmethod
+    def quoted_names(text):
+        import re
+        return set(re.findall(r"'(TiaMcp\.[\w.]+\.Tests|TiaMcp\.Tests)'", text))
+
+    def test_every_test_project_is_classified(self):
+        import re
+        root = RUNNER.parent.parent
+        runner = RUNNER.read_text(encoding='utf-8')
+        offline = re.search(r"\$suites = @\((.*?)\n    \)", runner, re.S)
+        compile_only = re.search(r"\$compileOnlySuites = @\((.*?)\)", runner, re.S)
+        self.assertIsNotNone(offline, 'Test-Offline.ps1 no longer declares $suites = @(...)')
+        self.assertIsNotNone(compile_only, 'Test-Offline.ps1 no longer declares $compileOnlySuites')
+        offline, compile_only = self.quoted_names(offline.group(1)), self.quoted_names(compile_only.group(1))
+        self.assertFalse(offline & compile_only, 'A suite is both run and compile-only')
+        workstation = (root / 'scripts' / 'Test.ps1').read_text(encoding='utf-8')
+        projects = {p.stem for p in (root / 'tests').glob('*/*.csproj')}
+        unclassified = sorted(name for name in projects
+                              if name not in offline and name not in compile_only and not re.search(r'(?<![\w.])' + re.escape(name) + r'(?![\w])', workstation))
+        self.assertEqual([], unclassified, 'Add these to $suites or $compileOnlySuites in Test-Offline.ps1, or to Test.ps1')
+        self.assertEqual(set(), (offline | compile_only) - projects, 'Test-Offline.ps1 names projects that do not exist')
+
+
 if __name__ == '__main__':
     unittest.main()

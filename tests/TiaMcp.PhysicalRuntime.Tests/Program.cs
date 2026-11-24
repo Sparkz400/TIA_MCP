@@ -201,6 +201,7 @@ checks += await RuntimePollingChecks.Run(args.Length == 1 ? Path.GetFullPath(arg
 checks += await RuntimeCaptureSoakChecks.CheckAcquisitionWaitBoundaries();
 checks += PlcsimTargetBindingChecks.Run(args.Length == 1 ? Path.GetFullPath(args[0])+".bindings" : Path.Combine(Path.GetTempPath(),"tia-plcsim-binding-"+Guid.NewGuid().ToString("N")));
 checks += await RuntimeCapturePlcsimChecks.Run(args.Length == 1 ? Path.GetFullPath(args[0])+".plcsim" : Path.Combine(Path.GetTempPath(),"tia-plcsim-"+Guid.NewGuid().ToString("N")));
+checks += await RuntimeConnectionReuseChecks.Run();
 
 if (args.Length == 1)
 {
@@ -208,4 +209,4 @@ if (args.Length == 1)
     File.WriteAllText(args[0], JsonSerializer.Serialize(new { schemaVersion="runtime-contract-test-output.v1", nativeExecuted=false,
         checks, reads=new[] { Read("18446744073709551615"), Read("-9223372036854775808"), clockJump, rawResult } }, BridgeProtocol.Json));
 }
-Console.WriteLine($"PASS physical-runtime protocol contracts: {checks} checks; no network, native or authenticated session execution.");
+Console.WriteLine($"PASS physical-runtime protocol contracts: {checks} checks; loopback TLS fixture only, no external network, native or real authenticated session execution.");
