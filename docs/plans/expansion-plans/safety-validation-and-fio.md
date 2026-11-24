@@ -58,7 +58,7 @@ upload release and Host restart. Preserve exact bytes, digests and unknown
 payloads. Match project/PLC identities, never display names alone. Supplied
 observations do not establish authenticity or current target state.
 
-Registered tools: `safety_evidence_review` and `safety_evidence_report`, following
+Registered tools: `safety_evidence_review` and `safety_evidence_review_page`, following
 existing review/report conventions. Arguments name the saved review, exact PLC,
 two observation uploads and optional supporting source roles. Versioned records
 and reports preserve phases, original bytes and expected scope. Report identity,

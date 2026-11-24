@@ -19,7 +19,7 @@ remain accessible through `hmi_text_list_author`.
 
 Upload UTF-8 JSON using `artifact_upload_begin/chunk/commit`, then call
 `hmi_text_list_generate_set` with `uploadRef`. Supply exactly one of `uploadRef`
-and `recordId`.
+and `recordRef` (a receipt's `recordId`).
 
 ```json
 {
@@ -180,7 +180,7 @@ leave unreferenced immutable artifacts; it cannot return a completed partial set
 or rewrite earlier evidence. An explicit resubmission of the unchanged request
 can reuse already published content-addressed bytes.
 
-After upload release or a fresh Host restart, reopen using `recordId`. Reopen
+After upload release or a fresh Host restart, reopen by passing the `recordId` as `recordRef`. Reopen
 revalidates original requests, saved project XML/model evidence, component
 reviews, all predecessor sets/authors, exact peer/source bytes and regenerated
 child candidates. An altered or missing child file prevents reopening the whole

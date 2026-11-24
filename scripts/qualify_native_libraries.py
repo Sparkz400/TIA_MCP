@@ -129,7 +129,7 @@ def run(args):
             client.tool("artifact_upload_chunk", {"uploadRef": upload["uploadRef"], "offset": offset,
                 "data": base64.b64encode(package_bytes[offset:offset + 16384]).decode("ascii")})
         committed = client.tool("artifact_upload_commit", {"uploadRef": upload["uploadRef"]})
-        package = client.tool("library_package_stage", {"artifactRef": committed["artifactRef"]})
+        package = client.tool("library_package_stage", {"uploadRef": committed["artifactRef"]})
         step("ZIP upload and staging", {"package": package, "zipSha256": hashlib.sha256(package_bytes).hexdigest()})
         candidates = client.tool("library_package_inspect", {"packageId": package["packageId"]})["items"]
         require(len(candidates) == 1 and candidates[0]["kind"] == "globalLibraryArchive", "Native archive classification mismatch")

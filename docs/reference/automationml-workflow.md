@@ -15,7 +15,7 @@ need TIA Portal V21 and feed the same record store.
    and `report.json`; the original upload may now be released. The source suffix
    does not change its encoding, BOM, comments, processing instructions or bytes.
 3. Page `/objects`, `/attributes`, `/references`, `/links`, `/opaqueContent` and
-   `/diagnostics` with `automationml_report_page`. Follow `nextOffset` until null.
+   `/diagnostics` with `review_page` (kind `automationml`). Follow `nextOffset` until null.
    Object paths and parent paths identify positions in this exact file. Attribute
    rows retain nested paths, owner, ID, name, type, unit, values and defaults.
    Plain text/CDATA is a scalar; attributed or annotated/nested XML produces
@@ -25,10 +25,10 @@ need TIA Portal V21 and feed the same record store.
    and `afterRef` handles. Page `/changes`, `/beforeImpacts`, `/afterImpacts`,
    `/beforeDiagnostics` and `/afterDiagnostics`.
 5. Download `original.aml`, `report.json` or `receipt.json` with
-   `automationml_artifact_read`. Follow byte `nextOffset` until `complete`, then
+   `review_artifact_read` (kind `automationml`). Follow byte `nextOffset` until `complete`, then
    independently check full length and SHA-256. Oversized report rows explicitly
    refer you to this complete download.
-6. After restarting the Host, use `automationml_reopen` or `automationml_list`.
+6. After restarting the Host, use `review_reopen` (kind `automationml`) or `review_list` (kind `automationml`).
    Every read verifies the receipt, retained artifacts and comparison inputs.
    Incomplete and integrity-failed publications remain visible in the inventory.
 
@@ -49,7 +49,7 @@ worker retains the transfer result (state, error/warning counts and nested
 messages, up to 50,000) as `cax-<id>.transfer-result.json`. The response returns
 both SHA-256 values, up to `maxItems` messages with explicit truncation, and the
 `automationml` summary of a new document record. Use its `recordRef` with
-`automationml_report_page` and `automationml_compare`, or as the `cax_import`
+`review_page` (kind `automationml`) and `automationml_compare`, or as the `cax_import`
 `amlRef`. Publication keeps the 8 MiB inspection bound; a publication error is
 reported beside the still valid export. The export reads the in-memory project
 and does not save it; `projectModifiedBefore`/`projectModifiedAfter` report

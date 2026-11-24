@@ -37,7 +37,7 @@ With the server connected, ask your MCP client in plain language:
   → `change_prepare`, `change_apply`, `change_restore` if it goes wrong
 - *"Create a PLCSIM instance and test that `Motor_On` follows `Start`."*
   → `sim_create`, `sim_test`
-- *"Give me a health report of this project."* → `project_health_report`
+- *"Give me a health report of this project."* → `project_health_review`
 
 Ask `feature_catalog` and `target_capabilities` what your target supports. The server
 also offers workflow prompts (`safe_change`, `project_health`, `block_test`,

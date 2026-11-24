@@ -37,7 +37,7 @@ repository state. All returned native qualification flags remain false.
    the current branch is allowed; a different existing branch is never reset or
    checked out. Names are literal bounded ASCII Git branch names (180 characters
    maximum); case aliases and path-prefix collisions are refused.
-3. Read `files.json` with `vci_artifact_read`, and inspect `diff.txt`. Git diff covers
+3. Read `files.json` with `review_artifact_read` (kind `vci`), and inspect `diff.txt`. Git diff covers
    tracked changes only. Review new files and any exact raw contents through
    `vci_file_read`, using paths from the file manifest. All downloads include the
    complete file hash/length and accept offsets for at most 64 KiB per call.
@@ -56,9 +56,9 @@ repository state. All returned native qualification flags remain false.
    listing explicitly. These are fresh local ref observations, not remote state
    or part of the retained raw-document content. Non-commit-valued refs are rejected.
 7. Use `vci_materialize` to recover any completed revision as a new raw-file directory,
-   `revision.zip` and a hash/mode manifest. Download the ZIP with `vci_artifact_read`.
+   `revision.zip` and a hash/mode manifest. Download the ZIP with `review_artifact_read` (kind `vci`).
    Export does not reconstruct a TIA project or restore operating-system permissions.
-8. Use `vci_reopen` and `vci_list` after Host restart. Completed candidates retain
+8. Use `review_reopen` (kind `vci`) and `review_list` (kind `vci`) after Host restart. Completed candidates retain
    their own input bytes, so releasing the original upload does not break them.
 
 Example preparation, using actual committed upload/revision handles:
@@ -88,7 +88,7 @@ preservation or current target state from matching names or hashes.
 Each candidate is separate from its parent. A deletion absent from the parent is
 refused before any record is created; a preparation that fails later removes its own
 partial record. Other failed operations remain discoverable as incomplete records.
-`vci_list` derives each row's state from its receipt files only; `vci_reopen` of a
+`review_list` (kind `vci`) derives each row's state from its receipt files only; `review_reopen` (kind `vci`) of a
 listed handle verifies the full chain and working bytes. A commit intent without a complete receipt remains
 `outcomeUnknown`; `vci_commit` refuses a repeat, even if the last Git callback says
 `verified`. Reopen exposes the validated callback phase, operation ID, candidate

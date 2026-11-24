@@ -162,7 +162,7 @@ that finds no enumerator is not proof that no such public API exists.
 ## Architecture and proposed contracts
 
 Use existing upload commit, immutable saved-review selection and artifact storage.
-TO-02 now provides `technology_profile_review` and `technology_profile_report`, backed by
+TO-02 now provides `technology_profile_review` and `technology_profile_review_page`, backed by
 `src/TiaMcp.Core/TechnologyObjects/TechnologyProfileReview.cs` and thin Host tools.
 The installed strict
 `technology-profile-review-request.v1` carries an exact saved technology reference,
@@ -279,7 +279,7 @@ All native/provider and TO-03-12 acceptance remains open until its evidence exis
 The [supplied profile/relationship workflow](../../reference/technology-profile-review.md)
 implements retained intake, parameter/relationship differences, declared-cycle and
 unresolved-endpoint reporting, saved graph context and restart-safe bounded report
-pages. `technology_profile_review` and `technology_profile_report` are implemented;
+pages. `technology_profile_review` and `technology_profile_review_page` are implemented;
 the proposal description above is retained as design context. The before/after
 proposal form permits at most 500 changed records rather than a separate redundant
 proposal array. Original JSON is retained; external provenance can be documented in

@@ -146,7 +146,7 @@ complete consumer coverage or native identity is inferred.
 
 ## Retention and limits
 
-After upload release or Host restart, call the same tool with `recordId`.
+After upload release or Host restart, call the same tool with the `recordId` as `recordRef`.
 The store revalidates original request bytes, saved PLC/model evidence, the
 component review, predecessor chain, source/peer bytes and independently
 regenerated candidates before returning the exact retained result. Rehashing

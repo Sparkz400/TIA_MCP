@@ -291,7 +291,7 @@ The names below are proposed contracts, not existing tools. Keep reads distinct 
 
 | Tool | Purpose and important arguments |
 | --- | --- |
-| artifact_upload_begin | Create a managed upload for expected size/hash and a display label; return uploadId, chunk limit and expiry. |
+| artifact_upload_begin | Create a managed upload for expected size/hash and a display label; return uploadRef, chunk limit and expiry. |
 | artifact_upload_chunk | Write bounded base64 bytes at an exact offset; report accepted range/hash. |
 | artifact_upload_status | Read received ranges, remaining bytes and finalized artifact identity. |
 | artifact_upload_commit | Verify full contents and publish an immutable artifactRef. |

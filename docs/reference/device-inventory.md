@@ -13,8 +13,8 @@ remote-I/O qualification remains **unverified**; see the
 ## Offline capture and paging
 
 Attach to the intended open project, then call `device_inventory` with
-`{"pageSize":100,"maxVisited":50000}`. Continue with the returned
-`snapshotId`, `cursor` and optional `pageSize`. Omit project selectors on
+`{"count":100,"maxVisited":50000}`. Continue with the returned
+`snapshotId` and `nextOffset` as `offset`, with an optional `count` (1–200). Omit project selectors on
 continuation. For larger projects, an exact `devicePath` from a `kind: device`
 row narrows a new capture to that device. Canonical paths distinguish duplicate
 names in separate groups.

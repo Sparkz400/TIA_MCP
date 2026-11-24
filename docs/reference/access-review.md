@@ -17,7 +17,7 @@ permissions.
    Siemens meaning. Every required right must also be allowed at the exact scope.
 4. Upload with `artifact_upload_begin/chunk/commit`, then call
    `access_review(reviewId, uploadRef)`. Retain `recordId`, `input` and `reportArtifact`.
-5. Call `access_review_page(recordId, section, offset, count)` with `summary`,
+5. Call `access_review_page(recordRef, section, offset, count)` with `summary`,
    `observations`, `assessments` or `changes`; download complete artifacts using
    `artifact_read`. Released uploads and Host restarts preserve the retained review.
 

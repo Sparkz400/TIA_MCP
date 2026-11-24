@@ -3,7 +3,7 @@
 `hmi_text_list_author` produces a downloadable pair of plain text-list candidate
 files without Siemens products. Supply a committed `uploadRef` containing a
 `unified-text-list-author-request.v1` request. To reopen the result, supply its
-`recordId` instead. Exactly one selector is required. Reopening reconstructs both
+`recordId` as `recordRef` instead. Exactly one selector is required. Reopening reconstructs both
 candidates from the retained original request and checks every stored byte and
 record field. Changed or invented results refuse.
 
@@ -22,7 +22,7 @@ not qualify newly authored files.
    baseline/current files, exact destination, ownership, mappings and observations
    as appropriate. Authoring alone does not establish those associations.
 5. Release transient uploads when retained results are confirmed. Reopen later by
-   `recordId`; no upload or native worker is required.
+   passing its `recordId` as `recordRef`; no upload or native worker is required.
 
 The two output names are `<fileBase>.hmi.yml` and
 `<fileBase>.TextLibrary.hmi.yml`. Output is deterministic UTF-8 without BOM, with LF

@@ -202,7 +202,7 @@ def body(h):
 
     def stage():
         started = time.perf_counter()
-        staged = h.tool("library_package_stage", {"artifactRef": uploaded["artifactRef"]})
+        staged = h.tool("library_package_stage", {"uploadRef": uploaded["artifactRef"]})
         seconds = round(time.perf_counter() - started, 3)
         status = h.tool("library_package_status", {"packageId": staged["packageId"]})
         require(status["state"] == "ready" and status["sourceSha256"] == package["sha256"], "Staged package differs from the upload")

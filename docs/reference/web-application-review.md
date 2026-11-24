@@ -94,7 +94,7 @@ default applications and enabled-page declarations with web serving disabled rem
 explicit findings. These are supplied-data contradictions, not effective native
 policy or proof that the remaining configuration is valid.
 
-Use `web_application_review_page(recordId, section, offset, count)` for these four
+Use `web_application_review_page(recordRef, section, offset, count)` for these four
 sections, or `summary`. Pages allow 1..200 rows and at most 128 KiB; oversized rows
 are explicitly omitted with the full report available through `artifact_read`.
 Complete original ZIPs remain downloadable, including unsupported script/binary

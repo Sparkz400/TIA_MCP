@@ -6,7 +6,7 @@ Baseline: `ec71c96b13b52491e2d6638e2da72f9c8e67b869`, 18 October 2026. Covers X0
 
 In TIA, a user selects exact engineering objects, chooses the companion command and receives a review in the existing Host/Explorer workflow. Proposed engineering changes use the existing preparation, approval, operation journal and native worker. The companion must not become an independent writer. Reopening a prior selection or operation receipt must never repeat acquisition or execution.
 
-There is no Siemens installation, SDK, publisher, TIA UI or qualified companion on this workstation. `addin_selection_review` and `addin_selection_page` implement review of **supplied detached selections** against a saved project review. They preserve ordered references and original bytes across Host restart, with producer authentication, live selection and native execution explicitly false. No native DLL, executable launcher, package manifest or authenticated IPC channel is delivered by these tools. [Portable workflow](../../reference/addin-selections.md).
+There is no Siemens installation, SDK, publisher, TIA UI or qualified companion on this workstation. `addin_selection_review` and `addin_selection_review_page` implement review of **supplied detached selections** against a saved project review. They preserve ordered references and original bytes across Host restart, with producer authentication, live selection and native execution explicitly false. No native DLL, executable launcher, package manifest or authenticated IPC channel is delivered by these tools. [Portable workflow](../../reference/addin-selections.md).
 
 ## Evidence and unresolved signatures
 

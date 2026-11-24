@@ -299,7 +299,7 @@ Offline validation: `dotnet run --project tests/TiaMcp.Diagnostics.Tests --confi
 ## Supplied Test Suite findings
 
 After [importing supplied results](../reference/testsuite-result-review.md), optionally
-select those receipts in `project_health_report.testSuiteResults`. Each returned
+select those receipts in `project_health_review.testSuiteResults`. Each returned
 `testSuite.reports` entry preserves the exact receipt used below. Pass an exact
 receipt and finding index to the existing case planner:
 

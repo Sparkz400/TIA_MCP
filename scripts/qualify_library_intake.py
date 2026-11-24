@@ -105,7 +105,7 @@ def run(host, artifacts):
         again = client.tool("artifact_upload_commit", {"uploadRef": identifier})
         require(committed["artifactRef"] == again["artifactRef"], "Commit retry changed artifact")
         record("complete upload hash and repeated commit", committed)
-        package = client.tool("library_package_stage", {"artifactRef": committed["artifactRef"]})
+        package = client.tool("library_package_stage", {"uploadRef": committed["artifactRef"]})
         package_id = package["packageId"]
         candidates = []
         offset = 0
@@ -135,7 +135,7 @@ def run(host, artifacts):
         upload = begin("hostile.zip", hostile)
         chunk(upload["uploadRef"], 0, hostile)
         committed_bad = client.tool("artifact_upload_commit", {"uploadRef": upload["uploadRef"]})
-        record("ZIP traversal rejected through MCP", failure("library_package_stage", {"artifactRef": committed_bad["artifactRef"]}, "PackageInvalid"))
+        record("ZIP traversal rejected through MCP", failure("library_package_stage", {"uploadRef": committed_bad["artifactRef"]}, "PackageInvalid"))
         require(not (directory / "library-intake" / "escaped.txt").exists(), "ZIP traversal escaped its root")
         report["completed"] = True
     except Exception as error:

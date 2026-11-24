@@ -4,7 +4,7 @@ Use `technology_profile_review(reviewId, uploadRef)` with a committed UTF-8 JSON
 upload and an exact saved `technologyObject` selection. v1 requests retain profile
 JSON; v2 also retains independently uploaded source files, v3 adds consumer context,
 and v4 adds typed supplied encoder connections. Use
-`technology_profile_report(recordId, section, offset, count)` to reopen the report.
+`technology_profile_review_page(recordRef, section, offset, count)` to reopen the report.
 Neither tool needs or launches Siemens products. They do not execute proposals.
 
 ## Workflow
@@ -19,7 +19,7 @@ Neither tool needs or launches Siemens products. They do not execute proposals.
 3. Call `technology_profile_review`. The returned receipt identifies immutable
    original input and report artifacts. Repeating the same call is idempotent.
 4. Page `observations`, `relationships`, `changes`, `context` or `sources` through
-   `technology_profile_report`; its default `summary` returns the original receipt.
+   `technology_profile_review_page`; its default `summary` returns the original receipt.
    Download complete artifacts through `artifact_read`, including oversized rows.
    Releasing the original upload does not remove retained review evidence.
 

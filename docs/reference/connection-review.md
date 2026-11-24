@@ -16,7 +16,7 @@ check resource capacity or execute connection changes.
    `artifact_upload_commit`. Call `connection_review(reviewId, uploadRef)`.
 4. Retain the returned `recordId`, original `input` and `reportArtifact` references.
    Download either artifact using its `path` with `artifact_read`.
-5. Use `connection_review_page(recordId, section, offset, count)` for `summary`,
+5. Use `connection_review_page(recordRef, section, offset, count)` for `summary`,
    `observations`, `comparisons`, `consumers` or `matches`. Reopening revalidates
    input and saved review hashes and independently rederives the report. Upload
    release and Host restart do not remove retained inputs or reports.

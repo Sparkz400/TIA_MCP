@@ -25,7 +25,7 @@ manual edits, and retain selected peer files unchanged.
 3. Upload a strict `hmi-component-review-request.v1` through `.v7` request, then call
    `hmi_component_review(uploadRef)`. The [schema](../../contracts/hmi-component-review.v1.schema.json)
    defines every mandatory field; unknown fields and duplicate JSON keys refuse.
-4. Read `hmi_component_review_page(recordId, section, offset, count)`, with section
+4. Read `hmi_component_review_page(recordRef, section, offset, count)`, with section
    `summary`, `components`, `outputs`, `bindings` or `files`; v2 also offers
    `consumerPaths` and `consumerCoverage`; v3 adds `effectChecks`; v4 adds
    `derivedEffects` and `expectationCoverage`; v5 adds `libraryAssociations` and
