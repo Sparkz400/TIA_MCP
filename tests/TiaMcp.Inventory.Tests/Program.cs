@@ -147,7 +147,7 @@ using (var zip = ZipFile.OpenRead(xlsx.GetProperty("artifact").GetProperty("path
 // Host behavior with absent native workers: errors before network or worker activity, and snapshot export.
 var bridge = new RejectBridge(); var options = new HostOptions("missing", output, null, 10, false, "missing", null);
 var tools = new DeviceInventoryTools(bridge, options, store, new SiemensWebIdentityFactory());
-var badPage = await tools.Inventory(default, pageSize: 0); Check(badPage.IsError == true && bridge.Calls == 0, "Validate before worker dispatch");
+var badPage = await tools.Inventory(default, count: 0); Check(badPage.IsError == true && bridge.Calls == 0, "Validate before worker dispatch");
 var badBinding = await tools.Identify(exportSnapshot.Metadata.SnapshotId, "https://192.0.2.10", row1.RowId, 1, [new(row1.RowId, 1)], default);
 Check(badBinding.IsError == true, "Non-CPU controller is rejected before network access");
 Check(tools.Export(exportSnapshot.Metadata.SnapshotId, "xlsx").IsError != true, "Host export route");
