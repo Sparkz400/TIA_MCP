@@ -118,7 +118,7 @@ namespace TiaMcp.Openness.V21
                 TranslationWrite(Path.Combine(directory, "result.json"), result); return result;
             }
         }
-        private JObject TranslationCapture(JObject args)
+        private JObject CaptureTranslations(JObject args)
         {
             TranslationQualified(); var project = TranslationOwned(args, true);
             using (_portal.ExclusiveAccess("TIA MCP: complete translation capture")) return TranslationObserve(project, args);
@@ -167,7 +167,7 @@ namespace TiaMcp.Openness.V21
                 var selector = (JObject)args.DeepClone(); selector["projectPath"] = project.Path.FullName; selector["plcPath"] = owners[index];
                 selector["artifactDirectory"] = directory; selector["tableName"] = "__translation_absent_control__";
                 selector["group"] = "root"; selector["allowAbsent"] = true;
-                var snapshot = WatchSnapshot(selector);
+                var snapshot = CaptureWatchSnapshot(selector);
                 string snapshotPath = snapshot["receipt"].Value<string>("path"), prefix = owners.Length == 1 ? "" : owners[index] + "|";
                 foreach (string path in Directory.GetFiles(Path.GetDirectoryName(snapshotPath), "*.xml").OrderBy(x => Path.GetFileName(x), StringComparer.Ordinal))
                     peers.Add(new JObject { ["identity"] = prefix + Path.GetFileName(path), ["profile"] = "tia21-simaticml-translation-v1", ["artifact"] = FileArtifact(new FileInfo(path)) });

@@ -127,7 +127,7 @@ namespace TiaMcp.Openness.V21
                     string mode = ChangeText(payload, "mode", 16), directory = VciPayloadDirectory(payload), fileName = ChangeText(payload, "fileName", 128), format = ChangeText(payload, "format", 64);
                     if (mode != "export" && mode != "connect") throw new BridgeException("InvalidRequest", "mode must be export (ExportObject writes the package) or connect (ConnectObject maps existing files).");
                     if (!VciSafeName(fileName)) throw new BridgeException("InvalidRequest", "fileName must be one plain file name without extension.");
-                    var target = VciTarget(change);
+                    var target = ResolveVciTarget(change);
                     var formats = workspace.GetSupportedFileFormats(target.Target).ToList();
                     if (!formats.Contains(format, StringComparer.Ordinal)) throw new BridgeException("VciFormatUnsupported", "format must be a native supported format for this object: " + string.Join(", ", formats));
                     foreach (var other in VciWorkspaces(service))
@@ -144,7 +144,7 @@ namespace TiaMcp.Openness.V21
                 }
                 else if (change.Kind == "vci_mapping_remove")
                 {
-                    var target = VciTarget(change);
+                    var target = ResolveVciTarget(change);
                     var row = VciMappingRow(workspace.MappedObjects.Find(target.Target) ?? throw new BridgeException("VciMappingNotFound", "The object is not mapped in this workspace."), root, true);
                     packages.Add(new JObject { ["directory"] = row["directory"], ["fileName"] = row["fileName"] });
                     effect["action"] = "removeMapping"; effect["object"] = target.Identity.DeepClone(); effect["mapping"] = row;
@@ -155,7 +155,7 @@ namespace TiaMcp.Openness.V21
                     // The Host bound this payload to one reviewed divergentChange row; the workspace must hold exactly its remote side.
                     string take = ChangeText(payload, "take", 16), direction = ChangeText(payload, "direction", 32);
                     var plan = payload["plan"] as JObject ?? throw new BridgeException("InvalidRequest", "Prepare vci_conflict_resolve through the Host with a reviewed comparisonRef.");
-                    var target = VciTarget(change);
+                    var target = ResolveVciTarget(change);
                     if (direction == "WorkspaceToProject") VciRequireWritableTarget(target);
                     var mapping = workspace.MappedObjects.Find(target.Target) ?? throw new BridgeException("VciMappingNotFound", "The object is not mapped in this workspace.");
                     var status = mapping.GetStatus(); var details = status.IndividualObjectCompareDetails;
@@ -194,7 +194,7 @@ namespace TiaMcp.Openness.V21
                     }
                     else
                     {
-                        var target = VciTarget(change);
+                        var target = ResolveVciTarget(change);
                         if (toProject) VciRequireWritableTarget(target);
                         mappings = new List<MappedObject> { workspace.MappedObjects.Find(target.Target) ?? throw new BridgeException("VciMappingNotFound", "The object is not mapped in this workspace.") };
                         effect["object"] = target.Identity.DeepClone();
@@ -259,7 +259,7 @@ namespace TiaMcp.Openness.V21
                 }
                 else if (change.Kind == "vci_mapping_add")
                 {
-                    var target = VciTarget(change);
+                    var target = ResolveVciTarget(change);
                     string directory = VciPayloadDirectory(payload), fileName = payload.Value<string>("fileName"), format = payload.Value<string>("format");
                     // V21 refused DirectoryInfo(".") as a relative path and accepted the absolute directory below the root (vci-native-profiles-20261015.md).
                     var location = new DirectoryInfo(directory.Length == 0 ? root : Path.Combine(root, directory.Replace('/', '\\')));
@@ -275,14 +275,14 @@ namespace TiaMcp.Openness.V21
                 }
                 else if (change.Kind == "vci_mapping_remove")
                 {
-                    var target = VciTarget(change);
+                    var target = ResolveVciTarget(change);
                     (workspace.MappedObjects.Find(target.Target) ?? throw new BridgeException("VciMappingNotFound", "The object is no longer mapped in this workspace.")).Delete();
                     if (workspace.MappedObjects.Find(target.Target) != null) throw new BridgeException("MutationVerificationFailed", "The mapping still exists after Delete.");
                     readback["mappingRemoved"] = true;
                 }
                 else if (change.Kind == "vci_conflict_resolve")
                 {
-                    var mapping = workspace.MappedObjects.Find(VciTarget(change).Target) ?? throw new BridgeException("VciMappingNotFound", "The object is no longer mapped in this workspace.");
+                    var mapping = workspace.MappedObjects.Find(ResolveVciTarget(change).Target) ?? throw new BridgeException("VciMappingNotFound", "The object is no longer mapped in this workspace.");
                     var result = VciResolutionRules.Files(payload, "resultFiles", true, VciSafeName);
                     foreach (var file in result)
                     {
@@ -304,7 +304,7 @@ namespace TiaMcp.Openness.V21
                 {
                     var mode = payload.Value<string>("direction") == "WorkspaceToProject" ? SynchronizationMode.WorkspaceToProject : SynchronizationMode.ProjectToWorkspace;
                     var mappings = payload["objectPath"] == null ? VciMappings(workspace)
-                        : new List<MappedObject> { workspace.MappedObjects.Find(VciTarget(change).Target) ?? throw new BridgeException("VciMappingNotFound", "The object is no longer mapped in this workspace.") };
+                        : new List<MappedObject> { workspace.MappedObjects.Find(ResolveVciTarget(change).Target) ?? throw new BridgeException("VciMappingNotFound", "The object is no longer mapped in this workspace.") };
                     var rows = new JArray(); readback["mappingsAfter"] = rows;
                     foreach (var mapping in mappings)
                     {
@@ -385,7 +385,7 @@ namespace TiaMcp.Openness.V21
             return workspace.MappedObjects.ToList();
         }
 
-        private NativeObjectTarget VciTarget(EngineeringChange change)
+        private NativeObjectTarget ResolveVciTarget(EngineeringChange change)
         {
             var target = ResolveObjectTarget(new JObject { ["projectName"] = change.Selector["projectName"], ["plcPath"] = change.Selector["plcPath"], ["objectPath"] = ChangeText(change.Payload, "objectPath", 4096) });
             if (!new[] { "block", "type", "tagTable", "technology" }.Contains(target.Identity.Value<string>("kind"), StringComparer.Ordinal))

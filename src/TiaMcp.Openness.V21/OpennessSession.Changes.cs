@@ -896,7 +896,7 @@ namespace TiaMcp.Openness.V21
                 {
                     var item = ChangeHardware(project, payload);
                     change.AttributeTarget = item.Item;
-                    HardwareEngineeringRules.RequireProfileWritable(ItemProfile(item.Item, out string profilePath), profilePath, null, ChangeObject(payload, "attributes").Properties().Select(property => property.Name));
+                    HardwareEngineeringRules.RequireProfileWritable(ReadItemProfile(item.Item, out string profilePath), profilePath, null, ChangeObject(payload, "attributes").Properties().Select(property => property.Name));
                     preview["attributeChanges"] = PrepareAttributes(item.Item, ChangeObject(payload, "attributes"), HardwareWriteAttributes);
                     effects.Add(new JObject { ["hardwarePath"] = item.Path });
                     break;
@@ -1598,13 +1598,13 @@ namespace TiaMcp.Openness.V21
                 var item = entry.Item;
                 var hw = new JObject { ["path"] = entry.Path, ["typeIdentifier"] = item.TypeIdentifier, ["position"] = item.PositionNumber };
                 var network = item.GetService<NetworkInterface>();
-                if (network != null) hw["nodes"] = new JArray(network.Nodes.Select(NodeSnapshot));
+                if (network != null) hw["nodes"] = new JArray(network.Nodes.Select(CaptureNodeSnapshot));
                 hw["addresses"] = new JArray(item.Addresses.Select(address => new JObject { ["type"] = address.IoType.ToString(), ["start"] = address.StartAddress, ["length"] = address.Length }));
                 hardware.Add(hw);
                 var plc = item.GetService<SoftwareContainer>()?.Software as PlcSoftware;
                 if (plc == null) continue;
                 var selection = new PlcSelection { Project = project, Software = plc, Path = entry.Path + "/plc/" + Segment(plc.Name) };
-                opcUa?.Add(new JObject { ["plcPath"] = selection.Path, ["serverInterfaceGroup"] = OpcUaSnapshot(OpcUaProviderFor(plc)?.CommunicationGroup?.ServerInterfaceGroup, budget) });
+                opcUa?.Add(new JObject { ["plcPath"] = selection.Path, ["serverInterfaceGroup"] = CaptureOpcUaSnapshot(OpcUaProviderFor(plc)?.CommunicationGroup?.ServerInterfaceGroup, budget) });
                 var safetyState = ReadSafety(plc);
                 bool hasSafetySignatureCoverage = HasSafetySignatureCoverage(safetyState);
                 safetyStates.Add(new JObject { ["plcPath"] = selection.Path, ["safety"] = safetyState });
@@ -1781,7 +1781,7 @@ namespace TiaMcp.Openness.V21
                 foreach (var child in technology.Groups) foreach (string value in EngineeringGroupPaths(child, path + "/groups/" + Segment(child.Name), depth + 1)) yield return value;
         }
 
-        private static JObject NodeSnapshot(Node node)
+        private static JObject CaptureNodeSnapshot(Node node)
         {
             var attributes = new JObject();
             var infos = node.GetAttributeInfos();

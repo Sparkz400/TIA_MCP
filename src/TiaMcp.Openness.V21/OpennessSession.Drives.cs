@@ -297,7 +297,7 @@ namespace TiaMcp.Openness.V21
 
         // Every parameter value of the drive object by name (the written ones included), for the before/after diff of side effects.
         // Never throws: a failed or oversized read marks the snapshot incomplete instead of failing the write.
-        private static Dictionary<string, JToken> DriveSnapshot(DriveObject driveObject, out bool complete)
+        private static Dictionary<string, JToken> CaptureDriveSnapshot(DriveObject driveObject, out bool complete)
         {
             var values = new Dictionary<string, JToken>(StringComparer.Ordinal); int visited = 0; complete = true;
             try
@@ -369,7 +369,7 @@ namespace TiaMcp.Openness.V21
             if (!write) return result;
             // The whole batch is preflighted before the first setter; a native failure after dispatch restores the earlier writes (best effort)
             // and still requires checkpoint recovery.
-            var sideBefore = DriveSnapshot(driveObject, out bool beforeComplete);
+            var sideBefore = CaptureDriveSnapshot(driveObject, out bool beforeComplete);
             CompensatingWrites.Apply(Enumerable.Range(0, targets.Count).ToList(), i => targets[i].Value = values[i], i => targets[i].Value = befores[i], i => rows[i].Value<string>("name"));
             result = new JArray();
             for (int i = 0; i < targets.Count; i++)
@@ -379,7 +379,7 @@ namespace TiaMcp.Openness.V21
                 if (!JToken.DeepEquals(expected, actual)) throw new BridgeException("MutationVerificationFailed", "Drive parameter readback differs from the request: " + rows[i].Value<string>("name"));
                 result.Add(new JObject { ["name"] = rows[i].Value<string>("name"), ["value"] = actual });
             }
-            var sideAfter = DriveSnapshot(driveObject, out bool afterComplete);
+            var sideAfter = CaptureDriveSnapshot(driveObject, out bool afterComplete);
             change.Readbacks.Add(new JObject { ["role"] = "drive-parameter-side-effects", ["sideEffects"] = DriveWriteRules.SideEffects(sideBefore, sideAfter, names, beforeComplete && afterComplete) });
             return result;
         }

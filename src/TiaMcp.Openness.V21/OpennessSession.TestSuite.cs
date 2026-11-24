@@ -154,7 +154,7 @@ namespace TiaMcp.Openness.V21
                     directory = Path.Combine(root, "testsuite-worker", Guid.NewGuid().ToString("N"));
                     Directory.CreateDirectory(directory); selector["artifactDirectory"] = directory;
 #if TESTSUITE_QUALIFICATION
-                    if (owner._testSuiteQualification) { qualificationLease = new QualificationLease(owner, lease); return qualificationLease; }
+                    if (owner._testSuiteQualification) { heldLease = new QualificationLease(owner, lease); return heldLease; }
 #endif
                     return lease;
                 }
@@ -316,7 +316,7 @@ namespace TiaMcp.Openness.V21
                 var softwareOwners = DeviceItems(project, budget).Select(d => d.Item.GetService<SoftwareContainer>()?.Software).Where(s => s != null).ToArray();
                 if (softwareOwners.Length != 1 || !softwareOwners[0].Equals(plc.Software) || budget.Truncated)
                     throw new BridgeException("TestSuiteProfileUnqualified", "Preservation is bounded to one PLC; other software owners remain unqualified.");
-                var snapshot = owner.WatchSnapshot(selector);
+                var snapshot = owner.CaptureWatchSnapshot(selector);
                 return new JObject { ["peers"] = snapshot["peers"].DeepClone(),
                     ["tables"] = new JArray(((JArray)snapshot["tables"]).Select(t => new JObject { ["kind"] = t["kind"], ["group"] = t["group"], ["name"] = t["name"], ["sha256"] = t["semanticSha256"] })),
                     ["definitions"] = StylePrerequisiteProbe.CaptureDefinitions(project, NewDirectory("definitions")),

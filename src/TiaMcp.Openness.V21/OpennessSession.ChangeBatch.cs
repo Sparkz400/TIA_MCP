@@ -109,12 +109,12 @@ namespace TiaMcp.Openness.V21
         private static void RequireIndependentItems(List<EngineeringChange> members)
         {
             bool numbers = members.Count > 0 && members[0].Kind == "block_number_set";
-            ChangeBatchRules.RequireDistinct(members.Select(m => (BatchTarget(m), BatchProduced(m))), numbers ? "BlockNumberCollision" : "ObjectExists", numbers ? "block number" : "name");
+            ChangeBatchRules.RequireDistinct(members.Select(m => (DescribeBatchTarget(m), BatchProduced(m))), numbers ? "BlockNumberCollision" : "ObjectExists", numbers ? "block number" : "name");
             ChangeBatchRules.RequireUnnested(members.Select(m => ChangeBatchRules.GroupTarget(m.Kind, m.Payload)).ToArray());
         }
 
         // The resolved identity of the object a member edits; creating kinds edit none.
-        private static string BatchTarget(EngineeringChange member)
+        private static string DescribeBatchTarget(EngineeringChange member)
         {
             switch (member.Kind)
             {

@@ -83,7 +83,7 @@ namespace TiaMcp.Openness.V21
             if (attributes.Count == 0 || attributes.Count > ChannelWriteAttributes.Count) throw new BridgeException("InvalidRequest", "At least one reviewed channel attribute is required.");
             var scalars = ChannelScalars(attributes);
             // The OB link is declared only while its flag is on, so a profile captured with the flag off cannot list it; its native check follows.
-            HardwareEngineeringRules.RequireProfileWritable(ItemProfile(module.Item, out string profilePath), profilePath,
+            HardwareEngineeringRules.RequireProfileWritable(ReadItemProfile(module.Item, out string profilePath), profilePath,
                 new JObject { ["type"] = channel.Type.ToString(), ["ioType"] = channel.IoType.ToString(), ["number"] = channel.Number }, scalars.Properties().Select(property => property.Name));
             var changes = PrepareAttributes(channel, scalars, ChannelWriteAttributes, out var converted);
             // Store native scalar representations so the preservation comparison
@@ -276,7 +276,7 @@ namespace TiaMcp.Openness.V21
                 if (!path.Value<string>().StartsWith(station + "/items/", StringComparison.Ordinal)) throw new BridgeException("InvalidRequest", "Every sharedSubmodules path must belong to the selected IO device's station.");
                 var entry = ChangeHardware(project, new JObject { ["hardwarePath"] = path.DeepClone() });
                 if (!Writable(entry.Item, SharedTarget)) throw new BridgeException("AttributeNotWritable", "A sharedSubmodules item declares no readable and writable " + SharedTarget + ".");
-                HardwareEngineeringRules.RequireProfileWritable(ItemProfile(entry.Item, out string profilePath), profilePath, null, new[] { SharedTarget });
+                HardwareEngineeringRules.RequireProfileWritable(ReadItemProfile(entry.Item, out string profilePath), profilePath, null, new[] { SharedTarget });
                 if (!hardware.Any(row => (row.Path == entry.Path || row.Path.StartsWith(entry.Path + "/", StringComparison.Ordinal)) && row.Item.Addresses.Any(address => address.Length > 0)))
                     throw new BridgeException("InvalidRequest", "A sharedSubmodules item must own I/O addresses itself or through a subitem: " + entry.Path);
                 if (!disconnect && SharedTargetPath(entry.Item, hardware) == owner) throw new BridgeException("InvalidRequest", "A sharedSubmodules item is already assigned to the selected PLC: " + entry.Path);
@@ -376,7 +376,7 @@ namespace TiaMcp.Openness.V21
                     ["addresses"] = new JArray(item.Addresses.Select(address => new JObject { ["ioType"] = address.IoType.ToString(), ["startAddress"] = address.StartAddress, ["lengthBits"] = address.Length,
                         ["owners"] = new JArray(address.AddressControllers.Select(owner => Owner(owner)).OrderBy(value => value, StringComparer.Ordinal)) })) };
                 var network = item.GetService<NetworkInterface>();
-                if (network != null) row["network"] = new JObject { ["nodes"] = new JArray(network.Nodes.Select(NodeSnapshot)),
+                if (network != null) row["network"] = new JObject { ["nodes"] = new JArray(network.Nodes.Select(CaptureNodeSnapshot)),
                     ["controllers"] = new JArray(network.IoControllers.Select((controller, index) => new JObject { ["index"] = index, ["system"] = System(controller.IoSystem) })),
                     ["connectors"] = new JArray(network.IoConnectors.Select((connector, index) => new JObject { ["index"] = index, ["system"] = System(connector.ConnectedToIoSystem) })) };
                 if (network != null && IsIDeviceInterface(item)) row["network"]["transferAreas"] = TransferAreas(network);

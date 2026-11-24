@@ -16,7 +16,7 @@ namespace TiaMcp.Openness.V21
     {
         // Static storage/call/binding evidence for one exact FB or FC. Every row names its source
         // (native xref, exported interface or exported network code); runtime call context is never proven.
-        private JObject InstanceLookup(JObject args)
+        private JObject LookUpInstances(JObject args)
         {
             if (string.IsNullOrWhiteSpace(args.Value<string>("blockPath")) && string.IsNullOrWhiteSpace(args.Value<string>("blockName")))
                 throw new BridgeException("InvalidRequest", "An exact FB or FC blockPath or blockName is required.");

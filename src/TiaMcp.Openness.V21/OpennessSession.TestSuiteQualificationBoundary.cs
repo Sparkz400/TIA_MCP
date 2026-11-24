@@ -14,7 +14,7 @@ namespace TiaMcp.Openness.V21
     {
         private sealed partial class NativeStyleBoundary
         {
-            private QualificationLease qualificationLease;
+            private QualificationLease heldLease;
             private string Rule => context["run"]["definitions"][0].Value<string>("name");
             private bool Application => context["application"] is JObject;
             private bool SystemTest => context["application"]?.Value<string>("executionMode") == "endpoint";
@@ -33,7 +33,7 @@ namespace TiaMcp.Openness.V21
                     : owner.TestSuiteOwnedSimulator(context["application"].Value<string>("simulatorTicket"));
                 if (instanceName != null && instanceName != simulator.Value<string>("instanceName")) throw new BridgeException("SimulationTargetMismatch", "The owned instance changed between observations.");
                 instanceName = simulator.Value<string>("instanceName");
-                var target = owner.TsTarget(project, selector, manifest, Profile);
+                var target = owner.ResolveTestSuiteTarget(project, selector, manifest, Profile);
                 var probes = owner.TsProbes(root, output, target, context["operation"]["plan"]["resources"][0].Value<string>("resourceKey"), SystemTest ? TsSystemProbes : TsApplicationProbes);
                 var definition = Definition(manifest, target, output);
                 var scope = QualificationScope(definition);
@@ -66,7 +66,7 @@ namespace TiaMcp.Openness.V21
                 if (owner._testSuiteUiProof["challenge"].Value<bool?>("requireLicenseCheck") != true)
                     throw new BridgeException("TargetPrerequisiteMissing", "Execution admission requires a fresh license observation, not a reopen-only proof.");
                 string output = NewDirectory("observation");
-                var target = owner.TsTarget(project, selector, manifest);
+                var target = owner.ResolveTestSuiteTarget(project, selector, manifest);
                 var probes = owner.TsProbes(root, output, target, context["operation"]["plan"]["resources"][0].Value<string>("resourceKey"));
                 var definition = owner.TsDefinition(project, selector, Rule, manifest, target, output);
                 var scope = QualificationScope(definition);
@@ -97,10 +97,10 @@ namespace TiaMcp.Openness.V21
                 var locked = reopened;
                 if (!Application)
                 {
-                    qualificationLease.ObserveUi(() => owner.TsObserveUi(project, selector, root, Rule, reopened, "reopen", false));
+                    heldLease.ObserveUi(() => owner.TsObserveUi(project, selector, root, Rule, reopened, "reopen", false));
                     locked = Capture(); Equal(baseline, locked); owner.TsRequireUi(project, Rule, locked);
                 }
-                string output = NewDirectory("reopened-scope"); var target = owner.TsTarget(project, selector, locked, Profile);
+                string output = NewDirectory("reopened-scope"); var target = owner.ResolveTestSuiteTarget(project, selector, locked, Profile);
                 var scope = QualificationScope(Definition(locked, target, output));
                 var scopeArtifact = ScopeArtifact(scope, output);
                 var reopenArtifact = Save(Path.Combine(directory, "fresh-reopen.json"), new JObject { ["beforeEpoch"] = beforeEpoch,
@@ -156,7 +156,7 @@ namespace TiaMcp.Openness.V21
                     manifest = Capture(); Equal(baseline, manifest);
                     if (!Application)
                     {
-                        qualificationLease.ObserveUi(() => owner.TsObserveUi(project, selector, root, Rule, manifest, "reconcile-" + phase, false));
+                        heldLease.ObserveUi(() => owner.TsObserveUi(project, selector, root, Rule, manifest, "reconcile-" + phase, false));
                         var locked = Capture(); Equal(baseline, locked); owner.TsRequireUi(project, Rule, locked); proof = owner._testSuiteUiProofPath;
                     }
                 }
