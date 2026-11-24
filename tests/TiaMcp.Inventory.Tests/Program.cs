@@ -375,7 +375,8 @@ foreach (var (tool, schema) in outputSchemas)
     var text = schema.GetRawText();
     Check(schema.GetProperty("type").GetString() == "object" && schema.GetProperty("anyOf").EnumerateArray().Any(a => a.TryGetProperty("$ref", out var r) && r.GetString() == "#/$defs/error")
         && schema.GetProperty("$defs").TryGetProperty("error", out _), tool + " schema admits the refusal envelope");
-    Check(!text.Contains("\"prefixItems\"") && !Regex.IsMatch(text, "\"\\$ref\":\"(?!#/\\$defs/)"), tool + " schema has only local references and no prefixItems");
+    // review_* schemas per record kind (tool.kind) are served only as tia://output-schemas resources, read by 2020-12 validators.
+    Check((tool.Contains('.') || !text.Contains("\"prefixItems\"")) &&!Regex.IsMatch(text, "\"\\$ref\":\"(?!#/\\$defs/)"), tool + " schema has only local references and no prefixItems");
 }
 var wrapped = ToolSurface.WithError(JsonDocument.Parse("{\"type\":\"object\",\"properties\":{\"self\":{\"$ref\":\"#\"}}}").RootElement);
 Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties").GetProperty("self").GetProperty("$ref").GetString() == "#/$defs/result"

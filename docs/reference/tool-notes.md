@@ -455,3 +455,11 @@ Review supplied public web application configuration and one selected applicatio
 ## xref_query
 
 Read native TIA cross-references for an offline block, including call/read/write locations where supplied by Siemens. Member references may have text only; unresolved coverage is reported. memberPath (relative to the block, e.g. Real[210], Real[200..220] or Station.Downholder.Enable) returns only locations of those members or elements, each with memberMatch: exact (member or constant index in range), indirect (variable index), wholeArray (array used without index) or container (containing structure or the whole block used); only matches take maxItems, and complete=true with no exact rows means no constant-index use.
+
+## plc_physical_download
+
+Download the selected PLC's software (softwareScope changes, the default, or all; hardware:true adds the hardware configuration) to a REAL PLC. This can stop the PLC and move the machine it controls: confirm the machine is in a safe state first. Required: acknowledgeLiveTarget:true, expectedPlcName equal to the selected PLC's name, the explicit route (pcInterface, targetInterface, expectedAddress as in plc_physical_online_compare) and a saved project. TIA's questions are answered only from acknowledgements: a stop needs acknowledgeStop, a data block reinitialization needs acknowledgeReinitialize and acknowledgeStop (otherwise actual values are kept where TIA allows it), startAfterDownload starts the CPU afterwards; any other question, a configuration password or a login stops the download. The operating state afterwards is not observed. Not qualified on a physical PLC yet; check every result in the TIA Portal.
+
+## plc_physical_online_compare
+
+Go online to a real PLC, run PlcSoftware.CompareToOnline and go offline again. Writes nothing to the PLC. The route is explicit: pcInterface (and pcInterfaceNumber, default 1) and targetInterface from plc_physical_targets, mode (default PN/IE), and expectedAddress, which must be an address the project configures for this CPU. PLCSIM interfaces are refused. Login and password challenges are never answered (PhysicalAuthenticationRequired); a TLS certificate is trusted only when its SHA-256 equals trustedCertificateSha256, which you check out of band. Not qualified on a physical PLC yet; check every result in the TIA Portal.
