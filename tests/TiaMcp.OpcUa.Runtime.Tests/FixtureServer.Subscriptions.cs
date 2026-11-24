@@ -5,13 +5,13 @@ namespace TiaMcp.OpcUa.Runtime.Tests;
 internal sealed partial class FixtureServer
 {
     private readonly Dictionary<uint,string> subscriptionHandles=new();
-    private int publishOrdinal, activePublishes;
+    private int publishOrdinal, dataOrdinal, duplicateOrdinal, activePublishes;
     internal int ActivePublishes=>Volatile.Read(ref activePublishes);
     private NotificationMessage? firstMessage;
     public override async Task<CreateSubscriptionResponse> CreateSubscriptionAsync(SecureChannelContext channel,RequestHeader header,
         double interval,uint lifetime,uint keepAlive,uint maximum,bool enabled,byte priority,CancellationToken ct)
     {
-        publishOrdinal=0;firstMessage=null;subscriptionHandles.Clear();
+        publishOrdinal=0;dataOrdinal=0;duplicateOrdinal=0;firstMessage=null;subscriptionHandles.Clear();
         var response=await base.CreateSubscriptionAsync(channel,header,Mode=="subscriptionLongKeepAlive"?1000:Math.Max(200,interval),Math.Max(60,lifetime),Math.Max(2,keepAlive),maximum,enabled,priority,ct);
         Audit.Enqueue(new {operation="SubscriptionCreated",requestedInterval=interval,requestedLifetime=lifetime,requestedKeepAlive=keepAlive,
             maximumNotifications=maximum,subscriptionId=response.SubscriptionId,revisedInterval=response.RevisedPublishingInterval,
@@ -50,13 +50,18 @@ internal sealed partial class FixtureServer
         {
         if(Mode=="subscriptionPublishDenied")throw new ServiceResultException(StatusCodes.BadUserAccessDenied);
         var response=await base.PublishAsync(channel,header,acks,ct);publishOrdinal++;
+        // Faults that drop or repeat "the first message" key on the first message that carries data. Whether a
+        // keep-alive precedes it depends on whether the first values or events were queued before the
+        // server's first publishing cycle, which is timing the test does not own (load delays it past 200 ms).
+        bool firstData=dataOrdinal==0 && response.NotificationMessage.NotificationData.Count>0;
+        if(response.NotificationMessage.NotificationData.Count>0)dataOrdinal++;
         if(DropPublishResponses>0)
         {
             Interlocked.Decrement(ref DropPublishResponses);
             Audit.Enqueue(new {operation="FixtureLostPublishResponse",sequence=response.NotificationMessage.SequenceNumber});
             throw new ServiceResultException(StatusCodes.BadConnectionClosed);
         }
-        if(Mode is "subscriptionGap" or "subscriptionRepublishUnavailable" or "subscriptionRepublishStatus" && publishOrdinal==1 || Mode=="subscriptionGapAfterRecovery" && publishOrdinal==2)
+        if(Mode is "subscriptionGap" or "subscriptionRepublishUnavailable" or "subscriptionRepublishStatus" && firstData || Mode=="subscriptionGapAfterRecovery" && publishOrdinal==2)
         {
             Audit.Enqueue(new {operation="FixtureDroppedPublish",sequence=response.NotificationMessage.SequenceNumber});
             var acknowledgementResults=response.Results;
@@ -66,8 +71,8 @@ internal sealed partial class FixtureServer
         Normalize(response.NotificationMessage);
         if(Mode=="subscriptionDuplicate")
         {
-            if(publishOrdinal==1)firstMessage=(NotificationMessage)response.NotificationMessage.Clone();
-            if(publishOrdinal==2)response.NotificationMessage=(NotificationMessage)firstMessage!.Clone();
+            if(firstData){firstMessage=(NotificationMessage)response.NotificationMessage.Clone();duplicateOrdinal=publishOrdinal+1;}
+            else if(publishOrdinal==duplicateOrdinal)response.NotificationMessage=(NotificationMessage)firstMessage!.Clone();
         }
         if(Mode=="subscriptionOversize")
             foreach(var change in response.NotificationMessage.NotificationData.Select(x=>x.Body).OfType<DataChangeNotification>())
