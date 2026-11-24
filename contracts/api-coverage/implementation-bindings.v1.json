@@ -2107,8 +2107,8 @@
     },
     {
       "path": "src/TiaMcp.Host/PhysicalPlcTools.cs",
-      "sha256": "58632232c1f4b2db869df00a06a1ce03eecd22ffd4658a1d8a4ec6b5132065e3",
-      "bytes": 5898
+      "sha256": "5c81f45517b1e79b4ee11e6fbf00c92eaf9f50f5b46f2c25a6a50d04a7789e3a",
+      "bytes": 5436
     },
     {
       "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
