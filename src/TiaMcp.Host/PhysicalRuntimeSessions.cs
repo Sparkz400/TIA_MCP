@@ -350,7 +350,7 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         }
         catch (BridgeException error) { errorCode = error.Code; }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException)
-        { errorCode = "RuntimeArtifactWriteFailed"; try { File.Delete(temporary); } catch (IOException) { } catch (UnauthorizedAccessException) { } }
+        { errorCode = "RuntimeArtifactWriteFailed"; PackageStorage.TryDelete(temporary); }
         finally
         {
             try { closed = await entry.Client.CloseTicketAsync(ticket.Ticket!, CancellationToken.None); } catch (BridgeException) { }
