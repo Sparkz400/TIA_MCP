@@ -112,7 +112,7 @@ def main():
         change = next(row for row in compared['changes'] if row.get('afterObjectPath') == plc_path + '/blocks/' + block_name)
         require('logicChanged' in change['changedFields'] and 'documentChanged' in change['changedFields'], 'Native implementation change was not detected.')
         require(compared['contentUnknownBlocks'] > 0 and compared['wholeProjectEquivalent'] is False, 'Omitted exports lost their unknown state.')
-        call('project_health_report', {'reviewId': report['afterId']})
+        call('project_health_review', {'reviewId': report['afterId']})
         detach_owned(call)
         attached = False
         close()
@@ -121,7 +121,7 @@ def main():
         client = connect()
         require(call('project_snapshot_compare', {'beforeId': report['beforeId'], 'afterId': report['afterId']})['changes'] == compared['changes'], 'Restart changed persisted comparison.')
         require(call('project_snapshot_search', {'reviewId': report['afterId'], 'query': 'ReviewMarker2'})['totalObservedHits'] >= 1, 'Restart lost source search.')
-        call('project_health_report', {'reviewId': report['afterId']})
+        call('project_health_review', {'reviewId': report['afterId']})
         close()
         report['offlineRestartWithoutWorker'] = not report['hostExits'][-1]['workerExits']
         require(report['offlineRestartWithoutWorker'], 'Offline review unexpectedly launched a native worker.')

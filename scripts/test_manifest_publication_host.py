@@ -70,38 +70,38 @@ def main():
     try:
         start()
         upload = client.tool('artifact_upload_begin', {'fileName': 'evidence.bin', 'expectedBytes': len(data), 'sha256': digest})
-        uid = upload['uploadId']
-        directory = artifacts / 'library-intake' / 'uploads' / uid
+        uid = upload['uploadRef']
+        directory = artifacts / 'library-intake' / 'uploads' / uid.removeprefix('upload:')
         manifest = directory / 'upload.json'
-        chunk = {'uploadId': uid, 'offset': 0, 'data': base64.b64encode(data).decode()}
+        chunk = {'uploadRef': uid, 'offset': 0, 'data': base64.b64encode(data).decode()}
         if os.name == 'nt':
             intended = blocked_manifest(manifest, 'artifact_upload_chunk', chunk)
             check((directory / 'data.bin').read_bytes() == data, 'Unacknowledged data tail is retained before retry')
-            state = client.tool('artifact_upload_status', {'uploadId': uid})
+            state = client.tool('artifact_upload_status', {'uploadRef': uid})
             check(state['state'] == 'receiving' and state['receivedBytes'] == 0, 'Failed chunk does not acknowledge uncommitted bytes')
-            refuse('artifact_upload_commit', {'uploadId': uid}, 'UploadIncomplete')
+            refuse('artifact_upload_commit', {'uploadRef': uid}, 'UploadIncomplete')
         written = client.tool('artifact_upload_chunk', chunk)
         check(written['receivedBytes'] == len(data) and (directory / 'data.bin').read_bytes() == data, 'Retry reconciles the data tail without duplicate bytes')
         if os.name == 'nt': check(manifest.read_bytes() == intended, 'Successful chunk publishes the exact previously prepared state')
         if os.name == 'nt':
-            intended = blocked_manifest(manifest, 'artifact_upload_commit', {'uploadId': uid})
-            check(client.tool('artifact_upload_status', {'uploadId': uid})['state'] == 'receiving', 'Failed commit remains uncommitted')
-        committed = client.tool('artifact_upload_commit', {'uploadId': uid})
+            intended = blocked_manifest(manifest, 'artifact_upload_commit', {'uploadRef': uid})
+            check(client.tool('artifact_upload_status', {'uploadRef': uid})['state'] == 'receiving', 'Failed commit remains uncommitted')
+        committed = client.tool('artifact_upload_commit', {'uploadRef': uid})
         check(committed['state'] == 'committed', 'Explicit commit retry succeeds after lock release')
         if os.name == 'nt': check(manifest.read_bytes() == intended, 'Commit publishes the exact prepared bytes')
         retained = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in directory.glob('*.tmp')}
         close(); start()
-        check(client.tool('artifact_upload_commit', {'uploadId': uid}) == committed, 'Restart reconciles an already committed upload')
+        check(client.tool('artifact_upload_commit', {'uploadRef': uid}) == committed, 'Restart reconciles an already committed upload')
         check((directory / 'data.bin').read_bytes() == data, 'Committed original survives restart')
         check({p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in directory.glob('*.tmp')} == retained, 'Restart preserves failed publication evidence')
         other = client.tool('artifact_upload_begin', {'fileName': 'abort.bin', 'expectedBytes': len(data), 'sha256': digest})
-        client.tool('artifact_upload_chunk', {**chunk, 'uploadId': other['uploadId']})
-        other_dir = artifacts / 'library-intake' / 'uploads' / other['uploadId']
+        client.tool('artifact_upload_chunk', {**chunk, 'uploadRef': other['uploadRef']})
+        other_dir = artifacts / 'library-intake' / 'uploads' / other['uploadRef'].removeprefix('upload:')
         if os.name == 'nt':
-            blocked_manifest(other_dir / 'upload.json', 'artifact_upload_abort', {'uploadId': other['uploadId']})
+            blocked_manifest(other_dir / 'upload.json', 'artifact_upload_abort', {'uploadRef': other['uploadRef']})
             check((other_dir / 'data.bin').read_bytes() == data, 'Failed abort cannot delete unacknowledged data')
-            check(client.tool('artifact_upload_status', {'uploadId': other['uploadId']})['state'] == 'receiving', 'Failed abort preserves receiving state')
-        aborted = client.tool('artifact_upload_abort', {'uploadId': other['uploadId']})
+            check(client.tool('artifact_upload_status', {'uploadRef': other['uploadRef']})['state'] == 'receiving', 'Failed abort preserves receiving state')
+        aborted = client.tool('artifact_upload_abort', {'uploadRef': other['uploadRef']})
         check(aborted['state'] == 'aborted' and not (other_dir / 'data.bin').exists(), 'Successful explicit abort deletes only its own upload data')
         check((directory / 'data.bin').read_bytes() == data, 'Other committed upload remains unchanged')
         close()

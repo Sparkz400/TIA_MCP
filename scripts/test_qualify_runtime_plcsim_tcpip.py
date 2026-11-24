@@ -261,9 +261,9 @@ class Host:
             return p.acquisition(tool, a)
         if tool in ("device_online_browse", "device_identify"):
             return p.inventory_tool(self, tool, a)
-        if tool == "device_inventory":  # Two pages: the runner must follow the cursor.
+        if tool == "device_inventory":  # Two pages: the runner must follow nextOffset.
             return {"snapshot": {"snapshotId": "s1", "coverage": {"scopeComplete": True, "truncated": False}},
-                    "rows": ROWS[2:] if a.get("cursor") else ROWS[:2], "nextCursor": None if a.get("cursor") else "c1"}
+                    "rows": ROWS[2:] if a.get("offset") else ROWS[:2], "nextOffset": None if a.get("offset") else 2}
         if tool == "certificate_inspect":
             p.inspections += 1
             return {"devices": [{"certificates": [CERTS["plc"]] + ([CERTS["web"], CERTS["ua"]] if p.inspections > 1 else [])}]}

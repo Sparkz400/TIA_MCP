@@ -53,9 +53,9 @@ def install_retained(store):
 def upload(client, data, name="request.json"):
     status = client.tool("artifact_upload_begin", {"fileName": name, "expectedBytes": len(data), "sha256": digest(data)})
     for offset in range(0, len(data), status["maxChunkBytes"]):
-        client.tool("artifact_upload_chunk", {"uploadId": status["uploadId"], "offset": offset,
+        client.tool("artifact_upload_chunk", {"uploadRef": status["uploadRef"], "offset": offset,
                                               "data": base64.b64encode(data[offset:offset + status["maxChunkBytes"]]).decode()})
-    return client.tool("artifact_upload_commit", {"uploadId": status["uploadId"]})["artifactRef"]
+    return client.tool("artifact_upload_commit", {"uploadRef": status["uploadRef"]})["artifactRef"]
 
 
 def author(client, request):

@@ -31,7 +31,7 @@ def main():
         rows = []
         offset = 0
         while True:
-            page = client.tool("feature_catalog", {"offset": offset, "maxItems": 7})
+            page = client.tool("feature_catalog", {"offset": offset, "count": 7})
             assert page["targetAvailabilityProbed"] is False
             assert len(page["features"]) <= 7
             rows.extend(page["features"])
@@ -44,7 +44,7 @@ def main():
         external_catalog = json.loads((ROOT / 'contracts/feature-catalog.v1.json').read_text(encoding='utf-8'))
         report['steps'].append({'name':'package catalog comparison without native workers',
                                 **verify_catalog(client, external_catalog, tool_names)})
-        backlog = client.tool("feature_catalog", {"implementationStatus": "not_implemented", "maxItems": 200})
+        backlog = client.tool("feature_catalog", {"implementationStatus": "not_implemented", "count": 200})
         assert backlog["features"] and all(not row["mcpTools"] for row in backlog["features"])
         report["steps"].append({"name": "unimplemented backlog has no callable bindings", "count": len(backlog["features"])})
         startup = client.tool("feature_catalog", {"featureId": "sim_state"})
@@ -52,7 +52,7 @@ def main():
         evidence = {row['id']: row for row in startup['evidence']}
         assert evidence[startup["features"][0]["qualification"]["evidenceIds"][0]]['status'] == 'passed'
         report["steps"].append({"name": "sim_state is verified by the record that exercised all four actions"})
-        for arguments, code in [({"featureId": "invented"}, "FeatureNotFound"), ({"maxItems": 0}, "InvalidRequest")]:
+        for arguments, code in [({"featureId": "invented"}, "FeatureNotFound"), ({"count": 0}, "InvalidRequest")]:
             response = client.request("tools/call", {"name": "feature_catalog", "arguments": arguments})
             assert response.get("isError")
             assert response["structuredContent"]["error"]["code"] == code

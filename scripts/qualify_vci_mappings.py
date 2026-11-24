@@ -310,7 +310,7 @@ def compare(run, label, baseline, native, remote):
     def check():
         result = h.tool("vci_package_compare", {"baselineRef": baseline["recordRef"], "projectRef": native["recordRef"], "workspaceRef": remote["recordRef"],
                         "expectedHashes": {"baseline": baseline["manifestSha256"], "project": native["manifestSha256"], "workspace": remote["manifestSha256"]}})
-        rows = json.loads(download(h, "vci_artifact_read", result["recordRef"], name="comparison.json"))["rows"]
+        rows = json.loads(download(h, "review_artifact_read", result["recordRef"], kind="vci", name="comparison.json"))["rows"]
         require(result["conflictCount"] == 1 and len(rows) == 1 and rows[0]["state"] == "divergentChange" and rows[0]["projectChange"] == "modified"
                 and rows[0]["workspaceChange"] == "modified", "The three-way plan does not report the two-sided conflict: %s" % rows)
         return {**result, "row": rows[0]}

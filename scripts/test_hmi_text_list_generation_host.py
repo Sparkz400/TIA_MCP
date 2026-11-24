@@ -33,10 +33,10 @@ def main():
         raw = json.dumps(request, ensure_ascii=False).encode()
         begin = client.tool('artifact_upload_begin', dict(fileName='generation.json', expectedBytes=len(raw), sha256=hashlib.sha256(raw).hexdigest()))
         for offset in range(0, len(raw), begin['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', dict(uploadId=begin['uploadId'], offset=offset, data=base64.b64encode(raw[offset:offset + begin['maxChunkBytes']]).decode()))
-        return begin['uploadId'], client.tool('artifact_upload_commit', dict(uploadId=begin['uploadId']))['artifactRef']
+            client.tool('artifact_upload_chunk', dict(uploadRef=begin['uploadRef'], offset=offset, data=base64.b64encode(raw[offset:offset + begin['maxChunkBytes']]).decode()))
+        return begin['uploadRef'], client.tool('artifact_upload_commit', dict(uploadRef=begin['uploadRef']))['artifactRef']
     def refuse(client, identity):
-        result = client.request('tools/call', dict(name='hmi_text_list_author', arguments=dict(recordId=identity)))
+        result = client.request('tools/call', dict(name='hmi_text_list_author', arguments=dict(recordRef=identity)))
         check(result.get('isError') and result['structuredContent']['error']['code'] == 'ArtifactChanged', 'Rehashed/tampered authoring refuses')
     def start():
         missing = output / 'absent-worker.exe'
@@ -61,20 +61,20 @@ def main():
                 verify(request, receipt, read)
                 check(True, 'Independent original PLC/binding/intent/YAML/peer verification')
                 check(receipt == client.tool('hmi_text_list_author', dict(uploadRef=reference)), 'Generation retry deterministic')
-                client.tool('artifact_upload_release', dict(uploadId=upload_id))
+                client.tool('artifact_upload_release', dict(uploadRef=upload_id))
                 rows.append((request, receipt))
             for conflict in fixture['conflicts']:
-                receipt = client.tool('hmi_text_list_author', dict(recordId=conflict['receipt']['recordId']))
+                receipt = client.tool('hmi_text_list_author', dict(recordRef=conflict['receipt']['recordId']))
                 check(receipt == conflict['receipt'] and receipt['status'] == 'conflict' and receipt['files'] == [], 'Conflict survives Host reopen: ' + conflict['label'])
                 verify(conflict['request'], receipt, read)
-            prior = client.tool('hmi_text_list_author', dict(recordId=fixture['migration']['recordId']))
+            prior = client.tool('hmi_text_list_author', dict(recordRef=fixture['migration']['recordId']))
             check(prior == fixture['migration'], 'Prior v1 author bytes accepted with explicit missing-lineage gap')
         finally:
             close(client)
         client = start()
         try:
             for request, receipt in rows:
-                reopened = client.tool('hmi_text_list_author', dict(recordId=receipt['recordId']))
+                reopened = client.tool('hmi_text_list_author', dict(recordRef=receipt['recordId']))
                 check(reopened == receipt, 'Fresh Host reopens exact released generation result')
                 verify(request, reopened, read)
             request, receipt = rows[1]
@@ -103,7 +103,7 @@ def main():
             try: verify(request, forged, read)
             except AssertionError: check(True, 'Independent YAML oracle rejects changed content with honest hash')
             else: raise AssertionError('Changed YAML accepted')
-            check(client.tool('hmi_text_list_author', dict(recordId=receipt['recordId'])) == receipt, 'Restored source reopens unchanged')
+            check(client.tool('hmi_text_list_author', dict(recordRef=receipt['recordId'])) == receipt, 'Restored source reopens unchanged')
         finally:
             close(client)
         report['completed'] = True

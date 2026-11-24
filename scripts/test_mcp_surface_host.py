@@ -15,12 +15,12 @@ from test_product_version import product_version
 
 OUTPUT_CONTRACTS = ['automationml-workflow.v1', 'graph-workflow.v1', 'opc-ua-workflow.v1', 'project-review-import.v1', 'vci-workspace.v1',
                     'opcua-runtime-subscription.v1', 'diagnostic-watch-plan.v1']
-REVIEW_TOOLS = {'access_review', 'access_review_page', 'addin_selection_review', 'addin_selection_page', 'connection_review',
+REVIEW_TOOLS = {'access_review', 'access_review_page', 'addin_selection_review', 'addin_selection_review_page', 'connection_review',
                 'connection_review_page', 'db_snapshot_review', 'db_snapshot_review_page', 'hmi_component_review',
-                'hmi_component_review_page', 'multiuser_observation_review', 'multiuser_observation_page', 'public_certificate_review',
-                'public_certificate_review_page', 'safety_evidence_review', 'safety_evidence_report', 'software_unit_review',
-                'software_unit_review_page', 'teamcenter_observation_review', 'teamcenter_observation_page', 'technology_profile_review',
-                'technology_profile_report', 'web_application_review', 'web_application_review_page'}
+                'hmi_component_review_page', 'multiuser_observation_review', 'multiuser_observation_review_page', 'public_certificate_review',
+                'public_certificate_review_page', 'safety_evidence_review', 'safety_evidence_review_page', 'software_unit_review',
+                'software_unit_review_page', 'teamcenter_observation_review', 'teamcenter_observation_review_page', 'technology_profile_review',
+                'technology_profile_review_page', 'web_application_review', 'web_application_review_page'}
 TYPED_TOOLS = {'artifact_read', 'artifact_upload_begin', 'artifact_upload_chunk', 'artifact_upload_status', 'artifact_upload_commit',
                'artifact_upload_abort', 'runtime_ua_connect', 'runtime_ua_status', 'runtime_ua_disconnect', 'runtime_ua_read',
                'runtime_ua_browse', 'runtime_ua_credential_binding', 'runtime_web_connect', 'runtime_web_status', 'runtime_web_disconnect',
@@ -29,6 +29,11 @@ TYPED_TOOLS = {'artifact_read', 'artifact_upload_begin', 'artifact_upload_chunk'
 REFUSAL = {'error': {'code': 'Refused', 'message': 'refused'}}
 ARTIFACT_TEMPLATE, FEATURE_TEMPLATE, REVIEW_TEMPLATE = 'tia://artifacts/{+path}', 'tia://feature-catalog/{featureId}', 'tia://project-reviews/{reviewId}'
 CONTRACT_TEMPLATE, PAYLOAD_TEMPLATE = 'tia://contracts/{name}', 'tia://change-payloads/{kind}'
+OUTPUT_SCHEMA_TEMPLATE, OUTPUT_SCHEMA_META, INLINE_LIMIT = 'tia://output-schemas/{tool}', 'tiaMcp/outputSchema', 1024
+RECORD_TOOLS = {'review_list', 'review_reopen', 'review_page', 'review_artifact_read'}
+# Record kinds whose family contract declares the review_* results (x-tool-contracts).
+RECORD_KIND_CONTRACTS = {'automationml': 'automationml-workflow.v1', 'graph': 'graph-workflow.v1', 'opcua': 'opc-ua-workflow.v1',
+                         'vci': 'vci-workspace.v1', 'composite_engineering': 'composite-engineering-workflow.v1', 'runtime_handoff': 'runtime-handoff.v1'}
 CANARY = 'surface-canary-7f3a'
 PROMPT_ARGUMENTS = {'safe_change': {'goal': 'rename tag Start to StartButton'}, 'project_health': {},
                     'block_test': {'behavior': 'Motor_On follows Start'}, 'diagnose_fault': {'symptom': 'conveyor stops'}}
@@ -77,7 +82,7 @@ def main():
     catalog = json.loads((ROOT / 'contracts/feature-catalog.v1.json').read_text(encoding='utf-8'))
     change_kinds = {feature['changeKind'] for feature in catalog['features'] if feature['changeKind']}
     contracts = {name: json.loads((ROOT / 'contracts' / (name + '.schema.json')).read_text(encoding='utf-8')) for name in OUTPUT_CONTRACTS}
-    expected_schemas = {tool for contract in contracts.values() for tool in contract['x-tool-contracts']} | REVIEW_TOOLS | TYPED_TOOLS
+    expected_schemas = {tool for contract in contracts.values() for tool in contract['x-tool-contracts'] if tool not in RECORD_TOOLS} | REVIEW_TOOLS | TYPED_TOOLS
 
     client, initialized = start()
     try:
@@ -89,27 +94,45 @@ def main():
         default_count = len(tools)
         titles = [tool.get('title') for tool in tools.values()]
         check(all(title and len(title) <= 60 for title in titles) and len(set(titles)) == len(titles), 'Every tool has a short, distinct title')
-        with_schema = {name for name, tool in tools.items() if 'outputSchema' in tool}
-        check(with_schema == expected_schemas, 'Output schemas exactly for the contract-validated and typed-result tools')
+        def read_json(uri):
+            return json.loads(client.request('resources/read', {'uri': uri})['contents'][0]['text'])
+        inline = {name for name, tool in tools.items() if 'outputSchema' in tool}
+        referenced = {name: tool['_meta'][OUTPUT_SCHEMA_META] for name, tool in tools.items() if OUTPUT_SCHEMA_META in (tool.get('_meta') or {})}
+        with_schema = inline | referenced.keys()
+        check(with_schema == expected_schemas | RECORD_TOOLS and not inline & referenced.keys(),
+              'Output schemas, inline or referenced, exactly for the contract-validated, typed-result and record tools')
+        check(all(len(json.dumps(tools[name]['outputSchema'], separators=(',', ':'))) <= INLINE_LIMIT for name in inline)
+              and all(referenced[name] == 'tia://output-schemas/' + name + ('.{kind}' if name in RECORD_TOOLS else '') for name in referenced),
+              'Only small output schemas are inline; larger ones and the record tools name their tia://output-schemas resource')
         read_only = {name for name, tool in tools.items() if tool.get('annotations', {}).get('readOnlyHint')}
-        report['outputSchemas'] = {'tools': len(with_schema), 'readOnly': len(with_schema & read_only), 'readOnlyTools': len(read_only)}
+        report['outputSchemas'] = {'tools': len(with_schema), 'inline': len(inline), 'readOnly': len(with_schema & read_only), 'readOnlyTools': len(read_only)}
+        schemas = {name: tools[name]['outputSchema'] for name in inline}
+        schemas |= {name: read_json(uri) for name, uri in referenced.items() if name not in RECORD_TOOLS}
+        for name in RECORD_TOOLS:
+            for kind, contract in RECORD_KIND_CONTRACTS.items():
+                if name in json.loads((ROOT / 'contracts' / (contract + '.schema.json')).read_text(encoding='utf-8'))['x-tool-contracts']:
+                    schemas[name + '.' + kind] = read_json(referenced[name].replace('{kind}', kind))
+        check(raw(client, 'resources/read', {'uri': 'tia://output-schemas/review_page.translation'})[0].get('error') is not None,
+              'A record kind without a declared result contract has no output schema resource')
         validators = {}
-        for name in with_schema:
-            schema = tools[name]['outputSchema']
+        for name, schema in schemas.items():
             Draft202012Validator.check_schema(schema)
             text = json.dumps(schema)
-            check(schema['type'] == 'object' and '$schema' not in schema and 'prefixItems' not in text
+            # Inline schemas reach draft-07 client validators; the resources are read by 2020-12 validators only.
+            check(schema['type'] == 'object' and '$schema' not in schema and (name not in inline or 'prefixItems' not in text)
                   and all(ref.startswith('#/$defs/') for ref in re.findall(r'"\$ref": "([^"]*)"', text)),
-                  name + ' output schema is a self-contained plain object schema without draft-07-incompatible keywords')
+                  name + ' output schema is a self-contained plain object schema' + (' without draft-07-incompatible keywords' if name in inline else ''))
             validators[name] = Draft202012Validator(schema)
             validators[name].validate(REFUSAL)
         check(True, 'Every output schema admits the Host refusal envelope')
-        for name, arguments in (('opcua_list', {}), ('automationml_list', {}), ('graph_list', {}),
-                                ('opcua_reopen', {'recordRef': 'nodeset:' + '0' * 32 + ':' + '0' * 64}),
-                                ('automationml_reopen', {'recordRef': 'automationml:' + '0' * 32 + ':' + '0' * 64})):
+        for name, arguments in (('review_list', {'kind': 'opcua'}), ('review_list', {'kind': 'automationml'}), ('review_list', {'kind': 'graph'}),
+                                ('review_reopen', {'kind': 'opcua', 'recordRef': 'nodeset:' + '0' * 32 + ':' + '0' * 64}),
+                                ('review_reopen', {'kind': 'automationml', 'recordRef': 'automationml:' + '0' * 32 + ':' + '0' * 64}),
+                                ('review_list', {'kind': 'composite_engineering'}), ('review_list', {'kind': 'runtime_handoff'})):
             response, notes = raw_call(client, name, arguments)
             result = response['result']
-            validators[name].validate(result['structuredContent'])
+            validators[name + '.' + arguments['kind']].validate(result['structuredContent'])
+            name = name + ' ' + arguments['kind']
             check(True, name + (' error' if result.get('isError') else ' result') + ' conforms to its advertised output schema')
             check(not any(note.get('method') == 'notifications/message' for note in notes), 'No log notifications before the client sets a level')
 
@@ -121,16 +144,16 @@ def main():
                 ('runtime_web_credential_binding', {'endpoint': 'https://192.0.2.10', 'peerCertificateSha256': 'b' * 64, 'user': 'operator'}, False),
                 ('runtime_ua_status', {'attemptId': '0' * 32}, True), ('runtime_web_status', {'attemptId': '0' * 32}, True),
                 ('runtime_ua_subscription_status', {'captureId': '0' * 32}, True), ('testsuite_style_job_status', {'jobId': '0' * 32}, True),
-                ('access_review_page', {'recordId': '0' * 64}, True), ('diagnostic_watch_plan', {'planId': '0' * 32, 'request': {}}, True),
+                ('access_review_page', {'recordRef': '0' * 64}, True), ('diagnostic_watch_plan', {'planId': '0' * 32, 'request': {}}, True),
                 ('artifact_read', {'path': '../outside.txt'}, True)):
             result = client.request('tools/call', {'name': name, 'arguments': arguments})
             check(name in with_schema and bool(result.get('isError')) == refused and 'structuredContent' in result,
                   name + (' refusal' if refused else ' result') + ' conforms to its advertised output schema')
         data = json.dumps({'surface': CANARY}).encode()
         upload = client.request('tools/call', {'name': 'artifact_upload_begin', 'arguments': {'fileName': 'surface.json', 'expectedBytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}})['structuredContent']
-        client.request('tools/call', {'name': 'artifact_upload_chunk', 'arguments': {'uploadId': upload['uploadId'], 'offset': 0, 'data': base64.b64encode(data).decode()}})
-        client.request('tools/call', {'name': 'artifact_upload_status', 'arguments': {'uploadId': upload['uploadId']}})
-        committed = client.request('tools/call', {'name': 'artifact_upload_commit', 'arguments': {'uploadId': upload['uploadId']}})['structuredContent']
+        client.request('tools/call', {'name': 'artifact_upload_chunk', 'arguments': {'uploadRef': upload['uploadRef'], 'offset': 0, 'data': base64.b64encode(data).decode()}})
+        client.request('tools/call', {'name': 'artifact_upload_status', 'arguments': {'uploadRef': upload['uploadRef']}})
+        committed = client.request('tools/call', {'name': 'artifact_upload_commit', 'arguments': {'uploadRef': upload['uploadRef']}})['structuredContent']
         stored = os.path.join(committed['hostPath'], 'data.bin')
         chunk = client.request('tools/call', {'name': 'artifact_read', 'arguments': {'path': stored}})['structuredContent']
         check(base64.b64decode(chunk['data']) == data, 'Upload and artifact_read results conform to their typed output schemas')
@@ -138,11 +161,9 @@ def main():
         resource_templates = client.request('resources/templates/list')['resourceTemplates']
         resources = client.request('resources/list')['resources']
         templates = {template['uriTemplate'] for template in resource_templates}
-        check(templates == {ARTIFACT_TEMPLATE, FEATURE_TEMPLATE, REVIEW_TEMPLATE, CONTRACT_TEMPLATE, PAYLOAD_TEMPLATE},
-              'Artifact, saved-review, feature, contract and change-payload resource templates listed')
+        check(templates == {ARTIFACT_TEMPLATE, FEATURE_TEMPLATE, REVIEW_TEMPLATE, CONTRACT_TEMPLATE, PAYLOAD_TEMPLATE, OUTPUT_SCHEMA_TEMPLATE},
+              'Artifact, saved-review, feature, contract, change-payload and output-schema resource templates listed')
         check({'tia://contracts', 'tia://change-payloads'} <= {resource['uri'] for resource in resources}, 'Contract and payload indexes listed as resources')
-        def read_json(uri):
-            return json.loads(client.request('resources/read', {'uri': uri})['contents'][0]['text'])
         index = read_json('tia://contracts')
         on_disk = sorted(path.name for path in (ROOT / 'contracts').glob('*.json'))
         check(index['contracts'] == on_disk and index['changePayloads'] == 'tia://change-payloads', 'Every shipped contract is listed under tia://contracts')
@@ -253,7 +274,7 @@ def main():
     client, initialized = start('--toolsets', 'opcua')
     try:
         names = {tool['name'] for tool in client.request('tools/list')['tools']}
-        check(names and all(name in ('feature_catalog', 'host_build_identity') or name.startswith(('artifact_', 'opcua_')) for name in names)
+        check(names and all(name in ('feature_catalog', 'host_build_identity') or name.startswith(('artifact_', 'review_', 'opcua_')) for name in names)
               and 'artifact_upload_begin' in names and 'opcua_inspect' in names, 'Selected toolset plus base tools only')
         check('toolsets opcua' in initialized['instructions'], 'Instructions name the restricted toolsets')
         check(client.request('prompts/list')['prompts'] == [], 'Prompts whose tools are hidden are not listed')

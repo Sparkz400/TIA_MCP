@@ -95,13 +95,13 @@ def capture(run, label, review_id):
 
         aml = domains["automationMl"]
         require(aml["status"] == "native" and retained("automationMl") == [phase["automationMlRef"]], "AML capture differs: %s" % aml)
-        reopened = h.tool("automationml_reopen", {"recordRef": phase["automationMlRef"]})
+        reopened = h.tool("review_reopen", {"kind": "automationml", "recordRef": phase["automationMlRef"]})
         require(reopened.get("recordRef", phase["automationMlRef"]) == phase["automationMlRef"], "The AML record does not reopen")
 
         inspected = h.tool("connection_inspect", {"maxItems": 512})["reviewSnapshot"]["connections"]
         connections = domains["connections"]
         require(connections["status"] == "native" and retained("connections") == phase["connections"] and len(phase["connections"]) == 1, "Connection capture differs: %s" % connections)
-        rows = h.tool("connection_review_page", {"recordId": phase["connections"][0], "section": "observations", "count": 200})["rows"]
+        rows = h.tool("connection_review_page", {"recordRef": phase["connections"][0], "section": "observations", "count": 200})["rows"]
         require(len(rows) == 2 * len(inspected), "The connection review holds %d observation rows for %d connections" % (len(rows), len(inspected)))
 
         drives = domains["drives"]
@@ -117,7 +117,7 @@ def capture(run, label, review_id):
         require(technology["status"] == "native" and sources == objects and len(phase["technology"]) == len(objects), "Technology capture differs: %s / %s" % (sources, objects))
         for record in technology["records"]:
             slots = [s for s in h.tool("technology_read", {"plcPath": run.plc, "technologyPath": record["source"], "maxItems": 2000})["hardwareConnections"] if s.get("status") != "notExposed"]
-            page = h.tool("technology_profile_report", {"recordId": record["recordRef"], "section": "relationships", "count": 200})["rows"]
+            page = h.tool("technology_profile_review_page", {"recordRef": record["recordRef"], "section": "relationships", "count": 200})["rows"]
             require(len(page) == 2 * len(slots), "%s: %d relationship rows for %d exposed slots" % (record["source"], len(page), len(slots)))
         require(run.state() == before, "The capture changed the project")
         summary = {d: {"status": domains[d]["status"], "records": len(domains[d]["records"])} for d in sorted(domains)}
@@ -177,8 +177,8 @@ def rebind(run, before, after):
     data = json.dumps({"schemaVersion": "composite-engineering-request.v3", "before": before, "after": after, "mappings": [], "correspondences": [],
                        "allowDifferentProjectCopy": True}).encode("utf-8")
     begun = run.h.tool("artifact_upload_begin", {"fileName": "composite.json", "expectedBytes": len(data), "sha256": hashlib.sha256(data).hexdigest()})
-    run.h.tool("artifact_upload_chunk", {"uploadId": begun["uploadId"], "offset": 0, "data": base64.b64encode(data).decode("ascii")})
-    upload = run.h.tool("artifact_upload_commit", {"uploadId": begun["uploadId"]})["artifactRef"]
+    run.h.tool("artifact_upload_chunk", {"uploadRef": begun["uploadRef"], "offset": 0, "data": base64.b64encode(data).decode("ascii")})
+    upload = run.h.tool("artifact_upload_commit", {"uploadRef": begun["uploadRef"]})["artifactRef"]
     record = run.h.tool("composite_engineering_review", {"uploadRef": upload})["recordRef"]
     plan = run.h.tool("composite_engineering_rebind_plan", {"recordRef": record})
     return {k: plan[k] for k in ("brokenConnectionCount", "notCapturedAfterCount", "truncated", "applied")}

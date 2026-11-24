@@ -52,10 +52,10 @@ def main():
     def upload(raw):
         opened = client.tool('artifact_upload_begin', {'fileName': 'public.json', 'expectedBytes': len(raw), 'sha256': digest(raw)})
         for offset in range(0, len(raw), opened['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', {'uploadId': opened['uploadId'], 'offset': offset, 'data': base64.b64encode(raw[offset:offset + opened['maxChunkBytes']]).decode()})
-        return client.tool('artifact_upload_commit', {'uploadId': opened['uploadId']})
+            client.tool('artifact_upload_chunk', {'uploadRef': opened['uploadRef'], 'offset': offset, 'data': base64.b64encode(raw[offset:offset + opened['maxChunkBytes']]).decode()})
+        return client.tool('artifact_upload_commit', {'uploadRef': opened['uploadRef']})
     def release(incoming):
-        client.tool('artifact_upload_release', {'uploadId': incoming['uploadId']})
+        client.tool('artifact_upload_release', {'uploadRef': incoming['uploadRef']})
     def download(record, name):
         raw = bytearray()
         while True:

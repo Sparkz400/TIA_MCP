@@ -114,7 +114,7 @@ def run(client, upload, read, check, refuse, output):
             except AssertionError: check(True, 'Independent oracle rejects ' + defect)
             else: raise AssertionError('Oracle accepted ' + defect)
         records.append((value, receipt, candidates))
-    for arguments in ({}, dict(uploadRef='upload:'+'0'*32, recordId='0'*64)):
+    for arguments in ({}, dict(uploadRef='upload:'+'0'*32, recordRef='0'*64)):
         refuse(client, 'hmi_text_list_author', arguments, 'InvalidHmiComponentReview')
     for defect in ('missingTranslation', 'overlap', 'extraClaim', 'path', 'unknownReference', 'fraction'):
         invalid = copy.deepcopy(request)
@@ -145,7 +145,7 @@ def run(client, upload, read, check, refuse, output):
 
 def reopen(client, records, read, check, refuse, artifacts):
     for request, receipt, originals in records:
-        check(client.tool('hmi_text_list_author', dict(recordId=receipt['recordId'])) == receipt, 'Authoring survives Host restart and upload release')
+        check(client.tool('hmi_text_list_author', dict(recordRef=receipt['recordId'])) == receipt, 'Authoring survives Host restart and upload release')
         candidates = [read(client, row['artifact']) for row in receipt['files']]
         check(candidates == originals, 'Exact candidate bytes survive restart')
         verify(request, receipt, candidates)
@@ -153,9 +153,9 @@ def reopen(client, records, read, check, refuse, artifacts):
             path = artifacts / reference['path']; saved = path.read_bytes()
             try:
                 path.write_bytes(saved + b'tampered')
-                refuse(client, 'hmi_text_list_author', dict(recordId=receipt['recordId']), 'ArtifactChanged')
+                refuse(client, 'hmi_text_list_author', dict(recordRef=receipt['recordId']), 'ArtifactChanged')
             finally: path.write_bytes(saved)
         record = json.loads(read(client, receipt['recordArtifact'])); record['nativeQualified'] = True
         raw = json.dumps(record).encode(); identity = hashlib.sha256(raw).hexdigest()
         (artifacts / 'hmi-component-reviews' / (identity + '.author.json')).write_bytes(raw)
-        refuse(client, 'hmi_text_list_author', dict(recordId=identity), 'ArtifactChanged')
+        refuse(client, 'hmi_text_list_author', dict(recordRef=identity), 'ArtifactChanged')

@@ -495,17 +495,17 @@ def hardware_reads(r):
     def inventory(result):
         snapshot = result["snapshot"]
         require(snapshot["projectPath"] == r.project and snapshot["coverage"]["scopeComplete"] is True and snapshot["coverage"]["truncated"] is False, "Inventory incomplete")
-        require(result["nextCursor"] is None and len(result["rows"]) == snapshot["totalRows"], "A full page has a continuation")
+        require(result["nextOffset"] is None and len(result["rows"]) == snapshot["totalRows"], "A full page has a continuation")
         r.inventory = result
         return {"snapshotId": snapshot["snapshotId"], "rows": snapshot["totalRows"]}
-    r.ok("device_inventory", ("identity", "completeness"), "device_inventory of the project", "device_inventory", {"pageSize": 200}, inventory)
+    r.ok("device_inventory", ("identity", "completeness"), "device_inventory of the project", "device_inventory", {"count": 200}, inventory)
 
     def pages():
-        page = h.tool("device_inventory", {"pageSize": 1})
+        page = h.tool("device_inventory", {"count": 1})
         snapshot, rows = page["snapshot"]["snapshotId"], list(page["rows"])
-        r.cursor = page["nextCursor"]
-        while page["nextCursor"]:
-            page = h.tool("device_inventory", {"snapshotId": snapshot, "cursor": page["nextCursor"], "pageSize": 1})
+        r.cursor = page["nextOffset"]
+        while page["nextOffset"]:
+            page = h.tool("device_inventory", {"snapshotId": snapshot, "offset": page["nextOffset"], "count": 1})
             require(len(page["rows"]) == 1 and page["snapshot"]["snapshotId"] == snapshot, "Page differs")
             rows.extend(page["rows"])
         ids = [row["rowId"] for row in rows]
@@ -513,13 +513,13 @@ def hardware_reads(r):
         return {"pages": len(ids), "snapshotId": snapshot}
     r.paged = h.stage("device_inventory pages of 1 return every row once", pages)
     r.mark("device_inventory", ("completeness",), "paging")
-    r.ok("device_inventory", ("identity",), "device_inventory of one device", "device_inventory", {"devicePath": r.device1, "pageSize": 200},
+    r.ok("device_inventory", ("identity",), "device_inventory of one device", "device_inventory", {"devicePath": r.device1, "count": 200},
          lambda result: require(result["snapshot"]["coverage"]["devicePath"] == r.device1
                                 and all(row["path"] == r.device1 or row["path"].startswith(r.device1 + "/") for row in result["rows"]), "Rows outside the device"))
     r.refuse("device_inventory", "device_inventory of an unknown device", "device_inventory", {"devicePath": r.device1 + "Missing"}, ("DeviceNotFound",))
     r.refuse("device_inventory", "device_inventory of an unknown snapshot", "device_inventory", {"snapshotId": "0" * 32}, ("InventorySnapshotUnavailable",))
-    r.refuse("device_inventory", "device_inventory with a tampered cursor", "device_inventory",
-             {"snapshotId": r.paged["snapshotId"], "cursor": r.cursor[:-2] + ("AA" if not r.cursor.endswith("AA") else "BB")}, ("InvalidCursor",))
+    r.refuse("device_inventory", "device_inventory with an offset past the snapshot", "device_inventory",
+             {"snapshotId": r.paged["snapshotId"], "offset": 10**6}, ("InvalidCursor",))
 
     def export(fmt):
         def check(result):

@@ -23,12 +23,12 @@ def run(args):
     try:
         first = connect('first')
         observer = connect('independent')
-        note('first catalog', first.tool('feature_catalog', {'maxItems': 1}))
+        note('first catalog', first.tool('feature_catalog', {'count': 1}))
         first.process.kill()  # Exact local SSH process, never a remote process tree.
         first.process.wait(timeout=10)
         first.terminal = True
         note('owned SSH connection terminated', {'pid': first.process.pid, 'exitCode': first.process.returncode})
-        note('independent connection remains usable', observer.tool('feature_catalog', {'maxItems': 1}))
+        note('independent connection remains usable', observer.tool('feature_catalog', {'count': 1}))
         fresh = connect('fresh')
         state = fresh.tool('tia_session_status')
         require(state.get('attached') is False and state.get('projects') == [], 'Fresh host unexpectedly inherited a TIA attachment.')

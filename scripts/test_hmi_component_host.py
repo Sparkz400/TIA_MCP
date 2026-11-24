@@ -67,8 +67,8 @@ def main():
     def upload(client, data):
         status = client.tool('artifact_upload_begin', {'fileName': 'supplied.json', 'expectedBytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()})
         for offset in range(0, len(data), status['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', {'uploadId': status['uploadId'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
-        return client.tool('artifact_upload_commit', {'uploadId': status['uploadId']})
+            client.tool('artifact_upload_chunk', {'uploadRef': status['uploadRef'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
+        return client.tool('artifact_upload_commit', {'uploadRef': status['uploadRef']})
     def read(client, reference):
         chunks, offset = [], 0
         while True:
@@ -113,7 +113,7 @@ def main():
         for section in sections:
             rows, offset = [], 0
             while True:
-                page = client.tool('hmi_component_review_page', {'recordId': receipt['recordId'], 'section': section, 'offset': offset, 'count': 1})
+                page = client.tool('hmi_component_review_page', {'recordRef': receipt['recordId'], 'section': section, 'offset': offset, 'count': 1})
                 validate(page, 'page')
                 rows.extend(row['value'] for row in page['rows'])
                 if page['nextOffset'] is None: break
@@ -154,7 +154,7 @@ def main():
             try: validate(adversary, 'record')
             except ValidationError: check(True, 'Output schema refuses native qualification')
             else: raise AssertionError('Native qualification accepted')
-            refuse(client, 'hmi_component_review_page', {'recordId': receipt['recordId'], 'section': 'files', 'offset': 100}, 'InvalidHmiComponentReview')
+            refuse(client, 'hmi_component_review_page', {'recordRef': receipt['recordId'], 'section': 'files', 'offset': 100}, 'InvalidHmiComponentReview')
             for data in (b'{"x":1,"x":2}', b'\xff', b'{"schemaVersion":"unknown"}'):
                 ref = retain_upload(client, data)
                 response = client.request('tools/call', {'name': 'hmi_component_review', 'arguments': {'uploadRef': ref}})
@@ -179,7 +179,7 @@ def main():
             consumer_install['files'] = copy.deepcopy(packet['files'])
             new_receipt, new_record = review(client, consumer_install)
             check(new_record['report']['summary']['consumerScopeCount'] == 2 and new_record['report']['consumerCoverage'][1]['excludedOutputIds'] == ['run'], 'Install supplies no prior component or invented created identity')
-            refuse(client, 'hmi_component_review_page', {'recordId': receipt['recordId'], 'section': 'consumerPaths'}, 'InvalidHmiComponentReview')
+            refuse(client, 'hmi_component_review_page', {'recordRef': receipt['recordId'], 'section': 'consumerPaths'}, 'InvalidHmiComponentReview')
             for mode in ('complete', 'envelope-version'):
                 bad_record = copy.deepcopy(consumer_record)
                 if mode == 'complete': bad_record['report']['consumerCoverage'][0]['traversal']['complete'] = True
@@ -209,7 +209,7 @@ def main():
             effect_missing_receipt, effect_missing_record = review(client, effect_missing)
             check(effect_missing_record['report']['summary']['effectIncompleteCount'] == 1, 'Missing observation remains incomplete')
             for old in (receipt, consumer_receipt):
-                refuse(client, 'hmi_component_review_page', {'recordId': old['recordId'], 'section': 'effectChecks'}, 'InvalidHmiComponentReview')
+                refuse(client, 'hmi_component_review_page', {'recordRef': old['recordId'], 'section': 'effectChecks'}, 'InvalidHmiComponentReview')
             for defect in ('complete', 'extra', 'duplicate', 'missing'):
                 invalid = copy.deepcopy(effect_packet)
                 if defect == 'complete': invalid['observations'][0]['complete'] = 'true'
@@ -240,7 +240,7 @@ def main():
             missing_derived=copy.deepcopy(derived_packet);missing_derived['observations']=[]
             derived_records.append(review(client,missing_derived))
             for old in (receipt,consumer_receipt,effect_receipt):
-                refuse(client,'hmi_component_review_page',dict(recordId=old['recordId'],section='derivedEffects'),'InvalidHmiComponentReview')
+                refuse(client,'hmi_component_review_page',dict(recordRef=old['recordId'],section='derivedEffects'),'InvalidHmiComponentReview')
             for defect in ['profile','extra','empty','source']:
                 invalid=copy.deepcopy(derived_packet)
                 if defect=='profile':invalid['expectations'][0]['profile']='all-hmi'
@@ -278,7 +278,7 @@ def main():
             verify_library(full,combined,{f['id']:read(client,f['artifact']) for f in full['report']['files']},library_reviews)
             check(full['report']['derivedEffects'][0]['proposal']['status']=='match','Existing expected effects compose with explicit library associations')
             for old in (receipt,consumer_receipt,effect_receipt,derived_receipt):
-                refuse(client,'hmi_component_review_page',dict(recordId=old['recordId'],section='libraryAssociations'),'InvalidHmiComponentReview')
+                refuse(client,'hmi_component_review_page',dict(recordRef=old['recordId'],section='libraryAssociations'),'InvalidHmiComponentReview')
             for defect in ['profile','extra','empty','scope','path','file']:
                 invalid=copy.deepcopy(library_request)
                 if defect=='profile':invalid['libraryAssociations'][0]['profile']='generic'
@@ -295,7 +295,7 @@ def main():
             report['libraryRecords']=[r['recordId'] for r,_ in library_records]
             # Earlier reviews own their retained inputs; release transient uploads before the next batch.
             for item in incoming:
-                client.tool('artifact_upload_release', {'uploadId': item['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef': item['uploadRef']})
             incoming.clear()
             dependency_fixture=fixture['dependencyFixture'];dependency_reviews={}
             for review_id in dependency_fixture['reviewIds']:
@@ -315,7 +315,7 @@ def main():
             dependency_full=dependency_records[0][1]
             report['dependencyMutationControls']=dependency_controls(dependency_full,dependency_request,{f['id']:read(client,f['artifact']) for f in dependency_full['report']['files']},dependency_reviews)
             for old in (receipt,consumer_receipt,effect_receipt,derived_receipt,library_records[0][0]):
-                refuse(client,'hmi_component_review_page',dict(recordId=old['recordId'],section='dependencyAssociations'),'InvalidHmiComponentReview')
+                refuse(client,'hmi_component_review_page',dict(recordRef=old['recordId'],section='dependencyAssociations'),'InvalidHmiComponentReview')
             for defect in ['extra','scope','target','index','duplicate','oldVersion']:
                 invalid=copy.deepcopy(dependency_request);row=invalid['dependencyAssociations'][0]
                 if defect=='extra':row['nativeQualified']=True
@@ -326,7 +326,7 @@ def main():
                 else:invalid['schemaVersion']='hmi-component-review-request.v5'
                 refuse(client,'hmi_component_review',dict(uploadRef=retain_upload(client,json.dumps(invalid).encode())),'InvalidHmiComponentReview')
             report['dependencyRecords']=[r['recordId'] for r,_ in dependency_records]
-            for item in incoming: client.tool('artifact_upload_release', {'uploadId': item['uploadId']})
+            for item in incoming: client.tool('artifact_upload_release', {'uploadRef': item['uploadRef']})
             incoming.clear()
             impact_fixture=fixture['dependencyImpactFixture'];impact_reviews=dict(dependency_reviews)
             for review_id in impact_fixture['reviewIds']:
@@ -348,7 +348,7 @@ def main():
                 {f['id']:read(client,f['artifact']) for f in impact_records[0][1]['report']['files']},impact_reviews)
             for old in (receipt,consumer_receipt,effect_receipt,derived_receipt,library_records[0][0],dependency_records[0][0]):
                 for section in ['dependencyImpacts','dependencyImpactCoverage']:
-                    refuse(client,'hmi_component_review_page',dict(recordId=old['recordId'],section=section),'InvalidHmiComponentReview')
+                    refuse(client,'hmi_component_review_page',dict(recordRef=old['recordId'],section=section),'InvalidHmiComponentReview')
             report['impactRecords']=[r['recordId'] for r,_ in impact_records]
             authored_records = author_text_lists(client, retain_upload, read, check, refuse, output)
             report['authoredTextListRecords'] = [receipt['recordId'] for _, receipt, _ in authored_records]
@@ -368,77 +368,77 @@ def main():
             check(authored_component_record['report']['summary']['conflictCount'] == 0, 'Authored candidates enter exact Unified destination component proposal review')
             check(authored_component_receipt['nativeExecutable'] is False and authored_component_receipt['wholeProjectPreservationVerified'] is False, 'Authoring proposal remains unqualified and unexecuted')
             for item in incoming:
-                client.tool('artifact_upload_release', {'uploadId': item['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef': item['uploadRef']})
         finally: close(client)
         client = start()
         try:
             reopen_text_lists(client, authored_records, read, check, refuse, artifacts)
-            check(client.tool('hmi_component_review_page', dict(recordId=authored_component_receipt['recordId'])) == authored_component_receipt, 'Authored component proposal survives upload release and Host restart')
+            check(client.tool('hmi_component_review_page', dict(recordRef=authored_component_receipt['recordId'])) == authored_component_receipt, 'Authored component proposal survives upload release and Host restart')
             for expected,full in impact_records:
-                check(client.tool('hmi_component_review_page',dict(recordId=expected['recordId']))==expected,'Dependency impact receipt survives fresh Host and upload release')
+                check(client.tool('hmi_component_review_page',dict(recordRef=expected['recordId']))==expected,'Dependency impact receipt survives fresh Host and upload release')
                 pages(client,expected,full)
                 verify_impacts(full,json.loads(read(client,expected['input'])),{f['id']:read(client,f['artifact']) for f in full['report']['files']},impact_reviews)
             forged_impact=copy.deepcopy(impact_records[0][1]);forged_impact['report']['dependencyImpacts'][0]['outputs'][0]['effectStatus']='match'
             raw=json.dumps(forged_impact).encode();identity=hashlib.sha256(raw).hexdigest()
             (artifacts/'hmi-component-reviews'/(identity+'.json')).write_bytes(raw)
-            refuse(client,'hmi_component_review_page',dict(recordId=identity),'ArtifactChanged')
+            refuse(client,'hmi_component_review_page',dict(recordRef=identity),'ArtifactChanged')
             forged_impact['report']['dependencyImpacts'][0]['nativeImpactVerified']=True
             try:validate(forged_impact,'record')
             except ValidationError:check(True,'Schema refuses native impact promotion')
             else:raise AssertionError('Native impact promotion accepted')
             for expected,full in dependency_records:
-                check(client.tool('hmi_component_review_page',dict(recordId=expected['recordId']))==expected,'Dependency associations survive restart and upload release')
+                check(client.tool('hmi_component_review_page',dict(recordRef=expected['recordId']))==expected,'Dependency associations survive restart and upload release')
                 pages(client,expected,full)
                 request=json.loads(read(client,expected['input']))
                 verify_dependencies(full,request,{f['id']:read(client,f['artifact']) for f in full['report']['files']},dependency_reviews)
             forged_dependency=copy.deepcopy(dependency_full);forged_dependency['report']['dependencyAssociations'][0]['status']='different'
             raw=json.dumps(forged_dependency).encode();identity=hashlib.sha256(raw).hexdigest()
             (artifacts/'hmi-component-reviews'/(identity+'.json')).write_bytes(raw)
-            refuse(client,'hmi_component_review_page',dict(recordId=identity),'ArtifactChanged')
+            refuse(client,'hmi_component_review_page',dict(recordRef=identity),'ArtifactChanged')
             source=dependency_full['report']['files'][0]['artifact'];original=(artifacts/source['path']).read_bytes()
             try:
                 (artifacts/source['path']).write_bytes(b'tampered')
-                refuse(client,'hmi_component_review_page',dict(recordId=dependency_records[0][0]['recordId']),'ArtifactChanged')
+                refuse(client,'hmi_component_review_page',dict(recordRef=dependency_records[0][0]['recordId']),'ArtifactChanged')
             finally:(artifacts/source['path']).write_bytes(original)
             forged_dependency['report']['dependencyAssociations'][0]['nativeIdentityVerified']=True
             try:validate(forged_dependency,'record')
             except ValidationError:check(True,'Schema refuses native dependency identity promotion')
             else:raise AssertionError('Dependency identity promotion accepted')
             for expected,full in library_records:
-                check(client.tool('hmi_component_review_page',dict(recordId=expected['recordId']))==expected,'Library associations survive restart and upload release')
+                check(client.tool('hmi_component_review_page',dict(recordRef=expected['recordId']))==expected,'Library associations survive restart and upload release')
                 pages(client,expected,full)
                 request=json.loads(read(client,expected['input']))
                 verify_library(full,request,{f['id']:read(client,f['artifact']) for f in full['report']['files']},library_reviews)
             forged_library=copy.deepcopy(library_full);forged_library['report']['libraryAssociations'][0]['identifierAgreement']='different'
             raw=json.dumps(forged_library).encode();identity=hashlib.sha256(raw).hexdigest()
             (artifacts/'hmi-component-reviews'/(identity+'.json')).write_bytes(raw)
-            refuse(client,'hmi_component_review_page',dict(recordId=identity),'ArtifactChanged')
+            refuse(client,'hmi_component_review_page',dict(recordRef=identity),'ArtifactChanged')
             source=library_full['report']['files'][0]['artifact'];original=(artifacts/source['path']).read_bytes()
             try:
                 (artifacts/source['path']).write_bytes(b'tampered')
-                refuse(client,'hmi_component_review_page',dict(recordId=library_records[0][0]['recordId']),'ArtifactChanged')
+                refuse(client,'hmi_component_review_page',dict(recordRef=library_records[0][0]['recordId']),'ArtifactChanged')
             finally:(artifacts/source['path']).write_bytes(original)
             forged_library['report']['libraryAssociations'][0]['libraryIdentityVerified']=True
             try:validate(forged_library,'record')
             except ValidationError:check(True,'Schema refuses library identity promotion')
             else:raise AssertionError('Library identity promotion accepted')
             for expected,full in derived_records:
-                check(client.tool('hmi_component_review_page',dict(recordId=expected['recordId']))==expected,'Derived expectations survive restart and upload release')
+                check(client.tool('hmi_component_review_page',dict(recordRef=expected['recordId']))==expected,'Derived expectations survive restart and upload release')
                 pages(client,expected,full)
                 request=json.loads(read(client,expected['input']))
                 verify_derived(full,request,{f['id']:read(client,f['artifact']) for f in full['report']['files']})
             forged_derived=copy.deepcopy(derived_record);forged_derived['report']['derivedEffects'][0]['observation']['status']='different'
             raw=json.dumps(forged_derived).encode();identity=hashlib.sha256(raw).hexdigest()
             (artifacts/'hmi-component-reviews'/(identity+'.json')).write_bytes(raw)
-            refuse(client,'hmi_component_review_page',dict(recordId=identity),'ArtifactChanged')
+            refuse(client,'hmi_component_review_page',dict(recordRef=identity),'ArtifactChanged')
             source=next(f['artifact'] for f in derived_record['report']['files'] if f['id']=='screen-current')
             original=(artifacts/source['path']).read_bytes()
             try:
                 (artifacts/source['path']).write_bytes(b'tampered')
-                refuse(client,'hmi_component_review_page',dict(recordId=derived_receipt['recordId']),'ArtifactChanged')
+                refuse(client,'hmi_component_review_page',dict(recordRef=derived_receipt['recordId']),'ArtifactChanged')
             finally:(artifacts/source['path']).write_bytes(original)
             for expected, full in ((receipt, record), (install_receipt, install_record), (conflict_receipt, conflict_record), (consumer_receipt, consumer_record), (bounded_receipt, bounded_record), (new_receipt, new_record), (effect_receipt, effect_record), (effect_bad_receipt, effect_bad_record), (effect_missing_receipt, effect_missing_record)):
-                check(client.tool('hmi_component_review_page', {'recordId': expected['recordId']}) == expected, 'Restart and release preserve receipt')
+                check(client.tool('hmi_component_review_page', {'recordRef': expected['recordId']}) == expected, 'Restart and release preserve receipt')
                 pages(client, expected, full)
             for file in record['report']['files']:
                 check(read(client, file['artifact']) == base64.b64decode(fixture['files'][file['id']]), 'Released original file survives restart: ' + file['id'])
@@ -448,21 +448,21 @@ def main():
                 original = path.read_bytes()
                 try:
                     path.write_bytes(b'corrupted')
-                    refuse(client, 'hmi_component_review_page', {'recordId': receipt['recordId']}, 'ArtifactChanged')
+                    refuse(client, 'hmi_component_review_page', {'recordRef': receipt['recordId']}, 'ArtifactChanged')
                 finally: path.write_bytes(original)
             forged = copy.deepcopy(record)
             forged['report']['outputs'][0]['preservationVerified'] = True
             raw = json.dumps(forged).encode()
             forged_id = hashlib.sha256(raw).hexdigest()
             (artifacts / 'hmi-component-reviews' / (forged_id + '.json')).write_bytes(raw)
-            refuse(client, 'hmi_component_review_page', {'recordId': forged_id}, 'ArtifactChanged')
+            refuse(client, 'hmi_component_review_page', {'recordRef': forged_id}, 'ArtifactChanged')
             forged_context = copy.deepcopy(consumer_record)
             forged_context['report']['consumerPaths'][0]['reviewId'] = fixture['consumerReviewIds'][1]
             raw = json.dumps(forged_context).encode()
             forged_id = hashlib.sha256(raw).hexdigest()
             (artifacts / 'hmi-component-reviews' / (forged_id + '.json')).write_bytes(raw)
-            refuse(client, 'hmi_component_review_page', {'recordId': forged_id}, 'ArtifactChanged')
-            check(client.tool('hmi_component_review_page', {'recordId': receipt['recordId']}) == receipt, 'Exact restored evidence reopens unchanged')
+            refuse(client, 'hmi_component_review_page', {'recordRef': forged_id}, 'ArtifactChanged')
+            check(client.tool('hmi_component_review_page', {'recordRef': receipt['recordId']}) == receipt, 'Exact restored evidence reopens unchanged')
             for file in effect_record['report']['files']:
                 check(read(client, file['artifact']) == base64.b64decode(fixture['files'][file['id']]), 'Independent observation/source survives release and restart: ' + file['id'])
             forged_effect = copy.deepcopy(effect_record)
@@ -470,7 +470,7 @@ def main():
             raw = json.dumps(forged_effect).encode()
             forged_id = hashlib.sha256(raw).hexdigest()
             (artifacts / 'hmi-component-reviews' / (forged_id + '.json')).write_bytes(raw)
-            refuse(client, 'hmi_component_review_page', {'recordId': forged_id}, 'ArtifactChanged')
+            refuse(client, 'hmi_component_review_page', {'recordRef': forged_id}, 'ArtifactChanged')
             forged_effect['report']['effectChecks'][0]['nativeEffectVerified'] = True
             try: validate(forged_effect, 'record')
             except ValidationError: check(True, 'Schema refuses native effect promotion')

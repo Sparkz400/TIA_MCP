@@ -32,6 +32,8 @@ def check(host, report):
                 assert content["_meta"]["ui"]["csp"]["connectDomains"] == []
                 assert all(t.get("_meta", {}).get("ui", {}).get("visibility") == ["model"] for t in tools if not t["name"].startswith("project_model") and t["name"] != "artifact_read")
             else:
+                # Without MCP Apps no app can call tools, so tools/list carries no visibility limits.
+                assert not any("ui" in t.get("_meta", {}) for t in tools)
                 try:
                     client.request("resources/read", {"uri": "ui://tia-project-explorer/view.html"})
                     raise AssertionError("Unnegotiated resource read must fail")

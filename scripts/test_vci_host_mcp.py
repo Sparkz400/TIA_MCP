@@ -84,15 +84,15 @@ def main():
     def upload(data):
         status = call('artifact_upload_begin', {'fileName':'source.bin','expectedBytes':len(data),'sha256':digest(data)})
         for offset in range(0, len(data), status['maxChunkBytes']):
-            call('artifact_upload_chunk', {'uploadId':status['uploadId'],'offset':offset,
+            call('artifact_upload_chunk', {'uploadRef':status['uploadRef'],'offset':offset,
                                           'data':base64.b64encode(data[offset:offset+status['maxChunkBytes']]).decode()})
-        return call('artifact_upload_commit', {'uploadId':status['uploadId']})
+        return call('artifact_upload_commit', {'uploadRef':status['uploadRef']})
 
     def download(record, name=None, path=None):
         result = bytearray()
         while True:
-            page = call('vci_artifact_read' if name else 'vci_file_read',
-                        dict(recordRef=record, offset=len(result), **({'name':name} if name else {'relativePath':path})))
+            page = call('review_artifact_read' if name else 'vci_file_read',
+                        dict(recordRef=record, offset=len(result), **({'kind':'vci','name':name} if name else {'relativePath':path})))
             result.extend(base64.b64decode(page['data'], validate=True))
             if page['complete']:
                 check('download is complete and SHA-256 matched', len(result) == page['bytes'] and digest(result) == page['sha256'])
@@ -103,7 +103,7 @@ def main():
     author = dict(name='MCP Fixture', email='fixture@example.invalid')
     try:
         client = start(False)
-        reject('vci_list', {}, 'GitNotConfigured')
+        reject('review_list', {'kind': 'vci', }, 'GitNotConfigured')
         stop(); client = start()
         listed = {row['name'] for row in client.request('tools/list')['tools']}
         check('all VCI tools registered in normal Host', tools <= listed)
@@ -114,9 +114,9 @@ def main():
         check('preview discloses untracked-diff limitation', 'new files' in preview['diffCoverage'])
         check('preview raw-file review preserves independent source bytes', download(preview['recordRef'],path='PLC/Über Motor.s7dcl') == raw)
         check('explicit empty file is preserved', download(preview['recordRef'],path='empty.txt') == b'')
-        call('artifact_upload_release', {'uploadId':uploaded['uploadId']})
+        call('artifact_upload_release', {'uploadRef':uploaded['uploadRef']})
         stop(); client = start()
-        check('restart and upload release retain independent candidate', call('vci_reopen',{'recordRef':preview['recordRef']})['planSha256'] == preview['planSha256'])
+        check('restart and upload release retain independent candidate', call('review_reopen',{'kind':'vci','recordRef':preview['recordRef']})['planSha256'] == preview['planSha256'])
         reject('vci_commit',dict(previewRef=preview['recordRef'],reviewedPlanSha256='a'*64),'PreviewStale')
         first = call('vci_commit',dict(previewRef=preview['recordRef'],reviewedPlanSha256=preview['planSha256']))
         receipt_bytes = download(first['recordRef'],name=first['receiptName'])
@@ -126,7 +126,7 @@ def main():
         first_path = directory(first['recordRef'])
         (first_path/'commit.json').rename(first_path/'commit.lost.json')
         stop(); client = start()
-        unknown = call('vci_reopen',dict(recordRef=preview['recordRef']))
+        unknown = call('review_reopen',dict(kind='vci',recordRef=preview['recordRef']))
         check('missing result stays unknown while exact verified callback remains inspectable', unknown['state']=='outcomeUnknown' and unknown['commitJournal']['phase']=='verified')
         reject('vci_reconcile',dict(previewRef=preview['recordRef'],expectedCallbackSha256='b'*64),'RecoveryRequired')
         recovered = call('vci_reconcile',dict(previewRef=preview['recordRef'],expectedCallbackSha256=unknown['commitJournal']['sha256']))
@@ -150,7 +150,7 @@ def main():
         stop(); client = start()
         refetched = call('vci_fetch',dict(branchName='main',parentRevisionRef=fetched['recordRef'],expectedRemoteCommit=second['commit']))
         check('fetch fast-forwards a fetched parent after Host restart', refetched['previousCommit']==first['commit'] and refetched['commit']==second['commit'] and
-              call('vci_reopen',dict(recordRef=pushed['recordRef']))['state']=='complete')
+              call('review_reopen',dict(kind='vci',recordRef=pushed['recordRef']))['state']=='complete')
         export = call('vci_materialize',dict(revisionRef=first['recordRef']))
         archive = download(export['recordRef'],name='revision.zip')
         with zipfile.ZipFile(io.BytesIO(archive)) as zip_file:
@@ -164,7 +164,7 @@ def main():
         check('named branch is reviewable before commit', named['headReference']=='refs/heads/review/offline')
         named=call('vci_commit',dict(previewRef=named['recordRef'],reviewedPlanSha256=named['planSha256']))
         stop();client=start()
-        check('named branch survives actual Host restart',call('vci_reopen',dict(recordRef=named['recordRef']))['headReference']=='refs/heads/review/offline')
+        check('named branch survives actual Host restart',call('review_reopen',dict(kind='vci',recordRef=named['recordRef']))['headReference']=='refs/heads/review/offline')
         page=call('vci_branches',dict(revisionRef=named['recordRef'],count=1))
         second_page=call('vci_branches',dict(revisionRef=named['recordRef'],count=1,offset=page['nextOffset'],expectedInventorySha256=page['inventorySha256']))
         check('paged branches bind parent and named commits exactly',page['rows']==[dict(reference='refs/heads/main',commit=first['commit'])] and
@@ -189,7 +189,7 @@ def main():
             check('named revision materialization preserves inherited and new files',named_zip.read('PLC/Über Motor.s7dcl')==raw and named_zip.read('branch.txt')==b'')
         interrupted=artifacts/'vci-workspaces/records'/('f'*32)/'fork-journal';interrupted.mkdir(parents=True)
         (interrupted/'intent.json').write_text('{}',encoding='ascii')
-        check('interrupted fork stays unknown and discoverable',any(row['id']=='f'*32 and row['state']=='outcomeUnknown' for row in call('vci_list',dict(count=50))['rows']))
+        check('interrupted fork stays unknown and discoverable',any(row['id']=='f'*32 and row['state']=='outcomeUnknown' for row in call('review_list',dict(kind='vci',count=50))['rows']))
         snapshot = dict(observationId='authored-stdio-mapping',sourceSha256='a'*64,tiaVersion=21)
         mapping = dict(schemaVersion='vci-mapping-evidence.v1',workspaceId='authored-workspace',snapshot=snapshot,enumerationComplete=True,packages=[dict(
             packageId='motor',object=dict(object=dict(projectPath='D:/Fixture/P.ap21',plcPath='/PLC',scopePath=None,objectPath='/PLC/Motor',kind='block'),
@@ -206,10 +206,10 @@ def main():
         third=call('vci_prepare',dict(files=[dict(relativePath='PLC/Über Motor.s7dcl',uploadRef=third_upload['artifactRef'])],
                                     author=author,message='third side',parentRevisionRef=first['recordRef']))
         workspace=call('vci_package_capture',dict(sourceRecordRef=third['recordRef'],mappingUploadRef=mapping_upload['artifactRef']))
-        call('artifact_upload_release',dict(uploadId=mapping_upload['uploadId']))
+        call('artifact_upload_release',dict(uploadRef=mapping_upload['uploadRef']))
         stop(); client=start()
         check('package mappings survive original upload release and Host restart',
-              download(baseline['recordRef'],name='mapping.json')==mapping_bytes and call('vci_reopen',dict(recordRef=baseline['recordRef']))['targetProbed'] is False)
+              download(baseline['recordRef'],name='mapping.json')==mapping_bytes and call('review_reopen',dict(kind='vci',recordRef=baseline['recordRef']))['targetProbed'] is False)
         manifest=json.loads(download(baseline['recordRef'],name='manifest.json'))
         Draft202012Validator(json.loads((ROOT/'contracts/vci-manifest.v1.schema.json').read_text(encoding='utf-8'))).validate(manifest)
         check('package manifest hashes independently supplied source bytes and reports unmanaged files',
@@ -230,18 +230,18 @@ def main():
         reject('vci_package_capture',dict(sourceRecordRef=first['recordRef'],mappingUploadRef=invalid_mapping['artifactRef']),'VciInvalidMapping')
         saved_mapping=(directory(baseline['recordRef'])/'mapping.json').read_bytes()
         (directory(baseline['recordRef'])/'mapping.json').write_bytes(saved_mapping+b' ')
-        reject('vci_reopen',dict(recordRef=comparison['recordRef']),'VciIntegrityFailure')
+        reject('review_reopen',dict(kind='vci',recordRef=comparison['recordRef']),'VciIntegrityFailure')
         (directory(baseline['recordRef'])/'mapping.json').write_bytes(saved_mapping)
-        check('exact mapping restoration revalidates comparison provenance',call('vci_reopen',dict(recordRef=comparison['recordRef']))['reportSha256']==comparison['reportSha256'])
+        check('exact mapping restoration revalidates comparison provenance',call('review_reopen',dict(kind='vci',recordRef=comparison['recordRef']))['reportSha256']==comparison['reportSha256'])
         damaged = call('vci_prepare',dict(files=[dict(relativePath='new.txt')],author=author,message='damage',parentRevisionRef=first['recordRef']))
         (directory(damaged['recordRef'])/'repository/new.txt').write_bytes(b'damaged')
         reject('vci_commit',dict(previewRef=damaged['recordRef'],reviewedPlanSha256=damaged['planSha256']),'VciIntegrityFailure')
         # vci_list derives state from receipt files only, so a damaged working tree stays listed as prepared; vci_reopen verifies its bytes.
         listed, offset = [], 0
         while offset is not None:
-            page = call('vci_list', dict(offset=offset, count=50)); listed += page['rows']; offset = page['nextOffset']
+            page = call('review_list', dict(kind='vci', offset=offset, count=50)); listed += page['rows']; offset = page['nextOffset']
         check('damaged candidates remain discoverable', any(row['recordRef']==damaged['recordRef'] and row['state']=='prepared' for row in listed))
-        reject('vci_reopen', dict(recordRef=damaged['recordRef']), 'VciIntegrityFailure')
+        reject('review_reopen', dict(kind='vci', recordRef=damaged['recordRef']), 'VciIntegrityFailure')
         check('parent remains independently intact', download(first['recordRef'],path='PLC/Über Motor.s7dcl') == raw)
         # Stop only this harness's live Host tree after its durable dispatch record.
         interrupted = call('vci_prepare',dict(files=[dict(relativePath='interrupted/'+str(i)+'.txt') for i in range(50)],
@@ -281,7 +281,7 @@ def main():
         check('interrupted stdio request terminates without a successful commit response', not commit_thread.is_alive() and 'response' not in call_outcome)
         check('interrupted Host never started native workers', not receipt['workerExits'])
         client = start()
-        unknown = call('vci_reopen',dict(recordRef=interrupted_ref))
+        unknown = call('review_reopen',dict(kind='vci',recordRef=interrupted_ref))
         check('fresh Host retains interrupted dispatch as unknown', unknown['state']=='outcomeUnknown')
         reject('vci_commit',dict(previewRef=interrupted_ref,reviewedPlanSha256=interrupted['planSha256']),'RecoveryRequired')
         journal = unknown['commitJournal']
@@ -296,7 +296,7 @@ def main():
         else:
             reject('vci_reconcile',reconcile,'RecoveryRequired')
             check('unverified interruption retains its exact callback',
-                  call('vci_reopen',dict(recordRef=interrupted_ref))['commitJournal']==journal)
+                  call('review_reopen',dict(kind='vci',recordRef=interrupted_ref))['commitJournal']==journal)
         check('parent remains intact after real Host loss', download(first['recordRef'],path='PLC/Über Motor.s7dcl') == raw)
         native_store = artifacts/'engineering-operations'
         check('no Siemens worker or native operation records created', not missing.exists() and

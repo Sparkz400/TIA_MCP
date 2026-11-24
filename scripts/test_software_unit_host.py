@@ -60,8 +60,8 @@ def main():
     def upload(client, data):
         status = client.tool('artifact_upload_begin', {'fileName': 'supplied.json', 'expectedBytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()})
         for offset in range(0, len(data), status['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', {'uploadId': status['uploadId'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
-        return client.tool('artifact_upload_commit', {'uploadId': status['uploadId']})
+            client.tool('artifact_upload_chunk', {'uploadRef': status['uploadRef'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
+        return client.tool('artifact_upload_commit', {'uploadRef': status['uploadRef']})
     def read(client, reference):
         chunks, offset = [], 0
         while True:
@@ -100,7 +100,7 @@ def main():
             for section in ('units', 'objects', 'relations', 'dependencies', 'cycles', 'collisions', 'changes'):
                 rows, offset = [], 0
                 while True:
-                    page = client.tool('software_unit_review_page', {'recordId': receipt['recordId'], 'section': section, 'offset': offset, 'count': 1})
+                    page = client.tool('software_unit_review_page', {'recordRef': receipt['recordId'], 'section': section, 'offset': offset, 'count': 1})
                     validate(page, 'page')
                     rows.extend(row['value'] for row in page['rows'])
                     if page['nextOffset'] is None: break
@@ -111,7 +111,7 @@ def main():
             try: validate(adversary, 'record')
             except ValidationError: check(True, 'Output schema cannot certify native qualification')
             else: raise AssertionError('Native claim accepted')
-            refuse(client, 'software_unit_review_page', {'recordId': receipt['recordId'], 'section': 'dependencies', 'offset': 100}, 'InvalidRequest')
+            refuse(client, 'software_unit_review_page', {'recordRef': receipt['recordId'], 'section': 'dependencies', 'offset': 100}, 'InvalidRequest')
             bad = copy.deepcopy(packet)
             bad['reviewId'] = '0' * 64
             invalid = upload(client, json.dumps(bad).encode())
@@ -119,11 +119,11 @@ def main():
             duplicate = upload(client, b'{"x":1,"x":2}')
             refuse(client, 'software_unit_review', {**arguments, 'uploadRef': duplicate['artifactRef']}, 'InvalidUnitReview')
             for item in (incoming, saved, invalid, duplicate):
-                client.tool('artifact_upload_release', {'uploadId': item['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef': item['uploadRef']})
         finally: close(client)
         client = start()
         try:
-            check(client.tool('software_unit_review_page', {'recordId': receipt['recordId']}) == receipt, 'Restart and upload release preserve receipt')
+            check(client.tool('software_unit_review_page', {'recordRef': receipt['recordId']}) == receipt, 'Restart and upload release preserve receipt')
             check(read(client, receipt['input']) == packet_bytes, 'Original bytes survive restart')
             for key in ('input', 'reportArtifact'):
                 path = (artifacts / receipt[key]['path']).resolve()
@@ -131,9 +131,9 @@ def main():
                 original = path.read_bytes()
                 try:
                     path.write_bytes(b'corrupted')
-                    refuse(client, 'software_unit_review_page', {'recordId': receipt['recordId']}, 'ArtifactChanged')
+                    refuse(client, 'software_unit_review_page', {'recordRef': receipt['recordId']}, 'ArtifactChanged')
                 finally: path.write_bytes(original)
-            check(client.tool('software_unit_review_page', {'recordId': receipt['recordId']}) == receipt, 'Restored exact bytes reopen without mutation replay')
+            check(client.tool('software_unit_review_page', {'recordRef': receipt['recordId']}) == receipt, 'Restored exact bytes reopen without mutation replay')
         finally: close(client)
         report['completed'] = True
     finally:

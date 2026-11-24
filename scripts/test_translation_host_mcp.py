@@ -14,9 +14,9 @@ from referencing import Registry, Resource
 
 
 TOOLS = {
-    "translation_capture", "translation_inspect", "translation_prepare", "translation_review_page",
-    "translation_approve", "translation_candidate", "translation_reconcile", "translation_reopen",
-    "translation_list", "translation_artifact_read",
+    "translation_capture", "translation_inspect", "translation_prepare", "review_page",
+    "translation_approve", "translation_candidate", "translation_reconcile", "review_reopen",
+    "review_list", "review_artifact_read",
 }
 ALLOWED = TOOLS | {"artifact_upload_begin", "artifact_upload_chunk", "artifact_upload_commit"}
 
@@ -58,9 +58,9 @@ def main():
         status = call(client, "artifact_upload_begin", {"fileName": name, "expectedBytes": len(data),
                                                        "sha256": hashlib.sha256(data).hexdigest()})
         for offset in range(0, len(data), 65536):
-            call(client, "artifact_upload_chunk", {"uploadId": status["uploadId"], "offset": offset,
+            call(client, "artifact_upload_chunk", {"uploadRef": status["uploadRef"], "offset": offset,
                                                    "data": base64.b64encode(data[offset:offset + 65536]).decode("ascii")})
-        return call(client, "artifact_upload_commit", {"uploadId": status["uploadId"]})["artifactRef"]
+        return call(client, "artifact_upload_commit", {"uploadRef": status["uploadRef"]})["artifactRef"]
 
     def artifact(record, name):
         return next(a["artifactRef"] for a in record["artifacts"] if a["artifactRef"].endswith(":" + name))
@@ -68,7 +68,8 @@ def main():
     def download(client, reference):
         data = bytearray()
         while True:
-            page = call(client, "translation_artifact_read", {"artifactRef": reference, "offset": len(data)})
+            record_ref, name = reference.rsplit(":", 1)
+            page = call(client, "review_artifact_read", {"kind": "translation", "recordRef": record_ref, "name": name, "offset": len(data)})
             data.extend(base64.b64decode(page["data"], validate=True))
             if page["complete"]:
                 require(hashlib.sha256(data).hexdigest() == page["sha256"], "Artifact hash differs")
@@ -106,18 +107,18 @@ def main():
             "profileUploadRef": upload(client, "profile.json", (fixture / "profile.json").read_bytes()),
             "projectUploadRef": upload(client, "project.json", json.dumps(project).encode()),
         })
-        inspection = call(client, "translation_inspect", {"captureRef": capture["recordRef"], "pageSize": 3})
+        inspection = call(client, "translation_inspect", {"captureRef": capture["recordRef"], "count": 3})
         row = next(r for r in inspection["rows"] if r["nativeKey"] == "K-002")
         require(row["target"]["state"] == "missing", "Missing cell lost")
-        resumed = call(client, "translation_inspect", {"captureRef": capture["recordRef"], "pageSize": 3,
-                                                        "cursor": inspection["nextCursor"]})
-        require(resumed["offset"] == 3, "MCP cursor did not roundtrip")
+        resumed = call(client, "translation_inspect", {"captureRef": capture["recordRef"], "count": 3,
+                                                        "offset": inspection["nextOffset"]})
+        require(resumed["offset"] == 3, "MCP offset did not roundtrip")
         batch = {"edits": [{"nativeKey": row["nativeKey"], "culture": "de-DE", "kind": "set", "value": "Kühlung 東京",
                              "expectedSourceSha256": row["sourceSha256"], "expectedTargetSha256": row["targetSha256"],
                              "approved": False, "reviewer": None, "rationale": "MCP test"}], "options": None}
         review = call(client, "translation_prepare", {"captureRef": capture["recordRef"],
                                                        "proposalsArtifactRef": upload(client, "proposals.json", json.dumps(batch, ensure_ascii=False).encode())})
-        page = call(client, "translation_review_page", {"recordRef": review["recordRef"]})
+        page = call(client, "review_page", {"kind": "translation", "recordRef": review["recordRef"]})
         require(page["rows"][0]["after"] == "Kühlung 東京" and not page["rows"][0]["edit"]["approved"], "Review changed suggestions")
         blocked = client.request("tools/call", {"name": "translation_candidate", "arguments": {
             "reviewRef": review["recordRef"], "exactReviewSha256": review["metadata"]["reviewSha256"], "approvalSha256": "0" * 64}})
@@ -138,19 +139,19 @@ def main():
             new_sheet = ET.fromstring(after.read('xl/worksheets/sheet1.xml'))
             require(ET.tostring(old_sheet.find(ns+'extLst')) == ET.tostring(new_sheet.find(ns+'extLst')), 'Opaque row-like extension changed')
             require(new_sheet.find(ns+'sheetData/'+ns+'row[@r="0003"]/'+ns+'c[@r="C3"]') is not None, 'Cell was not added to the exact original row')
-        report["steps"].append("Committed uploads, capture, cursor, unapproved review, explicit approval and preserving candidate through actual MCP")
+        report["steps"].append("Committed uploads, capture, paging, unapproved review, explicit approval and preserving candidate through actual MCP")
         report['hostExits'].append(client.close())
         require(client.process.returncode == 0, "First Host did not shut down cleanly")
         client = start()
-        reopened = call(client, "translation_reopen", {"recordRef": review["recordRef"]})
+        reopened = call(client, "review_reopen", {"kind": "translation", "recordRef": review["recordRef"]})
         require(reopened["candidate"]["recordSha256"] == candidate["recordSha256"], "Restart lost exact candidate")
         require(download(client, artifact(reopened["candidate"], "candidate.xlsx")) == result, "Restart changed candidate bytes")
-        listed = call(client, "translation_list", {"kind": "review"})
+        listed = call(client, "review_list", {"kind": "translation", "recordType": "review"})
         require(listed["rows"][0]["recordRef"] == review["recordRef"], "Restart discovery failed")
         reconciliation = call(client, "translation_reconcile", {"baselineCaptureRef": capture["recordRef"],
             "editedWorkbookArtifactRef": artifact(candidate, "candidate.xlsx"), "currentCaptureRef": capture["recordRef"]})
         require(not reconciliation["metadata"]["approved"] and reconciliation["metadata"]["proposals"] == 1, "Reconciliation reused approval")
-        rows = call(client, "translation_review_page", {"recordRef": reconciliation["recordRef"], "section": "rows"})
+        rows = call(client, "review_page", {"kind": "translation", "recordRef": reconciliation["recordRef"], "section": "rows"})
         require(rows["rows"][0]["status"] == "proposed", "Reconciliation page incorrect")
         report["steps"].append("Real Host restart, exact artifact retrieval and fresh unapproved reconciliation")
         def changed_workbook(old, new, source_bytes=original):
@@ -179,7 +180,7 @@ def main():
             expectedSourceSha256=opaque_row['sourceSha256'],expectedTargetSha256=opaque_row['targetSha256'],approved=False)]}
         blocked_review = call(client, 'translation_prepare', {'captureRef':opaque_capture['recordRef'],
             'proposalsArtifactRef':upload(client,'proposals.json',json.dumps(blocked_batch).encode())})
-        issues = call(client,'translation_review_page',{'recordRef':blocked_review['recordRef'],'section':'issues'})['rows']
+        issues = call(client,'review_page',{'kind':'translation','recordRef':blocked_review['recordRef'],'section':'issues'})['rows']
         require(any(issue['code']=='UnsupportedWorkbookProfile' for issue in issues), 'Opaque edit lacks an explicit preservation issue')
         refused = client.request('tools/call', {'name':'translation_approve','arguments':{
             'reviewRef':blocked_review['recordRef'],'exactReviewSha256':blocked_review['metadata']['reviewSha256'],
@@ -215,7 +216,7 @@ def main():
             'workbookUploadRef':upload(client,'alarm.xlsx',alarm_original),
             'profileUploadRef':upload(client,'alarm-profile.json',json.dumps(alarm_profile).encode()),
             'projectUploadRef':project_ref})
-        alarm_page = call(client,'translation_inspect',{'captureRef':alarm_capture['recordRef'],'pageSize':1})
+        alarm_page = call(client,'translation_inspect',{'captureRef':alarm_capture['recordRef'],'count':1})
         alarm_row = alarm_page['rows'][0]
         require(alarm_row['alarmInheritance']['status']=='mixed', 'Mixed mapped inheritance hidden')
         require(alarm_row['alarmInheritance']['mappedFields']==3, 'Third language omitted')
@@ -227,14 +228,14 @@ def main():
             return call(client,'translation_prepare',{'captureRef':alarm_capture['recordRef'],
                 'proposalsArtifactRef':upload(client,'alarm-proposals.json',json.dumps(batch).encode())})
         bad_alarm = alarm_prepare('Still literal')
-        bad_issues = call(client,'translation_review_page',{'recordRef':bad_alarm['recordRef'],'section':'issues'})['rows']
+        bad_issues = call(client,'review_page',{'kind':'translation','recordRef':bad_alarm['recordRef'],'section':'issues'})['rows']
         require(any(i['code']=='AlarmInheritanceMixed' for i in bad_issues), 'Mixed inheritance did not block')
         refused = client.request('tools/call',{'name':'translation_approve','arguments':{
             'reviewRef':bad_alarm['recordRef'],'exactReviewSha256':bad_alarm['metadata']['reviewSha256'],
             'reviewer':'MCP test reviewer','approveEveryChange':True}})
         require(refused.get('isError') and refused['structuredContent']['error']['code']=='TranslationReviewBlocked', 'Approval bypassed inheritance consistency')
         good_alarm = alarm_prepare(marker_text)
-        inheritance = call(client,'translation_review_page',{'recordRef':good_alarm['recordRef'],'section':'alarmInheritance','pageSize':1})
+        inheritance = call(client,'review_page',{'kind':'translation','recordRef':good_alarm['recordRef'],'section':'alarmInheritance','count':1})
         require(inheritance['rows'][0]['before']['status']=='mixed' and inheritance['rows'][0]['after']['status']=='inherited', 'Effective final language states incorrect')
         validate('translation-review.v1.schema.json', json.loads(download(client,artifact(good_alarm,'review.json'))))
         alarm_approval = call(client,'translation_approve',{'reviewRef':good_alarm['recordRef'],
@@ -255,10 +256,10 @@ def main():
         report['hostExits'].append(client.close())
         require(client.process.returncode==0,'Second Host did not close cleanly')
         client=start()
-        alarm_reopened=call(client,'translation_reopen',{'recordRef':good_alarm['recordRef']})
+        alarm_reopened=call(client,'review_reopen',{'kind':'translation','recordRef':good_alarm['recordRef']})
         require(download(client,artifact(alarm_reopened['candidate'],'candidate.xlsx'))==alarm_bytes,'Restart changed alarm candidate')
-        require(call(client,'translation_review_page',{'recordRef':good_alarm['recordRef'],'section':'alarmInheritance'})['rows']==inheritance['rows'],'Restart changed alarm evidence')
-        require(call(client,'translation_review_page',{'recordRef':review['recordRef'],'section':'alarmInheritance'})['total']==0,'Old profile gained alarm semantics')
+        require(call(client,'review_page',{'kind':'translation','recordRef':good_alarm['recordRef'],'section':'alarmInheritance'})['rows']==inheritance['rows'],'Restart changed alarm evidence')
+        require(call(client,'review_page',{'kind':'translation','recordRef':review['recordRef'],'section':'alarmInheritance'})['total']==0,'Old profile gained alarm semantics')
         report['steps'].append('Explicit alarm inheritance profile: three languages, mixed-state refusal, approval guard, exact peer-preserving repair, schema checks and fresh Host restart')
         # The Host constructor may create an empty durable store, but these calls
         # must not publish any native reservation, plan or operation record.

@@ -187,15 +187,15 @@ def hardware(inspect):
 
 def devices(call):
     """Every device_inventory row by path, without the project path, row id and snapshot that differ in a recovered copy."""
-    state, page = {}, call("device_inventory", {"pageSize": 200, "maxVisited": 50000})
+    state, page = {}, call("device_inventory", {"count": 200, "maxVisited": 50000})
     snapshot_id = page["snapshot"]["snapshotId"]
     require(page["snapshot"]["coverage"]["scopeComplete"] is True and page["snapshot"]["coverage"]["truncated"] is False, "device_inventory is incomplete")
     while True:
         for row in page["rows"]:
             state["inv:" + row["path"]] = {k: v for k, v in row.items() if k not in ("projectPath", "rowId")}
-        if page.get("nextCursor") is None:
+        if page.get("nextOffset") is None:
             return state
-        page = call("device_inventory", {"snapshotId": snapshot_id, "cursor": page["nextCursor"], "pageSize": 200})
+        page = call("device_inventory", {"snapshotId": snapshot_id, "offset": page["nextOffset"], "count": 200})
 
 
 def under(path, *extra):

@@ -81,7 +81,7 @@ class Run(StateRun):
         """The retained original.xml of a GRAPH record, read through graph_artifact_read."""
         chunks, offset = [], 0
         while True:
-            piece = self.h.tool("graph_artifact_read", {"recordRef": record, "name": "original.xml", "offset": offset})
+            piece = self.h.tool("review_artifact_read", {"kind": "graph", "recordRef": record, "name": "original.xml", "offset": offset})
             chunks.append(base64.b64decode(piece["data"]))
             offset = piece["nextOffset"]
             if piece["complete"]:

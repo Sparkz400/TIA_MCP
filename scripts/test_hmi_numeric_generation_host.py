@@ -44,9 +44,9 @@ def main():
     def upload(client, raw):
         begin = client.tool('artifact_upload_begin', dict(fileName='numeric.json', expectedBytes=len(raw), sha256=hashlib.sha256(raw).hexdigest()))
         for offset in range(0, len(raw), begin['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', dict(uploadId=begin['uploadId'], offset=offset,
+            client.tool('artifact_upload_chunk', dict(uploadRef=begin['uploadRef'], offset=offset,
                         data=base64.b64encode(raw[offset:offset + begin['maxChunkBytes']]).decode()))
-        return begin['uploadId'], client.tool('artifact_upload_commit', dict(uploadId=begin['uploadId']))['artifactRef']
+        return begin['uploadRef'], client.tool('artifact_upload_commit', dict(uploadRef=begin['uploadRef']))['artifactRef']
     def publish(raw, suffix):
         identity = hashlib.sha256(raw).hexdigest()
         reference = dict(path='hmi-component-reviews/' + identity + suffix, sha256=identity)
@@ -80,13 +80,13 @@ def main():
                 verify(case['request'], receipt, read)
                 check(True, 'Independent original source/dependency/state/YAML oracle: ' + case['label'])
                 check(client.tool('hmi_text_list_author', dict(uploadRef=reference)) == receipt, 'Upload retry deterministic')
-                client.tool('artifact_upload_release', dict(uploadId=upload_id))
+                client.tool('artifact_upload_release', dict(uploadRef=upload_id))
         finally:
             close(client)
         client = start()
         try:
             for case in fixture['cases']:
-                receipt = client.tool('hmi_text_list_author', dict(recordId=case['receipt']['recordId']))
+                receipt = client.tool('hmi_text_list_author', dict(recordRef=case['receipt']['recordId']))
                 check(receipt == case['receipt'], 'New Host exact released reopen: ' + case['label'])
                 verify(case['request'], receipt, read)
             case = fixture['cases'][1]
@@ -102,13 +102,13 @@ def main():
                 else:
                     record[field] = {}
                 forged = publish(encoded(record), '.author.json')
-                refuse(client, dict(recordId=forged['sha256']), 'Honestly rehashed derived record refuses: ' + field)
+                refuse(client, dict(recordRef=forged['sha256']), 'Honestly rehashed derived record refuses: ' + field)
             for reference in (receipt['input'], receipt['files'][0]['artifact'], receipt['preservedFiles'][0]['artifact']):
                 path = artifacts / reference['path']
                 raw = path.read_bytes()
                 try:
                     path.write_bytes(raw + b'tampered')
-                    refuse(client, dict(recordId=receipt['recordId']), 'Changed retained input/candidate/peer refuses')
+                    refuse(client, dict(recordRef=receipt['recordId']), 'Changed retained input/candidate/peer refuses')
                 finally:
                     path.write_bytes(raw)
             # A new honest hash cannot disguise a changed original review input
@@ -126,7 +126,7 @@ def main():
                 forged_request['componentReviewId'] = changed['sha256']
                 upload_id, reference = upload(client, encoded(forged_request))
                 refuse(client, dict(uploadRef=reference), 'Rehashed original/derived review chain refuses')
-                client.tool('artifact_upload_release', dict(uploadId=upload_id))
+                client.tool('artifact_upload_release', dict(uploadRef=upload_id))
             for index, old, new in ((0, b'20', b'21'), (1, b'Stopped', b'Wrong')):
                 forged = copy.deepcopy(receipt)
                 raw = read(forged['files'][index]['artifact'])
@@ -141,8 +141,8 @@ def main():
                     raise AssertionError('Changed YAML passed')
                 record = {k: v for k, v in forged.items() if k not in ('recordId', 'recordArtifact')}
                 reference = publish(encoded(record), '.author.json')
-                refuse(client, dict(recordId=reference['sha256']), 'Rehashed candidate record differs from regenerated original intent')
-            check(client.tool('hmi_text_list_author', dict(recordId=receipt['recordId'])) == receipt, 'Original record still reopens exactly after restored tamper controls')
+                refuse(client, dict(recordRef=reference['sha256']), 'Rehashed candidate record differs from regenerated original intent')
+            check(client.tool('hmi_text_list_author', dict(recordRef=receipt['recordId'])) == receipt, 'Original record still reopens exactly after restored tamper controls')
         finally:
             close(client)
         check(manifest(source) == before, 'Original managed fixture store remained byte immutable')

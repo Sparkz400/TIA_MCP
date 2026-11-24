@@ -130,15 +130,15 @@ class Run:
 
     def upload(self, name, data):
         begun = self.call('artifact_upload_begin', {'fileName': name, 'expectedBytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()})
-        self.call('artifact_upload_chunk', {'uploadId': begun['uploadId'], 'offset': 0, 'data': base64.b64encode(data).decode()})
-        return self.call('artifact_upload_commit', {'uploadId': begun['uploadId']})['artifactRef']
+        self.call('artifact_upload_chunk', {'uploadRef': begun['uploadRef'], 'offset': 0, 'data': base64.b64encode(data).decode()})
+        return self.call('artifact_upload_commit', {'uploadRef': begun['uploadRef']})['artifactRef']
 
     def main_row(self, capture_ref, target=ORIGINAL):
-        rows, cursor = [], None
+        rows, offset = [], 0
         while True:
-            page = self.call('translation_inspect', {'captureRef': capture_ref, 'pageSize': 1000, **({'cursor': cursor} if cursor else {})})
-            rows += page['rows']; cursor = page['nextCursor']
-            if cursor is None: break
+            page = self.call('translation_inspect', {'captureRef': capture_ref, 'offset': offset, 'count': 1000})
+            rows += page['rows']; offset = page['nextOffset']
+            if offset is None: break
         main = [r for r in rows if r['source'].get('text') == SOURCE and r['target'].get('text') == target]
         require(len(main) == 1, 'Exactly one captured Main OB1 comment required')
         return main[0], len(rows)

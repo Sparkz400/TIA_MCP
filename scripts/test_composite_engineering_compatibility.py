@@ -52,11 +52,11 @@ def main():
                 reference = record['recordRef']; folder = artifacts / 'composite-engineering-reviews' / reference.split(':')[1]
                 original = json.loads((folder / 'report.json').read_bytes())
                 assert original['schemaVersion'] in ('composite-engineering-review.v1', 'composite-engineering-review.v2')
-                check(client.tool('composite_engineering_reopen', {'recordRef': reference}) == record['summary'], 'Actual prior-producer summary remains exact across restart: ' + str(lifetime))
+                check(client.tool('review_reopen', {'kind': 'composite_engineering', 'recordRef': reference}) == record['summary'], 'Actual prior-producer summary remains exact across restart: ' + str(lifetime))
                 for name in ('request.json', 'report.json', 'receipt.json'):
                     retained = bytearray()
                     while True:
-                        chunk = client.tool('composite_engineering_artifact_read', dict(recordRef=reference, name=name, offset=len(retained), count=8192))
+                        chunk = client.tool('review_artifact_read', dict(kind='composite_engineering', recordRef=reference, name=name, offset=len(retained), count=8192))
                         data = base64.b64decode(chunk['data'], validate=True)
                         assert len(data) == chunk['count'] and chunk['offset'] == len(retained)
                         retained.extend(data); assert len(retained) == chunk['nextOffset']
@@ -72,13 +72,13 @@ def main():
                     for section, expected in sections.items():
                         rows, offset = [], 0
                         while True:
-                            page = client.tool('composite_engineering_page', dict(recordRef=reference, section=section, offset=offset, count=2))
+                            page = client.tool('review_page', dict(kind='composite_engineering', recordRef=reference, section=section, offset=offset, count=2))
                             for row in page['rows']: assert row['index'] == len(rows); rows.append(row['value'])
                             if page['nextOffset'] is None: break
                             assert page['nextOffset'] > offset; offset = page['nextOffset']
                         check(rows == expected, 'Prior producer paged array unchanged: ' + section)
                     if original['schemaVersion'] == 'composite-engineering-review.v1':
-                        refused = client.request('tools/call', {'name': 'composite_engineering_page', 'arguments': dict(recordRef=reference, section='consumerCoverage')})
+                        refused = client.request('tools/call', {'name': 'review_page', 'arguments': dict(kind='composite_engineering', recordRef=reference, section='consumerCoverage')})
                         check(refused.get('isError') and refused['structuredContent']['error']['code'] == 'CompositeInvalidSection', 'Prior v1 receipt cannot be reinterpreted as v2 consumer context')
             stop()
         check(all(digest((artifacts / row['path']).read_bytes()) == row['sha256'] for row in fixture['files']), 'All prior bytes remain unchanged after current Host reads')

@@ -32,7 +32,7 @@ def main():
             try:
                 client.request('initialize',dict(protocolVersion='2025-11-25',capabilities={},clientInfo=dict(name='prior-hmi',version='1')));client.notify('notifications/initialized')
                 for row in records:
-                    identity=row['recordId'];receipt=client.tool('hmi_component_review_page',dict(recordId=identity))
+                    identity=row['recordId'];receipt=client.tool('hmi_component_review_page',dict(recordRef=identity))
                     check(receipt==row['receipt'],'Exact prior receipt: '+str(lifetime)+' '+row['schemaVersion'])
                     record=json.loads((output/'store/hmi-component-reviews'/(identity+'.json')).read_bytes())
                     version=record['report']['schemaVersion']
@@ -44,13 +44,13 @@ def main():
                         if not isinstance(value,list):continue
                         offset=0;rows=[]
                         while True:
-                            page=client.tool('hmi_component_review_page',dict(recordId=identity,section=section,offset=offset,count=1))
+                            page=client.tool('hmi_component_review_page',dict(recordRef=identity,section=section,offset=offset,count=1))
                             rows.extend(r['value'] for r in page['rows'])
                             if page['nextOffset'] is None:break
                             check(page['nextOffset']>offset,'Prior paging makes progress');offset=page['nextOffset']
                         check(rows==value,'Exact prior '+section)
                     for section in ['dependencyImpacts','dependencyImpactCoverage','dependencyAssociations','dependencyCoverage','dependencyIdentities'] + ([] if has_libraries else ['libraryAssociations'] if has_derived else ['derivedEffects','libraryAssociations']):
-                        reply=client.request('tools/call',dict(name='hmi_component_review_page',arguments=dict(recordId=identity,section=section)))
+                        reply=client.request('tools/call',dict(name='hmi_component_review_page',arguments=dict(recordRef=identity,section=section)))
                         check(reply.get('isError') and reply['structuredContent']['error']['code']=='InvalidHmiComponentReview','Prior version refuses '+section)
                 for row in files.values():check(digest((output/'store'/row['path']).read_bytes())==row['sha256'],'Exact prior bytes: '+row['path'])
             finally:

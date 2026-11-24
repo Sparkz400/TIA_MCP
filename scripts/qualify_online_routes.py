@@ -300,7 +300,7 @@ def body(h):
                 record = h.tool("db_snapshot_capture", {"reviewId": review, "objectPath": db})
                 source = record["inputSource"]
                 require(source["objectPath"] == db and Path(source["projectPath"]).resolve() == Path(run.project).resolve(), "The capture names another DB or project: %s" % source)
-                rows = [r["value"] for r in h.tool("db_snapshot_review_page", {"recordId": record["recordId"], "section": "beforeValues", "count": 200})["rows"]]
+                rows = [r["value"] for r in h.tool("db_snapshot_review_page", {"recordRef": record["recordId"], "section": "beforeValues", "count": 200})["rows"]]
                 require([r["text"] for r in rows if r["path"].replace('"', "").split(".")[-1] == "Count"] == ["42"], "The captured snapshot does not hold Count = 42: %s" % rows)
                 return {"recordId": record["recordId"], "snapshotSha256": record["input"]["sha256"], "values": rows,
                         "equalsCreateReadback": record["input"]["sha256"] == readback[0]["sha256"]}

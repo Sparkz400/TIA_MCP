@@ -144,7 +144,7 @@ def link(run, kind, payload, item):
 def sensor(run, phase):
     """The axis record's sensor-0 relationship row of one composite phase."""
     require(len(phase["technology"]) == 1, "Expected one technology record: %s" % phase["technology"])
-    rows = [r["value"] for r in run.h.tool("technology_profile_report", {"recordId": phase["technology"][0], "section": "relationships", "count": 200})["rows"]]
+    rows = [r["value"] for r in run.h.tool("technology_profile_review_page", {"recordRef": phase["technology"][0], "section": "relationships", "count": 200})["rows"]]
     rows = [r for r in rows if r["phase"] == "after" and r["relationship"]["metadata"].get("role") == "sensor" and r["relationship"]["metadata"].get("sensorIndex") == 0]
     require(len(rows) == 1, "Expected one sensor-0 relationship: %s" % rows)
     return phase["technology"][0], rows[0]
@@ -164,10 +164,10 @@ def compose(run, label, before, after, correspondences):
         data = json.dumps({"schemaVersion": "composite-engineering-request.v3", "before": before, "after": after, "mappings": [],
                            "correspondences": correspondences, "allowDifferentProjectCopy": False}).encode("utf-8")
         begun = run.h.tool("artifact_upload_begin", {"fileName": "composite.json", "expectedBytes": len(data), "sha256": hashlib.sha256(data).hexdigest()})
-        run.h.tool("artifact_upload_chunk", {"uploadId": begun["uploadId"], "offset": 0, "data": base64.b64encode(data).decode("ascii")})
-        upload = run.h.tool("artifact_upload_commit", {"uploadId": begun["uploadId"]})["artifactRef"]
+        run.h.tool("artifact_upload_chunk", {"uploadRef": begun["uploadRef"], "offset": 0, "data": base64.b64encode(data).decode("ascii")})
+        upload = run.h.tool("artifact_upload_commit", {"uploadRef": begun["uploadRef"]})["artifactRef"]
         record = run.h.tool("composite_engineering_review", {"uploadRef": upload})["recordRef"]
-        claims = [r["value"] for r in run.h.tool("composite_engineering_page", {"recordRef": record, "section": "correspondences", "count": 50})["rows"]]
+        claims = [r["value"] for r in run.h.tool("review_page", {"kind": "composite_engineering", "recordRef": record, "section": "correspondences", "count": 50})["rows"]]
         require([c["state"] for c in claims] == ["declaredCorrespondence"] * len(correspondences), "Correspondences are not declared: %s" % claims)
         return record
     return run.h.stage("composite review " + label, submit)

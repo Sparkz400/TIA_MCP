@@ -37,7 +37,7 @@ def main():
                 client.request('initialize', dict(protocolVersion='2025-11-25', capabilities={}, clientInfo=dict(name='actual-prior-hmi-authors', version='1')))
                 client.notify('notifications/initialized')
                 for record in manifest['records']:
-                    receipt = client.tool('hmi_text_list_author', dict(recordId=record['recordId']))
+                    receipt = client.tool('hmi_text_list_author', dict(recordRef=record['recordId']))
                     check(receipt == record['receipt'], 'Exact actual prior ' + record['schemaVersion'] + ' receipt, lifetime ' + str(lifetime))
                     original = json.loads((output / 'store' / receipt['input']['path']).read_bytes())
                     intent = original if receipt['schemaVersion'].endswith('.v1') else receipt['intent']

@@ -145,12 +145,12 @@ def upload(h, package):
     started = time.perf_counter()
     begun = h.tool("artifact_upload_begin", {"fileName": Path(package["path"]).name, "expectedBytes": len(data), "sha256": package["sha256"]})
     for offset in range(0, len(data), CHUNK):
-        h.client.tool("artifact_upload_chunk", {"uploadId": begun["uploadId"], "offset": offset,
+        h.client.tool("artifact_upload_chunk", {"uploadRef": begun["uploadRef"], "offset": offset,
                                                  "data": base64.b64encode(data[offset:offset + CHUNK]).decode("ascii")})
-    committed = h.tool("artifact_upload_commit", {"uploadId": begun["uploadId"]})
+    committed = h.tool("artifact_upload_commit", {"uploadRef": begun["uploadRef"]})
     h.client.tool_calls = [c for c in h.client.tool_calls if c["name"] != "artifact_upload_chunk"] + [
         {"name": "artifact_upload_chunk", "isError": False, "count": -(-len(data) // CHUNK)}]
-    return {"uploadId": begun["uploadId"], "artifactRef": committed["artifactRef"], "chunks": -(-len(data) // CHUNK),
+    return {"uploadRef": begun["uploadRef"], "artifactRef": committed["artifactRef"], "chunks": -(-len(data) // CHUNK),
             "seconds": round(time.perf_counter() - started, 3)}
 
 

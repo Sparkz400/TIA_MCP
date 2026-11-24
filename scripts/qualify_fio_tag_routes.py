@@ -263,7 +263,7 @@ def conflict_route(h, plc, table, fio, f, vci):
     def compared():
         result = h.tool("vci_package_compare", {"baselineRef": sides[0]["recordRef"], "projectRef": sides[1]["recordRef"], "workspaceRef": sides[2]["recordRef"],
                         "expectedHashes": {"baseline": sides[0]["manifestSha256"], "project": sides[1]["manifestSha256"], "workspace": sides[2]["manifestSha256"]}})
-        rows = json.loads(download(h, "vci_artifact_read", result["recordRef"], name="comparison.json"))["rows"]
+        rows = json.loads(download(h, "review_artifact_read", result["recordRef"], kind="vci", name="comparison.json"))["rows"]
         require(result["conflictCount"] == 1 and [r["state"] for r in rows] == ["divergentChange"], "The comparison does not report the two-sided conflict: %s" % rows)
         return result
     comparison = h.stage("vci_package_compare reports a divergentChange", compared)

@@ -77,16 +77,16 @@ def run(host, output, samples_path):
     def upload(data, name='input.json'):
         begun = client.tool('artifact_upload_begin', dict(fileName=name, expectedBytes=len(data), sha256=hashlib.sha256(data).hexdigest()))
         for offset in range(0, len(data), begun['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', dict(uploadId=begun['uploadId'], offset=offset,
+            client.tool('artifact_upload_chunk', dict(uploadRef=begun['uploadRef'], offset=offset,
                         data=base64.b64encode(data[offset:offset+begun['maxChunkBytes']]).decode()))
-        return client.tool('artifact_upload_commit', dict(uploadId=begun['uploadId']))
+        return client.tool('artifact_upload_commit', dict(uploadRef=begun['uploadRef']))
     def import_review(data):
         committed = upload(data)
         result = client.tool('project_snapshot_import', dict(uploadRef=committed['artifactRef']))
         validator.validate(result)
         assert result['reviewId'] == hashlib.sha256(data).hexdigest()
         assert not result['nativeQualified'] and not result['sourceAuthenticityVerified']
-        client.tool('artifact_upload_release', dict(uploadId=committed['uploadId']))
+        client.tool('artifact_upload_release', dict(uploadRef=committed['uploadRef']))
         return result
     def close():
         receipt = client.close(); report['hostExits'].append(receipt)
@@ -229,7 +229,7 @@ def run(host, output, samples_path):
         assert next_page['changes'] == [] and next_page['observedImpactPaths'] == paths
         assert client.tool('project_snapshot_compare', {**type_args, 'impactDepth': 3})['impactTraversal']['truncated']
         assert client.tool('project_snapshot_search', dict(reviewId=before_type_id, query='überlast'))['totalObservedHits'] == 1
-        assert client.tool('project_health_report', dict(reviewId=before_type_id))['freshness'] == 'savedSnapshotOnly'
+        assert client.tool('project_health_review', dict(reviewId=before_type_id))['freshness'] == 'savedSnapshotOnly'
         downloaded = client.tool('artifact_read', dict(path=type_receipt['artifact']['path']))
         assert base64.b64decode(downloaded['data'], validate=True) == type_bytes
         report['steps'].append('supplied UDT XML exact-byte retention, search, health and before/after four-edge alarm impact after Host restart')
@@ -251,13 +251,13 @@ def run(host, output, samples_path):
             committed_type = upload(json.dumps(bad_type).encode('utf-8'))
             reject('project_snapshot_import', dict(uploadRef=committed_type['artifactRef']),
                    'ArtifactChanged' if mutation == 'signature' else 'InvalidSnapshot')
-            client.tool('artifact_upload_release', dict(uploadId=committed_type['uploadId']))
+            client.tool('artifact_upload_release', dict(uploadRef=committed_type['uploadRef']))
         report['steps'].append('type content unknown stays explicit; invalid document selectors, hashes and dependency identities refuse')
         (output / 'supplied-type-comparison.json').write_text(json.dumps(type_delta, ensure_ascii=False, indent=2)+'\n', encoding='utf-8', newline='\n')
         searched = client.tool('project_snapshot_search', dict(reviewId=review_id,query='Conveyor'))
         assert searched['totalObservedHits'] > 0 and not searched['sourceAuthenticityVerified']
         assert client.tool('project_snapshot_compare', dict(beforeId=review_id,afterId=review_id))['totalChanges'] == 0
-        assert client.tool('project_health_report', dict(reviewId=review_id))['freshness'] == 'savedSnapshotOnly'
+        assert client.tool('project_health_review', dict(reviewId=review_id))['freshness'] == 'savedSnapshotOnly'
         transferred = bytearray()
         while len(transferred) < retained_review['artifact']['bytes']:
             chunk = client.tool('artifact_read', dict(path=retained_review['artifact']['path'],offset=len(transferred)))
@@ -272,10 +272,10 @@ def run(host, output, samples_path):
         report["steps"].append("discovery and offline route capabilities")
         result_upload = upload(json.dumps(samples['testSuitePacket'], ensure_ascii=False).encode('utf-8'))
         supplied_results = client.tool('testsuite_result_import', dict(reviewId=review_id, uploadRef=result_upload['artifactRef']))
-        client.tool('artifact_upload_release', dict(uploadId=result_upload['uploadId']))
+        client.tool('artifact_upload_release', dict(uploadRef=result_upload['uploadRef']))
         finding_request = copy.deepcopy(samples['diagnosticRequest'])
         finding_request.pop('blockPath')
-        health = client.tool('project_health_report', dict(reviewId=review_id, testSuiteResults=[supplied_results['receipt']]))
+        health = client.tool('project_health_review', dict(reviewId=review_id, testSuiteResults=[supplied_results['receipt']]))
         assert health['testSuite']['findingCount'] == 1 and not health['testSuite']['wholeProjectHealthComplete']
         finding_request['testSuiteFinding'] = {**health['testSuite']['reports'][0]['receipt'], 'index': 0}
         report['steps'].append('selected Test Suite health evidence provides exact retained finding navigation into a diagnostic case')
@@ -362,7 +362,7 @@ def run(host, output, samples_path):
         data = json.dumps(measurement).encode("utf-8")
         committed = upload(data)
         imported = client.tool("trace_read", {"tracePlanId": trace["id"], "uploadRef": committed['artifactRef']})
-        client.tool('artifact_upload_release', dict(uploadId=committed['uploadId']))
+        client.tool('artifact_upload_release', dict(uploadRef=committed['uploadRef']))
         restart()
         assert client.tool('diagnostic_watch_plan', watch_args)['id'] == watch['id']
         assert client.tool('diagnostic_watch_plan', alarm_watch_args)['id'] == alarm_watch['id']
@@ -429,7 +429,7 @@ def run(host, output, samples_path):
                            columns=[{"signalId": key, "column": key, "unit": measurement["units"][key]} for key in ids])
         csv_bytes = buffer.getvalue().encode(); committed_csv = upload(csv_bytes, 'measurement.csv')
         csv_import = client.tool("trace_read", {"tracePlanId": trace["id"], "uploadRef": committed_csv['artifactRef'], "csvOptions": csv_options})
-        client.tool('artifact_upload_release', dict(uploadId=committed_csv['uploadId']))
+        client.tool('artifact_upload_release', dict(uploadRef=committed_csv['uploadRef']))
         comparison = client.tool("trace_compare", {"beforeMeasurementId": imported["id"], "afterMeasurementId": csv_import["id"], "options": samples["comparisonOptions"]})
         assert comparison["comparison"]["bugFixProven"] is False
         for row in comparison["comparison"]["signals"]:
@@ -443,7 +443,7 @@ def run(host, output, samples_path):
         changed['quality']['scanSynchronized'] = False
         committed = upload(json.dumps(changed).encode(), 'changed-program.json')
         changed_import = client.tool('trace_read', dict(tracePlanId=trace['id'], uploadRef=committed['artifactRef']))
-        client.tool('artifact_upload_release', dict(uploadId=committed['uploadId']))
+        client.tool('artifact_upload_release', dict(uploadRef=committed['uploadRef']))
         compare_args = dict(beforeMeasurementId=imported['id'], afterMeasurementId=changed_import['id'], options=samples['comparisonOptions'])
         reject('trace_compare', compare_args, 'ProgramRevisionMismatch')
         reject('trace_compare', {**compare_args, 'options': {**samples['comparisonOptions'], 'allowChangedSource': False}}, 'ProgramRevisionMismatch')
@@ -598,8 +598,8 @@ def run(host, output, samples_path):
         reject('project_snapshot_import', dict(uploadRef=upload(json.dumps(bad).encode())['artifactRef']), 'ArtifactChanged')
         reject('project_snapshot_import', dict(uploadRef=upload(b'{"schemaVersion":"one","schemaVersion":"two"}')['artifactRef']), 'InvalidSnapshot')
         pending = client.tool('artifact_upload_begin', dict(fileName='incomplete.json',expectedBytes=1,sha256=hashlib.sha256(b'x').hexdigest()))
-        reject('project_snapshot_import', dict(uploadRef='upload:'+pending['uploadId']), 'UploadIncomplete')
-        client.tool('artifact_upload_abort',dict(uploadId=pending['uploadId']))
+        reject('project_snapshot_import', dict(uploadRef=pending['uploadRef']), 'UploadIncomplete')
+        client.tool('artifact_upload_abort',dict(uploadRef=pending['uploadRef']))
         source_path = Path(retained_review['artifact']['path']); source_path.write_bytes(raw+b' ')
         reject('diagnostic_plan', dict(request=samples['diagnosticRequest']), 'ArtifactChanged')
         reject('diagnostic_watch_plan', watch_args, 'ArtifactChanged')

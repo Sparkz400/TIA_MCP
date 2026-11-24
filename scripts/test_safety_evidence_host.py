@@ -47,8 +47,8 @@ def main():
     def upload(client, data, file_name="supplied.json"):
         status = client.tool('artifact_upload_begin', {'fileName': file_name, 'expectedBytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()})
         for offset in range(0, len(data), status['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', {'uploadId': status['uploadId'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
-        return client.tool('artifact_upload_commit', {'uploadId': status['uploadId']})
+            client.tool('artifact_upload_chunk', {'uploadRef': status['uploadRef'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
+        return client.tool('artifact_upload_commit', {'uploadRef': status['uploadRef']})
     def read(client, reference):
         chunks, offset = [], 0
         while True:
@@ -68,7 +68,7 @@ def main():
     try:
         client = start()
         try:
-            check({'safety_evidence_review', 'safety_evidence_report'} <= {t['name'] for t in client.request('tools/list')['tools']}, 'Both tools registered')
+            check({'safety_evidence_review', 'safety_evidence_review_page'} <= {t['name'] for t in client.request('tools/list')['tools']}, 'Both tools registered')
             saved = upload(client, review_bytes)
             source = client.tool('project_snapshot_import', {'uploadRef': saved['artifactRef']})
             check(source['reviewId'] == fixture['reviewId'], 'Exact saved review imported')
@@ -99,7 +99,7 @@ def main():
             for section in ('observations', 'signatures', 'issues', 'changes'):
                 rows, offset = [], 0
                 while True:
-                    page = client.tool('safety_evidence_report', {'recordId': receipt['recordId'], 'section': section, 'offset': offset, 'count': 1})
+                    page = client.tool('safety_evidence_review_page', {'recordRef': receipt['recordId'], 'section': section, 'offset': offset, 'count': 1})
                     validate(page, 'page')
                     rows.extend(row['value'] for row in page['rows'])
                     if page['nextOffset'] is None: break
@@ -115,7 +115,7 @@ def main():
                     try: validate(adversary, kind)
                     except ValidationError: check(True, 'Schema refuses ' + kind + '/' + flag)
                     else: raise AssertionError('Unsupported claim accepted')
-            refuse(client, 'safety_evidence_report', {'recordId': receipt['recordId'], 'section': 'changes', 'offset': 100}, 'InvalidRequest')
+            refuse(client, 'safety_evidence_review_page', {'recordRef': receipt['recordId'], 'section': 'changes', 'offset': 100}, 'InvalidRequest')
             refuse(client, 'safety_evidence_review', {**arguments, 'plcPath': fixture['plcPath'] + 'Other'}, 'InvalidSafetyEvidence')
             refuse(client, 'safety_evidence_review', {**arguments, 'sources': {}}, 'InvalidSafetyEvidence')
             refuse(client, 'safety_evidence_review', {**arguments, 'sources': [arguments['sources'][0]] * 2}, 'InvalidSafetyEvidence')
@@ -137,16 +137,16 @@ def main():
             huge['futureEnvelope']['opaque'] = 'x' * (130 * 1024)
             huge_upload = upload(client, json.dumps(huge).encode())
             huge_receipt = client.tool('safety_evidence_review', {**arguments, 'comparisonUploadRef': huge_upload['artifactRef']})
-            huge_page = client.tool('safety_evidence_report', {'recordId': huge_receipt['recordId'], 'section': 'changes'})
+            huge_page = client.tool('safety_evidence_review_page', {'recordRef': huge_receipt['recordId'], 'section': 'changes'})
             validate(huge_page, 'page')
             check(huge_page['rows'][-1].get('omitted') is True and len(json.dumps(huge_page).encode()) <= 128 * 1024, 'Oversized page row omitted with bounded progress')
             check(read(client, huge_receipt['comparisonInput']) == json.dumps(huge).encode(), 'Oversized omitted content still downloadable exactly')
             for item in (incoming, comparison, supporting, saved, invalid, malformed, partial_upload, huge_upload):
-                client.tool('artifact_upload_release', {'uploadId': item['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef': item['uploadRef']})
         finally: close(client)
         client = start()
         try:
-            check(client.tool('safety_evidence_report', {'recordId': receipt['recordId']}) == receipt, 'Restart and upload release preserve receipt')
+            check(client.tool('safety_evidence_review_page', {'recordRef': receipt['recordId']}) == receipt, 'Restart and upload release preserve receipt')
             check(read(client, receipt['input']) == before, 'Original bytes survive restart')
             for reference in (receipt['input'], receipt['comparisonInput'], receipt['reportArtifact'], receipt['sources'][0]['artifact'], {'path': 'project-reviews/' + fixture['reviewId'] + '.json'}):
                 path = (artifacts / reference['path']).resolve()
@@ -154,16 +154,16 @@ def main():
                 original = path.read_bytes()
                 try:
                     path.write_bytes(b'corrupted')
-                    refuse(client, 'safety_evidence_report', {'recordId': receipt['recordId']}, 'ArtifactChanged')
+                    refuse(client, 'safety_evidence_review_page', {'recordRef': receipt['recordId']}, 'ArtifactChanged')
                 finally: path.write_bytes(original)
-            check(client.tool('safety_evidence_report', {'recordId': receipt['recordId']}) == receipt, 'Restored exact bytes reopen without mutation replay')
+            check(client.tool('safety_evidence_review_page', {'recordRef': receipt['recordId']}) == receipt, 'Restored exact bytes reopen without mutation replay')
             check(read(client, receipt['sources'][0]['artifact']) == opaque_bytes, 'Opaque sources survive release and restart')
             forged = copy.deepcopy(record)
             forged['report']['safetyApproval'] = True
             data = json.dumps(forged).encode()
             digest = hashlib.sha256(data).hexdigest()
             (artifacts / 'safety-evidence-reviews' / (digest + '.json')).write_bytes(data)
-            refuse(client, 'safety_evidence_report', {'recordId': digest}, 'ArtifactChanged')
+            refuse(client, 'safety_evidence_review_page', {'recordRef': digest}, 'ArtifactChanged')
         finally: close(client)
         report['completed'] = True
     finally:

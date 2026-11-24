@@ -14,7 +14,7 @@ class VciContracts(unittest.TestCase):
 
     def test_catalog_and_registry_cover_exact_tool_set_without_native_promotion(self):
         Draft202012Validator.check_schema(SCHEMA)
-        expected = {'vci_prepare','vci_commit','vci_reconcile','vci_reopen','vci_history','vci_materialize','vci_list','vci_artifact_read','vci_file_read',
+        expected = {'vci_prepare','vci_commit','vci_reconcile','review_reopen','vci_history','vci_materialize','review_list','review_artifact_read','vci_file_read',
                     'vci_package_capture','vci_package_compare','vci_branches','vci_push','vci_fetch'}
         self.assertEqual(expected, set(SCHEMA['x-tool-contracts']))
         catalog = json.loads((ROOT/'contracts/feature-catalog.v1.json').read_text(encoding='utf-8'))

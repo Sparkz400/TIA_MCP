@@ -14,6 +14,9 @@ class HostExited(RuntimeError):
     """The Host ended or closed its input before answering. The message starts "MCP host exited" and carries its last stderr lines."""
 
 
+OUTPUT_SCHEMA_META = "tiaMcp/outputSchema"
+
+
 def all_toolsets(command):
     """The Host advertises only base and core by default; harnesses exercise every tool, so they ask for all of them
     unless the command already names its own toolsets. A launcher script takes -Toolsets, the Host executable --toolsets."""
@@ -31,6 +34,7 @@ class Client:
         self.errors = []
         self.tool_calls = []  # Curated evidence records which tools answered without error.
         self.output_schemas = None  # Advertised outputSchema per tool, loaded before the first tools/call.
+        self.output_schema_uris = {}  # Tools whose schema is a resource: _meta["tiaMcp/outputSchema"], {kind} filled per call.
         self.exited = False  # Set once the Host is gone, so later requests fail at once instead of waiting out the timeout.
         self.process = subprocess.Popen(
             command if command is not None else all_toolsets([str(executable), "--timeout-seconds", str(timeout), *(extra_arguments or [])]),
@@ -82,7 +86,10 @@ class Client:
         if method == "tools/call" and params.get("name") in ("change_prepare", "change_apply", "change_status"):
             params = {**params, "arguments": {"includeDetails": True, **(params.get("arguments") or {})}}
         if method == "tools/call" and self.output_schemas is None:
-            self.output_schemas = {tool["name"]: tool["outputSchema"] for tool in self.request("tools/list")["tools"] if "outputSchema" in tool}
+            listed = self.request("tools/list")["tools"]
+            self.output_schemas = {tool["name"]: tool["outputSchema"] for tool in listed if "outputSchema" in tool}
+            self.output_schema_uris = {tool["name"]: tool["_meta"][OUTPUT_SCHEMA_META] for tool in listed
+                                       if OUTPUT_SCHEMA_META in (tool.get("_meta") or {})}
         self.sequence += 1
         self._send({"jsonrpc": "2.0", "id": self.sequence, "method": method, "params": params or {}})
         deadline = time.monotonic() + self.timeout + 15
@@ -102,11 +109,21 @@ class Client:
                 raise RuntimeError(response["error"])
             if method == "tools/call":
                 self.tool_calls.append({"name": params["name"], "isError": bool(response["result"].get("isError"))})
-                self.check_output(params["name"], response["result"])
+                self.check_output(params["name"], response["result"], params.get("arguments") or {})
             return response["result"]
 
-    def check_output(self, name, result):
-        """Every structured result, success or refusal, must match the tool's advertised outputSchema."""
+    def check_output(self, name, result, arguments=None):
+        """Every structured result, success or refusal, must match the tool's advertised outputSchema, inline or as the
+        tia://output-schemas resource its _meta names (review_* tools by record kind)."""
+        uri = self.output_schema_uris.get(name)
+        if uri is not None:
+            uri = uri.replace("{kind}", str((arguments or {}).get("kind")))
+            if uri not in self.output_schemas:
+                try:
+                    self.output_schemas[uri] = json.loads(self.request("resources/read", {"uri": uri})["contents"][0]["text"])
+                except RuntimeError:
+                    self.output_schemas[uri] = None  # A record kind without a declared result contract.
+            name = uri
         schema = (self.output_schemas or {}).get(name)
         if schema is not None and "structuredContent" in result:
             if not hasattr(schema, "validate"):
