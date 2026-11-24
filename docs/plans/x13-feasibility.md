@@ -5,7 +5,13 @@ finds CFC/DCC V21 public APIs, V19 Portal/SDK and ODK 1500S installed on the mai
 retains the 1 November workstation observations; its missing-product labels are not current here.
 OB55/56/57 counter qualification has since passed. Configuration-event subscriptions exist and IP
 observation passed; software delivery passed on 7 November and hardware delivery on 8 November through the new
-hardware download ([record](../verification/plcsim-hardware-download-20261108.md)). Data-record responses, timespan/bus capture modes and residual Web API routes remain software work.
+hardware download ([record](../verification/plcsim-hardware-download-20261108.md)). Since then (24 November): data-record
+responses (`sim_record`, 7 November) and the time-synchronised capture modes (8 November) ran natively, and
+`SingleStep_Bus` capture was added on 20 November without a native run. Of the residual Web API routes, four were
+built on 20 November with offline checks only: `runtime_web_download` (`Modules.DownloadServiceData`,
+`PlcProgram.DownloadProfilingData`), `runtime_web_backup` (`Plc.CreateBackup`) and `runtime_web_alarm_acknowledge`
+(`Alarms.Acknowledge`); their matrix rows are open ([TODO](../TODO.md#open-matrix-rows-by-owner)). `Plc.RestoreBackup`,
+the setters and the file, data-log, clock and web-application methods are not built (row 16 and item 4 below).
 The 3 November offline follow-up adds SingleStep_P/CP/CT/CPT capture selection and bounded
 Syslog.Browse reads; its native TCP/IP run passed on 8 November ([record](../verification/plcsim-syslog-20261108.md)); a physical CPU stays open. Do not repeat the completed event adapter.
 
