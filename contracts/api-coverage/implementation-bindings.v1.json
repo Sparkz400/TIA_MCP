@@ -2012,8 +2012,8 @@
     },
     {
       "path": "src/TiaMcp.Host/DiagnosticTools.cs",
-      "sha256": "1940215ea61ee6a48327dc265c9856d97f6595dd74dbacd50127c8c48bc372e3",
-      "bytes": 13669
+      "sha256": "b2115201989507908a6734e693db6f815646f474c95651aafe68adc6d15ad147",
+      "bytes": 13755
     },
     {
       "path": "src/TiaMcp.Host/DiscoveryTools.cs",
