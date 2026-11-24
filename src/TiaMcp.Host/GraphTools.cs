@@ -11,7 +11,7 @@ namespace TiaMcp.Host;
 public sealed class GraphTools(IBridgeClient bridge, HostOptions options)
 {
     [McpServerTool(Name = "graph_export", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Export one exact offline GRAPH block (blockPath from project_inventory, or an unambiguous blockName) as unchanged native SimaticML into the Host artifact directory, then retain those bytes with their SHA-256 as a graph_* document record for graph_report_page, graph_compare and the graph_import change kind. Non-GRAPH and protected blocks are refused. No project change; native and behavioral qualification stay false.")]
+    [Description("Export one exact offline GRAPH block (blockPath from project_inventory, or an unambiguous blockName) as unchanged native SimaticML into the Host artifact directory, then retain those bytes with their SHA-256 as a graph_* document record for review_page (kind graph), graph_compare and the graph_import change kind. Non-GRAPH and protected blocks are refused. No project change; native and behavioral qualification stay false.")]
     public async Task<CallToolResult> Export(CancellationToken cancellationToken, string? blockPath = null, string? blockName = null,
         string? plcPath = null, string? projectName = null, string? scopePath = null)
     {

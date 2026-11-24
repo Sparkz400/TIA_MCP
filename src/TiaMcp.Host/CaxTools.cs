@@ -11,7 +11,7 @@ namespace TiaMcp.Host;
 public sealed partial class TiaTools
 {
     [McpServerTool(Name = "cax_export", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Export the open project, or one exact device by hardwarePath (a device path from device_inventory), through Siemens CaxProvider into a new AML file. Returns AML and transfer-result log hashes and the native transfer messages (maxItems here, up to 50000 in the retained log), then publishes the AML as an AutomationML document record (as automationml_inspect would) for automationml_report_page/compare and the cax_import amlRef. Does not save or change the project; unsaved in-memory edits are exported.")]
+    [Description("Export the open project, or one exact device by hardwarePath (a device path from device_inventory), through Siemens CaxProvider into a new AML file. Returns AML and transfer-result log hashes and the native transfer messages (maxItems here, up to 50000 in the retained log), then publishes the AML as an AutomationML document record (as automationml_inspect would) for review_page (kind automationml), automationml_compare and the cax_import amlRef. Does not save or change the project; unsaved in-memory edits are exported.")]
     public async Task<CallToolResult> CaxExport(CancellationToken cancellationToken, string? hardwarePath = null, string? projectName = null, int maxItems = 500)
     {
         var result = await Call("cax_export", new { projectName, hardwarePath, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);

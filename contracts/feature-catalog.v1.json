@@ -22043,7 +22043,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Retain a three-way package conflict report from exact baseline/project/workspace manifest handles and their reviewed manifest SHA-256 values. Revalidates every mapping and raw source. Classifies two-sided edits, deletions, missing companions, stale hashes and identity/ownership conflicts conservatively. Reports are downloadable through vci_artifact_read; canSynchronize and resolutionApplied always remain false. No merge, native mutation or Git write occurs.",
+          "Retain a three-way package conflict report from exact baseline/project/workspace manifest handles and their reviewed manifest SHA-256 values. Revalidates every mapping and raw source. Classifies two-sided edits, deletions, missing companions, stale hashes and identity/ownership conflicts conservatively. Reports are downloadable through review_artifact_read (kind vci); canSynchronize and resolutionApplied always remain false. No merge, native mutation or Git write occurs.",
           "No native VCI mapping, project reconstruction, engineering compatibility or remote publication."
         ]
       },

@@ -16,7 +16,7 @@ public sealed class VciTools(HostOptions options)
         Run(s => Task.FromResult(s.CapturePackages(sourceRecordRef, mappingUploadRef)));
 
     [McpServerTool(Name = "vci_package_compare", ReadOnly = false, Destructive = false, OpenWorld = false)]
-    [Description("Retain a three-way package conflict report from exact baseline/project/workspace manifest handles and their reviewed manifest SHA-256 values. Revalidates every mapping and raw source. Classifies two-sided edits, deletions, missing companions, stale hashes and identity/ownership conflicts conservatively. Reports are downloadable through vci_artifact_read; canSynchronize and resolutionApplied always remain false. No merge, native mutation or Git write occurs.")]
+    [Description("Retain a three-way package conflict report from exact baseline/project/workspace manifest handles and their reviewed manifest SHA-256 values. Revalidates every mapping and raw source. Classifies two-sided edits, deletions, missing companions, stale hashes and identity/ownership conflicts conservatively. Reports are downloadable through review_artifact_read (kind vci); canSynchronize and resolutionApplied always remain false. No merge, native mutation or Git write occurs.")]
     public Task<CallToolResult> ComparePackages(string baselineRef, string projectRef, string workspaceRef, VciExpectedHashes expectedHashes) =>
         Run(s => Task.FromResult(s.ComparePackages(baselineRef, projectRef, workspaceRef, expectedHashes)));
 

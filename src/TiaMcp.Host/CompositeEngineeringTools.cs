@@ -22,7 +22,7 @@ public sealed class CompositeEngineeringTools(IBridgeClient bridge, HostOptions 
     public CallToolResult RebindPlan(string recordRef) => Run(s => s.RebindPlan(recordRef, ToConnect.Value));
 
     [McpServerTool(Name = "composite_engineering_review", ReadOnly = false, Destructive = false, OpenWorld = false)]
-    [Description("Retain a combined engineering review from a committed composite-engineering-request.v1/v2/v3 upload (up to 4 MiB). Independently reopens exact AML, saved review, connection, drive and TO references; preserves explicit associations, unresolved/conflicting mappings and declared impact. No native rebind, mutation authority, complete consumer coverage or source authenticity. Each call creates a new immutable record; discover lost replies with review_list.")]
+    [Description("Retain a combined engineering review from a committed composite-engineering-request.v1/v2/v3 upload (up to 4 MiB). Independently reopens exact AML, saved review, connection, drive and TO references; preserves explicit associations, unresolved/conflicting mappings and declared impact. No native rebind, mutation authority, complete consumer coverage or source authenticity. Each call creates a new immutable record; discover lost replies with review_list (kind composite_engineering).")]
     public CallToolResult Review(string uploadRef) => Run(s => s.Review(uploadRef));
 
     // Served by review_reopen (ReviewRecordTools).

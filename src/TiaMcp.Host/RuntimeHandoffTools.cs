@@ -14,7 +14,7 @@ public sealed class RuntimeHandoffTools(HostOptions options)
     public CallToolResult Observation(string role, string uploadRef) => Run(s => s.RetainObservation(role, uploadRef));
 
     [McpServerTool(Name = "runtime_handoff_review", ReadOnly = false, Destructive = false, OpenWorld = false)]
-    [Description("Retain an offline security/runtime review from a committed runtime-handoff-request.v1 upload (1 byte..128 KiB). Select exact saved review/access/owner references and six observation references returned by runtime_handoff_observation. Compare separate CPU/program/context declarations, baseline/current scoped allowed/denied permissions and invalidation. Unknown required evidence stays unknown. No live admission, native action or capture assertion. Each invocation creates a new record; discover lost responses with runtime_handoff_list.")]
+    [Description("Retain an offline security/runtime review from a committed runtime-handoff-request.v1 upload (1 byte..128 KiB). Select exact saved review/access/owner references and six observation references returned by runtime_handoff_observation. Compare separate CPU/program/context declarations, baseline/current scoped allowed/denied permissions and invalidation. Unknown required evidence stays unknown. No live admission, native action or capture assertion. Each invocation creates a new record; discover lost responses with review_list (kind runtime_handoff).")]
     public CallToolResult Review(string uploadRef) => Run(s => s.Review(uploadRef));
 
     // Served by review_reopen (ReviewRecordTools).

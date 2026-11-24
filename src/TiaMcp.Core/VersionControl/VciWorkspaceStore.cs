@@ -386,7 +386,7 @@ public sealed partial class VciWorkspaceStore
                 if (kind is null && (Directory.Exists(Path.Combine(directory, "fork-journal")) ||
                     File.Exists(Path.Combine(directory, "push-journal", "0001.json")) || File.Exists(Path.Combine(directory, "fetch-journal", "0001.json")))) state = "outcomeUnknown";
             }
-            // State comes from receipt files only; vci_reopen of the chosen record verifies the full chain and working tree.
+            // State comes from receipt files only; review_reopen (kind vci) of the chosen record verifies the full chain and working tree.
             catch (Exception e) when (e is BridgeException or IOException or JsonException or UnauthorizedAccessException) { state = "integrity-failed"; }
             return new { id, recordRef = reference, state };
         }).ToArray();
