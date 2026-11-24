@@ -38,8 +38,12 @@ class OpcUaWorkflowContractTests(unittest.TestCase):
         for value in ([], [REFERENCE, REFERENCE], [REFERENCE] * 33):
             with self.assertRaises(Exception):
                 validate_definition("opcua_dependenciesInput", {"modelRefs": value})
-        for name, payload in [("opcua_report_pageInput", {"recordRef": REFERENCE, "section": "nodes", "pageSize": 501}),
-                              ("opcua_artifact_readInput", {"artifactRef": REFERENCE + ":report.json", "count": 65537})]:
+        validate_definition("review_pageInput", {"kind": "opcua", "recordRef": REFERENCE, "section": "nodes", "offset": 0, "count": 200})
+        validate_definition("review_artifact_readInput", {"kind": "opcua", "recordRef": REFERENCE, "name": "report.json"})
+        for name, payload in [("review_pageInput", {"kind": "opcua", "recordRef": REFERENCE, "section": "nodes", "count": 201}),
+                              ("review_pageInput", {"kind": "graph", "recordRef": REFERENCE, "section": "nodes"}),
+                              ("review_artifact_readInput", {"kind": "opcua", "recordRef": REFERENCE, "name": "report.json", "count": 65537}),
+                              ("review_artifact_readInput", {"kind": "opcua", "recordRef": REFERENCE, "name": "../receipt.json"})]:
             with self.assertRaises(Exception):
                 validate_definition(name, payload)
 
@@ -51,7 +55,7 @@ class OpcUaWorkflowContractTests(unittest.TestCase):
 
     def test_native_and_completeness_claims_rejected(self):
         page = {"recordRef": REFERENCE, "reportSha256": "c" * 64, "section": "nodes", "offset": 0, "total": 0,
-                "rows": [], "nextCursor": None, "completeArtifactRef": REFERENCE + ":report.json",
+                "rows": [], "nextOffset": None, "completeArtifactRef": REFERENCE + ":report.json",
                 "nativeQualified": False, "compatibilityCertified": False, "dependencyClosureComplete": False}
         validate_definition("reportPage", page)
         for flag in ("nativeQualified", "compatibilityCertified", "dependencyClosureComplete"):

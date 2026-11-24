@@ -232,6 +232,8 @@ def main():
         surface = {'schemaVersion': 1, 'compatibilityPolicyAccepted': False, 'nativeExecuted': False,
                    'protocolVersion': initialized['protocolVersion'], 'serverInfo': initialized['serverInfo'],
                    'capabilities': initialized['capabilities'], 'tools': [tools[n] for n in sorted(tools)],
+                   # The output schemas tools/list only names in _meta, resolved, so the freeze baseline covers them too.
+                   'outputSchemaResources': {name: schemas[name] for name in sorted(schemas) if name not in inline},
                    'prompts': [prompts[n] for n in sorted(prompts)], 'resources': sorted(resources, key=lambda r: r['uri']),
                    'resourceTemplates': sorted(resource_templates, key=lambda r: r['uriTemplate']),
                    'binaryHashes': {n: hashlib.sha256((host.parent / n).read_bytes()).hexdigest()

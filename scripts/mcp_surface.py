@@ -31,6 +31,8 @@ def major(version):
 
 def frozen(surface, catalog, codes, options, version):
     features = {f["featureId"]: f for f in catalog["features"]}
+    # Output schemas served as tia://output-schemas/{tool} (review_* tools per record kind) freeze like inline ones.
+    resolved = surface.get("outputSchemaResources") or {}
     tools, experimental = {}, []
     for tool in surface["tools"]:
         name = tool["name"]
@@ -39,6 +41,12 @@ def frozen(surface, catalog, codes, options, version):
                      "annotations": {k: v for k, v in (tool.get("annotations") or {}).items() if k in ("readOnlyHint", "destructiveHint")}}
             if "outputSchema" in tool:
                 entry["outputSchema"] = tool["outputSchema"]
+            elif name in resolved:
+                entry["outputSchema"] = resolved[name]
+            else:
+                kinds = {key.split(".", 1)[1]: schema for key, schema in resolved.items() if key.startswith(name + ".")}
+                if kinds:
+                    entry["outputSchemaByKind"] = dict(sorted(kinds.items()))
             tools[name] = entry
         else:
             experimental.append(name)
@@ -118,6 +126,11 @@ def breaking(old, new):
                 out.append(f"tool {name}: output schema removed")
             else:
                 output_breaks(tool["outputSchema"], live["outputSchema"], f"tool {name} output", out)
+        for kind, schema in (tool.get("outputSchemaByKind") or {}).items():
+            if kind not in (live.get("outputSchemaByKind") or {}):
+                out.append(f"tool {name}: output schema of kind {kind} removed")
+            else:
+                output_breaks(schema, live["outputSchemaByKind"][kind], f"tool {name} {kind} output", out)
     for name, arguments in old["prompts"].items():
         if name not in new["prompts"]:
             out.append(f"prompt {name}: removed")

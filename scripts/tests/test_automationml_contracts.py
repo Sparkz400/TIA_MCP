@@ -25,8 +25,8 @@ class AutomationMlContracts(unittest.TestCase):
     def test_contracts_bind_all_six_tools_and_refuse_native_claim(self):
         schema = json.loads((ROOT / 'contracts/automationml-workflow.v1.schema.json').read_text(encoding='utf-8'))
         Draft202012Validator.check_schema(schema)
-        self.assertEqual(set(schema['x-tool-contracts']), {'automationml_'+suffix for suffix in
-                         ['inspect', 'compare', 'reopen', 'report_page', 'artifact_read', 'list']})
+        self.assertEqual(set(schema['x-tool-contracts']), {'automationml_inspect', 'automationml_compare', 'review_reopen', 'review_page',
+                                                            'review_artifact_read', 'review_list'})
         validator = Draft202012Validator(schema['$defs']['list'])
         good = dict(rows=[], total=0, nextOffset=None, ordering='record-id; relist after additions', nativeQualified=False)
         validator.validate(good)

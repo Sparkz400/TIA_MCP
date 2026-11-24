@@ -48,14 +48,14 @@ class HandoffWorkflowTests(unittest.TestCase):
     def test_tools_and_non_authority(self):
         schema = json.loads(SCHEMA.read_text(encoding='utf-8'))
         Draft202012Validator.check_schema(schema)
-        self.assertEqual(set(schema['x-tool-contracts']), {'runtime_handoff_' + name for name in
-                         ('observation', 'review', 'reopen', 'page', 'artifact_read', 'list')})
+        self.assertEqual(set(schema['x-tool-contracts']), {'runtime_handoff_observation', 'runtime_handoff_review', 'review_reopen', 'review_page',
+                                                            'review_artifact_read', 'review_list'})
         for name in ('observationReceipt', 'handoffReceipt', 'handoffPage', 'handoffChunk', 'handoffList'):
             for flag in ('nativeQualified', 'operationAdmitted', 'assertionsAdmitted'):
                 self.assertEqual(schema['$defs'][name]['properties'][flag], {'const': False})
-        validate({}, 'runtime_handoff_listInput')
+        validate({'kind': 'runtime_handoff', 'count': 100}, 'review_listInput')
         with self.assertRaises(ValidationError):
-            validate({'count': 21}, 'runtime_handoff_listInput')
+            validate({'kind': 'runtime_handoff', 'count': 101}, 'review_listInput')
         with self.assertRaises(ValidationError):
             validate({'role': 'native', 'uploadRef': 'upload:' + 'a' * 32}, 'runtime_handoff_observationInput')
 

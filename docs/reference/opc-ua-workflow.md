@@ -60,7 +60,7 @@ Create before and after sets independently, supplying unchanged dependencies on 
 | `review_page` (kind `opcua`) | Record, section, optional `offset` and `count` | Bounded rows and `nextOffset` |
 | `review_reopen` (kind `opcua`) | Record handle | Verified summary and artifact handles after restart |
 | `review_list` (kind `opcua`) | Optional offset and count | Discovery of complete, incomplete and integrity-failed publications |
-| `review_artifact_read` (kind `opcua`) | Artifact handle, byte offset and count | Base64 bytes, exact SHA-256 and continuation offset |
+| `review_artifact_read` (kind `opcua`) | `recordRef`, artifact `name` (`original.xml`, `consumers.json` or `report.json`), byte offset and count | Base64 bytes, exact SHA-256 and continuation offset |
 
 `review_artifact_read` (kind `opcua`) downloads the exact original XML, supplied consumer JSON or complete report, at most 65,536 bytes per call. Append decoded `data` at `offset`, continue at `nextOffset` until `complete=true`, then verify the full file against `sha256`. A read at the exact end returns an empty completed chunk. Nothing in this tool writes a caller-selected output path.
 

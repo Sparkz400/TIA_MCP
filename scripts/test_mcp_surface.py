@@ -72,6 +72,21 @@ class SurfaceTests(unittest.TestCase):
                 found = self.changed(edit)
                 self.assertTrue(any(expected in change for change in found), found)
 
+    def test_output_schemas_served_as_resources_freeze_like_inline_ones(self):
+        schema = surface()["tools"][0].pop("outputSchema")
+
+        def served(by_kind=False):
+            s = surface()
+            s["tools"][0].pop("outputSchema")
+            s["outputSchemaResources"] = {"t.opcua": copy.deepcopy(schema)} if by_kind else {"t": copy.deepcopy(schema)}
+            return s
+        self.assertEqual(cut(served())["tools"]["t"]["outputSchema"], schema)
+        self.assertEqual(cut(served(True))["tools"]["t"]["outputSchemaByKind"], {"opcua": schema})
+        moved = served(True)
+        moved["outputSchemaResources"]["t.opcua"]["properties"]["rows"]["items"]["properties"].pop("id")
+        self.assertTrue(any("opcua output" in change and "removed" in change for change in breaking(cut(served(True)), cut(moved))))
+        self.assertTrue(any("kind opcua removed" in change for change in breaking(cut(served(True)), cut(served()))))
+
     def test_a_frozen_tool_cannot_become_experimental(self):
         catalog = copy.deepcopy(CATALOG)
         catalog["features"][0]["qualification"]["status"] = "unverified"

@@ -54,13 +54,13 @@ class CompositeContracts(unittest.TestCase):
         schema = SCHEMAS['workflow']
         reference = 'composite-engineering:' + 'a' * 32 + ':' + 'b' * 64
         for tool, arguments, bad in [
-            ('page', dict(recordRef=reference, count=200), {'count': 201}),
-            ('artifact_read', dict(recordRef=reference, name='report.json', count=65536), {'name': '../report.json'}),
-            ('list', dict(count=20), {'count': 21}),
-            ('reopen', dict(recordRef=reference), {'recordRef': reference.upper()}),
-            ('review', dict(uploadRef='upload:x'), {'nativeQualified': True}),
+            ('review_page', dict(kind='composite_engineering', recordRef=reference, count=200), {'count': 201}),
+            ('review_artifact_read', dict(kind='composite_engineering', recordRef=reference, name='report.json', count=65536), {'name': '../report.json'}),
+            ('review_list', dict(kind='composite_engineering', count=100), {'count': 101}),
+            ('review_reopen', dict(kind='composite_engineering', recordRef=reference), {'recordRef': reference.upper()}),
+            ('composite_engineering_review', dict(uploadRef='upload:x'), {'nativeQualified': True}),
         ]:
-            validator = Draft202012Validator({**schema, 'oneOf': [schema['x-tool-contracts']['composite_engineering_' + tool]['input']]})
+            validator = Draft202012Validator({**schema, 'oneOf': [schema['x-tool-contracts'][tool]['input']]})
             validator.validate(arguments)
             self.assertFalse(validator.is_valid({**arguments, **bad}), tool)
 

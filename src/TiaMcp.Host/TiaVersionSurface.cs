@@ -40,8 +40,9 @@ public static class TiaVersionSurface
         ["tag_table_read"] = "Export a V19 tag table as unchanged native SimaticML XML including constants and multilingual comments. Select tagTableName or tagTablePath from software_inspect.",
     };
 
+    // The review_* record tools are in base but serve V21 workflows only; a V19 Host keeps catalog and artifact transfer.
     public static bool Advertised(string tool, HostOptions options) =>
-        options.TiaVersion != 19 || ToolGroups.Of(tool) == ToolGroups.Base || V19Tools.ContainsKey(tool);
+        options.TiaVersion != 19 || ToolGroups.Of(tool) == ToolGroups.Base && !tool.StartsWith("review_", StringComparison.Ordinal) || V19Tools.ContainsKey(tool);
 
     internal static string? Description(string tool, HostOptions options) =>
         options.TiaVersion == 19 && V19Descriptions.TryGetValue(tool, out var text) ? text : null;

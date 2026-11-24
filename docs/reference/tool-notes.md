@@ -4,7 +4,7 @@ A tool description holds what a model needs to call the tool correctly. The pros
 
 The 0.5.0 surface redesign shortened every description over about 600 characters to its essentials and moved the full
 text here, and folded the per-family record tools into `review_list`, `review_reopen`, `review_page` and `review_artifact_read`,
-whose per-kind behavior follows. Tool names in the moved text are the current ones; the [MCP surface](mcp-surface.md#migration-to-050)
+whose per-kind behavior follows. Tool names in the moved text are the current ones; its parameter names (`recordId`, `uploadId`, `cursor`, `pageSize`, `maxItems`) are those before 0.5.0, which the [MCP surface](mcp-surface.md#migration-to-050)
 lists the renames.
 
 ## change_prepare

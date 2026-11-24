@@ -20,7 +20,7 @@ class PackageCatalogTests(unittest.TestCase):
         class Pages:
             def __init__(self, defect=None): self.defect=defect
             def tool(self, name, args):
-                offset=args['offset']; rows=copy.deepcopy(catalog['features'][offset:offset+args['maxItems']]); end=offset+len(rows)
+                offset=args['offset']; rows=copy.deepcopy(catalog['features'][offset:offset+args['count']]); end=offset+len(rows)
                 response={'features':rows,'catalogVersion':'test','targetAvailabilityProbed':False,
                           'pagination':{'total':201,'complete':end==201,'nextOffset':end}}
                 if offset and self.defect=='version': response['catalogVersion']='changed'
@@ -53,7 +53,7 @@ class PackageCatalogTests(unittest.TestCase):
             def tool(self,name,args=None):
                 self.calls.append(name)
                 if name!='feature_catalog': raise RuntimeError('native intentionally unavailable')
-                offset=args.get('offset',0); rows=copy.deepcopy(catalog['features'][offset:offset+args['maxItems']]); end=offset+len(rows)
+                offset=args.get('offset',0); rows=copy.deepcopy(catalog['features'][offset:offset+args['count']]); end=offset+len(rows)
                 return {'features':rows,'catalogVersion':catalog['catalogVersion'],'targetAvailabilityProbed':False,
                         'pagination':{'total':len(catalog['features']),'complete':end==len(catalog['features']),'nextOffset':end}}
         with tempfile.TemporaryDirectory() as folder:

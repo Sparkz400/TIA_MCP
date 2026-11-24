@@ -32,7 +32,7 @@ class FakeClient:
 
     def tool(self, name, args=None):
         if name == "feature_catalog":
-            offset=args.get('offset',0); rows=FEATURES[offset:offset+args.get('maxItems',100)]; end=offset+len(rows)
+            offset=args.get('offset',0); rows=FEATURES[offset:offset+args.get('count',100)]; end=offset+len(rows)
             return {"features": rows, "catalogVersion": "fixture", "targetAvailabilityProbed": False,
                     "pagination": {"total":len(FEATURES),"complete":end==len(FEATURES),"nextOffset":end}}
         if name in ("tia_capabilities", "tia_discover", "sim_status"):

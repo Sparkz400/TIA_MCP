@@ -176,7 +176,7 @@ defines all five tool inputs, successful responses, errors and downloaded receip
 3. Call `composite_engineering_review(uploadRef)`. Save its `recordRef`, which
    binds a unique record ID and the exact receipt SHA-256. Every call creates
    a new record; use discovery after a lost reply before submitting again.
-4. `review_reopen (kind composite_engineering)(recordRef)` verifies intent, receipt, request,
+4. `review_reopen(kind: composite_engineering, recordRef)` verifies intent, receipt, request,
    report and all original dependencies, then rebuilds the report for comparison.
    Request upload release and Host restart do not invalidate retained records.
 5. Use `review_page` (kind `composite_engineering`) for `selections`, `mappings`,
@@ -203,7 +203,7 @@ prioritizes consistency; large records may be expensive to reopen repeatedly.
 Hashes prove retained consistency, not producer authentication or live identity.
 Copying a composite directory alone is insufficient: its dependencies are needed.
 
-`review_list (kind composite_engineering)(offset=0,count=20)` discovers complete, incomplete
+`review_list(kind: composite_engineering, offset=0, count=20)` discovers complete, incomplete
 and verification-failed records. It never resumes an interrupted publication.
 Records are ordered by record ID; relist after additions. A completed record
 whose reply was lost can be recovered through its returned handle. Malformed
