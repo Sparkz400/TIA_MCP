@@ -97,7 +97,7 @@ namespace TiaMcp.Openness.V21
         }
 
         // The capability profile of the nearest item at or above `item` whose type has one, and the item's row path in that profile.
-        private static JObject ItemProfile(DeviceItem item, out string relativePath)
+        private static JObject ReadItemProfile(DeviceItem item, out string relativePath)
         {
             var segments = new System.Collections.Generic.List<string>();
             IEngineeringInstance cursor = item;
@@ -314,7 +314,7 @@ namespace TiaMcp.Openness.V21
             var names = access == "PLC" ? new[] { SharedConfigured, SharedTarget } : new[] { SharedConfigured };
             foreach (string name in names)
                 if (!Writable(item.Item, name)) throw new BridgeException("AttributeNotWritable", "The item declares no readable and writable " + name + "; V21 keeps SharedDeviceAccessType itself read-only.");
-            HardwareEngineeringRules.RequireProfileWritable(ItemProfile(item.Item, out string profilePath), profilePath, null, names);
+            HardwareEngineeringRules.RequireProfileWritable(ReadItemProfile(item.Item, out string profilePath), profilePath, null, names);
             string before = item.Item.GetAttribute("SharedDeviceAccessType")?.ToString();
             string currentTarget = SharedTargetPath(item.Item, hardware);
             // With externalIoControllers a module already outside the project may change only its station's external controller count.

@@ -54,8 +54,8 @@ internal static class SimulationNetworkAdmissionTests
     {
         const string boot = "192.168.0.1", mac = "02-C0-A8-00-0A-00", plcsim = "S7-1500 (PLCSIM)";
         string[] runtime = { boot };
-        string Basis(string network, bool spent, int count = 1, string address = mac, string deviceMac = mac, string series = plcsim, string[] addresses = null,
-            string bootstrap = boot, string startup = mac) =>
+        string Basis(string network, bool spent, int count = 1, string address = mac, string deviceMac = mac, string series = plcsim, string[]? addresses = null,
+            string? bootstrap = boot, string? startup = mac) =>
             SimulationNetworkAdmission.RuntimeTargetBasis(network, spent, count, address, deviceMac, series, addresses ?? runtime, bootstrap, startup);
         // Every sample of run rs_a82cdf40 (29 October 2026): the instance read back 192.168.0.1, TIA kept showing the CPU by its MAC.
         foreach (long elapsed in new long[] { 60, 380, 704, 1029, 1355, 1682, 2014, 2329, 2642, 2949, 3291, 3627, 3966, 4272, 4587, 4899, 5207, 5534,
@@ -123,7 +123,7 @@ internal static class SimulationNetworkAdmissionTests
         // A system test endpoint also needs a TCP/IP instance: the route refusal comes first, then a Softbus ticket.
         const string plcsim = "Siemens PLCSIM Virtual Ethernet Adapter";
         Check.Equal(null, SimulationNetworkAdmission.EndpointRefusal(plcsim, "TCPIP"));
-        foreach (string softbus in new[] { "Softbus", null, "tcpip", "None" })
+        foreach (string? softbus in new[] { "Softbus", null, "tcpip", "None" })
             Check.Equal("PlcsimEndpointUnreachable", SimulationNetworkAdmission.EndpointRefusal(plcsim, softbus));
         Check.Equal("RuntimeTargetNotOwnedPlcsim", SimulationNetworkAdmission.EndpointRefusal("Intel(R) Ethernet Connection I219-LM", "Softbus"));
         Check.Equal("RuntimeTargetRouteUnverified", SimulationNetworkAdmission.EndpointRefusal(null, "TCPIP"));

@@ -34,7 +34,7 @@ namespace TiaMcp.Openness.V21
                     _scratchProject.Save();
                 }
                 var manifest = TsCapture(_scratchProject, selector, directory, system: true);
-                var target = TsTarget(_scratchProject, selector, manifest, SystemQualificationFixture.Profile);
+                var target = ResolveTestSuiteTarget(_scratchProject, selector, manifest, SystemQualificationFixture.Profile);
                 var definition = TsSystemDefinition(_scratchProject, selector, name, address, manifest, target, directory);
                 var probes = TsProbes(root, directory, target, "project:" + _scratchProject.Path.FullName.ToUpperInvariant(), TsSystemProbes);
                 return new JObject { ["target"] = target, ["definition"] = definition, ["probeEvidence"] = probes,

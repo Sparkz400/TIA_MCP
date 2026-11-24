@@ -1,3 +1,5 @@
+using TiaMcp.Core;
+
 namespace TiaMcp.Host;
 
 /// <summary>Content-addressed store for Web API ticket downloads (service data, profiling data, backups): a file is named by its SHA-256, so the same
@@ -15,7 +17,7 @@ internal static class RuntimeWebDownloads
     {
         string folder = Path.Combine(artifactsRoot, Folder); Directory.CreateDirectory(folder);
         foreach (var stale in Directory.EnumerateFiles(folder, "*.tmp").Where(f => File.GetLastWriteTimeUtc(f) < DateTime.UtcNow.AddHours(-1)))
-            try { File.Delete(stale); } catch (IOException) { } catch (UnauthorizedAccessException) { }
+            PackageStorage.TryDelete(stale);
         return Path.Combine(folder, Guid.NewGuid().ToString("N") + ".tmp");
     }
 

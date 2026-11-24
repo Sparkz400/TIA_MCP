@@ -76,7 +76,7 @@ namespace TiaMcp.Openness.V21
             {
                 var fresh = TsCapture(_scratchProject, selector, TsDirectory(root, "prepare-recheck"));
                 TsEqual(manifest, fresh); TsRequireUi(_scratchProject, ruleName, fresh);
-                var target = TsTarget(_scratchProject, selector, fresh);
+                var target = ResolveTestSuiteTarget(_scratchProject, selector, fresh);
                 var probes = TsProbes(root, directory, target, "project:" + _scratchProject.Path.FullName.ToUpperInvariant());
                 var definition = TsDefinition(_scratchProject, selector, ruleName, fresh, target, directory);
                 return new JObject { ["target"] = target, ["definition"] = definition, ["probeEvidence"] = probes,
@@ -104,7 +104,7 @@ namespace TiaMcp.Openness.V21
                     _scratchProject.Save();
                 }
                 var manifest = TsCapture(_scratchProject, selector, directory, true);
-                var target = TsTarget(_scratchProject, selector, manifest, ApplicationQualificationFixture.Profile);
+                var target = ResolveTestSuiteTarget(_scratchProject, selector, manifest, ApplicationQualificationFixture.Profile);
                 var probes = TsProbes(root, directory, target, "project:" + _scratchProject.Path.FullName.ToUpperInvariant(), TsApplicationProbes);
                 var definition = TsApplicationDefinition(_scratchProject, selector, name, instance, manifest, target, directory);
                 return new JObject { ["target"] = target, ["definition"] = definition, ["probeEvidence"] = probes,
@@ -200,7 +200,7 @@ namespace TiaMcp.Openness.V21
             var vci = QualificationVciCapture(project);
             if (((JArray)vci["workspaces"]).Count != 0 || ((JArray)vci["groups"]).Count != 1)
                 throw new BridgeException("TestSuiteProfileUnqualified", "This exact fixture requires no VCI workspaces or user groups.");
-            var snapshot = WatchSnapshot(selector);
+            var snapshot = CaptureWatchSnapshot(selector);
             string definitionsDirectory = Path.Combine(directory, "definitions-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(definitionsDirectory);
             var manifest = new JObject {
                 ["profile"] = system ? SystemQualificationFixture.Profile : application ? ApplicationQualificationFixture.Profile : TestSuiteQualificationProfile,
@@ -251,7 +251,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("TestSuiteScopeIncomplete", "Fresh independent scope evidence for this exact worker/project/definition is required.");
             StyleUiEvidence.Validate(challenge, StyleUiEvidence.Read(_testSuiteUiProofPath), Path.GetDirectoryName(_testSuiteUiProofPath), DateTime.UtcNow);
         }
-        private JObject TsTarget(Project project, JObject selector, JObject manifest, string profile = TestSuiteQualificationProfile)
+        private JObject ResolveTestSuiteTarget(Project project, JObject selector, JObject manifest, string profile = TestSuiteQualificationProfile)
         {
             var plc = SelectPlc(selector); string source = ChangeHash(manifest.ToString(Formatting.None));
             return new JObject {

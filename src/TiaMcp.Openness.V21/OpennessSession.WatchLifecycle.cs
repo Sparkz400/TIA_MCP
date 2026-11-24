@@ -54,7 +54,7 @@ namespace TiaMcp.Openness.V21
         }
         private JObject WatchLifecycleVerify(string[] expected, string stage)
         {
-            var after = WatchSnapshot(_watchSelector);
+            var after = CaptureWatchSnapshot(_watchSelector);
             if (after.Value<string>("peerSha256") != _watchBefore.Value<string>("peerSha256") || after["target"].Value<bool?>("isConsistent") != true ||
                 !WatchGroupManifest.Matches(expected, File.ReadAllBytes(after["target"]["artifact"].Value<string>("path"))))
                 throw new BridgeException("VerificationFailed", stage + " readback or peer preservation differs from the reviewed lifecycle effect.", after);

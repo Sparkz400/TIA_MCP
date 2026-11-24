@@ -43,7 +43,9 @@ internal sealed class CredentialRoute(IBridgeClient inner, Func<string, Credenti
             catch
             {
                 // A refused credential never reaches admission; release the native lease the dispatcher has not seen yet.
-                try { await inner.CallAsync("mutation_end", new { leaseToken = token }, CancellationToken.None); } catch { }
+                // The refusal is rethrown either way; stderr names a failed release (code only, never the token).
+                try { await inner.CallAsync("mutation_end", new { leaseToken = token }, CancellationToken.None); }
+                catch (Exception e) { Console.Error.WriteLine($"credential route: mutation_end after a refused credential failed: {(e is BridgeException b ? b.Code : e.GetType().FullName)}"); }
                 throw;
             }
         }

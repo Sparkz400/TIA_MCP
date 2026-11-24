@@ -96,7 +96,9 @@ namespace TiaMcp.Openness.V21
                 metadata["failureType"] = ex.GetType().FullName;
                 // Preserve partial state and credentials for diagnosis; do not delete
                 // users/roles or grant anonymous rights as a fallback.
-                try { File.WriteAllText(metadataPath, metadata.ToString(Formatting.Indented), new UTF8Encoding(false)); } catch { }
+                try { File.WriteAllText(metadataPath, metadata.ToString(Formatting.Indented), new UTF8Encoding(false)); }
+                // The original failure is rethrown; stderr names why the partial metadata was not written, never its content.
+                catch (Exception write) { Console.Error.WriteLine("Scratch runtime user metadata write after failure: " + write.GetType().FullName); }
                 throw;
             }
             finally

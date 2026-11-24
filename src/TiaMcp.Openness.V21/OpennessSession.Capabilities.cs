@@ -49,151 +49,11 @@ namespace TiaMcp.Openness.V21
             var compile = ProbeCapabilityService<ICompilable>(selected.Target, "target", probes);
             metadata["compileService"] = compile.ToJson();
             if (kind == "plc") AddTargetFeature(features, "change.plc_compile", compile, "partial", "Explicit PLC software compilation through prepare/apply with a checkpoint. Generated state may change; SDK/native baseline and recovery qualification remain open.");
-            if (kind == "project")
-            {
-                AddTargetFeature(features, "project_inventory", directApi, "partial", "Bounded configured hardware and exposed software scopes; library internals and runtime values are excluded.");
-                AddTargetFeature(features, "change.project_compile", directApi, "partial", "Compiles every device of the project (hardware and software) under a checkpoint; no other mutation runs. Each device needs a compiler service.");
-                AddTargetFeature(features, "project_index", directApi, "implemented", "Bounded metadata snapshots and stable pages; external edits require explicit verification and no whole-project or logic freshness is certified.");
-                AddTargetFeature(features, "hardware_inspect", directApi, "partial", "Module-specific attributes/channels are limited to the installed API's exposed metadata.");
-                AddTargetFeature(features, "hardware_catalog_search", directApi, "implemented", "Installed catalog content and optional products determine catalog results.");
-                AddTargetFeature(features, "change.hardware_add", directApi, "partial", "An exact installed catalog identifier and valid device configuration are required.");
-                var simulation = ProbeCapabilityService<PlcSimulationSettingsProvider>(project, "project", probes);
-                AddTargetFeature(features, "change.project_simulation_enable", simulation, "implemented", "Prepared project checkpoint and explicit apply are required; apply compiles every device of the project, because the setting changes how every PLC compiles, so a project with several PLCs needs no plcPath. No simulator is started.");
-                AddTargetFeature(features, "project_properties", directApi, "partial", "Bounded project metadata, history, languages and text categories; not natively qualified.");
-                AddTargetFeature(features, "change.project_attributes_set", directApi, "partial", "Author, Copyright, Family and Version only when native attribute info permits read/write; Comment is multilingual and excluded. Not natively qualified.");
-                AddTargetFeature(features, "change.project_languages_set", directApi, "partial", "Adds/removes active languages and sets reference/editing language; removing the reference or editing language is refused. Not natively qualified.");
-                var cax = ProbeCapabilityService<CaxProvider>(project, "project", probes);
-                AddTargetFeature(features, "cax_export", cax, "partial", "Whole-project or exact-device AML export with the retained native transfer result; Siemens excludes drives, most HMI devices and listed Scalance items.");
-                AddTargetFeature(features, "change.cax_import", cax, "partial", "One hash-pinned AML file with an explicit CaxImportOptions value, checkpoint, device compile and configured-hardware readback. Runs outside exclusive access.",
-                    blocked: !_ownsPortal, blocker: "CAx import must run outside exclusive access and is limited to a worker-owned TIA instance.");
-                AddTargetFeature(features, "change.testsuite_application_import", directApi, "partial", "Strict .tat/.ttst import into the optional Test Suite application group; the Test Suite service and license are not probed here. Names are verified by readback; nothing executes.");
-                AddTargetFeature(features, "change.testsuite_system_import", directApi, "partial", "Strict .tst import into the optional Test Suite system group; the Test Suite service and license are not probed here. Names are verified by readback; no OPC UA scope is set and nothing executes.");
-                AddTargetFeature(features, "change.plc_alarm_class_import", ProbeCapabilityService<AlarmClassDataProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound DAT import with retained native result and fresh-export readback; the DAT grammar is not interpreted.");
-                AddTargetFeature(features, "change.plc_supervision_settings_import", ProbeCapabilityService<SupervisionSettingsProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound ProDiag settings DAT import; the service can be absent without ProDiag. ErrorRollback is a failure.");
-                AddTargetFeature(features, "change.umac_role_set", ProbeCapabilityService<Siemens.Engineering.Umac.UmacConfigurator>(project, "project", probes), "partial", "Custom project roles only: create, grant/revoke engineering and device function rights, assign/unassign to a project user. System roles, the anonymous user, passwords, aliases, activation and authentication are refused; every engineering right an active project user holds stays held. Not natively qualified.");
-                var vci = ProbeCapabilityService<Siemens.Engineering.VersionControl.VersionControlInterface>(project, "project", probes);
-                foreach (string feature in VciChangeKinds)
-                    AddTargetFeature(features, "change." + feature, vci, "partial", "Exact workspace/group paths from vci_workspace_inspect and exact objectPath targets. Roots overlapping the project or artifact store, links and non-empty new roots are refused; a bounded root file inventory is pinned at prepare, rechecked before the checkpoint and verified after apply. Not natively qualified.");
-            }
+            if (kind == "project") AddProjectCapabilities(project, directApi, features, probes);
 
-            if (selected.Plc != null)
-            {
-                var plc = selected.Plc;
-                bool blockTarget = selected.Target is PlcBlock;
-                object xrefTarget = blockTarget ? (object)selected.Target : plc.Software;
-                var xref = ProbeCapabilityService<CrossReferenceService>(xrefTarget, blockTarget ? "block" : "plc", probes);
-                var analysisApi = xref;
-                if (!blockTarget && xref.Status == "unavailable")
-                    analysisApi = ApiObservation.Unknown("No PLC-level CrossReferenceService. Analysis can fall back to individual block services, which were not recursively probed by this bounded target inspection.");
-                AddTargetFeature(features, "xref_query", xref, "implemented", "Native cross-references are queried only by a separate operation; current consistency and result completeness are not tested here.");
-                foreach (string feature in new[] { "call_graph", "symbol_trace", "change_impact", "instance_lookup" })
-                    AddTargetFeature(features, feature, analysisApi, "partial", "Static native reference analysis; indirect/runtime aliases and unresolved propagation remain explicit gaps.");
-                var unit = ProbeCapabilityService<PlcUnitProvider>(plc.Software, "plc", probes);
-                metadata["softwareUnitService"] = unit.ToJson();
-                if (kind == "plc" || kind == "softwareUnit" || kind == "safetyUnit")
-                {
-                    AddTargetFeature(features, "software_inspect", directApi, "partial", "Bounded exposed software scopes, tags and data types; native protected content remains inaccessible.");
-                    AddTargetFeature(features, "technology_read", directApi, "partial", "Enumerates PLC technology groups and the OutputCams/MeasuringInputs child compositions; it does not infer unit-local TO support or other service coverage.");
-                    foreach (string feature in new[] { "source_upsert", "type_source_upsert", "block_import_xml", "graph_import", "plc_type_import_xml", "tag_table_import_xml" })
-                        AddTargetFeature(features, "change." + feature, directApi, "partial", "Standard and software-unit scopes use explicit native group routing; payload language/type, collision, protection and compile checks occur during prepare/apply. Unit routes require separate qualification.",
-                            blocked: safetyScope, blocker: "Safety-unit mutations require the dedicated safety import workflow.");
-                    AddTargetFeature(features, "change.graphical_typed_edit", directApi, "partial", "Versioned separate LAD/FBD models, explicit declaration/storage effects and immutable native artifacts use the existing checkpoint workflow. Exact CPU, instruction, data type, language and route profiles are required. Native-format evidence and runtime qualification are separate; inspect the shipped typed profile catalog.",
-                        blocked: safetyScope, blocker: "Typed graphical changes exclude safety scopes.");
-                    foreach (string feature in new[] { "tag_table_create", "tag_table_rename", "tag_table_delete" })
-                        AddTargetFeature(features, "change." + feature, directApi, "partial", "Create an empty table, rename one, or delete an empty user table; names are unique in the software scope and the default tag table is never deleted. Mandatory compilation and recovery checkpoint.",
-                            blocked: safetyScope, blocker: "Safety-unit tag tables are excluded from this workflow.");
-                    foreach (string feature in new[] { "group_create", "group_rename", "group_delete" })
-                        AddTargetFeature(features, "change." + feature, directApi, "partial", "Exact user groups in blocks/types/tags; generated/root groups are excluded, deletion requires an empty group, and moves are not implemented. Mandatory compilation and recovery checkpoints apply; recorded fixture evidence does not qualify the current target.",
-                            blocked: safetyScope, blocker: "Safety-unit group mutations are excluded from this workflow.");
-                    foreach (string feature in new[] { "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete", "software_unit_rename", "software_unit_create_from" })
-                        AddTargetFeature(features, "change." + feature, unit, "partial", "Standard software units only: create with an optional namespace preset or from a unit master copy (PlcUnitComposition.CreateFrom), add/remove SoftwareUnit relations between exact units (cycles refused), set Access of one unit block/type (not OBs), rename or delete an unreferenced unit (delete: empty only). V21 has no unit copy or move API. Mandatory compile and recovery checkpoint.",
-                            applicable: feature == "software_unit_create" || feature == "software_unit_create_from" ? kind == "plc" : kind != "plc",
-                            blocked: safetyScope, blocker: "Safety units are excluded from software-unit lifecycle changes.");
-                    AddTargetFeature(features, "change.instance_db_create", directApi, "partial", "PlcBlockComposition.CreateInstanceDB of one new instance DB for one FB of the PLC program scope or the IEC system FBs R_TRIG/F_TRIG; name/number collisions, protected or safety FBs refuse. Mandatory compile, InstanceOfName readback after create and after save; not natively qualified.",
-                        blocked: kind != "plc", blocker: "Instance DB creation targets the standard PLC program scope only.");
-                    AddTargetFeature(features, "change.to_create", directApi, "partial", "The installed API does not expose a complete CPU-specific TO type/version catalog, so preparation admits the CPU/type/version cells recorded in the embedded technology-version-profiles.v1 contract, refuses a recorded refusal with its native text and refuses an unrecorded pair unless unprofiledAcknowledged lets Siemens validate it during creation. Optional initial scalar parameters are resolved, type/write-access checked and read back after creation within the same checkpoint before compile. Invalid initial configuration requires recovery; only exact recorded CPU/type/version fixture profiles are qualified.",
-                        blocked: kind != "plc", blocker: "Technology creation currently targets the standard PLC technology-object group.");
-                    const string alarmBlocker = "Safety units are excluded from PLC alarm and ProDiag imports.";
-                    AddTargetFeature(features, "change.plc_alarm_text_list_import", ProbeCapabilityService<PlcAlarmTextListProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound XLSX with explicit None/Override and expected list names; native result/log, fresh-export readback and list-name verification. The workbook layout is not interpreted.",
-                        blocked: safetyScope, blocker: alarmBlocker);
-                    AddTargetFeature(features, "change.plc_alarm_instance_text_import", ProbeCapabilityService<PlcAlarmTextProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound XLSX updating existing alarm instance texts; native result/log and fresh-export readback only.",
-                        blocked: safetyScope, blocker: alarmBlocker);
-                    AddTargetFeature(features, "change.plc_supervision_import", ProbeCapabilityService<SupervisionProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound ProDiag supervision XLSX with explicit None/Override; the service can be absent without ProDiag.",
-                        blocked: safetyScope, blocker: alarmBlocker);
-                    if (kind == "plc")
-                    {
-                        AddTargetFeature(features, "plc_loadable_generate", ProbeCapabilityService<Siemens.Engineering.SW.Loader.LoadableProvider>(plc.Software, "plc", probes), "partial",
-                            "Native loadable file of exact blocks or software units. Siemens documents LoadableProvider only for CPU 1518 and its subtypes from firmware V2.8; on other CPUs the service is absent and the tool refuses with UnsupportedCapability.");
-                        var opcUa = ProbeCapabilityService<OpcUaProvider>(plc.Software, "plc", probes);
-                        if (opcUa.Status != "available") opcUa = ProbeOwningHardwareService<OpcUaProvider>(plc.Software, probes);
-                        foreach (string feature in OpcUaPayloadFields.Keys)
-                            AddTargetFeature(features, "change." + feature, opcUa, "partial", "Public SW.OpcUa API only: user-defined server interface import/delete/enable, reference namespace import/delete and role mapping create/remove with explicit namespace permissions. SIMATIC and generated companion interfaces are excluded; passwords and certificates are never accepted. Checkpoint and PLC compile are mandatory; not natively qualified.");
-                        AddTargetFeature(features, "change.opcua_server_settings_set", opcUa, "partial", "CPU OPC UA server activation, port, automatic client-certificate acceptance, purchased runtime license and Alarms and Conditions through native OpcUaServer, OpcUaPort, OpcUaAutoAcceptAllClientCertificates, OpcUaPurchasedLicense and OpcUaAlarmsAndConditionsEnable attributes, each with an exact expected value; port, acceptance and Alarms and Conditions only while the server is on, guest access is refused. Checkpoint and device compile are mandatory.");
-                        AddTargetFeature(features, "change.webserver_page_set", ProbeOwningHardwareService<DefaultWebPagesFeature>(plc.Software, probes), "partial", "System web page flag and default web application selection with exact expected values; refused unless the CPU's WebserverActivate attribute is true. Checkpoint and device compile are mandatory; not natively qualified.");
-                        AddTargetFeature(features, "change.webserver_user_pages_generate", ProbeOwningHardwareService<WebserverUserDefinedPages>(plc.Software, probes), "partial", "GenerateBlocks with explicit directory, default page and application name from a prepared copy; existing DBs only with Override naming exactly the overwritten blocks. Checkpoint and PLC compile are mandatory; not natively qualified.");
-                    }
-                    var download = ProbeOwningHardwareService<DownloadProvider>(plc.Software, probes);
-                    AddTargetFeature(features, "simulation_download", download, "partial", "Requires a compatible program/CPU, simulation compilation setting and an independently verified owned OFF PLCSIM Advanced instance with a fresh ticket. Runtime licensing is not probed here.");
-                }
-                bool safetyImportTarget = kind == "plc" || kind == "safetyUnit" || kind == "block" && ((PlcBlock)selected.Target).ProgrammingLanguage.ToString().StartsWith("F_", StringComparison.Ordinal);
-                var selectedBlock = kind == "block" ? (PlcBlock)selected.Target : null;
-                string safetyBlocker = selectedBlock == null ? null : CapabilityRules.SafetyImportBlocker(
-                    selectedBlock.ProgrammingLanguage.ToString(), selectedBlock.IsKnowHowProtected, selectedBlock.IsConsistent);
-                ObserveSafety(plc.Software, features, probes, protection, safetyImportTarget, generated, safetyBlocker);
-            }
+            if (selected.Plc != null) AddPlcCapabilities(selected, kind, safetyScope, generated, directApi, features, probes, metadata, protection);
 
-            if (kind == "block" && selected.Target is PlcBlock block)
-            {
-                bool protectedBlock = block.IsKnowHowProtected;
-                bool consistent = block.IsConsistent;
-                string language = block.ProgrammingLanguage.ToString();
-                bool safetyBlock = language.StartsWith("F_", StringComparison.Ordinal);
-                protection["knowHowProtected"] = protectedBlock;
-                protection["isConsistent"] = consistent;
-                protection["programmingLanguage"] = language;
-                protection["generatedSystemGroup"] = generated;
-                foreach (string feature in new[] { "block_read", "block_interface" })
-                    AddTargetFeature(features, feature, directApi, feature == "block_interface" ? "partial" : "implemented",
-                        feature == "block_interface" ? "Native XML is retained with normalized explicit array-element starts and nested declarations. Implicit array values are not expanded; unknown native elements remain explicit. Generated system blocks can reject export."
-                            : "Native export eligibility is determined by Siemens; generated system blocks can reject export.",
-                        blocked: protectedBlock || !consistent, blocker: protectedBlock ? "The selected block is know-how protected." : "The selected block is inconsistent; native export eligibility is not established.");
-                foreach (string feature in new[] { "block_rename", "block_delete", "block_import_xml", "block_number_set", "block_attributes_set" })
-                    AddTargetFeature(features, "change." + feature, directApi, "partial", "Prepare/apply enforce explicit scope, protection and recovery checkpoints. Generated/system objects may be rejected by the native API."
-                        + (feature == "block_delete" ? " Deletion defaults to rejectReferenced and repeats the conservative exported-XML dependency scan at prepare/apply; exact own declaration is excluded, references and incomplete evidence are rejected." : ""),
-                        blocked: protectedBlock || safetyBlock || safetyScope || generated,
-                        blocker: protectedBlock ? "The selected block is know-how protected." : generated ? "Generated system-group objects are excluded from direct mutations." : "F-blocks and safety-unit objects require the dedicated safety workflow.");
-                var knowHowApi = ProbeCapabilityService<PlcBlockProtectionProvider>(block, "block", probes);
-                var writeProtectionApi = ProbeCapabilityService<PlcBlockWriteProtectionProvider>(block, "block", probes);
-                foreach (string feature in BlockProtectionKinds)
-                    AddTargetFeature(features, "change." + feature, feature == "block_write_protection_set" ? writeProtectionApi : knowHowApi, "partial", "Protected credential references only, never plaintext; the Host seals each vault secret to the one admitted apply. Exact standard block, checkpoint, compile and protection readback.",
-                        applicable: feature == "block_unprotect" ? protectedBlock : !protectedBlock, blocked: safetyBlock || safetyScope || generated,
-                        blocker: safetyBlock || safetyScope ? "F-blocks and safety-unit objects are excluded." : "Generated system-group objects are excluded from direct mutations.");
-                AddTargetFeature(features, "db_snapshot_capture", directApi, "partial", "Exports the snapshot stored on this DB (InterfaceSnapshot.Export) into a db_snapshot_review record bound to its project/PLC/DB identity; a DB without a stored snapshot refuses. Not a current CPU read.",
-                    applicable: block is DataBlock, blocked: protectedBlock, blocker: "The selected block is know-how protected.");
-                foreach (string feature in new[] { "db_snapshot_create", "db_snapshot_load_actual" })
-                    AddTargetFeature(features, "change." + feature, directApi, "partial", "ValueService on a ticket-bound owned PLCSIM Advanced instance only, online through the plc_online_compare route; physical PLCs are refused. Loads need an acknowledged captured snapshot review whose stored snapshot is unchanged. Not natively qualified.",
-                        applicable: block is DataBlock, blocked: protectedBlock || safetyBlock || safetyScope || generated,
-                        blocker: protectedBlock ? "The selected block is know-how protected." : generated ? "Generated system-group objects are excluded from direct mutations." : "F-DBs and safety-unit objects are excluded.");
-                AddTargetFeature(features, "change.source_upsert", directApi, "partial", "SCL and STL/AWL source writes preserve the existing language; no implicit language conversion is supported.",
-                    applicable: language == "SCL" || language == "STL" || block is DataBlock,
-                    blocked: protectedBlock || safetyBlock || safetyScope || generated,
-                    blocker: protectedBlock ? "The selected block is know-how protected." : generated ? "Generated system-group objects are excluded from direct mutations." : "Standard source changes cannot write safety blocks or safety-unit objects.");
-                AddTargetFeature(features, "change.graphical_operand_set", directApi, "partial", "Only an existing local/global symbolic Access node with the same symbol-component count can be changed; new networks/instructions are not synthesized.",
-                    applicable: language == "LAD" || language == "FBD", blocked: protectedBlock || !consistent || safetyScope || generated,
-                    blocker: protectedBlock ? "The selected block is know-how protected." : !consistent ? "The selected block is inconsistent." : generated ? "Generated system-group objects are excluded from direct mutations." : "Safety-unit objects require the dedicated safety workflow.");
-                AddTargetFeature(features, "change.graphical_typed_edit", directApi, "partial", "Typed Boolean, comparison, call, timer and counter networks require an exact native profile, resolved declarations and explicit instance storage. Complete native readback is mandatory. Supported edits, insertion and creation have separate qualification cells; source/profile availability does not certify this target.",
-                    applicable: language == "LAD" || language == "FBD", blocked: protectedBlock || !consistent || safetyScope || generated,
-                    blocker: protectedBlock ? "The selected block is know-how protected." : !consistent ? "The selected block is inconsistent." : generated ? "Generated system-group objects are excluded from direct mutations." : "Safety-unit objects require the dedicated safety workflow.");
-                foreach (string feature in new[] { "graphical_network_patch", "graphical_network_insert", "call_connection_set" })
-                    AddTargetFeature(features, "change." + feature, directApi, "partial", "Native FlgNet/v5 fragments or isolated existing call wires only; untouched interfaces, comments and unknown XML are preserved. Explicit UId/object ID and reference checks precede mandatory native compilation. Broad instruction creation and software-unit network insertion still require separate native qualification.",
-                        applicable: language == "LAD" || language == "FBD", blocked: protectedBlock || !consistent || safetyScope || generated,
-                        blocker: protectedBlock ? "The selected block is know-how protected." : !consistent ? "The selected block is inconsistent." : generated ? "Generated system-group objects are excluded from direct mutations." : "Safety-unit objects require the dedicated safety workflow.");
-                AddTargetFeature(features, "change.call_parameter_set", directApi, "partial", "Edits one existing simple symbolic call argument in SCL/v4 or FlgNet/v5. Shared graphical Access nodes, expressions and indirect operands are rejected; instance relationships and all other native XML are preserved. Requires compilation; consult feature_catalog for the exact recorded native fixture profiles.",
-                    applicable: language == "SCL" || language == "LAD" || language == "FBD", blocked: protectedBlock || !consistent || safetyScope || generated,
-                    blocker: protectedBlock ? "The selected block is know-how protected." : !consistent ? "The selected block is inconsistent." : generated ? "Generated system-group objects are excluded from direct mutations." : "Safety-unit objects require the dedicated safety workflow.");
-                AddTargetFeature(features, "engineering_read", directApi, "partial", "scope=calls reads FC/FB connections; scope=graphical returns a versioned read-only LAD/FBD graph with native IDs, hashes, opaque nodes and unresolved coverage. Native XML is retained as an artifact and can be explicitly inlined. Syntax coverage is separate from type resolution and runtime qualification.",
-                    blocked: protectedBlock || !consistent, blocker: protectedBlock ? "The selected block is know-how protected." : "The selected block is inconsistent.");
-            }
+            if (kind == "block" && selected.Target is PlcBlock block) AddBlockCapabilities(block, safetyScope, generated, directApi, features, probes, protection);
             else if (selected.Target is PlcType type)
             {
                 protection["knowHowProtected"] = type.IsKnowHowProtected;
@@ -220,53 +80,7 @@ namespace TiaMcp.Openness.V21
                     AddTargetFeature(features, "change." + feature, directApi, "partial", "Creates one member in this table after a scope-wide tag/constant name collision check; created safety tags are rejected. Native compilation and recovery checkpoints are required.",
                         blocked: safetyScope || generated, blocker: "Safety-unit/generated tag tables are excluded from this mutation workflow.");
             }
-            else if (selected.Target is DeviceItem hardware)
-            {
-                AddTargetFeature(features, "hardware_inspect", directApi, "partial", "Only native offline configured address/channel data and exposed module attributes are available.");
-                AddTargetFeature(features, "engineering_read", directApi, "partial", "Native attribute access metadata and the bridge's explicit scalar write allowlist are separate restrictions.");
-                AddTargetFeature(features, "change.hardware_attributes", directApi, "partial", "Both native write access and HardwareWriteAttributes allowlist must permit each requested field, and the module's capability profile when one exists.");
-                AddTargetFeature(features, "change.hardware_shared_device_access", directApi, "partial", "SharedDeviceAccessType PLC or OutsideOfProject on one module or submodule of an assigned IO device; native write access, address ownership limited to the station's I/O-system PLCs, compiled preservation and checkpoint required.");
-                AddTargetFeature(features, "change.hardware_address_set", directApi, "partial", "Edits one exact exposed native I/O address with ioType and oldStartAddress conflict checks. Native controller ownership and overlap must be known; uncertain ownership is rejected. Compilation and a recovery checkpoint are mandatory. Recorded native DI/DO/AI/AO profiles do not qualify arbitrary targets.");
-                AddTargetFeature(features, "change.hardware_plug", directApi, "partial", "Actual CanPlugNew/type/position validation occurs during prepare; child-slot compatibility is not inferred from metadata.");
-                AddTargetFeature(features, "change.hardware_move", directApi, "partial", "Same-rack pluggable-module slot moves require native CanPlugMove, compiled readback and configured hardware preservation.");
-                AddTargetFeature(features, "change.hardware_channel_attributes", directApi, "partial", "Exact native channel type/I-O-type/number plus reviewed scalar allowlist and native read/write metadata, and a rising-edge hardware interrupt linked to a hardware interrupt OB of the module's own PLC by exact name; compiled preservation and checkpoint required.");
-                AddTargetFeature(features, "change.hardware_cpu_memory_bytes", directApi, "partial", "CPU device items declaring the native system and clock memory attributes only; boolean enable flags, byte numbers 0-65535, distinct enabled bytes, compiled preservation and checkpoint required.");
-                AddTargetFeature(features, "change.hardware_cpu_parameters", directApi, "partial", "Only the reviewed CPU parameter attributes this item declares, plus the protection level with its full-access password from the Host credential route; native conversion, readback, device compilation and configured-hardware preservation are mandatory.");
-                AddTargetFeature(features, "change.hardware_delete", directApi, "partial", "The mutation workflow also rejects software-bearing descendants; that subtree is not traversed here.",
-                    blocked: hardware.IsBuiltIn, blocker: "Built-in hardware items cannot be deleted by this workflow.");
-                AddTargetFeature(features, "change.hardware_replace", directApi, "partial", "DeviceItem.ChangeType to an exact installed catalog identifier for a pluggable module without software; lost addresses/children fail after the write unless acceptLoss is true; moved or resized addresses only with acceptAddressChange and acknowledged tags. Compiled preservation and checkpoint required.",
-                    blocked: hardware.IsBuiltIn, blocker: "Built-in hardware items cannot be replaced by this workflow.");
-                var port = ProbeCapabilityService<NetworkPort>(hardware, "hardware", probes);
-                foreach (string feature in new[] { "change.hardware_port_connect", "change.hardware_port_disconnect" })
-                    AddTargetFeature(features, feature, port, "partial", "One exact port device item and one exact partner port; connect requires both free. Forward/reverse ConnectedPorts readback, compiled preservation and checkpoint required.");
-                AddTargetFeature(features, "hardware_gsd_export", ProbeCapabilityService<GsdExportProvider>(hardware, "hardware", probes), "partial", "I-device GSD export through the native GsdExportProvider into the artifact directory with SHA-256; content is not validated.");
-                var network = ProbeCapabilityService<NetworkInterface>(hardware, "hardware", probes);
-                AddTargetFeature(features, "change.network_configure", network, "partial", "Offline node attributes and subnet links only; each field is checked against native access and the bridge allowlist.");
-                foreach (string feature in new[] { "change.hardware_transfer_area_create", "change.hardware_transfer_area_delete" })
-                    AddTargetFeature(features, feature, network, "partial", "One controller-device (CD) transfer area by exact name on a PROFINET interface in I-device mode; name readback, compiled preservation and checkpoint required.");
-                AddTargetFeature(features, "change.network_io_assign", network, "partial", "Exact native connector/controller indexes, selected-PLC ownership and common-subnet prerequisite; a further controller on another connector of the same interface only with sharedDevice: true.");
-                AddTargetFeature(features, "change.network_mrp_set", network, "partial", "MediaRedundancyRole of the interface (or its one MRP instance) and optional membership in a named (or created) MRP domain of its subnet; a ring role needs two ring ports; ring ports are not changed. Compiled preservation and checkpoint required.");
-                var communication = ProbeCapabilityService<CommunicationManagement>(hardware, "hardware", probes);
-                AddTargetFeature(features, "connection_inspect", communication, "partial", "Configured CommunicationManagement connections of this owner with typed properties and native endpoint owners; no consumers, resources or runtime communication.");
-                AddTargetFeature(features, "change.connection_create", communication, "partial", "One connection of an explicit V21 ConnectionType between exact local/partner nodes and partner target; type/endpoint readback, owner-table preservation, device compile and checkpoint required.");
-                AddTargetFeature(features, "change.connection_delete", communication, "partial", "Exactly one connection by connectionName and optional connectionId; program/HMI consumers are checked only by the mandatory device compile.");
-                AddTargetFeature(features, "change.connection_set", communication, "partial", "Both native write access and ConnectionWriteAttributes allowlist must permit each requested field; owner-table preservation and device compile required.");
-                metadata["connectionWriteAllowlist"] = new JArray(ConnectionWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
-                var certificates = ProbeCapabilityService<Siemens.Engineering.Security.LocalCertificateManager>(hardware, "hardware", probes);
-                foreach (string feature in CertificatePayloads.Keys)
-                    AddTargetFeature(features, "change." + feature, certificates, "partial", "Device-local certificate store only, refused while the global store is enabled: template create, public DER/PEM import, assignment through a native read-write certificate attribute with the expected current Id, deletion only without any readable reference. Private keys are never read, exported or accepted; device compile and checkpoint required; not natively qualified.");
-                ApiObservation drive;
-                try { drive = ProbeDriveContainer(hardware, probes); }
-                catch (Exception error) when (StartdriveMissing(error)) { drive = ApiObservation.Unavailable("SINAMICS Startdrive Openness is not installed or cannot be loaded."); }
-                AddTargetFeature(features, "drive_observe", drive, "partial", "Offline drive objects, parameters, BICO references and telegrams; parameter access is reported unknown.");
-                AddTargetFeature(features, "change.drive_parameter_set", drive, "partial", "Scalar offline parameter writes on one drive object with exact expected values and readback. BICO, Safety Integrated and commissioning/reset/identification parameters are refused; dependent recalculation is not read back.");
-                AddTargetFeature(features, "change.drive_motor_configure", drive, "partial", "Projects a motor without a Siemens code number into one drive data set through HardwareProjection (third-generation drives): optional motor type, exact expected nameplate entries, readback.");
-                AddTargetFeature(features, "change.drive_telegram_set", drive, "partial", "Changes the number of the one main or supplementary telegram, resizes one channel of the main, supplementary or additional telegram (ChangeSize, optionally keeping its start addresses), or inserts/erases the one supplementary, additional or torque telegram, after Startdrive's own feasibility check. Exact expected telegram rows, readback, address-shift report and overlap refusal; safety telegrams are refused; device compile required.");
-                metadata["channelWriteAllowlist"] = new JArray(ChannelWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
-                metadata["hardwareWriteAllowlist"] = new JArray(HardwareWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
-                metadata["networkWriteAllowlist"] = new JArray(NetworkWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
-                metadata["cpuMemoryByteAllowlist"] = new JArray(CpuMemoryByteAttributes.OrderBy(value => value, StringComparer.Ordinal));
-            }
+            else if (selected.Target is DeviceItem hardware) AddHardwareCapabilities(hardware, directApi, features, probes, metadata);
 
             // TechnologicalInstanceDB is also a PLC block. Its dedicated operations are
             // reported in addition to, never inferred from, the block-export interface.
@@ -303,6 +117,200 @@ namespace TiaMcp.Openness.V21
                     "No transactional snapshot; repeat discovery after a project edit, reopen or target change", "Unlisted features are not evaluated, not implicitly unsupported")
             };
             return result;
+        }
+
+        private void AddProjectCapabilities(Project project, ApiObservation directApi, JArray features, JArray probes)
+        {
+            AddTargetFeature(features, "project_inventory", directApi, "partial", "Bounded configured hardware and exposed software scopes; library internals and runtime values are excluded.");
+            AddTargetFeature(features, "change.project_compile", directApi, "partial", "Compiles every device of the project (hardware and software) under a checkpoint; no other mutation runs. Each device needs a compiler service.");
+            AddTargetFeature(features, "project_index", directApi, "implemented", "Bounded metadata snapshots and stable pages; external edits require explicit verification and no whole-project or logic freshness is certified.");
+            AddTargetFeature(features, "hardware_inspect", directApi, "partial", "Module-specific attributes/channels are limited to the installed API's exposed metadata.");
+            AddTargetFeature(features, "hardware_catalog_search", directApi, "implemented", "Installed catalog content and optional products determine catalog results.");
+            AddTargetFeature(features, "change.hardware_add", directApi, "partial", "An exact installed catalog identifier and valid device configuration are required.");
+            var simulation = ProbeCapabilityService<PlcSimulationSettingsProvider>(project, "project", probes);
+            AddTargetFeature(features, "change.project_simulation_enable", simulation, "implemented", "Prepared project checkpoint and explicit apply are required; apply compiles every device of the project, because the setting changes how every PLC compiles, so a project with several PLCs needs no plcPath. No simulator is started.");
+            AddTargetFeature(features, "project_properties", directApi, "partial", "Bounded project metadata, history, languages and text categories; not natively qualified.");
+            AddTargetFeature(features, "change.project_attributes_set", directApi, "partial", "Author, Copyright, Family and Version only when native attribute info permits read/write; Comment is multilingual and excluded. Not natively qualified.");
+            AddTargetFeature(features, "change.project_languages_set", directApi, "partial", "Adds/removes active languages and sets reference/editing language; removing the reference or editing language is refused. Not natively qualified.");
+            var cax = ProbeCapabilityService<CaxProvider>(project, "project", probes);
+            AddTargetFeature(features, "cax_export", cax, "partial", "Whole-project or exact-device AML export with the retained native transfer result; Siemens excludes drives, most HMI devices and listed Scalance items.");
+            AddTargetFeature(features, "change.cax_import", cax, "partial", "One hash-pinned AML file with an explicit CaxImportOptions value, checkpoint, device compile and configured-hardware readback. Runs outside exclusive access.",
+                blocked: !_ownsPortal, blocker: "CAx import must run outside exclusive access and is limited to a worker-owned TIA instance.");
+            AddTargetFeature(features, "change.testsuite_application_import", directApi, "partial", "Strict .tat/.ttst import into the optional Test Suite application group; the Test Suite service and license are not probed here. Names are verified by readback; nothing executes.");
+            AddTargetFeature(features, "change.testsuite_system_import", directApi, "partial", "Strict .tst import into the optional Test Suite system group; the Test Suite service and license are not probed here. Names are verified by readback; no OPC UA scope is set and nothing executes.");
+            AddTargetFeature(features, "change.plc_alarm_class_import", ProbeCapabilityService<AlarmClassDataProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound DAT import with retained native result and fresh-export readback; the DAT grammar is not interpreted.");
+            AddTargetFeature(features, "change.plc_supervision_settings_import", ProbeCapabilityService<SupervisionSettingsProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound ProDiag settings DAT import; the service can be absent without ProDiag. ErrorRollback is a failure.");
+            AddTargetFeature(features, "change.umac_role_set", ProbeCapabilityService<Siemens.Engineering.Umac.UmacConfigurator>(project, "project", probes), "partial", "Custom project roles only: create, grant/revoke engineering and device function rights, assign/unassign to a project user. System roles, the anonymous user, passwords, aliases, activation and authentication are refused; every engineering right an active project user holds stays held. Not natively qualified.");
+            var vci = ProbeCapabilityService<Siemens.Engineering.VersionControl.VersionControlInterface>(project, "project", probes);
+            foreach (string feature in VciChangeKinds)
+                AddTargetFeature(features, "change." + feature, vci, "partial", "Exact workspace/group paths from vci_workspace_inspect and exact objectPath targets. Roots overlapping the project or artifact store, links and non-empty new roots are refused; a bounded root file inventory is pinned at prepare, rechecked before the checkpoint and verified after apply. Not natively qualified.");
+        }
+
+        private void AddPlcCapabilities(NativeObjectTarget selected, string kind, bool safetyScope, bool generated, ApiObservation directApi, JArray features, JArray probes, JObject metadata, JObject protection)
+        {
+            var plc = selected.Plc;
+            bool blockTarget = selected.Target is PlcBlock;
+            object xrefTarget = blockTarget ? (object)selected.Target : plc.Software;
+            var xref = ProbeCapabilityService<CrossReferenceService>(xrefTarget, blockTarget ? "block" : "plc", probes);
+            var analysisApi = xref;
+            if (!blockTarget && xref.Status == "unavailable")
+                analysisApi = ApiObservation.Unknown("No PLC-level CrossReferenceService. Analysis can fall back to individual block services, which were not recursively probed by this bounded target inspection.");
+            AddTargetFeature(features, "xref_query", xref, "implemented", "Native cross-references are queried only by a separate operation; current consistency and result completeness are not tested here.");
+            foreach (string feature in new[] { "call_graph", "symbol_trace", "change_impact", "instance_lookup" })
+                AddTargetFeature(features, feature, analysisApi, "partial", "Static native reference analysis; indirect/runtime aliases and unresolved propagation remain explicit gaps.");
+            var unit = ProbeCapabilityService<PlcUnitProvider>(plc.Software, "plc", probes);
+            metadata["softwareUnitService"] = unit.ToJson();
+            if (kind == "plc" || kind == "softwareUnit" || kind == "safetyUnit")
+            {
+                AddTargetFeature(features, "software_inspect", directApi, "partial", "Bounded exposed software scopes, tags and data types; native protected content remains inaccessible.");
+                AddTargetFeature(features, "technology_read", directApi, "partial", "Enumerates PLC technology groups and the OutputCams/MeasuringInputs child compositions; it does not infer unit-local TO support or other service coverage.");
+                foreach (string feature in new[] { "source_upsert", "type_source_upsert", "block_import_xml", "graph_import", "plc_type_import_xml", "tag_table_import_xml" })
+                    AddTargetFeature(features, "change." + feature, directApi, "partial", "Standard and software-unit scopes use explicit native group routing; payload language/type, collision, protection and compile checks occur during prepare/apply. Unit routes require separate qualification.",
+                        blocked: safetyScope, blocker: "Safety-unit mutations require the dedicated safety import workflow.");
+                AddTargetFeature(features, "change.graphical_typed_edit", directApi, "partial", "Versioned separate LAD/FBD models, explicit declaration/storage effects and immutable native artifacts use the existing checkpoint workflow. Exact CPU, instruction, data type, language and route profiles are required. Native-format evidence and runtime qualification are separate; inspect the shipped typed profile catalog.",
+                    blocked: safetyScope, blocker: "Typed graphical changes exclude safety scopes.");
+                foreach (string feature in new[] { "tag_table_create", "tag_table_rename", "tag_table_delete" })
+                    AddTargetFeature(features, "change." + feature, directApi, "partial", "Create an empty table, rename one, or delete an empty user table; names are unique in the software scope and the default tag table is never deleted. Mandatory compilation and recovery checkpoint.",
+                        blocked: safetyScope, blocker: "Safety-unit tag tables are excluded from this workflow.");
+                foreach (string feature in new[] { "group_create", "group_rename", "group_delete" })
+                    AddTargetFeature(features, "change." + feature, directApi, "partial", "Exact user groups in blocks/types/tags; generated/root groups are excluded, deletion requires an empty group, and moves are not implemented. Mandatory compilation and recovery checkpoints apply; recorded fixture evidence does not qualify the current target.",
+                        blocked: safetyScope, blocker: "Safety-unit group mutations are excluded from this workflow.");
+                foreach (string feature in new[] { "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete", "software_unit_rename", "software_unit_create_from" })
+                    AddTargetFeature(features, "change." + feature, unit, "partial", "Standard software units only: create with an optional namespace preset or from a unit master copy (PlcUnitComposition.CreateFrom), add/remove SoftwareUnit relations between exact units (cycles refused), set Access of one unit block/type (not OBs), rename or delete an unreferenced unit (delete: empty only). V21 has no unit copy or move API. Mandatory compile and recovery checkpoint.",
+                        applicable: feature == "software_unit_create" || feature == "software_unit_create_from" ? kind == "plc" : kind != "plc",
+                        blocked: safetyScope, blocker: "Safety units are excluded from software-unit lifecycle changes.");
+                AddTargetFeature(features, "change.instance_db_create", directApi, "partial", "PlcBlockComposition.CreateInstanceDB of one new instance DB for one FB of the PLC program scope or the IEC system FBs R_TRIG/F_TRIG; name/number collisions, protected or safety FBs refuse. Mandatory compile, InstanceOfName readback after create and after save; not natively qualified.",
+                    blocked: kind != "plc", blocker: "Instance DB creation targets the standard PLC program scope only.");
+                AddTargetFeature(features, "change.to_create", directApi, "partial", "The installed API does not expose a complete CPU-specific TO type/version catalog, so preparation admits the CPU/type/version cells recorded in the embedded technology-version-profiles.v1 contract, refuses a recorded refusal with its native text and refuses an unrecorded pair unless unprofiledAcknowledged lets Siemens validate it during creation. Optional initial scalar parameters are resolved, type/write-access checked and read back after creation within the same checkpoint before compile. Invalid initial configuration requires recovery; only exact recorded CPU/type/version fixture profiles are qualified.",
+                    blocked: kind != "plc", blocker: "Technology creation currently targets the standard PLC technology-object group.");
+                const string alarmBlocker = "Safety units are excluded from PLC alarm and ProDiag imports.";
+                AddTargetFeature(features, "change.plc_alarm_text_list_import", ProbeCapabilityService<PlcAlarmTextListProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound XLSX with explicit None/Override and expected list names; native result/log, fresh-export readback and list-name verification. The workbook layout is not interpreted.",
+                    blocked: safetyScope, blocker: alarmBlocker);
+                AddTargetFeature(features, "change.plc_alarm_instance_text_import", ProbeCapabilityService<PlcAlarmTextProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound XLSX updating existing alarm instance texts; native result/log and fresh-export readback only.",
+                    blocked: safetyScope, blocker: alarmBlocker);
+                AddTargetFeature(features, "change.plc_supervision_import", ProbeCapabilityService<SupervisionProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound ProDiag supervision XLSX with explicit None/Override; the service can be absent without ProDiag.",
+                    blocked: safetyScope, blocker: alarmBlocker);
+                if (kind == "plc")
+                {
+                    AddTargetFeature(features, "plc_loadable_generate", ProbeCapabilityService<Siemens.Engineering.SW.Loader.LoadableProvider>(plc.Software, "plc", probes), "partial",
+                        "Native loadable file of exact blocks or software units. Siemens documents LoadableProvider only for CPU 1518 and its subtypes from firmware V2.8; on other CPUs the service is absent and the tool refuses with UnsupportedCapability.");
+                    var opcUa = ProbeCapabilityService<OpcUaProvider>(plc.Software, "plc", probes);
+                    if (opcUa.Status != "available") opcUa = ProbeOwningHardwareService<OpcUaProvider>(plc.Software, probes);
+                    foreach (string feature in OpcUaPayloadFields.Keys)
+                        AddTargetFeature(features, "change." + feature, opcUa, "partial", "Public SW.OpcUa API only: user-defined server interface import/delete/enable, reference namespace import/delete and role mapping create/remove with explicit namespace permissions. SIMATIC and generated companion interfaces are excluded; passwords and certificates are never accepted. Checkpoint and PLC compile are mandatory; not natively qualified.");
+                    AddTargetFeature(features, "change.opcua_server_settings_set", opcUa, "partial", "CPU OPC UA server activation, port, automatic client-certificate acceptance, purchased runtime license and Alarms and Conditions through native OpcUaServer, OpcUaPort, OpcUaAutoAcceptAllClientCertificates, OpcUaPurchasedLicense and OpcUaAlarmsAndConditionsEnable attributes, each with an exact expected value; port, acceptance and Alarms and Conditions only while the server is on, guest access is refused. Checkpoint and device compile are mandatory.");
+                    AddTargetFeature(features, "change.webserver_page_set", ProbeOwningHardwareService<DefaultWebPagesFeature>(plc.Software, probes), "partial", "System web page flag and default web application selection with exact expected values; refused unless the CPU's WebserverActivate attribute is true. Checkpoint and device compile are mandatory; not natively qualified.");
+                    AddTargetFeature(features, "change.webserver_user_pages_generate", ProbeOwningHardwareService<WebserverUserDefinedPages>(plc.Software, probes), "partial", "GenerateBlocks with explicit directory, default page and application name from a prepared copy; existing DBs only with Override naming exactly the overwritten blocks. Checkpoint and PLC compile are mandatory; not natively qualified.");
+                }
+                var download = ProbeOwningHardwareService<DownloadProvider>(plc.Software, probes);
+                AddTargetFeature(features, "simulation_download", download, "partial", "Requires a compatible program/CPU, simulation compilation setting and an independently verified owned OFF PLCSIM Advanced instance with a fresh ticket. Runtime licensing is not probed here.");
+            }
+            bool safetyImportTarget = kind == "plc" || kind == "safetyUnit" || kind == "block" && ((PlcBlock)selected.Target).ProgrammingLanguage.ToString().StartsWith("F_", StringComparison.Ordinal);
+            var selectedBlock = kind == "block" ? (PlcBlock)selected.Target : null;
+            string safetyBlocker = selectedBlock == null ? null : CapabilityRules.SafetyImportBlocker(
+                selectedBlock.ProgrammingLanguage.ToString(), selectedBlock.IsKnowHowProtected, selectedBlock.IsConsistent);
+            ObserveSafety(plc.Software, features, probes, protection, safetyImportTarget, generated, safetyBlocker);
+        }
+
+        private void AddBlockCapabilities(PlcBlock block, bool safetyScope, bool generated, ApiObservation directApi, JArray features, JArray probes, JObject protection)
+        {
+            bool protectedBlock = block.IsKnowHowProtected;
+            bool consistent = block.IsConsistent;
+            string language = block.ProgrammingLanguage.ToString();
+            bool safetyBlock = language.StartsWith("F_", StringComparison.Ordinal);
+            protection["knowHowProtected"] = protectedBlock;
+            protection["isConsistent"] = consistent;
+            protection["programmingLanguage"] = language;
+            protection["generatedSystemGroup"] = generated;
+            foreach (string feature in new[] { "block_read", "block_interface" })
+                AddTargetFeature(features, feature, directApi, feature == "block_interface" ? "partial" : "implemented",
+                    feature == "block_interface" ? "Native XML is retained with normalized explicit array-element starts and nested declarations. Implicit array values are not expanded; unknown native elements remain explicit. Generated system blocks can reject export."
+                        : "Native export eligibility is determined by Siemens; generated system blocks can reject export.",
+                    blocked: protectedBlock || !consistent, blocker: protectedBlock ? "The selected block is know-how protected." : "The selected block is inconsistent; native export eligibility is not established.");
+            foreach (string feature in new[] { "block_rename", "block_delete", "block_import_xml", "block_number_set", "block_attributes_set" })
+                AddTargetFeature(features, "change." + feature, directApi, "partial", "Prepare/apply enforce explicit scope, protection and recovery checkpoints. Generated/system objects may be rejected by the native API."
+                    + (feature == "block_delete" ? " Deletion defaults to rejectReferenced and repeats the conservative exported-XML dependency scan at prepare/apply; exact own declaration is excluded, references and incomplete evidence are rejected." : ""),
+                    blocked: protectedBlock || safetyBlock || safetyScope || generated,
+                    blocker: protectedBlock ? "The selected block is know-how protected." : generated ? "Generated system-group objects are excluded from direct mutations." : "F-blocks and safety-unit objects require the dedicated safety workflow.");
+            var knowHowApi = ProbeCapabilityService<PlcBlockProtectionProvider>(block, "block", probes);
+            var writeProtectionApi = ProbeCapabilityService<PlcBlockWriteProtectionProvider>(block, "block", probes);
+            foreach (string feature in BlockProtectionKinds)
+                AddTargetFeature(features, "change." + feature, feature == "block_write_protection_set" ? writeProtectionApi : knowHowApi, "partial", "Protected credential references only, never plaintext; the Host seals each vault secret to the one admitted apply. Exact standard block, checkpoint, compile and protection readback.",
+                    applicable: feature == "block_unprotect" ? protectedBlock : !protectedBlock, blocked: safetyBlock || safetyScope || generated,
+                    blocker: safetyBlock || safetyScope ? "F-blocks and safety-unit objects are excluded." : "Generated system-group objects are excluded from direct mutations.");
+            AddTargetFeature(features, "db_snapshot_capture", directApi, "partial", "Exports the snapshot stored on this DB (InterfaceSnapshot.Export) into a db_snapshot_review record bound to its project/PLC/DB identity; a DB without a stored snapshot refuses. Not a current CPU read.",
+                applicable: block is DataBlock, blocked: protectedBlock, blocker: "The selected block is know-how protected.");
+            foreach (string feature in new[] { "db_snapshot_create", "db_snapshot_load_actual" })
+                AddTargetFeature(features, "change." + feature, directApi, "partial", "ValueService on a ticket-bound owned PLCSIM Advanced instance only, online through the plc_online_compare route; physical PLCs are refused. Loads need an acknowledged captured snapshot review whose stored snapshot is unchanged. Not natively qualified.",
+                    applicable: block is DataBlock, blocked: protectedBlock || safetyBlock || safetyScope || generated,
+                    blocker: protectedBlock ? "The selected block is know-how protected." : generated ? "Generated system-group objects are excluded from direct mutations." : "F-DBs and safety-unit objects are excluded.");
+            AddTargetFeature(features, "change.source_upsert", directApi, "partial", "SCL and STL/AWL source writes preserve the existing language; no implicit language conversion is supported.",
+                applicable: language == "SCL" || language == "STL" || block is DataBlock,
+                blocked: protectedBlock || safetyBlock || safetyScope || generated,
+                blocker: protectedBlock ? "The selected block is know-how protected." : generated ? "Generated system-group objects are excluded from direct mutations." : "Standard source changes cannot write safety blocks or safety-unit objects.");
+            AddTargetFeature(features, "change.graphical_operand_set", directApi, "partial", "Only an existing local/global symbolic Access node with the same symbol-component count can be changed; new networks/instructions are not synthesized.",
+                applicable: language == "LAD" || language == "FBD", blocked: protectedBlock || !consistent || safetyScope || generated,
+                blocker: protectedBlock ? "The selected block is know-how protected." : !consistent ? "The selected block is inconsistent." : generated ? "Generated system-group objects are excluded from direct mutations." : "Safety-unit objects require the dedicated safety workflow.");
+            AddTargetFeature(features, "change.graphical_typed_edit", directApi, "partial", "Typed Boolean, comparison, call, timer and counter networks require an exact native profile, resolved declarations and explicit instance storage. Complete native readback is mandatory. Supported edits, insertion and creation have separate qualification cells; source/profile availability does not certify this target.",
+                applicable: language == "LAD" || language == "FBD", blocked: protectedBlock || !consistent || safetyScope || generated,
+                blocker: protectedBlock ? "The selected block is know-how protected." : !consistent ? "The selected block is inconsistent." : generated ? "Generated system-group objects are excluded from direct mutations." : "Safety-unit objects require the dedicated safety workflow.");
+            foreach (string feature in new[] { "graphical_network_patch", "graphical_network_insert", "call_connection_set" })
+                AddTargetFeature(features, "change." + feature, directApi, "partial", "Native FlgNet/v5 fragments or isolated existing call wires only; untouched interfaces, comments and unknown XML are preserved. Explicit UId/object ID and reference checks precede mandatory native compilation. Broad instruction creation and software-unit network insertion still require separate native qualification.",
+                    applicable: language == "LAD" || language == "FBD", blocked: protectedBlock || !consistent || safetyScope || generated,
+                    blocker: protectedBlock ? "The selected block is know-how protected." : !consistent ? "The selected block is inconsistent." : generated ? "Generated system-group objects are excluded from direct mutations." : "Safety-unit objects require the dedicated safety workflow.");
+            AddTargetFeature(features, "change.call_parameter_set", directApi, "partial", "Edits one existing simple symbolic call argument in SCL/v4 or FlgNet/v5. Shared graphical Access nodes, expressions and indirect operands are rejected; instance relationships and all other native XML are preserved. Requires compilation; consult feature_catalog for the exact recorded native fixture profiles.",
+                applicable: language == "SCL" || language == "LAD" || language == "FBD", blocked: protectedBlock || !consistent || safetyScope || generated,
+                blocker: protectedBlock ? "The selected block is know-how protected." : !consistent ? "The selected block is inconsistent." : generated ? "Generated system-group objects are excluded from direct mutations." : "Safety-unit objects require the dedicated safety workflow.");
+            AddTargetFeature(features, "engineering_read", directApi, "partial", "scope=calls reads FC/FB connections; scope=graphical returns a versioned read-only LAD/FBD graph with native IDs, hashes, opaque nodes and unresolved coverage. Native XML is retained as an artifact and can be explicitly inlined. Syntax coverage is separate from type resolution and runtime qualification.",
+                blocked: protectedBlock || !consistent, blocker: protectedBlock ? "The selected block is know-how protected." : "The selected block is inconsistent.");
+        }
+
+        private void AddHardwareCapabilities(DeviceItem hardware, ApiObservation directApi, JArray features, JArray probes, JObject metadata)
+        {
+            AddTargetFeature(features, "hardware_inspect", directApi, "partial", "Only native offline configured address/channel data and exposed module attributes are available.");
+            AddTargetFeature(features, "engineering_read", directApi, "partial", "Native attribute access metadata and the bridge's explicit scalar write allowlist are separate restrictions.");
+            AddTargetFeature(features, "change.hardware_attributes", directApi, "partial", "Both native write access and HardwareWriteAttributes allowlist must permit each requested field, and the module's capability profile when one exists.");
+            AddTargetFeature(features, "change.hardware_shared_device_access", directApi, "partial", "SharedDeviceAccessType PLC or OutsideOfProject on one module or submodule of an assigned IO device; native write access, address ownership limited to the station's I/O-system PLCs, compiled preservation and checkpoint required.");
+            AddTargetFeature(features, "change.hardware_address_set", directApi, "partial", "Edits one exact exposed native I/O address with ioType and oldStartAddress conflict checks. Native controller ownership and overlap must be known; uncertain ownership is rejected. Compilation and a recovery checkpoint are mandatory. Recorded native DI/DO/AI/AO profiles do not qualify arbitrary targets.");
+            AddTargetFeature(features, "change.hardware_plug", directApi, "partial", "Actual CanPlugNew/type/position validation occurs during prepare; child-slot compatibility is not inferred from metadata.");
+            AddTargetFeature(features, "change.hardware_move", directApi, "partial", "Same-rack pluggable-module slot moves require native CanPlugMove, compiled readback and configured hardware preservation.");
+            AddTargetFeature(features, "change.hardware_channel_attributes", directApi, "partial", "Exact native channel type/I-O-type/number plus reviewed scalar allowlist and native read/write metadata, and a rising-edge hardware interrupt linked to a hardware interrupt OB of the module's own PLC by exact name; compiled preservation and checkpoint required.");
+            AddTargetFeature(features, "change.hardware_cpu_memory_bytes", directApi, "partial", "CPU device items declaring the native system and clock memory attributes only; boolean enable flags, byte numbers 0-65535, distinct enabled bytes, compiled preservation and checkpoint required.");
+            AddTargetFeature(features, "change.hardware_cpu_parameters", directApi, "partial", "Only the reviewed CPU parameter attributes this item declares, plus the protection level with its full-access password from the Host credential route; native conversion, readback, device compilation and configured-hardware preservation are mandatory.");
+            AddTargetFeature(features, "change.hardware_delete", directApi, "partial", "The mutation workflow also rejects software-bearing descendants; that subtree is not traversed here.",
+                blocked: hardware.IsBuiltIn, blocker: "Built-in hardware items cannot be deleted by this workflow.");
+            AddTargetFeature(features, "change.hardware_replace", directApi, "partial", "DeviceItem.ChangeType to an exact installed catalog identifier for a pluggable module without software; lost addresses/children fail after the write unless acceptLoss is true; moved or resized addresses only with acceptAddressChange and acknowledged tags. Compiled preservation and checkpoint required.",
+                blocked: hardware.IsBuiltIn, blocker: "Built-in hardware items cannot be replaced by this workflow.");
+            var port = ProbeCapabilityService<NetworkPort>(hardware, "hardware", probes);
+            foreach (string feature in new[] { "change.hardware_port_connect", "change.hardware_port_disconnect" })
+                AddTargetFeature(features, feature, port, "partial", "One exact port device item and one exact partner port; connect requires both free. Forward/reverse ConnectedPorts readback, compiled preservation and checkpoint required.");
+            AddTargetFeature(features, "hardware_gsd_export", ProbeCapabilityService<GsdExportProvider>(hardware, "hardware", probes), "partial", "I-device GSD export through the native GsdExportProvider into the artifact directory with SHA-256; content is not validated.");
+            var network = ProbeCapabilityService<NetworkInterface>(hardware, "hardware", probes);
+            AddTargetFeature(features, "change.network_configure", network, "partial", "Offline node attributes and subnet links only; each field is checked against native access and the bridge allowlist.");
+            foreach (string feature in new[] { "change.hardware_transfer_area_create", "change.hardware_transfer_area_delete" })
+                AddTargetFeature(features, feature, network, "partial", "One controller-device (CD) transfer area by exact name on a PROFINET interface in I-device mode; name readback, compiled preservation and checkpoint required.");
+            AddTargetFeature(features, "change.network_io_assign", network, "partial", "Exact native connector/controller indexes, selected-PLC ownership and common-subnet prerequisite; a further controller on another connector of the same interface only with sharedDevice: true.");
+            AddTargetFeature(features, "change.network_mrp_set", network, "partial", "MediaRedundancyRole of the interface (or its one MRP instance) and optional membership in a named (or created) MRP domain of its subnet; a ring role needs two ring ports; ring ports are not changed. Compiled preservation and checkpoint required.");
+            var communication = ProbeCapabilityService<CommunicationManagement>(hardware, "hardware", probes);
+            AddTargetFeature(features, "connection_inspect", communication, "partial", "Configured CommunicationManagement connections of this owner with typed properties and native endpoint owners; no consumers, resources or runtime communication.");
+            AddTargetFeature(features, "change.connection_create", communication, "partial", "One connection of an explicit V21 ConnectionType between exact local/partner nodes and partner target; type/endpoint readback, owner-table preservation, device compile and checkpoint required.");
+            AddTargetFeature(features, "change.connection_delete", communication, "partial", "Exactly one connection by connectionName and optional connectionId; program/HMI consumers are checked only by the mandatory device compile.");
+            AddTargetFeature(features, "change.connection_set", communication, "partial", "Both native write access and ConnectionWriteAttributes allowlist must permit each requested field; owner-table preservation and device compile required.");
+            metadata["connectionWriteAllowlist"] = new JArray(ConnectionWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
+            var certificates = ProbeCapabilityService<Siemens.Engineering.Security.LocalCertificateManager>(hardware, "hardware", probes);
+            foreach (string feature in CertificatePayloads.Keys)
+                AddTargetFeature(features, "change." + feature, certificates, "partial", "Device-local certificate store only, refused while the global store is enabled: template create, public DER/PEM import, assignment through a native read-write certificate attribute with the expected current Id, deletion only without any readable reference. Private keys are never read, exported or accepted; device compile and checkpoint required; not natively qualified.");
+            ApiObservation drive;
+            try { drive = ProbeDriveContainer(hardware, probes); }
+            catch (Exception error) when (StartdriveMissing(error)) { drive = ApiObservation.Unavailable("SINAMICS Startdrive Openness is not installed or cannot be loaded."); }
+            AddTargetFeature(features, "drive_observe", drive, "partial", "Offline drive objects, parameters, BICO references and telegrams; parameter access is reported unknown.");
+            AddTargetFeature(features, "change.drive_parameter_set", drive, "partial", "Scalar offline parameter writes on one drive object with exact expected values and readback. BICO, Safety Integrated and commissioning/reset/identification parameters are refused; dependent recalculation is not read back.");
+            AddTargetFeature(features, "change.drive_motor_configure", drive, "partial", "Projects a motor without a Siemens code number into one drive data set through HardwareProjection (third-generation drives): optional motor type, exact expected nameplate entries, readback.");
+            AddTargetFeature(features, "change.drive_telegram_set", drive, "partial", "Changes the number of the one main or supplementary telegram, resizes one channel of the main, supplementary or additional telegram (ChangeSize, optionally keeping its start addresses), or inserts/erases the one supplementary, additional or torque telegram, after Startdrive's own feasibility check. Exact expected telegram rows, readback, address-shift report and overlap refusal; safety telegrams are refused; device compile required.");
+            metadata["channelWriteAllowlist"] = new JArray(ChannelWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
+            metadata["hardwareWriteAllowlist"] = new JArray(HardwareWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
+            metadata["networkWriteAllowlist"] = new JArray(NetworkWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
+            metadata["cpuMemoryByteAllowlist"] = new JArray(CpuMemoryByteAttributes.OrderBy(value => value, StringComparer.Ordinal));
         }
 
         private static JObject CapabilitySelectors(JObject args)

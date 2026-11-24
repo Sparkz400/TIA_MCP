@@ -16,7 +16,7 @@ namespace TiaMcp.Openness.V21
     internal sealed partial class OpennessSession
     {
         // Spool only inventory fields, rather than putting all channel/software metadata in MCP.
-        private JObject DeviceInventoryCapture(JObject args)
+        private JObject CaptureDeviceInventory(JObject args)
         {
             var project = SelectProject(args);
             string wanted = args.Value<string>("devicePath");

@@ -15,7 +15,7 @@ namespace TiaMcp.Openness.V21
         {
             var plc = SelectPlc(change.Selector);
             var blocks = new JArray();
-            var find = BlockLookup(plc, change);
+            var find = CreateBlockFinder(plc, change);
             foreach (var backup in change.Backups.OfType<JObject>().Where(b => b["blockName"] != null))
             {
                 string name = backup.Value<string>("blockName");

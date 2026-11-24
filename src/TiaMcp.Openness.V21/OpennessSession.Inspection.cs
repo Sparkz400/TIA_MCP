@@ -473,12 +473,12 @@ namespace TiaMcp.Openness.V21
                 foreach (var unit in provider.UnitGroup.Units)
                 {
                     if (!budget.Take()) break;
-                    scopes.Add(UnitScope(unit, plc.Path + "/units/" + Segment(unit.Name), "softwareUnit"));
+                    scopes.Add(CreateUnitScope(unit, plc.Path + "/units/" + Segment(unit.Name), "softwareUnit"));
                 }
                 foreach (var unit in provider.UnitGroup.SafetyUnits)
                 {
                     if (!budget.Take()) break;
-                    scopes.Add(UnitScope(unit, plc.Path + "/safetyUnits/" + Segment(unit.Name), "safetyUnit"));
+                    scopes.Add(CreateUnitScope(unit, plc.Path + "/safetyUnits/" + Segment(unit.Name), "safetyUnit"));
                 }
             }
             catch (Exception exception)
@@ -489,7 +489,7 @@ namespace TiaMcp.Openness.V21
             return scopes;
         }
 
-        private static SoftwareScope UnitScope(PlcUnitBase unit, string path, string kind) => new SoftwareScope
+        private static SoftwareScope CreateUnitScope(PlcUnitBase unit, string path, string kind) => new SoftwareScope
         { Name = unit.Name, Kind = kind, Path = path, Unit = unit, Blocks = unit.BlockGroup, Tags = unit.TagTableGroup, Types = unit.TypeGroup };
 
         private static IEnumerable<BlockEntry> AllBlocks(PlcSelection plc, ScanBudget budget)

@@ -213,9 +213,7 @@ namespace TiaMcp.Openness.V21
             if (payload == null) Fail("Hardware preservation payload is absent.");
             var expected = (JArray)before.DeepClone();
             string path = payload.Value<string>("hardwarePath");
-            JObject Target(JArray rows, string target) => rows.Cast<JObject>().SingleOrDefault(row => row.Value<string>("path") == target)
-                ?? throw new BridgeException("MutationVerificationFailed", "The exact selected hardware path is absent from the preservation manifest.");
-            var selected = kind == "cax_import" || kind == "safety_fparameter_set" ? null : Target(expected, path);
+            var selected = kind == "cax_import" || kind == "safety_fparameter_set" ? null : TargetRow(expected, path);
             if (kind == "cax_import")
             {
                 // Siemens keeps every name-conflicting device for MoveToParkingLot and RetainTiaDevice, so existing rows
@@ -225,42 +223,13 @@ namespace TiaMcp.Openness.V21
                 var known = new HashSet<string>(before.Select(row => row.Value<string>("path")), StringComparer.Ordinal);
                 foreach (var row in after.Where(row => !known.Contains(row.Value<string>("path")))) expected.Add(row.DeepClone());
             }
-            else if (kind == "hardware_plug")
-            {
-                // Logical DeviceItems can be siblings of their physical rack.
-                // Native Container identity, not string ancestry, proves placement.
-                var modules = after.OfType<JObject>().Where(row => row.Value<string>("name") == payload.Value<string>("name") && row.Value<string>("containerPath") == path &&
-                    !before.OfType<JObject>().Any(old => old.Value<string>("path") == row.Value<string>("path"))).ToArray();
-                if (modules.Length != 1) Fail("Exactly one new module must occupy the reviewed native container.");
-                string createdPath = modules[0].Value<string>("path");
-                var created = after.OfType<JObject>().Where(row => row.Value<string>("path") == createdPath || row.Value<string>("path").StartsWith(createdPath + "/", StringComparison.Ordinal)).ToArray();
-                if (created.Length == 0) Fail("The requested module is absent after plugging.");
-                var module = modules[0];
-                if (module.Value<int>("positionNumber") != payload.Value<int>("positionNumber") || module.Value<string>("typeIdentifier") != payload.Value<string>("typeIdentifier")) Fail("The created module differs from its reviewed catalog identifier or slot.");
-                foreach (var row in created) expected.Add(row.DeepClone());
-            }
+            else if (kind == "hardware_plug") ExpectPlugged(payload, before, after, expected, path);
             else if (kind == "hardware_move") selected["positionNumber"] = payload["positionNumber"].DeepClone();
-            else if (kind == "hardware_channel_attributes")
-            {
-                var channel = ((JArray)selected["channels"]).OfType<JObject>().Single(row => row.Value<int>("number") == payload.Value<int>("channelNumber") && row.Value<string>("type") == payload.Value<string>("channelType") && row.Value<string>("ioType") == payload.Value<string>("channelIoType"));
-                foreach (var property in ((JObject)payload["attributes"]).Properties()) channel["attributes"][property.Name] = property.Value.DeepClone();
-                // V21 undeclares a channel's hardware interrupt OB link while its rising-edge interrupt is off.
-                var flag = payload["attributes"]["HardwareInterruptRisingEdgeActive"];
-                if (flag != null && (flag.Type == JTokenType.Boolean ? !flag.Value<bool>() : flag.ToString() == "Deactivated")) ((JObject)channel["attributes"]).Remove("HardwareInterruptRisingEdgeInterrupt");
-                // TIA applies a technology module's OperatingMode to all its channels and resizes that item's own address ranges in place.
-                if (payload["attributes"]["OperatingMode"] != null)
-                {
-                    foreach (var peer in ((JArray)selected["channels"]).OfType<JObject>().Where(row => row["attributes"]?["OperatingMode"] != null))
-                        peer["attributes"]["OperatingMode"] = payload["attributes"]["OperatingMode"].DeepClone();
-                    var addresses = (JArray)selected["addresses"]; var observed = Target(after, path)["addresses"] as JArray;
-                    if (observed?.Count == addresses.Count)
-                        for (int index = 0; index < addresses.Count; index++) addresses[index]["lengthBits"] = observed[index]?["lengthBits"]?.DeepClone();
-                }
-            }
+            else if (kind == "hardware_channel_attributes") ExpectChannelAttributes(payload, after, selected, path);
             else if (kind == "safety_fparameter_set")
             {
                 foreach (var row in ((JArray)payload["parameters"]).OfType<JObject>())
-                    Target(expected, row.Value<string>("hardwarePath"))["attributes"][row.Value<string>("name")] = row["value"].DeepClone();
+                    TargetRow(expected, row.Value<string>("hardwarePath"))["attributes"][row.Value<string>("name")] = row["value"].DeepClone();
             }
             else if (kind == "hardware_cpu_memory_bytes")
             {
@@ -280,233 +249,283 @@ namespace TiaMcp.Openness.V21
                 var address = ((JArray)selected["addresses"]).OfType<JObject>().Single(row => row.Value<string>("ioType") == payload.Value<string>("ioType") && row.Value<int>("startAddress") == payload.Value<int>("oldStartAddress"));
                 address["startAddress"] = payload["startAddress"].DeepClone();
             }
-            else if (kind == "network_io_assign")
-            {
-                int connectorIndex = payload.Value<int>("connectorIndex");
-                string station = path.Substring(0, path.IndexOf("/items/", StringComparison.Ordinal));
-                bool disconnect = payload.Value<bool?>("disconnect") == true, shared = payload.Value<bool?>("sharedDevice") == true;
-                // A shared device keeps the selected interface's other connectors assigned to other controllers, whose PLCs may own station addresses.
-                var peers = new HashSet<string>((payload["sharedAddressControllerOwnerPaths"] as JArray ?? new JArray()).Select(owner => owner.Value<string>()), StringComparer.Ordinal);
-                if (shared == (peers.Count == 0)) Fail("A shared-device assignment, and only one, names the PLCs of the interface's other assigned connectors.");
-                var ownersBefore = new HashSet<string>(peers, StringComparer.Ordinal) { payload.Value<string>("addressControllerOwnerPath") };
-                var ownersAfter = disconnect ? peers : ownersBefore;
-                var sharedItems = (payload["sharedSubmodules"] as JArray ?? new JArray()).Select(item => item.Value<string>()).ToArray();
-                foreach (var planned in RemoteIoCompanionContract.ExpectedRows(payload)) expected.Add(planned.DeepClone());
-                int sharing = 0;
-                foreach (var row in expected.OfType<JObject>().Where(row => row.Value<string>("path").StartsWith(station + "/items/", StringComparison.Ordinal)))
-                    foreach (var peer in (row["network"]?["connectors"] as JArray ?? new JArray()).OfType<JObject>())
-                        if ((row.Value<string>("path") != path || peer.Value<int>("index") != connectorIndex) && peer["system"]?.Value<string>("state") == "assigned")
-                        {
-                            if (!shared || row.Value<string>("path") != path) Fail("Another remote-station interface/connector is assigned; its address ownership must not be rewritten.");
-                            sharing++;
-                        }
-                if (shared && sharing == 0) Fail("A shared-device assignment needs another assigned connector of the selected interface.");
-                var observed = Target(after, path);
-                var connector = (JObject)selected["network"]["connectors"][connectorIndex];
-                var actual = (JObject)observed["network"]["connectors"][connectorIndex]["system"];
-                if (disconnect)
-                {
-                    if (actual.Value<string>("state") != "notAssigned") Fail("The selected connector remains assigned.");
-                }
-                else
-                {
-                    string controllerPath = payload.Value<string>("controllerHardwarePath");
-                    int controllerIndex = payload.Value<int>("controllerIndex");
-                    var owner = Target(expected, controllerPath);
-                    var current = (JObject)owner["network"]["controllers"][controllerIndex]["system"];
-                    if (current.Value<string>("state") == "notAssigned")
-                    {
-                        current = (JObject)Target(after, controllerPath)["network"]["controllers"][controllerIndex]["system"];
-                        if (current.Value<string>("name") != payload.Value<string>("createIoSystemName") || current.Value<string>("ownerHardwarePath") != controllerPath || current.Value<int>("controllerIndex") != controllerIndex || current.Value<string>("state") != "assigned") Fail("Created I/O system differs from the reviewed controller/name.");
-                        owner["network"]["controllers"][controllerIndex]["system"] = current.DeepClone();
-                    }
-                    if (!JToken.DeepEquals(current, actual)) Fail("Connector does not reference the exact selected controller's I/O system.");
-                }
-                connector["system"] = actual.DeepClone();
-                // Native address ownership follows the assigned controller. It is the only allowed address change, and only on this
-                // remote station; a sharedDevice connection moves only its sharedSubmodules subtrees to the selected PLC, and a sharedDevice
-                // disconnect moves the leaving PLC's (its sharedSubmodules) to the remaining PLC: the only one, or remainingOwnerPath.
-                bool moving = shared && (!disconnect || sharedItems.Length != 0);
-                if (shared && !disconnect && sharedItems.Length == 0) Fail("A sharedDevice connection names its sharedSubmodules.");
-                string remaining = payload.Value<string>("remainingOwnerPath");
-                if (remaining != null && !(moving && disconnect && peers.Contains(remaining))) Fail("remainingOwnerPath names a remaining PLC of a shared disconnect that gives away sharedSubmodules.");
-                if (moving && disconnect && remaining == null && peers.Count != 1) Fail("A shared disconnect with several remaining PLCs names the one that takes its sharedSubmodules (remainingOwnerPath).");
-                string selectedOwner = moving && disconnect ? remaining ?? peers.Single() : payload.Value<string>("addressControllerOwnerPath");
-                var moved = new HashSet<string>(StringComparer.Ordinal);
-                foreach (var row in expected.OfType<JObject>().Where(row => row.Value<string>("path").StartsWith(station + "/items/", StringComparison.Ordinal) &&
-                    before.OfType<JObject>().Any(original => original.Value<string>("path") == row.Value<string>("path"))))
-                {
-                    var actualRow = Target(after, row.Value<string>("path"));
-                    var addresses = (JArray)row["addresses"]; var seen = actualRow["addresses"] as JArray;
-                    if (seen?.Count != addresses.Count) Fail("A remote-station item's address ranges changed in number.");
-                    string named = moving ? sharedItems.FirstOrDefault(item => InTree(row, item)) : null;
-                    for (int i = 0; i < addresses.Count; i++)
-                    {
-                        var previousOwners = (JArray)addresses[i]["owners"];
-                        if (previousOwners.Count > 1 || previousOwners.Any(owner => !ownersBefore.Contains(owner.Value<string>()))) Fail("Prechange remote-station address ownership is shared, foreign or unresolved.");
-                        var owners = (JArray)seen[i]["owners"];
-                        if (moving)
-                        {
-                            // Rows outside the sharedSubmodules subtrees and diagnostic (zero-length) addresses stay exact.
-                            if (named == null || addresses[i].Value<long>("lengthBits") == 0) continue;
-                            if (owners.Count != 1 || owners[0].Value<string>() != selectedOwner || !JToken.DeepEquals(addresses[i]["ioType"], seen[i]["ioType"]) || !JToken.DeepEquals(addresses[i]["lengthBits"], seen[i]["lengthBits"]))
-                                Fail("A shared submodule's I/O address must end owned by exactly the selected PLC, with its I/O type and length.");
-                            if (!JToken.DeepEquals(previousOwners, owners)) moved.Add(named);
-                            // It takes a start address in that PLC's address space (discovery hw4).
-                            addresses[i] = seen[i].DeepClone();
-                            continue;
-                        }
-                        if (owners.Count > 1 || owners.Any(owner => !ownersAfter.Contains(owner.Value<string>()))) Fail("Address ownership became shared or differs from the selected PLC address controller.");
-                        // An unaddressed range (start -1, no owner; an I-device GSD's transfer areas) takes a start in the assigned PLC's address space.
-                        if (!disconnect && previousOwners.Count == 0 && addresses[i].Value<long?>("startAddress") == -1 && owners.Count == 1 && owners[0].Value<string>() == selectedOwner &&
-                            JToken.DeepEquals(addresses[i]["ioType"], seen[i]["ioType"]) && JToken.DeepEquals(addresses[i]["lengthBits"], seen[i]["lengthBits"]))
-                            addresses[i]["startAddress"] = seen[i]["startAddress"].DeepClone();
-                        addresses[i]["owners"] = owners.DeepClone();
-                    }
-                    // A named item takes the selected PLC as its assignment target; its subitems keep theirs or follow it.
-                    var was = row["attributes"]?["SharedDeviceAssignmentTarget"]; var becomes = actualRow["attributes"]?["SharedDeviceAssignmentTarget"];
-                    bool takes = named != null && was != null && becomes?.Type == JTokenType.String && becomes.Value<string>() == selectedOwner;
-                    if (takes) row["attributes"]["SharedDeviceAssignmentTarget"] = becomes.DeepClone();
-                    if (row.Value<string>("path") == named && (!takes || JToken.DeepEquals(was, becomes))) Fail("A sharedSubmodules item does not move its assignment target to the selected PLC: " + named);
-                }
-                foreach (string item in moving ? sharedItems : new string[0])
-                    if (!moved.Contains(item)) Fail("A sharedSubmodules item moves no I/O address to the selected PLC: " + item);
-            }
-            else if (kind == "network_configure")
-            {
-                // Only the selected node's requested attributes and subnet may change; a change TIA couples to them refuses.
-                string nodeName = payload.Value<string>("nodeName"), subnet = payload.Value<string>("subnetName");
-                JObject Node(JObject row)
-                {
-                    var nodes = (row["network"]?["nodes"] as JArray ?? new JArray()).OfType<JObject>().Where(node => nodeName == null || node.Value<string>("name") == nodeName).Take(2).ToArray();
-                    return nodes.Length == 1 ? nodes[0] : throw new BridgeException("MutationVerificationFailed", "The selected network node is not exactly one manifest node.");
-                }
-                var node = Node(selected); var observed = Node(Target(after, path));
-                foreach (var property in (payload["attributes"] as JObject ?? new JObject()).Properties()) node["attributes"][property.Name] = property.Value.DeepClone();
-                if (subnet != null || payload.Value<bool?>("disconnect") == true)
-                {
-                    // Apply connects to an existing subnet by case-insensitive name; disconnect leaves none.
-                    if (!string.Equals(observed.Value<string>("subnet"), subnet, StringComparison.OrdinalIgnoreCase)) Fail("The selected node's subnet differs from the request.");
-                    node["subnet"] = observed["subnet"]?.DeepClone();
-                }
-            }
-            else if (kind == "hardware_port_connect" || kind == "hardware_port_disconnect")
-            {
-                bool connect = kind == "hardware_port_connect";
-                string partnerPath = payload.Value<string>("partnerHardwarePath");
-                if (partnerPath == path) Fail("A port cannot be linked to itself.");
-                void Link(JObject row, string other)
-                {
-                    var links = (row["port"] as JObject)?["connectedPorts"] as JArray ?? throw new BridgeException("MutationVerificationFailed", "A selected port has no captured interconnection list.");
-                    var paths = links.Select(link => link.Value<string>()).ToList();
-                    if (paths.Contains(other) == connect) Fail(connect ? "The ports were already connected." : "The ports were not connected.");
-                    if (connect) paths.Add(other); else paths.Remove(other);
-                    row["port"]["connectedPorts"] = new JArray(paths.OrderBy(value => value, StringComparer.Ordinal));
-                }
-                Link(selected, partnerPath);
-                Link(Target(expected, partnerPath), path);
-            }
-            else if (kind == "hardware_replace")
-            {
-                var observed = Target(after, path);
-                if (selected.Value<string>("typeIdentifier") == payload.Value<string>("typeIdentifier") || observed.Value<string>("typeIdentifier") != payload.Value<string>("typeIdentifier") ||
-                    observed.Value<string>("name") != selected.Value<string>("name") || !JToken.DeepEquals(observed["positionNumber"], selected["positionNumber"]) || !JToken.DeepEquals(observed["containerPath"], selected["containerPath"]))
-                    Fail("The replaced item differs from its reviewed type identifier, or its name, slot or container changed.");
-                if (payload.Value<bool?>("acceptLoss") != true)
-                {
-                    var lost = ReplaceLosses(ReplaceInventory(before, path), ReplaceInventory(after, path), payload.Value<bool?>("acceptAddressChange") == true);
-                    if (lost.Count != 0) Fail("The replacement lost configured addresses or child items; restore the checkpoint, or prepare again with acceptLoss: true. Lost: " + lost.ToString(Newtonsoft.Json.Formatting.None));
-                }
-                // The new type may bring its own channels, attributes and children; everything outside the subtree stays exact.
-                foreach (var row in expected.Where(row => InTree(row, path)).ToArray()) row.Remove();
-                foreach (var row in after.Where(row => InTree(row, path))) expected.Add(row.DeepClone());
-            }
-            else if (kind == "hardware_transfer_area_create" || kind == "hardware_transfer_area_delete")
-            {
-                // Only the named area of the selected interface may appear or disappear; its other areas stay exact.
-                bool create = kind == "hardware_transfer_area_create";
-                string name = payload.Value<string>("name");
-                JArray Areas(JObject row) => row["network"]?["transferAreas"] as JArray ?? throw new BridgeException("MutationVerificationFailed", "The selected interface has no captured transfer-area list.");
-                JArray Others(JArray areas) => new JArray(areas.Where(area => area.Value<string>("name") != name).Select(area => area.DeepClone()));
-                var old = Areas(selected); var now = Areas(Target(after, path));
-                if (old.Count(area => area.Value<string>("name") == name) != (create ? 0 : 1) || now.Count(area => area.Value<string>("name") == name) != (create ? 1 : 0) || !JToken.DeepEquals(Others(old), Others(now)))
-                    Fail("The selected interface's transfer areas differ from exactly one " + (create ? "created" : "deleted") + " area named " + name + ".");
-                selected["network"]["transferAreas"] = now.DeepClone();
-            }
-            else if (kind == "network_mrp_set")
-            {
-                // Only the selected interface's one MRP instance may take the requested role and domain; its name and ring ports stay.
-                JObject Instance(JObject row) => (row["mrp"] as JArray)?.Count == 1 ? (JObject)row["mrp"][0] : throw new BridgeException("MutationVerificationFailed", "The selected interface has no single captured MRP instance.");
-                var old = Instance(selected); var now = Instance(Target(after, path));
-                if (now.Value<string>("role") != payload.Value<string>("role") || now.Value<string>("domain") != (payload.Value<string>("domainName") ?? old.Value<string>("domain")) ||
-                    now.Value<string>("name") != old.Value<string>("name") || !JToken.DeepEquals(now["ringPorts"], old["ringPorts"]))
-                    Fail("The selected interface's MRP instance differs from the requested role and domain, or its name or ring ports changed.");
-                selected["mrp"][0] = now.DeepClone();
-                // Only createDomain adds a domain name, to every interface row of the selected interface's subnet.
-                if (payload.Value<bool?>("createDomain") == true)
-                {
-                    string subnet = selected["mrpDomains"]?.Value<string>("subnet") ?? throw new BridgeException("MutationVerificationFailed", "The selected interface has no captured subnet MRP domains.");
-                    foreach (var row in expected.OfType<JObject>().Where(row => row["mrpDomains"]?.Value<string>("subnet") == subnet))
-                    {
-                        var names = row["mrpDomains"]["domains"].Values<string>().ToList();
-                        if (names.Contains(payload.Value<string>("domainName"))) Fail("The created MRP domain already existed.");
-                        row["mrpDomains"]["domains"] = new JArray(names.Concat(new[] { payload.Value<string>("domainName") }).OrderBy(name => name, StringComparer.Ordinal));
-                    }
-                }
-            }
-            else if (kind == "hardware_shared_device_access")
-            {
-                // The module takes the requested access; its subitems may follow it. Address ranges stay; each may lose or change its one
-                // owner among the PLCs whose I/O systems the station's connectors join.
-                string access = payload.Value<string>("accessType");
-                var controllers = new HashSet<string>((payload["addressControllerOwnerPaths"] as JArray ?? new JArray()).Select(owner => owner.Value<string>()), StringComparer.Ordinal);
-                if (Target(after, path)["attributes"]?.Value<string>("SharedDeviceAccessType") != access) Fail("The selected item does not read back the requested SharedDeviceAccessType.");
-                if (access == "PLC" && Target(after, path)["attributes"]?.Value<string>("SharedDeviceAssignmentTarget") != payload.Value<string>("assignmentTargetPath")) Fail("The selected item does not read back the requested assignment target.");
-                // A direct PLC-to-PLC move is not covered (its start addresses would move unreviewed); prepare refuses it as well.
-                if (access == "PLC" && selected["attributes"]?.Value<string>("SharedDeviceAccessType") == "PLC") Fail("A module moves between two PLCs of the station only through OutsideOfProject.");
-                // externalIoControllers sets the station interface's NumberOfExternalIoControllers in the same change.
-                if (payload["externalIoControllers"] != null)
-                {
-                    var attributes = Target(expected, payload.Value<string>("ioDeviceInterfacePath"))["attributes"] as JObject ?? throw new BridgeException("MutationVerificationFailed", "The IO-device interface has no captured attributes.");
-                    attributes["NumberOfExternalIoControllers"] = payload["externalIoControllers"].DeepClone();
-                }
-                foreach (var row in expected.OfType<JObject>().Where(row => InTree(row, path)))
-                {
-                    var now = Target(after, row.Value<string>("path"));
-                    string was = row["attributes"]?.Value<string>("SharedDeviceAccessType"), becomes = now["attributes"]?.Value<string>("SharedDeviceAccessType");
-                    if (becomes != was && becomes != access) Fail("A subitem took a SharedDeviceAccessType other than the requested one.");
-                    if (becomes != null) row["attributes"]["SharedDeviceAccessType"] = becomes;
-                    // The writable inputs V21 derives the access from may follow in the subtree, only to the values the requested access gives.
-                    foreach (string name in new[] { "SharedDeviceAccessConfigured", "SharedDeviceAssignmentTarget" })
-                    {
-                        JToken old = row["attributes"]?[name], value = now["attributes"]?[name];
-                        JToken wanted = name == "SharedDeviceAccessConfigured" ? new JValue(access == "PLC") : access == "PLC" ? new JValue(payload.Value<string>("assignmentTargetPath")) : JValue.CreateNull();
-                        if (old == null && value == null) continue;
-                        if (value == null || !JToken.DeepEquals(value, old) && !JToken.DeepEquals(value, wanted)) Fail("A subitem's " + name + " differs from both its value before and the one the requested access gives.");
-                        row["attributes"][name] = value.DeepClone();
-                    }
-                    var addresses = (JArray)row["addresses"]; var observed = now["addresses"] as JArray ?? new JArray();
-                    // OutsideOfProject releases the subtree's addresses from this project; PLC gives them back, owned by the target (discovery hw4).
-                    if (observed.Count != addresses.Count)
-                    {
-                        bool released = access == "OutsideOfProject" && observed.Count == 0;
-                        bool restored = access == "PLC" && addresses.Count == 0 && observed.All(address => (address["owners"] as JArray)?.Count == 1 && address["owners"][0].Value<string>() == payload.Value<string>("assignmentTargetPath"));
-                        if (!released && !restored) Fail("The selected subtree's address ranges changed.");
-                        row["addresses"] = observed.DeepClone();
-                        continue;
-                    }
-                    for (int i = 0; i < addresses.Count; i++)
-                    {
-                        var owners = observed[i]["owners"] as JArray ?? new JArray();
-                        if (!new[] { "ioType", "startAddress", "lengthBits" }.All(key => JToken.DeepEquals(addresses[i][key], observed[i][key])) || owners.Count > 1 || owners.Any(owner => !controllers.Contains(owner.Value<string>())))
-                            Fail("A subtree address range changed, or its owner is not one PLC of the station's I/O systems.");
-                        addresses[i]["owners"] = owners.DeepClone();
-                    }
-                }
-            }
+            else if (kind == "network_io_assign") ExpectNetworkIoAssign(payload, before, after, expected, selected, path);
+            else if (kind == "network_configure") ExpectNetworkConfigured(payload, after, selected, path);
+            else if (kind == "hardware_port_connect" || kind == "hardware_port_disconnect") ExpectPortLink(kind, payload, expected, selected, path);
+            else if (kind == "hardware_replace") ExpectReplaced(payload, before, after, expected, selected, path);
+            else if (kind == "hardware_transfer_area_create" || kind == "hardware_transfer_area_delete") ExpectTransferArea(kind, payload, after, selected, path);
+            else if (kind == "network_mrp_set") ExpectMrp(payload, after, expected, selected, path);
+            else if (kind == "hardware_shared_device_access") ExpectSharedDeviceAccess(payload, after, expected, selected, path);
             else Fail("Unknown hardware preservation policy.");
             JArray Sorted(JArray rows) => new JArray(rows.Cast<JObject>().OrderBy(row => row.Value<string>("path"), StringComparer.Ordinal));
             if (!JToken.DeepEquals(Sorted(expected), Sorted(after))) Fail("An unrelated configured hardware, channel, address or network field changed; restore the checkpoint before further edits.");
+        }
+
+        private static JObject TargetRow(JArray rows, string target) => rows.Cast<JObject>().SingleOrDefault(row => row.Value<string>("path") == target)
+            ?? throw new BridgeException("MutationVerificationFailed", "The exact selected hardware path is absent from the preservation manifest.");
+
+        private static void ExpectPlugged(JObject payload, JArray before, JArray after, JArray expected, string path)
+        {
+            // Logical DeviceItems can be siblings of their physical rack.
+            // Native Container identity, not string ancestry, proves placement.
+            var modules = after.OfType<JObject>().Where(row => row.Value<string>("name") == payload.Value<string>("name") && row.Value<string>("containerPath") == path &&
+                !before.OfType<JObject>().Any(old => old.Value<string>("path") == row.Value<string>("path"))).ToArray();
+            if (modules.Length != 1) Fail("Exactly one new module must occupy the reviewed native container.");
+            string createdPath = modules[0].Value<string>("path");
+            var created = after.OfType<JObject>().Where(row => row.Value<string>("path") == createdPath || row.Value<string>("path").StartsWith(createdPath + "/", StringComparison.Ordinal)).ToArray();
+            if (created.Length == 0) Fail("The requested module is absent after plugging.");
+            var module = modules[0];
+            if (module.Value<int>("positionNumber") != payload.Value<int>("positionNumber") || module.Value<string>("typeIdentifier") != payload.Value<string>("typeIdentifier")) Fail("The created module differs from its reviewed catalog identifier or slot.");
+            foreach (var row in created) expected.Add(row.DeepClone());
+        }
+
+        private static void ExpectChannelAttributes(JObject payload, JArray after, JObject selected, string path)
+        {
+            var channel = ((JArray)selected["channels"]).OfType<JObject>().Single(row => row.Value<int>("number") == payload.Value<int>("channelNumber") && row.Value<string>("type") == payload.Value<string>("channelType") && row.Value<string>("ioType") == payload.Value<string>("channelIoType"));
+            foreach (var property in ((JObject)payload["attributes"]).Properties()) channel["attributes"][property.Name] = property.Value.DeepClone();
+            // V21 undeclares a channel's hardware interrupt OB link while its rising-edge interrupt is off.
+            var flag = payload["attributes"]["HardwareInterruptRisingEdgeActive"];
+            if (flag != null && (flag.Type == JTokenType.Boolean ? !flag.Value<bool>() : flag.ToString() == "Deactivated")) ((JObject)channel["attributes"]).Remove("HardwareInterruptRisingEdgeInterrupt");
+            // TIA applies a technology module's OperatingMode to all its channels and resizes that item's own address ranges in place.
+            if (payload["attributes"]["OperatingMode"] != null)
+            {
+                foreach (var peer in ((JArray)selected["channels"]).OfType<JObject>().Where(row => row["attributes"]?["OperatingMode"] != null))
+                    peer["attributes"]["OperatingMode"] = payload["attributes"]["OperatingMode"].DeepClone();
+                var addresses = (JArray)selected["addresses"]; var observed = TargetRow(after, path)["addresses"] as JArray;
+                if (observed?.Count == addresses.Count)
+                    for (int index = 0; index < addresses.Count; index++) addresses[index]["lengthBits"] = observed[index]?["lengthBits"]?.DeepClone();
+            }
+        }
+
+        private static void ExpectNetworkIoAssign(JObject payload, JArray before, JArray after, JArray expected, JObject selected, string path)
+        {
+            int connectorIndex = payload.Value<int>("connectorIndex");
+            string station = path.Substring(0, path.IndexOf("/items/", StringComparison.Ordinal));
+            bool disconnect = payload.Value<bool?>("disconnect") == true, shared = payload.Value<bool?>("sharedDevice") == true;
+            // A shared device keeps the selected interface's other connectors assigned to other controllers, whose PLCs may own station addresses.
+            var peers = new HashSet<string>((payload["sharedAddressControllerOwnerPaths"] as JArray ?? new JArray()).Select(owner => owner.Value<string>()), StringComparer.Ordinal);
+            if (shared == (peers.Count == 0)) Fail("A shared-device assignment, and only one, names the PLCs of the interface's other assigned connectors.");
+            var ownersBefore = new HashSet<string>(peers, StringComparer.Ordinal) { payload.Value<string>("addressControllerOwnerPath") };
+            var ownersAfter = disconnect ? peers : ownersBefore;
+            var sharedItems = (payload["sharedSubmodules"] as JArray ?? new JArray()).Select(item => item.Value<string>()).ToArray();
+            foreach (var planned in RemoteIoCompanionContract.ExpectedRows(payload)) expected.Add(planned.DeepClone());
+            int sharing = 0;
+            foreach (var row in expected.OfType<JObject>().Where(row => row.Value<string>("path").StartsWith(station + "/items/", StringComparison.Ordinal)))
+                foreach (var peer in (row["network"]?["connectors"] as JArray ?? new JArray()).OfType<JObject>())
+                    if ((row.Value<string>("path") != path || peer.Value<int>("index") != connectorIndex) && peer["system"]?.Value<string>("state") == "assigned")
+                    {
+                        if (!shared || row.Value<string>("path") != path) Fail("Another remote-station interface/connector is assigned; its address ownership must not be rewritten.");
+                        sharing++;
+                    }
+            if (shared && sharing == 0) Fail("A shared-device assignment needs another assigned connector of the selected interface.");
+            var observed = TargetRow(after, path);
+            var connector = (JObject)selected["network"]["connectors"][connectorIndex];
+            var actual = (JObject)observed["network"]["connectors"][connectorIndex]["system"];
+            if (disconnect)
+            {
+                if (actual.Value<string>("state") != "notAssigned") Fail("The selected connector remains assigned.");
+            }
+            else
+            {
+                string controllerPath = payload.Value<string>("controllerHardwarePath");
+                int controllerIndex = payload.Value<int>("controllerIndex");
+                var owner = TargetRow(expected, controllerPath);
+                var current = (JObject)owner["network"]["controllers"][controllerIndex]["system"];
+                if (current.Value<string>("state") == "notAssigned")
+                {
+                    current = (JObject)TargetRow(after, controllerPath)["network"]["controllers"][controllerIndex]["system"];
+                    if (current.Value<string>("name") != payload.Value<string>("createIoSystemName") || current.Value<string>("ownerHardwarePath") != controllerPath || current.Value<int>("controllerIndex") != controllerIndex || current.Value<string>("state") != "assigned") Fail("Created I/O system differs from the reviewed controller/name.");
+                    owner["network"]["controllers"][controllerIndex]["system"] = current.DeepClone();
+                }
+                if (!JToken.DeepEquals(current, actual)) Fail("Connector does not reference the exact selected controller's I/O system.");
+            }
+            connector["system"] = actual.DeepClone();
+            // Native address ownership follows the assigned controller. It is the only allowed address change, and only on this
+            // remote station; a sharedDevice connection moves only its sharedSubmodules subtrees to the selected PLC, and a sharedDevice
+            // disconnect moves the leaving PLC's (its sharedSubmodules) to the remaining PLC: the only one, or remainingOwnerPath.
+            bool moving = shared && (!disconnect || sharedItems.Length != 0);
+            if (shared && !disconnect && sharedItems.Length == 0) Fail("A sharedDevice connection names its sharedSubmodules.");
+            string remaining = payload.Value<string>("remainingOwnerPath");
+            if (remaining != null && !(moving && disconnect && peers.Contains(remaining))) Fail("remainingOwnerPath names a remaining PLC of a shared disconnect that gives away sharedSubmodules.");
+            if (moving && disconnect && remaining == null && peers.Count != 1) Fail("A shared disconnect with several remaining PLCs names the one that takes its sharedSubmodules (remainingOwnerPath).");
+            string selectedOwner = moving && disconnect ? remaining ?? peers.Single() : payload.Value<string>("addressControllerOwnerPath");
+            var moved = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var row in expected.OfType<JObject>().Where(row => row.Value<string>("path").StartsWith(station + "/items/", StringComparison.Ordinal) &&
+                before.OfType<JObject>().Any(original => original.Value<string>("path") == row.Value<string>("path"))))
+            {
+                var actualRow = TargetRow(after, row.Value<string>("path"));
+                var addresses = (JArray)row["addresses"]; var seen = actualRow["addresses"] as JArray;
+                if (seen?.Count != addresses.Count) Fail("A remote-station item's address ranges changed in number.");
+                string named = moving ? sharedItems.FirstOrDefault(item => InTree(row, item)) : null;
+                for (int i = 0; i < addresses.Count; i++)
+                {
+                    var previousOwners = (JArray)addresses[i]["owners"];
+                    if (previousOwners.Count > 1 || previousOwners.Any(owner => !ownersBefore.Contains(owner.Value<string>()))) Fail("Prechange remote-station address ownership is shared, foreign or unresolved.");
+                    var owners = (JArray)seen[i]["owners"];
+                    if (moving)
+                    {
+                        // Rows outside the sharedSubmodules subtrees and diagnostic (zero-length) addresses stay exact.
+                        if (named == null || addresses[i].Value<long>("lengthBits") == 0) continue;
+                        if (owners.Count != 1 || owners[0].Value<string>() != selectedOwner || !JToken.DeepEquals(addresses[i]["ioType"], seen[i]["ioType"]) || !JToken.DeepEquals(addresses[i]["lengthBits"], seen[i]["lengthBits"]))
+                            Fail("A shared submodule's I/O address must end owned by exactly the selected PLC, with its I/O type and length.");
+                        if (!JToken.DeepEquals(previousOwners, owners)) moved.Add(named);
+                        // It takes a start address in that PLC's address space (discovery hw4).
+                        addresses[i] = seen[i].DeepClone();
+                        continue;
+                    }
+                    if (owners.Count > 1 || owners.Any(owner => !ownersAfter.Contains(owner.Value<string>()))) Fail("Address ownership became shared or differs from the selected PLC address controller.");
+                    // An unaddressed range (start -1, no owner; an I-device GSD's transfer areas) takes a start in the assigned PLC's address space.
+                    if (!disconnect && previousOwners.Count == 0 && addresses[i].Value<long?>("startAddress") == -1 && owners.Count == 1 && owners[0].Value<string>() == selectedOwner &&
+                        JToken.DeepEquals(addresses[i]["ioType"], seen[i]["ioType"]) && JToken.DeepEquals(addresses[i]["lengthBits"], seen[i]["lengthBits"]))
+                        addresses[i]["startAddress"] = seen[i]["startAddress"].DeepClone();
+                    addresses[i]["owners"] = owners.DeepClone();
+                }
+                // A named item takes the selected PLC as its assignment target; its subitems keep theirs or follow it.
+                var was = row["attributes"]?["SharedDeviceAssignmentTarget"]; var becomes = actualRow["attributes"]?["SharedDeviceAssignmentTarget"];
+                bool takes = named != null && was != null && becomes?.Type == JTokenType.String && becomes.Value<string>() == selectedOwner;
+                if (takes) row["attributes"]["SharedDeviceAssignmentTarget"] = becomes.DeepClone();
+                if (row.Value<string>("path") == named && (!takes || JToken.DeepEquals(was, becomes))) Fail("A sharedSubmodules item does not move its assignment target to the selected PLC: " + named);
+            }
+            foreach (string item in moving ? sharedItems : new string[0])
+                if (!moved.Contains(item)) Fail("A sharedSubmodules item moves no I/O address to the selected PLC: " + item);
+        }
+
+        private static void ExpectNetworkConfigured(JObject payload, JArray after, JObject selected, string path)
+        {
+            // Only the selected node's requested attributes and subnet may change; a change TIA couples to them refuses.
+            string nodeName = payload.Value<string>("nodeName"), subnet = payload.Value<string>("subnetName");
+            JObject Node(JObject row)
+            {
+                var nodes = (row["network"]?["nodes"] as JArray ?? new JArray()).OfType<JObject>().Where(node => nodeName == null || node.Value<string>("name") == nodeName).Take(2).ToArray();
+                return nodes.Length == 1 ? nodes[0] : throw new BridgeException("MutationVerificationFailed", "The selected network node is not exactly one manifest node.");
+            }
+            var node = Node(selected); var observed = Node(TargetRow(after, path));
+            foreach (var property in (payload["attributes"] as JObject ?? new JObject()).Properties()) node["attributes"][property.Name] = property.Value.DeepClone();
+            if (subnet != null || payload.Value<bool?>("disconnect") == true)
+            {
+                // Apply connects to an existing subnet by case-insensitive name; disconnect leaves none.
+                if (!string.Equals(observed.Value<string>("subnet"), subnet, StringComparison.OrdinalIgnoreCase)) Fail("The selected node's subnet differs from the request.");
+                node["subnet"] = observed["subnet"]?.DeepClone();
+            }
+        }
+
+        private static void ExpectPortLink(string kind, JObject payload, JArray expected, JObject selected, string path)
+        {
+            bool connect = kind == "hardware_port_connect";
+            string partnerPath = payload.Value<string>("partnerHardwarePath");
+            if (partnerPath == path) Fail("A port cannot be linked to itself.");
+            void Link(JObject row, string other)
+            {
+                var links = (row["port"] as JObject)?["connectedPorts"] as JArray ?? throw new BridgeException("MutationVerificationFailed", "A selected port has no captured interconnection list.");
+                var paths = links.Select(link => link.Value<string>()).ToList();
+                if (paths.Contains(other) == connect) Fail(connect ? "The ports were already connected." : "The ports were not connected.");
+                if (connect) paths.Add(other); else paths.Remove(other);
+                row["port"]["connectedPorts"] = new JArray(paths.OrderBy(value => value, StringComparer.Ordinal));
+            }
+            Link(selected, partnerPath);
+            Link(TargetRow(expected, partnerPath), path);
+        }
+
+        private static void ExpectReplaced(JObject payload, JArray before, JArray after, JArray expected, JObject selected, string path)
+        {
+            var observed = TargetRow(after, path);
+            if (selected.Value<string>("typeIdentifier") == payload.Value<string>("typeIdentifier") || observed.Value<string>("typeIdentifier") != payload.Value<string>("typeIdentifier") ||
+                observed.Value<string>("name") != selected.Value<string>("name") || !JToken.DeepEquals(observed["positionNumber"], selected["positionNumber"]) || !JToken.DeepEquals(observed["containerPath"], selected["containerPath"]))
+                Fail("The replaced item differs from its reviewed type identifier, or its name, slot or container changed.");
+            if (payload.Value<bool?>("acceptLoss") != true)
+            {
+                var lost = ReplaceLosses(ReplaceInventory(before, path), ReplaceInventory(after, path), payload.Value<bool?>("acceptAddressChange") == true);
+                if (lost.Count != 0) Fail("The replacement lost configured addresses or child items; restore the checkpoint, or prepare again with acceptLoss: true. Lost: " + lost.ToString(Newtonsoft.Json.Formatting.None));
+            }
+            // The new type may bring its own channels, attributes and children; everything outside the subtree stays exact.
+            foreach (var row in expected.Where(row => InTree(row, path)).ToArray()) row.Remove();
+            foreach (var row in after.Where(row => InTree(row, path))) expected.Add(row.DeepClone());
+        }
+
+        private static void ExpectTransferArea(string kind, JObject payload, JArray after, JObject selected, string path)
+        {
+            // Only the named area of the selected interface may appear or disappear; its other areas stay exact.
+            bool create = kind == "hardware_transfer_area_create";
+            string name = payload.Value<string>("name");
+            JArray Areas(JObject row) => row["network"]?["transferAreas"] as JArray ?? throw new BridgeException("MutationVerificationFailed", "The selected interface has no captured transfer-area list.");
+            JArray Others(JArray areas) => new JArray(areas.Where(area => area.Value<string>("name") != name).Select(area => area.DeepClone()));
+            var old = Areas(selected); var now = Areas(TargetRow(after, path));
+            if (old.Count(area => area.Value<string>("name") == name) != (create ? 0 : 1) || now.Count(area => area.Value<string>("name") == name) != (create ? 1 : 0) || !JToken.DeepEquals(Others(old), Others(now)))
+                Fail("The selected interface's transfer areas differ from exactly one " + (create ? "created" : "deleted") + " area named " + name + ".");
+            selected["network"]["transferAreas"] = now.DeepClone();
+        }
+
+        private static void ExpectMrp(JObject payload, JArray after, JArray expected, JObject selected, string path)
+        {
+            // Only the selected interface's one MRP instance may take the requested role and domain; its name and ring ports stay.
+            JObject Instance(JObject row) => (row["mrp"] as JArray)?.Count == 1 ? (JObject)row["mrp"][0] : throw new BridgeException("MutationVerificationFailed", "The selected interface has no single captured MRP instance.");
+            var old = Instance(selected); var now = Instance(TargetRow(after, path));
+            if (now.Value<string>("role") != payload.Value<string>("role") || now.Value<string>("domain") != (payload.Value<string>("domainName") ?? old.Value<string>("domain")) ||
+                now.Value<string>("name") != old.Value<string>("name") || !JToken.DeepEquals(now["ringPorts"], old["ringPorts"]))
+                Fail("The selected interface's MRP instance differs from the requested role and domain, or its name or ring ports changed.");
+            selected["mrp"][0] = now.DeepClone();
+            // Only createDomain adds a domain name, to every interface row of the selected interface's subnet.
+            if (payload.Value<bool?>("createDomain") == true)
+            {
+                string subnet = selected["mrpDomains"]?.Value<string>("subnet") ?? throw new BridgeException("MutationVerificationFailed", "The selected interface has no captured subnet MRP domains.");
+                foreach (var row in expected.OfType<JObject>().Where(row => row["mrpDomains"]?.Value<string>("subnet") == subnet))
+                {
+                    var names = row["mrpDomains"]["domains"].Values<string>().ToList();
+                    if (names.Contains(payload.Value<string>("domainName"))) Fail("The created MRP domain already existed.");
+                    row["mrpDomains"]["domains"] = new JArray(names.Concat(new[] { payload.Value<string>("domainName") }).OrderBy(name => name, StringComparer.Ordinal));
+                }
+            }
+        }
+
+        private static void ExpectSharedDeviceAccess(JObject payload, JArray after, JArray expected, JObject selected, string path)
+        {
+            // The module takes the requested access; its subitems may follow it. Address ranges stay; each may lose or change its one
+            // owner among the PLCs whose I/O systems the station's connectors join.
+            string access = payload.Value<string>("accessType");
+            var controllers = new HashSet<string>((payload["addressControllerOwnerPaths"] as JArray ?? new JArray()).Select(owner => owner.Value<string>()), StringComparer.Ordinal);
+            if (TargetRow(after, path)["attributes"]?.Value<string>("SharedDeviceAccessType") != access) Fail("The selected item does not read back the requested SharedDeviceAccessType.");
+            if (access == "PLC" && TargetRow(after, path)["attributes"]?.Value<string>("SharedDeviceAssignmentTarget") != payload.Value<string>("assignmentTargetPath")) Fail("The selected item does not read back the requested assignment target.");
+            // A direct PLC-to-PLC move is not covered (its start addresses would move unreviewed); prepare refuses it as well.
+            if (access == "PLC" && selected["attributes"]?.Value<string>("SharedDeviceAccessType") == "PLC") Fail("A module moves between two PLCs of the station only through OutsideOfProject.");
+            // externalIoControllers sets the station interface's NumberOfExternalIoControllers in the same change.
+            if (payload["externalIoControllers"] != null)
+            {
+                var attributes = TargetRow(expected, payload.Value<string>("ioDeviceInterfacePath"))["attributes"] as JObject ?? throw new BridgeException("MutationVerificationFailed", "The IO-device interface has no captured attributes.");
+                attributes["NumberOfExternalIoControllers"] = payload["externalIoControllers"].DeepClone();
+            }
+            foreach (var row in expected.OfType<JObject>().Where(row => InTree(row, path)))
+            {
+                var now = TargetRow(after, row.Value<string>("path"));
+                string was = row["attributes"]?.Value<string>("SharedDeviceAccessType"), becomes = now["attributes"]?.Value<string>("SharedDeviceAccessType");
+                if (becomes != was && becomes != access) Fail("A subitem took a SharedDeviceAccessType other than the requested one.");
+                if (becomes != null) row["attributes"]["SharedDeviceAccessType"] = becomes;
+                // The writable inputs V21 derives the access from may follow in the subtree, only to the values the requested access gives.
+                foreach (string name in new[] { "SharedDeviceAccessConfigured", "SharedDeviceAssignmentTarget" })
+                {
+                    JToken old = row["attributes"]?[name], value = now["attributes"]?[name];
+                    JToken wanted = name == "SharedDeviceAccessConfigured" ? new JValue(access == "PLC") : access == "PLC" ? new JValue(payload.Value<string>("assignmentTargetPath")) : JValue.CreateNull();
+                    if (old == null && value == null) continue;
+                    if (value == null || !JToken.DeepEquals(value, old) && !JToken.DeepEquals(value, wanted)) Fail("A subitem's " + name + " differs from both its value before and the one the requested access gives.");
+                    row["attributes"][name] = value.DeepClone();
+                }
+                var addresses = (JArray)row["addresses"]; var observed = now["addresses"] as JArray ?? new JArray();
+                // OutsideOfProject releases the subtree's addresses from this project; PLC gives them back, owned by the target (discovery hw4).
+                if (observed.Count != addresses.Count)
+                {
+                    bool released = access == "OutsideOfProject" && observed.Count == 0;
+                    bool restored = access == "PLC" && addresses.Count == 0 && observed.All(address => (address["owners"] as JArray)?.Count == 1 && address["owners"][0].Value<string>() == payload.Value<string>("assignmentTargetPath"));
+                    if (!released && !restored) Fail("The selected subtree's address ranges changed.");
+                    row["addresses"] = observed.DeepClone();
+                    continue;
+                }
+                for (int i = 0; i < addresses.Count; i++)
+                {
+                    var owners = observed[i]["owners"] as JArray ?? new JArray();
+                    if (!new[] { "ioType", "startAddress", "lengthBits" }.All(key => JToken.DeepEquals(addresses[i][key], observed[i][key])) || owners.Count > 1 || owners.Any(owner => !controllers.Contains(owner.Value<string>())))
+                        Fail("A subtree address range changed, or its owner is not one PLC of the station's I/O systems.");
+                    addresses[i]["owners"] = owners.DeepClone();
+                }
+            }
         }
 
         // An address survives when the subtree still has its ioType and start with at least its length and the same owners;

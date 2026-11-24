@@ -953,9 +953,9 @@ internal static class TypedGraphicalTests
             "<Member Name='RetainedMarker' Datatype='Int'/></Section></Sections></Interface></AttributeList></SW.Blocks.InstanceDB></Document>");
         var caller = Iec("Timer_TON", "TON_TIME"); var dependent = Iec("Timer_TON", "TON_TIME", " Accessibility='Public'");
         var result = TypedGraphicalMultiInstanceTemplate.AppendSystemDependent(Db(), "U.Effect", Iec("Fresh", "TON_TIME"), caller, dependent);
-        var statics = result.Descendants(ns + "Section").Single(s => (string)s.Attribute("Name") == "Static").Elements().ToArray();
-        Check.Equal("RetainedMarker,Fresh", string.Join(",", statics.Select(m => (string)m.Attribute("Name"))));
-        Check.Equal("Public", (string)statics[1].Attribute("Accessibility"));
+        var statics = result.Descendants(ns + "Section").Single(s => (string?)s.Attribute("Name") == "Static").Elements().ToArray();
+        Check.Equal("RetainedMarker,Fresh", string.Join(",", statics.Select(m => (string?)m.Attribute("Name"))));
+        Check.Equal("Public", (string?)statics[1].Attribute("Accessibility"));
         Check.Equal("instance-effects-iec-namespace.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("namespace", true));
         foreach (var (declaration, existing) in new[] { (Iec("Fresh", "TON_TIME", " Remanence2='Retain'"), "Fresh"), (Iec("Fresh", "TOF_TIME"), "Fresh"),
                                                          (Iec("Fresh", "\"U.Other\""), "Fresh"), (Iec("RetainedMarker", "TON_TIME"), "RetainedMarker") })
