@@ -636,14 +636,18 @@
       ],
       "additionalProperties": false
     },
-    "vci_reopenInput": {
+    "review_reopenInput": {
       "type": "object",
       "properties": {
+        "kind": {
+          "const": "vci"
+        },
         "recordRef": {
           "$ref": "#/$defs/ref"
         }
       },
       "required": [
+        "kind",
         "recordRef"
       ],
       "additionalProperties": false
@@ -677,9 +681,12 @@
       ],
       "additionalProperties": false
     },
-    "vci_listInput": {
+    "review_listInput": {
       "type": "object",
       "properties": {
+        "kind": {
+          "const": "vci"
+        },
         "offset": {
           "type": "integer",
           "minimum": 0
@@ -687,15 +694,20 @@
         "count": {
           "type": "integer",
           "minimum": 1,
-          "maximum": 50
+          "maximum": 100
         }
       },
-      "required": [],
+      "required": [
+        "kind"
+      ],
       "additionalProperties": false
     },
-    "vci_artifact_readInput": {
+    "review_artifact_readInput": {
       "type": "object",
       "properties": {
+        "kind": {
+          "const": "vci"
+        },
         "recordRef": {
           "$ref": "#/$defs/ref"
         },
@@ -713,6 +725,7 @@
         }
       },
       "required": [
+        "kind",
         "recordRef",
         "name"
       ],
@@ -1400,9 +1413,9 @@
         "$ref": "#/$defs/summary"
       }
     },
-    "vci_reopen": {
+    "review_reopen": {
       "input": {
-        "$ref": "#/$defs/vci_reopenInput"
+        "$ref": "#/$defs/review_reopenInput"
       },
       "output": {
         "oneOf": [
@@ -1443,17 +1456,17 @@
         "$ref": "#/$defs/export"
       }
     },
-    "vci_list": {
+    "review_list": {
       "input": {
-        "$ref": "#/$defs/vci_listInput"
+        "$ref": "#/$defs/review_listInput"
       },
       "output": {
         "$ref": "#/$defs/list"
       }
     },
-    "vci_artifact_read": {
+    "review_artifact_read": {
       "input": {
-        "$ref": "#/$defs/vci_artifact_readInput"
+        "$ref": "#/$defs/review_artifact_readInput"
       },
       "output": {
         "$ref": "#/$defs/chunk"

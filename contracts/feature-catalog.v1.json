@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.190",
+  "catalogVersion": "0.5.0",
   "targetTiaVersions": [
     21
   ],
@@ -16808,11 +16808,11 @@
       ]
     },
     {
-      "featureId": "project_health_report",
+      "featureId": "project_health_review",
       "domain": "inspection",
       "title": "Report captured inconsistency and coverage findings",
       "mcpTools": [
-        "project_health_report"
+        "project_health_review"
       ],
       "changeKind": null,
       "api": {
@@ -19627,48 +19627,77 @@
       ]
     },
     {
-      "featureId": "translation_review_page",
-      "domain": "translations",
-      "title": "Translation review page",
+      "featureId": "review_page",
+      "domain": "artifacts",
+      "title": "Page a retained record report section",
       "mcpTools": [
-        "translation_review_page"
+        "review_page"
       ],
       "changeKind": null,
       "api": {
         "status": "available",
         "reasons": [
-          "Host-local offline translation workflow; no Siemens service is invoked."
+          "Host-local offline translation workflow; no Siemens service is invoked.",
+          "Offline bounded NodeSet inspection and dependency analysis; no native service.",
+          "Pure managed GRAPH structure reader; no Siemens service.",
+          "Offline CAEX document inspection; pinned embedded public schemas; no Siemens service.",
+          "Offline Host artifact review only; no native product or execution API is invoked."
         ]
       },
       "implementation": {
-        "status": "implemented",
+        "status": "partial",
         "limitations": [
-          "Explicit synthetic or unqualified-explicit workbook profiles only. Native export/import execution, language activation and automatic translation are outside this tool.",
-          "Immutable bounded capture/review/artifact workflow; see docs/reference/translation-host-workflow.md.",
-          "Explicit instance-inheritance-v1 alarm-text policy checks supplied mapped language fields only. No Siemens alarm workbook recognition, complete language coverage, alarm/supervision lifecycle or native import qualification; see docs/reference/translation-review.md."
+          "One tool for the record kinds translation, opcua, graph, automationml, composite_engineering, runtime_handoff; each call runs the unchanged store of its kind. Before 0.5.0 these were the tools translation_review_page, opcua_report_page, graph_report_page, automationml_report_page, composite_engineering_page, runtime_handoff_page.",
+          "translation: Explicit synthetic or unqualified-explicit workbook profiles only. Native export/import execution, language activation and automatic translation are outside this tool.",
+          "translation: Immutable bounded capture/review/artifact workflow; see docs/reference/translation-host-workflow.md.",
+          "translation: Explicit instance-inheritance-v1 alarm-text policy checks supplied mapped language fields only. No Siemens alarm workbook recognition, complete language coverage, alarm/supervision lifecycle or native import qualification; see docs/reference/translation-review.md.",
+          "opcua: Page an exact section from an OPC UA record summary, including nested before/after sections. 1..500 rows with 128 KiB row budget; cursor binds record, report hash and section. Oversized rows are explicitly marked omitted and remain downloadable in the complete report artifact. All retained input hashes are verified.",
+          "opcua: No native engineering, endpoint/runtime or complete compatibility certification.",
+          "graph: Offline v6 structural inspection/comparison, immutable receipts, bounded pages and exact source/report/HTML transfer. Diagnostics and opaque content remain explicit.",
+          "graph: No native schema, compilation, rendering, import or runtime behavior qualification.",
+          "automationml: Read 1..200 rows within 128 KiB from an exact retained report array: /objects, /attributes, /references, /links, /opaqueContent, /diagnostics, /changes, /beforeImpacts or /afterImpacts. Oversized rows are explicit omissions downloadable in report.json. Offset and section bind the immutable handle.",
+          "automationml: No native identities, inheritance/mirror expansion, complete affected-device scope, import/export, catalog, compile or runtime qualification.",
+          "composite_engineering: Retained supplied C02 evaluation and phase-local bounded consumer context. Explicit v3 adds exact drive telegram/address and technology encoder selectors, original target-reference/domain/number constraints and separately declared encoder consumer links. V1/v2 retain original evaluation and actual prior-producer byte compatibility. Unknown native profile eligibility, wiring, geometry, source authenticity/freshness, complete consumer/effect coverage, rebind, compile, motion and release qualification remain unverified.",
+          "runtime_handoff: Retained supplied/synthetic observations and offline constraint/permission comparison only. Exact original bytes and saved access/model dependencies are revalidated; matches never prove authenticated producer, live CPU/program identity, effective permissions, capture quality or operation/assertion admission. Native execution, runtime/capture lifecycle integration and client migration remain unqualified."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.rerun.20261028"
+          "local.hostonly.translation.rerun.20261028",
+          "local.hostonly.opcua.rerun.20261028",
+          "local.hostonly.graph.rerun.20261028",
+          "local.hostonly.automationml.rerun.20261028",
+          "local.hostonly.composite-engineering.rerun.20261028",
+          "local.hostonly.runtime-handoff.rerun.20261028"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires retained valid inputs and writable Host artifact storage. Offline checks confer no native qualification."
+          "Requires retained valid inputs and writable Host artifact storage. Offline checks confer no native qualification.",
+          "Requires committed valid artifact handles and writable Host storage.",
+          "Requires uploaded XML or exact retained GRAPH handles and available bounded Host storage.",
+          "Committed CAEX upload or exact retained handles and bounded writable Host storage.",
+          "Committed composite-engineering-request.v1/v2/v3 upload and exact retained phase contexts. Reopen, paging and download revalidate original saved reviews, AML and component inputs, including indirect encoder drive dependencies. Typed selectors require context-listed records and exact phase/local IDs. No Siemens product invoked.",
+          "Compatible offline Host, bounded writable artifact store, committed public observation/request uploads and exact saved review/access references. Reopening requires unchanged retained dependencies. No Siemens product or live target accessed."
         ]
       },
       "prerequisites": [
         "Compatible .NET Host runtime",
         "Committed uploads or exact Host-issued translation handles",
-        "Explicit digest-bound approval before candidate creation"
+        "Explicit digest-bound approval before candidate creation",
+        "Committed bounded NodeSet or consumer uploads; explicit dependency sets",
+        "GRAPH XML upload up to 8 MiB or retained GRAPH record",
+        "CAEX 2.15 or 3.0 document up to 8 MiB or retained AutomationML record",
+        "Compatible .NET Host and bounded writable artifact storage",
+        "Every referenced AML, saved review, connection, drive and technology record remains available and unchanged",
+        "Public-only supplied or synthetic target/program/session observations; no secrets in uploads",
+        "Exact saved access/model references and canonical retained observation references"
       ],
       "acceptanceCriteria": [
         "AC-identity",
         "AC-completeness",
-        "AC-preview",
         "AC-preserve",
         "AC-evidence"
       ]
@@ -19815,140 +19844,248 @@
       ]
     },
     {
-      "featureId": "translation_reopen",
-      "domain": "translations",
-      "title": "Translation reopen",
+      "featureId": "review_reopen",
+      "domain": "artifacts",
+      "title": "Reopen and revalidate a retained record",
       "mcpTools": [
-        "translation_reopen"
+        "review_reopen"
       ],
       "changeKind": null,
       "api": {
         "status": "available",
         "reasons": [
-          "Host-local offline translation workflow; no Siemens service is invoked."
+          "Host-local offline translation workflow; no Siemens service is invoked.",
+          "Offline bounded NodeSet inspection and dependency analysis; no native service.",
+          "Restricted local Git and uploaded documents; no Siemens service.",
+          "Pure managed GRAPH structure reader; no Siemens service.",
+          "Offline CAEX document inspection; pinned embedded public schemas; no Siemens service.",
+          "Offline Host artifact review only; no native product or execution API is invoked."
         ]
       },
       "implementation": {
-        "status": "implemented",
+        "status": "partial",
         "limitations": [
-          "Explicit synthetic or unqualified-explicit workbook profiles only. Native export/import execution, language activation and automatic translation are outside this tool.",
-          "Immutable bounded capture/review/artifact workflow; see docs/reference/translation-host-workflow.md.",
-          "Explicit instance-inheritance-v1 alarm-text policy checks supplied mapped language fields only. No Siemens alarm workbook recognition, complete language coverage, alarm/supervision lifecycle or native import qualification; see docs/reference/translation-review.md."
+          "One tool for the record kinds translation, opcua, vci, graph, automationml, composite_engineering, runtime_handoff; each call runs the unchanged store of its kind. Before 0.5.0 these were the tools translation_reopen, opcua_reopen, vci_reopen, graph_reopen, automationml_reopen, composite_engineering_reopen, runtime_handoff_reopen.",
+          "translation: Explicit synthetic or unqualified-explicit workbook profiles only. Native export/import execution, language activation and automatic translation are outside this tool.",
+          "translation: Immutable bounded capture/review/artifact workflow; see docs/reference/translation-host-workflow.md.",
+          "translation: Explicit instance-inheritance-v1 alarm-text policy checks supplied mapped language fields only. No Siemens alarm workbook recognition, complete language coverage, alarm/supervision lifecycle or native import qualification; see docs/reference/translation-review.md.",
+          "opcua: Reopen an immutable OPC UA record after restart. Verify manifest, all artifacts and exact retained inputs before returning bounded summary, pageable sections and download handles. Any change fails closed. Uploaded evidence never establishes native freshness.",
+          "opcua: No native engineering, endpoint/runtime or complete compatibility certification.",
+          "vci: Reopen a Host-issued VCI preview, revision, export, package manifest or comparison. Verify retained receipts, artifacts, working-file bytes and complete package input chains. A commit intent without a completed receipt remains outcomeUnknown and cannot be replayed. Returns bounded summary and download names; no native calls.",
+          "vci: No native VCI mapping, project reconstruction, engineering compatibility or remote publication.",
+          "graph: Offline v6 structural inspection/comparison, immutable receipts, bounded pages and exact source/report/HTML transfer. Diagnostics and opaque content remain explicit.",
+          "graph: No native schema, compilation, rendering, import or runtime behavior qualification.",
+          "automationml: Reopen an exact retained AutomationML document/comparison after restart. Verify receipt, artifacts and original comparison inputs before returning bounded counts and download names. No native qualification.",
+          "automationml: No native identities, inheritance/mirror expansion, complete affected-device scope, import/export, catalog, compile or runtime qualification.",
+          "composite_engineering: Retained supplied C02 evaluation and phase-local bounded consumer context. Explicit v3 adds exact drive telegram/address and technology encoder selectors, original target-reference/domain/number constraints and separately declared encoder consumer links. V1/v2 retain original evaluation and actual prior-producer byte compatibility. Unknown native profile eligibility, wiring, geometry, source authenticity/freshness, complete consumer/effect coverage, rebind, compile, motion and release qualification remain unverified.",
+          "runtime_handoff: Retained supplied/synthetic observations and offline constraint/permission comparison only. Exact original bytes and saved access/model dependencies are revalidated; matches never prove authenticated producer, live CPU/program identity, effective permissions, capture quality or operation/assertion admission. Native execution, runtime/capture lifecycle integration and client migration remain unqualified."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.rerun.20261028"
+          "local.hostonly.translation.rerun.20261028",
+          "local.hostonly.opcua.rerun.20261028",
+          "local.hostonly.vci.rerun.20261028",
+          "local.hostonly.graph.rerun.20261028",
+          "local.hostonly.automationml.rerun.20261028",
+          "local.hostonly.composite-engineering.rerun.20261028",
+          "local.hostonly.runtime-handoff.rerun.20261028"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires retained valid inputs and writable Host artifact storage. Offline checks confer no native qualification."
+          "Requires retained valid inputs and writable Host artifact storage. Offline checks confer no native qualification.",
+          "Requires committed valid artifact handles and writable Host storage.",
+          "Requires administrator-selected local Git executable, valid retained handles and available bounded Host storage.",
+          "Requires uploaded XML or exact retained GRAPH handles and available bounded Host storage.",
+          "Committed CAEX upload or exact retained handles and bounded writable Host storage.",
+          "Committed composite-engineering-request.v1/v2/v3 upload and exact retained phase contexts. Reopen, paging and download revalidate original saved reviews, AML and component inputs, including indirect encoder drive dependencies. Typed selectors require context-listed records and exact phase/local IDs. No Siemens product invoked.",
+          "Compatible offline Host, bounded writable artifact store, committed public observation/request uploads and exact saved review/access references. Reopening requires unchanged retained dependencies. No Siemens product or live target accessed."
         ]
       },
       "prerequisites": [
         "Compatible .NET Host runtime",
         "Committed uploads or exact Host-issued translation handles",
-        "Explicit digest-bound approval before candidate creation"
+        "Explicit digest-bound approval before candidate creation",
+        "Committed bounded NodeSet or consumer uploads; explicit dependency sets",
+        "Explicit --git-executable path",
+        "Committed raw-file uploads or Host-issued parent revision",
+        "GRAPH XML upload up to 8 MiB or retained GRAPH record",
+        "CAEX 2.15 or 3.0 document up to 8 MiB or retained AutomationML record",
+        "Compatible .NET Host and bounded writable artifact storage",
+        "Every referenced AML, saved review, connection, drive and technology record remains available and unchanged",
+        "Public-only supplied or synthetic target/program/session observations; no secrets in uploads",
+        "Exact saved access/model references and canonical retained observation references"
       ],
       "acceptanceCriteria": [
         "AC-identity",
         "AC-completeness",
-        "AC-preview",
         "AC-preserve",
         "AC-evidence"
       ]
     },
     {
-      "featureId": "translation_list",
-      "domain": "translations",
-      "title": "Translation list",
+      "featureId": "review_list",
+      "domain": "artifacts",
+      "title": "List retained records of one kind",
       "mcpTools": [
-        "translation_list"
+        "review_list"
       ],
       "changeKind": null,
       "api": {
         "status": "available",
         "reasons": [
-          "Host-local offline translation workflow; no Siemens service is invoked."
+          "Host-local offline translation workflow; no Siemens service is invoked.",
+          "Offline bounded NodeSet inspection and dependency analysis; no native service.",
+          "Restricted local Git and uploaded documents; no Siemens service.",
+          "Pure managed GRAPH structure reader; no Siemens service.",
+          "Offline CAEX document inspection; pinned embedded public schemas; no Siemens service.",
+          "Offline Host artifact review only; no native product or execution API is invoked."
         ]
       },
       "implementation": {
-        "status": "implemented",
+        "status": "partial",
         "limitations": [
-          "Explicit synthetic or unqualified-explicit workbook profiles only. Native export/import execution, language activation and automatic translation are outside this tool.",
-          "Immutable bounded capture/review/artifact workflow; see docs/reference/translation-host-workflow.md."
+          "One tool for the record kinds translation, opcua, vci, graph, automationml, composite_engineering, runtime_handoff; each call runs the unchanged store of its kind. Before 0.5.0 these were the tools translation_list, opcua_list, vci_list, graph_list, automationml_list, composite_engineering_list, runtime_handoff_list.",
+          "translation: Explicit synthetic or unqualified-explicit workbook profiles only. Native export/import execution, language activation and automatic translation are outside this tool.",
+          "translation: Immutable bounded capture/review/artifact workflow; see docs/reference/translation-host-workflow.md.",
+          "opcua: Discover retained offline OPC UA records and incomplete or integrity-failed publications after restart. Count 1..100, bounded responses. Sorted publication-ID offsets are discovery-only; relist after concurrent additions. Does not retry any native operation.",
+          "opcua: No native engineering, endpoint/runtime or complete compatibility certification.",
+          "vci: Discover 1..50 retained local VCI records, including incomplete, damaged or outcome-unknown candidates. Store limit 128 records and 2 GiB with bounded reserved headroom. Discovery offsets are sorted by record ID; relist after concurrent additions. Does not resume or replay Git writes.",
+          "vci: No native VCI mapping, project reconstruction, engineering compatibility or remote publication.",
+          "graph: Offline v6 structural inspection/comparison, immutable receipts, bounded pages and exact source/report/HTML transfer. Diagnostics and opaque content remain explicit.",
+          "graph: No native schema, compilation, rendering, import or runtime behavior qualification.",
+          "automationml: Discover 1..50 retained AutomationML records, including incomplete and integrity-failed publications. Storage limits 128 records and 2 GiB include failed publications. Sorted record-ID offsets are discovery-only; relist after additions.",
+          "automationml: No native identities, inheritance/mirror expansion, complete affected-device scope, import/export, catalog, compile or runtime qualification.",
+          "composite_engineering: Retained supplied C02 evaluation and phase-local bounded consumer context. Explicit v3 adds exact drive telegram/address and technology encoder selectors, original target-reference/domain/number constraints and separately declared encoder consumer links. V1/v2 retain original evaluation and actual prior-producer byte compatibility. Unknown native profile eligibility, wiring, geometry, source authenticity/freshness, complete consumer/effect coverage, rebind, compile, motion and release qualification remain unverified.",
+          "runtime_handoff: Retained supplied/synthetic observations and offline constraint/permission comparison only. Exact original bytes and saved access/model dependencies are revalidated; matches never prove authenticated producer, live CPU/program identity, effective permissions, capture quality or operation/assertion admission. Native execution, runtime/capture lifecycle integration and client migration remain unqualified."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.rerun.20261028"
+          "local.hostonly.translation.rerun.20261028",
+          "local.hostonly.opcua.rerun.20261028",
+          "local.hostonly.vci.rerun.20261028",
+          "local.hostonly.graph.rerun.20261028",
+          "local.hostonly.automationml.rerun.20261028",
+          "local.hostonly.composite-engineering.rerun.20261028",
+          "local.hostonly.runtime-handoff.rerun.20261028"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires retained valid inputs and writable Host artifact storage. Offline checks confer no native qualification."
+          "Requires retained valid inputs and writable Host artifact storage. Offline checks confer no native qualification.",
+          "Requires committed valid artifact handles and writable Host storage.",
+          "Requires administrator-selected local Git executable, valid retained handles and available bounded Host storage.",
+          "Requires uploaded XML or exact retained GRAPH handles and available bounded Host storage.",
+          "Committed CAEX upload or exact retained handles and bounded writable Host storage.",
+          "Committed composite-engineering-request.v1/v2/v3 upload and exact retained phase contexts. Reopen, paging and download revalidate original saved reviews, AML and component inputs, including indirect encoder drive dependencies. Typed selectors require context-listed records and exact phase/local IDs. No Siemens product invoked.",
+          "Compatible offline Host, bounded writable artifact store, committed public observation/request uploads and exact saved review/access references. Reopening requires unchanged retained dependencies. No Siemens product or live target accessed."
         ]
       },
       "prerequisites": [
         "Compatible .NET Host runtime",
         "Committed uploads or exact Host-issued translation handles",
-        "Explicit digest-bound approval before candidate creation"
+        "Explicit digest-bound approval before candidate creation",
+        "Committed bounded NodeSet or consumer uploads; explicit dependency sets",
+        "Explicit --git-executable path",
+        "Committed raw-file uploads or Host-issued parent revision",
+        "GRAPH XML upload up to 8 MiB or retained GRAPH record",
+        "CAEX 2.15 or 3.0 document up to 8 MiB or retained AutomationML record",
+        "Compatible .NET Host and bounded writable artifact storage",
+        "Every referenced AML, saved review, connection, drive and technology record remains available and unchanged",
+        "Public-only supplied or synthetic target/program/session observations; no secrets in uploads",
+        "Exact saved access/model references and canonical retained observation references"
       ],
       "acceptanceCriteria": [
         "AC-identity",
         "AC-completeness",
-        "AC-preview",
         "AC-preserve",
         "AC-evidence"
       ]
     },
     {
-      "featureId": "translation_artifact_read",
-      "domain": "translations",
-      "title": "Translation artifact read",
+      "featureId": "review_artifact_read",
+      "domain": "artifacts",
+      "title": "Read a retained record artifact",
       "mcpTools": [
-        "translation_artifact_read"
+        "review_artifact_read"
       ],
       "changeKind": null,
       "api": {
         "status": "available",
         "reasons": [
-          "Host-local offline translation workflow; no Siemens service is invoked."
+          "Host-local offline translation workflow; no Siemens service is invoked.",
+          "Offline bounded NodeSet inspection and dependency analysis; no native service.",
+          "Restricted local Git and uploaded documents; no Siemens service.",
+          "Pure managed GRAPH structure reader; no Siemens service.",
+          "Offline CAEX document inspection; pinned embedded public schemas; no Siemens service.",
+          "Offline Host artifact review only; no native product or execution API is invoked."
         ]
       },
       "implementation": {
-        "status": "implemented",
+        "status": "partial",
         "limitations": [
-          "Explicit synthetic or unqualified-explicit workbook profiles only. Native export/import execution, language activation and automatic translation are outside this tool.",
-          "Immutable bounded capture/review/artifact workflow; see docs/reference/translation-host-workflow.md."
+          "One tool for the record kinds translation, opcua, vci, graph, automationml, composite_engineering, runtime_handoff; each call runs the unchanged store of its kind. Before 0.5.0 these were the tools translation_artifact_read, opcua_artifact_read, vci_artifact_read, graph_artifact_read, automationml_artifact_read, composite_engineering_artifact_read, runtime_handoff_artifact_read.",
+          "translation: Explicit synthetic or unqualified-explicit workbook profiles only. Native export/import execution, language activation and automatic translation are outside this tool.",
+          "translation: Immutable bounded capture/review/artifact workflow; see docs/reference/translation-host-workflow.md.",
+          "opcua: Download exact original NodeSet, supplied consumer JSON or complete report by Host-issued OPC UA artifact handle, at most 64 KiB per call. Returns SHA-256 and byte offset. Revalidates retained manifest and inputs. No filesystem path input and no overwrite operation.",
+          "opcua: No native engineering, endpoint/runtime or complete compatibility certification.",
+          "vci: Download a returned VCI artifact name (raw Git review/export, mapping, manifest or comparison), or receipt.json containing the exact bytes bound by recordRef, at most 64 KiB per call. Verifies complete byte length/hash and package report inputs. No arbitrary filesystem path input.",
+          "vci: No native VCI mapping, project reconstruction, engineering compatibility or remote publication.",
+          "graph: Offline v6 structural inspection/comparison, immutable receipts, bounded pages and exact source/report/HTML transfer. Diagnostics and opaque content remain explicit.",
+          "graph: No native schema, compilation, rendering, import or runtime behavior qualification.",
+          "automationml: Download original.aml, report.json or receipt.json from an exact retained AutomationML handle, at most 64 KiB per call with full SHA-256 and length. Revalidate exact inputs; reports are limited to 64 MiB. No arbitrary filesystem paths.",
+          "automationml: No native identities, inheritance/mirror expansion, complete affected-device scope, import/export, catalog, compile or runtime qualification.",
+          "composite_engineering: Retained supplied C02 evaluation and phase-local bounded consumer context. Explicit v3 adds exact drive telegram/address and technology encoder selectors, original target-reference/domain/number constraints and separately declared encoder consumer links. V1/v2 retain original evaluation and actual prior-producer byte compatibility. Unknown native profile eligibility, wiring, geometry, source authenticity/freshness, complete consumer/effect coverage, rebind, compile, motion and release qualification remain unverified.",
+          "runtime_handoff: Retained supplied/synthetic observations and offline constraint/permission comparison only. Exact original bytes and saved access/model dependencies are revalidated; matches never prove authenticated producer, live CPU/program identity, effective permissions, capture quality or operation/assertion admission. Native execution, runtime/capture lifecycle integration and client migration remain unqualified."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.rerun.20261028"
+          "local.hostonly.translation.rerun.20261028",
+          "local.hostonly.opcua.rerun.20261028",
+          "local.hostonly.vci.rerun.20261028",
+          "local.hostonly.graph.rerun.20261028",
+          "local.hostonly.automationml.rerun.20261028",
+          "local.hostonly.composite-engineering.rerun.20261028",
+          "local.hostonly.runtime-handoff.rerun.20261028"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires retained valid inputs and writable Host artifact storage. Offline checks confer no native qualification."
+          "Requires retained valid inputs and writable Host artifact storage. Offline checks confer no native qualification.",
+          "Requires committed valid artifact handles and writable Host storage.",
+          "Requires administrator-selected local Git executable, valid retained handles and available bounded Host storage.",
+          "Requires uploaded XML or exact retained GRAPH handles and available bounded Host storage.",
+          "Committed CAEX upload or exact retained handles and bounded writable Host storage.",
+          "Committed composite-engineering-request.v1/v2/v3 upload and exact retained phase contexts. Reopen, paging and download revalidate original saved reviews, AML and component inputs, including indirect encoder drive dependencies. Typed selectors require context-listed records and exact phase/local IDs. No Siemens product invoked.",
+          "Compatible offline Host, bounded writable artifact store, committed public observation/request uploads and exact saved review/access references. Reopening requires unchanged retained dependencies. No Siemens product or live target accessed."
         ]
       },
       "prerequisites": [
         "Compatible .NET Host runtime",
         "Committed uploads or exact Host-issued translation handles",
-        "Explicit digest-bound approval before candidate creation"
+        "Explicit digest-bound approval before candidate creation",
+        "Committed bounded NodeSet or consumer uploads; explicit dependency sets",
+        "Explicit --git-executable path",
+        "Committed raw-file uploads or Host-issued parent revision",
+        "GRAPH XML upload up to 8 MiB or retained GRAPH record",
+        "CAEX 2.15 or 3.0 document up to 8 MiB or retained AutomationML record",
+        "Compatible .NET Host and bounded writable artifact storage",
+        "Every referenced AML, saved review, connection, drive and technology record remains available and unchanged",
+        "Public-only supplied or synthetic target/program/session observations; no secrets in uploads",
+        "Exact saved access/model references and canonical retained observation references"
       ],
       "acceptanceCriteria": [
         "AC-identity",
         "AC-completeness",
-        "AC-preview",
         "AC-preserve",
         "AC-evidence"
       ]
@@ -21027,182 +21164,6 @@
       ]
     },
     {
-      "featureId": "opcua_report_page",
-      "domain": "opc_ua",
-      "title": "Opcua report page",
-      "mcpTools": [
-        "opcua_report_page"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline bounded NodeSet inspection and dependency analysis; no native service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Page an exact section from an OPC UA record summary, including nested before/after sections. 1..500 rows with 128 KiB row budget; cursor binds record, report hash and section. Oversized rows are explicitly marked omitted and remain downloadable in the complete report artifact. All retained input hashes are verified.",
-          "No native engineering, endpoint/runtime or complete compatibility certification."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.opcua.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Requires committed valid artifact handles and writable Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "Committed bounded NodeSet or consumer uploads; explicit dependency sets"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "opcua_reopen",
-      "domain": "opc_ua",
-      "title": "Opcua reopen",
-      "mcpTools": [
-        "opcua_reopen"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline bounded NodeSet inspection and dependency analysis; no native service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Reopen an immutable OPC UA record after restart. Verify manifest, all artifacts and exact retained inputs before returning bounded summary, pageable sections and download handles. Any change fails closed. Uploaded evidence never establishes native freshness.",
-          "No native engineering, endpoint/runtime or complete compatibility certification."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.opcua.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Requires committed valid artifact handles and writable Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "Committed bounded NodeSet or consumer uploads; explicit dependency sets"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "opcua_list",
-      "domain": "opc_ua",
-      "title": "Opcua list",
-      "mcpTools": [
-        "opcua_list"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline bounded NodeSet inspection and dependency analysis; no native service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Discover retained offline OPC UA records and incomplete or integrity-failed publications after restart. Count 1..100, bounded responses. Sorted publication-ID offsets are discovery-only; relist after concurrent additions. Does not retry any native operation.",
-          "No native engineering, endpoint/runtime or complete compatibility certification."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.opcua.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Requires committed valid artifact handles and writable Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "Committed bounded NodeSet or consumer uploads; explicit dependency sets"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "opcua_artifact_read",
-      "domain": "opc_ua",
-      "title": "Opcua artifact read",
-      "mcpTools": [
-        "opcua_artifact_read"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline bounded NodeSet inspection and dependency analysis; no native service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Download exact original NodeSet, supplied consumer JSON or complete report by Host-issued OPC UA artifact handle, at most 64 KiB per call. Returns SHA-256 and byte offset. Revalidates retained manifest and inputs. No filesystem path input and no overwrite operation.",
-          "No native engineering, endpoint/runtime or complete compatibility certification."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.opcua.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Requires committed valid artifact handles and writable Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "Committed bounded NodeSet or consumer uploads; explicit dependency sets"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
       "featureId": "opcua_engineering_inspect",
       "domain": "opc_ua",
       "title": "Inspect native OPC UA server engineering",
@@ -21841,51 +21802,6 @@
       ]
     },
     {
-      "featureId": "vci_reopen",
-      "domain": "version_control",
-      "title": "Vci reopen",
-      "mcpTools": [
-        "vci_reopen"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Restricted local Git and uploaded documents; no Siemens service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Reopen a Host-issued VCI preview, revision, export, package manifest or comparison. Verify retained receipts, artifacts, working-file bytes and complete package input chains. A commit intent without a completed receipt remains outcomeUnknown and cannot be replayed. Returns bounded summary and download names; no native calls.",
-          "No native VCI mapping, project reconstruction, engineering compatibility or remote publication."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.vci.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Requires administrator-selected local Git executable, valid retained handles and available bounded Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "Explicit --git-executable path",
-        "Committed raw-file uploads or Host-issued parent revision"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
       "featureId": "vci_history",
       "domain": "version_control",
       "title": "Vci history",
@@ -21948,96 +21864,6 @@
         "status": "implemented",
         "limitations": [
           "Materialize the exact commit from a Host-issued revision into a new managed directory and downloadable revision.zip plus SHA-256 file manifest. Never checks out into or changes an existing revision. Preserves raw file bytes and paths; does not reconstruct TIA projects or OS permissions. Interrupted exports remain discoverable incomplete records.",
-          "No native VCI mapping, project reconstruction, engineering compatibility or remote publication."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.vci.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Requires administrator-selected local Git executable, valid retained handles and available bounded Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "Explicit --git-executable path",
-        "Committed raw-file uploads or Host-issued parent revision"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "vci_list",
-      "domain": "version_control",
-      "title": "Vci list",
-      "mcpTools": [
-        "vci_list"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Restricted local Git and uploaded documents; no Siemens service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Discover 1..50 retained local VCI records, including incomplete, damaged or outcome-unknown candidates. Store limit 128 records and 2 GiB with bounded reserved headroom. Discovery offsets are sorted by record ID; relist after concurrent additions. Does not resume or replay Git writes.",
-          "No native VCI mapping, project reconstruction, engineering compatibility or remote publication."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.vci.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Requires administrator-selected local Git executable, valid retained handles and available bounded Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "Explicit --git-executable path",
-        "Committed raw-file uploads or Host-issued parent revision"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "vci_artifact_read",
-      "domain": "version_control",
-      "title": "Vci artifact read",
-      "mcpTools": [
-        "vci_artifact_read"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Restricted local Git and uploaded documents; no Siemens service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Download a returned VCI artifact name (raw Git review/export, mapping, manifest or comparison), or receipt.json containing the exact bytes bound by recordRef, at most 64 KiB per call. Verifies complete byte length/hash and package report inputs. No arbitrary filesystem path input.",
           "No native VCI mapping, project reconstruction, engineering compatibility or remote publication."
         ]
       },
@@ -22380,182 +22206,6 @@
         "AC-completeness",
         "AC-preserve",
         "AC-preview",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "graph_reopen",
-      "domain": "language",
-      "title": "GRAPH REOPEN",
-      "mcpTools": [
-        "graph_reopen"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Pure managed GRAPH structure reader; no Siemens service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Offline v6 structural inspection/comparison, immutable receipts, bounded pages and exact source/report/HTML transfer. Diagnostics and opaque content remain explicit.",
-          "No native schema, compilation, rendering, import or runtime behavior qualification."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.graph.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Requires uploaded XML or exact retained GRAPH handles and available bounded Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "GRAPH XML upload up to 8 MiB or retained GRAPH record"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "graph_report_page",
-      "domain": "language",
-      "title": "GRAPH REPORT PAGE",
-      "mcpTools": [
-        "graph_report_page"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Pure managed GRAPH structure reader; no Siemens service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Offline v6 structural inspection/comparison, immutable receipts, bounded pages and exact source/report/HTML transfer. Diagnostics and opaque content remain explicit.",
-          "No native schema, compilation, rendering, import or runtime behavior qualification."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.graph.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Requires uploaded XML or exact retained GRAPH handles and available bounded Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "GRAPH XML upload up to 8 MiB or retained GRAPH record"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "graph_artifact_read",
-      "domain": "language",
-      "title": "GRAPH ARTIFACT READ",
-      "mcpTools": [
-        "graph_artifact_read"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Pure managed GRAPH structure reader; no Siemens service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Offline v6 structural inspection/comparison, immutable receipts, bounded pages and exact source/report/HTML transfer. Diagnostics and opaque content remain explicit.",
-          "No native schema, compilation, rendering, import or runtime behavior qualification."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.graph.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Requires uploaded XML or exact retained GRAPH handles and available bounded Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "GRAPH XML upload up to 8 MiB or retained GRAPH record"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "graph_list",
-      "domain": "language",
-      "title": "GRAPH LIST",
-      "mcpTools": [
-        "graph_list"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Pure managed GRAPH structure reader; no Siemens service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Offline v6 structural inspection/comparison, immutable receipts, bounded pages and exact source/report/HTML transfer. Diagnostics and opaque content remain explicit.",
-          "No native schema, compilation, rendering, import or runtime behavior qualification."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.graph.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Requires uploaded XML or exact retained GRAPH handles and available bounded Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "GRAPH XML upload up to 8 MiB or retained GRAPH record"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
         "AC-evidence"
       ]
     },
@@ -23085,182 +22735,6 @@
         "status": "implemented",
         "limitations": [
           "Compare two retained AutomationML documents. Retain exact before/after inputs, unique-ID and class-path differences, unmatched/ambiguous declarations and conservative declared hierarchy/link/class-consumer impacts. Every byte change requires whole-document review; complete native impact and importability remain uncertified.",
-          "No native identities, inheritance/mirror expansion, complete affected-device scope, import/export, catalog, compile or runtime qualification."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.automationml.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Committed CAEX upload or exact retained handles and bounded writable Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "CAEX 2.15 or 3.0 document up to 8 MiB or retained AutomationML record"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "automationml_reopen",
-      "domain": "hardware",
-      "title": "AutomationML reopen",
-      "mcpTools": [
-        "automationml_reopen"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline CAEX document inspection; pinned embedded public schemas; no Siemens service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Reopen an exact retained AutomationML document/comparison after restart. Verify receipt, artifacts and original comparison inputs before returning bounded counts and download names. No native qualification.",
-          "No native identities, inheritance/mirror expansion, complete affected-device scope, import/export, catalog, compile or runtime qualification."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.automationml.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Committed CAEX upload or exact retained handles and bounded writable Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "CAEX 2.15 or 3.0 document up to 8 MiB or retained AutomationML record"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "automationml_report_page",
-      "domain": "hardware",
-      "title": "AutomationML report page",
-      "mcpTools": [
-        "automationml_report_page"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline CAEX document inspection; pinned embedded public schemas; no Siemens service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Read 1..200 rows within 128 KiB from an exact retained report array: /objects, /attributes, /references, /links, /opaqueContent, /diagnostics, /changes, /beforeImpacts or /afterImpacts. Oversized rows are explicit omissions downloadable in report.json. Offset and section bind the immutable handle.",
-          "No native identities, inheritance/mirror expansion, complete affected-device scope, import/export, catalog, compile or runtime qualification."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.automationml.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Committed CAEX upload or exact retained handles and bounded writable Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "CAEX 2.15 or 3.0 document up to 8 MiB or retained AutomationML record"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "automationml_artifact_read",
-      "domain": "hardware",
-      "title": "AutomationML artifact read",
-      "mcpTools": [
-        "automationml_artifact_read"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline CAEX document inspection; pinned embedded public schemas; no Siemens service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Download original.aml, report.json or receipt.json from an exact retained AutomationML handle, at most 64 KiB per call with full SHA-256 and length. Revalidate exact inputs; reports are limited to 64 MiB. No arbitrary filesystem paths.",
-          "No native identities, inheritance/mirror expansion, complete affected-device scope, import/export, catalog, compile or runtime qualification."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.automationml.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Committed CAEX upload or exact retained handles and bounded writable Host storage."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host runtime",
-        "CAEX 2.15 or 3.0 document up to 8 MiB or retained AutomationML record"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preserve",
-        "AC-evidence"
-      ]
-    },
-    {
-      "featureId": "automationml_list",
-      "domain": "hardware",
-      "title": "AutomationML list",
-      "mcpTools": [
-        "automationml_list"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline CAEX document inspection; pinned embedded public schemas; no Siemens service."
-        ]
-      },
-      "implementation": {
-        "status": "implemented",
-        "limitations": [
-          "Discover 1..50 retained AutomationML records, including incomplete and integrity-failed publications. Storage limits 128 records and 2 GiB include failed publications. Sorted record-ID offsets are discovery-only; relist after additions.",
           "No native identities, inheritance/mirror expansion, complete affected-device scope, import/export, catalog, compile or runtime qualification."
         ]
       },
@@ -25274,11 +24748,11 @@
       ]
     },
     {
-      "featureId": "technology_profile_report",
+      "featureId": "technology_profile_review_page",
       "domain": "technology-profiles",
       "title": "Reopen retained technology profile differences and context",
       "mcpTools": [
-        "technology_profile_report"
+        "technology_profile_review_page"
       ],
       "changeKind": null,
       "api": {
@@ -25362,11 +24836,11 @@
       ]
     },
     {
-      "featureId": "safety_evidence_report",
+      "featureId": "safety_evidence_review_page",
       "domain": "safety",
       "title": "Reopen exact safety evidence signatures, issues and changes",
       "mcpTools": [
-        "safety_evidence_report"
+        "safety_evidence_review_page"
       ],
       "changeKind": null,
       "api": {
@@ -26627,11 +26101,11 @@
       ]
     },
     {
-      "featureId": "addin_selection_page",
+      "featureId": "addin_selection_review_page",
       "domain": "addins",
       "title": "Reopen retained Add-In selection evidence",
       "mcpTools": [
-        "addin_selection_page"
+        "addin_selection_review_page"
       ],
       "changeKind": null,
       "api": {
@@ -26761,11 +26235,11 @@
       ]
     },
     {
-      "featureId": "multiuser_observation_page",
+      "featureId": "multiuser_observation_review_page",
       "domain": "multiuser",
       "title": "Reopen retained Project Server observation comparisons",
       "mcpTools": [
-        "multiuser_observation_page"
+        "multiuser_observation_review_page"
       ],
       "changeKind": null,
       "api": {
@@ -26850,11 +26324,11 @@
       ]
     },
     {
-      "featureId": "teamcenter_observation_page",
+      "featureId": "teamcenter_observation_review_page",
       "domain": "teamcenter",
       "title": "Reopen retained Teamcenter observations and manifests",
       "mcpTools": [
-        "teamcenter_observation_page"
+        "teamcenter_observation_review_page"
       ],
       "changeKind": null,
       "api": {
@@ -26900,182 +26374,6 @@
       "title": "Retain combined supplied engineering mappings",
       "mcpTools": [
         "composite_engineering_review"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline Host artifact review only; no native product or execution API is invoked."
-        ]
-      },
-      "implementation": {
-        "status": "partial",
-        "limitations": [
-          "Retained supplied C02 evaluation and phase-local bounded consumer context. Explicit v3 adds exact drive telegram/address and technology encoder selectors, original target-reference/domain/number constraints and separately declared encoder consumer links. V1/v2 retain original evaluation and actual prior-producer byte compatibility. Unknown native profile eligibility, wiring, geometry, source authenticity/freshness, complete consumer/effect coverage, rebind, compile, motion and release qualification remain unverified."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.composite-engineering.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Committed composite-engineering-request.v1/v2/v3 upload and exact retained phase contexts. Reopen, paging and download revalidate original saved reviews, AML and component inputs, including indirect encoder drive dependencies. Typed selectors require context-listed records and exact phase/local IDs. No Siemens product invoked."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host and bounded writable artifact storage",
-        "Every referenced AML, saved review, connection, drive and technology record remains available and unchanged"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preview",
-        "AC-evidence",
-        "AC-preserve"
-      ]
-    },
-    {
-      "featureId": "composite_engineering_reopen",
-      "domain": "hardware",
-      "title": "Revalidate a retained combined engineering review",
-      "mcpTools": [
-        "composite_engineering_reopen"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline Host artifact review only; no native product or execution API is invoked."
-        ]
-      },
-      "implementation": {
-        "status": "partial",
-        "limitations": [
-          "Retained supplied C02 evaluation and phase-local bounded consumer context. Explicit v3 adds exact drive telegram/address and technology encoder selectors, original target-reference/domain/number constraints and separately declared encoder consumer links. V1/v2 retain original evaluation and actual prior-producer byte compatibility. Unknown native profile eligibility, wiring, geometry, source authenticity/freshness, complete consumer/effect coverage, rebind, compile, motion and release qualification remain unverified."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.composite-engineering.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Committed composite-engineering-request.v1/v2/v3 upload and exact retained phase contexts. Reopen, paging and download revalidate original saved reviews, AML and component inputs, including indirect encoder drive dependencies. Typed selectors require context-listed records and exact phase/local IDs. No Siemens product invoked."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host and bounded writable artifact storage",
-        "Every referenced AML, saved review, connection, drive and technology record remains available and unchanged"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preview",
-        "AC-evidence",
-        "AC-preserve"
-      ]
-    },
-    {
-      "featureId": "composite_engineering_page",
-      "domain": "hardware",
-      "title": "Page combined engineering evidence and gaps",
-      "mcpTools": [
-        "composite_engineering_page"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline Host artifact review only; no native product or execution API is invoked."
-        ]
-      },
-      "implementation": {
-        "status": "partial",
-        "limitations": [
-          "Retained supplied C02 evaluation and phase-local bounded consumer context. Explicit v3 adds exact drive telegram/address and technology encoder selectors, original target-reference/domain/number constraints and separately declared encoder consumer links. V1/v2 retain original evaluation and actual prior-producer byte compatibility. Unknown native profile eligibility, wiring, geometry, source authenticity/freshness, complete consumer/effect coverage, rebind, compile, motion and release qualification remain unverified."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.composite-engineering.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Committed composite-engineering-request.v1/v2/v3 upload and exact retained phase contexts. Reopen, paging and download revalidate original saved reviews, AML and component inputs, including indirect encoder drive dependencies. Typed selectors require context-listed records and exact phase/local IDs. No Siemens product invoked."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host and bounded writable artifact storage",
-        "Every referenced AML, saved review, connection, drive and technology record remains available and unchanged"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preview",
-        "AC-evidence",
-        "AC-preserve"
-      ]
-    },
-    {
-      "featureId": "composite_engineering_artifact_read",
-      "domain": "hardware",
-      "title": "Download exact retained combined engineering artifacts",
-      "mcpTools": [
-        "composite_engineering_artifact_read"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline Host artifact review only; no native product or execution API is invoked."
-        ]
-      },
-      "implementation": {
-        "status": "partial",
-        "limitations": [
-          "Retained supplied C02 evaluation and phase-local bounded consumer context. Explicit v3 adds exact drive telegram/address and technology encoder selectors, original target-reference/domain/number constraints and separately declared encoder consumer links. V1/v2 retain original evaluation and actual prior-producer byte compatibility. Unknown native profile eligibility, wiring, geometry, source authenticity/freshness, complete consumer/effect coverage, rebind, compile, motion and release qualification remain unverified."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.composite-engineering.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Committed composite-engineering-request.v1/v2/v3 upload and exact retained phase contexts. Reopen, paging and download revalidate original saved reviews, AML and component inputs, including indirect encoder drive dependencies. Typed selectors require context-listed records and exact phase/local IDs. No Siemens product invoked."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host and bounded writable artifact storage",
-        "Every referenced AML, saved review, connection, drive and technology record remains available and unchanged"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preview",
-        "AC-evidence",
-        "AC-preserve"
-      ]
-    },
-    {
-      "featureId": "composite_engineering_list",
-      "domain": "hardware",
-      "title": "Discover complete and interrupted combined reviews",
-      "mcpTools": [
-        "composite_engineering_list"
       ],
       "changeKind": null,
       "api": {
@@ -27271,186 +26569,6 @@
         "limitations": [
           "Retained supplied/synthetic observations and offline constraint/permission comparison only. Exact original bytes and saved access/model dependencies are revalidated; matches never prove authenticated producer, live CPU/program identity beyond an optional owned-PLCSIM binding, effective permissions, capture quality or operation/assertion admission. Native execution, runtime/capture lifecycle integration and client migration remain unqualified.",
           "Optional plcsimBinding selects a runtime_plcsim_bind record: target identity is then matched against the bound owned PLCSIM instance (and program identity against its online fingerprint where one was recorded) instead of the supplied expectation, the expected endpoint must be one of its controller addresses, and the report and receipt state boundOwnedPlcsim. Without a binding the receipt states unbound and identities stay supplied declarations."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.runtime-handoff.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Compatible offline Host, bounded writable artifact store, committed public observation/request uploads and exact saved review/access references. Reopening requires unchanged retained dependencies. No Siemens product or live target accessed."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host and bounded writable artifact storage",
-        "Public-only supplied or synthetic target/program/session observations; no secrets in uploads",
-        "Exact saved access/model references and canonical retained observation references"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preview",
-        "AC-evidence",
-        "AC-preserve"
-      ]
-    },
-    {
-      "featureId": "runtime_handoff_reopen",
-      "domain": "security-access",
-      "title": "Revalidate a retained security/runtime handoff",
-      "mcpTools": [
-        "runtime_handoff_reopen"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline Host artifact review only; no native product or execution API is invoked."
-        ]
-      },
-      "implementation": {
-        "status": "partial",
-        "limitations": [
-          "Retained supplied/synthetic observations and offline constraint/permission comparison only. Exact original bytes and saved access/model dependencies are revalidated; matches never prove authenticated producer, live CPU/program identity, effective permissions, capture quality or operation/assertion admission. Native execution, runtime/capture lifecycle integration and client migration remain unqualified."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.runtime-handoff.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Compatible offline Host, bounded writable artifact store, committed public observation/request uploads and exact saved review/access references. Reopening requires unchanged retained dependencies. No Siemens product or live target accessed."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host and bounded writable artifact storage",
-        "Public-only supplied or synthetic target/program/session observations; no secrets in uploads",
-        "Exact saved access/model references and canonical retained observation references"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preview",
-        "AC-evidence",
-        "AC-preserve"
-      ]
-    },
-    {
-      "featureId": "runtime_handoff_page",
-      "domain": "security-access",
-      "title": "Page security/runtime constraints and observations",
-      "mcpTools": [
-        "runtime_handoff_page"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline Host artifact review only; no native product or execution API is invoked."
-        ]
-      },
-      "implementation": {
-        "status": "partial",
-        "limitations": [
-          "Retained supplied/synthetic observations and offline constraint/permission comparison only. Exact original bytes and saved access/model dependencies are revalidated; matches never prove authenticated producer, live CPU/program identity, effective permissions, capture quality or operation/assertion admission. Native execution, runtime/capture lifecycle integration and client migration remain unqualified."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.runtime-handoff.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Compatible offline Host, bounded writable artifact store, committed public observation/request uploads and exact saved review/access references. Reopening requires unchanged retained dependencies. No Siemens product or live target accessed."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host and bounded writable artifact storage",
-        "Public-only supplied or synthetic target/program/session observations; no secrets in uploads",
-        "Exact saved access/model references and canonical retained observation references"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preview",
-        "AC-evidence",
-        "AC-preserve"
-      ]
-    },
-    {
-      "featureId": "runtime_handoff_artifact_read",
-      "domain": "security-access",
-      "title": "Download exact handoff evidence and reports",
-      "mcpTools": [
-        "runtime_handoff_artifact_read"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline Host artifact review only; no native product or execution API is invoked."
-        ]
-      },
-      "implementation": {
-        "status": "partial",
-        "limitations": [
-          "Retained supplied/synthetic observations and offline constraint/permission comparison only. Exact original bytes and saved access/model dependencies are revalidated; matches never prove authenticated producer, live CPU/program identity, effective permissions, capture quality or operation/assertion admission. Native execution, runtime/capture lifecycle integration and client migration remain unqualified."
-        ]
-      },
-      "qualification": {
-        "status": "verified",
-        "evidenceIds": [
-          "local.hostonly.runtime-handoff.rerun.20261028"
-        ]
-      },
-      "availability": {
-        "status": "conditional",
-        "reasons": [
-          "Compatible offline Host, bounded writable artifact store, committed public observation/request uploads and exact saved review/access references. Reopening requires unchanged retained dependencies. No Siemens product or live target accessed."
-        ]
-      },
-      "prerequisites": [
-        "Compatible .NET Host and bounded writable artifact storage",
-        "Public-only supplied or synthetic target/program/session observations; no secrets in uploads",
-        "Exact saved access/model references and canonical retained observation references"
-      ],
-      "acceptanceCriteria": [
-        "AC-identity",
-        "AC-completeness",
-        "AC-preview",
-        "AC-evidence",
-        "AC-preserve"
-      ]
-    },
-    {
-      "featureId": "runtime_handoff_list",
-      "domain": "security-access",
-      "title": "Discover complete and interrupted handoff reviews",
-      "mcpTools": [
-        "runtime_handoff_list"
-      ],
-      "changeKind": null,
-      "api": {
-        "status": "available",
-        "reasons": [
-          "Offline Host artifact review only; no native product or execution API is invoked."
-        ]
-      },
-      "implementation": {
-        "status": "partial",
-        "limitations": [
-          "Retained supplied/synthetic observations and offline constraint/permission comparison only. Exact original bytes and saved access/model dependencies are revalidated; matches never prove authenticated producer, live CPU/program identity, effective permissions, capture quality or operation/assertion admission. Native execution, runtime/capture lifecycle integration and client migration remain unqualified."
         ]
       },
       "qualification": {
@@ -31196,5 +30314,224 @@
         "AC-evidence"
       ]
     }
-  ]
+  ],
+  "toolRenames": {
+    "since": "0.5.0",
+    "note": "Tool names retired by the 0.5.0 MCP surface redesign. Evidence recorded under a former name counts for its replacement; arguments are the ones the replacement needs to reach the same capability.",
+    "renames": [
+      {
+        "from": "project_health_report",
+        "to": "project_health_review"
+      },
+      {
+        "from": "translation_review_page",
+        "to": "review_page",
+        "arguments": {
+          "kind": "translation"
+        }
+      },
+      {
+        "from": "translation_reopen",
+        "to": "review_reopen",
+        "arguments": {
+          "kind": "translation"
+        }
+      },
+      {
+        "from": "translation_list",
+        "to": "review_list",
+        "arguments": {
+          "kind": "translation"
+        }
+      },
+      {
+        "from": "translation_artifact_read",
+        "to": "review_artifact_read",
+        "arguments": {
+          "kind": "translation"
+        }
+      },
+      {
+        "from": "opcua_report_page",
+        "to": "review_page",
+        "arguments": {
+          "kind": "opcua"
+        }
+      },
+      {
+        "from": "opcua_reopen",
+        "to": "review_reopen",
+        "arguments": {
+          "kind": "opcua"
+        }
+      },
+      {
+        "from": "opcua_list",
+        "to": "review_list",
+        "arguments": {
+          "kind": "opcua"
+        }
+      },
+      {
+        "from": "opcua_artifact_read",
+        "to": "review_artifact_read",
+        "arguments": {
+          "kind": "opcua"
+        }
+      },
+      {
+        "from": "vci_reopen",
+        "to": "review_reopen",
+        "arguments": {
+          "kind": "vci"
+        }
+      },
+      {
+        "from": "vci_list",
+        "to": "review_list",
+        "arguments": {
+          "kind": "vci"
+        }
+      },
+      {
+        "from": "vci_artifact_read",
+        "to": "review_artifact_read",
+        "arguments": {
+          "kind": "vci"
+        }
+      },
+      {
+        "from": "graph_reopen",
+        "to": "review_reopen",
+        "arguments": {
+          "kind": "graph"
+        }
+      },
+      {
+        "from": "graph_report_page",
+        "to": "review_page",
+        "arguments": {
+          "kind": "graph"
+        }
+      },
+      {
+        "from": "graph_artifact_read",
+        "to": "review_artifact_read",
+        "arguments": {
+          "kind": "graph"
+        }
+      },
+      {
+        "from": "graph_list",
+        "to": "review_list",
+        "arguments": {
+          "kind": "graph"
+        }
+      },
+      {
+        "from": "automationml_reopen",
+        "to": "review_reopen",
+        "arguments": {
+          "kind": "automationml"
+        }
+      },
+      {
+        "from": "automationml_report_page",
+        "to": "review_page",
+        "arguments": {
+          "kind": "automationml"
+        }
+      },
+      {
+        "from": "automationml_artifact_read",
+        "to": "review_artifact_read",
+        "arguments": {
+          "kind": "automationml"
+        }
+      },
+      {
+        "from": "automationml_list",
+        "to": "review_list",
+        "arguments": {
+          "kind": "automationml"
+        }
+      },
+      {
+        "from": "technology_profile_report",
+        "to": "technology_profile_review_page"
+      },
+      {
+        "from": "safety_evidence_report",
+        "to": "safety_evidence_review_page"
+      },
+      {
+        "from": "addin_selection_page",
+        "to": "addin_selection_review_page"
+      },
+      {
+        "from": "multiuser_observation_page",
+        "to": "multiuser_observation_review_page"
+      },
+      {
+        "from": "teamcenter_observation_page",
+        "to": "teamcenter_observation_review_page"
+      },
+      {
+        "from": "composite_engineering_reopen",
+        "to": "review_reopen",
+        "arguments": {
+          "kind": "composite_engineering"
+        }
+      },
+      {
+        "from": "composite_engineering_page",
+        "to": "review_page",
+        "arguments": {
+          "kind": "composite_engineering"
+        }
+      },
+      {
+        "from": "composite_engineering_artifact_read",
+        "to": "review_artifact_read",
+        "arguments": {
+          "kind": "composite_engineering"
+        }
+      },
+      {
+        "from": "composite_engineering_list",
+        "to": "review_list",
+        "arguments": {
+          "kind": "composite_engineering"
+        }
+      },
+      {
+        "from": "runtime_handoff_reopen",
+        "to": "review_reopen",
+        "arguments": {
+          "kind": "runtime_handoff"
+        }
+      },
+      {
+        "from": "runtime_handoff_page",
+        "to": "review_page",
+        "arguments": {
+          "kind": "runtime_handoff"
+        }
+      },
+      {
+        "from": "runtime_handoff_artifact_read",
+        "to": "review_artifact_read",
+        "arguments": {
+          "kind": "runtime_handoff"
+        }
+      },
+      {
+        "from": "runtime_handoff_list",
+        "to": "review_list",
+        "arguments": {
+          "kind": "runtime_handoff"
+        }
+      }
+    ]
+  }
 }

@@ -442,22 +442,29 @@
       ],
       "additionalProperties": false
     },
-    "automationml_reopenInput": {
+    "review_reopenInput": {
       "type": "object",
       "properties": {
+        "kind": {
+          "const": "automationml"
+        },
         "recordRef": {
           "type": "string",
           "pattern": "^automationml:[a-f0-9]{32}:[a-f0-9]{64}$"
         }
       },
       "required": [
+        "kind",
         "recordRef"
       ],
       "additionalProperties": false
     },
-    "automationml_report_pageInput": {
+    "review_pageInput": {
       "type": "object",
       "properties": {
+        "kind": {
+          "const": "automationml"
+        },
         "recordRef": {
           "type": "string",
           "pattern": "^automationml:[a-f0-9]{32}:[a-f0-9]{64}$"
@@ -479,14 +486,18 @@
         }
       },
       "required": [
+        "kind",
         "recordRef",
         "section"
       ],
       "additionalProperties": false
     },
-    "automationml_artifact_readInput": {
+    "review_artifact_readInput": {
       "type": "object",
       "properties": {
+        "kind": {
+          "const": "automationml"
+        },
         "recordRef": {
           "type": "string",
           "pattern": "^automationml:[a-f0-9]{32}:[a-f0-9]{64}$"
@@ -509,14 +520,18 @@
         }
       },
       "required": [
+        "kind",
         "recordRef",
         "name"
       ],
       "additionalProperties": false
     },
-    "automationml_listInput": {
+    "review_listInput": {
       "type": "object",
       "properties": {
+        "kind": {
+          "const": "automationml"
+        },
         "offset": {
           "type": "integer",
           "minimum": 0
@@ -524,10 +539,12 @@
         "count": {
           "type": "integer",
           "minimum": 1,
-          "maximum": 50
+          "maximum": 100
         }
       },
-      "required": [],
+      "required": [
+        "kind"
+      ],
       "additionalProperties": false
     }
   },
@@ -548,33 +565,33 @@
         "$ref": "#/$defs/summary"
       }
     },
-    "automationml_reopen": {
+    "review_reopen": {
       "input": {
-        "$ref": "#/$defs/automationml_reopenInput"
+        "$ref": "#/$defs/review_reopenInput"
       },
       "output": {
         "$ref": "#/$defs/summary"
       }
     },
-    "automationml_report_page": {
+    "review_page": {
       "input": {
-        "$ref": "#/$defs/automationml_report_pageInput"
+        "$ref": "#/$defs/review_pageInput"
       },
       "output": {
         "$ref": "#/$defs/page"
       }
     },
-    "automationml_artifact_read": {
+    "review_artifact_read": {
       "input": {
-        "$ref": "#/$defs/automationml_artifact_readInput"
+        "$ref": "#/$defs/review_artifact_readInput"
       },
       "output": {
         "$ref": "#/$defs/chunk"
       }
     },
-    "automationml_list": {
+    "review_list": {
       "input": {
-        "$ref": "#/$defs/automationml_listInput"
+        "$ref": "#/$defs/review_listInput"
       },
       "output": {
         "$ref": "#/$defs/list"

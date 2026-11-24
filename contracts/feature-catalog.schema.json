@@ -10,6 +10,43 @@
     "qualificationScope": {"type": "string", "minLength": 1},
     "criteria": {"type": "array", "items": {"type": "object", "required": ["id", "requirement"], "properties": {"id": {"type": "string"}, "requirement": {"type": "string"}}}},
     "evidence": {"type": "array", "items": {"type": "object", "required": ["id", "status", "profile", "artifacts", "limitations"], "properties": {"id": {"type": "string"}, "status": {"enum": ["passed", "failed", "blocked", "skipped"]}, "profile": {"type": "object"}, "artifacts": {"type": "array", "items": {"type": "string"}}, "limitations": {"type": "array", "items": {"type": "string"}}}}},
+    "toolRenames": {
+      "type": "object",
+      "required": [
+        "since",
+        "renames"
+      ],
+      "properties": {
+        "since": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "renames": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "from",
+              "to"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              },
+              "arguments": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
     "features": {
       "type": "array",
       "items": {

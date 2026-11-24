@@ -3,7 +3,7 @@
   "$id": "https://tia-mcp.local/contracts/device-inventory.v1.schema.json",
   "title": "Immutable device inventory page",
   "type": "object",
-  "required": ["snapshot", "rows", "offset", "nextCursor"],
+  "required": ["snapshot", "rows", "offset", "nextOffset"],
   "properties": {
     "snapshot": {
       "type": "object",
@@ -31,7 +31,7 @@
       }
     },
     "rows": {"type": "array", "maxItems": 200, "items": {"$ref": "#/$defs/row"}},
-    "offset": {"type": "integer", "minimum": 0}, "nextCursor": {"type": ["string", "null"]}
+    "offset": {"type": "integer", "minimum": 0}, "nextOffset": {"type": ["integer", "null"], "minimum": 1}
   },
   "$defs": {
     "field": {

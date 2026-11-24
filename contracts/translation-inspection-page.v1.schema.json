@@ -3,7 +3,9 @@
   "$id": "https://tia-mcp.local/contracts/translation-inspection-page.v1.schema.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "kind", "workbookSha256", "profileSha256", "projectSha256", "offset", "totalMappedTargets", "scope", "rows", "nextCursor", "nativeQualified", "nativeExecuted", "nativeImportAllowed", "pageSha256"],
+  "description": "The engine page (TranslationInspection.Page) continues with nextCursor; translation_inspect returns the same page with nextOffset instead.",
+  "oneOf": [{"required": ["nextCursor"]}, {"required": ["nextOffset"]}],
+  "required": ["schemaVersion", "kind", "workbookSha256", "profileSha256", "projectSha256", "offset", "totalMappedTargets", "scope", "rows", "nativeQualified", "nativeExecuted", "nativeImportAllowed", "pageSha256"],
   "properties": {
     "schemaVersion": {"const": 1},
     "kind": {"const": "translation-inspection-page"},
@@ -36,6 +38,7 @@
       }
     },
     "nextCursor": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/cursor"}]},
+    "nextOffset": {"anyOf": [{"type": "null"}, {"type": "integer", "minimum": 1, "maximum": 1000000}]},
     "nativeQualified": {"const": false},
     "nativeExecuted": {"const": false},
     "nativeImportAllowed": {"const": false},
