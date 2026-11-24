@@ -42,8 +42,9 @@ def main():
     session_schema=json.loads((ROOT/'contracts/runtime-web-session.v2.schema.json').read_text())
     Draft202012Validator.check_schema(session_schema)
     session_validator=Draft202012Validator(session_schema,registry=registry)
-    def check(ok,label):
-        assert ok,label
+    def check(ok,label,detail=None):
+        # The detail (what actually came back) is only in the failure message; report labels stay stable.
+        assert ok,label+(': '+detail if detail else '')
         report['checks'].append(label)
     class Handler(http.server.BaseHTTPRequestHandler):
         def setup(self):
@@ -132,7 +133,7 @@ def main():
         r=c.request('tools/call',{'name':'runtime_web_'+name,'arguments':arguments})
         text=json.dumps(r);check(password not in text and token not in text,'MCP response redacted: '+name)
         if code:
-            check(r.get('isError') and r['structuredContent']['error']['code']==code,'Refuses '+code);return r['structuredContent']
+            check(r.get('isError') and r['structuredContent']['error']['code']==code,'Refuses '+code,str(r)[:400]);return r['structuredContent']
         check(not r.get('isError'),'Successful tool '+name+': '+str(r)[:160])
         value=r['structuredContent']
         if value.get('schemaVersion') in ['runtime-web-session.v1','runtime-web-session.v2']:report.setdefault('sessionObservations',[]).append(dict(tool=name,status=value))

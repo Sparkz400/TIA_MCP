@@ -26,6 +26,16 @@ adjacent ZIP and `.zip.sha256` are required. The SDK, Git and Python test
 dependencies are needed by the runner, even though deployed Host startup needs
 only the shared runtime. Reports are retained under `artifacts/offline-package/`.
 
+`scripts/Test-WorkerCompile.ps1` compiles the Siemens-dependent workers (V21, V19, Simulator, TestSuite, Add-In)
+without any Siemens assembly: empty API directories, the API presence checks and the developer Openness registration
+switched off, project references dropped. Every use of a Siemens type then fails as CS0246 or CS0234, and the runner
+fails on any other compiler error, such as a duplicate member across partial files, a syntax error or a wrong call into
+the project's own types. The CI job "Worker compile without Siemens" runs it. It cannot see errors inside expressions
+of Siemens types; `scripts/Build.ps1` on an engineering workstation remains the full build.
+
+Pull requests run the quick package check unless they change the Host, Core, the MCP surface contract or the packaging
+scripts; those, and every run on `main`, nightly and manual, run all packaged workflow stages.
+
 Source binding validation uses `--allow-missing-evidence` for clean checkouts:
 ignored historical native artifacts are listed as unavailable, with no release
 or qualification acceptance. Source files, method anchors and every available

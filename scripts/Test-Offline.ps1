@@ -149,7 +149,7 @@ try {
             if ($LASTEXITCODE -ne 0) { throw 'Project model and relationship scope schema checks failed.' }
             $result.projectModelContracts = 'passed'
             python -B scripts/api_coverage_bindings.py validate contracts/api-coverage/implementation-bindings.v1.json --allow-missing-evidence
-            if ($LASTEXITCODE -ne 0) { throw 'Source binding validation failed.' }
+            if ($LASTEXITCODE -ne 0) { throw 'Source binding validation failed. After intended source edits, run ./scripts/Refresh-Contracts.ps1 and commit contracts/api-coverage/implementation-bindings.v1.json.' }
             $result.sourceBindings = 'passed'
             python -B scripts/audit_retained_evidence.py --out (Join-Path $output 'retained-evidence.json')
             if ($LASTEXITCODE -ne 0) { throw 'Retained evidence integrity audit failed.' }
@@ -194,6 +194,10 @@ try {
         'TiaMcp.Hmi.Model.Tests', 'TiaMcp.HardwareEngineering.Tests',
         'TiaMcp.CompilationEvidence.Tests', 'TiaMcp.EncoderEvidence.Tests'
     )
+    # Suites whose runs need retained native inputs (Test-RetainedFixtures.ps1) but which compile shared sources;
+    # they are built in shard 0 so those sources cannot break them unnoticed. test_offline_runner.py requires every
+    # tests/* project to be in $suites, here, or in Test.ps1 (workstation-only).
+    $compileOnlySuites = @('TiaMcp.WatchReindex.Tests', 'TiaMcp.TranslationCategoryProbe.Tests')
     if ($Suite -in @('All','Managed')) {
         $ManagedPlan = Get-ShardPlan $suites $ManagedSuiteSeconds 60 $ManagedCheckGroups $ShardCount
         $suites = @($suites | Where-Object { $ManagedPlan[$_] -eq $ShardIndex })
@@ -208,7 +212,8 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'Managed suite solution could not be created.' }
         $solution = (Get-ChildItem -LiteralPath $solutionDirectory -File | Where-Object { $_.Name -like 'managed-suites.sln*' } | Select-Object -First 1).FullName
         # Checks run the Host even in shards whose suites do not reference it.
-        dotnet sln $solution add @($suites | ForEach-Object { "tests/$_/$_.csproj" }) src/TiaMcp.Host/TiaMcp.Host.csproj | Out-Null
+        $built = @($suites) + $(if ($ShardIndex -eq 0) { $compileOnlySuites } else { @() })
+        dotnet sln $solution add @($built | ForEach-Object { "tests/$_/$_.csproj" }) src/TiaMcp.Host/TiaMcp.Host.csproj | Out-Null
         if ($LASTEXITCODE -ne 0) { throw 'Managed suites could not be added to the build solution.' }
         dotnet build $solution --configuration $Configuration --artifacts-path $buildOutput
         if ($LASTEXITCODE -ne 0) { throw 'Managed suite build failed.' }

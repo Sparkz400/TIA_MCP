@@ -284,7 +284,8 @@ def validate(binding, repo=None, *, allow_missing_evidence=False):
     unavailable=[]
     if repo is not None:
         stale=[path for path,h in sources.items() if not inventory.within(repo,path).is_file() or digest(source_bytes(path,inventory.read_bytes(inventory.within(repo,path))))!=h]
-        if stale: raise ValueError('Stale source bindings: '+','.join(stale))
+        if stale: raise ValueError('Stale source bindings: '+','.join(stale)+'. If these edits are intended, run ./scripts/Refresh-Contracts.ps1 '
+                                   '(or: python -B scripts/api_coverage_bindings.py refresh contracts/api-coverage/implementation-bindings.v1.json) and commit the result.')
         actual=collect(repo)
         if allow_missing_evidence:
             # Clean source checkouts omit ignored native evidence. Only absence

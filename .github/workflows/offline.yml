@@ -18,8 +18,10 @@ env:
   PYTHONUTF8: '1'
 
 concurrency:
-  group: offline-${{ github.ref }}
-  # Only superseded PR pushes are cancelled; every main push and tag finishes, so each merge gets a verdict.
+  # Pull requests share one group per branch, so a new push cancels the superseded run. Every other run (main pushes,
+  # tags, nightly, manual) gets a group of its own: a shared group keeps only one pending run and cancels the others,
+  # which lost the verdict of a merge that broke main.
+  group: offline-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # Hosted runners execute only the offline allowlist. Native Siemens builds and
@@ -30,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       code: ${{ steps.scope.outputs.code }}
+      host: ${{ steps.scope.outputs.host }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -46,10 +49,14 @@ jobs:
           # Anything outside docs/** and top-level Markdown counts as code; unknown ranges run everything.
           if [ "$EVENT" = pull_request ]; then range="origin/$BASE_REF...HEAD"
           elif [ "$EVENT" = push ] && [ -n "$BEFORE" ] && [ "$BEFORE" != 0000000000000000000000000000000000000000 ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then range="$BEFORE..HEAD"
-          else echo "code=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          else echo "code=true" >> "$GITHUB_OUTPUT"; echo "host=true" >> "$GITHUB_OUTPUT"; exit 0; fi
           files=$(git diff --name-only "$range")
           code=$(printf '%s\n' "$files" | grep -v -E '^docs/|^[^/]+\.md$' | grep -c . || true)
           if [ -z "$files" ] || [ "$code" -gt 0 ]; then echo "code=true" >> "$GITHUB_OUTPUT"; else echo "code=false" >> "$GITHUB_OUTPUT"; fi
+          # Host, Core, the MCP surface and the packaging scripts are what the full packaged workflow stages exercise;
+          # the quick package smoke skips them, and every main failure since mid-November came from those stages.
+          host=$(printf '%s\n' "$files" | grep -c -E '^src/TiaMcp\.(Host|Core)/|^contracts/mcp-surface|^scripts/(Package|New-IsolatedBuild|Test-OfflinePackage|Verify-TiaMcpBundle|Start-TiaMcp)\.ps1$|^scripts/test_[^/]*(host|session|mcp)[^/]*\.py$' || true)
+          if [ -z "$files" ] || [ "$host" -gt 0 ]; then echo "host=true" >> "$GITHUB_OUTPUT"; else echo "host=false" >> "$GITHUB_OUTPUT"; fi
           printf 'Changed files:\n%s\n' "$files"
 
   python-shard:
@@ -227,8 +234,9 @@ jobs:
       - name: Validate portable package without Siemens
         shell: pwsh
         env:
-          # Pull requests run the packaging smoke; main, nightly and manual runs exercise every packaged workflow.
-          PACKAGE_MODE: ${{ github.event_name == 'pull_request' && 'quick' || 'full' }}
+          # Pull requests run the packaging smoke unless they touch the Host, Core, the MCP surface or the packaging
+          # scripts; main, nightly and manual runs always exercise every packaged workflow.
+          PACKAGE_MODE: ${{ github.event_name == 'pull_request' && needs.changes.outputs.host != 'true' && 'quick' || 'full' }}
         run: |
           python -m pip install -r scripts/requirements-test.txt
           if ($env:PACKAGE_MODE -eq 'quick') { ./scripts/Test-OfflinePackage.ps1 -Quick } else { ./scripts/Test-OfflinePackage.ps1 }
@@ -272,6 +280,39 @@ jobs:
             artifacts/offline-package/*/credential-cli/verification.json
             artifacts/releases/*.zip
             artifacts/releases/*.zip.sha256
+          retention-days: 14
+
+  workers:
+    name: Worker compile without Siemens
+    needs: changes
+    # Runs for docs-only changes too (steps skipped) so the check always reports and can be required.
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        if: needs.changes.outputs.code == 'true'
+      - uses: actions/cache@v6
+        if: needs.changes.outputs.code == 'true'
+        with:
+          path: |
+            .packages
+            ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/*.props', 'global.json', 'NuGet.Config') }}
+          restore-keys: nuget-${{ runner.os }}-
+      - uses: actions/setup-dotnet@v6
+        if: needs.changes.outputs.code == 'true'
+        with:
+          dotnet-version: '10.0.402' # Published SDK; avoid unavailable latestFeature redirects.
+      - name: Compile the Siemens-dependent workers
+        if: needs.changes.outputs.code == 'true'
+        shell: pwsh
+        # Fails on every compiler error that missing Siemens assemblies cannot explain (see the script header).
+        run: ./scripts/Test-WorkerCompile.ps1 -WorkDirectory "$env:RUNNER_TEMP/worker-compile"
+      - uses: actions/upload-artifact@v7
+        if: ${{ needs.changes.outputs.code == 'true' && !cancelled() }}
+        with:
+          name: worker-compile
+          path: ${{ runner.temp }}/worker-compile/*.log
           retention-days: 14
 
   opcua:
