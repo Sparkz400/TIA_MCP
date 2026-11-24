@@ -203,8 +203,13 @@ def collect(repo):
                 direct=any(t[0]=='str' and t[1]==kind and i>=4 and [x[1] for x in ts[i-4:i]]==['change','.','Kind','=='] for i,t in enumerate(ts)) and not cases
                 if cases or direct:
                     body=ts if direct else cases[0]
+                    worker=lambda tokens:[h for call in calls(tokens) for h in byname.get(call,[]) if h['path'].startswith('src/TiaMcp.Openness.V21/OpennessSession')]
+                    found=worker(body)
+                    # Stage methods split out of the dispatcher live in its file; follow them one level so a split
+                    # does not hide the handlers its stages call.
+                    found+=[h for s in found if s['path']==m['path'] and s['name'] not in method_names for h in worker(s['_tokens'])]
                     branches.append({'phase':name,'routeKind':'direct_early_route' if direct else 'switch_case','anchor':anchor(m),
-                       'handlers':[anchor(h) for call in calls(body) for h in byname.get(call,[]) if h['path'].startswith('src/TiaMcp.Openness.V21/OpennessSession')]})
+                       'handlers':[anchor(h) for h in found]})
         mutations.append({'changeKind':kind,'featureId':f['featureId'],'dispatcherFamily':'library_delegation' if library else 'engineering',
                           'branches':branches,'reviewState':'static_branches_bound' if len(branches)==2 else 'partial',
                           'gaps':['Shared lifecycle, dynamic dispatch and native effects require separate semantic review.']})
