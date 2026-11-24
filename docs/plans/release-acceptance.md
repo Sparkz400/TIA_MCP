@@ -61,17 +61,26 @@ execution rows later that day (twelve rows, 72 cells). Four of the first seven r
 behavior; `change.hmi_engineering` rests on V21's missing `Screen.Export` plus the repository's
 preservation gate. The three block-protection kinds were blocked only for a missing repository
 route; the maintainer decided the same day to build it for 1.0, so they count as open work.
-The two `deferred` rows have no disposition and stay 1.0 work
+The one remaining `deferred` row (`drives.engineering`, catalog `0.4.189`) has no disposition and stays 1.0 work
 ([TODO](../TODO.md#deferred-rows)).
 
 ## Current acceptance preparation — 2 November 2026
 
-No obligation has a maintainer acceptance record. Matrix closure is only the first condition:
+Refreshed on 24 November against the matrix of catalog `0.4.189` (computed by script from every owner of each
+`unqualified` and `deferred` row, not only the first). No obligation has a maintainer acceptance record
+(`releaseAccepted` is false for all 44 in the ledger). Matrix closure is only the first condition:
 remaining work outside the matrix, the current applicability of blockers and any accepted
 limitations must be reviewed on the frozen candidate too.
 
-- Open or deferred matrix work: L05, L06, D06, D10, D16, X12.
-- No open or deferred matrix cell: F00, F01, F02, F03, L01, L02, L03, L04, D01, D02, D03, D04, D05, D07, D08, D09, D11, D12, D13, D14, D15, D17, X01, X02, X03, X04, X05, X06, X07, X08, X09, X10, X11, X13, C01, C02, C03, C04. This includes obligations with no rows; it does not establish their completion.
+- Open or deferred matrix work: X07 (16 open cells), X01 (12), X13 (12), D12 (10), D06 (9), X08 (9), D09 (8),
+  L03 (8), D16 (3), L05 (3), L06 (3), D10 (3 deferred). Against 2 November, X12 left this list
+  (`tia.multiversion` became `limited` on 9 November), and L03, D09, D12, X01, X07, X08 and X13 joined it with rows
+  added from 14 to 20 November.
+- No open or deferred matrix cell: F00, F01, F02, F03, L01, L02, L04, D01, D02, D03, D04, D05, D07, D08, D11, D13, D14, D15, D17, X02, X03, X04, X05, X06, X09, X10, X11, X12, C01, C02, C03, C04. This includes obligations with no rows; it does not establish their completion.
+- Not verified in this refresh: the obligations' work outside the matrix, the current state of their blockers and
+  the ledger's per-obligation `currentResult` texts, which still describe earlier catalogs. The TODO's
+  [open matrix rows](../TODO.md#open-matrix-rows-by-owner) and [work outside the matrix](../TODO.md#work-outside-the-matrix)
+  list what is known to be open.
 
 The old candidate list described catalog 0.4.76 and is superseded. In particular, external Git,
 restricted translation and the native desktop roundtrip are now qualified. The collector already
