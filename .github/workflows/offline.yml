@@ -356,13 +356,96 @@ jobs:
             artifacts/offline-validation/*/credential-cli/verification.json
           retention-days: 14
 
-  package:
-    name: Portable package and relocation
+  package-build:
+    name: Portable package build and smoke
     needs: changes
     if: needs.changes.outputs.code == 'true'
     runs-on: windows-latest
-    # Full hosted runs took 17-20 minutes before the fixture suites were built once; 20 cancelled them at the limit.
-    timeout-minutes: 40
+    timeout-minutes: 20
+    env:
+      # Pull requests run the packaging smoke unless they touch the Host, Core, the MCP surface or the packaging
+      # scripts; main, nightly and manual runs always exercise every packaged workflow stage.
+      PACKAGE_MODE: ${{ github.event_name == 'pull_request' && needs.changes.outputs.host != 'true' && 'quick' || 'full' }}
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - id: mode
+        name: Record the package mode
+        shell: bash
+        run: echo "mode=$PACKAGE_MODE" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            .packages
+            ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/*.props', 'global.json', 'NuGet.Config') }}
+          restore-keys: nuget-${{ runner.os }}-
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '10.0.402' # Published SDK; avoid unavailable latestFeature redirects.
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: scripts/requirements-test.txt
+      - name: Build the portable package; run the deployment guards, strict verification and MCP/ZIP smoke
+        shell: pwsh
+        run: |
+          python -m pip install -r scripts/requirements-test.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Installing scripts/requirements-test.txt failed.' }
+          # The packaged workflow stages run in the package-stages matrix against this bundle.
+          ./scripts/Test-OfflinePackage.ps1 -Quick
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ env.PACKAGE_MODE == 'full' }}
+        with:
+          # The ZIP is the bundle: each stage leg extracts it next to itself and verifies it strictly before use.
+          name: portable-offline-bundle
+          path: |
+            artifacts/releases/*.zip
+            artifacts/releases/*.zip.sha256
+          compression-level: 0
+          retention-days: 1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: portable-package-validation
+          path: |
+            artifacts/offline-package/*/result.json
+            artifacts/offline-package/*/validation.log
+            artifacts/offline-package/*/original/verification.json
+            artifacts/offline-package/*/relocated/verification.json
+            artifacts/releases/*.zip
+            artifacts/releases/*.zip.sha256
+          retention-days: 14
+
+  package-stages:
+    name: Portable package stages (${{ matrix.shard }}/5)
+    needs: [changes, package-build]
+    if: needs.package-build.outputs.mode == 'full'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # Every name from ./scripts/Test-OfflinePackage.ps1 -ListStages in exactly one leg (test_offline_package_stages.py),
+        # balanced by the stage seconds each run records in result.json.
+        include:
+          - shard: 0
+            stages: opcua-runtime opcua-capture
+          - shard: 1
+            stages: diagnostics opcua-subscription diagnostic-ua-binding
+          - shard: 2
+            stages: connections composite-engineering hmi-components
+          - shard: 3
+            stages: >-
+              access public-certificates web-applications external-resources credentials runtime-session
+              runtime-capture-compatibility
+          - shard: 4
+            stages: >-
+              relationship-scope graph-mcp automationml-mcp opcua-mcp vci-mcp translation-mcp testsuite-result
+              software-units teamcenter-review multiuser-review addin-selection addin-receiver db-snapshots safety-evidence
+              manifest-publication drive-profiles technology-profiles
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -380,25 +463,29 @@ jobs:
           python-version: '3.13'
           cache: pip
           cache-dependency-path: scripts/requirements-test.txt
-      - name: Validate portable package without Siemens
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: portable-offline-bundle
+          path: artifacts/releases
+      - name: Run packaged workflow stages against the built bundle
         shell: pwsh
         env:
-          # Pull requests run the packaging smoke unless they touch the Host, Core, the MCP surface or the packaging
-          # scripts; main, nightly and manual runs always exercise every packaged workflow.
-          PACKAGE_MODE: ${{ github.event_name == 'pull_request' && needs.changes.outputs.host != 'true' && 'quick' || 'full' }}
+          STAGES: ${{ matrix.stages }}
         run: |
           python -m pip install -r scripts/requirements-test.txt
           if ($LASTEXITCODE -ne 0) { throw 'Installing scripts/requirements-test.txt failed.' }
-          if ($env:PACKAGE_MODE -eq 'quick') { ./scripts/Test-OfflinePackage.ps1 -Quick } else { ./scripts/Test-OfflinePackage.ps1 }
+          $archive = @(Get-ChildItem -LiteralPath artifacts/releases -Filter '*.zip' -File)
+          if ($archive.Count -ne 1) { throw 'Expected exactly one portable bundle ZIP from the build job.' }
+          $bundle = $archive[0].FullName.Substring(0, $archive[0].FullName.Length - 4)
+          Expand-Archive -LiteralPath $archive[0].FullName -DestinationPath $bundle
+          ./scripts/Test-OfflinePackage.ps1 -BundlePath $bundle -Stage $env:STAGES
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}
         with:
-          name: portable-package-validation
+          name: portable-package-validation-${{ matrix.shard }}
           path: |
             artifacts/offline-package/*/result.json
             artifacts/offline-package/*/validation.log
-            artifacts/offline-package/*/original/verification.json
-            artifacts/offline-package/*/relocated/verification.json
             artifacts/offline-package/*/runtime-session-mcp/*.json
             artifacts/offline-package/*/hmi-component-mcp/*.json
             artifacts/offline-package/*/hmi-component-mcp/host-artifacts/hmi-component-reviews/**
@@ -428,9 +515,25 @@ jobs:
             artifacts/offline-package/*/credentials/operations/verification.json
             artifacts/offline-package/*/credentials/verification.json
             artifacts/offline-package/*/credential-cli/verification.json
-            artifacts/releases/*.zip
-            artifacts/releases/*.zip.sha256
           retention-days: 14
+
+  package:
+    # The required check and the release gate's job name. It runs whenever code changed, even after a failed leg, so a
+    # failure reports as failed instead of as a skipped (and therefore passing) required check.
+    name: Portable package and relocation
+    needs: [changes, package-build, package-stages]
+    if: ${{ always() && needs.changes.outputs.code != 'false' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require the package build and, in full mode, every stage leg to pass
+        env:
+          BUILD: ${{ needs.package-build.result }}
+          STAGES: ${{ needs.package-stages.result }}
+          MODE: ${{ needs.package-build.outputs.mode }}
+        run: |
+          # Skipped legs count only in quick mode, which the build job itself decided.
+          test "$BUILD" = success || { echo "Package build: $BUILD"; exit 1; }
+          test "$STAGES" = success || { test "$STAGES" = skipped && test "$MODE" = quick; } || { echo "Package stages: $STAGES (mode=$MODE)"; exit 1; }
 
   workers:
     name: Worker compile without Siemens

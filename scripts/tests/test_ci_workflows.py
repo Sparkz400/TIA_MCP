@@ -41,11 +41,18 @@ class WorkflowTests(unittest.TestCase):
             for shard in shards:
                 found[job["name"].replace("${{ matrix.shard }}", str(shard))] = job
         self.assertFalse(names - found.keys(), "release.yml requires offline jobs that offline.yml does not have.")
+        # An aggregate runs after failed needs (always()) so its required check fails instead of skipping, yet is
+        # still skipped as a whole for a docs-only change; the jobs it needs are covered by it.
+        aggregate = "${{ always() && needs.changes.outputs.code != 'false' }}"
+        covered = set()
         for name in sorted(names):
-            self.assertEqual("needs.changes.outputs.code == 'true'", found[name].get("if"), name)
+            self.assertIn(found[name].get("if"), ("needs.changes.outputs.code == 'true'", aggregate), name)
+            if found[name].get("if") == aggregate:
+                covered.update(need for need in found[name]["needs"] if need != "changes")
+        covered_names = {offline[key]["name"] for key in covered}
         # Every job that is skipped as a whole for a docs-only change must be required, or the gate has a hole.
         scoped = {name for name, job in found.items() if job.get("if") == "needs.changes.outputs.code == 'true'"}
-        self.assertEqual(scoped, names)
+        self.assertEqual(scoped - covered_names, {name for name in names if found[name].get("if") != aggregate})
 
     def test_release_build_has_no_write_token(self):
         jobs = workflow("release.yml")["jobs"]

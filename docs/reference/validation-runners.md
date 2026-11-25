@@ -20,8 +20,12 @@ From the source checkout, `scripts/Test-OfflinePackage.ps1` builds a portable
 package without Siemens, verifies strict file/ZIP hashes and dependency notices,
 and checks generated configuration, direct Host refusal and Unicode relocation.
 It runs supplied-document workflows against the relocated binary, including
-actual local Git and saved-review/watch/measurement use. The Windows CI package
-job uses this runner. Existing packages can be selected with `-BundlePath`; their
+actual local Git and saved-review/watch/measurement use. `-ListStages` lists those
+stages and `-Stage <names>` runs only the named ones against an existing `-BundlePath`, building
+just the fixture projects they need. The Windows CI builds the package once (job "Portable package
+build and smoke", `-Quick`), runs the 32 stages in five parallel legs, and reports one aggregate job,
+"Portable package and relocation"; `scripts/tests/test_offline_package_stages.py` checks that every
+stage belongs to exactly one leg. Existing packages can be selected with `-BundlePath`; their
 adjacent ZIP and `.zip.sha256` are required. The SDK, Git and Python test
 dependencies are needed by the runner, even though deployed Host startup needs
 only the shared runtime. Reports are retained under `artifacts/offline-package/`.

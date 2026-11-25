@@ -206,6 +206,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Changed
 
+- CI builds the portable package once and runs its packaged workflow stages in five parallel legs (`Test-OfflinePackage.ps1 -Stage`/`-ListStages`), aiming to cut the package check from about 21 to about 10 minutes; the aggregate job keeps the name the release gate requires.
 - Moved 109 unit tests that no evidence cites into `scripts/tests/`, and added a generated `scripts/README.md` index (`scripts/scripts_index.py`) that a test keeps current. Scripts that evidence cites, the qualification runners, the probes and the PowerShell entry points keep their paths.
 - The maintainer put `drives.engineering` out of 1.0 scope (25 November): its ledger disposition carries `"scope": "post-1.0"` instead of a V21 boundary, and `scripts/release_matrix.py` summarizes such rows as the new support class `descoped`, which neither counts toward 1.0 nor holds the release gate and is not a pass. Recorded the same day: per-attempt first-use TLS trust stays, fingerprint reuse stays off by default, the three lost library reports get a reviewer disposition, and the missing native recheck of the watch-owned Test Suite reopen is a stated limitation.
 - **Breaking (tool surface cleanup):** `testsuite_style_plan_prepare`, `testsuite_application_plan_prepare` and `testsuite_system_plan_prepare` no longer return `completePlan`, a second copy of the reviewed plan. Read it with `testsuite_style_plan_review` and the returned `review` reference.

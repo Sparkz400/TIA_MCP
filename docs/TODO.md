@@ -227,8 +227,8 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   a Runtime Manager restart is needed; `sim_create` in TCP/IP after the API switch; the refusal with a registered
   instance; restore the original mode. The same run covers the Runtime-Manager-lost subscription, which never attached
   before 25 November (the API spells the event `OnRunTimemanagerLost`).
-- [ ] **CI and repository upkeep:** the package job runs its stages serially (about 21 minutes); `scripts/` holds
-  about 660 files in one folder; the [status log](history/status-log.md) has no entry between 3 and 25 November.
+- [ ] **CI and repository upkeep:** the split package job (build once, five legs) still needs its first CI run to confirm
+  the timing; the [status log](history/status-log.md) has no entry between 3 and 25 November.
 
 ## Code audit follow-ups (9 November)
 
