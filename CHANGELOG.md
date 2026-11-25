@@ -14,6 +14,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Added
 
+- An animated README demo (`docs/assets/demo.gif`) of the actual Project Explorer on synthetic sample data, regenerated with `npm run demo:record`.
 - `tia_discover` and `tia_attach` list `attachedSessions`, the other Openness clients of each TIA Portal (whether one is in a call and whether its process still runs); `tia_attach` takes `waitForIdleSeconds` and refuses with `OpennessClientBusy` instead of waiting behind a busy client. Another client is never disconnected (catalog `0.4.188`, unverified).
 - `project_open` opens a UMAC-protected project with `umacUserName`, `umacUserType` and `umacCredential`, a protected credential bound to the project path and user; the Host seals the stored password for that one open and TIA's login request is answered once ([route](docs/reference/protected-credentials.md#project-open-umac-route); catalog `0.4.188`, unverified).
 - `project_save` saves an open project in a worker-owned instance (no recovery archive; read-only projects and unresolved changes are refused), the step between `simulation_download` and credential provisioning (catalog `0.4.186`, unverified).

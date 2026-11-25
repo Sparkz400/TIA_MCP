@@ -20,8 +20,10 @@ are loaded from your installed products and are not redistributed.
 [Current status](docs/STATUS.md) · [Remaining work](docs/TODO.md) ·
 [Discussions](https://github.com/Sparkz400/TIA_MCP/discussions) · [Contributing](CONTRIBUTING.md)
 
-<!-- Demo: add docs/assets/demo.gif here (about 30 s: discover a session, find a
-     block's callers, preview a change) and reference it as the first image. -->
+![Animated demo of the Project Explorer: searching for MotorControl, viewing its callers and I/O relationships as a graph, opening the evidence for the call from Main, and expanding the hardware tree with the keyboard.](docs/assets/demo.gif)
+
+*Actual Explorer UI with synthetic sample data (27 s). Not a live TIA Portal session;
+it shows no session discovery or change preview.*
 
 ## What you can ask
 

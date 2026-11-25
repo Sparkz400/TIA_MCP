@@ -216,8 +216,7 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   `XmlException`; the worker's `ReadExportedXml` has no depth bound (it reads TIA's own exports); `browser-scale.mjs`
   needs a native `--report` and is not wired.
 - [ ] **CI and repository upkeep:** the package job runs its stages serially (about 21 minutes); `scripts/` holds
-  about 660 files in one folder; the [status log](history/status-log.md) has no entry between 3 and 25 November; the
-  README demo recording is still a placeholder.
+  about 660 files in one folder; the [status log](history/status-log.md) has no entry between 3 and 25 November.
 
 ## Code audit follow-ups (9 November)
 

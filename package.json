@@ -14,7 +14,8 @@
     "test:explorer:browser": "node ui/project-explorer/tests/browser.mjs",
     "test:explorer:benchmark": "node ui/project-explorer/tests/benchmark.cjs",
     "test:explorer:perf": "node ui/project-explorer/tests/browser-performance.mjs",
-    "test:explorer:import-perf": "node ui/project-explorer/tests/browser-import-performance.mjs"
+    "test:explorer:import-perf": "node ui/project-explorer/tests/browser-import-performance.mjs",
+    "demo:record": "node ui/project-explorer/tests/record-demo.mjs"
   },
   "keywords": [],
   "type": "commonjs",
