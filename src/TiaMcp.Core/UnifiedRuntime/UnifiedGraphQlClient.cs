@@ -7,6 +7,9 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
+// The Host's runtime_unified_* checks build clients over a scripted transport with the production peer check.
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("TiaMcp.Inventory.Tests")]
+
 namespace TiaMcp.Core.UnifiedRuntime;
 
 /// <summary>
@@ -46,11 +49,20 @@ public sealed class UnifiedGraphQlClient : IDisposable
     {
         if (pin is not { Length: 64 } || pin.Any(c => c is not (>= '0' and <= '9' or >= 'a' and <= 'f')))
             throw new BridgeException("UnifiedCertificatePinInvalid", "peerCertificateSha256 is the lowercase SHA-256 of the Runtime web server's leaf certificate.");
-        bool seen = false;
         var handler = new SocketsHttpHandler { AllowAutoRedirect = false, UseProxy = false, UseCookies = false,
             AutomaticDecompression = DecompressionMethods.None, MaxConnectionsPerServer = 1, PooledConnectionLifetime = TimeSpan.Zero };
         handler.SslOptions.AllowTlsResume = false;
-        handler.SslOptions.RemoteCertificateValidationCallback = (_, certificate, _, errors) =>
+        handler.SslOptions.RemoteCertificateValidationCallback = PeerValidation(pin, out verified);
+        return handler;
+    }
+
+    /// <summary>The TLS peer check of the pinned handler: the leaf's SHA-256 equals the pin, the host name matches and the
+    /// certificate is within its validity; only chain trust is waived (the pin replaces it). Tests drive the same callback.</summary>
+    internal static RemoteCertificateValidationCallback PeerValidation(string pin, out Func<bool> verified)
+    {
+        bool seen = false;
+        verified = () => seen;
+        return (_, certificate, _, errors) =>
         {
             using var peer = certificate is null ? null : X509CertificateLoader.LoadCertificate(certificate.GetRawCertData());
             bool valid = peer is not null &&
@@ -60,8 +72,6 @@ public sealed class UnifiedGraphQlClient : IDisposable
             seen = valid;
             return valid;
         };
-        verified = () => seen;
-        return handler;
     }
 
     /// <summary>login(username, password) with the password as a JSON string from the protected credential store, then the

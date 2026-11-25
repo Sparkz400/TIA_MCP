@@ -64,12 +64,12 @@ def main():
         names = {t["name"] for t in client.request("tools/list")["tools"]}
         assert {"device_inventory", "device_online_browse", "device_identify", "device_inventory_export"} <= names
         report["attachment"] = client.tool("tia_attach", {"processId": args.process})
-        page = client.tool("device_inventory", {"pageSize": 37})
+        page = client.tool("device_inventory", {"count": 37})
         metadata = page["snapshot"]
         rows = list(page["rows"])
         pages = 1
-        while page["nextCursor"]:
-            page = client.tool("device_inventory", {"snapshotId": metadata["snapshotId"], "cursor": page["nextCursor"], "pageSize": 37})
+        while page["nextOffset"]:
+            page = client.tool("device_inventory", {"snapshotId": metadata["snapshotId"], "offset": page["nextOffset"], "count": 37})
             assert page["offset"] == len(rows)
             rows.extend(page["rows"])
             pages += 1
@@ -86,11 +86,11 @@ def main():
         report["exportCrossCheck"] = "all CSV/XLSX cells equivalent; no XLSX formulas; all XML parts parsed"
         report["deviceScopes"] = []
         for device in (r for r in rows if r["kind"] == "device"):
-            scoped = client.tool("device_inventory", {"devicePath": device["path"], "pageSize": 200})
+            scoped = client.tool("device_inventory", {"devicePath": device["path"], "count": 200})
             expected = [r["rowId"] for r in rows if r["path"] == device["path"] or r["path"].startswith(device["path"] + "/")]
             observed = [r["rowId"] for r in scoped["rows"]]
-            while scoped["nextCursor"]:
-                scoped = client.tool("device_inventory", {"snapshotId": scoped["snapshot"]["snapshotId"], "cursor": scoped["nextCursor"], "pageSize": 200})
+            while scoped["nextOffset"]:
+                scoped = client.tool("device_inventory", {"snapshotId": scoped["snapshot"]["snapshotId"], "offset": scoped["nextOffset"], "count": 200})
                 observed.extend(r["rowId"] for r in scoped["rows"])
             assert observed == expected
             report["deviceScopes"].append({"devicePath": device["path"], "rows": len(observed), "status": "passed"})

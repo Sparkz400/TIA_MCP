@@ -47,8 +47,8 @@ def main():
     def upload(client, data):
         status = client.tool('artifact_upload_begin', dict(fileName='observations.json', expectedBytes=len(data), sha256=hashlib.sha256(data).hexdigest()))
         for offset in range(0, len(data), status['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', dict(uploadId=status['uploadId'], offset=offset, data=base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()))
-        return client.tool('artifact_upload_commit', dict(uploadId=status['uploadId']))
+            client.tool('artifact_upload_chunk', dict(uploadRef=status['uploadRef'], offset=offset, data=base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()))
+        return client.tool('artifact_upload_commit', dict(uploadRef=status['uploadRef']))
     def read(client, reference):
         chunks, offset = [], 0
         while True:
@@ -68,7 +68,7 @@ def main():
     try:
         client = start()
         try:
-            check({'multiuser_observation_review', 'multiuser_observation_page'} <= {t['name'] for t in client.request('tools/list')['tools']}, 'Both collaboration review tools registered')
+            check({'multiuser_observation_review', 'multiuser_observation_review_page'} <= {t['name'] for t in client.request('tools/list')['tools']}, 'Both collaboration review tools registered')
             incoming = upload(client, packet_bytes)
             arguments = dict(uploadRef=incoming['artifactRef'])
             receipt = client.tool('multiuser_observation_review', arguments)
@@ -85,7 +85,7 @@ def main():
             for section in ('observations', 'changes', 'issues'):
                 offset, rows = 0, []
                 while True:
-                    page = client.tool('multiuser_observation_page', dict(recordId=receipt['recordId'], section=section, offset=offset, count=2))
+                    page = client.tool('multiuser_observation_review_page', dict(recordRef=receipt['recordId'], section=section, offset=offset, count=2))
                     validate(page, 'page')
                     check(len(encode(page)) < 128 * 1024, 'Bounded ' + section + ' page')
                     rows.extend(r['value'] for r in page['rows'])
@@ -122,35 +122,35 @@ def main():
             try: validate(adversary, 'record')
             except ValidationError: check(True, 'Output schema rejects conflict-free assertion')
             else: raise AssertionError('Output schema admitted false authority')
-            refuse(client, 'multiuser_observation_page', dict(recordId=receipt['recordId'], section='execute'), 'InvalidRequest')
-            refuse(client, 'multiuser_observation_page', dict(recordId=receipt['recordId'], section='issues', offset=999999), 'InvalidRequest')
+            refuse(client, 'multiuser_observation_review_page', dict(recordRef=receipt['recordId'], section='execute'), 'InvalidRequest')
+            refuse(client, 'multiuser_observation_review_page', dict(recordRef=receipt['recordId'], section='issues', offset=999999), 'InvalidRequest')
             large = copy.deepcopy(packet)
             large['after']['markings']['rows'] = [dict(copy.deepcopy(packet['before']['markings']['rows'][0]), objectPath='P/' + str(i) + '/' + 'x' * 4000) for i in range(200)]
             validate(large, 'request')
             large_upload = upload(client, encode(large))
             large_receipt = client.tool('multiuser_observation_review', dict(uploadRef=large_upload['artifactRef']))
-            bounded = client.tool('multiuser_observation_page', dict(recordId=large_receipt['recordId'], section='observations', count=200))
+            bounded = client.tool('multiuser_observation_review_page', dict(recordRef=large_receipt['recordId'], section='observations', count=200))
             validate(bounded, 'page')
             check(0 < len(bounded['rows']) < 200 and bounded['nextOffset'] == len(bounded['rows']) and len(encode(bounded)) < 128 * 1024, 'Large valid rows stop at byte budget with a progressing cursor')
-            client.tool('artifact_upload_release', dict(uploadId=large_upload['uploadId']))
-            client.tool('artifact_upload_release', dict(uploadId=incoming['uploadId']))
+            client.tool('artifact_upload_release', dict(uploadRef=large_upload['uploadRef']))
+            client.tool('artifact_upload_release', dict(uploadRef=incoming['uploadRef']))
         finally:
             close(client)
         client = start()
         try:
-            check(client.tool('multiuser_observation_page', dict(recordId=receipt['recordId'])) == receipt, 'Fresh Host reopens after original upload release')
+            check(client.tool('multiuser_observation_review_page', dict(recordRef=receipt['recordId'])) == receipt, 'Fresh Host reopens after original upload release')
             for reference in (receipt['input'], receipt['reportArtifact']):
                 path = artifacts / reference['path']; original = path.read_bytes()
                 try:
                     path.write_bytes(original + b' ')
-                    refuse(client, 'multiuser_observation_page', dict(recordId=receipt['recordId']), 'ArtifactChanged')
+                    refuse(client, 'multiuser_observation_review_page', dict(recordRef=receipt['recordId']), 'ArtifactChanged')
                 finally: path.write_bytes(original)
             # A newly hashed forged record still cannot alter the derived report.
             forged = copy.deepcopy(record); forged['report']['conflictFreeVerified'] = True
             raw = encode(forged); forged_id = hashlib.sha256(raw).hexdigest()
             (artifacts / 'multiuser-reviews' / (forged_id + '.json')).write_bytes(raw)
-            refuse(client, 'multiuser_observation_page', dict(recordId=forged_id), 'ArtifactChanged')
-            check(client.tool('multiuser_observation_page', dict(recordId=receipt['recordId'])) == receipt, 'Original evidence remains usable after rejected forgery')
+            refuse(client, 'multiuser_observation_review_page', dict(recordRef=forged_id), 'ArtifactChanged')
+            check(client.tool('multiuser_observation_review_page', dict(recordRef=receipt['recordId'])) == receipt, 'Original evidence remains usable after rejected forgery')
         finally:
             close(client)
         report['completed'] = True

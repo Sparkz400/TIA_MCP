@@ -15,11 +15,11 @@ def retain_input(client, name, packet, **args):
         raw=json.dumps(value,ensure_ascii=False,separators=(',',':')).encode()
         incoming=client.tool('artifact_upload_begin',dict(fileName='public.json',expectedBytes=len(raw),sha256=hashlib.sha256(raw).hexdigest()))
         for offset in range(0,len(raw),incoming['maxChunkBytes']):
-            client.tool('artifact_upload_chunk',dict(uploadId=incoming['uploadId'],offset=offset,data=base64.b64encode(raw[offset:offset+incoming['maxChunkBytes']]).decode()))
-        return client.tool('artifact_upload_commit',dict(uploadId=incoming['uploadId']))
+            client.tool('artifact_upload_chunk',dict(uploadRef=incoming['uploadRef'],offset=offset,data=base64.b64encode(raw[offset:offset+incoming['maxChunkBytes']]).decode()))
+        return client.tool('artifact_upload_commit',dict(uploadRef=incoming['uploadRef']))
     incoming=upload(packet)
     result=client.tool(name,dict(uploadRef=incoming['artifactRef'],**args))
-    client.tool('artifact_upload_release',dict(uploadId=incoming['uploadId']))
+    client.tool('artifact_upload_release',dict(uploadRef=incoming['uploadRef']))
     return result
 
 

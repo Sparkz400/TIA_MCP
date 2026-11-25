@@ -356,10 +356,11 @@ def qualify(args):
             check(name + " has a native unit group or an explicit unsupported unit service", len(unit_groups) + len(unsupported) == 1)
             report["independentTree"][plc] = {"blocks": len(inspected["blocks"]), "types": len(inspected["types"]), "tagTables": len(inspected["tagTables"]),
                                               "unitService": "unsupported" if unsupported else "native"}
-        rows, cursor = [], None
+        # inventory_id is read only once a page returned a cursor, and that page also set it.
+        rows, cursor, inventory_id = [], None, None
         while True:
-            page = call("device_inventory", {"pageSize": 200, **({"snapshotId": inventory_id, "cursor": cursor} if cursor else {})}, "independent device_inventory")
-            inventory_id, cursor = page["snapshot"]["snapshotId"], page["nextCursor"]
+            page = call("device_inventory", {"count": 200, **({"snapshotId": inventory_id, "offset": cursor} if cursor else {})}, "independent device_inventory")
+            inventory_id, cursor = page["snapshot"]["snapshotId"], page["nextOffset"]
             rows.extend(page["rows"])
             if cursor is None:
                 break

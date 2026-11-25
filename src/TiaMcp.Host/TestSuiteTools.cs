@@ -38,7 +38,7 @@ public sealed partial class TiaTools
     });
 
     [McpServerTool(Name = "testsuite_application_plan_prepare", Destructive = false, OpenWorld = false)]
-    [Description("Retain a complete bounded application-test review (TS-05). request is the style plan request plus executionMode: systemManaged or externallyManaged, simulatorTicket: the downloadTicket of an owned sim_create instance, wholeGroup: true to run the project's whole application group. Each run dispatches one native TestCaseExecutor.Run: one case, a case list, one set, a set list or the whole group; cases and sets never mix. Use the testsuite_style_job_* tools with the returned review; they carry application reviews unchanged. The worker verifies the ticket-owned PLCSIM instance before SetScope and Run. Native execution stays disabled until qualified.")]
+    [Description("Retain a complete bounded application-test review (TS-05). request is the style plan request plus executionMode (systemManaged or externallyManaged), simulatorTicket (downloadTicket of an owned sim_create instance) and wholeGroup: true for the whole group. One native TestCaseExecutor.Run per run, cases or sets, never mixed. Use the testsuite_style_job_* tools with the returned review. Native execution stays disabled until qualified.")]
     public CallToolResult TestSuiteApplicationPlanPrepare(JsonElement request) => StyleResult(() =>
     {
         var input = TestSuiteStyleJobs.Parse<ApplicationPlanRequest>(Encoding.UTF8.GetBytes(request.GetRawText()));
@@ -55,7 +55,7 @@ public sealed partial class TiaTools
         => Call("testsuite_application_inventory", new { projectName, maxItems = Limit(maxItems), export, artifactDirectory = ExportDirectory }, cancellationToken);
 
     [McpServerTool(Name = "testsuite_system_plan_prepare", Destructive = false, OpenWorld = false)]
-    [Description("Retain a complete bounded system-test review (TS-06). request is the style plan request plus simulatorTicket: the downloadTicket of an owned sim_create instance, serverAddress: the canonical opc.tcp://<IPv4>:<port>/ address of that instance, wholeGroup: true to run the project's whole system group. Definitions use the system (.tst) family. Each run dispatches one native SystemTestCaseExecutor.Run: one case, a case list or the whole group. Use the testsuite_style_job_* tools with the returned review. The worker verifies the ticket-owned PLCSIM instance, that serverAddress is one of its controller addresses, routed by Windows through the PLCSIM Virtual Ethernet Adapter, and that the instance was created for TCP/IP (a Softbus instance has no OPC UA endpoint), before SetScope(StandardSIMATIC) and Run. Native execution stays disabled until qualified.")]
+    [Description("Retain a complete bounded system-test review (TS-06). request is the style plan request plus simulatorTicket (downloadTicket of an owned sim_create instance), serverAddress (canonical opc.tcp://<IPv4>:<port>/ of that TCP/IP instance) and wholeGroup: true for the whole group. Uses .tst definitions; one native SystemTestCaseExecutor.Run per run. Use the testsuite_style_job_* tools with the returned review. Native execution stays disabled until qualified.")]
     public CallToolResult TestSuiteSystemPlanPrepare(JsonElement request) => StyleResult(() =>
     {
         var input = TestSuiteStyleJobs.Parse<SystemPlanRequest>(Encoding.UTF8.GetBytes(request.GetRawText()));

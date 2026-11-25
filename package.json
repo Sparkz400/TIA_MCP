@@ -10,8 +10,13 @@
     "test": "tests"
   },
   "scripts": {
-    "test:explorer": "node --test ui/project-explorer/tests/model.test.cjs ui/project-explorer/tests/client.test.cjs",
-    "test:explorer:browser": "node ui/project-explorer/tests/browser.mjs"
+    "test:explorer": "node --test ui/project-explorer/tests/model.test.cjs ui/project-explorer/tests/client.test.cjs ui/project-explorer/tests/relationship-scope.test.cjs",
+    "test:explorer:browser": "node ui/project-explorer/tests/browser.mjs",
+    "test:explorer:scale": "node ui/project-explorer/tests/browser-scale.mjs",
+    "test:explorer:benchmark": "node ui/project-explorer/tests/benchmark.cjs",
+    "test:explorer:perf": "node ui/project-explorer/tests/browser-performance.mjs",
+    "test:explorer:import-perf": "node ui/project-explorer/tests/browser-import-performance.mjs",
+    "demo:record": "node ui/project-explorer/tests/record-demo.mjs"
   },
   "keywords": [],
   "type": "commonjs",

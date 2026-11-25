@@ -45,32 +45,6 @@
         "dependency-comparison"
       ]
     },
-    "cursor": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "recordRef",
-        "reportSha256",
-        "section",
-        "offset"
-      ],
-      "properties": {
-        "recordRef": {
-          "$ref": "#/$defs/recordRef"
-        },
-        "reportSha256": {
-          "$ref": "#/$defs/sha256"
-        },
-        "section": {
-          "type": "string",
-          "minLength": 1
-        },
-        "offset": {
-          "type": "integer",
-          "minimum": 0
-        }
-      }
-    },
     "artifact": {
       "type": "object",
       "additionalProperties": false,
@@ -200,7 +174,7 @@
         "offset",
         "total",
         "rows",
-        "nextCursor",
+        "nextOffset",
         "completeArtifactRef",
         "nativeQualified",
         "compatibilityCertified",
@@ -227,17 +201,14 @@
         },
         "rows": {
           "type": "array",
-          "maxItems": 500
+          "maxItems": 200
         },
-        "nextCursor": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/cursor"
-            },
-            {
-              "type": "null"
-            }
-          ]
+        "nextOffset": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
         },
         "completeArtifactRef": {
           "$ref": "#/$defs/artifactRef"
@@ -520,14 +491,18 @@
         }
       }
     },
-    "opcua_report_pageInput": {
+    "review_pageInput": {
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "kind",
         "recordRef",
         "section"
       ],
       "properties": {
+        "kind": {
+          "const": "opcua"
+        },
         "recordRef": {
           "$ref": "#/$defs/recordRef"
         },
@@ -535,40 +510,43 @@
           "type": "string",
           "minLength": 1
         },
-        "pageSize": {
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
           "type": "integer",
           "minimum": 1,
-          "maximum": 500
-        },
-        "cursor": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/cursor"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "maximum": 200
         }
       }
     },
-    "opcua_reopenInput": {
+    "review_reopenInput": {
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "kind",
         "recordRef"
       ],
       "properties": {
+        "kind": {
+          "const": "opcua"
+        },
         "recordRef": {
           "$ref": "#/$defs/recordRef"
         }
       }
     },
-    "opcua_listInput": {
+    "review_listInput": {
       "type": "object",
       "additionalProperties": false,
-      "required": [],
+      "required": [
+        "kind"
+      ],
       "properties": {
+        "kind": {
+          "const": "opcua"
+        },
         "offset": {
           "type": "integer",
           "minimum": 0
@@ -580,15 +558,27 @@
         }
       }
     },
-    "opcua_artifact_readInput": {
+    "review_artifact_readInput": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "artifactRef"
+        "kind",
+        "recordRef",
+        "name"
       ],
       "properties": {
-        "artifactRef": {
-          "$ref": "#/$defs/artifactRef"
+        "kind": {
+          "const": "opcua"
+        },
+        "recordRef": {
+          "$ref": "#/$defs/recordRef"
+        },
+        "name": {
+          "enum": [
+            "original.xml",
+            "consumers.json",
+            "report.json"
+          ]
         },
         "offset": {
           "type": "integer",
@@ -635,33 +625,33 @@
         "$ref": "#/$defs/recordSummary"
       }
     },
-    "opcua_report_page": {
+    "review_page": {
       "input": {
-        "$ref": "#/$defs/opcua_report_pageInput"
+        "$ref": "#/$defs/review_pageInput"
       },
       "output": {
         "$ref": "#/$defs/reportPage"
       }
     },
-    "opcua_reopen": {
+    "review_reopen": {
       "input": {
-        "$ref": "#/$defs/opcua_reopenInput"
+        "$ref": "#/$defs/review_reopenInput"
       },
       "output": {
         "$ref": "#/$defs/recordSummary"
       }
     },
-    "opcua_list": {
+    "review_list": {
       "input": {
-        "$ref": "#/$defs/opcua_listInput"
+        "$ref": "#/$defs/review_listInput"
       },
       "output": {
         "$ref": "#/$defs/listPage"
       }
     },
-    "opcua_artifact_read": {
+    "review_artifact_read": {
       "input": {
-        "$ref": "#/$defs/opcua_artifact_readInput"
+        "$ref": "#/$defs/review_artifact_readInput"
       },
       "output": {
         "$ref": "#/$defs/artifactPage"

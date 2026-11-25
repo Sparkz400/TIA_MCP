@@ -20,8 +20,10 @@ are loaded from your installed products and are not redistributed.
 [Current status](docs/STATUS.md) · [Remaining work](docs/TODO.md) ·
 [Discussions](https://github.com/Sparkz400/TIA_MCP/discussions) · [Contributing](CONTRIBUTING.md)
 
-<!-- Demo: add docs/assets/demo.gif here (about 30 s: discover a session, find a
-     block's callers, preview a change) and reference it as the first image. -->
+![Animated demo of the Project Explorer: searching for MotorControl, viewing its callers and I/O relationships as a graph, opening the evidence for the call from Main, and expanding the hardware tree with the keyboard.](docs/assets/demo.gif)
+
+*Actual Explorer UI with synthetic sample data (27 s). Not a live TIA Portal session;
+it shows no session discovery or change preview.*
 
 ## What you can ask
 
@@ -35,7 +37,7 @@ With the server connected, ask your MCP client in plain language:
   → `change_prepare`, `change_apply`, `change_restore` if it goes wrong
 - *"Create a PLCSIM instance and test that `Motor_On` follows `Start`."*
   → `sim_create`, `sim_test`
-- *"Give me a health report of this project."* → `project_health_report`
+- *"Give me a health report of this project."* → `project_health_review`
 
 Ask `feature_catalog` and `target_capabilities` what your target supports. The server
 also offers workflow prompts (`safe_change`, `project_health`, `block_test`,
@@ -157,7 +159,7 @@ Configure your MCP client's stdio server using your actual checkout path:
 }
 ```
 
-Without `--toolsets` the Host advertises only the `base` and `core` tools (about 70 of roughly 320) to keep
+Without `--toolsets` the Host advertises only the `base` and `core` tools (70 of the 306 a default Host can advertise; 333 exist, the rest need a Host option) to keep
 the tool list and its context cost small. Add groups such as `"--toolsets", "core,simulation"` to `args`, or
 `"--toolsets", "all"` for every tool; see
 [MCP surface](docs/reference/mcp-surface.md#tool-groups---toolsets) for the groups.

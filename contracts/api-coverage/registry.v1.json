@@ -1096,6 +1096,12 @@
       ]
     },
     {
+      "featureId": "sim_network_mode_set",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
       "featureId": "sim_time",
       "obligations": [
         "L03"
@@ -2003,7 +2009,7 @@
       ]
     },
     {
-      "featureId": "project_health_report",
+      "featureId": "project_health_review",
       "obligations": [
         "L04",
         "X11"
@@ -2367,11 +2373,20 @@
       ]
     },
     {
-      "featureId": "translation_review_page",
+      "featureId": "review_page",
       "obligations": [
         "D03",
         "D11",
-        "L05"
+        "L05",
+        "D04",
+        "X06",
+        "D05",
+        "C02",
+        "F02",
+        "C03",
+        "D12",
+        "D16",
+        "X03"
       ]
     },
     {
@@ -2399,23 +2414,55 @@
       ]
     },
     {
-      "featureId": "translation_reopen",
+      "featureId": "review_reopen",
       "obligations": [
         "D03",
         "D11",
-        "L05"
+        "L05",
+        "D04",
+        "D01",
+        "X06",
+        "D05",
+        "C02",
+        "F02",
+        "C03",
+        "D12",
+        "D16",
+        "X03"
       ]
     },
     {
-      "featureId": "translation_list",
+      "featureId": "review_list",
       "obligations": [
-        "D03"
+        "D03",
+        "D04",
+        "D01",
+        "X06",
+        "D05",
+        "C02",
+        "F02",
+        "L05",
+        "C03",
+        "D12",
+        "D16",
+        "X03"
       ]
     },
     {
-      "featureId": "translation_artifact_read",
+      "featureId": "review_artifact_read",
       "obligations": [
-        "D03"
+        "D03",
+        "D04",
+        "D01",
+        "X06",
+        "D05",
+        "C02",
+        "F02",
+        "L05",
+        "C03",
+        "D12",
+        "D16",
+        "X03"
       ]
     },
     {
@@ -2533,30 +2580,6 @@
       ]
     },
     {
-      "featureId": "opcua_report_page",
-      "obligations": [
-        "D04"
-      ]
-    },
-    {
-      "featureId": "opcua_reopen",
-      "obligations": [
-        "D04"
-      ]
-    },
-    {
-      "featureId": "opcua_list",
-      "obligations": [
-        "D04"
-      ]
-    },
-    {
-      "featureId": "opcua_artifact_read",
-      "obligations": [
-        "D04"
-      ]
-    },
-    {
       "featureId": "opcua_engineering_inspect",
       "obligations": [
         "D04"
@@ -2635,12 +2658,6 @@
       ]
     },
     {
-      "featureId": "vci_reopen",
-      "obligations": [
-        "D01"
-      ]
-    },
-    {
       "featureId": "vci_history",
       "obligations": [
         "D01"
@@ -2648,18 +2665,6 @@
     },
     {
       "featureId": "vci_materialize",
-      "obligations": [
-        "D01"
-      ]
-    },
-    {
-      "featureId": "vci_list",
-      "obligations": [
-        "D01"
-      ]
-    },
-    {
-      "featureId": "vci_artifact_read",
       "obligations": [
         "D01"
       ]
@@ -2702,30 +2707,6 @@
     },
     {
       "featureId": "graph_edit",
-      "obligations": [
-        "X06"
-      ]
-    },
-    {
-      "featureId": "graph_reopen",
-      "obligations": [
-        "X06"
-      ]
-    },
-    {
-      "featureId": "graph_report_page",
-      "obligations": [
-        "X06"
-      ]
-    },
-    {
-      "featureId": "graph_artifact_read",
-      "obligations": [
-        "X06"
-      ]
-    },
-    {
-      "featureId": "graph_list",
       "obligations": [
         "X06"
       ]
@@ -2828,34 +2809,6 @@
     },
     {
       "featureId": "automationml_compare",
-      "obligations": [
-        "D05",
-        "C02"
-      ]
-    },
-    {
-      "featureId": "automationml_reopen",
-      "obligations": [
-        "D05",
-        "C02"
-      ]
-    },
-    {
-      "featureId": "automationml_report_page",
-      "obligations": [
-        "D05",
-        "C02"
-      ]
-    },
-    {
-      "featureId": "automationml_artifact_read",
-      "obligations": [
-        "D05",
-        "C02"
-      ]
-    },
-    {
-      "featureId": "automationml_list",
       "obligations": [
         "D05",
         "C02"
@@ -3144,7 +3097,7 @@
       ]
     },
     {
-      "featureId": "technology_profile_report",
+      "featureId": "technology_profile_review_page",
       "obligations": [
         "D13",
         "F02",
@@ -3160,7 +3113,7 @@
       ]
     },
     {
-      "featureId": "safety_evidence_report",
+      "featureId": "safety_evidence_review_page",
       "obligations": [
         "D14",
         "F02",
@@ -3352,7 +3305,7 @@
       ]
     },
     {
-      "featureId": "addin_selection_page",
+      "featureId": "addin_selection_review_page",
       "obligations": [
         "X04",
         "F02"
@@ -3373,7 +3326,7 @@
       ]
     },
     {
-      "featureId": "multiuser_observation_page",
+      "featureId": "multiuser_observation_review_page",
       "obligations": [
         "X05",
         "F02"
@@ -3387,7 +3340,7 @@
       ]
     },
     {
-      "featureId": "teamcenter_observation_page",
+      "featureId": "teamcenter_observation_review_page",
       "obligations": [
         "X09",
         "F02"
@@ -3395,38 +3348,6 @@
     },
     {
       "featureId": "composite_engineering_review",
-      "obligations": [
-        "C02",
-        "F02",
-        "L05"
-      ]
-    },
-    {
-      "featureId": "composite_engineering_reopen",
-      "obligations": [
-        "C02",
-        "F02",
-        "L05"
-      ]
-    },
-    {
-      "featureId": "composite_engineering_page",
-      "obligations": [
-        "C02",
-        "F02",
-        "L05"
-      ]
-    },
-    {
-      "featureId": "composite_engineering_artifact_read",
-      "obligations": [
-        "C02",
-        "F02",
-        "L05"
-      ]
-    },
-    {
-      "featureId": "composite_engineering_list",
       "obligations": [
         "C02",
         "F02",
@@ -3458,50 +3379,6 @@
     },
     {
       "featureId": "runtime_handoff_review",
-      "obligations": [
-        "C03",
-        "D12",
-        "D16",
-        "X03",
-        "F02",
-        "L05"
-      ]
-    },
-    {
-      "featureId": "runtime_handoff_reopen",
-      "obligations": [
-        "C03",
-        "D12",
-        "D16",
-        "X03",
-        "F02",
-        "L05"
-      ]
-    },
-    {
-      "featureId": "runtime_handoff_page",
-      "obligations": [
-        "C03",
-        "D12",
-        "D16",
-        "X03",
-        "F02",
-        "L05"
-      ]
-    },
-    {
-      "featureId": "runtime_handoff_artifact_read",
-      "obligations": [
-        "C03",
-        "D12",
-        "D16",
-        "X03",
-        "F02",
-        "L05"
-      ]
-    },
-    {
-      "featureId": "runtime_handoff_list",
       "obligations": [
         "C03",
         "D12",

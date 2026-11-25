@@ -240,7 +240,7 @@ def read_catalog(client, *, include_features=False):
     expected_total = None
     expected_version = None
     for _ in range(100):
-        result = client.tool("feature_catalog", {"offset": offset, "maxItems": 50})
+        result = client.tool("feature_catalog", {"offset": offset, "count": 50})
         require(result.get("targetAvailabilityProbed") is False, "Catalog must not certify an arbitrary target.")
         rows = result.get("features")
         paging = result.get("pagination", {})

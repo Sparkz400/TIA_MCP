@@ -48,8 +48,8 @@ def main():
     def upload(client, data):
         status = client.tool('artifact_upload_begin', dict(fileName='observations.json', expectedBytes=len(data), sha256=hashlib.sha256(data).hexdigest()))
         for offset in range(0, len(data), status['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', dict(uploadId=status['uploadId'], offset=offset, data=base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()))
-        return client.tool('artifact_upload_commit', dict(uploadId=status['uploadId']))
+            client.tool('artifact_upload_chunk', dict(uploadRef=status['uploadRef'], offset=offset, data=base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()))
+        return client.tool('artifact_upload_commit', dict(uploadRef=status['uploadRef']))
     def read(client, reference):
         chunks, offset = [], 0
         while True:
@@ -72,7 +72,7 @@ def main():
     try:
         client = start()
         try:
-            check({'teamcenter_observation_review','teamcenter_observation_page'} <= {t['name'] for t in client.request('tools/list')['tools']}, 'Both Teamcenter tools registered')
+            check({'teamcenter_observation_review','teamcenter_observation_review_page'} <= {t['name'] for t in client.request('tools/list')['tools']}, 'Both Teamcenter tools registered')
             validate(json.loads(manifest_bytes), 'manifest')
             manifest_upload = upload(client, manifest_bytes)
             bind_manifest(packet, manifest_upload['artifactRef'], manifest_bytes)
@@ -91,7 +91,7 @@ def main():
             for section in ('observations','changes','issues','manifests'):
                 offset, rows = 0, []
                 while True:
-                    page = client.tool('teamcenter_observation_page', dict(recordId=receipt['recordId'],section=section,offset=offset,count=2)); validate(page,'page')
+                    page = client.tool('teamcenter_observation_review_page', dict(recordRef=receipt['recordId'],section=section,offset=offset,count=2)); validate(page,'page')
                     check(len(encode(page)) < 128*1024, 'Bounded '+section+' page')
                     rows.extend(r['value'] for r in page['rows'])
                     if page['nextOffset'] is None: break
@@ -137,20 +137,20 @@ def main():
             # Large custom metadata remains exact in the artifact; pages explicitly omit oversize rows.
             large=copy.deepcopy(packet);large['after']['items']['rows'][0]['properties']=[dict(name='public'+str(i),value='x'*4096) for i in range(64)]
             uploaded=upload(client,encode(large));large_receipt=client.tool('teamcenter_observation_review',dict(uploadRef=uploaded['artifactRef']))
-            page=client.tool('teamcenter_observation_page',dict(recordId=large_receipt['recordId'],section='observations',count=200));validate(page,'page')
+            page=client.tool('teamcenter_observation_review_page',dict(recordRef=large_receipt['recordId'],section='observations',count=200));validate(page,'page')
             check(any(r.get('omitted') for r in page['rows']) and len(encode(page)) < 128*1024,'Oversized metadata row is explicitly omitted within page budget')
-            refuse(client,'teamcenter_observation_page',dict(recordId=receipt['recordId'],section='execute'),'InvalidRequest')
-            refuse(client,'teamcenter_observation_page',dict(recordId=receipt['recordId'],section='manifests',offset=999),'InvalidRequest')
-            client.tool('artifact_upload_release',dict(uploadId=incoming['uploadId']))
-            client.tool('artifact_upload_release',dict(uploadId=manifest_upload['uploadId']))
+            refuse(client,'teamcenter_observation_review_page',dict(recordRef=receipt['recordId'],section='execute'),'InvalidRequest')
+            refuse(client,'teamcenter_observation_review_page',dict(recordRef=receipt['recordId'],section='manifests',offset=999),'InvalidRequest')
+            client.tool('artifact_upload_release',dict(uploadRef=incoming['uploadRef']))
+            client.tool('artifact_upload_release',dict(uploadRef=manifest_upload['uploadRef']))
         finally:close(client)
         client=start()
         try:
-            check(client.tool('teamcenter_observation_page',dict(recordId=receipt['recordId'])) == receipt,'Restart reopens after request and manifest upload release')
+            check(client.tool('teamcenter_observation_review_page',dict(recordRef=receipt['recordId'])) == receipt,'Restart reopens after request and manifest upload release')
             for reference in (receipt['input'],receipt['reportArtifact'],*receipt['manifestArtifacts'].values()):
                 path=artifacts/reference['path'];original=path.read_bytes()
                 try:
-                    path.write_bytes(original+b' ');refuse(client,'teamcenter_observation_page',dict(recordId=receipt['recordId']),'ArtifactChanged')
+                    path.write_bytes(original+b' ');refuse(client,'teamcenter_observation_review_page',dict(recordRef=receipt['recordId']),'ArtifactChanged')
                 finally:path.write_bytes(original)
             for label in ('authority','unusedManifest','missingManifest'):
                 forged=copy.deepcopy(record)
@@ -158,8 +158,8 @@ def main():
                 elif label=='unusedManifest':forged['manifests']['upload:'+'f'*32]=next(iter(forged['manifests'].values()))
                 else:forged['manifests']={}
                 raw=encode(forged);identifier=hashlib.sha256(raw).hexdigest();(artifacts/'teamcenter-reviews'/(identifier+'.json')).write_bytes(raw)
-                refuse(client,'teamcenter_observation_page',dict(recordId=identifier),'ArtifactChanged')
-            check(client.tool('teamcenter_observation_page',dict(recordId=receipt['recordId'])) == receipt,'Rejected forgery leaves original evidence usable')
+                refuse(client,'teamcenter_observation_review_page',dict(recordRef=identifier),'ArtifactChanged')
+            check(client.tool('teamcenter_observation_review_page',dict(recordRef=receipt['recordId'])) == receipt,'Rejected forgery leaves original evidence usable')
         finally:close(client)
         report['completed']=True
     finally:

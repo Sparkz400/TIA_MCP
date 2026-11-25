@@ -93,14 +93,14 @@ def main():
     def upload(data):
         status = call('artifact_upload_begin', dict(fileName='sequence.xml', expectedBytes=len(data), sha256=digest(data)))
         for offset in range(0, len(data), status['maxChunkBytes']):
-            call('artifact_upload_chunk', dict(uploadId=status['uploadId'], offset=offset,
+            call('artifact_upload_chunk', dict(uploadRef=status['uploadRef'], offset=offset,
                                               data=base64.b64encode(data[offset:offset+status['maxChunkBytes']]).decode()))
-        return call('artifact_upload_commit', dict(uploadId=status['uploadId']))
+        return call('artifact_upload_commit', dict(uploadRef=status['uploadRef']))
 
     def download(reference, name):
         data = bytearray()
         while True:
-            chunk = call('automationml_artifact_read', dict(recordRef=reference, name=name, offset=len(data), count=8192))
+            chunk = call('review_artifact_read', dict(kind='automationml', recordRef=reference, name=name, offset=len(data), count=8192))
             check('chunk offsets and lengths are contiguous', chunk['offset'] == len(data) and chunk['nextOffset'] == len(data)+chunk['count'])
             data.extend(base64.b64decode(chunk['data'], validate=True))
             if chunk['complete']:
@@ -115,9 +115,9 @@ def main():
         first = call('automationml_inspect', dict(xmlUploadRef=uploaded['artifactRef'])); before = first['recordRef']
         check('native, importability and complete impact qualification remain false',
               all(first[k] is False for k in ['nativeQualified', 'importabilityCertified', 'impactScopeComplete']))
-        call('artifact_upload_release', dict(uploadId=uploaded['uploadId']))
+        call('artifact_upload_release', dict(uploadRef=uploaded['uploadRef']))
         stop(); client = start()
-        check('restart reopens immutable record after source upload release', call('automationml_reopen', dict(recordRef=before)) == first)
+        check('restart reopens immutable record after source upload release', call('review_reopen', dict(kind='automationml', recordRef=before)) == first)
         check('download retains exact source bytes', download(before, 'original.aml') == raw)
         report_bytes = download(before, 'report.json'); inspection = json.loads(report_bytes)
         (output / 'inspection.json').write_bytes(report_bytes)
@@ -127,14 +127,14 @@ def main():
         check('receipt digest pins the handle', digest(download(before, 'receipt.json')) == before.split(':')[-1])
         steps = []; offset = 0
         while offset is not None:
-            page = call('automationml_report_page', dict(recordRef=before, section='/objects', offset=offset, count=1))
+            page = call('review_page', dict(kind='automationml', recordRef=before, section='/objects', offset=offset, count=1))
             check('page hash binds the downloaded report', page['reportSha256'] == digest(report_bytes))
             steps.extend(r['value']['path'] for r in page['rows']); offset = page['nextOffset']
         check('all object rows appear once in exact report order', steps == [row['path'] for row in inspection['objects']])
         second = call('automationml_inspect', dict(xmlUploadRef=upload(raw.replace(b'firstScrewdriver', b'firstScrewdriverRevised'))['artifactRef']))
         comparison = call('automationml_compare', dict(beforeRef=before, afterRef=second['recordRef']))
         check('comparison retains exact inputs and explicit changes', comparison['inputs'] == [before, second['recordRef']] and comparison['sourceBytesChanged'] and comparison['counts']['changes'] > 0)
-        check('comparison pages contain retained changes', bool(call('automationml_report_page', dict(recordRef=comparison['recordRef'], section='/changes'))['rows']))
+        check('comparison pages contain retained changes', bool(call('review_page', dict(kind='automationml', recordRef=comparison['recordRef'], section='/changes'))['rows']))
         raw3 = (ROOT / 'tests/TiaMcp.AutomationMl.Tests/fixtures/upstream/medium-valid-robot-cell.aml').read_bytes()
         third = call('automationml_inspect', dict(xmlUploadRef=upload(raw3)['artifactRef']))
         report3 = json.loads(download(third['recordRef'], 'report.json'))
@@ -157,21 +157,21 @@ def main():
         check('full interface name including colon resolves through actual MCP', colon['schemaValid'] and
               all(link['targetA'] and link['targetB'] for link in colon_report['links']))
         reject('automationml_compare', dict(beforeRef=comparison['recordRef'], afterRef=before), 'AutomationMlInvalidReference')
-        reject('automationml_report_page', dict(recordRef=before, section='/sourceSha256'), 'AutomationMlInvalidSection')
-        reject('automationml_report_page', dict(recordRef=before, section='/objects', count=201), 'AutomationMlPageLimit')
-        reject('automationml_artifact_read', dict(recordRef=before, name='../intent.json'), 'AutomationMlArtifactMissing')
-        reject('automationml_artifact_read', dict(recordRef=before, name='original.aml', count=65537), 'InvalidRequest')
+        reject('review_page', dict(kind='automationml', recordRef=before, section='/sourceSha256'), 'AutomationMlInvalidSection')
+        reject('review_page', dict(kind='automationml', recordRef=before, section='/objects', count=201), 'AutomationMlPageLimit')
+        reject('review_artifact_read', dict(kind='automationml', recordRef=before, name='../intent.json'), 'AutomationMlArtifactMissing')
+        reject('review_artifact_read', dict(kind='automationml', recordRef=before, name='original.aml', count=65537), 'InvalidRequest')
         reject('automationml_inspect', dict(xmlUploadRef=upload(b'<!DOCTYPE AutomationMl [<!ENTITY e SYSTEM "file:///denied">]><AutomationMl>&e;</AutomationMl>')['artifactRef']), 'AutomationMlInvalidXml')
         retained = artifacts / 'automationml-workflow' / before.split(':')[1] / 'original.aml'
         retained.write_bytes(raw+b' ')
-        reject('automationml_reopen', dict(recordRef=comparison['recordRef']), 'AutomationMlIntegrityFailure')
-        reject('automationml_artifact_read', dict(recordRef=comparison['recordRef'], name='report.json'), 'AutomationMlIntegrityFailure')
+        reject('review_reopen', dict(kind='automationml', recordRef=comparison['recordRef']), 'AutomationMlIntegrityFailure')
+        reject('review_artifact_read', dict(kind='automationml', recordRef=comparison['recordRef'], name='report.json'), 'AutomationMlIntegrityFailure')
         stop(); client = start()
-        check('tampered records remain discoverable after restart', any(r['state'] == 'integrity-failed' for r in call('automationml_list')['rows']))
+        check('tampered records remain discoverable after restart', any(r['state'] == 'integrity-failed' for r in call('review_list', dict(kind='automationml'))['rows']))
         retained.write_bytes(raw)
-        check('restored exact source revalidates input chain', call('automationml_reopen', dict(recordRef=comparison['recordRef'])) == comparison)
+        check('restored exact source revalidates input chain', call('review_reopen', dict(kind='automationml', recordRef=comparison['recordRef'])) == comparison)
         (artifacts / 'automationml-workflow' / ('f'*32)).mkdir()
-        check('incomplete publication remains discoverable', any(r['state'] == 'incomplete' for r in call('automationml_list')['rows']))
+        check('incomplete publication remains discoverable', any(r['state'] == 'incomplete' for r in call('review_list', dict(kind='automationml'))['rows']))
         native_store = artifacts / 'engineering-operations'
         check('offline workflow creates no native engineering operation',
               (not native_store.exists() or not any(native_store.iterdir())) and not missing.exists())

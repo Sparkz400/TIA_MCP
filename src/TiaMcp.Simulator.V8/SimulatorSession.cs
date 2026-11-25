@@ -24,7 +24,7 @@ namespace TiaMcp.Simulator.V8
         private Delegate _lostHandler;
         private int _droppedByManagerLoss;
 
-        // SimulationRuntimeManager.OnRuntimeManagerLost: the Runtime Manager went away, so every selection is stale. The event arrives on a
+        // SimulationRuntimeManager.OnRunTimemanagerLost: the Runtime Manager went away, so every selection is stale. The event arrives on a
         // runtime thread; it only sets a flag and the selections are dropped at the start of the next call. Subscribed by reflection, because
         // the delegate's signature is not verified natively: any mismatch leaves the worker without the subscription, never without the worker.
         private void WatchManagerLost()
@@ -32,7 +32,10 @@ namespace TiaMcp.Simulator.V8
             if (_lostHandler != null) return;
             try
             {
-                var lost = typeof(SimulationRuntimeManager).GetEvent("OnRuntimeManagerLost", BindingFlags.Public | BindingFlags.Static);
+                // The API spells it OnRunTimemanagerLost (assembly metadata of PLCSIM Advanced API 3.0 to 8.0, read 25 November 2026);
+                // the case-sensitive lookup of the manual's spelling found nothing, so the subscription never attached.
+                var lost = typeof(SimulationRuntimeManager).GetEvent("OnRunTimemanagerLost", BindingFlags.Public | BindingFlags.Static)
+                    ?? typeof(SimulationRuntimeManager).GetEvent("OnRuntimeManagerLost", BindingFlags.Public | BindingFlags.Static);
                 if (lost == null) return;
                 var parameters = lost.EventHandlerType.GetMethod("Invoke").GetParameters().Select(p => Expression.Parameter(p.ParameterType)).ToArray();
                 Action flag = () => _managerLost = true;
@@ -60,6 +63,8 @@ namespace TiaMcp.Simulator.V8
         {
             // This starts Siemens Runtime Manager on first use; it never starts a CPU
             // or calls license activation, network discovery, or adapter configuration.
+            // sim_network_mode_set refuses bad arguments and a missing acknowledgement before it.
+            if (operation == "sim_network_mode_set") ParseNetworkModeRequest(args);
             uint version = SimulationRuntimeManager.Version;
             _initialized = true;
             WatchManagerLost();
@@ -92,6 +97,7 @@ namespace TiaMcp.Simulator.V8
                 case "sim_area_write": return AreaWrite(args);
                 case "sim_observe": return Observe(args);
                 case "sim_prune": return Prune(args);
+                case "sim_network_mode_set": return NetworkModeSet(args);
                 default: throw new SimulatorException("UnknownOperation", "Unknown simulator operation: " + operation);
             }
         }
@@ -133,7 +139,7 @@ namespace TiaMcp.Simulator.V8
             string communication = args.Value<string>("communicationInterface") ?? "Softbus";
             if (communication != "Softbus" && communication != "TCPIP")
                 throw new SimulatorException("InvalidRequest", "communicationInterface must be Softbus or TCPIP.");
-            // V8 derives an instance's interface from the machine-wide mode, which is never assigned here. TCP/IP is
+            // V8 derives an instance's interface from the machine-wide mode, which only sim_network_mode_set assigns. TCP/IP is
             // admitted only in the operator's existing single-adapter mode; every later admission compares the live interface.
             if (communication == "TCPIP" && SimulationNetworkAdmission.Refusal(SimulationRuntimeManager.NetworkMode.ToString(), "TCPIP", "TCPIP") != null)
                 throw new SimulatorException("TcpIpModeRequired", TcpIpMessage, new JObject { ["networkMode"] = SimulationRuntimeManager.NetworkMode.ToString(),
@@ -901,7 +907,7 @@ namespace TiaMcp.Simulator.V8
             return selected;
         }
 
-        private const string TcpIpRemediation = "Set PLCSIM Advanced's machine-wide mode yourself: open the PLCSIM Advanced Control Panel, under Online Access choose PLCSIM Virtual Eth. Adapter and TCP/IP Single Adapter (pick the adapter), then call sim_status until tcpIpReady is true. The switch affects every PLCSIM instance on this PC, so running instances should be stopped first. This adapter reads the mode but never changes it.";
+        private const string TcpIpRemediation = "Set PLCSIM Advanced's machine-wide mode yourself: open the PLCSIM Advanced Control Panel, under Online Access choose PLCSIM Virtual Eth. Adapter and TCP/IP Single Adapter (pick the adapter), then call sim_status until tcpIpReady is true. Or, with no PLCSIM instance registered and the user's agreement to a machine-wide change, call sim_network_mode_set with mode TCPIPSingleAdapter and acknowledgeMachineWide true. The switch affects every PLCSIM instance on this PC. No other tool changes the mode.";
 
         // Windows network interfaces of PLCSIM's virtual Ethernet adapter with their IPv4 addresses; observation only.
         private static JArray PlcsimAdapters()
@@ -921,7 +927,7 @@ namespace TiaMcp.Simulator.V8
             return rows;
         }
 
-        private const string TcpIpMessage = "TCP/IP instances require PLCSIM's existing TCP/IP single-adapter mode. This adapter never changes shared network configuration.";
+        private const string TcpIpMessage = "TCP/IP instances require PLCSIM's existing TCP/IP single-adapter mode. Only an explicit, acknowledged sim_network_mode_set changes the machine-wide mode.";
 
         // Returns the interface recorded at creation; selections without a receipt stay Softbus-only.
         private static string EnsureAdmitted(Selection selected)
@@ -929,7 +935,7 @@ namespace TiaMcp.Simulator.V8
             string required = selected.CreationReceipt?.Value<string>("communicationInterface") ?? "Softbus";
             string code = SimulationNetworkAdmission.Refusal(SimulationRuntimeManager.NetworkMode.ToString(), selected.Instance.CommunicationInterface.ToString(), required);
             if (code == "SoftbusRequired")
-                throw new SimulatorException(code, "Runtime writes and RUN require a local Softbus instance. This adapter never changes shared network configuration.");
+                throw new SimulatorException(code, "Runtime writes and RUN require a local Softbus instance. Only an explicit, acknowledged sim_network_mode_set changes the machine-wide mode.");
             if (code != null) throw new SimulatorException(code, TcpIpMessage);
             return required;
         }

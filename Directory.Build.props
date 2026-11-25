@@ -14,4 +14,11 @@
     <Deterministic>true</Deterministic>
     <UseSharedCompilation>false</UseSharedCompilation>
   </PropertyGroup>
+  <!-- Analyzer rules with no finding today are errors (src/TiaMcp.Analyzers.globalconfig); every other rule keeps the
+       SDK default for its AnalysisLevel. Items are evaluated after every property, so the project's own TargetFramework
+       is known here. The net48 workers stay out: Test-WorkerCompile.ps1 reads their compiler errors. The file lives
+       under src/ so isolated package builds (New-IsolatedBuild.ps1) copy it. -->
+  <ItemGroup Condition="'$(TargetFramework)' != 'net48' and Exists('$(MSBuildThisFileDirectory)src/TiaMcp.Analyzers.globalconfig')">
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)src/TiaMcp.Analyzers.globalconfig" />
+  </ItemGroup>
 </Project>

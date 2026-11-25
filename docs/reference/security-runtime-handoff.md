@@ -20,19 +20,19 @@ records keep their original behavior.
    the request and call `runtime_handoff_review`. The request is retained byte
    for byte without rewriting its references. Each invocation creates a new
    immutable record; it is not an idempotent native operation.
-3. Keep the returned `recordRef`. `runtime_handoff_reopen` checks the original
+3. Keep the returned `recordRef`. `review_reopen` (kind `runtime_handoff`) checks the original
    intent, receipt, request, report, all six observation references and saved
    access/model dependencies, rebuilding the report before returning a summary.
-4. Use `runtime_handoff_page` for `constraints`, `permissions`,
+4. Use `review_page` (kind `runtime_handoff`) for `constraints`, `permissions`,
    `baselineObservations` or `currentObservations`. Pages contain 1..200 rows
    within a 128 KiB structured result. Oversized observations are explicitly
    omitted from the page, never silently dropped from the report.
-5. `runtime_handoff_artifact_read` downloads `request.json`, `report.json`,
+5. `review_artifact_read` (kind `runtime_handoff`) downloads `request.json`, `report.json`,
    `receipt.json`, or an exact `baseline.target.json`, `baseline.program.json`,
    `baseline.session.json`, `current.target.json`, `current.program.json` or
    `current.session.json`. Chunks contain 1..65536 requested bytes, exact offsets,
    total length and SHA-256. Each call revalidates the complete evidence chain.
-6. `runtime_handoff_list` discovers complete, incomplete and verification-failed
+6. `review_list` (kind `runtime_handoff`) discovers complete, incomplete and verification-failed
    records, plus retained/pending observation-file counts. It never completes an
    interrupted publication. After a lost response, inspect the returned handles
    and their original requests instead of automatically replaying the request.

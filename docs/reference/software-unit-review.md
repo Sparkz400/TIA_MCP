@@ -20,7 +20,7 @@ compile a project, determine native visibility, or execute any proposed change.
    `reviewId` and committed `uploadRef`.
 4. The receipt identifies immutable original input and report-envelope artifacts.
    `artifact_read` accepts their `path` fields and verifies retained bytes.
-5. Use `software_unit_review_page(recordId, section, offset, count)` for
+5. Use `software_unit_review_page(recordRef, section, offset, count)` for
    `summary`, `units`, `objects`, `relations`, `dependencies`, `cycles`,
    `collisions` or `changes`. Originals survive upload release and Host restart.
    Reopening verifies the input and saved review hashes and derives the report

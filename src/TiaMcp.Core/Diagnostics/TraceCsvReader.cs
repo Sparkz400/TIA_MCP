@@ -9,6 +9,17 @@ internal static class TraceCsvReader
 {
     internal static JsonObject Convert(byte[] bytes, JsonObject options, JsonObject plan, string tracePlanId, JsonObject original)
     {
+        // An option of the wrong JSON type (headerRecord "0", delimiter 1, a non-string missing value) makes JsonNode throw
+        // InvalidOperationException or FormatException; refuse it as a request error instead of an uncoded failure.
+        try { return ConvertChecked(bytes, options, plan, tracePlanId, original); }
+        catch (Exception error) when (error is InvalidOperationException or FormatException)
+        {
+            throw new BridgeException("InvalidRequest", "A CSV option has the wrong JSON type: " + error.Message);
+        }
+    }
+
+    private static JsonObject ConvertChecked(byte[] bytes, JsonObject options, JsonObject plan, string tracePlanId, JsonObject original)
+    {
         D.Bound(options);
         string delimiter = D.Required(options, "delimiter", 1), separator = D.Required(options, "decimalSeparator", 1);
         if (delimiter is not ("," or ";" or "\t") || separator is not ("." or ",")) throw new BridgeException("InvalidRequest", "Specify comma/semicolon/tab delimiter and dot/comma decimalSeparator.");
@@ -28,7 +39,7 @@ internal static class TraceCsvReader
             throw new BridgeException("MeasurementLineageMismatch", "CSV mappings must cover each selected signal exactly once.");
         var columns = mappings.Select(c => (Id: D.Required(c!, "signalId", 64), Index: Column(D.Required(c!, "column", 512)), Unit: D.Required(c!, "unit", 64))).ToArray();
         if (columns.Select(c => c.Index).Distinct().Count() != columns.Length || columns.Any(c => c.Index == timeColumn)) throw new BridgeException("InvalidRequest", "CSV signal/time columns must be distinct.");
-        var missing = options["missingValues"] is JsonArray missingValues ? missingValues.Select(n => n!.GetValue<string>()).ToHashSet(StringComparer.Ordinal) : new HashSet<string>(StringComparer.Ordinal) { "" };
+        var missing = options["missingValues"] is JsonArray missingValues ? missingValues.Select(n => n is JsonValue value && value.TryGetValue<string>(out var token) ? token : throw new BridgeException("InvalidRequest", "missingValues must be an array of strings.")).ToHashSet(StringComparer.Ordinal) : new HashSet<string>(StringComparer.Ordinal) { "" };
         if (missing.Count > 16) throw new BridgeException("InvalidRequest", "At most 16 explicit missing-value tokens.");
         var samples = new JsonArray(); var units = new JsonObject(); foreach (var c in columns) units[c.Id] = c.Unit;
         for (int row = headerIndex + 1; row < records.Count; row++)

@@ -174,6 +174,9 @@ internal static partial class Program
             ("Simulator signal batches carry primitive values with distinct written symbols", SimulationRuntimeControlTests.SignalBatchesCarryPrimitiveValues),
             ("Symbolic simulator writes refuse a symbol whose tag-list area is Output", SimulationRuntimeControlTests.SymbolicOutputWritesAreRefusedByTheirTagListArea),
             ("Simulator storage pruning deletes only unregistered receipt-backed storage and unchanged archives", SimulationRuntimeControlTests.StoragePruneNeverTouchesLiveOrForeignStorage),
+            ("PLCSIM network-mode switch refuses without acknowledgement, on a stale or unknown mode and with registered instances", SimulationNetworkModeSwitchTests.RefusesBeforeAnyChange),
+            ("PLCSIM network-mode switch is a no-op on the current mode and sets only when every rule holds", SimulationNetworkModeSwitchTests.SetsOnlyWhenEveryRuleHolds),
+            ("PLCSIM network-mode switch reports a readback mismatch and a remediation per setter error", SimulationNetworkModeSwitchTests.ReadbackAndFailuresAreReported),
             ("Simulator symbols take the tag-list spelling whatever their quoting", SimulationRuntimeControlTests.SymbolsTakeTheTagListSpelling),
             ("Simulator observation event times are explicit UTC", SimulationRuntimeControlTests.EventTimesAreUtc),
             ("Simulator state changes, writes, scenario writes, time, event, storage, batch and area writes require an owned instance, symbolic writes refuse outputs first", SimulationRuntimeControlTests.WritesRequireAnOwnedInstance),
@@ -247,6 +250,8 @@ internal static partial class Program
             ("Framing observes cancellation", FramingCancellation),
             ("Request envelope round-trips arguments and defaults", RequestEnvelope),
             ("Request size is capped before transport", RequestLimit),
+            ("A request the workers cannot load is refused before transport", RequestWorkerReadable),
+            ("A worker recovers the request id of a frame it cannot load", WorkerLoopTests.UnloadableRequestKeepsItsId),
             ("Response result survives JSON document disposal", ResponseResult),
             ("Response rejects mismatched IDs and versions", ResponseMismatch),
             ("Response rejects malformed envelopes", ResponseMalformed),
@@ -261,6 +266,7 @@ internal static partial class Program
             ("Bridge cancellation while queued leaves session usable", BridgeQueuedCancellation),
             ("Bridge queued call gives up after the bridge timeout without sending", BridgeQueueTimeout),
             ("Bridge queue wait is separate from the operation timeout", BridgeSeparateQueueTimeout),
+            ("The engineering dispatcher gives up queued calls after the queue timeout without sending", DispatcherQueueTimeout),
             ("Bridge long operations get their own timeout", BridgeLongOperationTimeout),
             ("Bridge pre-cancelled call never starts a worker", BridgePreCancelled),
             ("Bridge mismatched response ID is recoverable", () => BridgeTerminalFault("wrongId", "ProtocolMismatch")),
@@ -418,6 +424,8 @@ internal static partial class Program
             ("Graphical text renders LAD/FBD logic as Boolean statements", GraphicalNetworkTextTests.LadderLogicBecomesBooleanStatements),
             ("Graphical text renders boxes and calls with pin bindings", GraphicalNetworkTextTests.BoxesAndCallsShowPinBindings),
             ("Graphical text renders SCL networks as source text", GraphicalNetworkTextTests.StructuredTextBecomesSclSource),
+            ("Typed graphical exports render as text or are refused under seeded mutations", GraphicalNetworkTextRobustnessTests.SeededMutationsAreRenderedOrRefused),
+            ("The worker's export reader refuses nesting beyond its depth bound", GraphicalNetworkTextRobustnessTests.ExportedXmlDepthIsBounded),
             ("Graphical text renders a data block as its declared interface", GraphicalNetworkTextTests.DataBlockInterfaceBecomesText),
             ("Graphical text response carries each text once and writes no empty file", GraphicalNetworkTextTests.ResponseCarriesEachTextOnceAndNoEmptyFile),
             ("Graphical text renders operands, titles and unrendered network languages", GraphicalNetworkTextTests.OperandsTitlesAndUnrenderedNetworks),
@@ -540,6 +548,19 @@ internal static partial class Program
         BridgeProtocol.EncodeRequest("large", "write", new { text = new string('x', BridgeProtocol.MaxRequestBytes) });
         return Task.CompletedTask;
     });
+
+    // Tool arguments reach EncodeRequest as JsonElement, which keeps repeated names and any depth the MCP layer accepted.
+    private static async Task RequestWorkerReadable()
+    {
+        static JsonElement Parse(string json) { using var document = JsonDocument.Parse(json, new JsonDocumentOptions { MaxDepth = 256 }); return document.RootElement.Clone(); }
+        await Check.BridgeError("InvalidRequest", () => { BridgeProtocol.EncodeRequest("1", "sim_write", new { instanceId = 1, writes = Parse("""[{"symbol":"A","symbol":"B","type":"Bool","value":true}]""") }); return Task.CompletedTask; });
+        await Check.BridgeError("InvalidRequest", () => { BridgeProtocol.EncodeRequest("1", "change_prepare", new { payload = Parse("""{"name":"A","nested":{"x":1,"x":2}}""") }); return Task.CompletedTask; });
+        string deep = string.Concat(Enumerable.Repeat("[", 80)) + string.Concat(Enumerable.Repeat("]", 80));
+        await Check.BridgeError("InvalidRequest", () => { BridgeProtocol.EncodeRequest("1", "change_prepare", new { payload = Parse(deep) }); return Task.CompletedTask; });
+        // The same name in different objects, and in sibling array rows, is ordinary.
+        BridgeProtocol.EncodeRequest("1", "sim_write", new { writes = Parse("""[{"symbol":"A","value":{"symbol":"A"}},{"symbol":"A"}]""") });
+        BridgeProtocol.EncodeRequest("1", "change_prepare", new { payload = Parse(string.Concat(Enumerable.Repeat("[", 60)) + string.Concat(Enumerable.Repeat("]", 60))) });
+    }
 
     private static Task ResponseResult()
     {
@@ -715,6 +736,37 @@ internal static partial class Program
         await first; await second;
         await fixture.Client.CallAsync("echo");
         Check.Equal(0, fixture.Events().Count(e => e.Operation == "mustNotRun"));
+    }
+
+    private sealed class HeldBridge : IBridgeClient
+    {
+        public readonly TaskCompletionSource<JsonElement> Release = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public readonly List<string> Calls = [];
+        public Task<JsonElement> CallAsync(string operation, object? arguments = null, CancellationToken cancellationToken = default)
+        { lock (Calls) Calls.Add(operation); return Release.Task; }
+    }
+
+    // Every engineering tool goes through the dispatcher, whose gate is held for the whole native call; without its own
+    // bound a second call never reached the bridge's QueueTimeout.
+    private static async Task DispatcherQueueTimeout()
+    {
+        string root = Path.Combine(Path.GetTempPath(), "tia-mcp-dispatcher-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var native = new HeldBridge();
+            var dispatcher = new TiaMcp.Core.WatchTables.WatchTableDispatcher(native, root, queueTimeout: TimeSpan.FromMilliseconds(300));
+            var running = dispatcher.CallAsync("slow_operation");
+            await BridgeFixture.WaitForAsync(() => { lock (native.Calls) return native.Calls.Count == 1; }, "the first call to reach the worker");
+            await Check.BridgeError("QueueTimeout", () => dispatcher.CallAsync("mustNotRun"));
+            await Check.BridgeError("QueueTimeout", () => dispatcher.CallAsync("engineering_operation_status", new { operationId = "x" }));
+            lock (native.Calls) Check.Equal(1, native.Calls.Count);
+            native.Release.SetResult(JsonSerializer.SerializeToElement(new { ok = true }));
+            await running;
+            await dispatcher.CallAsync("after"); // The gate was released and later calls run.
+            lock (native.Calls) Check.Equal(2, native.Calls.Count);
+        }
+        finally { Directory.Delete(root, true); }
     }
 
     private static async Task BridgeSeparateQueueTimeout()

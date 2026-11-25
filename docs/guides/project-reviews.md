@@ -1,6 +1,6 @@
 # Persistent project reviews
 
-`project_snapshot_capture` saves the native hierarchy, selected standard block XML and bounded direct relationship observations in the host's `artifacts/project-reviews` directory. The returned `reviewId` is the SHA-256 of the entire saved document. `project_snapshot_compare`, `project_snapshot_search` and `project_health_report` use that document without starting TIA and remain usable after a host restart.
+`project_snapshot_capture` saves the native hierarchy, selected standard block XML and bounded direct relationship observations in the host's `artifacts/project-reviews` directory. The returned `reviewId` is the SHA-256 of the entire saved document. `project_snapshot_compare`, `project_snapshot_search` and `project_health_review` use that document without starting TIA and remain usable after a host restart.
 
 ## Use saved reviews without Siemens installed
 
@@ -115,7 +115,7 @@ The serialized path array also has a fixed 1 MiB limit; evidence is omitted as a
 
 `project_snapshot_search` accepts `reviewId` and a literal, case-insensitive `query` of 1–256 characters. It searches exact object paths/names, XML text and the native `Text`, `Name` and `Value` attributes used by code tokens and declarations. Results contain exact object paths and excerpts. The text index is not a source line number. Results describe the saved snapshot, not subsequent live edits.
 
-`project_health_report` accepts `reviewId`. It reports native inconsistency flags, protected/unavailable objects, unavailable selected source and unresolved relationship endpoints. An unresolved endpoint is a coverage finding, not proof of a broken reference. This report does not compile, establish that an object is unused, validate safety or inspect physical wiring.
+`project_health_review` accepts `reviewId`. It reports native inconsistency flags, protected/unavailable objects, unavailable selected source and unresolved relationship endpoints. An unresolved endpoint is a coverage finding, not proof of a broken reference. This report does not compile, establish that an object is unused, validate safety or inspect physical wiring.
 
 All three offline tools support `offset` and `maxItems` (1–200). Search retains at most 10,000 observed hits and reports truncation. Review IDs reject traversal, artifact reads reject symlinks/junctions, and every read verifies the saved content hash. XML DTDs and external entities are prohibited. Project text is never executed.
 

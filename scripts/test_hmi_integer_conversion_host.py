@@ -63,9 +63,9 @@ def main():
         raw = value if isinstance(value, bytes) else json.dumps(value, ensure_ascii=False).encode('utf-8')
         begin = client.tool('artifact_upload_begin', dict(fileName='conversion.json', expectedBytes=len(raw), sha256=digest(raw)))
         for offset in range(0, len(raw), begin['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', dict(uploadId=begin['uploadId'], offset=offset,
+            client.tool('artifact_upload_chunk', dict(uploadRef=begin['uploadRef'], offset=offset,
                         data=base64.b64encode(raw[offset:offset + begin['maxChunkBytes']]).decode()))
-        return begin['uploadId'], client.tool('artifact_upload_commit', dict(uploadId=begin['uploadId']))['artifactRef']
+        return begin['uploadRef'], client.tool('artifact_upload_commit', dict(uploadRef=begin['uploadRef']))['artifactRef']
     def candidates():
         return {p.name: digest(p.read_bytes()) for p in (artifacts / 'hmi-component-reviews').iterdir()
                 if p.is_file() and p.name.endswith(('.author.json', '.candidate'))}
@@ -74,7 +74,7 @@ def main():
         check(response.get('isError') and response['structuredContent']['error']['code'] == code, label)
     def prior_replay(client):
         for case in prior['cases']:
-            receipt = client.tool('hmi_text_list_generate_set', dict(recordId=case['receipt']['recordId']))
+            receipt = client.tool('hmi_text_list_generate_set', dict(recordRef=case['receipt']['recordId']))
             check(receipt == case['receipt'], 'Actual prior v2 exact response: ' + case['label'])
             verify(case['request'], receipt, read)
         for row in prior['files']:
@@ -94,11 +94,11 @@ def main():
                 check(True, 'Independent original XML/domain/full YAML/peer oracle: ' + case['label'])
                 if receipt['status'] == 'conflict':
                     check(candidates() == before, 'Conflict publishes no candidates: ' + case['label'])
-                client.tool('artifact_upload_release', dict(uploadId=upload_id))
+                client.tool('artifact_upload_release', dict(uploadRef=upload_id))
             for case in fixture['refusals']:
                 before = candidates(); upload_id, reference = upload(client, case['request'])
                 refuse(client, dict(uploadRef=reference), 'Explicit refusal: ' + case['label'], 'InvalidHmiComponentReview')
-                client.tool('artifact_upload_release', dict(uploadId=upload_id))
+                client.tool('artifact_upload_release', dict(uploadRef=upload_id))
                 check(candidates() == before, 'Invalid request publishes no candidates')
         finally:
             close(client)
@@ -106,7 +106,7 @@ def main():
         try:
             prior_replay(client)
             for case in fixture['cases']:
-                receipt = client.tool('hmi_text_list_generate_set', dict(recordId=case['receipt']['recordId']))
+                receipt = client.tool('hmi_text_list_generate_set', dict(recordRef=case['receipt']['recordId']))
                 check(receipt == case['receipt'], 'Exact released reopen after restart: ' + case['label'])
                 verify(case['request'], receipt, read)
             case = next(c for c in fixture['cases'] if c['label'].startswith('convert SInt to Int'))
@@ -117,15 +117,15 @@ def main():
                 forged['outputs'][1]['typeConversion'][field] = replacement
                 raw = json.dumps(forged, ensure_ascii=False).encode('utf-8'); identity = digest(raw)
                 (artifacts / 'hmi-component-reviews' / (identity + '.text-set.json')).write_bytes(raw)
-                refuse(client, dict(recordId=identity), 'Honestly rehashed conversion refuses: ' + field, 'ArtifactChanged')
+                refuse(client, dict(recordRef=identity), 'Honestly rehashed conversion refuses: ' + field, 'ArtifactChanged')
             for reference in (case['receipt']['input'], case['receipt']['previousRecordArtifact'], case['receipt']['files'][2]['artifact']):
                 path = artifacts / reference['path']; original = path.read_bytes()
                 try:
                     path.write_bytes(original + b'altered')
-                    refuse(client, dict(recordId=case['receipt']['recordId']), 'Original input/predecessor/candidate tamper refuses', 'ArtifactChanged')
+                    refuse(client, dict(recordRef=case['receipt']['recordId']), 'Original input/predecessor/candidate tamper refuses', 'ArtifactChanged')
                 finally:
                     path.write_bytes(original)
-            check(client.tool('hmi_text_list_generate_set', dict(recordId=case['receipt']['recordId'])) == case['receipt'], 'Original receipt restores after tamper controls')
+            check(client.tool('hmi_text_list_generate_set', dict(recordRef=case['receipt']['recordId'])) == case['receipt'], 'Original receipt restores after tamper controls')
         finally:
             close(client)
         check(manifest(source) == original_hashes, 'Managed fixture original bytes unchanged')

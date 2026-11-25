@@ -103,16 +103,16 @@ def run(host, output, samples_path):
     def upload(raw):
         begin = client.tool("artifact_upload_begin", dict(fileName="input.json", expectedBytes=len(raw), sha256=sha(raw)))
         for offset in range(0, len(raw), begin["maxChunkBytes"]):
-            client.tool("artifact_upload_chunk", dict(uploadId=begin["uploadId"], offset=offset,
+            client.tool("artifact_upload_chunk", dict(uploadRef=begin["uploadRef"], offset=offset,
                         data=base64.b64encode(raw[offset:offset + begin["maxChunkBytes"]]).decode()))
-        return client.tool("artifact_upload_commit", dict(uploadId=begin["uploadId"]))
+        return client.tool("artifact_upload_commit", dict(uploadRef=begin["uploadRef"]))
 
     def uploaded_call(name, args, raw):
         receipt = upload(raw)
         try:
             return client.tool(name, dict(args, uploadRef=receipt["artifactRef"]))
         finally:
-            client.tool("artifact_upload_release", dict(uploadId=receipt["uploadId"]))
+            client.tool("artifact_upload_release", dict(uploadRef=receipt["uploadRef"]))
 
     def reject(name, args, code):
         result = client.request("tools/call", dict(name=name, arguments=args))
@@ -256,14 +256,14 @@ def run(host, output, samples_path):
                 reject("trace_read", dict(tracePlanId=trace_id, uploadRef=uploaded["artifactRef"]), "MeasurementFormatUnsupported")
                 check(before == set((output / "trace-diagnostics").glob("*")), "Malformed v2 creates no diagnostic artifacts")
             finally:
-                client.tool("artifact_upload_release", dict(uploadId=uploaded["uploadId"]))
+                client.tool("artifact_upload_release", dict(uploadRef=uploaded["uploadRef"]))
         for token, replacement in (('"schemaVersion": "trace-measurement.v2"', '"schemaVersion": "trace-measurement.v2", "schemaVersion": "trace-measurement.v2"'),
                                    ('"status": "good"', '"status": "good", "status": "bad"')):
             uploaded = upload(expected_raw[measurements[0]["id"]].replace(token.encode(), replacement.encode()))
             try:
                 reject("trace_read", dict(tracePlanId=trace_id, uploadRef=uploaded["artifactRef"]), "MeasurementFormatUnsupported")
             finally:
-                client.tool("artifact_upload_release", dict(uploadId=uploaded["uploadId"]))
+                client.tool("artifact_upload_release", dict(uploadRef=uploaded["uploadRef"]))
         attested = measurement("attested", lambda c: (c["quality"].update(atomicAcrossSignals=True, scanSynchronized=True,
                               programMatchVerified=True), c["capture"].update(state="complete", reportedDroppedSamples=0)))
         attested_report = client.tool("trace_analyze", dict(measurementId=attested["id"]))["report"]

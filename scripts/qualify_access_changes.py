@@ -28,7 +28,7 @@ from qualify_plc_object_mutations import STAGES, coverage_gaps, diff, in_order, 
 KINDS = ("webserver_page_set", "webserver_user_pages_generate", "certificate_create", "certificate_assign", "certificate_delete",
          "certificate_import", "umac_role_set", "vci_workspace_create", "vci_workspace_delete")
 _MAPPING = "Not in this item: mappings need exported package fixtures and package file-effect gates; this run's workspaces have no mappings."
-# D12/X03/D01-owned change kinds this run does not qualify; scripts/test_qualify_access_changes.py keeps KINDS plus these
+# D12/X03/D01-owned change kinds this run does not qualify; scripts/tests/test_qualify_access_changes.py keeps KINDS plus these
 # equal to the catalog's change kinds owned by D12, X03 or D01.
 EXCLUDED = {"vci_mapping_add": _MAPPING, "vci_mapping_remove": _MAPPING, "vci_synchronize": _MAPPING, "vci_conflict_resolve": _MAPPING}
 PLC_COMPILED = ("webserver_user_pages_generate", "vci_workspace_create", "vci_workspace_delete")  # The other kinds compile all devices.
@@ -501,8 +501,8 @@ def delete(run, identifier, restore=False):
 def upload(h, name, data):
     def run():
         started = h.tool("artifact_upload_begin", {"fileName": name, "expectedBytes": len(data), "sha256": hashlib.sha256(data).hexdigest()})
-        h.tool("artifact_upload_chunk", {"uploadId": started["uploadId"], "offset": 0, "data": base64.b64encode(data).decode("ascii")})
-        return h.tool("artifact_upload_commit", {"uploadId": started["uploadId"]})["artifactRef"]
+        h.tool("artifact_upload_chunk", {"uploadRef": started["uploadRef"], "offset": 0, "data": base64.b64encode(data).decode("ascii")})
+        return h.tool("artifact_upload_commit", {"uploadRef": started["uploadRef"]})["artifactRef"]
     return h.stage("upload " + name, run)
 
 
@@ -551,8 +551,8 @@ def certificates(run):
     run.refuse("certificate_import", "format pem for DER bytes", {**hw, "uploadRef": reference, "format": "pem"}, "InvalidPublicCertificateReview")
     run.refuse("certificate_import", "a field outside the payload", {**hw, "uploadRef": reference, "format": "der", "trusted": True}, "InvalidPublicCertificateReview")
     pending = h.tool("artifact_upload_begin", {"fileName": "pending.cer", "expectedBytes": len(der), "sha256": hashlib.sha256(der).hexdigest()})
-    run.refuse("certificate_import", "an uncommitted upload", {**hw, "uploadRef": "upload:" + pending["uploadId"], "format": "der"}, "UploadIncomplete")
-    h.tool("artifact_upload_abort", {"uploadId": pending["uploadId"]})
+    run.refuse("certificate_import", "an uncommitted upload", {**hw, "uploadRef": pending["uploadRef"], "format": "der"}, "UploadIncomplete")
+    h.tool("artifact_upload_abort", {"uploadRef": pending["uploadRef"]})
     imported = import_(run, der, reference)
     delete(run, imported)
     return first, create(run, "TiaMcpQualifyY"), der, reference

@@ -47,7 +47,31 @@ npm ci
 npm run test:explorer
 npx playwright install chromium
 npm run test:explorer:browser
+npm run test:explorer:scale
+
+# Python lint: the rules and the pinned version CI uses (ruff.toml, job lint-python).
+python -m pip install ruff==0.17.4
+ruff check
+
+# Compile the Siemens-dependent workers without Siemens assemblies.
+.\scripts\Test-WorkerCompile.ps1
+
+# Managed line coverage (report only, nothing gates on it): Cobertura XML and a per-assembly summary
+# under artifacts/coverage/. Shard parameters as for Test-Offline.ps1 give a quick partial run.
+.\scripts\Measure-Coverage.ps1
+.\scripts\Measure-Coverage.ps1 -ShardCount 16 -ShardIndex 15
 ```
+
+[`scripts/README.md`](scripts/README.md) maps the scripts folder. New Python unit
+tests go in `scripts/tests/` and import helpers from `scripts/` by module name;
+`Test-Offline.ps1` puts both folders on the import path. Keep a script's path once
+evidence cites it, and regenerate the map with `python -B scripts/scripts_index.py`
+after adding, moving or removing a script.
+
+C# analyzer rules listed in `src/TiaMcp.Analyzers.globalconfig` are errors in every
+non-net48 build (`Directory.Build.props` applies the file), so any build above reports
+them; the remaining analyzer findings stay warnings. Raise a rule there only once
+`dotnet build` shows no finding for it across `src/` and `tests/`.
 
 Each offline invocation writes a fresh report under `artifacts/offline-validation/`.
 CI uses Windows for Python and .NET and Linux for the explorer browser. It does

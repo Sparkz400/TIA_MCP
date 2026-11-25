@@ -198,6 +198,24 @@
         "local.testsuite.style-q01.20261101",
         "local.testsuite.scope-probe.20261028"
       ]
+    },
+    {
+      "featureId": "drives.engineering",
+      "obligations": [
+        "D10"
+      ],
+      "decision": "descoped; out of 1.0 scope by maintainer decision, does not count toward 1.0 and is not a pass. A scope decision, not a V21 boundary, and an explicit exception to scopePolicy for this row only.",
+      "decidedBy": "maintainer",
+      "date": "2026-11-25",
+      "scope": "post-1.0",
+      "reason": "Online access, download/upload, activation, security and safety need a physical drive (B05). The parts already verified without one stay verified in their own rows: drive_observe, drive_inventory, servo_call_plan, drive_profile_review, drive_profile_review_page and the change kinds drive_parameter_set, drive_telegram_set and drive_motor_configure.",
+      "evidenceIds": [
+        "local.drives.index.20261101",
+        "local.drives.index-status.20261101",
+        "local.drives.telegram-resize.20261107",
+        "local.drives.motor-configure.20261108",
+        "local.drives.encoder-boundary.20261108"
+      ]
     }
   ],
   "auditArtifact": "artifacts/release-audit-20261015/current-results.json",
@@ -1113,7 +1131,7 @@
       "qualification": "native_drive_kinds_passed_by_index",
       "releaseAccepted": false,
       "currentResult": "2 November 2026 current matrix (catalog 0.4.121): 6 rows; 25 bound, 0 open, 0 blocked, 3 deferred. Current remainingWork/nextAction govern; the dated observations below retain their historical scope.\n28 October 2026 (catalog 0.4.68): 6 release-matrix rows (2 limited, 3 unqualified, 1 deferred); 10 cells bound and 15 open. drive_parameter_set, drive_telegram_set and drive_observe are implemented; Startdrive drives expose no device compile service and a new drive's objects cannot be read (28 October). 1 November (catalog 0.4.95): the device compile lists the drive as not compiled, drive objects without a readable number are addressed by container index, and the three rows passed natively on a G120C PN (local.drives.index.20261101). The first run did not call change_status; the rerun (local.drives.index-status.20261101) did, and all three rows are verified (15 cells bound).",
-      "remainingWork": "drives.engineering (deferred): drive creation, telegram size/PKW/torque/safety edits, TO/encoder connection and DRIVE-CLiQ; online access, download/upload, activation, security and safety need a physical drive (B05).",
+      "remainingWork": "drives.engineering (descoped: out of 1.0 scope by maintainer decision of 25 November 2026, ledger disposition): drive creation, telegram size/PKW/torque/safety edits, TO/encoder connection and DRIVE-CLiQ; online access, download/upload, activation, security and safety need a physical drive (B05).",
       "nextAction": "Review the remaining Startdrive adapters of drives.engineering; schedule the online gates with a physical drive (B05).",
       "ownerRole": "Drives",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
@@ -24467,7 +24485,7 @@
     "Retain failed/stopped original outcomes; separate recovery or copied persistence does not change them.",
     "Required native/runtime/visual/security/recovery/scale gates bind exact source/binary/fixture/target identities.",
     "Final combined release requires all obligation closures, integrated regression/hosted CI, immutable packaging and installation evidence.",
-    "A row that cannot close leaves the 1.0 count only through a maintainer disposition in dispositions (decision, date, boundary, reason, evidence); it is not a pass. Deferred (not implemented) rows have no disposition and remain 1.0 work."
+    "A row that cannot close leaves the 1.0 count only through a maintainer disposition in dispositions (decision, date, boundary, reason, evidence); it is not a pass. Deferred (not implemented) rows have no disposition and remain 1.0 work, unless the maintainer puts one out of 1.0 scope with a disposition whose scope is post-1.0 instead of a boundary (first on 25 November 2026, drives.engineering); the matrix then summarizes it as descoped, which is not a pass."
   ],
   "limitations": [
     "Catalog labels are retained claims, not newly certified release acceptance.",

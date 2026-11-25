@@ -97,7 +97,7 @@ namespace TiaMcp.Openness.V21
             {
                 manifest["manifestWriteFailure"] = Describe(reportingError);
                 throw new BridgeException("HmiPreservationUnavailable", "Preservation failed: " + Failure.Value<string>("message") +
-                    " The diagnostic manifest could not be written; the original failure is retained in these details.", manifest);
+                    " The diagnostic manifest could not be written; the original failure is retained in these details.", HmiPreservationRemediation.With(manifest, HmiPreservationRemediation.ManifestWrite));
             }
             return path;
         }

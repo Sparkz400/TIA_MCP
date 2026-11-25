@@ -357,9 +357,10 @@ namespace TiaMcp.Openness.V21
                 {
                     case "Powerrail": return Expr.True;
                     case "OpenCon": return new Expr("(open)", 4);
-                    case "IdentCon": return nodes.TryGetValue((string)end.Attribute("UId"), out var access) ? new Expr(access.Label, 4) : new Expr("?" + (string)end.Attribute("UId"), 4);
+                    // A wire end without UId is rendered as an unknown operand, like an unknown UId (a null key throws).
+                    case "IdentCon": return (string)end.Attribute("UId") is string identUid && nodes.TryGetValue(identUid, out var access) ? new Expr(access.Label, 4) : new Expr("?" + (string)end.Attribute("UId"), 4);
                     case "NameCon":
-                        return nodes.TryGetValue((string)end.Attribute("UId"), out var node) ? Output(node, (string)end.Attribute("Name")) : new Expr("?" + (string)end.Attribute("UId"), 4);
+                        return (string)end.Attribute("UId") is string nameUid && nodes.TryGetValue(nameUid, out var node) ? Output(node, (string)end.Attribute("Name")) : new Expr("?" + (string)end.Attribute("UId"), 4);
                     default: return new Expr("?" + end.Name.LocalName, 4);
                 }
             }

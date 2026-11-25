@@ -36,9 +36,9 @@ def main():
                 client.request('initialize', {'protocolVersion': '2025-11-25', 'capabilities': {}, 'clientInfo': {'name': 'prior-access-records', 'version': '1'}})
                 client.notify('notifications/initialized')
                 for record in manifest['records']:
-                    check(client.tool('access_review_page', {'recordId': record['recordId']}) == record['summary'], 'Exact prior summary: ' + str(lifetime))
+                    check(client.tool('access_review_page', {'recordRef': record['recordId']}) == record['summary'], 'Exact prior summary: ' + str(lifetime))
                     for section, page in record['pages'].items():
-                        check(client.tool('access_review_page', {'recordId': record['recordId'], 'section': section, 'count': 200}) == page, 'Exact prior page ' + section)
+                        check(client.tool('access_review_page', {'recordRef': record['recordId'], 'section': section, 'count': 200}) == page, 'Exact prior page ' + section)
                     for key in ('input', 'reportArtifact'):
                         reference = record['summary'][key]
                         raw = bytearray()

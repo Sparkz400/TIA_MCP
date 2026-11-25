@@ -22,7 +22,7 @@ it does not establish that an engineering observation is authentic or current.
 3. Call `vci_package_capture` with `sourceRecordRef` and `mappingUploadRef`.
    The result returns a `vci:manifest:...` handle, `manifestSha256`, package/file
    counts, incomplete-package and unmanaged-file counts, and artifact names.
-   Download `mapping.json` and `manifest.json` through `vci_artifact_read`.
+   Download `mapping.json` and `manifest.json` through `review_artifact_read` (kind `vci`).
    The first preserves the exact supplied bytes; the second hashes the actual
    retained raw files and reports missing companions and ownership problems.
 4. Capture all three sides and call `vci_package_compare` with `baselineRef`,

@@ -28,8 +28,16 @@ LEGACY_UNCURATED = {
 }
 
 
-def claim_errors(features, evidence, root=ROOT):
-    """Return catalog claims that outrun the evidence retained in this checkout."""
+def tool_renames(catalog):
+    """Former tool name -> current name from the catalog's toolRenames; evidence names the tool it ran."""
+    return {row["from"]: row["to"] for row in (catalog.get("toolRenames") or {}).get("renames", [])}
+
+
+def claim_errors(features, evidence, root=ROOT, renames=None):
+    """Return catalog claims that outrun the evidence retained in this checkout.
+
+    renames maps a retired tool name to its replacement, so a run of the former tool still counts for it."""
+    renames = renames or {}
     @functools.cache
     def on_history(commit):
         # Evidence PRs are merged, never squashed, so the frozen build commit stays reachable from HEAD.
@@ -65,9 +73,9 @@ def claim_errors(features, evidence, root=ROOT):
                         errors.append(f"{identifier}: {proof} was not curated from a clean worktree")
                     if not on_history(str(source.get("commit", ""))):
                         errors.append(f"{identifier}: {proof} source commit {source.get('commit')} is not an ancestor of HEAD")
-            exercised = {tool for rows in passed for r in rows for run in r["runs"] for tool in run["toolsPassed"]}
+            exercised = {renames.get(tool, tool) for rows in passed for r in rows for run in r["runs"] for tool in run["toolsPassed"]}
             # A run whose raw report is lost cannot be re-audited; it may not be the only support for a tool.
-            audited = {tool for rows in passed for r in rows for run in r["runs"]
+            audited = {renames.get(tool, tool) for rows in passed for r in rows for run in r["runs"]
                        if (r["evidenceId"], run["sha256"]) not in lost for tool in run["toolsPassed"]}
             if set(feature["mcpTools"]) - exercised:
                 errors.append(f"{identifier}: verified tools not exercised {sorted(set(feature['mcpTools']) - exercised)}")
@@ -75,7 +83,7 @@ def claim_errors(features, evidence, root=ROOT):
                 errors.append(f"{identifier}: tools rest only on lost raw reports {sorted(set(feature['mcpTools']) - audited)}")
             native_gates = NATIVE_GATES & set(feature.get("acceptanceCriteria", []))
             # Native gates need every bound tool exercised by native proofs; a Host-only record cannot stand in.
-            native = {tool for proof, rows in zip(proofs, passed) if HOST_ONLY not in proof
+            native = {renames.get(tool, tool) for proof, rows in zip(proofs, passed) if HOST_ONLY not in proof
                       for r in rows for run in r["runs"] for tool in run["toolsPassed"]}
             if native_gates and (all(HOST_ONLY in proof for proof in proofs) or set(feature["mcpTools"]) - native):
                 errors.append(f"{identifier}: Host-only evidence cannot close {sorted(native_gates)}; "
@@ -149,7 +157,10 @@ def check_contracts():
         if feature["changeKind"]:
             assert identifier == "change." + feature["changeKind"]
             assert {"AC-preview", "AC-native", "AC-recovery", "AC-preserve"} <= set(feature["acceptanceCriteria"])
-    errors = claim_errors(features, evidence)
+    renames = tool_renames(catalog)
+    # A retired name is never a current tool or feature, and every replacement is one.
+    assert not renames.keys() & features.keys() and set(renames.values()) <= features.keys(), "toolRenames out of step with the features"
+    errors = claim_errors(features, evidence, renames=renames)
     assert not errors, "Catalog claim exceeds retained evidence: " + "; ".join(errors)
     cited = {proof for feature in features.values() for proof in feature["qualification"]["evidenceIds"]}
     assert evidence.keys() <= cited, "Catalog evidence cited by no feature; retire it to docs/history: " + ", ".join(sorted(evidence.keys() - cited))
@@ -187,10 +198,12 @@ MANUAL_HARNESSES = {"test_testsuite_system_host.py"}  # Host built with TestSuit
 
 
 def unrun_test_scripts(root=ROOT):
-    """scripts/test_*.py files Test-Offline.ps1 would load but never exercise: no unittest case and named by no runner."""
+    """scripts/test_*.py and scripts/tests/test_*.py files Test-Offline.ps1 would load but never exercise: no unittest case
+    and named by no runner."""
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", SyntaxWarning)
-        trees = {p.name: ast.parse(p.read_text(encoding="utf-8")) for p in sorted((root / "scripts").glob("test_*.py"))}
+        files = [*(root / "scripts").glob("test_*.py"), *(root / "scripts/tests").glob("test_*.py")]
+        trees = {p.name: ast.parse(p.read_text(encoding="utf-8")) for p in sorted(files)}
     classes = [c for tree in trees.values() for c in ast.walk(tree) if isinstance(c, ast.ClassDef)]
     cases = {"TestCase", "IsolatedAsyncioTestCase"}
     while grown := {c.name for c in classes if {getattr(b, "attr", getattr(b, "id", None)) for b in c.bases} & cases} - cases:
@@ -245,6 +258,11 @@ class ClaimErrorTests(unittest.TestCase):
 
     def test_verified_tools_must_be_exercised(self):
         self.assertEqual(len(self.errors("verified", ["kept"], tools=("block_read", "xref_query"))), 1)
+
+    def test_evidence_under_a_retired_name_counts_only_through_the_catalog_renames(self):
+        feature = self.feature("verified", ["kept"], tools=("block_view",))
+        self.assertEqual(len(claim_errors(feature, self.evidence, self.root)), 1)
+        self.assertEqual(claim_errors(feature, self.evidence, self.root, renames={"block_read": "block_view"}), [])
 
     def test_verified_tools_cannot_rest_only_on_lost_raw_reports(self):
         self.summary("old", "local.old", tools=("xref_query",))

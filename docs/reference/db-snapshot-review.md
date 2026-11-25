@@ -18,7 +18,7 @@ worker; [native capture](#native-capture-and-owned-simulation-value-loads) uses 
    cross-project/program mapping is not implemented.
 4. Keep `recordId`, `input`, optional `comparisonInput` and `reportArtifact`.
    `artifact_read` downloads exact retained artifacts with their SHA-256.
-5. `db_snapshot_review_page(recordId, section, offset, count)` revalidates the
+5. `db_snapshot_review_page(recordRef, section, offset, count)` revalidates the
    saved review, original inputs and rederived report, including after Host
    restart and upload release. Sections are `summary`, `beforeValues`,
    `afterValues`, `changes`. A single inspection has no after values.

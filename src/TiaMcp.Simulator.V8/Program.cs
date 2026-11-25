@@ -74,7 +74,7 @@ namespace TiaMcp.Simulator.V8
                                         ["result"] = session.Execute(request.Value<string>("operation"), arguments) };
                                 }
                             }
-                            catch (Exception ex) { response = Error(id, ex); }
+                            catch (Exception ex) { id = id ?? RecoverRequestId(line); response = Error(id, ex); }
                             string output = response.ToString(Formatting.None);
                             if (Encoding.UTF8.GetByteCount(output) > 16 * 1024 * 1024)
                                 output = Error(id, new SimulatorException("ResponseTooLarge", "Simulator response exceeds 16 MiB.")).ToString(Formatting.None);
@@ -105,6 +105,14 @@ namespace TiaMcp.Simulator.V8
             }
             if (text.Length != 0) throw new EndOfStreamException("Incomplete request; no operation executed.");
             return null;
+        }
+
+        // As in the engineering worker: a request that cannot be loaded keeps its id, so the Host gets InvalidRequest
+        // and not a protocol fault that ends this worker and its instances' session.
+        private static string RecoverRequestId(string line)
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(line ?? "", "^[{]\"protocolVersion\":1,\"id\":\"([0-9A-Za-z_.-]{1,128})\"");
+            return match.Success ? match.Groups[1].Value : null;
         }
 
         private static JObject Error(string id, Exception ex)

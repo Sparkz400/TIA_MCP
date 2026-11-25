@@ -58,8 +58,8 @@ def main():
     def upload(client, data):
         status = client.tool('artifact_upload_begin', {'fileName': 'supplied.json', 'expectedBytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()})
         for offset in range(0, len(data), status['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', {'uploadId': status['uploadId'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
-        return client.tool('artifact_upload_commit', {'uploadId': status['uploadId']})
+            client.tool('artifact_upload_chunk', {'uploadRef': status['uploadRef'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
+        return client.tool('artifact_upload_commit', {'uploadRef': status['uploadRef']})
     def read(client, reference):
         chunks, offset = [], 0
         while True:
@@ -107,7 +107,7 @@ def main():
             for section in ('observations', 'configurationChanges', 'applicationChanges', 'fileChanges'):
                 rows, offset = [], 0
                 while True:
-                    page = client.tool('web_application_review_page', {'recordId':receipt['recordId'], 'section':section, 'offset':offset, 'count':1})
+                    page = client.tool('web_application_review_page', {'recordRef':receipt['recordId'], 'section':section, 'offset':offset, 'count':1})
                     validate(page, 'page')
                     rows.extend(r['value'] for r in page['rows'])
                     if page['nextOffset'] is None: break
@@ -120,7 +120,7 @@ def main():
                 try: validate(bad, 'record')
                 except ValidationError: check(True, 'Output schema refuses ' + flag)
                 else: raise AssertionError('Native claim accepted')
-            refuse(client, 'web_application_review_page', {'recordId':receipt['recordId'], 'section':'fileChanges', 'offset':100}, 'InvalidRequest')
+            refuse(client, 'web_application_review_page', {'recordRef':receipt['recordId'], 'section':'fileChanges', 'offset':100}, 'InvalidRequest')
             retained = artifacts / 'web-application-reviews'
             def files(): return {p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in retained.iterdir() if p.is_file()}
             for mutation in ('owner', 'selected', 'secret', 'purpose', 'default', 'fingerprint'):
@@ -146,27 +146,27 @@ def main():
                 prior = files()
                 refuse(client, 'web_application_review', {'request':bad}, 'PackageInvalid')
                 check(files() == prior, label + ' refused without a retained review')
-                client.tool('artifact_upload_release', {'uploadId':staged['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef':staged['uploadRef']})
             unknown = copy.deepcopy(packet)
             unknown['after']['archive'].update(uploadRef=None, sha256=None, rootRelative=None, defaultPage=None, unavailableReason='not captured')
             missing = client.tool('web_application_review', {'request':unknown})
             validate(missing, 'receipt')
             check(missing['summary']['filesComparable'] is False and missing['summary']['unavailableArchives'] == 1, 'Unavailable ZIP cannot prove file removal')
-            client.tool('artifact_upload_release', {'uploadId':saved['uploadId']})
-            for staged in originals.values(): client.tool('artifact_upload_release', {'uploadId':staged['uploadId']})
+            client.tool('artifact_upload_release', {'uploadRef':saved['uploadRef']})
+            for staged in originals.values(): client.tool('artifact_upload_release', {'uploadRef':staged['uploadRef']})
         finally: close(client)
         client = start()
         try:
-            check(client.tool('web_application_review_page', {'recordId':receipt['recordId']}) == receipt, 'Restart and released input uploads preserve exact receipt')
+            check(client.tool('web_application_review_page', {'recordRef':receipt['recordId']}) == receipt, 'Restart and released input uploads preserve exact receipt')
             for reference in (receipt['input'], receipt['reportArtifact'], receipt['archives']['before']):
                 path = (artifacts / reference['path']).resolve()
                 path.relative_to(artifacts.resolve())
                 original = path.read_bytes()
                 try:
                     path.write_bytes(b'corrupted')
-                    refuse(client, 'web_application_review_page', {'recordId':receipt['recordId']}, 'ArtifactChanged')
+                    refuse(client, 'web_application_review_page', {'recordRef':receipt['recordId']}, 'ArtifactChanged')
                 finally: path.write_bytes(original)
-            check(client.tool('web_application_review_page', {'recordId':receipt['recordId']}) == receipt, 'Restored originals reopen without mutation replay')
+            check(client.tool('web_application_review_page', {'recordRef':receipt['recordId']}) == receipt, 'Restored originals reopen without mutation replay')
             check(not list((artifacts/'web-application-analysis').glob('*/')), 'Transient extraction directories cleaned')
         finally: close(client)
         report['completed'] = True

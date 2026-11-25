@@ -108,16 +108,16 @@ def run(bundle, configuration, archive, output, git_executable):
         exercise([config['command'], *config['args']])
         data = b'\xef\xbb\xbfportable\r\n\x00\xff'
         upload = client.tool('artifact_upload_begin', dict(fileName='source.bin', expectedBytes=len(data), sha256=digest(data)))
-        client.tool('artifact_upload_chunk', dict(uploadId=upload['uploadId'], offset=0, data=base64.b64encode(data).decode()))
-        upload = client.tool('artifact_upload_commit', dict(uploadId=upload['uploadId']))
+        client.tool('artifact_upload_chunk', dict(uploadRef=upload['uploadRef'], offset=0, data=base64.b64encode(data).decode()))
+        upload = client.tool('artifact_upload_commit', dict(uploadRef=upload['uploadRef']))
         preview = client.tool('vci_prepare', dict(files=[dict(relativePath='PLC/Über Motor.s7dcl', uploadRef=upload['artifactRef'])],
             author=dict(name='Portable package test', email='fixture@example.invalid'), message='portable package fixture'))
         revision = client.tool('vci_commit', dict(previewRef=preview['recordRef'], reviewedPlanSha256=preview['planSha256']))
         assert revision['executableSha256'] == digest(git_executable.read_bytes())
-        client.tool('artifact_upload_release', dict(uploadId=upload['uploadId']))
+        client.tool('artifact_upload_release', dict(uploadRef=upload['uploadRef']))
         stop()
         exercise([config['command'], *config['args']])
-        assert client.tool('vci_reopen', dict(recordRef=revision['recordRef']))['commit'] == revision['commit']
+        assert client.tool('review_reopen', dict(kind='vci', recordRef=revision['recordRef']))['commit'] == revision['commit']
         downloaded = client.tool('vci_file_read', dict(recordRef=revision['recordRef'], relativePath='PLC/Über Motor.s7dcl'))
         assert base64.b64decode(downloaded['data'], validate=True) == data
         report['steps'].append('configured external Git commits exact uploaded bytes and retains them across launcher restart')

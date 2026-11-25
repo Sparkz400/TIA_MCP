@@ -11,7 +11,7 @@ namespace TiaMcp.Host;
 public sealed class GraphTools(IBridgeClient bridge, HostOptions options)
 {
     [McpServerTool(Name = "graph_export", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Export one exact offline GRAPH block (blockPath from project_inventory, or an unambiguous blockName) as unchanged native SimaticML into the Host artifact directory, then retain those bytes with their SHA-256 as a graph_* document record for graph_report_page, graph_compare and the graph_import change kind. Non-GRAPH and protected blocks are refused. No project change; native and behavioral qualification stay false.")]
+    [Description("Export one exact offline GRAPH block (blockPath from project_inventory, or an unambiguous blockName) as unchanged native SimaticML into the Host artifact directory, then retain those bytes with their SHA-256 as a graph_* document record for review_page (kind graph), graph_compare and the graph_import change kind. Non-GRAPH and protected blocks are refused. No project change; native and behavioral qualification stay false.")]
     public async Task<CallToolResult> Export(CancellationToken cancellationToken, string? blockPath = null, string? blockName = null,
         string? plcPath = null, string? projectName = null, string? scopePath = null)
     {
@@ -35,23 +35,19 @@ public sealed class GraphTools(IBridgeClient bridge, HostOptions options)
     public CallToolResult Compare(string beforeRef, string afterRef) => Run(s => s.Compare(beforeRef, afterRef));
 
     [McpServerTool(Name = "graph_edit", ReadOnly = false, Destructive = false, OpenWorld = false)]
-    [Description("Apply 1..32 typed edits, in order, to one exact retained GRAPH document with one chart. Ops: addStep {number,name,afterTransition}; addTransition {number,name,fromStep,toStep,jump?,condition}; removeStep/removeTransition {number} (linear-chain element; predecessor is spliced to successor); renameStep/renameTransition {number,name}; setStepComment {number,lang,text}; setSequenceTitle {sequence,lang,text}; setTransitionCondition {number,condition}. condition is 1..16 {operand,negated?}: LAD contacts in series on exact Bool members of the block interface. Unedited bytes stay identical. Results with reader errors, duplicate numbers or names, non-alternating or dangling connections or unreachable steps are refused. Retains the result as a new document whose input is the source, plus a graph_compare record. No project change; apply it with the graph_import change kind. Not natively qualified.")]
+    [Description("Apply 1..32 typed edits in order to one exact retained GRAPH document with one chart: addStep, addTransition, removeStep/removeTransition (linear chain), renameStep/renameTransition, setStepComment, setSequenceTitle, setTransitionCondition; condition is 1..16 {operand,negated?} on exact Bool interface members. Invalid graphs refuse. Retains a new document plus a graph_compare record. No project change; apply with the graph_import change kind. Not natively qualified.")]
     public CallToolResult Edit(string sourceRef, JsonElement operations) => Run(s => s.Edit(sourceRef, operations));
 
-    [McpServerTool(Name = "graph_reopen", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Reopen a retained GRAPH document/comparison after restart. Verify receipt, artifacts and exact comparison inputs before returning bounded counts, diagnostics flags and download names. Native qualification stays false.")]
+    // Served by review_reopen (ReviewRecordTools).
     public CallToolResult Reopen(string recordRef) => Run(s => s.Reopen(recordRef));
 
-    [McpServerTool(Name = "graph_report_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Read 1..200 rows within a 128 KiB response from an exact retained report array pointer: /diagnostics, /unsupported, /changes or /graphs/0/sequences/0/steps, transitions, branches, connections, actions, interlocks or supervisions. Oversized rows are explicit omissions available in report.json. Offset and section always bind the immutable record handle.")]
+    // Served by review_page (ReviewRecordTools).
     public CallToolResult ReportPage(string recordRef, string section, int offset = 0, int count = 50) => Run(s => s.ReportPage(recordRef, section, offset, count));
 
-    [McpServerTool(Name = "graph_artifact_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Download an exact retained GRAPH artifact name: original.xml, report.json, viewer.html or receipt.json. Read at most 64 KiB per call with complete SHA-256 and length; verify retained input chains. Reports and HTML are bounded to 96 MiB. No arbitrary filesystem path input.")]
+    // Served by review_artifact_read (ReviewRecordTools).
     public CallToolResult ArtifactRead(string recordRef, string name, long offset = 0, int count = 65536) => Run(s => s.ReadArtifact(recordRef, name, offset, count));
 
-    [McpServerTool(Name = "graph_list", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Discover 1..50 retained GRAPH publications, including incomplete and integrity-failed records. Storage limit 128 records and 2 GiB includes failed publications. Sorted record-ID offsets are discovery-only; relist after additions. Does not overwrite, resume or retry native work.")]
+    // Served by review_list (ReviewRecordTools).
     public CallToolResult List(int offset = 0, int count = 20) => Run(s => s.List(offset, count));
 
     private CallToolResult Run(Func<GraphWorkflowStore, object> action)

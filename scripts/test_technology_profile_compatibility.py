@@ -25,15 +25,15 @@ def main():
             try:
                 client.request('initialize',{'protocolVersion':'2025-11-25','capabilities':{},'clientInfo':{'name':'prior-technology-records','version':'1'}});client.notify('notifications/initialized')
                 for record in fixture['records']:
-                    key=record['recordId'];check(client.tool('technology_profile_report',{'recordId':key})==record['summary'],'Actual prior producer receipt unchanged: '+key)
+                    key=record['recordId'];check(client.tool('technology_profile_review_page',{'recordRef':key})==record['summary'],'Actual prior producer receipt unchanged: '+key)
                     for section,expected in record['sections'].items():
                         rows=[];offset=0
                         while True:
-                            page=client.tool('technology_profile_report',dict(recordId=key,section=section,offset=offset,count=2));rows.extend(page['rows'])
+                            page=client.tool('technology_profile_review_page',dict(recordRef=key,section=section,offset=offset,count=2));rows.extend(page['rows'])
                             if page['nextOffset'] is None:break
                             assert page['nextOffset']>offset;offset=page['nextOffset']
                         check(rows==expected,'Exact prior section unchanged: '+section)
-                    refused=client.request('tools/call',{'name':'technology_profile_report','arguments':dict(recordId=key,section='encoderConnections')})
+                    refused=client.request('tools/call',{'name':'technology_profile_review_page','arguments':dict(recordRef=key,section='encoderConnections')})
                     check(refused.get('isError') and refused['structuredContent']['error']['code']=='InvalidRequest','Legacy record cannot acquire encoder semantics')
                 for row in fixture['files']:
                     data=bytearray()

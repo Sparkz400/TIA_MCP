@@ -64,11 +64,10 @@ Test("native export bytes register as ordinary comparable model records", () => 
     Reject("OpcUaCapacity", () => store.InspectExported([]));
     Reject("OpcUaInvalidXml", () => store.InspectExported(Encoding.UTF8.GetBytes("<not-closed")));
 }));
-Test("inspection pages and bound cursors preserve exact ordering", () => InStore((_, store, uploads) => {
+Test("inspection pages continue at nextOffset in exact order", () => InStore((_, store, uploads) => {
     var record = Capture(store, uploads);
-    var page = store.ReportPage(Ref(record), "nodes", 1);
-    var cursor = page["nextCursor"]!.Deserialize<OpcUaReportCursor>(BridgeProtocol.Json)!;
-    var next = store.ReportPage(Ref(record), "nodes", 1, cursor);
+    var page = store.ReportPage(Ref(record), "nodes", count: 1);
+    var next = store.ReportPage(Ref(record), "nodes", page["nextOffset"]!.GetValue<int>(), 1);
     Equal(1, next["offset"]!.GetValue<int>());
     var full = JsonNode.Parse(Download(store, Artifact(record, "report.json")))!;
     Equal(full["nodes"]![1]!.ToJsonString(), next["rows"]![0]!.ToJsonString());
@@ -154,17 +153,16 @@ Test("wrong record kind refused", () => InStore((_, store, uploads) => {
     Reject("OpcUaInvalidReference", () => store.Compare(Ref(model), Ref(set)));
     Reject("OpcUaInvalidReference", () => store.CompareDependencies(Ref(model), Ref(set)));
 }));
-Test("stale cursor record report and section bindings refused", () => InStore((_, store, uploads) => {
-    var model = Capture(store, uploads); var other = Capture(store, uploads);
-    var cursor = store.ReportPage(Ref(model), "nodes", 1)["nextCursor"]!.Deserialize<OpcUaReportCursor>(BridgeProtocol.Json)!;
-    Reject("OpcUaStaleCursor", () => store.ReportPage(Ref(other), "nodes", 1, cursor));
-    Reject("OpcUaStaleCursor", () => store.ReportPage(Ref(model), "nodes", 1, cursor with { ReportSha256 = new string('0', 64) }));
-    Reject("OpcUaStaleCursor", () => store.ReportPage(Ref(model), "diagnostics", 1, cursor));
-    Reject("OpcUaInvalidCursor", () => store.ReportPage(Ref(model), "nodes", 1, cursor with { Offset = -1 }));
+Test("page offsets outside the section refused", () => InStore((_, store, uploads) => {
+    var model = Capture(store, uploads);
+    int total = store.ReportPage(Ref(model), "nodes", count: 1)["total"]!.GetValue<int>();
+    Equal(true, store.ReportPage(Ref(model), "nodes", total, 1)["nextOffset"] is null);
+    Reject("OpcUaInvalidCursor", () => store.ReportPage(Ref(model), "nodes", -1, 1));
+    Reject("OpcUaInvalidCursor", () => store.ReportPage(Ref(model), "nodes", total + 1, 1));
 }));
 Test("page read and list bounds fail closed", () => InStore((_, store, uploads) => {
     var model = Capture(store, uploads);
-    Reject("OpcUaPageLimit", () => store.ReportPage(Ref(model), "nodes", 501));
+    Reject("OpcUaPageLimit", () => store.ReportPage(Ref(model), "nodes", count: 201));
     Reject("OpcUaInvalidSection", () => store.ReportPage(Ref(model), "../../original.xml"));
     Reject("OpcUaPageLimit", () => store.ReadArtifact(Artifact(model, "report.json"), 0, 65537));
     Reject("OpcUaInvalidCursor", () => store.ReadArtifact(Artifact(model, "report.json"), long.MaxValue));

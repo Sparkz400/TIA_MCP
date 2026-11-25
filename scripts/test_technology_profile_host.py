@@ -60,8 +60,8 @@ def main():
     def upload(client, data, name='supplied.json'):
         status = client.tool('artifact_upload_begin', {'fileName': name, 'expectedBytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()})
         for offset in range(0, len(data), status['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', {'uploadId': status['uploadId'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
-        return client.tool('artifact_upload_commit', {'uploadId': status['uploadId']})
+            client.tool('artifact_upload_chunk', {'uploadRef': status['uploadRef'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
+        return client.tool('artifact_upload_commit', {'uploadRef': status['uploadRef']})
     def read(client, reference):
         chunks, offset = [], 0
         while True:
@@ -86,7 +86,7 @@ def main():
     try:
         client = start()
         try:
-            check({'technology_profile_review', 'technology_profile_report'} <= {t['name'] for t in client.request('tools/list')['tools']}, 'Both tools registered')
+            check({'technology_profile_review', 'technology_profile_review_page'} <= {t['name'] for t in client.request('tools/list')['tools']}, 'Both tools registered')
             saved = upload(client, review_bytes)
             source = client.tool('project_snapshot_import', {'uploadRef': saved['artifactRef']})
             check(source['reviewId'] == fixture['reviewId'], 'Saved review imports exact original bytes')
@@ -107,7 +107,7 @@ def main():
             for section in ('observations', 'relationships', 'changes', 'context'):
                 rows, offset = [], 0
                 while True:
-                    page = client.tool('technology_profile_report', {'recordId': receipt['recordId'], 'section': section, 'offset': offset, 'count': 1})
+                    page = client.tool('technology_profile_review_page', {'recordRef': receipt['recordId'], 'section': section, 'offset': offset, 'count': 1})
                     validate(page, 'page')
                     rows.extend(row['value'] for row in page['rows'])
                     if page['nextOffset'] is None: break
@@ -118,7 +118,7 @@ def main():
             try: validate(adversary, 'record')
             except ValidationError: check(True, 'Output schema cannot certify native qualification')
             else: raise AssertionError('Native claim accepted')
-            refuse(client, 'technology_profile_report', {'recordId': receipt['recordId'], 'section': 'changes', 'offset': 100}, 'InvalidRequest')
+            refuse(client, 'technology_profile_review_page', {'recordRef': receipt['recordId'], 'section': 'changes', 'offset': 100}, 'InvalidRequest')
             bad = copy.deepcopy(packet)
             bad['reviewId'] = '0' * 64
             invalid = upload(client, json.dumps(bad).encode())
@@ -164,12 +164,12 @@ def main():
             check([read(client, row['artifact']) for row in source_rows[:2]] == source_bytes, 'Independent UTF16 and binary source bytes preserved')
             rows = []
             for offset in range(3):
-                page = client.tool('technology_profile_report', {'recordId': source_receipt['recordId'], 'section': 'sources', 'offset': offset, 'count': 1})
+                page = client.tool('technology_profile_review_page', {'recordRef': source_receipt['recordId'], 'section': 'sources', 'offset': offset, 'count': 1})
                 validate(page, 'page')
                 rows.extend(row['value'] for row in page['rows'])
             check(rows == source_rows, 'Source manifest pages match complete retained record')
-            check(client.tool('technology_profile_report', {'recordId': receipt['recordId']}) == receipt, 'v1 receipt unchanged after v2 intake')
-            check(client.tool('technology_profile_report', {'recordId': receipt['recordId'], 'section': 'sources'})['total'] == 0, 'v1 gets no invented sources')
+            check(client.tool('technology_profile_review_page', {'recordRef': receipt['recordId']}) == receipt, 'v1 receipt unchanged after v2 intake')
+            check(client.tool('technology_profile_review_page', {'recordRef': receipt['recordId'], 'section': 'sources'})['total'] == 0, 'v1 gets no invented sources')
             for defect in ('name', 'digest', 'bytes', 'duplicate', 'count', 'total', 'authority'):
                 bad = copy.deepcopy(source_packet)
                 if defect == 'name': bad['sources'][0]['fileName'] = 'wrong.xml'
@@ -181,7 +181,7 @@ def main():
                 else: bad['sources'][0]['nativeQualified'] = True
                 invalid_source = upload(client, json.dumps(bad).encode())
                 refuse(client, 'technology_profile_review', {'reviewId': source['reviewId'], 'uploadRef': invalid_source['artifactRef']}, 'InvalidTechnologyProfile')
-                client.tool('artifact_upload_release', {'uploadId': invalid_source['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef': invalid_source['uploadRef']})
             consumer_packet = copy.deepcopy(fixture['consumerPacket'])
             consumer_review_bytes = (Path(fixture['artifactRoot']) / 'project-reviews' / (fixture['consumerReviewId'] + '.json')).read_bytes()
             consumer_saved = upload(client, consumer_review_bytes)
@@ -198,14 +198,14 @@ def main():
             for section in ('consumers', 'consumerChanges', 'impactPaths', 'impactTraversal'):
                 rows, offset = [], 0
                 while True:
-                    page = client.tool('technology_profile_report', {'recordId': consumer_receipt['recordId'], 'section': section, 'offset': offset, 'count': 1})
+                    page = client.tool('technology_profile_review_page', {'recordRef': consumer_receipt['recordId'], 'section': section, 'offset': offset, 'count': 1})
                     validate(page, 'page')
                     rows.extend(row['value'] for row in page['rows'])
                     if page['nextOffset'] is None: break
                     offset = page['nextOffset']
                 check(rows == ([consumer_record['report'][section]] if section == 'impactTraversal' else consumer_record['report'][section]), 'v3 paged ' + section + ' matches retained report')
                 for old_receipt in (receipt, source_receipt):
-                    old_page = client.tool('technology_profile_report', {'recordId': old_receipt['recordId'], 'section': section})
+                    old_page = client.tool('technology_profile_review_page', {'recordRef': old_receipt['recordId'], 'section': section})
                     validate(old_page, 'page')
                     check(old_page['total'] == 0, 'Legacy records invent no ' + section)
             # Exercise v3 source retention together with consumer/impact review.
@@ -227,7 +227,7 @@ def main():
                 else: bad['schemaVersion'] = 'technology-profile-review-request.v2'
                 invalid_consumer = upload(client, json.dumps(bad).encode())
                 refuse(client, 'technology_profile_review', {'reviewId': fixture['consumerReviewId'], 'uploadRef': invalid_consumer['artifactRef']}, 'InvalidTechnologyProfile')
-                client.tool('artifact_upload_release', {'uploadId': invalid_consumer['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef': invalid_consumer['uploadRef']})
             for defect in ('consumer', 'paths', 'coverage', 'version'):
                 forged = copy.deepcopy(consumer_record)
                 if defect == 'consumer': forged['report']['consumers'][0]['objectResolution'] = 'missing'
@@ -237,9 +237,9 @@ def main():
                 data = json.dumps(forged).encode()
                 digest = hashlib.sha256(data).hexdigest()
                 (artifacts / 'technology-profile-reviews' / (digest + '.json')).write_bytes(data)
-                refuse(client, 'technology_profile_report', {'recordId': digest}, 'InvalidTechnologyProfile' if defect == 'version' else 'ArtifactChanged')
+                refuse(client, 'technology_profile_review_page', {'recordRef': digest}, 'InvalidTechnologyProfile' if defect == 'version' else 'ArtifactChanged')
             for item in (consumer_input, consumer_saved, combined_input):
-                client.tool('artifact_upload_release', {'uploadId': item['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef': item['uploadRef']})
             from test_technology_encoder_contracts import verify as verify_encoders, loader as encoder_loader
             encoder_fixture = json.loads((args.fixture.parent / 'encoders-v4/mcp-fixture.json').read_text(encoding='utf-8'))
             encoder_root = Path(encoder_fixture['artifactRoot'])
@@ -260,13 +260,13 @@ def main():
             for section in ('encoderConnections', 'encoderChanges', 'encoderCoverage'):
                 rows, offset = [], 0
                 while True:
-                    page = client.tool('technology_profile_report', dict(recordId=encoder_receipt['recordId'], section=section, offset=offset, count=2)); validate(page, 'page')
+                    page = client.tool('technology_profile_review_page', dict(recordRef=encoder_receipt['recordId'], section=section, offset=offset, count=2)); validate(page, 'page')
                     for row in page['rows']: check(row['index'] == len(rows), 'Exact encoder page index'); rows.append(row['value'])
                     if page['nextOffset'] is None: break
                     offset = page['nextOffset']
                 check(rows == ([encoder_record['report'][section]] if section == 'encoderCoverage' else encoder_record['report'][section]), 'All encoder section rows retained: ' + section)
             for old in (receipt, source_receipt, consumer_receipt):
-                refuse(client, 'technology_profile_report', dict(recordId=old['recordId'], section='encoderConnections'), 'InvalidRequest')
+                refuse(client, 'technology_profile_review_page', dict(recordRef=old['recordId'], section='encoderConnections'), 'InvalidRequest')
             for defect in ('unit', 'phase', 'unknown', 'schema'):
                 bad = copy.deepcopy(encoder_fixture['packet']); rows = bad['encoders']['before']['observations']
                 if defect == 'unit': rows[3]['target']['input']['unit'] = 'word'
@@ -275,7 +275,7 @@ def main():
                 else: bad['schemaVersion'] = False
                 invalid_encoder = upload(client, json.dumps(bad).encode())
                 refuse(client, 'technology_profile_review', dict(reviewId=encoder_fixture['reviewId'], uploadRef=invalid_encoder['artifactRef']), 'InvalidTechnologyProfile')
-                client.tool('artifact_upload_release', {'uploadId': invalid_encoder['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef': invalid_encoder['uploadRef']})
             encoder_combined = copy.deepcopy(encoder_fixture['packet']); encoder_combined['sources'] = copy.deepcopy(source_packet['sources'])
             encoder_combined_input = upload(client, json.dumps(encoder_combined).encode())
             encoder_combined_receipt = client.tool('technology_profile_review', dict(reviewId=encoder_fixture['reviewId'], uploadRef=encoder_combined_input['artifactRef']))
@@ -286,40 +286,40 @@ def main():
             oversized_bytes = (encoder_root / encoder_fixture['oversizedReceipt']['input']['path']).read_bytes()
             oversized_input = upload(client, oversized_bytes)
             oversized_receipt = client.tool('technology_profile_review', dict(reviewId=encoder_fixture['reviewId'], uploadRef=oversized_input['artifactRef']))
-            page = client.tool('technology_profile_report', dict(recordId=oversized_receipt['recordId'], section='encoderConnections', count=1)); validate(page, 'page')
+            page = client.tool('technology_profile_review_page', dict(recordRef=oversized_receipt['recordId'], section='encoderConnections', count=1)); validate(page, 'page')
             check(page['rows'][0]['omitted'] is True, 'Oversized encoder page row is explicitly omitted')
             oversized_record = json.loads(read(client, oversized_receipt['reportArtifact'])); validate(oversized_record, 'record')
             check(verify_encoders(json.loads(oversized_bytes), oversized_record['report'], json.loads(encoder_review_bytes), encoder_loader(artifacts))['originalRowsChecked'], 'Full oversized encoder download independently matches originals')
             for item in (oversized_drive_input, oversized_input):
-                client.tool('artifact_upload_release', {'uploadId': item['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef': item['uploadRef']})
             for item in (encoder_saved, encoder_drive_input, encoder_input, encoder_combined_input):
-                client.tool('artifact_upload_release', {'uploadId': item['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef': item['uploadRef']})
             for item in [*source_uploads, source_input]:
-                client.tool('artifact_upload_release', {'uploadId': item['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef': item['uploadRef']})
             for item in (incoming, saved, invalid, duplicate, bad_mapping, bad_proposal, observed):
-                client.tool('artifact_upload_release', {'uploadId': item['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef': item['uploadRef']})
         finally: close(client)
         client = start()
         try:
-            check(client.tool('technology_profile_report', {'recordId': receipt['recordId']}) == receipt, 'Restart and upload release preserve receipt')
+            check(client.tool('technology_profile_review_page', {'recordRef': receipt['recordId']}) == receipt, 'Restart and upload release preserve receipt')
             check(read(client, receipt['input']) == packet_bytes, 'Original bytes survive restart')
             for current in (encoder_receipt, encoder_combined_receipt, oversized_receipt):
-                check(client.tool('technology_profile_report', {'recordId': current['recordId']}) == current, 'V4 survives restart and release of all uploads')
+                check(client.tool('technology_profile_review_page', {'recordRef': current['recordId']}) == current, 'V4 survives restart and release of all uploads')
             check(read(client, encoder_receipt['input']) == encoder_bytes, 'Encoder original bytes survive restart')
             dependent = artifacts / encoder_fixture['driveReceipt']['input']['path']; original_dependency = dependent.read_bytes()
             try:
                 dependent.write_bytes(b'corrupted original drive input')
                 for current in (encoder_receipt, encoder_combined_receipt):
-                    refuse(client, 'technology_profile_report', {'recordId': current['recordId']}, 'ArtifactChanged')
+                    refuse(client, 'technology_profile_review_page', {'recordRef': current['recordId']}, 'ArtifactChanged')
             finally: dependent.write_bytes(original_dependency)
-            check(client.tool('technology_profile_report', {'recordId': encoder_receipt['recordId']}) == encoder_receipt, 'Restored exact dependency reopens without mutation replay')
+            check(client.tool('technology_profile_review_page', {'recordRef': encoder_receipt['recordId']}) == encoder_receipt, 'Restored exact dependency reopens without mutation replay')
             for current in (consumer_receipt, combined_receipt):
-                check(client.tool('technology_profile_report', {'recordId': current['recordId']}) == current, 'v3 record reopens after restart and release of every upload')
+                check(client.tool('technology_profile_review_page', {'recordRef': current['recordId']}) == current, 'v3 record reopens after restart and release of every upload')
                 reopened = json.loads(read(client, current['reportArtifact']))
                 validate(reopened, 'record')
                 check(reopened['report']['consumers'] == consumer_record['report']['consumers'], 'v3 association bytes survive restart')
 
-            check(client.tool('technology_profile_report', {'recordId': source_receipt['recordId']}) == source_receipt, 'v2 reopens after all source uploads released and Host restarted')
+            check(client.tool('technology_profile_review_page', {'recordRef': source_receipt['recordId']}) == source_receipt, 'v2 reopens after all source uploads released and Host restarted')
             check([read(client, row['artifact']) for row in source_rows[:2]] == source_bytes, 'Owned source bytes survive release and restart')
             for row in source_rows[:2]:
                 path = (artifacts / row['artifact']['path']).resolve()
@@ -327,20 +327,20 @@ def main():
                 original = path.read_bytes()
                 try:
                     path.write_bytes(b'corrupted')
-                    refuse(client, 'technology_profile_report', {'recordId': source_receipt['recordId']}, 'ArtifactChanged')
-                    refuse(client, 'technology_profile_report', {'recordId': combined_receipt['recordId']}, 'ArtifactChanged')
-                    refuse(client, 'technology_profile_report', {'recordId': encoder_combined_receipt['recordId']}, 'ArtifactChanged')
+                    refuse(client, 'technology_profile_review_page', {'recordRef': source_receipt['recordId']}, 'ArtifactChanged')
+                    refuse(client, 'technology_profile_review_page', {'recordRef': combined_receipt['recordId']}, 'ArtifactChanged')
+                    refuse(client, 'technology_profile_review_page', {'recordRef': encoder_combined_receipt['recordId']}, 'ArtifactChanged')
                 finally: path.write_bytes(original)
-            check(client.tool('technology_profile_report', {'recordId': source_receipt['recordId']}) == source_receipt, 'Restored exact sources reopen without upload lookup')
+            check(client.tool('technology_profile_review_page', {'recordRef': source_receipt['recordId']}) == source_receipt, 'Restored exact sources reopen without upload lookup')
             for key in ('input', 'reportArtifact'):
                 path = (artifacts / receipt[key]['path']).resolve()
                 path.relative_to(artifacts.resolve())
                 original = path.read_bytes()
                 try:
                     path.write_bytes(b'corrupted')
-                    refuse(client, 'technology_profile_report', {'recordId': receipt['recordId']}, 'ArtifactChanged')
+                    refuse(client, 'technology_profile_review_page', {'recordRef': receipt['recordId']}, 'ArtifactChanged')
                 finally: path.write_bytes(original)
-            check(client.tool('technology_profile_report', {'recordId': receipt['recordId']}) == receipt, 'Restored exact bytes reopen without mutation replay')
+            check(client.tool('technology_profile_review_page', {'recordRef': receipt['recordId']}) == receipt, 'Restored exact bytes reopen without mutation replay')
         finally: close(client)
         report['completed'] = True
     finally:

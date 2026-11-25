@@ -38,9 +38,9 @@ def main():
         raw = value if isinstance(value, bytes) else json.dumps(value, ensure_ascii=False).encode('utf-8')
         begin = client.tool('artifact_upload_begin', dict(fileName='actual-prior.json', expectedBytes=len(raw), sha256=digest(raw)))
         for offset in range(0, len(raw), begin['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', dict(uploadId=begin['uploadId'], offset=offset,
+            client.tool('artifact_upload_chunk', dict(uploadRef=begin['uploadRef'], offset=offset,
                 data=base64.b64encode(raw[offset:offset + begin['maxChunkBytes']]).decode()))
-        return begin['uploadId'], client.tool('artifact_upload_commit', dict(uploadId=begin['uploadId']))['artifactRef']
+        return begin['uploadRef'], client.tool('artifact_upload_commit', dict(uploadRef=begin['uploadRef']))['artifactRef']
     try:
         for lifetime in range(2):
             client = Client(args.host.resolve(), 180, ['--no-native-workers', '--artifacts', str(artifacts)])
@@ -48,14 +48,14 @@ def main():
                 client.request('initialize', dict(protocolVersion='2025-11-25', capabilities={}, clientInfo=dict(name='actual-prior-hmi-sets', version='2')))
                 client.notify('notifications/initialized')
                 for record in source['records']:
-                    receipt = client.tool('hmi_text_list_generate_set', dict(recordId=record['recordId']))
+                    receipt = client.tool('hmi_text_list_generate_set', dict(recordRef=record['recordId']))
                     check(receipt == record['receipt'], 'Exact actual prior v1 set receipt lifetime ' + str(lifetime))
                     verify_v1(json.loads(read(receipt['input'])), receipt, read)
                     check(True, 'Independent full original v1 source and YAML oracle')
                     for child in receipt['outputs']:
                         identity = child['authorRecordId']
                         original = retained(identity, '.author.json')
-                        author = client.tool('hmi_text_list_author', dict(recordId=identity))
+                        author = client.tool('hmi_text_list_author', dict(recordRef=identity))
                         check(author == dict(**original, recordId=identity, recordArtifact=dict(path='hmi-component-reviews/' + identity + '.author.json', sha256=identity)),
                               'Exact actual prior original child author response')
                 if lifetime == 0:
@@ -86,7 +86,7 @@ def main():
                     upload_id, reference = upload(client, packet); upload_ids.append(upload_id)
                     component_receipt = client.tool('hmi_component_review', dict(uploadRef=reference))
                     for upload_id in upload_ids:
-                        client.tool('artifact_upload_release', dict(uploadId=upload_id))
+                        client.tool('artifact_upload_release', dict(uploadRef=upload_id))
                     request = dict(schemaVersion='unified-text-list-set-request.v2', componentReviewId=component_receipt['recordId'],
                         previousRecordId=prior['recordId'], outputs=[], removeOutputIds=[], retainOutputIds=original_set['retainOutputIds'],
                         requireObservedDependencies=False)
@@ -100,14 +100,14 @@ def main():
                         evolved = client.tool('hmi_text_list_generate_set', dict(uploadRef=reference))
                         check(evolved['status'] == 'candidatesReady', transition)
                         verify(request, evolved, read)
-                        client.tool('artifact_upload_release', dict(uploadId=upload_id))
+                        client.tool('artifact_upload_release', dict(uploadRef=upload_id))
                         proof['evolvedRecords'].append(dict(request=copy.deepcopy(request), receipt=evolved))
                         request['previousRecordId'] = evolved['recordId']
                         request['outputs'][0].update(operation='rename', listName='ActualPriorRenamed')
                         request['outputs'][0]['template'].update(fileBase='ActualPriorRenamed', textLibrary='ActualPriorRenamedTexts')
                 else:
                     for row in proof['evolvedRecords']:
-                        actual = client.tool('hmi_text_list_generate_set', dict(recordId=row['receipt']['recordId']))
+                        actual = client.tool('hmi_text_list_generate_set', dict(recordRef=row['receipt']['recordId']))
                         check(actual == row['receipt'], 'Exact mixed actual-prior v1/v2 chain after restart and release')
                         verify(row['request'], actual, read)
                 for row in source['files']:

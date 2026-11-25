@@ -75,7 +75,7 @@ and target observation must settle those discrepancies before native admission.
 
 ## Architecture and contracts
 
-`access_review(reviewId, uploadRef)` and `access_review_page(recordId, section,
+`access_review(reviewId, uploadRef)` and `access_review_page(recordRef, section,
 offset, count)` are implemented Host-only tools. Input has one exact saved owner,
 one explicit security domain/source/version/mode, before/after public grant graphs,
 selected subject and caller-defined required/allowed rights. Edges explicitly point

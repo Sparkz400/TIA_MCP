@@ -7,8 +7,8 @@ The [workflow schema](../../contracts/opc-ua-workflow.v1.schema.json) defines re
 ## Upload and inspect
 
 1. Begin an upload with `artifact_upload_begin`: display `fileName`, exact `expectedBytes` and lowercase `sha256`.
-2. Send sequential base64 chunks using `artifact_upload_chunk` and the returned `uploadId`, respecting `maxChunkBytes`. Exact-byte retry is supported.
-3. Call `artifact_upload_commit`; use its `artifactRef`, for example `upload:<id>`. An incomplete upload cannot be inspected.
+2. Send sequential base64 chunks using `artifact_upload_chunk` and the returned `uploadRef`, respecting `maxChunkBytes`. Exact-byte retry is supported.
+3. Call `artifact_upload_commit`; the committed `uploadRef` (also returned as `artifactRef`) is the handle, for example `upload:<id>`. An incomplete upload cannot be inspected.
 4. Call `opcua_inspect` with `{"nodeSetUploadRef":"upload:<id>"}`. This retains the exact original bytes and a complete inspection report in independent immutable storage.
 
 The response includes a `recordRef` in the form `opcua:<publication-id>:<receipt-sha256>`, the source hash under `summary.sourceSha256`, and `artifacts` entries for `original.xml` and `report.json`. Handles are opaque: pass them back exactly. A path, filename, URL or upload handle cannot substitute for a retained model handle.
@@ -16,10 +16,10 @@ The response includes a `recordRef` in the form `opcua:<publication-id>:<receipt
 Large arrays in `summary` become section descriptors such as `{"section":"nodes","rowCount":4}`. Read them with:
 
 ```json
-{"recordRef":"<model recordRef>","section":"nodes","pageSize":100}
+{"kind":"opcua","recordRef":"<model recordRef>","section":"nodes","offset":0,"count":100}
 ```
 
-Send that object to `opcua_report_page`. If `nextCursor` is non-null, repeat the same record and section with that exact cursor. Inspect `diagnostics`, `models` and `limitations` as well as `nodes`. The report represents selected fields and hashes of opaque content; the original NodeSet remains the source artifact. Each node also carries `annotationsSha256` (null when absent), binding XML comments and processing instructions to their positions inside that node. Annotations outside nodes, including prolog/epilog and model/alias/namespace metadata, contribute to `envelopeSha256`. Annotation changes require review and node changes participate in declared consumer impacts; they do not establish a runtime behavior change. Position hashing is conservative: formatting or reordering around annotations can require review. Inputs are bounded before DOM allocation by 16 MiB, depth 64 and 500,000 XML reader events, including annotations and opaque elements. [Validation](../verification/opc-ua-preservation-20261016.md).
+Send that object to `review_page` (kind `opcua`). If `nextOffset` is non-null, repeat the same record and section with that offset (1–200 rows per page). Inspect `diagnostics`, `models` and `limitations` as well as `nodes`. The report represents selected fields and hashes of opaque content; the original NodeSet remains the source artifact. Each node also carries `annotationsSha256` (null when absent), binding XML comments and processing instructions to their positions inside that node. Annotations outside nodes, including prolog/epilog and model/alias/namespace metadata, contribute to `envelopeSha256`. Annotation changes require review and node changes participate in declared consumer impacts; they do not establish a runtime behavior change. Position hashing is conservative: formatting or reordering around annotations can require review. Inputs are bounded before DOM allocation by 16 MiB, depth 64 and 500,000 XML reader events, including annotations and opaque elements. [Validation](../verification/opc-ua-preservation-20261016.md).
 
 ## Compare models and review declared consumers
 
@@ -57,16 +57,16 @@ Create before and after sets independently, supplying unchanged dependencies on 
 | `opcua_compare` | Two model handles; optional v1 manifest upload | Retained comparison and direct consumer impacts |
 | `opcua_dependencies` | 1–32 distinct model handles | Retained explicit dependency set |
 | `opcua_dependency_compare` | Two dependency-set handles; optional v2 manifest upload | Retained set comparison and conservative consumer impacts |
-| `opcua_report_page` | Record, section, optional size and exact cursor | Bounded rows and continuation cursor |
-| `opcua_reopen` | Record handle | Verified summary and artifact handles after restart |
-| `opcua_list` | Optional offset and count | Discovery of complete, incomplete and integrity-failed publications |
-| `opcua_artifact_read` | Artifact handle, byte offset and count | Base64 bytes, exact SHA-256 and continuation offset |
+| `review_page` (kind `opcua`) | Record, section, optional `offset` and `count` | Bounded rows and `nextOffset` |
+| `review_reopen` (kind `opcua`) | Record handle | Verified summary and artifact handles after restart |
+| `review_list` (kind `opcua`) | Optional offset and count | Discovery of complete, incomplete and integrity-failed publications |
+| `review_artifact_read` (kind `opcua`) | `recordRef`, artifact `name` (`original.xml`, `consumers.json` or `report.json`), byte offset and count | Base64 bytes, exact SHA-256 and continuation offset |
 
-`opcua_artifact_read` downloads the exact original XML, supplied consumer JSON or complete report, at most 65,536 bytes per call. Append decoded `data` at `offset`, continue at `nextOffset` until `complete=true`, then verify the full file against `sha256`. A read at the exact end returns an empty completed chunk. Nothing in this tool writes a caller-selected output path.
+`review_artifact_read` (kind `opcua`) downloads the exact original XML, supplied consumer JSON or complete report, at most 65,536 bytes per call. Append decoded `data` at `offset`, continue at `nextOffset` until `complete=true`, then verify the full file against `sha256`. A read at the exact end returns an empty completed chunk. Nothing in this tool writes a caller-selected output path.
 
 Every read, reopen and comparison verifies the retained receipt, intent manifest, artifacts and transitive inputs. The receipt hash is part of the record handle. Changed bytes fail closed. Captures keep independent copies, so an upload can be explicitly released through `artifact_upload_release` after successful inspection.
 
-Publication writes a complete intent manifest, then immutable artifacts, then the completion receipt. All files use create-new semantics. Repeated inspection or comparison creates another record; it never updates an existing output. An interrupted publication remains discoverable and cannot be read as complete. `OpcUaPublicationInterrupted` includes the intended record handle when available. Use `opcua_list` after response loss, then `opcua_reopen`; retrying a creation request creates a new publication. A crash before the intent is complete can leave only a `publicationId` for administrative review.
+Publication writes a complete intent manifest, then immutable artifacts, then the completion receipt. All files use create-new semantics. Repeated inspection or comparison creates another record; it never updates an existing output. An interrupted publication remains discoverable and cannot be read as complete. `OpcUaPublicationInterrupted` includes the intended record handle when available. Use `review_list` (kind `opcua`) after response loss, then `review_reopen` (kind `opcua`); retrying a creation request creates a new publication. A crash before the intent is complete can leave only a `publicationId` for administrative review.
 
 Discovery sorts publication IDs and accepts an offset. Concurrent additions can change offsets; relist from the beginning when reconciling concurrent work. Complete record handles remain stable. There is no automatic cleanup or overwrite tool for retained UA records. Storage maintenance is an explicit administrative action outside this workflow.
 
@@ -83,9 +83,9 @@ Discovery sorts publication IDs and accepts an offset. Concurrent additions can 
 | Discovery | 1–100 records per page |
 | Retention | 1,000 records and 2 GiB, including incomplete publications |
 
-Oversized rows become explicit `omitted` entries carrying their row index, byte count, hash and complete report handle. They still advance the cursor. Download the full report to review those rows; an omitted row does not count as reviewed or absent. Report arrays are never silently truncated in retained artifacts. Aggregate response metadata is bounded separately.
+Oversized rows become explicit `omitted` entries carrying their row index, byte count, hash and complete report handle. They still advance `nextOffset`. Download the full report to review those rows; an omitted row does not count as reviewed or absent. Report arrays are never silently truncated in retained artifacts. Aggregate response metadata is bounded separately.
 
-Errors distinguish invalid handles/sections, stale cursors/manifests, capacity limits, integrity failure, incomplete publication and a busy store. No error grants native admission. Symlinks and junctions in storage paths are refused. XML DTD/entities and network resolvers remain disabled.
+Errors distinguish invalid handles/sections, out-of-range offsets, stale manifests, capacity limits, integrity failure, incomplete publication and a busy store. No error grants native admission. Symlinks and junctions in storage paths are refused. XML DTD/entities and network resolvers remain disabled.
 
 ## Native engineering read and export
 

@@ -70,7 +70,12 @@ namespace TiaMcp.Openness.V21
             if (observed.Value<string>("linkStatus") == "noService") return;
             if (observed.Value<string>("linkStatus") == "linked")
                 throw new BridgeException("LibraryHandoffRequired", "This object has a native library type link; preserving import requires the library subsystem.", observed);
-            throw new BridgeException("HmiPreservationUnavailable", "The native library link could not be established; preserving import cannot assume it is absent.", observed);
+            {
+                // A copy: the observation is also the caller's evidence and stays as read.
+                var details = (JObject)observed.DeepClone();
+                details["remediation"] = "No change was made. The object's library type link could not be read (linkStatus and its failure are in these details). Reopen the project or check the object in TIA, then prepare the change again; if it is an instance of a library type, change it through the library tools (library_query, library_update_check) instead of a preserving import.";
+                throw new BridgeException("HmiPreservationUnavailable", "The native library link could not be established; preserving import cannot assume it is absent.", details);
+            }
         }
     }
 }

@@ -1,4 +1,9 @@
-/** Browser acceptance for the completed native 1,000-function qualification. */
+/**
+ * Browser acceptance at 1,000 functions. With --report <native report> it checks the completed native qualification
+ * (scripts/qualify_project_explorer_functions.py). Without --report it builds a synthetic report and snapshot of the same
+ * shape (scale-fixture.mjs) so the same checks run offline; that run is UI scale evidence only, never native evidence.
+ * --output and --screenshots default to fresh directories under artifacts/ and output/.
+ */
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
@@ -6,17 +11,24 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 import { pack } from '../pack.mjs';
+import { writeScaleReport } from './scale-fixture.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const argument = name => {
   const index = process.argv.indexOf(name);
-  assert.ok(index >= 0 && process.argv[index + 1] && !process.argv[index + 1].startsWith('--'), `${name} requires a path`);
+  if (index < 0) return null;
+  assert.ok(process.argv[index + 1] && !process.argv[index + 1].startsWith('--'), `${name} requires a path`);
   return path.resolve(process.argv[index + 1]);
 };
-const input = argument('--report'), output = argument('--output'), screenshots = argument('--screenshots');
+const runId = new Date().toISOString().replace(/[:.]/g, '-') + '-' + process.pid;
+const output = argument('--output') || path.join(root, 'artifacts/project-explorer/scale-runs', runId);
+const screenshots = argument('--screenshots') || path.join(root, 'output/playwright/project-explorer-scale', runId);
+const synthetic = argument('--report') === null;
+const input = synthetic ? await writeScaleReport(output + '-input') : argument('--report');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const nativeBytes = await fs.readFile(input), native = JSON.parse(nativeBytes);
 assert.equal(native.completed, true, 'Native acceptance must finish before browser acceptance');
+assert.equal(native.synthetic === true, synthetic, 'A synthetic report is never accepted as --report');
 assert.equal(native.generatedFunctionCount, 1000);
 assert.equal(native.failure, undefined);
 assert.equal(native.cleanupFailure, undefined);
@@ -36,15 +48,21 @@ for (const directory of [output, screenshots]) {
   await fs.mkdir(directory); // Refuse to overwrite an earlier evidence directory.
 }
 const sources = {};
-for (const relative of ['package.json', 'package-lock.json', 'ui/project-explorer/model.js', 'ui/project-explorer/client.js', 'ui/project-explorer/explorer.js', 'ui/project-explorer/style.css', 'ui/project-explorer/pack.mjs', 'ui/project-explorer/tests/browser-scale.mjs']) {
+for (const relative of ['package.json', 'package-lock.json', 'ui/project-explorer/model.js', 'ui/project-explorer/client.js', 'ui/project-explorer/explorer.js', 'ui/project-explorer/style.css', 'ui/project-explorer/pack.mjs', 'ui/project-explorer/tests/browser-scale.mjs', 'ui/project-explorer/tests/scale-fixture.mjs']) {
   sources[relative] = hash(await fs.readFile(path.join(root, relative)));
 }
-const report = { startedAtUtc: new Date().toISOString(), passed: false,
-  scope: 'Current project UI renders a hash-verified native offline export. This is not desktop MCP Apps host or PLC runtime acceptance.',
+const report = { startedAtUtc: new Date().toISOString(), passed: false, synthetic,
+  scope: synthetic
+    ? 'Current project UI renders a synthetic 1,000-function snapshot in the native export shape. UI scale evidence only: not native Siemens, desktop MCP Apps host or PLC runtime acceptance.'
+    : 'Current project UI renders a hash-verified native offline export. This is not desktop MCP Apps host or PLC runtime acceptance.',
   input: { path: input, sha256: hash(nativeBytes) }, snapshot: { path: snapshotPath, sha256: hash(snapshotBytes), snapshotId: snapshot.snapshotId },
   sources, checks: [], screenshots: [], pageErrors: [], networkRequests: [] };
-const browser = await chromium.launch({ headless: true, downloadsPath: path.join(output, 'downloads'), args: ['--allow-file-access-from-files'] });
-report.browser = { version: browser.version(), executablePath: chromium.executablePath() };
+// Same browser choice as browser.mjs: EXPLORER_BROWSER, else Playwright's bundled Chromium, else installed Chrome on Windows.
+const bundledBrowser = chromium.executablePath();
+const bundledBrowserInstalled = await fs.stat(bundledBrowser).then(info => info.isFile(), () => false);
+const executablePath = process.env.EXPLORER_BROWSER || (bundledBrowserInstalled ? bundledBrowser : (process.platform === 'win32' ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' : undefined));
+const browser = await chromium.launch({ headless: true, executablePath, downloadsPath: path.join(output, 'downloads'), args: ['--allow-file-access-from-files'] });
+report.browser = { version: browser.version(), executablePath: executablePath ?? bundledBrowser };
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, colorScheme: 'light', acceptDownloads: true });
 page.on('pageerror', error => report.pageErrors.push(error.message));
 page.on('request', request => { if (/^https?:/.test(request.url())) report.networkRequests.push(request.url()); });

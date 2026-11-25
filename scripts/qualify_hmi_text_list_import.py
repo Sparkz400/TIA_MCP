@@ -253,9 +253,9 @@ def main():
     def upload(client, data):
         status = client.tool('artifact_upload_begin', dict(fileName='request.json', expectedBytes=len(data), sha256=digest(data)))
         for offset in range(0, len(data), status['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', dict(uploadId=status['uploadId'], offset=offset,
+            client.tool('artifact_upload_chunk', dict(uploadRef=status['uploadRef'], offset=offset,
                         data=base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()))
-        return client.tool('artifact_upload_commit', dict(uploadId=status['uploadId']))['artifactRef']
+        return client.tool('artifact_upload_commit', dict(uploadRef=status['uploadRef']))['artifactRef']
 
     def read(client, reference):
         chunks, offset = [], 0
@@ -314,7 +314,7 @@ def main():
             labels = iter(AUTHOR_LABELS + SET_LABELS)
             for kind, record in retained_records():
                 tool = 'hmi_text_list_author' if kind == 'author' else 'hmi_text_list_generate_set'
-                receipt = client.tool(tool, dict(recordId=record['recordId']))
+                receipt = client.tool(tool, dict(recordRef=record['recordId']))
                 check(receipt == record['receipt'], 'Retained record reopens with its exact receipt: ' + record['recordId'][:12])
                 receipts[record['recordId']] = receipt
                 label = next(labels)
@@ -358,9 +358,9 @@ def main():
             reopen_text_lists(client, authored, read, check, refuse, store)
             for kind, record in retained_records():
                 tool = 'hmi_text_list_author' if kind == 'author' else 'hmi_text_list_generate_set'
-                check(client.tool(tool, dict(recordId=record['recordId'])) == receipts[record['recordId']], 'Retained record reopens unchanged after restart: ' + record['recordId'][:12])
+                check(client.tool(tool, dict(recordRef=record['recordId'])) == receipts[record['recordId']], 'Retained record reopens unchanged after restart: ' + record['recordId'][:12])
             for label in boundary_requests():
-                check(client.tool('hmi_text_list_author', dict(recordId=receipts[label]['recordId'])) == receipts[label], 'Boundary record reopens unchanged after restart: ' + label)
+                check(client.tool('hmi_text_list_author', dict(recordRef=receipts[label]['recordId'])) == receipts[label], 'Boundary record reopens unchanged after restart: ' + label)
         finally:
             close(client)
         report['completed'] = not report['failures']

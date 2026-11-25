@@ -13,7 +13,7 @@ drive objects into v2 snapshots of this format.
    `artifact_upload_begin/chunk/commit`.
 3. Call `drive_profile_review(reviewId, uploadRef)` and retain its `recordId`,
    original `input` and complete `reportArtifact` references.
-4. Reopen with `drive_profile_review_page(recordId, section, offset, count)`.
+4. Reopen with `drive_profile_review_page(recordRef, section, offset, count)`.
    Sections are `summary`, `observations` and `changes`; v2 also supplies
    `telegrams` and `telegramChanges`. V1 refuses the new sections. Use `artifact_read` for
    complete originals/reports; upload release and Host restart preserve them.

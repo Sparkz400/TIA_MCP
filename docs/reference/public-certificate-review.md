@@ -14,7 +14,7 @@ names or fingerprints.
    bytes before domain validation; this dedicated operation validates both phases
    before publishing its own retained input.
 3. Retain the returned `recordId`, `input` and `reportArtifact`. Reopen with
-   `public_certificate_review_page(recordId, section, offset, count)`, using `summary`
+   `public_certificate_review_page(recordRef, section, offset, count)`, using `summary`
    or `observations`. `artifact_read` downloads the complete public request/report.
 
 The request requires `reviewId`, `owner`, `evaluatedAtUtc`, `afterKind` and `before`/

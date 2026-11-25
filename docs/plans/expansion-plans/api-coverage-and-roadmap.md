@@ -193,7 +193,7 @@ This expansion also captures cross-domain workflows: PLC library component + HMI
 ### 3.3 Capabilities already present under different names
 
 - “Find callers/readers/writers” uses `xref_query`, `call_graph`, `symbol_trace`, `change_impact`; `symbol_trace` is offline references, not samples.
-- “Compare/search a project” uses `project_snapshot_capture/compare/search` and `project_health_report`; `project_index` and `project_model*` provide bounded inspection, not every native compare service.
+- “Compare/search a project” uses `project_snapshot_capture/compare/search` and `project_health_review`; `project_index` and `project_model*` provide bounded inspection, not every native compare service.
 - “Create/edit an FB/type/tag/group” uses `change_prepare` with existing source/SimaticML/object/typed kinds, then apply/status/restore, not a missing tool for every CRUD verb.
 - “PLC library deployment” already has library intake/open/query/compare/export and prepared lifecycle kinds. Full combined apply is still gated; adding another install API would not solve its qualification blockers.
 - “Network configuration” already includes subnet and reviewed IO assignment/module lifecycle. Transport connections, generic distributed I/O and physical wiring are distinct gaps.

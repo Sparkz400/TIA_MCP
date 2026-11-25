@@ -405,7 +405,8 @@ try
         await using (var store = Store("retention"))
         {
             var ids = Seed("retention", i => i == 0 ? (second.Selection, "remoteSessionUnknown") : (server.Selection, "closed"));
-            string id = Id(); Check((await store.Connect(id, server.Selection)).State == "connected", "A full store of resolved records admits a new attempt");
+            string id = Id(); var admitted = await store.Connect(id, server.Selection);
+            Check(admitted.State == "connected", "A full store of resolved records admits a new attempt (state " + admitted.State + ", error " + admitted.ErrorCode + ")");
             Check(File.Exists(Path.Combine(output, "retention", ids[0] + ".json")) && !File.Exists(Path.Combine(output, "retention", ids[1] + ".json")) &&
                 Directory.EnumerateFiles(Path.Combine(output, "retention"), "*.json").Count() == 1024, "Only the oldest resolved record makes room; an older unresolved one stays");
             int calls = server.Audit.Count;

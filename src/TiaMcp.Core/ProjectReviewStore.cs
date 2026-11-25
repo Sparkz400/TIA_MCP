@@ -397,7 +397,7 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
     }
 
     private static void Page(int offset, int count)
-    { if (count is < 1 or > 200 || offset < 0 || offset > int.MaxValue - count) throw new BridgeException("InvalidRequest", "offset must be nonnegative with a representable next page and maxItems 1..200."); }
+    { if (count is < 1 or > 200 || offset < 0 || offset > int.MaxValue - count) throw new BridgeException("InvalidRequest", "offset must be nonnegative with a representable next page and count 1..200."); }
     private static Dictionary<string, JsonObject> NativeNodes(JsonObject model)
     {
         var result = new Dictionary<string, JsonObject>(StringComparer.Ordinal);
@@ -415,10 +415,15 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
     {
         var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit,
             XmlResolver = null, MaxCharactersInDocument = 16 * 1024 * 1024 };
-        using (var depth = XmlReader.Create(new StringReader(xml), settings))
-            while (depth.Read()) if (depth.Depth > 128) throw new XmlException("Review XML exceeds 128 nested levels.");
-        using var reader = XmlReader.Create(new StringReader(xml), settings);
-        return XDocument.Load(reader, LoadOptions.PreserveWhitespace);
+        try
+        {
+            using (var depth = XmlReader.Create(new StringReader(xml), settings))
+                while (depth.Read()) if (depth.Depth > 128) throw new BridgeException("InvalidSnapshot", "Review block XML exceeds 128 nested levels.");
+            using var reader = XmlReader.Create(new StringReader(xml), settings);
+            return XDocument.Load(reader, LoadOptions.PreserveWhitespace);
+        }
+        // A DTD, malformed XML or more than 16 Mi characters: the supplied document is refused as a review input, never loaded.
+        catch (XmlException error) { throw new BridgeException("InvalidSnapshot", "Review block XML is not a well-formed SimaticML document without a DTD: " + error.Message, error); }
     }
     public static JsonObject XmlSignatures(string xml)
     {

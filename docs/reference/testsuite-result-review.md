@@ -71,13 +71,13 @@ see [the integrated workflow](../guides/trace-diagnostics.md#supplied-test-suite
 not rebase or carry old findings as current evidence. Supply a new finding selector
 explicitly if needed; the new review/block must match it independently.
 
-`project_health_report` can aggregate explicitly selected receipts as described
+`project_health_review` can aggregate explicitly selected receipts as described
 below. Broader alarm/context composition and D06 native providers remain open.
 A style warning is not a causal diagnosis or native watch/trace execution.
 
 ## Selected evidence in project health
 
-Pass `testSuiteResults:[{relativePath,sha256}]` to `project_health_report`, using
+Pass `testSuiteResults:[{relativePath,sha256}]` to `project_health_review`, using
 retained result-review **receipt** references for the same `reviewId`. Selection
 is explicit: omitting the parameter preserves the metadata-only view, and an
 empty array reports zero selected evidence with a false coverage gate.
@@ -105,7 +105,7 @@ selected packet. It says nothing about unselected tests or overall project healt
 `wholeProjectHealthComplete`, `nativeQualified`, source authenticity and live
 freshness remain false. Passing selected tests do not remove metadata findings.
 
-`offset`/`maxItems` still page metadata health findings only. Test Suite summaries
+`offset`/`count` still page metadata health findings only. Test Suite summaries
 are complete within a separate 128 KiB section budget; an oversized selection
 refuses rather than truncating. Use each summary's receipt with
 `testsuite_result_review` for detailed pages or `diagnostic_plan.testSuiteFinding`

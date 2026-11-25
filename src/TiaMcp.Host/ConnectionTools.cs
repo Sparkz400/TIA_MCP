@@ -16,7 +16,7 @@ public sealed class ConnectionTools(HostOptions options)
 
     [McpServerTool(Name = "connection_review_page", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Reopen an immutable supplied connection review by recordId; revalidate original, saved review and derived report after restart. section: summary/observations/comparisons/consumers/matches; 1..200 rows within 128 KiB. Exact original/report downloads use artifact_read. Coverage is supplied evidence, not completeness or native compatibility certification.")]
-    public CallToolResult Page(string recordId, string section = "summary", int offset = 0, int count = 50) => Run(s => s.Page(recordId, section, offset, count));
+    public CallToolResult Page(string recordRef, string section = "summary", int offset = 0, int count = 50) => Run(s => s.Page(recordRef, section, offset, count));
     private CallToolResult Run(Func<ConnectionWorkflowStore, JsonObject> action) =>
         ToolResult.Guard(() => action(new(options.ArtifactsDirectory)), "ConnectionReviewFailed", null, false);
 }

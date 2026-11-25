@@ -10,7 +10,6 @@ public sealed class InventoryStore
     public static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
     private readonly object gate = new();
     private readonly Dictionary<string, Snapshot> snapshots = new(StringComparer.Ordinal);
-    private readonly byte[] cursorKey = RandomNumberGenerator.GetBytes(32);
     private const long MemoryLimit = 256L * 1024 * 1024;
     private const int RowLimit = 50000;
 
@@ -58,42 +57,21 @@ public sealed class InventoryStore
 
     public bool Release(string id) { lock (gate) return snapshots.Remove(id); }
 
-    public InventoryPage Page(string id, int pageSize = 100, string? cursor = null)
+    /// <summary>Rows offset..offset+count of an immutable snapshot, at most 256 KiB; the snapshot ID binds the page to its capture.</summary>
+    public InventoryPage Page(string id, int offset = 0, int count = 100)
     {
-        if (pageSize is < 1 or > 200) throw new BridgeException("InvalidRequest", "pageSize must be 1..200.");
-        var snapshot = Get(id); int offset = DecodeCursor(id, cursor);
-        if (offset > snapshot.Lines.Length) throw new BridgeException("InvalidCursor", "Cursor exceeds the snapshot.");
+        if (count is < 1 or > 200) throw new BridgeException("InvalidRequest", "count must be 1..200.");
+        var snapshot = Get(id);
+        if (offset < 0 || offset > snapshot.Lines.Length) throw new BridgeException("InvalidCursor", "offset must lie within the snapshot.");
         var rows = new List<InventoryRow>(); int bytes = 0;
-        for (int i = offset; i < snapshot.Lines.Length && rows.Count < pageSize; i++)
+        for (int i = offset; i < snapshot.Lines.Length && rows.Count < count; i++)
         {
             var size = Encoding.UTF8.GetByteCount(snapshot.Lines[i]);
             if (rows.Count > 0 && bytes + size > 256 * 1024) break;
             rows.Add(JsonSerializer.Deserialize<InventoryRow>(snapshot.Lines[i], Json)!); bytes += size;
         }
         int next = offset + rows.Count;
-        return new(snapshot.Metadata, rows.ToArray(), offset, next < snapshot.Lines.Length ? EncodeCursor(id, next) : null);
-    }
-
-    private string EncodeCursor(string id, int offset)
-    {
-        var text = id + ":" + offset.ToString(System.Globalization.CultureInfo.InvariantCulture);
-        return Convert.ToBase64String(Encoding.UTF8.GetBytes(text)) + "." + Convert.ToHexString(HMACSHA256.HashData(cursorKey, Encoding.UTF8.GetBytes(text)));
-    }
-
-    private int DecodeCursor(string id, string? cursor)
-    {
-        if (cursor is null) return 0;
-        try
-        {
-            var parts = cursor.Split('.');
-            if (parts.Length != 2 || cursor.Length > 256) throw new FormatException();
-            var payload = Convert.FromBase64String(parts[0]);
-            if (!CryptographicOperations.FixedTimeEquals(HMACSHA256.HashData(cursorKey, payload), Convert.FromHexString(parts[1]))) throw new FormatException();
-            var values = Encoding.UTF8.GetString(payload).Split(':');
-            if (values.Length != 2 || values[0] != id || !int.TryParse(values[1], out int offset) || offset < 0) throw new FormatException();
-            return offset;
-        }
-        catch (FormatException) { throw new BridgeException("InvalidCursor", "Cursor must belong to this immutable snapshot and host."); }
+        return new(snapshot.Metadata, rows.ToArray(), offset, next < snapshot.Lines.Length ? next : null);
     }
 
     private static void Validate(InventoryRow row, string projectPath)

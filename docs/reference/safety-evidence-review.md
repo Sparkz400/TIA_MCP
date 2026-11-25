@@ -21,7 +21,7 @@ keeps native capture, F-I/O, activation-test management and specialist acceptanc
    `{uploadRef, phase, purpose}` objects. `phase` is `before`, `after` or `context`;
    `purpose` is a nonblank label up to 256 characters. Each exact phase/purpose/
    original-filename combination must be unique. Roles are supplied declarations.
-4. Keep the returned `recordId` and `reportArtifact`. Use `safety_evidence_report`
+4. Keep the returned `recordId` and `reportArtifact`. Use `safety_evidence_review_page`
    with `section` of `summary` (default), `observations`, `signatures`, `issues` or
    `changes`. Page using `offset`, `count` (1..200), and `nextOffset` until null.
    Oversized rows explicitly say `omitted`; download the complete report with

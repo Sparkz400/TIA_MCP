@@ -126,17 +126,17 @@ def run(args):
         upload = client.tool("artifact_upload_begin", {"fileName": package_path.name,
             "expectedBytes": len(package_bytes), "sha256": hashlib.sha256(package_bytes).hexdigest()})
         for offset in range(0, len(package_bytes), 16384):
-            client.tool("artifact_upload_chunk", {"uploadId": upload["uploadId"], "offset": offset,
+            client.tool("artifact_upload_chunk", {"uploadRef": upload["uploadRef"], "offset": offset,
                 "data": base64.b64encode(package_bytes[offset:offset + 16384]).decode("ascii")})
-        committed = client.tool("artifact_upload_commit", {"uploadId": upload["uploadId"]})
-        package = client.tool("library_package_stage", {"artifactRef": committed["artifactRef"]})
+        committed = client.tool("artifact_upload_commit", {"uploadRef": upload["uploadRef"]})
+        package = client.tool("library_package_stage", {"uploadRef": committed["artifactRef"]})
         step("ZIP upload and staging", {"package": package, "zipSha256": hashlib.sha256(package_bytes).hexdigest()})
         candidates = client.tool("library_package_inspect", {"packageId": package["packageId"]})["items"]
         require(len(candidates) == 1 and candidates[0]["kind"] == "globalLibraryArchive", "Native archive classification mismatch")
         opened = step("staged native archive open", client.tool("library_open", {"request": {
             "packageId": package["packageId"], "candidateId": candidates[0]["candidateId"]}}))
         require(opened.get("sourceSnapshotOwned") is True, "Native open did not establish an independent source snapshot")
-        client.tool("artifact_upload_release", {"uploadId": upload["uploadId"]})
+        client.tool("artifact_upload_release", {"uploadRef": upload["uploadRef"]})
         step("release intake after independent native snapshot", client.tool("library_package_release", {"packageId": package["packageId"]}))
         applied = apply("library_instantiate", {"schemaVersion": 1, "source": source_ref(opened["libraryId"]),
                         "selection": [{"masterCopyPath": master_path}], "destinationComposition": "blocks",

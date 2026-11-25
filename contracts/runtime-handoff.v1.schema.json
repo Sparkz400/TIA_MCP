@@ -1604,26 +1604,34 @@
         }
       }
     },
-    "runtime_handoff_reopenInput": {
+    "review_reopenInput": {
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "kind",
         "recordRef"
       ],
       "properties": {
+        "kind": {
+          "const": "runtime_handoff"
+        },
         "recordRef": {
           "type": "string",
           "pattern": "^runtime-handoff:[0-9a-f]{32}:[0-9a-f]{64}$"
         }
       }
     },
-    "runtime_handoff_pageInput": {
+    "review_pageInput": {
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "kind",
         "recordRef"
       ],
       "properties": {
+        "kind": {
+          "const": "runtime_handoff"
+        },
         "recordRef": {
           "type": "string",
           "pattern": "^runtime-handoff:[0-9a-f]{32}:[0-9a-f]{64}$"
@@ -1647,14 +1655,18 @@
         }
       }
     },
-    "runtime_handoff_artifact_readInput": {
+    "review_artifact_readInput": {
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "kind",
         "recordRef",
         "name"
       ],
       "properties": {
+        "kind": {
+          "const": "runtime_handoff"
+        },
         "recordRef": {
           "type": "string",
           "pattern": "^runtime-handoff:[0-9a-f]{32}:[0-9a-f]{64}$"
@@ -1683,11 +1695,16 @@
         }
       }
     },
-    "runtime_handoff_listInput": {
+    "review_listInput": {
       "type": "object",
       "additionalProperties": false,
-      "required": [],
+      "required": [
+        "kind"
+      ],
       "properties": {
+        "kind": {
+          "const": "runtime_handoff"
+        },
         "offset": {
           "type": "integer",
           "minimum": 0
@@ -1695,7 +1712,7 @@
         "count": {
           "type": "integer",
           "minimum": 1,
-          "maximum": 20
+          "maximum": 100
         }
       }
     },
@@ -1806,9 +1823,9 @@
         "$ref": "#/$defs/handoffError"
       }
     },
-    "runtime_handoff_reopen": {
+    "review_reopen": {
       "input": {
-        "$ref": "#/$defs/runtime_handoff_reopenInput"
+        "$ref": "#/$defs/review_reopenInput"
       },
       "output": {
         "$ref": "#/$defs/handoffReceipt"
@@ -1817,9 +1834,9 @@
         "$ref": "#/$defs/handoffError"
       }
     },
-    "runtime_handoff_page": {
+    "review_page": {
       "input": {
-        "$ref": "#/$defs/runtime_handoff_pageInput"
+        "$ref": "#/$defs/review_pageInput"
       },
       "output": {
         "$ref": "#/$defs/handoffPage"
@@ -1828,9 +1845,9 @@
         "$ref": "#/$defs/handoffError"
       }
     },
-    "runtime_handoff_artifact_read": {
+    "review_artifact_read": {
       "input": {
-        "$ref": "#/$defs/runtime_handoff_artifact_readInput"
+        "$ref": "#/$defs/review_artifact_readInput"
       },
       "output": {
         "$ref": "#/$defs/handoffChunk"
@@ -1839,9 +1856,9 @@
         "$ref": "#/$defs/handoffError"
       }
     },
-    "runtime_handoff_list": {
+    "review_list": {
       "input": {
-        "$ref": "#/$defs/runtime_handoff_listInput"
+        "$ref": "#/$defs/review_listInput"
       },
       "output": {
         "$ref": "#/$defs/handoffList"

@@ -557,22 +557,29 @@
       ],
       "additionalProperties": false
     },
-    "composite_engineering_reopenInput": {
+    "review_reopenInput": {
       "type": "object",
       "properties": {
+        "kind": {
+          "const": "composite_engineering"
+        },
         "recordRef": {
           "type": "string",
           "pattern": "^composite-engineering:[a-f0-9]{32}:[a-f0-9]{64}$"
         }
       },
       "required": [
+        "kind",
         "recordRef"
       ],
       "additionalProperties": false
     },
-    "composite_engineering_pageInput": {
+    "review_pageInput": {
       "type": "object",
       "properties": {
+        "kind": {
+          "const": "composite_engineering"
+        },
         "recordRef": {
           "type": "string",
           "pattern": "^composite-engineering:[a-f0-9]{32}:[a-f0-9]{64}$"
@@ -612,13 +619,17 @@
         }
       },
       "required": [
+        "kind",
         "recordRef"
       ],
       "additionalProperties": false
     },
-    "composite_engineering_artifact_readInput": {
+    "review_artifact_readInput": {
       "type": "object",
       "properties": {
+        "kind": {
+          "const": "composite_engineering"
+        },
         "recordRef": {
           "type": "string",
           "pattern": "^composite-engineering:[a-f0-9]{32}:[a-f0-9]{64}$"
@@ -641,14 +652,18 @@
         }
       },
       "required": [
+        "kind",
         "recordRef",
         "name"
       ],
       "additionalProperties": false
     },
-    "composite_engineering_listInput": {
+    "review_listInput": {
       "type": "object",
       "properties": {
+        "kind": {
+          "const": "composite_engineering"
+        },
         "offset": {
           "type": "integer",
           "minimum": 0
@@ -656,10 +671,12 @@
         "count": {
           "type": "integer",
           "minimum": 1,
-          "maximum": 20
+          "maximum": 100
         }
       },
-      "required": [],
+      "required": [
+        "kind"
+      ],
       "additionalProperties": false
     }
   },
@@ -672,33 +689,33 @@
         "$ref": "#/$defs/summary"
       }
     },
-    "composite_engineering_reopen": {
+    "review_reopen": {
       "input": {
-        "$ref": "#/$defs/composite_engineering_reopenInput"
+        "$ref": "#/$defs/review_reopenInput"
       },
       "output": {
         "$ref": "#/$defs/summary"
       }
     },
-    "composite_engineering_page": {
+    "review_page": {
       "input": {
-        "$ref": "#/$defs/composite_engineering_pageInput"
+        "$ref": "#/$defs/review_pageInput"
       },
       "output": {
         "$ref": "#/$defs/page"
       }
     },
-    "composite_engineering_artifact_read": {
+    "review_artifact_read": {
       "input": {
-        "$ref": "#/$defs/composite_engineering_artifact_readInput"
+        "$ref": "#/$defs/review_artifact_readInput"
       },
       "output": {
         "$ref": "#/$defs/chunk"
       }
     },
-    "composite_engineering_list": {
+    "review_list": {
       "input": {
-        "$ref": "#/$defs/composite_engineering_listInput"
+        "$ref": "#/$defs/review_listInput"
       },
       "output": {
         "$ref": "#/$defs/list"

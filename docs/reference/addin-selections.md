@@ -1,6 +1,6 @@
 # Review detached Add-In selections without TIA
 
-`addin_selection_review(reviewId, uploadRef)` imports a committed `addin-selection.v1` JSON upload and binds each selected reference to the exact saved project review. `addin_selection_page(recordId, section, offset, count)` reopens the immutable result; `section` is `summary` or `selections`. Download original bytes and the complete report using the returned `artifact_read` references.
+`addin_selection_review(reviewId, uploadRef)` imports a committed `addin-selection.v1` JSON upload and binds each selected reference to the exact saved project review. `addin_selection_review_page(recordRef, section, offset, count)` reopens the immutable result; `section` is `summary` or `selections`. Download original bytes and the complete report using the returned `artifact_read` references.
 
 This works without Siemens installed. It reviews supplied data; it does not run an Add-In, launch TIA, authenticate the producer or authorize engineering changes. The [companion plan](../plans/expansion-plans/tia-addin-companion.md) retains native delivery, workflow hooks, permissions, signing, UI lifetime and authenticated handoff requirements.
 
@@ -68,7 +68,7 @@ To use it:
 2. Set the user environment variable `TIAMCP_ARTIFACTS` to the Host's absolute `--artifacts` directory, then start TIA.
 3. Start the Host with `--addin-handoff --addin-enrollment <addin-enrollment.json>`. The enrollment option is refused without `--addin-handoff`, and the file must contain exactly `schemaVersion`, `assemblySha256` and `configurationSha256`.
 4. Through MCP, attach the worker to that TIA instance and save a review of the project (`project_snapshot_import`).
-5. In TIA, select 1 to 64 objects and choose *Send selection to TIA MCP*. The notification names the retained record; open it with `addin_selection_page`.
+5. In TIA, select 1 to 64 objects and choose *Send selection to TIA MCP*. The notification names the retained record; open it with `addin_selection_review_page`.
 
 With enrollment, the Host asks the already attached worker for `addin_owner_context`; it never starts or attaches one. It then admits a request only when all of these hold:
 

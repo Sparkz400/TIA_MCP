@@ -63,7 +63,8 @@ try
             builder.Services.AddSingleton<TiaMcp.Core.Inventory.IInventoryIdentityFactory, TiaMcp.Core.Inventory.SiemensWebIdentityFactory>();
             IBridgeClient native = new CredentialRoute(options.WatchQualificationPoint is null ? bridge : new WatchQualificationBridge(bridge, options));
             builder.Services.AddSingleton<IBridgeClient>(new TiaMcp.Core.WatchTables.WatchTableDispatcher(native, options.ArtifactsDirectory,
-                allowUnqualifiedDocumentEdits: options.WatchQualificationPoint is not null, allowComponentQualification: options.ComponentQualification));
+                allowUnqualifiedDocumentEdits: options.WatchQualificationPoint is not null, allowComponentQualification: options.ComponentQualification,
+                queueTimeout: TimeSpan.FromSeconds(options.QueueTimeoutSeconds ?? options.TimeoutSeconds)));
             builder.Services.AddSingleton(simulator);
             builder.Services.AddSingleton<PlcsimTargets>();
             builder.Services.PostConfigure<ModelContextProtocol.Server.McpServerOptions>(server => ToolSurface.Apply(server, options));
@@ -99,8 +100,9 @@ try
                 .WithTools<AddInSelectionTools>()
                 .WithTools<MultiuserTools>()
                 .WithTools<TeamcenterTools>()
+                .WithTools<ReviewRecordTools>()
                 .WithResources<ProjectExplorerResources>().WithRequestFilters(ProjectExplorerResources.Configure)
-                .WithResources<TiaResources>().WithResources<ContractResources>().WithCompleteHandler(TiaResources.Complete).WithSetLoggingLevelHandler(clientLogging.SetLevel);
+                .WithResources<TiaResources>().WithResources<ContractResources>().WithResources<OutputSchemaResources>().WithCompleteHandler(TiaResources.Complete).WithSetLoggingLevelHandler(clientLogging.SetLevel);
             if (options.WatchQualificationPoint is not null) mcp.WithTools<WatchQualificationTools>();
             if (options.WatchQualificationPoint is not null && options.ComponentQualification) mcp.WithTools<WatchAuthoringQualificationTools>();
             if (options.ComponentQualification) mcp.WithTools<ComponentQualificationTools>();

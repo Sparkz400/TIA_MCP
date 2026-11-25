@@ -6,8 +6,8 @@ on:
     paths: ['docs/wiki/**']
   workflow_dispatch:
 
-permissions:
-  contents: write
+# Each job names what it needs.
+permissions: {}
 
 concurrency:
   group: wiki
@@ -20,8 +20,13 @@ jobs:
     # A manual run from a feature branch must not publish that branch's pages.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write # push to the repository wiki
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false # the push below passes the token itself
       - name: Mirror docs/wiki into the repository wiki
         shell: bash
         env:

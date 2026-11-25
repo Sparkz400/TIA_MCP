@@ -13,7 +13,7 @@ sets `releaseAccepted: true`.
 
 1. Its [matrix](release-matrix.v1.json) rows have no `open` and no `deferred` cells on the commit
    under review, and `python -B scripts/release_matrix.py --check` passes there.
-2. Every `blocked` row it owns has a maintainer disposition in the ledger's `dispositions`.
+2. Every `blocked` or `descoped` row it owns has a maintainer disposition in the ledger's `dispositions`.
 3. Each blocker it lists (`blockers`, all release-blocking) is resolved, or the record says why
    that blocker does not bind the obligation's remaining scope.
 4. Its work outside the matrix in the TODO is closed or accepted as a stated limitation.
@@ -31,7 +31,7 @@ The record is stored on the obligation in the
   "commit": "<main commit reviewed>",
   "matrixSha256": "<SHA-256 of docs/plans/release-matrix.v1.json at that commit>",
   "evidenceIds": ["<every evidence ID bound in its rows, plus out-of-matrix records>"],
-  "dispositions": ["<featureId of each blocked row it relies on>"],
+  "dispositions": ["<featureId of each blocked or descoped row it owns>"],
   "blockers": {"B01": "resolved | <why it does not bind>"},
   "limitations": ["<accepted out-of-matrix limits, if any>"]
 }
@@ -43,8 +43,8 @@ the record changes the ledger, so regenerate the matrix afterwards
 
 The 1.0 release gate validates the record, not just its approval flag. The reviewed commit must
 be an ancestor available in Git history, and its matrix bytes must match `matrixSha256`. The
-obligation's rows and accepted matrix evidence must still match, every owned blocked row must
-have a disposition, and every listed blocker needs a nonempty resolution or explanation.
+obligation's rows and accepted matrix evidence must still match, every owned blocked or descoped row
+must have a disposition, and every listed blocker needs a nonempty resolution or explanation.
 Evidence IDs must cover the owned rows and name current matrix evidence or a retained curated
 record in `evidence/`. Source, tests, contracts, scripts, evidence and build inputs must already
 be frozen: changing them after acceptance requires a new review. Ledger and matrix edits that
@@ -61,8 +61,16 @@ execution rows later that day (twelve rows, 72 cells). Four of the first seven r
 behavior; `change.hmi_engineering` rests on V21's missing `Screen.Export` plus the repository's
 preservation gate. The three block-protection kinds were blocked only for a missing repository
 route; the maintainer decided the same day to build it for 1.0, so they count as open work.
-The one remaining `deferred` row (`drives.engineering`, catalog `0.4.189`) has no disposition and stays 1.0 work
-([TODO](../TODO.md#deferred-rows)).
+
+A disposition with `"scope": "post-1.0"` in place of `boundary` records a different decision: the maintainer put a
+`deferred` (not implemented) row out of 1.0 scope. It is not a V21 boundary and not a pass. `scripts/release_matrix.py`
+gives such a row the support class `descoped` and summarizes its cells as `descoped`, apart from open, deferred and
+blocked cells; they do not count toward 1.0 and do not hold the 1.0 release gate. The check requires a boundary
+disposition for every blocked row, a scope disposition for every descoped row, and a row of the matching class for
+every disposition; a scope disposition on any row that is not deferred, an unknown scope or a scope disposition that
+also names a boundary fails it. The first, on 25 November 2026, is `drives.engineering` (D10, 3 cells): online access,
+download/upload, activation, security and safety need a physical drive (B05), and the drive rows verified without one
+stay verified ([TODO](../TODO.md#deferred-rows)). No row is `deferred` since then.
 
 ## Current acceptance preparation — 2 November 2026
 
@@ -73,10 +81,11 @@ remaining work outside the matrix, the current applicability of blockers and any
 limitations must be reviewed on the frozen candidate too.
 
 - Open or deferred matrix work: X07 (16 open cells), X01 (12), X13 (12), D12 (10), D06 (9), X08 (9), D09 (8),
-  L03 (8), D16 (3), L05 (3), L06 (3), D10 (3 deferred). Against 2 November, X12 left this list
+  L03 (8), D16 (3), L05 (3), L06 (3). D10 left this list on 25 November, when its 3 deferred cells became
+  `descoped` (out of 1.0 scope by maintainer decision, [dispositions](#dispositions)). Against 2 November, X12 left this list
   (`tia.multiversion` became `limited` on 9 November), and L03, D09, D12, X01, X07, X08 and X13 joined it with rows
   added from 14 to 20 November.
-- No open or deferred matrix cell: F00, F01, F02, F03, L01, L02, L04, D01, D02, D03, D04, D05, D07, D08, D11, D13, D14, D15, D17, X02, X03, X04, X05, X06, X09, X10, X11, X12, C01, C02, C03, C04. This includes obligations with no rows; it does not establish their completion.
+- No open or deferred matrix cell: F00, F01, F02, F03, L01, L02, L04, D01, D02, D03, D04, D05, D07, D08, D10, D11, D13, D14, D15, D17, X02, X03, X04, X05, X06, X09, X10, X11, X12, C01, C02, C03, C04. This includes obligations with no rows; it does not establish their completion.
 - Not verified in this refresh: the obligations' work outside the matrix, the current state of their blockers and
   the ledger's per-obligation `currentResult` texts, which still describe earlier catalogs. The TODO's
   [open matrix rows](../TODO.md#open-matrix-rows-by-owner) and [work outside the matrix](../TODO.md#work-outside-the-matrix)

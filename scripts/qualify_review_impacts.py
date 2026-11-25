@@ -137,7 +137,7 @@ def qualify(args):
                                   [('baseline', False, False), ('changedLeaf', True, True)]}}
     persist = lambda: save_json(report_path, report)
     extra = ('project_inventory', 'project_snapshot_capture', 'project_snapshot_compare',
-             'project_snapshot_search', 'project_health_report')
+             'project_snapshot_search', 'project_health_review')
     owned = ComponentOwnedScratch(args.host, args.worker, root, report, persist,
         extra_tools=extra, lifecycle_directory=root / 'lifecycle')
     offline = None
@@ -198,7 +198,7 @@ def qualify(args):
         require(repeated == compared, 'Host restart changed persisted comparison or exact edge evidence.')
         search = offline.tool('project_snapshot_search', {'reviewId': after[0]['reviewId'], 'query': 'ReviewImpactMarker2'})
         require(search['totalObservedHits'] >= 1, 'Persisted source search failed after host restart.')
-        offline.tool('project_health_report', {'reviewId': after[0]['reviewId']})
+        offline.tool('project_health_review', {'reviewId': after[0]['reviewId']})
         shutdown = offline.close()
         offline = None
         require(shutdown['hostExitCode'] == 0 and shutdown['forcedHostStop'] is False

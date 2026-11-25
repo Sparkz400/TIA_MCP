@@ -5,6 +5,23 @@ Dated delivery notes, newest first. Until 28 October 2026 they were the body of
 banners of the [documentation index](../README.md). Each entry keeps the counts
 and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
+## 25 November 2026
+
+**Audit follow-ups (offline):** no entry was written here between 3 and 25 November; that work is recorded in the
+[TODO](../TODO.md) sections of 4 to 24 November and in the [CHANGELOG](../../CHANGELOG.md). On 25 November a check of
+the repository, the installed server and CI led to Host-side refusal of arguments the workers cannot load, a queue
+timeout for engineering tools, bounded `plc_tag_usage` index reads, pruning of Explorer HTML exports, remediation
+texts for `HmiPreservationUnavailable`, a release gate that needs the code jobs, pinned workflow actions and Markdown
+link and PowerShell lint checks. Offline tests and worker builds only; the native runs and the missing raw evidence
+store are open under [audit follow-ups](../TODO.md#audit-follow-ups-25-november).
+
+**Maintainer decisions:** six of the seven open [decisions](../TODO.md#decisions-for-the-maintainer) were taken:
+per-attempt TLS trust stays, a PLCSIM network-mode switch tool is to be built, `drives.engineering` is out of 1.0
+scope, fingerprint reuse stays off by default, the three lost library reports get a reviewer disposition and the
+missing native recheck of the watch-owned Test Suite reopen is a stated limitation. Obligation acceptance stays open.
+`drives.engineering` has a ledger disposition with `"scope": "post-1.0"`, and `scripts/release_matrix.py` summarizes
+its 3 cells as `descoped` (catalog `0.4.189`: 2,184 bound, 81 open, 72 blocked, 3 descoped, 0 deferred).
+
 ## 3 November 2026
 
 **Offline runtime follow-up:** catalog `0.4.133` adds bounded Web syslog reads,

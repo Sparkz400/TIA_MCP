@@ -44,7 +44,7 @@ public sealed class TiaPrompts
 
         1. Find it with `tia_discover` and `project_open`.
         2. Save a persistent review with `project_snapshot_capture`.
-        3. Run `project_health_report` on that reviewId.
+        3. Run `project_health_review` on that reviewId.
         4. Summarize the findings by severity: native inconsistencies, protected or unavailable sources and relationship gaps. Name exact object paths and say which findings are incomplete or bounded.
         5. Suggest next steps, but make no changes.
         {OfflineOnly}

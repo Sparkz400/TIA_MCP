@@ -63,14 +63,14 @@ def run(host, output, samples_path):
         begin = client.tool("artifact_upload_begin", dict(fileName="input.json", expectedBytes=len(raw),
                             sha256=hashlib.sha256(raw).hexdigest()))
         for offset in range(0, len(raw), begin["maxChunkBytes"]):
-            client.tool("artifact_upload_chunk", dict(uploadId=begin["uploadId"], offset=offset,
+            client.tool("artifact_upload_chunk", dict(uploadRef=begin["uploadRef"], offset=offset,
                         data=base64.b64encode(raw[offset:offset + begin["maxChunkBytes"]]).decode()))
-        return client.tool("artifact_upload_commit", dict(uploadId=begin["uploadId"]))
+        return client.tool("artifact_upload_commit", dict(uploadRef=begin["uploadRef"]))
 
     def uploaded_call(name, args, raw):
         receipt = upload(raw)
         result = client.tool(name, dict(args, uploadRef=receipt["artifactRef"]))
-        client.tool("artifact_upload_release", dict(uploadId=receipt["uploadId"]))
+        client.tool("artifact_upload_release", dict(uploadRef=receipt["uploadRef"]))
         return result
 
     def reject(name, args, code):

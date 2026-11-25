@@ -49,7 +49,7 @@ namespace TiaMcp.Openness.V21
                                 response = new JObject { ["protocolVersion"] = 1, ["id"] = id, ["success"] = true, ["result"] = execute(session, operation, arguments ?? new JObject()) };
                             }
                         }
-                        catch (Exception exception) { response = Error(id, exception); }
+                        catch (Exception exception) { id = id ?? RecoverRequestId(line); response = Error(id, exception); }
                         writer.WriteLine(Frame(id, operation, response));
                         // TIA caps live Openness object instances per Portal (500,000); proxies release them only when
                         // finalized, so large library walks accumulated until EngineeringOutOfMemoryException (scale run).
@@ -80,6 +80,15 @@ namespace TiaMcp.Openness.V21
 
         /// <summary>The response line. A read that does not fit is refused so the caller asks for less; a write that already
         /// happened is answered with a summary of its result instead, never with an error.</summary>
+        // A request that cannot be loaded (a repeated name, too deep, a malformed number) fails before its id is read.
+        // Answered without the id, the Host could only fault the bridge and end this worker's session; the Host writes
+        // the id second in every frame, so it is read from there and the refusal stays an ordinary InvalidRequest.
+        internal static string RecoverRequestId(string line)
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(line ?? "", "^[{]\"protocolVersion\":1,\"id\":\"([0-9A-Za-z_.-]{1,128})\"");
+            return match.Success ? match.Groups[1].Value : null;
+        }
+
         internal static string Frame(string id, string operation, JObject response)
         {
             string output = response.ToString(Formatting.None);

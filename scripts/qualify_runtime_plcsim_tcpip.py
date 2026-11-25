@@ -994,11 +994,11 @@ def keep_alive(r, stop, alive):
 
 def snapshot(r):
     """Every row of one device_inventory capture; device_identify needs a snapshot of the Host that calls it."""
-    page = r.tool("device_inventory", {"pageSize": 200, "maxVisited": 50000})
+    page = r.tool("device_inventory", {"count": 200, "maxVisited": 50000})
     coverage, rows = page["snapshot"]["coverage"], list(page["rows"])
     require(coverage["scopeComplete"] is True and coverage["truncated"] is False, "device_inventory is incomplete: %s" % coverage)
-    while page.get("nextCursor"):
-        page = r.tool("device_inventory", {"snapshotId": page["snapshot"]["snapshotId"], "cursor": page["nextCursor"], "pageSize": 200})
+    while page.get("nextOffset"):
+        page = r.tool("device_inventory", {"snapshotId": page["snapshot"]["snapshotId"], "offset": page["nextOffset"], "count": 200})
         rows += page["rows"]
     return {"snapshotId": page["snapshot"]["snapshotId"], "rows": rows}
 

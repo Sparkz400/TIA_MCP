@@ -1,17 +1,18 @@
 # Current status
 
 TIA MCP is pre-1.0; use it only with offline projects, copies, scratch projects and
-simulators you own (see the [README](../README.md)). Counts from catalog `0.4.189` (20 November 2026), computed from the catalog and the matrix on 24 November; backlog reconciled on 24 November:
+simulators you own (see the [README](../README.md)). Counts from catalog `0.5.0` (25 November 2026: the MCP surface redesign of 0.9.0 folded 27 per-family record tools into four `review_*` tools; `0.4.190` added `sim_network_mode_set`, unqualified), computed from the catalog and the matrix on 25 November (the drives row descoped the same day); backlog reconciled on 24 November, decisions of 25 November recorded:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.189` (20 November): 518 features, 477 verified, 41 unverified; 355 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 133 shipped, 344 limited, 28 unqualified, 12 unavailable on V21, 1 deferred |
-| Matrix cells | 2,184 bound, **81 open**, 72 blocked, 3 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.5.0` (25 November): 496 features, 454 verified, 42 unverified; 333 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 114 shipped, 340 limited, 29 unqualified, 12 unavailable on V21, 1 descoped (out of 1.0 scope) |
+| Matrix cells | 2,080 bound, **85 open**, 72 blocked, 3 descoped ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted; the [TODO](TODO.md) was reconciled on 24 November against catalog `0.4.189` ([ledger](plans/release-obligations-20261015.md), [acceptance rules](plans/release-acceptance.md), [earlier review](verification/release-readiness-20261103.md)) |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
-unresolved feasibility stay release blockers ([release ledger](plans/release-obligations-20261015.md)).
+unresolved feasibility stay release blockers ([release ledger](plans/release-obligations-20261015.md)). The one
+exception is a maintainer scope decision: `drives.engineering` is out of 1.0 scope since 25 November.
 
 The [3 November offline follow-up](verification/offline-backlog-20261103.md) adds selectable
 PLCSIM SingleStep capture modes, bounded Web syslog reads and a retained MCP discovery
@@ -64,8 +65,14 @@ names every row with an open cell.
   rows) are blocked and do not count toward 1.0 (decision
   of 29 October, the last seven on 1 November; each row's disposition is in the ledger). The three block-protection kinds
   left the blocked set: their credential route was built and verified on 30 October.
-- **Deferred rows:** one `not_implemented` row (`drives.engineering`, 3 cells) is not an open cell but stays 1.0
-  work ([TODO](TODO.md#deferred-rows)).
+- **Descoped rows:** the last `not_implemented` row, `drives.engineering` (3 cells), was put out of 1.0 scope by the
+  maintainer on 25 November: online access, download/upload, activation, security and safety need a physical drive
+  (B05). Its ledger disposition is a scope decision, not a V21 boundary; its cells are `descoped`, neither open nor
+  deferred, and not a pass ([TODO](TODO.md#deferred-rows)). No row is `deferred`.
+- **Maintainer decisions of 25 November:** per-attempt TLS trust stays, a PLCSIM network-mode switch tool is to be
+  built, fingerprint reuse stays off by default, the three lost library reports get a reviewer disposition and the
+  missing native recheck of the watch-owned Test Suite reopen is a stated limitation; obligation acceptance is still
+  open ([decisions](TODO.md#decisions-for-the-maintainer)).
 - **Release mechanics:** product version 0.9.0 from one source, a CHANGELOG, a draft-only
   release workflow and the 30 October security review are in place, and the contract freeze policy was accepted on 8 November;
   its enforcement, the engineering package and the release itself remain ([TODO](TODO.md#release-mechanics-and-policy)).
@@ -87,7 +94,7 @@ record is cited by a feature; records no feature cites any more are in the retir
 
 ## Recent changes
 
-Dated notes, newest first, are in the [status log](history/status-log.md); its last entry is 3 November, and the
+Dated notes, newest first, are in the [status log](history/status-log.md); it has no entry between 3 and 25 November, and the
 work since is recorded in the [TODO](TODO.md) sections it closed or opened. From 4 to 12 November the
 [offline engineering session follow-ups](TODO.md#offline-engineering-session-follow-ups-4-november) were qualified
 natively. User feedback on v0.9.0 of

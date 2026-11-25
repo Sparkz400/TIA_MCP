@@ -44,7 +44,8 @@ Requirements:
     (`SoftbusRequired`), and the discovery before `sim_create` needs Softbus, so switch *Online Access* back to
     Softbus for the other simulation work
   - `sim_status` reports `tcpIpReady`, the PLCSIM adapters with their addresses and the exact Control Panel step
-    while the mode is wrong; TIA MCP never switches the mode itself
+    while the mode is wrong. TIA MCP switches the mode only through `sim_network_mode_set`, after you agree to a
+    machine-wide change and with no PLCSIM instance registered; the adapter address stays a manual step
 - .NET 10 SDK and .NET Framework 4.8 reference assemblies
 - PowerShell 7, Python 3.13 and Node.js 24 for the development checks
 
@@ -89,7 +90,7 @@ Configure a stdio server with your actual checkout path:
 }
 ```
 
-`--toolsets` chooses which tool [groups](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md#tool-groups---toolsets) the Host advertises: name the groups you use (for example add `hmi`, `runtime`, `library`, `watch` or `diagnostics`). Without it the Host advertises only the `base` and `core` groups (sessions, projects, changes and the native reads), which keeps the tool list small; `--toolsets all` advertises every tool, about 330 and roughly 600 KB of tool definitions per session.
+`--toolsets` chooses which tool [groups](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md#tool-groups---toolsets) the Host advertises: name the groups you use (for example add `hmi`, `runtime`, `library`, `watch` or `diagnostics`). Without it the Host advertises only the `base` and `core` groups (sessions, projects, changes and the native reads), which keeps the tool list small (70 tools); `--toolsets all` advertises every tool of a default Host, 306 and roughly 250 KB of tool definitions per session. Tool names changed in 0.9.0; see the [migration table](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md#migration-to-090).
 
 Then ask the client: *Use `tia_discover` to list the available TIA Portal sessions.* For a command-line check, run `python .\scripts\smoke_mcp.py`.
 

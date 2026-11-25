@@ -42,9 +42,9 @@ def main():
         raw = value if isinstance(value, bytes) else json.dumps(value, ensure_ascii=False).encode()
         start = client.tool('artifact_upload_begin', dict(fileName='set.json', expectedBytes=len(raw), sha256=digest(raw)))
         for offset in range(0, len(raw), start['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', dict(uploadId=start['uploadId'], offset=offset,
+            client.tool('artifact_upload_chunk', dict(uploadRef=start['uploadRef'], offset=offset,
                         data=base64.b64encode(raw[offset:offset + start['maxChunkBytes']]).decode()))
-        return start['uploadId'], client.tool('artifact_upload_commit', dict(uploadId=start['uploadId']))['artifactRef']
+        return start['uploadRef'], client.tool('artifact_upload_commit', dict(uploadRef=start['uploadRef']))['artifactRef']
     def publish(value, suffix):
         raw = value if isinstance(value, bytes) else json.dumps(value, ensure_ascii=False).encode()
         identity = digest(raw)
@@ -125,13 +125,13 @@ def main():
                     after = {p.name: digest(p.read_bytes()) for p in (artifacts / 'hmi-component-reviews').iterdir()
                              if p.is_file() and p.name.endswith(('.author.json', '.candidate'))}
                     check(after == published_before, 'Whole-set conflict publishes no child authors or candidates')
-                client.tool('artifact_upload_release', dict(uploadId=upload_id))
+                client.tool('artifact_upload_release', dict(uploadRef=upload_id))
         finally:
             close(client)
         client = start()
         try:
             for case in fixture['cases']:
-                actual = client.tool('hmi_text_list_generate_set', dict(recordId=case['receipt']['recordId']))
+                actual = client.tool('hmi_text_list_generate_set', dict(recordRef=case['receipt']['recordId']))
                 check(actual == case['receipt'], 'Exact fresh Host released reopen: ' + case['label'])
                 verify(case['request'], actual, read)
             first = fixture['cases'][0]
@@ -147,7 +147,7 @@ def main():
                 record = json.loads(read(receipt['recordArtifact']))
                 record[field] = None if field == 'previousRecordId' else {} if field == 'coverage' else ['invented'] if field in ('conflicts', 'filenameTransfers') else []
                 forged = publish(record, '.text-set.json')
-                refuse(client, dict(recordId=forged['sha256']), 'Honestly rehashed coordinated record refuses: ' + field)
+                refuse(client, dict(recordRef=forged['sha256']), 'Honestly rehashed coordinated record refuses: ' + field)
             references = [receipt['input'], *[f['artifact'] for f in receipt['files']], *[f['artifact'] for f in receipt['preservedFiles']]]
             predecessor = json.loads(read(receipt['previousRecordArtifact']))
             references += [receipt['previousRecordArtifact'], predecessor['input']]
@@ -168,7 +168,7 @@ def main():
                             path.write_bytes(original + b'tampered')
                         else:
                             path.unlink()
-                        refuse(client, dict(recordId=receipt['recordId']), 'One retained input/candidate/peer/child/source ' + mode)
+                        refuse(client, dict(recordRef=receipt['recordId']), 'One retained input/candidate/peer/child/source ' + mode)
                     finally:
                         path.write_bytes(original)
             for change_input in (True, False):
@@ -184,19 +184,19 @@ def main():
                 changed_request['componentReviewId'] = changed['sha256']
                 upload_id, reference = upload(client, changed_request)
                 refuse(client, dict(uploadRef=reference), 'Honestly rehashed original/derived review chain refuses')
-                client.tool('artifact_upload_release', dict(uploadId=upload_id))
+                client.tool('artifact_upload_release', dict(uploadRef=upload_id))
             forged_prior = copy.deepcopy(predecessor)
             forged_prior['outputs'][0]['intent']['texts'][0]['translations']['en-US'] = 'fabricated prior translation'
             changed_prior = publish(forged_prior, '.text-set.json')
             changed_request = copy.deepcopy(request); changed_request['previousRecordId'] = changed_prior['sha256']
             upload_id, reference = upload(client, changed_request)
             refuse(client, dict(uploadRef=reference), 'Honestly rehashed complete predecessor link refuses fabricated original derivation')
-            client.tool('artifact_upload_release', dict(uploadId=upload_id))
+            client.tool('artifact_upload_release', dict(uploadRef=upload_id))
             removal = next(c for c in fixture['cases'] if c['label'] == 'remove all outputs preserving peer')
             changed = json.loads(read(removal['receipt']['recordArtifact'])); changed['removedOutputs'].pop()
             forged = publish(changed, '.text-set.json')
-            refuse(client, dict(recordId=forged['sha256']), 'Honestly rehashed removed predecessor omission refuses')
-            check(client.tool('hmi_text_list_generate_set', dict(recordId=receipt['recordId'])) == receipt, 'Exact original set reopens after restored controls')
+            refuse(client, dict(recordRef=forged['sha256']), 'Honestly rehashed removed predecessor omission refuses')
+            check(client.tool('hmi_text_list_generate_set', dict(recordRef=receipt['recordId'])) == receipt, 'Exact original set reopens after restored controls')
         finally:
             close(client)
         check(manifest(source) == before, 'Managed original fixture bytes remain immutable')

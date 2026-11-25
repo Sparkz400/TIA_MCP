@@ -14,16 +14,16 @@ namespace TiaMcp.Host;
 public sealed class DeviceInventoryTools(IBridgeClient bridge, HostOptions options, InventoryStore store, IInventoryIdentityFactory identityFactory)
 {
     [McpServerTool(Name = "device_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Capture or page an immutable offline device/module inventory, including BMK fields, MLFB, configured firmware, slot, IP and project paths. Omit snapshotId to capture; optional exact devicePath narrows large projects to one device. Continue with returned snapshotId/cursor. 1..200 rows and 256 KiB per page; maxVisited 100..50000. Explicit traversal and field gaps. Four bounded snapshots retained per host; export before eviction/restart. No online access.")]
+    [Description("Capture or page an immutable offline device/module inventory, including BMK fields, MLFB, configured firmware, slot, IP and project paths. Omit snapshotId to capture; optional exact devicePath narrows large projects to one device. Continue with the returned snapshotId and nextOffset as offset. count 1..200 rows and 256 KiB per page; maxVisited 100..50000. Explicit traversal and field gaps. Four bounded snapshots retained per host; export before eviction/restart. No online access.")]
     public async Task<CallToolResult> Inventory(CancellationToken cancellationToken, string? projectName = null,
-        string? snapshotId = null, string? cursor = null, int pageSize = 100, int maxVisited = 50000, string? devicePath = null)
+        string? snapshotId = null, int offset = 0, int count = 100, int maxVisited = 50000, string? devicePath = null)
     {
         try
         {
-            if (pageSize is < 1 or > 200 || maxVisited is < 100 or > 50000) throw new BridgeException("InvalidRequest", "pageSize must be 1..200 and maxVisited 100..50000.");
+            if (count is < 1 or > 200 || maxVisited is < 100 or > 50000) throw new BridgeException("InvalidRequest", "count must be 1..200 and maxVisited 100..50000.");
             if (snapshotId == null)
             {
-                if (cursor != null) throw new BridgeException("InvalidRequest", "cursor requires its snapshotId.");
+                if (offset != 0) throw new BridgeException("InvalidRequest", "offset requires its snapshotId.");
                 var result = await bridge.CallAsync("device_inventory_capture", new { projectName, maxVisited, devicePath,
                     artifactDirectory = Path.Combine(options.ArtifactsDirectory, "inventory") }, cancellationToken);
                 var artifact = result.GetProperty("artifact");
@@ -51,7 +51,7 @@ public sealed class DeviceInventoryTools(IBridgeClient bridge, HostOptions optio
                 snapshotId = snapshot.Metadata.SnapshotId;
             }
             else if (projectName != null || devicePath != null) throw new BridgeException("InvalidRequest", "Continuation uses the snapshot's captured scope; omit projectName and devicePath.");
-            return Format(store.Page(snapshotId, pageSize, cursor));
+            return Format(store.Page(snapshotId, offset, count));
         }
         catch (Exception error) when (IsExpected(error)) { return Failure(error); }
     }
@@ -72,7 +72,7 @@ public sealed class DeviceInventoryTools(IBridgeClient bridge, HostOptions optio
     }
 
     [McpServerTool(Name = "device_identify", ReadOnly = true, Destructive = false, OpenWorld = true)]
-    [Description("Read actual I&M0 MLFB, serial number, hardware revision and firmware for 1..32 explicitly mapped rows through a Siemens HTTPS controller. Requires snapshotId, controllerRowId/controllerHardwareId and bindings [{rowId,hardwareId}] from device_online_browse. Endpoint IP must match the configured controller; online names must match. Writes a new snapshot, keeping configured values separate and partial failures explicit. Supports only controllers advertising the required Web API methods and modules exposing I&M0; hardware qualification remains unverified. Optional target-bound host token record via sessionEnvironmentVariable.")]
+    [Description("Read actual I&M0 MLFB, serial number, hardware revision and firmware for 1..32 explicitly mapped rows through a Siemens HTTPS controller. Requires snapshotId, controllerRowId/controllerHardwareId and bindings [{rowId,hardwareId}] from device_online_browse. Endpoint IP and online names must match the configuration. Writes a new snapshot; partial failures explicit. Needs the required Web API methods and I&M0; hardware qualification unverified.")]
     public async Task<CallToolResult> Identify(string snapshotId, string endpoint, string controllerRowId, uint controllerHardwareId,
         InventoryBinding[] bindings, CancellationToken cancellationToken, string? sessionEnvironmentVariable = null)
     {

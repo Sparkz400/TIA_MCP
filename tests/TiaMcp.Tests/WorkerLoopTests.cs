@@ -5,6 +5,19 @@ namespace TiaMcp.Tests
 {
     internal static class WorkerLoopTests
     {
+        // The Host writes protocolVersion and id first; a frame Newtonsoft refuses (here a repeated name) must still be
+        // answered under its id, or the Host faults the bridge and the worker session ends.
+        internal static Task UnloadableRequestKeepsItsId()
+        {
+            string frame = TiaMcp.Core.BridgeProtocol.EncodeRequest("0123456789abcdef0123456789abcdef", "block_read", new { name = "A" });
+            Check.Equal("0123456789abcdef0123456789abcdef", WorkerLoop.RecoverRequestId(frame));
+            Check.Equal("0123456789abcdef0123456789abcdef", WorkerLoop.RecoverRequestId("{\"protocolVersion\":1,\"id\":\"0123456789abcdef0123456789abcdef\",\"operation\":\"x\",\"arguments\":{\"a\":1,\"a\":2}}"));
+            Check.Equal(null, WorkerLoop.RecoverRequestId("{\"id\":\"abc\"}"));
+            Check.Equal(null, WorkerLoop.RecoverRequestId("not json"));
+            Check.Equal(null, WorkerLoop.RecoverRequestId(null));
+            return Task.CompletedTask;
+        }
+
         // Only the exact Siemens exception types map to AccessDenied/LicenseUnavailable; a type name that merely contains the word does not.
         internal static Task ErrorCodesMatchExactSiemensTypes()
         {

@@ -58,7 +58,7 @@ namespace TiaMcp.AddIn
                 ["reviewId"] = reviewId, ["selectionBase64"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(HandoffJson.Write(document))) });
             var status = Exchange(discovery, new Dictionary<string, object> { ["protocolVersion"] = 1, ["action"] = "complete", ["requestId"] = requestId,
                 ["challenge"] = Text(challenge, "challenge") });
-            return "Record " + Text(Object(status["selection"]), "recordId") + ": " + references.Count + " object(s) bound to saved review " + reviewId + ". Open it with addin_selection_page.";
+            return "Record " + Text(Object(status["selection"]), "recordId") + ": " + references.Count + " object(s) bound to saved review " + reviewId + ". Open it with addin_selection_review_page.";
         }
 
         // Mirrors the worker's project-model object paths; anything else stays unsupported instead of being matched by name.

@@ -1,6 +1,7 @@
 """Keep the frozen release matrix in step with the catalog and its classification rules."""
 import unittest
 
+import collections
 import json
 import copy
 import hashlib
@@ -8,7 +9,7 @@ import pathlib
 import subprocess
 import tempfile
 
-from release_matrix import LEDGER, MATRIX, ROOT, build, disposition_errors, owners, release_gate_errors, render, support
+from release_matrix import LEDGER, MATRIX, ROOT, build, disposition_errors, owners, release_gate_errors, render, scoped, support
 
 
 def feature(implementation="implemented", qualification="verified", availability="conditional", api="available"):
@@ -30,6 +31,45 @@ class ReleaseMatrixTests(unittest.TestCase):
         self.assertEqual(support(feature("not_implemented", "unverified")), "deferred")
         self.assertEqual(support(feature("not_implemented", "unverified", "unsupported")), "deferred")
         self.assertEqual(support(feature("not_implemented", "unverified", "unsupported", "unavailable")), "unavailable_target")
+
+    def test_scope_decision_descopes_only_deferred_rows(self):
+        self.assertEqual(scoped("deferred", True), "descoped")
+        self.assertEqual(scoped("deferred", False), "deferred")
+        # A scope decision never hides bound cells or turns a V21 boundary into a scope question.
+        for base in ("shipped", "limited", "unqualified", "unavailable_target"):
+            self.assertEqual(scoped(base, True), base)
+
+    def test_descoped_cells_are_summarized_apart(self):
+        matrix = build()
+        descoped = sum(len(row["cells"]) for row in matrix["rows"] if row["support"] == "descoped")
+        self.assertEqual(matrix["summary"]["cells"].get("descoped", 0), descoped)
+        deferred = sum(len(row["cells"]) for row in matrix["rows"] if row["support"] == "deferred")
+        self.assertEqual(matrix["summary"]["cells"].get("deferred", 0), deferred)
+        # Only unqualified rows count as open work per owner; descoped rows add nothing there.
+        expected = collections.Counter()
+        for row in matrix["rows"]:
+            if row["support"] == "unqualified":
+                expected.update({owner: len(row["cells"]) for owner in row["owners"]})
+        self.assertEqual({k: v["open"] for k, v in matrix["summary"]["openCellsByOwner"].items()}, dict(expected))
+
+    def test_descoped_rows_match_scope_dispositions(self):
+        rows = [{"featureId": "a", "support": "unavailable_target"}, {"featureId": "d", "support": "descoped"},
+                {"featureId": "s", "support": "shipped"}, {"featureId": "x", "support": "deferred"}]
+        boundary, scope = {"featureId": "a", "boundary": "V21"}, {"featureId": "d", "scope": "post-1.0"}
+        self.assertEqual(disposition_errors(rows, [boundary, scope]), [])
+        cases = {
+            "descoped without a scope disposition": [boundary],
+            "descoped without a scope disposition ": [boundary, {"featureId": "d", "boundary": "V21"}],
+            "unknown disposition scope": [boundary, {"featureId": "d", "scope": "later"}],
+            "not a target boundary": [boundary, {"featureId": "d", "scope": "post-1.0", "boundary": "V21"}],
+            "blocked without a ledger disposition": [{"featureId": "a", "scope": "post-1.0"}, scope],
+            "scope disposition without a deferred row": [boundary, scope, {"featureId": "s", "scope": "post-1.0"}],
+            "ledger disposition without a blocked row": [boundary, scope, {"featureId": "x", "boundary": "V21"}],
+        }
+        for message, dispositions in cases.items():
+            with self.subTest(message=message):
+                errors = disposition_errors(rows, dispositions)
+                self.assertTrue(any(message.strip() in e for e in errors), errors)
 
     def test_owner_comes_from_ledger_then_longest_prefix(self):
         self.assertEqual(owners("block_read", {"block_read": ["X11"]}), ["X11"])
@@ -59,6 +99,11 @@ class ReleaseMatrixTests(unittest.TestCase):
         self.assertEqual(release_gate_errors("0.9.0", {"releaseReady": False, "obligations": []}, matrix), [])
         self.assertEqual(len(release_gate_errors("1.0.0", {"releaseReady": False, "obligations": accepted}, matrix)), 3)
         self.assertEqual(release_gate_errors("1.0.0", {"releaseReady": True, "obligations": accepted}, done), [])
+        # Descoped and blocked cells carry a maintainer disposition and do not hold 1.0; deferred ones do.
+        disposed = {"summary": {"cells": {"bound": 9, "blocked": 2, "descoped": 3}}}
+        self.assertEqual(release_gate_errors("1.0.0", {"releaseReady": True, "obligations": accepted}, disposed), [])
+        self.assertEqual(release_gate_errors("1.0.0", {"releaseReady": True, "obligations": accepted},
+                                             {"summary": {"cells": {"bound": 9, "deferred": 3}}}), ["3 deferred cells"])
         # A set flag cannot bypass an unaccepted obligation (audit of 1 November).
         pending = accepted + [{"id": "F02", "releaseObligation": True, "releaseAccepted": False}]
         self.assertEqual(release_gate_errors("1.0.0", {"releaseReady": True, "obligations": pending}, done),
@@ -81,7 +126,8 @@ class ReleaseMatrixTests(unittest.TestCase):
             (root / "src/probe.txt").write_text("frozen\n", encoding="utf-8")
             matrix = {"summary": {"cells": {"bound": 1, "blocked": 1}}, "rows": [
                 {"featureId": "implemented", "owners": ["F00"], "support": "shipped", "evidenceIds": ["proof"]},
-                {"featureId": "boundary", "owners": ["F00"], "support": "unavailable_target", "evidenceIds": []}],
+                {"featureId": "boundary", "owners": ["F00"], "support": "unavailable_target", "evidenceIds": []},
+                {"featureId": "later", "owners": ["F00"], "support": "descoped", "evidenceIds": []}],
                 "evidence": [{"id": "proof", "retained": [{"sha256": "a" * 64}]}]}
             target = root / MATRIX
             target.parent.mkdir(parents=True)
@@ -90,17 +136,20 @@ class ReleaseMatrixTests(unittest.TestCase):
             git("-c", "user.name=Gate test", "-c", "user.email=gate@example.invalid", "commit", "-qm", "candidate")
             record = {"date": "2026-11-02", "acceptedBy": "maintainer", "commit": git("rev-parse", "HEAD"),
                       "matrixSha256": hashlib.sha256(target.read_bytes()).hexdigest(), "evidenceIds": ["proof"],
-                      "dispositions": ["boundary"], "blockers": {"B01": "resolved"}, "limitations": []}
-            ledger = {"releaseReady": True, "dispositions": [{"featureId": "boundary"}], "obligations": [
+                      "dispositions": ["boundary", "later"], "blockers": {"B01": "resolved"}, "limitations": []}
+            ledger = {"releaseReady": True, "dispositions": [{"featureId": "boundary"}, {"featureId": "later", "scope": "post-1.0"}], "obligations": [
                 {"id": "F00", "releaseObligation": True, "releaseAccepted": True, "blockers": ["B01"], "acceptance": record}]}
             self.assertEqual(release_gate_errors("1.0.0", ledger, matrix, root), [])
             for key, value in [("date", "not-a-date"), ("acceptedBy", "agent"), ("commit", "0" * 40),
                                ("matrixSha256", "b" * 64), ("evidenceIds", []), ("evidenceIds", ["invented"]),
-                               ("dispositions", []), ("blockers", {}), ("limitations", "none")]:
+                               ("dispositions", []), ("dispositions", ["boundary"]), ("blockers", {}), ("limitations", "none")]:
                 with self.subTest(key=key, value=value):
                     invalid = copy.deepcopy(ledger)
                     invalid["obligations"][0]["acceptance"][key] = value
                     self.assertTrue(release_gate_errors("1.0.0", invalid, matrix, root))
+            undecided = copy.deepcopy(ledger)
+            undecided["dispositions"] = undecided["dispositions"][:1]
+            self.assertIn("has no ledger disposition", release_gate_errors("1.0.0", undecided, matrix, root)[0])
             changed = copy.deepcopy(matrix)
             changed["rows"][0]["support"] = "limited"
             self.assertIn("owned matrix rows changed", release_gate_errors("1.0.0", ledger, changed, root)[0])

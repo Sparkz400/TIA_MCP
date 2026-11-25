@@ -30,14 +30,19 @@ whether a change needs a major, minor or patch release. A version tag builds a *
    ```
 
 5. [`release.yml`](../../.github/workflows/release.yml) refuses a tag whose commit has no
-   successful offline and Explorer workflow run, then a read-only `build` job builds the offline bundle with
+   successful Explorer run or no successful non-pull-request offline run in which the Python, package and OPC UA jobs
+   ran (a docs-only push skips them; start a full one with `gh workflow run offline.yml --ref vX.Y.Z`), then a read-only `build` job builds the offline bundle with
    `scripts/Package.ps1 -Offline`, verifies it with `scripts/Verify-TiaMcpBundle.ps1 -Strict`,
    refuses a tag that differs from the bundle's `productVersion` or a CHANGELOG without its
    section, and, from 1.0 on, refuses unless the release ledger says `releaseReady`, every release obligation in it is
    accepted and the matrix has no open or deferred cell (`scripts/release_matrix.py --release-gate`), and refuses a
    bundled Host whose surface breaks the frozen baseline `contracts/mcp-surface.v1.json`
    (`scripts/mcp_surface.py check`; re-cut it on the release candidate with `cut`). It uploads
-   the ZIP, its `.zip.sha256`, the manifest and the notes as a workflow artifact. A separate
+   the ZIP, its `.zip.sha256`, the manifest and the notes as a workflow artifact. An `attest` job records build
+   provenance for the ZIP (`gh attestation verify <zip> --repo Sparkz400/TIA_MCP`). The same job attests an SPDX SBOM of the ZIP's contents, attached to
+   the draft as `<bundle>.spdx.json` (`gh attestation verify <zip> --repo Sparkz400/TIA_MCP --predicate-type
+   https://spdx.dev/Document/v2.3`). The bundle carries no Authenticode signature: the project has no code-signing
+   certificate, so the hash list, provenance and SBOM attestations are the integrity evidence. A separate
    `draft` job, the only one with a write token, checks the ZIP against its hash, expands it and
    runs `Verify-TiaMcpBundle.ps1 -Strict` on the expanded ZIP, then creates a draft release
    (marked pre-release before 1.0) using the CHANGELOG section as notes. It never publishes.

@@ -386,6 +386,8 @@ if (args.Length == 2 && args[0] == "--schema-dir")
 }
 else if (args.Length != 0) { Console.Error.WriteLine("Usage: [--schema-dir installed-schema-directory]"); return 2; }
 
+Test("seeded mutations are read or refused", () => Console.WriteLine(RobustnessChecks.Run(name => Fixture(name))));
+
 int failed = RunTests(tests, failuresToStderr: true);
 Console.WriteLine($"{tests.Count - failed}/{tests.Count} passed. Generated review artifacts: {generated}");
 Console.WriteLine("Native evidence checks cover the recorded V21 fixtures; arbitrary input documents are not certified.");

@@ -126,5 +126,6 @@ Directory.CreateDirectory(Path.Combine(output,"automationml-workflow",new string
 Check(Json(store.List()).GetProperty("rows").EnumerateArray().Any(r=>Text(r,"state")=="incomplete"),"incomplete publication discoverable");
 File.AppendAllText(Path.Combine(output,"automationml-workflow",beforeRef.Split(':')[1],"report.json")," ");
 Check(Json(store.List()).GetProperty("rows").EnumerateArray().Any(r=>Text(r,"state")=="integrity-failed"),"tampered report discoverable");
+Check(true, RobustnessChecks.Run());
 File.WriteAllText(Path.Combine(output,"verification.json"),JsonSerializer.Serialize(new {passed=true,checks,nativeExecuted=false,inputs},BridgeProtocol.Json));
 Console.WriteLine($"{checks} AutomationML parser/comparison/workflow checks passed; no Siemens execution.");

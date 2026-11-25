@@ -75,7 +75,7 @@ namespace TiaMcp.Openness.V21
 
         private static void RequireHmiEngineeringGate(JObject gate, JObject evidence)
         {
-            if (!gate.Value<bool>("available")) throw new BridgeException(gate.Value<string>("reasonCode"), gate.Value<string>("reason"), evidence);
+            if (!gate.Value<bool>("available")) throw new BridgeException(gate.Value<string>("reasonCode"), gate.Value<string>("reason"), HmiPreservationRemediation.With(evidence, HmiPreservationRemediation.Gate));
         }
 
         private JObject CaptureHmiEngineeringScope(EngineeringChange change, Project project, string stage)
@@ -300,16 +300,16 @@ namespace TiaMcp.Openness.V21
         private static void RequireHmiScope(EngineeringChange change, JObject manifest)
         {
             if (manifest?["nativeFailure"] is JObject failure)
-                throw new BridgeException("HmiPreservationUnavailable", "HMI preservation capture failed: " + failure.Value<string>("message"), manifest);
+                throw new BridgeException("HmiPreservationUnavailable", "HMI preservation capture failed: " + failure.Value<string>("message"), HmiPreservationRemediation.With(manifest, HmiPreservationRemediation.CaptureFailed));
             if (HmiEngineeringRules.StandingNotes(change.Kind) == null) { RequireHmiCompleteScope(manifest); return; }
             if (!HmiEngineeringRules.ScopeAccepted(change.Kind, manifest) || manifest.Value<string>("contentHash") != manifest.Value<string>("observedArtifactsHash"))
-                throw new BridgeException("HmiPreservationUnavailable", "The capture has coverage gaps beyond the standing notes of " + change.Kind + " (typed read errors, a capture failure or an HMI of the other family); no " + change.Kind + " change is authorized.", manifest);
+                throw new BridgeException("HmiPreservationUnavailable", "The capture has coverage gaps beyond the standing notes of " + change.Kind + " (typed read errors, a capture failure or an HMI of the other family); no " + change.Kind + " change is authorized.", HmiPreservationRemediation.With(manifest, HmiPreservationRemediation.CoverageGaps));
         }
 
         private static void RequireHmiCompleteScope(JObject manifest)
         {
             if (manifest == null || !manifest.Value<bool>("complete") || string.IsNullOrWhiteSpace(manifest.Value<string>("contentHash")))
-                throw new BridgeException("HmiPreservationUnavailable", "Complete family-specific native preservation coverage is required; partial exports and metadata cannot authorize an HMI change.", manifest);
+                throw new BridgeException("HmiPreservationUnavailable", "Complete family-specific native preservation coverage is required; partial exports and metadata cannot authorize an HMI change.", HmiPreservationRemediation.With(manifest, HmiPreservationRemediation.CompleteCoverage));
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]

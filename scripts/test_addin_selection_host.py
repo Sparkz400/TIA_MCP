@@ -56,8 +56,8 @@ def main():
     def upload(client, data):
         status = client.tool('artifact_upload_begin', dict(fileName='selection.json', expectedBytes=len(data), sha256=hashlib.sha256(data).hexdigest()))
         for offset in range(0, len(data), status['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', dict(uploadId=status['uploadId'], offset=offset, data=base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()))
-        return client.tool('artifact_upload_commit', dict(uploadId=status['uploadId']))
+            client.tool('artifact_upload_chunk', dict(uploadRef=status['uploadRef'], offset=offset, data=base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()))
+        return client.tool('artifact_upload_commit', dict(uploadRef=status['uploadRef']))
     def read(client, reference):
         chunks, offset = [], 0
         while True:
@@ -77,7 +77,7 @@ def main():
     try:
         client = start()
         try:
-            check({'addin_selection_review', 'addin_selection_page'} <= {t['name'] for t in client.request('tools/list')['tools']}, 'Both portable tools registered')
+            check({'addin_selection_review', 'addin_selection_review_page'} <= {t['name'] for t in client.request('tools/list')['tools']}, 'Both portable tools registered')
             source = upload(client, review_bytes)
             saved = client.tool('project_snapshot_import', dict(uploadRef=source['artifactRef']))
             check(saved['reviewId'] == review_id, 'Exact saved review bytes imported')
@@ -96,7 +96,7 @@ def main():
             check(not result['producerAuthenticated'] and not result['nativeExecutable'] and not result['liveSelectionVerified'], 'Declared producer and historical metadata cannot authorize native work')
             rows = []
             for offset in range(2):
-                page = client.tool('addin_selection_page', dict(recordId=receipt['recordId'], section='selections', offset=offset, count=1))
+                page = client.tool('addin_selection_review_page', dict(recordRef=receipt['recordId'], section='selections', offset=offset, count=1))
                 validate(page, 'page')
                 rows.extend(r['value'] for r in page['rows'])
             check(rows == result['selections'], 'Bounded pages reproduce full ordered selection')
@@ -123,19 +123,19 @@ def main():
             try: validate(adversary, 'record')
             except ValidationError: check(True, 'Output schema refuses authentication claims')
             else: raise AssertionError('Schema authenticated a supplied producer')
-            refuse(client, 'addin_selection_page', dict(recordId=receipt['recordId'], section='execute'), 'InvalidRequest')
-            client.tool('artifact_upload_release', dict(uploadId=incoming['uploadId']))
+            refuse(client, 'addin_selection_review_page', dict(recordRef=receipt['recordId'], section='execute'), 'InvalidRequest')
+            client.tool('artifact_upload_release', dict(uploadRef=incoming['uploadRef']))
         finally:
             close(client)
         client = start()
         try:
-            check(client.tool('addin_selection_page', dict(recordId=receipt['recordId'])) == receipt, 'Fresh Host reopens after original upload release')
+            check(client.tool('addin_selection_review_page', dict(recordRef=receipt['recordId'])) == receipt, 'Fresh Host reopens after original upload release')
             path = artifacts / receipt['input']['path']; original = path.read_bytes()
             try:
                 path.write_bytes(original + b' ')
-                refuse(client, 'addin_selection_page', dict(recordId=receipt['recordId']), 'ArtifactChanged')
+                refuse(client, 'addin_selection_review_page', dict(recordRef=receipt['recordId']), 'ArtifactChanged')
             finally: path.write_bytes(original)
-            check(client.tool('addin_selection_page', dict(recordId=receipt['recordId'])) == receipt, 'Restored exact bytes restore observation only')
+            check(client.tool('addin_selection_review_page', dict(recordRef=receipt['recordId'])) == receipt, 'Restored exact bytes restore observation only')
         finally:
             close(client)
         report['completed'] = True

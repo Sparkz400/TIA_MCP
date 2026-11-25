@@ -69,7 +69,7 @@ def run(host, artifacts):
                                                     "sha256": hashlib.sha256(data).hexdigest()})
 
     def chunk(identifier, offset, data):
-        return client.tool("artifact_upload_chunk", {"uploadId": identifier, "offset": offset,
+        return client.tool("artifact_upload_chunk", {"uploadRef": identifier, "offset": offset,
                                                     "data": base64.b64encode(data).decode("ascii")})
 
     try:
@@ -87,25 +87,25 @@ def run(host, artifacts):
                           ("Siemens-example/Code/Example.scl", "FUNCTION Example : Bool\nEND_FUNCTION"),
                           ("Siemens-example/install.cmd", "This text must never execute")])
         started = begin("example.zip", data)
-        identifier = started["uploadId"]
+        identifier = started["uploadRef"]
         split = len(data) // 2
         received = chunk(identifier, 0, data[:split])
         require(received["receivedBytes"] == split, "Chunk progress incorrect")
         client.close()
         require(client.process.returncode == 0, "First host did not exit normally")
         client = connect()
-        resumed = client.tool("artifact_upload_status", {"uploadId": identifier})
+        resumed = client.tool("artifact_upload_status", {"uploadRef": identifier})
         require(resumed["receivedBytes"] == split, "Host restart lost upload progress")
         repeated = chunk(identifier, 0, data[:split])
         require(repeated["receivedBytes"] == split, "Repeated chunk incorrectly advanced progress")
         record("restart and byte-identical retry", repeated)
-        record("incomplete commit rejected", failure("artifact_upload_commit", {"uploadId": identifier}, "UploadIncomplete"))
+        record("incomplete commit rejected", failure("artifact_upload_commit", {"uploadRef": identifier}, "UploadIncomplete"))
         chunk(identifier, split, data[split:])
-        committed = client.tool("artifact_upload_commit", {"uploadId": identifier})
-        again = client.tool("artifact_upload_commit", {"uploadId": identifier})
+        committed = client.tool("artifact_upload_commit", {"uploadRef": identifier})
+        again = client.tool("artifact_upload_commit", {"uploadRef": identifier})
         require(committed["artifactRef"] == again["artifactRef"], "Commit retry changed artifact")
         record("complete upload hash and repeated commit", committed)
-        package = client.tool("library_package_stage", {"artifactRef": committed["artifactRef"]})
+        package = client.tool("library_package_stage", {"uploadRef": committed["artifactRef"]})
         package_id = package["packageId"]
         candidates = []
         offset = 0
@@ -123,7 +123,7 @@ def run(host, artifacts):
         docs = client.tool("library_package_inspect", {"packageId": package_id, "section": "documents"})
         require(any("README" in item for item in docs["items"]), "Documentation omitted")
         record("documentation retained", docs)
-        record("release committed upload after independent staging", client.tool("artifact_upload_release", {"uploadId": identifier}))
+        record("release committed upload after independent staging", client.tool("artifact_upload_release", {"uploadRef": identifier}))
         client.close()
         client = connect()
         status = client.tool("library_package_status", {"packageId": package_id})
@@ -133,9 +133,9 @@ def run(host, artifacts):
 
         hostile = zip_bytes([("../escaped.txt", "must stay inside package")])
         upload = begin("hostile.zip", hostile)
-        chunk(upload["uploadId"], 0, hostile)
-        committed_bad = client.tool("artifact_upload_commit", {"uploadId": upload["uploadId"]})
-        record("ZIP traversal rejected through MCP", failure("library_package_stage", {"artifactRef": committed_bad["artifactRef"]}, "PackageInvalid"))
+        chunk(upload["uploadRef"], 0, hostile)
+        committed_bad = client.tool("artifact_upload_commit", {"uploadRef": upload["uploadRef"]})
+        record("ZIP traversal rejected through MCP", failure("library_package_stage", {"uploadRef": committed_bad["artifactRef"]}, "PackageInvalid"))
         require(not (directory / "library-intake" / "escaped.txt").exists(), "ZIP traversal escaped its root")
         report["completed"] = True
     except Exception as error:

@@ -21,25 +21,26 @@ InventoryRow Row(int i) => new("/devices/d/items/" + i, "Module " + i, "Station"
 var coverage = new InventoryCoverage(true, false, 30000, 50000, []);
 var store = new InventoryStore();
 var snapshot = store.Capture(Enumerable.Range(0, 30000).Select(Row), "project.ap21", coverage, DateTimeOffset.UtcNow);
-var seen = new HashSet<string>(); string? cursor = null; int pages = 0;
+var seen = new HashSet<string>(); int? offset = 0; int pages = 0;
 do
 {
-    var page = store.Page(snapshot.Metadata.SnapshotId, 173, cursor);
+    var page = store.Page(snapshot.Metadata.SnapshotId, offset.Value, 173);
     Check(page.Offset == seen.Count && page.Rows.Length <= 173, "Contiguous bounded pages");
     foreach (var row in page.Rows) Check(seen.Add(row.RowId), "No duplicated rows");
-    cursor = page.NextCursor; pages++;
-} while (cursor != null);
+    offset = page.NextOffset; pages++;
+} while (offset != null);
 Check(seen.Count == 30000 && pages > 170, "Large inventory was not silently truncated");
-var first = store.Page(snapshot.Metadata.SnapshotId, 1);
-var replay = store.Page(snapshot.Metadata.SnapshotId, 1, first.NextCursor);
-Check(replay.Rows.Single().Name == "Module 1", "Cursor replay");
-Fails(() => store.Page(snapshot.Metadata.SnapshotId, 1, first.NextCursor + "x"), "InvalidCursor");
-Fails(() => store.Page(snapshot.Metadata.SnapshotId, 0), "InvalidRequest");
+var first = store.Page(snapshot.Metadata.SnapshotId, count: 1);
+var replay = store.Page(snapshot.Metadata.SnapshotId, first.NextOffset!.Value, 1);
+Check(replay.Rows.Single().Name == "Module 1", "Offset replay");
+Fails(() => store.Page(snapshot.Metadata.SnapshotId, 30001, 1), "InvalidCursor");
+Fails(() => store.Page(snapshot.Metadata.SnapshotId, -1, 1), "InvalidCursor");
+Fails(() => store.Page(snapshot.Metadata.SnapshotId, count: 0), "InvalidRequest");
 var other = store.Capture([Row(7)], "project.ap21", coverage, DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(2)));
 Check(other.Metadata.CapturedAtUtc.Offset == TimeSpan.Zero, "Capture UTC label matches the timestamp offset");
-Fails(() => store.Page(other.Metadata.SnapshotId, 1, first.NextCursor), "InvalidCursor");
+Fails(() => store.Page(other.Metadata.SnapshotId, 2, 1), "InvalidCursor");
 first.Rows[0].Configured["mlfb"] = InventoryField.Read("tampered", "test");
-Check(store.Page(snapshot.Metadata.SnapshotId, 1).Rows[0].Configured["mlfb"].State == "notExposed", "Page cannot mutate snapshot");
+Check(store.Page(snapshot.Metadata.SnapshotId, count: 1).Rows[0].Configured["mlfb"].State == "notExposed", "Page cannot mutate snapshot");
 Fails(() => store.Capture([Row(1), Row(1)], "project.ap21", coverage, DateTimeOffset.UtcNow), "InventoryDuplicateIdentity");
 var row1 = Row(1); row1.Configured["mlfb"] = InventoryField.Read("6ES7 151-1AA00", "project"); row1.Configured["firmware"] = InventoryField.Read("V4.1", "project");
 row1 = row1 with { Actual = new() { ["mlfb"] = InventoryField.Read("6ES7151-1AA00", "online"), ["firmware"] = InventoryField.Read("V4.1.0", "online"),
@@ -146,7 +147,7 @@ using (var zip = ZipFile.OpenRead(xlsx.GetProperty("artifact").GetProperty("path
 // Host behavior with absent native workers: errors before network or worker activity, and snapshot export.
 var bridge = new RejectBridge(); var options = new HostOptions("missing", output, null, 10, false, "missing", null);
 var tools = new DeviceInventoryTools(bridge, options, store, new SiemensWebIdentityFactory());
-var badPage = await tools.Inventory(default, pageSize: 0); Check(badPage.IsError == true && bridge.Calls == 0, "Validate before worker dispatch");
+var badPage = await tools.Inventory(default, count: 0); Check(badPage.IsError == true && bridge.Calls == 0, "Validate before worker dispatch");
 var badBinding = await tools.Identify(exportSnapshot.Metadata.SnapshotId, "https://192.0.2.10", row1.RowId, 1, [new(row1.RowId, 1)], default);
 Check(badBinding.IsError == true, "Non-CPU controller is rejected before network access");
 Check(tools.Export(exportSnapshot.Metadata.SnapshotId, "xlsx").IsError != true, "Host export route");
@@ -374,7 +375,8 @@ foreach (var (tool, schema) in outputSchemas)
     var text = schema.GetRawText();
     Check(schema.GetProperty("type").GetString() == "object" && schema.GetProperty("anyOf").EnumerateArray().Any(a => a.TryGetProperty("$ref", out var r) && r.GetString() == "#/$defs/error")
         && schema.GetProperty("$defs").TryGetProperty("error", out _), tool + " schema admits the refusal envelope");
-    Check(!text.Contains("\"prefixItems\"") && !Regex.IsMatch(text, "\"\\$ref\":\"(?!#/\\$defs/)"), tool + " schema has only local references and no prefixItems");
+    // review_* schemas per record kind (tool.kind) are served only as tia://output-schemas resources, read by 2020-12 validators.
+    Check((tool.Contains('.') || !text.Contains("\"prefixItems\"")) &&!Regex.IsMatch(text, "\"\\$ref\":\"(?!#/\\$defs/)"), tool + " schema has only local references and no prefixItems");
 }
 var wrapped = ToolSurface.WithError(JsonDocument.Parse("{\"type\":\"object\",\"properties\":{\"self\":{\"$ref\":\"#\"}}}").RootElement);
 Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties").GetProperty("self").GetProperty("$ref").GetString() == "#/$defs/result"
@@ -610,6 +612,27 @@ Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties
     var unusedOnly = TagUsageScan.Report(tags, uses, true);
     Check(unusedOnly["tags"]!.AsArray().Count == 1 && unusedOnly["tags"]![0]!["name"]!.GetValue<string>() == "iSpare" && unusedOnly["summary"]!["ioTags"]!.GetValue<int>() == 4, "unusedOnly keeps only unreferenced tags and the full summary");
 }
+// plc_tag_usage index files: inside the artifact root, not through links, size-capped before reading, and typed refusals.
+{
+    var usageRoot = Path.Combine(output, "tag-usage"); var exports = Path.Combine(usageRoot, "exports"); var usageOutside = Path.Combine(output, "tag-usage-outside");
+    Directory.CreateDirectory(exports); Directory.CreateDirectory(usageOutside);
+    File.WriteAllText(Path.Combine(exports, "block-a.xml"), "<Document />"); File.WriteAllText(Path.Combine(usageOutside, "block-b.xml"), "<Document />");
+    string Index(string name, object content) { var path = Path.Combine(exports, name); File.WriteAllText(path, JsonSerializer.Serialize(content)); return path; }
+    var good = Index("block-export-1.json", new { directory = exports, blocks = new object[] { new { name = "A", xml = "block-a.xml" }, new { name = "Gone", xml = "missing.xml" },
+        new { name = "Escapes", xml = Path.Combine(usageOutside, "block-b.xml") }, new { name = "NoFile" }, 7 } });
+    var (files, skipped) = TagUsageScan.IndexFiles(usageRoot, good + ", " + Path.GetRelativePath(usageRoot, good));
+    Check(files.Count == 2 && files.All(f => f == Path.Combine(exports, "block-a.xml")) && skipped.SequenceEqual(new[] { "Gone", "Escapes", "NoFile", "?", "Gone", "Escapes", "NoFile", "?" }),
+        "An index lists its block files; missing rows and rows outside the artifact directory are skipped by name");
+    Fails(() => TagUsageScan.IndexFiles(usageRoot, Path.Combine(usageOutside, "block-b.xml")), "ArtifactPathDenied");
+    Fails(() => TagUsageScan.IndexFiles(usageRoot, Path.Combine(exports, "absent.json")), "ArtifactUnavailable");
+    Fails(() => TagUsageScan.IndexFiles(usageRoot, Path.Combine(exports, "block-a.xml")), "InvalidRequest");
+    Fails(() => TagUsageScan.IndexFiles(usageRoot, Index("not-index.json", new { blocks = 1 })), "InvalidRequest");
+    Fails(() => TagUsageScan.IndexFiles(usageRoot, Index("bad-directory.json", new { directory = 5, blocks = Array.Empty<object>() })), "InvalidRequest");
+    var large = Path.Combine(exports, "backup.bin");
+    using (var stream = File.Create(large)) stream.SetLength(TagUsageScan.MaxIndexBytes + 1);
+    Fails(() => TagUsageScan.IndexFiles(usageRoot, large), "InvalidRequest");
+    File.Delete(large);
+}
 // Resources read through the artifact-root and link checks of artifact_read; completion lists names only, never through links.
 var resourceRoot = Path.Combine(output, "resources");
 var outside = Path.Combine(output, "outside");
@@ -670,10 +693,19 @@ Directory.Delete(link);
 {
     var overBudget = typeof(ToolSurface).Assembly.GetTypes().SelectMany(type => type.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
         .Where(method => System.Reflection.CustomAttributeExtensions.GetCustomAttribute<ModelContextProtocol.Server.McpServerToolAttribute>(method) is not null
-            && System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>(method) is { Description.Length: > 1900 })
+            && System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>(method) is { Description.Length: > 600 })
         .Select(method => method.Name + "=" + System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>(method)!.Description.Length).ToArray();
-    Check(overBudget.Length == 0, "Tool descriptions stay within 1900 characters: " + string.Join(", ", overBudget));
+    Check(overBudget.Length == 0, "Tool descriptions stay within 600 characters: " + string.Join(", ", overBudget));
 }
+// MCP tool wrappers against fake bridges and a scripted GraphQL server: no worker, PLC or runtime; the Unified login reads a
+// current-user vault created under the output directory, never the user's own vault.
+int beforeWrappers = checks;
+await PhysicalPlcToolChecks.Run(Check, Path.Combine(output, "physical-plc-host"));
+int afterPhysical = checks;
+await UnifiedRuntimeToolChecks.Run(Check, Path.Combine(output, "unified-vaults"));
+int afterUnified = checks;
+await WrapperToolChecks.Run(Check, Path.Combine(output, "wrapper-host"));
+Console.WriteLine($"PASS Host tool wrappers: {afterPhysical - beforeWrappers} plc_physical_*, {afterUnified - afterPhysical} runtime_unified_*, {checks - afterUnified} composite/drive checks.");
 Console.WriteLine("Export artifacts: " + output);
 Console.WriteLine($"PASS Inventory: {checks} checks, 30000 rows / {pages} pages; protocol fixtures, exports and host guards. No physical hardware qualification.");
 

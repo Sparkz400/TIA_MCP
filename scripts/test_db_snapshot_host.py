@@ -47,8 +47,8 @@ def main():
     def upload(client, data):
         status = client.tool('artifact_upload_begin', {'fileName': 'supplied.json', 'expectedBytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()})
         for offset in range(0, len(data), status['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', {'uploadId': status['uploadId'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
-        return client.tool('artifact_upload_commit', {'uploadId': status['uploadId']})
+            client.tool('artifact_upload_chunk', {'uploadRef': status['uploadRef'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
+        return client.tool('artifact_upload_commit', {'uploadRef': status['uploadRef']})
     def read(client, reference):
         chunks, offset = [], 0
         while True:
@@ -86,7 +86,7 @@ def main():
             for section, expected in (('beforeValues', result['before']['values']), ('afterValues', result['after']['values']), ('changes', result['changes'])):
                 rows, offset = [], 0
                 while True:
-                    page = client.tool('db_snapshot_review_page', {'recordId': receipt['recordId'], 'section': section, 'offset': offset, 'count': 1})
+                    page = client.tool('db_snapshot_review_page', {'recordRef': receipt['recordId'], 'section': section, 'offset': offset, 'count': 1})
                     validate(page, 'page')
                     rows.extend(row['value'] for row in page['rows'])
                     if page['nextOffset'] is None: break
@@ -101,18 +101,18 @@ def main():
                 try: validate(adversary, 'record')
                 except ValidationError: check(True, 'Schema refuses ' + flag)
                 else: raise AssertionError('Unsupported claim accepted')
-            refuse(client, 'db_snapshot_review_page', {'recordId': receipt['recordId'], 'section': 'changes', 'offset': 100}, 'InvalidRequest')
+            refuse(client, 'db_snapshot_review_page', {'recordRef': receipt['recordId'], 'section': 'changes', 'offset': 100}, 'InvalidRequest')
             refuse(client, 'db_snapshot_review', {**arguments, 'objectPath': fixture['objectPath'].replace('CPU', 'OtherCPU')}, 'InvalidDbSnapshot')
             invalid = upload(client, before.replace(b'Path="Large"', b'Path="Flag"'))
             refuse(client, 'db_snapshot_review', {**arguments, 'uploadRef': invalid['artifactRef']}, 'InvalidDbSnapshot')
             malformed = upload(client, b'<Document>')
             refuse(client, 'db_snapshot_review', {**arguments, 'uploadRef': malformed['artifactRef']}, 'DbSnapshotReviewFailed')
             for item in (incoming, comparison, saved, invalid, malformed):
-                client.tool('artifact_upload_release', {'uploadId': item['uploadId']})
+                client.tool('artifact_upload_release', {'uploadRef': item['uploadRef']})
         finally: close(client)
         client = start()
         try:
-            check(client.tool('db_snapshot_review_page', {'recordId': receipt['recordId']}) == receipt, 'Restart and upload release preserve receipt')
+            check(client.tool('db_snapshot_review_page', {'recordRef': receipt['recordId']}) == receipt, 'Restart and upload release preserve receipt')
             check(read(client, receipt['input']) == before, 'Original bytes survive restart')
             for key in ('input', 'comparisonInput', 'reportArtifact'):
                 path = (artifacts / receipt[key]['path']).resolve()
@@ -120,9 +120,9 @@ def main():
                 original = path.read_bytes()
                 try:
                     path.write_bytes(b'corrupted')
-                    refuse(client, 'db_snapshot_review_page', {'recordId': receipt['recordId']}, 'ArtifactChanged')
+                    refuse(client, 'db_snapshot_review_page', {'recordRef': receipt['recordId']}, 'ArtifactChanged')
                 finally: path.write_bytes(original)
-            check(client.tool('db_snapshot_review_page', {'recordId': receipt['recordId']}) == receipt, 'Restored exact bytes reopen without mutation replay')
+            check(client.tool('db_snapshot_review_page', {'recordRef': receipt['recordId']}) == receipt, 'Restored exact bytes reopen without mutation replay')
         finally: close(client)
         report['completed'] = True
     finally:

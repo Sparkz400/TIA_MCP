@@ -60,8 +60,8 @@ def main():
     def upload(client, data):
         status = client.tool('artifact_upload_begin', {'fileName': 'supplied.json', 'expectedBytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()})
         for offset in range(0, len(data), status['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', {'uploadId': status['uploadId'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
-        return client.tool('artifact_upload_commit', {'uploadId': status['uploadId']})
+            client.tool('artifact_upload_chunk', {'uploadRef': status['uploadRef'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
+        return client.tool('artifact_upload_commit', {'uploadRef': status['uploadRef']})
     def read(client, reference):
         chunks, offset = [], 0
         while True:
@@ -100,7 +100,7 @@ def main():
             check(not result['signatureVerified'] and not result['chainVerified'] and not result['endpointAuthenticated'], 'Parsing does not establish trust')
             rows, offset = [], 0
             while True:
-                page = client.tool('public_certificate_review_page', {'recordId': receipt['recordId'], 'section': 'observations', 'offset': offset, 'count': 1})
+                page = client.tool('public_certificate_review_page', {'recordRef': receipt['recordId'], 'section': 'observations', 'offset': offset, 'count': 1})
                 validate(page, 'page')
                 rows.extend(row['value'] for row in page['rows'])
                 if page['nextOffset'] is None: break
@@ -111,7 +111,7 @@ def main():
             try: validate(adversary, 'record')
             except ValidationError: check(True, 'Output schema cannot certify native qualification')
             else: raise AssertionError('Native claim accepted')
-            refuse(client, 'public_certificate_review_page', {'recordId': receipt['recordId'], 'section': 'observations', 'offset': 100}, 'InvalidRequest')
+            refuse(client, 'public_certificate_review_page', {'recordRef': receipt['recordId'], 'section': 'observations', 'offset': 100}, 'InvalidRequest')
             retained = artifacts / 'public-certificate-reviews'
             def files():
                 return {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in retained.iterdir() if p.is_file()}
@@ -154,11 +154,11 @@ def main():
             missing = client.tool('public_certificate_review', {'request': unknown})
             validate(missing, 'receipt')
             check(missing['summary']['samePublicCertificate'] is None and missing['summary']['unavailableCount'] == 1, 'Unavailable bytes remain unknown')
-            client.tool('artifact_upload_release', {'uploadId': saved['uploadId']})
+            client.tool('artifact_upload_release', {'uploadRef': saved['uploadRef']})
         finally: close(client)
         client = start()
         try:
-            check(client.tool('public_certificate_review_page', {'recordId': receipt['recordId']}) == receipt, 'Restart and source upload release preserve receipt')
+            check(client.tool('public_certificate_review_page', {'recordRef': receipt['recordId']}) == receipt, 'Restart and source upload release preserve receipt')
             check(json.loads(read(client, receipt['input'])) == packet, 'Original public content survives restart')
             for key in ('input', 'reportArtifact'):
                 path = (artifacts / receipt[key]['path']).resolve()
@@ -166,9 +166,9 @@ def main():
                 original = path.read_bytes()
                 try:
                     path.write_bytes(b'corrupted')
-                    refuse(client, 'public_certificate_review_page', {'recordId': receipt['recordId']}, 'ArtifactChanged')
+                    refuse(client, 'public_certificate_review_page', {'recordRef': receipt['recordId']}, 'ArtifactChanged')
                 finally: path.write_bytes(original)
-            check(client.tool('public_certificate_review_page', {'recordId': receipt['recordId']}) == receipt, 'Restored exact bytes reopen without mutation replay')
+            check(client.tool('public_certificate_review_page', {'recordRef': receipt['recordId']}) == receipt, 'Restored exact bytes reopen without mutation replay')
         finally: close(client)
         report['completed'] = True
     finally:

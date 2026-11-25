@@ -33,7 +33,7 @@ public sealed class FeatureCatalog
         int offset = 0, int maxItems = 100)
     {
         if (offset < 0 || maxItems is < 1 or > 200)
-            throw new BridgeException("InvalidRequest", "offset must be nonnegative; maxItems must be between 1 and 200.");
+            throw new BridgeException("InvalidRequest", "offset must be nonnegative; count must be between 1 and 200.");
         if (implementationStatus is not null && implementationStatus is not ("implemented" or "partial" or "not_implemented"))
             throw new BridgeException("InvalidRequest", "implementationStatus must be implemented, partial or not_implemented.");
         if (featureId is not null && !_features.Any(f => f.GetProperty("featureId").GetString() == featureId))

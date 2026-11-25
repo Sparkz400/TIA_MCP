@@ -311,6 +311,7 @@ Test("review and candidate are deterministic across reordered edits", () => { va
 
 ExpansionChecks.Register(tests, parts, profile, identity);
 
+Test("seeded package mutations are opened or refused", () => Console.WriteLine(PackageRobustnessChecks.Run(parts, profile, identity)));
 int failures = RunTests(tests, failuresToStderr: false);
 Console.WriteLine($"{tests.Count - failures}/{tests.Count} translation checks passed; native execution: false");
 if (failures == 0 && args.Length == 2 && args[0] == "--demo")

@@ -5,6 +5,7 @@ using TiaMcp.Core.Engineering;
 // Contention checks (also in the probe children below) hold a store lock past this short bound; one check widens it.
 PackageStorage.LockWait = TimeSpan.FromMilliseconds(250);
 if (args.Length > 0 && args[0] == "--canonical-only") { CanonicalJsonChecks.Run(); return; }
+if (args.Length > 0 && args[0] == "--parser-robustness-only") { ParserRobustnessChecks.Run(); return; }
 if (args.Length > 0 && args[0] == "--multiuser-only") { MultiuserReviewChecks.Run(); return; }
 if (args.Length > 0 && args[0] == "--teamcenter-only") { TeamcenterReviewChecks.Run(); return; }
 if (args.Length == 1 && args[0] == "--watch-authoring-only") { await WatchAuthoringChecks.Run(); return; }
@@ -70,6 +71,7 @@ try
 finally { Directory.Delete(gitBound, true); }
 Console.WriteLine($"PASS Engineering identity and canonical capture contracts: {passed} checks; no native execution.");
 CanonicalJsonChecks.Run();
+ParserRobustnessChecks.Run();
 EngineeringOperationChecks.Run();
 MultiuserReviewChecks.Run();
 TeamcenterReviewChecks.Run();

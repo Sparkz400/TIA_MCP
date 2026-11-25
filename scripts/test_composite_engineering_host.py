@@ -53,19 +53,25 @@ def main():
         report['shutdowns'].append(closed)
         check(closed['hostExitCode'] == 0 and not closed['forcedHostStop'] and not closed['workerExits'], 'Clean Host exit without native workers')
 
+    def route(name, arguments):
+        # Since the 0.9.0 surface redesign the record routes are the review_* tools with the record kind.
+        if name in ('reopen', 'list', 'page', 'artifact_read'):
+            return 'review_' + name, {'kind': 'composite_engineering', **(arguments or {})}
+        return 'composite_engineering_' + name, arguments or {}
+
     def call(name, arguments=None):
-        tool = 'composite_engineering_' + name
+        tool, arguments = route(name, arguments)
         contract = schema['x-tool-contracts'][tool]
-        validate(arguments or {}, tool + 'Input')
-        value = client.tool(tool, arguments or {})
+        validate(arguments, tool + 'Input')
+        value = client.tool(tool, arguments)
         validate(value, contract['output']['$ref'].rsplit('/', 1)[1])
         return value
 
     def upload(data, name='supplied.json'):
         status = client.tool('artifact_upload_begin', {'fileName': name, 'expectedBytes': len(data), 'sha256': digest(data)})
         for offset in range(0, len(data), status['maxChunkBytes']):
-            client.tool('artifact_upload_chunk', {'uploadId': status['uploadId'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
-        return client.tool('artifact_upload_commit', {'uploadId': status['uploadId']})
+            client.tool('artifact_upload_chunk', {'uploadRef': status['uploadRef'], 'offset': offset, 'data': base64.b64encode(data[offset:offset + status['maxChunkBytes']]).decode()})
+        return client.tool('artifact_upload_commit', {'uploadRef': status['uploadRef']})
 
     def download(reference, name):
         raw = bytearray()
@@ -81,7 +87,8 @@ def main():
             assert data, 'Nonterminal chunk must make progress'
 
     def refuse(name, arguments, code):
-        response = client.request('tools/call', {'name': 'composite_engineering_' + name, 'arguments': arguments})
+        tool, arguments = route(name, arguments)
+        response = client.request('tools/call', {'name': tool, 'arguments': arguments})
         value = response['structuredContent']; validate(value, 'error')
         check(response.get('isError') and value['error']['code'] == code, 'Structured offline refusal: ' + name + '/' + code)
 
@@ -94,14 +101,14 @@ def main():
         for review_id in {request[p]['reviewId'] for p in ('before', 'after')}:
             incoming = upload((source / 'project-reviews' / (review_id + '.json')).read_bytes())
             check(client.tool('project_snapshot_import', {'uploadRef': incoming['artifactRef']})['reviewId'] == review_id, 'Exact saved review imported through MCP')
-            client.tool('artifact_upload_release', {'uploadId': incoming['uploadId']})
+            client.tool('artifact_upload_release', {'uploadRef': incoming['uploadRef']})
         references = {}
         for phase in ('before', 'after'):
             old = request[phase]['automationMlRef']
             incoming = upload((source / 'automationml-workflow' / old.split(':')[1] / 'original.aml').read_bytes(), 'source.aml')
             references[old] = client.tool('automationml_inspect', {'xmlUploadRef': incoming['artifactRef']})['recordRef']
             request[phase]['automationMlRef'] = references[old]
-            client.tool('artifact_upload_release', {'uploadId': incoming['uploadId']})
+            client.tool('artifact_upload_release', {'uploadRef': incoming['uploadRef']})
         components = {}
         for phase in ('before', 'after'):
             for field, domain, tool in [('connections', 'connection-reviews', 'connection_review'), ('drives', 'drive-profile-reviews', 'drive_profile_review'), ('technology', 'technology-profile-reviews', 'technology_profile_review')]:
@@ -113,7 +120,7 @@ def main():
                     result = client.tool(tool, {'reviewId': envelope['reviewId'], 'uploadRef': incoming['artifactRef']})
                     check(result['recordId'] == record, 'Exact component input reproduces retained record through MCP: ' + field)
                     components[record] = envelope
-                    client.tool('artifact_upload_release', {'uploadId': incoming['uploadId']})
+                    client.tool('artifact_upload_release', {'uploadRef': incoming['uploadRef']})
         for mapping in request['mappings']:
             for endpoint in ('source', 'target'):
                 selector = mapping[endpoint]
@@ -122,7 +129,7 @@ def main():
         original_request = encode(request)
         incoming = upload(original_request)
         summary = call('review', {'uploadRef': incoming['artifactRef']}); reference = summary['recordRef']
-        client.tool('artifact_upload_release', {'uploadId': incoming['uploadId']})
+        client.tool('artifact_upload_release', {'uploadRef': incoming['uploadRef']})
         stop(); start()
         check(call('reopen', {'recordRef': reference}) == summary, 'Restart and released uploads preserve exact summary')
         check(download(reference, 'request.json') == original_request, 'Request whitespace, Unicode and final newline preserved')
@@ -140,7 +147,7 @@ def main():
                 else: invalid['before']['drives'] = []
                 incoming = upload(encode(invalid))
                 refuse('review', dict(uploadRef=incoming['artifactRef']), 'InvalidCompositeEngineeringReview')
-                client.tool('artifact_upload_release', dict(uploadId=incoming['uploadId']))
+                client.tool('artifact_upload_release', dict(uploadRef=incoming['uploadRef']))
         sections = {k: v for k, v in result.items() if isinstance(v, list)}
         sections.update({p + 'Components': result['contexts'][p]['components'] for p in ('before', 'after')})
         sections.update(amlChanges=result['amlComparison']['changes'], beforeAmlImpacts=result['amlComparison']['beforeImpacts'], afterAmlImpacts=result['amlComparison']['afterImpacts'])

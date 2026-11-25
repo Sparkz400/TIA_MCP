@@ -35,8 +35,8 @@ The simulator MCP tool names match the `sim_*` bridge operations below. Engineer
 
 | Bridge operation | Purpose and parameters |
 | --- | --- |
-| `sim_status` | Initialize/read the local runtime manager, network mode, registered instance IDs/names, selected instances and runtime license status. Also `tcpIpReady` (whether `sim_create` with `TCPIP` is admitted), the PLCSIM virtual Ethernet adapters with their IPv4 addresses and, outside TCP/IP single-adapter mode, `tcpIpRemediation` with the Control Panel step. Does not power a CPU or change the mode. |
-| `sim_create` | `artifactDirectory`, optional exact V8 `cpuType` enum name (default `CPU1511`) and `communicationInterface` (`Softbus`, the default, or `TCPIP`). Creates a uniquely named `TiaMcp_<GUID>` instance, fresh storage, and a short-lived opaque `downloadTicket`; the creation receipt records the interface. `TCPIP` is refused with `TcpIpModeRequired` unless PLCSIM is already in TCP/IP single-adapter mode; the refusal's details carry the current mode, the adapters and the remediation. The adapter never switches the machine-wide mode: that stays a PLCSIM Control Panel step for the operator. Does not power the CPU. |
+| `sim_status` | Initialize/read the local runtime manager, network mode, registered instance IDs/names, selected instances and runtime license status. Also `tcpIpReady` (whether `sim_create` with `TCPIP` is admitted), the PLCSIM virtual Ethernet adapters with their IPv4 addresses and, outside TCP/IP single-adapter mode, `tcpIpRemediation` with the Control Panel step and the `sim_network_mode_set` alternative. Does not power a CPU or change the mode. |
+| `sim_create` | `artifactDirectory`, optional exact V8 `cpuType` enum name (default `CPU1511`) and `communicationInterface` (`Softbus`, the default, or `TCPIP`). Creates a uniquely named `TiaMcp_<GUID>` instance, fresh storage, and a short-lived opaque `downloadTicket`; the creation receipt records the interface. `TCPIP` is refused with `TcpIpModeRequired` unless PLCSIM is already in TCP/IP single-adapter mode; the refusal's details carry the current mode, the adapters and the remediation. `sim_create` never switches the machine-wide mode: set it in the PLCSIM Control Panel or, with the user's agreement, with `sim_network_mode_set`. Does not power the CPU. |
 | `sim_select` | `instanceId`, `expectedName`. Explicitly select an existing local simulated instance. Such an instance is not adapter-owned: it can be read and observed, but not written, powered, run, stopped or unregistered by this worker. |
 | `simulation_download` | Engineering operation: `downloadTicket`, optional `projectName`, exact `plcPath`, `credentialMetadataPath` and `credentialLineageJournalPaths` array. The singular `credentialLineageJournalPath` remains available for one hop; do not supply both forms. Compiles the selected in-memory PLC and generates a fresh virtual memory card. |
 | `simulation_provision_scratch_credential` | Opt-in engineering operation: the exact `downloadTicket`, required generated `credentialMetadataPath`, optional `projectName`, `plcPath` and `credentialLineageJournalPaths`. Validates the original card and owned scratch target (Softbus, or the TCP/IP route below for a `TCPIP` ticket), starts the same CPU empty, then attempts `OnlineProvider.SetPlcMasterSecret` with the generated DPAPI credential. Optional `trustOwnedEmptyCpuCertificate` defaults false. One attempt per owned instance; success requires OFF with protection enabled and the original card restored unchanged. Does not establish RUN or live values. |
@@ -58,6 +58,7 @@ The simulator MCP tool names match the `sim_*` bridge operations below. Engineer
 | `sim_record` | `instanceId`, `action` (`arm` with `responses`, or `collect` with optional `windowMs`). Answers the program's `RDREC`/`WRREC` on an owned instance from a reviewed response table and logs every request. |
 | `sim_storage` | `instanceId`, `artifactDirectory`, `action` (`archive`, `retrieve`), and for retrieve `archivePath` and `expectedSha256`. Archives or restores an owned, powered-off instance's virtual memory card. |
 | `sim_prune` | `scope` (`storage` or `archives`), optional `names`, `olderThanDays`, `maxTotalMegabytes`, `delete` (default false). Opt-in retention: without `delete` it lists every storage folder or archive with its bytes, age, eligibility and refusal. `delete:true` needs `names` or an age/size criterion and deletes at most 200 eligible ones per call. Eligible are the storage folder of an instance whose creation receipt says it was unregistered (and that is neither registered nor selected, with its ownership marker unchanged and no link inside) and an archive whose receipt still matches its SHA-256 and size. Storage of a registered, running, selected or orphaned instance and anything this adapter did not create is refused. Deleted archives can no longer be retrieved. Verified against temporary folders only. |
+| `sim_network_mode_set` | `mode` (`Softbus`, `TCPIPSingleAdapter` or `TCPIPMultipleAdapter`), `acknowledgeMachineWide` (must be `true`), optional `expectedCurrentMode` (the `networkMode` `sim_status` reported). Sets `SimulationRuntimeManager.NetworkMode`, which is **machine-wide**: it applies to every PLCSIM instance and Windows user on the PC, so call it only after the user agreed. See [Switching the network mode](#switching-the-network-mode). Not qualified on a native PLCSIM installation yet. |
 | `sim_release` | `instanceId`, optional `deleteOwned`. Releases the worker's interface; it is refused with `SimulationCaptureModeActive` while a Host capture (`runtime_capture_start`) runs on the instance, and otherwise retries a capture-mode restore that failed, also with `deleteOwned`. Explicit `deleteOwned:true` powers off and unregisters only an instance created by this worker. Storage files are retained. |
 
 Choosing a read or write tool:
@@ -87,7 +88,7 @@ A `downloadTicket` is valid for 15 minutes after `sim_create` and only for its o
 
 Runtime action calls require an instance created or explicitly selected by the current worker. Reads and observation (`sim_read`, `sim_read_signals`, `sim_tags`, `sim_area_read`, `sim_observe`, reading `sim_time`) work on any selected instance. Everything that writes or changes the instance (`sim_state`, `sim_write`, `sim_write_signals`, `sim_area_write`, scenario writes and `virtualTime` in `sim_test`, setting `sim_time`, `sim_event`, `sim_record`, `sim_storage`) needs one this worker created or adopted with its `creationId`; otherwise it fails with `OwnedInstanceRequired`.
 
-A simulator call still running when the Host's bridge timeout (`--timeout-seconds`, default 120) expires faults the simulator bridge until the Host restarts, so the Host refuses waits that cannot end 5 s before it with `InvalidRequest`: the `sim_observe` window, the `sim_state` `timeoutMs` (twice it for `powerOn`, whose failure is followed by a power-off) and `sim_test`, whose 90 s execution cap needs `--timeout-seconds` of at least 105. Cancelling a tool call does not interrupt the simulator call; it runs to completion. The worker verifies that the recorded ID/name still exists; it does not substitute another instance if an ID is reused. Power-on, RUN, writes, scenarios and `sim_identity` require the network mode that matches the interface recorded at creation: Softbus instances need existing local `Softbus` mode and a Softbus interface (otherwise `SoftbusRequired`); `TCPIP` instances need existing TCP/IP single-adapter mode and a TCP/IP interface (otherwise `TcpIpModeRequired`, also when the operator switches back to Softbus mid-window). PLCSIM V8 derives an instance's interface from the machine-wide mode, so the worker only compares it. Selections without a creation receipt stay Softbus-only. This adapter never changes shared adapter bindings/network mode or IP addresses and never uses remote instance discovery or an online physical-PLC download API. Engineering-side provisioning (`simulation_download`, credential provisioning) admits the network mode recorded in the ticket, Softbus or TCP/IP; only the discovery before `sim_create` requires Softbus.
+A simulator call still running when the Host's bridge timeout (`--timeout-seconds`, default 120) expires faults the simulator bridge until the Host restarts, so the Host refuses waits that cannot end 5 s before it with `InvalidRequest`: the `sim_observe` window, the `sim_state` `timeoutMs` (twice it for `powerOn`, whose failure is followed by a power-off), `sim_test`, whose 90 s execution cap needs `--timeout-seconds` of at least 105, and the 5 s readback of `sim_network_mode_set`, which needs at least 10. Cancelling a tool call does not interrupt the simulator call; it runs to completion. The worker verifies that the recorded ID/name still exists; it does not substitute another instance if an ID is reused. Power-on, RUN, writes, scenarios and `sim_identity` require the network mode that matches the interface recorded at creation: Softbus instances need existing local `Softbus` mode and a Softbus interface (otherwise `SoftbusRequired`); `TCPIP` instances need existing TCP/IP single-adapter mode and a TCP/IP interface (otherwise `TcpIpModeRequired`, also when the operator switches back to Softbus mid-window). PLCSIM V8 derives an instance's interface from the machine-wide mode, so the worker only compares it. Selections without a creation receipt stay Softbus-only. This adapter never changes shared adapter bindings or IP addresses, and changes the network mode only through an explicit, acknowledged `sim_network_mode_set` ([Switching the network mode](#switching-the-network-mode)) and never uses remote instance discovery or an online physical-PLC download API. Engineering-side provisioning (`simulation_download`, credential provisioning) admits the network mode recorded in the ticket, Softbus or TCP/IP; only the discovery before `sim_create` requires Softbus.
 
 For bounded retained polling of an owned instance, optionally one sample per PLC cycle in single-step mode, use `runtime_capture_start` with `source:"plcsim"`; the Host drives the worker's internal `sim_capture_begin`, `sim_capture_sample` and `sim_capture_end` operations. See [PLCSIM capture source](../reference/runtime-captures.md#plcsim-capture-source).
 
@@ -162,6 +163,41 @@ reviewed options or refused:
 because the card's `programRevision` no longer describes the running program. This is a CPU write:
 `change_restore` recovers only the project, and an interrupted admission is held for manual
 reconciliation.
+
+## Switching the network mode
+
+PLCSIM Advanced V8 has one network mode for the whole PC (Control Panel, *Online Access*): `Softbus`
+(the default, shown as *PLCSIM*), `TCPIPSingleAdapter` or `TCPIPMultipleAdapter`. Softbus instances need
+`Softbus`; instances from `sim_create` with `communicationInterface: "TCPIP"` need `TCPIPSingleAdapter`.
+There are two ways to change it:
+
+- **By hand**, the way `tcpIpRemediation` describes: in the PLCSIM Advanced Control Panel under *Online Access*.
+- **With `sim_network_mode_set`**, after the user agreed to a machine-wide change. No other tool changes the
+  mode, and none changes it implicitly.
+
+`sim_network_mode_set` refuses before it changes anything:
+
+| Code | When | Remediation |
+| --- | --- | --- |
+| `AcknowledgementRequired` | `acknowledgeMachineWide` is not `true`; the Host refuses before any worker call, so PLCSIM Runtime Manager is not started | Ask the user, then call again with `acknowledgeMachineWide: true`. |
+| `InvalidRequest` | `mode` or `expectedCurrentMode` is not an exact mode name | Use the names above (`expectedCurrentMode` may also be `UnknownState`). |
+| `SimulationNetworkModeStale` | the current mode is not `expectedCurrentMode` | Call `sim_status` and review the current mode with the user. |
+| `SimulationNetworkModeUnknown` | PLCSIM reports `UnknownState` | Check the PLCSIM virtual switch and the Control Panel. |
+| `SimulationRegistrationsPresent` | any PLCSIM instance is registered, owned or not (listed in `registeredInstances`) | Power off and unregister every instance (`sim_release` with `deleteOwned` for owned ones). |
+
+The PLCSIM API itself refuses only while an instance is running (`InstanceAlreadyRunning`); the tool is stricter
+and refuses any registered instance. When the mode already matches, nothing is set and the result says
+`changed: false`. Otherwise the mode is set and read back for up to 5 s; the result carries `previousMode`,
+`mode`, `changed`, `readbackVerified`, `tcpIpReady` and `plcsimAdapters` as `sim_status` reports them. A readback
+that differs is `SimulationNetworkModeReadbackMismatch`; a PLCSIM refusal is `SimulationNetworkModeSetFailed` with
+its `runtimeErrorCode` (for example `VirtualSwitchMisconfigured` or `PCAPDriverNotRunning`, Npcap not running), the
+mode read afterwards and a remediation.
+
+The tool sets only the mode. Adapter bindings and mappings (`SetNetInterfaceBindings` needs administrator rights)
+and IP addresses are never changed: the PLCSIM virtual Ethernet adapter's address, and a real adapter if you want
+one, stay manual steps. Siemens disables TCP/IP single-adapter mode by default for security reasons, because a real
+adapter bound in that mode receives telegrams not addressed to it. Whether the switch needs administrator rights or
+a Runtime Manager restart has not been observed yet.
 
 ## Virtual time, events and storage
 

@@ -719,7 +719,31 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "blockName": "FB_Conveyor",
+     "attributes": {
+      "HeaderAuthor": "batch"
+     }
+    },
+    {
+     "items": [
+      {
+       "blockName": "FB_Conveyor",
+       "attributes": {
+        "HeaderAuthor": "batch"
+       }
+      },
+      {
+       "blockName": "FC_Reset",
+       "attributes": {
+        "HeaderFamily": "batch"
+       }
+      }
+     ]
+    }
+   ]
   },
   "block_delete": {
    "oneOf": [
@@ -775,7 +799,13 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "scopePath": "/projects/Fixture/plc/CPU/units/Unit_1",
+     "blockName": "FC_Reset"
+    }
+   ]
   },
   "block_import_xml": {
    "type": "object",
@@ -921,7 +951,13 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "blockName": "FB_Conveyor",
+     "number": 78
+    }
+   ]
   },
   "block_protect": {
    "type": "object",
@@ -977,7 +1013,20 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "blockName": "FC_Reset",
+     "credential": {
+      "schemaVersion": "protected-credential-reference.v1",
+      "vaultId": "00000000000000000000000000000001",
+      "credentialId": "00000000000000000000000000000002",
+      "bindingSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "cipherSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+     },
+     "vaultName": "00000000000000000000000000000001"
+    }
+   ]
   },
   "block_rename": {
    "oneOf": [
@@ -1043,7 +1092,25 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "blockName": "FB_Conveyor",
+     "newName": "FB_Conveyor_2"
+    },
+    {
+     "items": [
+      {
+       "blockName": "FB_Conveyor",
+       "newName": "FB_Conveyor_2"
+      },
+      {
+       "blockName": "FC_Reset",
+       "newName": "FC_Reset_2"
+      }
+     ]
+    }
+   ]
   },
   "block_unprotect": {
    "type": "object",
@@ -1099,7 +1166,20 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "blockName": "FC_Reset",
+     "credential": {
+      "schemaVersion": "protected-credential-reference.v1",
+      "vaultId": "00000000000000000000000000000001",
+      "credentialId": "00000000000000000000000000000002",
+      "bindingSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "cipherSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+     },
+     "vaultName": "00000000000000000000000000000001"
+    }
+   ]
   },
   "block_write_protection_set": {
    "type": "object",
@@ -1191,7 +1271,40 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "blockName": "FB_Conveyor",
+     "action": "define",
+     "credential": {
+      "schemaVersion": "protected-credential-reference.v1",
+      "vaultId": "00000000000000000000000000000001",
+      "credentialId": "00000000000000000000000000000002",
+      "bindingSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "cipherSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+     },
+     "vaultName": "00000000000000000000000000000001"
+    },
+    {
+     "blockName": "FB_Conveyor",
+     "action": "change",
+     "credential": {
+      "schemaVersion": "protected-credential-reference.v1",
+      "vaultId": "00000000000000000000000000000001",
+      "credentialId": "00000000000000000000000000000002",
+      "bindingSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "cipherSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+     },
+     "newCredential": {
+      "schemaVersion": "protected-credential-reference.v1",
+      "vaultId": "00000000000000000000000000000001",
+      "credentialId": "00000000000000000000000000000003",
+      "bindingSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "cipherSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+     },
+     "vaultName": "00000000000000000000000000000001"
+    }
+   ]
   },
   "call_connection_set": {
    "allOf": [
@@ -1232,7 +1345,16 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "blockName": "FC_Reset",
+     "networkId": "3",
+     "callUid": "23",
+     "parameterName": "Enable",
+     "targetAccessUid": "24"
+    }
+   ]
   },
   "call_parameter_set": {
    "oneOf": [
@@ -1346,7 +1468,18 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch of 1..100 edits of distinct blocks (each item replaces its whole block) plus optional scopePath."
+   "description": "One edit, or a batch of 1..100 edits of distinct blocks (each item replaces its whole block) plus optional scopePath.",
+   "examples": [
+    {
+     "blockName": "FC_Reset",
+     "networkId": "3",
+     "callUid": "23",
+     "parameterName": "Enable",
+     "components": [
+      "EnableAlternate"
+     ]
+    }
+   ]
   },
   "cax_import": {
    "type": "object",
@@ -1395,7 +1528,14 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "importOption": "RetainTiaDevice",
+     "path": "C:/TiaMcpFixture/import/station.aml",
+     "expectedSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+   ]
   },
   "certificate_assign": {
    "type": "object",
@@ -1447,7 +1587,16 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1",
+     "targetPath": "/projects/Fixture/devices/Station_1/items/PLC_1",
+     "attributeName": "PlcCommunicationCertificate",
+     "certificateId": 12,
+     "expectedCertificateId": null
+    }
+   ]
   },
   "certificate_create": {
    "type": "object",
@@ -1521,7 +1670,22 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1",
+     "usage": "WebServer",
+     "subjectCommonName": "FixtureWeb",
+     "subjectAlternativeNames": [
+      {
+       "type": "Dns",
+       "value": "fixtureweb.local"
+      }
+     ],
+     "validFromUtc": "2026-01-01T00:00:00Z",
+     "validUntilUtc": "2099-01-01T00:00:00Z"
+    }
+   ]
   },
   "certificate_delete": {
    "type": "object",
@@ -1547,7 +1711,13 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1",
+     "certificateId": 12
+    }
+   ]
   },
   "certificate_import": {
    "type": "object",
@@ -1644,7 +1814,18 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1",
+     "connectionType": "S7Connection",
+     "localInterfacePath": "/projects/Fixture/devices/Station_1/items/PLC_1/PROFINET_1",
+     "localNodeName": "X1",
+     "partnerTargetPath": "/projects/Fixture/devices/Station_2/items/PLC_2",
+     "partnerInterfacePath": "/projects/Fixture/devices/Station_2/items/PLC_2/PROFINET_1",
+     "partnerNodeName": "X1"
+    }
+   ]
   },
   "connection_delete": {
    "type": "object",
@@ -1675,7 +1856,14 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1",
+     "connectionName": "S7_Connection_1",
+     "connectionId": "5"
+    }
+   ]
   },
   "connection_set": {
    "type": "object",
@@ -1724,7 +1912,16 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1",
+     "connectionName": "S7_Connection_1",
+     "attributes": {
+      "LocalPort": 2001
+     }
+    }
+   ]
   },
   "constant_create": {
    "oneOf": [
@@ -1814,7 +2011,15 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "tagTableName": "Tags_Line",
+     "name": "Limit",
+     "dataTypeName": "Int",
+     "value": "1"
+    }
+   ]
   },
   "constant_delete": {
    "oneOf": [
@@ -1890,7 +2095,14 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "tagTableName": "Tags_Line",
+     "memberName": "Limit",
+     "dependencyPolicy": "rejectReferenced"
+    }
+   ]
   },
   "constant_set": {
    "oneOf": [
@@ -2000,7 +2212,16 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "tagTableName": "Tags_Line",
+     "memberName": "Limit",
+     "attributes": {
+      "Value": "2"
+     }
+    }
+   ]
   },
   "db_snapshot_create": {
    "type": "object",
@@ -2088,7 +2309,12 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "devicePath": "/projects/Fixture/devices/Station_1"
+    }
+   ]
   },
   "drive_motor_configure": {
    "allOf": [
@@ -2892,7 +3118,16 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch of 1..100 edits of distinct blocks (each item replaces its whole block) plus optional scopePath."
+   "description": "One edit, or a batch of 1..100 edits of distinct blocks (each item replaces its whole block) plus optional scopePath.",
+   "examples": [
+    {
+     "blockName": "FC_Reset",
+     "networkId": "3",
+     "removeUids": [
+      "25"
+     ]
+    }
+   ]
   },
   "graphical_operand_set": {
    "oneOf": [
@@ -2994,7 +3229,17 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch of 1..100 edits of distinct blocks (each item replaces its whole block) plus optional scopePath."
+   "description": "One edit, or a batch of 1..100 edits of distinct blocks (each item replaces its whole block) plus optional scopePath.",
+   "examples": [
+    {
+     "blockName": "FC_Reset",
+     "networkId": "3",
+     "accessUid": "21",
+     "components": [
+      "EnableAlternate"
+     ]
+    }
+   ]
   },
   "group_create": {
    "oneOf": [
@@ -3090,7 +3335,14 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "groupKind": "blocks",
+     "groupPath": "/projects/Fixture/plc/CPU/blocks",
+     "name": "Line_1"
+    }
+   ]
   },
   "group_delete": {
    "type": "object",
@@ -3126,7 +3378,14 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "groupKind": "blocks",
+     "groupPath": "/projects/Fixture/plc/CPU/blocks/groups/Line_1",
+     "dependencyPolicy": "rejectReferenced"
+    }
+   ]
   },
   "group_rename": {
    "oneOf": [
@@ -3222,7 +3481,14 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "groupKind": "blocks",
+     "groupPath": "/projects/Fixture/plc/CPU/blocks/groups/Line_1",
+     "name": "Line_2"
+    }
+   ]
   },
   "hardware_add": {
    "type": "object",
@@ -3284,7 +3550,14 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "typeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+     "deviceName": "Station_1",
+     "itemName": "PLC_1"
+    }
+   ]
   },
   "hardware_address_set": {
    "type": "object",
@@ -3323,7 +3596,15 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/Module_1",
+     "ioType": "Input",
+     "oldStartAddress": 0,
+     "startAddress": 100
+    }
+   ]
   },
   "hardware_attributes": {
    "type": "object",
@@ -3365,7 +3646,16 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/Module_1",
+     "attributes": {
+      "Comment": "HwComment",
+      "Author": "HwAuthor"
+     }
+    }
+   ]
   },
   "hardware_channel_attributes": {
    "type": "object",
@@ -3508,7 +3798,18 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1",
+     "attributes": {
+      "SystemMemoryByte": true,
+      "SystemMemoryByteAddress": 20,
+      "ClockMemoryByte": true,
+      "ClockMemoryByteAddress": 21
+     }
+    }
+   ]
   },
   "hardware_cpu_parameters": {
    "type": "object",
@@ -3605,7 +3906,16 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1",
+     "attributes": {
+      "CycleEnableMinimumCycleTime": true,
+      "CycleMinimumCycleTime": 3
+     }
+    }
+   ]
   },
   "hardware_delete": {
    "type": "object",
@@ -3625,7 +3935,12 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/Module_1"
+    }
+   ]
   },
   "hardware_move": {
    "type": "object",
@@ -3651,7 +3966,13 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/Module_1",
+     "positionNumber": 4
+    }
+   ]
   },
   "hardware_plug": {
    "type": "object",
@@ -3687,7 +4008,15 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/Rail_0",
+     "typeIdentifier": "OrderNumber:6ES7 551-1AB01-0AB0/V2.0",
+     "name": "Encoder_1",
+     "positionNumber": 3
+    }
+   ]
   },
   "hardware_port_connect": {
    "type": "object",
@@ -3714,7 +4043,13 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1/PROFINET_1/Port_1",
+     "partnerHardwarePath": "/projects/Fixture/devices/Station_1/items/Module_1/PROFINET_1/Port_1"
+    }
+   ]
   },
   "hardware_port_disconnect": {
    "type": "object",
@@ -3741,7 +4076,13 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1/PROFINET_1/Port_1",
+     "partnerHardwarePath": "/projects/Fixture/devices/Station_1/items/Module_1/PROFINET_1/Port_1"
+    }
+   ]
   },
   "hardware_replace": {
    "type": "object",
@@ -3866,7 +4207,14 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/Module_1",
+     "accessType": "OutsideOfProject",
+     "externalIoControllers": 2
+    }
+   ]
   },
   "hardware_transfer_area_create": {
    "type": "object",
@@ -3892,7 +4240,13 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1/PROFINET_1",
+     "name": "TransferArea_1"
+    }
+   ]
   },
   "hardware_transfer_area_delete": {
    "type": "object",
@@ -3918,7 +4272,13 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1/PROFINET_1",
+     "name": "TransferArea_1"
+    }
+   ]
   },
   "hmi_compile": {
    "type": "object",
@@ -3953,7 +4313,15 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "target": {
+      "family": "unified",
+      "hmiPath": "/projects/Fixture/devices/Panel_1/items/HMI_RT_1/hmi/HMI_RT_1"
+     }
+    }
+   ]
   },
   "hmi_text_list_import": {
    "type": "object",
@@ -4025,7 +4393,22 @@
     "recordId"
    ],
    "additionalProperties": false,
-   "description": "outputId selects one output of a generated text-list set record."
+   "description": "outputId selects one output of a generated text-list set record.",
+   "examples": [
+    {
+     "schemaVersion": 1,
+     "target": {
+      "projectCopyId": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "sessionGeneration": "dddddddddddddddddddddddddddddddd",
+      "hmiPath": "/projects/Fixture/devices/Panel_1/items/HMI_RT_1/hmi/HMI_RT_1",
+      "objectPath": "/projects/Fixture/devices/Panel_1/items/HMI_RT_1/hmi/HMI_RT_1",
+      "family": "unified",
+      "kind": "hmiDevice"
+     },
+     "expectedContentHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "recordId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+   ]
   },
   "instance_db_create": {
    "type": "object",
@@ -4065,7 +4448,13 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "name": "FB_Conveyor_DB",
+     "instanceOfName": "FB_Conveyor"
+    }
+   ]
   },
   "network_configure": {
    "type": "object",
@@ -4146,7 +4535,14 @@
       ]
      }
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1/PROFINET_1",
+     "nodeName": "X1",
+     "subnetName": "PN_IE_1"
+    }
+   ]
   },
   "network_io_assign": {
    "type": "object",
@@ -4448,7 +4844,16 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/Module_1/PROFINET_1",
+     "connectorIndex": 0,
+     "controllerHardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1/PROFINET_1",
+     "controllerIndex": 0,
+     "createIoSystemName": "IoSystem_1"
+    }
+   ]
   },
   "network_mrp_set": {
    "type": "object",
@@ -4500,7 +4905,14 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/PLC_1/PROFINET_1",
+     "role": "Client",
+     "createDomain": false
+    }
+   ]
   },
   "opcua_reference_namespace_delete": {
    "type": "object",
@@ -4519,7 +4931,12 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "namespaceName": "ReferenceNamespace_1"
+    }
+   ]
   },
   "opcua_reference_namespace_import": {
    "type": "object",
@@ -4557,7 +4974,15 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "namespaceName": "ReferenceNamespace_1",
+     "mode": "create",
+     "path": "C:/TiaMcpFixture/import/ReferenceNamespace_1.xml",
+     "expectedSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+   ]
   },
   "opcua_role_mapping_set": {
    "oneOf": [
@@ -4657,7 +5082,13 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "action": "remove",
+     "roleName": "Operator"
+    }
+   ]
   },
   "opcua_server_interface_delete": {
    "type": "object",
@@ -4676,7 +5107,12 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "interfaceName": "ServerInterface_1"
+    }
+   ]
   },
   "opcua_server_interface_enable": {
    "type": "object",
@@ -4699,7 +5135,13 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "interfaceName": "ServerInterface_1",
+     "enabled": true
+    }
+   ]
   },
   "opcua_server_interface_import": {
    "type": "object",
@@ -4737,7 +5179,15 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "interfaceName": "ServerInterface_1",
+     "mode": "create",
+     "path": "C:/TiaMcpFixture/import/ServerInterface_1.xml",
+     "expectedSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+   ]
   },
   "opcua_server_settings_set": {
    "type": "object",
@@ -4845,7 +5295,15 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "port": {
+      "expected": 4840,
+      "value": 4841
+     }
+    }
+   ]
   },
   "plc_alarm_class_import": {
    "type": "object",
@@ -4884,7 +5342,13 @@
       ]
      }
     ]
-   }
+   },
+   "examples": [
+    {
+     "artifactPath": "C:/TiaMcpFixture/import/classes.dat",
+     "expectedSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+   ]
   },
   "plc_alarm_instance_text_import": {
    "type": "object",
@@ -4923,7 +5387,13 @@
       ]
      }
     ]
-   }
+   },
+   "examples": [
+    {
+     "artifactPath": "C:/TiaMcpFixture/import/instance-texts.xlsx",
+     "expectedSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+   ]
   },
   "plc_alarm_text_list_import": {
    "type": "object",
@@ -4971,7 +5441,17 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "artifactPath": "C:/TiaMcpFixture/import/text-list.xlsx",
+     "expectedSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "importOption": "None",
+     "expectedTextListNames": [
+      "TextList_1"
+     ]
+    }
+   ]
   },
   "plc_compile": {
    "type": "object",
@@ -4981,7 +5461,10 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {}
+   ]
   },
   "plc_supervision_import": {
    "type": "object",
@@ -5018,7 +5501,14 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "artifactPath": "C:/TiaMcpFixture/import/supervisions.xlsx",
+     "expectedSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "importOption": "Override"
+    }
+   ]
   },
   "plc_supervision_settings_import": {
    "type": "object",
@@ -5057,7 +5547,13 @@
       ]
      }
     ]
-   }
+   },
+   "examples": [
+    {
+     "artifactPath": "C:/TiaMcpFixture/import/supervision-settings.dat",
+     "expectedSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+   ]
   },
   "plc_type_import_xml": {
    "type": "object",
@@ -5143,7 +5639,10 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {}
+   ]
   },
   "project_languages_set": {
    "type": "object",
@@ -5208,7 +5707,16 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "addActive": [
+      "de-DE"
+     ],
+     "referenceLanguage": "de-DE",
+     "editingLanguage": "de-DE"
+    }
+   ]
   },
   "project_simulation_enable": {
    "type": "object",
@@ -5225,7 +5733,12 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "enabled": true
+    }
+   ]
   },
   "safety_drive_tags": {
    "allOf": [
@@ -5308,7 +5821,27 @@
       ]
      }
     ]
-   }
+   },
+   "examples": [
+    {
+     "safetyAcknowledged": true,
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/Drive_1",
+     "driveObjectNumber": 1,
+     "tagTableName": "SafetyTags",
+     "bits": [
+      {
+       "word": "status",
+       "bit": 0,
+       "name": "SafeDrive_ZSW1_0"
+      },
+      {
+       "word": "status",
+       "bit": 8,
+       "name": "SafeDrive_ZSW1_8"
+      }
+     ]
+    }
+   ]
   },
   "safety_fparameter_set": {
    "type": "object",
@@ -5526,7 +6059,12 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "name": "Unit_1"
+    }
+   ]
   },
   "software_unit_create_from": {
    "type": "object",
@@ -5586,7 +6124,13 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "unitPath": "/projects/Fixture/plc/CPU/units/Unit_1",
+     "dependencyPolicy": "rejectReferenced"
+    }
+   ]
   },
   "software_unit_publication_set": {
    "type": "object",
@@ -5621,7 +6165,15 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "objectPath": "/projects/Fixture/plc/CPU/units/Unit_1/blocks/FB_Conveyor",
+     "attributes": {
+      "Access": "Published"
+     }
+    }
+   ]
   },
   "software_unit_relation_set": {
    "type": "object",
@@ -5657,7 +6209,15 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "unitPath": "/projects/Fixture/plc/CPU/units/Unit_1",
+     "relatedUnitPath": "/projects/Fixture/plc/CPU/units/Unit_2",
+     "relationType": "SoftwareUnit",
+     "action": "add"
+    }
+   ]
   },
   "software_unit_rename": {
    "type": "object",
@@ -5682,7 +6242,13 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "unitPath": "/projects/Fixture/plc/CPU/units/Unit_1",
+     "name": "Unit_2"
+    }
+   ]
   },
   "source_upsert": {
    "type": "object",
@@ -5797,6 +6363,15 @@
       }
      }
     }
+   ],
+   "examples": [
+    {
+     "language": "SCL",
+     "source": "FUNCTION \"FC_Reset\" : Bool\nVERSION : 0.1\nBEGIN\n #FC_Reset := \"Start\";\nEND_FUNCTION\n",
+     "expectedBlockNames": [
+      "FC_Reset"
+     ]
+    }
    ]
   },
   "tag_create": {
@@ -5887,7 +6462,15 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "tagTableName": "Tags_Line",
+     "name": "Start",
+     "dataTypeName": "Bool",
+     "logicalAddress": "%M61.0"
+    }
+   ]
   },
   "tag_delete": {
    "oneOf": [
@@ -5963,7 +6546,14 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "tagTableName": "Tags_Line",
+     "memberName": "Start",
+     "dependencyPolicy": "rejectReferenced"
+    }
+   ]
   },
   "tag_set": {
    "oneOf": [
@@ -6105,7 +6695,16 @@
      "additionalProperties": false
     }
    ],
-   "description": "One tag edit, or a batch of up to 500. safetyAcknowledged only for renaming a safety tag with Name alone."
+   "description": "One tag edit, or a batch of up to 500. safetyAcknowledged only for renaming a safety tag with Name alone.",
+   "examples": [
+    {
+     "tagTableName": "Tags_Line",
+     "memberName": "Start",
+     "attributes": {
+      "LogicalAddress": "%M100.1"
+     }
+    }
+   ]
   },
   "tag_table_create": {
    "oneOf": [
@@ -6191,7 +6790,19 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "tagTableName": "Tags_Line"
+    },
+    {
+     "items": [
+      {
+       "tagTableName": "Tags_Line"
+      }
+     ]
+    }
+   ]
   },
   "tag_table_delete": {
    "allOf": [
@@ -6204,7 +6815,12 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "tagTableName": "Tags_Line"
+    }
+   ]
   },
   "tag_table_import_xml": {
    "description": "Either the XML form or the row form; mixing them is refused.",
@@ -6322,7 +6938,19 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "tagTableName": "Tags_Line",
+     "tags": [
+      {
+       "name": "Start",
+       "dataType": "Bool",
+       "logicalAddress": "%I0.0"
+      }
+     ]
+    }
+   ]
   },
   "tag_table_rename": {
    "oneOf": [
@@ -6388,7 +7016,13 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "tagTableName": "Tags_Line",
+     "newName": "Tags_Line_2"
+    }
+   ]
   },
   "testsuite_application_import": {
    "type": "object",
@@ -6452,7 +7086,15 @@
     "required": [
      "expectedTestSetNames"
     ]
-   }
+   },
+   "examples": [
+    {
+     "sourcePath": "C:/TiaMcpFixture/import/application.tat",
+     "expectedTestCaseNames": [
+      "ApplicationTest_1"
+     ]
+    }
+   ]
   },
   "testsuite_system_import": {
    "type": "object",
@@ -6484,7 +7126,15 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "sourcePath": "C:/TiaMcpFixture/import/system.tst",
+     "expectedTestCaseNames": [
+      "SystemTest_1"
+     ]
+    }
+   ]
   },
   "to_child_create": {
    "type": "object",
@@ -6527,7 +7177,16 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "ownerPath": "/projects/Fixture/plc/CPU/technology/Axis_1",
+     "composition": "OutputCams",
+     "name": "Cam_1",
+     "typeIdentifier": "TO_OutputCam",
+     "version": "10.0"
+    }
+   ]
   },
   "to_connect": {
    "allOf": [
@@ -6668,7 +7327,22 @@
     "telegramType": [
      "hardwarePath"
     ]
-   }
+   },
+   "examples": [
+    {
+     "name": "Axis_1",
+     "role": "actor",
+     "inputAddress": 256,
+     "outputAddress": 256
+    },
+    {
+     "name": "Axis_1",
+     "role": "sensor",
+     "sensorIndex": 0,
+     "hardwarePath": "/projects/Fixture/devices/Station_1/items/Module_1",
+     "telegramType": "MainTelegram"
+    }
+   ]
   },
   "to_create": {
    "type": "object",
@@ -6721,7 +7395,14 @@
       ]
      }
     ]
-   }
+   },
+   "examples": [
+    {
+     "name": "Axis_1",
+     "typeIdentifier": "TO_PositioningAxis",
+     "version": "10.0"
+    }
+   ]
   },
   "to_delete": {
    "allOf": [
@@ -6734,7 +7415,12 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "technologyPath": "/projects/Fixture/plc/CPU/technology/Axis_1"
+    }
+   ]
   },
   "to_disconnect": {
    "allOf": [
@@ -6791,7 +7477,14 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "technologyPath": "/projects/Fixture/plc/CPU/technology/Axis_1",
+     "role": "sensor",
+     "sensorIndex": 0
+    }
+   ]
   },
   "to_parameters": {
    "allOf": [
@@ -6820,7 +7513,15 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "technologyPath": "/projects/Fixture/plc/CPU/technology/Pid_1",
+     "parameters": {
+      "Config.OutputUpperLimit": 70.0
+     }
+    }
+   ]
   },
   "type_delete": {
    "allOf": [
@@ -6841,7 +7542,13 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "typeName": "UDT_Motor",
+     "dependencyPolicy": "rejectReferenced"
+    }
+   ]
   },
   "type_rename": {
    "oneOf": [
@@ -6907,7 +7614,13 @@
      "additionalProperties": false
     }
    ],
-   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath."
+   "description": "One edit, or a batch: items (1..100 distinct edits of this kind, no nesting) plus optional scopePath.",
+   "examples": [
+    {
+     "typeName": "UDT_Motor",
+     "newName": "UDT_Motor_2"
+    }
+   ]
   },
   "type_source_upsert": {
    "type": "object",
@@ -6951,7 +7664,15 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "source": "TYPE \"UDT_Motor\"\nVERSION : 0.1\nSTRUCT\nValue : Int;\nEND_STRUCT;\nEND_TYPE",
+     "expectedTypeNames": [
+      "UDT_Motor"
+     ]
+    }
+   ]
   },
   "umac_role_set": {
    "oneOf": [
@@ -7077,7 +7798,13 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "action": "create",
+     "roleName": "Role_1"
+    }
+   ]
   },
   "vci_conflict_resolve": {
    "type": "object",
@@ -7431,7 +8158,19 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "webServerActive": {
+      "expected": false,
+      "value": true
+     },
+     "systemWebPages": {
+      "expected": false,
+      "value": true
+     }
+    }
+   ]
   },
   "webserver_user_pages_generate": {
    "type": "object",
@@ -7500,7 +8239,15 @@
     "required": [
      "items"
     ]
-   }
+   },
+   "examples": [
+    {
+     "htmlDirectory": "C:/TiaMcpFixture/web",
+     "defaultPage": "index.html",
+     "applicationName": "FixturePages",
+     "override": false
+    }
+   ]
   }
  }
 }

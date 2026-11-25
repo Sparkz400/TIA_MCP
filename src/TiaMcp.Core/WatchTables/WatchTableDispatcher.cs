@@ -6,14 +6,18 @@ using TiaMcp.Core.EngineeringJobs;
 namespace TiaMcp.Core.WatchTables;
 
 /// <summary>Production Host integration. Every native call uses the same serialized bridge; no dispatch resumes automatically.</summary>
-public sealed partial class WatchTableDispatcher(IBridgeClient native, string artifactRoot, bool allowUnqualifiedDocumentEdits = false, bool allowComponentQualification = false) : IBridgeClient
+public sealed partial class WatchTableDispatcher(IBridgeClient native, string artifactRoot, bool allowUnqualifiedDocumentEdits = false, bool allowComponentQualification = false, TimeSpan? queueTimeout = null) : IBridgeClient
 {
     private readonly string root = Path.GetFullPath(artifactRoot);
     private readonly EngineeringOperationStore store = new(artifactRoot);
     private readonly SemaphoreSlim gate = new(1, 1);
     public async Task<JsonElement> CallAsync(string operation, object? arguments = null, CancellationToken cancellationToken = default)
     {
-        await gate.WaitAsync(cancellationToken);
+        // This gate is held for the whole native call, so a second call waits here and never reaches the bridge's own
+        // queue: without a bound it waited as long as the running call (a change_apply: the long timeout). Nothing was
+        // sent for a call that gives up here, as with the bridge's QueueTimeout.
+        if (!await gate.WaitAsync(queueTimeout ?? Timeout.InfiniteTimeSpan, cancellationToken))
+            throw new BridgeException("QueueTimeout", $"{operation} waited {(int)queueTimeout!.Value.TotalSeconds} s for the engineering worker: another engineering call is still running; nothing was sent.");
         try
         {
             var args = JsonSerializer.SerializeToNode(arguments ?? new { }, BridgeProtocol.Json)!.AsObject();

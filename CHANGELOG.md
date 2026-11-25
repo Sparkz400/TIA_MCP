@@ -10,10 +10,17 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.133`.
+## [0.9.0] - 2026-11-25
+
+First tagged pre-release. Changes since the repository went public on 23 October 2026, up to feature catalog `0.5.0`
+(the MCP surface redesign; see [Migration to 0.9.0](docs/reference/mcp-surface.md#migration-to-090) for retired tool names).
 
 ### Added
 
+- CI: a ruff gate (`ruff.toml`, job `lint-python`), 47 C# analyzer rules as build errors (`src/TiaMcp.Analyzers.globalconfig`), a weekly non-gating managed coverage report (`scripts/Measure-Coverage.ps1`), and an attested SPDX SBOM of the release ZIP published with each draft release.
+- `sim_network_mode_set` switches PLCSIM Advanced V8's machine-wide network mode after `acknowledgeMachineWide`, refusing while any instance is registered, on a stale or unknown mode, and reading the mode back (catalog `0.4.190`, unqualified; maintainer decision of 25 November).
+- `npm run test:explorer:scale` runs the 1,000-function Explorer browser check against a synthetic snapshot; it is part of the Explorer CI job.
+- An animated README demo (`docs/assets/demo.gif`) of the actual Project Explorer on synthetic sample data, regenerated with `npm run demo:record`.
 - `tia_discover` and `tia_attach` list `attachedSessions`, the other Openness clients of each TIA Portal (whether one is in a call and whether its process still runs); `tia_attach` takes `waitForIdleSeconds` and refuses with `OpennessClientBusy` instead of waiting behind a busy client. Another client is never disconnected (catalog `0.4.188`, unverified).
 - `project_open` opens a UMAC-protected project with `umacUserName`, `umacUserType` and `umacCredential`, a protected credential bound to the project path and user; the Host seals the stored password for that one open and TIA's login request is answered once ([route](docs/reference/protected-credentials.md#project-open-umac-route); catalog `0.4.188`, unverified).
 - `project_save` saves an open project in a worker-owned instance (no recovery archive; read-only projects and unresolved changes are refused), the step between `simulation_download` and credential provisioning (catalog `0.4.186`, unverified).
@@ -202,6 +209,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Changed
 
+- CI builds the portable package once and runs its packaged workflow stages in five parallel legs (`Test-OfflinePackage.ps1 -Stage`/`-ListStages`), aiming to cut the package check from about 21 to about 10 minutes; the aggregate job keeps the name the release gate requires.
+- Moved 109 unit tests that no evidence cites into `scripts/tests/`, and added a generated `scripts/README.md` index (`scripts/scripts_index.py`) that a test keeps current. Scripts that evidence cites, the qualification runners, the probes and the PowerShell entry points keep their paths.
+- The maintainer put `drives.engineering` out of 1.0 scope (25 November): its ledger disposition carries `"scope": "post-1.0"` instead of a V21 boundary, and `scripts/release_matrix.py` summarizes such rows as the new support class `descoped`, which neither counts toward 1.0 nor holds the release gate and is not a pass. Recorded the same day: per-attempt first-use TLS trust stays, fingerprint reuse stays off by default, the three lost library reports get a reviewer disposition, and the missing native recheck of the watch-owned Test Suite reopen is a stated limitation.
+- **Breaking (MCP surface redesign of 0.9.0, catalog `0.5.0`):** the per-workflow record tools of AutomationML, composite engineering, GRAPH, OPC UA, runtime handoff, translation and VCI (`*_list`, `*_reopen`, `*_page`/`*_report_page`/`translation_review_page`, `*_artifact_read`, 27 tools) are now `review_list`, `review_reopen`, `review_page` and `review_artifact_read` with a `kind` argument; each still revalidates its record through the family's own store, with one limit for every kind (100 records, 200 rows). Paging is `offset` + `count` with `nextOffset` everywhere (no `cursor`/`pageSize`, and `count` instead of `maxItems` on `feature_catalog` and the saved-review pagers); retained records are addressed by `recordRef` and uploads by `uploadRef` (`upload:<id>`, also from `artifact_upload_begin`). `safety_evidence_report`, `technology_profile_report`, `project_health_report` and three `*_page` tools are renamed to `*_review_page`/`project_health_review`. Output schemas over 1 KiB moved from `tools/list` to `tia://output-schemas/{tool}` and descriptions to at most 600 characters ([tool notes](docs/reference/tool-notes.md)): `tools/list` with `--toolsets all` shrank from about 700 KB to about 250 KB. No aliases; the [migration table](docs/reference/mcp-surface.md#migration-to-090) maps every retired name and parameter, and evidence recorded under a retired name still counts for its replacement.
 - **Breaking (tool surface cleanup):** `testsuite_style_plan_prepare`, `testsuite_application_plan_prepare` and `testsuite_system_plan_prepare` no longer return `completePlan`, a second copy of the reviewed plan. Read it with `testsuite_style_plan_review` and the returned `review` reference.
 - `project_model` is the one explorer tool. The eight `project_model_*` tools (`capture`, `children`, `search`, `details`, `relationships`, `verify`, `release`, `export`) and `project_index` stay callable with unchanged requests and results, but are deprecated and described in one line each; they will be removed in a later major release. The per-workflow `*_artifact_read` and `*_list` tools stay: they revalidate the retained input chain of their record, which the generic `artifact_read` does not.
 - Every Host tool result is built by one helper: the same JSON is serialized and parsed once and sent as the text block and as `structuredContent`, as the MCP specification recommends. Results are unchanged on the wire.
@@ -316,6 +327,20 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   ([hashes stored before RFC 8785](docs/reference/engineering-capture-identities.md#hashes-stored-before-rfc-8785)).
 
 ### Fixed
+
+- `runtime_ua_connect` gives the network connect its full 10 s: reading up to 1,024 retained session records used to spend the same deadline, so on a loaded machine a healthy server could be reported unreachable (seen twice in the offline suite on 25 November).
+- The simulator worker's Runtime-Manager-lost subscription never attached: PLCSIM's API spells the event `OnRunTimemanagerLost` (API 3.0 to 8.0), and the case-sensitive lookup used the manual's spelling.
+- `runtime_unified_connect` is tested offline end to end (certificate pin, protected-credential login, UMC language, alarms, disconnect, and pin, validity, host-name and login refusals). Malformed, DTD-bearing or too deeply nested review block XML is refused as `InvalidSnapshot` instead of a raw `XmlException`; `block_read` text rendering refuses exports nested deeper than 512 levels (`ExportedXmlTooDeep`) and still returns the export.
+- **Audit of 25 November (offline tests only, no native run):** a tool argument the workers cannot load (a property name repeated in one object, or nesting beyond the limit) is refused by the Host with `InvalidRequest` before anything is sent; it used to come back without its request id, which the Host treated as a protocol fault that ended the worker session with its attachment and open projects. The engineering and simulator workers also keep the request id of a frame they cannot load.
+- `--queue-timeout-seconds` now applies to engineering tools: they queue in the Host's dispatcher, which waited without a bound for the running call (a `change_apply`: up to the long timeout); a queued call now gives up with `QueueTimeout` and nothing sent.
+- `plc_tag_usage` reads its index files through the artifact store's root and link checks, refuses a file over 16 MiB before reading it and answers a file that is not a `block_export` index with `InvalidRequest`; a relative `index` path is now relative to the artifact directory.
+- HTML exports of `project_model` (`explorer-<guid>.html`, each embedding its snapshot) are aged out like block exports (14 days or 1 GiB, never a file younger than an hour); they used to accumulate without a bound.
+- `HmiPreservationUnavailable` refusals carry a `remediation` (closed gate, failed capture, coverage gaps, incomplete coverage, unreadable library link).
+- Found by the new seeded parser tests and fixed (25 November): a trace CSV import whose `missingValues` holds `null` raised `NullReferenceException`, and an option of the wrong JSON type (for example `headerRecord: "0"`) gave an uncoded failure; both are `InvalidRequest` now. A LAD/FBD wire end without `UId` made the network text renderer throw; it is shown as an unknown operand. In the Explorer tree, ArrowRight on a leaf no longer marks it expanded, so one ArrowLeft goes to its parent.
+- New offline tests: 109 checks for the `plc_physical_*`, `runtime_unified_*`, `review_list` (kind `composite_engineering`, formerly `composite_engineering_list`) and `drive_inventory` tool wrappers; about 22,500 seeded mutation cases for the block XML, trace CSV, AutomationML, NodeSet, GRAPH, network-text and ZIP/OPC readers; Explorer keyboard and ARIA checks; npm scripts for the Explorer benchmark and performance runs.
+- Change payload schemas carry `examples` for 88 kinds. `hmi-inspection.v1.schema.json` now fails non-device requests without an HMI selector, selector kinds outside the section, and `items` without `screenPath`.
+- `tia_capabilities` reports the product version as `workerVersion` (it was a fixed `0.3.0`, `0.1.0` on V19) and describes `physical_plc` as conditional on `--physical-plc-online` instead of unsupported.
+- The release workflow refuses a tag whose offline run skipped the code jobs (a docs-only push) and attests the release ZIP's build provenance (`gh attestation verify <zip> --repo Sparkz400/TIA_MCP`). Workflow actions are pinned to commit SHAs; CI checks Markdown links and runs PSScriptAnalyzer at error severity.
 
 - The review tools for connections, multiuser and Teamcenter observations, access, add-in selections, HMI components, DB snapshots, drive profiles, safety evidence, software units, technology profiles, saved project reviews and `project_model`, and `composite_engineering_capture`, no longer return the raw message of a file or permission error, which named absolute paths on the Host machine. They return a fixed message with the same error code.
 - `drive_inventory`, `servo_call_plan`, the Test Suite style job tools and `project_model` answer a file, JSON or XML failure with a coded `error` result instead of the SDK's generic error.
@@ -457,8 +482,12 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 - Pre-1.0. Use it only with offline projects, copies, scratch projects and simulators you own,
   never with production PLCs or plants.
-- 463 of 481 catalog features are verified; 22 release-matrix cells are open and 6 deferred
-  ([STATUS](docs/STATUS.md), [TODO](docs/TODO.md)).
+- 454 of 496 catalog features are verified; 85 release-matrix cells are open, 72 blocked by recorded V21
+  boundaries and 3 descoped (`drives.engineering`, out of 1.0 scope) ([STATUS](docs/STATUS.md), [TODO](docs/TODO.md)).
+- Implemented but never run natively: `sim_network_mode_set` (it changes PLCSIM's machine-wide network mode), the
+  WinCC Unified runtime alarm tools, and the real-PLC online tools behind the off-by-default `--physical-plc-online`
+  option; also the worker changes of 25 November (Host-side request refusal, queue timeout for engineering tools,
+  HMI preservation remediation texts, the PLCSIM Runtime-Manager-lost subscription). Each is an open box in the TODO.
 - V21 boundaries: no public API forces a value, an OPC UA reference-namespace import crashes TIA, V21 refuses the CPU protection
   level while UMAC runtime access is enabled (its password has a credential route), the PLC's OPC UA
   server has no `HistoryRead`, no public member moves a PLC block, Openness cannot install a GSD
@@ -480,4 +509,5 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   its `<name>(<n>)` form beside an existing `<name>`, so a tag that is itself named that way fails
   the change too.
 - Release assets are the offline bundle only; the engineering bundle with native workers is built
-  on a TIA V21 workstation. Bundle manifests are hash lists, not publisher signatures.
+  on a TIA V21 workstation. Bundle manifests are hash lists, not publisher signatures; the release ZIP carries
+  build-provenance and SPDX SBOM attestations (`gh attestation verify`) but no Authenticode signature.

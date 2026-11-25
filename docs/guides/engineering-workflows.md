@@ -427,7 +427,7 @@ at prepare, twice while the Host admits the apply, before the checkpoint
 (`StaleRevision`) and for the recorded outcome. Between an applied-and-saved change
 and the next one the project is normally untouched, so a Host started with
 `--enable-fingerprint-reuse` lets the worker keep its last read and reuse it. It is
-**off by default**, because one check below is still open. With reuse on, it applies
+**off by default** (maintainer decision of 25 November 2026), and one check below is still open. With reuse on, it applies
 under these conditions only:
 
 - TIA reports the project as saved (`IsModified` false) with the same
@@ -814,7 +814,7 @@ For a simple SCL/LAD/FBD argument, use `call_parameter_set` with the current `ne
 
 `engineering_read` accepts `scope: "hardware"`, `"network"`, `"technology"`, `"safety"` or `"calls"`, the normal project/PLC selectors, and optional `hardwarePath`, `name` and `maxItems` filters. The calls scope uses `blockName` or `blockPath` as described above.
 
-`cax_export` writes the whole project, or one exact device path from `device_inventory`, as a native AML file with its retained transfer result, and publishes it as an AutomationML document record for `automationml_report_page`/`automationml_compare`. It does not save the project. See [native CAx](../reference/automationml-workflow.md#native-cax-export-and-import).
+`cax_export` writes the whole project, or one exact device path from `device_inventory`, as a native AML file with its retained transfer result, and publishes it as an AutomationML document record for `review_page` (kind `automationml`)/`automationml_compare`. It does not save the project. See [native CAx](../reference/automationml-workflow.md#native-cax-export-and-import).
 
 Hardware results include available metadata and the bridge write allowlist. The initial subset contains `Name`, `Author`, `Comment`, `InformationText`, `PlantDesignation`, `LocationIdentifier`, `AdditionalInformation`, `ChannelActivation`, `MeasuringType`, `MeasuringRange`, `InputDelay`, `SubstituteValue`, `DigitalInputDelay`, a digital input channel's `HardwareInterruptRisingEdgeActive` with `HardwareInterruptRisingEdgeInterrupt` (the exact name of a hardware interrupt OB of the module's own PLC; V21 declares the link only while the flag is on, so enable both in one request and omit the link when disabling) and a PROFINET interface's `InterfaceOperatingMode`, a set of `IoController` and `IoDevice` (`"IoController, IoDevice"` makes the CPU an I-device for `hardware_gsd_export`; V21 refuses `IoDevice` alone on an S7-1500 CPU interface). Each must also exist and be readable/writable on the actual target. Some listed names are module-specific and may not be available.
 

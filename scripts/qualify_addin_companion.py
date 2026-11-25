@@ -5,7 +5,7 @@ declared permissions, sets the user environment variable TIAMCP_ARTIFACTS to thi
 and opens a project. The runner then starts the Host with --addin-handoff --addin-enrollment, attaches the worker to that
 TIA process, saves a review with project_snapshot_capture and waits for the operator to choose
 "Send selection to TIA MCP" on one to 64 project-tree objects. The completed handoff's record is read with
-addin_selection_page and checked: producer hashes equal the enrollment, the binding names this worker session, and every
+addin_selection_review_page and checked: producer hashes equal the enrollment, the binding names this worker session, and every
 reference resolves in the saved review. Nothing in the project is changed.
 """
 from __future__ import annotations
@@ -81,8 +81,8 @@ def main():
         folder = step("operator sent a selection", str(wait_for_handoff(artifacts, before)))
         receipt = json.loads((Path(folder) / "receipt.json").read_text(encoding="utf-8"))
         record = receipt.get("selectionRecordId") or receipt.get("SelectionRecordId")
-        summary = step("selection summary", client.tool("addin_selection_page", {"recordId": record, "section": "summary"}))
-        rows = step("selections", client.tool("addin_selection_page", {"recordId": record, "section": "selections", "count": 64}))
+        summary = step("selection summary", client.tool("addin_selection_review_page", {"recordRef": record, "section": "summary"}))
+        rows = step("selections", client.tool("addin_selection_review_page", {"recordRef": record, "section": "selections", "count": 64}))
         producer = step("stored producer", stored_producer(artifacts, summary, record))
         require(producer.get("assemblySha256") == enrollment["assemblySha256"] and producer.get("configurationSha256") == enrollment["configurationSha256"],
                 "The record does not carry the enrolled producer hashes")

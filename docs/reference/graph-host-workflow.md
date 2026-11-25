@@ -14,13 +14,13 @@ visible. The original bytes are retained without XML normalization.
    `recordRef`, artifact names and source/report hashes. The document owns copies
    of `original.xml`, `report.json` and self-contained `viewer.html`; the upload
    can now be released.
-3. Call `graph_report_page` with the exact handle and an array pointer such as
+3. Call `review_page` (kind `graph`) with the exact handle and an array pointer such as
    `/diagnostics`, `/unsupported`, `/graphs/0/sequences/0/steps`,
    `/graphs/0/sequences/0/transitions`, `/graphs/0/sequences/0/branches`,
    `/graphs/0/sequences/0/connections` or
    `/graphs/0/sequences/0/steps/1/actions`. Follow `nextOffset` until null.
    Indices are zero based. Scalar fields are available in the full report.
-4. Download a named artifact with `graph_artifact_read`, retaining the same handle
+4. Download a named artifact with `review_artifact_read` (kind `graph`), retaining the same handle
    and name while following byte offsets. Independently check the assembled byte
    count and SHA-256. `receipt.json` is also transferable; its digest is embedded
    in the handle.
@@ -28,7 +28,7 @@ visible. The original bytes are retained without XML normalization.
    Its `/changes`, `/beforeDiagnostics` and `/afterDiagnostics` arrays are pageable.
    Matching ambiguity, changed opaque XML and diagnostic differences stay explicit;
    no difference result certifies behavioral equivalence.
-6. After restart, use `graph_reopen` or `graph_list`. Reopen and transfer verify
+6. After restart, use `review_reopen` (kind `graph`) or `review_list` (kind `graph`). Reopen and transfer verify
    receipts, artifacts and both exact comparison inputs. Incomplete and damaged
    publications remain discoverable; they are not silently repaired or overwritten.
 

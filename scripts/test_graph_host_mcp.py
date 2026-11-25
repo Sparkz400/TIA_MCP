@@ -67,14 +67,14 @@ def main():
     def upload(data):
         status = call('artifact_upload_begin', dict(fileName='sequence.xml', expectedBytes=len(data), sha256=digest(data)))
         for offset in range(0, len(data), status['maxChunkBytes']):
-            call('artifact_upload_chunk', dict(uploadId=status['uploadId'], offset=offset,
+            call('artifact_upload_chunk', dict(uploadRef=status['uploadRef'], offset=offset,
                                               data=base64.b64encode(data[offset:offset+status['maxChunkBytes']]).decode()))
-        return call('artifact_upload_commit', dict(uploadId=status['uploadId']))
+        return call('artifact_upload_commit', dict(uploadRef=status['uploadRef']))
 
     def download(reference, name):
         data = bytearray()
         while True:
-            chunk = call('graph_artifact_read', dict(recordRef=reference, name=name, offset=len(data), count=8192))
+            chunk = call('review_artifact_read', dict(kind='graph', recordRef=reference, name=name, offset=len(data), count=8192))
             check('chunk offsets and lengths are contiguous', chunk['offset'] == len(data) and chunk['nextOffset'] == len(data)+chunk['count'])
             data.extend(base64.b64decode(chunk['data'], validate=True))
             if chunk['complete']:
@@ -89,9 +89,9 @@ def main():
         first = call('graph_inspect', dict(xmlUploadRef=uploaded['artifactRef'])); before = first['recordRef']
         check('native, behavior and full schema qualification remain false',
               all(first[k] is False for k in ['nativeQualified', 'behavioralEquivalenceCertified', 'fullSchemaValidated']))
-        call('artifact_upload_release', dict(uploadId=uploaded['uploadId']))
+        call('artifact_upload_release', dict(uploadRef=uploaded['uploadRef']))
         stop(); client = start()
-        check('restart reopens immutable record after source upload release', call('graph_reopen', dict(recordRef=before)) == first)
+        check('restart reopens immutable record after source upload release', call('review_reopen', dict(kind='graph', recordRef=before)) == first)
         check('download retains exact source bytes', download(before, 'original.xml') == raw)
         report_bytes = download(before, 'report.json'); inspection = json.loads(report_bytes)
         (output / 'inspection.json').write_bytes(report_bytes)
@@ -101,30 +101,30 @@ def main():
         check('static viewer has no script and includes CSP', b'<script' not in html.lower() and b'Content-Security-Policy' in html)
         steps = []; offset = 0
         while offset is not None:
-            page = call('graph_report_page', dict(recordRef=before, section='/graphs/0/sequences/0/steps', offset=offset, count=1))
+            page = call('review_page', dict(kind='graph', recordRef=before, section='/graphs/0/sequences/0/steps', offset=offset, count=1))
             check('page hash binds the downloaded report', page['reportSha256'] == digest(report_bytes))
             steps.extend(r['value']['name'] for r in page['rows']); offset = page['nextOffset']
         check('all step rows appear once in source order', steps == ['Idle', 'Run A', 'Run B'])
         second = call('graph_inspect', dict(xmlUploadRef=upload((ROOT / 'tests/TiaMcp.Graph.Tests/fixtures/sequence-v2.xml').read_bytes())['artifactRef']))
         comparison = call('graph_compare', dict(beforeRef=before, afterRef=second['recordRef']))
         check('comparison retains exact inputs and explicit changes', comparison['inputs'] == [before, second['recordRef']] and comparison['sourceBytesChanged'] and comparison['counts']['changes'] > 0)
-        check('comparison pages contain retained changes', bool(call('graph_report_page', dict(recordRef=comparison['recordRef'], section='/changes'))['rows']))
+        check('comparison pages contain retained changes', bool(call('review_page', dict(kind='graph', recordRef=comparison['recordRef'], section='/changes'))['rows']))
         reject('graph_compare', dict(beforeRef=comparison['recordRef'], afterRef=before), 'GraphInvalidReference')
-        reject('graph_report_page', dict(recordRef=before, section='/originalSourceBase64'), 'GraphInvalidSection')
-        reject('graph_report_page', dict(recordRef=before, section='/graphs', count=201), 'GraphPageLimit')
-        reject('graph_artifact_read', dict(recordRef=before, name='../intent.json'), 'GraphArtifactMissing')
-        reject('graph_artifact_read', dict(recordRef=before, name='original.xml', count=65537), 'InvalidRequest')
+        reject('review_page', dict(kind='graph', recordRef=before, section='/originalSourceBase64'), 'GraphInvalidSection')
+        reject('review_page', dict(kind='graph', recordRef=before, section='/graphs', count=201), 'GraphPageLimit')
+        reject('review_artifact_read', dict(kind='graph', recordRef=before, name='../intent.json'), 'GraphArtifactMissing')
+        reject('review_artifact_read', dict(kind='graph', recordRef=before, name='original.xml', count=65537), 'InvalidRequest')
         reject('graph_inspect', dict(xmlUploadRef=upload(b'<!DOCTYPE Graph [<!ENTITY e SYSTEM "file:///denied">]><Graph>&e;</Graph>')['artifactRef']), 'InvalidXml')
         retained = artifacts / 'graph-workflow' / before.split(':')[1] / 'original.xml'
         retained.write_bytes(raw+b' ')
-        reject('graph_reopen', dict(recordRef=comparison['recordRef']), 'GraphIntegrityFailure')
-        reject('graph_artifact_read', dict(recordRef=comparison['recordRef'], name='report.json'), 'GraphIntegrityFailure')
+        reject('review_reopen', dict(kind='graph', recordRef=comparison['recordRef']), 'GraphIntegrityFailure')
+        reject('review_artifact_read', dict(kind='graph', recordRef=comparison['recordRef'], name='report.json'), 'GraphIntegrityFailure')
         stop(); client = start()
-        check('tampered records remain discoverable after restart', any(r['state'] == 'integrity-failed' for r in call('graph_list')['rows']))
+        check('tampered records remain discoverable after restart', any(r['state'] == 'integrity-failed' for r in call('review_list', dict(kind='graph'))['rows']))
         retained.write_bytes(raw)
-        check('restored exact source revalidates input chain', call('graph_reopen', dict(recordRef=comparison['recordRef'])) == comparison)
+        check('restored exact source revalidates input chain', call('review_reopen', dict(kind='graph', recordRef=comparison['recordRef'])) == comparison)
         (artifacts / 'graph-workflow' / ('f'*32)).mkdir()
-        check('incomplete publication remains discoverable', any(r['state'] == 'incomplete' for r in call('graph_list')['rows']))
+        check('incomplete publication remains discoverable', any(r['state'] == 'incomplete' for r in call('review_list', dict(kind='graph'))['rows']))
         native_store = artifacts / 'engineering-operations'
         check('offline workflow creates no native engineering operation',
               (not native_store.exists() or not any(native_store.iterdir())) and not missing.exists())

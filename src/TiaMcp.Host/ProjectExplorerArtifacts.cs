@@ -28,6 +28,8 @@ internal static class ProjectExplorerArtifacts
         var output = Path.Combine(Path.GetDirectoryName(path)!, "explorer-" + Guid.NewGuid().ToString("N") + ".html");
         File.WriteAllText(output, html, new UTF8Encoding(false));
         var body = File.ReadAllBytes(output);
+        // Every export writes a new page that embeds the whole snapshot (up to 40 MiB); older ones are aged out like block exports.
+        ExportRetention.PruneExplorerViewers(Path.GetDirectoryName(output)!);
         result["snapshotArtifact"] = artifact.DeepClone();
         result["artifact"] = JsonSerializer.SerializeToNode(new { path = output, bytes = body.Length, sha256 = Convert.ToHexStringLower(SHA256.HashData(body)), mimeType = "text/html", portable = true, networkRequired = false });
         return JsonSerializer.SerializeToElement(result);

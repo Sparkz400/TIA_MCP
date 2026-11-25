@@ -3,11 +3,15 @@
 The matrix is derived from the feature catalog: one row per catalog feature, one
 cell per acceptance criterion. A cell is bound only when the feature is verified,
 and then names the evidence records and the hashes of their retained artifacts.
-Every other cell is open, except in two support classes summarized apart. Cells of
+Every other cell is open, except in three support classes summarized apart. Cells of
 unavailable_target rows are blocked: they do not count toward 1.0 (maintainer decision,
 29 October 2026; the ledger's dispositions records each row). A feature V21 has no API for is
 unavailable_target even when not implemented. Cells of deferred (not implemented) rows are
-deferred: not open cells, but still 1.0 work, listed in docs/TODO.md.
+deferred: not open cells, but still 1.0 work, listed in docs/TODO.md. A deferred row the
+maintainer put out of 1.0 scope is descoped: its ledger disposition carries "scope": "post-1.0"
+instead of a target boundary, and its cells are summarized as descoped, neither open nor
+deferred, and do not count toward 1.0 (first decision 25 November 2026). A scope decision is
+not a V21 boundary and not a pass.
 Owners come from the release-obligation ledger; features added after the ledger take the
 owner of their feature-name prefix.
 """
@@ -26,7 +30,11 @@ LEDGER = "docs/plans/release-obligations-20261015.json"
 MATRIX = "docs/plans/release-matrix.v1.json"
 PROFILE_KEYS = ("tiaVersion", "cpu", "firmware", "language", "languages", "simulatorVersion")
 # Support classes whose unbound cells are summarized apart from open 1.0 work.
-NOT_OPEN = {"deferred": "deferred", "unavailable_target": "blocked"}
+NOT_OPEN = {"deferred": "deferred", "unavailable_target": "blocked", "descoped": "descoped"}
+# The one scope a maintainer disposition may give a deferred row; anything else is an error.
+DESCOPED = "post-1.0"
+# Support classes that need a ledger disposition: blocked rows a boundary one, descoped rows a scope one.
+DISPOSED = ("unavailable_target", "descoped")
 
 # Obligation owners for features newer than the 15 October ledger, by feature-name prefix.
 PREFIX_OWNERS = {
@@ -40,12 +48,12 @@ PREFIX_OWNERS = {
     "opcua_": ["D04"], "plc.document_formats": ["X11"], "plc_compare": ["X01"], "plc_online_compare": ["D09", "C03"], "plc_station_upload": ["D09"], "plc_document_inventory": ["X11"], "plc_loadable_generate": ["X11"], "project_archive": ["X01"], "project_close": ["X01"], "project_save": ["X01"], "runtime_unified_": ["X13"], "project_open_copy": ["X01"], "plc_physical_": ["D09"], "project_copy": ["X01"], "project_upgrade": ["X01"], "project_open.read_only": ["X01"], "project_open.umac_login": ["X01"], "project_properties": ["X01"], "project_text_export": ["D03"], "project_snapshot": ["L04"], "public_certificate": ["X03"],
     "qualification_component": ["L02"], "qualification_testsuite": ["D06"],
     "qualification_translation": ["D03"], "qualification_watch": ["D02"],
-    "runtime.physical_plc": ["D16"], "runtime_capture": ["D16"], "runtime_handoff": ["C03"],
+    "project_health_review": ["L04", "X11"], "review_": ["D01", "D03", "D04", "D05", "X06", "C02", "C03"], "runtime.physical_plc": ["D16"], "runtime_capture": ["D16"], "runtime_handoff": ["C03"],
     "runtime_plcsim_bind": ["D16", "C03", "L03"], "runtime_web_write": ["D16", "L03"], "runtime_web_operating_mode": ["D16", "L03"], "runtime_ua_write": ["D16", "C03", "L03"],
     "runtime_ua_call": ["D16", "C03", "L03", "X13"], "runtime_ua_conditions": ["D16", "C03", "X13"], "runtime_ua_history_probe": ["D16", "C03", "X13"],
     "library_update_check": ["X02", "L02"], "change.library_cleanup": ["X02", "L02"], "change.library_harmonize": ["X02", "L02"], "runtime_ua": ["C03"], "runtime_web": ["D12"], "safety_evidence": ["D14"], "safety_validation_inspect": ["D14"], "safety_printout": ["D14"], "change.safety_fparameter_set": ["D14"], "library.integrate_combined_apply": ["X02", "L02"],
     "simulation_": ["L03"], "software_unit": ["D07"], "teamcenter_": ["X09"],
-    "sim_time": ["L03"], "sim_event": ["L03"], "sim_storage": ["L03"], "sim_prune": ["L03"], "sim_read_signals": ["L03"], "sim_write_signals": ["L03"], "sim_area_": ["L03"], "sim_observe": ["L03"], "sim_record": ["L03"], "change.simulation_download_online": ["L03", "D09"],
+    "sim_time": ["L03"], "sim_event": ["L03"], "sim_storage": ["L03"], "sim_prune": ["L03"], "sim_network_mode_set": ["L03"], "sim_read_signals": ["L03"], "sim_write_signals": ["L03"], "sim_area_": ["L03"], "sim_observe": ["L03"], "sim_record": ["L03"], "change.simulation_download_online": ["L03", "D09"],
     "change.hardware_cpu_parameters": ["X10"], "change.device_compile": ["X10", "X11"], "change.project_compile": ["X11", "X10"], "change.hmi_compile": ["X07"], "change.hmi_text_list_import": ["X07"], "change.hmi_classic_import": ["X07"], "change.hmi_external_tag_create": ["X08"], "change.hmi_screen_create": ["X08"], "change.hmi_dynamization_create": ["X08"], "change.hmi_event_handler_create": ["X08"], "change.tag_table_": ["X11"],
     "technology_profile": ["D13"], "testsuite_": ["D06"], "translation_": ["D03"],
     "vci_": ["D01"], "watch_table": ["D02"], "web_application": ["D12"],
@@ -65,6 +73,11 @@ def support(feature):
     if feature["qualification"]["status"] != "verified":
         return "unqualified"
     return "shipped" if feature["implementation"]["status"] == "implemented" else "limited"
+
+
+def scoped(base, descoped):
+    """A maintainer scope decision turns a deferred row descoped; any other class keeps its own."""
+    return "descoped" if descoped and base == "deferred" else base
 
 
 def owners(feature_id, ledger_owners):
@@ -100,6 +113,7 @@ def build(root=ROOT):
     ledger_owners = {row["featureId"]: row["obligations"] for row in ledger["catalogFeatures"]}
     roles = {row["id"]: row["ownerRole"] for row in ledger["obligations"]}
     records = {row["id"]: row for row in catalog["evidence"]}
+    out_of_scope = {row["featureId"] for row in ledger["dispositions"] if "scope" in row}
     rows, cited = [], set()
     for feature in catalog["features"]:
         verified = feature["qualification"]["status"] == "verified"
@@ -112,7 +126,7 @@ def build(root=ROOT):
         rows.append({
             "featureId": feature["featureId"], "domain": feature["domain"],
             "mcpTools": feature["mcpTools"], "changeKind": feature["changeKind"],
-            "support": support(feature), "owners": owner, "evidenceIds": proofs,
+            "support": scoped(support(feature), feature["featureId"] in out_of_scope), "owners": owner, "evidenceIds": proofs,
             "cells": [{"gate": gate, "status": "bound" if verified else "open",
                        "evidenceIds": proofs if verified else []} for gate in feature["acceptanceCriteria"]]})
     classes = collections.Counter(row["support"] for row in rows)
@@ -120,7 +134,8 @@ def build(root=ROOT):
     cells = collections.Counter()
     for row in rows:
         for cell in row["cells"]:
-            # Maintainer decision, 29 October 2026: rows V21 cannot close stay blocked and do not count toward 1.0.
+            # Maintainer decisions: rows V21 cannot close stay blocked (29 October 2026) and descoped rows
+            # are out of 1.0 scope (25 November 2026); neither counts toward 1.0.
             state = NOT_OPEN.get(row["support"], cell["status"])
             cells[state] += 1
             if state == "open":
@@ -141,11 +156,19 @@ def build(root=ROOT):
 
 
 def disposition_errors(rows, dispositions):
-    """A blocked row needs a maintainer disposition, and a disposition needs its blocked row."""
+    """A blocked row needs a boundary disposition, a descoped row a scope one; each disposition needs its row."""
     blocked = {row["featureId"] for row in rows if row["support"] == "unavailable_target"}
-    decided = {row["featureId"] for row in dispositions}
-    return ([f"{f}: blocked without a ledger disposition" for f in sorted(blocked - decided)]
-            + [f"{f}: ledger disposition without a blocked row" for f in sorted(decided - blocked)])
+    descoped = {row["featureId"] for row in rows if row["support"] == "descoped"}
+    scope = {row["featureId"] for row in dispositions if "scope" in row}
+    boundary = {row["featureId"] for row in dispositions} - scope
+    return ([f"{d['featureId']}: unknown disposition scope {d['scope']!r}" for d in dispositions
+             if "scope" in d and d["scope"] != DESCOPED]
+            + [f"{d['featureId']}: a scope decision is not a target boundary" for d in dispositions
+               if "scope" in d and d.get("boundary")]
+            + [f"{f}: blocked without a ledger disposition" for f in sorted(blocked - boundary)]
+            + [f"{f}: descoped without a scope disposition" for f in sorted(descoped - scope)]
+            + [f"{f}: ledger disposition without a blocked row" for f in sorted(boundary - blocked)]
+            + [f"{f}: scope disposition without a deferred row" for f in sorted(scope - descoped)])
 
 
 def acceptance_errors(obligation, ledger, matrix, root):
@@ -174,12 +197,12 @@ def acceptance_errors(obligation, ledger, matrix, root):
         known = {e["id"] for e in matrix["evidence"]} | {p.stem for p in (root / "evidence").glob("*.json")}
         if not required <= set(record["evidenceIds"]) <= known:
             raise ValueError("evidenceIds must cover every owned row and name current evidence")
-        blocked = {r["featureId"] for r in rows if r["support"] == "unavailable_target"}
+        blocked = {r["featureId"] for r in rows if r["support"] in DISPOSED}
         if set(record["dispositions"]) != blocked:
-            raise ValueError("dispositions must name exactly the owned blocked rows")
+            raise ValueError("dispositions must name exactly the owned blocked and descoped rows")
         decided = {d["featureId"] for d in ledger["dispositions"]}
         if not blocked <= decided:
-            raise ValueError("blocked row has no ledger disposition")
+            raise ValueError("blocked or descoped row has no ledger disposition")
 
         def git(*args):
             result = subprocess.run(["git", "-C", str(root), *args], capture_output=True, timeout=30)
@@ -209,7 +232,10 @@ def acceptance_errors(obligation, ledger, matrix, root):
 
 
 def release_gate_errors(version, ledger, matrix, root=ROOT):
-    """From 1.0 on, a release needs a ready ledger, every release obligation accepted and no open or deferred cell."""
+    """From 1.0 on, a release needs a ready ledger, every release obligation accepted and no open or deferred cell.
+
+    Blocked and descoped cells do not hold a release: each has a maintainer disposition in the ledger.
+    """
     if int(version.split(".")[0]) < 1:
         return []
     cells = matrix["summary"]["cells"]
@@ -229,7 +255,7 @@ def render(matrix):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="fail if the committed matrix is stale")
-    parser.add_argument("--release-gate", metavar="VERSION", help="fail unless VERSION may ship (1.0 and later need releaseReady, every obligation accepted and no open or deferred cells)")
+    parser.add_argument("--release-gate", metavar="VERSION", help="fail unless VERSION may ship (1.0 and later need releaseReady, every obligation accepted and no open or deferred cells; blocked and descoped cells do not hold it)")
     args = parser.parse_args()
     matrix = build()
     ledger = json.loads((ROOT / LEDGER).read_text(encoding="utf-8"))

@@ -367,8 +367,8 @@ public sealed partial class VciWorkspaceStore
     {
         using var gate = Lock();
         var entries = Directory.EnumerateDirectories(records).Order(StringComparer.Ordinal).Take(MaxRecords + 1).ToArray();
-        Require(entries.Length <= MaxRecords && offset >= 0 && offset <= entries.Length && count is > 0 and <= 50,
-            "VciInputLimit", "List accepts 1..50 records within the retained inventory.");
+        Require(entries.Length <= MaxRecords && offset >= 0 && offset <= entries.Length && count is > 0 and <= 100,
+            "VciInputLimit", "List accepts 1..100 records within the retained inventory.");
         var rows = entries.Skip(offset).Take(count).Select(directory =>
         {
             PackageStorage.EnsureNoLinks(directory); string id = PackageStorage.Id(Path.GetFileName(directory));
@@ -386,7 +386,7 @@ public sealed partial class VciWorkspaceStore
                 if (kind is null && (Directory.Exists(Path.Combine(directory, "fork-journal")) ||
                     File.Exists(Path.Combine(directory, "push-journal", "0001.json")) || File.Exists(Path.Combine(directory, "fetch-journal", "0001.json")))) state = "outcomeUnknown";
             }
-            // State comes from receipt files only; vci_reopen of the chosen record verifies the full chain and working tree.
+            // State comes from receipt files only; review_reopen (kind vci) of the chosen record verifies the full chain and working tree.
             catch (Exception e) when (e is BridgeException or IOException or JsonException or UnauthorizedAccessException) { state = "integrity-failed"; }
             return new { id, recordRef = reference, state };
         }).ToArray();
