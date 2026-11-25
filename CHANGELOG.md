@@ -10,7 +10,10 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.133`.
+## [0.9.0] - 2026-11-25
+
+First tagged pre-release. Changes since the repository went public on 23 October 2026, up to feature catalog `0.5.0`
+(the MCP surface redesign; see [Migration to 0.9.0](docs/reference/mcp-surface.md#migration-to-090) for retired tool names).
 
 ### Added
 
@@ -479,8 +482,12 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 - Pre-1.0. Use it only with offline projects, copies, scratch projects and simulators you own,
   never with production PLCs or plants.
-- 463 of 481 catalog features are verified; 22 release-matrix cells are open and 6 deferred
-  ([STATUS](docs/STATUS.md), [TODO](docs/TODO.md)).
+- 454 of 496 catalog features are verified; 85 release-matrix cells are open, 72 blocked by recorded V21
+  boundaries and 3 descoped (`drives.engineering`, out of 1.0 scope) ([STATUS](docs/STATUS.md), [TODO](docs/TODO.md)).
+- Implemented but never run natively: `sim_network_mode_set` (it changes PLCSIM's machine-wide network mode), the
+  WinCC Unified runtime alarm tools, and the real-PLC online tools behind the off-by-default `--physical-plc-online`
+  option; also the worker changes of 25 November (Host-side request refusal, queue timeout for engineering tools,
+  HMI preservation remediation texts, the PLCSIM Runtime-Manager-lost subscription). Each is an open box in the TODO.
 - V21 boundaries: no public API forces a value, an OPC UA reference-namespace import crashes TIA, V21 refuses the CPU protection
   level while UMAC runtime access is enabled (its password has a credential route), the PLC's OPC UA
   server has no `HistoryRead`, no public member moves a PLC block, Openness cannot install a GSD
@@ -502,4 +509,5 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   its `<name>(<n>)` form beside an existing `<name>`, so a tag that is itself named that way fails
   the change too.
 - Release assets are the offline bundle only; the engineering bundle with native workers is built
-  on a TIA V21 workstation. Bundle manifests are hash lists, not publisher signatures.
+  on a TIA V21 workstation. Bundle manifests are hash lists, not publisher signatures; the release ZIP carries
+  build-provenance and SPDX SBOM attestations (`gh attestation verify`) but no Authenticode signature.
