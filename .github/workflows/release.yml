@@ -1,7 +1,8 @@
 name: Release
 
-# Version tags only. Requires passed offline and Explorer runs on the tagged commit, packages and strictly verifies the offline bundle
-# and creates a DRAFT release; the maintainer reviews and publishes it (docs/guides/releasing.md).
+# Version tags only. Requires passed offline (code jobs run, not skipped) and Explorer runs on the tagged commit, packages and
+# strictly verifies the offline bundle, attests the ZIP's build provenance and creates a DRAFT release; the maintainer
+# reviews and publishes it (docs/guides/releasing.md).
 # It never publishes a release, creates a tag or pushes.
 on:
   push:
@@ -16,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
-      actions: read # gh run list only
+      actions: read # gh run list and the jobs of those runs only
     steps:
       - name: Require successful offline and Explorer runs on the tagged commit
         env:
@@ -24,10 +25,30 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           # main already ran both workflows on this commit; tag it only after they pass.
-          for workflow in offline.yml playwright.yml; do
-            passed=$(gh run list --workflow "$workflow" --commit "$GITHUB_SHA" --status success --json databaseId --jq length)
-            test "$passed" -gt 0 || { echo "No successful $workflow run on $GITHUB_SHA."; exit 1; }
+          passed=$(gh run list --workflow playwright.yml --commit "$GITHUB_SHA" --status success --json databaseId --jq length)
+          test "$passed" -gt 0 || { echo "No successful playwright.yml run on $GITHUB_SHA."; exit 1; }
+          # A successful offline.yml run proves nothing by itself: a docs-only push skips the Python, package and OPC UA
+          # jobs and still concludes success, and its managed and worker jobs succeed with every step skipped. These
+          # five jobs run only when the change scope is code (then the managed and worker steps run too), so one run
+          # must show each of them as passed; a skipped matrix reports one unexpanded name and matches none.
+          # test_ci_workflows.py keeps the names in step with offline.yml. Pull request runs do not count: they may
+          # run the package job in quick mode.
+          ran_code='["Python harnesses (shard 0/3)", "Python harnesses (shard 1/3)", "Python harnesses (shard 2/3)",
+            "Portable package and relocation", "OPC UA isolated parser and CLI"] as $required
+            | [.jobs[] | select(.conclusion == "success") | .name] as $passed
+            | $required | all(. as $name | $passed | index($name) != null)'
+          runs=$(gh run list --workflow offline.yml --commit "$GITHUB_SHA" --status success --limit 100 --json databaseId,event --jq '.[] | select(.event != "pull_request") | .databaseId')
+          full=
+          for run in $runs; do
+            verdict=$(gh api "repos/$GH_REPO/actions/runs/$run/jobs?per_page=100" --jq "$ran_code") || verdict=error
+            echo "offline.yml run $run: code jobs passed: $verdict"
+            if [ "$verdict" = true ]; then full=$run; fi
           done
+          test -n "$full" || {
+            echo "No successful offline.yml run on $GITHUB_SHA ran the code jobs (a docs-only push skips them)."
+            echo "Start a full one with: gh workflow run offline.yml --ref $GITHUB_REF_NAME, and re-run this job once it passed."
+            exit 1
+          }
 
   build:
     name: Package and verify
@@ -37,14 +58,14 @@ jobs:
     permissions:
       contents: read # NuGet restore and dotnet build run here, so no write token
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 0 # acceptance records bind the matrix and frozen inputs of a reviewed ancestor
-      - uses: actions/setup-dotnet@v6
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           dotnet-version: '10.0.402' # Published SDK; avoid unavailable latestFeature redirects.
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.13'
       - name: Package, verify and stage the release files
@@ -61,6 +82,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Release gate refused $version." }
           # From 1.0 on the bundle's Host must keep the frozen surface of contracts/mcp-surface.v1.json (contract freeze policy).
           python -m pip install -r scripts/requirements-test.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Installing scripts/requirements-test.txt failed.' }
           $surface = Join-Path $env:RUNNER_TEMP 'mcp-surface'
           python -B scripts/test_mcp_surface_host.py --host (Join-Path $bundle 'host/TiaMcp.Host.exe') --output $surface
           if ($LASTEXITCODE -ne 0) { throw 'MCP surface discovery of the bundled Host failed.' }
@@ -74,25 +96,44 @@ jobs:
           Copy-Item -LiteralPath (Join-Path $bundle 'manifest.json') -Destination (Join-Path $stage ((Split-Path $bundle -Leaf) + '.manifest.json'))
           Copy-Item -LiteralPath "$bundle.zip", "$bundle.zip.sha256" -Destination $stage
           "RELEASE_FILES=$stage" | Add-Content -LiteralPath $env:GITHUB_ENV
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-files
           path: ${{ env.RELEASE_FILES }}
           if-no-files-found: error
           retention-days: 7
 
+  attest:
+    name: Build provenance
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      id-token: write # Sigstore signing certificate for this workflow run
+      attestations: write # store the attestation; nothing is built or checked out here
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-files
+          path: release-files
+      # Binds the ZIP's SHA-256 to this repository, workflow and tag; check with
+      # `gh attestation verify <zip> --repo Sparkz400/TIA_MCP`.
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: release-files/*.zip
+
   draft:
     name: Draft release
-    needs: build
+    needs: [build, attest] # no draft without provenance for its ZIP
     runs-on: windows-latest
     timeout-minutes: 15
     permissions:
       contents: write # gh release create --draft only; nothing is built here
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-files
           path: release-files

@@ -82,6 +82,6 @@ gate:
 
 Proposed TODO text: "[x] `safety.logic_changes` (D14): V21 boundary on 1 November (records
 `local.safety.logic_plcsim_boundary.20261101`, `local.safety.logic_online_route.20261101`,
-[record](verification/safety-logic-plcsim-20261101.md)). Changed F-logic imports and compiles; V21 cannot load a safety
+[record](safety-logic-plcsim-20261101.md)). Changed F-logic imports and compiles; V21 cannot load a safety
 program into a PLCSIM memory card, the online route requires that card, and V21's SafetyProgram download confirmation is
 outside the project's policy. Closed as unavailable_target."
