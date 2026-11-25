@@ -57,8 +57,12 @@ const report = { startedAtUtc: new Date().toISOString(), passed: false, syntheti
     : 'Current project UI renders a hash-verified native offline export. This is not desktop MCP Apps host or PLC runtime acceptance.',
   input: { path: input, sha256: hash(nativeBytes) }, snapshot: { path: snapshotPath, sha256: hash(snapshotBytes), snapshotId: snapshot.snapshotId },
   sources, checks: [], screenshots: [], pageErrors: [], networkRequests: [] };
-const browser = await chromium.launch({ headless: true, downloadsPath: path.join(output, 'downloads'), args: ['--allow-file-access-from-files'] });
-report.browser = { version: browser.version(), executablePath: chromium.executablePath() };
+// Same browser choice as browser.mjs: EXPLORER_BROWSER, else Playwright's bundled Chromium, else installed Chrome on Windows.
+const bundledBrowser = chromium.executablePath();
+const bundledBrowserInstalled = await fs.stat(bundledBrowser).then(info => info.isFile(), () => false);
+const executablePath = process.env.EXPLORER_BROWSER || (bundledBrowserInstalled ? bundledBrowser : (process.platform === 'win32' ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' : undefined));
+const browser = await chromium.launch({ headless: true, executablePath, downloadsPath: path.join(output, 'downloads'), args: ['--allow-file-access-from-files'] });
+report.browser = { version: browser.version(), executablePath: executablePath ?? bundledBrowser };
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, colorScheme: 'light', acceptDownloads: true });
 page.on('pageerror', error => report.pageErrors.push(error.message));
 page.on('request', request => { if (/^https?:/.test(request.url())) report.networkRequests.push(request.url()); });
