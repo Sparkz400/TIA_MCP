@@ -19,7 +19,11 @@ public static class ExportRetention
     /// <summary>Throttled to once per interval and directory; never throws, because a cleanup must not fail the export that triggered it.</summary>
     public static void Prune(string exportsDirectory) => Prune(exportsDirectory, MaxAge, MaxBytes, DateTime.UtcNow, throttle: true);
 
-    internal static void Prune(string exportsDirectory, TimeSpan maxAge, long maxBytes, DateTime nowUtc, bool throttle)
+    /// <summary>The same bounds for the self-contained Explorer pages (<c>explorer-&lt;guid&gt;.html</c>, each embedding its
+    /// snapshot) that an HTML project-model export writes beside the snapshots; the snapshots themselves are not touched.</summary>
+    public static void PruneExplorerViewers(string directory) => Prune(directory, MaxAge, MaxBytes, DateTime.UtcNow, throttle: true, viewers: true);
+
+    internal static void Prune(string exportsDirectory, TimeSpan maxAge, long maxBytes, DateTime nowUtc, bool throttle, bool viewers = false)
     {
         try
         {
@@ -27,11 +31,12 @@ public static class ExportRetention
             if (!Directory.Exists(key)) return;
             if (throttle)
             {
-                if (LastRun.TryGetValue(key, out var last) && nowUtc - last < Interval) return;
-                LastRun[key] = nowUtc;
+                string run = viewers ? key + "|viewers" : key;
+                if (LastRun.TryGetValue(run, out var last) && nowUtc - last < Interval) return;
+                LastRun[run] = nowUtc;
             }
-            var files = new DirectoryInfo(key).EnumerateFiles("block-*")
-                .Where(f => f.Name.StartsWith("block-export-", StringComparison.Ordinal) ? f.Extension == ".json" : f.Extension is ".xml" or ".txt")
+            var files = new DirectoryInfo(key).EnumerateFiles(viewers ? "explorer-*.html" : "block-*")
+                .Where(f => viewers || (f.Name.StartsWith("block-export-", StringComparison.Ordinal) ? f.Extension == ".json" : f.Extension is ".xml" or ".txt"))
                 .Where(f => (f.Attributes & FileAttributes.ReparsePoint) == 0).OrderBy(f => f.LastWriteTimeUtc).ToList();
             long total = files.Sum(f => f.Length);
             foreach (var file in files)

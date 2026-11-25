@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <ProjectReference Include="../../src/TiaMcp.Core/TiaMcp.Core.csproj" />
+    <Compile Include="../Shared/SeededMutations.cs" Link="Shared/SeededMutations.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/OfflineEvidence.cs" Link="OfflineEvidence.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectLockRules.cs" Link="ProjectLockRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/OpennessClientRules.cs" Link="OpennessClientRules.cs" />

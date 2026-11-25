@@ -8,6 +8,7 @@ import { pack } from '../pack.mjs';
 import { hostFixture } from './host-fixture.mjs';
 import { runtimeCaptureBrowser } from './runtime-capture-browser.mjs';
 import { observeImports, importSnapshot } from './import-measurement.mjs';
+import { keyboardAriaBrowser } from './keyboard-aria-browser.mjs';
 const require = createRequire(import.meta.url);
 const { fixture, synthetic } = require('./fixture.cjs');
 const { graphFixture } = require('./graph-fixture.cjs');
@@ -228,6 +229,7 @@ try {
     report.performance.push(result);
   }
   check('1k/10k/50k saved nodes and edges virtualize tree rows; actual bounded 500-node/1000-edge query renders with visible large connected graph truncation');
+  await keyboardAriaBrowser(browser, pathToFileURL(viewer).href, check, errors, requests, report);
   const nativeArg=process.argv.indexOf('--snapshot');
   if(nativeArg>=0){
     const nativePath=path.resolve(process.argv[nativeArg+1]),snapshot=JSON.parse(await fs.readFile(nativePath,'utf8')),nativeHtml=path.join(output,'native-viewer.html');

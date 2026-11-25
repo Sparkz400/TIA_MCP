@@ -63,7 +63,8 @@ try
             builder.Services.AddSingleton<TiaMcp.Core.Inventory.IInventoryIdentityFactory, TiaMcp.Core.Inventory.SiemensWebIdentityFactory>();
             IBridgeClient native = new CredentialRoute(options.WatchQualificationPoint is null ? bridge : new WatchQualificationBridge(bridge, options));
             builder.Services.AddSingleton<IBridgeClient>(new TiaMcp.Core.WatchTables.WatchTableDispatcher(native, options.ArtifactsDirectory,
-                allowUnqualifiedDocumentEdits: options.WatchQualificationPoint is not null, allowComponentQualification: options.ComponentQualification));
+                allowUnqualifiedDocumentEdits: options.WatchQualificationPoint is not null, allowComponentQualification: options.ComponentQualification,
+                queueTimeout: TimeSpan.FromSeconds(options.QueueTimeoutSeconds ?? options.TimeoutSeconds)));
             builder.Services.AddSingleton(simulator);
             builder.Services.AddSingleton<PlcsimTargets>();
             builder.Services.PostConfigure<ModelContextProtocol.Server.McpServerOptions>(server => ToolSurface.Apply(server, options));

@@ -198,20 +198,9 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
     [Description("Report which exported blocks read and write each I/Q PLC tag, to answer whether an input or output is used. index is the index file of a block_export run (several, comma-separated, for a paged export); its XML files are scanned on disk, LAD/FBD and SCL networks alike, and the tags are read from the offline project. Each tag lists readers and writers as block and network number; unusedOnly=true returns only tags no scanned block references, namePrefix narrows the tags. absoluteAccesses lists direct %I/%Q operands that bypass the tags. Static evidence over the exported blocks only: know-how protected or skipped blocks, technology-object and HMI use, hardware-identifier access and PEEK/POKE are not seen, so an unused tag is unused in the scanned code, not proven unused. No project changes.")]
     public async Task<CallToolResult> PlcTagUsage(string index, CancellationToken cancellationToken, string? plcPath = null, string? projectName = null, bool unusedOnly = false, string? namePrefix = null)
     {
-        string root = Path.GetFullPath(options.ArtifactsDirectory) + Path.DirectorySeparatorChar;
-        var files = new List<string>();
-        var skipped = new List<string>();
-        foreach (string entry in index.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
-        {
-            string path = Path.GetFullPath(entry);
-            if (!path.StartsWith(root, StringComparison.OrdinalIgnoreCase) || !File.Exists(path)) throw new McpException("index must name block_export index files below the Host artifact directory.");
-            var document = System.Text.Json.Nodes.JsonNode.Parse(await File.ReadAllTextAsync(path, cancellationToken)) as System.Text.Json.Nodes.JsonObject;
-            if (document?["blocks"] is not System.Text.Json.Nodes.JsonArray rows || document["directory"]?.GetValue<string>() is not { } directory)
-                throw new McpException("index is not a block_export index file.");
-            foreach (var row in rows)
-                if (row?["xml"]?.GetValue<string>() is { } xml && Path.GetFullPath(Path.Combine(directory, xml)) is var file && file.StartsWith(root, StringComparison.OrdinalIgnoreCase) && File.Exists(file)) files.Add(file);
-                else skipped.Add(row?["name"]?.GetValue<string>() ?? "?");
-        }
+        List<string> files, skipped;
+        try { (files, skipped) = TagUsageScan.IndexFiles(options.ArtifactsDirectory, index); }
+        catch (BridgeException error) { return Failure(error); }
         if (files.Count == 0) throw new McpException("The index lists no exported block files.");
         try
         {

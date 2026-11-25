@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Native/**/*.cs" />
+    <Compile Include="../Shared/SeededMutations.cs" Link="Shared/SeededMutations.cs" />
     <None Remove="Native/bin/**/*;Native/obj/**/*" />
     <ProjectReference Include="../../src/TiaMcp.Graph/TiaMcp.Graph.csproj" />
     <ProjectReference Include="../../src/TiaMcp.Graph.Cli/TiaMcp.Graph.Cli.csproj" />

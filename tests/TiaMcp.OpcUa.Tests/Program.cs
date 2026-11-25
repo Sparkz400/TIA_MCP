@@ -188,6 +188,8 @@ Test("XML event budget includes annotations and opaque elements before DOM alloc
     }
 });
 
+Test("seeded mutations are read or refused", () => Console.WriteLine(RobustnessChecks.Run(Fixture)));
+
 int failures = RunTests(tests, failuresToStderr: true);
 Console.WriteLine($"{tests.Count - failures}/{tests.Count} offline OPC UA checks passed. No native qualification.");
 return failures == 0 ? 0 : 1;

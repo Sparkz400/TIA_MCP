@@ -106,6 +106,16 @@ internal static class StoreRetentionTests
             ExportRetention.Prune(root, TimeSpan.FromDays(14), 105, now, throttle: false);
             Check.Equal(false, File.Exists(older));
             Check.Equal(true, File.Exists(recentTxt) && File.Exists(justWritten));
+
+            // Explorer pages have their own selection: only explorer-*.html, never the snapshots beside them or block exports.
+            string oldPage = Make("explorer-" + Guid.NewGuid().ToString("N") + ".html", TimeSpan.FromDays(30)),
+                newPage = Make("explorer-" + Guid.NewGuid().ToString("N") + ".html", TimeSpan.FromMinutes(1)),
+                snapshot = Make("project-model-" + Guid.NewGuid().ToString("N") + ".json", TimeSpan.FromDays(30));
+            ExportRetention.Prune(root, TimeSpan.FromDays(14), 1L << 30, now, throttle: false);
+            Check.Equal(true, File.Exists(oldPage));
+            ExportRetention.Prune(root, TimeSpan.FromDays(14), 1L << 30, now, throttle: false, viewers: true);
+            Check.Equal(false, File.Exists(oldPage));
+            Check.Equal(true, File.Exists(newPage) && File.Exists(snapshot) && File.Exists(recentTxt) && File.Exists(other));
         }
         finally { Directory.Delete(root, true); }
         return Task.CompletedTask;

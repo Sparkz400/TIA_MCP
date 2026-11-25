@@ -205,7 +205,7 @@ namespace TiaMcp.Openness.V21
         private JObject BridgeInfo()
         {
             var result = Envelope();
-            result["workerVersion"] = "0.3.0";
+            result["workerVersion"] = typeof(OpennessSession).Assembly.GetName().Version.ToString(3); // The product version (Directory.Build.props).
             result["tiaVersion"] = 21;
             result["apiDirectory"] = _apiDirectory;
             result["apiAssemblyVersion"] = typeof(TiaPortal).Assembly.GetName().Version.ToString();
@@ -241,11 +241,11 @@ namespace TiaMcp.Openness.V21
                 Capability("recoverable_changes", "conditional", "Prepare/apply with preview hashes, conflict detection, recovery archive, persistent journal and compile results. Supported source/XML and typed engineering subsets only."),
                 Capability("library_management", "conditional", "Managed global/project libraries, exact native type/version inspection, native copies, constrained authoring/update operations and durable resource journals. HMI products and native target qualification remain separate prerequisites."),
                 Capability("safety_engineering", "conditional", "Exposed safety metadata/signatures and dedicated eligible F-block XML import. Protection is respected; safety acceptance/commissioning is outside this workflow."),
-                Capability("simulation_download", "conditional", "Offline memory-card generation for an independently verified owned PLCSIM Advanced V8 instance; no physical PLC download route."),
+                Capability("simulation_download", "conditional", "Offline memory-card generation for an independently verified owned PLCSIM Advanced V8 instance; this operation never loads a physical PLC (see physical_plc)."),
                 Capability("simulation_provision_scratch_credential", "conditional", "Existing generated scratch credential provisioning only for a ticket-bound owned local PLCSIM instance over isolated Softbus; runtime qualification is separate."),
                 Capability("simulation_discovery_baseline", "conditional", "PLCSIM discovery before any instance registration; may start the Runtime Manager. Lets the next provisioning attempt in the same session, project and PLC, within five minutes, exclude only the single exact all-zero Runtime Manager entry from the same process."),
                 Capability("runtime_values", "conditional", "Separate PLCSIM Advanced V8 adapter provides typed values and bounded test scenarios; installed runtime license and compatible CPU/program are required."),
-                Capability("physical_plc", "unsupported", "No physical PLC runtime writes, forces, downloads or CPU state changes are exposed."));
+                Capability("physical_plc", "conditional", "Online compare, station upload and download to a real PLC are refused unless the Host was started with --physical-plc-online (off by default; plc_physical_* tools), and are not qualified on physical hardware. Runtime value writes, forces and CPU mode control are not exposed."));
         }
 
         private static JObject Capability(string name, string status, string reason) => new JObject { ["name"] = name, ["status"] = status, ["reason"] = reason };

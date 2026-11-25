@@ -610,6 +610,27 @@ Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties
     var unusedOnly = TagUsageScan.Report(tags, uses, true);
     Check(unusedOnly["tags"]!.AsArray().Count == 1 && unusedOnly["tags"]![0]!["name"]!.GetValue<string>() == "iSpare" && unusedOnly["summary"]!["ioTags"]!.GetValue<int>() == 4, "unusedOnly keeps only unreferenced tags and the full summary");
 }
+// plc_tag_usage index files: inside the artifact root, not through links, size-capped before reading, and typed refusals.
+{
+    var usageRoot = Path.Combine(output, "tag-usage"); var exports = Path.Combine(usageRoot, "exports"); var usageOutside = Path.Combine(output, "tag-usage-outside");
+    Directory.CreateDirectory(exports); Directory.CreateDirectory(usageOutside);
+    File.WriteAllText(Path.Combine(exports, "block-a.xml"), "<Document />"); File.WriteAllText(Path.Combine(usageOutside, "block-b.xml"), "<Document />");
+    string Index(string name, object content) { var path = Path.Combine(exports, name); File.WriteAllText(path, JsonSerializer.Serialize(content)); return path; }
+    var good = Index("block-export-1.json", new { directory = exports, blocks = new object[] { new { name = "A", xml = "block-a.xml" }, new { name = "Gone", xml = "missing.xml" },
+        new { name = "Escapes", xml = Path.Combine(usageOutside, "block-b.xml") }, new { name = "NoFile" }, 7 } });
+    var (files, skipped) = TagUsageScan.IndexFiles(usageRoot, good + ", " + Path.GetRelativePath(usageRoot, good));
+    Check(files.Count == 2 && files.All(f => f == Path.Combine(exports, "block-a.xml")) && skipped.SequenceEqual(new[] { "Gone", "Escapes", "NoFile", "?", "Gone", "Escapes", "NoFile", "?" }),
+        "An index lists its block files; missing rows and rows outside the artifact directory are skipped by name");
+    Fails(() => TagUsageScan.IndexFiles(usageRoot, Path.Combine(usageOutside, "block-b.xml")), "ArtifactPathDenied");
+    Fails(() => TagUsageScan.IndexFiles(usageRoot, Path.Combine(exports, "absent.json")), "ArtifactUnavailable");
+    Fails(() => TagUsageScan.IndexFiles(usageRoot, Path.Combine(exports, "block-a.xml")), "InvalidRequest");
+    Fails(() => TagUsageScan.IndexFiles(usageRoot, Index("not-index.json", new { blocks = 1 })), "InvalidRequest");
+    Fails(() => TagUsageScan.IndexFiles(usageRoot, Index("bad-directory.json", new { directory = 5, blocks = Array.Empty<object>() })), "InvalidRequest");
+    var large = Path.Combine(exports, "backup.bin");
+    using (var stream = File.Create(large)) stream.SetLength(TagUsageScan.MaxIndexBytes + 1);
+    Fails(() => TagUsageScan.IndexFiles(usageRoot, large), "InvalidRequest");
+    File.Delete(large);
+}
 // Resources read through the artifact-root and link checks of artifact_read; completion lists names only, never through links.
 var resourceRoot = Path.Combine(output, "resources");
 var outside = Path.Combine(output, "outside");
@@ -674,6 +695,14 @@ Directory.Delete(link);
         .Select(method => method.Name + "=" + System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>(method)!.Description.Length).ToArray();
     Check(overBudget.Length == 0, "Tool descriptions stay within 1900 characters: " + string.Join(", ", overBudget));
 }
+// MCP tool wrappers against fake bridges and a scripted GraphQL server: no worker, PLC, runtime or vault.
+int beforeWrappers = checks;
+await PhysicalPlcToolChecks.Run(Check, Path.Combine(output, "physical-plc-host"));
+int afterPhysical = checks;
+await UnifiedRuntimeToolChecks.Run(Check);
+int afterUnified = checks;
+await WrapperToolChecks.Run(Check, Path.Combine(output, "wrapper-host"));
+Console.WriteLine($"PASS Host tool wrappers: {afterPhysical - beforeWrappers} plc_physical_*, {afterUnified - afterPhysical} runtime_unified_*, {checks - afterUnified} composite/drive checks.");
 Console.WriteLine("Export artifacts: " + output);
 Console.WriteLine($"PASS Inventory: {checks} checks, 30000 rows / {pages} pages; protocol fixtures, exports and host guards. No physical hardware qualification.");
 

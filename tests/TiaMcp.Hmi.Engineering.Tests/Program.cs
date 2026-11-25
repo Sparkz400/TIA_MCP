@@ -56,6 +56,18 @@ Check("An explicit target.kind must be one the operation's native prepare accept
     try { HmiEngineeringRules.RequireTargetKind("item_create", "unified", "hmiDevice"); throw new Exception("Expected a refusal."); }
     catch (ArgumentException error) { Assert(error.Message.Contains("hmiScreen") && error.Message.Contains("hmiDevice")); }
 });
+Check("An HmiPreservationUnavailable refusal carries a remediation on a copy of its details", () => {
+    var manifest = new JObject { ["complete"] = false, ["nativeFailure"] = new JObject { ["message"] = "x" } };
+    string before = manifest.ToString();
+    foreach (string text in new[] { HmiPreservationRemediation.Gate, HmiPreservationRemediation.CaptureFailed, HmiPreservationRemediation.CoverageGaps,
+        HmiPreservationRemediation.CompleteCoverage, HmiPreservationRemediation.ManifestWrite })
+    {
+        var details = HmiPreservationRemediation.With(manifest, text);
+        Assert(details.Value<string>("remediation") == text && text.StartsWith("No change was made.") && details["nativeFailure"]!.Value<string>("message") == "x");
+    }
+    Assert(manifest.ToString() == before); // The captured manifest is evidence and stays as captured.
+    Assert(HmiPreservationRemediation.With(null, HmiPreservationRemediation.Gate).Count == 1);
+});
 Check("A caller cannot turn native qualification on or substitute metadata revision", () => {
     foreach (string field in new[] { "qualified", "force", "preservationVerified", "metadataRevision" }) {
         var request = Scalar(); request[field] = true; Reject(() => HmiEngineeringRules.RequireRequest(request));

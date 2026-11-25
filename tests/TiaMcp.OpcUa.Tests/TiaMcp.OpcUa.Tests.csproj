@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/TiaMcp.OpcUa/TiaMcp.OpcUa.csproj" />
+    <Compile Include="../Shared/SeededMutations.cs" Link="Shared/SeededMutations.cs" />
     <None Include="../../fixtures/opcua/*.xml" Link="fixtures/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

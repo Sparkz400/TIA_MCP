@@ -1,8 +1,13 @@
 """contracts/change-payloads.v1.schema.json agrees with the worker's payload parsers on payloads whose verdict the code fixes.
 
-Each case is (kind, payload, worker accepts). The expectations follow the cited worker rules; they are not native evidence."""
+Each case is (kind, payload, worker accepts). The expectations follow the cited worker rules; they are not native evidence.
+
+Every inline kind also carries `examples`: payloads with synthetic names whose shapes and literal values come from the
+qualification harnesses (scripts/qualify_*.py) and the accepted cases below. They show a valid shape, not a payload that
+applies to any project: paths, names, hashes and credential references stand for what inventory returns."""
 import json
 import pathlib
+import re
 import unittest
 
 from jsonschema import Draft202012Validator
@@ -60,6 +65,52 @@ CASES = [
     ("plc_compile", {"a": 1}, False),
 ]
 
+# Inline kinds without an example yet, each with the reason. A kind leaves this list by getting an example.
+NO_EXAMPLE_YET = {
+    # The payload carries a whole exported document; a short real one does not exist.
+    "block_import_xml": "inline SimaticML block document",
+    "plc_type_import_xml": "inline SimaticML type document",
+    "safety_import_xml": "inline SimaticML F-block document",
+    "graphical_network_insert": "inline SimaticML compile unit",
+    # A required field is an opaque handle another tool issues; no fixture literal shows its form.
+    "certificate_import": "uploadRef of a committed upload",
+    "graph_import": "graphRef of a reviewed GRAPH document",
+    "software_unit_create_from": "libraryId and masterCopyPath of an open library",
+    "db_snapshot_create": "downloadTicket of an owned simulation",
+    "db_snapshot_load_actual": "downloadTicket and a reviewed snapshot record",
+    "simulation_download_online": "downloadTicket of an owned simulation",
+    "vci_workspace_create": "VCI group path from the worker's inventory",
+    "vci_workspace_delete": "VCI workspace path from the worker's inventory",
+    "vci_mapping_add": "VCI workspace path from the worker's inventory",
+    "vci_mapping_remove": "VCI workspace path from the worker's inventory",
+    "vci_synchronize": "VCI workspace path from the worker's inventory",
+    "vci_conflict_resolve": "VCI workspace path, comparison record and package id",
+    # Each entry guards on the value observed on the target, in the form the read tool reports it.
+    "drive_motor_configure": "expected nameplate values as observed on the drive",
+    "drive_parameter_set": "expected parameter values as observed on the drive",
+    "drive_telegram_set": "expectedTelegrams rows as observed on the drive",
+    "safety_fparameter_set": "F-parameter names and expected values as observed on the module",
+    "hardware_channel_attributes": "channel values in the native form the hardware read reports",
+    # The replacement must be a catalog identifier compatible with the module it replaces; no harness literal pairs the two.
+    "hardware_replace": "a compatible catalog typeIdentifier for the replaced module",
+    # Valid for the parser, but V21 declares every allowlisted attribute read-only (qualify_project_settings.py).
+    "project_attributes_set": "always refused on V21 with AttributeNotWritable",
+}
+
+
+def declared_properties(schema):
+    """Property names a kind declares on its payload object, through allOf/oneOf/anyOf, if/then/else and local $ref."""
+    names = set(schema.get("properties", {}))
+    for word in ("allOf", "oneOf", "anyOf"):
+        for part in schema.get(word, []):
+            names |= declared_properties(part)
+    for word in ("if", "then", "else"):
+        if isinstance(schema.get(word), dict):
+            names |= declared_properties(schema[word])
+    if "$ref" in schema:
+        names |= declared_properties(DOCUMENT["$defs"][schema["$ref"].rsplit("/", 1)[-1]])
+    return names
+
 
 class ChangePayloadSchemaTests(unittest.TestCase):
     def test_document_is_valid_and_every_definition_resolves(self):
@@ -80,6 +131,30 @@ class ChangePayloadSchemaTests(unittest.TestCase):
         external = set(DOCUMENT["x-external-payloads"])
         self.assertEqual(kinds, inline | external)
         self.assertFalse(inline & external)
+
+    def test_every_example_is_a_valid_payload_of_its_kind(self):
+        for kind, schema in DOCUMENT["$defs"].items():
+            validator = Draft202012Validator({"$ref": "#/$defs/" + kind, "$defs": DOCUMENT["$defs"]})
+            for example in schema.get("examples", []):
+                with self.subTest(kind=kind, example=example):
+                    self.assertEqual([], [error.message for error in validator.iter_errors(example)])
+                    # Kinds that ignore unknown fields would accept a misspelled one; an example uses declared fields only.
+                    self.assertFalse(set(example) - declared_properties(schema))
+                    # A batch item takes the fields of the single edit (the first oneOf branch).
+                    for item in example.get("items") or []:
+                        self.assertFalse(set(item) - declared_properties(schema["oneOf"][0]))
+
+    def test_every_inline_kind_has_an_example_or_a_reason(self):
+        inline = {name for name in DOCUMENT["$defs"] if not name.startswith("common.")}
+        with_examples = {name for name in inline if DOCUMENT["$defs"][name].get("examples")}
+        self.assertEqual(inline - with_examples, set(NO_EXAMPLE_YET))
+        self.assertFalse([name for name in DOCUMENT["$defs"] if name.startswith("common.") and "examples" in DOCUMENT["$defs"][name]])
+
+    def test_examples_use_synthetic_names_only(self):
+        text = json.dumps([schema.get("examples", []) for schema in DOCUMENT["$defs"].values()])
+        self.assertNotIn("Users", text)
+        for value in re.findall(r'"([A-Za-z]:[^"]*)"', text):
+            self.assertTrue(value.startswith("C:/TiaMcpFixture/"), value)
 
 
 if __name__ == "__main__":

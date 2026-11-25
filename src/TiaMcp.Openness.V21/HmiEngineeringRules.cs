@@ -5,6 +5,24 @@ using Newtonsoft.Json.Linq;
 
 namespace TiaMcp.Model
 {
+    /// <summary>What a caller can do after an HmiPreservationUnavailable refusal. Added to a copy of the refusal's details
+    /// (the capture manifest or gate evidence), which stay as captured. Every refusal happens before any write.</summary>
+    internal static class HmiPreservationRemediation
+    {
+        internal const string Gate = "No change was made. hmi_capabilities lists the operations admitted for this HMI profile, and the gate in these details names this operation and why it is closed. A closed operation cannot be forced: use a change kind that admits the edit on this profile, or make the edit in TIA.";
+        internal const string CaptureFailed = "No change was made. The preservation capture of the HMI failed natively (nativeFailure in these details). Read the HMI with hmi_inspect, check in TIA that the device opens and is consistent, then call change_prepare again; a failure that repeats on a consistent project is a limit of this HMI family's native export.";
+        internal const string CoverageGaps = "No change was made. hmi_content_fingerprint on the same target reports the capture's coverage and what is missing beyond the notes this change kind accepts. Resolve the typed read errors hmi_inspect shows, then call change_prepare again; an HMI of the other family is not covered by this kind.";
+        internal const string CompleteCoverage = "No change was made. hmi_engineering needs complete native preservation coverage, which V21 does not provide for this HMI. Use the dedicated change kind for the edit where one is admitted (hmi_capabilities lists them per HMI profile), or make the edit in TIA.";
+        internal const string ManifestWrite = "No change was made. The capture failed and its manifest could not be written: check free space and write access of the Host artifact directory, then call change_prepare again.";
+
+        internal static JObject With(JObject details, string remediation)
+        {
+            var copy = details == null ? new JObject() : (JObject)details.DeepClone();
+            copy["remediation"] = remediation;
+            return copy;
+        }
+    }
+
     internal static class HmiEngineeringRules
     {
         internal static readonly string[] Operations = { "scalar_property_set", "existing_binding_set", "tag_create", "item_properties_set", "item_place", "explicit_binding_set", "external_tag_create", "classic_xml_import", "connection_create", "object_create", "object_properties_set",

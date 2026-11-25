@@ -68,7 +68,7 @@ namespace TiaMcp.Openness.V19
         private JObject BridgeInfo()
         {
             var result = Envelope();
-            result["workerVersion"] = "0.1.0";
+            result["workerVersion"] = typeof(V19Session).Assembly.GetName().Version.ToString(3); // The product version (Directory.Build.props).
             result["tiaVersion"] = Program.TiaMajor;
             result["apiDirectory"] = _apiDirectory;
             result["apiAssemblyVersion"] = typeof(TiaPortal).Assembly.GetName().Version.ToString();

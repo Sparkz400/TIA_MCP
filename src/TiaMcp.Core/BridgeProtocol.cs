@@ -12,10 +12,45 @@ public static class BridgeProtocol
 
     public static string EncodeRequest(string id, string operation, object? arguments)
     {
-        var json = JsonSerializer.Serialize(new { protocolVersion = Version, id, operation, arguments = arguments ?? new { } }, Json);
+        string json;
+        try { json = JsonSerializer.Serialize(new { protocolVersion = Version, id, operation, arguments = arguments ?? new { } }, Json); }
+        catch (JsonException ex) { throw new BridgeException("InvalidRequest", "The request arguments cannot be written as JSON (nested too deep?); nothing was sent.", ex); }
         if (Encoding.UTF8.GetByteCount(json) > MaxRequestBytes)
             throw new BridgeException("RequestTooLarge", "The bridge request exceeds 4 MiB.");
+        RequireWorkerReadable(json);
         return json;
+    }
+
+    // The workers load a request with duplicate names refused and at most 64 levels. A request they cannot load comes
+    // back without its id, which the Host can only treat as a protocol fault that ends the worker session (attachment
+    // and open projects included). Tool arguments pass through as JsonElement, so both are refused here, before
+    // anything is sent.
+    private const int MaxRequestDepth = 64;
+    private static void RequireWorkerReadable(string json)
+    {
+        var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(json), new JsonReaderOptions { MaxDepth = MaxRequestDepth });
+        var names = new Stack<HashSet<string>?>();
+        try
+        {
+            while (reader.Read())
+            {
+                switch (reader.TokenType)
+                {
+                    case JsonTokenType.StartObject: names.Push(new HashSet<string>(StringComparer.Ordinal)); break;
+                    case JsonTokenType.StartArray: names.Push(null); break;
+                    case JsonTokenType.EndObject or JsonTokenType.EndArray: names.Pop(); break;
+                    case JsonTokenType.PropertyName:
+                        string name = reader.GetString()!;
+                        if (!names.Peek()!.Add(name))
+                            throw new BridgeException("InvalidRequest", $"The request repeats the property name '{(name.Length > 64 ? name[..64] : name)}' in one object; nothing was sent.");
+                        break;
+                }
+            }
+        }
+        catch (JsonException ex)
+        {
+            throw new BridgeException("InvalidRequest", $"The request is nested deeper than {MaxRequestDepth - 2} levels or is not valid JSON; nothing was sent.", ex);
+        }
     }
 
     public static JsonElement DecodeResponse(string json, string expectedId)

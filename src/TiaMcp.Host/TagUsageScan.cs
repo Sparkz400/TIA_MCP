@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.Json.Nodes;
 using System.Xml;
 using System.Xml.Linq;
+using TiaMcp.Core;
 
 namespace TiaMcp.Host;
 
@@ -14,6 +15,40 @@ internal static class TagUsageScan
 
     private static readonly HashSet<string> WritingParts = new(StringComparer.Ordinal) { "Coil", "SCoil", "RCoil", "Sr", "Rs" };
     private static readonly HashSet<string> AssignmentTokens = new(StringComparer.Ordinal) { ":=", "+=", "-=", "*=", "/=", "?=" };
+
+    /// <summary>A block_export index is a list of rows; anything larger is some other artifact (an archive, a backup) and is never loaded.</summary>
+    internal const long MaxIndexBytes = 16L * 1024 * 1024;
+
+    /// <summary>The exported block files the given index files list, and the names of rows whose file is missing or outside
+    /// the artifact directory. Index and block files pass the artifact store's root and link checks; an index is size-capped
+    /// before it is read.</summary>
+    internal static (List<string> Files, List<string> Skipped) IndexFiles(string artifactsDirectory, string index)
+    {
+        var store = new TiaMcp.Core.ArtifactStore(artifactsDirectory);
+        var files = new List<string>();
+        var skipped = new List<string>();
+        foreach (string entry in index.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+        {
+            string path = store.ResolveChecked(entry);
+            if (!File.Exists(path)) throw new BridgeException("InvalidRequest", "index must name block_export index files below the Host artifact directory.");
+            if (new FileInfo(path).Length > MaxIndexBytes) throw new BridgeException("InvalidRequest", $"index names a file larger than {MaxIndexBytes / (1024 * 1024)} MiB, which is not a block_export index file.");
+            System.Text.Json.Nodes.JsonObject? document;
+            try { document = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllBytes(path)) as System.Text.Json.Nodes.JsonObject; }
+            catch (System.Text.Json.JsonException) { document = null; }
+            if (document?["blocks"] is not System.Text.Json.Nodes.JsonArray rows || document["directory"] is not System.Text.Json.Nodes.JsonValue directoryValue || !directoryValue.TryGetValue<string>(out var directory))
+                throw new BridgeException("InvalidRequest", "index is not a block_export index file.");
+            foreach (var row in rows)
+            {
+                string? file = null;
+                if (row is System.Text.Json.Nodes.JsonObject && row["xml"] is System.Text.Json.Nodes.JsonValue xmlValue && xmlValue.TryGetValue<string>(out var xml))
+                    try { file = store.ResolveChecked(Path.Combine(directory, xml)); if (!File.Exists(file)) file = null; }
+                    catch (Exception error) when (error is BridgeException or ArgumentException or IOException) { file = null; }
+                if (file is not null) files.Add(file);
+                else skipped.Add(row is System.Text.Json.Nodes.JsonObject && row["name"] is System.Text.Json.Nodes.JsonValue name && name.TryGetValue<string>(out var text) ? text : "?");
+            }
+        }
+        return (files, skipped);
+    }
 
     internal static XDocument Load(string path)
     {
