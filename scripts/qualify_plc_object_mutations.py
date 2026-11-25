@@ -38,7 +38,7 @@ KINDS = ("tag_set", "tag_create", "tag_delete", "constant_set", "constant_create
          "group_create", "group_rename", "group_delete", "plc_compile", "instance_db_create")
 _CREDENTIAL = "Qualified by scripts/qualify_block_protection.py, which routes generated vault credentials to each apply."
 _GRAPHICAL = "Qualified by scripts/qualify_graphical_changes.py on native LAD/FBD fixtures; a plain scratch holds SCL blocks only."
-# X11-owned change kinds a plain scratch cannot qualify; scripts/test_qualify_plc_object_mutations.py keeps
+# X11-owned change kinds a plain scratch cannot qualify; scripts/tests/test_qualify_plc_object_mutations.py keeps
 # KINDS plus these equal to the catalog's X11-owned change kinds.
 EXCLUDED = {
     "block_protect": _CREDENTIAL, "block_unprotect": _CREDENTIAL, "block_write_protection_set": _CREDENTIAL,

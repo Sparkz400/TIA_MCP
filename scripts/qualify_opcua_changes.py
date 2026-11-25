@@ -29,7 +29,7 @@ KINDS = ("opcua_server_interface_import", "opcua_server_interface_enable", "opcu
 _CRASH = ("V21 Update 3: ReferenceNamespaces.Create terminates TIA (\"Unexpected exception\", Portal disposed) for every NodeSet tried, "
           "including the OPC Foundation DI 1.05.0 NodeSet, headless and with TIA's user interface, with the OPC UA server on or off "
           "(29 October 2026); this run reproduces it last with fixtures/opcua/machine-v1.xml.")
-# D04 kinds this run does not qualify; scripts/test_qualify_opcua_changes.py keeps KINDS plus these equal to the catalog's opcua_* change kinds.
+# D04 kinds this run does not qualify; scripts/tests/test_qualify_opcua_changes.py keeps KINDS plus these equal to the catalog's opcua_* change kinds.
 EXCLUDED = {"opcua_reference_namespace_import": _CRASH, "opcua_reference_namespace_delete": "Needs an imported reference namespace. " + _CRASH,
             "opcua_server_settings_set": "Qualified by scripts/qualify_opcua_server_settings.py (local.opcua.server-settings.20261028)."}
 V1, V2 = ROOT / "fixtures/opcua/server-interface-v1.xml", ROOT / "fixtures/opcua/server-interface-v2.xml"

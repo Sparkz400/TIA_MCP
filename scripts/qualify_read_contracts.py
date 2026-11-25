@@ -29,7 +29,7 @@ from qualify_cpu_memory_bytes import add_cpu
 
 ROOT = Path(__file__).resolve().parents[1]
 READ_GATES = {"AC-identity", "AC-completeness", "AC-evidence"}
-# Catalog features this run verifies and the MCP tools each one binds (scripts/test_qualify_read_contracts.py keeps
+# Catalog features this run verifies and the MCP tools each one binds (scripts/tests/test_qualify_read_contracts.py keeps
 # these equal to the catalog).
 FEATURES = {
     "tia_create_scratch": ("tia_create_scratch",), "project_properties": ("project_properties",),

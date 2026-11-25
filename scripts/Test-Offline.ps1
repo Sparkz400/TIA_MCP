@@ -84,7 +84,8 @@ $ManagedCheckGroups = @(
     @{seconds=125; suites=@('TiaMcp.DriveProfiles.Tests','TiaMcp.TechnologyProfiles.Tests','TiaMcp.Access.Tests','TiaMcp.PublicCertificates.Tests','TiaMcp.WebApplications.Tests','TiaMcp.Engineering.Tests','TiaMcp.Credentials.Tests')},
     @{seconds=215; suites=@('TiaMcp.OpcUa.Runtime.Tests','TiaMcp.Diagnostics.Tests')}
 )
-# Seconds per Python test file (local Python run, about 1:1 with hosted runners; CI run 42379522823); others count as 0.4 s.
+# Seconds per Python test file name in scripts/ or scripts/tests/ (local Python run, about 1:1 with hosted runners;
+# CI run 42379522823); others count as 0.4 s.
 # test_inventory_translation_exports.py is absent: it skips without retained native exports, as on hosted runners.
 $PythonTestSeconds = @{
     'test_qualification_optimization.py' = 46.9
@@ -136,8 +137,12 @@ try {
     New-Item -ItemType Directory -Path $env:TEMP -Force | Out-Null
     Start-Transcript -Path (Join-Path $output 'validation.log') | Out-Null
     if ($Suite -in @('All','Python')) {
-        # Contract checks are one group; test files spread by measured time. Discovery only reads top-level scripts/test_*.py.
-        $pythonTests = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'scripts') -Filter 'test_*.py' -File | ForEach-Object Name | Sort-Object)
+        # Contract checks are one group; test files spread by measured time. Discovery reads scripts/test_*.py (harnesses whose
+        # path evidence cites or a runner invokes) and scripts/tests/test_*.py (unit tests); module names are unique across both.
+        $pythonRoots = @((Join-Path $repoRoot 'scripts/tests'), (Join-Path $repoRoot 'scripts'))
+        $pythonTests = @(Get-ChildItem -LiteralPath $pythonRoots -Filter 'test_*.py' -File | ForEach-Object Name | Sort-Object)
+        $duplicateTests = @($pythonTests | Group-Object | Where-Object Count -gt 1 | ForEach-Object Name)
+        if ($duplicateTests.Count) { throw "Python test modules exist in both scripts/ and scripts/tests/: $($duplicateTests -join ', ')" }
         $pythonPlan = Get-ShardPlan $pythonTests $PythonTestSeconds 0.4 @(@{seconds=75; suites=@()}) $ShardCount
         $pythonTests = @($pythonTests | Where-Object { $pythonPlan[$_] -eq $ShardIndex })
         $result.pythonShard = @{index=$ShardIndex;count=$ShardCount;tests=$pythonTests}
@@ -162,9 +167,10 @@ try {
             }
         }
         if ($pythonTests.Count) {
-            # Same import root as discover -s scripts; an empty name list would discover from the repository root instead.
+            # Both folders are import roots, so unit tests import scripts/ helpers by module name; an empty name list
+            # would discover from the repository root instead.
             $previousPythonPath = $env:PYTHONPATH
-            $env:PYTHONPATH = Join-Path $repoRoot 'scripts'
+            $env:PYTHONPATH = $pythonRoots -join [IO.Path]::PathSeparator
             try { python -B -m unittest @($pythonTests | ForEach-Object { [IO.Path]::GetFileNameWithoutExtension($_) }) } finally { $env:PYTHONPATH = $previousPythonPath }
             if ($LASTEXITCODE -ne 0) { throw 'Python offline tests failed.' }
         }

@@ -56,7 +56,7 @@ jobs:
           if [ -z "$files" ] || [ "$code" -gt 0 ]; then echo "code=true" >> "$GITHUB_OUTPUT"; else echo "code=false" >> "$GITHUB_OUTPUT"; fi
           # Host, Core, the MCP surface and the packaging scripts are what the full packaged workflow stages exercise;
           # the quick package smoke skips them, and every main failure since mid-November came from those stages.
-          host=$(printf '%s\n' "$files" | grep -c -E '^src/TiaMcp\.(Host|Core)/|^contracts/mcp-surface|^scripts/(Package|New-IsolatedBuild|Test-OfflinePackage|Verify-TiaMcpBundle|Start-TiaMcp)\.ps1$|^scripts/test_[^/]*(host|session|mcp)[^/]*\.py$' || true)
+          host=$(printf '%s\n' "$files" | grep -c -E '^src/TiaMcp\.(Host|Core)/|^contracts/mcp-surface|^scripts/(Package|New-IsolatedBuild|Test-OfflinePackage|Verify-TiaMcpBundle|Start-TiaMcp)\.ps1$|^scripts/(tests/)?test_[^/]*(host|session|mcp)[^/]*\.py$' || true)
           if [ -z "$files" ] || [ "$host" -gt 0 ]; then echo "host=true" >> "$GITHUB_OUTPUT"; else echo "host=false" >> "$GITHUB_OUTPUT"; fi
           printf 'Changed files:\n%s\n' "$files"
 

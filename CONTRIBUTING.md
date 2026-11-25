@@ -50,6 +50,12 @@ npm run test:explorer:browser
 npm run test:explorer:scale
 ```
 
+[`scripts/README.md`](scripts/README.md) maps the scripts folder. New Python unit
+tests go in `scripts/tests/` and import helpers from `scripts/` by module name;
+`Test-Offline.ps1` puts both folders on the import path. Keep a script's path once
+evidence cites it, and regenerate the map with `python -B scripts/scripts_index.py`
+after adding, moving or removing a script.
+
 Each offline invocation writes a fresh report under `artifacts/offline-validation/`.
 CI uses Windows for Python and .NET and Linux for the explorer browser. It does
 not build the Siemens workers or establish native/runtime qualification. The

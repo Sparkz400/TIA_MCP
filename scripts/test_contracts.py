@@ -187,10 +187,12 @@ MANUAL_HARNESSES = {"test_testsuite_system_host.py"}  # Host built with TestSuit
 
 
 def unrun_test_scripts(root=ROOT):
-    """scripts/test_*.py files Test-Offline.ps1 would load but never exercise: no unittest case and named by no runner."""
+    """scripts/test_*.py and scripts/tests/test_*.py files Test-Offline.ps1 would load but never exercise: no unittest case
+    and named by no runner."""
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", SyntaxWarning)
-        trees = {p.name: ast.parse(p.read_text(encoding="utf-8")) for p in sorted((root / "scripts").glob("test_*.py"))}
+        files = [*(root / "scripts").glob("test_*.py"), *(root / "scripts/tests").glob("test_*.py")]
+        trees = {p.name: ast.parse(p.read_text(encoding="utf-8")) for p in sorted(files)}
     classes = [c for tree in trees.values() for c in ast.walk(tree) if isinstance(c, ast.ClassDef)]
     cases = {"TestCase", "IsolatedAsyncioTestCase"}
     while grown := {c.name for c in classes if {getattr(b, "attr", getattr(b, "id", None)) for b in c.bases} & cases} - cases:

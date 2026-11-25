@@ -28,7 +28,7 @@ from qualify_plc_object_mutations import STAGES, coverage_gaps, diff, in_order, 
 KINDS = ("webserver_page_set", "webserver_user_pages_generate", "certificate_create", "certificate_assign", "certificate_delete",
          "certificate_import", "umac_role_set", "vci_workspace_create", "vci_workspace_delete")
 _MAPPING = "Not in this item: mappings need exported package fixtures and package file-effect gates; this run's workspaces have no mappings."
-# D12/X03/D01-owned change kinds this run does not qualify; scripts/test_qualify_access_changes.py keeps KINDS plus these
+# D12/X03/D01-owned change kinds this run does not qualify; scripts/tests/test_qualify_access_changes.py keeps KINDS plus these
 # equal to the catalog's change kinds owned by D12, X03 or D01.
 EXCLUDED = {"vci_mapping_add": _MAPPING, "vci_mapping_remove": _MAPPING, "vci_synchronize": _MAPPING, "vci_conflict_resolve": _MAPPING}
 PLC_COMPILED = ("webserver_user_pages_generate", "vci_workspace_create", "vci_workspace_delete")  # The other kinds compile all devices.
