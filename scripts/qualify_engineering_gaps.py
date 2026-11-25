@@ -381,12 +381,13 @@ def retrieve_fits(directory):
 def prepared_archive(archive):
     """The configured archive's SHA-256 as its completed preparation (<output>/result.json) recorded it; the file must match."""
     archive = Path(archive).resolve(strict=True)
+    # The recorded path is compared resolved too: a TEMP in 8.3 form (C:\Users\NAME~1) and its long form name one file.
     result_path = archive.parent.parent / "result.json"
     result = json.loads(result_path.read_text(encoding="utf-8-sig"))
     native = result.get("nativeResult") or {}
     recorded = native.get("archive") or {}
     require(archive.name == "configured.zap21" and result.get("completed") is True and native.get("completed") is True
-            and native.get("savedConfiguredArchiveCaptured") is True and Path(recorded.get("path") or "") == archive,
+            and native.get("savedConfiguredArchiveCaptured") is True and Path(recorded.get("path") or "").resolve() == archive,
             "The archive is not the configured archive of a completed prepare_hmi_fixture_ui.py run: %s" % result_path)
     sha = hashlib.sha256(archive.read_bytes()).hexdigest()
     require(sha == recorded.get("sha256"), "The configured archive differs from the SHA-256 its preparation recorded")
