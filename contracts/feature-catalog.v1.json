@@ -19647,7 +19647,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "One tool for the record kinds translation, opcua, graph, automationml, composite_engineering, runtime_handoff; each call runs the unchanged store of its kind. Before 0.5.0 these were the tools translation_review_page, opcua_report_page, graph_report_page, automationml_report_page, composite_engineering_page, runtime_handoff_page.",
+          "One tool for the record kinds translation, opcua, graph, automationml, composite_engineering, runtime_handoff; each call runs the unchanged store of its kind. Before the 0.9.0 surface redesign these were the tools translation_review_page, opcua_report_page, graph_report_page, automationml_report_page, composite_engineering_page, runtime_handoff_page.",
           "translation: Explicit synthetic or unqualified-explicit workbook profiles only. Native export/import execution, language activation and automatic translation are outside this tool.",
           "translation: Immutable bounded capture/review/artifact workflow; see docs/reference/translation-host-workflow.md.",
           "translation: Explicit instance-inheritance-v1 alarm-text policy checks supplied mapped language fields only. No Siemens alarm workbook recognition, complete language coverage, alarm/supervision lifecycle or native import qualification; see docs/reference/translation-review.md.",
@@ -19865,7 +19865,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "One tool for the record kinds translation, opcua, vci, graph, automationml, composite_engineering, runtime_handoff; each call runs the unchanged store of its kind. Before 0.5.0 these were the tools translation_reopen, opcua_reopen, vci_reopen, graph_reopen, automationml_reopen, composite_engineering_reopen, runtime_handoff_reopen.",
+          "One tool for the record kinds translation, opcua, vci, graph, automationml, composite_engineering, runtime_handoff; each call runs the unchanged store of its kind. Before the 0.9.0 surface redesign these were the tools translation_reopen, opcua_reopen, vci_reopen, graph_reopen, automationml_reopen, composite_engineering_reopen, runtime_handoff_reopen.",
           "translation: Explicit synthetic or unqualified-explicit workbook profiles only. Native export/import execution, language activation and automatic translation are outside this tool.",
           "translation: Immutable bounded capture/review/artifact workflow; see docs/reference/translation-host-workflow.md.",
           "translation: Explicit instance-inheritance-v1 alarm-text policy checks supplied mapped language fields only. No Siemens alarm workbook recognition, complete language coverage, alarm/supervision lifecycle or native import qualification; see docs/reference/translation-review.md.",
@@ -19948,7 +19948,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "One tool for the record kinds translation, opcua, vci, graph, automationml, composite_engineering, runtime_handoff; each call runs the unchanged store of its kind. Before 0.5.0 these were the tools translation_list, opcua_list, vci_list, graph_list, automationml_list, composite_engineering_list, runtime_handoff_list.",
+          "One tool for the record kinds translation, opcua, vci, graph, automationml, composite_engineering, runtime_handoff; each call runs the unchanged store of its kind. Before the 0.9.0 surface redesign these were the tools translation_list, opcua_list, vci_list, graph_list, automationml_list, composite_engineering_list, runtime_handoff_list.",
           "translation: Explicit synthetic or unqualified-explicit workbook profiles only. Native export/import execution, language activation and automatic translation are outside this tool.",
           "translation: Immutable bounded capture/review/artifact workflow; see docs/reference/translation-host-workflow.md.",
           "opcua: Discover retained offline OPC UA records and incomplete or integrity-failed publications after restart. Count 1..100, bounded responses. Sorted publication-ID offsets are discovery-only; relist after concurrent additions. Does not retry any native operation.",
@@ -20030,7 +20030,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "One tool for the record kinds translation, opcua, vci, graph, automationml, composite_engineering, runtime_handoff; each call runs the unchanged store of its kind. Before 0.5.0 these were the tools translation_artifact_read, opcua_artifact_read, vci_artifact_read, graph_artifact_read, automationml_artifact_read, composite_engineering_artifact_read, runtime_handoff_artifact_read.",
+          "One tool for the record kinds translation, opcua, vci, graph, automationml, composite_engineering, runtime_handoff; each call runs the unchanged store of its kind. Before the 0.9.0 surface redesign these were the tools translation_artifact_read, opcua_artifact_read, vci_artifact_read, graph_artifact_read, automationml_artifact_read, composite_engineering_artifact_read, runtime_handoff_artifact_read.",
           "translation: Explicit synthetic or unqualified-explicit workbook profiles only. Native export/import execution, language activation and automatic translation are outside this tool.",
           "translation: Immutable bounded capture/review/artifact workflow; see docs/reference/translation-host-workflow.md.",
           "opcua: Download exact original NodeSet, supplied consumer JSON or complete report by Host-issued OPC UA artifact handle, at most 64 KiB per call. Returns SHA-256 and byte offset. Revalidates retained manifest and inputs. No filesystem path input and no overwrite operation.",
@@ -30316,8 +30316,8 @@
     }
   ],
   "toolRenames": {
-    "since": "0.5.0",
-    "note": "Tool names retired by the 0.5.0 MCP surface redesign. Evidence recorded under a former name counts for its replacement; arguments are the ones the replacement needs to reach the same capability.",
+    "since": "0.9.0",
+    "note": "Tool names retired by the MCP surface redesign of product 0.9.0 (catalog 0.5.0). Evidence recorded under a former name counts for its replacement; arguments are the ones the replacement needs to reach the same capability.",
     "renames": [
       {
         "from": "project_health_report",

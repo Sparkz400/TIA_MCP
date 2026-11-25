@@ -44,7 +44,7 @@ def main():
         result['shutdowns'].append(closed)
         check(closed['hostExitCode'] == 0 and not closed['forcedHostStop'] and not closed['workerExits'], 'Clean Host exit without native worker')
     def route(action, arguments):
-        # Since the 0.5.0 surface redesign the record routes are the review_* tools with the record kind.
+        # Since the 0.9.0 surface redesign the record routes are the review_* tools with the record kind.
         if action in ('reopen', 'list', 'page', 'artifact_read'):
             return 'review_' + action, {'kind': 'runtime_handoff', **(arguments or {})}
         return 'runtime_handoff_' + action, arguments or {}

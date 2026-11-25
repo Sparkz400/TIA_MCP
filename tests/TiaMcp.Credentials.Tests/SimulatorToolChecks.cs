@@ -49,7 +49,7 @@ internal static class SimulatorToolChecks
         check(tool is { Name: "sim_network_mode_set", Destructive: true, ReadOnly: false, OpenWorld: false } && ToolGroups.Of(tool.Name) == "simulation",
             "sim_network_mode_set is a destructive, closed-world tool in the simulation group");
         check(description.Contains("MACHINE-WIDE", StringComparison.Ordinal) && description.Contains("acknowledgeMachineWide", StringComparison.Ordinal)
-            && description.Contains("SimulationRegistrationsPresent", StringComparison.Ordinal) && description.Length <= 1900, "sim_network_mode_set's description states the scope, the acknowledgement and the refusals");
+            && description.Contains("SimulationRegistrationsPresent", StringComparison.Ordinal) && description.Length <= 600, "sim_network_mode_set's description states the scope, the acknowledgement and the refusals");
         check(method.GetParameters().Single(p => p.Name == "acknowledgeMachineWide").DefaultValue is false, "acknowledgeMachineWide defaults to false");
         await Expect("AcknowledgementRequired", 60, t => t.NetworkModeSet("TCPIPSingleAdapter", default), "sim_network_mode_set without acknowledgement is refused before the bridge");
         await Expect("AcknowledgementRequired", 60, t => t.NetworkModeSet("Softbus", default, false, "Softbus"), "An unacknowledged no-op is refused before the bridge too");

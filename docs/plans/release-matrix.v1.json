@@ -4,27 +4,27 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.5.0",
-    "catalogSha256": "c07fd24abb6df222702c1261d2b1a49429948fcb49fbc6fa005dcf50bd677b03",
+    "catalogSha256": "4c0a94006cbbc70b83e5f178a6751f269ef92c3879991ceb67226aa77918cd58",
     "ledger": "docs/plans/release-obligations-20261015.json",
-    "ledgerSha256": "5c4786dd1c89d694fbb8dd6cedda08b781fd52cfb05022cdeda06a2770ef8125"
+    "ledgerSha256": "5ad6d7bbf56bafce83a0016aaa5e48d0fda369dce536f7e1d1c7ec696ba1146d"
   },
   "targetTiaVersions": [
     21
   ],
   "summary": {
-    "features": 495,
+    "features": 496,
     "support": {
-      "deferred": 1,
+      "descoped": 1,
       "limited": 340,
       "shipped": 114,
       "unavailable_target": 12,
-      "unqualified": 28
+      "unqualified": 29
     },
     "cells": {
       "blocked": 72,
       "bound": 2080,
-      "deferred": 3,
-      "open": 81
+      "descoped": 3,
+      "open": 85
     },
     "openCellsByOwner": {
       "D06": {
@@ -45,7 +45,7 @@
       },
       "L03": {
         "role": "Runtime",
-        "open": 8
+        "open": 12
       },
       "L05": {
         "role": "Qualification and libraries",
@@ -3047,6 +3047,41 @@
       "domain": "simulation",
       "mcpTools": [
         "sim_prune"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "L03"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-completeness",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-simulator-lifecycle",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "sim_network_mode_set",
+      "domain": "simulation",
+      "mcpTools": [
+        "sim_network_mode_set"
       ],
       "changeKind": null,
       "support": "unqualified",
@@ -6592,7 +6627,7 @@
       "domain": "drives",
       "mcpTools": [],
       "changeKind": null,
-      "support": "deferred",
+      "support": "descoped",
       "owners": [
         "D10"
       ],

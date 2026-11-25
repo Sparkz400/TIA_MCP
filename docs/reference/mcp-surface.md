@@ -3,13 +3,13 @@
 What the Host advertises over MCP besides its tools' own contracts: tool groups, parameter
 conventions, titles, output schemas, workflow prompts, resources, completions, logging, progress
 notifications and its version. The tools themselves are listed by `feature_catalog` and in the
-[tools reference](tools.md); the [0.5.0 migration](#migration-to-050) maps retired names.
+[tools reference](tools.md); the [0.9.0 migration](#migration-to-090) maps retired names.
 
 ## Tool groups (`--toolsets`)
 
 Every tool belongs to one group. Without `--toolsets` the Host advertises the `base` and `core`
 groups only. All groups, 306 tools on a default Host (the catalog has 333; the rest need a Host option such as `--physical-plc-online`), make the `tools/list` reply about 250 KB
-(about 700 KB before 0.5.0, when large [output schemas](#titles-and-output-schemas) were inline), and
+(about 700 KB before the 0.9.0 redesign, when large [output schemas](#titles-and-output-schemas) were inline), and
 every advertised tool costs model context (many MCP clients also limit the number of tools per server or
 per request). Start the Host with `--toolsets`
 to name the groups a task needs, or `--toolsets all` for every tool:
@@ -71,7 +71,7 @@ otherwise, so a new tool needs a prefix in `src/TiaMcp.Host/ToolGroups.cs` and a
   `project_model` request object keeps its own `maxItems`/`cursor` fields.
 - **Handles:** a retained record is addressed by `recordRef`, an upload by `uploadRef` (`upload:<id>`,
   returned by `artifact_upload_begin` and accepted by every upload tool and every consuming tool once
-  committed). Receipts that predate 0.5.0 keep their stored `recordId` field; pass its value as
+  committed). Receipts that predate the 0.9.0 redesign keep their stored `recordId` field; pass its value as
   `recordRef`.
 - **Names:** a tool that pages a retained review is `<family>_review_page`; `*_report` names remain
   only on tools that export a report artifact (`diagnostic_*report_export`).
@@ -196,9 +196,9 @@ says which parts of this surface are frozen; the frozen part is recorded in
 [`contracts/mcp-surface.v1.json`](../../contracts/mcp-surface.v1.json) and every error code with its class in
 [error codes](error-codes.md).
 
-## Migration to 0.5.0
+## Migration to 0.9.0
 
-The 0.5.0 surface redesign (feature catalog 0.5.0, product still 0.9.x) is a breaking change without
+The surface redesign of 0.9.0, the first tagged release (feature catalog `0.5.0`), is a breaking change without
 aliases: retired names are not callable. The feature catalog records every retired name in
 `toolRenames`, and the catalog's claim checks count evidence recorded under a retired name for its
 replacement; no evidence was rewritten and no capability changed its qualification.

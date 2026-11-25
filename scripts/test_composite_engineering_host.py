@@ -54,7 +54,7 @@ def main():
         check(closed['hostExitCode'] == 0 and not closed['forcedHostStop'] and not closed['workerExits'], 'Clean Host exit without native workers')
 
     def route(name, arguments):
-        # Since the 0.5.0 surface redesign the record routes are the review_* tools with the record kind.
+        # Since the 0.9.0 surface redesign the record routes are the review_* tools with the record kind.
         if name in ('reopen', 'list', 'page', 'artifact_read'):
             return 'review_' + name, {'kind': 'composite_engineering', **(arguments or {})}
         return 'composite_engineering_' + name, arguments or {}

@@ -4,7 +4,7 @@ using ModelContextProtocol.Protocol;
 using TiaMcp.Core;
 using TiaMcp.Host;
 
-/// <summary>composite_engineering_list and drive_inventory wrappers: defaults, bounds and what reaches the bridge.</summary>
+/// <summary>review_list (kind composite_engineering) and drive_inventory wrappers: defaults, bounds and what reaches the bridge.</summary>
 internal static class WrapperToolChecks
 {
     private static string? Code(CallToolResult result) =>
@@ -14,17 +14,19 @@ internal static class WrapperToolChecks
     {
         var options = new HostOptions("", artifacts, null, 60, false, "", null);
 
-        // composite_engineering_list is an offline store read: it never calls the worker.
+        // review_list kind composite_engineering (formerly composite_engineering_list) is an offline store read: it never calls the worker.
         var reject = new RejectBridge();
-        var composite = new CompositeEngineeringTools(reject, options);
-        var empty = composite.List();
+        var review = new ReviewRecordTools(reject, options);
+        var empty = await review.List("composite_engineering");
         check(empty.IsError != true && empty.StructuredContent!.Value.GetProperty("rows").GetArrayLength() == 0 && empty.StructuredContent.Value.GetProperty("total").GetInt32() == 0 &&
             empty.StructuredContent.Value.GetProperty("nextOffset").ValueKind == JsonValueKind.Null && !empty.StructuredContent.Value.GetProperty("nativeQualified").GetBoolean(),
-            "composite_engineering_list of an empty store returns no rows, no next offset and no native qualification");
-        check(composite.List(0, 1).IsError != true && composite.List(0, 20).IsError != true, "composite_engineering_list accepts 1 and 20 records");
-        foreach (var (offset, count) in new[] { (0, 0), (0, 21), (0, -1), (-1, 20), (1, 20), (int.MaxValue, 1) })
-            check(Code(composite.List(offset, count)) == "CompositePageLimit", $"composite_engineering_list refuses offset {offset}, count {count}");
-        check(reject.Calls == 0, "composite_engineering_list never calls the worker");
+            "review_list composite_engineering of an empty store returns no rows, no next offset and no native qualification");
+        check((await review.List("composite_engineering", 0, 1)).IsError != true && (await review.List("composite_engineering", 0, 100)).IsError != true,
+            "review_list composite_engineering accepts 1 and 100 records");
+        foreach (var (offset, count) in new[] { (0, 0), (0, 101), (0, -1), (-1, 20), (1, 20), (int.MaxValue, 1) })
+            check(Code(await review.List("composite_engineering", offset, count)) == "CompositePageLimit", $"review_list composite_engineering refuses offset {offset}, count {count}");
+        check(Code(await review.List("composite_engineering", recordType: "review")) == "InvalidRequest", "review_list composite_engineering refuses a recordType");
+        check(reject.Calls == 0, "review_list composite_engineering never calls the worker");
 
         // drive_inventory: the project selection and the fixed read bounds reach the worker; a worker refusal is a coded error.
         var calls = new List<(string Operation, JsonObject Arguments)>();
