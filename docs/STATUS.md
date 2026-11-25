@@ -87,7 +87,7 @@ record is cited by a feature; records no feature cites any more are in the retir
 
 ## Recent changes
 
-Dated notes, newest first, are in the [status log](history/status-log.md); its last entry is 3 November, and the
+Dated notes, newest first, are in the [status log](history/status-log.md); it has no entry between 3 and 25 November, and the
 work since is recorded in the [TODO](TODO.md) sections it closed or opened. From 4 to 12 November the
 [offline engineering session follow-ups](TODO.md#offline-engineering-session-follow-ups-4-november) were qualified
 natively. User feedback on v0.9.0 of

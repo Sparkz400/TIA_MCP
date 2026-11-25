@@ -157,7 +157,7 @@ Configure your MCP client's stdio server using your actual checkout path:
 }
 ```
 
-Without `--toolsets` the Host advertises only the `base` and `core` tools (about 70 of roughly 320) to keep
+Without `--toolsets` the Host advertises only the `base` and `core` tools (66 of the 328 a default Host can advertise; 355 exist, the rest need a Host option) to keep
 the tool list and its context cost small. Add groups such as `"--toolsets", "core,simulation"` to `args`, or
 `"--toolsets", "all"` for every tool; see
 [MCP surface](docs/reference/mcp-surface.md#tool-groups---toolsets) for the groups.

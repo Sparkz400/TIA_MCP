@@ -7,7 +7,7 @@ The tools themselves are listed by `feature_catalog`.
 ## Tool groups (`--toolsets`)
 
 Every tool belongs to one group. Without `--toolsets` the Host advertises the `base` and `core`
-groups only; all groups, about 300 tools on a normal build, make the `tools/list` reply about 600 KB, more
+groups only; all groups, 328 tools on a default Host (355 with every Host option that adds tools), make the `tools/list` reply about 700 KB, more
 than half of it [output schemas](#titles-and-output-schemas), and every advertised tool costs model context
 (many MCP clients also limit the number of tools per server or per request). Start the Host with `--toolsets`
 to name the groups a task needs, or `--toolsets all` for every tool:

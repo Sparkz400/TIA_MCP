@@ -45,10 +45,11 @@ data silently and come first.
 - [x] **P2 — No read-only HMI content hash:** `hmi_content_fingerprint` added on 14 November. `change_prepare` for HMI kinds needs `expectedContentHash`, which only a deliberately failed prepare returns (`StaleRevision` details), after a full baseline capture that writes change artifacts. `hmi_classic_screen_capture` returns it for Classic RT Advanced only. Add a read-only fingerprint/status read with `contentHash`, `complete`, `scopeAccepted` and the accepted missing coverage.
 - [x] **P2 — `tia_detach` leaves the owned Portal running:** fixed on 14 November (closes owned projects, waits for exit, optional termination of the owned process), checked once natively. `project_close` added in the follow-up. detach only disposes the connection (`OpennessSession.cs`, "Do not call Project.Close or Process.Kill") and reports `processExitVerified: false`. Add `project_close` and an owned-instance stop that reports `projectClosed`, `pid` and `processExited`.
 - [x] **P2 — Refusals lack the current state:** current/supplied identity and fingerprints added on 14 November; a `remediation` for `ReadOnlyProject` (snapshot capture) and `TcpIpModeRequired`. The `HmiPreservationUnavailable` remediation is the open box below. Earlier text: errors already carry `{error:{code,message,details}}` in `structuredContent`. Missing: the current identity on `ProjectMismatch`, the current fingerprint on the generic `StaleRevision`, and a `remediation` for `TcpIpModeRequired`, `ReadOnlyProject` and `HmiPreservationUnavailable`.
-- [ ] **P2 — Remediation for `HmiPreservationUnavailable`:** reopened from the box above on 24 November. The worker's
-  `HmiPreservationUnavailable` refusals (HMI preservation capture failed or has coverage gaps, incomplete family
-  coverage, an unestablished library link) carry the capture manifest or observation as details but still no
-  `remediation`. Add one, as `ReadOnlyProject` and `TcpIpModeRequired` have.
+- [x] **P2 — Remediation for `HmiPreservationUnavailable`:** done on 25 November (offline): every refusal (closed
+  gate, failed capture, coverage gaps, incomplete family coverage, a manifest that could not be written, an unreadable
+  library link) carries a `remediation` on a copy of its details; the captured manifest stays as captured. Managed test
+  and a worker build against the installed V21 assemblies only; its native run is in the
+  [25 November box](#audit-follow-ups-25-november).
 - [x] **P2 — PLCSIM TCP/IP dead end:** `sim_status` reports `tcpIpReady`, adapters and remediation (14 November); the mode stays an operator step, and whether an explicit, acknowledged mode switch tool is wanted is open under [decisions](#decisions-for-the-maintainer). `sim_create` now reports `controllerAddresses` (filled after the download) and the lifecycle. `sim_create` refuses with `TcpIpModeRequired` (`SimulationNetworkAdmission.cs`) and `sim_status` reports only `networkMode`. The PLCSIM V8 API has a public `SimulationRuntimeManager.NetworkMode` setter; the adapter never changes it by policy. Report `tcpIpReady`, adapters and addresses and the exact Control Panel step; decide whether an explicit, acknowledged mode switch tool is wanted. Return the instance's IP, subnet and adapter from `sim_create`.
 - [x] **P3 — HMI row shapes differ by section:** every row now carries top-level `path`, `kind`, `name` and `identity` (follow-up). `screens` rows carry `path: null` with the path under `identity.objectPath` and null `Width`/`Height`; `model` rows carry a top-level `path`. Give every row top-level `path`, `kind`, `name`, `identity` and `attributes`.
 - [x] **P3 — Counts:** done on 16 November: `nodeCount` is the distinct object nodes of the saved review's model (the model is re-exported after relationship observation, so the two agree); the result carries `nodeCountScope`, and the [review guide](guides/project-reviews.md#capture-and-compare) explains `nodeCount` versus `visited`.
@@ -56,7 +57,10 @@ data silently and come first.
 - [ ] **P3 — Content readback for `block_import_xml`:** reopened from the box above on 24 November. The import
   still checks only that the imported objects exist, inside the write, so an applied `block_import_xml` reports its
   `readbackVerified` milestone as `notRecorded` (now with a reason, `ChangeMilestoneRules.cs`). Add a content readback
-  of the imported blocks so the milestone can report `done`.
+  of the imported blocks so the milestone can report `done`. Looked at on 25 November and left open: the readback has to
+  compare the supplied XML with TIA's re-export, which TIA normalizes, and no normalizer for block XML is qualified;
+  a rule written without a native run would either fail valid imports or report `done` wrongly. It needs a native
+  session on an owned scratch (LAD, FBD, SCL and a DB) to derive the rule.
 - [x] **P3 — Evidence size:** done on 16 November: `change_prepare`, `change_apply` and `change_status` take `detail` (`summary` default, `standard`, `full`); `standard` is the full view with every HMI preservation artifact map reduced to `artifactCount` and `artifactsSha256`, the manifests keep the paths. The default summary never carried the maps; `includeDetails: true` stays the full view for the qualification runners, which read it.
 - [x] **P3 — Opaque payload schemas:** `contracts/change-kinds.v1.json` lists every kind's documented payload fields and every contract is a `tia://contracts/{name}` resource (14 November). Full per-kind JSON Schemas followed on 16 November: [`change-payloads.v1.schema.json`](../contracts/change-payloads.v1.schema.json) (111 inline, 28 pointing to the HMI, library and typed graphical contracts) as `tia://change-payloads/{kind}`, derived from the worker parsers and audited against them (75 audit payloads, `scripts/test_change_payload_schemas.py`, and 151 distinct payloads the worker accepted in retained journals; the only mismatches were the retired `safety_drive_tags` `tags` form). Undetermined constraints were left out. `change_prepare` already said `hmi_screen_create` covers `item_create`.
 - [x] **P3 — HMI model size:** `excludeSystem`, `rowMode: "compact"` and `sectionContentSha256` added (14 November). Earlier text: a near-empty Unified HMI returns 134 model rows (184 KB for page 1), mostly system tags, text lists and thresholds. Add `excludeSystem`, a compact or hash-only row mode, `totalItems`, a larger page limit and an aggregate content hash at HMI scope. 16 November (offline): `page` at the top of every result (limits, payload bytes, `stoppedBy`), a page limit up to 1000, and an explicit `target.kind` that does not belong to the section is refused before the capture.
@@ -73,7 +77,7 @@ data silently and come first.
   ([record](verification/v090-followups-20261114.md#not-covered)).
 - [x] **Graphical block recovery route:** natively on 14 November an inconsistent LAD block (a global operand that does not exist) refused the SimaticML export and has no generated source, but `block_read format=simaticSd` (`ExportAsDocuments`) exported it with the unresolved operand and left it unchanged. The XML refusal now names that route. Not an Openness gap. Repairing the block still goes through an explicit tag change; no route edits the SIMATIC SD document back in yet.
 - [x] **Batch `call_parameter_set` and the graphical edits:** done on 14 November for `call_parameter_set`, `graphical_operand_set`, `graphical_network_patch` and `graphical_network_insert` (one block per item, per-item readback); natively checked with two LAD blocks. `graphical_typed_edit` and `graph_import` keep their own readbacks and are not batched.
-- [ ] **Paging fields and schema depth (16 November leftovers):** add `totalItems` and `pageCount` beside each paged family's own total field (`total`, `totalMatches`, `totalRows`, ...; additive, so existing clients keep working); add `examples` to the change payload schemas; give `hmi-inspection.v1.schema.json` per-section rules (which fields each section takes).
+- [ ] **Paging fields and schema depth (16 November leftovers):** done on 25 November: `examples` for 88 of the 111 inline change payload schemas (the other 23 are listed with reasons in `scripts/test_change_payload_schemas.py`) and per-section request rules in `hmi-inspection.v1.schema.json` (`scripts/test_hmi_inspection_sections.py`). Still open: `totalItems` and `pageCount`, which wait for the [surface redesign decision](#audit-follow-ups-25-november). Original item: add `totalItems` and `pageCount` beside each paged family's own total field (`total`, `totalMatches`, `totalRows`, ...; additive, so existing clients keep working); add `examples` to the change payload schemas; give `hmi-inspection.v1.schema.json` per-section rules (which fields each section takes).
 - [ ] **Native runs of the 16 November worker changes:** each is covered by offline tests only and needs one run on an owned scratch project: `hmi_inspect` `page` and the early `target.kind` refusal (also the early HMI change `target.kind` refusal); `ProjectLocked` with a second Portal holding the project and `tia_session_status` `portals`; a failed `simulation_download` before and after its claim (`ticketState`); and the stale change-directory sweep.
 
 Kept as they are (the user's "worked well" list): strict `projectCopyId`/`sessionGeneration` and stale-revision checks, the HMI engineering gate with readback, compile/save milestones and checkpoints, typed `hmi_inspect` attributes with per-item `contentSha256`, `project-review.v1` with its content-hash ID, and the simulator tool breadth.
@@ -172,8 +176,48 @@ with evidence from an owned fixture.
   user and `UmacLoginRejected` for `project_open`, and for `attachedSessions` a client whose process has exited
   (`processRunning: false`) and how long a plain attach waits behind a busy client. Matrix row
   `project_open.umac_login` (X01, 2 open cells) has no catalog evidence: the [record](verification/feedback-20261120.md)
-  is a single run of Debug builds, not curated. Its report (`artifacts/s0952`) is in the main checkout and could be
-  curated with `scripts/curate_evidence.py`, but it does not cover the global user. The matrix was not changed.
+  is a single run of Debug builds, not curated. Its report (`artifacts/s0952`) is in the main checkout, but
+  it cannot be curated as it is (checked 25 November): it has no completion flag or tool-call list, so
+  `scripts/curate_evidence.py` would record it as failed, the Debug binaries that ran are gone, it holds user-profile
+  paths, and it does not cover the global user. Binding needs a rerun. The matrix was not changed.
+
+## Audit follow-ups (25 November)
+
+A check of the repository, the installed server and CI on 25 November. Fixed the same day, offline tests only: the
+worker session lost on an argument the worker cannot load, the queue timeout that never applied to engineering tools,
+`plc_tag_usage` reading any artifact whole, unpruned Explorer HTML exports, the `HmiPreservationUnavailable`
+remediation, the fixed `workerVersion`, the release gate, pinned actions and the link and PowerShell lint checks
+([CHANGELOG](../CHANGELOG.md)).
+
+- [ ] **The raw evidence store is absent from this checkout:** `artifacts/evidence/` does not exist in the main
+  checkout (every file dates from 20 November), so `scripts/audit_evidence_store.py` reports 656 raw reports of 338
+  evidence IDs missing and a local `scripts/Test-Offline.ps1` stops there; CI has no store and skips the audit. Find the
+  store (an earlier checkout, the second workstation) and restore it, or record the loss as
+  [lost evidence](#lost-evidence). `artifacts/n18b` and `artifacts/n18c` are gone as well; `artifacts/s0952` is present.
+- [ ] **Native runs of the 25 November worker changes:** build a bundle from main (the installed `tia-v21` server ran
+  a bundle of 23 November, 33 commits behind), then one run each: a `sim_write` row and a `change_prepare` payload
+  with a repeated name (refused, session kept), a second engineering call during a long `change_apply`
+  (`QueueTimeout`), an `HmiPreservationUnavailable` refusal with its `remediation`, and `tia_capabilities`
+  (`workerVersion`, `physical_plc`).
+- [ ] **MCP surface redesign, decision:** `claude/mcp-surface` and `claude/mcp-surface-redesign` (near-identical, about
+  208 files, no pull request) hold the `review_*` record tools and one paging convention. Merge one or drop both; the
+  paging item under the 14 November feedback and the frozen surface baseline depend on it. The live surface already
+  differs from `contracts/mcp-surface.v1.json` in 42 places (reported, not enforced before 1.0).
+- [ ] **No tag or release exists**, so `release.yml`, its gate and the new attestation job have never run. A dry run
+  on a pre-release tag is the maintainer's call (tagging comes after acceptance under
+  [release mechanics](#release-mechanics-and-policy)).
+- [ ] **Quality gates still missing:** code coverage measurement; a ruff gate (`E9,F63,F7,F82` gives 196 F821 false
+  positives in `qualify_force_capture.py`, which binds names through `globals()`, and one in
+  `qualify_project_explorer.py`: import the names explicitly or add per-file ignores, then gate); analyzers or
+  `TreatWarningsAsErrors` for the C# projects; an SBOM and a signature for the bundle.
+- [ ] **Found by the new tests, left open:** `plc_physical_*` has no Host-side gate (only tool registration behind
+  `--physical-plc-online` and the worker refuse); the successful `runtime_unified_connect` path has no offline test
+  (no transport or vault seam in `UnifiedRuntimeSessions`); `ProjectReviewStore.XmlSignatures` refuses with a raw
+  `XmlException`; the worker's `ReadExportedXml` has no depth bound (it reads TIA's own exports); `browser-scale.mjs`
+  needs a native `--report` and is not wired.
+- [ ] **CI and repository upkeep:** the package job runs its stages serially (about 21 minutes); `scripts/` holds
+  about 660 files in one folder; the [status log](history/status-log.md) has no entry between 3 and 25 November; the
+  README demo recording is still a placeholder.
 
 ## Code audit follow-ups (9 November)
 
@@ -363,7 +407,7 @@ One box per obligation group of the [release ledger](plans/release-obligations-2
 
 - [x] **One product version source.** `Directory.Build.props` sets 0.9.0 for every assembly, the bundle name and manifest; `serverInfo.version` reports it and the catalog version moved to `capabilities.experimental["tiaMcp/featureCatalog"]`; `scripts/test_product_version.py` keeps the copies in package.json and the Add-In in step.
 - [x] **CHANGELOG:** `CHANGELOG.md` keeps an Unreleased section with known limitations; the release section is cut at release time ([releasing](guides/releasing.md)).
-- [x] **Release workflow:** `.github/workflows/release.yml` runs on `v*` tags only, reruns the offline and Explorer checks, packages and strictly verifies the bundle, and creates a draft pre-release with the bundle, checksum and manifest; it never publishes or pushes. Since 31 October a `v1.x` tag also needs the ledger's `releaseReady` and zero open and deferred matrix cells, the build job has no write token, and the draft job verifies the uploaded ZIP itself.
+- [x] **Release workflow:** `.github/workflows/release.yml` runs on `v*` tags only, requires a successful Explorer run and an offline run on the tagged commit in which the code jobs ran (it does not rerun them; until 25 November a docs-only push, whose offline run skips the code jobs, satisfied it), attests the ZIP's build provenance in a separate job, packages and strictly verifies the bundle, and creates a draft pre-release with the bundle, checksum and manifest; it never publishes or pushes. Since 31 October a `v1.x` tag also needs the ledger's `releaseReady` and zero open and deferred matrix cells, the build job has no write token, and the draft job verifies the uploaded ZIP itself.
 - [x] **Pre-release security review:** done on 30 October ([review](verification/security-review-20261030.md)): no vulnerable NuGet or npm dependency, no critical or high finding; `SECURITY.md` has a supported-versions statement. Rerun the vulnerability check on the release candidate.
 - [x] **Security review follow-ups:** the medium finding is fixed (combined library apply refuses unsupported projects before any change; `--disable-library-integrate-apply` turns it off) and the TLS pin gaps are fixed and rechecked natively (`local.online.upload.tls-hardening.20261030`); the three low items are fixed offline (1 November): a logged-in Web API or OPC UA session's requests and capture polls run outside the vault lock (login, connect and reconnect keep it while they send the secret), `watch_table_monitor` deletes the export its table read leaves, and consumers refuse an unknown vault name instead of creating its folder. Native workflow recheck passed on 2 November for logged-in PLCSIM Web API and OPC UA reads, subscriptions and capture polls using the shared credential vault (`local.runtime.plcsim-tcpip.20261102`). This exercises the revised route; it does not measure lock latency under concurrent load. The translation-reopen ownership scope is fixed (31 October audit).
 - [ ] **Batch follow-ups (11 November):** three items from the native runs of `local.change-batch.items-2.20261111`, `local.safety.tag-batch.20261111` and `local.safety.fio-routes.20261111`. (1) Decided on 12 November: the refusal stays. On an F-CPU with a safety program a `tag_delete` item naming a standard tag is refused with `DependencyCoverageIncomplete`, because TIA refuses to export the generated F-runtime-group OB `FOB_RTG1` (a know-how protected SCL OB); its native cross-references were tried as a fallback and name no references (one source, none of its calls), so nothing proves it free of the name. The message now names the block's language, protection and consistency (`local.safety.drive-tags-bool.20261112`). (2) Done on 12 November: `scripts/qualify_vci_mappings.py` stopped at the preview check of `create VciFc` because the shared runner compared the echoed payload with the request, while `change_prepare` shows persisted source and XML by bytes and SHA-256 since 9 November; the runner now compares with that form and passed 202/202 on a German installation (`local.vci_git.de.20261112`). (3) Fingerprint reuse stays off by default until the [manual check](guides/engineering-workflows.md#fingerprint-reuse-between-changes) of edits made by hand in the TIA user interface is done, and no large project has been timed with batches or reuse; whether it then goes on by default is open under [decisions](#decisions-for-the-maintainer).

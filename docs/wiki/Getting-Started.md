@@ -89,7 +89,7 @@ Configure a stdio server with your actual checkout path:
 }
 ```
 
-`--toolsets` chooses which tool [groups](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md#tool-groups---toolsets) the Host advertises: name the groups you use (for example add `hmi`, `runtime`, `library`, `watch` or `diagnostics`). Without it the Host advertises only the `base` and `core` groups (sessions, projects, changes and the native reads), which keeps the tool list small; `--toolsets all` advertises every tool, about 330 and roughly 600 KB of tool definitions per session.
+`--toolsets` chooses which tool [groups](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md#tool-groups---toolsets) the Host advertises: name the groups you use (for example add `hmi`, `runtime`, `library`, `watch` or `diagnostics`). Without it the Host advertises only the `base` and `core` groups (sessions, projects, changes and the native reads), which keeps the tool list small (66 tools); `--toolsets all` advertises every tool of a default Host, 328 and roughly 700 KB of tool definitions per session.
 
 Then ask the client: *Use `tia_discover` to list the available TIA Portal sessions.* For a command-line check, run `python .\scripts\smoke_mcp.py`.
 
