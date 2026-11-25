@@ -211,10 +211,11 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
 - [ ] **No tag or release exists**, so `release.yml`, its gate and the new attestation job have never run. A dry run
   on a pre-release tag is the maintainer's call (tagging comes after acceptance under
   [release mechanics](#release-mechanics-and-policy)).
-- [ ] **Quality gates still missing:** code coverage measurement; a ruff gate (`E9,F63,F7,F82` gives 196 F821 false
-  positives in `qualify_force_capture.py`, which binds names through `globals()`, and one in
-  `qualify_project_explorer.py`: import the names explicitly or add per-file ignores, then gate); analyzers or
-  `TreatWarningsAsErrors` for the C# projects; an SBOM and a signature for the bundle.
+- [ ] **Remaining quality gates:** the bundle has no Authenticode signature (no code-signing certificate; the hash
+  list, provenance and SBOM attestations are the integrity evidence); 1,825 `latest-recommended` analyzer findings
+  (CA2201 771, CA1861 419, CA1305 142, ...) and ruff F401/F841/F402 await a clean-up before more rules become errors;
+  coverage does not measure worker sources linked into test assemblies (first local numbers: Translations 84.7 %,
+  Core 6 % from seven suites only).
 - [ ] **Found by the new tests, left open:** `plc_physical_*` has no Host-side gate (only tool registration behind
   `--physical-plc-online` and the worker refuse; the maintainer has not decided whether to add one). Closed the same
   day: the successful `runtime_unified_connect` path is tested offline end to end, `ProjectReviewStore` refuses

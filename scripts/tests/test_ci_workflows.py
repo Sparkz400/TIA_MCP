@@ -53,6 +53,33 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual({"id-token": "write", "attestations": "write"}, jobs["attest"]["permissions"])
         self.assertIn("attest", jobs["draft"]["needs"])
 
+    def test_release_attests_and_publishes_an_sbom_of_the_zip(self):
+        jobs = workflow("release.yml")["jobs"]
+        steps = jobs["attest"]["steps"]
+        sbom = [s for s in steps if s.get("uses", "").startswith("anchore/sbom-action@")]
+        self.assertEqual(1, len(sbom))
+        # Exact Syft version; the action must not publish anything itself (the attest job has no contents permission).
+        self.assertRegex(sbom[0]["with"]["syft-version"], r"^v\d+\.\d+\.\d+$")
+        self.assertEqual(False, sbom[0]["with"]["upload-release-assets"])
+        attested = [s["with"] for s in steps if s.get("uses", "").startswith("actions/attest@")]
+        self.assertEqual([{"subject-path": "release-files/*.zip", "sbom-path": sbom[0]["with"]["output-file"]}], attested)
+        uploaded = [s["with"]["name"] for s in steps if s.get("uses", "").startswith("actions/upload-artifact@")]
+        downloaded = [s["with"]["name"] for s in jobs["draft"]["steps"] if s.get("uses", "").startswith("actions/download-artifact@")]
+        self.assertEqual(["release-sbom"], uploaded)
+        self.assertIn("release-sbom", downloaded)
+
+    def test_python_lint_pins_ruff_and_coverage_never_gates(self):
+        jobs = workflow("offline.yml")["jobs"]
+        lint = " ".join(s.get("run", "") for s in jobs["lint-python"]["steps"])
+        self.assertRegex(lint, r"pip install ruff==\d+\.\d+\.\d+\b")
+        self.assertTrue((ROOT / "ruff.toml").is_file())
+        for name in ("coverage", "coverage-report"):
+            job = jobs[name]
+            self.assertIs(True, job.get("continue-on-error"), name)
+            self.assertNotIn("pull_request", job["if"], name)
+            self.assertNotIn("needs.changes", job["if"], name)
+        self.assertNotIn("needs", jobs["coverage"])
+
 
 if __name__ == "__main__":
     unittest.main()

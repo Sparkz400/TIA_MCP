@@ -14,6 +14,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Added
 
+- CI: a ruff gate (`ruff.toml`, job `lint-python`), 47 C# analyzer rules as build errors (`src/TiaMcp.Analyzers.globalconfig`), a weekly non-gating managed coverage report (`scripts/Measure-Coverage.ps1`), and an attested SPDX SBOM of the release ZIP published with each draft release.
 - `sim_network_mode_set` switches PLCSIM Advanced V8's machine-wide network mode after `acknowledgeMachineWide`, refusing while any instance is registered, on a stale or unknown mode, and reading the mode back (catalog `0.4.190`, unqualified; maintainer decision of 25 November).
 - `npm run test:explorer:scale` runs the 1,000-function Explorer browser check against a synthetic snapshot; it is part of the Explorer CI job.
 - An animated README demo (`docs/assets/demo.gif`) of the actual Project Explorer on synthetic sample data, regenerated with `npm run demo:record`.

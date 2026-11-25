@@ -12,8 +12,8 @@
   "sourceInputs": [
     {
       "path": "Directory.Build.props",
-      "sha256": "845561146ba0a293f3e5e43719baa0b29681b415b23afa2dbc2bba340653041e",
-      "bytes": 1053
+      "sha256": "03ae181c22d5f134777bd1d7994647dadd2f71b1dd70a4caed5dd08a2921bdad",
+      "bytes": 1745
     },
     {
       "path": "contracts/access-review.v1.schema.json",

@@ -1,0 +1,107 @@
+# Analyzer rules that fail the build. Directory.Build.props applies this file to every non-net48 project in src/ and
+# tests/; the net48 workers keep their compiler-only build (Test-WorkerCompile.ps1).
+# Each rule had no finding when it was added: on 25 November 2026 a Release build of all 55 non-net48 projects in src/
+# and tests/ (plus scripts/native/ReliabilityWorker and WatchWorkflow) with this file applied reported no error and the
+# same 10 compiler warnings as without it. Every rule not named here keeps the SDK default severity.
+# Add a rule only after `dotnet build` shows no finding for it; fix findings first rather than suppressing them.
+is_global = true
+
+# Reliability and correctness
+# platform compatibility (Windows-only API outside a Windows guard)
+dotnet_diagnostic.CA1416.severity = error
+# OutAttribute on string P/Invoke parameters
+dotnet_diagnostic.CA1417.severity = error
+# invalid platform string
+dotnet_diagnostic.CA1418.severity = error
+# runtime marshalling disabled but required
+dotnet_diagnostic.CA1420.severity = error
+# empty finalizer
+dotnet_diagnostic.CA1821.severity = error
+# ToImmutableCollection on an immutable collection
+dotnet_diagnostic.CA2009.severity = error
+# property assigned within its own setter
+dotnet_diagnostic.CA2011.severity = error
+# ValueTask misuse
+dotnet_diagnostic.CA2012.severity = error
+# ReferenceEquals on value types
+dotnet_diagnostic.CA2013.severity = error
+# stackalloc in a loop
+dotnet_diagnostic.CA2014.severity = error
+# finalizer on a MemoryManager-derived type
+dotnet_diagnostic.CA2015.severity = error
+# logging template and argument count differ
+dotnet_diagnostic.CA2017.severity = error
+# Buffer.BlockCopy count is bytes
+dotnet_diagnostic.CA2018.severity = error
+# Cast/OfType with incompatible types
+dotnet_diagnostic.CA2021.severity = error
+# inexact Stream.Read
+dotnet_diagnostic.CA2022.severity = error
+# rethrow loses the stack trace
+dotnet_diagnostic.CA2200.severity = error
+# wrong number of format arguments
+dotnet_diagnostic.CA2241.severity = error
+# comparison with NaN
+dotnet_diagnostic.CA2242.severity = error
+# property assigned to itself
+dotnet_diagnostic.CA2245.severity = error
+# symbol and member assigned in one statement
+dotnet_diagnostic.CA2246.severity = error
+# TaskCompletionSource given a TaskContinuationOptions value
+dotnet_diagnostic.CA2247.severity = error
+# wrong enum in HasFlag
+dotnet_diagnostic.CA2248.severity = error
+# ThrowIfCancellationRequested after a cancellation check
+dotnet_diagnostic.CA2250.severity = error
+# numeric logging placeholders
+dotnet_diagnostic.CA2253.severity = error
+# non-constant logging template
+dotnet_diagnostic.CA2254.severity = error
+# ModuleInitializer in a library
+dotnet_diagnostic.CA2255.severity = error
+# DynamicInterfaceCastableImplementation members
+dotnet_diagnostic.CA2256.severity = error
+# ThreadStatic on an instance field
+dotnet_diagnostic.CA2259.severity = error
+# generic math interface implemented wrongly
+dotnet_diagnostic.CA2260.severity = error
+# ConfigureAwaitOptions.SuppressThrowing on Task<T>
+dotnet_diagnostic.CA2261.severity = error
+# ArgumentNullException.ThrowIfNull on a non-nullable value
+dotnet_diagnostic.CA2264.severity = error
+# comparison of Span<T> with null or default
+dotnet_diagnostic.CA2265.severity = error
+
+# Security
+# SQL command text built from input
+dotnet_diagnostic.CA2100.severity = error
+# insecure DTD processing in XML
+dotnet_diagnostic.CA3075.severity = error
+# insecure XML reader/document settings in a type
+dotnet_diagnostic.CA3077.severity = error
+# MVC verb handler without antiforgery validation
+dotnet_diagnostic.CA3147.severity = error
+# broken cryptographic algorithm (DES, MD5, RC2)
+dotnet_diagnostic.CA5351.severity = error
+# certificate validation disabled
+dotnet_diagnostic.CA5359.severity = error
+# dangerous method called during deserialization
+dotnet_diagnostic.CA5360.severity = error
+# request validation disabled
+dotnet_diagnostic.CA5363.severity = error
+# deprecated security protocol
+dotnet_diagnostic.CA5364.severity = error
+# XmlSerializer.Deserialize without an XmlReader
+dotnet_diagnostic.CA5369.severity = error
+# XmlValidatingReader
+dotnet_diagnostic.CA5370.severity = error
+# XPathDocument without an XmlReader
+dotnet_diagnostic.CA5372.severity = error
+# weak key derivation function algorithm
+dotnet_diagnostic.CA5379.severity = error
+# DSA
+dotnet_diagnostic.CA5384.severity = error
+# RSA key shorter than 2048 bits
+dotnet_diagnostic.CA5385.severity = error
+# deprecated SslProtocols value
+dotnet_diagnostic.CA5397.severity = error

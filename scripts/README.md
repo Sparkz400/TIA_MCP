@@ -6,7 +6,7 @@ Entry points, qualification runners, helper modules and tests. Paths that curate
 
 | Location | Files |
 | --- | ---: |
-| PowerShell entry points (`*.ps1`) | 43 |
+| PowerShell entry points (`*.ps1`) | 44 |
 | Qualification runners (`qualify_*`) | 171 |
 | Probes (`probe_*.py`) | 15 |
 | Verifiers (`verify_*.py`) | 24 |
@@ -48,6 +48,7 @@ Documented user commands; run them from the repository root, for example `./scri
 
 | Script | Synopsis |
 | --- | --- |
+| [`Measure-Coverage.ps1`](Measure-Coverage.ps1) | Measures line coverage of the managed offline suites and writes a Cobertura report with a per-assembly summary. |
 | [`Test-AddInOwner.ps1`](Test-AddInOwner.ps1) |  |
 | [`Test-AddInSandbox.ps1`](Test-AddInSandbox.ps1) |  |
 | [`Test-Deployment.ps1`](Test-Deployment.ps1) |  |

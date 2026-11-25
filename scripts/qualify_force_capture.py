@@ -35,11 +35,10 @@ LANE = REPO / "artifacts/startup-unblock-20261015/force"
 # this changed controller. Importing them never constructs a native coordinator.
 import qualify_testsuite_scope_probe as _scope
 import qualify_vci_preservation_probe as _vci
-for _name in ("HOST_SHA", "WORKER_SHA", "bind_handle_identity", "graceful_close", "validate_status", "exact_exit",
-              "binary_package", "check_ref", "load", "ref", "sha", "save"):
-    globals()[_name] = getattr(_scope, _name)
-for _name in ("freeze_binding", "fixture_snapshot", "fixture_vci", "inspection_payload", "scan_overlays"):
-    globals()[_name] = getattr(_vci, _name)
+from qualify_testsuite_scope_probe import (HOST_SHA, WORKER_SHA, bind_handle_identity, graceful_close, validate_status,
+                                           exact_exit, binary_package, check_ref, load, ref, sha, save)
+from qualify_vci_preservation_probe import (freeze_binding, fixture_snapshot, fixture_vci, inspection_payload,
+                                            scan_overlays)
 _build = REPO / "artifacts/deployment-build/b274e08b806a44f4928e429f190b153d"
 HOST = _build / "published-host/TiaMcp.Host.exe"
 WORKER = _build / "src/TiaMcp.Openness.V21/bin/Release/net48/TiaMcp.Openness.V21.exe"
