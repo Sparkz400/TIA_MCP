@@ -211,7 +211,7 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   `claude/mcp-surface-redesign` is dropped. `contracts/mcp-surface.v1.json` was re-cut from the merged surface, so the
   42 differences are gone. The `totalItems`/`pageCount` part of the paging item stays open.
 - [x] **First tag and release:** `v0.9.0` was tagged on 25 November on the merge commit of PR 333 and published as a
-  release (marked Latest; the workflow drafts it as a pre-release before 1.0) with the offline bundle, its hash, manifest and SPDX SBOM; the release workflow ran end to end for the
+  pre-release with the offline bundle, its hash, manifest and SPDX SBOM; the release workflow ran end to end for the
   first time (tagged-commit gate, package and strict verify, build provenance and SBOM attestation, draft). The 1.0
   tag still comes after acceptance under [release mechanics](#release-mechanics-and-policy).
 - [ ] **Remaining quality gates:** the bundle has no Authenticode signature (no code-signing certificate; the hash
