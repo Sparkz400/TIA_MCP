@@ -1096,6 +1096,12 @@
       ]
     },
     {
+      "featureId": "sim_network_mode_set",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
       "featureId": "sim_time",
       "obligations": [
         "L03"

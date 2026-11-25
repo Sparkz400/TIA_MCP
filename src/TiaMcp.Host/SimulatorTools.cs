@@ -21,7 +21,7 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
     public Task<CallToolResult> Status(CancellationToken cancellationToken) => Call("sim_status", new { }, cancellationToken);
 
     [McpServerTool(Name = "sim_create", Destructive = false, OpenWorld = false)]
-    [Description("Create a uniquely named local PLCSIM Advanced instance owned by this session. Supply a fresh creationId (32 hex GUID characters) to inspect its durable receipt after a lost response; an existing ID is never replayed. Returns exact identity and a short-lived one-use downloadTicket for simulation_download. Does not activate a license trial. communicationInterface is Softbus (default) or TCPIP; TCPIP is refused with TcpIpModeRequired unless PLCSIM is already in TCP/IP single-adapter mode, and every later power-on, RUN, write and binding rechecks it. Network mode, adapters and IP addresses are operator settings and are never changed.")]
+    [Description("Create a uniquely named local PLCSIM Advanced instance owned by this session. Supply a fresh creationId (32 hex GUID characters) to inspect its durable receipt after a lost response; an existing ID is never replayed. Returns exact identity and a short-lived one-use downloadTicket for simulation_download. Does not activate a license trial. communicationInterface is Softbus (default) or TCPIP; TCPIP is refused with TcpIpModeRequired unless PLCSIM is already in TCP/IP single-adapter mode, and every later power-on, RUN, write and binding rechecks it. Adapters and IP addresses are never changed; the machine-wide network mode changes only through an explicit, acknowledged sim_network_mode_set.")]
     public Task<CallToolResult> Create(CancellationToken cancellationToken, string cpuType = "CPU1511", string? creationId = null, string communicationInterface = "Softbus")
         => Call("sim_create", new { cpuType, creationId, communicationInterface, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation") }, cancellationToken);
 
@@ -116,6 +116,36 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
     public Task<CallToolResult> Prune(string scope, CancellationToken cancellationToken, JsonElement? names = null, int? olderThanDays = null, int? maxTotalMegabytes = null, bool delete = false)
         => Call("sim_prune", new { scope, names, olderThanDays, maxTotalMegabytes, delete,
             artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation"), archiveDirectory = Path.Combine(options.ArtifactsDirectory, "simulation-archives") }, cancellationToken);
+
+    [McpServerTool(Name = "sim_network_mode_set", Destructive = true, OpenWorld = false)]
+    [Description("Switch PLCSIM Advanced V8's network mode (SimulationRuntimeManager.NetworkMode). MACHINE-WIDE: the mode applies to every PLCSIM instance and Windows user on this PC, not only to this session; ask the user before calling. mode is Softbus, TCPIPSingleAdapter (what sim_create TCPIP needs) or TCPIPMultipleAdapter. acknowledgeMachineWide must be true, otherwise AcknowledgementRequired before anything is sent to PLCSIM. Pass expectedCurrentMode as the networkMode sim_status reported; a different current mode is refused with SimulationNetworkModeStale. Refused with SimulationRegistrationsPresent (listing them) while any PLCSIM instance is registered, owned or not, and with SimulationNetworkModeUnknown when PLCSIM reports UnknownState. When the mode already matches, nothing is set (changed false). Otherwise the mode is set and read back for up to 5 s: the result has previousMode, mode, changed, readbackVerified, tcpIpReady and plcsimAdapters as sim_status reports them; a different readback is SimulationNetworkModeReadbackMismatch, a PLCSIM refusal SimulationNetworkModeSetFailed with its runtimeErrorCode. Every refusal carries a remediation. Adapter bindings, mappings and IP addresses are never changed; pick a real adapter, if any, in the PLCSIM Control Panel. No other tool changes the mode. Not qualified on a native PLCSIM installation yet.")]
+    public Task<CallToolResult> NetworkModeSet(string mode, CancellationToken cancellationToken, bool acknowledgeMachineWide = false, string? expectedCurrentMode = null)
+        => Wrap(() =>
+        {
+            var arguments = NetworkModeArguments(mode, acknowledgeMachineWide, expectedCurrentMode);
+            // The worker reads the mode back for up to 5 s after setting it; a call still running at the bridge timeout would leave the switch's outcome unknown.
+            if (NetworkModeReadbackMs > options.TimeoutSeconds * 1000 - BridgeMarginMs)
+                throw new BridgeException("InvalidRequest", $"sim_network_mode_set reads the mode back for up to {NetworkModeReadbackMs} ms, which does not end {BridgeMarginMs} ms before this Host's {options.TimeoutSeconds} s bridge timeout (--timeout-seconds). Start the Host with a longer timeout; nothing was sent.");
+            return simulator.Bridge.CallAsync("sim_network_mode_set", arguments, CancellationToken.None);
+        });
+
+    private const int NetworkModeReadbackMs = 5000;
+
+    internal static readonly string[] NetworkModes = ["Softbus", "TCPIPSingleAdapter", "TCPIPMultipleAdapter"];
+
+    // Host-side refusals of sim_network_mode_set: every worker call starts PLCSIM Runtime Manager, so a missing acknowledgement
+    // or an unknown mode name never reaches the worker. The worker checks the same rules again.
+    internal static object NetworkModeArguments(string mode, bool acknowledgeMachineWide, string? expectedCurrentMode)
+    {
+        if (System.Array.IndexOf(NetworkModes, mode) < 0)
+            throw new BridgeException("InvalidRequest", "mode must be " + string.Join(", ", NetworkModes) + ". Nothing was sent.");
+        if (expectedCurrentMode is not null && expectedCurrentMode != "UnknownState" && System.Array.IndexOf(NetworkModes, expectedCurrentMode) < 0)
+            throw new BridgeException("InvalidRequest", "expectedCurrentMode must be " + string.Join(", ", NetworkModes) + " or UnknownState, as sim_status reported networkMode. Nothing was sent.");
+        if (!acknowledgeMachineWide)
+            throw new BridgeOperationException("AcknowledgementRequired", "PLCSIM's network mode is machine-wide: it applies to every PLCSIM instance and user on this PC. Nothing was sent and nothing was changed.",
+                JsonSerializer.SerializeToElement(new { remediation = "Call again with acknowledgeMachineWide true only after the user has agreed to change the PLCSIM network mode for the whole PC.", machineWide = true, changed = false }));
+        return new { mode, acknowledgeMachineWide, expectedCurrentMode };
+    }
 
     private static JsonElement Array(JsonElement value) => value.ValueKind == JsonValueKind.Array ? value : throw new McpException("An array is required.");
     // sim_test: the adapter's 90 s execution cap plus one interval and one sync-point wait it can still run after its last cap check.

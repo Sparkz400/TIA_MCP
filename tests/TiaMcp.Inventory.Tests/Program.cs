@@ -695,11 +695,12 @@ Directory.Delete(link);
         .Select(method => method.Name + "=" + System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>(method)!.Description.Length).ToArray();
     Check(overBudget.Length == 0, "Tool descriptions stay within 1900 characters: " + string.Join(", ", overBudget));
 }
-// MCP tool wrappers against fake bridges and a scripted GraphQL server: no worker, PLC, runtime or vault.
+// MCP tool wrappers against fake bridges and a scripted GraphQL server: no worker, PLC or runtime; the Unified login reads a
+// current-user vault created under the output directory, never the user's own vault.
 int beforeWrappers = checks;
 await PhysicalPlcToolChecks.Run(Check, Path.Combine(output, "physical-plc-host"));
 int afterPhysical = checks;
-await UnifiedRuntimeToolChecks.Run(Check);
+await UnifiedRuntimeToolChecks.Run(Check, Path.Combine(output, "unified-vaults"));
 int afterUnified = checks;
 await WrapperToolChecks.Run(Check, Path.Combine(output, "wrapper-host"));
 Console.WriteLine($"PASS Host tool wrappers: {afterPhysical - beforeWrappers} plc_physical_*, {afterUnified - afterPhysical} runtime_unified_*, {checks - afterUnified} composite/drive checks.");

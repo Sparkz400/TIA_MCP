@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.189",
+  "catalogVersion": "0.4.190",
   "targetTiaVersions": [
     21
   ],
@@ -9011,7 +9011,7 @@
         "status": "implemented",
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "14 November 2026 (not curated evidence): reports tcpIpReady, the PLCSIM virtual Ethernet adapters with IPv4 addresses and, outside TCP/IP single-adapter mode, a Control Panel remediation; TcpIpModeRequired carries the same details. The mode is never changed. Checked once in TCP/IP single-adapter mode."
+          "14 November 2026 (not curated evidence): reports tcpIpReady, the PLCSIM virtual Ethernet adapters with IPv4 addresses and, outside TCP/IP single-adapter mode, a Control Panel remediation; TcpIpModeRequired carries the same details. sim_status never changes the mode; since 25 November the remediation also names the explicit, acknowledged sim_network_mode_set. Checked once in TCP/IP single-adapter mode."
         ]
       },
       "qualification": {
@@ -9429,6 +9429,50 @@
       "prerequisites": [
         "PLCSIM Advanced V8 API and authorized Windows user",
         "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-simulator-lifecycle",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_network_mode_set",
+      "domain": "simulation",
+      "title": "Switch the machine-wide PLCSIM Advanced network mode after an explicit acknowledgement",
+      "mcpTools": [
+        "sim_network_mode_set"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Public SimulationRuntimeManager.NetworkMode getter and setter of the installed PLCSIM Advanced V8 API (ENetworkMode UnknownState, TCPIPMultipleAdapter, TCPIPSingleAdapter, Softbus); the API manual V8.0 documents the setter's errors VirtualSwitchMisconfigured, InstanceAlreadyRunning and PCAPDriverNotRunning."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Machine-wide: the mode applies to every PLCSIM instance and Windows user on the PC. acknowledgeMachineWide must be true (AcknowledgementRequired, checked by the Host before any worker call and again by the worker); no other tool changes the mode.",
+          "Refused while any PLCSIM instance is registered, owned or not (SimulationRegistrationsPresent, listing them), stricter than the API, which refuses only a running instance; refused when expectedCurrentMode differs from the observed mode (SimulationNetworkModeStale) and when PLCSIM reports UnknownState (SimulationNetworkModeUnknown). The current mode is a no-op (changed false).",
+          "The mode is read back for up to 5 s (SimulationNetworkModeReadbackMismatch otherwise); a PLCSIM refusal is SimulationNetworkModeSetFailed with its runtime error code and a remediation. Adapter bindings, mappings and IP addresses are never changed (SetNetInterfaceBindings needs administrator rights).",
+          "Decision rules verified offline (SimulationNetworkModeSwitch); not run against a live PLCSIM installation, so administrator rights, a Runtime Manager restart and the readback timing are unobserved."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "No registered PLCSIM instance and the user's agreement to a machine-wide change"
       ],
       "acceptanceCriteria": [
         "AC-identity",

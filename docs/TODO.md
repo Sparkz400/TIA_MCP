@@ -216,10 +216,16 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   `qualify_project_explorer.py`: import the names explicitly or add per-file ignores, then gate); analyzers or
   `TreatWarningsAsErrors` for the C# projects; an SBOM and a signature for the bundle.
 - [ ] **Found by the new tests, left open:** `plc_physical_*` has no Host-side gate (only tool registration behind
-  `--physical-plc-online` and the worker refuse); the successful `runtime_unified_connect` path has no offline test
-  (no transport or vault seam in `UnifiedRuntimeSessions`); `ProjectReviewStore.XmlSignatures` refuses with a raw
-  `XmlException`; the worker's `ReadExportedXml` has no depth bound (it reads TIA's own exports); `browser-scale.mjs`
-  needs a native `--report` and is not wired.
+  `--physical-plc-online` and the worker refuse; the maintainer has not decided whether to add one). Closed the same
+  day: the successful `runtime_unified_connect` path is tested offline end to end, `ProjectReviewStore` refuses
+  malformed review XML as `InvalidSnapshot`, the worker's exported-XML reader stops at 512 levels
+  (`ExportedXmlTooDeep`), and `npm run test:explorer:scale` runs the 1,000-function browser check on a synthetic snapshot.
+- [ ] **Native runs of `sim_network_mode_set`** (added 25 November, decision 2; offline tests only): with no instance
+  registered, record `sim_status` `networkMode`; switch to `TCPIPSingleAdapter` with `acknowledgeMachineWide` and
+  `expectedCurrentMode`, once as a standard user and once as administrator; note whether the readback is immediate and
+  a Runtime Manager restart is needed; `sim_create` in TCP/IP after the API switch; the refusal with a registered
+  instance; restore the original mode. The same run covers the Runtime-Manager-lost subscription, which never attached
+  before 25 November (the API spells the event `OnRunTimemanagerLost`).
 - [ ] **CI and repository upkeep:** the package job runs its stages serially (about 21 minutes); `scripts/` holds
   about 660 files in one folder; the [status log](history/status-log.md) has no entry between 3 and 25 November.
 

@@ -539,18 +539,11 @@ namespace TiaMcp.Openness.V21
             if (render == "text")
             {
                 // The export is the result; a text rendering that fails must not lose it.
-                try { AddNetworkText(result, ReadExportedXml(destination), culture, Path.ChangeExtension(destination, ".txt")); }
-                catch (Exception ex) when (ex is System.Xml.XmlException || ex is InvalidOperationException || ex is IOException)
+                try { AddNetworkText(result, ExportedXml.Load(destination), culture, Path.ChangeExtension(destination, ".txt")); }
+                catch (Exception ex) when (ex is System.Xml.XmlException || ex is BridgeException { Code: "ExportedXmlTooDeep" } || ex is InvalidOperationException || ex is IOException)
                 { result["textUnavailable"] = new JObject { ["reason"] = ex.Message, ["read"] = "artifact.path holds the complete native XML" }; }
             }
             return result;
-        }
-
-        // TIA's own export of one block: read without the 4 MiB bound that guards supplied import documents.
-        private static System.Xml.Linq.XDocument ReadExportedXml(string path)
-        {
-            using (var reader = System.Xml.XmlReader.Create(path, new System.Xml.XmlReaderSettings { DtdProcessing = System.Xml.DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 256L * 1024 * 1024 }))
-                return System.Xml.Linq.XDocument.Load(reader, System.Xml.Linq.LoadOptions.PreserveWhitespace);
         }
 
         // A reading aid next to the unchanged native XML: each network as text, LAD/FBD logic as statements; for a block without

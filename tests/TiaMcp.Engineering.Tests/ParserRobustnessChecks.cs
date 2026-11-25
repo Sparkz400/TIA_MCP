@@ -1,6 +1,5 @@
 using System.Text;
 using System.Text.Json.Nodes;
-using System.Xml;
 using TiaMcp.Core;
 using TiaMcp.Core.Diagnostics;
 
@@ -22,12 +21,12 @@ internal static class ParserRobustnessChecks
             .Select(name => File.ReadAllBytes(Path.Combine(fixtures, name))).ToArray();
         foreach (byte[] block in blocks) ProjectReviewStore.XmlSignatures(Encoding.UTF8.GetString(block));
 
-        // The block reader takes text the worker exported; its own refusal is XmlException (the 128-level bound throws one
-        // itself), which every Host caller turns into a coded result (ToolResult.IsRefusal).
+        // The block reader takes text the worker exported or a supplied review carried. Its one refusal is InvalidSnapshot
+        // (malformed XML, a DTD or more than 128 levels); a raw XmlException is a defect, since it carries no review code.
         var xml = SeededMutations.Run("SimaticML block XML", Seed, 4000,
             random => SeededMutations.Xml(blocks[random.Next(blocks.Length)], random),
             input => ProjectReviewStore.XmlSignatures(new UTF8Encoding(false, false).GetString(input)),
-            error => error is BridgeException bridge ? bridge.Code : error is XmlException ? "XmlException" : null,
+            error => error is BridgeException { Code: "InvalidSnapshot" } bridge ? bridge.Code : null,
             TimeSpan.FromSeconds(10), minimumOutcomes: 2);
         Console.WriteLine("PASS " + xml.Summary("SimaticML block XML robustness"));
 

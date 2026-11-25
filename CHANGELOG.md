@@ -14,6 +14,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Added
 
+- `sim_network_mode_set` switches PLCSIM Advanced V8's machine-wide network mode after `acknowledgeMachineWide`, refusing while any instance is registered, on a stale or unknown mode, and reading the mode back (catalog `0.4.190`, unqualified; maintainer decision of 25 November).
+- `npm run test:explorer:scale` runs the 1,000-function Explorer browser check against a synthetic snapshot; it is part of the Explorer CI job.
 - An animated README demo (`docs/assets/demo.gif`) of the actual Project Explorer on synthetic sample data, regenerated with `npm run demo:record`.
 - `tia_discover` and `tia_attach` list `attachedSessions`, the other Openness clients of each TIA Portal (whether one is in a call and whether its process still runs); `tia_attach` takes `waitForIdleSeconds` and refuses with `OpennessClientBusy` instead of waiting behind a busy client. Another client is never disconnected (catalog `0.4.188`, unverified).
 - `project_open` opens a UMAC-protected project with `umacUserName`, `umacUserType` and `umacCredential`, a protected credential bound to the project path and user; the Host seals the stored password for that one open and TIA's login request is answered once ([route](docs/reference/protected-credentials.md#project-open-umac-route); catalog `0.4.188`, unverified).
@@ -319,6 +321,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- `runtime_ua_connect` gives the network connect its full 10 s: reading up to 1,024 retained session records used to spend the same deadline, so on a loaded machine a healthy server could be reported unreachable (seen twice in the offline suite on 25 November).
+- The simulator worker's Runtime-Manager-lost subscription never attached: PLCSIM's API spells the event `OnRunTimemanagerLost` (API 3.0 to 8.0), and the case-sensitive lookup used the manual's spelling.
+- `runtime_unified_connect` is tested offline end to end (certificate pin, protected-credential login, UMC language, alarms, disconnect, and pin, validity, host-name and login refusals). Malformed, DTD-bearing or too deeply nested review block XML is refused as `InvalidSnapshot` instead of a raw `XmlException`; `block_read` text rendering refuses exports nested deeper than 512 levels (`ExportedXmlTooDeep`) and still returns the export.
 - **Audit of 25 November (offline tests only, no native run):** a tool argument the workers cannot load (a property name repeated in one object, or nesting beyond the limit) is refused by the Host with `InvalidRequest` before anything is sent; it used to come back without its request id, which the Host treated as a protocol fault that ended the worker session with its attachment and open projects. The engineering and simulator workers also keep the request id of a frame they cannot load.
 - `--queue-timeout-seconds` now applies to engineering tools: they queue in the Host's dispatcher, which waited without a bound for the running call (a `change_apply`: up to the long timeout); a queued call now gives up with `QueueTimeout` and nothing sent.
 - `plc_tag_usage` reads its index files through the artifact store's root and link checks, refuses a file over 16 MiB before reading it and answers a file that is not a `block_export` index with `InvalidRequest`; a relative `index` path is now relative to the artifact directory.

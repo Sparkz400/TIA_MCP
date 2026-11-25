@@ -23,14 +23,8 @@ internal static class GraphicalNetworkTextRobustnessTests
             .Select(name => File.ReadAllBytes(Path.Combine(directory ?? throw new InvalidOperationException("Native graphical fixtures are missing."), name))).ToArray();
         static void Read(byte[] input)
         {
-            // The worker reads TIA's own export without a depth bound. XDocument.Load itself slows superlinearly with nesting
-            // (about 2 s at 40 000 levels, no return within 20 s at 200 000), so this loader refuses beyond the Host review
-            // reader's 128 levels; the renderer is exercised on everything below that.
-            var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null };
-            using (var depth = XmlReader.Create(new MemoryStream(input, false), settings))
-                while (depth.Read()) if (depth.Depth > 128) throw new XmlException("More than 128 nested levels.");
-            XDocument document;
-            using (var reader = XmlReader.Create(new MemoryStream(input, false), settings)) document = XDocument.Load(reader);
+            // The worker's own export reader (block_read render:text), with its depth bound.
+            var document = ExportedXml.Load(new MemoryStream(input, false));
             _ = GraphicalNetworkText.Format(GraphicalNetworkText.Render(document));
             _ = GraphicalNetworkText.RenderInterface(document);
             _ = GraphicalNetworkText.Describe(document, null, out _);
@@ -46,6 +40,44 @@ internal static class GraphicalNetworkTextRobustnessTests
         minimal.Descendants().First(e => e.Name.LocalName == "IdentCon").Attribute("UId")!.Remove();
         // Fixed on 25 November: it used to raise ArgumentNullException; it is rendered as an unknown operand now.
         _ = GraphicalNetworkText.Render(minimal);
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// The worker's export reader refuses nesting beyond ExportedXml.MaxDepth with a BridgeException before XDocument.Load
+    /// builds the tree (XDocument.Load alone takes about 2 s at 40 000 levels and does not return at 200 000). The deepest
+    /// retained native export nests 19 levels.
+    /// </summary>
+    internal static Task ExportedXmlDepthIsBounded()
+    {
+        static byte[] Nested(int levels) => System.Text.Encoding.UTF8.GetBytes(
+            "<Document>" + string.Concat(Enumerable.Repeat("<x>", levels - 1)) + string.Concat(Enumerable.Repeat("</x>", levels - 1)) + "</Document>");
+        static TiaMcp.Openness.V21.BridgeException Refused(byte[] input)
+        {
+            try { ExportedXml.Load(new MemoryStream(input, false)); }
+            catch (TiaMcp.Openness.V21.BridgeException error) { return error; }
+            throw new Exception("A document nested deeper than " + ExportedXml.MaxDepth + " levels was read.");
+        }
+        Check.Equal(512, ExportedXml.MaxDepth);
+        var refused = Refused(Nested(ExportedXml.MaxDepth + 2));
+        Check.Equal("ExportedXmlTooDeep", refused.Code);
+        Check.Equal(true, refused.Message.Contains("512"));
+        Check.Equal(ExportedXml.MaxDepth + 1, ExportedXml.Load(new MemoryStream(Nested(ExportedXml.MaxDepth + 1), false)).Descendants().Count());
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        Check.Equal("ExportedXmlTooDeep", Refused(Nested(200_000)).Code);
+        Check.Equal(true, clock.Elapsed < TimeSpan.FromSeconds(5));
+
+        string? deepest = null;
+        for (var current = new DirectoryInfo(AppContext.BaseDirectory); current != null && deepest == null; current = current.Parent)
+        {
+            string path = Path.Combine(current.FullName, "fixtures", "typed-graphical", "native", "instance-effects-transitive-component", "after-Tgp_CompNestGrand.xml");
+            if (File.Exists(path)) deepest = path;
+        }
+        var native = ExportedXml.Load(deepest ?? throw new InvalidOperationException("Native graphical fixtures are missing."));
+        Check.Equal(true, native.Root!.DescendantsAndSelf().Max(e => e.Ancestors().Count()) + 1 >= 19);
+        // DTDs stay prohibited, as before the bound.
+        try { ExportedXml.Load(new MemoryStream(System.Text.Encoding.UTF8.GetBytes("<!DOCTYPE x [<!ENTITY e SYSTEM 'file:///secret'>]><x>&e;</x>"), false)); throw new Exception("A DTD was read."); }
+        catch (XmlException) { }
         return Task.CompletedTask;
     }
 

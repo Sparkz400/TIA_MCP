@@ -19,6 +19,21 @@ public sealed class UnifiedRuntimeSessions : IDisposable
     private sealed record Live(UnifiedGraphQlClient Client, UnifiedLoginSelection Login, Uri Endpoint, DateTimeOffset ConnectedAt);
     private readonly Dictionary<string, Live> live = new(StringComparer.Ordinal);
     private readonly SemaphoreSlim gate = new(1);
+    private readonly Func<Uri, string, UnifiedGraphQlClient> clientFor;
+    private readonly Func<string, string> vaultRoot;
+    private readonly Func<Uri, CancellationToken, Task<(bool IsLocal, string[] Addresses)>> locality;
+
+    public UnifiedRuntimeSessions() : this(null, null, null) { }
+
+    // Offline checks: a client over a scripted transport (with the production peer check), a vault in a test directory and a
+    // host that counts as this PC. Production passes nothing and gets the pinned TLS client, the user's vault and DNS.
+    internal UnifiedRuntimeSessions(Func<Uri, string, UnifiedGraphQlClient>? clientFor, Func<string, string>? vaultRoot,
+        Func<Uri, CancellationToken, Task<(bool IsLocal, string[] Addresses)>>? locality)
+    {
+        this.clientFor = clientFor ?? ((endpoint, pin) => new UnifiedGraphQlClient(endpoint, pin));
+        this.vaultRoot = vaultRoot ?? CredentialVault.UserRoot;
+        this.locality = locality ?? LocalEndpoint;
+    }
 
     public static CredentialBinding Binding(string endpoint, string certificate, string user)
     {
@@ -49,11 +64,11 @@ public sealed class UnifiedRuntimeSessions : IDisposable
             }
             if (live.Count >= 4) throw new BridgeException("RuntimeSessionCapacity", "This Host holds four Unified sessions; disconnect one first.");
             var endpoint = UnifiedAlarmRules.Endpoint(login.Endpoint);
-            var client = new UnifiedGraphQlClient(endpoint, login.PeerCertificateSha256);
+            var client = clientFor(endpoint, login.PeerCertificateSha256);
             try
             {
                 string? failure = null;
-                CredentialVault.Existing(CredentialVault.UserRoot(login.VaultName)).Use(login.Credential, binding, bytes =>
+                CredentialVault.Existing(vaultRoot(login.VaultName)).Use(login.Credential, binding, bytes =>
                 {
                     try { client.LoginAsync(login.User, bytes, cancellationToken).GetAwaiter().GetResult(); }
                     catch (BridgeException error) { failure = error.Code + "\n" + error.Message; }
@@ -98,7 +113,7 @@ public sealed class UnifiedRuntimeSessions : IDisposable
     {
         if (!acknowledgeWrite) throw new BridgeException("WriteAcknowledgementRequired", "Acknowledging alarms changes the runtime's alarm state; pass acknowledgeWrite:true after the user asked for it.");
         var entry = Get(attemptId);
-        var local = await LocalEndpoint(entry.Endpoint, cancellationToken);
+        var local = await locality(entry.Endpoint, cancellationToken);
         if (!local.IsLocal)
             throw new BridgeOperationException("UnifiedWriteRouteRefused", "Alarms are acknowledged only on a WinCC Unified PC Runtime running on this PC; " + entry.Endpoint.Host + " resolves to another machine.",
                 System.Text.Json.JsonSerializer.SerializeToElement(new { host = entry.Endpoint.Host, addresses = local.Addresses }));

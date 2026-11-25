@@ -14,12 +14,14 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/OpennessClientRules.cs" Link="OpennessClientRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/StaleChangeDirectories.cs" Link="StaleChangeDirectories.cs" />
     <Compile Include="../../src/TiaMcp.Simulator.V8/SimulationRuntimeControl.cs" Link="SimulationRuntimeControl.cs" />
+    <Compile Include="../../src/TiaMcp.Simulator.V8/SimulationNetworkModeSwitch.cs" Link="SimulationNetworkModeSwitch.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/AlarmWorkbook.cs" Link="AlarmWorkbook.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/DependencyRules.cs" Link="DependencyRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/LibraryJournalStore.cs" Link="LibraryJournalStore.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/LibraryDocumentNames.cs" Link="LibraryDocumentNames.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/EngineeringSources.cs" Link="EngineeringSources.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/GraphicalNetworkText.cs" Link="GraphicalNetworkText.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ExportedXml.cs" Link="ExportedXml.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/CrossReferenceMemberFilter.cs" Link="CrossReferenceMemberFilter.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/SoftwareObjectFilter.cs" Link="SoftwareObjectFilter.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/GraphicalUidRenumbering.cs" Link="GraphicalUidRenumbering.cs" />

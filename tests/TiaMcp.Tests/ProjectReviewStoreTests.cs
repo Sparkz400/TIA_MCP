@@ -114,7 +114,13 @@ internal static class ProjectReviewStoreTests
     internal static async Task UntrustedInputs()
     {
         using var files = new Fixture();
-        await Check.ThrowsAsync<XmlException>(() => Task.FromResult(ProjectReviewStore.XmlSignatures("<!DOCTYPE x [<!ENTITY e SYSTEM 'file:///secret'>]><x>&e;</x>")));
+        var dtd = await Check.ThrowsAsync<BridgeException>(() => Task.FromResult(ProjectReviewStore.XmlSignatures("<!DOCTYPE x [<!ENTITY e SYSTEM 'file:///secret'>]><x>&e;</x>")));
+        Check.Equal("InvalidSnapshot", dtd.Code);
+        Check.Equal(true, dtd.InnerException is XmlException);
+        var malformed = await Check.ThrowsAsync<BridgeException>(() => Task.FromResult(ProjectReviewStore.XmlSignatures("<Document><Open></Document>")));
+        Check.Equal("InvalidSnapshot", malformed.Code);
+        // The parser's own position is kept in the message.
+        Check.Equal(true, malformed.InnerException is XmlException { LineNumber: 1 } inner && malformed.Message.EndsWith(inner.Message, StringComparison.Ordinal));
         var docs = Documents(Xml); docs[0]!["objectPath"] = "/projects/Other/Logic";
         await Check.ThrowsAsync<BridgeException>(() => Task.FromResult(files.Store.Save(Model(), docs, new JsonObject())));
         docs = Documents(Xml); docs[0]!["utf8Sha256"] = new string('0', 64);
@@ -176,8 +182,11 @@ internal static class ProjectReviewStoreTests
         await Check.ThrowsAsync<DecoderFallbackException>(() => Task.FromResult(target.Store.Import(Upload(target.Root, [0xff, 0xfe]))));
         var unsafeXml = original.DeepClone().AsObject(); string xml = "<!DOCTYPE x [<!ENTITY e SYSTEM 'file:///secret'>]><x>&e;</x>";
         unsafeXml["documents"]![0]!["xml"] = xml; unsafeXml["documents"]![0]!["utf8Sha256"] = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(xml)));
-        await Check.ThrowsAsync<XmlException>(() => Task.FromResult(target.Store.Import(Upload(target.Root, Encoding.UTF8.GetBytes(unsafeXml.ToJsonString())))));
-        await Check.ThrowsAsync<XmlException>(() => Task.FromResult(ProjectReviewStore.XmlSignatures(string.Concat(Enumerable.Repeat("<x>", 130)) + string.Concat(Enumerable.Repeat("</x>", 130)))));
+        Check.Equal("InvalidSnapshot", (await Check.ThrowsAsync<BridgeException>(() => Task.FromResult(target.Store.Import(Upload(target.Root, Encoding.UTF8.GetBytes(unsafeXml.ToJsonString())))))).Code);
+        var deep = await Check.ThrowsAsync<BridgeException>(() => Task.FromResult(ProjectReviewStore.XmlSignatures(string.Concat(Enumerable.Repeat("<x>", 130)) + string.Concat(Enumerable.Repeat("</x>", 130)))));
+        Check.Equal("InvalidSnapshot", deep.Code);
+        Check.Equal(true, deep.Message.Contains("128"));
+        _ = ProjectReviewStore.XmlSignatures(string.Concat(Enumerable.Repeat("<x>", 129)) + string.Concat(Enumerable.Repeat("</x>", 129)));
         Check.Equal(false, Directory.Exists(Path.Combine(target.Root, "project-reviews")));
     }
 

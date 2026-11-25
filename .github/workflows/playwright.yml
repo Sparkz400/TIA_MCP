@@ -29,6 +29,8 @@ jobs:
       run: npm run test:explorer
     - name: Validate the actual offline and MCP explorer
       run: npm run test:explorer:browser
+    - name: Validate the explorer at 1,000 functions (synthetic snapshot)
+      run: npm run test:explorer:scale
     - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       if: ${{ !cancelled() }}
       with:
@@ -36,4 +38,6 @@ jobs:
         path: |
           artifacts/project-explorer/runs/
           output/playwright/project-explorer/
+          artifacts/project-explorer/scale-runs/
+          output/playwright/project-explorer-scale/
         retention-days: 30

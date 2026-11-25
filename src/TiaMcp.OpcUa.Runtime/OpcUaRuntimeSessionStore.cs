@@ -145,9 +145,12 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
             foreach (var name in new[] { "trusted", "issuers", "rejected" }) Plain(Path.Combine(pkiPath, name));
             var client = new OpcUaRuntimeClient(selection, certificate, clientUri, pkiPath);
             live.Add(attemptId, new(client, status));
+            // The connect gets the whole timeout of its own: reading up to 1,024 retained records above must not spend it
+            // (on a loaded machine that bookkeeping alone took most of the 10 s and a healthy server was reported unreachable).
+            using var connectDeadline = Deadline(ct);
             try
             {
-                if (selection.Authentication == "anonymous") await client.Connect(null, deadline.Token);
+                if (selection.Authentication == "anonymous") await client.Connect(null, connectDeadline.Token);
                 else
                 {
                     // The secret is copied out under the vault lock and the network call runs after it is released, so a
@@ -156,7 +159,7 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
                     try
                     {
                         credentialConsumer(selection, bytes => { secret = GC.AllocateUninitializedArray<byte>(bytes.Length, pinned: true); bytes.CopyTo(secret, 0); });
-                        await client.Connect(secret, deadline.Token);
+                        await client.Connect(secret, connectDeadline.Token);
                     }
                     finally { if (secret is not null) CryptographicOperations.ZeroMemory(secret); }
                 }

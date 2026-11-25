@@ -47,6 +47,7 @@ npm ci
 npm run test:explorer
 npx playwright install chromium
 npm run test:explorer:browser
+npm run test:explorer:scale
 ```
 
 Each offline invocation writes a fresh report under `artifacts/offline-validation/`.
