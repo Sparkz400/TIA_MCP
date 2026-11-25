@@ -427,7 +427,7 @@ at prepare, twice while the Host admits the apply, before the checkpoint
 (`StaleRevision`) and for the recorded outcome. Between an applied-and-saved change
 and the next one the project is normally untouched, so a Host started with
 `--enable-fingerprint-reuse` lets the worker keep its last read and reuse it. It is
-**off by default**, because one check below is still open. With reuse on, it applies
+**off by default** (maintainer decision of 25 November 2026), and one check below is still open. With reuse on, it applies
 under these conditions only:
 
 - TIA reports the project as saved (`IsModified` false) with the same

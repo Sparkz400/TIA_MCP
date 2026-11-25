@@ -6,7 +6,7 @@
     "catalogVersion": "0.4.189",
     "catalogSha256": "99a9203fec356edd2250aef09b5d657b7cc6ae39a5e3a85ee26fc5f45984591b",
     "ledger": "docs/plans/release-obligations-20261015.json",
-    "ledgerSha256": "5c4786dd1c89d694fbb8dd6cedda08b781fd52cfb05022cdeda06a2770ef8125"
+    "ledgerSha256": "5ad6d7bbf56bafce83a0016aaa5e48d0fda369dce536f7e1d1c7ec696ba1146d"
   },
   "targetTiaVersions": [
     21
@@ -14,7 +14,7 @@
   "summary": {
     "features": 518,
     "support": {
-      "deferred": 1,
+      "descoped": 1,
       "limited": 344,
       "shipped": 133,
       "unavailable_target": 12,
@@ -23,7 +23,7 @@
     "cells": {
       "blocked": 72,
       "bound": 2184,
-      "deferred": 3,
+      "descoped": 3,
       "open": 81
     },
     "openCellsByOwner": {
@@ -6592,7 +6592,7 @@
       "domain": "drives",
       "mcpTools": [],
       "changeKind": null,
-      "support": "deferred",
+      "support": "descoped",
       "owners": [
         "D10"
       ],

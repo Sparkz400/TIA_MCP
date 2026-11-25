@@ -15,6 +15,13 @@ texts for `HmiPreservationUnavailable`, a release gate that needs the code jobs,
 link and PowerShell lint checks. Offline tests and worker builds only; the native runs and the missing raw evidence
 store are open under [audit follow-ups](../TODO.md#audit-follow-ups-25-november).
 
+**Maintainer decisions:** six of the seven open [decisions](../TODO.md#decisions-for-the-maintainer) were taken:
+per-attempt TLS trust stays, a PLCSIM network-mode switch tool is to be built, `drives.engineering` is out of 1.0
+scope, fingerprint reuse stays off by default, the three lost library reports get a reviewer disposition and the
+missing native recheck of the watch-owned Test Suite reopen is a stated limitation. Obligation acceptance stays open.
+`drives.engineering` has a ledger disposition with `"scope": "post-1.0"`, and `scripts/release_matrix.py` summarizes
+its 3 cells as `descoped` (catalog `0.4.189`: 2,184 bound, 81 open, 72 blocked, 3 descoped, 0 deferred).
+
 ## 3 November 2026
 
 **Offline runtime follow-up:** catalog `0.4.133` adds bounded Web syslog reads,
