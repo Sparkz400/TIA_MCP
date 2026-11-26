@@ -8,24 +8,24 @@ internal static class RuntimeCaptureDiskFullChecks
     // Invoked only by Test-RuntimeCaptureDiskFull.ps1 after it creates and validates its own 64 MiB VHD.
     internal static async Task Run(string volumeRoot,string token,string evidenceRoot)
     {
-        if(!OperatingSystem.IsWindows() || !Guid.TryParseExact(token,"N",out _))throw new Exception("Bounded Windows volume and owner token required.");
+        if(!OperatingSystem.IsWindows() || !Guid.TryParseExact(token,"N",out _))throw new InvalidOperationException("Bounded Windows volume and owner token required.");
         string volume=Path.GetFullPath(volumeRoot);
         if(!string.Equals(volume,Path.GetPathRoot(volume),StringComparison.OrdinalIgnoreCase) ||
             string.Equals(volume,Path.GetPathRoot(Environment.SystemDirectory),StringComparison.OrdinalIgnoreCase))
-            throw new Exception("Only a dedicated non-system drive root is accepted.");
+            throw new InvalidOperationException("Only a dedicated non-system drive root is accepted.");
         var drive=new DriveInfo(volume);
         if(drive.TotalSize>64L<<20 || drive.TotalSize<32L<<20 || drive.VolumeLabel!="TIA_"+token[..20])
-            throw new Exception("Volume label or bounded capacity does not match the owned fixture.");
+            throw new InvalidOperationException("Volume label or bounded capacity does not match the owned fixture.");
         using var marker=JsonDocument.Parse(File.ReadAllBytes(Path.Combine(volume,"runtime-pressure-owner.json")));
         if(marker.RootElement.GetProperty("token").GetString()!=token || marker.RootElement.GetProperty("sizeBytes").GetInt64()!=64L<<20)
-            throw new Exception("Owned volume marker does not match.");
+            throw new InvalidOperationException("Owned volume marker does not match.");
         if(Path.GetFullPath(evidenceRoot).StartsWith(volume,StringComparison.OrdinalIgnoreCase))
-            throw new Exception("Evidence must be retained outside the volume being exhausted.");
+            throw new InvalidOperationException("Evidence must be retained outside the volume being exhausted.");
         Directory.CreateDirectory(evidenceRoot);
         int checks=0;var passed=new List<string>();
-        void Check(bool value,string label){if(!value)throw new Exception(label);checks++;passed.Add(label);}
+        void Check(bool value,string label){if(!value)throw new InvalidOperationException(label);checks++;passed.Add(label);}
         string fixtureRoot=Path.Combine(volume,"capture-pressure-"+token),fill=Path.Combine(volume,"fill-"+token+".bin");
-        if(Directory.Exists(fixtureRoot) || File.Exists(fill))throw new Exception("Pressure paths must be new.");
+        if(Directory.Exists(fixtureRoot) || File.Exists(fill))throw new InvalidOperationException("Pressure paths must be new.");
         await using var f=new RuntimePollingChecks.PollFixture(fixtureRoot);
         f.Sessions.BeforeRead=(_,_)=>{f.Clock.Advance(1001);return Task.CompletedTask;};
         await f.Start(duration:30);

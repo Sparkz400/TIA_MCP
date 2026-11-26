@@ -7,7 +7,7 @@ internal static class RuntimeCaptureCompletionChecks
     internal static async Task<int> Run(string root)
     {
         int checks=0;var cases=new List<object>();
-        void Check(bool value,string label){if(!value)throw new Exception(label);checks++;}
+        void Check(bool value,string label){if(!value)throw new InvalidOperationException(label);checks++;}
         await using var f=new RuntimePollingChecks.PollFixture(root);
         f.Sessions.BeforeRead=(_,_)=>{f.Clock.Advance(10);return Task.CompletedTask;};
         for(int i=0;i<8;i++)

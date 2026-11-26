@@ -10,7 +10,7 @@ internal static class RuntimeCaptureAclChecks
     internal static async Task<int> Run(string root)
     {
         int checks=0;
-        void Check(bool value,string label){if(!value)throw new Exception(label);checks++;}
+        void Check(bool value,string label){if(!value)throw new InvalidOperationException(label);checks++;}
         await using var f=new RuntimePollingChecks.PollFixture(root);
         f.Sessions.BeforeRead=(_,_)=>{f.Clock.Advance(1001);return Task.CompletedTask;};
         await f.Start(duration:10);_=await f.Clock.NextTimer();var delay=await f.Clock.NextTimer();

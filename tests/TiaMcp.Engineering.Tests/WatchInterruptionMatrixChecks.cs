@@ -38,7 +38,7 @@ internal static class WatchInterruptionMatrixChecks
         int passed = 0;
         void Check(bool value, string label) { if (!value) throw new Exception(label); passed++; }
         async Task Reject(Func<Task> call, string code)
-        { try { await call(); } catch (BridgeException e) when (e.Code == code) { passed++; return; } throw new Exception("Expected " + code); }
+        { try { await call(); } catch (BridgeException e) when (e.Code == code) { passed++; return; } throw new InvalidOperationException("Expected " + code); }
         foreach (string state in new[] { "acquired", "checkpointIntent", "ready", "dispatchIntent", "recoveryIntent" })
         {
             string root = Path.Combine(Path.GetTempPath(), "watch-host-loss-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
@@ -94,7 +94,7 @@ internal static class WatchInterruptionMatrixChecks
         using var process = System.Diagnostics.Process.Start(start)!;
         var output = process.StandardOutput.ReadToEndAsync(); var error = process.StandardError.ReadToEndAsync();
         await process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(30));
-        if (!string.IsNullOrWhiteSpace(await error)) throw new Exception(await error);
+        if (!string.IsNullOrWhiteSpace(await error)) throw new InvalidOperationException(await error);
         return (process.ExitCode, (await output).Trim());
     }
 }

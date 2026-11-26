@@ -7,9 +7,9 @@ using TiaMcp.Core.Drives;
 
 if (args.Length != 1 || Directory.Exists(args[0])) throw new ArgumentException("Fresh evidence directory required.");
 string root = Path.GetFullPath(args[0]); Directory.CreateDirectory(root); var checks = new List<string>();
-void Check(bool ok, string label) { if (!ok) throw new Exception(label); checks.Add(label); }
+void Check(bool ok, string label) { if (!ok) throw new InvalidOperationException(label); checks.Add(label); }
 void Reject(Action action, string label, string code = "InvalidDriveProfile")
-{ try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
+{ try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new InvalidOperationException("Expected refusal: " + label); }
 const string project = "/projects/Fixture", hardware = project + "/devices/Drive/items/CU";
 var model = new JsonObject { ["schemaVersion"] = "project-model.v1", ["project"] = new JsonObject { ["projectPath"] = "synthetic.ap21", ["host"] = "synthetic" },
     ["nodes"] = new JsonArray(new JsonObject { ["nodeId"] = project, ["objectPath"] = project, ["kind"] = "project", ["name"] = "Fixture", ["parentId"] = null, ["metadata"] = new JsonObject() },

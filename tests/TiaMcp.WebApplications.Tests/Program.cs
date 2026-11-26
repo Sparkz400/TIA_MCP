@@ -8,8 +8,8 @@ using TiaMcp.Core.WebApplications;
 
 if(args.Length!=1||Directory.Exists(args[0]))throw new ArgumentException("Fresh evidence directory required.");
 string root=Path.GetFullPath(args[0]);Directory.CreateDirectory(root);var checks=new List<string>();
-void Check(bool ok,string label){if(!ok)throw new Exception(label);checks.Add(label);}
-void Reject(Action action,string label,string? code=null){try{action();}catch(BridgeException e)when(code is null||e.Code==code){Check(true,label);return;}throw new Exception("Expected refusal: "+label);}
+void Check(bool ok,string label){if(!ok)throw new InvalidOperationException(label);checks.Add(label);}
+void Reject(Action action,string label,string? code=null){try{action();}catch(BridgeException e)when(code is null||e.Code==code){Check(true,label);return;}throw new InvalidOperationException("Expected refusal: "+label);}
 string Hash(byte[] b)=>Convert.ToHexStringLower(SHA256.HashData(b));byte[] Bytes(JsonObject p)=>Encoding.UTF8.GetBytes(p.ToJsonString()+"\n");
 byte[] Zip((string Path,byte[] Bytes)[] entries,int attributes=0){using var m=new MemoryStream();using(var z=new ZipArchive(m,ZipArchiveMode.Create,true)){foreach(var row in entries){var e=z.CreateEntry(row.Path,CompressionLevel.Fastest);if(attributes!=0)e.ExternalAttributes=attributes;using var s=e.Open();s.Write(row.Bytes);}}return m.ToArray();}
 byte[] Text(string s)=>Encoding.UTF8.GetBytes(s);

@@ -39,9 +39,9 @@ internal static class WatchSourceNegativeRecoveryChecks
             }
             catch (BridgeException error) when (mutation.Key != "unchanged" && error.Code is "ReconciliationIncomplete" or "ArtifactChanged")
             {
-                if (store.Read(admission.Id).State != "outcomeUnknown") throw new Exception("Failed proof released original ownership.");
+                if (store.Read(admission.Id).State != "outcomeUnknown") throw new InvalidOperationException("Failed proof released original ownership.");
             }
-            if (bridge.Reads != 1) throw new Exception("Reconciliation must observe once, never mutate/replay.");
+            if (bridge.Reads != 1) throw new InvalidOperationException("Reconciliation must observe once, never mutate/replay.");
             passed++;
         }
         // An error before HeaderAuthor read/archive now retains this initial marker.
@@ -65,7 +65,7 @@ internal static class WatchSourceNegativeRecoveryChecks
             try { await dispatcher.CallAsync("qualification_watch_authoring_source_reconcile", new { admissionId = admission.Id }); }
             catch (BridgeException) { refused = true; }
             if (!refused || bridge.Reads != 0 || store.Read(admission.Id).State != "outcomeUnknown")
-                throw new Exception("Unproven initial-marker error released ownership: " + failure);
+                throw new InvalidOperationException("Unproven initial-marker error released ownership: " + failure);
             passed++;
         }
         Console.WriteLine($"PASS WT source-negative recovery: {passed} actual dispatcher checks including pre-effect marker failure; no native mutation.");

@@ -7,8 +7,8 @@ internal static class RuntimeCaptureChecks
     internal static int Run(string root, WebRuntimeReadResult result, JsonElement metadata)
     {
         int checks=0;
-        void Check(bool value,string label){checks++;if(!value)throw new Exception(label);}
-        void Fails(Action action,string code){try{action();}catch(BridgeException e)when(e.Code==code){checks++;return;}throw new Exception("Expected "+code);}
+        void Check(bool value,string label){checks++;if(!value)throw new InvalidOperationException(label);}
+        void Fails(Action action,string code){try{action();}catch(BridgeException e)when(e.Code==code){checks++;return;}throw new InvalidOperationException("Expected "+code);}
         JsonElement Json(object value)=>JsonSerializer.SerializeToElement(value,BridgeProtocol.Json);
         string id=Guid.NewGuid().ToString("N"),sid=Guid.NewGuid().ToString("N");
         var request=new RuntimeCaptureRequest(result.Selection.Context.ConnectionId,[sid],100,10,20,1<<20);

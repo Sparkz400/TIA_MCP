@@ -9,7 +9,7 @@ internal static class TranslationRegistryChecks
     internal static void Register(Action<string, Func<Task>> test, string output)
     {
         static void Refuse(string code, Action action)
-        { try { action(); } catch (BridgeException error) when (error.Code == code) { return; } throw new Exception("Expected " + code); }
+        { try { action(); } catch (BridgeException error) when (error.Code == code) { return; } throw new InvalidOperationException("Expected " + code); }
         (TranslationProductionRegistry Registry, string Installation, string Worker, string Config, TranslationImportContext Context) FixtureRegistry(bool restricted = false, string? deployment = null)
         {
             string root = Path.Combine(output, "registry-" + Guid.NewGuid().ToString("N"));

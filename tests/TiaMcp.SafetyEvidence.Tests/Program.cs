@@ -7,12 +7,12 @@ using TiaMcp.Core.Safety;
 if (args.Length != 1 || Directory.Exists(args[0]) || File.Exists(args[0])) throw new ArgumentException("Supply one fresh fixture output directory.");
 string output = Path.GetFullPath(args[0]); Directory.CreateDirectory(output);
 int checks = 0;
-void Check(bool ok, string text) { if (!ok) throw new Exception(text); checks++; }
+void Check(bool ok, string text) { if (!ok) throw new InvalidOperationException(text); checks++; }
 void Refuse(Action action, string label)
 {
     try { action(); }
     catch (Exception e) when (e is BridgeException or JsonException or DecoderFallbackException) { checks++; return; }
-    throw new Exception("Expected refusal: " + label);
+    throw new InvalidOperationException("Expected refusal: " + label);
 }
 const string plc = "/projects/Fixture/devices/Station/plc/CPU日本", file = "C:/synthetic/Fixture.ap21";
 var review = new JsonObject { ["model"] = new JsonObject { ["project"] = new JsonObject { ["projectPath"] = file },

@@ -11,7 +11,7 @@ internal static class TeamcenterReviewChecks
     {
         int checks = 0;
         void Check(bool value, string label) { if (!value) throw new Exception(label); checks++; }
-        void Reject(Action action) { try { action(); } catch (Exception e) when (e is BridgeException or JsonException or ArgumentException or InvalidOperationException) { checks++; return; } throw new Exception("Expected Teamcenter review refusal."); }
+        void Reject(Action action) { try { action(); } catch (Exception e) when (e is BridgeException or JsonException or ArgumentException or InvalidOperationException) { checks++; return; } throw new InvalidOperationException("Expected Teamcenter review refusal."); }
         var input = TeamcenterReview.Parse(File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "fixtures/teamcenter/observations.json")));
         byte[] manifest = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "fixtures/teamcenter/local-manifest.json"));
         JsonObject Request() => input.DeepClone().AsObject();

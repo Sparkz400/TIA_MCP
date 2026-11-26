@@ -415,15 +415,15 @@ internal static class GitRunnerChecks
         if (input is not null) await process.StandardInput.BaseStream.WriteAsync(input);
         process.StandardInput.Close();
         await Task.WhenAll(read, process.WaitForExitAsync());
-        if (process.ExitCode != 0) throw new Exception("Fixture Git failed: " + await error);
+        if (process.ExitCode != 0) throw new InvalidOperationException("Fixture Git failed: " + await error);
         return output.ToArray();
     }
     private static async Task Reject(string code, Func<Task> run)
     {
         try { await run(); } catch (BridgeException ex) { Equal(code, ex.Code); return; }
-        throw new Exception("Expected " + code);
+        throw new InvalidOperationException("Expected " + code);
     }
-    private static void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected {expected}, got {actual}"); }
-    private static void True(bool value) { if (!value) throw new Exception("Expected true"); }
+    private static void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}, got {actual}"); }
+    private static void True(bool value) { if (!value) throw new InvalidOperationException("Expected true"); }
     private static void Bytes(byte[] expected, byte[] actual) { if (!expected.SequenceEqual(actual)) throw new Exception("Raw bytes differ"); }
 }

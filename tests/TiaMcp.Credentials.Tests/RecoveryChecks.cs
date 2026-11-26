@@ -34,7 +34,7 @@ internal static class RecoveryChecks
         void Reject(Action action, string code, string label)
         {
             try { action(); } catch (BridgeException e) when (e.Code == code) { Check(e.InnerException is null, label); return; }
-            throw new Exception("Expected " + code + ": " + label);
+            throw new InvalidOperationException("Expected " + code + ": " + label);
         }
         EngineeringArtifactReference Save(string name, object value)
         {
@@ -146,7 +146,7 @@ internal static class RecoveryChecks
         using (var child = Process.Start(start)!)
         {
             var stdout = child.StandardOutput.ReadToEndAsync(); var stderr = child.StandardError.ReadToEndAsync();
-            if (!child.WaitForExit(15000)) { child.Kill(true); throw new Exception("Recovery child timeout"); }
+            if (!child.WaitForExit(15000)) { child.Kill(true); throw new InvalidOperationException("Recovery child timeout"); }
             Check(child.ExitCode == 18, "Actual child loses reply after recovery intent and fixture side effect: " + stderr.GetAwaiter().GetResult());
         }
         lost = new EngineeringOperationStore(root).Read(lost.Id);

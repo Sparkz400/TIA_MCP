@@ -6,7 +6,7 @@ static class ClassicScreenAreaTests
 {
     public static void Run(Action<string,Action> check)
     {
-        void Assert(bool value) { if (!value) throw new Exception("Area workflow assertion failed"); }
+        void Assert(bool value) { if (!value) throw new InvalidOperationException("Area workflow assertion failed"); }
         check("Targeted tag roots preserve quoted names and never match sibling prefixes", () => {
             Assert(ClassicScreenPreflight.UsesRoot("\"DB.HMI\".Belt[0].Speed","DB.HMI"));
             Assert(!ClassicScreenPreflight.UsesRoot("\"DB.HMI2\".Belt[0].Speed","DB.HMI"));

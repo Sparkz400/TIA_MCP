@@ -14,7 +14,7 @@ internal static class RuntimeHandoffWorkflowChecks
         var checks = new List<string>(); var processes = new List<object>();
         void Check(bool value, string label) { if (!value) throw new Exception(label); checks.Add(label); }
         void Reject(Action run, string label, string code)
-        { try { run(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
+        { try { run(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new InvalidOperationException("Expected refusal: " + label); }
         JsonObject Json(object value) => JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!.AsObject();
         var uploads = new ArtifactUploadStore(root); var store = new RuntimeHandoffWorkflowStore(root);
         (string Ref, string Id) Upload(byte[] bytes)
@@ -118,7 +118,7 @@ internal static class RuntimeHandoffWorkflowChecks
             }
             var start = new ProcessStartInfo("dotnet") { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
             foreach (string arg in new[] { Assembly.GetExecutingAssembly().Location, "--handoff-publication-child", root, childUpload.Ref, phase, signal }) start.ArgumentList.Add(arg);
-            using var child = Process.Start(start) ?? throw new Exception("Child failed to start");
+            using var child = Process.Start(start) ?? throw new InvalidOperationException("Child failed to start");
             var stdout = child.StandardOutput.ReadToEndAsync(); var stderr = child.StandardError.ReadToEndAsync(); string? reached = null; var watch = Stopwatch.StartNew();
             try
             {

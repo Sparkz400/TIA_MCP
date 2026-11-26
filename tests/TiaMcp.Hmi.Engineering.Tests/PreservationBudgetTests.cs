@@ -2,7 +2,7 @@ using TiaMcp.Model;
 
 static class PreservationBudgetTests
 {
-    static void Assert(bool value) { if (!value) throw new Exception("Unexpected preservation-budget decision."); }
+    static void Assert(bool value) { if (!value) throw new InvalidOperationException("Unexpected preservation-budget decision."); }
 
     internal static void Run(Action<string, Action> check)
     {

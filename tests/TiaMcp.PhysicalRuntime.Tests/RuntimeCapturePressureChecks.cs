@@ -11,7 +11,7 @@ internal static class RuntimeCapturePressureChecks
     {
         Directory.CreateDirectory(root);
         int checks=0;var passed=new List<string>();var cases=new List<object>();
-        void Check(bool value,string label){if(!value)throw new Exception(label);checks++;passed.Add(label);}
+        void Check(bool value,string label){if(!value)throw new InvalidOperationException(label);checks++;passed.Add(label);}
         var elapsed=Stopwatch.StartNew();
         await using(var f=new RuntimePollingChecks.PollFixture(root,64))
         {

@@ -7,9 +7,9 @@ using TiaMcp.Core.Connections;
 
 if (args.Length != 1 || Directory.Exists(args[0])) throw new ArgumentException("Fresh evidence directory required.");
 string root = Path.GetFullPath(args[0]); Directory.CreateDirectory(root); var checks = new List<string>();
-void Check(bool value, string label) { if (!value) throw new Exception(label); checks.Add(label); }
+void Check(bool value, string label) { if (!value) throw new InvalidOperationException(label); checks.Add(label); }
 void Reject(Action action, string label, string code = "InvalidConnectionReview")
-{ try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
+{ try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new InvalidOperationException("Expected refusal: " + label); }
 const string project = "/projects/Fixture", a = project + "/devices/A", b = project + "/devices/B", h = project + "/devices/HMI";
 const string block = a + "/plc/blocks/Send", tag = h + "/hmi/tags/Value";
 var nodes = new JsonArray();

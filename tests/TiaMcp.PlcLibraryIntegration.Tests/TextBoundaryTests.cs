@@ -50,6 +50,6 @@ internal static class TextBoundaryTests
     {
         try { action(); }
         catch (PlcIntegrationPlanException error) when (error.Code == code) { return; }
-        throw new Exception("Expected " + code + " for the complete input.");
+        throw new InvalidOperationException("Expected " + code + " for the complete input.");
     }
 }

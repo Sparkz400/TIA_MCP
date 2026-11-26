@@ -90,7 +90,7 @@ internal static class AcceptanceChecks
         }
         List<JsonObject> Clone() => originals.Select(r => r.DeepClone().AsObject()).ToList();
         void Reject(Action<List<JsonObject>> mutation, string label)
-        { var rows = Clone(); mutation(rows); try { Verify(rows); } catch (BridgeException) { checks++; return; } throw new Exception("Accepted corrupt component evidence: " + label); }
+        { var rows = Clone(); mutation(rows); try { Verify(rows); } catch (BridgeException) { checks++; return; } throw new InvalidOperationException("Accepted corrupt component evidence: " + label); }
         Verify(Clone()); checks++;
         Reject(r => r[1]["record"]!["library"]!["result"]!["journal"]!["compile"]!["targets"]![0]!["state"] = "Error", "native Error with zero error count");
         Reject(r => r[1]["record"]!["library"]!["result"]!["journal"]!["events"]![0]!["stage"] = "after_mutation", "first checkpoint ordering");
@@ -139,7 +139,7 @@ internal static class AcceptanceChecks
         }
         VerifyRecovery(recoveryRows); checks++;
         void RejectRecovery(Action<List<JsonObject>> mutation, string label)
-        { var rows = recoveryRows.Select(r => r.DeepClone().AsObject()).ToList(); mutation(rows); try { VerifyRecovery(rows); } catch (BridgeException) { checks++; return; } throw new Exception("Accepted invalid recovery-only reconciliation: " + label); }
+        { var rows = recoveryRows.Select(r => r.DeepClone().AsObject()).ToList(); mutation(rows); try { VerifyRecovery(rows); } catch (BridgeException) { checks++; return; } throw new InvalidOperationException("Accepted invalid recovery-only reconciliation: " + label); }
         RejectRecovery(rows => rows[2]["coordinatorBeforeRecovery"]!["innerRecoveryStatuses"]![0]!["journal"]!["events"]!.AsArray().Add(new JsonObject { ["stage"] = "native_mutation", ["state"] = "dispatching" }), "ambiguous actual inner dispatch remains reserved");
         RejectRecovery(rows => rows[4]["componentWindow"]!["observation"] = observations["observeOriginal"].DeepClone(), "changed original is not baseline-preserved recovery");
         RejectRecovery(rows => rows[2]["coordinatorBeforeRecovery"]!["innerRecoveryStatuses"] = new JsonArray(), "missing actual inner outcome");

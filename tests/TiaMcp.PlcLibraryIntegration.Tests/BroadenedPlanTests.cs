@@ -339,6 +339,6 @@ internal static class BroadenedPlanTests
         var built = TypedGraphical.Build(caller, model, context);
         Equal(1, built.Document.Descendants(TypedGraphical.Net + "Call").Count());
     }
-    private static void Reject(string code, Fixture f, Action<Fixture> change) { change(f); try { f.Build(); } catch (PlcIntegrationPlanException e) when (e.Code == code) { return; } catch (PlcIntegrationPlanException e) { throw new Exception("Expected " + code + "; got " + e.Code + ": " + e.Message); } throw new Exception("Expected " + code); }
-    private static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new Exception($"Expected {expected}; got {actual}"); }
+    private static void Reject(string code, Fixture f, Action<Fixture> change) { change(f); try { f.Build(); } catch (PlcIntegrationPlanException e) when (e.Code == code) { return; } catch (PlcIntegrationPlanException e) { throw new InvalidOperationException("Expected " + code + "; got " + e.Code + ": " + e.Message); } throw new InvalidOperationException("Expected " + code); }
+    private static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}; got {actual}"); }
 }

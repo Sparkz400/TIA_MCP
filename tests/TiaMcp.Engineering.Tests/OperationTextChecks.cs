@@ -9,7 +9,7 @@ internal static class OperationTextChecks
     internal static void Run(string? destination = null)
     {
         string root = Path.GetFullPath(destination ?? Path.Combine(Path.GetTempPath(), "operation-text-" + Guid.NewGuid().ToString("N")));
-        if (Directory.Exists(root)) throw new Exception("Fresh operation text evidence directory required.");
+        if (Directory.Exists(root)) throw new InvalidOperationException("Fresh operation text evidence directory required.");
         Directory.CreateDirectory(root);
         var checks = new List<string>(); var failures = new List<string>(); int sequence = 0;
         void Check(bool ok, string name) { if (!ok) failures.Add(name); else checks.Add(name); }
@@ -94,7 +94,7 @@ internal static class OperationTextChecks
                 "Valid Unicode preserves exact plan, gate and successful reopen " + valid);
         }
         File.WriteAllText(Path.Combine(root, "verification.json"), JsonSerializer.Serialize(new { checks, failures, nativeExecuted = false }, new JsonSerializerOptions { WriteIndented = true }));
-        if (failures.Count != 0) throw new Exception(string.Join("; ", failures));
+        if (failures.Count != 0) throw new InvalidOperationException(string.Join("; ", failures));
         Console.WriteLine($"PASS operation text boundaries: {checks.Count} checks; no native execution. Receipts retained at {root}");
     }
 }

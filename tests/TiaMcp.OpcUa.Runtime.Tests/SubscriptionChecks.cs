@@ -225,7 +225,7 @@ internal static class SubscriptionChecks
     private static OpcUaSubscriptionEvent[] Events(OpcUaRuntimeSubscriptions subscriptions,JsonElement status)=>
         Json(subscriptions.Page(status.GetProperty("snapshotRef").GetString()!,0,200)).GetProperty("rows").EnumerateArray().Select(x=>x.GetProperty("event").Deserialize<OpcUaSubscriptionEvent>(BridgeProtocol.Json)!).ToArray();
     private static async Task<JsonElement> End(OpcUaRuntimeSubscriptions subscriptions,string id)
-    {var timer=Stopwatch.StartNew();while(timer.Elapsed<TimeSpan.FromSeconds(30)){var s=Json(await subscriptions.Status(id,default));if(s.GetProperty("state").GetString()!="running")return s;await Task.Delay(25);}throw new Exception("Subscription termination deadline");}
+    {var timer=Stopwatch.StartNew();while(timer.Elapsed<TimeSpan.FromSeconds(30)){var s=Json(await subscriptions.Status(id,default));if(s.GetProperty("state").GetString()!="running")return s;await Task.Delay(25);}throw new InvalidOperationException("Subscription termination deadline");}
     private static async Task Refuse(Func<Task> action,string expected,Action<bool,string> check)
     {string? code=null;try{await action();}catch(BridgeException e){code=e.Code;}check(code==expected,"Subscription refusal "+expected+" (actual "+code+")");}
 }

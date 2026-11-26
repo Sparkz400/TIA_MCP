@@ -9,11 +9,11 @@ using TiaMcp.Openness.V21;
 
 if (args.Length != 1 || Directory.Exists(args[0])) throw new ArgumentException("Fresh evidence directory required.");
 string root = Path.GetFullPath(args[0]); Directory.CreateDirectory(root); var checks = new List<string>();
-void Check(bool ok, string label) { if (!ok) throw new Exception(label); checks.Add(label); }
+void Check(bool ok, string label) { if (!ok) throw new InvalidOperationException(label); checks.Add(label); }
 void Reject(Action action, string label, string code = "InvalidDbSnapshot")
-{ try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
+{ try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new InvalidOperationException("Expected refusal: " + label); }
 void XmlReject(string xml, string label)
-{ try { DbSnapshotReview.Parse(Encoding.UTF8.GetBytes(xml)); } catch (Exception e) when (e is XmlException or BridgeException) { Check(true, label); return; } throw new Exception(label); }
+{ try { DbSnapshotReview.Parse(Encoding.UTF8.GetBytes(xml)); } catch (Exception e) when (e is XmlException or BridgeException) { Check(true, label); return; } throw new InvalidOperationException(label); }
 const string plc = "/projects/Fixture/devices/CPU/plc", path = plc + "/blocks/Data";
 var node = new JsonObject { ["nodeId"] = path, ["objectPath"] = path, ["name"] = "Data", ["kind"] = "block", ["plcPath"] = plc,
     ["parentId"] = "/projects/Fixture", ["metadata"] = new JsonObject { ["kind"] = "GlobalDB" } };

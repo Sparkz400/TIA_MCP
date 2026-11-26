@@ -106,12 +106,12 @@ internal static class LibraryDependencyCaptureTests
         });
     }
 
-    private static void Check(bool value) { if (!value) throw new Exception("Dependency observation differs."); }
+    private static void Check(bool value) { if (!value) throw new InvalidOperationException("Dependency observation differs."); }
     private static void Reject(Action action, string code = "DependencyUnresolved")
     {
         try { action(); }
         catch (BridgeException error) when (error.Code == code) { return; }
-        throw new Exception("Expected " + code + ".");
+        throw new InvalidOperationException("Expected " + code + ".");
     }
 }
 

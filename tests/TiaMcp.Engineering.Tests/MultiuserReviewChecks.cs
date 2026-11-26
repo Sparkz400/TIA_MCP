@@ -14,7 +14,7 @@ internal static class MultiuserReviewChecks
         {
             try { action(); }
             catch (Exception e) when (e is BridgeException or JsonException or ArgumentException or InvalidOperationException) { checks++; return; }
-            throw new Exception("Expected invalid collaboration observation refusal.");
+            throw new InvalidOperationException("Expected invalid collaboration observation refusal.");
         }
         var snapshot = JsonNode.Parse("""
         {"captureId":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","capturedAtUtc":"2026-10-18T00:00:00.0000000+00:00","producer":"supplied fixture","principal":"DOMAIN/user","server":{"host":"https://server.invalid/","port":443,"alias":"Ü Server"},

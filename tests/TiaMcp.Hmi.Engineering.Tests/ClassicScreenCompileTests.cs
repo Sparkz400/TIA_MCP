@@ -14,7 +14,7 @@ static class ClassicScreenCompileTests
     static JObject Completed(JObject value) { value["targets"][0]["messages"].Last["description"] = "Compiling finished (errors: 0; warnings: 1)"; return value; }
     public static void Run(Action<string, Action> check)
     {
-        void Assert(bool value) { if (!value) throw new Exception("Classic diagnostic comparison assertion failed"); }
+        void Assert(bool value) { if (!value) throw new InvalidOperationException("Classic diagnostic comparison assertion failed"); }
         check("Completed baseline errors remain usable; new diagnostics and incomplete compiler runs refuse", () => {
             var baseline = Fixture(); baseline["errorCount"] = 1; baseline["targets"][0]["errorCount"] = 1;
             var rows = (JArray)baseline["targets"][0]["messages"];

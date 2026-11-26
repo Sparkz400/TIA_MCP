@@ -186,7 +186,7 @@ internal static class ExpansionChecks
     internal static void WriteEvidence(string path, Dictionary<string, byte[]> fixture, WorkbookProfile profile,
         EngineeringObjectReference identity, int tests)
     {
-        if (Directory.Exists(path)) throw new Exception("Evidence directory already exists: " + path);
+        if (Directory.Exists(path)) throw new InvalidOperationException("Evidence directory already exists: " + path);
         Directory.CreateDirectory(path);
         var (formatted, map) = Formatted(fixture, profile); var bytes = Pack(formatted);
         var wb = TranslationWorkbook.Open(bytes, map, identity, Hash(bytes));
@@ -362,7 +362,7 @@ internal static class ExpansionChecks
         }
         Check(XNode.DeepEquals(left, right), "Independent XML preservation oracle failed.");
     }
-    private static void Check(bool value, string message = "Assertion failed") { if (!value) throw new Exception(message); }
-    private static void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected [{expected}], got [{actual}]"); }
-    private static void Reject(string code, Action action) { try { action(); } catch (BridgeException ex) { Equal(code, ex.Code); return; } throw new Exception("Expected rejection " + code); }
+    private static void Check(bool value, string message = "Assertion failed") { if (!value) throw new InvalidOperationException(message); }
+    private static void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected [{expected}], got [{actual}]"); }
+    private static void Reject(string code, Action action) { try { action(); } catch (BridgeException ex) { Equal(code, ex.Code); return; } throw new InvalidOperationException("Expected rejection " + code); }
 }

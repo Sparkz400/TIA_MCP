@@ -12,7 +12,7 @@ internal static class CoordinatedTextListTests
         var store = new HmiComponentWorkflowStore(root); var reviews = new ProjectReviewStore(root); var uploads = new ArtifactUploadStore(root);
         var uploadIds = new List<string>(); var cases = new JsonArray(); int checks = 0;
         void Check(bool value, string label) { if (!value) throw new Exception(label); checks++; }
-        void Reject(Action action, string label) { try { action(); } catch (Exception e) when (e is BridgeException or ArgumentException or JsonException or InvalidOperationException) { checks++; return; } throw new Exception("Expected refusal: " + label); }
+        void Reject(Action action, string label) { try { action(); } catch (Exception e) when (e is BridgeException or ArgumentException or JsonException or InvalidOperationException) { checks++; return; } throw new InvalidOperationException("Expected refusal: " + label); }
         string Upload(byte[] bytes)
         {
             var begin = uploads.Begin("input.json", bytes.Length, Hash(bytes)); uploadIds.Add(begin.UploadId);

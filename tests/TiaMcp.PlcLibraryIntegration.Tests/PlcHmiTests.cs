@@ -58,9 +58,9 @@ internal static class PlcHmiTests
     static PlcIntegrationPlanException Refused(string code, Action body)
     {
         try { body(); } catch (PlcIntegrationPlanException e) when (e.Code == code) { return e; }
-        throw new Exception("Expected " + code);
+        throw new InvalidOperationException("Expected " + code);
     }
-    static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new Exception($"Expected {expected}; got {actual}"); }
+    static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}; got {actual}"); }
 
     internal static void Run(Action<string, Action> test)
     {

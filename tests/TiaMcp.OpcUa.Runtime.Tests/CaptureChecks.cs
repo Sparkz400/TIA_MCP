@@ -219,7 +219,7 @@ internal static class CaptureChecks
             if(status.GetProperty("state").GetString()!="running")return status;
             await Task.Delay(20);
         }
-        throw new Exception("UA capture did not terminate within its bounded qualification window.");
+        throw new InvalidOperationException("UA capture did not terminate within its bounded qualification window.");
     }
     private static async Task Refuse(Func<Task<object>> action,string expected,Action<bool,string> check)
     {

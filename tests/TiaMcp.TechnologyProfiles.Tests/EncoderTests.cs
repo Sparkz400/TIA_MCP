@@ -9,9 +9,9 @@ internal static class EncoderTests
     internal static void Run(string parent, JsonObject originalReview, JsonObject originalPacket)
     {
         string root = Path.Combine(parent, "encoders-v4"); Directory.CreateDirectory(root); var checks = new List<string>();
-        void Check(bool ok, string label) { if (!ok) throw new Exception(label); checks.Add(label); }
+        void Check(bool ok, string label) { if (!ok) throw new InvalidOperationException(label); checks.Add(label); }
         void Reject(Action action, string label, string code = "InvalidTechnologyProfile")
-        { try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
+        { try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new InvalidOperationException("Expected refusal: " + label); }
         var model = originalReview["model"]!.DeepClone().AsObject(); string plc = (string)originalPacket["before"]!["identity"]!["plcPath"]!, technology = (string)originalPacket["technologyPath"]!;
         string hardware = plc + "/hardware/Drive", block = plc + "/blocks/DB", otherPlc = "/projects/Fixture/OtherPLC", foreign = otherPlc + "/hardware/Drive";
         model["nodes"]!.AsArray().Single(n => (string?)n!["objectPath"] == technology)!["metadata"]!["systemLibraryType"] = "TO_ExternalEncoder";

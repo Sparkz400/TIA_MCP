@@ -39,11 +39,11 @@ Directory.CreateDirectory(output);
 var tests = new List<(string Name, Func<Task> Body)>();
 void Test(string name, Func<Task> body) => tests.Add((name, body));
 Fixture New(bool edit = true) => new(Path.Combine(output, Guid.NewGuid().ToString("N")), edit);
-void True(bool value, string message = "assertion failed") { if (!value) throw new Exception(message); }
+void True(bool value, string message = "assertion failed") { if (!value) throw new InvalidOperationException(message); }
 async Task Reject(string code, Func<Task> action)
 {
     try { await action(); } catch (BridgeException error) when (error.Code == code) { return; }
-    throw new Exception("Expected " + code);
+    throw new InvalidOperationException("Expected " + code);
 }
 async Task Interrupted(Func<Task> action)
 {
@@ -327,7 +327,7 @@ async Task RejectOutOfScope(Func<Task> action)
 {
     try { await action(); }
     catch (BridgeException error) when (error.Code == "TranslationScopeMismatch" && error.Message.Contains("admitted restricted categories")) { return; }
-    throw new Exception("Expected the restricted-category refusal");
+    throw new InvalidOperationException("Expected the restricted-category refusal");
 }
 foreach (int observation in new[] { 1, 3 })
 Test($"restricted scope refuses an out-of-scope apply observation {observation} and keeps ownership", async () => {

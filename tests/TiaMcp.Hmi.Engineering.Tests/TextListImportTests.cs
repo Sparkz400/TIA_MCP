@@ -22,11 +22,11 @@ static class TextListImportTests
         return (Text(files.Single(f => f != library)), Text(library));
     }
     static SortedDictionary<string, string> Lists(string directory) { var (c, l) = Pair(directory); return HmiTextListImportRules.Resolve(c, l); }
-    static void Assert(bool value, string label) { if (!value) throw new Exception(label); }
+    static void Assert(bool value, string label) { if (!value) throw new InvalidOperationException(label); }
     static void Refuse(Action action, string label)
     {
         try { action(); } catch (FormatException) { return; } catch (ArgumentException) { return; }
-        throw new Exception("Expected a refusal: " + label);
+        throw new InvalidOperationException("Expected a refusal: " + label);
     }
 
     internal static void Run(Action<string, Action> check)

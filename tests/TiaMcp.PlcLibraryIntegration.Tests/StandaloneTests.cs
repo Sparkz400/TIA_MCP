@@ -50,6 +50,6 @@ internal static class StandaloneTests
             Equal("NativeIdPreservationUnsupported", f.Build()["blockers"][0].Value<string>("code"));
         });
     }
-    private static void Reject(string code, Action<Fixture> change) { var f = new Fixture(); f.Standalone(); change(f); try { f.Build(); } catch (PlcIntegrationPlanException e) when (e.Code == code) { return; } throw new Exception("Expected " + code); }
-    private static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new Exception($"Expected {expected}; got {actual}"); }
+    private static void Reject(string code, Action<Fixture> change) { var f = new Fixture(); f.Standalone(); change(f); try { f.Build(); } catch (PlcIntegrationPlanException e) when (e.Code == code) { return; } throw new InvalidOperationException("Expected " + code); }
+    private static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}; got {actual}"); }
 }

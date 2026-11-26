@@ -7,8 +7,8 @@ if (args.Length == 2 && args[0] == "--scale-qualification")
 
 int passed = 0, failed = 0;
 void Test(string name, Action body) { try { body(); passed++; Console.WriteLine("PASS " + name); } catch (Exception e) { failed++; Console.WriteLine("FAIL " + name + ": " + e); } }
-void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new Exception($"Expected {expected}; got {actual}"); }
-void Reject(string code, Action<Fixture> change) { var f = new Fixture(); change(f); try { f.Build(); } catch (PlcIntegrationPlanException e) when (e.Code == code) { return; } throw new Exception("Expected " + code); }
+void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}; got {actual}"); }
+void Reject(string code, Action<Fixture> change) { var f = new Fixture(); change(f); try { f.Build(); } catch (PlcIntegrationPlanException e) when (e.Code == code) { return; } throw new InvalidOperationException("Expected " + code); }
 
 Test("FBD motor plan emits independently preparable pinned import and typed instance/call steps", () => {
     var f = new Fixture(); var p = f.Build();

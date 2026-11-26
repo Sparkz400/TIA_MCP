@@ -10,8 +10,8 @@ internal static class RuntimeCapturePlcsimChecks
     internal static async Task<int> Run(string root)
     {
         int checks=0;
-        void Check(bool value,string label){if(!value)throw new Exception(label);checks++;}
-        async Task Fails(Func<Task> action,string code){try{await action();}catch(BridgeException e)when(e.Code==code){checks++;return;}throw new Exception("Expected "+code);}
+        void Check(bool value,string label){if(!value)throw new InvalidOperationException(label);checks++;}
+        async Task Fails(Func<Task> action,string code){try{await action();}catch(BridgeException e)when(e.Code==code){checks++;return;}throw new InvalidOperationException("Expected "+code);}
         string creation=Guid.NewGuid().ToString("N");
         RuntimeCaptureRequest Request(bool sync,int samples=4,int duration=10,string? mode=null)=>new(creation,[Guid.NewGuid().ToString("N"),Guid.NewGuid().ToString("N")],100,duration,samples,1<<20,
             Source:"plcsim",Simulator:new(7,"TiaMcp_owned",[new("\"DB\".Flag","bool","Bool"),new("\"DB\".Counter","uint64","ULInt")],sync,mode));

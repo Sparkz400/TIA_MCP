@@ -4,11 +4,11 @@ using TiaMcp.Core.WatchTables;
 
 if (args.Length != 3) throw new ArgumentException("Usage: <new-output> <reorder-run> <delete-run>. Retained native evidence roots are required; this test never starts TIA.");
 string destination = Path.GetFullPath(args[0]);
-if (Directory.Exists(destination)) throw new Exception("Preserve previous evidence.");
+if (Directory.Exists(destination)) throw new InvalidOperationException("Preserve previous evidence.");
 Directory.CreateDirectory(destination);
 var results = new List<object>(); int failed = 0;
 void Check(string name, Action action) { try { action(); results.Add(new { name, passed = true }); Console.WriteLine("PASS " + name); } catch (Exception e) { failed++; results.Add(new { name, passed = false, error = e.Message }); Console.WriteLine("FAIL " + name + ": " + e.Message); } }
-void Require(bool value) { if (!value) throw new Exception("Independent fixture assertion failed"); }
+void Require(bool value) { if (!value) throw new InvalidOperationException("Independent fixture assertion failed"); }
 byte[] NativeInput(string run)
 {
     var review = JsonDocument.Parse(File.ReadAllText(Path.Combine(run, "review.json")));

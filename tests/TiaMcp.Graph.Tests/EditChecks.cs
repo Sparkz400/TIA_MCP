@@ -6,14 +6,14 @@ internal static class EditChecks
     public static void Register(Action<string, Action> test)
     {
         static byte[] Fixture(string name) => File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "fixtures", name));
-        static void Require(bool value, string message) { if (!value) throw new Exception(message); }
+        static void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
         static GraphDocument Edit(string fixture, params GraphEdit[] edits) => GraphDocument.Parse(GraphEditor.Apply(GraphDocument.Parse(Fixture(fixture)), edits));
         static string Text(GraphDocument document) => Encoding.UTF8.GetString(document.GetOriginalBytes());
         static void Refuse(string code, string fixture, params GraphEdit[] edits)
         {
             try { GraphEditor.Apply(GraphDocument.Parse(Fixture(fixture)), edits); }
             catch (GraphException error) { Require(error.Code == code, $"Expected {code}; got {error.Code}: {error.Message}"); return; }
-            throw new Exception("Expected refusal " + code);
+            throw new InvalidOperationException("Expected refusal " + code);
         }
         // The single changed region of a one-splice edit: (removed source text, inserted text).
         static (string Removed, string Inserted) Change(string before, string after)

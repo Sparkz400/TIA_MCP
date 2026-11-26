@@ -10,7 +10,7 @@ internal static class ProjectTextExportChecks
 {
     internal static void Register(Action<string, Func<Task>> test, string output)
     {
-        static void True(bool value, string message) { if (!value) throw new Exception(message); }
+        static void True(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
         test("native profile reads header cultures and keeps the bilingual profile unchanged", () => {
             var bilingual = TranslationWorkerAdapter.NativeProfile(Book(["de-DE", "en-GB"], [Values("K-1", "<BlockCommentCategoryData>", 1)]));
             True(bilingual.Id == "tia21-whole-project-bilingual-qualification-v1" && bilingual.SourceCulture == "de-DE" &&

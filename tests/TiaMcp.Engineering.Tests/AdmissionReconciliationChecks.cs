@@ -13,7 +13,7 @@ internal static class AdmissionReconciliationChecks
         async Task Reject(Func<Task> action, string code)
         {
             try { await action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; }
-            throw new Exception("Expected " + code);
+            throw new InvalidOperationException("Expected " + code);
         }
         string root = Path.Combine(Path.GetTempPath(), "admission-reconcile-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
         string project = Path.Combine(root, "p", "p.ap21"), journal = Path.Combine(root, "change-" + new string('1', 32)), input = Path.Combine(journal, "requested.scl");

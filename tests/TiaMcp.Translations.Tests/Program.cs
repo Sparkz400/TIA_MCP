@@ -25,9 +25,9 @@ var oracle = JsonNode.Parse(File.ReadAllText(Path.Combine(fixtureRoot, "expected
 var identity = new EngineeringObjectReference(new(@"D:\synthetic\TranslationFixture_A.ap21", null, null, "/project/TranslationFixture_A", "project"), new("fixture-observation-1", new string('a', 64)), new string('b', 64));
 var tests = new List<(string Name, Action Run)>();
 void Test(string name, Action body) => tests.Add((name, body));
-void Assert(bool condition, string message = "Assertion failed") { if (!condition) throw new Exception(message); }
-void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected [{expected}], got [{actual}]"); }
-void Reject(string code, Action body) { try { body(); } catch (BridgeException ex) { Equal(code, ex.Code); return; } throw new Exception("Expected rejection " + code); }
+void Assert(bool condition, string message = "Assertion failed") { if (!condition) throw new InvalidOperationException(message); }
+void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected [{expected}], got [{actual}]"); }
+void Reject(string code, Action body) { try { body(); } catch (BridgeException ex) { Equal(code, ex.Code); return; } throw new InvalidOperationException("Expected rejection " + code); }
 byte[] Pack(IReadOnlyDictionary<string, byte[]> data, string? duplicate = null)
 {
     using var output = new MemoryStream();
@@ -317,7 +317,7 @@ Console.WriteLine($"{tests.Count - failures}/{tests.Count} translation checks pa
 if (failures == 0 && args.Length == 2 && args[0] == "--demo")
 {
     string directory = Path.GetFullPath(args[1]);
-    if (Directory.Exists(directory)) throw new Exception("Demo output directory already exists.");
+    if (Directory.Exists(directory)) throw new InvalidOperationException("Demo output directory already exists.");
     Directory.CreateDirectory(directory);
     using (var s = new FileStream(Path.Combine(directory, "original.xlsx"), FileMode.CreateNew)) s.Write(original);
     var wb = Open(); var edits = new[] { Edit(wb, "K-002", "Kühlung aktiviert"), Edit(wb, "K-007", "Betriebsbereit") };

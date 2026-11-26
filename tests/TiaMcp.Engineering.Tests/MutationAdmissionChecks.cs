@@ -36,7 +36,7 @@ internal static class MutationAdmissionChecks
         void Reject(Action action, string code)
         {
             try { action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; }
-            throw new Exception("Expected " + code);
+            throw new InvalidOperationException("Expected " + code);
         }
         string root = Path.Combine(Path.GetTempPath(), "mutation-admission-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
         EngineeringArtifactReference Evidence(string name, string content)
@@ -75,8 +75,8 @@ internal static class MutationAdmissionChecks
             start.ArgumentList.Add(Assembly.GetExecutingAssembly().Location); start.ArgumentList.Add("--admission-probe");
             foreach (string arg in arguments) start.ArgumentList.Add(arg);
             using var process = Process.Start(start)!; string stdout = process.StandardOutput.ReadToEnd(), stderr = process.StandardError.ReadToEnd();
-            if (!process.WaitForExit(30000)) { process.Kill(true); throw new Exception("Admission child timed out."); }
-            if (process.ExitCode != 0) throw new Exception("Admission child failed: " + stderr);
+            if (!process.WaitForExit(30000)) { process.Kill(true); throw new InvalidOperationException("Admission child timed out."); }
+            if (process.ExitCode != 0) throw new InvalidOperationException("Admission child failed: " + stderr);
             return stdout.Trim();
         }
         Check(Child("operation", root, operation.Id) == "ResourceBusy", "Separate process cannot acquire operation over unknown admission");
@@ -148,7 +148,7 @@ internal static class MutationAdmissionChecks
         var finished = scans.Acquire(Scope(linked), new('5', 64)); finished = scans.Returned(finished.Id, finished.Revision, response);
         File.Delete(Path.Combine(scanRoot, response.RelativePath));
         if (OperatingSystem.IsWindows() && !EngineeringOperationChecks.CreateHardLink(Path.Combine(scanRoot, "alias.ap21"), linked, IntPtr.Zero))
-            throw new Exception("Could not create the isolated hard-link fixture.");
+            throw new InvalidOperationException("Could not create the isolated hard-link fixture.");
         Check(scans.Acquire(Scope(Path.Combine(scanRoot, "later.ap21")), new('6', 64)).State == "dispatchIntent", "A finished admission whose resource and response are gone does not block unrelated mutations");
         Reject(() => scans.Read(finished.Id), OperatingSystem.IsWindows() ? "InvalidResourceKey" : "ArtifactChanged");
         string removed = Path.Combine(scanRoot, "removed", "project.ap21"); Directory.CreateDirectory(Path.GetDirectoryName(removed)!);

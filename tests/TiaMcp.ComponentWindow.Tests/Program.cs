@@ -37,9 +37,9 @@ if (args.Length > 0)
 }
 
 int passed = 0;
-void Check(bool value, string label) { if (!value) throw new Exception(label); passed++; }
+void Check(bool value, string label) { if (!value) throw new InvalidOperationException(label); passed++; }
 void Reject(Action action, string code)
-{ try { action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; } throw new Exception("Expected " + code); }
+{ try { action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; } throw new InvalidOperationException("Expected " + code); }
 string basis = Path.Combine(Path.GetTempPath(), "component-window-offline-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(basis);
 string Child(params string[] arguments)
 {
@@ -47,8 +47,8 @@ string Child(params string[] arguments)
     start.ArgumentList.Add(Assembly.GetExecutingAssembly().Location); foreach (string arg in arguments) start.ArgumentList.Add(arg);
     using var process = Process.Start(start)!;
     var output = process.StandardOutput.ReadToEndAsync(); var error = process.StandardError.ReadToEndAsync();
-    if (!process.WaitForExit(30000)) { process.Kill(); throw new Exception("File-only test child timeout"); }
-    if (process.ExitCode != 0) throw new Exception(error.Result); return output.Result.Trim();
+    if (!process.WaitForExit(30000)) { process.Kill(); throw new InvalidOperationException("File-only test child timeout"); }
+    if (process.ExitCode != 0) throw new InvalidOperationException(error.Result); return output.Result.Trim();
 }
 var f = Fixture(Path.Combine(basis, "live")); var store = new ComponentQualificationWindowStore(f.Root);
 var acquired = store.Acquire(f.Manifest); var r = acquired.Reservation; string token = acquired.Capability;

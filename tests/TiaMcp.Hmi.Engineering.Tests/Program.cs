@@ -27,9 +27,9 @@ void Reject(Action action)
     try { action(); }
     catch (ArgumentException) { return; }
     catch (System.Xml.XmlException) { return; }
-    throw new Exception("Expected a rejection.");
+    throw new InvalidOperationException("Expected a rejection.");
 }
-void Assert(bool value) { if (!value) throw new Exception("Assertion failed."); }
+void Assert(bool value) { if (!value) throw new InvalidOperationException("Assertion failed."); }
 ClassicScreenAreaTests.Run(Check);
 JObject Identity(string path = "/devices/HMI/hmi/Runtime/screens/Main/items/Widget") => new JObject {
     ["family"] = "unified", ["projectCopyId"] = "project-copy-a", ["sessionGeneration"] = "generation-a", ["hmiPath"] = "/devices/HMI/hmi/Runtime", ["objectPath"] = path };

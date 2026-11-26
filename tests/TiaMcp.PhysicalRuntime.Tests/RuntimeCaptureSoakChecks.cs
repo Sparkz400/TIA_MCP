@@ -14,7 +14,7 @@ internal static partial class RuntimeCaptureSoakChecks
             throw new ArgumentException("Windows resource soak requires 30..120 real seconds.");
         NewRoot(root);
         var checks = new List<string>();
-        void Check(bool value, string name) { if (!value) throw new Exception(name); checks.Add(name); }
+        void Check(bool value, string name) { if (!value) throw new InvalidOperationException(name); checks.Add(name); }
         var watch = Stopwatch.StartNew();
         await using var fixture = new Fixture(root, 4, 16);
         var captures = Enumerable.Range(0, 4).Select(i => fixture.Case(i, seconds + 30, 100000)).ToArray();
@@ -163,7 +163,7 @@ internal static partial class RuntimeCaptureSoakChecks
         };
         await fixture.Captures.Start(capture.CaptureId, capture.Request, CancellationToken.None);
         await Task.Delay(TimeSpan.FromSeconds(40));
-        throw new Exception("Controlled owned-process failure was not reached");
+        throw new InvalidOperationException("Controlled owned-process failure was not reached");
     }
 
     internal static async Task Recover(string root)
@@ -177,11 +177,11 @@ internal static partial class RuntimeCaptureSoakChecks
         var interrupted = await fixture.Status(original.CaptureId);
         if (interrupted.GetProperty("state").GetString() != "interrupted" || !interrupted.GetProperty("uncommittedDataUnknown").GetBoolean() ||
             interrupted.GetProperty("snapshotRef").GetString() != expected.GetProperty("snapshotRef").GetString())
-            throw new Exception("Process restart must reopen the original running prefix as interrupted with unknown uncommitted loss");
+            throw new InvalidOperationException("Process restart must reopen the original running prefix as interrupted with unknown uncommitted loss");
         await fixture.Captures.Start(original.CaptureId, original.Request, CancellationToken.None);
         await Task.Delay(750);
         if (fixture.ReadCount != 0 || !SameHashes(before, Hashes(fixture.StoreRoot)))
-            throw new Exception("Restart must not replay acquisition or alter the original prefix");
+            throw new InvalidOperationException("Restart must not replay acquisition or alter the original prefix");
         await fixture.Export(original.CaptureId, "export-recovered-prefix.json");
         var healthy = fixture.Case(0, 5, 16);
         await fixture.Captures.Start(healthy.CaptureId, healthy.Request, CancellationToken.None);

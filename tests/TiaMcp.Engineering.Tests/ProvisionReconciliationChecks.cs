@@ -13,7 +13,7 @@ internal static class ProvisionReconciliationChecks
         async Task Reject(Func<Task> action, string code)
         {
             try { await action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; }
-            throw new Exception("Expected " + code);
+            throw new InvalidOperationException("Expected " + code);
         }
         string root = Path.Combine(Path.GetTempPath(), "provision-reconcile-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
         string storage = Path.Combine(root, "simulation", "TiaMcp_owned"), project = Path.Combine(root, "scratch", "p.ap21"), observer = Path.Combine(root, "do_observer");

@@ -8,7 +8,7 @@ internal static class NativeFixtureChecks
     public static void Register(Action<string, Action> test, string generated)
     {
         string root = Path.Combine(AppContext.BaseDirectory, "fixtures", "native-v21");
-        static void Require(bool value, string message) { if (!value) throw new Exception(message); }
+        static void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
         test("native evidence artifact integrity and owned process receipts", () =>
         {
             using var manifest = JsonDocument.Parse(File.ReadAllText(Path.Combine(root, "manifest.json")));

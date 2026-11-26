@@ -110,12 +110,12 @@ internal static class ContentArtifactTests
         try { File.WriteAllBytes(path, bytes); action(path); }
         finally { File.Delete(path); }
     }
-    private static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new Exception($"Expected {expected}; got {actual}"); }
+    private static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}; got {actual}"); }
     private static void Reject(Action action)
     {
         try { action(); }
         catch (PlcComponentException error) when (error.Code == "ComponentReadbackMismatch") { return; }
-        throw new Exception("Expected component content refusal.");
+        throw new InvalidOperationException("Expected component content refusal.");
     }
     private sealed class Fragmented(byte[] bytes, int chunk, int failAfter = int.MaxValue) : Stream
     {

@@ -4,8 +4,8 @@ using TiaMcp.Model;
 
 static class ClassicScreenWorkflowTests
 {
-    static void Assert(bool value) { if (!value) throw new Exception("Workflow assertion failed."); }
-    static void Reject(Action action) { try { action(); } catch (ArgumentException) { return; } throw new Exception("Expected refusal."); }
+    static void Assert(bool value) { if (!value) throw new InvalidOperationException("Workflow assertion failed."); }
+    static void Reject(Action action) { try { action(); } catch (ArgumentException) { return; } throw new InvalidOperationException("Expected refusal."); }
     static XDocument Screen() => XDocument.Parse("<Document><Hmi.Screen.Screen ID='0'><AttributeList><Name>Main</Name><Width>800</Width><Height>480</Height></AttributeList><ObjectList><Hmi.Screen.ScreenLayer ID='1'><ObjectList><Hmi.Screen.Rectangle ID='2'><AttributeList><ObjectName>Prototype</ObjectName><Left>30</Left><Top>40</Top><Width>120</Width><Height>60</Height></AttributeList><ObjectList><Hmi.Event.Event ID='3'><Unknown>preserve</Unknown></Hmi.Event.Event></ObjectList></Hmi.Screen.Rectangle></ObjectList></Hmi.Screen.ScreenLayer></ObjectList></Hmi.Screen.Screen></Document>");
     static JObject Payload() => new() { ["schemaVersion"] = 1, ["operation"] = "classic_xml_import", ["expectedContentHash"] = new string('a',64),
         ["target"] = new JObject { ["family"] = "classic", ["projectCopyId"] = "copy", ["sessionGeneration"] = "session", ["hmiPath"] = "/hmi", ["objectPath"] = "/hmi/screens/Main", ["kind"] = "hmiScreen" }, ["xml"] = Screen().ToString() };

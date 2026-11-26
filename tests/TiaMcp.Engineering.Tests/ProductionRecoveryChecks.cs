@@ -14,7 +14,7 @@ internal static class ProductionRecoveryChecks
         int passed = 0;
         void Check(bool condition, string label) { if (!condition) throw new Exception(label); passed++; }
         void Reject(Action action, string code)
-        { try { action(); } catch (BridgeException e) when (e.Code == code) { passed++; return; } throw new Exception("Expected " + code); }
+        { try { action(); } catch (BridgeException e) when (e.Code == code) { passed++; return; } throw new InvalidOperationException("Expected " + code); }
         string root = Path.Combine(Path.GetTempPath(), "production-recovery-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
         var store = new EngineeringOperationStore(root);
         EngineeringArtifactReference Save(string name, string text)
@@ -112,7 +112,7 @@ internal static class ProductionRecoveryChecks
         int passed = 0;
         void Check(bool value, string label) { if (!value) throw new Exception(label); passed++; }
         async Task Reject(Func<Task> run, string code)
-        { try { await run(); } catch (BridgeException e) when (e.Code == code) { passed++; return; } throw new Exception("Expected " + code); }
+        { try { await run(); } catch (BridgeException e) when (e.Code == code) { passed++; return; } throw new InvalidOperationException("Expected " + code); }
         async Task<(string Root, FakeWatch Native, WatchTableDispatcher Dispatcher, JsonObject Prepared)> New(string suffix)
         {
             string root = Path.Combine(Path.GetTempPath(), "dispatcher-" + suffix + "-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);

@@ -104,13 +104,13 @@ internal static class PlanArtifactTests
             if (!bytes.SequenceEqual(File.ReadAllBytes(original))) throw new Exception("Original fixture changed.");
         });
     }
-    private static void Equal(JToken expected, JToken actual) { if (!JToken.DeepEquals(expected, actual)) throw new Exception("Plan differs from its original XML/descriptor inputs."); }
+    private static void Equal(JToken expected, JToken actual) { if (!JToken.DeepEquals(expected, actual)) throw new InvalidOperationException("Plan differs from its original XML/descriptor inputs."); }
     private static void Reject(string code, Action action)
     {
         try { action(); }
         catch (PlcComponentException error) when (error.Code == code) { return; }
         catch (PlcIntegrationPlanException error) when (error.Code == code) { return; }
-        throw new Exception("Expected " + code);
+        throw new InvalidOperationException("Expected " + code);
     }
     private sealed class Files : IDisposable
     {

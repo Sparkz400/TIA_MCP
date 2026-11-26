@@ -12,12 +12,12 @@ const string reading = "nsu=urn%3Aexample%3Atypes;i=1002";
 const string a = "nsu=urn%3Atest;s=A", c = "nsu=urn%3Atest;s=C";
 var tests = new List<(string Name, Action Run)>();
 void Test(string name, Action run) => tests.Add((name, run));
-void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected {expected}, got {actual}"); }
+void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}, got {actual}"); }
 string? Text(JsonNode? value) => value?.GetValue<string>();
 void Reject(string code, Action action)
 {
     try { action(); } catch (BridgeException ex) { Equal(code, ex.Code); return; }
-    throw new Exception("Expected rejection: " + code);
+    throw new InvalidOperationException("Expected rejection: " + code);
 }
 OpcUaNodeSetSource Xml(string id, string body, string namespaces = "<Uri>urn:test</Uri>") => new(id,
     Encoding.UTF8.GetBytes($"<UANodeSet xmlns=\"{ns}\"><NamespaceUris>{namespaces}</NamespaceUris>{body}</UANodeSet>"));
@@ -217,7 +217,7 @@ if (args.Length == 1)
         foreach (string argument in arguments) start.ArgumentList.Add(argument);
         using var process = Process.Start(start)!;
         var stdout = process.StandardOutput.ReadToEndAsync(); var stderr = process.StandardError.ReadToEndAsync();
-        if (!process.WaitForExit(30000)) { process.Kill(entireProcessTree: true); throw new Exception("Owned CLI process timed out."); }
+        if (!process.WaitForExit(30000)) { process.Kill(entireProcessTree: true); throw new InvalidOperationException("Owned CLI process timed out."); }
         return (process.ExitCode, stdout.GetAwaiter().GetResult(), stderr.GetAwaiter().GetResult());
     }
     void WithDirectory(Action<string> run)
