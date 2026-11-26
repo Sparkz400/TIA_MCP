@@ -14,9 +14,21 @@ import uuid
 from smoke_mcp import Client, ROOT
 
 
+def services(fixture):
+    """Remote evidence for "no UA service": the fixture's request audit, live sessions and in-flight Publish/Read counters.
+
+    Its client-certificate log is not service evidence: the Host's OPC UA stack renews the secure-channel token on its
+    own timer (75% of the 60 s SecurityTokenLifetime, src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs), and the fixture
+    logs that renewal's certificate validation without any request, so a session older than about 45 s changes it.
+    """
+    state = fixture("audit")
+    state.pop("clientCertificates")
+    return state
+
+
 def check_unknown_subscription_inputs(client, request, fixture, store, check, responses):
     """Shared by focused, aggregate and relocated-package qualification."""
-    baseline = fixture("audit")
+    baseline = services(fixture)
     def files():
         return sorted(str(p.relative_to(store)) for p in store.rglob("*") if p.is_file())
     paths = files()
@@ -35,7 +47,7 @@ def check_unknown_subscription_inputs(client, request, fixture, store, check, re
         check(response.get("isError") and "structuredContent" not in response and
               response.get("content") == [dict(type="text", text="An error occurred invoking 'runtime_ua_subscription_start'.")],
               "MCP deserialization refuses " + label + " before subscription facade")
-        check(fixture("audit") == baseline, "No remote service for " + label)
+        check(services(fixture) == baseline, "No remote service for " + label)
         check(paths == files(), "No retained intent for " + label)
     return baseline
 
@@ -62,8 +74,8 @@ def main():
                     "scripts/qualify_opcua_subscription_inputs.py", "tests/TiaMcp.OpcUa.Runtime.Tests/SubscriptionInputChecks.cs"]
     report["sourceHashes"] = {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest() for name in source_names}
     client = None; server = None; server_lines = queue.Queue(); server_errors = []
-    def fixture(operation):
-        server.stdin.write(json.dumps(dict(operation=operation)) + "\n"); server.stdin.flush()
+    def fixture(operation, **arguments):
+        server.stdin.write(json.dumps(dict(operation=operation, **arguments)) + "\n"); server.stdin.flush()
         return json.loads(server_lines.get(timeout=20))
     def call(name, arguments):
         response = client.request("tools/call", dict(name="runtime_ua_" + name, arguments=arguments))
@@ -82,6 +94,9 @@ def main():
         threading.Thread(target=read_lines, daemon=True).start(); threading.Thread(target=read_errors, daemon=True).start()
         check(json.loads(server_lines.get(timeout=30)).get("ready"), "Independent encrypted fixture ready")
         ready = json.loads((out / "server/ready.json").read_text(encoding="utf-8"))
+        # Grant the Host's requested 600 s session timeout: the fixture's default 60 s would end a session across a stretch
+        # without UA requests on a slow machine, and the Host's idle sweep would then retire it mid-qualification.
+        fixture("sessionTimeout", value=600000)
         check(ready["processId"] == server.pid, "Fixture matches original owned process")
         client = Client(host, 20, ["--no-native-workers", "--artifacts", str(out / "store")])
         client.request("initialize", dict(protocolVersion="2025-11-25", capabilities={}, clientInfo=dict(name="ua-input-guard", version="1")))
@@ -96,7 +111,7 @@ def main():
               node_schema["items"]["properties"] == {key: dict(type="string") for key in ("namespaceUri", "identifierType", "identifier")},
               "Converter preserves advertised array and exact node field types")
         defaults = dict(publishingIntervalMilliseconds=100, samplingIntervalMilliseconds=100, queueSize=16,
-                        discardOldest=True, keepAliveCount=10, lifetimeCount=30, durationSeconds=10,
+                        discardOldest=True, keepAliveCount=3, lifetimeCount=30, durationSeconds=10,
                         maximumNotifications=10000, maximumBytes=67108864, maximumRepublish=16)
         check({key: request_schema["properties"][key]["default"] for key in defaults} == defaults, "All ten advertised optional defaults unchanged")
         identity = call("client_identity", {})["structuredContent"]
@@ -110,7 +125,7 @@ def main():
         baseline = check_unknown_subscription_inputs(client, request, fixture, out / "store", check, report["responses"])
         response = call("subscription_start", dict(captureId=uuid.uuid4().hex, request=dict(request, queueSize=0)))
         check(response.get("isError") and response["structuredContent"]["error"]["code"] == "UaSubscriptionInvalid", "Known invalid bound still reaches typed runtime validation")
-        check(fixture("audit") == baseline, "Bound refusal emits no remote service")
+        check(services(fixture) == baseline, "Bound refusal emits no remote service")
         # An unchanged shared node still follows the established manual-read profile.
         response = call("read", dict(attemptId=attempt, nodes=[dict(node, legacyExtra=True)]))
         check(not response.get("isError") and response["structuredContent"]["items"][0]["node"] == node, "Existing manual-read node deserialization unchanged")
