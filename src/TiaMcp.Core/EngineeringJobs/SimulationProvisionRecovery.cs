@@ -27,7 +27,9 @@ public static class SimulationProvisionRecovery
         var attempts = new JsonArray(ordered.Take(maxItems).Select(r => (JsonNode)Attempt(r)).ToArray());
         return new JsonObject
         {
-            ["attempts"] = attempts, ["totalAttempts"] = ordered.Length, ["truncated"] = ordered.Length > maxItems,
+            ["attempts"] = attempts,
+            ["totalAttempts"] = ordered.Length,
+            ["truncated"] = ordered.Length > maxItems,
             ["held"] = ordered.Count(r => r.State is "dispatchIntent" or "outcomeUnknown"),
             ["note"] = "Read from the Host's admission records and the owned storage folders only; the PLCSIM registration of an instance is not checked here (sim_status lists it). A new provisioning attempt needs the user's TLS authorization again.",
         };
@@ -47,8 +49,14 @@ public static class SimulationProvisionRecovery
         string? instanceName = storage is null ? null : Path.GetFileName(Path.TrimEndingDirectorySeparator(storage));
         return new JsonObject
         {
-            ["admissionId"] = record.Id, ["admissionState"] = record.State, ["recordedAtUtc"] = record.RecordedAt.UtcDateTime.ToString("O"),
-            ["stage"] = stage, ["projectPath"] = project, ["storagePath"] = storage, ["instanceName"] = instanceName, ["storage"] = files,
+            ["admissionId"] = record.Id,
+            ["admissionState"] = record.State,
+            ["recordedAtUtc"] = record.RecordedAt.UtcDateTime.ToString("O"),
+            ["stage"] = stage,
+            ["projectPath"] = project,
+            ["storagePath"] = storage,
+            ["instanceName"] = instanceName,
+            ["storage"] = files,
             ["nextSteps"] = NextSteps(stage, record.Id, project, instanceName),
         };
     }

@@ -37,8 +37,10 @@ internal sealed partial class CredentialVault
     }
     internal static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
     {
-        PropertyNameCaseInsensitive = false, UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
-        RespectRequiredConstructorParameters = true, MaxDepth = 8
+        PropertyNameCaseInsensitive = false,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        RespectRequiredConstructorParameters = true,
+        MaxDepth = 8
     };
 
     internal CredentialVault(string path)

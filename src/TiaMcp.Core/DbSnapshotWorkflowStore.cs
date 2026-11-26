@@ -25,8 +25,13 @@ public sealed class DbSnapshotWorkflowStore(string artifactsRoot)
     public JsonObject Capture(string reviewId, string objectPath, JsonObject export)
     {
         var identity = export["identity"] as JsonObject ?? throw new BridgeException("InvalidDbSnapshot", "The native export returned no identity.");
-        var source = new JsonObject { ["kind"] = "nativeInterfaceSnapshotExport", ["projectPath"] = identity["projectPath"]?.DeepClone(),
-            ["plcPath"] = identity["plcPath"]?.DeepClone(), ["objectPath"] = identity["objectPath"]?.DeepClone() };
+        var source = new JsonObject
+        {
+            ["kind"] = "nativeInterfaceSnapshotExport",
+            ["projectPath"] = identity["projectPath"]?.DeepClone(),
+            ["plcPath"] = identity["plcPath"]?.DeepClone(),
+            ["objectPath"] = identity["objectPath"]?.DeepClone()
+        };
         var artifact = export["artifact"] as JsonObject ?? throw new BridgeException("InvalidDbSnapshot", "The native export returned no artifact.");
         return Record(reviewId, objectPath, ProjectReviewStore.ReadArtifact(artifactsRoot, new() { ["path"] = artifact["path"]?.DeepClone(), ["sha256"] = artifact["sha256"]?.DeepClone() },
             DbSnapshotReview.InputLimit), null, source);
@@ -54,9 +59,15 @@ public sealed class DbSnapshotWorkflowStore(string artifactsRoot)
     private JsonObject Record(string reviewId, string objectPath, byte[] before, byte[]? after, JsonObject? source)
     {
         var report = DbSnapshotReview.Build(reviewId, new ProjectReviewStore(artifactsRoot).Read(reviewId), objectPath, before, after, source);
-        var envelope = new JsonObject { ["schemaVersion"] = "db-snapshot-review-record.v1", ["reviewId"] = reviewId, ["objectPath"] = objectPath,
+        var envelope = new JsonObject
+        {
+            ["schemaVersion"] = "db-snapshot-review-record.v1",
+            ["reviewId"] = reviewId,
+            ["objectPath"] = objectPath,
             ["input"] = Publish(before, ".xml", DbSnapshotReview.InputLimit),
-            ["comparisonInput"] = after is null ? null : Publish(after, ".xml", DbSnapshotReview.InputLimit), ["report"] = report };
+            ["comparisonInput"] = after is null ? null : Publish(after, ".xml", DbSnapshotReview.InputLimit),
+            ["report"] = report
+        };
         if (source is not null) envelope["source"] = source.DeepClone();
         var artifact = Publish(JsonSerializer.SerializeToUtf8Bytes(envelope, BridgeProtocol.Json), ".json", ReportLimit);
         return Summary(envelope, artifact);
@@ -109,11 +120,23 @@ public sealed class DbSnapshotWorkflowStore(string artifactsRoot)
         PackageStorage.PublishContent(artifactsRoot, "db-snapshot-reviews", bytes, extension, limit, 512L << 20, "DB snapshot review");
     private static JsonObject Summary(JsonObject record, JsonObject artifact)
     {
-        var summary = new JsonObject {
-            ["recordId"] = artifact["sha256"]!.DeepClone(), ["reviewId"] = record["reviewId"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["comparisonInput"] = record["comparisonInput"]?.DeepClone(), ["objectPath"] = record["objectPath"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),
-            ["summary"] = record["report"]!["summary"]!.DeepClone(), ["nativeExecutable"] = false, ["nativeQualified"] = false,
-            ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["programIdentityVerified"] = false, ["structureCompatibilityVerified"] = false,
-            ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+        var summary = new JsonObject
+        {
+            ["recordId"] = artifact["sha256"]!.DeepClone(),
+            ["reviewId"] = record["reviewId"]!.DeepClone(),
+            ["input"] = record["input"]!.DeepClone(),
+            ["comparisonInput"] = record["comparisonInput"]?.DeepClone(),
+            ["objectPath"] = record["objectPath"]!.DeepClone(),
+            ["reportArtifact"] = artifact.DeepClone(),
+            ["summary"] = record["report"]!["summary"]!.DeepClone(),
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["programIdentityVerified"] = false,
+            ["structureCompatibilityVerified"] = false,
+            ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy
+        };
         if (record["source"] is not null) summary["inputSource"] = record["source"]!.DeepClone();
         return summary;
     }

@@ -18,8 +18,12 @@ public sealed class TestSuiteScopeProbeTools(IBridgeClient bridge, HostOptions o
         {
             if (!options.TestSuiteScopeProbe || action is not ("prepare" or "read"))
                 throw new BridgeException("InvalidRequest", "An isolated scope-probe Host and prepare/read action are required.");
-            var result = await bridge.CallAsync("testsuite_scope_probe", new { action, projectPath,
-                artifactDirectory = Path.Combine(options.ArtifactsDirectory, "scope-probe") }, cancellationToken);
+            var result = await bridge.CallAsync("testsuite_scope_probe", new
+            {
+                action,
+                projectPath,
+                artifactDirectory = Path.Combine(options.ArtifactsDirectory, "scope-probe")
+            }, cancellationToken);
             return ToolResult.Of(result);
         }
         catch (BridgeException error) { return ToolResult.Failure(error, "BridgeError"); }

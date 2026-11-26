@@ -71,11 +71,16 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
             catch (IOException) { unreadable++; content.AppendData(Encoding.UTF8.GetBytes("<unreadable>\n")); }
             catch (UnauthorizedAccessException) { unreadable++; content.AppendData(Encoding.UTF8.GetBytes("<unreadable>\n")); }
         }
-        var result = new JsonObject { ["status"] = "observed", ["fileCount"] = files.Length, ["totalBytes"] = bytes,
+        var result = new JsonObject
+        {
+            ["status"] = "observed",
+            ["fileCount"] = files.Length,
+            ["totalBytes"] = bytes,
             ["metadataSha256"] = Convert.ToHexStringLower(metadata.GetHashAndReset()),
             ["contentSha256"] = includeContent ? Convert.ToHexStringLower(content.GetHashAndReset()) : null,
             ["unreadableFiles"] = includeContent ? unreadable : null,
-            ["scope"] = "Saved files of the project folder only: unsaved edits in an open project are not included. metadataSha256 covers relative path, size and last write time; contentSha256 (hashProjectFolder) covers bytes. The .ap21 file alone does not change on save and is not a project-state hash." };
+            ["scope"] = "Saved files of the project folder only: unsaved edits in an open project are not included. metadataSha256 covers relative path, size and last write time; contentSha256 (hashProjectFolder) covers bytes. The .ap21 file alone does not change on save and is not a project-state hash."
+        };
         return result;
     }
 
@@ -88,13 +93,30 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
         var reasons = new JsonArray();
         foreach (var group in failed.GroupBy(row => row?["errorCode"]?.GetValue<string>() ?? "ExportUnavailable").OrderBy(g => g.Key, StringComparer.Ordinal))
             reasons.Add(new JsonObject { ["code"] = group.Key, ["blocks"] = group.Count(), ["reason"] = Text(group.First(), "reason") });
-        if (skipped > 0) reasons.Add(new JsonObject { ["code"] = "ContentOutsideExportRoute", ["blocks"] = skipped,
-            ["reason"] = "Know-how protected, safety or unsupported-language blocks are not exported by this route." });
-        if (observedBlocks > selectedBlocks) reasons.Add(new JsonObject { ["code"] = "BlocksOmittedByMaxBlocks", ["blocks"] = observedBlocks - selectedBlocks,
-            ["reason"] = "Only maxBlocks blocks (at most 200) are exported; page on with blockOffset (capture.content.nextBlockOffset) or select blocks with blockPaths." });
-        return new JsonObject { ["observedBlocks"] = observedBlocks, ["selectedBlocks"] = selectedBlocks, ["attemptedBlocks"] = selectedBlocks - skipped,
-            ["exportedBlocks"] = exported, ["failedBlocks"] = failed.Length, ["skippedBlocks"] = skipped,
-            ["omittedBlocks"] = observedBlocks - selectedBlocks, ["degraded"] = reasons.Count > 0, ["degradedReasons"] = reasons };
+        if (skipped > 0) reasons.Add(new JsonObject
+        {
+            ["code"] = "ContentOutsideExportRoute",
+            ["blocks"] = skipped,
+            ["reason"] = "Know-how protected, safety or unsupported-language blocks are not exported by this route."
+        });
+        if (observedBlocks > selectedBlocks) reasons.Add(new JsonObject
+        {
+            ["code"] = "BlocksOmittedByMaxBlocks",
+            ["blocks"] = observedBlocks - selectedBlocks,
+            ["reason"] = "Only maxBlocks blocks (at most 200) are exported; page on with blockOffset (capture.content.nextBlockOffset) or select blocks with blockPaths."
+        });
+        return new JsonObject
+        {
+            ["observedBlocks"] = observedBlocks,
+            ["selectedBlocks"] = selectedBlocks,
+            ["attemptedBlocks"] = selectedBlocks - skipped,
+            ["exportedBlocks"] = exported,
+            ["failedBlocks"] = failed.Length,
+            ["skippedBlocks"] = skipped,
+            ["omittedBlocks"] = observedBlocks - selectedBlocks,
+            ["degraded"] = reasons.Count > 0,
+            ["degradedReasons"] = reasons
+        };
     }
 
     public JsonObject Save(JsonObject model, JsonArray documents, JsonObject capture)
@@ -115,21 +137,33 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
                 throw new BridgeException("ArtifactChanged", "Export text hash mismatch.");
             row!["signatures"] = XmlSignatures(xml);
         }
-        var review = new JsonObject { ["schemaVersion"] = "project-review.v1", ["createdAtUtc"] = DateTime.UtcNow.ToString("O"),
-            ["model"] = model.DeepClone(), ["documents"] = documents.DeepClone(), ["capture"] = capture.DeepClone(),
+        var review = new JsonObject
+        {
+            ["schemaVersion"] = "project-review.v1",
+            ["createdAtUtc"] = DateTime.UtcNow.ToString("O"),
+            ["model"] = model.DeepClone(),
+            ["documents"] = documents.DeepClone(),
+            ["capture"] = capture.DeepClone(),
             ["consistency"] = "Sequential native observations; metadata recheck does not certify an atomic project/content revision.",
-            ["wholeProjectContentComplete"] = false };
+            ["wholeProjectContentComplete"] = false
+        };
         byte[] data = JsonSerializer.SerializeToUtf8Bytes(review, BridgeProtocol.Json);
         if (data.Length > MaxBytes) throw new BridgeException("ArtifactCapacity", "Review exceeds 64 MiB.");
         string output = Publish(data), id = Hash(data);
-        return new JsonObject { ["reviewId"] = id, ["artifact"] = new JsonObject { ["path"] = output, ["bytes"] = (long)data.Length, ["sha256"] = id },
+        return new JsonObject
+        {
+            ["reviewId"] = id,
+            ["artifact"] = new JsonObject { ["path"] = output, ["bytes"] = (long)data.Length, ["sha256"] = id },
             ["nodeCount"] = nodes.Count,
             ["nodeCountScope"] = "Distinct native object nodes in the saved review's model, the same set the review document holds (the model is re-exported after relationship observation, so it includes nodes those observations added). Native traversal counts (visited) count every object touched, containers and skipped objects included, and are larger.",
             ["exportedBlocks"] = documents.Count(row => Text(row, "status") == "exported" && Text(nodes[Text(row, "objectPath")], "kind") == "block"),
             ["exportedTypes"] = documents.Count(row => Text(row, "status") == "exported" && Text(nodes[Text(row, "objectPath")], "kind") == "type"),
-            ["capture"] = capture.DeepClone(), ["wholeProjectContentComplete"] = false,
-            ["degraded"] = capture["content"]?["degraded"]?.DeepClone(), ["degradedReasons"] = capture["content"]?["degradedReasons"]?.DeepClone(),
-            ["summary"] = Summary(capture["content"] as JsonObject) };
+            ["capture"] = capture.DeepClone(),
+            ["wholeProjectContentComplete"] = false,
+            ["degraded"] = capture["content"]?["degraded"]?.DeepClone(),
+            ["degradedReasons"] = capture["content"]?["degradedReasons"]?.DeepClone(),
+            ["summary"] = Summary(capture["content"] as JsonObject)
+        };
     }
 
     private static string Summary(JsonObject? content) => content is null ? "Block content coverage was not recorded." :
@@ -167,8 +201,13 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
         foreach (string path in a.Keys.Union(b.Keys).Order(StringComparer.Ordinal))
         {
             a.TryGetValue(path, out var oldNode); b.TryGetValue(path, out var newNode);
-            var change = new JsonObject { ["path"] = path, ["beforeObjectPath"] = oldNode?["objectPath"]?.DeepClone(),
-                ["afterObjectPath"] = newNode?["objectPath"]?.DeepClone(), ["kind"] = (newNode ?? oldNode)?["kind"]?.DeepClone() };
+            var change = new JsonObject
+            {
+                ["path"] = path,
+                ["beforeObjectPath"] = oldNode?["objectPath"]?.DeepClone(),
+                ["afterObjectPath"] = newNode?["objectPath"]?.DeepClone(),
+                ["kind"] = (newNode ?? oldNode)?["kind"]?.DeepClone()
+            };
             if (oldNode is null || newNode is null)
                 change["change"] = oldNode is null ? "addedToCapturedScope" : "removedFromCapturedScope";
             else
@@ -202,26 +241,42 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
         var impacts = new JsonArray();
         foreach (var edge in Rows(bModel["edges"]))
             if (changedPaths.Contains(Text(edge?["target"], "objectPath")) && Text(edge?["source"], "objectPath").Length > 0)
-                impacts.Add(new JsonObject { ["kind"] = edge?["kind"]?.DeepClone(), ["source"] = edge?["source"]?.DeepClone(),
-                    ["target"] = edge?["target"]?.DeepClone(), ["evidence"] = edge?["evidence"]?.DeepClone() });
+                impacts.Add(new JsonObject
+                {
+                    ["kind"] = edge?["kind"]?.DeepClone(),
+                    ["source"] = edge?["source"]?.DeepClone(),
+                    ["target"] = edge?["target"]?.DeepClone(),
+                    ["evidence"] = edge?["evidence"]?.DeepClone()
+                });
         var impactAnalysis = ObservedImpactPaths(beforeId, afterId, aModel, bModel, changes, impactDepth, maxImpactPaths, maxImpactEdgeVisits);
-        return new JsonObject { ["beforeReviewId"] = beforeId, ["afterReviewId"] = afterId,
+        return new JsonObject
+        {
+            ["beforeReviewId"] = beforeId,
+            ["afterReviewId"] = afterId,
             ["changes"] = new JsonArray(changes.Skip(offset).Take(maxItems).Select(n => n!.DeepClone()).ToArray()),
-            ["totalChanges"] = changes.Count, ["nextOffset"] = offset + maxItems < changes.Count ? offset + maxItems : null,
-            ["totalItems"] = changes.Count, ["pageCount"] = PageTotals.PageCount(changes.Count, maxItems),
-            ["contentComparedBlocks"] = contentCompared, ["contentUnknownBlocks"] = unknownContent,
-            ["contentComparedTypes"] = typesCompared, ["contentUnknownTypes"] = unknownTypes,
+            ["totalChanges"] = changes.Count,
+            ["nextOffset"] = offset + maxItems < changes.Count ? offset + maxItems : null,
+            ["totalItems"] = changes.Count,
+            ["pageCount"] = PageTotals.PageCount(changes.Count, maxItems),
+            ["contentComparedBlocks"] = contentCompared,
+            ["contentUnknownBlocks"] = unknownContent,
+            ["contentComparedTypes"] = typesCompared,
+            ["contentUnknownTypes"] = unknownTypes,
             ["directObservedImpacts"] = new JsonArray(impacts.Take(200).Select(n => n!.DeepClone()).ToArray()),
-            ["impactTruncated"] = impacts.Count > 200, ["impactCoverageComplete"] = false,
-            ["observedImpactPaths"] = impactAnalysis["paths"]!.DeepClone(), ["impactTraversal"] = impactAnalysis["coverage"]!.DeepClone(),
-            ["beforeCoverage"] = aModel["coverage"]?.DeepClone(), ["afterCoverage"] = bModel["coverage"]?.DeepClone(),
+            ["impactTruncated"] = impacts.Count > 200,
+            ["impactCoverageComplete"] = false,
+            ["observedImpactPaths"] = impactAnalysis["paths"]!.DeepClone(),
+            ["impactTraversal"] = impactAnalysis["coverage"]!.DeepClone(),
+            ["beforeCoverage"] = aModel["coverage"]?.DeepClone(),
+            ["afterCoverage"] = bModel["coverage"]?.DeepClone(),
             ["wholeProjectEquivalent"] = false,
             ["volatileMetadataFields"] = new JsonArray(VolatileMetadataFields.Select(f => (JsonNode)f).ToArray()),
             ["volatileOnlyChanges"] = volatileOnly,
             ["degraded"] = unknownContent > 0 || unknownTypes > 0 || before["degraded"]?.GetValue<bool>() == true || after["degraded"]?.GetValue<bool>() == true
                 || before["capture"]?["content"]?["degraded"]?.GetValue<bool>() == true || after["capture"]?["content"]?["degraded"]?.GetValue<bool>() == true,
             ["degradedReason"] = unknownContent > 0 || unknownTypes > 0 ? $"{unknownContent} blocks and {unknownTypes} types have no exported content on at least one side; their content was not compared." : null,
-            ["comparisonPolicy"] = "Exact relative native paths; no rename inference. Metadata timestamps and update counters (volatileMetadataFields) are not compared; a node whose only difference is one of them is counted in volatileOnlyChanges, not listed. XML ignores only top-level DocumentInfo/Created. Whitespace, IDs, namespaces, comments and unknown payload remain significant. Scope absence is not proof of deletion." };
+            ["comparisonPolicy"] = "Exact relative native paths; no rename inference. Metadata timestamps and update counters (volatileMetadataFields) are not compared; a node whose only difference is one of them is counted in volatileOnlyChanges, not listed. XML ignores only top-level DocumentInfo/Created. Whitespace, IDs, namespaces, comments and unknown payload remain significant. Scope absence is not proof of deletion."
+        };
     }
 
     private static readonly string[] ImpactKinds = ["calls", "dependsOn", "hmiBinding", "instanceOf", "libraryVersion", "reads", "usesType", "writes"];
@@ -269,8 +324,12 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
                     if (order == 0) order = StringComparer.Ordinal.Compare(Text(left, "edgeId"), Text(right, "edgeId"));
                     return order == 0 ? StringComparer.Ordinal.Compare(left.ToJsonString(), right.ToJsonString()) : order;
                 });
-            exclusions.Add(new JsonObject { ["reviewSide"] = side, ["counts"] = new JsonObject(excluded.Select(p =>
-                new KeyValuePair<string, JsonNode?>(p.Key, JsonValue.Create(p.Value)))) });
+            exclusions.Add(new JsonObject
+            {
+                ["reviewSide"] = side,
+                ["counts"] = new JsonObject(excluded.Select(p =>
+                new KeyValuePair<string, JsonNode?>(p.Key, JsonValue.Create(p.Value))))
+            });
             if (stopped) continue;
             foreach (var change in changes)
             {
@@ -290,12 +349,19 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
                         if (walk.Edges.Length == depth) { bounds.Add("impactDepth"); continue; }
                         if (paths.Count == maxPaths) { bounds.Add("maxImpactPaths"); stopped = true; break; }
                         string[] sequence = [source, .. walk.Paths]; JsonObject[] edges = [edge, .. walk.Edges];
-                        var path = new JsonObject { ["reviewSide"] = side, ["reviewId"] = reviewId,
-                            ["changedPath"] = change!["path"]!.DeepClone(), ["changedObjectPath"] = root,
-                            ["change"] = change["change"]!.DeepClone(), ["changedFields"] = change["changedFields"]?.DeepClone(),
-                            ["affectedObjectPath"] = source, ["distance"] = edges.Length,
+                        var path = new JsonObject
+                        {
+                            ["reviewSide"] = side,
+                            ["reviewId"] = reviewId,
+                            ["changedPath"] = change!["path"]!.DeepClone(),
+                            ["changedObjectPath"] = root,
+                            ["change"] = change["change"]!.DeepClone(),
+                            ["changedFields"] = change["changedFields"]?.DeepClone(),
+                            ["affectedObjectPath"] = source,
+                            ["distance"] = edges.Length,
                             ["objectPaths"] = new JsonArray(sequence.Select(p => (JsonNode?)JsonValue.Create(p)).ToArray()),
-                            ["edges"] = new JsonArray(edges.Select(e => e.DeepClone()).ToArray()) };
+                            ["edges"] = new JsonArray(edges.Select(e => e.DeepClone()).ToArray())
+                        };
                         int bytes = Encoding.UTF8.GetByteCount(path.ToJsonString(BridgeProtocol.Json)) + (paths.Count == 0 ? 0 : 1);
                         if (pathBytes + bytes > maxPathBytes) { bounds.Add("maxImpactPathBytes"); stopped = true; break; }
                         paths.Add(path); pathBytes += bytes;
@@ -305,16 +371,31 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
                 if (stopped) break;
             }
         }
-        return new JsonObject { ["paths"] = paths, ["coverage"] = new JsonObject {
-            ["complete"] = false, ["freshness"] = "savedSnapshotsOnly", ["truncated"] = bounds.Count > 0,
-            ["truncationReasons"] = new JsonArray(bounds.Order(StringComparer.Ordinal).Select(p => (JsonNode?)JsonValue.Create(p)).ToArray()),
-            ["limits"] = new JsonObject { ["impactDepth"] = depth, ["maxImpactPaths"] = maxPaths,
-                ["maxImpactEdgeVisits"] = maxEdgeVisits, ["maxImpactPathBytes"] = maxPathBytes },
-            ["returnedPaths"] = paths.Count, ["visitedEdges"] = visitedEdges, ["pathBytes"] = pathBytes,
-            ["excludedEdges"] = exclusions,
-            ["supportedRelationshipKinds"] = new JsonArray(ImpactKinds.Select(p => (JsonNode?)JsonValue.Create(p)).ToArray()),
-            ["policy"] = "Incoming simple dependency paths, breadth first per changed object, before snapshot then after snapshot. Each path runs from the affected object to the changed object; diamonds retain distinct paths and cycles never repeat an object. Only resolved nativeConfirmed/parsedSupported edges with exact captured endpoints are followed. No cross-snapshot edges are joined.",
-            ["limitations"] = "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact." } };
+        return new JsonObject
+        {
+            ["paths"] = paths,
+            ["coverage"] = new JsonObject
+            {
+                ["complete"] = false,
+                ["freshness"] = "savedSnapshotsOnly",
+                ["truncated"] = bounds.Count > 0,
+                ["truncationReasons"] = new JsonArray(bounds.Order(StringComparer.Ordinal).Select(p => (JsonNode?)JsonValue.Create(p)).ToArray()),
+                ["limits"] = new JsonObject
+                {
+                    ["impactDepth"] = depth,
+                    ["maxImpactPaths"] = maxPaths,
+                    ["maxImpactEdgeVisits"] = maxEdgeVisits,
+                    ["maxImpactPathBytes"] = maxPathBytes
+                },
+                ["returnedPaths"] = paths.Count,
+                ["visitedEdges"] = visitedEdges,
+                ["pathBytes"] = pathBytes,
+                ["excludedEdges"] = exclusions,
+                ["supportedRelationshipKinds"] = new JsonArray(ImpactKinds.Select(p => (JsonNode?)JsonValue.Create(p)).ToArray()),
+                ["policy"] = "Incoming simple dependency paths, breadth first per changed object, before snapshot then after snapshot. Each path runs from the affected object to the changed object; diamonds retain distinct paths and cycles never repeat an object. Only resolved nativeConfirmed/parsedSupported edges with exact captured endpoints are followed. No cross-snapshot edges are joined.",
+                ["limitations"] = "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+            }
+        };
     }
 
     public JsonObject Search(string reviewId, string query, int offset = 0, int maxItems = 50)
@@ -342,27 +423,44 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
                 index++;
                 int found = text.IndexOf(query, StringComparison.OrdinalIgnoreCase);
                 if (found < 0) continue;
-                hits.Add(new JsonObject { ["objectPath"] = doc?["objectPath"]?.DeepClone(), ["origin"] = "nativeXmlText",
-                    ["textNode"] = index, ["excerpt"] = text.Substring(Math.Max(0, found - 80), Math.Min(320, text.Length - Math.Max(0, found - 80))) });
+                hits.Add(new JsonObject
+                {
+                    ["objectPath"] = doc?["objectPath"]?.DeepClone(),
+                    ["origin"] = "nativeXmlText",
+                    ["textNode"] = index,
+                    ["excerpt"] = text.Substring(Math.Max(0, found - 80), Math.Min(320, text.Length - Math.Max(0, found - 80)))
+                });
                 if (hits.Count >= 10000) break;
             }
             if (hits.Count >= 10000) break;
         }
-        return new JsonObject { ["reviewId"] = reviewId, ["query"] = query,
+        return new JsonObject
+        {
+            ["reviewId"] = reviewId,
+            ["query"] = query,
             ["hits"] = new JsonArray(hits.Skip(offset).Take(maxItems).Select(n => n!.DeepClone()).ToArray()),
-            ["totalObservedHits"] = hits.Count, ["truncated"] = hits.Count >= 10000,
-            ["nextOffset"] = offset + maxItems < hits.Count ? offset + maxItems : null, ["freshness"] = "savedSnapshotOnly",
+            ["totalObservedHits"] = hits.Count,
+            ["truncated"] = hits.Count >= 10000,
+            ["nextOffset"] = offset + maxItems < hits.Count ? offset + maxItems : null,
+            ["freshness"] = "savedSnapshotOnly",
             // Search stops at 10,000 hits; a capped search has no known total.
-            ["totalItems"] = hits.Count >= 10000 ? null : hits.Count, ["pageCount"] = PageTotals.PageCount(hits.Count >= 10000 ? (int?)null : hits.Count, maxItems),
-            ["sourceCoverage"] = review["capture"]?.DeepClone() };
+            ["totalItems"] = hits.Count >= 10000 ? null : hits.Count,
+            ["pageCount"] = PageTotals.PageCount(hits.Count >= 10000 ? (int?)null : hits.Count, maxItems),
+            ["sourceCoverage"] = review["capture"]?.DeepClone()
+        };
     }
 
     public JsonObject Health(string reviewId, int offset = 0, int maxItems = 100, EngineeringArtifactReference[]? testSuiteResults = null)
     {
         Page(offset, maxItems);
         var review = Read(reviewId); var model = review["model"]!.AsObject(); var findings = new JsonArray();
-        void Add(string rule, string severity, string path, string message) => findings.Add(new JsonObject {
-            ["rule"] = rule, ["severity"] = severity, ["objectPath"] = path, ["message"] = message });
+        void Add(string rule, string severity, string path, string message) => findings.Add(new JsonObject
+        {
+            ["rule"] = rule,
+            ["severity"] = severity,
+            ["objectPath"] = path,
+            ["message"] = message
+        });
         var nodes = NativeNodes(model);
         var byId = Rows(model["nodes"]).Where(n => Text(n, "nodeId").Length > 0).ToLookup(n => Text(n, "nodeId"), StringComparer.Ordinal);
         bool Endpoint(JsonNode? endpoint, bool grouping)
@@ -390,12 +488,19 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
                 || Text(edge?["evidence"], "origin") is not ("nativeConfirmed" or "parsedSupported")
                 || !Endpoint(edge?["source"], Text(edge, "kind") == "contains") || !Endpoint(edge?["target"], Text(edge, "kind") == "contains"))
                 Add("unresolved-reference", "coverage", Text(edge?["source"], "objectPath"), "A captured relationship lacks supported resolved evidence or exact endpoints; this alone does not prove a broken reference.");
-        var result = new JsonObject { ["reviewId"] = reviewId, ["findings"] = new JsonArray(findings.Skip(offset).Take(maxItems).Select(n => n!.DeepClone()).ToArray()),
-            ["totalFindings"] = findings.Count, ["nextOffset"] = offset + maxItems < findings.Count ? offset + maxItems : null,
-            ["totalItems"] = findings.Count, ["pageCount"] = PageTotals.PageCount(findings.Count, maxItems),
-            ["freshness"] = "savedSnapshotOnly", ["coverage"] = model["coverage"]?.DeepClone(),
+        var result = new JsonObject
+        {
+            ["reviewId"] = reviewId,
+            ["findings"] = new JsonArray(findings.Skip(offset).Take(maxItems).Select(n => n!.DeepClone()).ToArray()),
+            ["totalFindings"] = findings.Count,
+            ["nextOffset"] = offset + maxItems < findings.Count ? offset + maxItems : null,
+            ["totalItems"] = findings.Count,
+            ["pageCount"] = PageTotals.PageCount(findings.Count, maxItems),
+            ["freshness"] = "savedSnapshotOnly",
+            ["coverage"] = model["coverage"]?.DeepClone(),
             ["rules"] = new JsonArray("native-inconsistent", "content-protected", "inspection-unavailable", "source-unavailable", "unresolved-reference"),
-            ["limitations"] = "No live compile, unused-object verdict, safety validation or physical network inspection. No findings does not establish project correctness." };
+            ["limitations"] = "No live compile, unused-object verdict, safety validation or physical network inspection. No findings does not establish project correctness."
+        };
         if (testSuiteResults is not null) result["testSuite"] = TestSuiteHealth(reviewId, testSuiteResults);
         return result;
     }
@@ -417,8 +522,12 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
     private static Dictionary<string, JsonObject> Documents(JsonObject review, string root) => Rows(review["documents"]).ToDictionary(n => Relative(Text(n, "objectPath"), root), n => n!.AsObject(), StringComparer.Ordinal);
     private static XDocument ParseXml(string xml)
     {
-        var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit,
-            XmlResolver = null, MaxCharactersInDocument = 16 * 1024 * 1024 };
+        var settings = new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null,
+            MaxCharactersInDocument = 16 * 1024 * 1024
+        };
         try
         {
             using (var depth = XmlReader.Create(new StringReader(xml), settings))
@@ -435,8 +544,11 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
         if (document.Root?.Name == XName.Get("Document"))
             foreach (var created in document.Root.Elements("DocumentInfo").Elements("Created").ToArray()) created.Remove();
         string Digest(IEnumerable<XElement> elements) => Hash(Encoding.UTF8.GetBytes(string.Join("\n", elements.Select(e => e.ToString(SaveOptions.DisableFormatting)))));
-        return new JsonObject { ["document"] = Hash(Encoding.UTF8.GetBytes(document.ToString(SaveOptions.DisableFormatting))),
+        return new JsonObject
+        {
+            ["document"] = Hash(Encoding.UTF8.GetBytes(document.ToString(SaveOptions.DisableFormatting))),
             ["interface"] = Digest(document.Descendants().Where(e => e.Name.LocalName == "Interface")),
-            ["logic"] = Digest(document.Descendants().Where(e => e.Name.LocalName == "NetworkSource")) };
+            ["logic"] = Digest(document.Descendants().Where(e => e.Name.LocalName == "NetworkSource"))
+        };
     }
 }

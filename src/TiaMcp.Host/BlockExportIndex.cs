@@ -24,8 +24,10 @@ internal static class BlockExportIndex
         string plc = block.GetProperty("plcPath").GetString()!, path = block.GetProperty("path").GetString()!;
         var row = new JsonObject
         {
-            ["name"] = block.GetProperty("name").GetString(), ["kind"] = block.GetProperty("kind").GetString(),
-            ["number"] = block.GetProperty("number").GetInt32(), ["language"] = block.GetProperty("programmingLanguage").GetString(),
+            ["name"] = block.GetProperty("name").GetString(),
+            ["kind"] = block.GetProperty("kind").GetString(),
+            ["number"] = block.GetProperty("number").GetInt32(),
+            ["language"] = block.GetProperty("programmingLanguage").GetString(),
             // Relative to plcPath + "/blocks/": a full path per row would dominate the response.
             ["path"] = path.StartsWith(plc + "/blocks/", StringComparison.Ordinal) ? path[(plc.Length + "/blocks/".Length)..] : path,
         };
@@ -53,16 +55,20 @@ internal static class BlockExportIndex
             ["plcs"] = JsonNode.Parse(inventory.GetProperty("plcs").GetRawText()),
             ["directory"] = directory,
             ["kinds"] = new JsonArray([.. kinds.Select(kind => (JsonNode)kind)]),
-            ["matchedBlocks"] = matched, ["offset"] = offset,
-            ["exported"] = rows.Count(row => row["skipped"] is null), ["skipped"] = rows.Count(row => row["skipped"] is not null),
+            ["matchedBlocks"] = matched,
+            ["offset"] = offset,
+            ["exported"] = rows.Count(row => row["skipped"] is null),
+            ["skipped"] = rows.Count(row => row["skipped"] is not null),
             ["nextOffset"] = offset + rows.Count < matched ? offset + rows.Count : null,
             // Unknown when the inventory walk was cut: matchedBlocks then counts only the listed blocks.
-            ["totalItems"] = listed ? matched : null, ["pageCount"] = TiaMcp.Core.PageTotals.PageCount(listed ? matched : (int?)null, maxBlocks),
+            ["totalItems"] = listed ? matched : null,
+            ["pageCount"] = TiaMcp.Core.PageTotals.PageCount(listed ? matched : (int?)null, maxBlocks),
             ["blocks"] = new JsonArray([.. rows]),
             ["completeness"] = new JsonObject
             {
                 // False when the inventory walk itself was cut: blocks beyond its bound are not in matchedBlocks.
-                ["inventoryComplete"] = listed, ["complete"] = listed && offset + rows.Count >= matched,
+                ["inventoryComplete"] = listed,
+                ["complete"] = listed && offset + rows.Count >= matched,
                 ["scope"] = "Native XML and rendered text of the selected blocks; paths are relative to plcPath + \"/blocks/\". No project changes, no revision guarantee across the batch."
             }
         };

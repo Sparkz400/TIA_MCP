@@ -52,9 +52,13 @@ public sealed class DiagnosticRepeatedExperiments(string artifactsRoot)
             }
             if (parts.Count > 0) CheckComparable(parts[0], derived);
             parts.Add(derived);
-            runs.Add(new JsonObject { ["id"] = id, ["reviewId"] = Id(derived.Report),
+            runs.Add(new JsonObject
+            {
+                ["id"] = id,
+                ["reviewId"] = Id(derived.Report),
                 ["beforeWindow"] = DiagnosticExperimentWindows.Assess(derived.BeforeExperiment, derived.BeforeImport, derived.Comparison, "before"),
-                ["afterWindow"] = DiagnosticExperimentWindows.Assess(derived.AfterExperiment, derived.AfterImport, derived.Comparison, "after") });
+                ["afterWindow"] = DiagnosticExperimentWindows.Assess(derived.AfterExperiment, derived.AfterImport, derived.Comparison, "after")
+            });
         }
         var aggregates = new JsonArray();
         foreach (var hypothesis in D.Rows(parts[0].BeforeExperiment["diagnosticCase"]?["hypotheses"]))
@@ -64,25 +68,48 @@ public sealed class DiagnosticRepeatedExperiments(string artifactsRoot)
             {
                 var results = runs.Select(run => run![side + "Window"]!["hypotheses"]!.AsArray()
                     .Single(h => D.Text(h, "id") == id)!).ToArray();
-                return new JsonObject { ["runs"] = results.Length,
+                return new JsonObject
+                {
+                    ["runs"] = results.Length,
                     ["supportedPredictionRuns"] = results.Count(r => D.Text(r, "verdict") == "supportedPrediction"),
                     ["contradictedPredictionRuns"] = results.Count(r => D.Text(r, "verdict") == "contradictedPrediction"),
                     ["unresolvedRuns"] = results.Count(r => D.Text(r, "verdict") == "unresolved"),
-                    ["conditionObservedRuns"] = results.Count(r => r["matchedSamples"]!.GetValue<int>() + r["contradictedSamples"]!.GetValue<int>() > 0) };
+                    ["conditionObservedRuns"] = results.Count(r => r["matchedSamples"]!.GetValue<int>() + r["contradictedSamples"]!.GetValue<int>() > 0)
+                };
             }
-            aggregates.Add(new JsonObject { ["id"] = id, ["statement"] = hypothesis!["statement"]!.DeepClone(),
-                ["before"] = Counts("before"), ["after"] = Counts("after"), ["causationProven"] = false, ["bugFixProven"] = false });
+            aggregates.Add(new JsonObject
+            {
+                ["id"] = id,
+                ["statement"] = hypothesis!["statement"]!.DeepClone(),
+                ["before"] = Counts("before"),
+                ["after"] = Counts("after"),
+                ["causationProven"] = false,
+                ["bugFixProven"] = false
+            });
         }
-        var report = new JsonObject { ["schemaVersion"] = "diagnostic-experiment-repeat.v1", ["request"] = request.DeepClone(),
-            ["runPairCount"] = pairs.Count, ["runs"] = runs, ["hypotheses"] = aggregates,
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-experiment-repeat.v1",
+            ["request"] = request.DeepClone(),
+            ["runPairCount"] = pairs.Count,
+            ["runs"] = runs,
+            ["hypotheses"] = aggregates,
             ["beforeDiagnosticPlanId"] = parts[0].BeforeExperiment["diagnosticPlanId"]!.DeepClone(),
             ["afterDiagnosticPlanId"] = parts[0].AfterExperiment["diagnosticPlanId"]!.DeepClone(),
-            ["requestedWindowsEqual"] = true, ["signalMappingsEqual"] = true,
+            ["requestedWindowsEqual"] = true,
+            ["signalMappingsEqual"] = true,
             ["settingsEqualAcrossRuns"] = parts.All(p => JsonNode.DeepEquals(p.BeforeExperiment["request"]?["trace"]?["settings"], parts[0].BeforeExperiment["request"]?["trace"]?["settings"])
                 && JsonNode.DeepEquals(p.AfterExperiment["request"]?["trace"]?["settings"], parts[0].AfterExperiment["request"]?["trace"]?["settings"])),
-            ["aggregation"] = "descriptiveRunCountsOnly", ["independentRunsVerified"] = false,
-            ["sourceAuthenticityVerified"] = false, ["clockSynchronizationVerified"] = false, ["causationProven"] = false,
-            ["bugFixProven"] = false, ["nativeQualification"] = false, ["nativeAccessAttempted"] = false, ["limits"] = Limits };
+            ["aggregation"] = "descriptiveRunCountsOnly",
+            ["independentRunsVerified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["clockSynchronizationVerified"] = false,
+            ["causationProven"] = false,
+            ["bugFixProven"] = false,
+            ["nativeQualification"] = false,
+            ["nativeAccessAttempted"] = false,
+            ["limits"] = Limits
+        };
         D.Bound(report, DiagnosticStore.MaxBytes);
         return new(report, parts.ToArray());
     }
@@ -135,7 +162,8 @@ internal static class DiagnosticExperimentWindows
         var alignment = comparison["alignment"]!;
         decimal anchor = TraceMeasurements.Number(alignment[side + "AnchorSeconds"]),
             start = TraceMeasurements.Number(alignment["windowStartSeconds"]), end = TraceMeasurements.Number(alignment["windowEndSeconds"]);
-        var rows = D.Rows(measurement["samples"]).Select(sample => {
+        var rows = D.Rows(measurement["samples"]).Select(sample =>
+        {
             decimal raw = TraceMeasurements.Number(sample!["time"]), seconds = raw / divisor;
             if (seconds * divisor != raw) throw new BridgeException("MeasurementFormatUnsupported", "Window conversion loses time precision.");
             return (Sample: sample!, Time: TraceNumber.SubtractTime(seconds, anchor));
@@ -170,24 +198,44 @@ internal static class DiagnosticExperimentWindows
             }
             string verdict = !prediction || reasons.Count > 0 || unknown > 0 || matched + contradicted == 0 ? "unresolved"
                 : contradicted > 0 ? "contradictedPrediction" : "supportedPrediction";
-            hypotheses.Add(new JsonObject { ["id"] = hypothesis!["id"]!.DeepClone(), ["statement"] = hypothesis["statement"]!.DeepClone(),
-                ["matchedSamples"] = matched, ["contradictedSamples"] = contradicted, ["unknownSamples"] = unknown, ["verdict"] = verdict,
+            hypotheses.Add(new JsonObject
+            {
+                ["id"] = hypothesis!["id"]!.DeepClone(),
+                ["statement"] = hypothesis["statement"]!.DeepClone(),
+                ["matchedSamples"] = matched,
+                ["contradictedSamples"] = contradicted,
+                ["unknownSamples"] = unknown,
+                ["verdict"] = verdict,
                 ["reason"] = !prediction ? "No declarative sample prediction."
                     : reasons.Count > 0 ? "Acquisition or window quality prevents a sample prediction verdict; counts remain observations."
                     : unknown > 0 ? "Required predicate values are unknown."
                     : matched + contradicted == 0 ? "The specified condition was not observed inside this window; absence does not prove a fix."
                     : "Verdict applies only to recorded samples inside the requested window, with caller-attested quality.",
-                ["causationProven"] = false, ["bugFixProven"] = false });
+                ["causationProven"] = false,
+                ["bugFixProven"] = false
+            });
         }
-        return new JsonObject { ["requestedStartSeconds"] = start, ["requestedEndSeconds"] = end, ["anchorSeconds"] = anchor,
-            ["firstRecordedSeconds"] = rows[0].Time, ["lastRecordedSeconds"] = rows[^1].Time, ["samplesInWindow"] = selected.Length,
+        return new JsonObject
+        {
+            ["requestedStartSeconds"] = start,
+            ["requestedEndSeconds"] = end,
+            ["anchorSeconds"] = anchor,
+            ["firstRecordedSeconds"] = rows[0].Time,
+            ["lastRecordedSeconds"] = rows[^1].Time,
+            ["samplesInWindow"] = selected.Length,
             ["firstWindowSampleSeconds"] = selected.Length == 0 ? null : JsonValue.Create(selected[0].Time),
             ["lastWindowSampleSeconds"] = selected.Length == 0 ? null : JsonValue.Create(selected[^1].Time),
             ["recordedSpanCoversRequestedWindow"] = spans,
             ["coverage"] = selected.Length == 0 ? "noRecordedSamples" : spans ? "completeRecordedSpan" : "partialRecordedSpan",
-            ["qualityGatePassed"] = reasons.Count == 0, ["qualityGateReasons"] = reasons,
-            ["qualityGateScope"] = "conservativeWholeCaptureQualityAndRequestedWindow", ["qualityAssessment"] = assessment,
-            ["acquisitionQuality"] = quality.DeepClone(), ["acquisitionContext"] = TraceMeasurements.AcquisitionContext(measurement),
-            ["hypotheses"] = hypotheses, ["sourceAuthenticityVerified"] = false, ["clockSynchronizationVerified"] = false };
+            ["qualityGatePassed"] = reasons.Count == 0,
+            ["qualityGateReasons"] = reasons,
+            ["qualityGateScope"] = "conservativeWholeCaptureQualityAndRequestedWindow",
+            ["qualityAssessment"] = assessment,
+            ["acquisitionQuality"] = quality.DeepClone(),
+            ["acquisitionContext"] = TraceMeasurements.AcquisitionContext(measurement),
+            ["hypotheses"] = hypotheses,
+            ["sourceAuthenticityVerified"] = false,
+            ["clockSynchronizationVerified"] = false
+        };
     }
 }

@@ -34,7 +34,8 @@ namespace TiaMcp.Core.WatchTables
             {
                 case "createTable":
                     if (taken("watch force", n)) refusal = "WatchTableCollision"; else lines.Add("watch\t" + n + "\t*\t0"); break;
-                case "renameTable": case "deleteTable":
+                case "renameTable":
+                case "deleteTable":
                     if (table == null) refusal = "WatchTableNotFound";
                     else if (operation == "deleteTable") lines.Remove(table);
                     else if (renamedSha256 == null) refusal = "InvalidRequest";
@@ -43,7 +44,8 @@ namespace TiaMcp.Core.WatchTables
                     break;
                 case "createGroup":
                     if (taken("group", n)) refusal = "WatchGroupCollision"; else lines.Add("group\t" + n); break;
-                case "renameGroup": case "deleteGroup":
+                case "renameGroup":
+                case "deleteGroup":
                     if (!lines.Contains("group\t" + n)) refusal = "WatchGroupNotFound";
                     else if (operation == "deleteGroup")
                     { if (lines.Any(l => rel(l).StartsWith(n + "/", StringComparison.Ordinal))) refusal = "WatchGroupNotEmpty"; else lines.Remove("group\t" + n); }

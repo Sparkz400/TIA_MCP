@@ -100,9 +100,14 @@ public sealed class UnifiedRuntimeSessions : IDisposable
         var rows = UnifiedAlarmRules.Rows(data.GetProperty(kind == "active" ? "activeAlarms" : "loggedAlarms"), chosen, kind == "active", maxItems, out int total);
         return new JsonObject
         {
-            ["attemptId"] = attemptId, ["kind"] = kind, ["languages"] = new JsonArray(chosen.Select(l => (JsonNode)l).ToArray()),
+            ["attemptId"] = attemptId,
+            ["kind"] = kind,
+            ["languages"] = new JsonArray(chosen.Select(l => (JsonNode)l).ToArray()),
             ["languageSource"] = languages is { Length: > 0 } ? "request" : "umcUserLanguage",
-            ["alarms"] = rows, ["returned"] = rows.Count, ["totalReturnedByServer"] = total, ["truncated"] = total > rows.Count,
+            ["alarms"] = rows,
+            ["returned"] = rows.Count,
+            ["totalReturnedByServer"] = total,
+            ["truncated"] = total > rows.Count,
             ["note"] = kind == "active"
                 ? "Acknowledge with runtime_unified_alarm_acknowledge using each row's acknowledge object: path is the fully qualified name (System::Tag:Alarm) the server needs; name alone does not resolve."
                 : "Logged alarms have no path and cannot be acknowledged; acknowledge the matching active alarm.",
@@ -123,8 +128,12 @@ public sealed class UnifiedRuntimeSessions : IDisposable
         var failed = rows.OfType<JsonObject>().Where(r => r["error"]?["code"] is JsonValue code && code.ToString() is not ("0" or "")).ToArray();
         return new JsonObject
         {
-            ["attemptId"] = attemptId, ["requested"] = alarms.Count, ["results"] = rows, ["returned"] = total,
-            ["itemErrors"] = failed.Length, ["acknowledged"] = failed.Length == 0 && total > 0,
+            ["attemptId"] = attemptId,
+            ["requested"] = alarms.Count,
+            ["results"] = rows,
+            ["returned"] = total,
+            ["itemErrors"] = failed.Length,
+            ["acknowledged"] = failed.Length == 0 && total > 0,
             ["note"] = "Item codes from the server: 2 cannot resolve the name, 304 invalid object state, 305 not acknowledgeable in the current state. Read the active alarms again to see the new state.",
         };
     }
@@ -138,8 +147,12 @@ public sealed class UnifiedRuntimeSessions : IDisposable
         {
             bool removed = live.Remove(attemptId, out var entry);
             entry?.Client.Dispose();
-            return new JsonObject { ["attemptId"] = attemptId, ["closed"] = removed,
-                ["note"] = "The token is dropped here; the server ends the session after its idle time (autoLoggOffSec)." };
+            return new JsonObject
+            {
+                ["attemptId"] = attemptId,
+                ["closed"] = removed,
+                ["note"] = "The token is dropped here; the server ends the session after its idle time (autoLoggOffSec)."
+            };
         }
         finally { gate.Release(); }
     }
@@ -153,11 +166,19 @@ public sealed class UnifiedRuntimeSessions : IDisposable
 
     private static JsonObject Status(string attemptId, Live entry) => new()
     {
-        ["schemaVersion"] = "runtime-unified-session.v1", ["attemptId"] = attemptId, ["endpoint"] = entry.Endpoint.ToString(), ["user"] = entry.Login.User,
-        ["state"] = "connected", ["connectedAtUtc"] = entry.ConnectedAt.UtcDateTime.ToString("O"), ["peerVerified"] = entry.Client.Verified,
-        ["userLanguage"] = entry.Client.UserLanguage, ["autoLogoffSeconds"] = entry.Client.AutoLogoffSeconds,
-        ["activeAlarmFields"] = entry.Client.ActiveFields.Length, ["loggedAlarmFields"] = entry.Client.LoggedFields.Length,
-        ["trust"] = "explicitLeafPinAndHostnameAndValidity", ["secretReturned"] = false,
+        ["schemaVersion"] = "runtime-unified-session.v1",
+        ["attemptId"] = attemptId,
+        ["endpoint"] = entry.Endpoint.ToString(),
+        ["user"] = entry.Login.User,
+        ["state"] = "connected",
+        ["connectedAtUtc"] = entry.ConnectedAt.UtcDateTime.ToString("O"),
+        ["peerVerified"] = entry.Client.Verified,
+        ["userLanguage"] = entry.Client.UserLanguage,
+        ["autoLogoffSeconds"] = entry.Client.AutoLogoffSeconds,
+        ["activeAlarmFields"] = entry.Client.ActiveFields.Length,
+        ["loggedAlarmFields"] = entry.Client.LoggedFields.Length,
+        ["trust"] = "explicitLeafPinAndHostnameAndValidity",
+        ["secretReturned"] = false,
     };
 
     internal static async Task<(bool IsLocal, string[] Addresses)> LocalEndpoint(Uri endpoint, CancellationToken cancellationToken)

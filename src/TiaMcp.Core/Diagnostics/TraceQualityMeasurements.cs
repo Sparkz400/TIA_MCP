@@ -73,8 +73,13 @@ public sealed class TraceQualityMeasurements(string artifactsRoot)
     internal JsonObject Plan(string traceId)
     {
         var store = new DiagnosticStore(artifactsRoot); var retained = store.Read(traceId, "trace-plan.v1");
-        var request = new JsonObject { ["backend"] = retained["backend"]?.DeepClone(), ["family"] = retained["family"]?.DeepClone(),
-            ["reviewId"] = retained["reviewId"]?.DeepClone(), ["settings"] = retained["requestedSettings"]?.DeepClone() };
+        var request = new JsonObject
+        {
+            ["backend"] = retained["backend"]?.DeepClone(),
+            ["family"] = retained["family"]?.DeepClone(),
+            ["reviewId"] = retained["reviewId"]?.DeepClone(),
+            ["settings"] = retained["requestedSettings"]?.DeepClone()
+        };
         var derived = new TracePlanning(artifactsRoot).Build(D.Required(retained, "diagnosticPlanId", 64), request);
         Same(retained, derived, "trace specification");
         return retained;
@@ -183,9 +188,14 @@ public sealed class TraceQualityMeasurements(string artifactsRoot)
             _ = ProjectReviewStore.ReadArtifact(artifactsRoot, original, 32 * 1024 * 1024);
             D.Required(measurement, "conversion", 2000); D.Required(measurement, "settingsReadbackEvidence", 4096);
         }
-        var imported = new JsonObject { ["schemaVersion"] = "trace-import.v2", ["tracePlanId"] = traceId,
-            ["inputArtifact"] = artifact.DeepClone(), ["measurement"] = measurement.DeepClone(),
-            ["qualityAssessment"] = Assess(measurement, plan) };
+        var imported = new JsonObject
+        {
+            ["schemaVersion"] = "trace-import.v2",
+            ["tracePlanId"] = traceId,
+            ["inputArtifact"] = artifact.DeepClone(),
+            ["measurement"] = measurement.DeepClone(),
+            ["qualityAssessment"] = Assess(measurement, plan)
+        };
         D.Bound(imported, DiagnosticStore.MaxBytes);
         return imported;
     }
@@ -236,12 +246,24 @@ public sealed class TraceQualityMeasurements(string artifactsRoot)
         foreach (var signal in D.Rows(plan["signals"]))
             foreach (var clock in D.Rows(m["clocks"]))
                 series.Add(Series(m, D.Text(signal, "id"), D.Text(clock, "id"), null, null, null, null));
-        return new JsonObject { ["sampleGroups"] = D.Rows(m["samples"]).Count, ["absentReadings"] = absent,
-            ["goodStatusReadings"] = good, ["badStatusReadings"] = bad, ["uncertainStatusReadings"] = uncertain,
-            ["missingStatusReadings"] = missing, ["nullValues"] = nullValues, ["errorReadings"] = errors,
-            ["untimedReadings"] = untimed, ["sequenceGaps"] = sequenceGaps, ["capture"] = m["capture"]!.DeepClone(),
-            ["suppliedQuality"] = m["quality"]!.DeepClone(), ["series"] = series,
-            ["qualityOrigin"] = "unverifiedSuppliedObservationsAndStructuralChecks", ["completenessVerified"] = false };
+        return new JsonObject
+        {
+            ["sampleGroups"] = D.Rows(m["samples"]).Count,
+            ["absentReadings"] = absent,
+            ["goodStatusReadings"] = good,
+            ["badStatusReadings"] = bad,
+            ["uncertainStatusReadings"] = uncertain,
+            ["missingStatusReadings"] = missing,
+            ["nullValues"] = nullValues,
+            ["errorReadings"] = errors,
+            ["untimedReadings"] = untimed,
+            ["sequenceGaps"] = sequenceGaps,
+            ["capture"] = m["capture"]!.DeepClone(),
+            ["suppliedQuality"] = m["quality"]!.DeepClone(),
+            ["series"] = series,
+            ["qualityOrigin"] = "unverifiedSuppliedObservationsAndStructuralChecks",
+            ["completenessVerified"] = false
+        };
     }
 
     // Windows select a clock and epoch explicitly. Every boundary clears the previous observation.
@@ -298,22 +320,48 @@ public sealed class TraceQualityMeasurements(string artifactsRoot)
             if (adjacent && !TraceMeasurements.Equal(priorValue!, read!["value"]!))
             {
                 changes++;
-                if (transitions.Count < 200) transitions.Add(new JsonObject { ["clockId"] = clock, ["epoch"] = currentEpoch,
-                    ["afterTime"] = priorTime, ["byTime"] = raw, ["before"] = priorValue!.DeepClone(), ["after"] = read!["value"]!.DeepClone() });
+                if (transitions.Count < 200) transitions.Add(new JsonObject
+                {
+                    ["clockId"] = clock,
+                    ["epoch"] = currentEpoch,
+                    ["afterTime"] = priorTime,
+                    ["byTime"] = raw,
+                    ["before"] = priorValue!.DeepClone(),
+                    ["after"] = read!["value"]!.DeepClone()
+                });
             }
             priorValue = good && raw is not null ? read!["value"] : null;
             priorTime = raw; priorEpoch = stamp is null ? null : currentEpoch; priorSequence = sequence;
         }
-        return new JsonObject { ["signalId"] = signal, ["clockId"] = clock, ["epoch"] = epoch,
-            ["selectedReadings"] = count, ["excludedReadings"] = excluded, ["usableValueReadings"] = usable,
-            ["selectionExclusions"] = exclusions, ["untimedSelectedReadings"] = untimed,
-            ["unknownValueReadings"] = unknown, ["statusCounts"] = statuses, ["trueReadings"] = trueCount, ["falseReadings"] = falseCount,
-            ["minimum"] = min, ["maximum"] = max, ["firstRecordedTime"] = firstTime, ["lastRecordedTime"] = lastTime,
-            ["clockResets"] = resets, ["duplicateTimes"] = duplicates, ["epochChanges"] = epochChanges,
-            ["irregularIntervals"] = irregular, ["intervalGaps"] = gaps, ["adjacentValueChanges"] = transitions,
-            ["adjacentValueChangeCount"] = changes, ["changesTruncated"] = changes > 200,
+        return new JsonObject
+        {
+            ["signalId"] = signal,
+            ["clockId"] = clock,
+            ["epoch"] = epoch,
+            ["selectedReadings"] = count,
+            ["excludedReadings"] = excluded,
+            ["usableValueReadings"] = usable,
+            ["selectionExclusions"] = exclusions,
+            ["untimedSelectedReadings"] = untimed,
+            ["unknownValueReadings"] = unknown,
+            ["statusCounts"] = statuses,
+            ["trueReadings"] = trueCount,
+            ["falseReadings"] = falseCount,
+            ["minimum"] = min,
+            ["maximum"] = max,
+            ["firstRecordedTime"] = firstTime,
+            ["lastRecordedTime"] = lastTime,
+            ["clockResets"] = resets,
+            ["duplicateTimes"] = duplicates,
+            ["epochChanges"] = epochChanges,
+            ["irregularIntervals"] = irregular,
+            ["intervalGaps"] = gaps,
+            ["adjacentValueChanges"] = transitions,
+            ["adjacentValueChangeCount"] = changes,
+            ["changesTruncated"] = changes > 200,
             ["transitionSemantics"] = "Recorded endpoints only; no interpolation, rate or event-time inference. Exact expected intervals, consecutive sequence and good observations required.",
-            ["coverage"] = count == 0 ? "noSelectedReadings" : "recordedObservationsOnly" };
+            ["coverage"] = count == 0 ? "noSelectedReadings" : "recordedObservationsOnly"
+        };
     }
 
     internal static JsonArray Findings(JsonObject m, JsonObject plan, Func<JsonNode, string, bool>? selected = null)
@@ -346,10 +394,17 @@ public sealed class TraceQualityMeasurements(string artifactsRoot)
                     if (observed is null) unknown++; else if (observed.Value) matched++; else contradicted++;
                 }
             }
-            findings.Add(new JsonObject { ["id"] = hypothesis!["id"]!.DeepClone(), ["statement"] = hypothesis["statement"]!.DeepClone(),
-                ["matchedSamples"] = matched, ["contradictedSamples"] = contradicted, ["unknownSamples"] = unknown,
-                ["verdict"] = "unresolved", ["causationProven"] = false,
-                ["reason"] = "Counts describe supplied sequence groups, not verified simultaneous states. Source identity, acquisition quality and timing remain unverified." });
+            findings.Add(new JsonObject
+            {
+                ["id"] = hypothesis!["id"]!.DeepClone(),
+                ["statement"] = hypothesis["statement"]!.DeepClone(),
+                ["matchedSamples"] = matched,
+                ["contradictedSamples"] = contradicted,
+                ["unknownSamples"] = unknown,
+                ["verdict"] = "unresolved",
+                ["causationProven"] = false,
+                ["reason"] = "Counts describe supplied sequence groups, not verified simultaneous states. Source identity, acquisition quality and timing remain unverified."
+            });
         }
         return findings;
     }
@@ -357,14 +412,29 @@ public sealed class TraceQualityMeasurements(string artifactsRoot)
     internal JsonObject BuildAnalysis(string measurementId)
     {
         var imported = Read(measurementId); var m = Object(imported, "measurement"); var plan = Plan(D.Required(imported, "tracePlanId", 64));
-        var report = new JsonObject { ["schemaVersion"] = "diagnostic-report.v2", ["measurementId"] = measurementId,
-            ["tracePlanId"] = imported["tracePlanId"]!.DeepClone(), ["reviewId"] = plan["reviewId"]!.DeepClone(),
-            ["inputArtifact"] = imported["inputArtifact"]!.DeepClone(), ["hypotheses"] = Findings(m, plan),
-            ["qualityAssessment"] = Assess(m, plan), ["clocks"] = m["clocks"]!.DeepClone(), ["capture"] = m["capture"]!.DeepClone(),
-            ["acquisitionContext"] = Context(m), ["coverageGaps"] = plan["coverageGaps"]!.DeepClone() };
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-report.v2",
+            ["measurementId"] = measurementId,
+            ["tracePlanId"] = imported["tracePlanId"]!.DeepClone(),
+            ["reviewId"] = plan["reviewId"]!.DeepClone(),
+            ["inputArtifact"] = imported["inputArtifact"]!.DeepClone(),
+            ["hypotheses"] = Findings(m, plan),
+            ["qualityAssessment"] = Assess(m, plan),
+            ["clocks"] = m["clocks"]!.DeepClone(),
+            ["capture"] = m["capture"]!.DeepClone(),
+            ["acquisitionContext"] = Context(m),
+            ["coverageGaps"] = plan["coverageGaps"]!.DeepClone()
+        };
         Authority(report); D.Bound(report, DiagnosticStore.MaxBytes); return report;
     }
-    internal static JsonObject Context(JsonObject m) => new() { ["mode"] = m["mode"]!.DeepClone(),
-        ["programIdentity"] = m["programIdentity"]!.DeepClone(), ["clocks"] = m["clocks"]!.DeepClone(),
-        ["suppliedQuality"] = m["quality"]!.DeepClone(), ["identityVerified"] = false, ["rowGroupingVerified"] = false };
+    internal static JsonObject Context(JsonObject m) => new()
+    {
+        ["mode"] = m["mode"]!.DeepClone(),
+        ["programIdentity"] = m["programIdentity"]!.DeepClone(),
+        ["clocks"] = m["clocks"]!.DeepClone(),
+        ["suppliedQuality"] = m["quality"]!.DeepClone(),
+        ["identityVerified"] = false,
+        ["rowGroupingVerified"] = false
+    };
 }

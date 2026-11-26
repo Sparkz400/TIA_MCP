@@ -69,16 +69,29 @@ public sealed class DriveProfileWorkflowStore(string artifactsRoot)
         if (!JsonNode.DeepEquals(expected, envelope["report"])) throw new BridgeException("ArtifactChanged", "Report differs from its retained input and saved review.");
         return envelope;
     }
-    private static string RecordVersion(JsonObject request) => (string?)request["schemaVersion"] switch {
+    private static string RecordVersion(JsonObject request) => (string?)request["schemaVersion"] switch
+    {
         "drive-profile-review-request.v1" => "drive-profile-review-record.v1",
         "drive-profile-review-request.v2" => "drive-profile-review-record.v2",
-        _ => throw new BridgeException("InvalidDriveProfile", "Unsupported request version.") };
+        _ => throw new BridgeException("InvalidDriveProfile", "Unsupported request version.")
+    };
     private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "drive-profile-reviews/" + hash + extension, ["sha256"] = hash };
     private JsonObject Publish(byte[] bytes, string extension, int limit) =>
         PackageStorage.PublishContent(artifactsRoot, "drive-profile-reviews", bytes, extension, limit, 512L << 20, "Drive profile review");
-    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {
-        ["recordId"] = artifact["sha256"]!.DeepClone(), ["reviewId"] = record["reviewId"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),
-        ["summary"] = record["report"]!["summary"]!.DeepClone(), ["nativeExecutable"] = false, ["nativeQualified"] = false,
-        ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["driveIdentityVerified"] = false, ["wholeDriveAnalysisComplete"] = false, ["nativeConstraintsVerified"] = false,
-        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new()
+    {
+        ["recordId"] = artifact["sha256"]!.DeepClone(),
+        ["reviewId"] = record["reviewId"]!.DeepClone(),
+        ["input"] = record["input"]!.DeepClone(),
+        ["reportArtifact"] = artifact.DeepClone(),
+        ["summary"] = record["report"]!["summary"]!.DeepClone(),
+        ["nativeExecutable"] = false,
+        ["nativeQualified"] = false,
+        ["sourceAuthenticityVerified"] = false,
+        ["liveFreshnessVerified"] = false,
+        ["driveIdentityVerified"] = false,
+        ["wholeDriveAnalysisComplete"] = false,
+        ["nativeConstraintsVerified"] = false,
+        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy
+    };
 }

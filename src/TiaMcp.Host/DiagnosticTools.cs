@@ -95,9 +95,21 @@ public sealed partial class TiaTools
         try { return Result(action().ToJsonString(), false); }
         catch (Exception e) when (e is BridgeException or IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or ArgumentException or System.Xml.XmlException)
         {
-            return Result(JsonSerializer.Serialize(new { error = new { code = (e as BridgeException)?.Code ?? "DiagnosticFailed",
-                message = e.Message, details = new { mutationAttempted = false, nativeAccessAttempted = false, retrySafe = true,
-                    resolution = (e as DiagnosticResolutionException)?.Details } } }, BridgeProtocol.Json), true);
+            return Result(JsonSerializer.Serialize(new
+            {
+                error = new
+                {
+                    code = (e as BridgeException)?.Code ?? "DiagnosticFailed",
+                    message = e.Message,
+                    details = new
+                    {
+                        mutationAttempted = false,
+                        nativeAccessAttempted = false,
+                        retrySafe = true,
+                        resolution = (e as DiagnosticResolutionException)?.Details
+                    }
+                }
+            }, BridgeProtocol.Json), true);
         }
     }
 }

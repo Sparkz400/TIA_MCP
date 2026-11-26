@@ -58,13 +58,20 @@ public sealed class VciPackageEvidence
 
     internal JsonObject Json() => new()
     {
-        ["packageId"] = PackageId, ["object"] = JsonSerializer.SerializeToNode(Object, BridgeProtocol.Json),
-        ["profileId"] = ProfileId, ["family"] = Family, ["nativeFormat"] = NativeFormat,
-        ["evidenceSha256"] = EvidenceSha256, ["evidenceOrigin"] = EvidenceOrigin,
-        ["profileComplete"] = ProfileComplete, ["libraryTypeGuid"] = LibraryTypeGuid,
-        ["libraryVersionGuid"] = LibraryVersionGuid, ["nativeStatus"] = NativeStatus, ["nativeObjectIdentity"] = NativeObjectIdentity,
+        ["packageId"] = PackageId,
+        ["object"] = JsonSerializer.SerializeToNode(Object, BridgeProtocol.Json),
+        ["profileId"] = ProfileId,
+        ["family"] = Family,
+        ["nativeFormat"] = NativeFormat,
+        ["evidenceSha256"] = EvidenceSha256,
+        ["evidenceOrigin"] = EvidenceOrigin,
+        ["profileComplete"] = ProfileComplete,
+        ["libraryTypeGuid"] = LibraryTypeGuid,
+        ["libraryVersionGuid"] = LibraryVersionGuid,
+        ["nativeStatus"] = NativeStatus,
+        ["nativeObjectIdentity"] = NativeObjectIdentity,
         ["expectedFiles"] = new JsonArray(ExpectedFiles.Select(x => (JsonNode)new JsonObject
-            { ["relativePath"] = x.RelativePath, ["role"] = x.Role }).ToArray()),
+        { ["relativePath"] = x.RelativePath, ["role"] = x.Role }).ToArray()),
         ["issues"] = new JsonArray(Issues.Select(x => (JsonNode)JsonValue.Create(x)!).ToArray())
     };
 }
@@ -88,12 +95,15 @@ public sealed class VciManifest
         Packages = Array.AsReadOnly(packages); Files = Array.AsReadOnly(files);
         document = new JsonObject
         {
-            ["schemaVersion"] = SchemaVersion, ["workspaceId"] = workspaceId,
+            ["schemaVersion"] = SchemaVersion,
+            ["workspaceId"] = workspaceId,
             ["snapshot"] = JsonSerializer.SerializeToNode(snapshot, BridgeProtocol.Json),
-            ["enumerationComplete"] = complete, ["nativeQualified"] = false, ["targetProbed"] = false,
+            ["enumerationComplete"] = complete,
+            ["nativeQualified"] = false,
+            ["targetProbed"] = false,
             ["packages"] = new JsonArray(packages.Select(p => (JsonNode)p.Json()).ToArray()),
             ["files"] = new JsonArray(files.Select(f => (JsonNode)new JsonObject
-                { ["relativePath"] = f.RelativePath, ["sha256"] = f.Sha256, ["bytes"] = f.Bytes }).ToArray())
+            { ["relativePath"] = f.RelativePath, ["sha256"] = f.Sha256, ["bytes"] = f.Bytes }).ToArray())
         };
         Sha256 = CanonicalJson.Sha256(document);
     }

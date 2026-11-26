@@ -15,15 +15,31 @@ internal sealed class DiagnosticEvidence
     private int instanceVisits;
     private bool traversalTruncated;
     private readonly JsonArray unresolvedInstances = new();
-    internal JsonObject Traversal() => new() { ["visited"] = instanceVisits, ["maxVisited"] = 1000,
-        ["maxDepth"] = 8, ["maxInstances"] = 200, ["truncated"] = traversalTruncated, ["complete"] = false,
-        ["unresolvedAlternatives"] = unresolvedInstances.DeepClone() };
+    internal JsonObject Traversal() => new()
+    {
+        ["visited"] = instanceVisits,
+        ["maxVisited"] = 1000,
+        ["maxDepth"] = 8,
+        ["maxInstances"] = 200,
+        ["truncated"] = traversalTruncated,
+        ["complete"] = false,
+        ["unresolvedAlternatives"] = unresolvedInstances.DeepClone()
+    };
     private void Unresolved(string db, IEnumerable<string> members, string reason, IEnumerable<JsonObject>? alternatives = null)
     {
         if (unresolvedInstances.Count == 200) { traversalTruncated = true; return; }
-        unresolvedInstances.Add(new JsonObject { ["dbPath"] = db, ["memberPath"] = D.Strings(members), ["reason"] = reason,
-            ["alternatives"] = new JsonArray((alternatives ?? []).Take(20).Select(a => (JsonNode?)new JsonObject { ["objectPath"] = a["objectPath"]?.DeepClone(),
-                ["scopePath"] = a["scopePath"]?.DeepClone(), ["namespace"] = a["metadata"]?["namespace"]?.DeepClone() }).ToArray()) });
+        unresolvedInstances.Add(new JsonObject
+        {
+            ["dbPath"] = db,
+            ["memberPath"] = D.Strings(members),
+            ["reason"] = reason,
+            ["alternatives"] = new JsonArray((alternatives ?? []).Take(20).Select(a => (JsonNode?)new JsonObject
+            {
+                ["objectPath"] = a["objectPath"]?.DeepClone(),
+                ["scopePath"] = a["scopePath"]?.DeepClone(),
+                ["namespace"] = a["metadata"]?["namespace"]?.DeepClone()
+            }).ToArray())
+        });
     }
     internal DiagnosticEvidence(JsonObject review)
     {
@@ -37,8 +53,12 @@ internal sealed class DiagnosticEvidence
         if (xml.TryGetValue(path, out var cached)) return cached;
         if (!Documents.TryGetValue(path, out var doc) || D.Text(doc, "status") != "exported"
             || Nodes[path]["metadata"]?["isKnowHowProtected"]?.GetValue<bool>() == true) return null;
-        using var reader = XmlReader.Create(new StringReader(D.Text(doc, "xml")), new XmlReaderSettings {
-            DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 16 * 1024 * 1024 });
+        using var reader = XmlReader.Create(new StringReader(D.Text(doc, "xml")), new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null,
+            MaxCharactersInDocument = 16 * 1024 * 1024
+        });
         return xml[path] = XDocument.Load(reader, LoadOptions.SetLineInfo);
     }
     internal static IEnumerable<XElement> Children(XContainer element, string name) => element.Elements().Where(e => e.Name.LocalName == name);
@@ -63,9 +83,14 @@ internal sealed class DiagnosticEvidence
         }
         return current;
     }
-    internal JsonObject Evidence(string path, XElement element) => new() {
-        ["objectPath"] = path, ["utf8Sha256"] = Documents[path]["utf8Sha256"]!.DeepClone(),
-        ["xmlLine"] = ((IXmlLineInfo)element).LineNumber, ["origin"] = "savedNativeXml", ["liveVerified"] = false };
+    internal JsonObject Evidence(string path, XElement element) => new()
+    {
+        ["objectPath"] = path,
+        ["utf8Sha256"] = Documents[path]["utf8Sha256"]!.DeepClone(),
+        ["xmlLine"] = ((IXmlLineInfo)element).LineNumber,
+        ["origin"] = "savedNativeXml",
+        ["liveVerified"] = false
+    };
 
     internal JsonArray Instances(string blockPath)
     {
@@ -99,10 +124,20 @@ internal sealed class DiagnosticEvidence
             var calls = members.Length == 0 ? Calls(type, db, null) : new JsonArray(evidence.OfType<JsonObject>()
                 .Where(e => D.Text(e, "calleePath") == type).Select(e => (JsonNode?)e.DeepClone()).ToArray());
             if (type == blockPath)
-                result.Add(new JsonObject { ["dbPath"] = db, ["memberPath"] = D.Strings(members), ["blockPath"] = type,
-                    ["plcPath"] = Nodes[type]["plcPath"]?.DeepClone(), ["scopePath"] = Nodes[type]["scopePath"]?.DeepClone(),
-                    ["namespace"] = Nodes[type]["metadata"]?["namespace"]?.DeepClone(), ["evidence"] = evidence.DeepClone(),
-                    ["callSites"] = calls, ["rootCallSites"] = rootCalls.DeepClone(), ["resolution"] = "capturedStorageOnly", ["runtimeCallContextVerified"] = false });
+                result.Add(new JsonObject
+                {
+                    ["dbPath"] = db,
+                    ["memberPath"] = D.Strings(members),
+                    ["blockPath"] = type,
+                    ["plcPath"] = Nodes[type]["plcPath"]?.DeepClone(),
+                    ["scopePath"] = Nodes[type]["scopePath"]?.DeepClone(),
+                    ["namespace"] = Nodes[type]["metadata"]?["namespace"]?.DeepClone(),
+                    ["evidence"] = evidence.DeepClone(),
+                    ["callSites"] = calls,
+                    ["rootCallSites"] = rootCalls.DeepClone(),
+                    ["resolution"] = "capturedStorageOnly",
+                    ["runtimeCallContextVerified"] = false
+                });
             var block = Block(Xml(type));
             var face = block is null ? null : Children(Children(block, "AttributeList").Single(), "Interface").SingleOrDefault();
             if (face is null) { Unresolved(db, members, "Parent interface unavailable/protected."); return; }

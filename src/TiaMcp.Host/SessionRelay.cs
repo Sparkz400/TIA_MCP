@@ -92,11 +92,17 @@ internal static class SessionRelay
     private static async Task<int> ServerAsync(Settings settings)
     {
         int sessionId = Process.GetCurrentProcess().SessionId;
-        var receipt = new Dictionary<string, object?> {
-            ["schemaVersion"] = 1, ["channel"] = settings.Channel, ["userSid"] = settings.UserSid,
-            ["sessionId"] = sessionId, ["relayProcessId"] = Environment.ProcessId,
-            ["startedAtUtc"] = DateTimeOffset.UtcNow, ["mode"] = "interactive-user",
-            ["status"] = "starting", ["replayCount"] = 0,
+        var receipt = new Dictionary<string, object?>
+        {
+            ["schemaVersion"] = 1,
+            ["channel"] = settings.Channel,
+            ["userSid"] = settings.UserSid,
+            ["sessionId"] = sessionId,
+            ["relayProcessId"] = Environment.ProcessId,
+            ["startedAtUtc"] = DateTimeOffset.UtcNow,
+            ["mode"] = "interactive-user",
+            ["status"] = "starting",
+            ["replayCount"] = 0,
             ["nativeProcessExitVerified"] = false
         };
         void Save()
@@ -120,9 +126,13 @@ internal static class SessionRelay
         try
         {
             await Task.WhenAll(input.ConnectAsync(startup.Token), output.ConnectAsync(startup.Token), errors.ConnectAsync(startup.Token));
-            var start = new ProcessStartInfo(Environment.ProcessPath!) {
-                UseShellExecute = false, CreateNoWindow = true,
-                RedirectStandardInput = true, RedirectStandardOutput = true, RedirectStandardError = true,
+            var start = new ProcessStartInfo(Environment.ProcessPath!)
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 WorkingDirectory = Path.GetDirectoryName(Environment.ProcessPath!)!
             };
             foreach (string argument in settings.HostArguments) start.ArgumentList.Add(argument);

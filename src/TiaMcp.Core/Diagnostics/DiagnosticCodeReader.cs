@@ -35,8 +35,14 @@ internal static class DiagnosticCodeReader
         {
             string name = (string?)parameter.Attribute("Name") ?? "";
             if (name.Length == 0) continue;
-            var row = new JsonObject { ["parameter"] = name, ["direction"] = (string?)parameter.Attribute("Section"),
-                ["evidence"] = source.Evidence(caller, parameter), ["resolution"] = "unresolved", ["actual"] = null };
+            var row = new JsonObject
+            {
+                ["parameter"] = name,
+                ["direction"] = (string?)parameter.Attribute("Section"),
+                ["evidence"] = source.Evidence(caller, parameter),
+                ["resolution"] = "unresolved",
+                ["actual"] = null
+            };
             result.Add(row); XElement? access = null;
             if (ns.NamespaceName == Scl)
             {
@@ -86,10 +92,15 @@ internal static class DiagnosticCodeReader
                     if (elements[i].Name != network.Name.Namespace + "Token" || (string?)elements[i].Attribute("Text") != ":=") continue;
                     var output = Operand(elements[i - 1]); if (output is null) continue;
                     references += all.Length; if (references > 5000) throw new BridgeException("TraversalLimit", "Block dependency reference budget exceeded.");
-                    result.Add(new JsonObject { ["kind"] = "sclCompileUnitDependencySuperset", ["output"] = output.Json(),
+                    result.Add(new JsonObject
+                    {
+                        ["kind"] = "sclCompileUnitDependencySuperset",
+                        ["output"] = output.Json(),
                         ["inputs"] = new JsonArray(all.Where(s => s.Key != output.Key).Select(s => (JsonNode?)s.Json()).ToArray()),
-                        ["evidence"] = source.Evidence(blockPath, elements[i - 1]), ["exactDataflow"] = false,
-                        ["limits"] = "All symbolic compile-unit references included; execution order, alias effects and called-block side effects remain unknown." });
+                        ["evidence"] = source.Evidence(blockPath, elements[i - 1]),
+                        ["exactDataflow"] = false,
+                        ["limits"] = "All symbolic compile-unit references included; execution order, alias effects and called-block side effects remain unknown."
+                    });
                 }
             }
             else if (network.Name.NamespaceName == Graphical && network.Name.LocalName == "FlgNet")
@@ -101,14 +112,20 @@ internal static class DiagnosticCodeReader
                 // Only directly wired output parameters are known writers. Arbitrary instruction pin
                 // direction is never guessed from a pin name or drawing position.
                 foreach (var call in parts.Elements(ns + "Call").Elements(ns + "CallInfo"))
-                foreach (var binding in Bindings(source, blockPath, call).OfType<JsonObject>())
-                {
-                    if (D.Text(binding, "direction") is not ("Output" or "InOut") || binding["actual"] is null) continue;
-                    references += all.Length; if (references > 5000) throw new BridgeException("TraversalLimit", "Block dependency reference budget exceeded.");
-                    result.Add(new JsonObject { ["kind"] = "graphicalNetworkDependencySuperset", ["output"] = binding["actual"]!.DeepClone(),
-                        ["inputs"] = new JsonArray(all.Select(s => (JsonNode?)s.Json()).ToArray()), ["evidence"] = binding["evidence"]!.DeepClone(),
-                        ["exactDataflow"] = false, ["limits"] = "All symbolic network references included; unqualified instruction pin directions and side effects remain unknown." });
-                }
+                    foreach (var binding in Bindings(source, blockPath, call).OfType<JsonObject>())
+                    {
+                        if (D.Text(binding, "direction") is not ("Output" or "InOut") || binding["actual"] is null) continue;
+                        references += all.Length; if (references > 5000) throw new BridgeException("TraversalLimit", "Block dependency reference budget exceeded.");
+                        result.Add(new JsonObject
+                        {
+                            ["kind"] = "graphicalNetworkDependencySuperset",
+                            ["output"] = binding["actual"]!.DeepClone(),
+                            ["inputs"] = new JsonArray(all.Select(s => (JsonNode?)s.Json()).ToArray()),
+                            ["evidence"] = binding["evidence"]!.DeepClone(),
+                            ["exactDataflow"] = false,
+                            ["limits"] = "All symbolic network references included; unqualified instruction pin directions and side effects remain unknown."
+                        });
+                    }
             }
             if (result.Count > 2000) throw new BridgeException("TraversalLimit", "Too many dependency statements; narrow the saved review.");
         }

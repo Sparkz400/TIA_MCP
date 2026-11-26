@@ -45,17 +45,34 @@ public sealed class DiagnosticExperiments(string artifactsRoot)
         var measurements = new TraceMeasurements(artifactsRoot);
         var beforeReport = measurements.BuildAnalysis(beforeMeasurement); var afterReport = measurements.BuildAnalysis(afterMeasurement);
         var comparison = new TraceComparison(artifactsRoot).Build(beforeMeasurement, afterMeasurement, Object(request, "comparison"));
-        var report = new JsonObject {
-            ["schemaVersion"] = "diagnostic-experiment-review.v1", ["beforeExperimentId"] = experimentId, ["afterExperimentId"] = afterId,
-            ["beforeMeasurementId"] = beforeMeasurement, ["afterMeasurementId"] = afterMeasurement,
-            ["request"] = request.DeepClone(), ["lineage"] = lineage,
-            ["beforeReportId"] = Id(beforeReport), ["afterReportId"] = Id(afterReport), ["comparisonId"] = Id(comparison),
-            ["beforeHypotheses"] = beforeReport["hypotheses"]!.DeepClone(), ["afterHypotheses"] = afterReport["hypotheses"]!.DeepClone(),
-            ["beforeQualityAssessment"] = beforeReport["qualityAssessment"]!.DeepClone(), ["afterQualityAssessment"] = afterReport["qualityAssessment"]!.DeepClone(),
-            ["beforeAcquisition"] = comparison["beforeAcquisition"]!.DeepClone(), ["afterAcquisition"] = comparison["afterAcquisition"]!.DeepClone(),
-            ["sourceChanged"] = comparison["sourceChanged"]!.DeepClone(), ["programIdentityChanged"] = comparison["programIdentityChanged"]!.DeepClone(),
-            ["sourceAuthenticityVerified"] = false, ["clockSynchronizationVerified"] = false, ["causationProven"] = false,
-            ["bugFixProven"] = false, ["nativeQualification"] = false, ["nativeAccessAttempted"] = false, ["limits"] = Limits };
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-experiment-review.v1",
+            ["beforeExperimentId"] = experimentId,
+            ["afterExperimentId"] = afterId,
+            ["beforeMeasurementId"] = beforeMeasurement,
+            ["afterMeasurementId"] = afterMeasurement,
+            ["request"] = request.DeepClone(),
+            ["lineage"] = lineage,
+            ["beforeReportId"] = Id(beforeReport),
+            ["afterReportId"] = Id(afterReport),
+            ["comparisonId"] = Id(comparison),
+            ["beforeHypotheses"] = beforeReport["hypotheses"]!.DeepClone(),
+            ["afterHypotheses"] = afterReport["hypotheses"]!.DeepClone(),
+            ["beforeQualityAssessment"] = beforeReport["qualityAssessment"]!.DeepClone(),
+            ["afterQualityAssessment"] = afterReport["qualityAssessment"]!.DeepClone(),
+            ["beforeAcquisition"] = comparison["beforeAcquisition"]!.DeepClone(),
+            ["afterAcquisition"] = comparison["afterAcquisition"]!.DeepClone(),
+            ["sourceChanged"] = comparison["sourceChanged"]!.DeepClone(),
+            ["programIdentityChanged"] = comparison["programIdentityChanged"]!.DeepClone(),
+            ["sourceAuthenticityVerified"] = false,
+            ["clockSynchronizationVerified"] = false,
+            ["causationProven"] = false,
+            ["bugFixProven"] = false,
+            ["nativeQualification"] = false,
+            ["nativeAccessAttempted"] = false,
+            ["limits"] = Limits
+        };
         foreach (var document in new[] { beforeReport, afterReport, comparison, report }) D.Bound(document, DiagnosticStore.MaxBytes);
         return new(report, beforeReport, afterReport, comparison, before, after, beforeImport, afterImport);
     }
@@ -98,11 +115,15 @@ public sealed class DiagnosticExperiments(string artifactsRoot)
         foreach (var hypothesis in D.Rows(plan["hypotheses"]).OfType<JsonObject>())
         {
             string id = D.Required(hypothesis, "id", 64);
-            tests.Add(new JsonObject { ["hypothesisId"] = id, ["statement"] = hypothesis["statement"]!.DeepClone(),
+            tests.Add(new JsonObject
+            {
+                ["hypothesisId"] = id,
+                ["statement"] = hypothesis["statement"]!.DeepClone(),
                 ["prediction"] = hypothesis["prediction"]?.DeepClone(),
                 ["assessment"] = hypothesis["prediction"] is null ? "unresolvedWithoutPrediction" : "samplePredictionOnly",
                 ["signals"] = new JsonArray(D.Rows(plan["signals"]).Where(s => D.Rows(s?["hypothesisIds"]).Any(h => h?.GetValue<string>() == id))
-                    .Select(s => (JsonNode?)new JsonObject { ["id"] = s!["id"]!.DeepClone(), ["role"] = s["role"]!.DeepClone(), ["reason"] = s["reason"]!.DeepClone() }).ToArray()) });
+                    .Select(s => (JsonNode?)new JsonObject { ["id"] = s!["id"]!.DeepClone(), ["role"] = s["role"]!.DeepClone(), ["reason"] = s["reason"]!.DeepClone() }).ToArray())
+            });
         }
         var gaps = new JsonArray();
         if (!plan.ContainsKey("alarmEvidence")) gaps.Add("No alarm context was selected; no alarm association is inferred.");
@@ -110,11 +131,23 @@ public sealed class DiagnosticExperiments(string artifactsRoot)
         if (!plan.ContainsKey("testSuiteEvidence")) gaps.Add("No retained Test Suite finding was selected; no test execution is inferred.");
         foreach (var test in tests.Where(t => D.Text(t, "assessment") == "unresolvedWithoutPrediction"))
             gaps.Add("Hypothesis " + D.Text(test, "hypothesisId") + " has no declarative sample prediction.");
-        var experiment = new JsonObject { ["schemaVersion"] = "diagnostic-experiment.v1", ["diagnosticPlanId"] = planId,
-            ["reviewId"] = reviewId, ["request"] = request.DeepClone(), ["diagnosticCase"] = plan.DeepClone(),
-            ["watchPlanId"] = Id(watch), ["tracePlanId"] = Id(trace), ["tests"] = tests, ["compositionGaps"] = gaps,
-            ["sourceAuthenticityVerified"] = false, ["nativeExecutable"] = false, ["nativeAccessAttempted"] = false,
-            ["qualification"] = "offlineExperimentOnly", ["limits"] = Limits };
+        var experiment = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-experiment.v1",
+            ["diagnosticPlanId"] = planId,
+            ["reviewId"] = reviewId,
+            ["request"] = request.DeepClone(),
+            ["diagnosticCase"] = plan.DeepClone(),
+            ["watchPlanId"] = Id(watch),
+            ["tracePlanId"] = Id(trace),
+            ["tests"] = tests,
+            ["compositionGaps"] = gaps,
+            ["sourceAuthenticityVerified"] = false,
+            ["nativeExecutable"] = false,
+            ["nativeAccessAttempted"] = false,
+            ["qualification"] = "offlineExperimentOnly",
+            ["limits"] = Limits
+        };
         // Exercise serialization limits before publishing any child.
         foreach (var document in new[] { watch, trace, experiment }) D.Bound(document, DiagnosticStore.MaxBytes);
         return (experiment, watch, trace);

@@ -62,10 +62,12 @@ internal sealed record AddInEnrollment(string AssemblySha256, string Configurati
     }
     private static void Require(bool value, string code)
     {
-        if (!value) throw new BridgeException(code, code switch {
+        if (!value) throw new BridgeException(code, code switch
+        {
             "InvalidAddInEnrollment" => "Enrollment must be exactly {schemaVersion: addin-enrollment.v1, assemblySha256, configurationSha256} as written by Publish-AddIn.ps1.",
             "AddInOwnerUnavailable" => "No attached worker owns a verified TIA process; attach this Host to the TIA instance first. Nothing was started or attached.",
-            _ => "Add-In producer refused: it must run in TIA's Add-In loader below the TIA process owned by the attached worker." });
+            _ => "Add-In producer refused: it must run in TIA's Add-In loader below the TIA process owned by the attached worker."
+        });
     }
 
     internal static int ParentProcessId(int id)

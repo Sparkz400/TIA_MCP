@@ -51,9 +51,11 @@ public static class OpcUaCaptureContracts
             return;
         }
         using var doc = JsonDocument.Parse(row.ReadResultJson!);
-        var result = doc.RootElement.Deserialize<OpcUaRuntimeReadResult>(new JsonSerializerOptions(BridgeProtocol.Json) {
+        var result = doc.RootElement.Deserialize<OpcUaRuntimeReadResult>(new JsonSerializerOptions(BridgeProtocol.Json)
+        {
             UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow,
-            RespectRequiredConstructorParameters = true })!;
+            RespectRequiredConstructorParameters = true
+        })!;
         var index = Array.IndexOf(plan.Request.SelectionIds, row.SelectionId);
         Require(result is not null && result.AttemptId == plan.Request.AttemptId && result.Items is { Count: 1 } && index >= 0 &&
             result.Items[0].Node == plan.UaContext!.Request.Nodes[index] &&
@@ -80,32 +82,39 @@ public static class OpcUaCaptureContracts
         }
         if (item.Quality == "Bad") Require(item.Outcome == "itemError");
     }
-    public static void ValidateReconnectRows(RuntimeCapturePlan plan,IEnumerable<RuntimeCaptureRow> rows)
+    public static void ValidateReconnectRows(RuntimeCapturePlan plan, IEnumerable<RuntimeCaptureRow> rows)
     {
-        var history=new OpcUaReconnectHistory(plan.UaContext!.Request.MaximumReconnectAttempts);
-        string? error=null;double elapsed=0;
-        foreach(var row in rows)
+        var history = new OpcUaReconnectHistory(plan.UaContext!.Request.MaximumReconnectAttempts);
+        string? error = null; double elapsed = 0;
+        foreach (var row in rows)
         {
-            Require(row.ElapsedMilliseconds>=elapsed);elapsed=row.ElapsedMilliseconds;
-            if(row.Reconnect is { } e)
+            Require(row.ElapsedMilliseconds >= elapsed); elapsed = row.ElapsedMilliseconds;
+            if (row.Reconnect is { } e)
             {
                 Require(e.Transfer is null); // Polling owns no subscription to transfer.
-                if(e.State=="starting")Require(e.ErrorCode==error && OpcUaReconnectHistory.Retryable(error));
+                if (e.State == "starting") Require(e.ErrorCode == error && OpcUaReconnectHistory.Retryable(error));
                 history.Apply(e);
-                if(e.State!="starting")error=e.ErrorCode;
+                if (e.State != "starting") error = e.ErrorCode;
             }
-            else if(row.Kind=="read")
+            else if (row.Kind == "read")
             {
                 Require(history.Healthy && !history.Pending && error is null);
-                error=row.ErrorCode;
+                error = row.ErrorCode;
             }
         }
     }
-    public static string? ScalarEncoding(string? type) => type switch {
+    public static string? ScalarEncoding(string? type) => type switch
+    {
         "Boolean" => "boolean",
         "SByte" or "Byte" or "Int16" or "UInt16" or "Int32" or "UInt32" or "Int64" or "UInt64" => "decimalInteger",
-        "Float" => "roundTripFloat", "Double" => "roundTripDouble", "String" => "string",
-        "DateTime" => "utcDateTime", "Guid" => "guid", "ByteString" => "base64", _ => null };
+        "Float" => "roundTripFloat",
+        "Double" => "roundTripDouble",
+        "String" => "string",
+        "DateTime" => "utcDateTime",
+        "Guid" => "guid",
+        "ByteString" => "base64",
+        _ => null
+    };
     public static bool ArrayShapeMatches(int? rank, uint[]? declared, int[]? dimensions, int? count)
     {
         if (rank is null or < -3 or -1 or > 32 || declared is { Length: > 32 }) return false;
@@ -124,8 +133,14 @@ public static class OpcUaCaptureContracts
         Require(item.Value is JsonElement { ValueKind: JsonValueKind.Object });
         var json = (JsonElement)item.Value!;
         OpcUaRuntimeArray? array;
-        try { array = json.Deserialize<OpcUaRuntimeArray>(new JsonSerializerOptions(BridgeProtocol.Json) {
-            UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow, RespectRequiredConstructorParameters = true }); }
+        try
+        {
+            array = json.Deserialize<OpcUaRuntimeArray>(new JsonSerializerOptions(BridgeProtocol.Json)
+            {
+                UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+                RespectRequiredConstructorParameters = true
+            });
+        }
         catch (JsonException) { throw new BridgeException("UaCaptureInvalid", "Invalid retained UA array."); }
         Require(array is not null && JsonElement.DeepEquals(json, JsonSerializer.SerializeToElement(array, BridgeProtocol.Json)) &&
             ScalarEncoding(item.BuiltInType) is { } encoding && array.ElementEncoding == encoding &&
@@ -154,33 +169,42 @@ public static class OpcUaCaptureContracts
         }
         Require(item.Value is JsonElement { ValueKind: JsonValueKind.String });
         string text = ((JsonElement)item.Value!).GetString()!;
-        bool valid = item.BuiltInType switch {
+        bool valid = item.BuiltInType switch
+        {
             "SByte" or "Byte" or "Int16" or "UInt16" or "Int32" or "UInt32" or "Int64" or "UInt64" =>
-                item.Encoding == "decimalInteger" && Integer(text,item.BuiltInType),
-            "Float" => item.Encoding == "roundTripFloat" && float.TryParse(text,NumberStyles.Float,CultureInfo.InvariantCulture,out var f) &&
-                float.IsFinite(f) && f.ToString("R",CultureInfo.InvariantCulture) == text,
-            "Double" => item.Encoding == "roundTripDouble" && double.TryParse(text,NumberStyles.Float,CultureInfo.InvariantCulture,out var d) &&
-                double.IsFinite(d) && d.ToString("R",CultureInfo.InvariantCulture) == text,
+                item.Encoding == "decimalInteger" && Integer(text, item.BuiltInType),
+            "Float" => item.Encoding == "roundTripFloat" && float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var f) &&
+                float.IsFinite(f) && f.ToString("R", CultureInfo.InvariantCulture) == text,
+            "Double" => item.Encoding == "roundTripDouble" && double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) &&
+                double.IsFinite(d) && d.ToString("R", CultureInfo.InvariantCulture) == text,
             "String" => item.Encoding == "string" && text.Length <= 16384,
-            "DateTime" => item.Encoding == "utcDateTime" && DateTime.TryParseExact(text,"O",CultureInfo.InvariantCulture,DateTimeStyles.RoundtripKind,out var date) &&
-                date.Kind == DateTimeKind.Utc && date.ToString("O",CultureInfo.InvariantCulture) == text,
-            "Guid" => item.Encoding == "guid" && Guid.TryParseExact(text,"D",out var guid) && guid.ToString("D") == text,
+            "DateTime" => item.Encoding == "utcDateTime" && DateTime.TryParseExact(text, "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var date) &&
+                date.Kind == DateTimeKind.Utc && date.ToString("O", CultureInfo.InvariantCulture) == text,
+            "Guid" => item.Encoding == "guid" && Guid.TryParseExact(text, "D", out var guid) && guid.ToString("D") == text,
             "ByteString" => item.Encoding == "base64" && ByteString(text),
-            _ => false };
+            _ => false
+        };
         Require(valid);
     }
-    private static bool Integer(string text,string type)
+    private static bool Integer(string text, string type)
     {
-        if (text.Length > 20 || !BigInteger.TryParse(text,NumberStyles.AllowLeadingSign,CultureInfo.InvariantCulture,out var n) ||
+        if (text.Length > 20 || !BigInteger.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var n) ||
             n.ToString(CultureInfo.InvariantCulture) != text) return false;
-        return type switch {
-            "SByte" => n >= sbyte.MinValue && n <= sbyte.MaxValue, "Byte" => n >= byte.MinValue && n <= byte.MaxValue,
-            "Int16" => n >= short.MinValue && n <= short.MaxValue, "UInt16" => n >= ushort.MinValue && n <= ushort.MaxValue,
-            "Int32" => n >= int.MinValue && n <= int.MaxValue, "UInt32" => n >= uint.MinValue && n <= uint.MaxValue,
-            "Int64" => n >= long.MinValue && n <= long.MaxValue, "UInt64" => n >= ulong.MinValue && n <= ulong.MaxValue, _ => false };
+        return type switch
+        {
+            "SByte" => n >= sbyte.MinValue && n <= sbyte.MaxValue,
+            "Byte" => n >= byte.MinValue && n <= byte.MaxValue,
+            "Int16" => n >= short.MinValue && n <= short.MaxValue,
+            "UInt16" => n >= ushort.MinValue && n <= ushort.MaxValue,
+            "Int32" => n >= int.MinValue && n <= int.MaxValue,
+            "UInt32" => n >= uint.MinValue && n <= uint.MaxValue,
+            "Int64" => n >= long.MinValue && n <= long.MaxValue,
+            "UInt64" => n >= ulong.MinValue && n <= ulong.MaxValue,
+            _ => false
+        };
     }
     private static bool ByteString(string text)
-    { try { var bytes=Convert.FromBase64String(text);return bytes.Length<=65536 && Convert.ToBase64String(bytes)==text; } catch { return false; } }
+    { try { var bytes = Convert.FromBase64String(text); return bytes.Length <= 65536 && Convert.ToBase64String(bytes) == text; } catch { return false; } }
     public static readonly string[] ReadErrors = ["UaCancelled", "UaTimeout", "UaTransportInterrupted", "UaSessionUnavailable", "UaSessionExpired",
         "UaSessionRecordChanged", "UaSessionIdentityMismatch", "UaSessionIdentityChanged", "UaCredentialUnavailable",
         "UaNamespaceUnavailable", "UaAuthenticationDenied", "UaCertificateRejected", "UaProtocolFailure",
@@ -191,11 +215,14 @@ public static class OpcUaCaptureContracts
     {
         Require(node is not null && !string.IsNullOrEmpty(node.NamespaceUri) && node.NamespaceUri.Length <= 4096 &&
             Uri.TryCreate(node.NamespaceUri, UriKind.Absolute, out _) && node.Identifier is { Length: > 0 and <= 4096 });
-        bool valid = node.IdentifierType switch {
+        bool valid = node.IdentifierType switch
+        {
             "numeric" => uint.TryParse(node.Identifier, NumberStyles.None, CultureInfo.InvariantCulture, out var n) && n.ToString(CultureInfo.InvariantCulture) == node.Identifier,
             "string" => !node.Identifier.Any(char.IsControl),
             "guid" => Guid.TryParseExact(node.Identifier, "D", out var g) && g.ToString("D") == node.Identifier,
-            "opaque" => Opaque(node.Identifier), _ => false };
+            "opaque" => Opaque(node.Identifier),
+            _ => false
+        };
         Require(valid);
     }
     private static bool Opaque(string value) { try { return Convert.ToBase64String(Convert.FromBase64String(value)) == value; } catch { return false; } }

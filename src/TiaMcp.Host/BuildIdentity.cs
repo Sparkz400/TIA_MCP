@@ -26,24 +26,34 @@ public static class BuildIdentity
             if (string.IsNullOrWhiteSpace(path)) return new JsonObject { ["role"] = role, ["configured"] = false };
             string? before; lock (AtStart) AtStart.TryGetValue(path, out before);
             string? now = Hash(path);
-            return new JsonObject { ["role"] = role, ["path"] = Path.GetFullPath(path), ["sha256AtHostStart"] = before, ["sha256Now"] = now,
-                ["changedOnDisk"] = before is not null && now != before, ["presentNow"] = now is not null };
+            return new JsonObject
+            {
+                ["role"] = role,
+                ["path"] = Path.GetFullPath(path),
+                ["sha256AtHostStart"] = before,
+                ["sha256Now"] = now,
+                ["changedOnDisk"] = before is not null && now != before,
+                ["presentNow"] = now is not null
+            };
         }
         string? host = Environment.ProcessPath;
         var root = host is null ? null : Path.GetDirectoryName(Path.GetDirectoryName(host));
         string? manifest = root is null ? null : Path.Combine(root, "manifest.json");
         var files = new JsonArray(File("host", host), File("engineeringWorker", workerPath), File("simulatorWorker", simulatorPath));
         bool changed = files.OfType<JsonObject>().Any(f => f["changedOnDisk"]?.GetValue<bool>() == true);
-        return new JsonObject {
+        return new JsonObject
+        {
             ["schemaVersion"] = "host-build-identity.v1",
-            ["hostProcessId"] = Environment.ProcessId, ["hostStartedAtUtc"] = Started.ToString("O"),
+            ["hostProcessId"] = Environment.ProcessId,
+            ["hostStartedAtUtc"] = Started.ToString("O"),
             ["productVersion"] = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
             ["files"] = files,
             ["bundle"] = manifest is not null && System.IO.File.Exists(manifest) ? Bundle(root!, manifest) : null,
             ["runningMatchesDisk"] = !changed,
             ["note"] = changed
                 ? "A binary changed on disk after this Host started. This Host still runs the build it started with; a worker started later would load the new file. Restart the Host to run one consistent build."
-                : "The running Host and its configured workers match the files on disk. Compare sha256Now with a build's own hashes to tell which build that is; building or packaging elsewhere does not update this Host." };
+                : "The running Host and its configured workers match the files on disk. Compare sha256Now with a build's own hashes to tell which build that is; building or packaging elsewhere does not update this Host."
+        };
     }
 
     /// <summary>The bundle's manifest hash and the source it was packaged from. sourceCommit is null for bundles packaged before it

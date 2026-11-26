@@ -56,9 +56,18 @@ public sealed class SoftwareUnitWorkflowStore(string artifactsRoot)
     private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "software-unit-reviews/" + hash + extension, ["sha256"] = hash };
     private JsonObject Publish(byte[] bytes, string extension, int limit) =>
         PackageStorage.PublishContent(artifactsRoot, "software-unit-reviews", bytes, extension, limit, 512L << 20, "Unit review");
-    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {
-        ["recordId"] = artifact["sha256"]!.DeepClone(), ["reviewId"] = record["reviewId"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),
-        ["summary"] = record["report"]!["summary"]!.DeepClone(), ["nativeExecutable"] = false, ["nativeQualified"] = false,
-        ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["wholeProjectAnalysisComplete"] = false,
-        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new()
+    {
+        ["recordId"] = artifact["sha256"]!.DeepClone(),
+        ["reviewId"] = record["reviewId"]!.DeepClone(),
+        ["input"] = record["input"]!.DeepClone(),
+        ["reportArtifact"] = artifact.DeepClone(),
+        ["summary"] = record["report"]!["summary"]!.DeepClone(),
+        ["nativeExecutable"] = false,
+        ["nativeQualified"] = false,
+        ["sourceAuthenticityVerified"] = false,
+        ["liveFreshnessVerified"] = false,
+        ["wholeProjectAnalysisComplete"] = false,
+        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy
+    };
 }

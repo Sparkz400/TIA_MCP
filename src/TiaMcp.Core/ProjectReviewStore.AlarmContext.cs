@@ -19,13 +19,22 @@ public sealed partial class ProjectReviewStore
             throw new BridgeException("AlarmContextUnresolved", "Select an exact nonvirtual alarm, supervision or hmiAlarm node in this saved review; names and cross-review identities cannot substitute.");
         const int maxBytes = 256 * 1024;
         var ancestors = new JsonArray(); var relationships = new JsonArray();
-        var result = new JsonObject {
-            ["reviewId"] = reviewId, ["selector"] = selector.DeepClone(), ["object"] = nodes[path].DeepClone(),
-            ["ancestry"] = ancestors, ["ancestryStatus"] = "unresolved", ["relationships"] = relationships,
-            ["sourceAuthenticityVerified"] = false, ["nativeQualified"] = false, ["storageSelected"] = false,
-            ["coverageComplete"] = false, ["freshness"] = "savedSnapshotOnly",
+        var result = new JsonObject
+        {
+            ["reviewId"] = reviewId,
+            ["selector"] = selector.DeepClone(),
+            ["object"] = nodes[path].DeepClone(),
+            ["ancestry"] = ancestors,
+            ["ancestryStatus"] = "unresolved",
+            ["relationships"] = relationships,
+            ["sourceAuthenticityVerified"] = false,
+            ["nativeQualified"] = false,
+            ["storageSelected"] = false,
+            ["coverageComplete"] = false,
+            ["freshness"] = "savedSnapshotOnly",
             ["limits"] = new JsonObject { ["maxAncestors"] = 64, ["maxRelationships"] = 100, ["maxBytes"] = maxBytes },
-            ["policy"] = "Explicit supplied alarm context only. Captured parents may include virtual navigation; this does not establish native ownership. Direct relationships are not a full dependency graph or executable storage selection. Use saved-review comparison for transitive impacts. Missing evidence, protected source and unknown storage remain gaps." };
+            ["policy"] = "Explicit supplied alarm context only. Captured parents may include virtual navigation; this does not establish native ownership. Direct relationships are not a full dependency graph or executable storage selection. Use saved-review comparison for transitive impacts. Missing evidence, protected source and unknown storage remain gaps."
+        };
         bool Fits() => Encoding.UTF8.GetByteCount(result.ToJsonString(BridgeProtocol.Json)) <= maxBytes - 2048;
         if (!Fits()) throw new BridgeException("ArtifactCapacity", "Selected alarm metadata exceeds the context byte budget; the original review remains retained.");
         var ids = new Dictionary<string, JsonObject>(StringComparer.Ordinal);

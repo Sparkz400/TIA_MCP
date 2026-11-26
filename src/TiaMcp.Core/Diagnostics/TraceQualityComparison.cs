@@ -41,20 +41,41 @@ internal sealed class TraceQualityComparison(string artifactsRoot)
             if (!storage && !explicitMap) throw new BridgeException("MeasurementLineageMismatch", "Changed instance/storage requires explicit signal mappings.");
             if (D.Text(sa, "datatype") != D.Text(sb, "datatype") || D.Text(am["units"], x) != D.Text(bm["units"], y))
                 throw new BridgeException("MeasurementLineageMismatch", "Signal types and units must match exactly.");
-            results.Add(new JsonObject { ["beforeSignalId"] = x, ["afterSignalId"] = y,
-                ["beforeIdentity"] = sa.DeepClone(), ["afterIdentity"] = sb.DeepClone(), ["sameStorage"] = storage,
-                ["unit"] = am["units"]![x]!.DeepClone(), ["before"] = WindowSeries(am, x, options, "before"),
-                ["after"] = WindowSeries(bm, y, options, "after") });
+            results.Add(new JsonObject
+            {
+                ["beforeSignalId"] = x,
+                ["afterSignalId"] = y,
+                ["beforeIdentity"] = sa.DeepClone(),
+                ["afterIdentity"] = sb.DeepClone(),
+                ["sameStorage"] = storage,
+                ["unit"] = am["units"]![x]!.DeepClone(),
+                ["before"] = WindowSeries(am, x, options, "before"),
+                ["after"] = WindowSeries(bm, y, options, "after")
+            });
         }
-        var report = new JsonObject { ["schemaVersion"] = "trace-comparison.v2", ["beforeMeasurementId"] = beforeId, ["afterMeasurementId"] = afterId,
-            ["beforeTracePlanId"] = a["tracePlanId"]!.DeepClone(), ["afterTracePlanId"] = b["tracePlanId"]!.DeepClone(),
-            ["beforeReviewId"] = ap["reviewId"]!.DeepClone(), ["afterReviewId"] = bp["reviewId"]!.DeepClone(),
-            ["reason"] = options["reason"]!.DeepClone(), ["alignment"] = options.DeepClone(), ["signals"] = results,
-            ["sourceChanged"] = changed, ["programIdentityChanged"] = changedProgram,
-            ["beforeAcquisition"] = TraceQualityMeasurements.Context(am), ["afterAcquisition"] = TraceQualityMeasurements.Context(bm),
-            ["beforeAssessment"] = a["qualityAssessment"]!.DeepClone(), ["afterAssessment"] = b["qualityAssessment"]!.DeepClone(),
-            ["beforeWindow"] = Window(am, ap, options, "before"), ["afterWindow"] = Window(bm, bp, options, "after"),
-            ["settingsEqual"] = JsonNode.DeepEquals(ap["requestedSettings"], bp["requestedSettings"]), ["resampled"] = false };
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "trace-comparison.v2",
+            ["beforeMeasurementId"] = beforeId,
+            ["afterMeasurementId"] = afterId,
+            ["beforeTracePlanId"] = a["tracePlanId"]!.DeepClone(),
+            ["afterTracePlanId"] = b["tracePlanId"]!.DeepClone(),
+            ["beforeReviewId"] = ap["reviewId"]!.DeepClone(),
+            ["afterReviewId"] = bp["reviewId"]!.DeepClone(),
+            ["reason"] = options["reason"]!.DeepClone(),
+            ["alignment"] = options.DeepClone(),
+            ["signals"] = results,
+            ["sourceChanged"] = changed,
+            ["programIdentityChanged"] = changedProgram,
+            ["beforeAcquisition"] = TraceQualityMeasurements.Context(am),
+            ["afterAcquisition"] = TraceQualityMeasurements.Context(bm),
+            ["beforeAssessment"] = a["qualityAssessment"]!.DeepClone(),
+            ["afterAssessment"] = b["qualityAssessment"]!.DeepClone(),
+            ["beforeWindow"] = Window(am, ap, options, "before"),
+            ["afterWindow"] = Window(bm, bp, options, "after"),
+            ["settingsEqual"] = JsonNode.DeepEquals(ap["requestedSettings"], bp["requestedSettings"]),
+            ["resampled"] = false
+        };
         TraceQualityMeasurements.Authority(report); D.Bound(report, DiagnosticStore.MaxBytes); return report;
     }
     internal static void ValidateWindow(JsonObject m, JsonObject options, string side)
@@ -101,10 +122,21 @@ internal sealed class TraceQualityComparison(string artifactsRoot)
                 TraceQualityMeasurements.Number(s["firstRecordedTime"]) > start || TraceQualityMeasurements.Number(s["lastRecordedTime"]) < end)
                 reasons.Add("Recorded epoch does not span both requested boundaries for " + D.Text(s, "signalId") + ".");
         }
-        return new JsonObject { ["clockId"] = clock, ["epoch"] = epoch, ["anchorSeconds"] = anchor,
-            ["requestedStartSeconds"] = start, ["requestedEndSeconds"] = end, ["series"] = series,
-            ["completeEpochAssessment"] = full, ["hypotheses"] = TraceQualityMeasurements.Findings(m, plan, Selected),
-            ["coverage"] = "recordedObservationsOnly", ["verdict"] = "unresolved", ["reasons"] = reasons,
-            ["completenessVerified"] = false, ["clockSynchronizationVerified"] = false };
+        return new JsonObject
+        {
+            ["clockId"] = clock,
+            ["epoch"] = epoch,
+            ["anchorSeconds"] = anchor,
+            ["requestedStartSeconds"] = start,
+            ["requestedEndSeconds"] = end,
+            ["series"] = series,
+            ["completeEpochAssessment"] = full,
+            ["hypotheses"] = TraceQualityMeasurements.Findings(m, plan, Selected),
+            ["coverage"] = "recordedObservationsOnly",
+            ["verdict"] = "unresolved",
+            ["reasons"] = reasons,
+            ["completenessVerified"] = false,
+            ["clockSynchronizationVerified"] = false
+        };
     }
 }

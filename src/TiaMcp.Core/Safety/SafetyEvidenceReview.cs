@@ -46,27 +46,57 @@ public static class SafetyEvidenceReview
             {
                 b[section].TryGetValue(identity, out var old); a[section].TryGetValue(identity, out var next);
                 if (old is not null && next is not null && CanonicalJson.ExactlyEqual(old, next)) continue;
-                changes.Add(new JsonObject { ["section"] = section, ["identity"] = identity,
+                changes.Add(new JsonObject
+                {
+                    ["section"] = section,
+                    ["identity"] = identity,
                     ["status"] = old is null ? "onlyAfter" : next is null ? "onlyBefore" : "differentObservation",
-                    ["before"] = old?.DeepClone(), ["after"] = next?.DeepClone(),
+                    ["before"] = old?.DeepClone(),
+                    ["after"] = next?.DeepClone(),
                     ["beforeSignatureDecimal"] = section.EndsWith("Signatures", StringComparison.Ordinal) && old is not null ? old["value"]!.GetValue<ulong>().ToString(System.Globalization.CultureInfo.InvariantCulture) : null,
-                    ["afterSignatureDecimal"] = section.EndsWith("Signatures", StringComparison.Ordinal) && next is not null ? next["value"]!.GetValue<ulong>().ToString(System.Globalization.CultureInfo.InvariantCulture) : null });
+                    ["afterSignatureDecimal"] = section.EndsWith("Signatures", StringComparison.Ordinal) && next is not null ? next["value"]!.GetValue<ulong>().ToString(System.Globalization.CultureInfo.InvariantCulture) : null
+                });
             }
         var metadataBefore = before.DeepClone().AsObject(); var metadataAfter = after.DeepClone().AsObject();
         foreach (string section in b.Keys) { metadataBefore.Remove(section); metadataAfter.Remove(section); }
         bool metadataChanged = !CanonicalJson.ExactlyEqual(metadataBefore, metadataAfter);
-        if (metadataChanged) changes.Add(new JsonObject { ["section"] = "otherReportedContent", ["identity"] = "observation",
-            ["status"] = "differentObservation", ["before"] = metadataBefore, ["after"] = metadataAfter });
-        return new JsonObject { ["schemaVersion"] = "safety-evidence-review.v1", ["reviewId"] = reviewId, ["plcPath"] = plcPath,
-            ["projectPath"] = projectPath, ["observations"] = observations, ["signatures"] = signatures, ["changes"] = changes, ["issues"] = issues,
-            ["summary"] = new JsonObject { ["changeCount"] = changes.Count, ["issueCount"] = issues.Count,
+        if (metadataChanged) changes.Add(new JsonObject
+        {
+            ["section"] = "otherReportedContent",
+            ["identity"] = "observation",
+            ["status"] = "differentObservation",
+            ["before"] = metadataBefore,
+            ["after"] = metadataAfter
+        });
+        return new JsonObject
+        {
+            ["schemaVersion"] = "safety-evidence-review.v1",
+            ["reviewId"] = reviewId,
+            ["plcPath"] = plcPath,
+            ["projectPath"] = projectPath,
+            ["observations"] = observations,
+            ["signatures"] = signatures,
+            ["changes"] = changes,
+            ["issues"] = issues,
+            ["summary"] = new JsonObject
+            {
+                ["changeCount"] = changes.Count,
+                ["issueCount"] = issues.Count,
                 ["programSignatureChangeCount"] = changes.Count(c => (string?)c!["section"] == "programSignatures"),
                 ["blockSignatureChangeCount"] = changes.Count(c => (string?)c!["section"] == "blockSignatures"),
-                ["otherReportedContentChanged"] = metadataChanged, ["originalBytesEqual"] = beforeBytes.AsSpan().SequenceEqual(afterBytes) },
-            ["nativeExecutable"] = false, ["nativeExecuted"] = false, ["nativeQualified"] = false,
-            ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["safetyApproval"] = false,
-            ["requiredSignatureProfileVerified"] = false, ["wholeProgramAnalysisComplete"] = false,
-            ["limits"] = "Supplied safety_inspect observations bound to one captured PLC. Values remain exact UInt64; zero values are absent/invalid observations, not valid safety proof. Missing rows do not prove native addition/deletion. Reported completeness is retained but required product-specific signature/profile coverage is not certified. Unknown content remains in originals and comparisons. No native login, compile, mutation, download, activation-test execution or functional-safety approval." };
+                ["otherReportedContentChanged"] = metadataChanged,
+                ["originalBytesEqual"] = beforeBytes.AsSpan().SequenceEqual(afterBytes)
+            },
+            ["nativeExecutable"] = false,
+            ["nativeExecuted"] = false,
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["safetyApproval"] = false,
+            ["requiredSignatureProfileVerified"] = false,
+            ["wholeProgramAnalysisComplete"] = false,
+            ["limits"] = "Supplied safety_inspect observations bound to one captured PLC. Values remain exact UInt64; zero values are absent/invalid observations, not valid safety proof. Missing rows do not prove native addition/deletion. Reported completeness is retained but required product-specific signature/profile coverage is not certified. Unknown content remains in originals and comparisons. No native login, compile, mutation, download, activation-test execution or functional-safety approval."
+        };
 
         Dictionary<string, Dictionary<string, JsonObject>> Inspect(JsonObject snapshot, string phase)
         {
@@ -95,10 +125,17 @@ public static class SafetyEvidenceReview
                 rows["blockSignatures"] = new(StringComparer.Ordinal);
             }
             Read("runtimeGroups", "name", 4096, false); Read("settings", "name", 4096, false);
-            observations.Add(new JsonObject { ["phase"] = phase, ["reportedCompleteness"] = coverage.DeepClone(),
-                ["warnings"] = warnings.DeepClone(), ["reportedBlock"] = snapshot["block"]?.DeepClone(),
-                ["programSignatureCount"] = rows["programSignatures"].Count, ["blockSignatureCount"] = rows["blockSignatures"].Count,
-                ["runtimeGroupCount"] = rows["runtimeGroups"].Count, ["settingCount"] = rows["settings"].Count });
+            observations.Add(new JsonObject
+            {
+                ["phase"] = phase,
+                ["reportedCompleteness"] = coverage.DeepClone(),
+                ["warnings"] = warnings.DeepClone(),
+                ["reportedBlock"] = snapshot["block"]?.DeepClone(),
+                ["programSignatureCount"] = rows["programSignatures"].Count,
+                ["blockSignatureCount"] = rows["blockSignatures"].Count,
+                ["runtimeGroupCount"] = rows["runtimeGroups"].Count,
+                ["settingCount"] = rows["settings"].Count
+            });
             return rows;
 
             void Issue(string code, string message) => issues.Add(new JsonObject { ["phase"] = phase, ["code"] = code, ["message"] = message });
@@ -112,8 +149,14 @@ public static class SafetyEvidenceReview
                     if (signature)
                     {
                         if (row["value"] is not JsonValue value || !value.TryGetValue<ulong>(out var number)) throw Error("Signatures must be exact unsigned 64-bit integers.");
-                        signatures.Add(new JsonObject { ["phase"] = phase, ["scope"] = section, ["type"] = identity,
-                            ["valueDecimal"] = number.ToString(System.Globalization.CultureInfo.InvariantCulture), ["zero"] = number == 0 });
+                        signatures.Add(new JsonObject
+                        {
+                            ["phase"] = phase,
+                            ["scope"] = section,
+                            ["type"] = identity,
+                            ["valueDecimal"] = number.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            ["zero"] = number == 0
+                        });
                         if (number == 0) Issue("zeroSignature", section + "/" + identity + " is absent or invalid; applicability is not inferred.");
                     }
                 }

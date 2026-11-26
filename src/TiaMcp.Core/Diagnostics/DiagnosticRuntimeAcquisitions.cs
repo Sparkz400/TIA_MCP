@@ -62,13 +62,23 @@ public sealed class DiagnosticRuntimeAcquisitions(string artifactsRoot)
         var quality = analysis["qualityAssessment"]!;
         foreach (string field in new[] { "missingValues", "hostReadErrors", "providerFailures", "unsupportedValues" })
             if (quality[field]!.GetValue<int>() > 0) issues.Add(field + " remain unknown; no carry-forward or interpolation.");
-        var acquisition = new JsonObject { ["schemaVersion"] = "diagnostic-runtime-acquisition.v1",
-            ["experimentId"] = experimentId, ["snapshotRef"] = snapshotRef, ["request"] = request.DeepClone(),
-            ["experiment"] = experiment, ["captureSource"] = original,
-            ["analysisId"] = RuntimeCaptureAcquisitionSource.Id(analysis), ["analysis"] = analysis,
-            ["acquisitionMode"] = "sequentialPolling", ["sourceEvidenceRevalidated"] = true,
-            ["qualityLimits"] = issues, ["completeCommittedPrefixRetained"] = true,
-            ["plcChangesBetweenPollsUnknown"] = true, ["limits"] = Limits };
+        var acquisition = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-runtime-acquisition.v1",
+            ["experimentId"] = experimentId,
+            ["snapshotRef"] = snapshotRef,
+            ["request"] = request.DeepClone(),
+            ["experiment"] = experiment,
+            ["captureSource"] = original,
+            ["analysisId"] = RuntimeCaptureAcquisitionSource.Id(analysis),
+            ["analysis"] = analysis,
+            ["acquisitionMode"] = "sequentialPolling",
+            ["sourceEvidenceRevalidated"] = true,
+            ["qualityLimits"] = issues,
+            ["completeCommittedPrefixRetained"] = true,
+            ["plcChangesBetweenPollsUnknown"] = true,
+            ["limits"] = Limits
+        };
         foreach (string field in FalseClaims) acquisition[field] = false;
         byte[] encoded = JsonSerializer.SerializeToUtf8Bytes(acquisition, BridgeProtocol.Json);
         if (encoded.Length > DiagnosticStore.MaxBytes)
@@ -78,16 +88,24 @@ public sealed class DiagnosticRuntimeAcquisitions(string artifactsRoot)
 
     public JsonObject Export(RuntimeCaptureStore captures, string acquisitionId, string format)
     {
-        var (extension, mediaType) = format switch { "json" => (".json", "application/json"),
-            "markdown" => (".md", "text/markdown"), "html" => (".html", "text/html"),
-            _ => throw new BridgeException("InvalidRequest", "format must be json, markdown or html.") };
+        var (extension, mediaType) = format switch
+        {
+            "json" => (".json", "application/json"),
+            "markdown" => (".md", "text/markdown"),
+            "html" => (".html", "text/html"),
+            _ => throw new BridgeException("InvalidRequest", "format must be json, markdown or html.")
+        };
         var store = new DiagnosticStore(artifactsRoot); var (retained, source) = Reopen(captures, acquisitionId);
         byte[] bytes = format == "json" ? source : Encoding.UTF8.GetBytes(Render(retained, acquisitionId, Encoding.UTF8.GetString(source), format == "html"));
         if (bytes.Length > DiagnosticStore.MaxBytes) throw new BridgeException("ArtifactCapacity", "Readable acquisition exceeds 8 MiB; use exact JSON.");
         var receipt = store.Publish(bytes, extension);
         receipt["schemaVersion"] = "diagnostic-runtime-acquisition-export.v1"; receipt["acquisitionId"] = acquisitionId;
-        receipt["sourceArtifact"] = new JsonObject { ["path"] = Path.Combine(Path.GetFullPath(artifactsRoot), "trace-diagnostics", acquisitionId + ".json"),
-            ["sha256"] = acquisitionId, ["bytes"] = source.Length };
+        receipt["sourceArtifact"] = new JsonObject
+        {
+            ["path"] = Path.Combine(Path.GetFullPath(artifactsRoot), "trace-diagnostics", acquisitionId + ".json"),
+            ["sha256"] = acquisitionId,
+            ["bytes"] = source.Length
+        };
         receipt["format"] = format; receipt["mediaType"] = mediaType; receipt["sourceEvidenceRevalidated"] = true;
         receipt["analysisRecomputed"] = true; foreach (string field in FalseClaims) receipt[field] = false;
         receipt["limits"] = Limits; return receipt;
@@ -122,31 +140,61 @@ public sealed class DiagnosticRuntimeAcquisitions(string artifactsRoot)
         JsonObject Side(JsonObject acquisition, string id)
         {
             var analysis = acquisition["analysis"]!;
-            return new() { ["acquisitionId"] = id, ["snapshotRef"] = acquisition["snapshotRef"]!.DeepClone(), ["analysisId"] = acquisition["analysisId"]!.DeepClone(),
-                ["context"] = analysis["capture"]!["context"]?.DeepClone(), ["recordedProgress"] = analysis["capture"]!["recordedProgress"]!.DeepClone(),
+            return new()
+            {
+                ["acquisitionId"] = id,
+                ["snapshotRef"] = acquisition["snapshotRef"]!.DeepClone(),
+                ["analysisId"] = acquisition["analysisId"]!.DeepClone(),
+                ["context"] = analysis["capture"]!["context"]?.DeepClone(),
+                ["recordedProgress"] = analysis["capture"]!["recordedProgress"]!.DeepClone(),
                 ["signalIds"] = D.Strings(analysis["association"]!["signals"]!.AsArray().Select(s => D.Text(s, "signalId"))),
-                ["qualityAssessment"] = analysis["qualityAssessment"]!.DeepClone(), ["qualityLimits"] = acquisition["qualityLimits"]!.DeepClone() };
+                ["qualityAssessment"] = analysis["qualityAssessment"]!.DeepClone(),
+                ["qualityLimits"] = acquisition["qualityLimits"]!.DeepClone()
+            };
         }
         JsonObject Counts(JsonNode hypothesis)
         {
             int matched = hypothesis["matchedCycles"]!.GetValue<int>(), contradicted = hypothesis["contradictedCycles"]!.GetValue<int>();
-            return new() { ["matchedCycles"] = matched, ["contradictedCycles"] = contradicted, ["unknownCycles"] = hypothesis["unknownCycles"]!.DeepClone(),
-                ["pattern"] = (matched > 0, contradicted > 0) switch { (true, false) => "matchedOnly", (false, true) => "contradictedOnly", (true, true) => "mixed", _ => "notApplicable" } };
+            return new()
+            {
+                ["matchedCycles"] = matched,
+                ["contradictedCycles"] = contradicted,
+                ["unknownCycles"] = hypothesis["unknownCycles"]!.DeepClone(),
+                ["pattern"] = (matched > 0, contradicted > 0) switch { (true, false) => "matchedOnly", (false, true) => "contradictedOnly", (true, true) => "mixed", _ => "notApplicable" }
+            };
         }
         // Same experiment, same immutable case: both analyses list its hypotheses in the same order.
         var a = before["analysis"]!["hypotheses"]!.AsArray(); var b = after["analysis"]!["hypotheses"]!.AsArray();
         var hypotheses = new JsonArray(a.Select((h, i) =>
         {
             var x = Counts(h!); var y = Counts(b[i]!);
-            return (JsonNode?)new JsonObject { ["id"] = h!["id"]!.DeepClone(), ["statement"] = h["statement"]!.DeepClone(), ["prediction"] = h["prediction"]?.DeepClone(),
-                ["before"] = x, ["after"] = y, ["patternChanged"] = D.Text(x, "pattern") != D.Text(y, "pattern"), ["verdict"] = "unresolved", ["causationProven"] = false };
+            return (JsonNode?)new JsonObject
+            {
+                ["id"] = h!["id"]!.DeepClone(),
+                ["statement"] = h["statement"]!.DeepClone(),
+                ["prediction"] = h["prediction"]?.DeepClone(),
+                ["before"] = x,
+                ["after"] = y,
+                ["patternChanged"] = D.Text(x, "pattern") != D.Text(y, "pattern"),
+                ["verdict"] = "unresolved",
+                ["causationProven"] = false
+            };
         }).ToArray());
         var beforeSide = Side(before, beforeAcquisitionId); var afterSide = Side(after, afterAcquisitionId);
-        var comparison = new JsonObject { ["schemaVersion"] = "diagnostic-runtime-acquisition-comparison.v1", ["experimentId"] = before["experimentId"]!.DeepClone(),
-            ["request"] = request.DeepClone(), ["before"] = beforeSide, ["after"] = afterSide, ["hypotheses"] = hypotheses,
+        var comparison = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-runtime-acquisition-comparison.v1",
+            ["experimentId"] = before["experimentId"]!.DeepClone(),
+            ["request"] = request.DeepClone(),
+            ["before"] = beforeSide,
+            ["after"] = afterSide,
+            ["hypotheses"] = hypotheses,
             ["sameCaptureContext"] = JsonNode.DeepEquals(beforeSide["context"], afterSide["context"]),
             ["sameSignals"] = JsonNode.DeepEquals(beforeSide["signalIds"], afterSide["signalIds"]),
-            ["verdict"] = "unresolved", ["sourceEvidenceRevalidated"] = true, ["limits"] = ComparisonLimits };
+            ["verdict"] = "unresolved",
+            ["sourceEvidenceRevalidated"] = true,
+            ["limits"] = ComparisonLimits
+        };
         foreach (string field in FalseClaims) comparison[field] = false;
         var receipt = new DiagnosticStore(artifactsRoot).Save(comparison); receipt["comparison"] = comparison; return receipt;
     }
@@ -162,8 +210,11 @@ public sealed class DiagnosticRuntimeAcquisitions(string artifactsRoot)
         void Code(string text)
         {
             if (html) Line("<pre tabindex=\"0\"><code>" + WebUtility.HtmlEncode(text) + "</code></pre>");
-            else { int longest = 0, current = 0; foreach (char c in text) { current = c == '`' ? current + 1 : 0; longest = Math.Max(longest, current); }
-                string fence = new('`', Math.Max(3, longest + 1)); Line(fence + "json\n" + text + "\n" + fence + "\n"); }
+            else
+            {
+                int longest = 0, current = 0; foreach (char c in text) { current = c == '`' ? current + 1 : 0; longest = Math.Max(longest, current); }
+                string fence = new('`', Math.Max(3, longest + 1)); Line(fence + "json\n" + text + "\n" + fence + "\n");
+            }
         }
         if (html) Line("<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'\"><title>Retained runtime acquisition</title><style>" + DiagnosticReportExport.Style + "h1,h2,h3,p{overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere}</style></head><body><main>");
         Heading(1, "Retained runtime acquisition"); Paragraph("Acquisition: " + id); Paragraph(Limits);

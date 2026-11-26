@@ -60,10 +60,23 @@ public sealed class PublicCertificateWorkflowStore(string artifactsRoot)
     private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "public-certificate-reviews/" + hash + extension, ["sha256"] = hash };
     private JsonObject Publish(byte[] bytes, string extension, int limit) =>
         PackageStorage.PublishContent(artifactsRoot, "public-certificate-reviews", bytes, extension, limit, 512L << 20, "Public certificate review");
-    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {
-        ["recordId"] = artifact["sha256"]!.DeepClone(), ["reviewId"] = record["reviewId"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),
-        ["summary"] = record["report"]!["summary"]!.DeepClone(), ["changedFields"] = record["report"]!["changedFields"]!.DeepClone(),
-        ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["associationVerified"] = false, ["signatureVerified"] = false,
-        ["chainVerified"] = false, ["revocationChecked"] = false, ["endpointAuthenticated"] = false, ["privateKeyAvailabilityVerified"] = false, ["usagePolicyVerified"] = false,
-        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new()
+    {
+        ["recordId"] = artifact["sha256"]!.DeepClone(),
+        ["reviewId"] = record["reviewId"]!.DeepClone(),
+        ["input"] = record["input"]!.DeepClone(),
+        ["reportArtifact"] = artifact.DeepClone(),
+        ["summary"] = record["report"]!["summary"]!.DeepClone(),
+        ["changedFields"] = record["report"]!["changedFields"]!.DeepClone(),
+        ["nativeQualified"] = false,
+        ["sourceAuthenticityVerified"] = false,
+        ["associationVerified"] = false,
+        ["signatureVerified"] = false,
+        ["chainVerified"] = false,
+        ["revocationChecked"] = false,
+        ["endpointAuthenticated"] = false,
+        ["privateKeyAvailabilityVerified"] = false,
+        ["usagePolicyVerified"] = false,
+        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy
+    };
 }

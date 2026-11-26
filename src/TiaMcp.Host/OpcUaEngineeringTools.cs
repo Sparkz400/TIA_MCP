@@ -23,8 +23,16 @@ public sealed partial class TiaTools
         try
         {
             if (maxItems is < 1 or > 32) throw new BridgeException("InvalidRequest", "maxItems must be between 1 and 32.");
-            var result = JsonNode.Parse((await bridge.CallAsync("opcua_engineering_export", new { category, name, projectName, hardwarePath, plcPath, maxItems,
-                artifactDirectory = Path.Combine(ExportDirectory, "opcua") }, cancellationToken)).GetRawText())!.AsObject();
+            var result = JsonNode.Parse((await bridge.CallAsync("opcua_engineering_export", new
+            {
+                category,
+                name,
+                projectName,
+                hardwarePath,
+                plcPath,
+                maxItems,
+                artifactDirectory = Path.Combine(ExportDirectory, "opcua")
+            }, cancellationToken)).GetRawText())!.AsObject();
             var store = new OpcUaWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits);
             foreach (var file in result["files"]!.AsArray())
             {
@@ -36,8 +44,15 @@ public sealed partial class TiaTools
         }
         catch (Exception error) when (ReviewError(error))
         {
-            return Result(JsonSerializer.Serialize(new { error = new { code = (error as BridgeException)?.Code ?? "OpcUaEngineeringExportFailed",
-                message = error.Message, details = (error as BridgeOperationException)?.Details } }, BridgeProtocol.Json), true);
+            return Result(JsonSerializer.Serialize(new
+            {
+                error = new
+                {
+                    code = (error as BridgeException)?.Code ?? "OpcUaEngineeringExportFailed",
+                    message = error.Message,
+                    details = (error as BridgeOperationException)?.Details
+                }
+            }, BridgeProtocol.Json), true);
         }
     }
 }

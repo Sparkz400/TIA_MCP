@@ -28,12 +28,19 @@ public sealed partial class TiaTools
             if (relationshipRoots is < 0 or > 25) throw new BridgeException("InvalidRequest", "maxRelationshipRoots must be 0..25.");
             JsonObject? temporaryCopy = null;
             if (input["fromTemporaryCopy"]?.GetValue<bool>() == true)
-                temporaryCopy = JsonNode.Parse((await bridge.CallAsync("project_open_copy", new { projectName = input["projectName"]?.GetValue<string>(),
-                    artifactDirectory = Path.Combine(options.ArtifactsDirectory, "copies") }, cancellationToken)).GetRawText())!.AsObject();
+                temporaryCopy = JsonNode.Parse((await bridge.CallAsync("project_open_copy", new
+                {
+                    projectName = input["projectName"]?.GetValue<string>(),
+                    artifactDirectory = Path.Combine(options.ArtifactsDirectory, "copies")
+                }, cancellationToken)).GetRawText())!.AsObject();
             int blockOffset = input["blockOffset"]?.GetValue<int>() ?? 0;
             if (blockOffset < 0) throw new BridgeException("InvalidRequest", "blockOffset must be 0 or more.");
-            var captureArgs = new JsonObject { ["action"] = "capture", ["lifetimeSeconds"] = 900,
-                ["artifactDirectory"] = Path.Combine(options.ArtifactsDirectory, "project-explorer") };
+            var captureArgs = new JsonObject
+            {
+                ["action"] = "capture",
+                ["lifetimeSeconds"] = 900,
+                ["artifactDirectory"] = Path.Combine(options.ArtifactsDirectory, "project-explorer")
+            };
             foreach (string name in new[] { "projectName", "plcPath", "maxVisited" })
                 if (input[name] is not null) captureArgs[name] = input[name]!.DeepClone();
             ToolProgress.Stage("capturing the project hierarchy");
@@ -57,20 +64,35 @@ public sealed partial class TiaTools
                 var relationships = new JsonArray();
                 foreach (var node in selected.Take(relationshipRoots))
                 {
-                    var reference = new JsonObject { ["schemaVersion"] = "project-model.v1", ["snapshotId"] = snapshotId,
+                    var reference = new JsonObject
+                    {
+                        ["schemaVersion"] = "project-model.v1",
+                        ["snapshotId"] = snapshotId,
                         ["sessionGeneration"] = listing["sessionGeneration"]!.DeepClone(),
                         ["projectPath"] = listing["projectPath"]!.DeepClone(),
-                        ["nodeId"] = node!["nodeId"]!.DeepClone(), ["objectPath"] = node["objectPath"]!.DeepClone() };
-                    var observed = JsonNode.Parse((await bridge.CallAsync("project_model", new JsonObject {
-                        ["action"] = "relationships", ["reference"] = reference, ["direction"] = "both",
-                        ["depth"] = 1, ["maxNodes"] = 500, ["maxEdges"] = 1000 }, cancellationToken)).GetRawText())!.AsObject();
+                        ["nodeId"] = node!["nodeId"]!.DeepClone(),
+                        ["objectPath"] = node["objectPath"]!.DeepClone()
+                    };
+                    var observed = JsonNode.Parse((await bridge.CallAsync("project_model", new JsonObject
+                    {
+                        ["action"] = "relationships",
+                        ["reference"] = reference,
+                        ["direction"] = "both",
+                        ["depth"] = 1,
+                        ["maxNodes"] = 500,
+                        ["maxEdges"] = 1000
+                    }, cancellationToken)).GetRawText())!.AsObject();
                     var observation = new JsonObject { ["objectPath"] = node["objectPath"]!.DeepClone() };
                     foreach (string key in new[] { "status", "retainedForExport", "coverage", "nativeCoverage", "warnings", "truncated" })
                         if (observed[key] is not null) observation[key] = observed[key]!.DeepClone();
                     relationships.Add(observation);
                 }
-                var export = JsonNode.Parse((await bridge.CallAsync("project_model", new { action = "export", snapshotId,
-                    artifactDirectory = Path.Combine(options.ArtifactsDirectory, "project-explorer") }, cancellationToken)).GetRawText())!.AsObject();
+                var export = JsonNode.Parse((await bridge.CallAsync("project_model", new
+                {
+                    action = "export",
+                    snapshotId,
+                    artifactDirectory = Path.Combine(options.ArtifactsDirectory, "project-explorer")
+                }, cancellationToken)).GetRawText())!.AsObject();
                 var model = JsonNode.Parse(ProjectReviewStore.ReadArtifact(options.ArtifactsDirectory, export["artifact"]!.AsObject()))!.AsObject();
                 var documents = new JsonArray(); long totalBytes = 0;
                 foreach (var node in selected)
@@ -85,8 +107,12 @@ public sealed partial class TiaTools
                     { row["reason"] = "Protected/safety block content is outside this review export route."; row["skipped"] = true; continue; }
                     try
                     {
-                        var block = JsonNode.Parse((await bridge.CallAsync("block_read", new { blockPath = path, includeXml = false,
-                            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "exports") }, cancellationToken)).GetRawText())!.AsObject();
+                        var block = JsonNode.Parse((await bridge.CallAsync("block_read", new
+                        {
+                            blockPath = path,
+                            includeXml = false,
+                            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "exports")
+                        }, cancellationToken)).GetRawText())!.AsObject();
                         if (block["block"]?["path"]?.GetValue<string>() != path)
                             throw new BridgeException("SnapshotIdentityMismatch", "Export resolved a different native block.");
                         var artifact = block["artifact"]!.AsObject();
@@ -123,14 +149,26 @@ public sealed partial class TiaTools
                 var verification = await bridge.CallAsync("project_model", new { action = "verify", snapshotId }, cancellationToken);
                 if (!verification.TryGetProperty("matchesCurrentMetadata", out var matched) || matched.ValueKind != JsonValueKind.True)
                     throw new BridgeException("SnapshotInvalidated", "Native metadata changed during review capture; no persistent snapshot was accepted.");
-                var coverage = new JsonObject { ["selectedBlocks"] = selected.Length, ["observedBlocks"] = allBlocks.Length,
-                    ["omittedBlocks"] = allBlocks.Length - selected.Length, ["originalSnapshotId"] = snapshotId,
-                    ["metadataVerification"] = JsonNode.Parse(verification.GetRawText()), ["nativeContentAtomic"] = false,
-                    ["relationshipObservations"] = relationships, ["relationshipCoverageComplete"] = false, ["content"] = content,
-                    ["temporaryCopy"] = temporaryCopy is null ? null : new JsonObject { ["source"] = temporaryCopy["source"]?.DeepClone(),
-                        ["copy"] = temporaryCopy["project"]?.DeepClone(), ["archive"] = temporaryCopy["archive"]?.DeepClone(),
-                        ["note"] = "Captured from a temporary read-write copy; the original project was closed unchanged and the copy stays open." },
-                    ["projectFolder"] = ProjectReviewStore.ProjectFolderManifest(model["project"]!["projectPath"]!.GetValue<string>(), input["hashProjectFolder"]?.GetValue<bool>() == true) };
+                var coverage = new JsonObject
+                {
+                    ["selectedBlocks"] = selected.Length,
+                    ["observedBlocks"] = allBlocks.Length,
+                    ["omittedBlocks"] = allBlocks.Length - selected.Length,
+                    ["originalSnapshotId"] = snapshotId,
+                    ["metadataVerification"] = JsonNode.Parse(verification.GetRawText()),
+                    ["nativeContentAtomic"] = false,
+                    ["relationshipObservations"] = relationships,
+                    ["relationshipCoverageComplete"] = false,
+                    ["content"] = content,
+                    ["temporaryCopy"] = temporaryCopy is null ? null : new JsonObject
+                    {
+                        ["source"] = temporaryCopy["source"]?.DeepClone(),
+                        ["copy"] = temporaryCopy["project"]?.DeepClone(),
+                        ["archive"] = temporaryCopy["archive"]?.DeepClone(),
+                        ["note"] = "Captured from a temporary read-write copy; the original project was closed unchanged and the copy stays open."
+                    },
+                    ["projectFolder"] = ProjectReviewStore.ProjectFolderManifest(model["project"]!["projectPath"]!.GetValue<string>(), input["hashProjectFolder"]?.GetValue<bool>() == true)
+                };
                 var saved = new ProjectReviewStore(options.ArtifactsDirectory).Save(model, documents, coverage);
                 // A client on another machine cannot open the Host path: name the resource and the chunked route.
                 string reviewId = saved["reviewId"]!.GetValue<string>();
@@ -138,11 +176,14 @@ public sealed partial class TiaTools
                 // here with "System.Int32 cannot be converted to System.Int64"); read either width.
                 var bytesValue = saved["artifact"]!["bytes"]!.AsValue();
                 long reviewBytes = bytesValue.TryGetValue(out long wide) ? wide : bytesValue.GetValue<int>();
-                saved["remoteAccess"] = new JsonObject { ["resourceUri"] = "tia://project-reviews/" + reviewId,
+                saved["remoteAccess"] = new JsonObject
+                {
+                    ["resourceUri"] = "tia://project-reviews/" + reviewId,
                     ["resourceReadable"] = reviewBytes <= TiaResources.MaxBytes,
                     ["artifactPath"] = "project-reviews/" + reviewId + ".json",
                     ["note"] = reviewBytes <= TiaResources.MaxBytes ? "Read it with resources/read on resourceUri."
-                        : "The review exceeds the 4 MiB resource limit; read it in 64 KiB chunks with artifact_read on artifactPath." };
+                        : "The review exceeds the 4 MiB resource limit; read it in 64 KiB chunks with artifact_read on artifactPath."
+                };
                 return ReviewResult(saved);
             }
             finally
@@ -175,8 +216,14 @@ public sealed partial class TiaTools
     [McpServerTool(Name = "project_health_review", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Review a saved reviewId for native inconsistency, protected/unavailable source and exact relationship evidence. Optional testSuiteResults:[{relativePath,sha256}] selects up to 32 retained result-review receipts, summarized in a separate testSuite section. offset/count page metadata findings only; testsuite_result_review pages supplied findings. Passing selections never establish whole-project health. No compile, physical/safety validation or native qualification.")]
     public CallToolResult ProjectHealthReview(string reviewId, int offset = 0, int count = 100, JsonElement? testSuiteResults = null)
-    { try { return ReviewResult(new ProjectReviewStore(options.ArtifactsDirectory).Health(reviewId, offset, count,
-        testSuiteResults is null ? null : TestSuiteStyleJobs.Parse<EngineeringArtifactReference[]>(Encoding.UTF8.GetBytes(testSuiteResults.Value.GetRawText())))); } catch (Exception e) when (ReviewError(e)) { return ReviewFailure(e); } }
+    {
+        try
+        {
+            return ReviewResult(new ProjectReviewStore(options.ArtifactsDirectory).Health(reviewId, offset, count,
+        testSuiteResults is null ? null : TestSuiteStyleJobs.Parse<EngineeringArtifactReference[]>(Encoding.UTF8.GetBytes(testSuiteResults.Value.GetRawText()))));
+        }
+        catch (Exception e) when (ReviewError(e)) { return ReviewFailure(e); }
+    }
 
     private static bool ReviewError(Exception e) => ToolResult.IsRefusal(e);
     private static CallToolResult ReviewResult(JsonObject result)

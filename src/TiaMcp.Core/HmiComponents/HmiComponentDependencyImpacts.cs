@@ -46,21 +46,33 @@ internal static class HmiComponentDependencyImpacts
                 if (!outputIds.Contains(id)) continue;
                 int effectIndex = Enumerable.Range(0, effects.Count).Single(i => (string?)effects[i]!["outputId"] == id);
                 int expectationIndex = Enumerable.Range(0, expectations.Count).Single(i => (string?)expectations[i]!["outputId"] == id);
-                outputRows.Add(new JsonObject {
-                    ["outputId"] = id, ["outputIndex"] = outputIndex, ["action"] = outputs[outputIndex]!["selection"]!["action"]!.DeepClone(),
-                    ["effectCheckIndex"] = effectIndex, ["effectStatus"] = effects[effectIndex]!["status"]!.DeepClone(),
+                outputRows.Add(new JsonObject
+                {
+                    ["outputId"] = id,
+                    ["outputIndex"] = outputIndex,
+                    ["action"] = outputs[outputIndex]!["selection"]!["action"]!.DeepClone(),
+                    ["effectCheckIndex"] = effectIndex,
+                    ["effectStatus"] = effects[effectIndex]!["status"]!.DeepClone(),
                     ["expectationCoverageIndex"] = expectationIndex,
                     ["derivedEffectIndices"] = Indices(Enumerable.Range(0, derived.Count).Where(i => (string?)derived[i]!["expectation"]?["outputId"] == id))
                 });
             }
-            var row = new JsonObject {
-                ["associationIndex"] = index, ["scope"] = scope, ["reviewId"] = reviewId,
-                ["componentObjectPath"] = owner, ["dependencyObjectPath"] = dependency,
+            var row = new JsonObject
+            {
+                ["associationIndex"] = index,
+                ["scope"] = scope,
+                ["reviewId"] = reviewId,
+                ["componentObjectPath"] = owner,
+                ["dependencyObjectPath"] = dependency,
                 ["associationStatus"] = association["status"]!.DeepClone(),
-                ["rootObjectPaths"] = Paths(roots), ["consumerPathIndices"] = Indices(consumerIndices),
-                ["bindingIndices"] = Indices(bindingIndices), ["outputs"] = outputRows,
+                ["rootObjectPaths"] = Paths(roots),
+                ["consumerPathIndices"] = Indices(consumerIndices),
+                ["bindingIndices"] = Indices(bindingIndices),
+                ["outputs"] = outputRows,
                 ["unmappedObjectPaths"] = Paths(affected.Except(mapped, StringComparer.Ordinal)),
-                ["nativeImpactVerified"] = false, ["consumerCoverageComplete"] = false, ["outputMappingComplete"] = false
+                ["nativeImpactVerified"] = false,
+                ["consumerCoverageComplete"] = false,
+                ["outputMappingComplete"] = false
             };
             int size = JsonSerializer.SerializeToUtf8Bytes(row, BridgeProtocol.Json).Length + (rows.Count == 0 ? 0 : 1);
             if (size > ByteLimit - bytes) break;
@@ -68,11 +80,17 @@ internal static class HmiComponentDependencyImpacts
         }
         report["schemaVersion"] = "hmi-component-review.v7";
         report["dependencyImpacts"] = rows;
-        report["dependencyImpactCoverage"] = new JsonArray(new JsonObject {
-            ["associationCount"] = associations.Count, ["includedAssociationCount"] = rows.Count,
+        report["dependencyImpactCoverage"] = new JsonArray(new JsonObject
+        {
+            ["associationCount"] = associations.Count,
+            ["includedAssociationCount"] = rows.Count,
             ["omittedAssociationIndices"] = Indices(Enumerable.Range(rows.Count, associations.Count - rows.Count)),
-            ["returnedBytes"] = bytes, ["maxBytes"] = ByteLimit, ["truncated"] = rows.Count != associations.Count,
-            ["consumerCoverageComplete"] = false, ["outputMappingComplete"] = false, ["nativeImpactVerified"] = false
+            ["returnedBytes"] = bytes,
+            ["maxBytes"] = ByteLimit,
+            ["truncated"] = rows.Count != associations.Count,
+            ["consumerCoverageComplete"] = false,
+            ["outputMappingComplete"] = false,
+            ["nativeImpactVerified"] = false
         });
         report["summary"]!["dependencyImpactCount"] = rows.Count;
         report["summary"]!["dependencyImpactOutputCount"] = rows.Sum(r => r!["outputs"]!.AsArray().Count);

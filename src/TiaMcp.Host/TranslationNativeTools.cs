@@ -36,7 +36,8 @@ public sealed class TranslationNativeTools(IBridgeClient bridge, HostOptions opt
 
     [McpServerTool(Name = "translation_native_capture", ReadOnly = true, OpenWorld = false)]
     [Description("Capture complete bilingual texts and peers for an exact operator-admitted project. Missing installed admission refuses before native dispatch.")]
-    public Task<CallToolResult> Capture(string profileId, CancellationToken cancellationToken) => Run(async () => {
+    public Task<CallToolResult> Capture(string profileId, CancellationToken cancellationToken) => Run(async () =>
+    {
         var (observation, profile) = await Worker(profileId).Capture(cancellationToken);
         var uploads = new ArtifactUploadStore(Root, options.LibraryLimits);
         var capture = new TranslationWorkflowStore(Root).Capture(uploads.Upload(observation.Workbook, "native-original.xlsx"),
@@ -47,13 +48,14 @@ public sealed class TranslationNativeTools(IBridgeClient bridge, HostOptions opt
     [McpServerTool(Name = "translation_native_prepare", Destructive = false, OpenWorld = false)]
     [Description("Bind an explicitly approved offline candidate to fresh native capture and the exact installed translation profile; returns a durable plan without importing.")]
     public Task<CallToolResult> Prepare(string profileId, string candidateRef, string candidateReceiptSha256,
-        string idempotencyKey, CancellationToken cancellationToken) => Run(async () => {
-        var (observed, _) = await Worker(profileId).Capture(cancellationToken);
-        var op = Runner.Prepare(candidateRef, candidateReceiptSha256, observed, idempotencyKey);
-        var binding = new TranslationImportArtifacts(Root).Read<TranslationImportBinding>(op.Plan.Inputs[0]);
-        Registry.RequireAdmission(profileId, new(Root, op, candidateRef, candidateReceiptSha256, binding.Candidate.Sha256, binding.Baseline.Scope));
-        return op;
-    });
+        string idempotencyKey, CancellationToken cancellationToken) => Run(async () =>
+        {
+            var (observed, _) = await Worker(profileId).Capture(cancellationToken);
+            var op = Runner.Prepare(candidateRef, candidateReceiptSha256, observed, idempotencyKey);
+            var binding = new TranslationImportArtifacts(Root).Read<TranslationImportBinding>(op.Plan.Inputs[0]);
+            Registry.RequireAdmission(profileId, new(Root, op, candidateRef, candidateReceiptSha256, binding.Candidate.Sha256, binding.Baseline.Scope));
+            return op;
+        });
 
     [McpServerTool(Name = "translation_native_apply", Destructive = true, OpenWorld = false)]
     [Description("Import one exact admitted reviewed translation plan once, with retained checkpoint, full preservation, compile/save/fresh reopen and durable unknown-outcome handling.")]

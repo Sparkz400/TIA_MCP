@@ -54,7 +54,7 @@ public sealed partial class WebRuntimeClient
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, Context.Endpoint + "/api/ticket?id=" + Uri.EscapeDataString(ticket))
-                { Version = HttpVersion.Version11, VersionPolicy = HttpVersionPolicy.RequestVersionExact };
+            { Version = HttpVersion.Version11, VersionPolicy = HttpVersionPolicy.RequestVersionExact };
             request.Headers.ConnectionClose = true;
             request.Headers.Add("X-Auth-Token", token!);
             DropReadConnection();

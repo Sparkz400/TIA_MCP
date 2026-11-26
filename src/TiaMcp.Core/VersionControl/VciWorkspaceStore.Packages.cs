@@ -15,8 +15,10 @@ public sealed partial class VciWorkspaceStore
         VciExpectedHashes ExpectedHashes, string ReportSha256, VciStoredArtifact[] Artifacts);
     private static readonly JsonSerializerOptions MappingJson = new(BridgeProtocol.Json)
     {
-        PropertyNameCaseInsensitive = false, UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
-        RespectRequiredConstructorParameters = true, MaxDepth = 32
+        PropertyNameCaseInsensitive = false,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        RespectRequiredConstructorParameters = true,
+        MaxDepth = 32
     };
 
     public object CapturePackages(string sourceRecordRef, string mappingUploadRef)
@@ -99,19 +101,29 @@ public sealed partial class VciWorkspaceStore
         Require(remoteFiles.Values.Concat(result?.Values ?? Enumerable.Empty<byte[]>()).Sum(b => (long)b.Length) <= MaxResolutionBytes, "VciInputLimit", "Resolved package files exceed 4 MiB.");
         JsonArray Rows(Dictionary<string, byte[]> files, bool content) => new(files.Select(f => (JsonNode)new JsonObject
         {
-            ["path"] = f.Key, ["sha256"] = GitSafety.Hash(f.Value), ["bytes"] = f.Value.Length,
+            ["path"] = f.Key,
+            ["sha256"] = GitSafety.Hash(f.Value),
+            ["bytes"] = f.Value.Length,
             ["contentBase64"] = content ? Convert.ToBase64String(f.Value) : null
         }).ToArray());
         return new JsonObject
         {
-            ["workspacePath"] = workspacePath, ["objectPath"] = objectPath, ["take"] = take,
+            ["workspacePath"] = workspacePath,
+            ["objectPath"] = objectPath,
+            ["take"] = take,
             ["direction"] = take == "native" ? "ProjectToWorkspace" : "WorkspaceToProject",
             ["plan"] = new JsonObject
             {
-                ["comparisonRef"] = comparisonRef, ["reportSha256"] = report.Sha256, ["workspaceId"] = remoteSide.Manifest.WorkspaceId,
-                ["packageId"] = packageId, ["state"] = row.State, ["projectObjectContentSha256"] = native.Object.ContentSha256,
-                ["baselineContentSha256"] = row.BaselineContentSha256, ["projectContentSha256"] = row.ProjectContentSha256,
-                ["workspaceContentSha256"] = row.WorkspaceContentSha256, ["mergedRecordRef"] = merged
+                ["comparisonRef"] = comparisonRef,
+                ["reportSha256"] = report.Sha256,
+                ["workspaceId"] = remoteSide.Manifest.WorkspaceId,
+                ["packageId"] = packageId,
+                ["state"] = row.State,
+                ["projectObjectContentSha256"] = native.Object.ContentSha256,
+                ["baselineContentSha256"] = row.BaselineContentSha256,
+                ["projectContentSha256"] = row.ProjectContentSha256,
+                ["workspaceContentSha256"] = row.WorkspaceContentSha256,
+                ["mergedRecordRef"] = merged
             },
             ["workspaceFiles"] = Rows(remoteFiles, false),
             ["resultFiles"] = result is null ? new JsonArray() : Rows(result, true)
@@ -192,20 +204,45 @@ public sealed partial class VciWorkspaceStore
         {
             var record = LoadManifest(reference); var manifest = record.Manifest;
             var owned = manifest.Packages.SelectMany(p => p.ExpectedFiles).Select(f => f.RelativePath).ToHashSet(StringComparer.Ordinal);
-            return new { recordRef = reference, kind, state = "complete", nativeQualified = false, targetProbed = false,
-                record.Receipt.SourceRecordRef, manifestSha256 = manifest.Sha256, manifest.WorkspaceId, manifest.EnumerationComplete,
-                fileCount = manifest.Files.Count, packageCount = manifest.Packages.Count,
+            return new
+            {
+                recordRef = reference,
+                kind,
+                state = "complete",
+                nativeQualified = false,
+                targetProbed = false,
+                record.Receipt.SourceRecordRef,
+                manifestSha256 = manifest.Sha256,
+                manifest.WorkspaceId,
+                manifest.EnumerationComplete,
+                fileCount = manifest.Files.Count,
+                packageCount = manifest.Packages.Count,
                 incompletePackageCount = manifest.Packages.Count(p => p.Issues.Count != 0),
                 unmanagedFileCount = manifest.Files.Count(f => !owned.Contains(f.RelativePath)),
-                artifacts = record.Receipt.Artifacts, receiptName = "receipt.json" };
+                artifacts = record.Receipt.Artifacts,
+                receiptName = "receipt.json"
+            };
         }
         var comparison = LoadComparison(reference);
-        return new { recordRef = reference, kind, state = "complete", nativeQualified = false, canSynchronize = false, resolutionApplied = false,
-            comparison.Receipt.BaselineRef, comparison.Receipt.ProjectRef, comparison.Receipt.WorkspaceRef,
-            reportSha256 = comparison.Report.Sha256, rowCount = comparison.Report.Rows.Count,
-            conflictCount = comparison.Report.Rows.Count(r => r.Conflict), issues = comparison.Report.Issues,
+        return new
+        {
+            recordRef = reference,
+            kind,
+            state = "complete",
+            nativeQualified = false,
+            canSynchronize = false,
+            resolutionApplied = false,
+            comparison.Receipt.BaselineRef,
+            comparison.Receipt.ProjectRef,
+            comparison.Receipt.WorkspaceRef,
+            reportSha256 = comparison.Report.Sha256,
+            rowCount = comparison.Report.Rows.Count,
+            conflictCount = comparison.Report.Rows.Count(r => r.Conflict),
+            issues = comparison.Report.Issues,
             stateCounts = comparison.Report.Rows.GroupBy(r => r.State).ToDictionary(g => g.Key, g => g.Count()),
-            artifacts = comparison.Receipt.Artifacts, receiptName = "receipt.json" };
+            artifacts = comparison.Receipt.Artifacts,
+            receiptName = "receipt.json"
+        };
     }
 
     private VciStoredArtifact[] PackageArtifacts(string reference, string kind) =>

@@ -52,9 +52,20 @@ public sealed class RuntimeHandoffWorkflowStore
             File.Move(temporary, path); checkpoint?.Invoke("observationPublished", path);
         }
         Require(Read(path, RuntimeHandoffReview.ObservationLimit).AsSpan().SequenceEqual(bytes), "HandoffIntegrityFailure", "Retained observation differs from its original upload.");
-        return new { schemaVersion = "runtime-handoff-observation-receipt.v1", role, artifact = ObservationReference(hash), bytes = bytes.Length,
-            sourceKind = (string)observation["sourceKind"]!, nativeExecutable = false, nativeQualified = false,
-            sourceAuthenticityVerified = false, liveFreshnessVerified = false, operationAdmitted = false, assertionsAdmitted = false };
+        return new
+        {
+            schemaVersion = "runtime-handoff-observation-receipt.v1",
+            role,
+            artifact = ObservationReference(hash),
+            bytes = bytes.Length,
+            sourceKind = (string)observation["sourceKind"]!,
+            nativeExecutable = false,
+            nativeQualified = false,
+            sourceAuthenticityVerified = false,
+            liveFreshnessVerified = false,
+            operationAdmitted = false,
+            assertionsAdmitted = false
+        };
     }
 
     public object Review(string uploadRef)
@@ -94,8 +105,21 @@ public sealed class RuntimeHandoffWorkflowStore
             : report[section]!.AsArray();
         Require(offset <= source.Count, "HandoffPageLimit", "Offset exceeds the selected report array.");
         var (rows, next) = ReportPageRows.Read(source, offset, count, PageBytes - 4096, "Row exceeds page budget; download report.json or the original observation.");
-        var result = new { recordRef, reportSha256 = record.Receipt.Artifacts[1].Sha256, section, offset, total = source.Count,
-            rows, nextOffset = next == source.Count ? (int?)null : next, totalItems = source.Count, pageCount = PageTotals.PageCount(source.Count, count), nativeQualified = false, operationAdmitted = false, assertionsAdmitted = false };
+        var result = new
+        {
+            recordRef,
+            reportSha256 = record.Receipt.Artifacts[1].Sha256,
+            section,
+            offset,
+            total = source.Count,
+            rows,
+            nextOffset = next == source.Count ? (int?)null : next,
+            totalItems = source.Count,
+            pageCount = PageTotals.PageCount(source.Count, count),
+            nativeQualified = false,
+            operationAdmitted = false,
+            assertionsAdmitted = false
+        };
         Require(JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length <= PageBytes, "HandoffPageLimit", "Page exceeds 128 KiB; download the complete report.");
         return result;
     }
@@ -109,9 +133,22 @@ public sealed class RuntimeHandoffWorkflowStore
         byte[] bytes = name switch { "request.json" => record.Request, "report.json" => record.Report, "receipt.json" => record.ReceiptData, _ => record.Observations[name] };
         Require(offset <= bytes.Length, "HandoffPageLimit", "Offset exceeds the selected artifact.");
         int length = (int)Math.Min(count, bytes.Length - offset);
-        return new { recordRef, name, sha256 = Hash(bytes), bytes = bytes.Length, offset, count = length, nextOffset = offset + length,
-            complete = offset + length == bytes.Length, encoding = "base64", data = Convert.ToBase64String(bytes, (int)offset, length),
-            nativeQualified = false, operationAdmitted = false, assertionsAdmitted = false };
+        return new
+        {
+            recordRef,
+            name,
+            sha256 = Hash(bytes),
+            bytes = bytes.Length,
+            offset,
+            count = length,
+            nextOffset = offset + length,
+            complete = offset + length == bytes.Length,
+            encoding = "base64",
+            data = Convert.ToBase64String(bytes, (int)offset, length),
+            nativeQualified = false,
+            operationAdmitted = false,
+            assertionsAdmitted = false
+        };
     }
 
     public object List(int offset = 0, int count = 20)
@@ -133,10 +170,20 @@ public sealed class RuntimeHandoffWorkflowStore
             { state = "verificationFailed"; errorCode = e is BridgeException b ? b.Code : "HandoffVerificationFailed"; }
             return new { id, recordRef = reference, state, errorCode };
         }).ToArray();
-        return new { rows, total = directories.Length, nextOffset = offset + rows.Length == directories.Length ? (int?)null : offset + rows.Length, totalItems = directories.Length, pageCount = PageTotals.PageCount(directories.Length, count),
+        return new
+        {
+            rows,
+            total = directories.Length,
+            nextOffset = offset + rows.Length == directories.Length ? (int?)null : offset + rows.Length,
+            totalItems = directories.Length,
+            pageCount = PageTotals.PageCount(directories.Length, count),
             retainedObservationFiles = Directory.EnumerateFiles(observationsRoot, "*.json").Count(),
             incompleteObservationFiles = Directory.EnumerateFiles(observationsRoot, "*.tmp").Count(),
-            ordering = "record-id; relist after additions", nativeQualified = false, operationAdmitted = false, assertionsAdmitted = false };
+            ordering = "record-id; relist after additions",
+            nativeQualified = false,
+            operationAdmitted = false,
+            assertionsAdmitted = false
+        };
     }
 
     private Record Load(string reference)
@@ -186,13 +233,28 @@ public sealed class RuntimeHandoffWorkflowStore
     private static object Summary(Record record)
     {
         var report = JsonNode.Parse(record.Report)!.AsObject();
-        return new { schemaVersion = "runtime-handoff-receipt.v1", recordRef = record.Reference, state = "complete",
-            requestSha256 = record.Receipt.Artifacts[0].Sha256, reportSha256 = record.Receipt.Artifacts[1].Sha256,
-            reviewId = (string)report["reviewId"]!, accessRecordId = (string)report["accessRecordId"]!, accessPhase = (string)report["accessPhase"]!,
-            summary = report["summary"]!.DeepClone(), artifacts = record.Receipt.Artifacts, receiptName = "receipt.json",
+        return new
+        {
+            schemaVersion = "runtime-handoff-receipt.v1",
+            recordRef = record.Reference,
+            state = "complete",
+            requestSha256 = record.Receipt.Artifacts[0].Sha256,
+            reportSha256 = record.Receipt.Artifacts[1].Sha256,
+            reviewId = (string)report["reviewId"]!,
+            accessRecordId = (string)report["accessRecordId"]!,
+            accessPhase = (string)report["accessPhase"]!,
+            summary = report["summary"]!.DeepClone(),
+            artifacts = record.Receipt.Artifacts,
+            receiptName = "receipt.json",
             targetBinding = (string?)report["targetBinding"]?["state"] ?? "unbound",
-            nativeExecutable = false, nativeQualified = false, sourceAuthenticityVerified = false, liveFreshnessVerified = false,
-            operationAdmitted = false, assertionsAdmitted = false, admission = "unavailableWithoutQualifiedNativeEvidence" };
+            nativeExecutable = false,
+            nativeQualified = false,
+            sourceAuthenticityVerified = false,
+            liveFreshnessVerified = false,
+            operationAdmitted = false,
+            assertionsAdmitted = false,
+            admission = "unavailableWithoutQualifiedNativeEvidence"
+        };
     }
 
     private void Inventory(long additionalBytes = 0, int additionalEntries = 0, int additionalRecords = 0)

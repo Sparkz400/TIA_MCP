@@ -63,7 +63,7 @@ public sealed class DiagnosticUaObservations(string artifactsRoot, Func<string, 
             else
             {
                 var evt = row!["event"]!; string kind = D.Text(evt, "kind");
-                if (kind == "gap" || kind == "reconnect" && D.Text(evt["reconnect"],"state")=="starting") gapRows++;
+                if (kind == "gap" || kind == "reconnect" && D.Text(evt["reconnect"], "state") == "starting") gapRows++;
                 if (kind == "failure") failures++;
                 if (evt["duplicate"]!.GetValue<bool>()) { duplicates++; continue; }
                 if (evt["keepAlive"]!.GetValue<bool>()) { keepalives++; continue; }
@@ -85,47 +85,87 @@ public sealed class DiagnosticUaObservations(string artifactsRoot, Func<string, 
         {
             var values = evidence[i];
             int Count(Func<JsonNode, bool> test) => values.Count(v => test(v["value"]!));
-            summaries.Add(new JsonObject { ["signalId"] = mappings[i]!["signalId"]!.DeepClone(), ["node"] = mappings[i]!["node"]!.DeepClone(),
-                ["unit"] = mappings[i]!["unit"]!.DeepClone(), ["savedDatatype"] = mappings[i]!["declaration"]!["datatype"]!.DeepClone(),
+            summaries.Add(new JsonObject
+            {
+                ["signalId"] = mappings[i]!["signalId"]!.DeepClone(),
+                ["node"] = mappings[i]!["node"]!.DeepClone(),
+                ["unit"] = mappings[i]!["unit"]!.DeepClone(),
+                ["savedDatatype"] = mappings[i]!["declaration"]!["datatype"]!.DeepClone(),
                 ["monitoredItem"] = creation?["items"]?[i]?.DeepClone(),
-                ["observationCount"] = values.Count, ["hostReadErrors"] = hostErrors[i],
+                ["observationCount"] = values.Count,
+                ["hostReadErrors"] = hostErrors[i],
                 ["goodValues"] = Count(v => D.Text(v, "quality") == "Good" && D.Text(v, "outcome") == "value" && v["encoding"]?.GetValue<string>() != "null"),
-                ["uncertain"] = Count(v => D.Text(v, "quality") == "Uncertain"), ["bad"] = Count(v => D.Text(v, "quality") == "Bad"),
+                ["uncertain"] = Count(v => D.Text(v, "quality") == "Uncertain"),
+                ["bad"] = Count(v => D.Text(v, "quality") == "Bad"),
                 ["unsupported"] = Count(v => D.Text(v, "outcome") == "unsupported"),
                 ["metadataErrors"] = Count(v => D.Text(v, "outcome") == "metadataError"),
                 ["nullValues"] = Count(v => D.Text(v, "encoding") == "null"),
-                ["missingSourceTimestamps"] = Count(v => v["sourceTimestamp"] is null), ["missingServerTimestamps"] = Count(v => v["serverTimestamp"] is null),
+                ["missingSourceTimestamps"] = Count(v => v["sourceTimestamp"] is null),
+                ["missingServerTimestamps"] = Count(v => v["serverTimestamp"] is null),
                 ["observedBuiltInTypes"] = D.Strings(values.Select(v => D.Text(v["value"], "builtInType")).Where(t => t.Length > 0).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)),
-                ["firstObservation"] = values.FirstOrDefault()?.DeepClone(), ["lastObservation"] = values.LastOrDefault()?.DeepClone(),
-                ["coverage"] = values.Count == 0 ? "noSelectedObservations" : "recordedObservationsOnly" });
+                ["firstObservation"] = values.FirstOrDefault()?.DeepClone(),
+                ["lastObservation"] = values.LastOrDefault()?.DeepClone(),
+                ["coverage"] = values.Count == 0 ? "noSelectedObservations" : "recordedObservationsOnly"
+            });
         }
-        var hypotheses = new JsonArray(D.Rows(binding["experiment"]!["diagnosticCase"]!["hypotheses"]).Select(h => (JsonNode)new JsonObject {
-            ["id"] = h!["id"]!.DeepClone(), ["statement"] = h["statement"]!.DeepClone(), ["verdict"] = "unresolved",
-            ["reason"] = "Independent online signal/program association and simultaneous sample semantics are not established." }).ToArray());
-        var report = new JsonObject { ["schemaVersion"] = "diagnostic-ua-observation.v1", ["snapshotRef"] = snapshotRef,
-            ["acquisitionMode"] = mode, ["bindingId"] = bindingId, ["experimentId"] = binding["experimentId"]!.DeepClone(),
-            ["binding"] = binding, ["bindingArtifact"] = new JsonObject { ["sha256"] = bindingId, ["bytes"] = bindingBytes.Length, ["base64"] = Convert.ToBase64String(bindingBytes) },
-            ["captureSource"] = source, ["signals"] = summaries, ["hypotheses"] = hypotheses,
+        var hypotheses = new JsonArray(D.Rows(binding["experiment"]!["diagnosticCase"]!["hypotheses"]).Select(h => (JsonNode)new JsonObject
+        {
+            ["id"] = h!["id"]!.DeepClone(),
+            ["statement"] = h["statement"]!.DeepClone(),
+            ["verdict"] = "unresolved",
+            ["reason"] = "Independent online signal/program association and simultaneous sample semantics are not established."
+        }).ToArray());
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-ua-observation.v1",
+            ["snapshotRef"] = snapshotRef,
+            ["acquisitionMode"] = mode,
+            ["bindingId"] = bindingId,
+            ["experimentId"] = binding["experimentId"]!.DeepClone(),
+            ["binding"] = binding,
+            ["bindingArtifact"] = new JsonObject { ["sha256"] = bindingId, ["bytes"] = bindingBytes.Length, ["base64"] = Convert.ToBase64String(bindingBytes) },
+            ["captureSource"] = source,
+            ["signals"] = summaries,
+            ["hypotheses"] = hypotheses,
             ["unselectedSignalIds"] = D.Strings(D.Rows(binding["experiment"]!["diagnosticCase"]!["signals"]).Select(s => D.Text(s, "id"))
                 .Except(mappings.Select(m => D.Text(m, "signalId")), StringComparer.Ordinal)),
-            ["events"] = new JsonObject { ["gapRows"] = gapRows, ["duplicateMessages"] = duplicates, ["keepalives"] = keepalives,
-                ["failureEvents"] = failures, ["overflowNotifications"] = overflow },
-            ["completeCommittedPrefixRetained"] = true, ["sourceEvidenceRevalidated"] = true, ["limits"] = Limits };
+            ["events"] = new JsonObject
+            {
+                ["gapRows"] = gapRows,
+                ["duplicateMessages"] = duplicates,
+                ["keepalives"] = keepalives,
+                ["failureEvents"] = failures,
+                ["overflowNotifications"] = overflow
+            },
+            ["completeCommittedPrefixRetained"] = true,
+            ["sourceEvidenceRevalidated"] = true,
+            ["limits"] = Limits
+        };
         foreach (string flag in FalseClaims) report[flag] = false;
         if (JsonSerializer.SerializeToUtf8Bytes(report, BridgeProtocol.Json).Length > DiagnosticStore.MaxBytes)
             throw new BridgeException("ArtifactCapacity", "Complete UA observation report exceeds 8 MiB; no source rows were silently omitted.");
         return report;
     }
 
-    private static JsonObject Item(JsonNode row, JsonNode value, JsonNode? started, JsonNode? completed) => new() {
-        ["rowSequence"] = row["sequence"]!.DeepClone(), ["elapsedMilliseconds"] = row["elapsedMilliseconds"]!.DeepClone(),
-        ["observedUtc"] = row["observedUtc"]!.DeepClone(), ["readStartedAt"] = started?.DeepClone(),
-        ["readCompletedAt"] = completed?.DeepClone(), ["value"] = value.DeepClone() };
+    private static JsonObject Item(JsonNode row, JsonNode value, JsonNode? started, JsonNode? completed) => new()
+    {
+        ["rowSequence"] = row["sequence"]!.DeepClone(),
+        ["elapsedMilliseconds"] = row["elapsedMilliseconds"]!.DeepClone(),
+        ["observedUtc"] = row["observedUtc"]!.DeepClone(),
+        ["readStartedAt"] = started?.DeepClone(),
+        ["readCompletedAt"] = completed?.DeepClone(),
+        ["value"] = value.DeepClone()
+    };
 
     public JsonObject Export(string reportId, string format)
     {
-        var (extension, media) = format switch { "json" => (".json", "application/json"), "markdown" => (".md", "text/markdown"),
-            "html" => (".html", "text/html"), _ => throw new BridgeException("InvalidRequest", "format must be json, markdown or html.") };
+        var (extension, media) = format switch
+        {
+            "json" => (".json", "application/json"),
+            "markdown" => (".md", "text/markdown"),
+            "html" => (".html", "text/html"),
+            _ => throw new BridgeException("InvalidRequest", "format must be json, markdown or html.")
+        };
         var store = new DiagnosticStore(artifactsRoot); byte[] source = store.ReadBytes(reportId);
         var saved = JsonNode.Parse(source)!.AsObject();
         if (D.Text(saved, "schemaVersion") != "diagnostic-ua-observation.v1") throw new BridgeException("InvalidRequest", "Expected a retained UA observation report.");
@@ -150,8 +190,11 @@ public sealed class DiagnosticUaObservations(string artifactsRoot, Func<string, 
         void Code(string text)
         {
             if (html) Line("<pre tabindex=\"0\"><code>" + WebUtility.HtmlEncode(text) + "</code></pre>");
-            else { int longest = 0, current = 0; foreach (char c in text) { current = c == '`' ? current + 1 : 0; longest = Math.Max(longest, current); }
-                string fence = new('`', Math.Max(3, longest + 1)); Line(fence + "json\n" + text + "\n" + fence + "\n"); }
+            else
+            {
+                int longest = 0, current = 0; foreach (char c in text) { current = c == '`' ? current + 1 : 0; longest = Math.Max(longest, current); }
+                string fence = new('`', Math.Max(3, longest + 1)); Line(fence + "json\n" + text + "\n" + fence + "\n");
+            }
         }
         if (html) Line("<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'\"><title>Retained UA observations</title><style>" + DiagnosticReportExport.Style + "h1,h2,h3,p{overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere}</style></head><body><main>");
         Heading(1, "Retained UA observations"); Paragraph("Report: " + id); Paragraph(Limits);
@@ -165,7 +208,7 @@ public sealed class DiagnosticUaObservations(string artifactsRoot, Func<string, 
         Paragraph("Counts overlap: quality, outcome and missing timestamps describe separate dimensions. First and last observations are recorded endpoints only; no continuous state is inferred.");
         foreach (var signal in report["signals"]!.AsArray()) { Heading(3, D.Text(signal, "signalId")); Code(signal!.ToJsonString(BridgeProtocol.Json)); }
         if (report["captureSource"]!["plan"]?["request"]?["events"] is not null)
-            Line(DiagnosticUaTimeline.Render(report["captureSource"]!["rows"]!.AsArray(),html));
+            Line(DiagnosticUaTimeline.Render(report["captureSource"]!["rows"]!.AsArray(), html));
         Heading(2, "Timing, gaps and cleanup"); Code(report["captureSource"]!["recordedProgress"]!.ToJsonString(BridgeProtocol.Json)); Code(report["events"]!.ToJsonString(BridgeProtocol.Json));
         Paragraph("Only the selected committed prefix is retained. A running prefix does not establish final termination or remote cleanup. Source/server timestamps and client elapsed times are separate clocks.");
         Heading(2, "Unresolved hypotheses"); Code(report["hypotheses"]!.ToJsonString(BridgeProtocol.Json));

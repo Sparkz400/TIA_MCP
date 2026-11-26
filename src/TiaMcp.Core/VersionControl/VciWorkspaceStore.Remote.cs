@@ -102,12 +102,40 @@ public sealed partial class VciWorkspaceStore
         if (kind == "push")
         {
             var push = Pushed(reference);
-            return new { recordRef = reference, kind, state = "complete", nativeQualified = false, push.RevisionRef, push.Remote, push.Branch, push.Commit,
-                push.ExpectedRemoteCommit, push.ExecutableSha256, push.GitVersion, receiptName = "receipt.json" };
+            return new
+            {
+                recordRef = reference,
+                kind,
+                state = "complete",
+                nativeQualified = false,
+                push.RevisionRef,
+                push.Remote,
+                push.Branch,
+                push.Commit,
+                push.ExpectedRemoteCommit,
+                push.ExecutableSha256,
+                push.GitVersion,
+                receiptName = "receipt.json"
+            };
         }
         var fetch = Fetched(reference).Value;
-        return new { recordRef = reference, kind, state = "complete", nativeQualified = false, fetch.ParentRevisionRef, fetch.Remote, fetch.Branch,
-            fetch.Commit, fetch.Tree, fetch.PreviousCommit, fileCount = fetch.Files.Length, artifacts = fetch.Artifacts, fetch.ExecutableSha256, fetch.GitVersion,
-            receiptName = "receipt.json" };
+        return new
+        {
+            recordRef = reference,
+            kind,
+            state = "complete",
+            nativeQualified = false,
+            fetch.ParentRevisionRef,
+            fetch.Remote,
+            fetch.Branch,
+            fetch.Commit,
+            fetch.Tree,
+            fetch.PreviousCommit,
+            fileCount = fetch.Files.Length,
+            artifacts = fetch.Artifacts,
+            fetch.ExecutableSha256,
+            fetch.GitVersion,
+            receiptName = "receipt.json"
+        };
     }
 }

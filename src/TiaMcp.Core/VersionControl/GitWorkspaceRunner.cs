@@ -625,8 +625,11 @@ public sealed class GitWorkspaceRunner
             ExpectedSnapshotSha256: snapshot?.Sha256, ExpectedIndexSha256: snapshot?.IndexSha256, ExpectedConfigurationSha256: snapshot?.ConfigurationSha256, BindingSha256: binding), token);
     private async Task Unknown(string id, string operation, string root, string? expected, string? candidate, string? plan, Exception ex, string binding)
     {
-        try { await journal.RecordAsync(new(id, operation, root, "outcomeUnknown", expected, candidate, PlanSha256: plan,
-            ErrorCode: ex is BridgeException bridge ? bridge.Code : ex.GetType().Name, RecordedAt: DateTimeOffset.UtcNow, BindingSha256: binding), CancellationToken.None); }
+        try
+        {
+            await journal.RecordAsync(new(id, operation, root, "outcomeUnknown", expected, candidate, PlanSha256: plan,
+            ErrorCode: ex is BridgeException bridge ? bridge.Code : ex.GetType().Name, RecordedAt: DateTimeOffset.UtcNow, BindingSha256: binding), CancellationToken.None);
+        }
         catch { /* The durable pre-dispatch record remains authoritative when result recording fails. */ }
     }
 }

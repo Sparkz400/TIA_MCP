@@ -37,10 +37,14 @@ public static class InventoryExport
             using (var stream = new FileStream(metadataPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
             {
                 metadataCreated = true;
-                JsonSerializer.Serialize(stream, new { snapshot = snapshot.Metadata, rowsExported = snapshot.Metadata.TotalRows,
+                JsonSerializer.Serialize(stream, new
+                {
+                    snapshot = snapshot.Metadata,
+                    rowsExported = snapshot.Metadata.TotalRows,
                     formulaPolicy = "CSV formula-like text is prefixed with an apostrophe; XLSX uses inline strings, never formulas.",
                     comparisonPolicy = "Only available values compared. Whitespace normalized in MLFB; V prefix and omitted zero patch normalized in firmware. Catalog wildcard MLFB is not comparable. Differences do not determine compatibility.",
-                    fieldPolicy = "Unavailable values retain [state] and detailed reasons. IPs can be aggregated from explicitly recorded descendant interfaces. BMK components are never parsed from names." }, InventoryStore.Json);
+                    fieldPolicy = "Unavailable values retain [state] and detailed reasons. IPs can be aggregated from explicitly recorded descendant interfaces. BMK components are never parsed from names."
+                }, InventoryStore.Json);
             }
             return new { snapshot = snapshot.Metadata, rowsExported = snapshot.Metadata.TotalRows, artifact = Artifact(path), metadataArtifact = Artifact(metadataPath) };
         }

@@ -67,9 +67,17 @@ public static class HmiComponentReview
                 throw Error("Component matches require unique explicitly selected before/after objects; installation has no prior match.");
             var oldSignatures = Signatures(before, oldPath); var newSignatures = Signatures(after, newPath);
             bool? Changed(string key) => oldSignatures is null || newSignatures is null ? null : (string?)oldSignatures[key] != (string?)newSignatures[key];
-            componentRows.Add(new JsonObject { ["mapping"] = row.DeepClone(), ["status"] = oldSignatures is null || newSignatures is null ? "contentUnknown" : "explicitlyCompared",
-                ["beforeSignatures"] = oldSignatures, ["afterSignatures"] = newSignatures, ["interfaceChanged"] = Changed("interface"), ["logicChanged"] = Changed("logic"),
-                ["documentChanged"] = Changed("document"), ["nativeCompatibilityVerified"] = false });
+            componentRows.Add(new JsonObject
+            {
+                ["mapping"] = row.DeepClone(),
+                ["status"] = oldSignatures is null || newSignatures is null ? "contentUnknown" : "explicitlyCompared",
+                ["beforeSignatures"] = oldSignatures,
+                ["afterSignatures"] = newSignatures,
+                ["interfaceChanged"] = Changed("interface"),
+                ["logicChanged"] = Changed("logic"),
+                ["documentChanged"] = Changed("document"),
+                ["nativeCompatibilityVerified"] = false
+            });
         }
         foreach (string path in before?.Paths ?? []) if (!matchedBefore.Contains(path)) componentRows.Add(new JsonObject { ["status"] = "unmatchedBefore", ["objectPath"] = path, ["nativeCompatibilityVerified"] = false });
         foreach (string path in after.Paths) if (!matchedAfter.Contains(path)) componentRows.Add(new JsonObject { ["status"] = "unmatchedAfter", ["objectPath"] = path, ["nativeCompatibilityVerified"] = false });
@@ -122,10 +130,22 @@ public static class HmiComponentReview
             }
             if (action is "create" or "update" && (!proposedComplete || proposed.Count == 0)) gaps.Add("A complete declared proposed file set has not been supplied.");
             if (action is "retain" or "remove" && proposed.Count != 0) conflicts.Add("Retain/remove must not silently publish proposed replacement bytes.");
-            outputRows.Add(new JsonObject { ["id"] = id, ["selection"] = row.DeepClone(), ["capturedObject"] = node?.DeepClone(),
-                ["baselineFiles"] = baseline, ["currentFiles"] = current, ["proposedFiles"] = proposed,
-                ["conflicts"] = conflicts, ["gaps"] = gaps, ["preservationVerified"] = false, ["nativeActionAvailable"] = false,
-                ["ownershipVerified"] = false, ["contentAssociationVerified"] = false, ["contentCompletenessVerified"] = false });
+            outputRows.Add(new JsonObject
+            {
+                ["id"] = id,
+                ["selection"] = row.DeepClone(),
+                ["capturedObject"] = node?.DeepClone(),
+                ["baselineFiles"] = baseline,
+                ["currentFiles"] = current,
+                ["proposedFiles"] = proposed,
+                ["conflicts"] = conflicts,
+                ["gaps"] = gaps,
+                ["preservationVerified"] = false,
+                ["nativeActionAvailable"] = false,
+                ["ownershipVerified"] = false,
+                ["contentAssociationVerified"] = false,
+                ["contentCompletenessVerified"] = false
+            });
         }
         foreach (var output in outputRows.OfType<JsonObject>().Where(o => (string?)o["selection"]?["action"] == "create"))
         {
@@ -159,21 +179,51 @@ public static class HmiComponentReview
             string? path = (string?)output["objectPath"];
             var capturedProperties = path is not null && target.Nodes.TryGetValue(path, out var outputNode) ? outputNode["metadata"]?["properties"] as JsonObject : null;
             if (capturedProperties is null || !capturedProperties.ContainsKey(property)) gaps.Add("Destination property/faceplate port is not established by captured metadata.");
-            bindingRows.Add(new JsonObject { ["id"] = id, ["selection"] = row.DeepClone(), ["beforeDeclaration"] = previous, ["afterDeclaration"] = next,
+            bindingRows.Add(new JsonObject
+            {
+                ["id"] = id,
+                ["selection"] = row.DeepClone(),
+                ["beforeDeclaration"] = previous,
+                ["afterDeclaration"] = next,
                 ["change"] = oldPath is null ? "added" : newPath is null ? "removed" : oldType != newType ? "typeTextChanged" : (oldMember!.ObjectPath != newMember!.ObjectPath || !oldPath.SequenceEqual(newPath)) ? "explicitMemberMapping" : "sameSelectedMember",
-                ["capturedProperty"] = capturedProperties?[property]?.DeepClone(), ["conflicts"] = conflicts, ["gaps"] = gaps,
-                ["nativeCompatibilityVerified"] = false, ["runtimeStorageVerified"] = false });
+                ["capturedProperty"] = capturedProperties?[property]?.DeepClone(),
+                ["conflicts"] = conflicts,
+                ["gaps"] = gaps,
+                ["nativeCompatibilityVerified"] = false,
+                ["runtimeStorageVerified"] = false
+            });
         }
         int Count(string field) => outputRows.Concat(bindingRows).Sum(r => r![field]!.AsArray().Count);
-        return new JsonObject { ["schemaVersion"] = "hmi-component-review.v1", ["operation"] = operation, ["reason"] = request["reason"]!.DeepClone(),
-            ["beforeComponent"] = before?.Summary, ["afterComponent"] = after.Summary, ["destination"] = destination.DeepClone(),
-            ["destinationProject"] = targetReview["model"]?["project"]?.DeepClone(), ["components"] = componentRows, ["outputs"] = outputRows, ["bindings"] = bindingRows,
-            ["summary"] = new JsonObject { ["outputCount"] = outputRows.Count, ["bindingCount"] = bindingRows.Count, ["conflictCount"] = Count("conflicts"), ["gapCount"] = Count("gaps"),
-                ["componentComparisonCount"] = componentRows.Count, ["changedInterfaceCount"] = componentRows.Count(c => (bool?)c!["interfaceChanged"] == true),
-                ["unresolvedComponentCount"] = componentRows.Count(c => (string?)c!["status"] != "explicitlyCompared") },
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["wholeProjectPreservationVerified"] = false,
-            ["componentMemberCoverageComplete"] = false, ["consumerCoverageComplete"] = false,
-            ["limits"] = "Explicit supplied mappings and file sets only. Equal bytes/type text do not establish native compatibility, complete HMI content, genuine library GUID/version identity, runtime storage or safe regeneration. New native identities, live freshness, full dependencies, compile/reopen/recovery, manual ownership and visuals require independent native qualification. No scripts or generated content are executed; no object is created, changed or removed." };
+        return new JsonObject
+        {
+            ["schemaVersion"] = "hmi-component-review.v1",
+            ["operation"] = operation,
+            ["reason"] = request["reason"]!.DeepClone(),
+            ["beforeComponent"] = before?.Summary,
+            ["afterComponent"] = after.Summary,
+            ["destination"] = destination.DeepClone(),
+            ["destinationProject"] = targetReview["model"]?["project"]?.DeepClone(),
+            ["components"] = componentRows,
+            ["outputs"] = outputRows,
+            ["bindings"] = bindingRows,
+            ["summary"] = new JsonObject
+            {
+                ["outputCount"] = outputRows.Count,
+                ["bindingCount"] = bindingRows.Count,
+                ["conflictCount"] = Count("conflicts"),
+                ["gapCount"] = Count("gaps"),
+                ["componentComparisonCount"] = componentRows.Count,
+                ["changedInterfaceCount"] = componentRows.Count(c => (bool?)c!["interfaceChanged"] == true),
+                ["unresolvedComponentCount"] = componentRows.Count(c => (string?)c!["status"] != "explicitlyCompared")
+            },
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["wholeProjectPreservationVerified"] = false,
+            ["componentMemberCoverageComplete"] = false,
+            ["consumerCoverageComplete"] = false,
+            ["limits"] = "Explicit supplied mappings and file sets only. Equal bytes/type text do not establish native compatibility, complete HMI content, genuine library GUID/version identity, runtime storage or safe regeneration. New native identities, live freshness, full dependencies, compile/reopen/recovery, manual ownership and visuals require independent native qualification. No scripts or generated content are executed; no object is created, changed or removed."
+        };
 
         ComponentEvidence Component(JsonObject selector)
         {
@@ -186,11 +236,22 @@ public static class HmiComponentReview
                 string path = Text(new JsonObject { ["path"] = value?.DeepClone() }, "path");
                 if (!selectedPaths.Add(path) || !evidence.Nodes.TryGetValue(path, out var node) || (string?)node["kind"] is not ("block" or "type") || (string?)node["origin"] == "virtual")
                     throw Error("Component paths must select unique exact captured PLC blocks/types; no name or library-version substitution.");
-                objects.Add(new JsonObject { ["capturedObject"] = node.DeepClone(), ["document"] = evidence.Documents.TryGetValue(path, out var document)
-                    ? new JsonObject { ["status"] = document["status"]?.DeepClone(), ["utf8Sha256"] = document["utf8Sha256"]?.DeepClone() } : null });
+                objects.Add(new JsonObject
+                {
+                    ["capturedObject"] = node.DeepClone(),
+                    ["document"] = evidence.Documents.TryGetValue(path, out var document)
+                    ? new JsonObject { ["status"] = document["status"]?.DeepClone(), ["utf8Sha256"] = document["utf8Sha256"]?.DeepClone() } : null
+                });
             }
-            return new(evidence, selectedPaths, new JsonObject { ["selection"] = selector.DeepClone(), ["objects"] = objects,
-                ["project"] = review["model"]?["project"]?.DeepClone(), ["libraryIdentityVerified"] = false, ["runtimeInstanceVerified"] = false, ["dependencyClosureVerified"] = false });
+            return new(evidence, selectedPaths, new JsonObject
+            {
+                ["selection"] = selector.DeepClone(),
+                ["objects"] = objects,
+                ["project"] = review["model"]?["project"]?.DeepClone(),
+                ["libraryIdentityVerified"] = false,
+                ["runtimeInstanceVerified"] = false,
+                ["dependencyClosureVerified"] = false
+            });
         }
         bool Within(JsonObject node)
         {
@@ -236,9 +297,15 @@ public static class HmiComponentReview
             member = matches.Length == 1 ? matches[0] : null;
         }
         string? type = (string?)member?.Attribute("Datatype");
-        return new JsonObject { ["objectPath"] = selection.ObjectPath, ["memberPath"] = new JsonArray(selection.Path.Select(p => (JsonNode?)JsonValue.Create(p)).ToArray()),
-            ["status"] = member is null || string.IsNullOrWhiteSpace(type) ? "unavailableOrAmbiguous" : "capturedDeclaration", ["dataType"] = type,
-            ["evidence"] = member is null ? null : source.Evidence.Evidence(selection.ObjectPath, member), ["nativeCompatibilityVerified"] = false };
+        return new JsonObject
+        {
+            ["objectPath"] = selection.ObjectPath,
+            ["memberPath"] = new JsonArray(selection.Path.Select(p => (JsonNode?)JsonValue.Create(p)).ToArray()),
+            ["status"] = member is null || string.IsNullOrWhiteSpace(type) ? "unavailableOrAmbiguous" : "capturedDeclaration",
+            ["dataType"] = type,
+            ["evidence"] = member is null ? null : source.Evidence.Evidence(selection.ObjectPath, member),
+            ["nativeCompatibilityVerified"] = false
+        };
     }
     private static MemberSelection? Member(JsonNode? value)
     {

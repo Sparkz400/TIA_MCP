@@ -19,17 +19,27 @@ public sealed partial class WatchTableDispatcher
         {
             if (componentWindowId is not null) throw new BridgeException("ResourceBusy", "This Host already owns a component lifetime.");
             string id = Guid.NewGuid().ToString("N");
-            var described = Node(await native.CallAsync("component_window_plan", new { id, artifactDirectory = root,
-                planId = Text(args, "planId"), planPreviewHash = Text(args, "planPreviewHash") }, token));
+            var described = Node(await native.CallAsync("component_window_plan", new
+            {
+                id,
+                artifactDirectory = root,
+                planId = Text(args, "planId"),
+                planPreviewHash = Text(args, "planPreviewHash")
+            }, token));
             var manifest = described["manifest"]!.Deserialize<ComponentWindowManifest>(BridgeProtocol.Json)!;
             if (manifest.Id != id || ComponentQualificationWindowStore.ManifestHash(manifest) != Text(described, "manifestSha256"))
                 throw new BridgeException("MutationScopeIncomplete", "Native manifest does not bind the exact planned window.");
             var acquired = windows.Acquire(manifest); componentWindowId = acquired.Reservation.Id; componentOwnerCapability = acquired.Capability;
             // Return the owner capability before any child dispatch: a lost start response must not strand the only recovery credential.
             var result = new JsonObject { ["state"] = "reserved", ["reservation"] = JsonSerializer.SerializeToNode(acquired.Reservation, BridgeProtocol.Json), ["nextAction"] = "start" };
-            result["componentOwner"] = new JsonObject { ["id"] = componentWindowId, ["capability"] = componentOwnerCapability,
-                ["manifestSha256"] = acquired.Reservation.ManifestSha256, ["workspace"] = manifest.Workspace,
-                ["coordinationScope"] = "Configured canonical Host store; unknown independently configured stores are not federated." };
+            result["componentOwner"] = new JsonObject
+            {
+                ["id"] = componentWindowId,
+                ["capability"] = componentOwnerCapability,
+                ["manifestSha256"] = acquired.Reservation.ManifestSha256,
+                ["workspace"] = manifest.Workspace,
+                ["coordinationScope"] = "Configured canonical Host store; unknown independently configured stores are not federated."
+            };
             return Element(result);
         }
         string requestedId = Text(args, "id"); var record = windows.Read(requestedId);
@@ -73,12 +83,26 @@ public sealed partial class WatchTableDispatcher
         if (action is "complete" or "reconcile-recovery")
         {
             var source = Node(await native.CallAsync("component_window_source", new { manifestSha256 = record.ManifestSha256 }, token));
-            var receipt = new JsonObject { ["manifestSha256"] = record.ManifestSha256, ["sourceSnapshotSha256"] = Text(source, "sourceSnapshotSha256"),
-                ["sourceObservation"] = source, ["childReceipts"] = new JsonArray(record.Children.Select(c => JsonValue.Create(c.Response?.Sha256)).ToArray()) };
+            var receipt = new JsonObject
+            {
+                ["manifestSha256"] = record.ManifestSha256,
+                ["sourceSnapshotSha256"] = Text(source, "sourceSnapshotSha256"),
+                ["sourceObservation"] = source,
+                ["childReceipts"] = new JsonArray(record.Children.Select(c => JsonValue.Create(c.Response?.Sha256)).ToArray())
+            };
             var proof = Save(ComponentResponseDirectory(record), action + "-" + Guid.NewGuid().ToString("N") + ".json", receipt);
             record = action == "complete" ? windows.Complete(record.Id, record.Revision, owner, proof) : windows.ReconcileRecovery(record.Id, record.Revision, owner, proof);
-            return Element(new { state = record.State, reservation = record, qualificationOnly = true, lifecycleEvidenceComplete = action == "complete", installationAccepted = action == "complete", recoveryOnlyReconciled = action == "reconcile-recovery",
-                productionApplySupported = false, runtimeVerified = false });
+            return Element(new
+            {
+                state = record.State,
+                reservation = record,
+                qualificationOnly = true,
+                lifecycleEvidenceComplete = action == "complete",
+                installationAccepted = action == "complete",
+                recoveryOnlyReconciled = action == "reconcile-recovery",
+                productionApplySupported = false,
+                runtimeVerified = false
+            });
         }
         throw new BridgeException("InvalidRequest", "Component action must be begin, start, status, owner-resume, recover, complete or reconcile-recovery.");
     }
@@ -86,8 +110,13 @@ public sealed partial class WatchTableDispatcher
     private async Task BindComponentWindow(ComponentWindowReservation record, CancellationToken token)
     {
         var proof = ComponentReservationProof(record);
-        var bound = Node(await native.CallAsync("component_window_bind", new { manifest = record.Manifest, manifestSha256 = record.ManifestSha256,
-            reservationPath = proof.Path, reservationSha256 = proof.Sha256 }, token));
+        var bound = Node(await native.CallAsync("component_window_bind", new
+        {
+            manifest = record.Manifest,
+            manifestSha256 = record.ManifestSha256,
+            reservationPath = proof.Path,
+            reservationSha256 = proof.Sha256
+        }, token));
         if (bound["bound"]?.GetValue<bool>() != true || Text(bound, "manifestSha256") != record.ManifestSha256 ||
             bound["installationAllowed"]?.GetValue<bool>() != record.InstallationAllowed)
             throw new BridgeException("ComponentReservationRequired", "Worker did not bind the exact durable parent reservation.");
@@ -107,8 +136,13 @@ public sealed partial class WatchTableDispatcher
                 throw new BridgeException("MutationScopeIncomplete", "Exact worker, native child request and resource scope are required.");
             record = windows.BeginChild(record.Id, record.Revision, componentOwnerCapability, step, scope.RequestSha256, scope.Resources); intent = true;
             var proof = ComponentReservationProof(record);
-            var response = await native.CallAsync("mutation_dispatch", new { leaseToken = lease, scopeSha256 = scope.ScopeSha256,
-                reservationPath = proof.Path, reservationSha256 = proof.Sha256 }, token);
+            var response = await native.CallAsync("mutation_dispatch", new
+            {
+                leaseToken = lease,
+                scopeSha256 = scope.ScopeSha256,
+                reservationPath = proof.Path,
+                reservationSha256 = proof.Sha256
+            }, token);
             var retained = Save(ComponentResponseDirectory(record), step + "-returned.json", response);
             windows.Returned(record.Id, record.Revision, componentOwnerCapability, retained);
             return response;

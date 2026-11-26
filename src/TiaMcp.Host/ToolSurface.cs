@@ -55,17 +55,29 @@ internal static class ToolSurface
     // Every Host refusal is { error: { code, message, ... } } with isError; families add their own detail fields.
     private static JsonObject HostError() => new()
     {
-        ["type"] = "object", ["required"] = new JsonArray("error"),
-        ["properties"] = new JsonObject { ["error"] = new JsonObject { ["type"] = "object", ["required"] = new JsonArray("code", "message"),
-            ["properties"] = new JsonObject { ["code"] = new JsonObject { ["type"] = "string" }, ["message"] = new JsonObject { ["type"] = "string" } } } }
+        ["type"] = "object",
+        ["required"] = new JsonArray("error"),
+        ["properties"] = new JsonObject
+        {
+            ["error"] = new JsonObject
+            {
+                ["type"] = "object",
+                ["required"] = new JsonArray("code", "message"),
+                ["properties"] = new JsonObject { ["code"] = new JsonObject { ["type"] = "string" }, ["message"] = new JsonObject { ["type"] = "string" } }
+            }
+        }
     };
 
     /// <summary>Runs after the SDK collected the registered primitives.</summary>
     internal static void Apply(McpServerOptions server, HostOptions options)
     {
         // Product version from Directory.Build.props; the catalog version stays visible as the data contract version.
-        server.ServerInfo = new Implementation { Name = "TiaMcp.Host", Title = "TIA MCP",
-            Version = typeof(ToolSurface).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion };
+        server.ServerInfo = new Implementation
+        {
+            Name = "TiaMcp.Host",
+            Title = "TIA MCP",
+            Version = typeof(ToolSurface).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion
+        };
         server.Capabilities ??= new ServerCapabilities();
         (server.Capabilities.Experimental ??= new Dictionary<string, object>())["tiaMcp/featureCatalog"] =
             new JsonObject { ["version"] = FeatureCatalog.LoadBundled().Version };
@@ -162,8 +174,11 @@ internal static class ToolSurface
             using var done = CancellationTokenSource.CreateLinkedTokenSource(token);
             var stage = ToolProgress.Begin();
             var heartbeat = Heartbeat(HeartbeatInterval, tool, done.Token,
-                async (beat, message) => await context.Server.NotifyProgressAsync(progress, new ProgressNotificationValue { Progress = beat,
-                    Message = stage.Stage is { } current ? message + ": " + current : message }));
+                async (beat, message) => await context.Server.NotifyProgressAsync(progress, new ProgressNotificationValue
+                {
+                    Progress = beat,
+                    Message = stage.Stage is { } current ? message + ": " + current : message
+                }));
             try { return Timed(await next(context, token), started); }
             finally { done.Cancel(); await heartbeat; }
         });

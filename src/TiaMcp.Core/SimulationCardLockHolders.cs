@@ -42,8 +42,13 @@ namespace TiaMcp.Simulation
                 code = RmGetList(session, out needed, ref count, found, ref reasons);
                 if (code == 234) error = needed + " holders; only the first " + MaximumHolders + " are listed."; // ERROR_MORE_DATA fills nothing
                 else if (code != 0) { error = "RmGetList " + code; return Array.Empty<Holder>(); }
-                return found.Take(code == 0 ? (int)count : 0).Select(info => new Holder { ProcessId = info.Process.ProcessId,
-                    AppName = info.AppName, ServiceName = info.ServiceShortName, ApplicationType = info.ApplicationType }).ToArray();
+                return found.Take(code == 0 ? (int)count : 0).Select(info => new Holder
+                {
+                    ProcessId = info.Process.ProcessId,
+                    AppName = info.AppName,
+                    ServiceName = info.ServiceShortName,
+                    ApplicationType = info.ApplicationType
+                }).ToArray();
             }
             catch (Exception exception) { error = exception.GetType().FullName + ": " + exception.Message; return Array.Empty<Holder>(); }
             finally { if (started) RmEndSession(session); }

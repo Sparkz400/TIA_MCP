@@ -20,8 +20,11 @@ public static class PlcsimTargetBindings
 {
     public const string Folder = "runtime-plcsim-bindings";
     public const int ByteLimit = 16 << 10;
-    private static readonly JsonSerializerOptions Strict = new(BridgeProtocol.Json) {
-        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow, RespectRequiredConstructorParameters = true };
+    private static readonly JsonSerializerOptions Strict = new(BridgeProtocol.Json)
+    {
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        RespectRequiredConstructorParameters = true
+    };
 
     /// <summary>Maps one sim_identity response; it must describe the exact requested owned instance with at least one usable IPv4 address.</summary>
     public static PlcsimTargetBinding Observed(JsonElement identity, int instanceId, string instanceName, string creationId, DateTimeOffset observedUtc)

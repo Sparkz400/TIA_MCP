@@ -85,20 +85,30 @@ public sealed class SiemensWebIdentity : IDisposable
             ["hardwareRevision"] = OnlineField(Number(data, "hardware_revision"), source),
             ["firmware"] = OnlineField(ReadFirmware(data), source)
         };
-        return (row with { Actual = actual, Online = new(actual.Values.All(f => f.State == "available") ? "read" : "partial",
+        return (row with
+        {
+            Actual = actual,
+            Online = new(actual.Values.All(f => f.State == "available") ? "read" : "partial",
             Endpoint, hardwareId, DateTimeOffset.UtcNow, null,
-            "Explicit controller/row/hardware-ID binding plus exact online name; downloaded configuration equivalence is not proven.") }).Compare();
+            "Explicit controller/row/hardware-ID binding plus exact online name; downloaded configuration equivalence is not proven.")
+        }).Compare();
     }
 
     public static InventoryRow Failure(InventoryRow row, string endpoint, uint hwid, BridgeException error)
     {
         string state = error.Code switch
         {
-            "UnsupportedInterface" or "ImNotSupported" => "unsupported", "PermissionDenied" => "permissionDenied",
-            "IdentityMismatch" => "identityMismatch", "OnlineTimeout" or "OnlineUnreachable" => "unreachable", _ => "readError"
+            "UnsupportedInterface" or "ImNotSupported" => "unsupported",
+            "PermissionDenied" => "permissionDenied",
+            "IdentityMismatch" => "identityMismatch",
+            "OnlineTimeout" or "OnlineUnreachable" => "unreachable",
+            _ => "readError"
         };
-        return (row with { Actual = InventoryRow.ActualUnavailable(state, error.Message),
-            Online = new(state, endpoint, hwid, DateTimeOffset.UtcNow, error.Message) }).Compare();
+        return (row with
+        {
+            Actual = InventoryRow.ActualUnavailable(state, error.Message),
+            Online = new(state, endpoint, hwid, DateTimeOffset.UtcNow, error.Message)
+        }).Compare();
     }
 
     private async Task<JsonElement> RpcAsync(string method, object? parameters, CancellationToken cancellationToken)

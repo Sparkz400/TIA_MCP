@@ -21,8 +21,15 @@ public static class ComponentWindowEvidence
             var record = Object(value, "record");
             Need(Text(value, "changeId") == "lib-" + r.Manifest.ComponentId && Text(record, "operationId") == r.Manifest.ComponentId,
                 "Child component identity differs.");
-            string expected = step switch { "start" => "library_prepared", "applyLibrary" => "library_applied", "verifyImport" => "import_verified",
-                "prepareGraphical" => "graphical_prepared", "applyGraphical" => "graphical_applied", _ => "installation_verified" };
+            string expected = step switch
+            {
+                "start" => "library_prepared",
+                "applyLibrary" => "library_applied",
+                "verifyImport" => "import_verified",
+                "prepareGraphical" => "graphical_prepared",
+                "applyGraphical" => "graphical_applied",
+                _ => "installation_verified"
+            };
             Need(Text(record, "state") == expected && Text(value, "state") == expected, "Native child is not in its expected completed state.");
             var contract = Object(record, "contract");
             Need(Text(contract, "planChangeId") == r.Manifest.PlanId && Text(contract, "planPreviewHash") == r.Manifest.PlanPreviewHash &&

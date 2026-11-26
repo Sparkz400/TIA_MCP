@@ -60,9 +60,18 @@ public sealed class MultiuserReviewStore(string artifactsRoot)
     private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "multiuser-reviews/" + hash + extension, ["sha256"] = hash };
     private JsonObject Publish(byte[] bytes, string extension, int limit) =>
         PackageStorage.PublishContent(artifactsRoot, "multiuser-reviews", bytes, extension, limit, 512L << 20, "Observation");
-    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {
-        ["recordId"] = artifact["sha256"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),
-        ["summary"] = record["report"]!["summary"]!.DeepClone(), ["nativeExecutable"] = false, ["nativeQualified"] = false,
-        ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["conflictFreeVerified"] = false, ["stableProjectIdentityVerified"] = false,
-        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new()
+    {
+        ["recordId"] = artifact["sha256"]!.DeepClone(),
+        ["input"] = record["input"]!.DeepClone(),
+        ["reportArtifact"] = artifact.DeepClone(),
+        ["summary"] = record["report"]!["summary"]!.DeepClone(),
+        ["nativeExecutable"] = false,
+        ["nativeQualified"] = false,
+        ["sourceAuthenticityVerified"] = false,
+        ["liveFreshnessVerified"] = false,
+        ["conflictFreeVerified"] = false,
+        ["stableProjectIdentityVerified"] = false,
+        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy
+    };
 }

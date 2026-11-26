@@ -43,15 +43,25 @@ internal static class HmiComponentExpectations
                 names[0].Value != (string?)selection["name"])
                 throw Error("Source must contain one exact Classic screen with the selected export-local ID and output name.");
             XDocument expected;
-            try { expected = HmiPreservationRules.PatchClassicScalar(original, "Hmi.Screen.Screen", ownerId, "BackColor",
-                Text(rule, "expectedValue", 64), Text(rule, "replacementValue", 64)); }
+            try
+            {
+                expected = HmiPreservationRules.PatchClassicScalar(original, "Hmi.Screen.Screen", ownerId, "BackColor",
+                Text(rule, "expectedValue", 64), Text(rule, "replacementValue", 64));
+            }
             catch (ArgumentException) { throw Error("Expected-effect source scalar is stale, ambiguous or outside the supported profile."); }
             observations.TryGetValue(id, out var observation);
             var proposed = Compare(selection["proposed"]!.AsArray(), Boolean(selection, "proposedComplete"));
             var observed = Compare(observation?["files"]?.AsArray() ?? [], observation is not null && Boolean(observation, "complete"));
-            checks.Add(new JsonObject { ["expectation"] = rule.DeepClone(), ["source"] = HmiComponentXml.Descriptor(source),
-                ["proposal"] = proposed, ["observation"] = observed, ["nativeEffectVerified"] = false,
-                ["contentAssociationVerified"] = false, ["wholeProjectPreservationVerified"] = false });
+            checks.Add(new JsonObject
+            {
+                ["expectation"] = rule.DeepClone(),
+                ["source"] = HmiComponentXml.Descriptor(source),
+                ["proposal"] = proposed,
+                ["observation"] = observed,
+                ["nativeEffectVerified"] = false,
+                ["contentAssociationVerified"] = false,
+                ["wholeProjectPreservationVerified"] = false
+            });
 
             JsonObject Compare(JsonArray ids, bool complete)
             {
@@ -77,8 +87,13 @@ internal static class HmiComponentExpectations
                 .Concat(observations.TryGetValue(id, out var observation) ? observation["files"]!.AsArray().Select(n => Text(files[(string)n!], "fileName")) : [])
                 .Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
             JsonArray Names(bool assessed) => new(names.Where(n => selected.Contains((id, n)) == assessed).Select(n => (JsonNode?)JsonValue.Create(n)).ToArray());
-            coverage.Add(new JsonObject { ["outputId"] = id, ["derivedFileNames"] = Names(true), ["unassessedFileNames"] = Names(false),
-                ["completeOutputEffectsVerified"] = false });
+            coverage.Add(new JsonObject
+            {
+                ["outputId"] = id,
+                ["derivedFileNames"] = Names(true),
+                ["unassessedFileNames"] = Names(false),
+                ["completeOutputEffectsVerified"] = false
+            });
         }
         report["schemaVersion"] = "hmi-component-review.v4";
         report["derivedEffects"] = checks; report["expectationCoverage"] = coverage;

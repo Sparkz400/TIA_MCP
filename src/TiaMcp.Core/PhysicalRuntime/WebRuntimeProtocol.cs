@@ -51,9 +51,15 @@ public static class WebRuntimeProtocol
     private static readonly UTF8Encoding Utf8 = new(false, true);
     private static readonly Dictionary<string, string> DiagnosticMethods = new(StringComparer.Ordinal)
     {
-        ["languages"] = "Project.ReadLanguages", ["alarms"] = "Alarms.Browse", ["diagnosticBuffer"] = "DiagnosticBuffer.Browse", ["syslog"] = "Syslog.Browse",
-        ["operatingMode"] = "Plc.ReadOperatingMode", ["modeSelector"] = "Plc.ReadModeSelectorState",
-        ["systemTime"] = "Plc.ReadSystemTime", ["timeSettings"] = "Plc.ReadTimeSettings", ["projectInformation"] = "Project.ReadInformation"
+        ["languages"] = "Project.ReadLanguages",
+        ["alarms"] = "Alarms.Browse",
+        ["diagnosticBuffer"] = "DiagnosticBuffer.Browse",
+        ["syslog"] = "Syslog.Browse",
+        ["operatingMode"] = "Plc.ReadOperatingMode",
+        ["modeSelector"] = "Plc.ReadModeSelectorState",
+        ["systemTime"] = "Plc.ReadSystemTime",
+        ["timeSettings"] = "Plc.ReadTimeSettings",
+        ["projectInformation"] = "Project.ReadInformation"
     };
     private static readonly HashSet<string> ReadMethods = new(DiagnosticMethods.Values.Concat(
         ["Api.Browse", "Api.GetPermissions", "PlcProgram.Browse", "PlcProgram.Read"]), StringComparer.Ordinal);
@@ -277,7 +283,7 @@ public static class WebRuntimeProtocol
     // Gated owned-PLCSIM mutations, kept out of the read-only builder: Siemens Web API PlcProgram.Write (write_value) and
     // Plc.RequestChangeOperatingMode (change_operating_mode), docs/plans/expansion-plans/physical-plc-runtime.md [W13]/[W14].
     private static readonly Dictionary<string, string> MutationPermissions = new(StringComparer.Ordinal)
-        { ["PlcProgram.Write"] = "write_value", ["Plc.RequestChangeOperatingMode"] = "change_operating_mode", ["Alarms.Acknowledge"] = "acknowledge_alarms" };
+    { ["PlcProgram.Write"] = "write_value", ["Plc.RequestChangeOperatingMode"] = "change_operating_mode", ["Alarms.Acknowledge"] = "acknowledge_alarms" };
 
     public static string MutationPermission(string method) =>
         method is not null && MutationPermissions.TryGetValue(method, out var permission) ? permission : throw Error("RuntimeMethodUnsupported");
@@ -360,8 +366,13 @@ public static class WebRuntimeProtocol
     public static JsonElement CloseTicket(string requestId, string ticket)
     {
         Id(requestId); Ticket(ticket);
-        return JsonSerializer.SerializeToElement(new Dictionary<string, object> { ["jsonrpc"] = "2.0", ["id"] = requestId, ["method"] = "Api.CloseTicket",
-            ["params"] = new Dictionary<string, object> { ["id"] = ticket } });
+        return JsonSerializer.SerializeToElement(new Dictionary<string, object>
+        {
+            ["jsonrpc"] = "2.0",
+            ["id"] = requestId,
+            ["method"] = "Api.CloseTicket",
+            ["params"] = new Dictionary<string, object> { ["id"] = ticket }
+        });
     }
 
     public static (string Status, int? ProviderErrorCode, string? Ticket) TicketResult(ReadOnlyMemory<byte> response, string requestId)
@@ -370,8 +381,16 @@ public static class WebRuntimeProtocol
         if (document.RootElement.TryGetProperty("error", out var error))
         {
             int code = error.GetProperty("code").GetInt32();
-            return (code switch { 2 => "permissionDenied", 4 or 600 => "resourceUnavailable", 7 => "partnerNotAccessible", 1000 or 1001 => "backupBusy",
-                1004 => "plcNotInStop", 1100 => "invalidHardwareId", _ => ProviderStatus(code) }, code, null);
+            return (code switch
+            {
+                2 => "permissionDenied",
+                4 or 600 => "resourceUnavailable",
+                7 => "partnerNotAccessible",
+                1000 or 1001 => "backupBusy",
+                1004 => "plcNotInStop",
+                1100 => "invalidHardwareId",
+                _ => ProviderStatus(code)
+            }, code, null);
         }
         var result = document.RootElement.GetProperty("result");
         if (result.ValueKind != JsonValueKind.String) throw Error("RuntimeResponseInvalid");
@@ -404,9 +423,14 @@ public static class WebRuntimeProtocol
 
     private static string ProviderStatus(int code) => code switch
     {
-        2 => "permissionDenied", -32601 => "unsupportedMethod", 4 => "resourceUnavailable",
-        200 => "addressUnavailable", 201 => "invalidAddress", 203 => "invalidArrayIndex",
-        204 => "unsupportedAddress", _ => "providerError"
+        2 => "permissionDenied",
+        -32601 => "unsupportedMethod",
+        4 => "resourceUnavailable",
+        200 => "addressUnavailable",
+        201 => "invalidAddress",
+        203 => "invalidArrayIndex",
+        204 => "unsupportedAddress",
+        _ => "providerError"
     };
 
     private static JsonElement Request(string method, string id, object? parameters)

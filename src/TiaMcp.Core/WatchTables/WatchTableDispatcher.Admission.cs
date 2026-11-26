@@ -76,11 +76,19 @@ public sealed partial class WatchTableDispatcher
                         bool returned = error is BridgeOperationException && (operation is ("change_apply" or "change_restore" or "plc_station_upload" or "project_upgrade")
                             || operation == "simulation_download" && SimulationDownloadWroteNothing(nativeDetails));
                         // Bind a later independent report check without persisting raw diagnostic text or credentials.
-                        string? nativeDetailsHash = nativeDetails is null ? null : CanonicalJson.Sha256(new JsonObject {
-                            ["details"] = JsonNode.Parse(nativeDetails.Value.GetRawText()) });
-                        var proof = Save(directory, "failure.json", new { type = error.GetType().FullName, automaticReplay = false,
-                            nativeOutcome = returned ? "returnedFailure" : "unknown", admissionId = record.Id,
-                            nativeErrorCode = (error as BridgeException)?.Code, nativeDetailsSha256 = nativeDetailsHash });
+                        string? nativeDetailsHash = nativeDetails is null ? null : CanonicalJson.Sha256(new JsonObject
+                        {
+                            ["details"] = JsonNode.Parse(nativeDetails.Value.GetRawText())
+                        });
+                        var proof = Save(directory, "failure.json", new
+                        {
+                            type = error.GetType().FullName,
+                            automaticReplay = false,
+                            nativeOutcome = returned ? "returnedFailure" : "unknown",
+                            admissionId = record.Id,
+                            nativeErrorCode = (error as BridgeException)?.Code,
+                            nativeDetailsSha256 = nativeDetailsHash
+                        });
                         if (returned) admissions.Returned(record.Id, current.Revision, proof);
                         else admissions.Unknown(record.Id, current.Revision, proof);
                     }
@@ -92,8 +100,12 @@ public sealed partial class WatchTableDispatcher
                     var details = nativeDetails?.ValueKind == JsonValueKind.Object
                         ? JsonNode.Parse(nativeDetails.Value.GetRawText())!.AsObject()
                         : new JsonObject { ["nativeDetails"] = nativeDetails is null ? null : JsonNode.Parse(nativeDetails.Value.GetRawText()) };
-                    details["mutationAdmission"] = new JsonObject { ["admissionId"] = record.Id,
-                        ["statusTool"] = "engineering_operation_status", ["automaticReplay"] = false };
+                    details["mutationAdmission"] = new JsonObject
+                    {
+                        ["admissionId"] = record.Id,
+                        ["statusTool"] = "engineering_operation_status",
+                        ["automaticReplay"] = false
+                    };
                     throw new BridgeOperationException(bridgeError.Code, bridgeError.Message, Element(details));
                 }
             }

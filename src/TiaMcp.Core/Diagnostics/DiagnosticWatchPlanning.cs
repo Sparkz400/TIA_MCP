@@ -70,16 +70,31 @@ public sealed class DiagnosticWatchPlanning(string artifactsRoot)
             external.Add(new(Reference(path), reason));
         }
         var members = instance["memberPath"] is JsonArray { Count: 0 } ? [] : D.Path(instance["memberPath"]);
-        var watch = WatchTablePlanner.Plan(new WatchTablePlanningRequest {
-            ExpectedSource = source, CapturedSource = source, Instance = new(storage, members),
-            TableName = tableName, MaxRows = maxRows, DiagnosticCase = diagnostic,
-            DiagnosticCaseSha256 = CanonicalJson.Sha256(diagnostic), ExternalStorage = external });
-        var envelope = new JsonObject {
-            ["schemaVersion"] = "diagnostic-watch-plan.v1", ["caseId"] = planId, ["reviewId"] = reviewId,
-            ["tiaVersionOrigin"] = "callerSuppliedUnverified", ["sourceAuthenticityVerified"] = false,
+        var watch = WatchTablePlanner.Plan(new WatchTablePlanningRequest
+        {
+            ExpectedSource = source,
+            CapturedSource = source,
+            Instance = new(storage, members),
+            TableName = tableName,
+            MaxRows = maxRows,
+            DiagnosticCase = diagnostic,
+            DiagnosticCaseSha256 = CanonicalJson.Sha256(diagnostic),
+            ExternalStorage = external
+        });
+        var envelope = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-watch-plan.v1",
+            ["caseId"] = planId,
+            ["reviewId"] = reviewId,
+            ["tiaVersionOrigin"] = "callerSuppliedUnverified",
+            ["sourceAuthenticityVerified"] = false,
             ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy,
-            ["nativeAccessAttempted"] = false, ["nativeExecutable"] = false, ["nativeDocumentGenerated"] = false,
-            ["qualification"] = "offlinePlanningOnly", ["watchPlan"] = watch };
+            ["nativeAccessAttempted"] = false,
+            ["nativeExecutable"] = false,
+            ["nativeDocumentGenerated"] = false,
+            ["qualification"] = "offlinePlanningOnly",
+            ["watchPlan"] = watch
+        };
         if (diagnostic.ContainsKey("alarmEvidence"))
         {
             if (diagnostic["alarmEvidence"] is not JsonObject alarm) throw new BridgeException("CaptureMismatch", "Malformed retained alarm context.");

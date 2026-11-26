@@ -12,9 +12,13 @@ public sealed class DiagnosticExperimentReportExport(string artifactsRoot)
     private static readonly string[] Sides = new[] { "before", "after" };
     public JsonObject Export(string reportId, string format)
     {
-        var (extension, mediaType) = format switch { "json" => (".json", "application/json"),
-            "markdown" => (".md", "text/markdown"), "html" => (".html", "text/html"),
-            _ => throw new BridgeException("InvalidRequest", "format must be json, markdown or html.") };
+        var (extension, mediaType) = format switch
+        {
+            "json" => (".json", "application/json"),
+            "markdown" => (".md", "text/markdown"),
+            "html" => (".html", "text/html"),
+            _ => throw new BridgeException("InvalidRequest", "format must be json, markdown or html.")
+        };
         var store = new DiagnosticStore(artifactsRoot);
         byte[] original = store.ReadBytes(reportId);
         var source = JsonNode.Parse(original)?.AsObject() ?? throw new BridgeException("InvalidRequest", "Expected an experiment report.");
@@ -35,20 +39,39 @@ public sealed class DiagnosticExperimentReportExport(string artifactsRoot)
             var pair = parts[i];
             AddExperiment(D.Required(pair.Report, "beforeExperimentId", 64), pair.BeforeExperiment);
             AddExperiment(D.Required(pair.Report, "afterExperimentId", 64), pair.AfterExperiment);
-            runs.Add(new JsonObject { ["id"] = schema == "diagnostic-experiment-repeat.v1" ? source["runs"]![i]!["id"]!.DeepClone() : JsonValue.Create("pair"),
+            runs.Add(new JsonObject
+            {
+                ["id"] = schema == "diagnostic-experiment-repeat.v1" ? source["runs"]![i]!["id"]!.DeepClone() : JsonValue.Create("pair"),
                 ["reviewId"] = schema == "diagnostic-experiment-repeat.v1" ? source["runs"]![i]!["reviewId"]!.DeepClone() : JsonValue.Create(reportId),
-                ["review"] = pair.Report.DeepClone(), ["beforeReport"] = pair.BeforeReport.DeepClone(), ["afterReport"] = pair.AfterReport.DeepClone(),
+                ["review"] = pair.Report.DeepClone(),
+                ["beforeReport"] = pair.BeforeReport.DeepClone(),
+                ["afterReport"] = pair.AfterReport.DeepClone(),
                 ["comparison"] = pair.Comparison.DeepClone(),
-                ["beforeInputArtifact"] = pair.BeforeImport["inputArtifact"]!.DeepClone(), ["afterInputArtifact"] = pair.AfterImport["inputArtifact"]!.DeepClone(),
+                ["beforeInputArtifact"] = pair.BeforeImport["inputArtifact"]!.DeepClone(),
+                ["afterInputArtifact"] = pair.AfterImport["inputArtifact"]!.DeepClone(),
                 ["beforeWindow"] = DiagnosticExperimentWindows.Assess(pair.BeforeExperiment, pair.BeforeImport, pair.Comparison, "before"),
-                ["afterWindow"] = DiagnosticExperimentWindows.Assess(pair.AfterExperiment, pair.AfterImport, pair.Comparison, "after") });
+                ["afterWindow"] = DiagnosticExperimentWindows.Assess(pair.AfterExperiment, pair.AfterImport, pair.Comparison, "after")
+            });
         }
-        var combined = new JsonObject { ["schemaVersion"] = "diagnostic-experiment-report.v1", ["sourceReportId"] = reportId,
-            ["sourceSchemaVersion"] = schema, ["sourceReport"] = source.DeepClone(), ["experiments"] = experiments, ["runs"] = runs,
-            ["sourceEvidenceRevalidated"] = true, ["windowAnalysisRecomputed"] = true, ["sourceAuthenticityVerified"] = false,
-            ["independentRunsVerified"] = false, ["clockSynchronizationVerified"] = false, ["causationProven"] = false,
-            ["bugFixProven"] = false, ["nativeQualification"] = false, ["nativeAccessAttempted"] = false,
-            ["limits"] = DiagnosticRepeatedExperiments.Limits };
+        var combined = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-experiment-report.v1",
+            ["sourceReportId"] = reportId,
+            ["sourceSchemaVersion"] = schema,
+            ["sourceReport"] = source.DeepClone(),
+            ["experiments"] = experiments,
+            ["runs"] = runs,
+            ["sourceEvidenceRevalidated"] = true,
+            ["windowAnalysisRecomputed"] = true,
+            ["sourceAuthenticityVerified"] = false,
+            ["independentRunsVerified"] = false,
+            ["clockSynchronizationVerified"] = false,
+            ["causationProven"] = false,
+            ["bugFixProven"] = false,
+            ["nativeQualification"] = false,
+            ["nativeAccessAttempted"] = false,
+            ["limits"] = DiagnosticRepeatedExperiments.Limits
+        };
         byte[] json = JsonSerializer.SerializeToUtf8Bytes(combined, BridgeProtocol.Json);
         if (json.Length > DiagnosticStore.MaxBytes) throw new BridgeException("ArtifactCapacity", "Combined report exceeds 8 MiB; select fewer repeated pairs.");
         byte[] bytes = format == "json" ? json : Encoding.UTF8.GetBytes(Render(combined, Encoding.UTF8.GetString(json), format == "html"));
@@ -181,11 +204,20 @@ public sealed class DiagnosticExperimentReportExport(string artifactsRoot)
     {
         var result = new StringBuilder();
         foreach (char c in text)
-            result.Append(c switch {
-                ':' => "&#58;", '.' => "&#46;", '@' => "&#64;",
-                '&' => "&amp;", '<' => "&lt;", '>' => "&gt;", '\n' => "<br>", '\r' => "", '\t' => "    ",
+            result.Append(c switch
+            {
+                ':' => "&#58;",
+                '.' => "&#46;",
+                '@' => "&#64;",
+                '&' => "&amp;",
+                '<' => "&lt;",
+                '>' => "&gt;",
+                '\n' => "<br>",
+                '\r' => "",
+                '\t' => "    ",
                 '\\' or '`' or '*' or '_' or '{' or '}' or '[' or ']' or '(' or ')' or '#' or '+' or '-' or '!' or '|' or '~' => "\\" + c,
-                _ => char.IsControl(c) ? "\\u" + ((int)c).ToString("x4", CultureInfo.InvariantCulture) : c.ToString() });
+                _ => char.IsControl(c) ? "\\u" + ((int)c).ToString("x4", CultureInfo.InvariantCulture) : c.ToString()
+            });
         return result.ToString();
     }
 

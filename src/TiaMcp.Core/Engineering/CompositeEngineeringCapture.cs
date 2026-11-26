@@ -31,9 +31,16 @@ public static class CompositeEngineeringCapture
         {
             var snapshot = connections["reviewSnapshot"]!;
             // A single observed state: identical before/after with identity matches, so every connection compares unchanged.
-            Component("connections", connectionCapture, "project", new JsonObject { ["schemaVersion"] = "connection-review-request.v1", ["reviewId"] = reviewId, ["afterKind"] = "observation",
-                ["before"] = snapshot.DeepClone(), ["after"] = snapshot.DeepClone(), ["matches"] = new JsonArray(snapshot["connections"]!.AsArray()
-                    .Select(c => (JsonNode)new JsonObject { ["beforeId"] = c?["id"]?.DeepClone(), ["afterId"] = c?["id"]?.DeepClone() }).ToArray()) },
+            Component("connections", connectionCapture, "project", new JsonObject
+            {
+                ["schemaVersion"] = "connection-review-request.v1",
+                ["reviewId"] = reviewId,
+                ["afterKind"] = "observation",
+                ["before"] = snapshot.DeepClone(),
+                ["after"] = snapshot.DeepClone(),
+                ["matches"] = new JsonArray(snapshot["connections"]!.AsArray()
+                    .Select(c => (JsonNode)new JsonObject { ["beforeId"] = c?["id"]?.DeepClone(), ["afterId"] = c?["id"]?.DeepClone() }).ToArray())
+            },
                 upload => (string)new ConnectionWorkflowStore(artifactsRoot).Review(reviewId, upload)["recordId"]!);
         }
 
@@ -41,8 +48,15 @@ public static class CompositeEngineeringCapture
         var driveCapture = Row("drives", "drive_observe", driveError);
         foreach (var drive in drives?["drives"]?.AsArray() ?? new JsonArray())
             foreach (var item in drive!["driveObjects"]!.AsArray())
-                Component("drives", driveCapture, (string)drive["hardwarePath"]! + "#" + (string?)item!["snapshot"]?["identity"]?["driveId"], new JsonObject { ["schemaVersion"] = "drive-profile-review-request.v2",
-                    ["reviewId"] = reviewId, ["hardwarePath"] = drive["hardwarePath"]!.DeepClone(), ["afterKind"] = "observation", ["before"] = item["snapshot"]!.DeepClone(), ["after"] = item["snapshot"]!.DeepClone() },
+                Component("drives", driveCapture, (string)drive["hardwarePath"]! + "#" + (string?)item!["snapshot"]?["identity"]?["driveId"], new JsonObject
+                {
+                    ["schemaVersion"] = "drive-profile-review-request.v2",
+                    ["reviewId"] = reviewId,
+                    ["hardwarePath"] = drive["hardwarePath"]!.DeepClone(),
+                    ["afterKind"] = "observation",
+                    ["before"] = item["snapshot"]!.DeepClone(),
+                    ["after"] = item["snapshot"]!.DeepClone()
+                },
                     upload => (string)new DriveProfileWorkflowStore(artifactsRoot).Review(reviewId, upload)["recordId"]!);
 
         // Technology objects come from the saved review, so every record names a captured TO of this exact review.
@@ -62,10 +76,20 @@ public static class CompositeEngineeringCapture
         if (technologyCapture is null) { technologyCapture = Row("technology", "technology_read"); if (objects.Length == 0) { technologyCapture["status"] = "notCaptured"; technologyCapture["message"] = "The saved review contains no technology objects."; } }
         if (technologyTruncated) technologyCapture["truncated"] = true;
 
-        return new JsonObject { ["schemaVersion"] = "composite-engineering-capture.v1", ["reviewId"] = reviewId, ["projectPath"] = projectPath, ["phase"] = phase, ["captures"] = captures,
+        return new JsonObject
+        {
+            ["schemaVersion"] = "composite-engineering-capture.v1",
+            ["reviewId"] = reviewId,
+            ["projectPath"] = projectPath,
+            ["phase"] = phase,
+            ["captures"] = captures,
             ["composable"] = phase["automationMlRef"] is not null,
             ["usage"] = "Use phase as the before or after context of a composite-engineering-request; without a native AML capture supply automationMlRef from automationml_inspect.",
-            ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["wholeProjectCaptured"] = false };
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["wholeProjectCaptured"] = false
+        };
 
         async Task<(JsonObject? Response, BridgeOperationException? Error)> Native(string operation, JsonObject arguments)
         {
@@ -82,8 +106,14 @@ public static class CompositeEngineeringCapture
         }
         JsonObject Row(string domain, string operation, BridgeOperationException? error = null)
         {
-            var row = new JsonObject { ["domain"] = domain, ["operation"] = operation, ["status"] = error is null ? "native" : Absent(error) ? "unavailable" : "failed",
-                ["records"] = new JsonArray(), ["truncated"] = false };
+            var row = new JsonObject
+            {
+                ["domain"] = domain,
+                ["operation"] = operation,
+                ["status"] = error is null ? "native" : Absent(error) ? "unavailable" : "failed",
+                ["records"] = new JsonArray(),
+                ["truncated"] = false
+            };
             if (error is not null) { row["errorCode"] = error.Code; row["message"] = error.Message; }
             captures.Add(row); return row;
         }
@@ -113,13 +143,16 @@ public static class CompositeEngineeringCapture
     /// <summary>technology_read output as one observed technology-profile-review-request.v1 state.</summary>
     private static JsonObject TechnologyRequest(string reviewId, string path, JsonObject read)
     {
-        var parameters = new JsonArray(read["parameters"]!.AsArray().OfType<JsonObject>().Select(p => (JsonNode)new JsonObject {
-            ["name"] = p["name"]?.DeepClone(), ["nativeType"] = p["type"]?.DeepClone(),
+        var parameters = new JsonArray(read["parameters"]!.AsArray().OfType<JsonObject>().Select(p => (JsonNode)new JsonObject
+        {
+            ["name"] = p["name"]?.DeepClone(),
+            ["nativeType"] = p["type"]?.DeepClone(),
             ["access"] = p["writable"] is JsonValue w && w.TryGetValue<bool>(out bool writable) ? writable ? "readWrite" : "readOnly" : "unknown",
             ["value"] = p["valueCaptured"] is JsonValue c && c.TryGetValue<bool>(out bool captured) && captured
                 ? new JsonObject { ["kind"] = p["valueComplete"] is JsonValue v && v.TryGetValue<bool>(out bool complete) && complete ? "scalar" : "opaque", ["text"] = Text(p["value"]) ?? p["value"]?.ToJsonString() ?? "null" }
                 : new JsonObject { ["kind"] = "unavailable", ["reason"] = Text(p["valueStatus"]) ?? "notCaptured" },
-            ["metadata"] = new JsonObject { ["valueStatus"] = p["valueStatus"]?.DeepClone(), ["valueAccess"] = p["valueAccess"]?.DeepClone() } }).ToArray());
+            ["metadata"] = new JsonObject { ["valueStatus"] = p["valueStatus"]?.DeepClone(), ["valueAccess"] = p["valueAccess"]?.DeepClone() }
+        }).ToArray());
         var relationships = new JsonArray(); string prefix = path + "/hardwareConnections/";
         foreach (var row in read["hardwareConnections"]!.AsArray().OfType<JsonObject>().Where(r => Text(r["status"]) != "notExposed"))
         {
@@ -130,23 +163,56 @@ public static class CompositeEngineeringCapture
             var targets = references.Select(r => Text(Text(r["kind"]) == "channel" ? r["parent"]?["hardwarePath"] : r["hardwarePath"])).Distinct().ToArray();
             bool? connected = row["isConnected"] is JsonValue c && c.TryGetValue<bool>(out bool value) ? value : null;
             string state = connected == true && targets is [string] ? "declared" : connected == false ? "disconnected" : "unknown";
-            var metadata = new JsonObject { ["role"] = row["role"]?.DeepClone(), ["service"] = row["service"]?.DeepClone(), ["observationPath"] = observation,
-                ["target"] = (references.FirstOrDefault(r => Text(r["kind"]) == "channel") ?? references.FirstOrDefault())?.DeepClone() };
+            var metadata = new JsonObject
+            {
+                ["role"] = row["role"]?.DeepClone(),
+                ["service"] = row["service"]?.DeepClone(),
+                ["observationPath"] = observation,
+                ["target"] = (references.FirstOrDefault(r => Text(r["kind"]) == "channel") ?? references.FirstOrDefault())?.DeepClone()
+            };
             if (Text(row["role"]) == "sensor" && int.TryParse(id[(id.LastIndexOf('/') + 1)..], out int sensor)) metadata["sensorIndex"] = sensor;
             if (row["channelIndex"] is JsonValue index && index.TryGetValue<int>(out int channelIndex)) metadata["channelIndex"] = channelIndex;
-            relationships.Add(new JsonObject { ["id"] = id, ["kind"] = "hardware", ["sourcePath"] = path, ["targetPath"] = state == "declared" ? targets[0] : null,
-                ["targetMember"] = null, ["state"] = state, ["metadata"] = metadata, ["reason"] = state != "unknown" ? null
-                    : $"Observation {Text(row["status"])}: isConnected {connected?.ToString() ?? "unknown"}, {targets.Length} resolved hardware/channel references." });
+            relationships.Add(new JsonObject
+            {
+                ["id"] = id,
+                ["kind"] = "hardware",
+                ["sourcePath"] = path,
+                ["targetPath"] = state == "declared" ? targets[0] : null,
+                ["targetMember"] = null,
+                ["state"] = state,
+                ["metadata"] = metadata,
+                ["reason"] = state != "unknown" ? null
+                    : $"Observation {Text(row["status"])}: isConnected {connected?.ToString() ?? "unknown"}, {targets.Length} resolved hardware/channel references."
+            });
         }
         var info = read["technologyObject"]!;
-        var snapshot = new JsonObject {
-            ["identity"] = new JsonObject { ["plcPath"] = read["plcPath"]?.DeepClone(), ["orderNumber"] = null, ["firmware"] = null, ["technologyType"] = Text(info["systemLibraryType"]),
-                ["technologyVersion"] = Text(info["systemLibraryVersion"]), ["options"] = new JsonArray(), ["unknownReason"] = "technology_read exposes no CPU order number or firmware." },
-            ["valueDomain"] = "offline", ["parametersComplete"] = read["parametersComplete"]?.DeepClone(),
+        var snapshot = new JsonObject
+        {
+            ["identity"] = new JsonObject
+            {
+                ["plcPath"] = read["plcPath"]?.DeepClone(),
+                ["orderNumber"] = null,
+                ["firmware"] = null,
+                ["technologyType"] = Text(info["systemLibraryType"]),
+                ["technologyVersion"] = Text(info["systemLibraryVersion"]),
+                ["options"] = new JsonArray(),
+                ["unknownReason"] = "technology_read exposes no CPU order number or firmware."
+            },
+            ["valueDomain"] = "offline",
+            ["parametersComplete"] = read["parametersComplete"]?.DeepClone(),
             ["relationshipsComplete"] = read["hardwareConnectionCoverage"]?["complete"] is JsonValue done && done.TryGetValue<bool>(out bool all) && all,
-            ["parameters"] = parameters, ["relationships"] = relationships };
-        return new JsonObject { ["schemaVersion"] = "technology-profile-review-request.v1", ["reviewId"] = reviewId, ["technologyPath"] = path,
-            ["afterKind"] = "observation", ["before"] = snapshot, ["after"] = snapshot.DeepClone() };
+            ["parameters"] = parameters,
+            ["relationships"] = relationships
+        };
+        return new JsonObject
+        {
+            ["schemaVersion"] = "technology-profile-review-request.v1",
+            ["reviewId"] = reviewId,
+            ["technologyPath"] = path,
+            ["afterKind"] = "observation",
+            ["before"] = snapshot,
+            ["after"] = snapshot.DeepClone()
+        };
     }
 
     private static string? Text(JsonNode? node) => node is JsonValue value && value.TryGetValue<string>(out string? text) ? text : null;

@@ -41,7 +41,10 @@ public static class ChangeInputReference
         args[names.Inline] = Decode(bytes, names.Reference);
         args["inputReference"] = new JsonObject
         {
-            ["field"] = names.Inline, ["reference"] = reference, ["origin"] = origin, ["bytes"] = bytes.Length,
+            ["field"] = names.Inline,
+            ["reference"] = reference,
+            ["origin"] = origin,
+            ["bytes"] = bytes.Length,
             ["sha256"] = Convert.ToHexStringLower(SHA256.HashData(bytes)),
         };
         return JsonSerializer.SerializeToElement(args, BridgeProtocol.Json);

@@ -17,15 +17,32 @@ public sealed class DiagnosticReplanner(string artifactsRoot)
         foreach (var mapping in mappings)
         {
             var oldSignal = oldSignals[D.Text(mapping, "id")];
-            signals.Add(new JsonObject { ["id"] = oldSignal["id"]!.DeepClone(), ["role"] = oldSignal["role"]!.DeepClone(), ["hypothesisIds"] = oldSignal["hypothesisIds"]!.DeepClone(),
-                ["reason"] = D.Required(mapping!, "reason", 2000), ["storagePath"] = D.Required(mapping!, "storagePath"), ["memberPath"] = D.Strings(D.Path(mapping?["memberPath"])), ["expectedDatatype"] = oldSignal["datatype"]?.DeepClone() });
+            signals.Add(new JsonObject
+            {
+                ["id"] = oldSignal["id"]!.DeepClone(),
+                ["role"] = oldSignal["role"]!.DeepClone(),
+                ["hypothesisIds"] = oldSignal["hypothesisIds"]!.DeepClone(),
+                ["reason"] = D.Required(mapping!, "reason", 2000),
+                ["storagePath"] = D.Required(mapping!, "storagePath"),
+                ["memberPath"] = D.Strings(D.Path(mapping?["memberPath"])),
+                ["expectedDatatype"] = oldSignal["datatype"]?.DeepClone()
+            });
         }
-        var next = new JsonObject { ["reviewId"] = D.Required(request, "reviewId", 64), ["report"] = request["report"]?.DeepClone() ?? old["report"]!.DeepClone(),
+        var next = new JsonObject
+        {
+            ["reviewId"] = D.Required(request, "reviewId", 64),
+            ["report"] = request["report"]?.DeepClone() ?? old["report"]!.DeepClone(),
             ["templateId"] = old["template"]?["id"]?.DeepClone(),
             ["testSuiteFinding"] = request["testSuiteFinding"]?.DeepClone(),
-            ["blockPath"] = D.Required(request, "blockPath"), ["instance"] = request["instance"]?.DeepClone(), ["searchTerms"] = request["searchTerms"]?.DeepClone(),
-            ["signals"] = signals, ["hypotheses"] = old["hypotheses"]!.DeepClone(), ["observations"] = request["observations"]?.DeepClone(),
-            ["context"] = request["context"]?.DeepClone(), ["lineage"] = new JsonObject { ["previousPlanId"] = planId, ["reason"] = request["reason"]!.DeepClone(), ["mapping"] = mappings.DeepClone() } };
+            ["blockPath"] = D.Required(request, "blockPath"),
+            ["instance"] = request["instance"]?.DeepClone(),
+            ["searchTerms"] = request["searchTerms"]?.DeepClone(),
+            ["signals"] = signals,
+            ["hypotheses"] = old["hypotheses"]!.DeepClone(),
+            ["observations"] = request["observations"]?.DeepClone(),
+            ["context"] = request["context"]?.DeepClone(),
+            ["lineage"] = new JsonObject { ["previousPlanId"] = planId, ["reason"] = request["reason"]!.DeepClone(), ["mapping"] = mappings.DeepClone() }
+        };
         if (request.ContainsKey("alarmContext")) next["alarmContext"] = request["alarmContext"]?.DeepClone();
         if (request.ContainsKey("alarmBindings")) next["alarmBindings"] = request["alarmBindings"]?.DeepClone();
         return new DiagnosticPlanner(artifactsRoot).Plan(next);

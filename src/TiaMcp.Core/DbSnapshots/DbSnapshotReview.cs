@@ -15,14 +15,23 @@ public static class DbSnapshotReview
     {
         if (bytes.Length is < 1 or > InputLimit) throw Error("Snapshot XML must contain 1 byte..4 MiB.");
         using var stream = new MemoryStream(bytes, false);
-        using var reader = XmlReader.Create(stream, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit,
-            XmlResolver = null, MaxCharactersInDocument = InputLimit, IgnoreWhitespace = false });
+        using var reader = XmlReader.Create(stream, new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null,
+            MaxCharactersInDocument = InputLimit,
+            IgnoreWhitespace = false
+        });
         // Bound depth and node count before building a tree, including opaque extensions.
         int events = 0;
         while (reader.Read()) if (reader.Depth > 32 || ++events > 200000) throw Error("Snapshot XML exceeds depth/event bounds.");
         stream.Position = 0;
-        using var treeReader = XmlReader.Create(stream, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit,
-            XmlResolver = null, MaxCharactersInDocument = InputLimit });
+        using var treeReader = XmlReader.Create(stream, new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null,
+            MaxCharactersInDocument = InputLimit
+        });
         var document = XDocument.Load(treeReader, LoadOptions.PreserveWhitespace);
         var root = document.Root;
         if (root?.Name != "Document") throw Error("Expected an unqualified Document export root.");
@@ -44,10 +53,18 @@ public static class DbSnapshotReview
             values.Add(new JsonObject { ["path"] = path, ["type"] = type, ["text"] = Scalar(element, InputLimit, true) });
         }
         string? snapshotDate = Optional(attributes, "SnapshotDate"), structureModified = Optional(attributes, "StructureModified");
-        return new JsonObject { ["name"] = name, ["snapshotDate"] = snapshotDate, ["structureModified"] = structureModified,
-            ["values"] = values, ["valueCount"] = values.Count, ["formatProfile"] = "documented-interface-snapshot-shape",
-            ["valueDomain"] = "suppliedSnapshotValues", ["xsdValidated"] = false,
-            ["metadataPolicy"] = "Dates, types and values remain exact XML text. Other content is retained in the original artifact, without interpretation." };
+        return new JsonObject
+        {
+            ["name"] = name,
+            ["snapshotDate"] = snapshotDate,
+            ["structureModified"] = structureModified,
+            ["values"] = values,
+            ["valueCount"] = values.Count,
+            ["formatProfile"] = "documented-interface-snapshot-shape",
+            ["valueDomain"] = "suppliedSnapshotValues",
+            ["xsdValidated"] = false,
+            ["metadataPolicy"] = "Dates, types and values remain exact XML text. Other content is retained in the original artifact, without interpretation."
+        };
     }
 
     /// <param name="source">Worker export identity of a captured input (db_snapshot_capture); null for supplied uploads.</param>
@@ -74,21 +91,44 @@ public static class DbSnapshotReview
             foreach (string path in left.Keys.Union(right.Keys, StringComparer.Ordinal).Order(StringComparer.Ordinal))
             {
                 left.TryGetValue(path, out var a); right.TryGetValue(path, out var b);
-                if (!JsonNode.DeepEquals(a, b)) changes.Add(new JsonObject { ["path"] = path,
+                if (!JsonNode.DeepEquals(a, b)) changes.Add(new JsonObject
+                {
+                    ["path"] = path,
                     ["status"] = a is null ? "onlyAfter" : b is null ? "onlyBefore" : "differentTextOrType",
-                    ["before"] = a?.DeepClone(), ["after"] = b?.DeepClone() });
+                    ["before"] = a?.DeepClone(),
+                    ["after"] = b?.DeepClone()
+                });
             }
         }
-        var summary = new JsonObject { ["beforeCount"] = before["valueCount"]!.DeepClone(), ["afterCount"] = after?["valueCount"]?.DeepClone(),
-            ["changedPathCount"] = changes.Count, ["comparisonRequested"] = after is not null,
+        var summary = new JsonObject
+        {
+            ["beforeCount"] = before["valueCount"]!.DeepClone(),
+            ["afterCount"] = after?["valueCount"]?.DeepClone(),
+            ["changedPathCount"] = changes.Count,
+            ["comparisonRequested"] = after is not null,
             ["originalBytesEqual"] = afterBytes is null ? null : beforeBytes.AsSpan().SequenceEqual(afterBytes),
             ["structureTimestampComparison"] = after is null ? "notCompared" : before["structureModified"] is null || after["structureModified"] is null ? "unknown" :
-                JsonNode.DeepEquals(before["structureModified"], after["structureModified"]) ? "sameReportedText" : "differentReportedText" };
-        var report = new JsonObject { ["schemaVersion"] = "db-snapshot-review.v1", ["reviewId"] = reviewId, ["objectPath"] = objectPath, ["plcPath"] = plcPath,
-            ["association"] = "userSelectedCapturedDB", ["before"] = before, ["after"] = after, ["changes"] = changes, ["summary"] = summary,
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false,
-            ["programIdentityVerified"] = false, ["structureCompatibilityVerified"] = false,
-            ["limits"] = "Supplied documents only. Equal names, timestamps or text do not prove CPU/program identity, freshness, structural compatibility or equal runtime values. No start/actual value conversion, snapshot import, engineering change or online access." };
+                JsonNode.DeepEquals(before["structureModified"], after["structureModified"]) ? "sameReportedText" : "differentReportedText"
+        };
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "db-snapshot-review.v1",
+            ["reviewId"] = reviewId,
+            ["objectPath"] = objectPath,
+            ["plcPath"] = plcPath,
+            ["association"] = "userSelectedCapturedDB",
+            ["before"] = before,
+            ["after"] = after,
+            ["changes"] = changes,
+            ["summary"] = summary,
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["programIdentityVerified"] = false,
+            ["structureCompatibilityVerified"] = false,
+            ["limits"] = "Supplied documents only. Equal names, timestamps or text do not prove CPU/program identity, freshness, structural compatibility or equal runtime values. No start/actual value conversion, snapshot import, engineering change or online access."
+        };
         // Supplied reports keep their earlier shape so retained records still reopen.
         if (source is null) return report;
         report["association"] = "nativeExportOfSelectedDB";

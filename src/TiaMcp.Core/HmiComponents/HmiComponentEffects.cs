@@ -52,11 +52,21 @@ internal static class HmiComponentEffects
                 rows.Add(new JsonObject { ["fileName"] = name, ["status"] = status, ["expected"] = wanted?.DeepClone(), ["observed"] = actual?.DeepClone() });
             }
             bool mismatch = rows.Any(r => (string?)r!["status"] is "unexpected" or "missing" or "different");
-            checks.Add(new JsonObject { ["outputId"] = id, ["action"] = action, ["comparison"] = "exactBytes",
-                ["expectedCompleteDeclared"] = expectedComplete, ["observedCompleteDeclared"] = observedComplete,
+            checks.Add(new JsonObject
+            {
+                ["outputId"] = id,
+                ["action"] = action,
+                ["comparison"] = "exactBytes",
+                ["expectedCompleteDeclared"] = expectedComplete,
+                ["observedCompleteDeclared"] = observedComplete,
                 ["status"] = mismatch ? "mismatch" : !expectedComplete || !observedComplete ? "incomplete" : "match",
-                ["files"] = rows, ["gaps"] = gaps, ["nativeEffectVerified"] = false, ["contentAssociationVerified"] = false,
-                ["contentCompletenessVerified"] = false, ["ownershipVerified"] = false });
+                ["files"] = rows,
+                ["gaps"] = gaps,
+                ["nativeEffectVerified"] = false,
+                ["contentAssociationVerified"] = false,
+                ["contentCompletenessVerified"] = false,
+                ["ownershipVerified"] = false
+            });
         }
         report["schemaVersion"] = "hmi-component-review.v3";
         report["effectChecks"] = checks;

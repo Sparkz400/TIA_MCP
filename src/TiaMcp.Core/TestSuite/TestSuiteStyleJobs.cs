@@ -229,8 +229,13 @@ public sealed class TestSuiteStyleJobs
         catch (Exception error)
         {
             op = store.Read(operationId);
-            var failure = Retain(new { classification = nativeReturned ? "incompleteEvidence" : "unknownOutcome", code = (error as BridgeException)?.Code,
-                message = error.Message, automaticReplay = false });
+            var failure = Retain(new
+            {
+                classification = nativeReturned ? "incompleteEvidence" : "unknownOutcome",
+                code = (error as BridgeException)?.Code,
+                message = error.Message,
+                automaticReplay = false
+            });
             if (op.State == "dispatchIntent" && nativeReturned) store.RecordOutcome(op.Id, op.Revision, false, [new("failure", failure)]);
             else if (op.State is "acquired" or "checkpointIntent" or "ready" or "dispatchIntent") store.MarkUnknown(op.Id, op.Revision, failure);
             throw;

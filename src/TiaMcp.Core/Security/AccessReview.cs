@@ -59,14 +59,36 @@ public static class AccessReview
                     if (!JsonNode.DeepEquals(old[field], next[field])) fields.Add(field);
             changes.Add(new JsonObject { ["id"] = id, ["status"] = old is null ? "onlyAfter" : next is null ? "onlyBefore" : fields.Count == 0 ? "unchanged" : "changed", ["changedFields"] = fields });
         }
-        return new JsonObject { ["schemaVersion"] = "access-review.v1", ["reviewId"] = reviewId, ["owner"] = owner.DeepClone(), ["identity"] = identity.DeepClone(),
-            ["subjectId"] = subject, ["afterKind"] = afterKind, ["observations"] = observations, ["assessments"] = assessments, ["changes"] = changes,
-            ["summary"] = new JsonObject { ["beforeCount"] = before.Count, ["afterCount"] = after.Count, ["changedCount"] = changes.Count(c => (string?)c!["status"] != "unchanged"),
-                ["beforeUnexpectedCount"] = assessments[0]!["outsideAllowedRights"]!.AsArray().Count, ["afterUnexpectedCount"] = assessments[1]!["outsideAllowedRights"]!.AsArray().Count,
-                ["beforeRequiredNotObservedCount"] = assessments[0]!["requiredNotObserved"]!.AsArray().Count, ["afterRequiredNotObservedCount"] = assessments[1]!["requiredNotObserved"]!.AsArray().Count },
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false,
-            ["effectiveRightsVerified"] = false, ["minimumRightsVerified"] = false, ["lockoutSafetyVerified"] = false,
-            ["limits"] = "Public supplied grant graph only; exact IDs/scopes never translate between security domains. Potential rights include disabled or unknown-state references and do not implement native deny, inheritance or activation semantics. Missing observations are not proof of revocation. Caller-defined required/allowed rights are not an authenticated policy. No credentials, private keys, native edit, certificate operation or app deployment. Unknown fields are refused; this is not a secret-content detector. Use only public metadata." };
+        return new JsonObject
+        {
+            ["schemaVersion"] = "access-review.v1",
+            ["reviewId"] = reviewId,
+            ["owner"] = owner.DeepClone(),
+            ["identity"] = identity.DeepClone(),
+            ["subjectId"] = subject,
+            ["afterKind"] = afterKind,
+            ["observations"] = observations,
+            ["assessments"] = assessments,
+            ["changes"] = changes,
+            ["summary"] = new JsonObject
+            {
+                ["beforeCount"] = before.Count,
+                ["afterCount"] = after.Count,
+                ["changedCount"] = changes.Count(c => (string?)c!["status"] != "unchanged"),
+                ["beforeUnexpectedCount"] = assessments[0]!["outsideAllowedRights"]!.AsArray().Count,
+                ["afterUnexpectedCount"] = assessments[1]!["outsideAllowedRights"]!.AsArray().Count,
+                ["beforeRequiredNotObservedCount"] = assessments[0]!["requiredNotObserved"]!.AsArray().Count,
+                ["afterRequiredNotObservedCount"] = assessments[1]!["requiredNotObserved"]!.AsArray().Count
+            },
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["effectiveRightsVerified"] = false,
+            ["minimumRightsVerified"] = false,
+            ["lockoutSafetyVerified"] = false,
+            ["limits"] = "Public supplied grant graph only; exact IDs/scopes never translate between security domains. Potential rights include disabled or unknown-state references and do not implement native deny, inheritance or activation semantics. Missing observations are not proof of revocation. Caller-defined required/allowed rights are not an authenticated policy. No credentials, private keys, native edit, certificate operation or app deployment. Unknown fields are refused; this is not a secret-content detector. Use only public metadata."
+        };
 
         Dictionary<string, JsonObject> Snapshot(JsonObject snapshot, string phase)
         {
@@ -104,10 +126,19 @@ public static class AccessReview
                 active.Remove(id);
             }
             Visit(subject, 0);
-            assessments.Add(new JsonObject { ["phase"] = phase, ["subjectId"] = subject, ["visitedIds"] = paths,
-                ["suppliedClosureComplete"] = complete, ["gaps"] = gaps, ["potentialRights"] = RightRows(rights),
-                ["outsideAllowedRights"] = RightRows(rights.Except(allowed)), ["requiredNotObserved"] = RightRows(required.Except(rights)),
-                ["effectiveRightsVerified"] = false, ["minimumRightsVerified"] = false });
+            assessments.Add(new JsonObject
+            {
+                ["phase"] = phase,
+                ["subjectId"] = subject,
+                ["visitedIds"] = paths,
+                ["suppliedClosureComplete"] = complete,
+                ["gaps"] = gaps,
+                ["potentialRights"] = RightRows(rights),
+                ["outsideAllowedRights"] = RightRows(rights.Except(allowed)),
+                ["requiredNotObserved"] = RightRows(required.Except(rights)),
+                ["effectiveRightsVerified"] = false,
+                ["minimumRightsVerified"] = false
+            });
             return entities;
         }
     }

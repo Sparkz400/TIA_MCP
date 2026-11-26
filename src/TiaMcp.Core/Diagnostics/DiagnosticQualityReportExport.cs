@@ -10,8 +10,13 @@ internal sealed class DiagnosticQualityReportExport(string artifactsRoot)
 {
     internal JsonObject Export(string reportId, string format)
     {
-        string extension = format switch { "json" => ".json", "markdown" => ".md", "html" => ".html",
-            _ => throw new BridgeException("InvalidRequest", "Use json, markdown or html.") };
+        string extension = format switch
+        {
+            "json" => ".json",
+            "markdown" => ".md",
+            "html" => ".html",
+            _ => throw new BridgeException("InvalidRequest", "Use json, markdown or html.")
+        };
         var store = new DiagnosticStore(artifactsRoot); byte[] original = store.ReadBytes(reportId);
         var source = JsonNode.Parse(original)!.AsObject(); string schema = TraceQualityMeasurements.Schema(source);
         var reader = new TraceQualityMeasurements(artifactsRoot); var experiments = new DiagnosticQualityExperiments(artifactsRoot);
@@ -22,9 +27,18 @@ internal sealed class DiagnosticQualityReportExport(string artifactsRoot)
             if (!seen.Add(id)) return;
             var imported = reader.Read(id); var artifact = TraceQualityMeasurements.Object(imported, "inputArtifact");
             byte[] raw = ProjectReviewStore.ReadArtifact(artifactsRoot, artifact, DiagnosticStore.MaxBytes);
-            measurements.Add(new JsonObject { ["id"] = id, ["document"] = imported, ["original"] = new JsonObject {
-                ["artifact"] = artifact.DeepClone(), ["sha256"] = artifact["sha256"]!.DeepClone(), ["bytes"] = raw.Length,
-                ["base64"] = Convert.ToBase64String(raw) } });
+            measurements.Add(new JsonObject
+            {
+                ["id"] = id,
+                ["document"] = imported,
+                ["original"] = new JsonObject
+                {
+                    ["artifact"] = artifact.DeepClone(),
+                    ["sha256"] = artifact["sha256"]!.DeepClone(),
+                    ["bytes"] = raw.Length,
+                    ["base64"] = Convert.ToBase64String(raw)
+                }
+            });
         }
         void Pair(DiagnosticExperimentReviewParts p, string id)
         {
@@ -34,8 +48,14 @@ internal sealed class DiagnosticQualityReportExport(string artifactsRoot)
                 string experimentId = D.Required(p.Report, key, 64);
                 if (seenExperiments.Add(experimentId)) contexts.Add(new JsonObject { ["id"] = experimentId, ["document"] = document.DeepClone() });
             }
-            runs.Add(new JsonObject { ["id"] = id, ["review"] = p.Report.DeepClone(), ["beforeReport"] = p.BeforeReport.DeepClone(),
-                ["afterReport"] = p.AfterReport.DeepClone(), ["comparison"] = p.Comparison.DeepClone() });
+            runs.Add(new JsonObject
+            {
+                ["id"] = id,
+                ["review"] = p.Report.DeepClone(),
+                ["beforeReport"] = p.BeforeReport.DeepClone(),
+                ["afterReport"] = p.AfterReport.DeepClone(),
+                ["comparison"] = p.Comparison.DeepClone()
+            });
         }
         switch (schema)
         {
@@ -55,10 +75,19 @@ internal sealed class DiagnosticQualityReportExport(string artifactsRoot)
                 break;
             default: throw new BridgeException("InvalidDiagnosticReport", "Expected a v2 quality analysis, comparison or experiment report.");
         }
-        var document = new JsonObject { ["schemaVersion"] = "diagnostic-quality-report.v2", ["sourceReportId"] = reportId,
-            ["sourceSchemaVersion"] = schema, ["sourceReport"] = source, ["sourceReportBase64"] = Convert.ToBase64String(original),
-            ["measurements"] = measurements, ["experiments"] = contexts, ["runs"] = runs, ["sourceEvidenceRevalidated"] = true,
-            ["originalBytesIncluded"] = true };
+        var document = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-quality-report.v2",
+            ["sourceReportId"] = reportId,
+            ["sourceSchemaVersion"] = schema,
+            ["sourceReport"] = source,
+            ["sourceReportBase64"] = Convert.ToBase64String(original),
+            ["measurements"] = measurements,
+            ["experiments"] = contexts,
+            ["runs"] = runs,
+            ["sourceEvidenceRevalidated"] = true,
+            ["originalBytesIncluded"] = true
+        };
         TraceQualityMeasurements.Authority(document);
         byte[] json = JsonSerializer.SerializeToUtf8Bytes(document, BridgeProtocol.Json);
         if (json.Length > DiagnosticStore.MaxBytes) throw new BridgeException("ArtifactCapacity", "Complete quality report exceeds 8 MiB; select fewer run pairs. No observations were omitted.");

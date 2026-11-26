@@ -111,8 +111,16 @@ internal static class TechnologyEncoderReview
                     }
                 }
                 if (unknown && reason is null) throw Invalid("Unknown encoder state, route, sensor, option or target fields require a reason.");
-                Add(observations, new JsonObject { ["phase"] = phase, ["sourceIndex"] = index, ["encoder"] = row.DeepClone(), ["targetEvidence"] = resolved,
-                    ["contradictions"] = contradictions, ["nativeConnectionVerified"] = false, ["targetCompatibilityVerified"] = false });
+                Add(observations, new JsonObject
+                {
+                    ["phase"] = phase,
+                    ["sourceIndex"] = index,
+                    ["encoder"] = row.DeepClone(),
+                    ["targetEvidence"] = resolved,
+                    ["contradictions"] = contradictions,
+                    ["nativeConnectionVerified"] = false,
+                    ["targetCompatibilityVerified"] = false
+                });
             }
             report["summary"]![phase + "EncoderCount"] = rows.Count;
         }

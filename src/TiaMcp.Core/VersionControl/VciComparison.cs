@@ -22,20 +22,30 @@ public sealed class VciConflictReport
         Rows = Array.AsReadOnly(rows.ToArray()); Issues = Array.AsReadOnly(issues.ToArray());
         document = new JsonObject
         {
-            ["schemaVersion"] = "vci-conflict-report.v1", ["workspaceId"] = baseline.WorkspaceId,
-            ["baselineSha256"] = baseline.Sha256, ["projectSha256"] = project.Sha256,
+            ["schemaVersion"] = "vci-conflict-report.v1",
+            ["workspaceId"] = baseline.WorkspaceId,
+            ["baselineSha256"] = baseline.Sha256,
+            ["projectSha256"] = project.Sha256,
             ["workspaceSha256"] = workspace.Sha256,
             ["expectedHashes"] = new JsonObject { ["baseline"] = expected.Baseline, ["project"] = expected.Project, ["workspace"] = expected.Workspace },
-            ["nativeQualified"] = false, ["canSynchronize"] = false, ["resolutionApplied"] = false,
+            ["nativeQualified"] = false,
+            ["canSynchronize"] = false,
+            ["resolutionApplied"] = false,
             ["issues"] = Strings(Issues),
             ["rows"] = new JsonArray(Rows.Select(r => (JsonNode)new JsonObject
             {
-                ["packageId"] = r.PackageId, ["state"] = r.State, ["conflict"] = r.Conflict,
-                ["projectChange"] = r.ProjectChange, ["workspaceChange"] = r.WorkspaceChange,
-                ["baselineContentSha256"] = r.BaselineContentSha256, ["projectContentSha256"] = r.ProjectContentSha256,
+                ["packageId"] = r.PackageId,
+                ["state"] = r.State,
+                ["conflict"] = r.Conflict,
+                ["projectChange"] = r.ProjectChange,
+                ["workspaceChange"] = r.WorkspaceChange,
+                ["baselineContentSha256"] = r.BaselineContentSha256,
+                ["projectContentSha256"] = r.ProjectContentSha256,
                 ["workspaceContentSha256"] = r.WorkspaceContentSha256,
-                ["baselineNativeStatus"] = r.BaselineNativeStatus, ["projectNativeStatus"] = r.ProjectNativeStatus,
-                ["workspaceNativeStatus"] = r.WorkspaceNativeStatus, ["reasons"] = Strings(r.Reasons)
+                ["baselineNativeStatus"] = r.BaselineNativeStatus,
+                ["projectNativeStatus"] = r.ProjectNativeStatus,
+                ["workspaceNativeStatus"] = r.WorkspaceNativeStatus,
+                ["reasons"] = Strings(r.Reasons)
             }).ToArray())
         };
         Sha256 = CanonicalJson.Sha256(document);
@@ -134,13 +144,17 @@ public static class VciComparison
         // Observation IDs, source observation hash and opaque native status are deliberately separate.
         var json = new JsonObject
         {
-            ["objectIdentity"] = VciGuard.ObjectKey(package.Object), ["nativeObjectIdentity"] = package.NativeObjectIdentity, ["family"] = package.Family,
+            ["objectIdentity"] = VciGuard.ObjectKey(package.Object),
+            ["nativeObjectIdentity"] = package.NativeObjectIdentity,
+            ["family"] = package.Family,
             ["objectContentSha256"] = package.Object.ContentSha256,
-            ["nativeFormat"] = package.NativeFormat, ["libraryTypeGuid"] = package.LibraryTypeGuid,
+            ["nativeFormat"] = package.NativeFormat,
+            ["libraryTypeGuid"] = package.LibraryTypeGuid,
             ["libraryVersionGuid"] = package.LibraryVersionGuid,
             ["files"] = new JsonArray(package.ExpectedFiles.Select(f => (JsonNode)new JsonObject
             {
-                ["relativePath"] = f.RelativePath, ["role"] = f.Role,
+                ["relativePath"] = f.RelativePath,
+                ["role"] = f.Role,
                 ["sha256"] = files.GetValueOrDefault(f.RelativePath)?.Sha256,
                 ["bytes"] = files.GetValueOrDefault(f.RelativePath)?.Bytes
             }).ToArray())

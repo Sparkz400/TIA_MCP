@@ -73,8 +73,16 @@ public sealed partial class WatchTableDispatcher
         }
         token.ThrowIfCancellationRequested();
         var proof = Save(DirectoryOf(record), "reconcile-interrupted-" + Guid.NewGuid().ToString("N") + ".json",
-            new { original = snapshot, originalDisposition, destinationDisposition, destination = manifest,
-                automaticReplay = false, nativeRestoreInvoked = false, restoredProjectVerified = false });
+            new
+            {
+                original = snapshot,
+                originalDisposition,
+                destinationDisposition,
+                destination = manifest,
+                automaticReplay = false,
+                nativeRestoreInvoked = false,
+                restoredProjectVerified = false
+            });
         if (manifest is not null)
             record = store.RecordRecoveryEvidence(record.Id, record.Revision, new("recovery.interrupted." + record.Revision, proof));
         record = store.Reconcile(record.Id, record.Revision,

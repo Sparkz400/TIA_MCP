@@ -12,9 +12,12 @@ public static class RuntimeHandoffReview
 {
     public const int InputLimit = 128 << 10, ObservationLimit = 256 << 10, ReportLimit = 2 << 20;
     private static readonly UTF8Encoding Utf8 = new(false, true);
-    private static readonly JsonSerializerOptions Json = new(BridgeProtocol.Json) {
-        PropertyNameCaseInsensitive = false, UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
-        RespectRequiredConstructorParameters = true };
+    private static readonly JsonSerializerOptions Json = new(BridgeProtocol.Json)
+    {
+        PropertyNameCaseInsensitive = false,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        RespectRequiredConstructorParameters = true
+    };
 
     public static JsonObject Build(string artifactsRoot, byte[] bytes)
     {
@@ -35,8 +38,11 @@ public static class RuntimeHandoffReview
         Text(owner, "nodeId"); Text(owner, "objectPath");
         Require(JsonNode.DeepEquals(owner, access["owner"]), "Select the exact access owner.");
         var review = new ProjectReviewStore(artifactsRoot).Read(reviewId);
-        Charge(ProjectReviewStore.ReadArtifact(artifactsRoot, new JsonObject {
-            ["path"] = "project-reviews/" + reviewId + ".json", ["sha256"] = reviewId }).Length);
+        Charge(ProjectReviewStore.ReadArtifact(artifactsRoot, new JsonObject
+        {
+            ["path"] = "project-reviews/" + reviewId + ".json",
+            ["sha256"] = reviewId
+        }).Length);
         var nodes = review["model"]!["nodes"]!.AsArray();
         Require(nodes.Count(n => JsonNode.DeepEquals(n?["nodeId"], owner["nodeId"])) == 1 &&
             nodes.Count(n => JsonNode.DeepEquals(n?["objectPath"], owner["objectPath"])) == 1,
@@ -75,8 +81,12 @@ public static class RuntimeHandoffReview
         JsonNode? programIdentity = (bound is null ? null : PlcsimTargetBindings.ProgramIdentity(bound)) ?? expected["programIdentity"];
         var baseline = Load("baseline"); var current = Load("current");
         var constraints = new JsonArray();
-        void Constraint(string stage, string name, string state) => constraints.Add(new JsonObject {
-            ["stage"] = stage, ["kind"] = name, ["state"] = state });
+        void Constraint(string stage, string name, string state) => constraints.Add(new JsonObject
+        {
+            ["stage"] = stage,
+            ["kind"] = name,
+            ["state"] = state
+        });
         void Match(string stage, string name, JsonNode? wanted, JsonNode? observed) =>
             Constraint(stage, name, wanted is null || observed is null ? "unknown" : JsonNode.DeepEquals(wanted, observed) ? "equalDeclarations" : "mismatch");
         foreach (var (stage, evidence) in new[] { ("baseline", baseline), ("current", current) })
@@ -130,36 +140,68 @@ public static class RuntimeHandoffReview
             string wanted = Text(operation, "requiredOutcome");
             string Outcome(Dictionary<(string, string), string> values) => values.GetValueOrDefault(key, "unknown");
             string before = Outcome(oldPermissions), after = Outcome(newPermissions);
-            permissions.Add(new JsonObject { ["operation"] = operation.DeepClone(), ["baselineOutcome"] = before,
-                ["currentOutcome"] = after, ["state"] = before == "unknown" || after == "unknown" ? "unknown" :
+            permissions.Add(new JsonObject
+            {
+                ["operation"] = operation.DeepClone(),
+                ["baselineOutcome"] = before,
+                ["currentOutcome"] = after,
+                ["state"] = before == "unknown" || after == "unknown" ? "unknown" :
                     before == wanted && after == wanted ? "matchesDeclaredExpectation" : "mismatch",
                 ["publicGrantDeclared"] = assessment["potentialRights"]!.AsArray().Any(r =>
-                    (string?)r!["id"] == key.Item1 && (string?)r["scope"] == key.Item2), ["operationAdmitted"] = false });
+                    (string?)r!["id"] == key.Item1 && (string?)r["scope"] == key.Item2),
+                ["operationAdmitted"] = false
+            });
         }
         bool invalid = constraints.Any(c => (string?)c!["state"] is "unknown" or "mismatch" or "expired" or "unavailable" or "regressed") ||
             permissions.Any(p => (string?)p!["state"] != "matchesDeclaredExpectation");
-        var report = new JsonObject {
-            ["schemaVersion"] = "runtime-handoff-review.v1", ["reviewId"] = reviewId, ["accessRecordId"] = accessId,
-            ["accessPhase"] = phase, ["owner"] = owner.DeepClone(), ["expected"] = expected.DeepClone(),
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "runtime-handoff-review.v1",
+            ["reviewId"] = reviewId,
+            ["accessRecordId"] = accessId,
+            ["accessPhase"] = phase,
+            ["owner"] = owner.DeepClone(),
+            ["expected"] = expected.DeepClone(),
             ["evidence"] = new JsonObject { ["baseline"] = request["baseline"]!.DeepClone(), ["current"] = request["current"]!.DeepClone() },
             ["observations"] = new JsonObject { ["baseline"] = ObservationRows(baseline), ["current"] = ObservationRows(current) },
-            ["constraints"] = constraints, ["permissions"] = permissions,
-            ["summary"] = new JsonObject { ["state"] = invalid ? "requiresFreshEvidence" : "consistentDeclarations",
-                ["requiresFreshEvidence"] = invalid, ["constraintCount"] = constraints.Count, ["operationCount"] = permissions.Count,
+            ["constraints"] = constraints,
+            ["permissions"] = permissions,
+            ["summary"] = new JsonObject
+            {
+                ["state"] = invalid ? "requiresFreshEvidence" : "consistentDeclarations",
+                ["requiresFreshEvidence"] = invalid,
+                ["constraintCount"] = constraints.Count,
+                ["operationCount"] = permissions.Count,
                 ["publicAccessPhaseKind"] = phase == "before" ? "observation" : access["afterKind"]!.DeepClone(),
-                ["publicClosureComplete"] = assessment["suppliedClosureComplete"]!.DeepClone(), ["referencedBytes"] = charged },
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false,
-            ["liveFreshnessVerified"] = false, ["deviceIdentityVerified"] = false, ["programMatchVerified"] = false,
-            ["effectiveRightsVerified"] = false, ["operationAdmitted"] = false, ["assertionsAdmitted"] = false,
+                ["publicClosureComplete"] = assessment["suppliedClosureComplete"]!.DeepClone(),
+                ["referencedBytes"] = charged
+            },
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["deviceIdentityVerified"] = false,
+            ["programMatchVerified"] = false,
+            ["effectiveRightsVerified"] = false,
+            ["operationAdmitted"] = false,
+            ["assertionsAdmitted"] = false,
             ["admission"] = "unavailableWithoutQualifiedNativeEvidence",
             ["mutationRecovery"] = "unknownOutcomeRequiresIndependentReconciliationNoAutomaticReplay",
-            ["limits"] = "Supplied or synthetic public observations only. Separate artifact references do not authenticate independent producers. Sequence and freshness are declarations. Neither certificates, metadata hashes, successful reads nor public grants prove CPU/program identity or effective rights. Replay reproduces a review only; it never creates a session or admits an operation. Capture quality and source-to-runtime signal association require separate checks." };
+            ["limits"] = "Supplied or synthetic public observations only. Separate artifact references do not authenticate independent producers. Sequence and freshness are declarations. Neither certificates, metadata hashes, successful reads nor public grants prove CPU/program identity or effective rights. Replay reproduces a review only; it never creates a session or admits an operation. Capture quality and source-to-runtime signal association require separate checks."
+        };
         if (bindable) report["targetBinding"] = bound is null
             ? new JsonObject { ["state"] = "unbound", ["reason"] = "No owned PLCSIM binding was selected; target and program identity remain supplied declarations." }
-            : new JsonObject { ["state"] = "boundOwnedPlcsim", ["binding"] = bindingReference!.DeepClone(), ["instanceName"] = bound.InstanceName,
-                ["storagePath"] = bound.StoragePath, ["markerSha256"] = bound.MarkerSha256, ["controllerAddresses"] = new JsonArray(bound.ControllerAddresses.Select(a => (JsonNode)a).ToArray()),
+            : new JsonObject
+            {
+                ["state"] = "boundOwnedPlcsim",
+                ["binding"] = bindingReference!.DeepClone(),
+                ["instanceName"] = bound.InstanceName,
+                ["storagePath"] = bound.StoragePath,
+                ["markerSha256"] = bound.MarkerSha256,
+                ["controllerAddresses"] = new JsonArray(bound.ControllerAddresses.Select(a => (JsonNode)a).ToArray()),
                 ["programFingerprintSha256"] = bound.ProgramFingerprintSha256,
-                ["programIdentitySource"] = bound.ProgramFingerprintSha256 is null ? "suppliedDeclaration" : "boundOnlineFingerprint" };
+                ["programIdentitySource"] = bound.ProgramFingerprintSha256 is null ? "suppliedDeclaration" : "boundOnlineFingerprint"
+            };
         Require(JsonSerializer.SerializeToUtf8Bytes(report, Json).Length <= ReportLimit, "Report exceeds 2 MiB.");
         return report;
 

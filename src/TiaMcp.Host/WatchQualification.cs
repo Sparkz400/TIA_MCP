@@ -39,9 +39,14 @@ internal sealed class WatchQualificationBridge(IBridgeClient inner, HostOptions 
         try
         {
             using var file = new FileStream(marker, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
-            JsonSerializer.Serialize(file, new { point, hostProcessId = Environment.ProcessId,
+            JsonSerializer.Serialize(file, new
+            {
+                point,
+                hostProcessId = Environment.ProcessId,
                 hostStartedAtUtc = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime(),
-                response, automaticReplay = false }, BridgeProtocol.Json);
+                response,
+                automaticReplay = false
+            }, BridgeProtocol.Json);
             file.Flush(true);
         }
         catch (IOException) { }
@@ -63,8 +68,13 @@ public sealed class WatchQualificationTools(IBridgeClient bridge, HostOptions op
     public async Task<JsonElement> Seed(string inputPath, string inputSha256, CancellationToken cancellationToken)
     {
         RequireQualification();
-        return await bridge.CallAsync("qualification_watch_fixture_seed", new { inputPath, inputSha256,
-            tableName = "MilestoneWatch", artifactDirectory = Path.Combine(options.ArtifactsDirectory, "seed") }, cancellationToken);
+        return await bridge.CallAsync("qualification_watch_fixture_seed", new
+        {
+            inputPath,
+            inputSha256,
+            tableName = "MilestoneWatch",
+            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "seed")
+        }, cancellationToken);
     }
 
     [McpServerTool(Name = "qualification_watch_compete", Destructive = false, OpenWorld = false)]
@@ -83,8 +93,14 @@ public sealed class WatchQualificationTools(IBridgeClient bridge, HostOptions op
         }
         catch (BridgeException error) when (error.Code == "ResourceBusy")
         {
-            return new { code = error.Code, operationId, competitorId = competitor.Id,
-                hostProcessId = Environment.ProcessId, nativeDispatchInvoked = false };
+            return new
+            {
+                code = error.Code,
+                operationId,
+                competitorId = competitor.Id,
+                hostProcessId = Environment.ProcessId,
+                nativeDispatchInvoked = false
+            };
         }
     }
 }

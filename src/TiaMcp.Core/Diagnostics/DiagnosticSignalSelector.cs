@@ -31,18 +31,26 @@ internal sealed class DiagnosticSignalSelector(DiagnosticEvidence source, JsonOb
         foreach (var row in truncated ? [] : Resolve(block, instance, new("LocalVariable", members), new HashSet<string>(), 0))
             Add(row, "selectedMemberOrAlias");
         foreach (var call in calls.OfType<JsonObject>().TakeWhile(_ => !truncated))
-        foreach (var binding in D.Rows(call["parameterBindings"]).OfType<JsonObject>().Where(b => D.Text(b, "parameter") == members[0]))
+            foreach (var binding in D.Rows(call["parameterBindings"]).OfType<JsonObject>().Where(b => D.Text(b, "parameter") == members[0]))
+            {
+                if (binding["actual"] is null) { Gap("Unresolved call parameter", binding); continue; }
+                var actual = Symbol(binding["actual"]!);
+                actual = actual with { Components = [.. actual.Components, .. members.Skip(1)] };
+                if (actual.Components.Length > 16) { Gap("Operand member depth exceeded", binding); continue; }
+                foreach (var row in Resolve(D.Text(call, "objectPath"), CallerContext(call), actual, new HashSet<string>(), 0))
+                    Add(row, "actualParameter", call, binding);
+            }
+        return new JsonObject
         {
-            if (binding["actual"] is null) { Gap("Unresolved call parameter", binding); continue; }
-            var actual = Symbol(binding["actual"]!);
-            actual = actual with { Components = [.. actual.Components, .. members.Skip(1)] };
-            if (actual.Components.Length > 16) { Gap("Operand member depth exceeded", binding); continue; }
-            foreach (var row in Resolve(D.Text(call, "objectPath"), CallerContext(call), actual, new HashSet<string>(), 0))
-                Add(row, "actualParameter", call, binding);
-        }
-        return new JsonObject { ["candidates"] = rows, ["gaps"] = gaps.DeepClone(), ["truncated"] = truncated,
-            ["maxCandidates"] = 64, ["maxCallSites"] = 64, ["maxParameterBindings"] = 256,
-            ["maxResolutionVisits"] = 1000, ["runtimeCallContextVerified"] = false };
+            ["candidates"] = rows,
+            ["gaps"] = gaps.DeepClone(),
+            ["truncated"] = truncated,
+            ["maxCandidates"] = 64,
+            ["maxCallSites"] = 64,
+            ["maxParameterBindings"] = 256,
+            ["maxResolutionVisits"] = 1000,
+            ["runtimeCallContextVerified"] = false
+        };
     }
 
     internal JsonObject Select(JsonObject request)
@@ -87,55 +95,76 @@ internal sealed class DiagnosticSignalSelector(DiagnosticEvidence source, JsonOb
                     continue;
                 }
                 if (output.Count == budget) { truncated = true; continue; }
-                var signal = new JsonObject { ["id"] = "auto" + (output.Count + 1), ["role"] = item.Depth == 0 ? "symptomSeed" : "dependencyOrBinding",
-                    ["storagePath"] = row["storagePath"]!.DeepClone(), ["memberPath"] = row["memberPath"]!.DeepClone(),
-                    ["reason"] = item.Reason, ["hypothesisIds"] = new JsonArray(hypotheses.Select(h => h!["id"]!.DeepClone()).ToArray()),
-                    ["selectionOrigin"] = "boundedDependencyEvidence", ["selectionEvidence"] = new JsonArray(new JsonObject { ["reason"] = item.Reason, ["evidence"] = trail }) };
+                var signal = new JsonObject
+                {
+                    ["id"] = "auto" + (output.Count + 1),
+                    ["role"] = item.Depth == 0 ? "symptomSeed" : "dependencyOrBinding",
+                    ["storagePath"] = row["storagePath"]!.DeepClone(),
+                    ["memberPath"] = row["memberPath"]!.DeepClone(),
+                    ["reason"] = item.Reason,
+                    ["hypothesisIds"] = new JsonArray(hypotheses.Select(h => h!["id"]!.DeepClone()).ToArray()),
+                    ["selectionOrigin"] = "boundedDependencyEvidence",
+                    ["selectionEvidence"] = new JsonArray(new JsonObject { ["reason"] = item.Reason, ["evidence"] = trail })
+                };
                 retained.Add(key, signal); output.Add(signal);
             }
             foreach (var pair in byCaller.Where(p => p.Key == item.Caller || item.Symbol.Scope == "GlobalVariable" && D.Text(source.Nodes[p.Key], "scopePath") == D.Text(source.Nodes[item.Caller], "scopePath")))
-            foreach (var dependency in pair.Value)
-            {
-                if (++edgeVisits > 5000) { truncated = true; break; }
-                if (!Same(item.Symbol, dependency["output"])) continue;
-                if (item.Depth == depth) { truncated = true; continue; }
-                foreach (var input in D.Rows(dependency["inputs"]))
+                foreach (var dependency in pair.Value)
                 {
-                    var evidence = (JsonArray)item.Evidence.DeepClone(); evidence.Add(dependency["evidence"]!.DeepClone());
-                    queue.Enqueue((Symbol(input!), item.Depth + 1, "Captured " + D.Text(dependency, "kind") + " feeding seed/dependency " + string.Join(".", item.Symbol.Components), evidence, pair.Key));
+                    if (++edgeVisits > 5000) { truncated = true; break; }
+                    if (!Same(item.Symbol, dependency["output"])) continue;
+                    if (item.Depth == depth) { truncated = true; continue; }
+                    foreach (var input in D.Rows(dependency["inputs"]))
+                    {
+                        var evidence = (JsonArray)item.Evidence.DeepClone(); evidence.Add(dependency["evidence"]!.DeepClone());
+                        queue.Enqueue((Symbol(input!), item.Depth + 1, "Captured " + D.Text(dependency, "kind") + " feeding seed/dependency " + string.Join(".", item.Symbol.Components), evidence, pair.Key));
+                    }
                 }
-            }
             // Formal input bindings retain actual storage in every captured call context. IN_OUT is
             // substituted by actual storage in Resolve; ordinary IN/OUT keep both sides observable.
             if (item.Symbol.Scope == "LocalVariable" && item.Caller == block)
                 foreach (var call in D.Rows(instance["callSites"]).OfType<JsonObject>())
-                foreach (var binding in D.Rows(call["parameterBindings"]).OfType<JsonObject>().Where(b => D.Text(b, "parameter") == item.Symbol.Components[0]))
-                {
-                    if (binding["actual"] is null) { Gap("Unresolved call parameter", binding); continue; }
-                    var actual = Symbol(binding["actual"]!);
-                    actual = actual with { Components = [.. actual.Components, .. item.Symbol.Components.Skip(1)] };
-                    if (actual.Scope == "GlobalVariable" && item.Depth < depth)
-                        queue.Enqueue((actual, item.Depth + 1, "Actual parameter storage and competing writers for " + item.Symbol.Components[0], new JsonArray(binding.DeepClone()), D.Text(call, "objectPath")));
-                    var context = CallerContext(call);
-                    if (actual.Scope == "LocalVariable" && context is null) { Gap("Caller instance context absent", call); continue; }
-                    foreach (var row in Resolve(D.Text(call, "objectPath"), context, actual, new HashSet<string>(), 0))
+                    foreach (var binding in D.Rows(call["parameterBindings"]).OfType<JsonObject>().Where(b => D.Text(b, "parameter") == item.Symbol.Components[0]))
                     {
-                        string key = D.Text(row, "storagePath") + ":" + row["memberPath"]!.ToJsonString();
-                        if (retained.ContainsKey(key)) continue;
-                        if (output.Count == budget) { truncated = true; continue; }
-                        var signal = new JsonObject { ["id"] = "auto" + (output.Count + 1), ["role"] = "actualParameter",
-                            ["storagePath"] = row["storagePath"]!.DeepClone(), ["memberPath"] = row["memberPath"]!.DeepClone(),
-                            ["reason"] = "Explicit captured argument for " + item.Symbol.Components[0] + "; retain actual storage alongside instance member.",
-                            ["hypothesisIds"] = new JsonArray(hypotheses.Select(h => h!["id"]!.DeepClone()).ToArray()), ["selectionOrigin"] = "boundedDependencyEvidence",
-                            ["selectionEvidence"] = new JsonArray(binding.DeepClone(), call.DeepClone()) };
-                        retained.Add(key, signal); output.Add(signal);
+                        if (binding["actual"] is null) { Gap("Unresolved call parameter", binding); continue; }
+                        var actual = Symbol(binding["actual"]!);
+                        actual = actual with { Components = [.. actual.Components, .. item.Symbol.Components.Skip(1)] };
+                        if (actual.Scope == "GlobalVariable" && item.Depth < depth)
+                            queue.Enqueue((actual, item.Depth + 1, "Actual parameter storage and competing writers for " + item.Symbol.Components[0], new JsonArray(binding.DeepClone()), D.Text(call, "objectPath")));
+                        var context = CallerContext(call);
+                        if (actual.Scope == "LocalVariable" && context is null) { Gap("Caller instance context absent", call); continue; }
+                        foreach (var row in Resolve(D.Text(call, "objectPath"), context, actual, new HashSet<string>(), 0))
+                        {
+                            string key = D.Text(row, "storagePath") + ":" + row["memberPath"]!.ToJsonString();
+                            if (retained.ContainsKey(key)) continue;
+                            if (output.Count == budget) { truncated = true; continue; }
+                            var signal = new JsonObject
+                            {
+                                ["id"] = "auto" + (output.Count + 1),
+                                ["role"] = "actualParameter",
+                                ["storagePath"] = row["storagePath"]!.DeepClone(),
+                                ["memberPath"] = row["memberPath"]!.DeepClone(),
+                                ["reason"] = "Explicit captured argument for " + item.Symbol.Components[0] + "; retain actual storage alongside instance member.",
+                                ["hypothesisIds"] = new JsonArray(hypotheses.Select(h => h!["id"]!.DeepClone()).ToArray()),
+                                ["selectionOrigin"] = "boundedDependencyEvidence",
+                                ["selectionEvidence"] = new JsonArray(binding.DeepClone(), call.DeepClone())
+                            };
+                            retained.Add(key, signal); output.Add(signal);
+                        }
                     }
-                }
             if (edgeVisits > 5000) break;
         }
-        return new JsonObject { ["signals"] = output, ["gaps"] = gaps, ["truncated"] = truncated,
-            ["visitedSymbols"] = visited.Count, ["edgeVisits"] = edgeVisits, ["maxSignals"] = budget,
-            ["complete"] = false, ["semantics"] = "Conservative dependency supersets and explicit simple parameter bindings; no causality, alias completeness or runtime invocation proof." };
+        return new JsonObject
+        {
+            ["signals"] = output,
+            ["gaps"] = gaps,
+            ["truncated"] = truncated,
+            ["visitedSymbols"] = visited.Count,
+            ["edgeVisits"] = edgeVisits,
+            ["maxSignals"] = budget,
+            ["complete"] = false,
+            ["semantics"] = "Conservative dependency supersets and explicit simple parameter bindings; no causality, alias completeness or runtime invocation proof."
+        };
     }
 
     private List<JsonObject> Resolve(string caller, JsonObject? context, DiagnosticCodeReader.Symbol symbol, HashSet<string> resolving, int depth)
@@ -165,19 +194,22 @@ internal sealed class DiagnosticSignalSelector(DiagnosticEvidence source, JsonOb
             if (section == "InOut")
             {
                 foreach (var call in D.Rows(context["callSites"]).OfType<JsonObject>())
-                foreach (var binding in D.Rows(call["parameterBindings"]).OfType<JsonObject>().Where(b => D.Text(b, "parameter") == symbol.Components[0]))
-                {
-                    if (binding["actual"] is null) { Gap("IN_OUT actual is unresolved", binding); continue; }
-                    var actual = Symbol(binding["actual"]!); actual = actual with { Components = [.. actual.Components, .. symbol.Components.Skip(1)] };
-                    foreach (var row in Resolve(D.Text(call, "objectPath"), CallerContext(call), actual, resolving, depth + 1))
-                    { D.Rows(row["bindingEvidence"]).Add(binding.DeepClone()); result.Add(row); }
-                }
+                    foreach (var binding in D.Rows(call["parameterBindings"]).OfType<JsonObject>().Where(b => D.Text(b, "parameter") == symbol.Components[0]))
+                    {
+                        if (binding["actual"] is null) { Gap("IN_OUT actual is unresolved", binding); continue; }
+                        var actual = Symbol(binding["actual"]!); actual = actual with { Components = [.. actual.Components, .. symbol.Components.Skip(1)] };
+                        foreach (var row in Resolve(D.Text(call, "objectPath"), CallerContext(call), actual, resolving, depth + 1))
+                        { D.Rows(row["bindingEvidence"]).Add(binding.DeepClone()); result.Add(row); }
+                    }
                 if (result.Count == 0) Gap("IN_OUT has no resolved actual storage", symbol.Json());
                 return result;
             }
-            result.Add(new JsonObject { ["storagePath"] = context["dbPath"]!.DeepClone(),
+            result.Add(new JsonObject
+            {
+                ["storagePath"] = context["dbPath"]!.DeepClone(),
                 ["memberPath"] = D.Strings(D.Rows(context["memberPath"]).Select(n => n!.GetValue<string>()).Concat(symbol.Components)),
-                ["bindingEvidence"] = new JsonArray(source.Evidence(caller, declaration)) });
+                ["bindingEvidence"] = new JsonArray(source.Evidence(caller, declaration))
+            });
             return result;
         }
         finally { resolving.Remove(recursion); }
@@ -186,8 +218,12 @@ internal sealed class DiagnosticSignalSelector(DiagnosticEvidence source, JsonOb
     {
         if (call["callerDbPath"] is null) return null;
         var evidenceCalls = D.Rows(instance["evidence"]).OfType<JsonObject>().Where(c => D.Text(c, "calleePath") == D.Text(call, "objectPath"));
-        return new JsonObject { ["dbPath"] = call["callerDbPath"]!.DeepClone(), ["memberPath"] = call["callerMemberPath"]!.DeepClone(),
-            ["callSites"] = new JsonArray(evidenceCalls.Select(c => (JsonNode?)c.DeepClone()).ToArray()) };
+        return new JsonObject
+        {
+            ["dbPath"] = call["callerDbPath"]!.DeepClone(),
+            ["memberPath"] = call["callerMemberPath"]!.DeepClone(),
+            ["callSites"] = new JsonArray(evidenceCalls.Select(c => (JsonNode?)c.DeepClone()).ToArray())
+        };
     }
     private void Gap(string reason, JsonNode evidence) { if (gaps.Count < 100) gaps.Add(new JsonObject { ["reason"] = reason, ["evidence"] = evidence.DeepClone() }); else truncated = true; }
     private static bool Same(DiagnosticCodeReader.Symbol symbol, JsonNode? json) => json is not null && symbol.Key == Symbol(json).Key;

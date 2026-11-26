@@ -19,8 +19,11 @@ public sealed class WatchAuthoringQualificationTools(IBridgeClient bridge, HostO
     public Task<CallToolResult> SourceNegative(JsonElement sourceBinding, CancellationToken cancellationToken)
     {
         RequireQualification();
-        return Call("qualification_watch_authoring_source_negative", new { sourceBinding,
-            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "watch-source-negative") }, cancellationToken);
+        return Call("qualification_watch_authoring_source_negative", new
+        {
+            sourceBinding,
+            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "watch-source-negative")
+        }, cancellationToken);
     }
 
     [McpServerTool(Name = "qualification_watch_authoring_source_reconcile", ReadOnly = true, Destructive = false, OpenWorld = false)]

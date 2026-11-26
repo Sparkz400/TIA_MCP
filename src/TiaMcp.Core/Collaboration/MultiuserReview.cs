@@ -46,18 +46,40 @@ public static class MultiuserReview
             {
                 oldRows[section].TryGetValue(identity, out var old); newRows[section].TryGetValue(identity, out var next);
                 if (old is not null && next is not null && CanonicalJson.ExactlyEqual(old, next)) continue;
-                changes.Add(new JsonObject { ["section"] = section, ["identity"] = identity,
+                changes.Add(new JsonObject
+                {
+                    ["section"] = section,
+                    ["identity"] = identity,
                     ["status"] = old is null ? "onlyAfter" : next is null ? "onlyBefore" : "differentObservation",
-                    ["before"] = old?.DeepClone(), ["after"] = next?.DeepClone() });
+                    ["before"] = old?.DeepClone(),
+                    ["after"] = next?.DeepClone()
+                });
             }
         var metadataBefore = before.DeepClone().AsObject(); var metadataAfter = after.DeepClone().AsObject();
         foreach (string section in oldRows.Keys) { metadataBefore[section]!.AsObject().Remove("rows"); metadataAfter[section]!.AsObject().Remove("rows"); }
-        if (!JsonNode.DeepEquals(metadataBefore, metadataAfter)) changes.Add(new JsonObject {
-            ["section"] = "metadata", ["identity"] = "capture", ["status"] = "differentObservation", ["before"] = metadataBefore, ["after"] = metadataAfter });
-        return new JsonObject { ["schemaVersion"] = "multiuser-report.v1", ["observations"] = observations, ["changes"] = changes, ["issues"] = issues,
+        if (!JsonNode.DeepEquals(metadataBefore, metadataAfter)) changes.Add(new JsonObject
+        {
+            ["section"] = "metadata",
+            ["identity"] = "capture",
+            ["status"] = "differentObservation",
+            ["before"] = metadataBefore,
+            ["after"] = metadataAfter
+        });
+        return new JsonObject
+        {
+            ["schemaVersion"] = "multiuser-report.v1",
+            ["observations"] = observations,
+            ["changes"] = changes,
+            ["issues"] = issues,
             ["summary"] = new JsonObject { ["observationCount"] = observations.Count, ["changeCount"] = changes.Count, ["issueCount"] = issues.Count, ["scope"] = "suppliedDeclarationsOnly" },
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false,
-            ["conflictFreeVerified"] = false, ["stableProjectIdentityVerified"] = false, ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["conflictFreeVerified"] = false,
+            ["stableProjectIdentityVerified"] = false,
+            ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy
+        };
 
         Dictionary<string, Dictionary<string, JsonObject>> Inspect(JsonObject snapshot, string phase)
         {
@@ -76,7 +98,8 @@ public static class MultiuserReview
             if (server["port"] is not JsonValue port || !port.TryGetValue<int>(out int number) || number is < 1 or > 65535) throw Error("Invalid server port.");
             var indexed = new Dictionary<string, Dictionary<string, JsonObject>>(StringComparer.Ordinal);
             Read("groups", 128, row => { Fields(row, "path"); return Group(row["path"]); });
-            Read("projects", 256, row => {
+            Read("projects", 256, row =>
+            {
                 Fields(row, "groupPath name revision lock"); string project = Project(row);
                 if (row["groupPath"]!.AsArray().Count != 0 && !indexed["groups"].ContainsKey(Group(row["groupPath"]))) Issue("projects", project, "groupNotSupplied");
                 NullableText(row, "revision"); if (row["revision"] is null) Issue("projects", project, "unknownRevision");
@@ -86,7 +109,8 @@ public static class MultiuserReview
                 if (status != "unlocked") Issue("projects", project, status == "locked" ? "reportedLock" : "unknownLock");
                 return project;
             });
-            Read("sessions", 512, row => {
+            Read("sessions", 512, row =>
+            {
                 Fields(row, "project sessionId projectPath mode upToDate"); string project = ProjectReference(row["project"]);
                 Text(row, "sessionId"); Text(row, "projectPath", 4096); Choice(row, "mode", "multiuser exclusive unknown");
                 if (row["upToDate"] is not null && (row["upToDate"] is not JsonValue value || !value.TryGetValue<bool>(out _))) throw Error("upToDate requires a Boolean or unknown null.");
@@ -96,7 +120,8 @@ public static class MultiuserReview
                 if (Text(row, "mode") == "unknown") Issue("sessions", identity, "unknownSessionMode");
                 return identity;
             });
-            Read("markings", 2048, row => {
+            Read("markings", 2048, row =>
+            {
                 Fields(row, "project sessionId objectPath markState"); string project = ProjectReference(row["project"]);
                 string session = Key(project, Text(row, "sessionId")); Text(row, "objectPath", 4096); Text(row, "markState");
                 string identity = Key(session, Text(row, "objectPath", 4096));

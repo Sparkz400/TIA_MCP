@@ -30,8 +30,8 @@ public static class WatchTablePlanner
         long inputBytes = 0;
         void Account(JsonNode? value) { if (value is null) return; inputBytes += Encoding.UTF8.GetByteCount(value.ToJsonString()); if (inputBytes > 16 * 1024 * 1024) Fail("WatchTableLimitExceeded", "Combined captured inputs exceed the 16 MiB host budget."); }
         Account(request.DiagnosticCase); Account(Node(request.Template));
-        foreach(var binding in request.TemplateBindings) Account(Node(binding));
-        foreach(var observation in request.AddressObservations) Account(Node(observation));
+        foreach (var binding in request.TemplateBindings) Account(Node(binding));
+        foreach (var observation in request.AddressObservations) Account(Node(observation));
         var external = new Dictionary<string, WatchTableExternalStorage>(StringComparer.Ordinal);
         foreach (var allowance in request.ExternalStorage)
         {
@@ -67,12 +67,24 @@ public static class WatchTablePlanner
                 Fail("CaptureMismatch", "Resolved normalized candidate needs matching captured declaration evidence.");
             Path(c.SymbolComponents ?? [], true);
             bool transient = c.StorageClass is "temp" or "inOutAlias" or "indirect" or "unknown";
-            candidates.Add(new JsonObject { ["id"] = c.Id, ["sourceKind"] = c.SourceKind, ["sourceObject"] = Node(c.SourceObject),
-                ["storage"] = Node(c.Storage), ["memberPath"] = Strings(c.MemberPath), ["datatype"] = c.Datatype,
-                ["role"] = c.Role, ["reason"] = c.Reason, ["resolution"] = transient && c.Resolution == "capturedDeclaration" ? "unavailable" : c.Resolution,
+            candidates.Add(new JsonObject
+            {
+                ["id"] = c.Id,
+                ["sourceKind"] = c.SourceKind,
+                ["sourceObject"] = Node(c.SourceObject),
+                ["storage"] = Node(c.Storage),
+                ["memberPath"] = Strings(c.MemberPath),
+                ["datatype"] = c.Datatype,
+                ["role"] = c.Role,
+                ["reason"] = c.Reason,
+                ["resolution"] = transient && c.Resolution == "capturedDeclaration" ? "unavailable" : c.Resolution,
                 ["storageClass"] = c.StorageClass,
-                ["unavailableReason"] = transient ? "Captured storage class has no established persistent exact declaration: " + c.StorageClass : c.UnavailableReason, ["symbolComponents"] = Strings(c.SymbolComponents ?? []),
-                ["evidence"] = c.Evidence.DeepClone(), ["networkId"] = c.NetworkId, ["hypothesisIds"] = new JsonArray() });
+                ["unavailableReason"] = transient ? "Captured storage class has no established persistent exact declaration: " + c.StorageClass : c.UnavailableReason,
+                ["symbolComponents"] = Strings(c.SymbolComponents ?? []),
+                ["evidence"] = c.Evidence.DeepClone(),
+                ["networkId"] = c.NetworkId,
+                ["hypothesisIds"] = new JsonArray()
+            });
         }
         if (candidates.Count > MaxCandidates) Fail("WatchTableLimitExceeded", "Combined candidate count exceeds host budget.");
         var ids = new HashSet<string>(StringComparer.Ordinal);
@@ -117,26 +129,48 @@ public static class WatchTablePlanner
             }
             if (rows.Count == request.MaxRows) { omitted++; gaps.Add(Gap(c, "RowBudgetExceeded", "Explicit planner row budget exhausted; candidate is retained.")); continue; }
             first.TryAdd(key, id);
-            rows.Add(new JsonObject { ["ordinal"] = rows.Count, ["candidateId"] = id, ["candidate"] = c.DeepClone(),
-                ["displayFormat"] = "Undef", ["modifyIntention"] = false, ["modifyValue"] = null,
-                ["onlineAddress"] = null, ["suppliedAddressObservation"] = observations.TryGetValue(id, out var observation) ? observation.DeepClone() : null,
-                ["selectionReasons"] = new JsonArray(new JsonObject { ["candidateId"] = id, ["reason"] = c["reason"]!.DeepClone(), ["evidence"] = c["evidence"]!.DeepClone() }) });
+            rows.Add(new JsonObject
+            {
+                ["ordinal"] = rows.Count,
+                ["candidateId"] = id,
+                ["candidate"] = c.DeepClone(),
+                ["displayFormat"] = "Undef",
+                ["modifyIntention"] = false,
+                ["modifyValue"] = null,
+                ["onlineAddress"] = null,
+                ["suppliedAddressObservation"] = observations.TryGetValue(id, out var observation) ? observation.DeepClone() : null,
+                ["selectionReasons"] = new JsonArray(new JsonObject { ["candidateId"] = id, ["reason"] = c["reason"]!.DeepClone(), ["evidence"] = c["evidence"]!.DeepClone() })
+            });
         }
-        var plan = new JsonObject { ["schemaVersion"] = "watch-table-plan.v1", ["tableName"] = request.TableName,
-            ["source"] = Node(request.CapturedSource), ["instance"] = Node(request.Instance),
+        var plan = new JsonObject
+        {
+            ["schemaVersion"] = "watch-table-plan.v1",
+            ["tableName"] = request.TableName,
+            ["source"] = Node(request.CapturedSource),
+            ["instance"] = Node(request.Instance),
             ["diagnosticCaseSha256"] = request.DiagnosticCaseSha256,
             ["diagnosticSourceRevisionSha256"] = request.DiagnosticCase?["sourceRevision"] is JsonNode revision ? CanonicalJson.Sha256(revision) : null,
             ["template"] = Node(request.Template),
-            ["templateBindings"] = Node(request.TemplateBindings), ["externalStorage"] = Node(request.ExternalStorage),
+            ["templateBindings"] = Node(request.TemplateBindings),
+            ["externalStorage"] = Node(request.ExternalStorage),
             ["candidates"] = new JsonArray(candidates.Select(c => (JsonNode?)c.DeepClone()).ToArray()),
-            ["rows"] = rows, ["unresolvedSuggestions"] = gaps, ["sourceGaps"] = sourceGaps, ["duplicates"] = duplicates,
+            ["rows"] = rows,
+            ["unresolvedSuggestions"] = gaps,
+            ["sourceGaps"] = sourceGaps,
+            ["duplicates"] = duplicates,
             ["addressObservations"] = new JsonArray(observations.OrderBy(k => k.Key, StringComparer.Ordinal).Select(p => (JsonNode?)p.Value.DeepClone()).ToArray()),
             ["addressWarnings"] = addressWarnings,
-            ["candidateCount"] = candidates.Count, ["omittedByBudget"] = omitted,
-            ["sourceTruncated"] = SourceTruncated(request.DiagnosticCase), ["truncated"] = omitted > 0 || SourceTruncated(request.DiagnosticCase),
-            ["maxRows"] = request.MaxRows, ["duplicatePolicy"] = request.DuplicatePolicy,
-            ["nativeExecutable"] = false, ["nativeDocumentGenerated"] = false, ["qualification"] = "offlinePlanningOnly",
-            ["pendingNativeGates"] = new JsonArray("currentOwnerAdmission", "genuineNativeEntryGrammar", "exactTargetSymbolAndProfileValidation", "independentNativeReadback", "preservationCompileApplicability", "saveReopenRecovery") };
+            ["candidateCount"] = candidates.Count,
+            ["omittedByBudget"] = omitted,
+            ["sourceTruncated"] = SourceTruncated(request.DiagnosticCase),
+            ["truncated"] = omitted > 0 || SourceTruncated(request.DiagnosticCase),
+            ["maxRows"] = request.MaxRows,
+            ["duplicatePolicy"] = request.DuplicatePolicy,
+            ["nativeExecutable"] = false,
+            ["nativeDocumentGenerated"] = false,
+            ["qualification"] = "offlinePlanningOnly",
+            ["pendingNativeGates"] = new JsonArray("currentOwnerAdmission", "genuineNativeEntryGrammar", "exactTargetSymbolAndProfileValidation", "independentNativeReadback", "preservationCompileApplicability", "saveReopenRecovery")
+        };
         Bound(plan, 16 * 1024 * 1024);
         plan["planSha256"] = CanonicalJson.Sha256(plan);
         return plan;
@@ -248,17 +282,17 @@ public static class WatchTablePlanner
     private static JsonObject AddressWarnings(IEnumerable<JsonObject> observations)
     {
         var warnings = new JsonArray();
-        foreach (var area in observations.Where(o => S(o,"kind") == "absolute").GroupBy(o => S(o,"area") + ":" + o["dbNumber"]?.ToJsonString(), StringComparer.Ordinal))
+        foreach (var area in observations.Where(o => S(o, "kind") == "absolute").GroupBy(o => S(o, "area") + ":" + o["dbNumber"]?.ToJsonString(), StringComparer.Ordinal))
         {
             var active = new List<JsonObject>();
-            foreach(var row in area.OrderBy(o => o["startBit"]!.GetValue<long>()).ThenBy(o => S(o,"candidateId"),StringComparer.Ordinal))
+            foreach (var row in area.OrderBy(o => o["startBit"]!.GetValue<long>()).ThenBy(o => S(o, "candidateId"), StringComparer.Ordinal))
             {
                 long start = row["startBit"]!.GetValue<long>();
                 active.RemoveAll(o => o["startBit"]!.GetValue<long>() + o["widthBits"]!.GetValue<int>() <= start);
-                foreach(var peer in active)
+                foreach (var peer in active)
                 {
-                    if(warnings.Count == 1000) return new JsonObject { ["items"] = warnings, ["truncated"] = true };
-                    warnings.Add(new JsonObject { ["code"] = "OverlappingSuppliedRanges", ["leftCandidateId"] = S(peer,"candidateId"), ["rightCandidateId"] = S(row,"candidateId"), ["area"] = area.Key });
+                    if (warnings.Count == 1000) return new JsonObject { ["items"] = warnings, ["truncated"] = true };
+                    warnings.Add(new JsonObject { ["code"] = "OverlappingSuppliedRanges", ["leftCandidateId"] = S(peer, "candidateId"), ["rightCandidateId"] = S(row, "candidateId"), ["area"] = area.Key });
                 }
                 active.Add(row);
             }

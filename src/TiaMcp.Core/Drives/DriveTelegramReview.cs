@@ -57,16 +57,27 @@ internal static class DriveTelegramReview
                     if ((plc is null || direction is null || context is null || start is null || length is null || unit == "unknown" || lengthUnit == "unknown") && unknown is null) throw Error("Unknown address fields require a reason.");
                     long? startBit = Bits(start, unit), lengthBits = Bits(length, lengthUnit);
                     int? size = direction == "Input" ? input : direction == "Output" ? output : null;
-                    addresses.Add(new JsonObject {
-                        ["sourceIndex"] = addressIndex, ["address"] = address.DeepClone(), ["plcResolution"] = Resolve(plc),
-                        ["startBit"] = startBit, ["lengthBits"] = lengthBits,
+                    addresses.Add(new JsonObject
+                    {
+                        ["sourceIndex"] = addressIndex,
+                        ["address"] = address.DeepClone(),
+                        ["plcResolution"] = Resolve(plc),
+                        ["startBit"] = startBit,
+                        ["lengthBits"] = lengthBits,
                         ["endBitExclusive"] = startBit is not null && lengthBits is not null ? startBit + lengthBits : null,
                         ["directionalSizeComparison"] = size is null || lengthBits is null ? "unknown" : lengthBits == 8L * size ? "equalDeclaredSize" : "differentDeclaredSize",
-                        ["nativeAddressVerified"] = false });
+                        ["nativeAddressVerified"] = false
+                    });
                 }
-                observations.Add(new JsonObject { ["phase"] = phase, ["sourceIndex"] = index, ["telegram"] = row.DeepClone(), ["addresses"] = addresses,
+                observations.Add(new JsonObject
+                {
+                    ["phase"] = phase,
+                    ["sourceIndex"] = index,
+                    ["telegram"] = row.DeepClone(),
+                    ["addresses"] = addresses,
                     ["numberSemantics"] = number is null ? "unknown" : number == 999 && type == "MainTelegram" ? "freelyConfigurable" : "declaredNumber",
-                    ["nativeCompatibilityVerified"] = false });
+                    ["nativeCompatibilityVerified"] = false
+                });
             }
             report["summary"]![phase + "TelegramCount"] = rows.Count;
         }
@@ -77,8 +88,14 @@ internal static class DriveTelegramReview
             if (before is not null && after is not null)
                 foreach (string field in new[] { "type", "number", "inputBytes", "outputBytes", "addressesComplete", "addresses", "unknownReason" })
                     if (!JsonNode.DeepEquals(field == "addresses" ? OrderedAddresses(before) : before[field], field == "addresses" ? OrderedAddresses(after) : after[field])) fields.Add(field);
-            changes.Add(new JsonObject { ["id"] = id, ["status"] = before is null ? "onlyAfter" : after is null ? "onlyBefore" : fields.Count == 0 ? "unchanged" : "changed",
-                ["changedFields"] = fields, ["identityEqualityVerified"] = false, ["nativeCompatibilityVerified"] = false });
+            changes.Add(new JsonObject
+            {
+                ["id"] = id,
+                ["status"] = before is null ? "onlyAfter" : after is null ? "onlyBefore" : fields.Count == 0 ? "unchanged" : "changed",
+                ["changedFields"] = fields,
+                ["identityEqualityVerified"] = false,
+                ["nativeCompatibilityVerified"] = false
+            });
         }
         report["schemaVersion"] = "drive-profile-review.v2"; report["telegrams"] = observations; report["telegramChanges"] = changes;
         report["summary"]!["changedTelegramCount"] = changes.Count(r => (string?)r!["status"] != "unchanged");

@@ -6,12 +6,17 @@ namespace TiaMcp.Core.HmiComponents;
 /// <summary>Explicit bounded state intervals, never inferred enum or runtime semantics.</summary>
 internal static class HmiNumericTextLists
 {
-    private static (long Min, long Max) Domain(string type) => type switch {
-        "SInt" => (sbyte.MinValue, sbyte.MaxValue), "USInt" => (byte.MinValue, byte.MaxValue),
-        "Int" => (short.MinValue, short.MaxValue), "UInt" => (ushort.MinValue, ushort.MaxValue),
-        "DInt" => (int.MinValue, int.MaxValue), "UDInt" => (uint.MinValue, uint.MaxValue),
+    private static (long Min, long Max) Domain(string type) => type switch
+    {
+        "SInt" => (sbyte.MinValue, sbyte.MaxValue),
+        "USInt" => (byte.MinValue, byte.MaxValue),
+        "Int" => (short.MinValue, short.MaxValue),
+        "UInt" => (ushort.MinValue, ushort.MaxValue),
+        "DInt" => (int.MinValue, int.MaxValue),
+        "UDInt" => (uint.MinValue, uint.MaxValue),
         "LInt" => (long.MinValue, long.MaxValue),
-        _ => throw Error("Integer-state dataType must be SInt/USInt/Int/UInt/DInt/UDInt/LInt; bit strings, ULInt, floats, aliases and enums are unsupported.") };
+        _ => throw Error("Integer-state dataType must be SInt/USInt/Int/UInt/DInt/UDInt/LInt; bit strings, ULInt, floats, aliases and enums are unsupported.")
+    };
 
     internal static JsonObject Intent(JsonObject template, string name)
     {
@@ -27,14 +32,26 @@ internal static class HmiNumericTextLists
             if (from < domain.Min || to > domain.Max || from > to || type == "SingleValue" && from != to)
                 throw Error("State bounds must be ordered and fit the exact selected integer type.");
             texts.Add(new JsonObject { ["id"] = id, ["translations"] = state["translations"]?.DeepClone() });
-            entries.Add(new JsonObject { ["id"] = id, ["type"] = type, ["fromValue"] = from, ["toValue"] = to,
-                ["isDefault"] = state["isDefault"]?.DeepClone(), ["textId"] = id });
+            entries.Add(new JsonObject
+            {
+                ["id"] = id,
+                ["type"] = type,
+                ["fromValue"] = from,
+                ["toValue"] = to,
+                ["isDefault"] = state["isDefault"]?.DeepClone(),
+                ["textId"] = id
+            });
         }
-        return new JsonObject {
-            ["schemaVersion"] = "unified-text-list-author-request.v1", ["fileBase"] = template["fileBase"]?.DeepClone(),
-            ["textLibrary"] = template["textLibrary"]?.DeepClone(), ["languages"] = template["languages"]?.DeepClone(),
-            ["defaultLanguage"] = template["defaultLanguage"]?.DeepClone(), ["texts"] = texts,
-            ["lists"] = new JsonArray(new JsonObject { ["name"] = name, ["rangeType"] = "Decimal", ["entries"] = entries }) };
+        return new JsonObject
+        {
+            ["schemaVersion"] = "unified-text-list-author-request.v1",
+            ["fileBase"] = template["fileBase"]?.DeepClone(),
+            ["textLibrary"] = template["textLibrary"]?.DeepClone(),
+            ["languages"] = template["languages"]?.DeepClone(),
+            ["defaultLanguage"] = template["defaultLanguage"]?.DeepClone(),
+            ["texts"] = texts,
+            ["lists"] = new JsonArray(new JsonObject { ["name"] = name, ["rangeType"] = "Decimal", ["entries"] = entries })
+        };
     }
 
     private static long Number(JsonNode? node) => node is JsonValue value && value.TryGetValue<long>(out long wide) ? wide :
@@ -52,10 +69,18 @@ internal static class HmiNumericTextLists
             next = interval.To + 1; // Domain maximum handled first, including Int64.MaxValue.
         }
         if (!end) missing.Add(new JsonObject { ["fromValue"] = next, ["toValue"] = domain.Max });
-        return new JsonObject { ["dataType"] = type, ["minimum"] = domain.Min, ["maximum"] = domain.Max,
-            ["stateCount"] = intervals.Length, ["unlistedIntervals"] = missing, ["allTypeValuesListed"] = missing.Count == 0,
+        return new JsonObject
+        {
+            ["dataType"] = type,
+            ["minimum"] = domain.Min,
+            ["maximum"] = domain.Max,
+            ["stateCount"] = intervals.Length,
+            ["unlistedIntervals"] = missing,
+            ["allTypeValuesListed"] = missing.Count == 0,
             ["requireFullTypeCoverage"] = template["requireFullTypeCoverage"]!.DeepClone(),
-            ["defaultCoversUnlistedValuesVerified"] = false, ["nativeNumericSemanticsVerified"] = false };
+            ["defaultCoversUnlistedValuesVerified"] = false,
+            ["nativeNumericSemanticsVerified"] = false
+        };
     }
 
     internal static JsonArray Changes(JsonObject? previous, JsonObject current)
@@ -64,14 +89,24 @@ internal static class HmiNumericTextLists
         {
             var texts = intent["texts"]!.AsArray().ToDictionary(t => (string)t!["id"]!, t => t!["translations"]);
             return intent["lists"]!.AsArray().SelectMany(l => l!["entries"]!.AsArray()).GroupBy(e => (string)e!["id"]!)
-                .ToDictionary(g => g.Key, g => new JsonObject { ["entries"] = new JsonArray(g.Select(e => e!.DeepClone()).ToArray()),
-                    ["translations"] = new JsonArray(g.Select(e => texts[(string)e!["textId"]!]?.DeepClone()).ToArray()) });
+                .ToDictionary(g => g.Key, g => new JsonObject
+                {
+                    ["entries"] = new JsonArray(g.Select(e => e!.DeepClone()).ToArray()),
+                    ["translations"] = new JsonArray(g.Select(e => texts[(string)e!["textId"]!]?.DeepClone()).ToArray())
+                });
         }
         var before = previous is null ? new Dictionary<string, JsonObject>() : States(previous); var after = States(current);
-        return new JsonArray(before.Keys.Union(after.Keys).Order(StringComparer.Ordinal).Select(id => {
+        return new JsonArray(before.Keys.Union(after.Keys).Order(StringComparer.Ordinal).Select(id =>
+        {
             before.TryGetValue(id, out var old); after.TryGetValue(id, out var next);
-            return (JsonNode?)new JsonObject { ["id"] = id, ["change"] = old is null ? "added" : next is null ? "removed" : JsonNode.DeepEquals(old, next) ? "unchanged" : "changed",
-                ["before"] = old?.DeepClone(), ["after"] = next?.DeepClone(), ["consumerCompatibilityVerified"] = false };
+            return (JsonNode?)new JsonObject
+            {
+                ["id"] = id,
+                ["change"] = old is null ? "added" : next is null ? "removed" : JsonNode.DeepEquals(old, next) ? "unchanged" : "changed",
+                ["before"] = old?.DeepClone(),
+                ["after"] = next?.DeepClone(),
+                ["consumerCompatibilityVerified"] = false
+            };
         }).ToArray());
     }
 
@@ -102,10 +137,17 @@ internal static class HmiNumericTextLists
         var coverage = new JsonArray(report["dependencyCoverage"]!.AsArray().Where(r =>
             selected.Contains(((string)r!["scope"]!, (string)r["objectPath"]!))).Select(r => r!.DeepClone()).ToArray());
         bool complete = coverage.Count == selected.Count && coverage.Count > 0 && coverage.All(r => (bool?)r!["allObservedIndicesMatched"] == true);
-        return new JsonObject { ["selectedScopes"] = coverage, ["associations"] = associations, ["contradictionCount"] = contradictions,
-            ["allObservedSelectedIndicesMatched"] = complete, ["dependencyClosureVerified"] = false, ["consumerCoverageComplete"] = false,
+        return new JsonObject
+        {
+            ["selectedScopes"] = coverage,
+            ["associations"] = associations,
+            ["contradictionCount"] = contradictions,
+            ["allObservedSelectedIndicesMatched"] = complete,
+            ["dependencyClosureVerified"] = false,
+            ["consumerCoverageComplete"] = false,
             ["sourceImpactCoverage"] = report["dependencyImpactCoverage"]!.DeepClone(),
             ["sourceConsumerCoverage"] = report["consumerCoverage"]!.DeepClone(),
-            ["policy"] = "Exact selected member scopes plus original same-review incoming consumer roots select all original dependency associations, independent of bounded impact-page omission. Associated owner/target coverage stays explicit. No transitive closure, foreign-snapshot join or native identity is inferred." };
+            ["policy"] = "Exact selected member scopes plus original same-review incoming consumer roots select all original dependency associations, independent of bounded impact-page omission. Associated owner/target coverage stays explicit. No transitive closure, foreign-snapshot join or native identity is inferred."
+        };
     }
 }

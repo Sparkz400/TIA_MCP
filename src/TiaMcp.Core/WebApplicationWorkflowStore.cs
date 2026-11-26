@@ -16,7 +16,8 @@ public sealed class WebApplicationWorkflowStore(string artifactsRoot)
         var request = WebApplicationReview.Parse(bytes);
         string reviewId = WebApplicationReview.ReviewId(request);
         var originals = new Dictionary<string, byte[]>(StringComparer.Ordinal);
-        var report = WebApplicationReview.Build(reviewId, new ProjectReviewStore(artifactsRoot).Read(reviewId), request, (phase, archive) => {
+        var report = WebApplicationReview.Build(reviewId, new ProjectReviewStore(artifactsRoot).Read(reviewId), request, (phase, archive) =>
+        {
             var upload = new ArtifactUploadStore(artifactsRoot).ResolveCommitted((string)archive["uploadRef"]!);
             if (upload.Sha256 != (string)archive["sha256"]!) throw new BridgeException("ArtifactChanged", "Archive differs from the explicitly expected SHA-256.");
             byte[] data = ProjectReviewStore.ReadArtifact(artifactsRoot, new() { ["path"] = upload.Path, ["sha256"] = upload.Sha256 }, WebApplicationReview.ArchiveLimit);
@@ -45,7 +46,8 @@ public sealed class WebApplicationWorkflowStore(string artifactsRoot)
         string reviewId = (string)envelope["reviewId"]!;
         var request = WebApplicationReview.Parse(ProjectReviewStore.ReadArtifact(artifactsRoot, envelope["input"]!.AsObject(), WebApplicationReview.InputLimit));
         var archives = envelope["archives"]!.AsObject(); var phases = new HashSet<string>(StringComparer.Ordinal);
-        var expected = WebApplicationReview.Build(reviewId, new ProjectReviewStore(artifactsRoot).Read(reviewId), request, (phase, archive) => {
+        var expected = WebApplicationReview.Build(reviewId, new ProjectReviewStore(artifactsRoot).Read(reviewId), request, (phase, archive) =>
+        {
             phases.Add(phase); string hash = (string)archive["sha256"]!;
             if (!JsonNode.DeepEquals(archives[phase], Reference(hash, ".zip"))) throw new BridgeException("ArtifactChanged", "Retained archive reference differs from the supplied identity.");
             return InspectArchive(ProjectReviewStore.ReadArtifact(artifactsRoot, archives[phase]!.AsObject(), WebApplicationReview.ArchiveLimit), archive);
@@ -88,22 +90,40 @@ public sealed class WebApplicationWorkflowStore(string artifactsRoot)
             if (files.Length == 0) throw new BridgeException("InvalidWebApplicationReview", "Selected archive root contains no files.");
             var pageFile = files.SingleOrDefault(f => f.RelativePath == defaultPage) ?? throw new BridgeException("InvalidWebApplicationReview", "Default page is not an exact file inside the selected archive root.");
             var rows = new JsonArray(files.Select(f => (JsonNode)new JsonObject { ["relativePath"] = f.RelativePath, ["bytes"] = f.Bytes, ["sha256"] = f.Sha256 }).ToArray());
-            return new JsonObject { ["archiveSha256"] = Convert.ToHexStringLower(SHA256.HashData(bytes)), ["archiveBytes"] = bytes.Length,
-                ["files"] = rows, ["selectedBytes"] = files.Sum(f => f.Bytes), ["defaultPageSha256"] = pageFile.Sha256,
+            return new JsonObject
+            {
+                ["archiveSha256"] = Convert.ToHexStringLower(SHA256.HashData(bytes)),
+                ["archiveBytes"] = bytes.Length,
+                ["files"] = rows,
+                ["selectedBytes"] = files.Sum(f => f.Bytes),
+                ["defaultPageSha256"] = pageFile.Sha256,
                 ["topLevelArchiveFiles"] = all.Count(f => f.RelativePath.StartsWith("content/000001/", StringComparison.Ordinal)),
                 ["excludedTopLevelFiles"] = all.Count(f => f.RelativePath.StartsWith("content/000001/", StringComparison.Ordinal)) - files.Length,
                 ["nestedExtractedFiles"] = all.Count(f => f.RelativePath.StartsWith("nested/", StringComparison.Ordinal)),
-                ["manifestSha256"] = Convert.ToHexStringLower(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(rows, BridgeProtocol.Json))) };
+                ["manifestSha256"] = Convert.ToHexStringLower(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(rows, BridgeProtocol.Json)))
+            };
         }
         finally { PackageStorage.DeleteOwned(analysisRoot, scratch); }
     }
     private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "web-application-reviews/" + hash + extension, ["sha256"] = hash };
     private JsonObject Publish(byte[] bytes, string extension, int limit) =>
         PackageStorage.PublishContent(artifactsRoot, "web-application-reviews", bytes, extension, limit, 512L << 20, "Web application review");
-    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {
-        ["recordId"] = artifact["sha256"]!.DeepClone(), ["reviewId"] = record["reviewId"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),
-        ["summary"] = record["report"]!["summary"]!.DeepClone(), ["archiveChanges"] = record["report"]!["archiveChanges"]!.DeepClone(), ["archives"] = record["archives"]!.DeepClone(),
-        ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["associationVerified"] = false,
-        ["siemensCompatibilityVerified"] = false, ["generatedBlocksVerified"] = false, ["deploymentVerified"] = false, ["endpointVerified"] = false,
-        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new()
+    {
+        ["recordId"] = artifact["sha256"]!.DeepClone(),
+        ["reviewId"] = record["reviewId"]!.DeepClone(),
+        ["input"] = record["input"]!.DeepClone(),
+        ["reportArtifact"] = artifact.DeepClone(),
+        ["summary"] = record["report"]!["summary"]!.DeepClone(),
+        ["archiveChanges"] = record["report"]!["archiveChanges"]!.DeepClone(),
+        ["archives"] = record["archives"]!.DeepClone(),
+        ["nativeQualified"] = false,
+        ["sourceAuthenticityVerified"] = false,
+        ["associationVerified"] = false,
+        ["siemensCompatibilityVerified"] = false,
+        ["generatedBlocksVerified"] = false,
+        ["deploymentVerified"] = false,
+        ["endpointVerified"] = false,
+        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy
+    };
 }

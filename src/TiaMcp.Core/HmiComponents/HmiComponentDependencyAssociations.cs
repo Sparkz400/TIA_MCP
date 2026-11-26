@@ -62,11 +62,19 @@ internal static class HmiComponentDependencyAssociations
                 var types = group.Select(o => o.Type).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
                 bool conflict = types.Length > 1;
                 if (conflict) conflicts.Add((scope, group.Key));
-                identities.Add(new JsonObject { ["scope"] = scope, ["versionGuid"] = group.Key,
+                identities.Add(new JsonObject
+                {
+                    ["scope"] = scope,
+                    ["versionGuid"] = group.Key,
                     ["typeGuids"] = new JsonArray(types.Select(t => (JsonNode?)JsonValue.Create(t)).ToArray()),
                     ["conflictingTypeObservations"] = conflict,
-                    ["observations"] = new JsonArray(group.Select(o => (JsonNode?)new JsonObject {
-                        ["objectPath"] = o.Path, ["source"] = o.Source, ["typeGuid"] = o.Type }).ToArray()) });
+                    ["observations"] = new JsonArray(group.Select(o => (JsonNode?)new JsonObject
+                    {
+                        ["objectPath"] = o.Path,
+                        ["source"] = o.Source,
+                        ["typeGuid"] = o.Type
+                    }).ToArray())
+                });
             }
         }
 
@@ -91,12 +99,24 @@ internal static class HmiComponentDependencyAssociations
             bool conflict = conflicts.Contains((scope, required));
             string status = targetAgreement == "different" || exportAgreement == "different" || pairAgreement == "different" ? "different" :
                 conflict ? "conflicting" : targetAgreement == "match" && exportAgreement == "match" && pairAgreement == "match" ? "match" : "unavailable";
-            var row = new JsonObject { ["selection"] = selection.DeepClone(), ["reviewId"] = owner.ReviewId, ["requiredVersionGuid"] = required,
-                ["targetTypeGuid"] = target.Type, ["targetVersionGuid"] = target.Version,
-                ["exportFile"] = export?["file"]?.DeepClone(), ["exportIdentity"] = export?["exportIdentity"]?.DeepClone(),
-                ["targetVersionAgreement"] = targetAgreement, ["exportVersionAgreement"] = exportAgreement, ["targetExportAgreement"] = pairAgreement,
-                ["identityConflict"] = conflict, ["status"] = status, ["declaredCycle"] = false,
-                ["nativeIdentityVerified"] = false, ["dependencyClosureVerified"] = false };
+            var row = new JsonObject
+            {
+                ["selection"] = selection.DeepClone(),
+                ["reviewId"] = owner.ReviewId,
+                ["requiredVersionGuid"] = required,
+                ["targetTypeGuid"] = target.Type,
+                ["targetVersionGuid"] = target.Version,
+                ["exportFile"] = export?["file"]?.DeepClone(),
+                ["exportIdentity"] = export?["exportIdentity"]?.DeepClone(),
+                ["targetVersionAgreement"] = targetAgreement,
+                ["exportVersionAgreement"] = exportAgreement,
+                ["targetExportAgreement"] = pairAgreement,
+                ["identityConflict"] = conflict,
+                ["status"] = status,
+                ["declaredCycle"] = false,
+                ["nativeIdentityVerified"] = false,
+                ["dependencyClosureVerified"] = false
+            };
             if (!selected.TryAdd((scope, path, index), row)) throw Error("The same dependency observation index is mapped more than once.");
             rows.Add(row);
         }
@@ -130,14 +150,21 @@ internal static class HmiComponentDependencyAssociations
             var mapped = selected.Where(p => p.Key.Scope == owner.Scope && p.Key.Path == owner.Path).ToDictionary(p => p.Key.Index, p => p.Value);
             var repeats = owner.Dependencies?.Select((id, index) => (Id: id, Index: index)).GroupBy(p => p.Id).Where(g => g.Count() > 1);
             JsonArray Numbers(IEnumerable<int> numbers) => new(numbers.Select(n => (JsonNode?)JsonValue.Create(n)).ToArray());
-            coverage.Add(new JsonObject { ["scope"] = owner.Scope, ["reviewId"] = owner.ReviewId, ["objectPath"] = owner.Path,
-                ["dependencyStatus"] = owner.Dependencies is null ? "unavailable" : "observed", ["reason"] = owner.Reason,
+            coverage.Add(new JsonObject
+            {
+                ["scope"] = owner.Scope,
+                ["reviewId"] = owner.ReviewId,
+                ["objectPath"] = owner.Path,
+                ["dependencyStatus"] = owner.Dependencies is null ? "unavailable" : "observed",
+                ["reason"] = owner.Reason,
                 ["requiredCount"] = owner.Dependencies is null ? null : JsonValue.Create(owner.Dependencies.Length),
-                ["selectedIndices"] = Numbers(indices.Where(mapped.ContainsKey)), ["unassociatedIndices"] = Numbers(indices.Where(i => !mapped.ContainsKey(i))),
+                ["selectedIndices"] = Numbers(indices.Where(mapped.ContainsKey)),
+                ["unassociatedIndices"] = Numbers(indices.Where(i => !mapped.ContainsKey(i))),
                 ["repeatedVersionGuids"] = new JsonArray((repeats ?? []).Select(g => (JsonNode?)new JsonObject { ["versionGuid"] = g.Key, ["indices"] = Numbers(g.Select(p => p.Index)) }).ToArray()),
                 ["selfReferenceIndices"] = Numbers(indices.Where(i => owner.Dependencies![i] == owner.Version)),
                 ["allObservedIndicesMatched"] = owner.Dependencies is not null && indices.All(i => mapped.TryGetValue(i, out var row) && (string?)row["status"] == "match"),
-                ["dependencyClosureVerified"] = false });
+                ["dependencyClosureVerified"] = false
+            });
         }
         report["schemaVersion"] = "hmi-component-review.v6";
         report["dependencyAssociations"] = rows; report["dependencyCoverage"] = coverage; report["dependencyIdentities"] = identities;

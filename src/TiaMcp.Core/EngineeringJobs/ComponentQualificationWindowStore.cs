@@ -156,9 +156,12 @@ public sealed class ComponentQualificationWindowStore
     // Reservations stored before RFC 8785 bound the manifest with this relaxed-escaping form.
     private static string LegacyManifestHash(ComponentWindowManifest manifest)
     {
-        JsonNode? Sort(JsonNode? node) => node switch {
+        JsonNode? Sort(JsonNode? node) => node switch
+        {
             JsonObject obj => new JsonObject(obj.OrderBy(x => x.Key, StringComparer.Ordinal).Select(x => new KeyValuePair<string, JsonNode?>(x.Key, Sort(x.Value)))),
-            JsonArray array => new JsonArray(array.Select(Sort).ToArray()), _ => node?.DeepClone() };
+            JsonArray array => new JsonArray(array.Select(Sort).ToArray()),
+            _ => node?.DeepClone()
+        };
         return TokenHash(Sort(JsonSerializer.SerializeToNode(manifest, BridgeProtocol.Json))!.ToJsonString(new JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
     }
     public ComponentWindowReservation RequireOwner(string id, string capability)

@@ -16,15 +16,29 @@ internal sealed class DiagnosticQualityExperiments(string artifactsRoot)
             throw new BridgeException("MeasurementLineageMismatch", "Each v2 measurement must belong to its exact experiment trace plan.");
         var ar = reader.BuildAnalysis(beforeId); var br = reader.BuildAnalysis(afterMeasurementId);
         var comparison = new TraceQualityComparison(artifactsRoot).Build(beforeId, afterMeasurementId, TraceQualityMeasurements.Object(request, "comparison"));
-        var report = new JsonObject { ["schemaVersion"] = "diagnostic-experiment-review.v2", ["beforeExperimentId"] = experimentId,
-            ["afterExperimentId"] = afterId, ["beforeMeasurementId"] = beforeId, ["afterMeasurementId"] = afterMeasurementId,
-            ["request"] = request.DeepClone(), ["lineage"] = lineage, ["beforeReportId"] = TraceQualityMeasurements.Id(ar),
-            ["afterReportId"] = TraceQualityMeasurements.Id(br), ["comparisonId"] = TraceQualityMeasurements.Id(comparison),
-            ["beforeHypotheses"] = ar["hypotheses"]!.DeepClone(), ["afterHypotheses"] = br["hypotheses"]!.DeepClone(),
-            ["beforeWindow"] = comparison["beforeWindow"]!.DeepClone(), ["afterWindow"] = comparison["afterWindow"]!.DeepClone(),
-            ["beforeQualityAssessment"] = ar["qualityAssessment"]!.DeepClone(), ["afterQualityAssessment"] = br["qualityAssessment"]!.DeepClone(),
-            ["beforeAcquisition"] = comparison["beforeAcquisition"]!.DeepClone(), ["afterAcquisition"] = comparison["afterAcquisition"]!.DeepClone(),
-            ["sourceChanged"] = comparison["sourceChanged"]!.DeepClone(), ["programIdentityChanged"] = comparison["programIdentityChanged"]!.DeepClone() };
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-experiment-review.v2",
+            ["beforeExperimentId"] = experimentId,
+            ["afterExperimentId"] = afterId,
+            ["beforeMeasurementId"] = beforeId,
+            ["afterMeasurementId"] = afterMeasurementId,
+            ["request"] = request.DeepClone(),
+            ["lineage"] = lineage,
+            ["beforeReportId"] = TraceQualityMeasurements.Id(ar),
+            ["afterReportId"] = TraceQualityMeasurements.Id(br),
+            ["comparisonId"] = TraceQualityMeasurements.Id(comparison),
+            ["beforeHypotheses"] = ar["hypotheses"]!.DeepClone(),
+            ["afterHypotheses"] = br["hypotheses"]!.DeepClone(),
+            ["beforeWindow"] = comparison["beforeWindow"]!.DeepClone(),
+            ["afterWindow"] = comparison["afterWindow"]!.DeepClone(),
+            ["beforeQualityAssessment"] = ar["qualityAssessment"]!.DeepClone(),
+            ["afterQualityAssessment"] = br["qualityAssessment"]!.DeepClone(),
+            ["beforeAcquisition"] = comparison["beforeAcquisition"]!.DeepClone(),
+            ["afterAcquisition"] = comparison["afterAcquisition"]!.DeepClone(),
+            ["sourceChanged"] = comparison["sourceChanged"]!.DeepClone(),
+            ["programIdentityChanged"] = comparison["programIdentityChanged"]!.DeepClone()
+        };
         TraceQualityMeasurements.Authority(report); D.Bound(report, DiagnosticStore.MaxBytes);
         return new(report, ar, br, comparison, before, after, a, b);
     }
@@ -59,25 +73,51 @@ internal sealed class DiagnosticQualityExperiments(string artifactsRoot)
                 if (!originals.Add(hash)) throw new BridgeException("ExperimentRepeatedInput", "Original bytes cannot count twice as independent runs.");
             }
             if (parts.Count > 0) DiagnosticRepeatedExperiments.CheckComparable(parts[0], part);
-            parts.Add(part); runs.Add(new JsonObject { ["id"] = id, ["reviewId"] = TraceQualityMeasurements.Id(part.Report),
-                ["beforeWindow"] = part.Comparison["beforeWindow"]!.DeepClone(), ["afterWindow"] = part.Comparison["afterWindow"]!.DeepClone() });
+            parts.Add(part); runs.Add(new JsonObject
+            {
+                ["id"] = id,
+                ["reviewId"] = TraceQualityMeasurements.Id(part.Report),
+                ["beforeWindow"] = part.Comparison["beforeWindow"]!.DeepClone(),
+                ["afterWindow"] = part.Comparison["afterWindow"]!.DeepClone()
+            });
         }
         var hypotheses = new JsonArray();
         foreach (var h in D.Rows(parts[0].BeforeExperiment["diagnosticCase"]?["hypotheses"]))
         {
-            JsonObject Counts(string side) => new() { ["runs"] = parts.Count, ["supportedPredictionRuns"] = 0, ["contradictedPredictionRuns"] = 0,
-                ["unresolvedRuns"] = parts.Count, ["conditionObservedRuns"] = runs.Count(r => D.Rows(r![side + "Window"]!["hypotheses"])
-                    .Any(f => D.Text(f, "id") == D.Text(h, "id") && f!["matchedSamples"]!.GetValue<int>() + f["contradictedSamples"]!.GetValue<int>() > 0)) };
-            hypotheses.Add(new JsonObject { ["id"] = h!["id"]!.DeepClone(), ["statement"] = h["statement"]!.DeepClone(),
-                ["before"] = Counts("before"), ["after"] = Counts("after"), ["causationProven"] = false, ["bugFixProven"] = false });
+            JsonObject Counts(string side) => new()
+            {
+                ["runs"] = parts.Count,
+                ["supportedPredictionRuns"] = 0,
+                ["contradictedPredictionRuns"] = 0,
+                ["unresolvedRuns"] = parts.Count,
+                ["conditionObservedRuns"] = runs.Count(r => D.Rows(r![side + "Window"]!["hypotheses"])
+                    .Any(f => D.Text(f, "id") == D.Text(h, "id") && f!["matchedSamples"]!.GetValue<int>() + f["contradictedSamples"]!.GetValue<int>() > 0))
+            };
+            hypotheses.Add(new JsonObject
+            {
+                ["id"] = h!["id"]!.DeepClone(),
+                ["statement"] = h["statement"]!.DeepClone(),
+                ["before"] = Counts("before"),
+                ["after"] = Counts("after"),
+                ["causationProven"] = false,
+                ["bugFixProven"] = false
+            });
         }
-        var report = new JsonObject { ["schemaVersion"] = "diagnostic-experiment-repeat.v2", ["request"] = request.DeepClone(),
-            ["runPairCount"] = pairs.Count, ["runs"] = runs, ["hypotheses"] = hypotheses,
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-experiment-repeat.v2",
+            ["request"] = request.DeepClone(),
+            ["runPairCount"] = pairs.Count,
+            ["runs"] = runs,
+            ["hypotheses"] = hypotheses,
             ["beforeDiagnosticPlanId"] = parts[0].BeforeExperiment["diagnosticPlanId"]!.DeepClone(),
             ["afterDiagnosticPlanId"] = parts[0].AfterExperiment["diagnosticPlanId"]!.DeepClone(),
-            ["requestedWindowsEqual"] = true, ["signalMappingsEqual"] = true, ["independentRunsVerified"] = false,
+            ["requestedWindowsEqual"] = true,
+            ["signalMappingsEqual"] = true,
+            ["independentRunsVerified"] = false,
             ["aggregation"] = "descriptiveRunCountsOnly",
-            ["clockEpochMappings"] = new JsonArray(parts.Select(p => (JsonNode)p.Comparison["alignment"]!.DeepClone()).ToArray()) };
+            ["clockEpochMappings"] = new JsonArray(parts.Select(p => (JsonNode)p.Comparison["alignment"]!.DeepClone()).ToArray())
+        };
         TraceQualityMeasurements.Authority(report); D.Bound(report, DiagnosticStore.MaxBytes); return new(report, parts.ToArray());
     }
     internal DiagnosticRepeatedExperimentParts ReadRepeated(string id)

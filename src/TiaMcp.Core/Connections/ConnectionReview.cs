@@ -65,8 +65,13 @@ public static class ConnectionReview
             {
                 string status = phase == "before" ? "unmatchedBefore" : "unmatchedAfter";
                 outcomes.Add((phase, id), status);
-                comparisons.Add(new JsonObject { ["beforeId"] = phase == "before" ? id : null, ["afterId"] = phase == "after" ? id : null,
-                    ["status"] = status, ["changedFields"] = new JsonArray() });
+                comparisons.Add(new JsonObject
+                {
+                    ["beforeId"] = phase == "before" ? id : null,
+                    ["afterId"] = phase == "after" ? id : null,
+                    ["status"] = status,
+                    ["changedFields"] = new JsonArray()
+                });
             }
         var observations = new JsonArray(); var consumers = new JsonArray(); int unresolvedEndpoints = 0, unresolvedConsumers = 0;
         foreach (var (phase, state) in new[] { ("before", before), ("after", after) })
@@ -75,9 +80,15 @@ public static class ConnectionReview
             {
                 var local = Endpoint(Object(pair.Value["local"])); var partner = Endpoint(Object(pair.Value["partner"]));
                 unresolvedEndpoints += ((string)local["status"]! == "capturedHardwareAncestry" ? 0 : 1) + ((string)partner["status"]! == "capturedHardwareAncestry" ? 0 : 1);
-                observations.Add(new JsonObject { ["phase"] = phase, ["connection"] = pair.Value.DeepClone(), ["local"] = local, ["partner"] = partner,
+                observations.Add(new JsonObject
+                {
+                    ["phase"] = phase,
+                    ["connection"] = pair.Value.DeepClone(),
+                    ["local"] = local,
+                    ["partner"] = partner,
                     ["advertisedFamily"] = Text(pair.Value, "protocol") is "S7" or "TCP" or "UDP" or "ISO" or "ISO-on-TCP" or "FDL" or "PtP" or "HMI",
-                    ["resourceAssessment"] = "notAssessed" });
+                    ["resourceAssessment"] = "notAssessed"
+                });
             }
             foreach (var value in Array(Object(request[phase]), "consumers", 2048))
             {
@@ -87,23 +98,52 @@ public static class ConnectionReview
                 bool supplied = connection is not null && state.ContainsKey(connection);
                 if (connection is not null && !supplied && Boolean(Object(request[phase]), "connectionsComplete")) throw Error("Complete supplied connections contradict a declared consumer connection ID.");
                 if (!captured || !supplied) unresolvedConsumers++;
-                consumers.Add(new JsonObject { ["phase"] = phase, ["evidence"] = row.DeepClone(),
+                consumers.Add(new JsonObject
+                {
+                    ["phase"] = phase,
+                    ["evidence"] = row.DeepClone(),
                     ["objectResolution"] = captured ? "capturedObject" : "unresolved",
                     ["connectionResolution"] = supplied ? "suppliedConnection" : "unresolved",
-                    ["comparisonStatus"] = supplied ? outcomes[(phase, connection!)] : "unknown" });
+                    ["comparisonStatus"] = supplied ? outcomes[(phase, connection!)] : "unknown"
+                });
             }
         }
-        var summary = new JsonObject { ["beforeCount"] = before.Count, ["afterCount"] = after.Count, ["matchedCount"] = matches.Count,
-            ["changedCount"] = comparisons.Count(c => (string?)c!["status"] == "changed"), ["unmatchedBeforeCount"] = before.Count - usedBefore.Count,
-            ["unmatchedAfterCount"] = after.Count - usedAfter.Count, ["unresolvedEndpointCount"] = unresolvedEndpoints,
-            ["consumerCount"] = consumers.Count, ["unresolvedConsumerCount"] = unresolvedConsumers };
-        return new JsonObject { ["schemaVersion"] = "connection-review.v1", ["reviewId"] = reviewId, ["afterKind"] = request["afterKind"]!.DeepClone(),
-            ["coverage"] = new JsonObject { ["beforeConnectionsComplete"] = Boolean(Object(request["before"]), "connectionsComplete"),
+        var summary = new JsonObject
+        {
+            ["beforeCount"] = before.Count,
+            ["afterCount"] = after.Count,
+            ["matchedCount"] = matches.Count,
+            ["changedCount"] = comparisons.Count(c => (string?)c!["status"] == "changed"),
+            ["unmatchedBeforeCount"] = before.Count - usedBefore.Count,
+            ["unmatchedAfterCount"] = after.Count - usedAfter.Count,
+            ["unresolvedEndpointCount"] = unresolvedEndpoints,
+            ["consumerCount"] = consumers.Count,
+            ["unresolvedConsumerCount"] = unresolvedConsumers
+        };
+        return new JsonObject
+        {
+            ["schemaVersion"] = "connection-review.v1",
+            ["reviewId"] = reviewId,
+            ["afterKind"] = request["afterKind"]!.DeepClone(),
+            ["coverage"] = new JsonObject
+            {
+                ["beforeConnectionsComplete"] = Boolean(Object(request["before"]), "connectionsComplete"),
                 ["afterConnectionsComplete"] = Boolean(Object(request["after"]), "connectionsComplete"),
-                ["beforeConsumersComplete"] = Boolean(Object(request["before"]), "consumersComplete"), ["afterConsumersComplete"] = Boolean(Object(request["after"]), "consumersComplete") },
-            ["observations"] = observations, ["comparisons"] = comparisons, ["consumers"] = consumers, ["matches"] = matches.DeepClone(), ["summary"] = summary,
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["wholeProjectAnalysisComplete"] = false,
-            ["limits"] = "Explicit supplied mappings and saved model ancestry only. Properties and declared consumers are unverified evidence. Unmatched rows do not prove creation/deletion. No native property validation, resource/capacity/port rules, live topology, compilation or communication assessment." };
+                ["beforeConsumersComplete"] = Boolean(Object(request["before"]), "consumersComplete"),
+                ["afterConsumersComplete"] = Boolean(Object(request["after"]), "consumersComplete")
+            },
+            ["observations"] = observations,
+            ["comparisons"] = comparisons,
+            ["consumers"] = consumers,
+            ["matches"] = matches.DeepClone(),
+            ["summary"] = summary,
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["wholeProjectAnalysisComplete"] = false,
+            ["limits"] = "Explicit supplied mappings and saved model ancestry only. Properties and declared consumers are unverified evidence. Unmatched rows do not prove creation/deletion. No native property validation, resource/capacity/port rules, live topology, compilation or communication assessment."
+        };
 
         Dictionary<string, JsonObject> Snapshot(JsonObject snapshot)
         {

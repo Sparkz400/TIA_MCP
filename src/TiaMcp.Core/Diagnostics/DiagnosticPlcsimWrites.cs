@@ -27,9 +27,19 @@ public static class DiagnosticPlcsimWrites
         var signals = request.Simulator!.Signals;
         if (writes.Where((w, i) => !SimulatorCaptureContracts.Value(signals[i], w.Expected) || !SimulatorCaptureContracts.Value(signals[i], w.Value)).Any())
             throw new BridgeException("InvalidRequest", "expected and value must be exact JSON values of each signal's declared datatype; nothing was sent.");
-        var arguments = new JsonObject { ["instanceId"] = instanceId, ["instanceName"] = instanceName, ["creationId"] = creationId,
-            ["writes"] = new JsonArray(writes.Select(w => (JsonNode?)new JsonObject { ["symbol"] = w.Symbol, ["type"] = w.Type,
-                ["expected"] = JsonNode.Parse(w.Expected.GetRawText()), ["value"] = JsonNode.Parse(w.Value.GetRawText()) }).ToArray()) };
+        var arguments = new JsonObject
+        {
+            ["instanceId"] = instanceId,
+            ["instanceName"] = instanceName,
+            ["creationId"] = creationId,
+            ["writes"] = new JsonArray(writes.Select(w => (JsonNode?)new JsonObject
+            {
+                ["symbol"] = w.Symbol,
+                ["type"] = w.Type,
+                ["expected"] = JsonNode.Parse(w.Expected.GetRawText()),
+                ["value"] = JsonNode.Parse(w.Value.GetRawText())
+            }).ToArray())
+        };
         return (arguments, association);
     }
 

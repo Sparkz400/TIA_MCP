@@ -48,8 +48,11 @@ public sealed record SimulationProvisionReconciliation(string AdmissionId, strin
 
     public JsonObject NativeRequest(string retrieveDirectory) => new()
     {
-        ["reportPath"] = ReportPath, ["projectPath"] = ProjectPath, ["observerProjectPath"] = ObserverPath,
-        ["scopeSha256"] = ScopeSha256, ["retrieveDirectory"] = retrieveDirectory
+        ["reportPath"] = ReportPath,
+        ["projectPath"] = ProjectPath,
+        ["observerProjectPath"] = ObserverPath,
+        ["scopeSha256"] = ScopeSha256,
+        ["retrieveDirectory"] = retrieveDirectory
     };
 
     /// <summary>Every reason the fresh observation does not prove a safe release; empty means release.</summary>

@@ -56,22 +56,46 @@ public sealed class TraceComparison(string artifactsRoot)
             if (!sameStorage && !explicitMapping) throw new BridgeException("MeasurementLineageMismatch", "Different storage/instances require an explicit signalMap; IDs alone are not identity.");
             if (D.Text(a, "datatype") != D.Text(b, "datatype") || D.Text(before["units"], aid) != D.Text(after["units"], bid))
                 throw new BridgeException("MeasurementLineageMismatch", "Compared signal types and units must match exactly; no silent unit/type conversion.");
-            results.Add(new JsonObject { ["beforeSignalId"] = aid, ["afterSignalId"] = bid, ["sameStorage"] = sameStorage,
-                ["beforeIdentity"] = a.DeepClone(), ["afterIdentity"] = b.DeepClone(), ["unit"] = before["units"]![aid]!.DeepClone(),
-                ["before"] = Summarize(before, aid, beforeAnchor, start, end), ["after"] = Summarize(after, bid, afterAnchor, start, end) });
+            results.Add(new JsonObject
+            {
+                ["beforeSignalId"] = aid,
+                ["afterSignalId"] = bid,
+                ["sameStorage"] = sameStorage,
+                ["beforeIdentity"] = a.DeepClone(),
+                ["afterIdentity"] = b.DeepClone(),
+                ["unit"] = before["units"]![aid]!.DeepClone(),
+                ["before"] = Summarize(before, aid, beforeAnchor, start, end),
+                ["after"] = Summarize(after, bid, afterAnchor, start, end)
+            });
         }
-        var report = new JsonObject { ["schemaVersion"] = "trace-comparison.v1", ["beforeMeasurementId"] = beforeId, ["afterMeasurementId"] = afterId,
-            ["beforeTracePlanId"] = beforeImport["tracePlanId"]!.DeepClone(), ["afterTracePlanId"] = afterImport["tracePlanId"]!.DeepClone(),
-            ["beforeReviewId"] = beforePlan["reviewId"]!.DeepClone(), ["afterReviewId"] = afterPlan["reviewId"]!.DeepClone(),
-            ["sourceChanged"] = changedSource, ["reason"] = reason, ["alignment"] = options.DeepClone(), ["signals"] = results,
-            ["programIdentityChanged"] = changedProgram, ["beforeAcquisition"] = TraceMeasurements.AcquisitionContext(before), ["afterAcquisition"] = TraceMeasurements.AcquisitionContext(after),
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "trace-comparison.v1",
+            ["beforeMeasurementId"] = beforeId,
+            ["afterMeasurementId"] = afterId,
+            ["beforeTracePlanId"] = beforeImport["tracePlanId"]!.DeepClone(),
+            ["afterTracePlanId"] = afterImport["tracePlanId"]!.DeepClone(),
+            ["beforeReviewId"] = beforePlan["reviewId"]!.DeepClone(),
+            ["afterReviewId"] = afterPlan["reviewId"]!.DeepClone(),
+            ["sourceChanged"] = changedSource,
+            ["reason"] = reason,
+            ["alignment"] = options.DeepClone(),
+            ["signals"] = results,
+            ["programIdentityChanged"] = changedProgram,
+            ["beforeAcquisition"] = TraceMeasurements.AcquisitionContext(before),
+            ["afterAcquisition"] = TraceMeasurements.AcquisitionContext(after),
             ["clockSynchronizationVerified"] = false,
-            ["beforeQuality"] = before["quality"]!.DeepClone(), ["afterQuality"] = after["quality"]!.DeepClone(),
-            ["beforeAssessment"] = TraceMeasurements.AssessQuality(before), ["afterAssessment"] = TraceMeasurements.AssessQuality(after),
+            ["beforeQuality"] = before["quality"]!.DeepClone(),
+            ["afterQuality"] = after["quality"]!.DeepClone(),
+            ["beforeAssessment"] = TraceMeasurements.AssessQuality(before),
+            ["afterAssessment"] = TraceMeasurements.AssessQuality(after),
             ["settingsEqual"] = JsonNode.DeepEquals(beforePlan["requestedSettings"], afterPlan["requestedSettings"]),
-            ["acquisitionModesEqual"] = D.Text(before, "mode") == D.Text(after, "mode"), ["resampled"] = false,
-            ["bugFixProven"] = false, ["nativeQualification"] = false,
-            ["limits"] = "Explicit caller-selected anchors do not establish clock synchronization or simultaneous events. Program identities and clock labels are supplied observations, not authenticated native identities. Counts/ranges may reflect different sample rates or coverage. Missing events never prove a fix; preserve acquisition uncertainty and review changed programs independently." };
+            ["acquisitionModesEqual"] = D.Text(before, "mode") == D.Text(after, "mode"),
+            ["resampled"] = false,
+            ["bugFixProven"] = false,
+            ["nativeQualification"] = false,
+            ["limits"] = "Explicit caller-selected anchors do not establish clock synchronization or simultaneous events. Program identities and clock labels are supplied observations, not authenticated native identities. Counts/ranges may reflect different sample rates or coverage. Missing events never prove a fix; preserve acquisition uncertainty and review changed programs independently."
+        };
         return report;
     }
     private static JsonObject Summarize(JsonNode measurement, string id, decimal anchor, decimal start, decimal end)
@@ -96,9 +120,19 @@ public sealed class TraceComparison(string artifactsRoot)
             }
             previous = value; previousTime = time;
         }
-        return new JsonObject { ["samplesInWindow"] = count, ["missingValues"] = missing, ["trueSamples"] = trueCount, ["falseSamples"] = falseCount,
-            ["minimum"] = minimum, ["maximum"] = maximum, ["transitions"] = changes, ["transitionCount"] = transitionCount, ["transitionsTruncated"] = transitionCount > 200,
-            ["coverage"] = count == 0 ? "noSamplesInWindow" : "recordedSamplesOnly" };
+        return new JsonObject
+        {
+            ["samplesInWindow"] = count,
+            ["missingValues"] = missing,
+            ["trueSamples"] = trueCount,
+            ["falseSamples"] = falseCount,
+            ["minimum"] = minimum,
+            ["maximum"] = maximum,
+            ["transitions"] = changes,
+            ["transitionCount"] = transitionCount,
+            ["transitionsTruncated"] = transitionCount > 200,
+            ["coverage"] = count == 0 ? "noSamplesInWindow" : "recordedSamplesOnly"
+        };
     }
     private static decimal Numeric(JsonNode? node)
     {

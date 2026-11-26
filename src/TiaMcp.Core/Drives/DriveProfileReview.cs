@@ -105,16 +105,38 @@ public static class DriveProfileReview
             }
             changes.Add(new JsonObject { ["name"] = name, ["status"] = status, ["changedFields"] = fields, ["proposalAssessment"] = proposal });
         }
-        return new JsonObject { ["schemaVersion"] = "drive-profile-review.v1", ["reviewId"] = reviewId, ["hardwarePath"] = hardware,
-            ["identity"] = b["identity"]!.DeepClone(), ["afterKind"] = afterKind, ["beforeValueDomain"] = b["valueDomain"]!.DeepClone(), ["afterValueDomain"] = a["valueDomain"]!.DeepClone(),
+        return new JsonObject
+        {
+            ["schemaVersion"] = "drive-profile-review.v1",
+            ["reviewId"] = reviewId,
+            ["hardwarePath"] = hardware,
+            ["identity"] = b["identity"]!.DeepClone(),
+            ["afterKind"] = afterKind,
+            ["beforeValueDomain"] = b["valueDomain"]!.DeepClone(),
+            ["afterValueDomain"] = a["valueDomain"]!.DeepClone(),
             ["coverage"] = new JsonObject { ["beforeParametersComplete"] = Boolean(b, "parametersComplete"), ["afterParametersComplete"] = Boolean(a, "parametersComplete") },
-            ["observations"] = observations, ["changes"] = changes,
-            ["summary"] = new JsonObject { ["beforeCount"] = before.Count, ["afterCount"] = after.Count, ["changedCount"] = changes.Count(c => (string?)c!["status"] != "unchanged"),
-                ["selectorConflictCount"] = identityConflicts, ["readOnlyConflictCount"] = readOnlyConflicts, ["unknownAccessChangeCount"] = unknownAccess,
-                ["unresolvedReferenceCount"] = unresolvedReferences, ["unresolvedParentCount"] = unresolvedParents },
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false,
-            ["driveIdentityVerified"] = false, ["wholeDriveAnalysisComplete"] = false, ["nativeConstraintsVerified"] = false,
-            ["limits"] = "Supplied observations bound to a captured hardware selection only. Exact full parameter names never derive from bit-list position. Units, limits/enums and other metadata are retained without conversion or native validation. Read/write declarations cannot authorize writes. Missing rows do not prove addition/deletion; BICO references and parent chains are supplied, not live wiring; parent traversal is bounded to 128 links. No native discovery, engineering edit, transfer, activation, persistence, safety or motion." };
+            ["observations"] = observations,
+            ["changes"] = changes,
+            ["summary"] = new JsonObject
+            {
+                ["beforeCount"] = before.Count,
+                ["afterCount"] = after.Count,
+                ["changedCount"] = changes.Count(c => (string?)c!["status"] != "unchanged"),
+                ["selectorConflictCount"] = identityConflicts,
+                ["readOnlyConflictCount"] = readOnlyConflicts,
+                ["unknownAccessChangeCount"] = unknownAccess,
+                ["unresolvedReferenceCount"] = unresolvedReferences,
+                ["unresolvedParentCount"] = unresolvedParents
+            },
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["driveIdentityVerified"] = false,
+            ["wholeDriveAnalysisComplete"] = false,
+            ["nativeConstraintsVerified"] = false,
+            ["limits"] = "Supplied observations bound to a captured hardware selection only. Exact full parameter names never derive from bit-list position. Units, limits/enums and other metadata are retained without conversion or native validation. Read/write declarations cannot authorize writes. Missing rows do not prove addition/deletion; BICO references and parent chains are supplied, not live wiring; parent traversal is bounded to 128 links. No native discovery, engineering edit, transfer, activation, persistence, safety or motion."
+        };
 
         Dictionary<string, JsonObject> Snapshot(JsonObject snapshot)
         {

@@ -75,48 +75,48 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
     // Under the gate.
     private async Task<JsonElement> SendAsync(string operation, string id, string frame, CancellationToken cancellationToken)
     {
-            using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            deadline.CancelAfter(TimeSpan.FromSeconds(LongOperations.Contains(operation) ? Math.Max(options.TimeoutSeconds, options.LongTimeoutSeconds) : options.TimeoutSeconds));
-            bool sent = false, interrupted = false;
-            try
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        deadline.CancelAfter(TimeSpan.FromSeconds(LongOperations.Contains(operation) ? Math.Max(options.TimeoutSeconds, options.LongTimeoutSeconds) : options.TimeoutSeconds));
+        bool sent = false, interrupted = false;
+        try
+        {
+            await EnsureConnectedAsync(deadline.Token);
+            var bytes = Encoding.UTF8.GetBytes(frame + "\n");
+            sent = true; // From here the worker may have received the request.
+            await _pipe!.WriteAsync(bytes, deadline.Token);
+            await _pipe.FlushAsync(deadline.Token);
+            // The read itself is never cancelled: a cancelled pipe read could drop part of a frame.
+            var read = _reader!.ReadAsync(CancellationToken.None);
+            if (await Task.WhenAny(read, Task.Delay(Timeout.Infinite, deadline.Token)) != read)
             {
-                await EnsureConnectedAsync(deadline.Token);
-                var bytes = Encoding.UTF8.GetBytes(frame + "\n");
-                sent = true; // From here the worker may have received the request.
-                await _pipe!.WriteAsync(bytes, deadline.Token);
-                await _pipe.FlushAsync(deadline.Token);
-                // The read itself is never cancelled: a cancelled pipe read could drop part of a frame.
-                var read = _reader!.ReadAsync(CancellationToken.None);
-                if (await Task.WhenAny(read, Task.Delay(Timeout.Infinite, deadline.Token)) != read)
-                {
-                    // Do not kill an engineering operation in progress. Its response is collected by a later call.
-                    _inflight = read; _inflightOperation = operation; _inflightId = id; interrupted = true;
-                    throw new BridgeException(cancellationToken.IsCancellationRequested ? "CancelledOutcomeUnknown" : "TimeoutOutcomeUnknown",
-                        "The bridge call was interrupted. It may still be running in TIA and will not be retried automatically. " +
-                        "Later calls are refused with PreviousOperationRunning until it finishes; then inspect its outcome (for a change, change_status).");
-                }
-                return BridgeProtocol.DecodeResponse(await read, id);
+                // Do not kill an engineering operation in progress. Its response is collected by a later call.
+                _inflight = read; _inflightOperation = operation; _inflightId = id; interrupted = true;
+                throw new BridgeException(cancellationToken.IsCancellationRequested ? "CancelledOutcomeUnknown" : "TimeoutOutcomeUnknown",
+                    "The bridge call was interrupted. It may still be running in TIA and will not be retried automatically. " +
+                    "Later calls are refused with PreviousOperationRunning until it finishes; then inspect its outcome (for a change, change_status).");
             }
-            catch (BridgeOperationException) { throw; }
-            catch (BridgeException) when (interrupted) { throw; }
-            catch (Exception ex)
+            return BridgeProtocol.DecodeResponse(await read, id);
+        }
+        catch (BridgeOperationException) { throw; }
+        catch (BridgeException) when (interrupted) { throw; }
+        catch (Exception ex)
+        {
+            // Before the frame is written nothing can run in TIA: drop only this connection; the next call starts a worker.
+            _faulted = sent;
+            if (_pipe is not null) await _pipe.DisposeAsync();
+            _pipe = null;
+            if (ex is OperationCanceledException && !sent)
             {
-                // Before the frame is written nothing can run in TIA: drop only this connection; the next call starts a worker.
-                _faulted = sent;
-                if (_pipe is not null) await _pipe.DisposeAsync();
-                _pipe = null;
-                if (ex is OperationCanceledException && !sent)
-                {
-                    if (cancellationToken.IsCancellationRequested) throw;
-                    throw new BridgeException("WorkerConnectTimeout", "The worker did not connect within the bridge timeout; no request was sent.", ex);
-                }
-                // Do not kill an engineering operation in progress. The worker observes EOF after its call returns.
-                if (ex is OperationCanceledException)
-                    throw new BridgeException(cancellationToken.IsCancellationRequested ? "CancelledOutcomeUnknown" : "TimeoutOutcomeUnknown",
-                        "The bridge call was interrupted. It may still be running in TIA and will not be retried automatically.", ex);
-                if (ex is BridgeException) throw;
-                throw new BridgeException("WorkerDisconnected", "The TIA worker connection failed: " + ex.Message, ex);
+                if (cancellationToken.IsCancellationRequested) throw;
+                throw new BridgeException("WorkerConnectTimeout", "The worker did not connect within the bridge timeout; no request was sent.", ex);
             }
+            // Do not kill an engineering operation in progress. The worker observes EOF after its call returns.
+            if (ex is OperationCanceledException)
+                throw new BridgeException(cancellationToken.IsCancellationRequested ? "CancelledOutcomeUnknown" : "TimeoutOutcomeUnknown",
+                    "The bridge call was interrupted. It may still be running in TIA and will not be retried automatically.", ex);
+            if (ex is BridgeException) throw;
+            throw new BridgeException("WorkerDisconnected", "The TIA worker connection failed: " + ex.Message, ex);
+        }
     }
 
     // Under the gate. A lost connection leaves the old worker to exit on EOF; once it has, the next call may start a fresh one.
@@ -278,10 +278,20 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
                 catch (OperationCanceledException) { /* Native work may still be in flight; never kill it. */ }
                 finally
                 {
-                    Console.Error.WriteLine(JsonSerializer.Serialize(new { bridgeWorkerExit = new {
-                        processId = workerId, startedAtUtc, processExitVerified = exited, exitCode,
-                        waitBudgetSeconds = WorkerExitBudgetSeconds, elapsedMs = exitWait.ElapsedMilliseconds,
-                        forcedTermination = false, projectLockReleaseVerified = false } }, BridgeProtocol.Json));
+                    Console.Error.WriteLine(JsonSerializer.Serialize(new
+                    {
+                        bridgeWorkerExit = new
+                        {
+                            processId = workerId,
+                            startedAtUtc,
+                            processExitVerified = exited,
+                            exitCode,
+                            waitBudgetSeconds = WorkerExitBudgetSeconds,
+                            elapsedMs = exitWait.ElapsedMilliseconds,
+                            forcedTermination = false,
+                            projectLockReleaseVerified = false
+                        }
+                    }, BridgeProtocol.Json));
                     _worker.Dispose();
                 }
             }

@@ -29,18 +29,30 @@ public sealed class SafetyEvidenceWorkflowStore(string artifactsRoot)
                 throw Invalid("Supporting sources require uploadRef, phase and purpose only.");
             var upload = new ArtifactUploadStore(artifactsRoot).ResolveCommitted(SourceText(row, "uploadRef", 39));
             byte[] bytes = ProjectReviewStore.ReadArtifact(artifactsRoot, new() { ["path"] = upload.Path, ["sha256"] = upload.Sha256 }, SourceLimit);
-            retained.Add(new JsonObject { ["phase"] = SourceText(row, "phase", 16), ["purpose"] = SourceText(row, "purpose", 256),
-                ["fileName"] = upload.FileName, ["bytes"] = bytes.Length, ["artifact"] = Reference(upload.Sha256, ".source") });
+            retained.Add(new JsonObject
+            {
+                ["phase"] = SourceText(row, "phase", 16),
+                ["purpose"] = SourceText(row, "purpose", 256),
+                ["fileName"] = upload.FileName,
+                ["bytes"] = bytes.Length,
+                ["artifact"] = Reference(upload.Sha256, ".source")
+            });
             captured.Add(bytes);
             if (captured.Sum(b => (long)b.Length) > 64L * 1024 * 1024) throw Invalid("Supporting sources exceed 64 MiB total, including repeated roles.");
         }
         ValidateSources(retained, read: false);
         // Validate every declaration and upload before publishing any retained evidence.
         foreach (var bytes in captured) Publish(bytes, ".source", SourceLimit);
-        var envelope = new JsonObject { ["schemaVersion"] = "safety-evidence-review-record.v1", ["reviewId"] = reviewId, ["plcPath"] = plcPath,
+        var envelope = new JsonObject
+        {
+            ["schemaVersion"] = "safety-evidence-review-record.v1",
+            ["reviewId"] = reviewId,
+            ["plcPath"] = plcPath,
             ["sources"] = retained,
             ["input"] = Publish(before, ".input", SafetyEvidenceReview.InputLimit),
-            ["comparisonInput"] = Publish(after, ".input", SafetyEvidenceReview.InputLimit), ["report"] = report };
+            ["comparisonInput"] = Publish(after, ".input", SafetyEvidenceReview.InputLimit),
+            ["report"] = report
+        };
         var artifact = Publish(JsonSerializer.SerializeToUtf8Bytes(envelope, BridgeProtocol.Json), ".json", ReportLimit);
         return Summary(envelope, artifact);
     }
@@ -115,10 +127,25 @@ public sealed class SafetyEvidenceWorkflowStore(string artifactsRoot)
     private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "safety-evidence-reviews/" + hash + extension, ["sha256"] = hash };
     private JsonObject Publish(byte[] bytes, string extension, int limit) =>
         PackageStorage.PublishContent(artifactsRoot, "safety-evidence-reviews", bytes, extension, limit, 512L << 20, "Safety evidence review");
-    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {
-        ["recordId"] = artifact["sha256"]!.DeepClone(), ["reviewId"] = record["reviewId"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["comparisonInput"] = record["comparisonInput"]?.DeepClone(), ["plcPath"] = record["plcPath"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),
-        ["sources"] = record["sources"]!.DeepClone(), ["supportingSourcePolicy"] = "Opaque supplied bytes. Roles are caller declarations; proprietary formats, authenticity and association with live state are not verified.",
-        ["summary"] = record["report"]!["summary"]!.DeepClone(), ["nativeExecutable"] = false, ["nativeExecuted"] = false, ["nativeQualified"] = false,
-        ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["requiredSignatureProfileVerified"] = false, ["safetyApproval"] = false, ["wholeProgramAnalysisComplete"] = false,
-        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new()
+    {
+        ["recordId"] = artifact["sha256"]!.DeepClone(),
+        ["reviewId"] = record["reviewId"]!.DeepClone(),
+        ["input"] = record["input"]!.DeepClone(),
+        ["comparisonInput"] = record["comparisonInput"]?.DeepClone(),
+        ["plcPath"] = record["plcPath"]!.DeepClone(),
+        ["reportArtifact"] = artifact.DeepClone(),
+        ["sources"] = record["sources"]!.DeepClone(),
+        ["supportingSourcePolicy"] = "Opaque supplied bytes. Roles are caller declarations; proprietary formats, authenticity and association with live state are not verified.",
+        ["summary"] = record["report"]!["summary"]!.DeepClone(),
+        ["nativeExecutable"] = false,
+        ["nativeExecuted"] = false,
+        ["nativeQualified"] = false,
+        ["sourceAuthenticityVerified"] = false,
+        ["liveFreshnessVerified"] = false,
+        ["requiredSignatureProfileVerified"] = false,
+        ["safetyApproval"] = false,
+        ["wholeProgramAnalysisComplete"] = false,
+        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy
+    };
 }

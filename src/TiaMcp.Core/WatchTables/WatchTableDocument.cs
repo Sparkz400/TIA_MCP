@@ -264,12 +264,12 @@ namespace TiaMcp.Core.WatchTables
                 if (commentRow) { if (fields != null) scalarAttributes(fields, Array.Empty<string>()); }
                 else
                 {
-                if (fields == null) throw new InvalidDataException("Captured row attributes required.");
-                scalarAttributes(fields, SignalRowFields);
-                if ((!authoring && ((string)fields.Element("DisplayFormat") != "Bool" || !new[] { "FALSE", "TRUE" }.Contains((string)fields.Element("ModifyValue")))) ||
-                    (authoring && (fields.Element("DisplayFormat") == null || fields.Element("ModifyValue") == null)) ||
-                    (string)fields.Element("ModifyTrigger") != "Permanent" || (string)fields.Element("MonitorTrigger") != "Permanent" || fields.Element("Name") == null)
-                    throw new InvalidDataException("Document ID reindex requires the observed offline Bool row shape.");
+                    if (fields == null) throw new InvalidDataException("Captured row attributes required.");
+                    scalarAttributes(fields, SignalRowFields);
+                    if ((!authoring && ((string)fields.Element("DisplayFormat") != "Bool" || !new[] { "FALSE", "TRUE" }.Contains((string)fields.Element("ModifyValue")))) ||
+                        (authoring && (fields.Element("DisplayFormat") == null || fields.Element("ModifyValue") == null)) ||
+                        (string)fields.Element("ModifyTrigger") != "Permanent" || (string)fields.Element("MonitorTrigger") != "Permanent" || fields.Element("Name") == null)
+                        throw new InvalidDataException("Document ID reindex requires the observed offline Bool row shape.");
                 }
                 var objects = row.Element("ObjectList");
                 children(objects, MultilingualTextElement); attributes(objects, Array.Empty<string>());

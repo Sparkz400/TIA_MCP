@@ -36,35 +36,41 @@ public static class TechnologyProfileConsumers
             foreach (var item in rows)
             {
                 var row = Object(item); Fields(row, "id subjectKind subjectKey objectPath nodeId member state reason");
-                if (!state.TryAdd(Text(row,"id",256),row)) throw Invalid("Duplicate exact consumer ID in phase.");
-                string kind = Text(row,"subjectKind",16), key = Text(row,"subjectKey",256), status = Text(row,"state",16);
+                if (!state.TryAdd(Text(row, "id", 256), row)) throw Invalid("Duplicate exact consumer ID in phase.");
+                string kind = Text(row, "subjectKind", 16), key = Text(row, "subjectKey", 256), status = Text(row, "state", 16);
                 if (kind is not ("parameter" or "relationship") || status is not ("declared" or "unknown")) throw Invalid("Unknown consumer subject kind or state.");
-                string? path = Optional(row,"objectPath",8192), id = Optional(row,"nodeId",8192), member = Optional(row,"member",1024), reason = Optional(row,"reason",1024);
+                string? path = Optional(row, "objectPath", 8192), id = Optional(row, "nodeId", 8192), member = Optional(row, "member", 1024), reason = Optional(row, "reason", 1024);
                 if ((path is null) != (id is null) || status == "declared" && path is null || status == "unknown" && reason is null)
                     throw Invalid("Declare both exact consumer identity fields or an explained unknown.");
                 bool subjectFound = request[phase]![kind == "parameter" ? "parameters" : "relationships"]!.AsArray()
                     .Any(p => (string?)p![kind == "parameter" ? "name" : "id"] == key);
-                string resolution = Resolve(path,id);
-                consumers.Add(new JsonObject { ["phase"] = phase, ["consumer"] = row.DeepClone(),
-                    ["subjectResolution"] = subjectFound ? "suppliedDeclaration" : "missingDeclaration", ["objectResolution"] = resolution,
-                    ["memberResolution"] = member is null ? "notDeclared" : "notVerified", ["nativeLinkVerified"] = false });
-                if (subjectFound && status == "declared" && resolution == "capturedObject") Root(path!,phase);
+                string resolution = Resolve(path, id);
+                consumers.Add(new JsonObject
+                {
+                    ["phase"] = phase,
+                    ["consumer"] = row.DeepClone(),
+                    ["subjectResolution"] = subjectFound ? "suppliedDeclaration" : "missingDeclaration",
+                    ["objectResolution"] = resolution,
+                    ["memberResolution"] = member is null ? "notDeclared" : "notVerified",
+                    ["nativeLinkVerified"] = false
+                });
+                if (subjectFound && status == "declared" && resolution == "capturedObject") Root(path!, phase);
             }
         }
-        foreach (string key in states[0].Keys.Union(states[1].Keys,StringComparer.Ordinal).Order(StringComparer.Ordinal))
+        foreach (string key in states[0].Keys.Union(states[1].Keys, StringComparer.Ordinal).Order(StringComparer.Ordinal))
         {
-            states[0].TryGetValue(key,out var before); states[1].TryGetValue(key,out var after); var fields = new JsonArray();
+            states[0].TryGetValue(key, out var before); states[1].TryGetValue(key, out var after); var fields = new JsonArray();
             if (before is not null && after is not null)
                 foreach (string field in new[] { "subjectKind", "subjectKey", "objectPath", "nodeId", "member", "state", "reason" })
-                    if (!JsonNode.DeepEquals(before[field],after[field])) fields.Add(field);
+                    if (!JsonNode.DeepEquals(before[field], after[field])) fields.Add(field);
             changes.Add(new JsonObject { ["id"] = key, ["status"] = before is null ? "onlyAfter" : after is null ? "onlyBefore" : fields.Count == 0 ? "unchanged" : "changed", ["changedFields"] = fields });
         }
         // Supplied links never become graph edges. Exclude ambiguous/out-of-scope nodes before using the existing traversal.
         var scoped = model.DeepClone().AsObject();
-        scoped["nodes"] = new JsonArray(nodes.Where(n => Resolve((string?)n["objectPath"],(string?)n["nodeId"]) == "capturedObject").Select(n => n.DeepClone()).ToArray());
+        scoped["nodes"] = new JsonArray(nodes.Where(n => Resolve((string?)n["objectPath"], (string?)n["nodeId"]) == "capturedObject").Select(n => n.DeepClone()).ToArray());
         string reviewId = (string)request["reviewId"]!;
-        var impact = ProjectReviewStore.ObservedImpactPaths(reviewId,reviewId,scoped,scoped,
-            new JsonArray(roots.OrderBy(p => p.Key,StringComparer.Ordinal).Select(p => (JsonNode)p.Value).ToArray()),depth,maxPaths,visits);
+        var impact = ProjectReviewStore.ObservedImpactPaths(reviewId, reviewId, scoped, scoped,
+            new JsonArray(roots.OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => (JsonNode)p.Value).ToArray()), depth, maxPaths, visits);
         report["consumers"] = consumers; report["consumerChanges"] = changes; report["impactPaths"] = impact["paths"]!.DeepClone();
         var coverage = impact["coverage"]!.DeepClone().AsObject();
         coverage["excludedNodeCount"] = nodes.Length - scoped["nodes"]!.AsArray().Count;
@@ -76,20 +82,20 @@ public static class TechnologyProfileConsumers
 
         int Limit(string key, int maximum) => limits[key] is JsonValue value && value.TryGetValue<int>(out int count) && count >= 1 && count <= maximum
             ? count : throw Invalid("Impact limit out of range: " + key);
-        void Root(string path,string phase)
+        void Root(string path, string phase)
         {
-            if (!roots.TryGetValue(path,out var root)) roots[path] = root = new JsonObject { ["path"] = path, ["change"] = "suppliedContextRoot", ["changedFields"] = new JsonArray() };
+            if (!roots.TryGetValue(path, out var root)) roots[path] = root = new JsonObject { ["path"] = path, ["change"] = "suppliedContextRoot", ["changedFields"] = new JsonArray() };
             root[phase + "ObjectPath"] = path;
         }
     }
     private static JsonObject Object(JsonNode? node) => node as JsonObject ?? throw Invalid("Expected consumer object.");
-    private static void Fields(JsonObject row,string fields)
+    private static void Fields(JsonObject row, string fields)
     { var names = fields.Split(' '); if (row.Count != names.Length || names.Any(n => !row.ContainsKey(n))) throw Invalid("Unexpected consumer fields."); }
-    private static string? Optional(JsonObject row,string key,int maximum) => row[key] is null ? null : Text(row,key,maximum);
-    private static string Text(JsonObject row,string key,int maximum)
+    private static string? Optional(JsonObject row, string key, int maximum) => row[key] is null ? null : Text(row, key, maximum);
+    private static string Text(JsonObject row, string key, int maximum)
     {
         if (row[key] is not JsonValue value || !value.TryGetValue<string>(out string? text) || text is null) throw Invalid("Expected consumer text: " + key);
-        EngineeringIdentityGuard.Text(text,key,maximum); return text;
+        EngineeringIdentityGuard.Text(text, key, maximum); return text;
     }
-    private static BridgeException Invalid(string message) => new("InvalidTechnologyProfile",message);
+    private static BridgeException Invalid(string message) => new("InvalidTechnologyProfile", message);
 }

@@ -13,10 +13,19 @@ public sealed class PlcsimTargets(SimulatorClient simulator, IBridgeClient engin
         var binding = await Observe(instanceId, instanceName, creationId);
         // The fingerprint comes only from the engineering worker's own compare against this owned instance, never from the caller.
         if (downloadTicket is not null)
-            binding = binding with { ProgramFingerprintSha256 = PlcsimTargetBindings.Fingerprint(binding,
-                await engineering.CallAsync("plc_online_compare", new { downloadTicket, projectName, plcPath, maxItems = 500 }, cancellationToken)) };
-        return new { binding = PlcsimTargetBindings.Retain(options.ArtifactsDirectory, binding), record = binding,
-            programFingerprint = binding.ProgramFingerprintSha256 is null ? "notObserved" : "boundOnlineFingerprint", physicalPlc = false, nativeQualified = false };
+            binding = binding with
+            {
+                ProgramFingerprintSha256 = PlcsimTargetBindings.Fingerprint(binding,
+                await engineering.CallAsync("plc_online_compare", new { downloadTicket, projectName, plcPath, maxItems = 500 }, cancellationToken))
+            };
+        return new
+        {
+            binding = PlcsimTargetBindings.Retain(options.ArtifactsDirectory, binding),
+            record = binding,
+            programFingerprint = binding.ProgramFingerprintSha256 is null ? "notObserved" : "boundOnlineFingerprint",
+            physicalPlc = false,
+            nativeQualified = false
+        };
     }
 
     // The adapter each runtime session's endpoint was routed through when it connected (null if undetermined or it changed during the

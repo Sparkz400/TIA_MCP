@@ -12,8 +12,14 @@ internal static class RuntimeQualification
         {
             using (var file = new FileStream(Path.Combine(options.ArtifactsDirectory, "runtime-interruption-marker.json"), FileMode.CreateNew, FileAccess.Write, FileShare.Read))
             {
-                JsonSerializer.Serialize(file, new { point, hostProcessId = Environment.ProcessId,
-                    hostStartedAtUtc = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime(), intent, automaticReplay = false }, BridgeProtocol.Json);
+                JsonSerializer.Serialize(file, new
+                {
+                    point,
+                    hostProcessId = Environment.ProcessId,
+                    hostStartedAtUtc = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime(),
+                    intent,
+                    automaticReplay = false
+                }, BridgeProtocol.Json);
                 file.Flush(true);
             }
             Environment.Exit(74);

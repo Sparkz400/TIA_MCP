@@ -69,8 +69,18 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
         RequireBlock(blockPath, blockName);
         if (render is not (null or "text")) throw new McpException("render accepts only text.");
         ExportRetention.Prune(Path.Combine(options.ArtifactsDirectory, "exports"));
-        var result = await Call("block_read", new { projectName, plcPath, blockPath, blockName, scopePath, format, render, culture,
-            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "exports") }, cancellationToken);
+        var result = await Call("block_read", new
+        {
+            projectName,
+            plcPath,
+            blockPath,
+            blockName,
+            scopePath,
+            format,
+            render,
+            culture,
+            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "exports")
+        }, cancellationToken);
         return includeXml ? result : WithoutLargeXml(result, render == "text");
     }
 
@@ -164,8 +174,16 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
                 cancellationToken.ThrowIfCancellationRequested();
                 try
                 {
-                    var response = await bridge.CallAsync("block_read", new { projectName, plcPath, blockPaths = chunk.Select(i => blocks[i].GetProperty("path").GetString()).ToArray(),
-                        render = "text", culture, includeXml = false, artifactDirectory = directory }, cancellationToken);
+                    var response = await bridge.CallAsync("block_read", new
+                    {
+                        projectName,
+                        plcPath,
+                        blockPaths = chunk.Select(i => blocks[i].GetProperty("path").GetString()).ToArray(),
+                        render = "text",
+                        culture,
+                        includeXml = false,
+                        artifactDirectory = directory
+                    }, cancellationToken);
                     var entries = response.GetProperty("results").EnumerateArray().ToDictionary(entry => entry.GetProperty("path").GetString()!, StringComparer.Ordinal);
                     foreach (int i in chunk)
                     {
@@ -216,8 +234,12 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
             bool tagsCut = software.TryGetProperty("truncation", out _) || software.GetProperty("completeness").GetProperty("truncated").GetBoolean();
             report["blocksScanned"] = files.Distinct(StringComparer.OrdinalIgnoreCase).Count();
             report["blocksNotScanned"] = new System.Text.Json.Nodes.JsonArray([.. skipped.Select(name => (System.Text.Json.Nodes.JsonNode)name)]);
-            report["completeness"] = new System.Text.Json.Nodes.JsonObject { ["complete"] = false, ["tagsTruncated"] = tagsCut,
-                ["scope"] = "Static references in the exported block files of the given index. Blocks not in the index, skipped blocks, technology objects, HMI, hardware-identifier access and indirect addressing are not covered; the files are not checked against the current project state." };
+            report["completeness"] = new System.Text.Json.Nodes.JsonObject
+            {
+                ["complete"] = false,
+                ["tagsTruncated"] = tagsCut,
+                ["scope"] = "Static references in the exported block files of the given index. Blocks not in the index, skipped blocks, technology objects, HMI, hardware-identifier access and indirect addressing are not covered; the files are not checked against the current project state."
+            };
             return Result(report.ToJsonString(BridgeProtocol.Json), false);
         }
         catch (BridgeException error) { return Failure(error); }
@@ -234,8 +256,12 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
         if (!rendered && characters <= InlineXmlLimit) return result;
         var node = System.Text.Json.Nodes.JsonNode.Parse(content.GetRawText())!.AsObject();
         node.Remove("xml");
-        node["xmlOmitted"] = new System.Text.Json.Nodes.JsonObject { ["characters"] = characters,
-            ["reason"] = rendered ? "render=text" : "larger than 64 KiB", ["read"] = "artifact.path with artifact_read, or block_read includeXml=true" };
+        node["xmlOmitted"] = new System.Text.Json.Nodes.JsonObject
+        {
+            ["characters"] = characters,
+            ["reason"] = rendered ? "render=text" : "larger than 64 KiB",
+            ["read"] = "artifact.path with artifact_read, or block_read includeXml=true"
+        };
         return Result(node.ToJsonString(BridgeProtocol.Json), false);
     }
 

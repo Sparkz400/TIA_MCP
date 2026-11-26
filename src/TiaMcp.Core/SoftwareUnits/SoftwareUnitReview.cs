@@ -121,15 +121,38 @@ public static class SoftwareUnitReview
             else throw Error("Unsupported change kind; native create/move/template operations are not implemented by this review.");
         }
         var after = Assess(editedUnits, editedObjects);
-        var report = new JsonObject { ["schemaVersion"] = "software-unit-review.v1", ["reviewId"] = reviewId, ["plcPath"] = plc,
-            ["suppliedCoverage"] = coverage.DeepClone(), ["changes"] = request["changes"]!.DeepClone(),
-            ["units"] = new JsonArray(units.Select(p => (JsonNode?)new JsonObject { ["objectPath"] = p.Key, ["beforeNamespacePreset"] = p.Value.Facts["namespacePreset"]?.DeepClone(),
-                ["afterNamespacePreset"] = editedUnits[p.Key].Facts["namespacePreset"]?.DeepClone(), ["relationsComplete"] = p.Value.Facts["relationsComplete"]!.DeepClone() }).ToArray()),
-            ["objects"] = new JsonArray(objects.Select(p => (JsonNode?)new JsonObject { ["objectPath"] = p.Key, ["namespace"] = p.Value["namespace"]?.DeepClone(),
-                ["beforePublication"] = p.Value["publication"]!.DeepClone(), ["afterPublication"] = editedObjects[p.Key]["publication"]!.DeepClone() }).ToArray()),
-            ["relations"] = new JsonArray(), ["dependencies"] = new JsonArray(), ["cycles"] = new JsonArray(), ["collisions"] = new JsonArray(),
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["wholeProjectAnalysisComplete"] = false,
-            ["limits"] = "Supplied facts and exact captured selectors only. Direct declared access prerequisites are not native visibility or compile proof. Missing paths never resolve by name. Namespace-preset edits do not rewrite member namespaces in this model; native propagation, syntax, preservation, library links and runtime remain unverified." };
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "software-unit-review.v1",
+            ["reviewId"] = reviewId,
+            ["plcPath"] = plc,
+            ["suppliedCoverage"] = coverage.DeepClone(),
+            ["changes"] = request["changes"]!.DeepClone(),
+            ["units"] = new JsonArray(units.Select(p => (JsonNode?)new JsonObject
+            {
+                ["objectPath"] = p.Key,
+                ["beforeNamespacePreset"] = p.Value.Facts["namespacePreset"]?.DeepClone(),
+                ["afterNamespacePreset"] = editedUnits[p.Key].Facts["namespacePreset"]?.DeepClone(),
+                ["relationsComplete"] = p.Value.Facts["relationsComplete"]!.DeepClone()
+            }).ToArray()),
+            ["objects"] = new JsonArray(objects.Select(p => (JsonNode?)new JsonObject
+            {
+                ["objectPath"] = p.Key,
+                ["namespace"] = p.Value["namespace"]?.DeepClone(),
+                ["beforePublication"] = p.Value["publication"]!.DeepClone(),
+                ["afterPublication"] = editedObjects[p.Key]["publication"]!.DeepClone()
+            }).ToArray()),
+            ["relations"] = new JsonArray(),
+            ["dependencies"] = new JsonArray(),
+            ["cycles"] = new JsonArray(),
+            ["collisions"] = new JsonArray(),
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["wholeProjectAnalysisComplete"] = false,
+            ["limits"] = "Supplied facts and exact captured selectors only. Direct declared access prerequisites are not native visibility or compile proof. Missing paths never resolve by name. Namespace-preset edits do not rewrite member namespaces in this model; native propagation, syntax, preservation, library links and runtime remain unverified."
+        };
         foreach (var (phase, state) in new[] { ("before", before), ("after", after) })
         {
             foreach (var row in state.Relations) { var copy = row!.DeepClone(); copy["phase"] = phase; report["relations"]!.AsArray().Add(copy); }
@@ -138,16 +161,29 @@ public static class SoftwareUnitReview
         for (int i = 0; i < dependencies.Count; i++)
             report["dependencies"]!.AsArray().Add(new JsonObject { ["index"] = i, ["evidence"] = dependencies[i]!.DeepClone(), ["before"] = before.Dependencies[i]!.DeepClone(), ["after"] = after.Dependencies[i]!.DeepClone() });
         foreach (var group in objects.Where(p => p.Value["namespace"] is not null).GroupBy(p => (Text(Node(p.Key), "kind"), Text(p.Value, "namespace", 256, true), Text(Node(p.Key), "name", 256))))
-            if (group.Count() > 1) report["collisions"]!.AsArray().Add(new JsonObject { ["kind"] = group.Key.Item1, ["namespace"] = group.Key.Item2, ["name"] = group.Key.Item3,
-                ["objectPaths"] = new JsonArray(group.Select(p => (JsonNode?)JsonValue.Create(p.Key)).ToArray()) });
+            if (group.Count() > 1) report["collisions"]!.AsArray().Add(new JsonObject
+            {
+                ["kind"] = group.Key.Item1,
+                ["namespace"] = group.Key.Item2,
+                ["name"] = group.Key.Item3,
+                ["objectPaths"] = new JsonArray(group.Select(p => (JsonNode?)JsonValue.Create(p.Key)).ToArray())
+            });
         string[] omittedUnits = all.Where(p => (string?)p.Value["plcPath"] == plc && (string?)p.Value["kind"] == "softwareUnit" && !units.ContainsKey(p.Key)).Select(p => p.Key).ToArray();
         int omittedObjects = all.Count(p => (string?)p.Value["plcPath"] == plc && units.ContainsKey((string?)p.Value["scopePath"] ?? "") && (string?)p.Value["kind"] is "block" or "type" && !objects.ContainsKey(p.Key));
         if (Boolean(coverage, "unitsComplete") && omittedUnits.Length > 0 || Boolean(coverage, "objectsComplete") && omittedObjects > 0) throw Error("Claimed supplied inventory completeness contradicts captured objects.");
-        report["summary"] = new JsonObject { ["unitCount"] = units.Count, ["objectCount"] = objects.Count, ["dependencyCount"] = dependencies.Count,
-            ["changeCount"] = request["changes"]!.AsArray().Count, ["omittedCapturedUnits"] = omittedUnits.Length, ["omittedCapturedObjects"] = omittedObjects,
+        report["summary"] = new JsonObject
+        {
+            ["unitCount"] = units.Count,
+            ["objectCount"] = objects.Count,
+            ["dependencyCount"] = dependencies.Count,
+            ["changeCount"] = request["changes"]!.AsArray().Count,
+            ["omittedCapturedUnits"] = omittedUnits.Length,
+            ["omittedCapturedObjects"] = omittedObjects,
             ["beforeUnresolvedDependencies"] = before.Dependencies.Count(d => (string?)d!["status"] != "declaredPrerequisitesPresent"),
             ["afterUnresolvedDependencies"] = after.Dependencies.Count(d => (string?)d!["status"] != "declaredPrerequisitesPresent"),
-            ["cycleRowCount"] = report["cycles"]!.AsArray().Count, ["collisionCount"] = report["collisions"]!.AsArray().Count };
+            ["cycleRowCount"] = report["cycles"]!.AsArray().Count,
+            ["collisionCount"] = report["collisions"]!.AsArray().Count
+        };
         return report;
 
         (JsonArray Relations, JsonArray Dependencies, string[] Cycles) Assess(Dictionary<string, Unit> state, Dictionary<string, JsonObject> declarations)
@@ -187,7 +223,8 @@ public static class SoftwareUnitReview
                 evaluated.Add(new JsonObject { ["status"] = status });
             }
             var adjacency = state.Keys.ToDictionary(k => k, k => exact.Where(e => e.Unit == k && e.Type == "SoftwareUnit").Select(e => e.Target).ToArray(), StringComparer.Ordinal);
-            var cycles = state.Keys.Where(start => {
+            var cycles = state.Keys.Where(start =>
+            {
                 var pending = new Stack<string>(adjacency[start]); var visited = new HashSet<string>(StringComparer.Ordinal);
                 while (pending.TryPop(out string? current)) { if (current == start) return true; if (visited.Add(current) && adjacency.TryGetValue(current, out var next)) foreach (string n in next) pending.Push(n); }
                 return false;
@@ -197,9 +234,13 @@ public static class SoftwareUnitReview
     }
     private static bool Restricted(JsonObject node) => (string?)node["access"]?["state"] == "protected" || (bool?)node["metadata"]?["generated"] == true || (bool?)node["metadata"]?["isKnowHowProtected"] == true || (bool?)node["metadata"]?["isSafety"] == true;
     private static bool Publishable(JsonObject node) => (string?)node["kind"] == "type" || (string?)node["kind"] == "block" && (string?)node["metadata"]?["kind"] is "FC" or "FB" or "GlobalDB" or "InstanceDB";
-    private static bool RelationTarget(string type, JsonObject node, string plc) => (string?)node["plcPath"] == plc && type switch {
-        "SoftwareUnit" => (string?)node["kind"] == "softwareUnit", "NonUnitDB" => (string?)node["kind"] == "block" && (string?)node["scopePath"] == plc && (string?)node["metadata"]?["kind"] == "GlobalDB",
-        "TODB" => (string?)node["kind"] == "technology" && (string?)node["scopePath"] == plc, _ => false };
+    private static bool RelationTarget(string type, JsonObject node, string plc) => (string?)node["plcPath"] == plc && type switch
+    {
+        "SoftwareUnit" => (string?)node["kind"] == "softwareUnit",
+        "NonUnitDB" => (string?)node["kind"] == "block" && (string?)node["scopePath"] == plc && (string?)node["metadata"]?["kind"] == "GlobalDB",
+        "TODB" => (string?)node["kind"] == "technology" && (string?)node["scopePath"] == plc,
+        _ => false
+    };
     private static JsonObject Object(JsonNode? node) => node as JsonObject ?? throw Error("Expected an object row.");
     private static void Fields(JsonObject value, string fields)
     { var expected = fields.Split(' '); if (value.Count != expected.Length || expected.Any(k => !value.ContainsKey(k))) throw Error("Missing or unknown fields; expected: " + fields); }

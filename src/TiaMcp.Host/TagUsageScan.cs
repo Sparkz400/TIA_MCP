@@ -158,8 +158,11 @@ internal static class TagUsageScan
             rows.Add(row);
         }
         var absolute = uses.Where(use => use.Operand.StartsWith('%')).GroupBy(use => use.Operand, StringComparer.Ordinal).OrderBy(group => group.Key, StringComparer.Ordinal)
-            .Select(group => (JsonNode)new JsonObject { ["address"] = group.Key,
-                ["blocks"] = new JsonArray([.. group.Select(use => use.Block + " N" + use.Network + (use.Write ? " (write)" : " (read)")).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).Select(text => (JsonNode)text)]) });
+            .Select(group => (JsonNode)new JsonObject
+            {
+                ["address"] = group.Key,
+                ["blocks"] = new JsonArray([.. group.Select(use => use.Block + " N" + use.Network + (use.Write ? " (write)" : " (read)")).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).Select(text => (JsonNode)text)])
+            });
         return new JsonObject
         {
             ["summary"] = new JsonObject { ["ioTags"] = tags.Count, ["unused"] = unused, ["readOnly"] = readOnly, ["writeOnly"] = writeOnly, ["readAndWritten"] = tags.Count - unused - readOnly - writeOnly },

@@ -46,8 +46,12 @@ public sealed partial class ProjectReviewStore
             int size = JsonSerializer.SerializeToUtf8Bytes(row, BridgeProtocol.Json).Length;
             if (size > 120 * 1024)
             {
-                row = new() { ["index"] = next, ["omitted"] = true,
-                    ["reason"] = "Row exceeds page budget; retrieve the complete report artifact." };
+                row = new()
+                {
+                    ["index"] = next,
+                    ["omitted"] = true,
+                    ["reason"] = "Row exceeds page budget; retrieve the complete report artifact."
+                };
                 size = JsonSerializer.SerializeToUtf8Bytes(row, BridgeProtocol.Json).Length;
             }
             if (used + size > 120 * 1024) break;
@@ -93,12 +97,23 @@ public sealed partial class ProjectReviewStore
             resolvedCount += summary["resolvedFindingCount"]!.GetValue<int>();
             passed &= summary["suppliedRequiredCoveragePassed"]!.GetValue<bool>() && summary["savedReviewScopeBound"]!.GetValue<bool>();
         }
-        var result = new JsonObject { ["schemaVersion"] = "project-health-testsuite.v1", ["reviewId"] = reviewId,
-            ["reports"] = reports, ["selectionCount"] = reports.Count, ["resultCount"] = resultCount, ["findingCount"] = findingCount,
-            ["resolvedFindingCount"] = resolvedCount, ["unresolvedFindingCount"] = findingCount - resolvedCount,
-            ["allSelectedSuppliedEvidencePassed"] = passed, ["wholeProjectHealthComplete"] = false,
-            ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false,
-            ["coveragePolicy"] = "Explicitly selected supplied packets only. Execution units and diagnostic messages are counted per packet, not unique defects or Siemens assertions. Attempts are not merged; native counters are not summed. Empty or passing selections never establish whole-project health." };
+        var result = new JsonObject
+        {
+            ["schemaVersion"] = "project-health-testsuite.v1",
+            ["reviewId"] = reviewId,
+            ["reports"] = reports,
+            ["selectionCount"] = reports.Count,
+            ["resultCount"] = resultCount,
+            ["findingCount"] = findingCount,
+            ["resolvedFindingCount"] = resolvedCount,
+            ["unresolvedFindingCount"] = findingCount - resolvedCount,
+            ["allSelectedSuppliedEvidencePassed"] = passed,
+            ["wholeProjectHealthComplete"] = false,
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["coveragePolicy"] = "Explicitly selected supplied packets only. Execution units and diagnostic messages are counted per packet, not unique defects or Siemens assertions. Attempts are not merged; native counters are not summed. Empty or passing selections never establish whole-project health."
+        };
         if (JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length > 128 * 1024)
             throw new BridgeException("TestResultLimit", "Test Suite health section exceeds 128 KiB; select fewer receipts.");
         return result;
@@ -158,8 +173,12 @@ public sealed partial class ProjectReviewStore
             if (exactContent && (expected.Object != observed.Object || expected.ContentSha256 != observed.ContentSha256)) return "differentObjectOrContent";
             return "exactCapturedSource";
         }
-        var bindings = packet.Plan.Definitions.SelectMany(d => d.RequiredScope.Select(r => new {
-            definitionId = d.Id, reference = r, binding = Binding(r, Observed(r.Object.ObjectPath, r), true) })).ToArray();
+        var bindings = packet.Plan.Definitions.SelectMany(d => d.RequiredScope.Select(r => new
+        {
+            definitionId = d.Id,
+            reference = r,
+            binding = Binding(r, Observed(r.Object.ObjectPath, r), true)
+        })).ToArray();
         var findings = packet.Results.SelectMany(c => TestSuiteResultNormalizer.Findings(c, []).Select(f =>
         {
             var observed = Observed(f.NativePath, c.DefinitionReference);
@@ -171,22 +190,47 @@ public sealed partial class ProjectReviewStore
             d.Reference.Snapshot == new EngineeringSnapshotIdentity(reviewId, reviewId, d.Reference.Snapshot.TiaVersion));
         bool savedReviewScopeBound = sourceBound && bindings.All(b => b.binding == "exactCapturedSource");
         var capturedById = packet.Results.Select((capture, index) => (capture, index)).ToDictionary(x => x.capture.DefinitionId, StringComparer.Ordinal);
-        var report = new {
-            schemaVersion = "testsuite-result-report.v1", reviewId, inputSha256 = Hash(original), planSha256 = packet.Plan.PlanSha256,
-            summary = new { suppliedRequiredCoveragePassed = assessment.RequiredCoveragePassed,
+        var report = new
+        {
+            schemaVersion = "testsuite-result-report.v1",
+            reviewId,
+            inputSha256 = Hash(original),
+            planSha256 = packet.Plan.PlanSha256,
+            summary = new
+            {
+                suppliedRequiredCoveragePassed = assessment.RequiredCoveragePassed,
                 savedReviewScopeBound,
-                resultCount = results.Results.Length, findingCount = findings.Length,
+                resultCount = results.Results.Length,
+                findingCount = findings.Length,
                 resolvedFindingCount = findings.Count(f => f.Finding.ResolvedObject is not null),
-                sourceAuthenticityVerified = false, liveFreshnessVerified = false, nativeExecuted = false, nativeQualified = false,
-                nativeExecutionAuthorized = false, wholeProjectHealthComplete = false, tiaVersionOrigin = "suppliedUnverified",
-                sourceEvidencePolicy = SourceEvidencePolicy },
-            results = results.Results.Select(r => {
+                sourceAuthenticityVerified = false,
+                liveFreshnessVerified = false,
+                nativeExecuted = false,
+                nativeQualified = false,
+                nativeExecutionAuthorized = false,
+                wholeProjectHealthComplete = false,
+                tiaVersionOrigin = "suppliedUnverified",
+                sourceEvidencePolicy = SourceEvidencePolicy
+            },
+            results = results.Results.Select(r =>
+            {
                 bool found = capturedById.TryGetValue(r.DefinitionId, out var captured);
-                return new { r.DefinitionId, r.Outcome, r.RawSha256, r.Reasons, captureIndex = found ? (int?)captured.index : null,
-                    nativeState = found ? captured.capture.State : null, nativeErrorCount = found ? (int?)captured.capture.ErrorCount : null,
-                    nativeWarningCount = found ? (int?)captured.capture.WarningCount : null };
+                return new
+                {
+                    r.DefinitionId,
+                    r.Outcome,
+                    r.RawSha256,
+                    r.Reasons,
+                    captureIndex = found ? (int?)captured.index : null,
+                    nativeState = found ? captured.capture.State : null,
+                    nativeErrorCount = found ? (int?)captured.capture.ErrorCount : null,
+                    nativeWarningCount = found ? (int?)captured.capture.WarningCount : null
+                };
             }),
-            scope = scope.Entries, scopeBindings = bindings, findings, assessment
+            scope = scope.Entries,
+            scopeBindings = bindings,
+            findings,
+            assessment
         };
         byte[] reportBytes = TestSuiteReviewJson(report);
         var junit = XDocument.Parse(TestSuiteResultNormalizer.ExportJUnit(packet.Plan, results, inputPath));
@@ -209,9 +253,15 @@ public sealed partial class ProjectReviewStore
 
     private static JsonObject TestSuiteReviewSummary(TestSuiteReviewReceipt receipt, EngineeringArtifactReference retained, JsonObject report)
     {
-        var result = new JsonObject { ["reviewId"] = receipt.ReviewId, ["receipt"] = JsonSerializer.SerializeToNode(retained, BridgeProtocol.Json),
-            ["input"] = JsonSerializer.SerializeToNode(receipt.Input, BridgeProtocol.Json), ["report"] = JsonSerializer.SerializeToNode(receipt.Report, BridgeProtocol.Json),
-            ["junit"] = JsonSerializer.SerializeToNode(receipt.Junit, BridgeProtocol.Json), ["summary"] = report["summary"]!.DeepClone() };
+        var result = new JsonObject
+        {
+            ["reviewId"] = receipt.ReviewId,
+            ["receipt"] = JsonSerializer.SerializeToNode(retained, BridgeProtocol.Json),
+            ["input"] = JsonSerializer.SerializeToNode(receipt.Input, BridgeProtocol.Json),
+            ["report"] = JsonSerializer.SerializeToNode(receipt.Report, BridgeProtocol.Json),
+            ["junit"] = JsonSerializer.SerializeToNode(receipt.Junit, BridgeProtocol.Json),
+            ["summary"] = report["summary"]!.DeepClone()
+        };
         if (JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length > 124 * 1024)
             throw new BridgeException("TestResultLimit", "Supplied-result summary exceeds its response budget.");
         return result;

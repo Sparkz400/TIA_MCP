@@ -51,16 +51,34 @@ public static class PublicCertificateReview
         foreach (string field in new[] { "association", "expectedSha256", "status", "unavailableReason", "inputSha256", "certificate" })
             if (!JsonNode.DeepEquals(before[field], after[field])) changes.Add(field);
         bool both = before["certificate"] is JsonObject && after["certificate"] is JsonObject;
-        return new JsonObject { ["schemaVersion"] = "public-certificate-review.v1", ["reviewId"] = reviewId, ["owner"] = owner.DeepClone(), ["evaluatedAtUtc"] = evaluation, ["afterKind"] = afterKind,
-            ["observations"] = new JsonArray(before, after), ["changedFields"] = changes,
-            ["summary"] = new JsonObject { ["samePublicCertificate"] = both ? JsonNode.DeepEquals(before["certificate"]!["sha256"], after["certificate"]!["sha256"]) : null,
+        return new JsonObject
+        {
+            ["schemaVersion"] = "public-certificate-review.v1",
+            ["reviewId"] = reviewId,
+            ["owner"] = owner.DeepClone(),
+            ["evaluatedAtUtc"] = evaluation,
+            ["afterKind"] = afterKind,
+            ["observations"] = new JsonArray(before, after),
+            ["changedFields"] = changes,
+            ["summary"] = new JsonObject
+            {
+                ["samePublicCertificate"] = both ? JsonNode.DeepEquals(before["certificate"]!["sha256"], after["certificate"]!["sha256"]) : null,
                 ["associationChanged"] = !JsonNode.DeepEquals(before["association"], after["association"]),
                 ["unavailableCount"] = new[] { before, after }.Count(p => p["certificate"] is null),
                 ["fingerprintMismatchCount"] = new[] { before, after }.Count(p => (string?)p["fingerprintMatch"] == "mismatch"),
-                ["outsideValidityCount"] = new[] { before, after }.Count(p => p["certificate"] is JsonObject c && (string?)c["validity"] != "withinInterval") },
-            ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["associationVerified"] = false, ["signatureVerified"] = false,
-            ["chainVerified"] = false, ["revocationChecked"] = false, ["endpointAuthenticated"] = false, ["privateKeyAvailabilityVerified"] = false, ["usagePolicyVerified"] = false,
-            ["limits"] = "Strict single public certificate per supplied phase. A parsed certificate or matching caller-supplied fingerprint does not establish ownership, trust, signature validity, endpoint identity, key availability or native usage policy. No chain building, network, certificate-store access, key import/export, native mutation or deployment. Unknown extensions are retained as opaque public bytes. Identifier/extension content is not a secret detector; send only public metadata." };
+                ["outsideValidityCount"] = new[] { before, after }.Count(p => p["certificate"] is JsonObject c && (string?)c["validity"] != "withinInterval")
+            },
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["associationVerified"] = false,
+            ["signatureVerified"] = false,
+            ["chainVerified"] = false,
+            ["revocationChecked"] = false,
+            ["endpointAuthenticated"] = false,
+            ["privateKeyAvailabilityVerified"] = false,
+            ["usagePolicyVerified"] = false,
+            ["limits"] = "Strict single public certificate per supplied phase. A parsed certificate or matching caller-supplied fingerprint does not establish ownership, trust, signature validity, endpoint identity, key availability or native usage policy. No chain building, network, certificate-store access, key import/export, native mutation or deployment. Unknown extensions are retained as opaque public bytes. Identifier/extension content is not a secret detector; send only public metadata."
+        };
     }
     private static JsonObject Inspect(JsonObject input, string phase, DateTimeOffset at)
     {
@@ -70,9 +88,19 @@ public static class PublicCertificateReview
         if (Text(association, "usage") is not ("webServer" or "opcUaServer" or "opcUaClient" or "tls" or "unspecified")) throw Error("Unknown supplied usage label.");
         string? expected = input["expectedSha256"] is null ? null : Text(input, "expectedSha256");
         if (expected is not null && (expected.Length != 64 || expected.Any(c => c is not (>= '0' and <= '9') and not (>= 'a' and <= 'f')))) throw Error("Expected fingerprint must be lowercase SHA-256 or null.");
-        var result = new JsonObject { ["phase"] = phase, ["association"] = association.DeepClone(), ["expectedSha256"] = expected,
-            ["status"] = "unavailable", ["unavailableReason"] = input["unavailableReason"]?.DeepClone(), ["inputSha256"] = null,
-            ["inputBytes"] = null, ["format"] = input["format"]?.DeepClone(), ["fingerprintMatch"] = "unavailable", ["certificate"] = null };
+        var result = new JsonObject
+        {
+            ["phase"] = phase,
+            ["association"] = association.DeepClone(),
+            ["expectedSha256"] = expected,
+            ["status"] = "unavailable",
+            ["unavailableReason"] = input["unavailableReason"]?.DeepClone(),
+            ["inputSha256"] = null,
+            ["inputBytes"] = null,
+            ["format"] = input["format"]?.DeepClone(),
+            ["fingerprintMatch"] = "unavailable",
+            ["certificate"] = null
+        };
         if (input["contentBase64"] is null)
         { if (input["format"] is not null) throw Error("Unavailable content must have null format."); Text(input, "unavailableReason"); return result; }
         if (input["unavailableReason"] is not null) throw Error("Available content cannot also claim an unavailable reason.");
@@ -93,12 +121,25 @@ public static class PublicCertificateReview
             }
             var from = cert.NotBefore.ToUniversalTime(); var until = cert.NotAfter.ToUniversalTime();
             string hash = Convert.ToHexStringLower(SHA256.HashData(der));
-            result["certificate"] = new JsonObject { ["sha256"] = hash, ["derBytes"] = der.Length, ["version"] = cert.Version, ["serialNumber"] = cert.SerialNumber,
-                ["subject"] = cert.Subject, ["issuer"] = cert.Issuer, ["subjectNameDerBase64"] = Convert.ToBase64String(cert.SubjectName.RawData), ["issuerNameDerBase64"] = Convert.ToBase64String(cert.IssuerName.RawData),
-                ["notBeforeUtc"] = from.ToString(TimeFormat, CultureInfo.InvariantCulture), ["notAfterUtc"] = until.ToString(TimeFormat, CultureInfo.InvariantCulture),
+            result["certificate"] = new JsonObject
+            {
+                ["sha256"] = hash,
+                ["derBytes"] = der.Length,
+                ["version"] = cert.Version,
+                ["serialNumber"] = cert.SerialNumber,
+                ["subject"] = cert.Subject,
+                ["issuer"] = cert.Issuer,
+                ["subjectNameDerBase64"] = Convert.ToBase64String(cert.SubjectName.RawData),
+                ["issuerNameDerBase64"] = Convert.ToBase64String(cert.IssuerName.RawData),
+                ["notBeforeUtc"] = from.ToString(TimeFormat, CultureInfo.InvariantCulture),
+                ["notAfterUtc"] = until.ToString(TimeFormat, CultureInfo.InvariantCulture),
                 ["validity"] = from > until ? "invalidInterval" : at.UtcDateTime < from ? "notYetValid" : at.UtcDateTime > until ? "expired" : "withinInterval",
-                ["signatureAlgorithmOid"] = cert.SignatureAlgorithm?.Value, ["publicKeyAlgorithmOid"] = cert.PublicKey.Oid?.Value,
-                ["publicKeyParametersBase64"] = cert.PublicKey.EncodedParameters is { } parameters ? Convert.ToBase64String(parameters.RawData) : null, ["publicKeyValueBase64"] = Convert.ToBase64String(cert.PublicKey.EncodedKeyValue.RawData), ["extensions"] = extensions };
+                ["signatureAlgorithmOid"] = cert.SignatureAlgorithm?.Value,
+                ["publicKeyAlgorithmOid"] = cert.PublicKey.Oid?.Value,
+                ["publicKeyParametersBase64"] = cert.PublicKey.EncodedParameters is { } parameters ? Convert.ToBase64String(parameters.RawData) : null,
+                ["publicKeyValueBase64"] = Convert.ToBase64String(cert.PublicKey.EncodedKeyValue.RawData),
+                ["extensions"] = extensions
+            };
             result["status"] = "suppliedPublicCertificate"; result["inputSha256"] = Convert.ToHexStringLower(SHA256.HashData(bytes)); result["inputBytes"] = bytes.Length;
             result["fingerprintMatch"] = expected is null ? "notProvided" : expected == hash ? "matches" : "mismatch"; return result;
         }
@@ -203,7 +244,8 @@ public static class PublicCertificateReview
             }
             else if (oid == "2.5.29.37")
             {
-                var usages = new JsonArray(); while (sequence.HasData) { if (usages.Count == 128) throw Error("Extended usage exceeds 128 OIDs."); usages.Add(sequence.ReadObjectIdentifier()); } result["usageOids"] = usages;
+                var usages = new JsonArray(); while (sequence.HasData) { if (usages.Count == 128) throw Error("Extended usage exceeds 128 OIDs."); usages.Add(sequence.ReadObjectIdentifier()); }
+                result["usageOids"] = usages;
             }
             else
             {

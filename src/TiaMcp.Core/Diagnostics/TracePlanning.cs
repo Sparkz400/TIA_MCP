@@ -4,8 +4,11 @@ namespace TiaMcp.Core.Diagnostics;
 
 public sealed class TracePlanning(string artifactsRoot)
 {
-    public static JsonObject Capabilities() => new() {
-        ["schemaVersion"] = "trace-capabilities.v1", ["targetProbed"] = false, ["nativeQualification"] = false,
+    public static JsonObject Capabilities() => new()
+    {
+        ["schemaVersion"] = "trace-capabilities.v1",
+        ["targetProbed"] = false,
+        ["nativeQualification"] = false,
         ["routes"] = new JsonArray(
             Route("manual", "ordinaryPlc", "documentedUi", "specificationOnly", "Human configuration/readback/transfer/arming/recording/export required; .ttcfgx is not a verified generation schema."),
             Route("nativeApi", "ordinaryPlc", "notEstablished", "unavailable", "Installed V21 public references do not establish general PLC trace lifecycle APIs."),
@@ -17,7 +20,8 @@ public sealed class TracePlanning(string artifactsRoot)
             Route("uiAssistance", "ordinaryPlc", "separateAuthorizationAndQualification", "unavailable", "Existing native UI pause remains in force."),
             Route("sim_test", "polling", "existingSimulator", "separateTool", "Wall-clock sequential polling; non-atomic across symbols, no scan accuracy, cannot guarantee one-scan glitches. sim_test can write stimuli.")),
         ["measurementFormats"] = new JsonArray("trace-measurement.v1 (explicit normalized JSON)", "trace-measurement.v2 (byte-exact supplied JSON with per-reading quality, clock domains/epochs and incomplete captures; all behavioral verdicts unresolved)", "UTF-8 CSV with explicit column/decimal/unit/clock mapping; no native dialect qualification", "No binary .ttrecx/.lttcd/.dat decoder or .ttcfgx generator"),
-        ["targetLimits"] = null, ["limitsReason"] = "CPU, firmware, product, license, types, OB timing, slots and resource limits require target-specific validation.",
+        ["targetLimits"] = null,
+        ["limitsReason"] = "CPU, firmware, product, license, types, OB timing, slots and resource limits require target-specific validation.",
         ["diagnosticTemplates"] = DiagnosticTemplates.All(),
         ["sources"] = new JsonArray(
             "https://docs.tia.siemens.cloud/r/en-us/v21/trace-and-logic-analyzer-function",
@@ -26,9 +30,16 @@ public sealed class TracePlanning(string artifactsRoot)
             "docs/plans/expansion-plans/bug-driven-trace-simatic-ax-feasibility.md",
             "docs/plans/expansion-plans/bug-driven-trace-diagnostics.md")
     };
-    private static JsonObject Route(string backend, string family, string api, string implementation, string limit) => new() {
-        ["backend"] = backend, ["family"] = family, ["documentedRoute"] = api, ["implementation"] = implementation,
-        ["qualification"] = "unqualified", ["targetAvailability"] = "unknown", ["limitations"] = limit };
+    private static JsonObject Route(string backend, string family, string api, string implementation, string limit) => new()
+    {
+        ["backend"] = backend,
+        ["family"] = family,
+        ["documentedRoute"] = api,
+        ["implementation"] = implementation,
+        ["qualification"] = "unqualified",
+        ["targetAvailability"] = "unknown",
+        ["limitations"] = limit
+    };
 
     public JsonObject Prepare(string planId, JsonObject request)
     {
@@ -91,18 +102,39 @@ public sealed class TracePlanning(string artifactsRoot)
             "Export the measurement and retain the native original, hashes, timestamps/units, settings readback, target/program identity and acquisition uncertainty.",
             "Import understood UTF-8 CSV with explicit mapping or normalized trace-measurement.v1, preserving quality and lineage; the tool does not decode native Siemens binary formats.",
             "Do not delete user traces or measurements. No reproduced fault leaves the hypotheses unresolved.");
-        var specification = new JsonObject { ["schemaVersion"] = "trace-plan.v1", ["diagnosticPlanId"] = planId,
-            ["reviewId"] = reviewId, ["backend"] = backend, ["family"] = "ordinaryPlc", ["fulfillment"] = "partialManualHandoff",
-            ["nativeExecutable"] = false, ["mutationAttempted"] = false, ["target"] = plan["selectedInstance"]!.DeepClone(),
-            ["project"] = plan["project"]?.DeepClone(), ["sourceRevision"] = plan["sourceRevision"]!.DeepClone(),
-            ["report"] = plan["report"]!.DeepClone(), ["hypotheses"] = plan["hypotheses"]!.DeepClone(), ["signals"] = plan["signals"]!.DeepClone(),
-            ["requestedSettings"] = settings.DeepClone(), ["effectiveSettings"] = null, ["targetLimits"] = null,
-            ["pendingValidation"] = pending, ["manualSteps"] = steps, ["coverageGaps"] = plan["coverageGaps"]!.DeepClone(),
-            ["signalSelectionCoverage"] = plan["automaticSelection"] is JsonObject selection ? new JsonObject {
-                ["gaps"] = selection["gaps"]?.DeepClone(), ["truncated"] = selection["truncated"]?.DeepClone(),
-                ["complete"] = false, ["maxSignals"] = selection["maxSignals"]?.DeepClone(), ["semantics"] = selection["semantics"]?.DeepClone() } : null,
+        var specification = new JsonObject
+        {
+            ["schemaVersion"] = "trace-plan.v1",
+            ["diagnosticPlanId"] = planId,
+            ["reviewId"] = reviewId,
+            ["backend"] = backend,
+            ["family"] = "ordinaryPlc",
+            ["fulfillment"] = "partialManualHandoff",
+            ["nativeExecutable"] = false,
+            ["mutationAttempted"] = false,
+            ["target"] = plan["selectedInstance"]!.DeepClone(),
+            ["project"] = plan["project"]?.DeepClone(),
+            ["sourceRevision"] = plan["sourceRevision"]!.DeepClone(),
+            ["report"] = plan["report"]!.DeepClone(),
+            ["hypotheses"] = plan["hypotheses"]!.DeepClone(),
+            ["signals"] = plan["signals"]!.DeepClone(),
+            ["requestedSettings"] = settings.DeepClone(),
+            ["effectiveSettings"] = null,
+            ["targetLimits"] = null,
+            ["pendingValidation"] = pending,
+            ["manualSteps"] = steps,
+            ["coverageGaps"] = plan["coverageGaps"]!.DeepClone(),
+            ["signalSelectionCoverage"] = plan["automaticSelection"] is JsonObject selection ? new JsonObject
+            {
+                ["gaps"] = selection["gaps"]?.DeepClone(),
+                ["truncated"] = selection["truncated"]?.DeepClone(),
+                ["complete"] = false,
+                ["maxSignals"] = selection["maxSignals"]?.DeepClone(),
+                ["semantics"] = selection["semantics"]?.DeepClone()
+            } : null,
             ["ownership"] = "Specification artifact only; no TIA trace or measurement ownership acquired.",
-            ["freshness"] = "Immutable saved review only; source, binding, program, target or firmware changes invalidate execution assumptions." };
+            ["freshness"] = "Immutable saved review only; source, binding, program, target or firmware changes invalidate execution assumptions."
+        };
         if (plan.ContainsKey("alarmBindings")) specification["alarmBindings"] = plan["alarmBindings"]!.DeepClone();
         return specification;
     }

@@ -36,23 +36,51 @@ public static partial class DriveInventory
                     var snapshot = item["snapshot"] as JsonObject ?? new JsonObject();
                     string driveId = Text(snapshot["identity"]?["driveId"]) ?? "?";
                     if (snapshot["telegramsComplete"]?.GetValue<bool>() != true) incomplete.Add(Text(drive["hardwarePath"]) + "#" + driveId);
-                    var telegrams = new JsonArray(snapshot["telegrams"]?.AsArray().OfType<JsonObject>().Select(t => (JsonNode)new JsonObject {
-                        ["id"] = t["id"]?.DeepClone(), ["type"] = t["type"]?.DeepClone(), ["number"] = t["number"]?.DeepClone(),
-                        ["inputBytes"] = t["inputBytes"]?.DeepClone(), ["outputBytes"] = t["outputBytes"]?.DeepClone(), ["addressesComplete"] = t["addressesComplete"]?.DeepClone(),
-                        ["addresses"] = new JsonArray(t["addresses"]?.AsArray().OfType<JsonObject>().Select(a => (JsonNode)new JsonObject {
-                            ["direction"] = a["direction"]?.DeepClone(), ["startAddress"] = a["startAddress"]?.DeepClone(), ["lengthBits"] = a["length"]?.DeepClone(),
-                            ["unknownReason"] = a["unknownReason"]?.DeepClone(), ["tags"] = new JsonArray() }).ToArray() ?? []) }).ToArray() ?? []);
+                    var telegrams = new JsonArray(snapshot["telegrams"]?.AsArray().OfType<JsonObject>().Select(t => (JsonNode)new JsonObject
+                    {
+                        ["id"] = t["id"]?.DeepClone(),
+                        ["type"] = t["type"]?.DeepClone(),
+                        ["number"] = t["number"]?.DeepClone(),
+                        ["inputBytes"] = t["inputBytes"]?.DeepClone(),
+                        ["outputBytes"] = t["outputBytes"]?.DeepClone(),
+                        ["addressesComplete"] = t["addressesComplete"]?.DeepClone(),
+                        ["addresses"] = new JsonArray(t["addresses"]?.AsArray().OfType<JsonObject>().Select(a => (JsonNode)new JsonObject
+                        {
+                            ["direction"] = a["direction"]?.DeepClone(),
+                            ["startAddress"] = a["startAddress"]?.DeepClone(),
+                            ["lengthBits"] = a["length"]?.DeepClone(),
+                            ["unknownReason"] = a["unknownReason"]?.DeepClone(),
+                            ["tags"] = new JsonArray()
+                        }).ToArray() ?? [])
+                    }).ToArray() ?? []);
                     foreach (var telegram in telegrams.OfType<JsonObject>().Where(t => t["addressesComplete"]?.GetValue<bool>() != true))
                         incomplete.Add(Text(drive["hardwarePath"]) + "#" + driveId + "/" + Text(telegram["id"]));
-                    objects.Add(new JsonObject { ["driveId"] = driveId, ["driveObjectNumber"] = item["driveObjectNumber"]?.DeepClone(),
-                        ["driveObjectIndex"] = item["driveObjectIndex"]?.DeepClone(), ["telegrams"] = telegrams });
+                    objects.Add(new JsonObject
+                    {
+                        ["driveId"] = driveId,
+                        ["driveObjectNumber"] = item["driveObjectNumber"]?.DeepClone(),
+                        ["driveObjectIndex"] = item["driveObjectIndex"]?.DeepClone(),
+                        ["telegrams"] = telegrams
+                    });
                 }
-                drives.Add(new JsonObject { ["hardwarePath"] = drive["hardwarePath"]?.DeepClone(), ["name"] = drive["name"]?.DeepClone(),
-                    ["typeIdentifier"] = drive["typeIdentifier"]?.DeepClone(), ["driveObjects"] = objects, ["technologyObjects"] = new JsonArray() });
+                drives.Add(new JsonObject
+                {
+                    ["hardwarePath"] = drive["hardwarePath"]?.DeepClone(),
+                    ["name"] = drive["name"]?.DeepClone(),
+                    ["typeIdentifier"] = drive["typeIdentifier"]?.DeepClone(),
+                    ["driveObjects"] = objects,
+                    ["technologyObjects"] = new JsonArray()
+                });
             }
             drivesComplete = scope && !truncated && incomplete.Count == 0;
-            coverage["drives"] = new JsonObject { ["status"] = drivesComplete ? "complete" : "partial", ["scopeComplete"] = scope, ["truncated"] = truncated,
-                ["incompleteTelegrams"] = incomplete, ["warnings"] = observed["warnings"]?.DeepClone() ?? new JsonArray() };
+            coverage["drives"] = new JsonObject
+            {
+                ["status"] = drivesComplete ? "complete" : "partial",
+                ["scopeComplete"] = scope,
+                ["truncated"] = truncated,
+                ["incompleteTelegrams"] = incomplete,
+                ["warnings"] = observed["warnings"]?.DeepClone() ?? new JsonArray()
+            };
             if (!drivesComplete) blockers.Add(Blocker("driveCoverage", null, "The drive read is partial (" + (truncated ? "truncated" : !scope ? "scope incomplete" : incomplete.Count + " telegram(s) without complete addresses") + ")."));
         }
 
@@ -82,8 +110,16 @@ public static partial class DriveInventory
                 var targets = readError is null ? HardwareTargets(read!) : [];
                 bool complete = readError is null && read!["hardwareConnectionCoverage"]?["scopeComplete"]?.GetValue<bool>() == true;
                 if (!complete) { row["status"] = "partial"; row["unreadObjects"]!.AsArray().Add(path); }
-                technology.Add(new JsonObject { ["plcPath"] = plc, ["path"] = path, ["name"] = info["name"]?.DeepClone(), ["type"] = info["systemLibraryType"]?.DeepClone(),
-                    ["connectionsComplete"] = complete, ["hardwareTargets"] = new JsonArray(targets.Select(t => (JsonNode)t).ToArray()), ["drives"] = new JsonArray() });
+                technology.Add(new JsonObject
+                {
+                    ["plcPath"] = plc,
+                    ["path"] = path,
+                    ["name"] = info["name"]?.DeepClone(),
+                    ["type"] = info["systemLibraryType"]?.DeepClone(),
+                    ["connectionsComplete"] = complete,
+                    ["hardwareTargets"] = new JsonArray(targets.Select(t => (JsonNode)t).ToArray()),
+                    ["drives"] = new JsonArray()
+                });
             }
         }
         coverage["tags"] = tagCoverage; coverage["technology"] = technologyCoverage;
@@ -91,12 +127,20 @@ public static partial class DriveInventory
             blockers.Add(Blocker("technologyCoverage", null, "Some technology objects' connections were not read completely; a drive may have an unseen technology object."));
 
         var reconciliation = Reconcile(drives, technology, tags, blockers);
-        return new JsonObject {
-            ["schemaVersion"] = "drive-inventory.v1", ["project"] = observed?["project"]?.DeepClone() ?? inventory["project"]?.DeepClone(),
-            ["drives"] = drives, ["technologyObjects"] = technology, ["reconciliation"] = reconciliation, ["coverage"] = coverage,
-            ["noDrivesConfirmed"] = drivesComplete && drives.Count == 0, ["blockers"] = blockers, ["writeReady"] = blockers.Count == 0,
+        return new JsonObject
+        {
+            ["schemaVersion"] = "drive-inventory.v1",
+            ["project"] = observed?["project"]?.DeepClone() ?? inventory["project"]?.DeepClone(),
+            ["drives"] = drives,
+            ["technologyObjects"] = technology,
+            ["reconciliation"] = reconciliation,
+            ["coverage"] = coverage,
+            ["noDrivesConfirmed"] = drivesComplete && drives.Count == 0,
+            ["blockers"] = blockers,
+            ["writeReady"] = blockers.Count == 0,
             ["note"] = "Tags join telegrams by address overlap and technology objects join drives by resolved hardware references; names are never used. " +
-                       "Startdrive does not report which PLC owns a telegram, so a tag matches when its address overlaps; matches in several PLCs are ambiguous." };
+                       "Startdrive does not report which PLC owns a telegram, so a tag matches when its address overlaps; matches in several PLCs are ambiguous."
+        };
 
         async Task<(JsonObject? Response, BridgeOperationException? Error)> Native(string operation, JsonObject arguments)
         {
@@ -122,8 +166,15 @@ public static partial class DriveInventory
                         foreach (var match in matches)
                         {
                             owners[match.Tag] = owners.TryGetValue(match.Tag, out int n) ? n + 1 : 1;
-                            range["tags"]!.AsArray().Add(new JsonObject { ["plcPath"] = match.Plc, ["tablePath"] = match.Table, ["name"] = match.Tag["name"]?.DeepClone(),
-                                ["dataType"] = match.Tag["dataType"]?.DeepClone(), ["logicalAddress"] = match.Tag["logicalAddress"]?.DeepClone(), ["isSafety"] = match.Tag["isSafety"]?.DeepClone() });
+                            range["tags"]!.AsArray().Add(new JsonObject
+                            {
+                                ["plcPath"] = match.Plc,
+                                ["tablePath"] = match.Table,
+                                ["name"] = match.Tag["name"]?.DeepClone(),
+                                ["dataType"] = match.Tag["dataType"]?.DeepClone(),
+                                ["logicalAddress"] = match.Tag["logicalAddress"]?.DeepClone(),
+                                ["isSafety"] = match.Tag["isSafety"]?.DeepClone()
+                            });
                         }
                         if (matches.Count == 0) withoutTags.Add(where);
                         var plcs = matches.Select(m => m.Plc).Distinct().ToArray();
@@ -163,9 +214,16 @@ public static partial class DriveInventory
             }
         }
         var duplicateNames = new JsonArray(drives.OfType<JsonObject>().GroupBy(d => Text(d["name"]) ?? "").Where(g => g.Count() > 1).Select(g => (JsonNode)g.Key!).ToArray());
-        return new JsonObject { ["telegramRangesWithoutTags"] = withoutTags, ["ambiguousTagOwnership"] = ambiguous, ["tagsSpanningTelegrams"] = spanning,
-            ["drivesWithoutTechnologyObject"] = withoutTechnology, ["drivesWithSeveralTechnologyObjects"] = severalTechnology,
-            ["technologyObjectsWithoutDiscoveredDrive"] = technologyWithoutDrive, ["duplicateDriveNames"] = duplicateNames };
+        return new JsonObject
+        {
+            ["telegramRangesWithoutTags"] = withoutTags,
+            ["ambiguousTagOwnership"] = ambiguous,
+            ["tagsSpanningTelegrams"] = spanning,
+            ["drivesWithoutTechnologyObject"] = withoutTechnology,
+            ["drivesWithSeveralTechnologyObjects"] = severalTechnology,
+            ["technologyObjectsWithoutDiscoveredDrive"] = technologyWithoutDrive,
+            ["duplicateDriveNames"] = duplicateNames
+        };
     }
 
     // Resolved hardware or channel references of a technology object's connections, as hardware paths.
