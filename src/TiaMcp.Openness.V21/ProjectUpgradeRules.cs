@@ -13,6 +13,7 @@ namespace TiaMcp.Openness.V21
     /// <summary>project_upgrade rules without any native call; only plain file reads.</summary>
     internal static class ProjectUpgradeRules
     {
+        private static readonly char[] PathSeparators = new[] { '/', '\\' };
         // V15.1 projects carry .ap15_1; every other release keeps its major number (V14 SP1 is .ap14).
         private static readonly Regex Supported = new Regex(@"^\.(z?)ap(1[4-9]|20|15_1)$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         private static readonly Regex AnyRelease = new Regex(@"^\.z?ap\d+(_\d+)?$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
@@ -54,7 +55,7 @@ namespace TiaMcp.Openness.V21
             {
                 using (var zip = ZipFile.OpenRead(path))
                 {
-                    var markers = zip.Entries.Where(e => e.FullName.IndexOfAny(new[] { '/', '\\' }) < 0 && AnyRelease.IsMatch(Path.GetExtension(e.FullName))).ToList();
+                    var markers = zip.Entries.Where(e => e.FullName.IndexOfAny(PathSeparators) < 0 && AnyRelease.IsMatch(Path.GetExtension(e.FullName))).ToList();
                     if (markers.Count != 1) throw new BridgeException("InvalidRequest", "A project archive must hold exactly one top-level project file.");
                     if (!string.Equals(Path.GetExtension(markers[0].FullName), Path.GetExtension(path).Remove(1, 1), StringComparison.OrdinalIgnoreCase)) throw Unsupported(" The archived project file is of another release.");
                     using (var stream = markers[0].Open()) text = Head(stream);

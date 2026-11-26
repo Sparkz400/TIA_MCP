@@ -9,6 +9,7 @@ namespace TiaMcp.Core.Diagnostics;
 /// <summary>Revalidates original experiment provenance and exports one complete, self-contained report.</summary>
 public sealed class DiagnosticExperimentReportExport(string artifactsRoot)
 {
+    private static readonly string[] Sides = new[] { "before", "after" };
     public JsonObject Export(string reportId, string format)
     {
         var (extension, mediaType) = format switch { "json" => (".json", "application/json"),
@@ -111,7 +112,7 @@ public sealed class DiagnosticExperimentReportExport(string artifactsRoot)
         {
             Heading(2, "Repeated-run observations");
             Table(["Hypothesis", "Phase", "Runs", "Supported", "Contradicted", "Unresolved", "Condition observed"],
-                aggregates.SelectMany(h => new[] { "before", "after" }.Select(side => new[] {
+                aggregates.SelectMany(h => Sides.Select(side => new[] {
                     Value(h!["id"]), side, Value(h[side]?["runs"]), Value(h[side]?["supportedPredictionRuns"]),
                     Value(h[side]?["contradictedPredictionRuns"]), Value(h[side]?["unresolvedRuns"]), Value(h[side]?["conditionObservedRuns"]) })));
             Paragraph("Counts describe selected runs. Samples are not pooled, runs are not weighted, and no statistical or successful-fix conclusion is calculated.");

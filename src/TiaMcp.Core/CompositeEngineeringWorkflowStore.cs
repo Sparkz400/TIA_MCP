@@ -11,6 +11,8 @@ namespace TiaMcp.Core;
 /// <summary>Immutable supplied C02 reviews; reopening revalidates every referenced input.</summary>
 public sealed class CompositeEngineeringWorkflowStore
 {
+    private static readonly string[] ReceiptArtifactNames = new[] { "request.json", "report.json" };
+    private static readonly string[] RecordFileNames = new[] { "intent.json", "receipt.json", "report.json", "request.json" };
     private const string Prefix = "composite-engineering";
     private const int PageBytes = 128 << 10, ReceiptBytes = 64 << 10, MaxRecords = 128, MaxEntries = 1024;
     private const long StoreBytes = 512L << 20;
@@ -142,12 +144,12 @@ public sealed class CompositeEngineeringWorkflowStore
             "CompositeIntegrityFailure", "Receipt or publication intent changed.");
         var receipt = JsonSerializer.Deserialize<Receipt>(receiptData, BridgeProtocol.Json);
         Require(receipt is not null && receipt.SchemaVersion == 1 && receipt.Id == id && receipt.Artifacts is { Length: 2 } &&
-            receipt.Artifacts.All(a => a is not null) && receipt.Artifacts.Select(a => a.Name).SequenceEqual(new[] { "request.json", "report.json" }) &&
+            receipt.Artifacts.All(a => a is not null) && receipt.Artifacts.Select(a => a.Name).SequenceEqual(ReceiptArtifactNames) &&
             JsonSerializer.SerializeToUtf8Bytes(receipt, BridgeProtocol.Json).AsSpan().SequenceEqual(receiptData),
             "CompositeIntegrityFailure", "Receipt fields, artifact order or serialization are invalid.");
         var entries = Directory.EnumerateFileSystemEntries(PathFor(id)).Take(5).ToArray();
         foreach (string entry in entries) PackageStorage.EnsureNoLinks(entry);
-        Require(entries.Length == 4 && entries.Select(Path.GetFileName).Order(StringComparer.Ordinal).SequenceEqual(new[] { "intent.json", "receipt.json", "report.json", "request.json" }),
+        Require(entries.Length == 4 && entries.Select(Path.GetFileName).Order(StringComparer.Ordinal).SequenceEqual(RecordFileNames),
             "CompositeIntegrityFailure", "Unexpected record contents.");
         byte[] request = Read(PathFor(id, "request.json"), CompositeEngineeringReview.InputLimit), report = Read(PathFor(id, "report.json"), CompositeEngineeringReview.ReportLimit);
         foreach (var (artifact, bytes) in new[] { (receipt.Artifacts[0], request), (receipt.Artifacts[1], report) })

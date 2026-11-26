@@ -14,6 +14,7 @@ namespace TiaMcp.Openness.V21
     /// "container" (a containing structure is accessed as a whole). Only "exact" proves a use; the others are possible uses.</summary>
     internal sealed class CrossReferenceMemberFilter
     {
+        private static readonly string[] RangeSeparator = new[] { ".." };
         internal sealed class Segment
         {
             internal string Name;
@@ -43,7 +44,7 @@ namespace TiaMcp.Openness.V21
 
         private static Range ParseRange(string text)
         {
-            var parts = text.Split(new[] { ".." }, StringSplitOptions.None);
+            var parts = text.Split(RangeSeparator, StringSplitOptions.None);
             if (parts.Length > 2 || !long.TryParse(parts[0].Trim(), NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out long low))
                 throw new BridgeException("InvalidRequest", "memberPath indices must be constant integers or low..high ranges: " + text);
             long high = low;

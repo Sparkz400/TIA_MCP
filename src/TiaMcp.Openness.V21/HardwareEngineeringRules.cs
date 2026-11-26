@@ -9,6 +9,7 @@ namespace TiaMcp.Openness.V21
     // This deliberately makes no claim about unexposed vendor payloads or wiring.
     internal static class HardwareEngineeringRules
     {
+        private static readonly string[] AddressFields = new[] { "ioType", "startAddress", "lengthBits" };
         internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes", "hardware_cpu_parameters",
             "hardware_port_connect", "hardware_port_disconnect", "hardware_replace", "cax_import", "safety_fparameter_set", "network_configure",
             "hardware_transfer_area_create", "hardware_transfer_area_delete", "network_mrp_set", "hardware_shared_device_access" }.Contains(kind);
@@ -521,7 +522,7 @@ namespace TiaMcp.Openness.V21
                 for (int i = 0; i < addresses.Count; i++)
                 {
                     var owners = observed[i]["owners"] as JArray ?? new JArray();
-                    if (!new[] { "ioType", "startAddress", "lengthBits" }.All(key => JToken.DeepEquals(addresses[i][key], observed[i][key])) || owners.Count > 1 || owners.Any(owner => !controllers.Contains(owner.Value<string>())))
+                    if (!AddressFields.All(key => JToken.DeepEquals(addresses[i][key], observed[i][key])) || owners.Count > 1 || owners.Any(owner => !controllers.Contains(owner.Value<string>())))
                         Fail("A subtree address range changed, or its owner is not one PLC of the station's I/O systems.");
                     addresses[i]["owners"] = owners.DeepClone();
                 }

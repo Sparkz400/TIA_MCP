@@ -18,6 +18,7 @@ public sealed record VciGitExport(string RevisionRef, GitRevisionResult Result, 
 /// <summary>Local document revisions only. Each candidate owns a separate repository; native admission is never inferred.</summary>
 public sealed partial class VciWorkspaceStore
 {
+    private static readonly string[] ForkJournalFiles = new[] { "fork-journal/intent.json", "fork-journal/0001.json", "fork-journal/0002.json" };
     private const int MaxFiles = 1000, MaxRecords = 128, MaxFileBytes = 16 << 20;
     private const long MaxTreeBytes = 256L << 20, MaxStoreBytes = 2L << 30;
     private static readonly GitRunnerLimits Limits = new(MaxFiles, 64L << 20, MaxFileBytes);
@@ -121,7 +122,7 @@ public sealed partial class VciWorkspaceStore
             WriteNew(Path.Combine(entry.Path, "files.json"), snapshot.Files);
             var artifacts = new List<VciStoredArtifact> { Artifact(entry.Path, "diff.txt"), Artifact(entry.Path, "files.json") };
             if (Directory.Exists(Path.Combine(entry.Path, "fork-journal")))
-                artifacts.AddRange(new[] { "fork-journal/intent.json", "fork-journal/0001.json", "fork-journal/0002.json" }.Select(name => Artifact(entry.Path, name)));
+                artifacts.AddRange(ForkJournalFiles.Select(name => Artifact(entry.Path, name)));
             var review = new VciGitReview(entry.Id, parentRevisionRef, inspect.ExecutableSha256, snapshot.Sha256,
                 plan.Sha256, changes, author, message, snapshot.Files.ToArray(),
                 artifacts.ToArray(), snapshot.HeadReference);

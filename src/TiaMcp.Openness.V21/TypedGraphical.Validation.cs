@@ -9,6 +9,7 @@ namespace TiaMcp.Openness.V21
 {
     internal static partial class TypedGraphical
     {
+        private static readonly char[] InvalidComponentChars = new[] { '[', ']', '\r', '\n', '"' };
         private static TypedGraphicalProfile SelectProfile(TypedGraphicalNode node, string language, TypedGraphicalContext context)
         {
             bool lad = language == "LAD";
@@ -188,7 +189,7 @@ namespace TiaMcp.Openness.V21
             else
             {
                 if ((operand.Scope != "LocalVariable" && operand.Scope != "GlobalVariable") || operand.Components == null || operand.Components.Length == 0 || operand.Components.Length > 32
-                    || operand.Components.Any(c => string.IsNullOrWhiteSpace(c) || c.Length > 128 || c.IndexOfAny(new[] { '[', ']', '\r', '\n', '"' }) >= 0))
+                    || operand.Components.Any(c => string.IsNullOrWhiteSpace(c) || c.Length > 128 || c.IndexOfAny(InvalidComponentChars) >= 0))
                     Fail("OperandScopeUnsupported", "Operands require an exact local/global symbolic component path; indexing and indirect access are unsupported.");
                 if (string.IsNullOrWhiteSpace(operand.DeclarationHash)) Fail("UnresolvedOperand", "Resolved symbolic operands require declaration fingerprint evidence.");
             }
@@ -251,7 +252,7 @@ namespace TiaMcp.Openness.V21
         {
             TypedGraphicalInstance instance;
             if (node.Instance == null || !context.Instances.TryGetValue(node.Instance, out instance) || instance == null || string.IsNullOrWhiteSpace(instance.Identity) || string.IsNullOrWhiteSpace(instance.DeclarationHash)
-                || instance.Components == null || instance.Components.Length == 0 || instance.Components.Any(c => string.IsNullOrWhiteSpace(c) || c.IndexOfAny(new[] { '[', ']', '\r', '\n', '"' }) >= 0)
+                || instance.Components == null || instance.Components.Length == 0 || instance.Components.Any(c => string.IsNullOrWhiteSpace(c) || c.IndexOfAny(InvalidComponentChars) >= 0)
                 || instance.Scope != "LocalVariable" && instance.Scope != "GlobalVariable")
             { Fail("GraphicalInstanceUnresolved", "An exact verified global or multi-instance declaration is required."); return null; }
             if (node.Kind == "call" && instance.CalleePath != node.CalleePath) Fail("GraphicalInstanceMismatch", "The instance declaration does not reference the selected exact FB identity.");

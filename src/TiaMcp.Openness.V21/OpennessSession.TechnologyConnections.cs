@@ -11,6 +11,8 @@ namespace TiaMcp.Openness.V21
 {
     internal sealed partial class OpennessSession
     {
+        private static readonly string[] ChannelFields = new[] { "channelNumber", "channelType", "channelIoType" };
+        private static readonly string[] TelegramTypes = new[] { "MainTelegram", "SupplementaryTelegram", "TorqueTelegram" };
         private static JArray TechnologyConnections(TechnologicalInstanceDB technology, ScanBudget budget, JArray warnings, string path, out JObject coverage, TechnologyReferenceReader references = null)
         {
             InspectionValueRenderer render = references == null ? (InspectionValueRenderer)null : references.Render;
@@ -68,7 +70,7 @@ namespace TiaMcp.Openness.V21
             string family = role == "sensor" || role == "encoder" ? "actor" : role;
             if (!TechnologyConnectForms.TryGetValue(family, out var supported))
                 throw new BridgeException("InvalidRequest", "role must be actor, sensor, torque, encoder, measuringInput or outputCam.");
-            bool channel = new[] { "channelNumber", "channelType", "channelIoType" }.Any(field => payload[field] != null), index = payload["channelIndex"] != null;
+            bool channel = ChannelFields.Any(field => payload[field] != null), index = payload["channelIndex"] != null;
             bool telegram = payload["telegramType"] != null;
             var forms = new[]
             {
@@ -87,7 +89,7 @@ namespace TiaMcp.Openness.V21
             // As drive_telegram_set: a PROFIsafe telegram belongs to the safety workflow, and only these telegrams carry axis setpoints and actual values.
             if (form == "telegram" && (string)payload["telegramType"] == "SafetyTelegram")
                 throw new BridgeException("SafetyBoundary", "Safety telegrams require a dedicated safety workflow; a technology object never connects to one.");
-            if (form == "telegram" && Array.IndexOf(new[] { "MainTelegram", "SupplementaryTelegram", "TorqueTelegram" }, (string)payload["telegramType"]) < 0)
+            if (form == "telegram" && Array.IndexOf(TelegramTypes, (string)payload["telegramType"]) < 0)
                 throw new BridgeException("InvalidRequest", "telegramType must be MainTelegram, SupplementaryTelegram or TorqueTelegram.");
             if (!supported.Contains(form)) throw new BridgeException("UnsupportedTarget", "The " + role + " role has no V21 Connect overload for a " + form + " target.");
             // Axis, encoder and torque address overloads take both addresses; a measuring input takes an input and an output cam an output address.

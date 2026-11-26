@@ -9,6 +9,7 @@ namespace TiaMcp.Core.HmiComponents;
 /// <summary>Derive supported expected documents from original current files, independently of proposed/observed bytes.</summary>
 internal static class HmiComponentExpectations
 {
+    private static readonly string[] FileSets = new[] { "baselineFiles", "currentFiles", "proposedFiles" };
     internal static void Add(JsonObject report, JsonObject request, Func<JsonObject, XDocument> readXml)
     {
         var files = Files(request).ToDictionary(f => Text(f, "id"), StringComparer.Ordinal);
@@ -72,7 +73,7 @@ internal static class HmiComponentExpectations
         foreach (var output in outputs.Values)
         {
             string id = Text(output, "id");
-            var names = new[] { "baselineFiles", "currentFiles", "proposedFiles" }.SelectMany(k => output[k]!.AsArray()).Select(f => Text(Object(f), "fileName"))
+            var names = FileSets.SelectMany(k => output[k]!.AsArray()).Select(f => Text(Object(f), "fileName"))
                 .Concat(observations.TryGetValue(id, out var observation) ? observation["files"]!.AsArray().Select(n => Text(files[(string)n!], "fileName")) : [])
                 .Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
             JsonArray Names(bool assessed) => new(names.Where(n => selected.Contains((id, n)) == assessed).Select(n => (JsonNode?)JsonValue.Create(n)).ToArray());

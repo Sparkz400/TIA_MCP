@@ -9,6 +9,7 @@ namespace TiaMcp.Openness.V21
     // Pure inspection rules. Export IDs identify only the retained native export, never a persistent native GUID.
     internal static class HmiInspectionRules
     {
+        private static readonly string[] ReferenceTokens = new[] { "Tag", "Connection", "Script", "Type", "Screen", "Navigation", "Event", "LinkList" };
         internal static readonly string[] Profiles = { "classic-comfort", "classic-rt-advanced", "classic-basic", "classic-rt-professional", "unified-comfort", "unified-pc" };
         internal static string Profile(string family, string identifier)
         {
@@ -226,7 +227,7 @@ namespace TiaMcp.Openness.V21
                 string parentId = element.Ancestors().FirstOrDefault(e => e.Name.LocalName.StartsWith("Hmi.Screen.", StringComparison.Ordinal) && !ClassicScreenRoots.Contains(e.Name.LocalName) && e.Attribute("ID") != null)?.Attribute("ID")?.Value;
                 bool structural = nativeType == "Hmi.Screen.ScreenLayer";
                 var payloads = ClassicOwnedPayloads(element, take).Where(e => !e.HasElements &&
-                    e.AncestorsAndSelf().TakeWhile(a => a != element).Take(64).Any(a => new[] { "Tag", "Connection", "Script", "Type", "Screen", "Navigation", "Event", "LinkList" }.Any(token => a.Name.LocalName.IndexOf(token, StringComparison.OrdinalIgnoreCase) >= 0)))
+                    e.AncestorsAndSelf().TakeWhile(a => a != element).Take(64).Any(a => ReferenceTokens.Any(token => a.Name.LocalName.IndexOf(token, StringComparison.OrdinalIgnoreCase) >= 0)))
                     .Take(65).Select(e => ClassicPayloadObservation(e, element)).ToList();
                 yield return new JObject { ["kind"] = structural ? "hmiScreenLayer" : "hmiScreenItem", ["name"] = name, ["structural"] = structural,
                     ["objectPath"] = screenPath + "/exportItems/" + Escape(id),
