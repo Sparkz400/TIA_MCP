@@ -9,7 +9,7 @@ internal static class CompositeTypedTests
     internal static void Run(string root, JsonObject baseline, JsonObject drivePacket, JsonObject encoderPacket)
     {
         var checks = new List<string>(); var uploads = new ArtifactUploadStore(root);
-        void Check(bool ok, string label) { if (!ok) throw new Exception(label); checks.Add(label); }
+        void Check(bool ok, string label) { if (!ok) throw new InvalidOperationException(label); checks.Add(label); }
         string Upload(JsonObject value)
         {
             byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(value, BridgeProtocol.Json);
@@ -73,7 +73,7 @@ internal static class CompositeTypedTests
         }
         JsonObject Change(Action<JsonObject> edit) { var packet = request.DeepClone().AsObject(); edit(packet); return packet; }
         void Reject(JsonObject packet, string label)
-        { try { Build(packet); } catch (BridgeException e) when (e.Code == "InvalidCompositeEngineeringReview") { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
+        { try { Build(packet); } catch (BridgeException e) when (e.Code == "InvalidCompositeEngineeringReview") { Check(true, label); return; } throw new InvalidOperationException("Expected refusal: " + label); }
         var report = Build();
         Check(report["mappings"]!.AsArray().All(m => (string?)m!["state"] == "declaredAssociation"), "Exact telegram, encoder and address declarations resolve in both phases");
         Check(report["selections"]!.AsArray().Any(s => (string?)s!["selector"]!["kind"] == "driveTelegramAddress" && (long)s["evidence"]!["address"]!["startBit"]! == 17179869176L), "Original independently unit-tagged Int64 address retained");

@@ -16,7 +16,7 @@ internal static class CanonicalJsonChecks
         int passed = 0;
         void Check(bool ok, string name) { if (!ok) throw new Exception(name); passed++; }
         void Reject(Action action, string code, string name)
-        { try { action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; } throw new Exception(name); }
+        { try { action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; } throw new InvalidOperationException(name); }
 
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "fixtures", "canonical-json", "vectors.v1.json"))) directory = directory.Parent;
@@ -60,7 +60,7 @@ internal static class CanonicalJsonChecks
         {
             string text = CanonicalJsonText.Number(value)!;
             if (double.Parse(text, CultureInfo.InvariantCulture) != value || Significant(text) != Significant(value.ToString("R", CultureInfo.InvariantCulture)) || text.Contains('E'))
-                throw new Exception("Number text is not the shortest round trip: " + value.ToString("R", CultureInfo.InvariantCulture) + " -> " + text);
+                throw new InvalidOperationException("Number text is not the shortest round trip: " + value.ToString("R", CultureInfo.InvariantCulture) + " -> " + text);
             passed++;
         }
 
@@ -72,7 +72,7 @@ internal static class CanonicalJsonChecks
             double expected = double.Parse(literal, CultureInfo.InvariantCulture);
             double? parsed = CanonicalJsonText.ParseNumber(literal);
             if (double.IsInfinity(expected) ? parsed is not null : BitConverter.DoubleToInt64Bits(parsed!.Value) != BitConverter.DoubleToInt64Bits(expected))
-                throw new Exception("Exact literal reading differs from .NET: " + literal);
+                throw new InvalidOperationException("Exact literal reading differs from .NET: " + literal);
             passed++;
         }
         foreach (double value in samples)

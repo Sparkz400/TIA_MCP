@@ -77,7 +77,6 @@ def body(h):
 
     # --compile: the upgrades run with an owned scratch CPU 1511 open, which then takes the named library's default code blocks.
     plc = h.owned_scratch("vendor workload") if h.args.compile else (h.owned_portal("vendor workload") or None)
-    kept = None
     h.report["portalMemoryStartMiB"] = portal_memory()
     upgrades, nonlocal_kept = {}, {}
     for package, path in packages:

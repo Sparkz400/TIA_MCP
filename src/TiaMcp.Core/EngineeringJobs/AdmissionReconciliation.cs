@@ -11,6 +11,7 @@ namespace TiaMcp.Core.EngineeringJobs;
 /// </summary>
 public sealed record AdmissionReconciliation(EngineeringMutationAdmission Record, DateTimeOffset AdmittedAt)
 {
+    private static readonly string[] ReconciliationChecks = new[] { "nativeExclusiveAccess", "retainedArtifactsVerified", "terminalJournalUnchanged", "savedProjectFingerprintMatches", "screenScopeMatches" };
     public static readonly IReadOnlyList<string> Operations =
         ["simulation_download", "change_apply", "change_restore", "scratch_create", "project_retrieve", "project_copy", "project_upgrade", "library_open"];
 
@@ -63,7 +64,7 @@ public sealed record AdmissionReconciliation(EngineeringMutationAdmission Record
         && Value<string>(v, "changeKind") == "hmi_classic_screen_edit"
         && Value<string>(v, "terminalState") is ("applied" or "rolled_back")
         && Value<string>(v, "scopePolicy") == "classic-regular-screens-selected-hmi-v1"
-        && new[] { "nativeExclusiveAccess", "retainedArtifactsVerified", "terminalJournalUnchanged", "savedProjectFingerprintMatches", "screenScopeMatches" }
+        && ReconciliationChecks
             .All(p => v[p]?.GetValueKind() == JsonValueKind.True)
         && v["projectIsModified"]?.GetValueKind() == JsonValueKind.False
         && Record.Scope.Resources.Count == 3

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -29,7 +30,7 @@ if (args.Length > 0)
             }
             Console.WriteLine(JsonSerializer.Serialize(new { pair.Reservation.Id, pair.Capability }, BridgeProtocol.Json));
         }
-        else if (args[0] == "resume") { childStore.Resume(args[2], int.Parse(args[3]), args[4]); Console.WriteLine("resumed"); }
+        else if (args[0] == "resume") { childStore.Resume(args[2], int.Parse(args[3], CultureInfo.InvariantCulture), args[4]); Console.WriteLine("resumed"); }
         else if (args[0] == "compete") { new EngineeringMutationAdmissionStore(root).Acquire(Scope(args[2]), new('c', 64)); Console.WriteLine("unexpectedly-admitted"); }
     }
     catch (BridgeException error) { Console.WriteLine(error.Code); }
@@ -39,7 +40,7 @@ if (args.Length > 0)
 int passed = 0;
 void Check(bool value, string label) { if (!value) throw new Exception(label); passed++; }
 void Reject(Action action, string code)
-{ try { action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; } throw new Exception("Expected " + code); }
+{ try { action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; } throw new InvalidOperationException("Expected " + code); }
 string basis = Path.Combine(Path.GetTempPath(), "component-window-offline-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(basis);
 string Child(params string[] arguments)
 {
@@ -47,8 +48,8 @@ string Child(params string[] arguments)
     start.ArgumentList.Add(Assembly.GetExecutingAssembly().Location); foreach (string arg in arguments) start.ArgumentList.Add(arg);
     using var process = Process.Start(start)!;
     var output = process.StandardOutput.ReadToEndAsync(); var error = process.StandardError.ReadToEndAsync();
-    if (!process.WaitForExit(30000)) { process.Kill(); throw new Exception("File-only test child timeout"); }
-    if (process.ExitCode != 0) throw new Exception(error.Result); return output.Result.Trim();
+    if (!process.WaitForExit(30000)) { process.Kill(); throw new InvalidOperationException("File-only test child timeout"); }
+    if (process.ExitCode != 0) throw new InvalidOperationException(error.Result); return output.Result.Trim();
 }
 var f = Fixture(Path.Combine(basis, "live")); var store = new ComponentQualificationWindowStore(f.Root);
 var acquired = store.Acquire(f.Manifest); var r = acquired.Reservation; string token = acquired.Capability;
@@ -179,7 +180,7 @@ var window = finishedStore.Acquire(finished.Manifest).Reservation; var receipt =
 ComponentWindowReservation Next(ComponentWindowReservation prior, string transition, Func<ComponentWindowReservation, ComponentWindowReservation> change)
 {
     var next = change(prior) with { Revision = prior.Revision + 1, PreviousSha256 = CanonicalJson.Sha256(JsonSerializer.SerializeToNode(prior, BridgeProtocol.Json)!), Transition = transition };
-    File.WriteAllText(Path.Combine(finished.Root, "engineering-component-windows", next.Id, next.Revision.ToString("D8") + ".json"), JsonSerializer.Serialize(next, BridgeProtocol.Json));
+    File.WriteAllText(Path.Combine(finished.Root, "engineering-component-windows", next.Id, next.Revision.ToString("D8", CultureInfo.InvariantCulture) + ".json"), JsonSerializer.Serialize(next, BridgeProtocol.Json));
     return next;
 }
 foreach (string step in new[] { "start", "applyLibrary", "recover", "observeRestored", "observeRecoveryOriginal" })

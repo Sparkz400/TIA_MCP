@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO.Pipes;
 using System.Reflection;
 using System.Text;
@@ -38,7 +39,7 @@ internal static class FakeWorker
 
         if (args.Contains("--delegate-connection"))
         {
-            Record(new("launcherStarted", Id: Environment.ProcessId.ToString()));
+            Record(new("launcherStarted", Id: Environment.ProcessId.ToString(CultureInfo.InvariantCulture)));
             var start = new ProcessStartInfo(BridgeFixture.DotnetPath()) { UseShellExecute = false, CreateNoWindow = true };
             start.ArgumentList.Add(Assembly.GetExecutingAssembly().Location);
             foreach (var argument in args.Where(a => a != "--delegate-connection")) start.ArgumentList.Add(argument);
@@ -48,11 +49,11 @@ internal static class FakeWorker
             finally
             {
                 if (!peer.HasExited) { peer.Kill(); await peer.WaitForExitAsync(); }
-                Record(new("launcherStopped", Id: Environment.ProcessId.ToString()));
+                Record(new("launcherStopped", Id: Environment.ProcessId.ToString(CultureInfo.InvariantCulture)));
             }
             return peer.ExitCode;
         }
-        Record(new("started", Id: Environment.ProcessId.ToString()));
+        Record(new("started", Id: Environment.ProcessId.ToString(CultureInfo.InvariantCulture)));
         using var pipe = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
         using var lifetime = new CancellationTokenSource(TimeSpan.FromSeconds(30));
         using var writeGate = new SemaphoreSlim(1, 1);

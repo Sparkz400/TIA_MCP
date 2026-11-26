@@ -17,7 +17,7 @@ import time
 import uuid
 import xml.etree.ElementTree as ET
 
-from qualify_deployment import McpClient, ProtocolFailure, ToolBlocked, initialize, load_configuration, require
+from qualify_deployment import McpClient, ToolBlocked, initialize, load_configuration, require
 
 ROOT = Path(__file__).resolve().parents[1]
 

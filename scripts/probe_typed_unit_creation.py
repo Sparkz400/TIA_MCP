@@ -1,7 +1,6 @@
 """Compare native unit creation AutoNumber flags through the MCP change lifecycle."""
 import argparse
 import hashlib
-import json
 import pathlib
 import uuid
 from xml.dom import minidom

@@ -7,8 +7,8 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 25 November 2026
 
-**Audit follow-ups (offline):** no entry was written here between 3 and 25 November; that work is recorded in the
-[TODO](../TODO.md) sections of 4 to 24 November and in the [CHANGELOG](../../CHANGELOG.md). On 25 November a check of
+**Audit follow-ups (offline):** the work of 4 to 24 November is in the entries below, the [TODO](../TODO.md) sections of
+those days and the [CHANGELOG](../../CHANGELOG.md). On 25 November a check of
 the repository, the installed server and CI led to Host-side refusal of arguments the workers cannot load, a queue
 timeout for engineering tools, bounded `plc_tag_usage` index reads, pruning of Explorer HTML exports, remediation
 texts for `HmiPreservationUnavailable`, a release gate that needs the code jobs, pinned workflow actions and Markdown
@@ -21,6 +21,68 @@ scope, fingerprint reuse stays off by default, the three lost library reports ge
 missing native recheck of the watch-owned Test Suite reopen is a stated limitation. Obligation acceptance stays open.
 `drives.engineering` has a ledger disposition with `"scope": "post-1.0"`, and `scripts/release_matrix.py` summarizes
 its 3 cells as `descoped` (catalog `0.4.189`: 2,184 bound, 81 open, 72 blocked, 3 descoped, 0 deferred).
+
+## 24 November 2026
+
+**Code-health refactoring and TODO reconciliation:** offline only. The long change-kind cases of `Prepare`/`ApplyEngineeringMutation`, `SimulationProvision`, `TargetCapabilities` and the hardware preservation rule were split into smaller units, `OpennessSession` methods got verb names, and catches that used to drop failures now report them. A runtime read connection the peer does not keep open is no longer reused, and the journal cache never serves a stale change state. The V19 worker links `BatchedAttributeReads` again so that it compiles, and the CI worker compile check now fails on a forgotten source link; main runs keep their verdicts. [TODO](../TODO.md) was reconciled with the release matrix, and STATUS, release acceptance and the X13 feasibility note were brought up to catalog `0.4.189`. Native smoke of the refactoring and the V19 rebuild are open under [code audit follow-ups](../TODO.md#code-audit-follow-ups-9-november). Two OPC UA fixture flakes (the certificate log compared in the binding harness, gap and duplicate faults hitting keep-alives) were fixed, and the timing assumptions left are recorded there. On 23 November a `block_export` lookup class was renamed so that the V21 worker compiled again.
+
+## 20 November 2026
+
+**Surface, runtime and store hardening (offline):** catalog `0.4.189`. The Host got a safety write gate, separate timeouts, bridge recovery and the default toolsets; the tool surface was cleaned up (version history and edge cases moved out of the longest descriptions, one helper builds every tool result, the `project_model` aliases are deprecated). `block_export` pages inventories past 2000 blocks and Openness reads are batched on the engineering path. The OPC UA runtime client got session liveness, batched capture reads and notification bundles; Web API capture cycles are read in one batch, and Web API service data, profiling data, backup and alarm acknowledgement routes were added (twelve runtime Web tools). PLCSIM gained `SingleStep_Bus` capture, absolute-address watch rows, a process image partition fixture and `sim_prune`, an opt-in retention of PLCSIM storage and archives; the artifact and workflow stores are bounded and back off their lock wait. F-I/O hardware edits and drive batch writes are guarded, and unreadable drive telegrams fail closed.
+
+**Field findings from a physical download:** `tia_discover` and `tia_attach` list the other Openness clients of a Portal, `tia_attach` takes `waitForIdleSeconds`, and `project_open` opens UMAC-protected projects through a protected credential. The native runs on owned headless Portals and scratch projects passed ([record](../verification/feedback-20261120.md)); the open items are in [field findings](../TODO.md#field-findings-from-a-physical-download-20-november). The Openness gaps G-005 to G-010 were registered in the [gap register](../reference/openness-gaps.md).
+
+## 18 November 2026
+
+**Second v0.9.0 feedback round:** `project_save` closes the gap between a download and provisioning, `ResourceBusy` lists the blocking admissions, `simulation_provision_status` and `simulation_provision_recover` give a one-call recovery, quoted simulator symbols resolve through the tag list's spelling, and change views carry `projectSave`. `host_build_identity` reports the source commit of isolated builds. The WinCC Unified runtime alarm tools were added against a scripted GraphQL server; their native run is blocked (the Runtime web server certificate on the workstation had expired and no runtime project was running). The golden-path run for a protected scratch CPU (create, download, save, provisioning, RUN, reads, writes, `sim_test`) and the native checks of the worker changes are in the [record](../verification/v090-feedback-20261118.md); the items are listed under [User feedback on v0.9.0 (18 November)](../TODO.md#user-feedback-on-v090-18-november).
+
+## 16 November 2026
+
+**Remaining v0.9.0 P3 feedback (offline):** `detail` levels (`summary`, `standard`, `full`) for change views, full per-kind JSON Schemas for change payloads, `ProjectLocked` naming the other Portal that holds a project, `--timeout-seconds` up to 3600 s with `tiaMcp/durationMs` on every tool result, `portals` in `tia_session_status`, and pruning of old prepared changes. Native runs of these changes are open under [User feedback on v0.9.0 (14 November)](../TODO.md#user-feedback-on-v090-14-november). The reference client was kept working for harness-built clients.
+
+## 14 November 2026
+
+**User feedback on v0.9.0:** the P1 items were fixed: `hmi_inspect` no longer reads as complete while pages remain, a read-only snapshot capture is refused with `ReadOnlyProject` instead of losing block content silently, captures carry a project-folder hash, and volatile metadata no longer produces false diffs. Added `hmi_content_fingerprint`, `project_close`, `project_copy`, `project_archive` (saves an open project as a `.zap21` file), PLCSIM TCP/IP readiness in `sim_status`, and the real-PLC online tools behind `--physical-plc-online`, which were built without a physical PLC and are not qualified. Structured block edits take `items` batches, the HMI model has a compact row mode and capture reports progress. The native checks (single runs on owned fixtures, not curated catalog evidence) are in the [follow-up record](../verification/v090-followups-20261114.md) and the [batch record](../verification/usability-batch-schemas-20261114.md); the items are under [User feedback on v0.9.0 (14 November)](../TODO.md#user-feedback-on-v090-14-november). On 13 and 14 November dependency updates were merged and the package license metadata was retained.
+
+## 12 November 2026
+
+**Batched capture reads:** `project_model_capture` and `project_index` read each block's and tag's attributes with one `GetAttributes` call; results are unchanged and the warm capture of a 2,582-node project is 2.8 times faster in the measured run ([record](../verification/batched-capture-reads-20261112.md)). The read-only V19 qualification of the shared worker loop passed with the same 53 stages as before (`local.tia.v19-adapter.shared-loop.20261112`, see [code audit follow-ups](../TODO.md#code-audit-follow-ups-9-november)).
+
+**PROFIsafe drive tags and previews:** the drive tags are created as Bool bits the safety program can read (catalog `0.4.180`); the cross-reference check for blocks TIA will not export is limited to F-blocks and the dependency refusal stays. Change previews compare source and XML by bytes and hash. The VCI mappings were rerun on a German installation, and the maintainer's decision on Bool drive tags is recorded.
+
+## 11 November 2026
+
+**Batches and safety tags:** `tag_set` batches, items on ten further kinds and opt-in fingerprint reuse (catalog `0.4.177`); batches in namespaces, beside safety tags and on F-I/O, plus batched block numbers and groups (catalog `0.4.178`); a single acknowledged `tag_set` renames a safety tag that the safety program reads (catalog `0.4.179`). A batch refused for an F-I/O address names the item.
+
+**Classic HMI compile failure and start screen:** one failed `hmi_classic_screen_edit` apply on Classic WinCC RT Advanced was recorded; its cause was not identified or reproduced, and a compiler that could not run is now reported apart from the screen edit and its rollback ([record](../verification/classic-screen-compile-path-failure-20261111.md)). A native probe found that a screen created from a master copy in an HMI without screens becomes its start screen, which removes the editor step from Classic fixture preparation ([record](../verification/classic-start-screen-master-copy-20261111.md)). The [Openness gap register](../reference/openness-gaps.md) was created, and technology hardware references now resolve beside same-named sibling items.
+
+## 10 November 2026
+
+**Native audit confirmation and I/O tools:** the change-pipeline fixes (`not_applied` after a failed checkpoint, the intent decision log, the hashed preview payload) passed natively (390/390), and `block_export`, `plc_io_map` and `plc_tag_usage` were qualified (187/187) ([record](../verification/native-audit-20261110.md); catalog `0.4.175`). The run found and fixed that a `not_applied` apply could not be replayed through mutation admission. New: I/O analysis tools, tag-table import from rows with an address cross-check against hardware, one `tag_set` change with many tag edits, project-wide fingerprint reuse, and the OPC UA client's requested 600 s session timeout.
+
+**Five more OB event classes:** status, update, profile, pull/plug and rack/station failure callers joined the component route (catalog `0.4.176`, [record](../verification/component-ob-event-classes-20261110.md)).
+
+## 9 November 2026
+
+**Whole-repository audit:** 34 items found; the fixes (bridge queueing and held cleanups, Host path confinement, change apply and restore, runtime session locking, the shared capture store, Core store hardening and the scripts/CI clean-up) landed offline, and the remainder is tracked under [code audit follow-ups](../TODO.md#code-audit-follow-ups-9-november).
+
+**Read-only TIA V19 adapter:** `--tia-version 19` runs a read-only adapter, and `project_upgrade` gains its first V19 source. `scripts/qualify_tia_v19.py --run-native` passed with 53 stages on a workstation with TIA Portal V19 Update 5 and V21 Update 3 (`local.tia.v19-adapter.20261109`, catalog `0.4.173`, [record](../verification/tia-v19-adapter-20261109.md)). The 1,000-node library branching tree was recorded the same day (catalog `0.4.172`). Large-project edits got input refs, summary results, member xrefs, filters and LAD text, and Classic screen edits run on HMIs with many existing compile findings.
+
+## 8 November 2026
+
+**Drives, PLCSIM and libraries:** `drive_motor_configure` projects a motor into a G220 data set (catalog `0.4.168`, [record](../verification/drive-motor-configure-20261108.md)); encoder projection was recorded as a G220 boundary (catalog `0.4.169`) after `drive_encoder_configure` was reverted. Motion technology objects connect to a SINAMICS drive telegram ([record](../verification/drive-telegram-connect-20261108.md), catalog `0.4.161`). PLCSIM gained the hardware download to an owned simulator (catalog `0.4.162`, [record](../verification/plcsim-hardware-download-20261108.md)), time-synchronised captures (catalog `0.4.163`, [record](../verification/plcsim-timespan-capture-20261108.md)) and Syslog reads over TCP/IP (catalog `0.4.170`, [record](../verification/plcsim-syslog-20261108.md)). The real vendor library workload ran: 22 of 22 DMC archives upgraded and 180 default blocks compiled (catalog `0.4.167`, [record](../verification/library-vendor-workload-20261108.md)), and a 1,000-version publish stays within the journal bounds.
+
+**Component route:** further OB caller shapes and OB event-class combinations were verified (catalog `0.4.164` to `0.4.169`, [record](../verification/component-ob-event-classes-20261108.md)); installs into startup and cyclic-interrupt OBs work, and installs into other non-program-cycle OBs stay plan-only. The contract freeze policy was accepted and its tooling built.
+
+## 7 November 2026
+
+**Native qualification of the 4 November follow-ups:** scoped tag-table import, native table replacement, compiler baseline comparison, isolation of unrelated project errors, cancellation reconciliation, scoped recovery, PROFIsafe drive tags, drive inventory, servo call planning, unresolved-symbol recovery, refresh from generated source, progress reporting and confirmed machine intent passed on owned fixtures; the issue-by-issue results are in the [TODO section](../TODO.md#offline-engineering-session-follow-ups-4-november) and the records for [tag tables](../verification/tag-table-scope-20261107.md), [unrelated errors](../verification/unrelated-errors-20261107.md) and [cancellation](../verification/cancellation-20261107.md). The compile-only kinds were requalified natively and 24 matrix cells closed.
+
+**Other runs:** `sim_record` answers a program's RDREC/WRREC on an owned PLCSIM instance and `sim_observe` can watch changes across calls (catalog `0.4.159`); the PLCSIM cycle-synchronous capture modes ran ([record](../verification/plcsim-capture-modes-20261107.md)); drive telegram channels can be resized ([record](../verification/drives-telegram-resize-20261107.md)); a shared device among three PLCs passed ([record](../verification/hardware-shared3-20261107.md)); the OB caller and embedded-caller combinations of the component route were verified ([OB](../verification/component-ob-combinations-20261107.md), [embedding parent](../verification/component-embedding-parent-20261107.md)). Offline CI was sharded to run faster.
+
+## 4 November 2026
+
+**Classic area workflow and scoped tag import:** Classic HMI area authoring and its compile recovery workflow were smoothed ([record](../verification/classic-screen-smoothing-20261104.md)) and scoped tag-table import checks were added, with every finding of the multi-drive safety engineering session tracked as an issue ([TODO](../TODO.md#offline-engineering-session-follow-ups-4-november)). Offline only; the native results followed on 7 November.
 
 ## 3 November 2026
 

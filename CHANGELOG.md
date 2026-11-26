@@ -14,6 +14,10 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 - **Paging totals:** every item pager returns `totalItems` and `pageCount` beside its own total field (`total`, `totalRows`, `totalMatches`, `totalChanges`, `totalFindings`, `totalObservedHits`, `totalCaptured`, `totalMappedTargets`, `matchedBlocks`), which keeps its name and meaning: the 13 `*_review_page` tools, `testsuite_result_review`, `review_page` and `review_list` for every kind, `vci_branches`, `runtime_capture_page`, `runtime_ua_capture_page`, `runtime_ua_subscription_page`, `feature_catalog`, `device_inventory`, `library_package_inspect`, `library_query`, `project_snapshot_compare`, `project_snapshot_search`, `project_health_review`, `watch_table_monitor`, `block_export`, `translation_inspect`, `hmi_references` and the `project_model` search/children and `project_index` pages. `pageCount` is `ceil(totalItems / count)` at the effective count; both are null where the family's total is partial (a capped search, a truncated library, inventory or relationship walk). Additive: the output schemas declare both fields as optional and the frozen surface baseline was re-cut with no breaking change ([conventions](docs/reference/mcp-surface.md#parameter-conventions)). Offline tests only; the worker pagers are not run natively yet.
 
+### Changed
+
+- CI: the ruff gate also enforces F401, F841 and F402 (unused imports and locals, imports shadowed by a loop variable) now that the scripts have none.
+
 ## [0.9.0] - 2026-11-25
 
 First tagged pre-release. Changes since the repository went public on 23 October 2026, up to feature catalog `0.5.0`

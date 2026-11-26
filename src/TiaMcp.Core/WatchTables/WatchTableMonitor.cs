@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -110,8 +111,8 @@ public static class WatchTableMonitor
         var g = match.Groups;
         string area = char.ToUpperInvariant(g[1].Value[0]) switch { 'I' => "input", 'Q' => "output", _ => "marker" };
         var result = new JsonObject { ["status"] = "resolved", ["area"] = area };
-        if (g[2].Success) { result["offset"] = int.Parse(g[2].Value); result["bit"] = int.Parse(g[3].Value); result["length"] = 1; }
-        else { result["offset"] = int.Parse(g[5].Value); result["length"] = char.ToUpperInvariant(g[4].Value[0]) switch { 'B' => 1, 'W' => 2, _ => 4 }; }
+        if (g[2].Success) { result["offset"] = int.Parse(g[2].Value, CultureInfo.InvariantCulture); result["bit"] = int.Parse(g[3].Value, CultureInfo.InvariantCulture); result["length"] = 1; }
+        else { result["offset"] = int.Parse(g[5].Value, CultureInfo.InvariantCulture); result["length"] = char.ToUpperInvariant(g[4].Value[0]) switch { 'B' => 1, 'W' => 2, _ => 4 }; }
         return result;
     }
 

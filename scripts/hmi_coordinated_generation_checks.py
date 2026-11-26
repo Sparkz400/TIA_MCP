@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError
 from hmi_text_list_author_checks import ROOT, expected_documents, parse_candidate
-from hmi_text_list_generation_checks import local_reader, expected_intent as bool_intent, verify as verify_bool
+from hmi_text_list_generation_checks import local_reader as local_reader, expected_intent as bool_intent, verify as verify_bool
 from hmi_numeric_generation_checks import expected_intent as numeric_intent, expected_coverage, verify as verify_numeric, retained
 from hmi_dependency_impact_checks import verify as verify_dependencies
 

@@ -1,7 +1,6 @@
 """Offline checks for the project_upgrade qualifier's pure logic."""
 import argparse
 import json
-import os
 from pathlib import Path
 import tempfile
 import traceback
@@ -9,7 +8,7 @@ import unittest
 from unittest import mock
 
 from library_native_harness import Harness
-from qualify_project_upgrade import (EXAMPLES, REFUSED, body, fingerprint, inventory_view, leaks, paths_fit, pinned, public, refuse,
+from qualify_project_upgrade import (EXAMPLES, body, fingerprint, inventory_view, leaks, paths_fit, pinned, public, refuse,
                                      refusal_view, released, remove_copies, stage_input, upgrade_view)
 
 try:

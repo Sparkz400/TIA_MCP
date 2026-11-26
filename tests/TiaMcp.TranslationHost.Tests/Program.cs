@@ -535,9 +535,9 @@ internal static class Check
         var json = JsonNode.Parse(((TextContentBlock)result.Content[0]).Text)!; Equal(code, S(json["error"]!, "code"));
     }
     internal static void Reject(string code, Action action)
-    { try { action(); } catch (BridgeException ex) { Equal(code, ex.Code); return; } throw new Exception("Expected " + code); }
+    { try { action(); } catch (BridgeException ex) { Equal(code, ex.Code); return; } throw new InvalidOperationException("Expected " + code); }
     internal static void True(bool condition, string message = "Assertion failed") { if (!condition) throw new Exception(message); }
-    internal static void Equal<T>(T expected, T actual, string message = "") { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected [{expected}], actual [{actual}]. {message}"); }
+    internal static void Equal<T>(T expected, T actual, string message = "") { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected [{expected}], actual [{actual}]. {message}"); }
     internal static void Bytes(byte[] expected, byte[] actual) => True(expected.AsSpan().SequenceEqual(actual), "Bytes differ");
     internal static byte[] Pack(Dictionary<string, byte[]> parts)
     { using var output = new MemoryStream(); using (var zip = new ZipArchive(output, ZipArchiveMode.Create, true)) foreach (var p in parts.OrderBy(p => p.Key, StringComparer.Ordinal)) { using var stream = zip.CreateEntry(p.Key).Open(); stream.Write(p.Value); } return output.ToArray(); }

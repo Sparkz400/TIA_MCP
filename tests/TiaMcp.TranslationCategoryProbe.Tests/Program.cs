@@ -11,7 +11,7 @@ var results = new List<object>();
 XNamespace s = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
 XNamespace r = "http://schemas.openxmlformats.org/package/2006/relationships";
 var baseline = TranslationCategoryWorkbook.Read(genuine);
-if (baseline.Count != 4) throw new Exception("Expected the genuine retained four-row PLC capture.");
+if (baseline.Count != 4) throw new InvalidOperationException("Expected the genuine retained four-row PLC capture.");
 results.Add(new { name = "genuine captured workbook decodes all four rows", passed = true, synthetic = false });
 string projectName = "TiaMcpScratch_20261015_071342_e395a300", plcName = "ScratchPLC";
 var selected = baseline.Where(p => p.Value.ViewPath.Contains("\\Main\\", StringComparison.Ordinal)).ToDictionary(p => p.Key, p => p.Value);
@@ -61,7 +61,7 @@ Console.WriteLine($"{results.Count} file-only populated category gate checks pas
 
 void Check(string name, bool condition)
 {
-    if (!condition) throw new Exception(name);
+    if (!condition) throw new InvalidOperationException(name);
     results.Add(new { name, passed = true, synthetic = true });
 }
 string Mutate(string name, string part, Action<XElement> modify)
@@ -83,5 +83,5 @@ void Reject(string name, string part, Action<XElement> change)
     string path = Mutate(name, part, change);
     try { TranslationCategoryWorkbook.Read(path); }
     catch (InvalidDataException) { Check(name + " refused", true); return; }
-    throw new Exception(name + " was accepted");
+    throw new InvalidOperationException(name + " was accepted");
 }

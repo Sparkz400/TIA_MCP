@@ -10,9 +10,9 @@ internal static class CompositeWorkflowTests
     internal static void Run(string root)
     {
         var checks = new List<string>(); var processes = new List<object>();
-        void Check(bool condition, string label) { if (!condition) throw new Exception(label); checks.Add(label); }
+        void Check(bool condition, string label) { if (!condition) throw new InvalidOperationException(label); checks.Add(label); }
         void Reject(Action action, string label, string code)
-        { try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
+        { try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new InvalidOperationException("Expected refusal: " + label); }
         JsonObject Json(object value) => JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!.AsObject();
         byte[] request = File.ReadAllBytes(Path.Combine(root, "request.json")), expected = File.ReadAllBytes(Path.Combine(root, "report.json"));
         var packet = JsonNode.Parse(request)!.AsObject(); var uploads = new ArtifactUploadStore(root);
@@ -98,7 +98,7 @@ internal static class CompositeWorkflowTests
             string signal = Path.Combine(root, "pause-" + phase + ".txt");
             var start = new ProcessStartInfo("dotnet") { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
             foreach (string arg in new[] { Assembly.GetExecutingAssembly().Location, "--publication-child", root, uploadRef, phase, signal }) start.ArgumentList.Add(arg);
-            using var child = Process.Start(start) ?? throw new Exception("Child did not start");
+            using var child = Process.Start(start) ?? throw new InvalidOperationException("Child did not start");
             var stdout = child.StandardOutput.ReadToEndAsync(); var stderr = child.StandardError.ReadToEndAsync();
             string? folder = null; var watch = Stopwatch.StartNew();
             try

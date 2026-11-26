@@ -13,7 +13,6 @@ import time
 import base64
 import csv
 import io
-import copy
 
 import psutil
 from jsonschema import Draft202012Validator

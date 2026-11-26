@@ -13,13 +13,13 @@ var store = new VciWorkspaceStore(root, args[0]);
 var uploads = new ArtifactUploadStore(root);
 var author = new GitAuthor("Offline Fixture", "fixture@example.invalid");
 int checks = 0;
-void Check(bool value, string message) { if (!value) throw new Exception(message); checks++; Console.WriteLine("PASS " + message); }
+void Check(bool value, string message) { if (!value) throw new InvalidOperationException(message); checks++; Console.WriteLine("PASS " + message); }
 JsonElement Json(object value) => JsonSerializer.SerializeToElement(value, BridgeProtocol.Json);
 string Text(JsonElement value, string key) => value.GetProperty(key).GetString()!;
 async Task Reject(string code, Func<Task> action)
 {
     try { await action(); } catch (BridgeException error) { Check(error.Code == code, "refuses " + code + ": " + error.Code); return; }
-    throw new Exception("Expected " + code);
+    throw new InvalidOperationException("Expected " + code);
 }
 string Upload(byte[] bytes)
 {

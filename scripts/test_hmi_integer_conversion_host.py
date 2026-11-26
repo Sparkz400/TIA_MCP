@@ -1,7 +1,6 @@
 """Actual offline MCP conversion, independent YAML/domain oracles, refusal and restart."""
 import argparse
 import base64
-import copy
 import hashlib
 import json
 import shutil

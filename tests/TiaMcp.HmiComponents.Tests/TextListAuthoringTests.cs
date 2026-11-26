@@ -13,7 +13,7 @@ internal static class TextListAuthoringTests
         var packet = HmiComponentReview.Parse(File.ReadAllBytes(Path.Combine(repository, "fixtures/hmi/unified-text-list/author-request.json")));
         var store = new HmiComponentWorkflowStore(root); var uploads = new ArtifactUploadStore(root); int checks = 0;
         void Check(bool condition, string label) { if (!condition) throw new Exception(label); checks++; }
-        void Reject(Action action, string label) { try { action(); } catch (Exception e) when (e is BridgeException or ArgumentException or JsonException or InvalidOperationException) { checks++; return; } throw new Exception("Expected refusal: " + label); }
+        void Reject(Action action, string label) { try { action(); } catch (Exception e) when (e is BridgeException or ArgumentException or JsonException or InvalidOperationException) { checks++; return; } throw new InvalidOperationException("Expected refusal: " + label); }
         void Invalid(Action<JsonObject> edit, string label) { var value = packet.DeepClone().AsObject(); edit(value); Reject(() => UnifiedTextListAuthoring.Build(value), label); }
         JsonObject Entry(JsonObject value) => value["lists"]![0]!["entries"]![0]!.AsObject();
         byte[] raw = JsonSerializer.SerializeToUtf8Bytes(packet, BridgeProtocol.Json);

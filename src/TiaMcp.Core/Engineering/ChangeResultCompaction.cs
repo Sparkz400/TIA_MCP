@@ -10,6 +10,7 @@ namespace TiaMcp.Core.Engineering;
 /// Full detail stays available through includeDetails=true or change_status(includeDetails=true).</summary>
 public static class ChangeResultCompaction
 {
+    private static readonly string[] FullPreviewKey = new[] { "preview (full)" };
     public const int MaxString = 1024;
     public const int MaxArray = 50;
     public const int MaxCompileErrors = 20;
@@ -59,7 +60,7 @@ public static class ChangeResultCompaction
         if (view["readbacks"] is JsonArray readbacks && readbacks.Count > 0) result["readbackCount"] = readbacks.Count;
         if ((view["phaseTimings"] ?? journal?["phaseTimings"]) is JsonArray phases && phases.Count > 0) result["stageTimings"] = StageTimings(phases);
         result["omitted"] = new JsonArray(view.Select(p => p.Key).Where(k => result[k] is null && k is not ("preview" or "compile" or "journal" or "readbacks" or "phaseTimings"))
-            .Concat(preview is null ? Array.Empty<string>() : new[] { "preview (full)" }).Select(k => (JsonNode)k).ToArray());
+            .Concat(preview is null ? Array.Empty<string>() : FullPreviewKey).Select(k => (JsonNode)k).ToArray());
         result["responseDetail"] = "summary";
         result["fullEvidence"] = "The full preview, compiler messages and readback evidence are retained in journalPath. Pass includeDetails=true, or call change_status(includeDetails=true).";
         return result;

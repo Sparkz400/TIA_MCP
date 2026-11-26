@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using Newtonsoft.Json.Linq;
 using TiaMcp.Indexing;
 
@@ -238,7 +239,7 @@ internal static class ProjectModelTests
         {
             var document = Fixture(); var nodes = new JArray();
             for (int i = 0; i < count; i++) nodes.Add(new JObject { ["nodeId"] = "n" + i, ["parentId"] = i == 0 ? null : "n0", ["kind"] = i == 0 ? "project" : "block",
-                ["name"] = "Node " + i.ToString("D5"), ["origin"] = "native", ["objectPath"] = "/objects/" + i, ["access"] = new JObject { ["state"] = "readable" }, ["detailAvailability"] = "metadata", ["metadata"] = new JObject() });
+                ["name"] = "Node " + i.ToString("D5", CultureInfo.InvariantCulture), ["origin"] = "native", ["objectPath"] = "/objects/" + i, ["access"] = new JObject { ["state"] = "readable" }, ["detailAvailability"] = "metadata", ["metadata"] = new JObject() });
             document["nodes"] = nodes; document["edges"] = new JArray();
             var store = new ProjectModelStore(); var capture = Stopwatch.StartNew(); var snapshot = store.Capture(document); capture.Stop();
             string id = (string)snapshot["snapshotId"]!;

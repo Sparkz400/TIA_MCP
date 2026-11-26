@@ -12,7 +12,7 @@ internal static class ExternalResourceChecks
     internal static void Process(string[] args)
     {
         string root=Path.GetFullPath(args[1]);var record=new EngineeringOperationStore(root).Read(args[2]);
-        if(record.State!="dispatchIntent")throw new Exception("Fake provider requires persisted dispatch intent");
+        if(record.State!="dispatchIntent")throw new InvalidOperationException("Fake provider requires persisted dispatch intent");
         byte[] bytes=File.ReadAllBytes(Path.Combine(root,"after-state.json"));
         using(var stream=new FileStream(Path.Combine(root,"provider-state.json"),FileMode.Create,FileAccess.Write,FileShare.None)){stream.Write(bytes);stream.Flush(true);}
         File.AppendAllText(Path.Combine(root,"provider-calls.txt"),"one synthetic mutation\n");
@@ -21,9 +21,9 @@ internal static class ExternalResourceChecks
     internal static void Run(string? destination=null)
     {
         string root=Path.GetFullPath(destination??Path.Combine(Path.GetTempPath(),"external-resources-"+Guid.NewGuid().ToString("N")));
-        if(Directory.Exists(root))throw new Exception("Fresh external resource evidence directory required");Directory.CreateDirectory(root);
+        if(Directory.Exists(root))throw new InvalidOperationException("Fresh external resource evidence directory required");Directory.CreateDirectory(root);
         var checks=new List<string>();void Check(bool ok,string label){if(!ok)throw new Exception(label);checks.Add(label);}
-        void Reject(Action action,string code,string label){try{action();}catch(BridgeException e)when(e.Code==code){Check(true,label);return;}throw new Exception("Expected "+code+": "+label);}
+        void Reject(Action action,string code,string label){try{action();}catch(BridgeException e)when(e.Code==code){Check(true,label);return;}throw new InvalidOperationException("Expected "+code+": "+label);}
         EngineeringArtifactReference Save(string name,byte[] data){File.WriteAllBytes(Path.Combine(root,name),data);return new(name,Hash(data));}
         EngineeringArtifactReference Json(string name,object value)=>Save(name,JsonSerializer.SerializeToUtf8Bytes(value,BridgeProtocol.Json));
         var before=Save("before-state.json",Encoding.UTF8.GetBytes("{\"application\":\"main\",\"version\":1}"));
@@ -60,9 +60,9 @@ internal static class ExternalResourceChecks
         {
             var start=new ProcessStartInfo("dotnet"){UseShellExecute=false,RedirectStandardOutput=true,RedirectStandardError=true,CreateNoWindow=true};start.ArgumentList.Add(typeof(ExternalResourceChecks).Assembly.Location);start.ArgumentList.Add(mode);foreach(string argument in arguments)start.ArgumentList.Add(argument);
             using var process=System.Diagnostics.Process.Start(start)!;var output=process.StandardOutput.ReadToEndAsync();var errors=process.StandardError.ReadToEndAsync();
-            if(!process.WaitForExit(15000)){process.Kill(true);throw new Exception("Fixture process exceeded deadline");}
+            if(!process.WaitForExit(15000)){process.Kill(true);throw new InvalidOperationException("Fixture process exceeded deadline");}
             if(mode=="--external-process"){Check(process.ExitCode==17,"Actual provider process loses reply after mutation");return "lost";}
-            if(process.ExitCode!=0)throw new Exception(errors.GetAwaiter().GetResult());return output.GetAwaiter().GetResult().Trim();
+            if(process.ExitCode!=0)throw new InvalidOperationException(errors.GetAwaiter().GetResult());return output.GetAwaiter().GetResult().Trim();
         }
         var plan=Plan("primary",effect);string projectKey=plan.Resources[0].ResourceKey;
         var local=Plan("legacy");var localJson=JsonSerializer.SerializeToNode(local,BridgeProtocol.Json)!.AsObject();

@@ -29,7 +29,7 @@ internal static class WorkerRouteChecks
         {
             try { action(); }
             catch (WorkerError error) when (error.Code == code) { check(true, label); return; }
-            throw new Exception("Expected " + code + ": " + label);
+            throw new InvalidOperationException("Expected " + code + ": " + label);
         }
 
         // The binding the worker derives for the CPU full-access password is the one the Host hashes and the vault stores.

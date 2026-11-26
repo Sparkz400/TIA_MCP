@@ -10,6 +10,7 @@ namespace TiaMcp.Core.WatchTables
     // "watch\t<rel>\t<semanticSha256>\t<rows>", "force\t<rel>\t<semanticSha256>", "group\t<rel>"; rel joins escaped name segments with '/'.
     public static class WatchGroupManifest
     {
+        private static readonly char[] LineSeparator = new[] { '\n' };
         public const string Profile = "watch-group.v1";
         public static string Segment(string value) { return Uri.EscapeDataString(value ?? ""); }
         public static byte[] Build(IEnumerable<string> lines)
@@ -18,7 +19,7 @@ namespace TiaMcp.Core.WatchTables
         {
             string text = Encoding.UTF8.GetString(bytes ?? new byte[0]);
             if (!text.StartsWith(Profile + "\n", StringComparison.Ordinal)) throw new FormatException("Not a watch group manifest.");
-            return text.Substring(Profile.Length + 1).Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            return text.Substring(Profile.Length + 1).Split(LineSeparator, StringSplitOptions.RemoveEmptyEntries);
         }
 
         // Exact subtree after one lifecycle operation on a direct child, or null with a refusal code.

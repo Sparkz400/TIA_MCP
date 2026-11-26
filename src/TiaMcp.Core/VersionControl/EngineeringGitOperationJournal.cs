@@ -1,3 +1,4 @@
+using System.Globalization;
 using TiaMcp.Core.Engineering;
 using TiaMcp.Core.EngineeringJobs;
 
@@ -66,7 +67,7 @@ public sealed class EngineeringGitOperationJournal : IGitOperationJournal
             if (!allowed) throw new BridgeException("GitJournalSequence", "Callback order cannot authorize repeated dispatch or publication.");
             var callback = new EngineeringGitCallback(operation.Id, (latest?.Sequence ?? 0) + 1,
                 binding.Sha256, latestArtifact?.Sha256, record);
-            string relative = "git-callbacks/" + operation.Id + "/" + callback.Sequence.ToString("D4") + ".json";
+            string relative = "git-callbacks/" + operation.Id + "/" + callback.Sequence.ToString("D4", CultureInfo.InvariantCulture) + ".json";
             string path = PackageStorage.Under(root, relative);
             if (File.Exists(path)) throw new BridgeException("RecoveryRequired", "The callback already exists; reconcile without replay.");
             PackageStorage.Save(path, callback); // Flush before dispatch/publication is allowed to return.
@@ -103,7 +104,7 @@ public sealed class EngineeringGitOperationJournal : IGitOperationJournal
             if (results.Count >= 5) throw new BridgeException("GitJournalInvalid", "Callback count exceeds one bounded invocation.");
             var item = PackageStorage.Load<EngineeringGitCallback>(path);
             if (item.EngineeringOperationId != operationId || item.Sequence != results.Count + 1 ||
-                Path.GetFileName(path) != item.Sequence.ToString("D4") + ".json" || item.PreviousSha256 != previous ||
+                Path.GetFileName(path) != item.Sequence.ToString("D4", CultureInfo.InvariantCulture) + ".json" || item.PreviousSha256 != previous ||
                 item.BindingSha256 != item.Record.BindingSha256 ||
                 (results.Count > 0 && (item.BindingSha256 != results[0].BindingSha256 || item.Record.OperationId != results[0].Record.OperationId)))
                 throw new BridgeException("GitJournalInvalid", "Callback identity, order or hash chain is invalid.");

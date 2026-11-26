@@ -219,10 +219,17 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   first time (tagged-commit gate, package and strict verify, build provenance and SBOM attestation, draft). The 1.0
   tag still comes after acceptance under [release mechanics](#release-mechanics-and-policy).
 - [ ] **Remaining quality gates:** the bundle has no Authenticode signature (no code-signing certificate; the hash
-  list, provenance and SBOM attestations are the integrity evidence); 1,825 `latest-recommended` analyzer findings
-  (CA2201 771, CA1861 419, CA1305 142, ...) and ruff F401/F841/F402 await a clean-up before more rules become errors;
-  coverage does not measure worker sources linked into test assemblies (first local numbers: Translations 84.7 %,
-  Core 6 % from seven suites only).
+  list, provenance and SBOM attestations are the integrity evidence); `latest-recommended` analyzer findings await
+  the rest of a clean-up before more rules become errors. Measured 26 November with a Release build of the 57
+  non-net48 projects in `src/` and `tests/` plus `scripts/native/ReliabilityWorker` and `WatchWorkflow`
+  (`-p:AnalysisLevel=latest-recommended -p:TreatWarningsAsErrors=false`, findings counted once per file, line, column
+  and rule, compiler warnings excluded): 1,821 before the clean-up (1,825 on 25 November), 1,368 after (CA2201
+  774 → 503, CA1861 421 → 357, CA1305 142 → 30; next CA1822 77, CA1825 65, CA1310 58). Left: CA2201 sites inside
+  lambdas or try blocks, or reachable from product code or a handler that treats `InvalidOperationException`
+  differently; CA1861 in `tests/` (349), which needs fields named by hand; CA1305 in user-facing text
+  (`GraphHtml.cs`, simulated TIA messages). Ruff F401/F841/F402 were cleaned up and are part of the gate. Coverage
+  does not measure worker sources linked into test assemblies (first local numbers: Translations 84.7 %, Core 6 % from
+  seven suites only).
 - [ ] **Found by the new tests, left open:** `plc_physical_*` has no Host-side gate (only tool registration behind
   `--physical-plc-online` and the worker refuse; the maintainer has not decided whether to add one). Closed the same
   day: the successful `runtime_unified_connect` path is tested offline end to end, `ProjectReviewStore` refuses
@@ -235,7 +242,7 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   instance; restore the original mode. The same run covers the Runtime-Manager-lost subscription, which never attached
   before 25 November (the API spells the event `OnRunTimemanagerLost`).
 - [ ] **CI and repository upkeep:** the split package job (build once, five legs) still needs its first CI run to confirm
-  the timing; the [status log](history/status-log.md) has no entry between 3 and 25 November.
+  the timing.
 
 ## Code audit follow-ups (9 November)
 

@@ -44,7 +44,7 @@ def motor(h):
 
 
 def body(h):
-    plc = h.owned_scratch("drive motor")
+    h.owned_scratch("drive motor")
     add_g220(h)
     h.apply("project_compile", {})
     ref, before = h.stage("read motor data set 0", lambda: motor(h))

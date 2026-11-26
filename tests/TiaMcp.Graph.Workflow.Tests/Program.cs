@@ -9,12 +9,12 @@ string root = Path.GetFullPath(args[0]); Directory.CreateDirectory(root);
 var store = new GraphWorkflowStore(root); var uploads = new ArtifactUploadStore(root); int checks = 0;
 JsonElement Json(object value) => JsonSerializer.SerializeToElement(value, BridgeProtocol.Json);
 string Text(JsonElement value, string key) => value.GetProperty(key).GetString()!;
-void Check(bool value, string name) { if (!value) throw new Exception(name); checks++; Console.WriteLine("PASS GRAPH workflow " + name); }
+void Check(bool value, string name) { if (!value) throw new InvalidOperationException(name); checks++; Console.WriteLine("PASS GRAPH workflow " + name); }
 void Reject(string code, Action action)
 {
     try { action(); } catch (BridgeException error) { Check(error.Code == code, "refuses " + code + ": " + error.Code); return; }
     catch (GraphException error) { Check(error.Code == code, "refuses " + code + ": " + error.Code); return; }
-    throw new Exception("Expected " + code);
+    throw new InvalidOperationException("Expected " + code);
 }
 string Upload(byte[] bytes)
 {

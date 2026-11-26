@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Linq;
+using System.Globalization;
 using System.Xml.Linq;
 using TiaMcp.Openness.V21;
 
@@ -57,7 +58,7 @@ internal static class TypedGraphicalCorpusTests
         foreach (var attribute in expectedNetwork.Descendants().Attributes("UId"))
             if (accessIds.TryGetValue(attribute.Value, out string? current)) attribute.Value = current;
         var parts = expectedNetwork.Element(TypedGraphical.Net + "Parts")!;
-        parts.ReplaceNodes(parts.Elements(TypedGraphical.Net + "Access").OrderBy(a => int.Parse(a.Attribute("UId")!.Value)).Concat(parts.Elements().Where(e => e.Name != TypedGraphical.Net + "Access")).ToArray());
+        parts.ReplaceNodes(parts.Elements(TypedGraphical.Net + "Access").OrderBy(a => int.Parse(a.Attribute("UId")!.Value, CultureInfo.InvariantCulture)).Concat(parts.Elements().Where(e => e.Name != TypedGraphical.Net + "Access")).ToArray());
         var wires = expectedNetwork.Element(TypedGraphical.Net + "Wires")!;
         var observedWireOrder = new[] { "29", "30", "32", "33", "34", "35", "31" }.Select(id => wires.Elements().Single(w => w.Attribute("UId")!.Value == id)).ToArray();
         for (int i = 0; i < observedWireOrder.Length; i++) observedWireOrder[i].SetAttributeValue("UId", i + 29);
@@ -81,7 +82,7 @@ internal static class TypedGraphicalCorpusTests
                 Connections = language == "LAD" ? [Wire("rail", "out", "input", "in"), Wire("input", "out", "output", "in")] : [Wire("$input", "value", "output", "in")] };
             var result = TypedGraphical.Build(source, model, context);
             var added = result.Document.Descendants("SW.Blocks.CompileUnit").Single(n => (string?)n.Attribute("ID") == result.NetworkId);
-            int[] definitions = added.Descendants().Where(e => e.Name.LocalName is "Access" or "Part" or "Wire").Select(e => int.Parse(e.Attribute("UId")!.Value)).ToArray();
+            int[] definitions = added.Descendants().Where(e => e.Name.LocalName is "Access" or "Part" or "Wire").Select(e => int.Parse(e.Attribute("UId")!.Value, CultureInfo.InvariantCulture)).ToArray();
             Check.Equal(string.Join(",", Enumerable.Range(21, definitions.Length)), string.Join(",", definitions));
             Check.Equal(3, result.Document.Descendants("SW.Blocks.CompileUnit").Count());
             Check.Equal(3, result.Document.Descendants(TypedGraphical.Net + "Access").Count(e => (string?)e.Attribute("UId") == "21"));

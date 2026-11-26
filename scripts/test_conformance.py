@@ -1,6 +1,5 @@
 """Pure conformance harness tests. No Siemens APIs, network or MCP host required."""
 import copy
-import hashlib
 import json
 import pathlib
 import tempfile

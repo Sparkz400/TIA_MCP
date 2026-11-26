@@ -18,7 +18,6 @@ import hashlib
 from pathlib import Path
 import re
 
-from compilation_evidence import require_plc_compile
 from library_native_harness import Harness, require
 from qualify_access_changes import Run as StateRun, reopen
 from qualify_plc_object_mutations import coverage_gaps, view

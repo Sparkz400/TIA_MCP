@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -58,7 +59,7 @@ public sealed class AutomationMlWorkflowStore
             foreach (var part in parts)
             {
                 if (node is JsonObject obj) node = obj[part];
-                else if (node is JsonArray array && int.TryParse(part, out int index) && index >= 0 && index < array.Count && index.ToString() == part) node = array[index];
+                else if (node is JsonArray array && int.TryParse(part, out int index) && index >= 0 && index < array.Count && index.ToString(CultureInfo.InvariantCulture) == part) node = array[index];
                 else throw new BridgeException("AutomationMlInvalidSection", "Use an exact report array pointer, such as /objects.");
             }
             Require(node is JsonArray, "AutomationMlInvalidSection", "Selected report value is not an array.");

@@ -45,9 +45,9 @@ void Reject(Action action, string code = "CapturedStorageProfileUnavailable")
 {
     try { action(); }
     catch (BridgeException error) when (error.Code == code) { return; }
-    throw new Exception("Expected strict rejection: " + code);
+    throw new InvalidOperationException("Expected strict rejection: " + code);
 }
-void Require(bool result, string why) { if (!result) throw new Exception(why); }
+void Require(bool result, string why) { if (!result) throw new InvalidOperationException(why); }
 XDocument Mutate(XDocument original, Action<XDocument> change) { var result = new XDocument(original); change(result); return result; }
 tests.Add(("Complete native template clone changes only allowed direct fields", () => {
     string before = db.ToString(SaveOptions.DisableFormatting);

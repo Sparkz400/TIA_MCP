@@ -62,7 +62,7 @@ internal static class LibraryAssociationTests
         {
             try { _ = Receipt(p); }
             catch (BridgeException e) when ((e.Code is "InvalidHmiComponentReview" or "ArtifactChanged") && (message is null || e.Message.Contains(message))) { Check(true, label); return; }
-            throw new Exception("Expected refusal: " + label);
+            throw new InvalidOperationException("Expected refusal: " + label);
         }
         var receipt = Receipt(request); var report = Record(receipt)["report"]!;
         Check((string?)report["libraryAssociations"]![0]!["identifierAgreement"] == "match", "Original full export matches exact observed GUIDs despite renamed instance");

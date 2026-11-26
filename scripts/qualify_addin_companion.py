@@ -82,7 +82,7 @@ def main():
         receipt = json.loads((Path(folder) / "receipt.json").read_text(encoding="utf-8"))
         record = receipt.get("selectionRecordId") or receipt.get("SelectionRecordId")
         summary = step("selection summary", client.tool("addin_selection_review_page", {"recordRef": record, "section": "summary"}))
-        rows = step("selections", client.tool("addin_selection_review_page", {"recordRef": record, "section": "selections", "count": 64}))
+        step("selections", client.tool("addin_selection_review_page", {"recordRef": record, "section": "selections", "count": 64}))
         producer = step("stored producer", stored_producer(artifacts, summary, record))
         require(producer.get("assemblySha256") == enrollment["assemblySha256"] and producer.get("configurationSha256") == enrollment["configurationSha256"],
                 "The record does not carry the enrolled producer hashes")

@@ -70,7 +70,7 @@ internal static class ConfiguredVerifyChecks
             bool refused = false;
             try { Program.ValidateConfiguredVerifyAdmission(admission, helper); }
             catch (Exception) { refused = true; }
-            if (refused != reject) throw new Exception("Unexpected configured verification admission: " + label);
+            if (refused != reject) throw new InvalidOperationException("Unexpected configured verification admission: " + label);
             results.Add(new { name = "configured-" + label, passed = true, rejected = refused, nativeInvoked = false });
         }
         Check("first-valid", _ => { }, reject: false);

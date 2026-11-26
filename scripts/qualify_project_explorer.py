@@ -388,7 +388,7 @@ def qualify(args):
         block = next(n for n in nodes if n["name"] == "TiaMcp_EnableGate" and n["kind"] == "block")
         reference = exact_reference(snapshot, block)
         report["selectedReference"] = reference
-        details = model("details", reference=reference)
+        model("details", reference=reference)
         independent = call("block_read", {"blockPath": block["objectPath"]})
         report["independentInspection"] = independent
         check("exact selected path survives independent native inspection", block["objectPath"] in json.dumps(independent))

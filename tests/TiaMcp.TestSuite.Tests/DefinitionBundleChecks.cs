@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -98,7 +99,7 @@ internal static class DefinitionBundleChecks
         var opaqueBundle = TestSuiteDefinitionBundle.Capture(opaqueRun, [opaque]);
         Check(TestSuiteDefinitionBundle.Restore(opaqueRun, opaqueBundle.Bytes).OriginalBytes("opaque").SequenceEqual(opaque.OriginalBytes), "Opaque non-XML definitions retain every byte without interpreting native grammar.");
 
-        var scale = Enumerable.Range(0, 1000).Select(i => Definition("scale-" + i.ToString("D4"))).ToArray();
+        var scale = Enumerable.Range(0, 1000).Select(i => Definition("scale-" + i.ToString("D4", CultureInfo.InvariantCulture))).ToArray();
         var scaleRun = TestSuiteRunPlanner.Prepare(scale, scale.Select(c => c.Manifest.Id).ToArray(), [], "style");
         var stopwatch = Stopwatch.StartNew();
         var scaleBundle = TestSuiteDefinitionBundle.Capture(scaleRun, scale.Reverse().ToArray());

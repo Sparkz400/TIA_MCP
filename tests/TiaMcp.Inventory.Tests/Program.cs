@@ -14,8 +14,8 @@ using ModelContextProtocol.Protocol;
 
 int checks = 0;
 void Check(bool condition, string message) { checks++; if (!condition) throw new Exception(message); }
-void Fails(Action action, string code) { try { action(); } catch (BridgeException e) when (e.Code == code) { checks++; return; } throw new Exception("Expected " + code); }
-async Task FailsAsync(Func<Task> action, string code) { try { await action(); } catch (BridgeException e) when (e.Code == code) { checks++; return; } throw new Exception("Expected " + code); }
+void Fails(Action action, string code) { try { action(); } catch (BridgeException e) when (e.Code == code) { checks++; return; } throw new InvalidOperationException("Expected " + code); }
+async Task FailsAsync(Func<Task> action, string code) { try { await action(); } catch (BridgeException e) when (e.Code == code) { checks++; return; } throw new InvalidOperationException("Expected " + code); }
 InventoryRow Row(int i) => new("/devices/d/items/" + i, "Module " + i, "Station", "module", "/devices/d/items/" + i, "/devices/d", "project.ap21",
     InventoryRow.ConfiguredKeys.ToDictionary(k => k, k => InventoryField.Missing("notExposed", "Not supported by this fixture.", k)));
 var coverage = new InventoryCoverage(true, false, 30000, 50000, []);
@@ -442,7 +442,7 @@ Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties
     const string plc = "/projects/P/devices/D/items/CPU/plc/CPU";
     string ExportRoot() => Path.Combine(output, "block-export-host");
     var hostOptions = new HostOptions("", ExportRoot(), null, 60, false, "", null);
-    string BlockJson(int i, bool isProtected = false) => "{\"path\":\"" + plc + "/blocks/FB" + i.ToString("D3") + "\",\"plcPath\":\"" + plc + "\",\"name\":\"FB" + i.ToString("D3")
+    string BlockJson(int i, bool isProtected = false) => "{\"path\":\"" + plc + "/blocks/FB" + i.ToString("D3", CultureInfo.InvariantCulture) + "\",\"plcPath\":\"" + plc + "\",\"name\":\"FB" + i.ToString("D3", CultureInfo.InvariantCulture)
         + "\",\"number\":" + i + ",\"kind\":\"FB\",\"programmingLanguage\":\"SCL\",\"isConsistent\":true,\"isKnowHowProtected\":" + (isProtected ? "true" : "false") + "}";
     JsonElement Inventory(int count, int protectedAt = -1) => JsonDocument.Parse("{\"project\":{\"name\":\"P\"},\"plcs\":[{\"path\":\"" + plc + "\"}],\"completeness\":{\"truncated\":false},\"blocks\":["
         + string.Join(",", Enumerable.Range(0, count).Select(i => BlockJson(i, i == protectedAt))) + "]}").RootElement;
@@ -666,7 +666,7 @@ var mklink = new System.Diagnostics.ProcessStartInfo("cmd.exe") { UseShellExecut
 foreach (var argument in new[] { "/c", "mklink", "/J", link, outside }) mklink.ArgumentList.Add(argument);
 using (var child = System.Diagnostics.Process.Start(mklink)!) { child.WaitForExit(); Check(child.ExitCode == 0, "Test junction created"); }
 var resources = new TiaResources(options with { ArtifactsDirectory = resourceRoot });
-void Refused(Action action, string label) { try { action(); } catch (ModelContextProtocol.McpException) { checks++; return; } throw new Exception(label); }
+void Refused(Action action, string label) { try { action(); } catch (ModelContextProtocol.McpException) { checks++; return; } throw new InvalidOperationException(label); }
 Check(resources.Artifact("exports/plan.json") is ModelContextProtocol.Protocol.TextResourceContents { Text: "{\"ok\":true}", MimeType: "application/json", Uri: "tia://artifacts/exports/plan.json" },
     "JSON artifact reads as text with its canonical URI");
 Check(resources.Artifact("exports\\raw.bin") is ModelContextProtocol.Protocol.BlobResourceContents blob && blob.DecodedData.ToArray().SequenceEqual(new byte[] { 0, 159, 255 }),

@@ -12,6 +12,7 @@ namespace TiaMcp.Simulation
     // runtime call. Event codes are the numeric values of the V8 API enums (SimulationRuntimeApi.h); the worker casts them.
     internal static class SimulationRuntimeControl
     {
+        private static readonly string[] ChannelErrorFields = new[] { "channel", "errorType", "extErrorType", "severity", "direction" };
         internal static string CaptureMode(JObject args)
         {
             if (Given(args, "cycleSynchronous") && args["cycleSynchronous"].Type != JTokenType.Boolean)
@@ -123,7 +124,7 @@ namespace TiaMcp.Simulation
                     result["channels"] = new JArray(channels.Select(token =>
                     {
                         var channel = token as JObject ?? throw new ArgumentException("Each diagnostic channel must be an object.");
-                        if (channel.Properties().Any(p => Array.IndexOf(new[] { "channel", "errorType", "extErrorType", "severity", "direction" }, p.Name) < 0))
+                        if (channel.Properties().Any(p => Array.IndexOf(ChannelErrorFields, p.Name) < 0))
                             throw new ArgumentException("Unknown diagnostic channel field.");
                         return new JObject { ["channel"] = UInt16(channel, "channel", 0), ["errorType"] = UInt16(channel, "errorType", 0),
                             ["extErrorType"] = channel["extErrorType"] == null ? 0 : UInt16(channel, "extErrorType", 0),

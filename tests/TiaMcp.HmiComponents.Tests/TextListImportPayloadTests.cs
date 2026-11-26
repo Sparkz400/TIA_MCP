@@ -12,7 +12,7 @@ internal static class TextListImportPayloadTests
         string root = Path.Combine(parent, "text-list-import"); int checks = 0;
         void Check(bool condition, string label) { if (!condition) throw new Exception(label); checks++; }
         void Refuse(Func<JsonObject> action, string label, string code)
-        { try { action(); } catch (BridgeException e) when (e.Code == code) { checks++; return; } throw new Exception("Expected " + code + ": " + label); }
+        { try { action(); } catch (BridgeException e) when (e.Code == code) { checks++; return; } throw new InvalidOperationException("Expected " + code + ": " + label); }
         var records = new List<(string Id, JsonObject Receipt)>();
         foreach (string fixture in new[] { "fixtures/hmi-coordinated/retained-v1-v3", "fixtures/hmi-evolution/retained-v1-sets" })
         {
