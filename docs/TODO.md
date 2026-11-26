@@ -160,18 +160,18 @@ with evidence from an owned fixture.
   something or cannot return every pre-download configuration. Runner: `scripts/probe_download_abort.py`
   (standard-access DB, one fresh owned lifecycle per case, because a refused `simulation_download_online` leaves its
   change `recovery_required` and blocks further changes on that project; a control download of the same changes shows
-  that the online compare detects a load). First native run on 26 November
-  ([record](verification/native-runs-20261126.md#download-pre-check-abort)), case `first` only: a layout change of the
-  standard-access DB made TIA raise `DataBlockReinitialization` as the first pre-download configuration; the worker's
-  refusal from that callback stopped the download and nothing reached the CPU (PLCSIM: `Kept` 7, `ProgramVersion` 1,
-  RUN, cycles advancing, no software-configuration event). But every Openness call afterwards failed with "TIA Portal
-  has either been disposed or stopped running", so the online compare after the abort, the `later` case and the
-  control could not run, and the change reported `EngineeringError` instead of the typed
-  `SimulationDownloadReinitializationRequired`. The same refusal path is the documented behaviour of
-  `simulation_download_online` and `plc_physical_download`, so if it reproduces it is a product defect: a refused
-  download question costs the owned Portal session. Next: rerun the `first` case alone, check whether the Portal
-  process exits or only the connection is disposed (and why the typed code is lost), then run `later` and `control`.
-  Not registered as an Openness gap: the abort loaded nothing and returned the configuration it was asked.
+  that the online compare detects a load). Run natively on 26 November ([record](verification/native-runs-20261126.md#download-pre-check-abort)): a
+  layout change of the standard-access DB makes TIA raise `DataBlockReinitialization` as the first pre-download
+  configuration (before `ConsistentBlocksDownload`). Refusing it by throwing a worker exception from the delegate loaded
+  nothing (PLCSIM values, RUN and the watch unchanged) but left the Openness Portal disposed and hid the typed code
+  (twice). The documented `DataBlockReinitializationSelections.NoAction` is refused by V21 ("The configuration provided
+  is invalid"); that Siemens exception ends the download without loading and leaves the Portal usable. Since then
+  `simulation_download_online` and `plc_physical_download` decline a refused `DataBlockReinitialization` that way and
+  report the typed refusal (`SimulationDownloadReinitializationRequired`): nothing loaded, the online compare after the
+  abort ran, and the control download was detected by the compare. Open: `StopModules` (still refused by a worker
+  exception; its `NoAction` is unobserved), a complete curated run of all three cases (the `first` case of the last run
+  hit the card-staging access denial), and the physical route (B05). Not an Openness gap: the abort loads nothing and
+  returns every configuration up to the refused one.
 - [x] **P2 — Opening a UMAC-protected project:** the user found that `ProjectComposition.Open(FileInfo, UmacDelegate,
   ProjectOpenMode)` works with `UmacCredentials.Name` and `SetPassword(SecureString)` in the callback. `project_open`
   passed no callback, so it could not open such a project. Done on 20 November (offline): `project_open` takes
@@ -288,6 +288,7 @@ scripts/CI clean-up). Nothing here was qualified natively: the changes are cover
   and after the refused-TLS one `simulation_provision_recover` stopped at the reconciliation ("Memory card cannot
   contain a reparse point"; none was found afterwards and `SIMATIC_MC` was absent). The other attempts restored the
   card at the first move. Heavy concurrent builds and test runs were active during both failures ([record](verification/native-runs-20261126.md)).
+  A third occurrence on 26 November ended a download-abort probe case the same way.
   Earlier: seen once for 15 s on 23 October, not reproduced in 5 instrumented runs on 1 November
   (`local.provision.card_move.20261101`). Next: identify the holder with a handle listing (Restart Manager does not see
   directory handles), e.g. Sysinternals `handle` on the card folder during a failure, and decide whether a longer

@@ -87,6 +87,17 @@ online compare and `tia_detach`, failed with "TIA Portal has either been dispose
 process was left and Windows logged no application error. The `later` and `control` cases could not run. One
 observation, to be repeated before any conclusion about the Portal's fate.
 
+The repeat (`artifacts/da3`) showed the same: nothing loaded, the Portal disposed, `EngineeringError`. TIA documents
+`DataBlockReinitializationSelections.NoAction`, but setting it is refused ("The configuration provided is invalid",
+`EngineeringTargetInvocationException`), and that Siemens exception ended the download without loading while the
+Portal stayed usable (`artifacts/da4`: the online compare after the abort ran; the control case, `reinitialize` with
+`allowStop`, loaded `Added` and `ProgramVersion` 2 and the compare became identical, so the compare detects a load).
+The worker now records its typed refusal and declines a refused `DataBlockReinitialization` through that setter
+(`artifacts/da5`, case `later`: `SimulationDownloadReinitializationRequired`, nothing loaded, compare ran; the probe's
+rule that counted the later `ConsistentBlocksDownload` as missing was corrected, since TIA asks it after the refused
+question). The `first` case of that run hit the card-staging access denial during provisioning, so no run of all three
+cases is complete and nothing is curated.
+
 ## HMI content fingerprint
 
 `scripts/qualify_hmi_content_fingerprint.py` on HmiSeeder positive baselines (`HmiSeeder qualify ... positive`; two

@@ -141,8 +141,12 @@ class ClassificationTests(unittest.TestCase):
         self.assertEqual(p.classify(row, "later")["verdict"], "inconclusive")
 
     def test_missing_configurations_of_the_same_change_set_are_a_gap(self):
-        verdict = p.classify(aborted(), "later", ["ConsistentBlocksDownload", "DataBlockReinitialization", "UserManagementDownload"], same_change_set=True)
+        # A configuration the control raised before the refused one never arrived: a gap.
+        verdict = p.classify(aborted(), "later", ["UserManagementDownload", "ConsistentBlocksDownload", "DataBlockReinitialization"], same_change_set=True)
         self.assertEqual((verdict["verdict"], verdict["missingConfigurations"]), ("gap", ["UserManagementDownload"]))
+        # One the control raised only after it cannot arrive once TIA stops at the refusal (native order on 26 November).
+        after = p.classify(aborted(), "later", ["ConsistentBlocksDownload", "DataBlockReinitialization", "UserManagementDownload"], same_change_set=True)
+        self.assertEqual((after["verdict"], after["missingConfigurations"]), ("noGap", []))
 
     def test_post_download_refusal_is_a_gap(self):
         row = aborted(configurations=[configuration("pre", "ConsistentBlocksDownload", "ConsistentDownload"), configuration("post", "Unknown", exception="X")],

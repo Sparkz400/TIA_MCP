@@ -276,7 +276,11 @@ def classify(row, intent, reference=None, same_change_set=False):
     if reference is None:
         result["completeness"] = "unknown"
     else:
-        missing = [t for t in reference if t not in attempted]
+        # Only the configurations the control raised before the refused one can arrive: TIA stops asking at the refusal
+        # (natively, 26 November: DataBlockReinitialization comes before ConsistentBlocksDownload).
+        refused_type = (refusal or {}).get("type")
+        expected = reference[:reference.index(refused_type) + 1] if refused_type in reference else reference
+        missing = [t for t in expected if t not in attempted]
         result["missingConfigurations"] = missing
         result["completeness"] = ("incomplete" if missing else "complete") if same_change_set else "notComparable"
     old_version = ((row.get("before") or {}).get("values") or {}).get("ProgramVersion")

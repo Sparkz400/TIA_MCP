@@ -20,6 +20,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ### Fixed
 
+- `simulation_download_online` and `plc_physical_download` refused a `DataBlockReinitialization` question by throwing from TIA's download callback, which loaded nothing but left the TIA Portal session disposed and reported `EngineeringError`; they now decline it through TIA and report `SimulationDownloadReinitializationRequired` (or the physical route's refusal) with the Portal intact.
 - `hmi_content_fingerprint` fingerprinted any kind starting with `hmi_`; an unknown kind is now refused (`InvalidRequest`).
 - `project_snapshot_capture` failed every successful capture with `ProjectReviewFailed` ("System.Int32 cannot be converted to System.Int64") while it added `remoteAccess` to the saved review, since 20 November (in 0.9.0). The review's byte count is now stored as a 64-bit number and read in either width.
 

@@ -100,6 +100,19 @@ namespace TiaMcp.Openness.V21
             if (refusal != null) throw new BridgeException("SimulationTargetMismatch", refusal);
         }
 
+        // A refused DataBlockReinitialization is declined through TIA itself. Observed natively on 26 November 2026
+        // (scripts/probe_download_abort.py): throwing a worker exception from the delegate loaded nothing but left the Openness
+        // Portal disposed ("TIA Portal has either been disposed or stopped running"); the documented NoAction selection is
+        // refused by V21 ("The configuration provided is invalid", EngineeringTargetInvocationException), and that Siemens
+        // exception ends the download without loading and leaves the Portal usable. The caller records its typed refusal first;
+        // this call is expected to throw. Returns false for any other question (StopModules NoAction is unobserved).
+        internal static bool DeclineDownloadConfiguration(DownloadConfiguration request)
+        {
+            if (!(request is DataBlockReinitialization reinitialize)) return false;
+            reinitialize.CurrentSelection = DataBlockReinitializationSelections.NoAction;
+            return true;
+        }
+
         private BridgeException OwnedSimulationDownload(JObject marker, PlcSelection plc, DeviceItem hardware, string observerDirectory, JObject report, JObject options,
             SimulationCredential login, SimulationCredential credential)
         {
@@ -158,8 +171,16 @@ namespace TiaMcp.Openness.V21
                             entry["selection"] = "generatedScratchCredential"; entry["secretReturned"] = false;
                             return;
                         }
-                        string selection = SimulationOnlineDownloadRules.Selection(type, preDownload, options, wasRunning, out string refusal)
-                            ?? throw new BridgeException(refusal, "The owned simulator download requested " + type + "; the reviewed options do not answer it: " + configurationRequest.Message);
+                        string selection = SimulationOnlineDownloadRules.Selection(type, preDownload, options, wasRunning, out string refusal);
+                        if (selection == null)
+                        {
+                            var refused = new BridgeException(refusal, "The owned simulator download requested " + type + "; the reviewed options do not answer it: " + configurationRequest.Message);
+                            // The typed refusal is what the caller sees, whatever ends the download below.
+                            callbackFailure = callbackFailure ?? refused;
+                            entry["selection"] = "declined"; entry["refusal"] = refusal;
+                            if (!DeclineDownloadConfiguration(configurationRequest)) throw refused;
+                            return;
+                        }
                         switch (configurationRequest)
                         {
                             case ConsistentBlocksDownload blocks: blocks.CurrentSelection = ConsistentBlocksDownloadSelections.ConsistentDownload; break;
