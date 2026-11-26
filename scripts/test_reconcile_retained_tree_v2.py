@@ -1,6 +1,5 @@
 """File-only tests; every process and Windows boundary is synthetic."""
 import copy
-import json
 from pathlib import Path
 import tempfile
 import unittest

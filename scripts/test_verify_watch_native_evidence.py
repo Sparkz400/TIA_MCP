@@ -1,5 +1,4 @@
 """Authored in-memory oracle tests; no customer capture becomes a tracked fixture."""
-import copy
 import json
 from pathlib import Path
 import tempfile

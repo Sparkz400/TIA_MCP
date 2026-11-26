@@ -205,7 +205,6 @@ class Lab:
         return result
 
     def write(self, label, signal, expected, value, **extra):
-        h = self.h
         arguments = {"caseId": self.case, "instanceId": self.instance["id"], "instanceName": self.instance["name"], "creationId": self.creation,
                      "writes": [{"signalId": signal["id"], "symbol": signal["symbol"], "type": signal["type"], "datatype": signal["datatype"],
                                  "expected": expected, "value": value, "reason": label}], "acknowledgeWrite": True}

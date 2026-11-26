@@ -1,6 +1,5 @@
 """Exact known project-lock retries with an injected clock and MCP double."""
 import copy
-import pathlib
 import unittest
 
 from block_test_runtime import NativeToolError

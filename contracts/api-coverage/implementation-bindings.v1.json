@@ -842,8 +842,8 @@
     },
     {
       "path": "scripts/test_api_coverage.py",
-      "sha256": "4b00415ca437753b7aefb7e9096b611c64b1bbe996cd6cc79dddb06d20d59661",
-      "bytes": 22644
+      "sha256": "0177cca216aeb23c8c97517be809f90f2740c4dd7531ce11426f6fb11f042adf",
+      "bytes": 22633
     },
     {
       "path": "scripts/test_api_coverage_bindings.py",

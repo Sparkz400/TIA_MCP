@@ -2,7 +2,7 @@
 import copy
 import unittest
 
-from block_test_executor import ExecutionBlocked, evaluate_assertion, execute_suite, revision_hash, validate_suite
+from block_test_executor import evaluate_assertion, execute_suite, revision_hash, validate_suite
 
 
 PROGRAM = {"bindings": {"dut": {
