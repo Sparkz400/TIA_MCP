@@ -43,3 +43,16 @@ def default_table_path(state, plc):
     found = sorted(tables & holding)
     _require(len(found) == 1, "Expected one default tag table of %s (%s): %s" % (plc, NOTE, found))
     return found[0]
+
+
+def count_follows_members(before, after, observed, category, key):
+    """True for a tag table row that changed by tagCount/constantCount alone while members below it were added or removed.
+
+    Since 10 November tag table rows carry those counts, so a table gaining a member (a plugged module's or an I-device
+    interface's system constant, a created tag) changes its own row too. before/after are compared views, observed their diff.
+    """
+    if category != "changed" or not key.startswith("tagTable:"):
+        return False
+    fields = {f for f in set(before[key]) | set(after[key]) if before[key].get(f) != after[key].get(f)}
+    members = "member:" + key[len("tagTable:"):] + "/"
+    return fields <= {"tagCount", "constantCount"} and any(k.startswith(members) for k in observed["added"] + observed["removed"])

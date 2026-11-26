@@ -21,6 +21,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 import hardware_paths
+import plc_tag_tables
 from library_native_harness import Harness, require
 from qualify_hardware_changes import CRITERIA as HARDWARE_CRITERIA, Run, interface_of
 from qualify_plc_object_mutations import STAGES, coverage_gaps, diff, in_order, matches
@@ -118,7 +119,8 @@ def mode_uncompiled(run, interface, value):
     def verify():
         state = run.current["view"]
         observed = diff(before["view"], state)
-        unexpected = {c: [k for k in keys if k != key and not coupled(interface)(c, k)] for c, keys in observed.items()}
+        unexpected = {c: [k for k in keys if k != key and not coupled(interface)(c, k)
+                          and not plc_tag_tables.count_follows_members(before["view"], state, observed, c, k)] for c, keys in observed.items()}
         require(key in observed["changed"] and not any(unexpected.values()), "Native effect of %s differs: %s" % (label, observed))
         require(matches({"attributes": {"InterfaceOperatingMode": value}, "network": {"transferAreas": []}}, state[key]), "Readback of %s differs: %s" % (key, state[key]))
         side = {c: [k for k in keys if k != key] for c, keys in observed.items() if any(k != key for k in keys)}

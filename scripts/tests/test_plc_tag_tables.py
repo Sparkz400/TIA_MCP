@@ -127,5 +127,40 @@ class TagTableTests(unittest.TestCase):
         self.assertTrue(coupled("added", "member:" + table + "/tags/RbAxis_Sensor1_Interface_AddressIn"))
 
 
+class CountFollowsMembersTests(unittest.TestCase):
+    TABLE = PLC + "/tags/" + GERMAN
+    KEY = "tagTable:" + TABLE
+
+    def views(self, **after):
+        before = {self.KEY: {"name": GERMAN, "tagCount": 0, "constantCount": 3}}
+        return before, {self.KEY: {**before[self.KEY], **after}}
+
+    def test_counts_following_an_added_constant_are_tolerated(self):
+        # An I-device interface adds Local~<interface>~IODevice to the default table (observed natively, 26 November).
+        before, after = self.views(constantCount=4)
+        observed = {"added": ["member:" + self.TABLE + "/systemConstants/Local~PROFINET-Schnittstelle_1~IODevice"], "removed": [], "changed": [self.KEY]}
+        self.assertTrue(tt.count_follows_members(before, after, observed, "changed", self.KEY))
+
+    def test_counts_without_a_member_change_are_not(self):
+        before, after = self.views(constantCount=4)
+        self.assertFalse(tt.count_follows_members(before, after, {"added": [], "removed": [], "changed": [self.KEY]}, "changed", self.KEY))
+
+    def test_other_fields_are_not(self):
+        before, after = self.views(constantCount=4, name="Renamed")
+        observed = {"added": ["member:" + self.TABLE + "/systemConstants/X"], "removed": [], "changed": [self.KEY]}
+        self.assertFalse(tt.count_follows_members(before, after, observed, "changed", self.KEY))
+
+    def test_only_changed_tag_table_rows(self):
+        before, after = self.views(constantCount=4)
+        observed = {"added": ["member:" + self.TABLE + "/systemConstants/X"], "removed": [], "changed": []}
+        self.assertFalse(tt.count_follows_members(before, after, observed, "added", self.KEY))
+        self.assertFalse(tt.count_follows_members(before, after, observed, "changed", "hw:" + PLC))
+
+    def test_a_member_of_another_table_does_not_count(self):
+        before, after = self.views(tagCount=1)
+        observed = {"added": ["member:" + PLC + "/tags/Other/tags/T"], "removed": [], "changed": [self.KEY]}
+        self.assertFalse(tt.count_follows_members(before, after, observed, "changed", self.KEY))
+
+
 if __name__ == "__main__":
     unittest.main()
