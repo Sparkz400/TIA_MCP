@@ -219,12 +219,13 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   the rest of a clean-up before more rules become errors. Measured 26 November with a Release build of the 57
   non-net48 projects in `src/` and `tests/` plus `scripts/native/ReliabilityWorker` and `WatchWorkflow`
   (`-p:AnalysisLevel=latest-recommended -p:TreatWarningsAsErrors=false`, findings counted once per file, line, column
-  and rule, compiler warnings excluded): 1,821 before the clean-up (1,825 on 25 November), 1,297 after (CA2201
-  774 → 432, CA1861 421 → 357, CA1305 142 → 30; next CA1822 77, CA1825 65, CA1310 58). Left: CA2201 sites inside
-  lambdas or try blocks, or reachable from a handler that treats `InvalidOperationException` differently; CA1861 in
-  `tests/`, which needs fields named by hand; CA1305 in user-facing text (`GraphHtml.cs`, simulated TIA messages).
-  Ruff F401/F841/F402 were cleaned up and are part of the gate. Coverage does not measure worker sources linked into test assemblies (first local numbers: Translations 84.7 %,
-  Core 6 % from seven suites only).
+  and rule, compiler warnings excluded): 1,821 before the clean-up (1,825 on 25 November), 1,368 after (CA2201
+  774 → 503, CA1861 421 → 357, CA1305 142 → 30; next CA1822 77, CA1825 65, CA1310 58). Left: CA2201 sites inside
+  lambdas or try blocks, or reachable from product code or a handler that treats `InvalidOperationException`
+  differently; CA1861 in `tests/` (349), which needs fields named by hand; CA1305 in user-facing text
+  (`GraphHtml.cs`, simulated TIA messages). Ruff F401/F841/F402 were cleaned up and are part of the gate. Coverage
+  does not measure worker sources linked into test assemblies (first local numbers: Translations 84.7 %, Core 6 % from
+  seven suites only).
 - [ ] **Found by the new tests, left open:** `plc_physical_*` has no Host-side gate (only tool registration behind
   `--physical-plc-online` and the worker refuse; the maintainer has not decided whether to add one). Closed the same
   day: the successful `runtime_unified_connect` path is tested offline end to end, `ProjectReviewStore` refuses
