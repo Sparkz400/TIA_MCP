@@ -134,7 +134,10 @@ public sealed partial class TiaTools
                 var saved = new ProjectReviewStore(options.ArtifactsDirectory).Save(model, documents, coverage);
                 // A client on another machine cannot open the Host path: name the resource and the chunked route.
                 string reviewId = saved["reviewId"]!.GetValue<string>();
-                long reviewBytes = saved["artifact"]!["bytes"]!.GetValue<long>();
+                // A JsonValue built from an int does not convert to long (natively on 26 November 2026 every successful capture failed
+                // here with "System.Int32 cannot be converted to System.Int64"); read either width.
+                var bytesValue = saved["artifact"]!["bytes"]!.AsValue();
+                long reviewBytes = bytesValue.TryGetValue(out long wide) ? wide : bytesValue.GetValue<int>();
                 saved["remoteAccess"] = new JsonObject { ["resourceUri"] = "tia://project-reviews/" + reviewId,
                     ["resourceReadable"] = reviewBytes <= TiaResources.MaxBytes,
                     ["artifactPath"] = "project-reviews/" + reviewId + ".json",
