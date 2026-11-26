@@ -72,6 +72,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 from pathlib import Path
+import shutil
 import subprocess
 import time
 import traceback
@@ -559,7 +560,10 @@ def body(h):
 
 
 class ProbeHarness(Harness):
-    report_name = "report.json"
+    def persist(self):
+        """Keep the shared qualification.json and copy it to report.json, the name this probe's readers use."""
+        super().persist()
+        shutil.copyfile(self.directory / "qualification.json", self.directory / "report.json")
 
 
 def parse(argv=None):

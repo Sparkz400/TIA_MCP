@@ -27,9 +27,6 @@ def identity(version):
 
 
 class Harness:
-    # A runner may name its report differently (probe_download_abort.py writes report.json).
-    report_name = "qualification.json"
-
     def __init__(self, args, prefix, profile, limitations, inputs, scratch=True):
         require(args.run_native, "Explicit --run-native is required")
         self.directory = args.artifacts.resolve() / (prefix + uuid.uuid4().hex[:8])
@@ -49,7 +46,7 @@ class Harness:
     def persist(self):
         if self.client is not None:
             self.report["toolCalls"] = self.client.tool_calls
-        (self.directory / self.report_name).write_text(json.dumps(self.report, indent=2), encoding="utf-8")
+        (self.directory / "qualification.json").write_text(json.dumps(self.report, indent=2), encoding="utf-8")
 
     def connect(self):
         """Start the Host. A later call closes the current Host first (a fresh-Host stage); its calls stay in toolCalls."""
@@ -92,7 +89,7 @@ class Harness:
                     if self.report["completed"]:
                         self.report.update(completed=False, failure="The owned TIA process did not exit after detach and Host close: " + str(error))
             self.persist()
-            print("Report: " + str(self.directory / self.report_name), flush=True)
+            print("Report: " + str(self.directory / "qualification.json"), flush=True)
         require(self.report["completed"], self.report.get("failure", "The run did not complete"))
 
     def watch_owned_tia(self):
