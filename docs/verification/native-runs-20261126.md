@@ -71,3 +71,18 @@ Catalog `0.5.1` binds them; the matrix has 63 open cells (85 before).
   `sim_network_mode_set`, the elevated UA disk-full test and the WinCC Unified alarm tools (the user skipped the
   elevated steps and the Runtime certificate renewal).
 - A 2-5 minute `runtime_plcsim_bind` with a live UA session: there is no honest way to make the bind take that long.
+
+## Download pre-check abort
+
+`scripts/probe_download_abort.py` on Debug builds of `d85a6444` (owned scratch CPU 1511-1 PN, owned PLCSIM instance
+provisioned with the user's first-use trust, RUN, `Kept := 7`), report `artifacts/da/da_da578614/report.json` (not
+curated: the run did not complete). Case `first`: after a layout change of a standard-access DB,
+`simulation_download_online` (`changes`, `keepActualValues`, `allowStop: false`) received `DataBlockReinitialization`
+("The data blocks will be re-initialized with their start values.") as its first pre-download configuration and
+refused it from the callback. PLCSIM showed nothing loaded: `Kept` 7, `ProgramVersion` 1, RUN, `Cycles` advancing,
+no software-configuration or operating-state event in the watch around the download. The online compare before the
+download listed `AbortDb` and `Main` as different. After the refusal the change reported `EngineeringError`
+("Access to a disposed object of type 'Siemens.Engineering.Project'"), and every later Openness call, including the
+online compare and `tia_detach`, failed with "TIA Portal has either been disposed or stopped running"; no Portal
+process was left and Windows logged no application error. The `later` and `control` cases could not run. One
+observation, to be repeated before any conclusion about the Portal's fate.

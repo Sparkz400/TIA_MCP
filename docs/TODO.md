@@ -157,10 +157,21 @@ with evidence from an owned fixture.
   `plc_physical_download` already does for a question it does not answer, may stop the download before anything is
   loaded, and that route is untried. Next: on an owned PLCSIM instance (later the bench PLC, B05), abort from the first
   and from a later pre-download callback and check that nothing was loaded; register the gap if the abort loads
-  something or cannot return every pre-download configuration. Runner written, not run yet:
-  `scripts/probe_download_abort.py` (standard-access DB, one fresh owned lifecycle per case, because a refused
-  `simulation_download_online` leaves its change `recovery_required` and blocks further changes on that project; a
-  control download of the same changes shows that the online compare detects a load).
+  something or cannot return every pre-download configuration. Runner: `scripts/probe_download_abort.py`
+  (standard-access DB, one fresh owned lifecycle per case, because a refused `simulation_download_online` leaves its
+  change `recovery_required` and blocks further changes on that project; a control download of the same changes shows
+  that the online compare detects a load). First native run on 26 November
+  ([record](verification/native-runs-20261126.md#download-pre-check-abort)), case `first` only: a layout change of the
+  standard-access DB made TIA raise `DataBlockReinitialization` as the first pre-download configuration; the worker's
+  refusal from that callback stopped the download and nothing reached the CPU (PLCSIM: `Kept` 7, `ProgramVersion` 1,
+  RUN, cycles advancing, no software-configuration event). But every Openness call afterwards failed with "TIA Portal
+  has either been disposed or stopped running", so the online compare after the abort, the `later` case and the
+  control could not run, and the change reported `EngineeringError` instead of the typed
+  `SimulationDownloadReinitializationRequired`. The same refusal path is the documented behaviour of
+  `simulation_download_online` and `plc_physical_download`, so if it reproduces it is a product defect: a refused
+  download question costs the owned Portal session. Next: rerun the `first` case alone, check whether the Portal
+  process exits or only the connection is disposed (and why the typed code is lost), then run `later` and `control`.
+  Not registered as an Openness gap: the abort loaded nothing and returned the configuration it was asked.
 - [x] **P2 — Opening a UMAC-protected project:** the user found that `ProjectComposition.Open(FileInfo, UmacDelegate,
   ProjectOpenMode)` works with `UmacCredentials.Name` and `SetPassword(SecureString)` in the callback. `project_open`
   passed no callback, so it could not open such a project. Done on 20 November (offline): `project_open` takes
