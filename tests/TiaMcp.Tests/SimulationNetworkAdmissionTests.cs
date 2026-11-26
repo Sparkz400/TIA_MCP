@@ -150,7 +150,7 @@ internal static class SimulationNetworkAdmissionTests
         foreach (var (tool, send) in new[] { ("runtime_web_write", "sessions.Write("), ("runtime_web_operating_mode", "sessions.ChangeOperatingMode("),
             ("runtime_web_alarm_acknowledge", "sessions.AcknowledgeAlarm("), ("runtime_web_backup", "sessions.Backup(") })
         {
-            int start = web.IndexOf("Name=\"" + tool + "\"", StringComparison.Ordinal), gate = web.IndexOf("await Gate(attemptId,bindingSha256,", Math.Max(start, 0), StringComparison.Ordinal);
+            int start = web.IndexOf("Name = \"" + tool + "\"", StringComparison.Ordinal), gate = web.IndexOf("await Gate(attemptId, bindingSha256,", Math.Max(start, 0), StringComparison.Ordinal);
             Check.Equal(true, start >= 0 && gate > start && gate < web.IndexOf(send, start, StringComparison.Ordinal));
         }
         string system = Source("TiaMcp.Openness.V21", "OpennessSession.TestSuiteSystem.cs");
