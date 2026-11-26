@@ -161,7 +161,7 @@ release. A deprecated tool names the release that deprecated it and its replacem
 | `hmi_classic_screen_compose` | Compose and preflight native Classic screen components | unqualified | hmi | experimental |  |  |
 | `hmi_component_review` | Review component/interface-to-HMI proposals | shipped | hmi | frozen |  |  |
 | `hmi_component_review_page` | Read retained component/HMI review evidence | shipped | hmi | frozen |  |  |
-| `hmi_content_fingerprint` | Read the HMI native-content hash a change needs, without preparing it | unqualified | hmi | experimental |  |  |
+| `hmi_content_fingerprint` | Read the HMI native-content hash a change needs, without preparing it | limited | hmi | frozen |  |  |
 | `hmi_inspect` | Bounded Classic and Unified HMI inspection | limited | hmi | frozen |  |  |
 | `hmi_references` | Evidence-backed HMI and PLC relationships | limited | hmi | frozen |  |  |
 | `hmi_text_list_author` | Author plain Unified text-list candidates | shipped | hmi | frozen |  |  |

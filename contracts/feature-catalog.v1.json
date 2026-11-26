@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.5.1",
+  "catalogVersion": "0.5.2",
   "targetTiaVersions": [
     21
   ],
@@ -5995,6 +5995,23 @@
       "limitations": [
         "Four block shapes (SCL FC, optimized DB, LAD FB, FBD FB) on one CPU 1511-1 PN V4.1 in a German TIA installation; STL, GRAPH, instance DBs, standard-access DBs, protected and multi-block documents are not exercised. A difference is recorded, not failed.",
         "Supplied fixture texts were stripped before import (a scratch in another language refuses them); supplied documents with non-empty multilingual texts are not exercised."
+      ]
+    },
+    {
+      "id": "local.hmi.content-fingerprint.20261126",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "3a7eb1006453eb5412ddf6f65f959095dfdbae5b",
+        "passedScope": "scripts/qualify_hmi_content_fingerprint.py on Debug builds of 3a7eb100, on HmiSeeder positive baselines (two HMIs, HMI_RT_1 and HMI_RT_2) of unified-pc, unified-comfort, classic-comfort, classic-rt-advanced and classic-basic, each retrieved into an owned copy: hmi_content_fingerprint for the profile's production kind (Unified: hmi_screen_create, also hmi_external_tag_create; Classic: hmi_classic_import scalar_property_set) returned a usable contentHash with scopeAccepted, the same hash on a repeat; change_prepare bound to it prepared; the applied change (a new Unified screen, a Classic BackColor) changed the fingerprint; a prepare bound to the old hash was refused with StaleRevision naming the new hash; an unknown kind was refused (InvalidRequest)."
+      },
+      "artifacts": [
+        "evidence/local.hmi.content-fingerprint.20261126.json"
+      ],
+      "limitations": [
+        "Seeded baselines, not desk-configured fixtures; complete is false on every profile (the kinds' standing capture notes), scopeAccepted true. The hash was identical for HMI_RT_1 and HMI_RT_2 and for hmi_screen_create and hmi_external_tag_create: it covers the family's HMIs of the project, not one target, so identity separation between HMIs is not provided by the fingerprint.",
+        "Other HMI change kinds (hmi_text_list_import, hmi_dynamization_create, hmi_event_handler_create, hmi_classic_screen_edit) are not fingerprinted in this run."
       ]
     }
   ],
@@ -30339,12 +30356,15 @@
           "The hash depends on the change kind's scope policy, so the caller names the kind it will prepare; hmi_classic_import also needs its operation.",
           "Runs the full preservation capture and writes its export artifacts under the Host's hmi artifacts; it is as slow as change_prepare's baseline.",
           "change_prepare still recaptures and refuses with StaleRevision when the content changed in between; the fingerprint is not a lease.",
-          "Native check on 14 November 2026 (not curated evidence): on a seeded Unified PC fixture the fingerprint for hmi_screen_create returned scopeAccepted true with only the standing Unified notes missing, and change_prepare for a screen_create with that expectedContentHash prepared without StaleRevision; the change was not applied."
+          "Natively qualified on 26 November 2026 on HmiSeeder baselines of unified-pc, unified-comfort, classic-comfort, classic-rt-advanced and classic-basic (local.hmi.content-fingerprint.20261126): repeatable usable hash, a prepare bound to it, a new hash after an applied change, StaleRevision naming it for the old one, and an unknown kind refused (InvalidRequest).",
+          "The hash is the same for every HMI of that family in the project and, observed, for hmi_screen_create and hmi_external_tag_create: it does not separate one HMI target from another."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.content-fingerprint.20261126"
+        ]
       },
       "availability": {
         "status": "conditional",

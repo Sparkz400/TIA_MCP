@@ -1,0 +1,116 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.content-fingerprint.20261126",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-26T09:19:17+00:00",
+  "source": {
+    "commit": "3a7eb1006453eb5412ddf6f65f959095dfdbae5b",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "LT-PRG2024-03",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_hmi_content_fingerprint.py on Debug builds of 3a7eb100, on HmiSeeder positive baselines (two HMIs, HMI_RT_1 and HMI_RT_2) of unified-pc, unified-comfort, classic-comfort, classic-rt-advanced and classic-basic, each retrieved into an owned copy: hmi_content_fingerprint for the profile's production kind (Unified: hmi_screen_create, also hmi_external_tag_create; Classic: hmi_classic_import scalar_property_set) returned a usable contentHash with scopeAccepted, the same hash on a repeat; change_prepare bound to it prepared; the applied change (a new Unified screen, a Classic BackColor) changed the fingerprint; a prepare bound to the old hash was refused with StaleRevision naming the new hash; an unknown kind was refused (InvalidRequest).",
+  "limitations": [
+    "Seeded baselines, not desk-configured fixtures; complete is false on every profile (the kinds' standing capture notes), scopeAccepted true. The hash was identical for HMI_RT_1 and HMI_RT_2 and for hmi_screen_create and hmi_external_tag_create: it covers the family's HMIs of the project, not one target, so identity separation between HMIs is not provided by the fingerprint.",
+    "Other HMI change kinds (hmi_text_list_import, hmi_dynamization_create, hmi_event_handler_create, hmi_classic_screen_edit) are not fingerprinted in this run."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "66da5fc3102436badb6d0b2ebdde462d159947dbe19120aafb296e47acc42b0e"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "7ddf767dcb8549fc88f87a93dc2acbda45fd29cf813446136d0279b1bf3df426"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "807d9b2ddaa2e7eefe393a8fabbc3dab7d8d18cabe43f3a3fd2c3c1738bf6753"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "fc626c90ae1c1cc58d06dcca1f3363a984eeed91d6334ba95143a8f3e60e9e61",
+      "bytes": 89819,
+      "completed": true,
+      "steps": [
+        "host_build_identity",
+        "unified-pc: project_retrieve",
+        "unified-pc: fingerprint hmi_screen_create",
+        "unified-pc: fingerprint repeated",
+        "unified-pc: fingerprint HMI_RT_2",
+        "unified-pc: fingerprint hmi_external_tag_create",
+        "unified-pc: prepare bound to the fingerprint",
+        "unified-pc: apply",
+        "unified-pc: fingerprint after apply",
+        "unified-pc: prepare bound to the old hash",
+        "unified-pc: unknown kind refused",
+        "unified-pc: project_close",
+        "unified-comfort: project_retrieve",
+        "unified-comfort: fingerprint hmi_screen_create",
+        "unified-comfort: fingerprint repeated",
+        "unified-comfort: fingerprint HMI_RT_2",
+        "unified-comfort: fingerprint hmi_external_tag_create",
+        "unified-comfort: prepare bound to the fingerprint",
+        "unified-comfort: apply",
+        "unified-comfort: fingerprint after apply",
+        "unified-comfort: prepare bound to the old hash",
+        "unified-comfort: unknown kind refused",
+        "unified-comfort: project_close",
+        "classic-comfort: project_retrieve",
+        "classic-comfort: fingerprint hmi_classic_import",
+        "classic-comfort: fingerprint repeated",
+        "classic-comfort: fingerprint HMI_RT_2",
+        "classic-comfort: prepare bound to the fingerprint",
+        "classic-comfort: apply",
+        "classic-comfort: fingerprint after apply",
+        "classic-comfort: prepare bound to the old hash",
+        "classic-comfort: unknown kind refused",
+        "classic-comfort: project_close",
+        "classic-rt-advanced: project_retrieve",
+        "classic-rt-advanced: fingerprint hmi_classic_import",
+        "classic-rt-advanced: fingerprint repeated",
+        "classic-rt-advanced: fingerprint HMI_RT_2",
+        "classic-rt-advanced: prepare bound to the fingerprint",
+        "classic-rt-advanced: apply",
+        "classic-rt-advanced: fingerprint after apply",
+        "classic-rt-advanced: prepare bound to the old hash",
+        "classic-rt-advanced: unknown kind refused",
+        "classic-rt-advanced: project_close",
+        "classic-basic: project_retrieve",
+        "classic-basic: fingerprint hmi_classic_import",
+        "classic-basic: fingerprint repeated",
+        "classic-basic: fingerprint HMI_RT_2",
+        "classic-basic: prepare bound to the fingerprint",
+        "classic-basic: apply",
+        "classic-basic: fingerprint after apply",
+        "classic-basic: prepare bound to the old hash",
+        "classic-basic: unknown kind refused",
+        "classic-basic: project_close",
+        "tia_detach"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "hmi_content_fingerprint",
+        "hmi_inspect",
+        "host_build_identity",
+        "project_close",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "hmi_content_fingerprint"
+      ]
+    }
+  ]
+}

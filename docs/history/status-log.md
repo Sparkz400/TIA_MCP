@@ -7,9 +7,9 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 26 November 2026
 
-**Native runs on owned scratch projects:** catalog `0.5.1` binds `project_save`, `project_close`, `project_archive`,
-`project_open_copy`, `simulation_provision_status`, `simulation_provision_recover`, `sim_prune` and
-`sim_network_mode_set` (2,102 bound, 63 open, 72 blocked, 3 descoped cells) and adds a content readback to
+**Native runs on owned scratch projects:** catalog `0.5.2` binds `project_save`, `project_close`, `project_archive`,
+`project_open_copy`, `simulation_provision_status`, `simulation_provision_recover`, `sim_prune`,
+`sim_network_mode_set` and `hmi_content_fingerprint` (2,105 bound, 60 open, 72 blocked, 3 descoped cells) and adds a content readback to
 `block_import_xml`, each with curated evidence of the same day ([record](../verification/native-runs-20261126.md)).
 The runs found a 0.9.0 regression (every successful `project_snapshot_capture` failed while adding `remoteAccess`;
 fixed), that TIA's `Project.Archive` writes into the open project's folder, and a recurrence of the card-staging

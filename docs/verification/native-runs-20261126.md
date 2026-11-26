@@ -86,3 +86,17 @@ download listed `AbortDb` and `Main` as different. After the refusal the change 
 online compare and `tia_detach`, failed with "TIA Portal has either been disposed or stopped running"; no Portal
 process was left and Windows logged no application error. The `later` and `control` cases could not run. One
 observation, to be repeated before any conclusion about the Portal's fate.
+
+## HMI content fingerprint
+
+`scripts/qualify_hmi_content_fingerprint.py` on HmiSeeder positive baselines (`HmiSeeder qualify ... positive`; two
+HMIs per profile) of unified-pc, unified-comfort, classic-comfort, classic-rt-advanced and classic-basic, each
+retrieved into an owned copy. The first run found that `hmi_content_fingerprint` accepted any kind beginning with
+`hmi_` and fingerprinted `hmi_not_a_kind`; fixed in `3a7eb100` (`HmiEngineeringRules.IsFingerprintKind`). The rerun on
+that build passed on all five profiles and is curated as
+[`local.hmi.content-fingerprint.20261126`](../../evidence/local.hmi.content-fingerprint.20261126.json) (catalog
+`0.5.2`): a usable, repeatable hash (`complete` false with the kinds' standing notes, `scopeAccepted` true), a prepare
+bound to it, a new hash after the applied change (a Unified screen, a Classic `BackColor`), `StaleRevision` naming the
+new hash for a prepare bound to the old one, and `InvalidRequest` for an unknown kind. The hash was identical for
+`HMI_RT_1` and `HMI_RT_2` and for `hmi_screen_create` and `hmi_external_tag_create`, so it covers the family's HMIs of
+the project rather than one target.
