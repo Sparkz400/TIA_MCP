@@ -94,65 +94,28 @@ record is cited by a feature; records no feature cites any more are in the retir
 
 ## Recent changes
 
-Dated notes, newest first, are in the [status log](history/status-log.md); it has no entry between 3 and 25 November, and the
-work since is recorded in the [TODO](TODO.md) sections it closed or opened. From 4 to 12 November the
-[offline engineering session follow-ups](TODO.md#offline-engineering-session-follow-ups-4-november) were qualified
-natively. User feedback on v0.9.0 of
-[14 November](TODO.md#user-feedback-on-v090-14-november) and
-[18 November](TODO.md#user-feedback-on-v090-18-november) and the
-[20 November field findings](TODO.md#field-findings-from-a-physical-download-20-november) added, among others,
-`project_save`, `project_close`, `project_archive`, `project_open_copy`, the provisioning status and recovery tools,
-`hmi_content_fingerprint`, the WinCC Unified runtime alarm tools, the real-PLC online tools, `attachedSessions` and
-the UMAC project login; since 26 November the project lifecycle, provisioning recovery, `sim_prune` and
-`hmi_content_fingerprint` rows have curated evidence ([record](verification/native-runs-20261126.md)), the others none yet. The merges of 20 November (PRs 315–326)
-added the Web API download, backup and alarm acknowledgement routes, `sim_prune` and `SingleStep_Bus` capture
-(offline checks only, catalog 0.4.189) and hardened the safety write gates, the OPC UA and Web API clients, PLCSIM
-capture and retention, the artifact stores, `block_export` paging and the tool surface; PR 328 (23 November) made the
-V21 worker compile again after a class-name clash. On
-[2 November](history/status-log.md#2-november-2026) the worker paths of the 31 October audit ran natively (catalog 0.4.114 and 0.4.116):
-the delete and rename compile rule, the unresolved-change refusal of `change_prepare`, generated-source reads, `vci_workspace_inspect`'s `contentSha256` and translation scratch
-status, with the restricted translation pipeline running end to end again after an RFC 8785 fix of its admission scripts.
-From 31 October to
-[1 November](history/status-log.md#1-november-2026): the Classic screen/tag-table import and BackColor (TP700 Comfort) and PLC-backed
-Unified tags (Unified Comfort, Unified PC) passed the HMI preservation gate natively and are admitted in production, and WinCC RT
-Professional became a recorded V21 boundary (catalog 0.4.92). Before that: project upgrade, OPC UA method calls and
-conditions, external Git delivery with two-sided conflicts, the Unified text-list import, a
-restricted translation profile, four more combined-apply shapes, technology version and F-parameter
-profiles and the shared-device/MRP hardware topology were added and natively qualified (catalog
-0.4.88); HistoryRead, block move, GSD installation and loading a safety program into PLCSIM are
-recorded V21 boundaries. Later on 1 November: the six TS-Q01 Test Suite style cases passed natively with the operator at the desk, which verifies three
-style-job tools, and production style execution became a V21 boundary (catalog 0.4.97); the `project_upgrade` interruption cases passed natively
-(16/16) and combined apply gained a multi-instance shape. Two admission gaps were closed (catalog 0.4.103) and rechecked natively with the symbolic output-write refusal (catalog 0.4.105): a first motion object without compile and F-I/O tag addresses from VCI packages and library master copies now refuse before any write; a second round (catalog 0.4.107) added the F-I/O rule to `software_unit_create_from`, made a renamed master-copy tag fail its change instead of reporting applied, and ran the remaining F-I/O, output-tag and canonical-hash checks natively. A TS-Q02 run queued the fixture case with `testsuite_style_job_prepare` and dispatched that job, which verifies the tool (catalog 0.4.108); system tests stay open, since they need PLCSIM's TCP/IP mode and a guest-access seed at the desk ([record](verification/testsuite-system-blocker-20261101.md), catalog 0.4.109). The Host and the worker now hash with one canonical form, RFC 8785 (catalog 0.4.104). Drive objects whose number Startdrive cannot read
-are addressed by container index, and the three D10 drive rows are verified on a G120C PN (catalog 0.4.95; the
-drive object number left the recorded boundaries). In a desk session the Explorer roundtrip passed
-in VS Code 1.144.0, change.hmi_compile on desk-configured Classic and Unified fixtures and an
-operator-installed I-device GSD in the hardware runner (catalog 0.4.89). On
-[31 October](history/status-log.md#31-october-2026): the 20 findings of a code audit were fixed
-offline, among them simulator ownership on every write, a PLCSIM route check for runtime writes and
-stores that no longer block on a missing old path; the changed native paths await a native recheck. On
-[30 October](history/status-log.md#30-october-2026): software-unit rename and create-from, motion
-connections, five PLCSIM signal and observation tools, Test Suite application runs (TS-Q02), MCP
-resource templates, completions and logging, the block-protection credential route, the CPU
-protection-level route and default-on combined library apply were added and natively qualified
-(catalog 0.4.86). On
-[29 October](history/status-log.md#29-october-2026): online downloads to an owned PLCSIM instance, PLCSIM virtual time, interrupt injection, memory reset and storage, typed CPU parameters, device/project compile and the tag-table lifecycle were added and natively qualified except HMI compilation ([record](verification/plcsim-openness-gaps-20261029.md)); the runtime UA, web and capture tools passed
-against the real servers of an owned TCP/IP PLCSIM instance ([record](verification/runtime-real-server-20261029.md)); the [MCP surface](reference/mcp-surface.md)
-gained `--toolsets`, tool titles, workflow prompts, progress heartbeats and output schemas; the remaining re-runnable lost records
-re-run and 21 replaced records retired (catalog 0.4.70); native qualification of web user
-pages, OPC UA interfaces and role mappings, the Add-In companion, force-table edits and the
-logged-in online compare; Test Suite TS-Q01 ran natively and its defects are fixed; earlier, 53
-uncited records retired (0.4.69), dated plans moved to history and the TODO made the one open list. On
-[28 October](history/status-log.md#28-october-2026): lost evidence re-run (21 host-only and 18
-native records); `safety_import_xml` now compiles every device; catalog evidence retired and
-the release ledger refreshed; STATUS, TODO and the docs index restructured; raw evidence store
-and encoder test leak fix; Test Suite definitions and scope probe; runtime real-server Tasks
-1–3; project translations under V21 Update 3; the composite rebind plan; I-device transfer
-areas and GSD export; watch-table lifecycle and Host-loss reconciliation; graphical network
-edits; connections, GRAPH, VCI mappings and CAx.
+Dated notes, newest first, are in the [status log](history/status-log.md); open work is in the [TODO](TODO.md).
+The last weeks in short:
+
+- **26 November:** [native runs](verification/native-runs-20261126.md) bound the project lifecycle, provisioning
+  recovery, `sim_prune`, `sim_network_mode_set` and `hmi_content_fingerprint` rows; the V19 adapter requalified;
+  the follow-up checks of 14 to 25 November and a hardware smoke passed (catalog `0.5.2` to `0.5.5`).
+- **25 November:** `v0.9.0`, the first tagged pre-release, with the MCP surface redesign (catalog `0.5.0`); the
+  [audit follow-ups](TODO.md#audit-follow-ups-25-november) and six maintainer decisions.
+- **14 to 20 November:** user feedback on v0.9.0 ([14 November](history/todo-closed-20261126.md#user-feedback-on-v090-14-november),
+  [18 November](history/todo-closed-20261126.md#user-feedback-on-v090-18-november)) and the
+  [20 November field findings](TODO.md#field-findings-from-a-physical-download-20-november) added the project
+  lifecycle tools, provisioning status and recovery, the WinCC Unified runtime alarm tools, the real-PLC online tools
+  and the UMAC project login; PRs 315–326 hardened the safety write gates, the runtime clients and the stores.
+- **4 to 12 November:** the [offline engineering session follow-ups](history/todo-closed-20261126.md#offline-engineering-session-follow-ups-4-november)
+  were qualified natively, and the read-only V19 adapter was added (9 November).
+- **Up to 3 November:** the work that built the verified catalog, from the 15 October scope policy on, is in the
+  [status log](history/status-log.md#3-november-2026).
 
 ## Updating this page
 
 When a change lands, add its dated note at the top of the
-[status log](history/status-log.md) under its date heading, then update the numbers
-and lists above. Keep this page short; detail belongs in the log, `verification/` and
-the catalog.
+[status log](history/status-log.md) under its date heading, then update the lists above.
+`python -B scripts/status_counts.py --write` updates the counts in the table and in the TODO
+from the catalog and the matrix; the offline suite fails while they differ. Keep this page
+short; detail belongs in the log, `verification/` and the catalog.

@@ -60,6 +60,9 @@ try {
     if ($changed -match '^(contracts/|docs/plans/release-(matrix|obligations))') {
         Invoke-Check 'Feature contracts' { $env:PYTHONUTF8 = '1'; python -B scripts/test_contracts.py }
     }
+    if ($changed -match '^(contracts/feature-catalog|docs/plans/release-matrix|docs/STATUS\.md|docs/TODO\.md)') {
+        Invoke-Check 'STATUS and TODO counts' { python -B scripts/status_counts.py }
+    }
 
     # Python test modules: changed ones, and those importing a changed module from scripts/.
     $testFiles = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'scripts'), (Join-Path $repoRoot 'scripts/tests') -Filter 'test_*.py' -File)

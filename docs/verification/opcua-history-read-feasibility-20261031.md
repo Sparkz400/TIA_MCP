@@ -1,7 +1,7 @@
 # OPC UA HistoryRead feasibility — 31 October 2026
 
 The TODO lists `HistoryRead` among the missing OPC UA client services of the `runtime_ua_*` tools
-([capability gaps](../TODO.md#capability-gaps-found-on-29-october)). This record decides whether the
+([capability gaps](../history/todo-closed-20261126.md#capability-gaps-found-on-29-october)). This record decides whether the
 servers those tools talk to (the OPC UA server of an S7-1500 CPU, simulated by PLCSIM Advanced V8) can
 answer it. It is an offline check of the installed Siemens documentation and of the pinned client
 library; no TIA Portal or PLCSIM process was started.
