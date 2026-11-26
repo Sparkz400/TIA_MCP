@@ -36,7 +36,10 @@ def main():
                     check(status==record['status'],'Exact prior capture status: '+str(lifetime))
                     check('handoff' not in status['plan'] and 'handoffRef' not in status['plan']['request'],'No retroactive handoff in prior capture')
                     page=client.tool('runtime_capture_page',dict(snapshotRef=record['snapshotRef'],count=100))
+                    # totalItems and pageCount were added to every page later (additive); every recorded field is unchanged.
+                    added={key:page.pop(key,None) for key in ('totalItems','pageCount')}
                     check(page==record['page'],'Exact prior capture rows')
+                    check(added=={'totalItems':page['totalRows'],'pageCount':-(-page['totalRows']//100)},'Additive paging totals beside the prior capture page')
                     exported=client.tool('runtime_capture_export',dict(snapshotRef=record['snapshotRef']))
                     raw=Path(exported['artifacts'][0]['path']).read_bytes();validator().validate(json.loads(raw))
                     check(digest(raw)==record['exportSha256'],'Exact prior capture export bytes')

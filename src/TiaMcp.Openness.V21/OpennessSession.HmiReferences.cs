@@ -195,6 +195,9 @@ namespace TiaMcp.Openness.V21
                 }
             }
             HmiNativeReferenceEdges(project, target, capture, edges, args);
+            // The scopeComplete condition of the coverage below, taken before paging: a traversal cut by its budget or one that did
+            // not complete leaves the relationship total partial, so totalItems and pageCount are then null.
+            bool totalKnown = !capture.Budget.Truncated && capture.Status == "complete";
             int limit = HmiBound(args, "limit", 100, 1, 200), offset = HmiBound(args, "offset", 0, 0, 50000), maxBytes = HmiBound(args, "maxBytes", 262144, 4096, 1048576);
             var page = new JArray(); int bytes = 0;
             foreach (JObject edge in edges.Skip(offset).Take(limit))
@@ -211,6 +214,8 @@ namespace TiaMcp.Openness.V21
             if (args.Value<string>("expectedMetadataRevision") is string expected && expected != revision) throw new BridgeException("HmiMetadataChanged", "Relationship metadata changed between pages.");
             var result = Envelope(); result["schemaVersion"] = 1; result["target"] = HmiDeviceView(project, target); result["relationships"] = page;
             result["offset"] = offset; result["nextOffset"] = offset + page.Count < edges.Count && page.Count > 0 ? (JToken)(offset + page.Count) : null;
+            result["totalItems"] = totalKnown ? (JToken)edges.Count : JValue.CreateNull();
+            result["pageCount"] = totalKnown ? (JToken)TiaMcp.Core.PageTotals.PageCount(edges.Count, limit) : JValue.CreateNull();
             result["metadataRevision"] = revision; result["observedAtUtc"] = DateTime.UtcNow.ToString("O"); result["diagnostics"] = capture.Diagnostics; result["artifacts"] = capture.Artifacts;
             result["coverage"] = new JObject { ["status"] = capture.Budget.Truncated ? "truncated" : capture.Status, ["complete"] = false,
                 ["scopeComplete"] = !capture.Budget.Truncated && capture.Status == "complete", ["truncated"] = capture.Budget.Truncated || page.Count + offset < edges.Count,

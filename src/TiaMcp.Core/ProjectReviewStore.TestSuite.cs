@@ -55,6 +55,7 @@ public sealed partial class ProjectReviewStore
         }
         result["section"] = section; result["offset"] = offset; result["total"] = source.Count;
         result["rows"] = rows; result["nextOffset"] = next == source.Count ? null : JsonValue.Create(next);
+        result["totalItems"] = source.Count; result["pageCount"] = PageTotals.PageCount(source.Count, count);
         if (JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length > 124 * 1024)
             throw new BridgeException("TestResultLimit", "Encoded page exceeds 128 KiB; download the report artifact.");
         return result;

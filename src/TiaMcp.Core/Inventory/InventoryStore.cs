@@ -71,7 +71,8 @@ public sealed class InventoryStore
             rows.Add(JsonSerializer.Deserialize<InventoryRow>(snapshot.Lines[i], Json)!); bytes += size;
         }
         int next = offset + rows.Count;
-        return new(snapshot.Metadata, rows.ToArray(), offset, next < snapshot.Lines.Length ? next : null);
+        long? total = snapshot.Metadata.Coverage.Truncated ? null : snapshot.Lines.Length;
+        return new(snapshot.Metadata, rows.ToArray(), offset, next < snapshot.Lines.Length ? next : null, total, PageTotals.PageCount(total, count));
     }
 
     private static void Validate(InventoryRow row, string projectPath)

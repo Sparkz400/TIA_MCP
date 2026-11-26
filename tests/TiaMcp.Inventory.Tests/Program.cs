@@ -30,6 +30,11 @@ do
     offset = page.NextOffset; pages++;
 } while (offset != null);
 Check(seen.Count == 30000 && pages > 170, "Large inventory was not silently truncated");
+var lastPage = store.Page(snapshot.Metadata.SnapshotId, 29900, 173);
+Check(lastPage.NextOffset is null && lastPage.TotalItems == 30000 && lastPage.PageCount == 174, "The last page repeats totalRows as totalItems and counts ceil(30000/173) pages");
+var emptyStore = new InventoryStore(); // its own store: an extra capture here must not evict the snapshots the checks below use
+var emptyPage = emptyStore.Page(emptyStore.Capture([], "project.ap21", coverage, DateTimeOffset.UtcNow).Metadata.SnapshotId);
+Check(emptyPage.Rows.Length == 0 && emptyPage.NextOffset is null && emptyPage.TotalItems == 0 && emptyPage.PageCount == 0, "An empty snapshot has zero items and zero pages");
 var first = store.Page(snapshot.Metadata.SnapshotId, count: 1);
 var replay = store.Page(snapshot.Metadata.SnapshotId, first.NextOffset!.Value, 1);
 Check(replay.Rows.Single().Name == "Module 1", "Offset replay");
@@ -129,6 +134,9 @@ Check(InventoryExport.CsvCell("quoted,\"text\"\nnew") == "\"quoted,\"\"text\"\"\
 var output = Path.Combine(Path.GetTempPath(), "tia-inventory-tests-" + Guid.NewGuid().ToString("N"));
 var exportSnapshot = store.Capture([row1 with { Name = "=HYPERLINK(\"bad\")" }, Row(2)], "project.ap21",
     coverage with { ScopeComplete = false, Truncated = true, Warnings = ["Stopped at requested bound."] }, DateTimeOffset.UtcNow);
+var truncatedPage = JsonSerializer.SerializeToElement(store.Page(exportSnapshot.Metadata.SnapshotId), InventoryStore.Json);
+Check(truncatedPage.GetProperty("snapshot").GetProperty("totalRows").GetInt32() == 2 && truncatedPage.GetProperty("totalItems").ValueKind == JsonValueKind.Null
+    && truncatedPage.GetProperty("pageCount").ValueKind == JsonValueKind.Null, "A capture cut at maxVisited has a partial total: totalItems and pageCount are null, totalRows keeps its meaning");
 var csv = JsonSerializer.SerializeToElement(InventoryExport.Write(exportSnapshot, output, "csv"), InventoryStore.Json);
 var csvText = File.ReadAllText(csv.GetProperty("artifact").GetProperty("path").GetString()!);
 Check(csvText.Contains("[notRead]") && csvText.Contains("mismatch") && csvText.Contains("'="), "CSV includes gaps, mismatches and literal formulas");
@@ -423,6 +431,11 @@ Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties
     Check(File.Exists(built["index"]!.GetValue<string>()) && JsonNode.Parse(File.ReadAllText(built["index"]!.GetValue<string>()))!["blocks"]!.AsArray().Count == 2, "The rows are also written to an index file");
     var last = BlockExportIndex.Build(inventory, kinds, null, 2, 2, exportDirectory, [BlockExportIndex.Row(BlockExportIndex.Select(inventory, kinds, null, 2, 2)[0], null, "ProtectedObject", "protected")]);
     Check(last["nextOffset"] is null && last["completeness"]!["complete"]!.GetValue<bool>(), "The last page is complete and has no next offset");
+    Check(built["totalItems"]!.GetValue<int>() == 3 && built["pageCount"]!.GetValue<int>() == 2 && last["totalItems"]!.GetValue<int>() == 3
+        && last["pageCount"]!.GetValue<int>() == 2, "block_export repeats matchedBlocks as totalItems and counts pages at maxBlocks, the last page included");
+    var none = BlockExportIndex.Build(inventory, new[] { "OB" }, null, 0, 2, exportDirectory, []);
+    Check(none["matchedBlocks"]!.GetValue<int>() == 0 && none["totalItems"]!.GetValue<int>() == 0 && none["pageCount"]!.GetValue<int>() == 0 && none["nextOffset"] is null,
+        "An empty selection has zero items and zero pages");
 }
 // block_export / project_snapshot_capture against a fake bridge: failures of the bridge itself, batching, the cached selection, release.
 {
@@ -496,12 +509,15 @@ Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties
     Check(calls.Where(c => c.Operation == "project_inventory").Select(c => c.Arguments.TryGetProperty("blockOffset", out var skip) ? skip.GetInt32() : 0).SequenceEqual(new[] { 0, 2000, 4000 })
         && last["matchedBlocks"]!.GetValue<int>() == 4500 && last["blocks"]!.AsArray().Count == 100 && last["nextOffset"] is null
         && last["completeness"]!["inventoryComplete"]!.GetValue<bool>() && last["completeness"]!["complete"]!.GetValue<bool>(), "block_export pages the inventory so every match is reachable and the last page is complete");
+    Check(last["totalItems"]!.GetValue<int>() == 4500 && last["pageCount"]!.GetValue<int>() == 9, "The last of nine 500-block pages reports 4500 items in 9 pages");
     var middle = JsonNode.Parse(Text(await blockTools.BlockExport(default, offset: 1000, maxBlocks: 500, namePrefix: "paged")))!.AsObject();
     Check(middle["nextOffset"]!.GetValue<int>() == 1500 && !middle["completeness"]!["complete"]!.GetValue<bool>(), "A page before the end reports the next offset");
     // A walk cut cannot be continued: the listing stays incomplete and no page claims otherwise.
     bridgeHandler = (operation, arguments) => operation == "project_inventory" ? InventoryPage(2500, arguments.TryGetProperty("blockOffset", out var skip) ? skip.GetInt32() : 0, walkCut: arguments.TryGetProperty("blockOffset", out _)) : Entries(arguments);
     var cut = JsonNode.Parse(Text(await blockTools.BlockExport(default, offset: 0, maxBlocks: 500, namePrefix: "cut")))!.AsObject();
     Check(!cut["completeness"]!["inventoryComplete"]!.GetValue<bool>() && !cut["completeness"]!["complete"]!.GetValue<bool>() && cut["matchedBlocks"]!.GetValue<int>() == 2500, "A cut walk leaves the inventory incomplete");
+    Check(cut.ContainsKey("totalItems") && cut["totalItems"] is null && cut.ContainsKey("pageCount") && cut["pageCount"] is null,
+        "A cut walk has no known total: totalItems and pageCount are null while matchedBlocks keeps its meaning");
 
     // project_snapshot_capture: the model is exported once, after the relationship pass, and the snapshot is released on every path.
     Directory.CreateDirectory(Path.Combine(ExportRoot(), "project-explorer"));
