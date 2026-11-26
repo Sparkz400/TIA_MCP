@@ -393,10 +393,9 @@ the catalog. The matrix was not changed.
   (elevated), then rerun with `--cpu-ip` in that subnet. The run also showed that the runner hardcoded the English
   item name `PROFINET interface_1` (fixed: it finds the CPU's networked interface); the other runners that hardcoded
   TIA-generated item names (interfaces, ports, racks, the CPU display) now resolve them structurally through
-  `scripts/hardware_paths.py` (offline-tested with German-named fixtures; no native rerun yet). Still open: eight runners
-  hardcode the default tag table's name `Default tag table`, which a German installation calls `Standard-Variablentabelle`;
-  among them `qualify_hardware_changes.py` (every plug expects its system constant there) and
-  `qualify_composite_rebind.py`, so those two still fail on a German installation. Known risk from the mode itself: TIA's default Program_Alarm class
+  `scripts/hardware_paths.py`, and the eight runners that named the default tag table `Default tag table` (German
+  `Standard-Variablentabelle`) now take the PLC scope's one table holding system constants (`scripts/plc_tag_tables.py`;
+  `software_inspect` does not report Openness' `IsDefault`). Both offline-tested with German-named fixtures; no native rerun yet. Known risk from the mode itself: TIA's default Program_Alarm class
   needs no acknowledgement (`local.runtime.plcsim-ua-services.20261031`); a stand-in alarm does not bind
   `runtime_web_alarm_acknowledge`.
 - [x] **`sim_prune` (L03, 4 cells):** bound on 26 November (`local.plcsim.prune.20261126`, [record](verification/native-runs-20261126.md)): listing,

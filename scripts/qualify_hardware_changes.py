@@ -52,6 +52,7 @@ import re
 
 import hardware_paths
 import hardware_profiles
+import plc_tag_tables
 from library_native_harness import Harness, require
 from qualification_owned_scratch import snapshot
 from qualify_access_changes import Run as StateRun
@@ -343,9 +344,21 @@ def add_cpu(run, label, name, cpu=CPU, restore=False):
               added=under(run.path(name)), rows={run.hw(name, "items", name + "Cpu"): {"typeIdentifier": cpu, "name": name + "Cpu"}}, restore=restore)
 
 
+def default_table(run, plc):
+    """The PLC's default tag table (its path and name) in the current state; TIA names it in the UI language ("Default tag table",
+    "Standard-Variablentabelle"), so it is the table holding the PLC's system constants (plc_tag_tables)."""
+    view = run.current["view"]
+    cached = getattr(run, "default_tables", {}).get(plc)
+    if cached is None or cached[0] is not view:  # Verification lambdas ask per state key: resolve once per state.
+        path = plc_tag_tables.default_table_path(view, plc)
+        cached = (view, path, view["tagTable:" + path]["name"])
+        run.default_tables = {**getattr(run, "default_tables", {}), plc: cached}
+    return cached[1:]
+
+
 def constant(run, station, name):
     """The system constant of one hardware object in the station's PLC default tag table."""
-    return "member:" + run.path(station.plc_device, "items", station.plc, "plc", station.plc, "tags", "Default%20tag%20table", "systemConstants", name)
+    return "member:" + default_table(run, run.path(station.plc_device, "items", station.plc, "plc", station.plc))[0] + "/systemConstants/" + name
 
 
 def interface_of(run, device, item):
@@ -597,9 +610,9 @@ def address_change(run, moved=False):
     module, view = run.path("ScratchStation", "items", "HwDi"), run.current["view"]
     start = min(a["startAddress"] for key, row in view.items() if key == "hw:" + module or key.startswith("hw:" + module + "/")
                 for a in row["addresses"] or [] if a["ioType"] == "Input" and a.get("length", 0) > 0)
-    table = scratch_plc(run) + "/tags/Default%20tag%20table"
+    table, name = default_table(run, scratch_plc(run))
     tag = table + "/tags/HwInput"
-    run.apply("tag HwInput on HwDi's input", "tag_create", {"tagTableName": "Default tag table", "name": "HwInput", "dataTypeName": "Bool", "logicalAddress": "%%I%d.0" % start},
+    run.apply("tag HwInput on HwDi's input", "tag_create", {"tagTableName": name, "name": "HwInput", "dataTypeName": "Bool", "logicalAddress": "%%I%d.0" % start},
               plc=scratch_plc(run), added=["member:" + tag], changed=["tagTable:" + table])
     entries = run.h.stage("select DI 32x24VDC HF", lambda: run.h.tool("hardware_catalog_search", {"filter": WIDE_DI[0], "maxItems": 500}))["entries"]
     wide = max((e["typeIdentifier"] for e in entries if (e.get("articleNumber") or "").startswith(WIDE_DI[1]) and e.get("typeName") == WIDE_DI[0]), default=None)

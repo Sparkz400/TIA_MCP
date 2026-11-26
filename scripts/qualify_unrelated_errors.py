@@ -19,6 +19,7 @@ import json
 from pathlib import Path
 
 from library_native_harness import Harness, require
+import plc_tag_tables
 from probe_safety_kinds import catalog, change
 
 MAIN = "Main_Safety_RTG1"
@@ -80,7 +81,9 @@ def body(h):
     result = h.stage("second device-compiled edit in the same session", lambda: comparison(applied, "network_configure"))
     require(result["existingCount"] > 0, "The conflict was not reported as existing: %s" % result)
 
-    _, applied = change(h, "tag_create", {"tagTableName": "Default tag table", "name": "UnrelatedOk", "dataTypeName": "Bool", "logicalAddress": "%M70.0"}, {"plcPath": p1})
+    # The default tag table's name follows the TIA UI language: it is the table holding the PLC's system constants.
+    table = plc_tag_tables.default_table(h.tool, p1)["name"]
+    _, applied = change(h, "tag_create", {"tagTableName": table, "name": "UnrelatedOk", "dataTypeName": "Bool", "logicalAddress": "%M70.0"}, {"plcPath": p1})
     h.stage("PLC-scoped tag_create in the same session", lambda: comparison(applied, "tag_create"))
     source = 'FUNCTION "UnrelatedConsumer" : Bool\nVERSION : 0.1\nBEGIN\n IF "UnrelatedOk" THEN #UnrelatedConsumer := TRUE; ELSE #UnrelatedConsumer := FALSE; END_IF;\nEND_FUNCTION\n'
     _, applied = change(h, "source_upsert", {"language": "SCL", "source": source, "expectedBlockNames": ["UnrelatedConsumer"]}, {"plcPath": p1})
@@ -93,7 +96,7 @@ def body(h):
     require(result["resolvedCount"] > 0, "The fixed conflict was not reported as resolved: %s" % result)
 
     prepared = h.stage("prepare tag_set", lambda: h.tool("change_prepare", {"kind": "tag_set", "plcPath": p1, "payload": {
-        "tagTableName": "Default tag table", "memberName": "UnrelatedOk", "attributes": {"DataTypeName": "Int", "LogicalAddress": "%MW72"}}}))
+        "tagTableName": table, "memberName": "UnrelatedOk", "attributes": {"DataTypeName": "Int", "LogicalAddress": "%MW72"}}}))
 
     def introduced():
         error = h.call_error("change_apply", h.apply_args(prepared))

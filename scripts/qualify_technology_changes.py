@@ -18,6 +18,7 @@ import re
 
 from engineering_preservation import native_payload_hash
 from library_native_harness import Harness, require
+import plc_tag_tables
 from qualification_owned_scratch import complete_inventory, snapshot
 from qualify_access_changes import Run as StateRun
 from qualify_plc_object_mutations import coverage_gaps, diff, view
@@ -171,7 +172,7 @@ def delete(run, name, restore=False):
 
 
 def tag(run, name, address):
-    table = run.plc + "/tags/Default%20tag%20table"
+    table = plc_tag_tables.default_table_path(run.current["view"], run.plc)  # "Default tag table" or a localized name
     run.apply("create tag " + name, "tag_create", {"tagTablePath": table, "name": name, "dataTypeName": "Bool", "logicalAddress": address},
               added=["member:%s/tags/%s" % (table, name)], changed=["tagTable:" + table])
 

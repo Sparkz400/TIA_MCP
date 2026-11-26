@@ -26,11 +26,12 @@ def item(path, comment="", ports=None):
     return {"path": path, "name": path.rsplit("/", 1)[1], "attributes": attributes, **({"network": {"ports": ports}} if ports is not None else {})}
 
 
-# Item names TIA generates (encoded path segments): an English installation's, and a German one's. "PROFINET-Schnittstelle_1"
-# and "Profilschiene_0" were observed natively; the S7-1200 rack and port names are stand-ins that differ from the English
+# Item names TIA generates (encoded path segments): an English installation's, and a German one's. "PROFINET-Schnittstelle_1",
+# "Profilschiene_0" and the default tag table "Standard-Variablentabelle" were observed natively; the S7-1200 rack and port names are stand-ins that differ from the English
 # ones, so a runner that builds such a path from a name fails here.
-ENGLISH = {"cpu": "PROFINET%20interface_1", "head": "PROFINET%20interface", "rail": "Rail_0", "rack": "Rack_0", "port": "Port_%d"}
-GERMAN = {"cpu": "PROFINET-Schnittstelle_1", "head": "PROFINET-Schnittstelle", "rail": "Profilschiene_0", "rack": "Baugruppentr%C3%A4ger_0", "port": "Anschluss_%d"}
+ENGLISH = {"cpu": "PROFINET%20interface_1", "head": "PROFINET%20interface", "rail": "Rail_0", "rack": "Rack_0", "port": "Port_%d", "table": "Default%20tag%20table"}
+GERMAN = {"cpu": "PROFINET-Schnittstelle_1", "head": "PROFINET-Schnittstelle", "rail": "Profilschiene_0", "rack": "Baugruppentr%C3%A4ger_0", "port": "Anschluss_%d",
+          "table": "Standard-Variablentabelle"}
 
 
 def stations(base, names):
@@ -54,6 +55,11 @@ def stations(base, names):
         view.update(("hw:" + port, row(32769 + index)) for index, port in enumerate(ports))
         if holder != interface:
             view["hw:" + holder] = row(1)
+        if kind == "cpu":  # The PLC's default tag table holds its system constants; a user table beside it holds none.
+            plc = owner + "/plc/" + head
+            for table, member in ((plc + "/tags/" + names["table"], "/systemConstants/Local~Common"), (plc + "/tags/UserTags", "/tags/UserTag")):
+                view["tagTable:" + table] = {"path": table, "name": unquote(table.rsplit("/", 1)[1]), "scopePath": plc}
+                view["member:" + table + member] = {"path": table + member}
     return view
 
 
@@ -99,6 +105,10 @@ class HardwareChangeTests(unittest.TestCase):
         run = english
         self.assertEqual("member:/projects/P/devices/HwPeer/items/HwPeerCpu/plc/HwPeerCpu/tags/Default%20tag%20table/systemConstants/HwMpHead~MpDi",
                          q.constant(run, q.MP, q.MP.prefix + "MpDi"))
+        self.assertEqual("member:/projects/P/devices/HwPeer/items/HwPeerCpu/plc/HwPeerCpu/tags/Standard-Variablentabelle/systemConstants/HwMpHead~MpDi",
+                         q.constant(german, q.MP, q.MP.prefix + "MpDi"))
+        self.assertEqual(("/projects/P/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/Standard-Variablentabelle", "Standard-Variablentabelle"),
+                         q.default_table(german, q.scratch_plc(german)))
 
     def test_ring_link_closes_the_line_into_one_ring(self):
         for names in (ENGLISH, GERMAN):
@@ -646,17 +656,22 @@ class HardwareChangeTests(unittest.TestCase):
                     q.complementary(run, first)
 
     def test_address_change_can_require_a_moved_start(self):
-        for moved, after, ok in ((True, 4, True), (True, 0, False), (False, 0, True)):
-            run, checks = q.Run.__new__(q.Run), []
-            run.base, run.h = "/projects/P/devices/", type("H", (), {"report": {}, "stage": lambda self, name, operation: operation(),
-                                                                     "tool": lambda self, name, arguments: {"entries": [{"typeIdentifier": "W", "articleNumber": "6ES7 521-1BL00", "typeName": "DI 32x24VDC HF"}]}})()
+        for (moved, after, ok), names in zip(((True, 4, True), (True, 0, False), (False, 0, True)), (ENGLISH, GERMAN, GERMAN)):
+            run, checks, created = fixture_run(names), [], []
+            run.h = type("H", (), {"report": {}, "stage": lambda self, name, operation: operation(),
+                                   "tool": lambda self, name, arguments: {"entries": [{"typeIdentifier": "W", "articleNumber": "6ES7 521-1BL00", "typeName": "DI 32x24VDC HF"}]}})()
             module = run.path("ScratchStation", "items", "HwDi")
-            run.current = {"view": {"hw:" + module: {"addresses": [{"ioType": "Input", "startAddress": 0, "length": 16}]}}}
-            tag = q.scratch_plc(run) + "/tags/Default%20tag%20table/tags/HwInput"
+            run.current["view"]["hw:" + module] = {"addresses": [{"ioType": "Input", "startAddress": 0, "length": 16}]}
+            tag = q.scratch_plc(run) + "/tags/" + names["table"] + "/tags/HwInput"
             run.refuse = lambda *a, **k: {"details": {"referencedTags": [{"path": tag}]}}
             run.expect = lambda ok_, *a, **k: None
-            run.apply = lambda label, kind, payload, preview=None, shown=None, plc=None, **expected: checks.append(expected.get("check"))
+            def apply(label, kind, payload, preview=None, shown=None, plc=None, **expected):
+                checks.append(expected.get("check"))
+                created.append((payload.get("tagTableName"), expected.get("added")))
+            run.apply = apply
             q.address_change(run, moved)
+            # English: the literal table name and path the runner used; German: the table holding the system constants.
+            self.assertEqual((unquote(names["table"]), ["member:" + tag]), created[0])
             applied = {"readbacks": [{"role": "hardware-replace-inventory", "addressMap": [{"changed": True}],
                                       "changedReferencedTags": [{"path": tag, "startAddress": 0, "rangeAfter": {"startAddress": after}}]}]}
             if ok:
