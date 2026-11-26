@@ -77,6 +77,13 @@ jobs:
           $findings = @(Get-ChildItem -LiteralPath scripts -Filter *.ps1 -File | ForEach-Object { Invoke-ScriptAnalyzer -Path $_.FullName -Severity Error, ParseError })
           $findings | Format-Table ScriptName, Line, RuleName, Message -AutoSize -Wrap | Out-String -Width 220 | Write-Host
           if ($findings.Count -gt 0) { throw "PSScriptAnalyzer reported $($findings.Count) error(s)." }
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '10.0.402' # Published SDK; avoid unavailable latestFeature redirects.
+      - name: C# whitespace formatting (Core and Host)
+        # Folder mode reads .editorconfig only, so it needs no restore. More projects join once they are formatted;
+        # scripts/Test-BeforePush.ps1 runs the same check locally.
+        run: dotnet format whitespace --folder --include src/TiaMcp.Core/ src/TiaMcp.Host/ --verify-no-changes --verbosity quiet
 
   lint-python:
     name: Python lint (ruff)

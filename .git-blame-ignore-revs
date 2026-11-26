@@ -1,0 +1,4 @@
+# Whitespace-only formatting commits; `git config blame.ignoreRevsFile .git-blame-ignore-revs` makes git blame skip them.
+
+# Format src/TiaMcp.Core and src/TiaMcp.Host with dotnet format whitespace
+03ed9f06cb1db95432645e758ec834ad3aba2abe

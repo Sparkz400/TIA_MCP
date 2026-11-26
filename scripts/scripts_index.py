@@ -27,7 +27,7 @@ ENTRY_POINTS = {
         "Start-TiaMcp.ps1", "Publish-AddIn.ps1", "Refresh-Contracts.ps1",
     ],
     "Test runners": [
-        "Test-Offline.ps1", "Measure-Coverage.ps1", "Test-OfflinePackage.ps1", "Test-OpcUaOffline.ps1", "Test-OpennessRegistrationLogic.ps1",
+        "Test-Offline.ps1", "Test-BeforePush.ps1", "Measure-Coverage.ps1", "Test-OfflinePackage.ps1", "Test-OpcUaOffline.ps1", "Test-OpennessRegistrationLogic.ps1",
         "Test-Deployment.ps1", "Test-AddInSandbox.ps1", "Test-WorkerCompile.ps1", "Test-EnvironmentDiagnostics.ps1",
         "Test.ps1", "Test-Libraries.ps1", "Test-ProjectExplorer.ps1", "Test-RetainedFixtures.ps1", "Test-AddInOwner.ps1",
         "Test-DeploymentReliability.ps1", "Test-WorkstationBoundaries.ps1", "Test-InventoryExcel.ps1",
