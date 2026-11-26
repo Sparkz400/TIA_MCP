@@ -10,9 +10,9 @@ import json
 import pathlib
 from xml.dom import minidom
 
-from qualification_owned_scratch import assert_snapshot, complete_inventory, native_hash, require, snapshot
+from qualification_owned_scratch import assert_snapshot, native_hash, require, snapshot
 from qualify_typed_resolution import ResolutionRun, apply_arguments, artifact_policy, select, verify_untouched_caller
-from run_conformance import native_document, structural_xml
+from run_conformance import native_document
 from smoke_mcp import ROOT
 from typed_graphical_native_expectations import adapt_reference_bindings, assert_independent_topology
 from typed_graphical_transport import artifact_bytes

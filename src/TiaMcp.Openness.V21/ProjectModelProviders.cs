@@ -19,6 +19,7 @@ namespace TiaMcp.Indexing
 
     internal sealed class ProjectModelProviderRequest
     {
+        private static readonly string[] ReferenceFields = new[] { "snapshotId", "sessionGeneration", "projectPath", "nodeId", "objectPath" };
         private readonly JObject _reference, _node, _options;
         internal JObject Reference => (JObject)_reference.DeepClone();
         internal JObject Node => (JObject)_node.DeepClone();
@@ -30,7 +31,7 @@ namespace TiaMcp.Indexing
         internal ProjectModelProviderRequest(JObject reference, JObject node, string facet, int maxItems = 200, int maxBytes = 65536, JObject options = null)
         {
             if (reference == null || (string)reference["schemaVersion"] != "project-model.v1"
-                || new[] { "snapshotId", "sessionGeneration", "projectPath", "nodeId", "objectPath" }.Any(field => string.IsNullOrEmpty((string)reference[field]))
+                || ReferenceFields.Any(field => string.IsNullOrEmpty((string)reference[field]))
                 || node == null || (string)node["origin"] != "native"
                 || (string)reference["nodeId"] != (string)node["nodeId"] || (string)reference["objectPath"] != (string)node["objectPath"])
                 throw new ProjectModelStore.ModelException("InvalidSelection", "Providers require the exact native node reference.");

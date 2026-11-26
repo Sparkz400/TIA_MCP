@@ -72,7 +72,7 @@ def queue_job(h, prepared, ticket, refuse):
 
 
 def body(h, case):
-    plc = h.owned_scratch("testsuite application " + case)
+    h.owned_scratch("testsuite application " + case)
     project = h.scratch["project"]["path"]
     h.apply("project_simulation_enable", {"enabled": True})
     h.report["case"] = case

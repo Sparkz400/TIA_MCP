@@ -13,13 +13,12 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
-import sys
+import sys as sys
 import time
 import uuid
 import xml.etree.ElementTree as ET
 
 import psutil
-from block_test_process import OwnedTiaProcessWatcher
 from qualify_worker_startup_exact import identity
 from smoke_mcp import Client
 from retained_native_lifecycle import RetainedNativeTree, close_host_without_kill
@@ -425,7 +424,7 @@ class Coordinator:
         with StoreExclusiveWindow(self.stores, self.original, self.root / "final-reservation-locks", mode="readOnlyProbe", resources=record["resources"],
                 effects="File-only verification of full VCI run evidence before resolving own isolated parent overlay; no native dispatch") as held:
             scan_overlays(self.stores, held.keys, self.overlay_owner)
-            review = require_review(checked_json(ref(self.root / "independent-vci-review.json")), restored=True)
+            require_review(checked_json(ref(self.root / "independent-vci-review.json")), restored=True)
             require(all(checks.get(key) is True for key in ("preseedRestorationVerified", "postseedRestorationVerified", "originalUnchangedAfterRecovery", "freshReopenVerified")), "Incomplete parent verification")
             evidence = [ref(self.root / (name + ".json")) for name in ("seed-verified", "postseed-restoration", "preseed-restoration", "original-verified", "lifecycle-close")]
             for item in evidence: require(checked_json(item).get("completed") is True, "Parent evidence has incomplete stage")

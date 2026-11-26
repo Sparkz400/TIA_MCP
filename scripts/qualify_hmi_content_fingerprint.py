@@ -23,7 +23,7 @@ import uuid
 from pathlib import Path
 
 from smoke_mcp import Client, ROOT
-from qualify_hmi_gate_route import HMIS, classic_fixture, rows, scalar, screen_fixture, screen_payload
+from qualify_hmi_gate_route import HMIS, classic_fixture, scalar, screen_fixture, screen_payload
 
 FAMILY = {"classic-comfort": "classic", "classic-rt-advanced": "classic", "classic-basic": "classic",
           "unified-comfort": "unified", "unified-pc": "unified"}

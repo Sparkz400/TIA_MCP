@@ -13,6 +13,9 @@ namespace TiaMcp.Openness.V21
     /// <summary>Strict import envelope validation; Siemens remains the language compiler.</summary>
     internal static class EngineeringSources
     {
+        private static readonly string[] SupportedBlockTypes = new[] { "SW.Blocks.FC", "SW.Blocks.FB", "SW.Blocks.OB", "SW.Blocks.GlobalDB", "SW.Blocks.InstanceDB" };
+        private static readonly string[] SourceStartKeywords = new[] { "FUNCTION_BLOCK", "FUNCTION", "DATA_BLOCK", "ORGANIZATION_BLOCK", "TYPE" };
+        private static readonly string[] ForbiddenSourceKeywords = new[] { "CONFIGURATION", "RESOURCE", "PLC_TAG_TABLE", "VAR_GLOBAL" };
         internal static string[] DeclaredBlocks(string source)
         {
             return Declarations(source, false).Names;
@@ -47,8 +50,8 @@ namespace TiaMcp.Openness.V21
         private static SourceDeclarations Declarations(string source, bool typesOnly)
         {
             var tokens = LexSource(source).ToArray();
-            var starts = new HashSet<string>(new[] { "FUNCTION_BLOCK", "FUNCTION", "DATA_BLOCK", "ORGANIZATION_BLOCK", "TYPE" }, StringComparer.OrdinalIgnoreCase);
-            var forbidden = new HashSet<string>(new[] { "CONFIGURATION", "RESOURCE", "PLC_TAG_TABLE", "VAR_GLOBAL" }, StringComparer.OrdinalIgnoreCase);
+            var starts = new HashSet<string>(SourceStartKeywords, StringComparer.OrdinalIgnoreCase);
+            var forbidden = new HashSet<string>(ForbiddenSourceKeywords, StringComparer.OrdinalIgnoreCase);
             var names = new List<string>();
             var namespaces = new List<string>();
             string expectedEnd = null;
@@ -207,7 +210,7 @@ namespace TiaMcp.Openness.V21
             if (document.Root == null || document.Root.Name != "Document") throw new BridgeException("InvalidSimaticML", "A native SimaticML Document root is required.");
             var allIds = document.Root.DescendantsAndSelf().Attributes("ID").Select(attribute => attribute.Value).ToArray();
             if (allIds.Distinct(StringComparer.Ordinal).Count() != allIds.Length) throw new BridgeException("InvalidSimaticML", "Duplicate object ID definitions in the XML document.");
-            var allowed = new HashSet<string>(new[] { "SW.Blocks.FC", "SW.Blocks.FB", "SW.Blocks.OB", "SW.Blocks.GlobalDB", "SW.Blocks.InstanceDB" }, StringComparer.Ordinal);
+            var allowed = new HashSet<string>(SupportedBlockTypes, StringComparer.Ordinal);
             var blocks = new List<BlockDeclaration>();
             foreach (var child in document.Root.Elements())
             {

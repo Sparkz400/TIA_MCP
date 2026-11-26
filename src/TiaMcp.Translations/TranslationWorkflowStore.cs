@@ -11,6 +11,13 @@ public sealed record TranslationProposalBatch(TranslationEdit[] Edits, Translati
 /// <summary>Durable offline workflow. No bridge, Siemens service, native admission or import dependency.</summary>
 public sealed partial class TranslationWorkflowStore
 {
+    private static readonly string[] RequiredQualificationGates = new[] { "exact-destination-and-active-language-observation", "fresh-native-export-comparison-all-keys-cultures-peers",
+            "new-review-on-drift", "shared-resource-admission-and-native-exclusive-access", "retained-archive-checkpoint",
+            "durable-dispatch-intent-one-import-no-replay", "retained-native-result-and-complete-log", "independent-native-readback-and-preservation",
+            "applicable-compile-save-and-fresh-reopen", "unknown-outcome-reconciliation", "restore-to-new-owned-destination-and-recovered-reopen" };
+    private static readonly string[] QualificationBlockers = new[] { "Workbook write/clear/missing-cell and rich-text semantics remain unqualified.",
+            "Recorded category-filter mismatches and empty inconclusive controls remain unresolved; do not assume category intersections.",
+            "No native freshness, import acceptance, lifecycle or recovery evidence is created by this offline workflow." };
     private readonly TranslationRetention retained;
     private readonly ArtifactUploadStore uploads;
     private const int InputJsonLimit = 16 * 1024 * 1024;
@@ -440,12 +447,7 @@ public sealed partial class TranslationWorkflowStore
         ["profileSha256"] = workbook.ProfileSha256, ["nativeFreshnessVerified"] = false,
         ["nativeQualified"] = false, ["nativeExecuted"] = false, ["nativeImportAllowed"] = false,
         ["adapterContract"] = "EngineeringOperationStore + trusted NativeTargetObservation; this artifact is not an admitted EngineeringOperationPlan",
-        ["requiredGates"] = Node(new[] { "exact-destination-and-active-language-observation", "fresh-native-export-comparison-all-keys-cultures-peers",
-            "new-review-on-drift", "shared-resource-admission-and-native-exclusive-access", "retained-archive-checkpoint",
-            "durable-dispatch-intent-one-import-no-replay", "retained-native-result-and-complete-log", "independent-native-readback-and-preservation",
-            "applicable-compile-save-and-fresh-reopen", "unknown-outcome-reconciliation", "restore-to-new-owned-destination-and-recovered-reopen" }),
-        ["qualificationBlockers"] = Node(new[] { "Workbook write/clear/missing-cell and rich-text semantics remain unqualified.",
-            "Recorded category-filter mismatches and empty inconclusive controls remain unresolved; do not assume category intersections.",
-            "No native freshness, import acceptance, lifecycle or recovery evidence is created by this offline workflow." })
+        ["requiredGates"] = Node(RequiredQualificationGates),
+        ["qualificationBlockers"] = Node(QualificationBlockers)
     };
 }

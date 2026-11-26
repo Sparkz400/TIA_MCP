@@ -8,12 +8,12 @@ internal static class DriveObjectChecks
     internal static int Run()
     {
         int count = 0;
-        void Check(bool ok, string label) { if (!ok) throw new Exception(label); count++; Console.WriteLine("PASS " + label); }
+        void Check(bool ok, string label) { if (!ok) throw new InvalidOperationException(label); count++; Console.WriteLine("PASS " + label); }
         void Refuse(Action action, string code, string label, string text = null)
         {
             try { action(); }
             catch (BridgeException error) when (error.Code == code && (text == null || error.Message.Contains(text))) { Check(true, label); return; }
-            throw new Exception("Expected " + code + ": " + label);
+            throw new InvalidOperationException("Expected " + code + ": " + label);
         }
         JObject Number(long value) => new JObject { ["hardwarePath"] = "/d", ["driveObjectNumber"] = value };
         JObject Index(long value) => new JObject { ["hardwarePath"] = "/d", ["driveObjectIndex"] = value };

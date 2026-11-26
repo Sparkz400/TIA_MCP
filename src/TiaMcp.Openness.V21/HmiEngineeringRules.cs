@@ -25,6 +25,8 @@ namespace TiaMcp.Model
 
     internal static class HmiEngineeringRules
     {
+        private static readonly string[] PermittedRequestFields = new[] { "schemaVersion", "operation", "target", "expectedContentHash", "properties", "name", "dataType", "placement", "bindings", "connection", "plcTag", "xml", "composition", "itemType", "eventType", "script", "additionalScreens", "inputReference" };
+        private static readonly string[] SizeFields = new[] { "Width", "Height" };
         internal static readonly string[] Operations = { "scalar_property_set", "existing_binding_set", "tag_create", "item_properties_set", "item_place", "explicit_binding_set", "external_tag_create", "classic_xml_import", "connection_create", "object_create", "object_properties_set",
             "screen_create", "item_create", "dynamization_set", "event_handler_set" };
         private static readonly string[] ScreenOperations = { "screen_create", "item_create", "dynamization_set", "event_handler_set" };
@@ -97,7 +99,7 @@ namespace TiaMcp.Model
         internal static void RequireRequest(JObject payload)
         {
             if (payload == null || payload.Value<int?>("schemaVersion") != 1) throw new ArgumentException("HMI engineering requires payload.schemaVersion=1.");
-            var permitted = new HashSet<string>(new[] { "schemaVersion", "operation", "target", "expectedContentHash", "properties", "name", "dataType", "placement", "bindings", "connection", "plcTag", "xml", "composition", "itemType", "eventType", "script", "additionalScreens", "inputReference" }, StringComparer.Ordinal);
+            var permitted = new HashSet<string>(PermittedRequestFields, StringComparer.Ordinal);
             foreach (var property in payload.Properties())
                 if (!permitted.Contains(property.Name)) throw new ArgumentException("Unsupported HMI engineering field: " + property.Name);
             string operation = Text(payload, "operation");
@@ -191,7 +193,7 @@ namespace TiaMcp.Model
                 HmiRecipeRules.RequireName(Text(payload, "name"), "name");
                 // The size must equal an existing screen's size of the same HMI; that native set is the allowlist.
                 var size = payload["properties"] as JObject;
-                if (size == null || size.Count != 2 || new[] { "Width", "Height" }.Any(k => size[k]?.Type != JTokenType.Integer || (long)size[k] < 1 || (long)size[k] > uint.MaxValue))
+                if (size == null || size.Count != 2 || SizeFields.Any(k => size[k]?.Type != JTokenType.Integer || (long)size[k] < 1 || (long)size[k] > uint.MaxValue))
                     throw new ArgumentException("screen_create requires properties with exactly Width and Height (positive integers) copied from an existing screen of the same HMI.");
                 RejectFields(payload, "dataType", "placement", "bindings", "connection", "plcTag");
             }

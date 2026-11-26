@@ -10,6 +10,7 @@ public sealed record GitOperationBinding(string Operation, string RepositoryRoot
     string? Branch = null, string? TargetCommit = null, string? ExpectedReferenceCommit = null,
     string? Destination = null)
 {
+    private static readonly string[] RequiredGates = new[] { "git.callbacks", "git.result" };
     [JsonIgnore] public string Sha256 => GitWorkspaceSnapshot.Digest(this);
 
     public static GitOperationBinding Initialize(string root, string control, string executableSha256, string initialBranch) =>
@@ -68,7 +69,7 @@ public sealed record GitOperationBinding(string Operation, string RepositoryRoot
                 if (EngineeringResourceKey.Overlaps(resources[i].ResourceKey, resources[j].ResourceKey))
                     throw new BridgeException("GitUnsafePath", "Project, repository, control storage and destination resources must be disjoint.");
         return new("vci.git." + Operation, target, resources.ToArray(), [bindingArtifact, .. inputs],
-            requiredProbes.ToArray(), new[] { "git.callbacks", "git.result" }.Concat(additionalGates).Distinct(StringComparer.Ordinal).ToArray());
+            requiredProbes.ToArray(), RequiredGates.Concat(additionalGates).Distinct(StringComparer.Ordinal).ToArray());
     }
 
     private static string Root(string path) => GitSafety.PathRoot(path, false);

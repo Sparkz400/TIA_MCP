@@ -1,6 +1,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -56,9 +57,9 @@ namespace TiaMcp.Openness.V21
             if (!match.Success) return null;
             char area = char.ToUpperInvariant(match.Groups["area"].Value[0]);
             string ioType = area == 'I' || area == 'E' ? "Input" : "Output";
-            if (match.Groups["byte"].Success) return (ioType, int.Parse(match.Groups["byte"].Value) * 8 + int.Parse(match.Groups["bit"].Value), 1);
+            if (match.Groups["byte"].Success) return (ioType, int.Parse(match.Groups["byte"].Value, CultureInfo.InvariantCulture) * 8 + int.Parse(match.Groups["bit"].Value, CultureInfo.InvariantCulture), 1);
             int bytes = "BWDL".IndexOf(char.ToUpperInvariant(match.Groups["size"].Value[0])) switch { 0 => 1, 1 => 2, 2 => 4, _ => 8 };
-            return (ioType, int.Parse(match.Groups["start"].Value) * 8, bytes * 8);
+            return (ioType, int.Parse(match.Groups["start"].Value, CultureInfo.InvariantCulture) * 8, bytes * 8);
         }
 
         /// <summary>Every PLC tag's LogicalAddress in a SimaticML tag-table document (user constants have none).</summary>

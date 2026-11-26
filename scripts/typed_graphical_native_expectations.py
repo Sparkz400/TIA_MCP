@@ -10,7 +10,7 @@ import json
 import re
 from xml.dom import minidom, Node
 
-from run_conformance import safe_xml, structural_xml, native_document
+from run_conformance import safe_xml, structural_xml
 from engineering_preservation import native_payload
 
 

@@ -360,7 +360,7 @@ def qualify(configuration, report_path, timeout=300, engineering=False, simulati
             result = client.tool("tia_discover")
             require(isinstance(result.get("processes"), list), "Discovery response omitted processes.")
             return result
-        discovery = stage("engineering_discovery", discover, bridge is not None)
+        stage("engineering_discovery", discover, bridge is not None)
         def detached():
             result = client.tool("tia_session_status")
             require(result.get("attached") is False and result.get("ownsPortalProcess") is False

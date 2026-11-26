@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using TiaMcp.Core.PhysicalRuntime;
@@ -17,7 +18,7 @@ public static class DiagnosticPlcsimWrites
         if (writes is not { Length: >= 1 and <= 16 } || writes.Any(w => w is null))
             throw new BridgeException("RuntimeWriteLimit", "Supply 1..16 diagnostic signal writes; nothing was sent.");
         string reviewId = D.Required(new DiagnosticStore(artifactsRoot).Read(caseId, "diagnostic-case.v1"), "reviewId", 64);
-        string[] labels = writes.Select((_, i) => i.ToString("x32")).ToArray();
+        string[] labels = writes.Select((_, i) => i.ToString("x32", CultureInfo.InvariantCulture)).ToArray();
         var request = new RuntimeCaptureRequest(creationId, labels, 100, 1, ReviewId: reviewId,
             Association: new(caseId, writes.Select((w, i) => new RuntimeCaptureMapping(labels[i], w.SignalId, w.Reason)).ToArray()),
             Source: "plcsim", Simulator: new(instanceId, instanceName, writes.Select(w => new SimulatorCaptureSignal(w.Symbol, w.Type, w.Datatype)).ToArray()));

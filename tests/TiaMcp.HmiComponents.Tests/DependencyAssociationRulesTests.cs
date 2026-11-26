@@ -21,7 +21,7 @@ internal static class DependencyAssociationRulesTests
         JsonObject Request()=>new() { ["dependencyAssociations"]=new JsonArray(Selection()) };
         JsonObject Observation(JsonObject r,int i=0)=>r["afterComponent"]!["objects"]![i]!["capturedObject"]!["metadata"]!["libraryInstance"]!.AsObject();
         void Check(bool yes,string label){if(!yes)throw new Exception(label);checks++;Console.WriteLine("PASS "+label);}
-        void Reject(JsonObject report,JsonObject request,string label){try{HmiComponentDependencyAssociations.Add(report,request);}catch(TiaMcp.Core.BridgeException){Check(true,label);return;}throw new Exception("Accepted: "+label);}
+        void Reject(JsonObject report,JsonObject request,string label){try{HmiComponentDependencyAssociations.Add(report,request);}catch(TiaMcp.Core.BridgeException){Check(true,label);return;}throw new InvalidOperationException("Accepted: "+label);}
         string Status(JsonObject r)=>(string)r["dependencyAssociations"]![0]!["status"]!;
         var r=Report();var q=Request();HmiComponentDependencyAssociations.Add(r,q);
         Check(Status(r)=="match" && (bool)r["dependencyCoverage"]![0]!["allObservedIndicesMatched"]!,"Exact selected dependency, target and export agree");

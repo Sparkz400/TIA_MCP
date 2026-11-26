@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -86,7 +87,7 @@ internal static class ExtendedChecks
         Reject(() => TestSuiteResultNormalizer.Flatten(Enumerable.Repeat(largeMessage, 100001).ToArray()).Count(), "TestResultLimit");
 
         var stopwatch = Stopwatch.StartNew();
-        var definitions = Enumerable.Range(0, 1000).Select(i => Definition("rule-" + i.ToString("D4"))).ToArray();
+        var definitions = Enumerable.Range(0, 1000).Select(i => Definition("rule-" + i.ToString("D4", CultureInfo.InvariantCulture))).ToArray();
         var scalePlan = TestSuiteRunPlanner.Prepare(definitions, definitions.Select(d => d.Manifest.Id).ToArray(), [], "style");
         long planMs = stopwatch.ElapsedMilliseconds;
         Check(scalePlan.RequiredDefinitionIds.Length == 1000 && scalePlan.Blockers.Length == 0, "1,000 definitions preserve exact required closure.");

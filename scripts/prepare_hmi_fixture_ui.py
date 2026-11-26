@@ -10,7 +10,7 @@ Use --prepare-only for a hash-bound packet without native access or admission.
 import argparse
 import hashlib
 import json
-import subprocess
+import subprocess as subprocess
 import threading
 import time
 from pathlib import Path

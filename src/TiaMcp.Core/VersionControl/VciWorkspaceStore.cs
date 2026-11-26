@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO.Compression;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -17,6 +18,7 @@ public sealed record VciGitExport(string RevisionRef, GitRevisionResult Result, 
 /// <summary>Local document revisions only. Each candidate owns a separate repository; native admission is never inferred.</summary>
 public sealed partial class VciWorkspaceStore
 {
+    private static readonly string[] ForkJournalFiles = new[] { "fork-journal/intent.json", "fork-journal/0001.json", "fork-journal/0002.json" };
     private const int MaxFiles = 1000, MaxRecords = 128, MaxFileBytes = 16 << 20;
     private const long MaxTreeBytes = 256L << 20, MaxStoreBytes = 2L << 30;
     private static readonly GitRunnerLimits Limits = new(MaxFiles, 64L << 20, MaxFileBytes);
@@ -120,7 +122,7 @@ public sealed partial class VciWorkspaceStore
             WriteNew(Path.Combine(entry.Path, "files.json"), snapshot.Files);
             var artifacts = new List<VciStoredArtifact> { Artifact(entry.Path, "diff.txt"), Artifact(entry.Path, "files.json") };
             if (Directory.Exists(Path.Combine(entry.Path, "fork-journal")))
-                artifacts.AddRange(new[] { "fork-journal/intent.json", "fork-journal/0001.json", "fork-journal/0002.json" }.Select(name => Artifact(entry.Path, name)));
+                artifacts.AddRange(ForkJournalFiles.Select(name => Artifact(entry.Path, name)));
             var review = new VciGitReview(entry.Id, parentRevisionRef, inspect.ExecutableSha256, snapshot.Sha256,
                 plan.Sha256, changes, author, message, snapshot.Files.ToArray(),
                 artifacts.ToArray(), snapshot.HeadReference);
@@ -569,7 +571,7 @@ public sealed partial class VciWorkspaceStore
             foreach (var path in paths)
             {
                 var bytes = ReadBytes(path); var row = JsonSerializer.Deserialize<Callback>(bytes, BridgeProtocol.Json);
-                Require(row is not null && row.Sequence == ++count && Path.GetFileName(path) == count.ToString("D4") + ".json" &&
+                Require(row is not null && row.Sequence == ++count && Path.GetFileName(path) == count.ToString("D4", CultureInfo.InvariantCulture) + ".json" &&
                     row.PreviousSha256 == priorHash && GitWorkspaceSnapshot.Matches(row.Record.BindingSha256, intent) && row.Record.Operation == operation &&
                     row.Record.RepositoryRoot == repository && (previousRecord is null || row.Record.OperationId == previousRecord.OperationId) &&
                     Allowed(operation, previousRecord?.Phase, row.Record.Phase), "VciIntegrityFailure", "Callback sequence or hash chain changed.");
@@ -606,7 +608,7 @@ public sealed partial class VciWorkspaceStore
                 record.Operation == binding.Operation && (latest is null || record.OperationId == latest.OperationId), "VciJournalMismatch", "Callback differs from admitted local intent.");
             Require(Allowed(binding.Operation, latest?.Phase, record.Phase), "VciJournalSequence", "Invalid callback sequence.");
             // The number advances only once its record is published, so a later outcomeUnknown takes the slot of a failed one.
-            string path = Path.Combine(directory, (sequence + 1).ToString("D4") + ".json");
+            string path = Path.Combine(directory, (sequence + 1).ToString("D4", CultureInfo.InvariantCulture) + ".json");
             Publish(path, new { sequence = sequence + 1, previousSha256 = previous, record }); sequence++; previous = PackageStorage.FileHash(path); latest = record;
             return Task.CompletedTask;
         }

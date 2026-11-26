@@ -8,6 +8,7 @@ namespace TiaMcp.Host;
 
 internal static class ProjectExplorerArtifacts
 {
+    private static readonly string[] ExplorerScripts = new[] { "model.js", "client.js", "explorer.js" };
     internal static JsonElement CreateViewer(JsonElement export, string artifactsRoot)
     {
         var result = JsonNode.Parse(export.GetRawText())!.AsObject();
@@ -40,7 +41,7 @@ internal static class ProjectExplorerArtifacts
     internal static string Render(string template, string assets, string json)
     {
         var safe = json.Replace("<", "\\u003c").Replace(">", "\\u003e").Replace("&", "\\u0026").Replace("\u2028", "\\u2028").Replace("\u2029", "\\u2029");
-        var script = string.Join("\n", new[] { "model.js", "client.js", "explorer.js" }.Select(file => File.ReadAllText(Path.Combine(assets, file))));
+        var script = string.Join("\n", ExplorerScripts.Select(file => File.ReadAllText(Path.Combine(assets, file))));
         return template.Replace("__EXPLORER_STYLE__", File.ReadAllText(Path.Combine(assets, "style.css")))
             .Replace("__EXPLORER_SCRIPT__", script).Replace("__PROJECT_MODEL_JSON__", safe);
     }

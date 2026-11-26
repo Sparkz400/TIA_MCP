@@ -14,9 +14,9 @@ if (args is ["--publication-child", var childRoot, var childUpload, var childPha
 }
 if (args.Length != 1 || Directory.Exists(args[0])) throw new ArgumentException("Fresh evidence directory required.");
 string root = Path.GetFullPath(args[0]); Directory.CreateDirectory(root); var checks = new List<string>();
-void Check(bool ok, string label) { if (!ok) throw new Exception(label); checks.Add(label); }
+void Check(bool ok, string label) { if (!ok) throw new InvalidOperationException(label); checks.Add(label); }
 void Reject(Action run, string label, string? code = "InvalidCompositeEngineeringReview")
-{ try { run(); } catch (BridgeException e) when (code is null || e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
+{ try { run(); } catch (BridgeException e) when (code is null || e.Code == code) { Check(true, label); return; } throw new InvalidOperationException("Expected refusal: " + label); }
 JsonObject Obj(string text) => JsonNode.Parse(text)!.AsObject();
 const string p = "/projects/Fixture", plc = p + "/PLC", hw = plc + "/Hardware", peer = plc + "/Peer", to = plc + "/Axis";
 JsonObject Node(string path, string kind, string? parent) => new() { ["nodeId"] = path, ["objectPath"] = path, ["kind"] = kind, ["name"] = "Shared",

@@ -4,7 +4,6 @@ Uses the explorer's optional workspace-local jsonschema>=4.18 test dependency.
 No native engineering operation runs here.
 """
 import argparse
-import copy
 import json
 from pathlib import Path
 import sys

@@ -10,11 +10,11 @@ internal static class GitLongPathChecks
     internal static async Task Run(string executable, string fixture)
     {
         fixture = Path.GetFullPath(fixture);
-        if (Directory.Exists(fixture)) throw new Exception("Use a fresh long-path fixture.");
+        if (Directory.Exists(fixture)) throw new InvalidOperationException("Use a fresh long-path fixture.");
         string root = fixture;
         // Keep the process cwd below Windows MAX_PATH while object and data
         // paths exceed it. Windows cannot start Git with a >=260-character cwd.
-        if (root.Length > 165) throw new Exception("Select a fixture root of at most 165 characters.");
+        if (root.Length > 165) throw new InvalidOperationException("Select a fixture root of at most 165 characters.");
         while (root.Length < 165) root = Path.Combine(root, new string('x', Math.Min(40, Math.Max(1, 164 - root.Length))));
         Directory.CreateDirectory(root);
         var store = new VciWorkspaceStore(root, executable);
@@ -29,7 +29,7 @@ internal static class GitLongPathChecks
         }
         JsonElement Json(object value) => JsonSerializer.SerializeToElement(value, BridgeProtocol.Json);
         string Text(JsonElement value, string key) => value.GetProperty(key).GetString()!;
-        void Check(bool value, string message) { if (!value) throw new Exception(message); }
+        void Check(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
         byte[] Read(string reference) => Convert.FromBase64String(Text(Json(store.ReadFile(reference, name)), "data"));
         var author = new GitAuthor("Long Path Fixture", "fixture@example.invalid");
         var review = Json(await store.PrepareAsync([new(name, Upload(original))], author, "Long path original"));

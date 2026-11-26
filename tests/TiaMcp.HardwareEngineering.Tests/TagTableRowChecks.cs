@@ -8,7 +8,7 @@ internal static class TagTableRowChecks
     internal static int Run()
     {
         int count = 0;
-        void Check(bool ok, string label) { if (!ok) throw new Exception(label); count++; Console.WriteLine("PASS " + label); }
+        void Check(bool ok, string label) { if (!ok) throw new InvalidOperationException(label); count++; Console.WriteLine("PASS " + label); }
         string Refused(Action action) { try { action(); } catch (BridgeException error) { return error.Code; } return null; }
         static JArray Tags(params (string Name, string Type, string Address, string Comment)[] rows) => new JArray(rows.Select(row =>
         {

@@ -188,7 +188,7 @@ internal static class DocumentChecks
         var oldIds = originalRows[0].DescendantsAndSelf().Attributes("ID").ToArray();
         for (int i = 0; i < ids.Length; i++) ids[i].Value = oldIds[i].Value;
         True(XNode.DeepEquals(originalRows[0], clone));
-        var allIds = after.Descendants().Attributes("ID").Select(a => uint.Parse(a.Value, NumberStyles.HexNumber)).ToArray();
+        var allIds = after.Descendants().Attributes("ID").Select(a => uint.Parse(a.Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture)).ToArray();
         Equal(allIds.Length, allIds.Distinct().Count()); _ = new WatchTableDocument(doc.ToBytes());
         var append = Open(); append.Duplicate(1, 2); Equal(Prefix + "PlcTableCommentEntry", Rows(Parse(append.ToBytes()))[2].Name.LocalName);
     }
@@ -313,7 +313,7 @@ internal static class DocumentChecks
         Refuse(() => Open(Fixture.Replace("<OpaqueInfo>  </OpaqueInfo>", string.Concat(Enumerable.Repeat("<n>", 130)) + string.Concat(Enumerable.Repeat("</n>", 130)))));
         Refuse(() => Open("<Document>"));
         var doc = Parse(Bytes()); var list = Table(doc).Element("ObjectList")!; list.RemoveNodes();
-        list.Add(Enumerable.Range(1, 10001).Select(i => new XElement(Prefix + "PlcTableCommentEntry", new XAttribute("ID", i.ToString("X")), new XAttribute("CompositionName", "Entries"))));
+        list.Add(Enumerable.Range(1, 10001).Select(i => new XElement(Prefix + "PlcTableCommentEntry", new XAttribute("ID", i.ToString("X", CultureInfo.InvariantCulture)), new XAttribute("CompositionName", "Entries"))));
         Refuse(() => new WatchTableDocument(Encoding.UTF8.GetBytes(doc.ToString())));
     }
     private static void InvalidEdits()

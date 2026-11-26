@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Linq;
@@ -427,7 +428,7 @@ internal static class TypedGraphicalTests
             Check.Equal(true, inserted.Effects.Any(e => e.Kind == "followingObjectIdShift" && e.Description.Contains("8->D", StringComparison.Ordinal)));
             var restored = new XDocument(inserted.Document);
             restored.Descendants("SW.Blocks.CompileUnit").Single(u => u.Attribute("ID")?.Value == "8").Remove();
-            foreach (var id in restored.Descendants().Attributes("ID").Where(a => Convert.ToInt32(a.Value, 16) >= 0xD)) id.Value = (Convert.ToInt32(id.Value, 16) - 5).ToString("X");
+            foreach (var id in restored.Descendants().Attributes("ID").Where(a => Convert.ToInt32(a.Value, 16) >= 0xD)) id.Value = (Convert.ToInt32(id.Value, 16) - 5).ToString("X", CultureInfo.InvariantCulture);
             Check.Equal(unchanged, restored.ToString(SaveOptions.DisableFormatting));
             var gapped = new XDocument(native); gapped.Descendants().Attributes("ID").Last().Value = "F";
             var error = await Check.ThrowsAsync<EngineeringBridgeException>(() => { TypedGraphical.Build(gapped, model, context); return Task.CompletedTask; });
@@ -448,7 +449,7 @@ internal static class TypedGraphicalTests
             // Network-free derivation of the native block: no compile unit, consecutive IDs (title 8/9 -> 3/4).
             var empty = new XDocument(native);
             empty.Descendants("SW.Blocks.CompileUnit").Single().Remove();
-            foreach (var id in empty.Descendants().Attributes("ID").Where(a => Convert.ToInt32(a.Value, 16) >= 8)) id.Value = (Convert.ToInt32(id.Value, 16) - 5).ToString("X");
+            foreach (var id in empty.Descendants().Attributes("ID").Where(a => Convert.ToInt32(a.Value, 16) >= 8)) id.Value = (Convert.ToInt32(id.Value, 16) - 5).ToString("X", CultureInfo.InvariantCulture);
             string unchanged = empty.ToString(SaveOptions.DisableFormatting);
             var model = BooleanModel(language); model.InsertAfterNetworkId = null;
             var context = Context(); context.NetworkTemplateXml = envelope.ToString(SaveOptions.DisableFormatting);
@@ -461,7 +462,7 @@ internal static class TypedGraphicalTests
             Check.Equal("8,9", string.Join(",", objects[2].DescendantsAndSelf().Attributes("ID").Select(a => a.Value)));
             var restored = new XDocument(inserted.Document);
             restored.Descendants("SW.Blocks.CompileUnit").Single().Remove();
-            foreach (var id in restored.Descendants().Attributes("ID").Where(a => Convert.ToInt32(a.Value, 16) >= 8)) id.Value = (Convert.ToInt32(id.Value, 16) - 5).ToString("X");
+            foreach (var id in restored.Descendants().Attributes("ID").Where(a => Convert.ToInt32(a.Value, 16) >= 8)) id.Value = (Convert.ToInt32(id.Value, 16) - 5).ToString("X", CultureInfo.InvariantCulture);
             Check.Equal(unchanged, restored.ToString(SaveOptions.DisableFormatting));
             var untitled = new XDocument(empty); untitled.Descendants("MultilingualText").Single(e => (string?)e.Attribute("CompositionName") == "Title").Remove();
             await Error("NativeIdPreservationUnsupported", () => TypedGraphical.Build(untitled, model, context));

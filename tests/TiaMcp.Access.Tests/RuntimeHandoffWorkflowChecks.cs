@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -14,7 +15,7 @@ internal static class RuntimeHandoffWorkflowChecks
         var checks = new List<string>(); var processes = new List<object>();
         void Check(bool value, string label) { if (!value) throw new Exception(label); checks.Add(label); }
         void Reject(Action run, string label, string code)
-        { try { run(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
+        { try { run(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new InvalidOperationException("Expected refusal: " + label); }
         JsonObject Json(object value) => JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!.AsObject();
         var uploads = new ArtifactUploadStore(root); var store = new RuntimeHandoffWorkflowStore(root);
         (string Ref, string Id) Upload(byte[] bytes)
@@ -118,7 +119,7 @@ internal static class RuntimeHandoffWorkflowChecks
             }
             var start = new ProcessStartInfo("dotnet") { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
             foreach (string arg in new[] { Assembly.GetExecutingAssembly().Location, "--handoff-publication-child", root, childUpload.Ref, phase, signal }) start.ArgumentList.Add(arg);
-            using var child = Process.Start(start) ?? throw new Exception("Child failed to start");
+            using var child = Process.Start(start) ?? throw new InvalidOperationException("Child failed to start");
             var stdout = child.StandardOutput.ReadToEndAsync(); var stderr = child.StandardError.ReadToEndAsync(); string? reached = null; var watch = Stopwatch.StartNew();
             try
             {
@@ -201,7 +202,7 @@ internal static class RuntimeHandoffWorkflowChecks
         Reject(() => ReportPageRows.Read(pageSource, 2, 1, 1, "Download original."), "Impossible omission budget refuses instead of stalling", "ArtifactCapacity");
         Check(pageSource[0] is null && (string)pageSource[2]! == new string('x', 500), "Paging never changes original rows");
         var large = JsonNode.Parse(sourceBytes["baseline.session.json"])!.AsObject(); var permissionRows = new JsonArray();
-        for (int i = 0; i < 140; i++) permissionRows.Add(new JsonObject { ["id"] = i.ToString(), ["scope"] = "scope", ["outcome"] = "denied" });
+        for (int i = 0; i < 140; i++) permissionRows.Add(new JsonObject { ["id"] = i.ToString(CultureInfo.InvariantCulture), ["scope"] = "scope", ["outcome"] = "denied" });
         large["permissions"] = permissionRows;
         var boundaryRow = new JsonObject { ["role"] = "session", ["observation"] = large };
         int padding = (128 << 10) - 4096 - JsonSerializer.SerializeToUtf8Bytes(boundaryRow, BridgeProtocol.Json).Length;

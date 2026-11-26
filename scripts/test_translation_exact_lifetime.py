@@ -1,5 +1,4 @@
 """No native execution: exercise real controller/helper hold against fake handles and locks."""
-import copy
 import json
 from pathlib import Path
 import subprocess

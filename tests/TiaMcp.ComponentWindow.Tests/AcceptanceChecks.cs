@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -55,7 +56,7 @@ internal static class AcceptanceChecks
                 ["languages"] = new JsonObject { ["active"] = new JsonArray("de-DE", "en-US"), ["reference"] = "de-DE", ["editing"] = "en-US" } };
             var watchTables = new JsonObject { ["watch:root/Peer"] = new JsonObject { ["kind"] = "watch", ["path"] = "root/Peer", ["group"] = "root", ["name"] = "Peer",
                 ["artifact"] = Artifact(Path.Combine(m.Workspace, "captures", phase, "watch.xml"), "<Document><WatchTable ID=\"8\"><Comment>保持</Comment></WatchTable></Document>") } };
-            return new() { ["projectPath"] = project, ["plcPath"] = m.PlcPath, ["processId"] = identity, ["nativeBirthUtc"] = "2026-01-01T00:" + (identity - 999).ToString("D2") + ":00Z", ["sessionEpoch"] = identity == 999 ? m.InitialNativeSessionEpoch : "fresh-" + identity,
+            return new() { ["projectPath"] = project, ["plcPath"] = m.PlcPath, ["processId"] = identity, ["nativeBirthUtc"] = "2026-01-01T00:" + (identity - 999).ToString("D2", CultureInfo.InvariantCulture) + ":00Z", ["sessionEpoch"] = identity == 999 ? m.InitialNativeSessionEpoch : "fresh-" + identity,
                 ["scopeComplete"] = true, ["isModified"] = false, ["projectFileSha256"] = Hash("synthetic project"), ["componentVersions"] = new JsonArray(version), ["objects"] = objects,
                 ["peerMetadata"] = metadata, ["watchForceTables"] = watchTables,
                 ["inventory"] = new JsonObject { ["completeness"] = new JsonObject { ["scopeComplete"] = true, ["truncated"] = false }, ["softwareScopes"] = new JsonArray(new JsonObject()), ["technologyObjects"] = new JsonArray(), ["blocks"] = inventory, ["types"] = new JsonArray(), ["tagTables"] = new JsonArray() } };
@@ -90,7 +91,7 @@ internal static class AcceptanceChecks
         }
         List<JsonObject> Clone() => originals.Select(r => r.DeepClone().AsObject()).ToList();
         void Reject(Action<List<JsonObject>> mutation, string label)
-        { var rows = Clone(); mutation(rows); try { Verify(rows); } catch (BridgeException) { checks++; return; } throw new Exception("Accepted corrupt component evidence: " + label); }
+        { var rows = Clone(); mutation(rows); try { Verify(rows); } catch (BridgeException) { checks++; return; } throw new InvalidOperationException("Accepted corrupt component evidence: " + label); }
         Verify(Clone()); checks++;
         Reject(r => r[1]["record"]!["library"]!["result"]!["journal"]!["compile"]!["targets"]![0]!["state"] = "Error", "native Error with zero error count");
         Reject(r => r[1]["record"]!["library"]!["result"]!["journal"]!["events"]![0]!["stage"] = "after_mutation", "first checkpoint ordering");
@@ -139,7 +140,7 @@ internal static class AcceptanceChecks
         }
         VerifyRecovery(recoveryRows); checks++;
         void RejectRecovery(Action<List<JsonObject>> mutation, string label)
-        { var rows = recoveryRows.Select(r => r.DeepClone().AsObject()).ToList(); mutation(rows); try { VerifyRecovery(rows); } catch (BridgeException) { checks++; return; } throw new Exception("Accepted invalid recovery-only reconciliation: " + label); }
+        { var rows = recoveryRows.Select(r => r.DeepClone().AsObject()).ToList(); mutation(rows); try { VerifyRecovery(rows); } catch (BridgeException) { checks++; return; } throw new InvalidOperationException("Accepted invalid recovery-only reconciliation: " + label); }
         RejectRecovery(rows => rows[2]["coordinatorBeforeRecovery"]!["innerRecoveryStatuses"]![0]!["journal"]!["events"]!.AsArray().Add(new JsonObject { ["stage"] = "native_mutation", ["state"] = "dispatching" }), "ambiguous actual inner dispatch remains reserved");
         RejectRecovery(rows => rows[4]["componentWindow"]!["observation"] = observations["observeOriginal"].DeepClone(), "changed original is not baseline-preserved recovery");
         RejectRecovery(rows => rows[2]["coordinatorBeforeRecovery"]!["innerRecoveryStatuses"] = new JsonArray(), "missing actual inner outcome");

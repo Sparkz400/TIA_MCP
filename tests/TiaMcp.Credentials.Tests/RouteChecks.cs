@@ -119,7 +119,7 @@ internal static class RouteChecks
         catch (BridgeException error) when (error.Code == "CredentialRouteInvalid") { check(tokenless.Calls.SequenceEqual(["mutation_begin"]), "A begin reply with credentials but no lease token refuses before admission and dispatch"); }
 
         foreach (string path in Directory.EnumerateFiles(output, "*", SearchOption.AllDirectories).Where(path => !path.EndsWith(".credential.json", StringComparison.Ordinal)))
-            if (Leaks(File.ReadAllBytes(path))) throw new Exception("Plaintext secret retained in " + path);
+            if (Leaks(File.ReadAllBytes(path))) throw new InvalidOperationException("Plaintext secret retained in " + path);
         check(true, "No admission record, response or receipt retains the plaintext secret");
     }
 

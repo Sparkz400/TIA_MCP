@@ -21,7 +21,7 @@ from library_native_harness import Harness, require
 import plc_tag_tables
 from qualification_owned_scratch import complete_inventory, snapshot
 from qualify_access_changes import Run as StateRun
-from qualify_plc_object_mutations import coverage_gaps, diff, matches, view
+from qualify_plc_object_mutations import coverage_gaps, diff, view
 
 KINDS = ("project_languages_set", "project_simulation_enable")
 # V21 native attribute info declares the whole project_attributes_set allowlist read-only.

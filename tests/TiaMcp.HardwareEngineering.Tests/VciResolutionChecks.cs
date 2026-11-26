@@ -9,7 +9,7 @@ internal static class VciResolutionChecks
 
     private static void Pass(string name, bool condition)
     {
-        if (!condition) throw new Exception("Check failed: " + name);
+        if (!condition) throw new InvalidOperationException("Check failed: " + name);
         _count++; Console.WriteLine("PASS " + name);
     }
 

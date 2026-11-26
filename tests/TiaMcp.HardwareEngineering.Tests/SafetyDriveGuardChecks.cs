@@ -14,12 +14,12 @@ internal static class SafetyDriveGuardChecks
     internal static int Run()
     {
         int count = 0;
-        void Check(bool ok, string label) { if (!ok) throw new Exception(label); count++; Console.WriteLine("PASS " + label); }
+        void Check(bool ok, string label) { if (!ok) throw new InvalidOperationException(label); count++; Console.WriteLine("PASS " + label); }
         void Refuse(Action action, string code, string label)
         {
             try { action(); }
             catch (BridgeException error) when (error.Code == code) { Check(true, label); return; }
-            throw new Exception("Expected " + code + ": " + label);
+            throw new InvalidOperationException("Expected " + code + ": " + label);
         }
         string FirstSafety(Node node) => SafetyHardwareRules.FirstSafety(node, n => n.Children, n => n.Parent, n => n.Safety, n => n.Name);
 
