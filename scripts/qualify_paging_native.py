@@ -99,7 +99,7 @@ def main():
         snapshot = client.tool('project_model', {'request': {'action': 'capture'}})
         sid = snapshot['snapshotId']
         pages, seen = walk(lambda token: client.tool('project_model', {'request': {'action': 'search', 'snapshotId': sid, 'text': 'PgFc', 'maxItems': 5,
-                                                                                    **({'offset': token} if token else {})}}), 5, 'nextOffset')
+                                                                                    **({'cursor': token} if token else {})}}), 5, 'nextCursor')
         report['checks']['project_model search'] = record('project_model search paged', check_totals('project_model search', pages, seen, 5, 'totalMatches'))
         none = client.tool('project_model', {'request': {'action': 'search', 'snapshotId': sid, 'text': 'NoSuchName_xyz', 'maxItems': 5}})
         assert (none.get('totalItems'), none.get('pageCount')) == (0, 0), none
