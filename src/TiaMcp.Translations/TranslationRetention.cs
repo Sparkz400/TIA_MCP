@@ -193,6 +193,7 @@ internal sealed class TranslationRetention
         }
         return new JsonObject { ["kind"] = kind, ["rows"] = rows, ["total"] = directories.Length,
             ["nextOffset"] = offset + rows.Count < directories.Length ? offset + rows.Count : null,
+            ["totalItems"] = directories.Length, ["pageCount"] = TiaMcp.Core.PageTotals.PageCount(directories.Length, count),
             ["ordering"] = "record-id; discovery only, concurrent additions may require relisting" };
     }
 

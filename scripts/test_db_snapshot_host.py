@@ -88,10 +88,16 @@ def main():
                 while True:
                     page = client.tool('db_snapshot_review_page', {'recordRef': receipt['recordId'], 'section': section, 'offset': offset, 'count': 1})
                     validate(page, 'page')
+                    check(page['totalItems'] == page['total'] == len(expected) and page['pageCount'] == len(expected),
+                          'totalItems repeats total and pageCount counts one-row pages: ' + section)
                     rows.extend(row['value'] for row in page['rows'])
                     if page['nextOffset'] is None: break
                     offset = page['nextOffset']
                 check(rows == expected, 'Paged ' + section + ' matches immutable artifact')
+                tail = client.tool('db_snapshot_review_page', {'recordRef': receipt['recordId'], 'section': section, 'offset': len(expected), 'count': 3})
+                validate(tail, 'page')
+                check(tail['rows'] == [] and tail['nextOffset'] is None and tail['totalItems'] == len(expected)
+                      and tail['pageCount'] == -(-len(expected) // 3), 'An empty page at the end keeps totalItems and pageCount: ' + section)
             single = client.tool('db_snapshot_review', {k: v for k, v in arguments.items() if k != 'comparisonUploadRef'})
             validate(single, 'receipt')
             check(single['comparisonInput'] is None and not single['summary']['comparisonRequested'], 'Single inspection has no fabricated comparison')

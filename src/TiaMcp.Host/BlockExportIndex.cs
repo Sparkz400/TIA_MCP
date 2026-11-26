@@ -56,6 +56,8 @@ internal static class BlockExportIndex
             ["matchedBlocks"] = matched, ["offset"] = offset,
             ["exported"] = rows.Count(row => row["skipped"] is null), ["skipped"] = rows.Count(row => row["skipped"] is not null),
             ["nextOffset"] = offset + rows.Count < matched ? offset + rows.Count : null,
+            // Unknown when the inventory walk was cut: matchedBlocks then counts only the listed blocks.
+            ["totalItems"] = listed ? matched : null, ["pageCount"] = TiaMcp.Core.PageTotals.PageCount(listed ? matched : (int?)null, maxBlocks),
             ["blocks"] = new JsonArray([.. rows]),
             ["completeness"] = new JsonObject
             {

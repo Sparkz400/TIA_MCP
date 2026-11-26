@@ -57,6 +57,7 @@ public sealed class FeatureCatalog
             criteria = _catalog.GetProperty("criteria").EnumerateArray().Where(c => criteriaIds.Contains(c.GetProperty("id").GetString())).ToArray(),
             pagination = new { offset, returned = page.Length, total = matches.Length,
                 nextOffset = offset + page.Length < matches.Length ? (int?)(offset + page.Length) : null,
+                totalItems = matches.Length, pageCount = PageTotals.PageCount(matches.Length, maxItems),
                 complete = offset + page.Length >= matches.Length }
         };
     }
