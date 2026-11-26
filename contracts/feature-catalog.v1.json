@@ -5928,6 +5928,23 @@
       "limitations": [
         "Read-only V19 check of the shared worker loop; the AccessDenied and LicenseUnavailable mappings by exact Siemens type were not provoked natively."
       ]
+    },
+    {
+      "id": "local.paging.worker-pagers.20261126",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "11b178d639382ec0af78368d18f3b227dbd750ca",
+        "passedScope": "scripts/qualify_paging_native.py on Debug builds of the paging branch (src of 54fd7b87) in one owned TIA V21 scratch with 23 generated SCL functions: project_model search and project_index query paged at 5 (23 rows in 5 pages, totalItems 23 = totalMatches, pageCount 5 on every page), an empty project_model search with 0 and 0, library_query of the project library (2 rows, 1 page), and hmi_references of HMI_RT_1 on a retrieved HmiSeeder unified-pc baseline paged at 5 (6 rows, 2 pages)."
+      },
+      "artifacts": [
+        "evidence/local.paging.worker-pagers.20261126.json"
+      ],
+      "limitations": [
+        "Null totals (a truncated library walk, an incomplete hmi_references scope, the project_snapshot_search hit cap) are not provoked natively; they are covered offline.",
+        "Host-side pagers are covered by the offline Host harnesses only."
+      ]
     }
   ],
   "features": [
@@ -13749,13 +13766,15 @@
           "Two snapshots, 50k visited items, 32MiB accounted payload each, expiring authenticated cursors.",
           "External changes require explicit recapture/verification. See docs/guides/project-index.md.",
           "The 17 October child-discovery extension includes OutputCamMeasuringInputContainer.OutputCams and MeasuringInputs under owner-relative paths, with explicit ownerPath/composition, shared object/depth bounds and failed-discovery refusal. Existing root paths are unchanged. Other service compositions/associations are not expanded. Current linked-routine and portable store tests use synthetic native shapes; native SDK compilation, child ownership/alias behavior, complete preservation and lifecycle qualification remain open. Historical evidence references do not qualify this expanded source.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "Page totals checked natively on 26 November 2026 (local.paging.worker-pagers.20261126): totalItems and pageCount equal on every page, the walk takes exactly pageCount pages."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.project_index.20261028"
+          "local.project_index.20261028",
+          "local.paging.worker-pagers.20261126"
         ]
       },
       "availability": {
@@ -13893,7 +13912,8 @@
         "limitations": [
           "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
+          "Page totals checked natively on 26 November 2026 (local.paging.worker-pagers.20261126): totalItems and pageCount equal on every page, the walk takes exactly pageCount pages."
         ]
       },
       "qualification": {
@@ -13906,7 +13926,8 @@
           "local.library_releases.rerun.20261028",
           "local.library_unit_relations.rerun.20261029",
           "local.library_protected.rerun.20261029",
-          "local.library.branching-scale.20261109"
+          "local.library.branching-scale.20261109",
+          "local.paging.worker-pagers.20261126"
         ]
       },
       "availability": {
@@ -15871,14 +15892,16 @@
           "The 18 October PLC library-instance observation retains exact per-object FB/FC/PLC-type service identity with distinct no-service, unsupported and unavailable states. Linked GUID pairs are detached one-read observations; complete library/dependency coverage, export correspondence and runtime instance identity are not inferred. Synthetic-shape and Framework helper checks do not compile or qualify Siemens callers; the new native capture route still needs SDK and native acceptance. Historical evidence is unchanged.",
           "Saved PLC library-instance observations now retain direct dependency version GUID lists from the same captured version. Observed empty lists remain distinct from unavailable observations. Each list is bounded to 1000 entries; a separate shared 20000 collection/iterator-read budget spans the capture and is exposed in limits, usage and partial provider coverage. Budget exhaustion publishes no partial list and does not discard the known owner GUID pair. Duplicate and self references remain original observations, not complete dependency closure or export/object association. Portable and actual Framework helper checks use synthetic Siemens shapes; native callers still require SDK compilation and qualification. Historical evidence is unchanged.",
           "Unscoped captures add project-library nodes (type folders, types, versions, master-copy folders, master copies) from the library tools' metadata walk, bounded by 10000 entries and the remaining capture budget; truncation and unavailable elements are reported in `libraries` coverage. PLC-scoped captures omit the library. Global libraries, version dependencies and master-copy usage are not modeled. Compiled against the V21 PublicAPI only; not natively qualified.",
-          "FB/FC/PLC-type library-instance GUID pairs become `libraryVersion` edges only on an exact type/version GUID match with a captured project-library version; missing or partially captured libraries leave them unresolved. Configured port interconnections (`connectedPort`, NetworkPort.ConnectedPorts) are read only for a selected port device item and are not verified cables or link state. Compiled against the V21 PublicAPI only; not natively qualified."
+          "FB/FC/PLC-type library-instance GUID pairs become `libraryVersion` edges only on an exact type/version GUID match with a captured project-library version; missing or partially captured libraries leave them unresolved. Configured port interconnections (`connectedPort`, NetworkPort.ConnectedPorts) are read only for a selected port device item and are not verified cables or link state. Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Page totals checked natively on 26 November 2026 (local.paging.worker-pagers.20261126): totalItems and pageCount equal on every page, the walk takes exactly pageCount pages."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.explorer.e1.20261028",
-          "local.explorer.relationship-scope.rerun.20261029"
+          "local.explorer.relationship-scope.rerun.20261029",
+          "local.paging.worker-pagers.20261126"
         ]
       },
       "availability": {
@@ -16401,13 +16424,15 @@
           "Read-only use qualified natively for Classic Comfort, RT Advanced, Basic, Unified Comfort and Unified PC through the production bridge (local.hmi.bridge.20261025). WinCC RT Professional is not exposed by V21 Openness (1 November 2026); Classic PLC declaration mapping is not qualified.",
           "Exact native object endpoints or native foreign-key semantics are required. Same names do not prove PLC ownership or declaration binding.",
           "Dynamic scripts, unsupported XML binding shapes, incomplete member mappings and missing native cross-reference providers remain unresolved.",
-          "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source."
+          "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source.",
+          "Page totals checked natively on 26 November 2026 (local.paging.worker-pagers.20261126): totalItems and pageCount equal on every page, the walk takes exactly pageCount pages."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hmi.bridge.rerun.20261029"
+          "local.hmi.bridge.rerun.20261029",
+          "local.paging.worker-pagers.20261126"
         ]
       },
       "availability": {

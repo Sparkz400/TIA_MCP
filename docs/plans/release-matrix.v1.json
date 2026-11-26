@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.5.0",
-    "catalogSha256": "4c0a94006cbbc70b83e5f178a6751f269ef92c3879991ceb67226aa77918cd58",
+    "catalogSha256": "f4bebd137a6e2f141ae1cd67b392545e5518e25218f6955c9d3f6403d7779122",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "5ad6d7bbf56bafce83a0016aaa5e48d0fda369dce536f7e1d1c7ec696ba1146d"
   },
@@ -8259,28 +8259,32 @@
         "X11"
       ],
       "evidenceIds": [
-        "local.project_index.20261028"
+        "local.project_index.20261028",
+        "local.paging.worker-pagers.20261126"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.project_index.20261028"
+            "local.project_index.20261028",
+            "local.paging.worker-pagers.20261126"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.project_index.20261028"
+            "local.project_index.20261028",
+            "local.paging.worker-pagers.20261126"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.project_index.20261028"
+            "local.project_index.20261028",
+            "local.paging.worker-pagers.20261126"
           ]
         }
       ]
@@ -8423,7 +8427,8 @@
         "local.library_releases.rerun.20261028",
         "local.library_unit_relations.rerun.20261029",
         "local.library_protected.rerun.20261029",
-        "local.library.branching-scale.20261109"
+        "local.library.branching-scale.20261109",
+        "local.paging.worker-pagers.20261126"
       ],
       "cells": [
         {
@@ -8437,7 +8442,8 @@
             "local.library_releases.rerun.20261028",
             "local.library_unit_relations.rerun.20261029",
             "local.library_protected.rerun.20261029",
-            "local.library.branching-scale.20261109"
+            "local.library.branching-scale.20261109",
+            "local.paging.worker-pagers.20261126"
           ]
         },
         {
@@ -8451,7 +8457,8 @@
             "local.library_releases.rerun.20261028",
             "local.library_unit_relations.rerun.20261029",
             "local.library_protected.rerun.20261029",
-            "local.library.branching-scale.20261109"
+            "local.library.branching-scale.20261109",
+            "local.paging.worker-pagers.20261126"
           ]
         },
         {
@@ -8465,7 +8472,8 @@
             "local.library_releases.rerun.20261028",
             "local.library_unit_relations.rerun.20261029",
             "local.library_protected.rerun.20261029",
-            "local.library.branching-scale.20261109"
+            "local.library.branching-scale.20261109",
+            "local.paging.worker-pagers.20261126"
           ]
         }
       ]
@@ -11520,7 +11528,8 @@
       ],
       "evidenceIds": [
         "local.explorer.e1.20261028",
-        "local.explorer.relationship-scope.rerun.20261029"
+        "local.explorer.relationship-scope.rerun.20261029",
+        "local.paging.worker-pagers.20261126"
       ],
       "cells": [
         {
@@ -11528,7 +11537,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.explorer.e1.20261028",
-            "local.explorer.relationship-scope.rerun.20261029"
+            "local.explorer.relationship-scope.rerun.20261029",
+            "local.paging.worker-pagers.20261126"
           ]
         },
         {
@@ -11536,7 +11546,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.explorer.e1.20261028",
-            "local.explorer.relationship-scope.rerun.20261029"
+            "local.explorer.relationship-scope.rerun.20261029",
+            "local.paging.worker-pagers.20261126"
           ]
         },
         {
@@ -11544,7 +11555,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.explorer.e1.20261028",
-            "local.explorer.relationship-scope.rerun.20261029"
+            "local.explorer.relationship-scope.rerun.20261029",
+            "local.paging.worker-pagers.20261126"
           ]
         }
       ]
@@ -11976,28 +11988,32 @@
         "X08"
       ],
       "evidenceIds": [
-        "local.hmi.bridge.rerun.20261029"
+        "local.hmi.bridge.rerun.20261029",
+        "local.paging.worker-pagers.20261126"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.hmi.bridge.rerun.20261029"
+            "local.hmi.bridge.rerun.20261029",
+            "local.paging.worker-pagers.20261126"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.hmi.bridge.rerun.20261029"
+            "local.hmi.bridge.rerun.20261029",
+            "local.paging.worker-pagers.20261126"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.hmi.bridge.rerun.20261029"
+            "local.hmi.bridge.rerun.20261029",
+            "local.paging.worker-pagers.20261126"
           ]
         }
       ]
@@ -30633,6 +30649,21 @@
         {
           "path": "evidence/local.operation_status.20261028.json",
           "sha256": "08726173f80aaaa3e3f98f35bf6005321797077edbde2d18dc75b8902845ad75"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.paging.worker-pagers.20261126",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "11b178d639382ec0af78368d18f3b227dbd750ca",
+      "retained": [
+        {
+          "path": "evidence/local.paging.worker-pagers.20261126.json",
+          "sha256": "54d693374a86489e0e783879a3edd7ac7270eafc24f731f4be17ee81cdfad023"
         }
       ],
       "notRetained": []
