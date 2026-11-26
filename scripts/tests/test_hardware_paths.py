@@ -56,6 +56,10 @@ class HardwarePathTests(unittest.TestCase):
         unresolved = interface("X", [None])
         with self.assertRaises(AssertionError):
             hp.ports([unresolved], unresolved["path"])
+        portless = interface("Z", [])
+        self.assertEqual([], hp.ports([portless], portless["path"]))
+        with self.assertRaises(AssertionError):
+            hp.port([portless], portless["path"], 1)
         with self.assertRaises(AssertionError):
             hp.node_name([interface("Y", [], nodes=("X1", "X2"))], CPU + "/items/Y")
 

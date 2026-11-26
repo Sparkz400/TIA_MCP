@@ -64,10 +64,10 @@ def node_name(source, interface):
 
 def ports(source, interface):
     """The interface's port items in TIA's port order (the first is Port_1), from its own port list: an ET 200SP head's ports sit
-    on the BusAdapter beside the interface, not below it."""
+    on the BusAdapter beside the interface, not below it. An interface without ports has none; an unresolved port fails."""
     listed = sorted(_network(rows(source).get(interface)).get("ports") or [], key=lambda row: row["portIndex"])
     paths = [((row.get("port") or {}).get("ownerHardwarePath")) for row in listed]
-    _require(paths and all(paths), "Expected resolved ports on %s: %s" % (interface, listed))
+    _require(all(paths), "Expected resolved ports on %s: %s" % (interface, listed))
     return paths
 
 
