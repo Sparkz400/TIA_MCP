@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO.Pipes;
 using System.Reflection;
 using System.Text;
@@ -841,7 +842,7 @@ internal static partial class Program
     {
         await using var fixture = new BridgeFixture();
         await fixture.Client.CallAsync("echo");
-        using var worker = Process.GetProcessById(int.Parse(fixture.Events().Single(e => e.Kind == "started").Id!));
+        using var worker = Process.GetProcessById(int.Parse(fixture.Events().Single(e => e.Kind == "started").Id!, CultureInfo.InvariantCulture));
         _ = worker.SafeHandle;
         await fixture.Client.CallAsync("exitAfterReply");
         using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(10));
@@ -893,7 +894,7 @@ internal static partial class Program
         await Check.ThrowsAsync<OperationCanceledException>(() => fixture.Client.CallAsync("addin_owner_context", cancellationToken: cancelled.Token));
         Check.Equal(0, fixture.Events().Count);
         await fixture.Client.CallAsync("echo");
-        using var worker = Process.GetProcessById(int.Parse(fixture.Events().Single(e => e.Kind == "started").Id!));
+        using var worker = Process.GetProcessById(int.Parse(fixture.Events().Single(e => e.Kind == "started").Id!, CultureInfo.InvariantCulture));
         _ = worker.SafeHandle;
         await fixture.Client.CallAsync("exitAfterReply");
         using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(10));

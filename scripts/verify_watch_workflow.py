@@ -5,7 +5,6 @@ blank peer rows; normalizes only known container indentation and export time.
 No production parser or semantic-hash implementation is imported.
 """
 import argparse
-import copy
 from datetime import datetime, timezone
 import json
 from pathlib import Path

@@ -20,6 +20,7 @@ internal sealed record TranslationRetainedCheckpoint(EngineeringArtifactReferenc
 /// </summary>
 public sealed class TranslationImportWorkflow
 {
+    private static readonly string[] ExitRoles = new[] { "host", "native", "worker" };
     private readonly string root;
     private readonly TranslationWorkflowStore workflow;
     private readonly EngineeringOperationStore store;
@@ -196,7 +197,7 @@ public sealed class TranslationImportWorkflow
         Require(close["tree"]!["completed"]!.GetValue<bool>() && !close["tree"]!["forcedTermination"]!.GetValue<bool>() &&
             !close["tree"]!["startupOutcomeUnknown"]!.GetValue<bool>(), "NativeCleanupUnverified", "Original exact process tree must be closed.");
         var exits = close["tree"]!["exits"]!.AsArray();
-        Require(exits.Count == 3 && exits.Select(e => e!["role"]!.GetValue<string>()).Order().SequenceEqual(new[] { "host", "native", "worker" }) &&
+        Require(exits.Count == 3 && exits.Select(e => e!["role"]!.GetValue<string>()).Order().SequenceEqual(ExitRoles) &&
             exits.All(e => e!["proof"]!["completed"]!.GetValue<bool>() && e["proof"]!["processExitVerified"]!.GetValue<bool>() &&
                 e["proof"]!["birthAndImageVerified"]!.GetValue<bool>() && e["proof"]!["sameOsHandleRetained"]!.GetValue<bool>() &&
                 e["proof"]!["handleClosed"]!.GetValue<bool>() && e["proof"]!["exitCode"]!.GetValue<int>() == 0 &&

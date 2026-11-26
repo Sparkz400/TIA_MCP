@@ -39,7 +39,7 @@ if (args.Length != 1 || Directory.Exists(args[0])) throw new ArgumentException("
 string root = Path.GetFullPath(args[0]); Directory.CreateDirectory(root); var checks = new List<string>();
 void Check(bool value, string label) { if (!value) throw new Exception(label); checks.Add(label); }
 void Reject(Action action, string label, params string[] codes)
-{ try { action(); } catch (BridgeException e) when (codes.Length == 0 || codes.Contains(e.Code)) { Check(true, label + " (" + e.Code + ")"); return; } throw new Exception("Expected refusal: " + label); }
+{ try { action(); } catch (BridgeException e) when (codes.Length == 0 || codes.Contains(e.Code)) { Check(true, label + " (" + e.Code + ")"); return; } throw new InvalidOperationException("Expected refusal: " + label); }
 const string project = "/projects/Fixture", plc = project + "/plc", block = plc + "/blocks/Component", type = plc + "/types/Status";
 const string hmi = project + "/hmi/Panel", tag = hmi + "/tags/Run", foreign = project + "/hmi/Other";
 var reviews = new ProjectReviewStore(root); var uploads = new ArtifactUploadStore(root);
@@ -303,7 +303,7 @@ File.WriteAllBytes(Path.Combine(root, "hmi-component-reviews", forgedEffectId + 
 Reject(() => store.Page(forgedEffectId), "Rehashed invented effect result rejected", "ArtifactChanged");
 // Authored expected output is a literal edit of a retained original, not emitted by the production patcher.
 string repository = AppContext.BaseDirectory; // the build output sits inside the checkout; the cwd need not
-while (!File.Exists(Path.Combine(repository, "fixtures/hmi/native-classic-screen.xml"))) repository = Directory.GetParent(repository)?.FullName ?? throw new Exception("Repository fixture unavailable.");
+while (!File.Exists(Path.Combine(repository, "fixtures/hmi/native-classic-screen.xml"))) repository = Directory.GetParent(repository)?.FullName ?? throw new InvalidOperationException("Repository fixture unavailable.");
 byte[] originalScreen = File.ReadAllBytes(Path.Combine(repository, "fixtures/hmi/native-classic-screen.xml"));
 string screenText = new UTF8Encoding(false, true).GetString(originalScreen);
 const string oldColor = "<BackColor>204, 204, 204</BackColor>", newColor = "<BackColor>64, 128, 192</BackColor>";

@@ -1,6 +1,6 @@
 """Safety harness integration with the existing retained process controller."""
 from component_exact_lifetime import ComponentOwnedScratch
-from encoder_lifecycle import encoder_client as retained_client, sync_steps, finish_session, verify_lifecycle
+from encoder_lifecycle import encoder_client as retained_client, sync_steps as sync_steps, finish_session, verify_lifecycle
 from block_test_runtime import NativeToolError
 from engineering_preservation import require
 

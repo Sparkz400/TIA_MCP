@@ -18,6 +18,7 @@ public sealed record WebRuntimeProfile(JsonElement? ApiVersion, string QuantityP
 /// <summary>One owned, pinned HTTPS session. Callers serialize access and persist intent before Login/Logout.</summary>
 public sealed partial class WebRuntimeClient : IDisposable
 {
+    private static readonly string[] RequiredMethods = new[] { "Api.Login", "Api.Logout", "Api.GetPermissions", "PlcProgram.Browse", "PlcProgram.Read" };
     // Login, logout and mutations use a fresh connection per request and are never retried. Read-class requests share one pinned
     // keep-alive connection (created on first use, dropped before any mutation and after any reply the peer does not keep the
     // connection open for); its certificate pin is checked once, at its handshake.
@@ -76,7 +77,7 @@ public sealed partial class WebRuntimeClient : IDisposable
         string id = Id(); var body = WebRuntimeProtocol.Discover(id);
         var methods = await Exchange(body, bytes => WebRuntimeProtocol.Names(bytes, id), cancellationToken);
         if (JsonSerializer.SerializeToUtf8Bytes(methods).Length > 64*1024) throw Error("RuntimeDiscoveryLimit");
-        if (!new[] { "Api.Login", "Api.Logout", "Api.GetPermissions", "PlcProgram.Browse", "PlcProgram.Read" }.All(methods.Contains))
+        if (!RequiredMethods.All(methods.Contains))
             throw Error("RuntimeMethodsUnavailable");
         Methods = methods;
         if (Methods.Contains("Api.Version"))

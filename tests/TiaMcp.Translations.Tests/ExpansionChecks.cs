@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
@@ -186,7 +187,7 @@ internal static class ExpansionChecks
     internal static void WriteEvidence(string path, Dictionary<string, byte[]> fixture, WorkbookProfile profile,
         EngineeringObjectReference identity, int tests)
     {
-        if (Directory.Exists(path)) throw new Exception("Evidence directory already exists: " + path);
+        if (Directory.Exists(path)) throw new InvalidOperationException("Evidence directory already exists: " + path);
         Directory.CreateDirectory(path);
         var (formatted, map) = Formatted(fixture, profile); var bytes = Pack(formatted);
         var wb = TranslationWorkbook.Open(bytes, map, identity, Hash(bytes));
@@ -253,7 +254,7 @@ internal static class ExpansionChecks
             var document = XDocument.Parse(Encoding.UTF8.GetString(output[part]));
             foreach (var row in document.Root!.Element(Ss + "sheetData")!.Elements(Ss + "row"))
             {
-                int index = int.Parse(row.Attribute("r")!.Value) - 1;
+                int index = int.Parse(row.Attribute("r")!.Value, CultureInfo.InvariantCulture) - 1;
                 var cells = row.Elements(Ss + "c").ToDictionary(c => c.Attribute("r")!.Value);
                 string? de = cells.GetValueOrDefault("C" + (index + 1))?.Element(Ss + "is")?.Element(Ss + "t")?.Value;
                 string? expectedDe = index < 100 ? "Reviewed " + (index * 10 + owner) : (index % 10) switch { 0 => null, 1 => "", 2 => " ", _ => "Deutsch " + index };
@@ -288,7 +289,7 @@ internal static class ExpansionChecks
         {
             string part = $"xl/worksheets/owner{owner:D2}.xml";
             workbook.Element(Ss + "sheets")!.Add(new XElement(Ss + "sheet", new XAttribute("name", "SyntheticOwner" + owner), new XAttribute("sheetId", owner + 1), new XAttribute(XName.Get("id", OfficeRel.TrimEnd('/')), "s" + owner)));
-            links.Add(new XElement(Rel + "Relationship", new XAttribute("Id", "s" + owner), new XAttribute("Type", OfficeRel + "worksheet"), new XAttribute("Target", "worksheets/owner" + owner.ToString("D2") + ".xml")));
+            links.Add(new XElement(Rel + "Relationship", new XAttribute("Id", "s" + owner), new XAttribute("Type", OfficeRel + "worksheet"), new XAttribute("Target", "worksheets/owner" + owner.ToString("D2", CultureInfo.InvariantCulture) + ".xml")));
             var text = new StringBuilder("<worksheet xmlns=\"" + Ss + "\"><sheetData>");
             for (int index = 0; index < count / 10; ++index)
             {
@@ -362,7 +363,7 @@ internal static class ExpansionChecks
         }
         Check(XNode.DeepEquals(left, right), "Independent XML preservation oracle failed.");
     }
-    private static void Check(bool value, string message = "Assertion failed") { if (!value) throw new Exception(message); }
-    private static void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected [{expected}], got [{actual}]"); }
-    private static void Reject(string code, Action action) { try { action(); } catch (BridgeException ex) { Equal(code, ex.Code); return; } throw new Exception("Expected rejection " + code); }
+    private static void Check(bool value, string message = "Assertion failed") { if (!value) throw new InvalidOperationException(message); }
+    private static void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected [{expected}], got [{actual}]"); }
+    private static void Reject(string code, Action action) { try { action(); } catch (BridgeException ex) { Equal(code, ex.Code); return; } throw new InvalidOperationException("Expected rejection " + code); }
 }

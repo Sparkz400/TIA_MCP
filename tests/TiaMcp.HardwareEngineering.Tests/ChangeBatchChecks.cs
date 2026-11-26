@@ -7,7 +7,7 @@ internal static class ChangeBatchChecks
     internal static int Run()
     {
         int count = 0;
-        void Check(bool ok, string label) { if (!ok) throw new Exception(label); count++; Console.WriteLine("PASS " + label); }
+        void Check(bool ok, string label) { if (!ok) throw new InvalidOperationException(label); count++; Console.WriteLine("PASS " + label); }
         string Refused(Action action) { try { action(); } catch (BridgeException error) { return error.Code; } return null; }
         string Message(Action action) { try { action(); } catch (BridgeException error) { return error.Message; } return null; }
         static JObject Batch(params JObject[] items) => new JObject { ["items"] = new JArray(items.Cast<object>().ToArray()) };

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
 using Siemens.Engineering.Compiler;
@@ -178,7 +179,7 @@ namespace TiaMcp.Tests
             project.DeviceGroups = [new() { Name = "G", Groups = [group] }];
             await Refuse("TraversalLimit", () => OpennessSession.CompileDevicesForTest(project)); Check.Equal(1, device.Compiler.Calls);
             var first = Device("A");
-            IEnumerable<Device> Many() { yield return first; for (int i = 0; i < 50000; i++) yield return Device(i.ToString()); }
+            IEnumerable<Device> Many() { yield return first; for (int i = 0; i < 50000; i++) yield return Device(i.ToString(CultureInfo.InvariantCulture)); }
             project = new() { Devices = Many() };
             await Refuse("TraversalLimit", () => OpennessSession.CompileDevicesForTest(project)); Check.Equal(0, first.ServiceReads);
         }

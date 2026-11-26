@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Json;
 using TiaMcp.Core;
@@ -9,13 +10,13 @@ internal static class OperationTextChecks
     internal static void Run(string? destination = null)
     {
         string root = Path.GetFullPath(destination ?? Path.Combine(Path.GetTempPath(), "operation-text-" + Guid.NewGuid().ToString("N")));
-        if (Directory.Exists(root)) throw new Exception("Fresh operation text evidence directory required.");
+        if (Directory.Exists(root)) throw new InvalidOperationException("Fresh operation text evidence directory required.");
         Directory.CreateDirectory(root);
         var checks = new List<string>(); var failures = new List<string>(); int sequence = 0;
         void Check(bool ok, string name) { if (!ok) failures.Add(name); else checks.Add(name); }
         (EngineeringOperationStore Store, EngineeringOperationPlan Plan, EngineeringArtifactReference Proof) Fixture()
         {
-            string folder = Path.Combine(root, (++sequence).ToString()); Directory.CreateDirectory(folder);
+            string folder = Path.Combine(root, (++sequence).ToString(CultureInfo.InvariantCulture)); Directory.CreateDirectory(folder);
             string proof = Path.Combine(folder, "proof-\uFFFD.json"); File.WriteAllText(proof, "synthetic evidence only");
             var artifact = new EngineeringArtifactReference(Path.GetFileName(proof), Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(proof))));
             string project = Path.Combine(folder, "project.ap21");
@@ -33,7 +34,7 @@ internal static class OperationTextChecks
         }
         void Reject(Action action, string name, EngineeringOperationStore store, EngineeringOperationRecord? before = null)
         {
-            string folder = Path.Combine(root, sequence.ToString());
+            string folder = Path.Combine(root, sequence.ToString(CultureInfo.InvariantCulture));
             string Snapshot() => string.Join("\n", Directory.GetFiles(folder, "*.json", SearchOption.AllDirectories).Order(StringComparer.Ordinal)
                 .Select(p => p + ":" + Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(p)))));
             string original = Snapshot();
@@ -94,7 +95,7 @@ internal static class OperationTextChecks
                 "Valid Unicode preserves exact plan, gate and successful reopen " + valid);
         }
         File.WriteAllText(Path.Combine(root, "verification.json"), JsonSerializer.Serialize(new { checks, failures, nativeExecuted = false }, new JsonSerializerOptions { WriteIndented = true }));
-        if (failures.Count != 0) throw new Exception(string.Join("; ", failures));
+        if (failures.Count != 0) throw new InvalidOperationException(string.Join("; ", failures));
         Console.WriteLine($"PASS operation text boundaries: {checks.Count} checks; no native execution. Receipts retained at {root}");
     }
 }

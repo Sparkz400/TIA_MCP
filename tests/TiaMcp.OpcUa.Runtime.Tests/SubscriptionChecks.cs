@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -79,7 +80,7 @@ internal static class SubscriptionChecks
                 File.WriteAllText(Path.Combine(root,mode+".json"),Json(new{outcome,events=rows}).GetRawText());
                 if(mode=="subscriptionGap")check(rows.Any(x=>x.Kind=="gap" && x.GapFrom==1 && x.GapTo==1 && x.MissingCount==1) && rows.Any(x=>x.Kind=="republish" && x.SequenceNumber==1),"Real Republish repairs injected missing original sequence");
                 if(mode=="subscriptionDuplicate")check(rows.Count(x=>x.Duplicate)==1 && rows.Any(x=>x.Kind=="republish" && x.SequenceNumber==2) && outcome.GetProperty("recordedProgress").GetProperty("notifications").GetInt32()==3,"Duplicate retains original envelope without double counting; subsequent gap repaired");
-                if(mode=="subscriptionOverflow")check(rows.SelectMany(x=>x.Notifications??[]).All(x=>x.Overflow && (uint.Parse(x.Value.StatusCode[2..],System.Globalization.NumberStyles.HexNumber)&0x480)==0x480),"Original DataValue overflow information bits retained");
+                if(mode=="subscriptionOverflow")check(rows.SelectMany(x=>x.Notifications??[]).All(x=>x.Overflow && (uint.Parse(x.Value.StatusCode[2..],System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture)&0x480)==0x480),"Original DataValue overflow information bits retained");
                 if(mode=="subscriptionRepublishUnavailable")check(rows.Any(x=>x.Kind=="failure" && x.ErrorCode=="UaRepublishUnavailable" && x.StatusCode=="0x807b0000"),"Unavailable retransmission remains explicit gap evidence");
                 if(mode=="subscriptionRepublishStatus")check(rows.Any(x=>x.Kind=="republish" && x.StatusChanges?.Contains("0x800a0000")==true) && outcome.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="serverStatusChanged","Retransmitted StatusChangeNotification also terminates acquisition");
                 if(mode=="subscriptionStatus")check(rows.Any(x=>x.StatusChanges?.Contains("0x800a0000")==true) && outcome.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="serverStatusChanged","Server StatusChangeNotification retained and terminates acquisition");
@@ -231,7 +232,7 @@ internal static class SubscriptionChecks
     private static OpcUaSubscriptionEvent[] Events(OpcUaRuntimeSubscriptions subscriptions,JsonElement status)=>
         Json(subscriptions.Page(status.GetProperty("snapshotRef").GetString()!,0,200)).GetProperty("rows").EnumerateArray().Select(x=>x.GetProperty("event").Deserialize<OpcUaSubscriptionEvent>(BridgeProtocol.Json)!).ToArray();
     private static async Task<JsonElement> End(OpcUaRuntimeSubscriptions subscriptions,string id)
-    {var timer=Stopwatch.StartNew();while(timer.Elapsed<TimeSpan.FromSeconds(30)){var s=Json(await subscriptions.Status(id,default));if(s.GetProperty("state").GetString()!="running")return s;await Task.Delay(25);}throw new Exception("Subscription termination deadline");}
+    {var timer=Stopwatch.StartNew();while(timer.Elapsed<TimeSpan.FromSeconds(30)){var s=Json(await subscriptions.Status(id,default));if(s.GetProperty("state").GetString()!="running")return s;await Task.Delay(25);}throw new InvalidOperationException("Subscription termination deadline");}
     private static async Task Refuse(Func<Task> action,string expected,Action<bool,string> check)
     {string? code=null;try{await action();}catch(BridgeException e){code=e.Code;}check(code==expected,"Subscription refusal "+expected+" (actual "+code+")");}
 }

@@ -26,10 +26,10 @@ if (args.Length > 0 && args[0] == "--probe")
     return;
 }
 string output = Path.GetFullPath(args.Length > 0 ? args[0] : Path.Combine(Path.GetTempPath(), "credentials-" + Guid.NewGuid().ToString("N")));
-if (Directory.Exists(output)) throw new Exception("Fresh output required"); Directory.CreateDirectory(output);
+if (Directory.Exists(output)) throw new InvalidOperationException("Fresh output required"); Directory.CreateDirectory(output);
 var checks = new List<string>();
 void Check(bool ok, string label) { if (!ok) throw new Exception(label); checks.Add(label); }
-void Reject(Action action, string code, string label) { try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected " + code + ": " + label); }
+void Reject(Action action, string code, string label) { try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new InvalidOperationException("Expected " + code + ": " + label); }
 string Sha(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
 string root = Path.Combine(output, "vault"); var vault = new CredentialVault(root);
 var binding = new CredentialBinding(new("fixture-provider", "fixture-authority", "CPU/one", "account", "monitoring"), "runtime-authentication", "monitor-reader");
@@ -59,8 +59,8 @@ string Probe()
     foreach (string arg in new[] { typeof(CredentialVault).Assembly.Location.Replace("TiaMcp.Host.dll", "TiaMcp.Credentials.Tests.dll"), "--probe", root, statusPath }) start.ArgumentList.Add(arg);
     // The test assembly is next to the copied Host reference in this test output.
     using var process = Process.Start(start)!; var stdout = process.StandardOutput.ReadToEndAsync(); var stderr = process.StandardError.ReadToEndAsync();
-    if (!process.WaitForExit(15000)) { process.Kill(true); throw new Exception("Probe timeout"); }
-    if (process.ExitCode != 0) throw new Exception(stderr.GetAwaiter().GetResult());
+    if (!process.WaitForExit(15000)) { process.Kill(true); throw new InvalidOperationException("Probe timeout"); }
+    if (process.ExitCode != 0) throw new InvalidOperationException(stderr.GetAwaiter().GetResult());
     return stdout.GetAwaiter().GetResult().Trim();
 }
 Check(Probe() == "readable", "Separate process same user opens exact protected reference");
@@ -114,7 +114,7 @@ Tamper(n => n["secret"] = "SYNTHETIC-SURPLUS", first.Reference, binding, "Creden
 try { File.WriteAllText(recordPath, "{\"schemaVersion\":null,\"schemaVersion\":null}"); Reject(() => vault.Inspect(first.Reference, binding), "CredentialInputInvalid", "Duplicate fields refused"); }
 finally { File.WriteAllBytes(recordPath, original); }
 string link = Path.Combine(root, "alias.json");
-if (!Links.CreateHardLink(link, recordPath, IntPtr.Zero)) throw new Exception("Hard-link fixture could not be created");
+if (!Links.CreateHardLink(link, recordPath, IntPtr.Zero)) throw new InvalidOperationException("Hard-link fixture could not be created");
 try { Reject(() => vault.Inspect(first.Reference, binding), "InvalidResourceKey", "Multiply linked encrypted file refuses before decryption"); }
 finally { File.Delete(link); }
 Reject(() => vault.Inspect(first.Reference with { CredentialId = "../escape" }, binding), "CredentialInputInvalid", "Reference cannot escape the vault directory");

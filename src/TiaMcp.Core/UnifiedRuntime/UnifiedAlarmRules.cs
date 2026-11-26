@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
@@ -66,8 +67,8 @@ public static partial class UnifiedAlarmRules
         DateTimeOffset? startTime, DateTimeOffset? endTime, int maxItems)
     {
         var variables = Variables(languages, filterString, filterLanguage);
-        variables["startTime"] = startTime?.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
-        variables["endTime"] = endTime?.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+        variables["startTime"] = startTime?.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
+        variables["endTime"] = endTime?.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
         variables["maxNumberOfResults"] = maxItems;
         return Request("query($languages:[String],$filterString:String,$filterLanguage:String,$startTime:Timestamp,$endTime:Timestamp,$maxNumberOfResults:Int){loggedAlarms(languages:$languages,filterString:$filterString,filterLanguage:$filterLanguage,startTime:$startTime,endTime:$endTime,maxNumberOfResults:$maxNumberOfResults){"
             + Selection(LoggedFields, available) + "}}", variables);

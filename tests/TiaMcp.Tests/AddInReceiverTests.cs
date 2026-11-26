@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO.Pipes;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -30,11 +31,11 @@ internal static class AddInReceiverTests
             if (peer != binding.TiaProcess) throw new BridgeException("SyntheticPeerRefused", "A different same-user process is not the selected producer.");
             string mode = File.Exists(Path.Combine(root, "control")) ? File.ReadAllText(Path.Combine(root, "control")) : "";
             if (mode == "block") {
-                File.WriteAllText(Path.Combine(root, "entered"), calls.ToString());
+                File.WriteAllText(Path.Combine(root, "entered"), calls.ToString(CultureInfo.InvariantCulture));
                 await Task.Delay(Timeout.Infinite, token);
             }
             if (mode == "hold") {
-                File.WriteAllText(Path.Combine(root, "entered"), calls.ToString());
+                File.WriteAllText(Path.Combine(root, "entered"), calls.ToString(CultureInfo.InvariantCulture));
                 while (!File.Exists(Path.Combine(root, "release"))) await Task.Delay(10, token);
             }
             return mode == "changed" ? binding with { WorkerInstanceId = new string('f', 32) } : binding;

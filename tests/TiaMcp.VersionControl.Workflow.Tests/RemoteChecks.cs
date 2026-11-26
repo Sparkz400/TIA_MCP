@@ -12,11 +12,11 @@ internal static class RemoteChecks
     public static async Task<int> Run(string fixtureRoot, string git)
     {
         int checks = 0;
-        void Check(bool value, string name) { if (!value) throw new Exception(name); checks++; Console.WriteLine("PASS remote " + name); }
+        void Check(bool value, string name) { if (!value) throw new InvalidOperationException(name); checks++; Console.WriteLine("PASS remote " + name); }
         async Task Reject(string code, Func<Task> action)
         {
             try { await action(); } catch (BridgeException error) { Check(error.Code == code, "refuses " + code + ": " + error.Code + " " + error.Message); return; }
-            throw new Exception("Expected " + code);
+            throw new InvalidOperationException("Expected " + code);
         }
         string root = Path.Combine(fixtureRoot, "remote-store"), bare = Path.Combine(fixtureRoot, "remote.git"), clone = Path.Combine(fixtureRoot, "other-engineer");
         Directory.CreateDirectory(root);
@@ -27,7 +27,7 @@ internal static class RemoteChecks
             foreach (var a in new[] { "-c", "user.name=Other Engineer", "-c", "user.email=other@example.invalid", "-c", "core.autocrlf=false" }.Concat(arguments)) start.ArgumentList.Add(a);
             start.Environment["GIT_CONFIG_NOSYSTEM"] = "1"; start.Environment["GIT_CONFIG_GLOBAL"] = "NUL";
             using var process = Process.Start(start)!; var output = process.StandardOutput.ReadToEnd(); var error = process.StandardError.ReadToEnd(); process.WaitForExit();
-            if (process.ExitCode != 0) throw new Exception("git " + string.Join(' ', arguments) + ": " + error);
+            if (process.ExitCode != 0) throw new InvalidOperationException("git " + string.Join(' ', arguments) + ": " + error);
             return output.Trim();
         }
         Plain(fixtureRoot, "init", "--bare", "--initial-branch=main", bare);
@@ -49,7 +49,7 @@ internal static class RemoteChecks
         void Reject2(string code, Action action)
         {
             try { action(); } catch (BridgeException error) { Check(error.Code == code, "parse refuses " + code); return; }
-            throw new Exception("Expected " + code);
+            throw new InvalidOperationException("Expected " + code);
         }
 
         var uploads = new ArtifactUploadStore(root);
@@ -174,7 +174,7 @@ internal static class RemoteChecks
             var start = new ProcessStartInfo(Path.Combine(Environment.SystemDirectory, "cmd.exe")) { UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true };
             foreach (var a in new[] { "/c", "mklink", "/J", link, target }) start.ArgumentList.Add(a);
             using var process = Process.Start(start)!; process.StandardOutput.ReadToEnd(); process.WaitForExit();
-            if (process.ExitCode != 0) throw new Exception("mklink /J failed: " + process.StandardError.ReadToEnd());
+            if (process.ExitCode != 0) throw new InvalidOperationException("mklink /J failed: " + process.StandardError.ReadToEnd());
         }
         foreach (var (relative, label) in new[] { ("refs/heads", "refs/heads"), ("objects/pack", "objects/pack") })
         {

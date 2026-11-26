@@ -3,7 +3,7 @@ using TiaMcp.Openness.V21;
 
 int passed = 0, failed = 0;
 void Check(string name, Action action) { try { action(); Console.WriteLine("PASS " + name); passed++; } catch (Exception e) { Console.Error.WriteLine("FAIL " + name + ": " + e); failed++; } }
-void Assert(bool value) { if (!value) throw new Exception("Assertion failed."); }
+void Assert(bool value) { if (!value) throw new InvalidOperationException("Assertion failed."); }
 JObject Target() => new JObject { ["target"] = "/devices/HMI", ["state"] = "Success", ["errorCount"] = 0, ["warningCount"] = 0,
     ["messagesTruncated"] = false, ["messages"] = new JArray(new JObject { ["state"] = "Information", ["description"] = "Software compilation started.", ["depth"] = 0 }) };
 JObject Aggregate(params JObject[] targets) => new JObject { ["errorCount"] = 0, ["targets"] = new JArray(targets) };

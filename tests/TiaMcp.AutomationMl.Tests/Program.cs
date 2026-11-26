@@ -6,9 +6,9 @@ using TiaMcp.Core.AutomationMl;
 
 if (args.Length != 1 || Directory.Exists(args[0])) throw new ArgumentException("Supply a fresh evidence directory.");
 string output = Path.GetFullPath(args[0]); Directory.CreateDirectory(output); int checks = 0;
-void Check(bool value, string name) { if (!value) throw new Exception(name); checks++; Console.WriteLine("PASS AutomationML " + name); }
+void Check(bool value, string name) { if (!value) throw new InvalidOperationException(name); checks++; Console.WriteLine("PASS AutomationML " + name); }
 void Reject(string code, Action action)
-{ try { action(); } catch (BridgeException error) { Check(error.Code == code, "refuses " + code + ": " + error.Code); return; } throw new Exception("Expected " + code); }
+{ try { action(); } catch (BridgeException error) { Check(error.Code == code, "refuses " + code + ": " + error.Code); return; } throw new InvalidOperationException("Expected " + code); }
 byte[] Bytes(string text) => Encoding.UTF8.GetBytes(text);
 JsonElement Json(object value) => JsonSerializer.SerializeToElement(value, BridgeProtocol.Json);
 string Text(JsonElement value, string key) => value.GetProperty(key).GetString()!;

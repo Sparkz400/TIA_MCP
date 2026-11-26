@@ -570,7 +570,7 @@ class IntegrateApplyRun(ComponentRun):
             self.persist()
             raise
         self.retain("combined_apply_result", applied)
-        checkpoint = case["initialCheckpoint"] = verify_combined_receipt(applied, prepared, baseline["inventory"]["project"]["path"])
+        case["initialCheckpoint"] = verify_combined_receipt(applied, prepared, baseline["inventory"]["project"]["path"])
         record = json.loads(Path(applied["journal"]["combinedApply"]["coordinatorJournal"]).read_text(encoding="utf-8-sig"))["record"]
         require(record.get("state") == "installation_verified", "Coordinator journal is not at verified installation.")
         return applied, record

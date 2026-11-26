@@ -178,6 +178,6 @@ internal static class ArrayValueChecks
             if (result.GetProperty("state").GetString() != "running") return result;
             await Task.Delay(30);
         }
-        throw new Exception("Array acquisition did not terminate");
+        throw new InvalidOperationException("Array acquisition did not terminate");
     }
 }

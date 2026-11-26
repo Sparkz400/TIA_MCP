@@ -20,7 +20,7 @@ from engineering_preservation import require, native_payload, decode_native_arti
 import encoder_software_preservation as software_peers
 import encoder_hardware_preservation as hardware_peers
 from qualify_technology_families import parameter_rows
-from encoder_endpoints import POLICY as ENDPOINT_POLICY, connection_attributes, capture_endpoint, endpoint, require_endpoint_calls, same
+from encoder_endpoints import POLICY as ENDPOINT_POLICY, connection_attributes as connection_attributes, capture_endpoint, endpoint, require_endpoint_calls, same
 
 
 CPU = "OrderNumber:6ES7 511-1AL03-0AB0/V4.1"
@@ -365,7 +365,7 @@ def main():
         auth = {"deviceCompilerTargets": report["deviceCompilerInventories"][-1]["targets"], "plcPath": selector["plcPath"], "cpuHardwarePath": inventory["plcs"][0]["hardwarePath"], "moduleHardwarePath": modules[0]["path"], "ownsPortalProcess": True, "creationTool": "tia_create_scratch", "processId": start["processId"],
                 "projectPath": report["projectPath"], "cpuTypeIdentifier": CPU, "moduleName": "TiaMcp_EncoderHardware",
                 "moduleTypeIdentifier": selected["typeIdentifier"], "technologyName": NAME}
-        inspection = seed("inspect", auth)
+        seed("inspect", auth)
         if not configuration:
             report["discoveryCompleted"] = True
             return

@@ -7,9 +7,9 @@ using TiaMcp.Core.SoftwareUnits;
 
 if (args.Length != 1 || Directory.Exists(args[0])) throw new ArgumentException("Fresh evidence directory required.");
 string root = Path.GetFullPath(args[0]); Directory.CreateDirectory(root); var checks = new List<string>();
-void Check(bool value, string label) { if (!value) throw new Exception(label); checks.Add(label); }
+void Check(bool value, string label) { if (!value) throw new InvalidOperationException(label); checks.Add(label); }
 void Reject(Action action, string label, string code = "InvalidUnitReview")
-{ try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
+{ try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; } throw new InvalidOperationException("Expected refusal: " + label); }
 JsonObject J(string text) => JsonNode.Parse(text)!.AsObject();
 const string plc = "/projects/Fixture/plc/A", a = plc + "/units/A", b = plc + "/units/B", c = plc + "/units/C";
 const string source = a + "/blocks/Run", target = b + "/blocks/Value", far = c + "/blocks/Value", db = plc + "/blocks/Shared";

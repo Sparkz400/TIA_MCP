@@ -52,8 +52,8 @@ internal static class RuntimeHandoffChecks
         {
             foreach (string key in new[] { "nativeExecutable", "nativeQualified", "sourceAuthenticityVerified", "liveFreshnessVerified",
                 "deviceIdentityVerified", "programMatchVerified", "effectiveRightsVerified", "operationAdmitted", "assertionsAdmitted" })
-                if (report[key]!.GetValue<bool>()) throw new Exception("Promoted authority: " + key);
-            if (report["permissions"]!.AsArray().Any(p => p!["operationAdmitted"]!.GetValue<bool>())) throw new Exception("Admitted operation");
+                if (report[key]!.GetValue<bool>()) throw new InvalidOperationException("Promoted authority: " + key);
+            if (report["permissions"]!.AsArray().Any(p => p!["operationAdmitted"]!.GetValue<bool>())) throw new InvalidOperationException("Admitted operation");
         }
         void Case(string label, Action<JsonObject>? change, bool invalid, Action<JsonObject>? requestChange = null)
         {
@@ -112,7 +112,7 @@ internal static class RuntimeHandoffChecks
             var input = request.DeepClone().AsObject(); change(input);
             if (observationChange is not null) { var rows = originals.DeepClone().AsObject(); observationChange(rows); input["current"] = References(rows); }
             try { Build(input); } catch (BridgeException e) when (e.Code == code) { check(!e.Message.Contains("SECRET-SENTINEL"), "Handoff refuses " + label); return; }
-            throw new Exception("Expected handoff refusal: " + label);
+            throw new InvalidOperationException("Expected handoff refusal: " + label);
         }
         Reject("foreign saved review", p => p["reviewId"] = new string('0',64));
         Reject("different access owner", p => p["owner"]!["nodeId"] = "another");

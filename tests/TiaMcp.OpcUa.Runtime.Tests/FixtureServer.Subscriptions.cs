@@ -1,3 +1,4 @@
+using System.Globalization;
 using Opc.Ua;
 using Opc.Ua.Server;
 
@@ -39,7 +40,7 @@ internal sealed partial class FixtureServer
         if(Mode=="subscriptionCreateItemsDenied")throw new ServiceResultException(StatusCodes.BadUserAccessDenied);
         foreach(var item in items)
         {
-            subscriptionHandles[item.RequestedParameters.ClientHandle]=Convert.ToString(item.ItemToMonitor.NodeId.Identifier)!;
+            subscriptionHandles[item.RequestedParameters.ClientHandle]=Convert.ToString(item.ItemToMonitor.NodeId.Identifier, CultureInfo.InvariantCulture)!;
             item.RequestedParameters.SamplingInterval=Math.Max(200,item.RequestedParameters.SamplingInterval);
             item.RequestedParameters.QueueSize=Math.Min(4,item.RequestedParameters.QueueSize);
         }
@@ -53,7 +54,7 @@ internal sealed partial class FixtureServer
                 minimumSeverity=(filter.WhereClause?.Elements?.Count??0)==0?null:((LiteralOperand)filter.WhereClause.Elements[0].FilterOperands[1].Body).Value.Value});
         }
         Audit.Enqueue(new {operation="ItemsCreated",subscription,items=response.Results.Select((r,i)=>new {clientHandle=items[i].RequestedParameters.ClientHandle,
-            node=Convert.ToString(items[i].ItemToMonitor.NodeId.Identifier),status=$"0x{r.StatusCode.Code:x8}",id=r.MonitoredItemId,
+            node=Convert.ToString(items[i].ItemToMonitor.NodeId.Identifier, CultureInfo.InvariantCulture),status=$"0x{r.StatusCode.Code:x8}",id=r.MonitoredItemId,
             revisedSampling=r.RevisedSamplingInterval,revisedQueue=r.RevisedQueueSize}).ToArray()});
         return response;
     }

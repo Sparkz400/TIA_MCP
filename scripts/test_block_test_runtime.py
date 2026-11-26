@@ -9,7 +9,7 @@ import unittest
 from unittest import mock
 
 from block_test_program import generate_program, inspect_interface
-from block_test_runtime import McpRuntimeBackend, NativeAudit, NativeToolError, RuntimeCleanupUncertain, redact, verify_memory_card, verify_credential_provisioning
+from block_test_runtime import McpRuntimeBackend, NativeAudit, NativeToolError, RuntimeCleanupUncertain, verify_memory_card, verify_credential_provisioning
 import run_block_tests
 import validate_simulation
 

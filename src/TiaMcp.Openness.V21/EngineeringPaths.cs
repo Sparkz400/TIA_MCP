@@ -6,6 +6,7 @@ namespace TiaMcp.Openness.V21
 {
     internal static class EngineeringPaths
     {
+        private static readonly char[] PathSeparators = new[] { '\\', '/' };
         internal const int MaximumProjectDirectoryLength = 143;
 
         // The longer of the two directories RetrieveWithUpgrade was seen to create for a library archive (8 November 2026):
@@ -65,7 +66,7 @@ namespace TiaMcp.Openness.V21
             if (string.IsNullOrWhiteSpace(path)) return false;
             if (path.Length >= 3 && char.IsLetter(path[0]) && path[1] == ':' && (path[2] == '\\' || path[2] == '/')) return true;
             if (!path.StartsWith("\\\\", StringComparison.Ordinal) || path.StartsWith("\\\\?\\", StringComparison.Ordinal) || path.StartsWith("\\\\.\\", StringComparison.Ordinal)) return false;
-            var components = path.Substring(2).Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var components = path.Substring(2).Split(PathSeparators, StringSplitOptions.RemoveEmptyEntries);
             return components.Length >= 2 && components[0] != "." && components[0] != ".." && components[1] != "." && components[1] != "..";
         }
     }

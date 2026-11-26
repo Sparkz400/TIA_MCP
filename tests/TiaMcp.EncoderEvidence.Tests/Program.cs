@@ -8,9 +8,9 @@ if (Directory.Exists(root)) throw new IOException("Choose a fresh checkpoint tes
 Directory.CreateDirectory(root);
 int passed = 0;
 JsonObject Artifact(string path) => new() { ["path"] = path, ["bytes"] = new FileInfo(path).Length, ["sha256"] = Hash(File.ReadAllBytes(path)) };
-void Assert(bool value) { if (!value) throw new Exception("Checkpoint evidence assertion failed."); }
+void Assert(bool value) { if (!value) throw new InvalidOperationException("Checkpoint evidence assertion failed."); }
 void Check(string name, Action action) { action(); passed++; Console.WriteLine("PASS " + name); }
-void Reject(Action action) { try { action(); } catch (Exception error) when (error is IOException || error is InvalidOperationException) { return; } throw new Exception("Expected checkpoint refusal."); }
+void Reject(Action action) { try { action(); } catch (Exception error) when (error is IOException || error is InvalidOperationException) { return; } throw new InvalidOperationException("Expected checkpoint refusal."); }
 (string archive, string auth, string project) Inputs(string name)
 {
     string folder = Path.Combine(root, name); Directory.CreateDirectory(folder);

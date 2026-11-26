@@ -1,5 +1,4 @@
 """Offline checks for the protected-object and unit-relation library qualifiers."""
-from types import SimpleNamespace
 import unittest
 
 from library_native_harness import Harness

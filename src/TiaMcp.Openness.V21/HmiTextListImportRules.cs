@@ -15,6 +15,7 @@ namespace TiaMcp.Model
     /// with defaults applied and every text reference replaced by its per-language texts. Every stated value stays significant.</summary>
     internal static class HmiTextListImportRules
     {
+        private static readonly char[] PathOrDriveSeparators = new[] { '/', '\\', ':' };
         internal const string Operation = "text_list_import";
         // Profiles whose native qualification passed (local.hmi.text-list-import.route.20261031 and the interruption records).
         internal static readonly string[] Profiles = { "unified-comfort", "unified-pc" };
@@ -41,7 +42,7 @@ namespace TiaMcp.Model
             {
                 var file = files[i] as JObject ?? throw new ArgumentException("A candidate file must be an object.");
                 string name = HmiEngineeringRules.Text(file, "fileName");
-                if (name.IndexOfAny(new[] { '/', '\\', ':' }) >= 0 || name.StartsWith(".", StringComparison.Ordinal) || !name.EndsWith(".hmi.yml", StringComparison.Ordinal)
+                if (name.IndexOfAny(PathOrDriveSeparators) >= 0 || name.StartsWith(".", StringComparison.Ordinal) || !name.EndsWith(".hmi.yml", StringComparison.Ordinal)
                     || name.EndsWith(".TextLibrary.hmi.yml", StringComparison.Ordinal) != (i == 1))
                     throw new ArgumentException("Candidate files are <base>.hmi.yml and <base>.TextLibrary.hmi.yml.");
                 string sha = HmiEngineeringRules.Text(file, "sha256");
