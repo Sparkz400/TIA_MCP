@@ -911,6 +911,10 @@ class Run:
 
     def sim_write_signals_both_spellings(self):
         scratch = self.ensure_scratch()
+        # The default scratch has no test DB (validate_milestones.py adds it for its own run): add the one member written here.
+        db = 'DATA_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\n   STRUCT\n      Enable : Bool;\n   END_STRUCT;\nBEGIN\nEND_DATA_BLOCK\n' % TEST_DB
+        self.record("test DB created", self.apply_change(self.a, "source_upsert", {"language": "SCL", "source": db, "expectedBlockNames": [TEST_DB]},
+                                                         plc_path=scratch["plcPath"]).get("state"))
         self.enable_simulation()
         self.record("sim_status before", self.ok(self.a, "sim_status"))
         if self.args.trust_owned_empty_cpu_certificate:
