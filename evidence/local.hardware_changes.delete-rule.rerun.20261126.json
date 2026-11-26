@@ -1,0 +1,75 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hardware_changes.delete-rule.rerun.20261126",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-26T12:39:11+00:00",
+  "source": {
+    "commit": "3376e751e21dcee1d77542b012ffc54c0e9f0d86",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "LT-PRG2024-03",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_hardware_changes.py --slice delete-rule on Debug builds of 3376e751 on a German TIA V21 installation (structural item and default-tag-table lookups): one owned scratch CPU 1511-1 PN V4.1, a DI 16x24VDC HF plugged at slot 2 through hardware_plug; hardware_delete of it refused with compile=false before its checkpoint, then applied with compile and save (14 steps). PR 330 hardware smoke.",
+  "limitations": [
+    "No reopen and no restore in this slice.",
+    "The default tag table's tagCount/constantCount row change is tolerated when its members changed in the same step (fields added 10 November)."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "4cef51e847174d0ecec79e53efe9cf0c9d07a5435a72bf50cb6ca84d2b08d60f"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "eea58939264b9fec24d0700ae3531a99ca704d73c3b518238dd16f4a1baabca4"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "e2c322a27326d395c9161e0f8c485d94e4ce08043f63b8a6b95c6797b0273a7c",
+      "bytes": 148688,
+      "completed": true,
+      "steps": [
+        "start owned TIA hardware changes",
+        "create owned scratch hardware changes",
+        "snapshot baseline",
+        "prepare plug HwDi",
+        "apply hardware_plug",
+        "change_status plug HwDi",
+        "snapshot plug HwDi",
+        "verify plug HwDi",
+        "prepare delete HwDi",
+        "refuse apply hardware_delete: compile=false",
+        "apply hardware_delete",
+        "change_status delete HwDi",
+        "snapshot delete HwDi",
+        "verify delete HwDi"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_status",
+        "device_inventory",
+        "hardware_inspect",
+        "project_inventory",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

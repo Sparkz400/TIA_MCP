@@ -135,3 +135,31 @@ The V19 worker, which had stopped compiling when the batched capture reads made 
 whitelist by its Debug build. `scripts/qualify_tia_v19.py --run-native` passed all 53 stages, the first V19 run of the
 batched reads, and is curated as
 [`local.tia.v19-adapter.rebuild.20261126`](../../evidence/local.tia.v19-adapter.rebuild.20261126.json) (catalog `0.5.3`).
+
+## Follow-up checks
+
+`scripts/qualify_followup_checks.py` covers the native checks still open from 14 to 25 November in 16 independent
+stages on owned scratch projects and instances. Its runs found three defects, fixed the same day:
+
+- a `simulation_download` refused before its claim (`ticketState` `reusable`) kept its admission `outcomeUnknown`, so
+  every later download and `project_save` was refused with `ResourceBusy` (`34308389`);
+- a download whose password question the worker refuses from TIA's callback leaves the Portal disposed, and
+  `tia_detach` then failed, so `tia_start` stayed refused with `AlreadyAttached` (`ed8a84e3`; the decline itself stays
+  open);
+- the runner's own stage order and fixtures (the timed apply, the test DB, the spent-ticket retry, which the Host
+  refuses with `ResourceBusy` because the spent download stays held).
+
+The complete run (`artifacts/n26/fu5`) passed all 16 stages and is curated as
+[`local.followups.native.20261126`](../../evidence/local.followups.native.20261126.json) (catalog `0.5.4`); among
+them, `QueueTimeout` refused a second call after 5 s during a 47 s apply, the stale sweep removed only the aged
+prepared change, and a CPU 1518-4 PN/DP added to the scratch reported `plc_loadable_generate` available.
+
+## Hardware smoke on a German installation
+
+`scripts/qualify_hardware_changes.py` now resolves TIA-generated items (interfaces, ports, racks, the CPU display)
+through `scripts/hardware_paths.py` and the default tag table through `scripts/plc_tag_tables.py` instead of their
+English names. Its first rerun reported the default tag table's row as an unexpected change: since 10 November tag
+table rows carry `tagCount` and `constantCount`, which a plugged module's system constant changes. The shared effect
+check now tolerates exactly that. `--slice delete-rule` (14 steps) and `--slice drive` (52 steps) then passed and are
+curated as [`local.hardware_changes.delete-rule.rerun.20261126`](../../evidence/local.hardware_changes.delete-rule.rerun.20261126.json)
+and [`local.hardware_changes.drive.rerun.20261126`](../../evidence/local.hardware_changes.drive.rerun.20261126.json).

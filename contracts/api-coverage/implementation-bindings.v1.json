@@ -82,7 +82,7 @@
     },
     {
       "path": "contracts/change-kinds.v1.json",
-      "sha256": "d76782cee2c1ca379439cc382b7a3ad0b65b814b6463cd909ef27215bd54e7db",
+      "sha256": "4420a21f7c04a08149c520d74124c6d99f0e5d71c0916b77a1062e6fcd559071",
       "bytes": 101297
     },
     {
@@ -297,8 +297,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "3dc389c4643c745a026492bfb86072f789d37ef634612ebe30800345932e39ad",
-      "bytes": 1959644
+      "sha256": "9ea8a1cf622cfc93b12f85a96567f6147e411ce7dc4ba64722362c343ff09cd3",
+      "bytes": 1966288
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -120668,6 +120668,13 @@
           "artifacts": [
             "evidence/local.hardware_changes.full.rerun.20261107.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.drive.rerun.20261126",
+          "profileSha256": "348e1e31659599ca063cf62b5842783800235c6334376e660cd25313c75d264a",
+          "artifacts": [
+            "evidence/local.hardware_changes.drive.rerun.20261126.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -120970,6 +120977,13 @@
           "profileSha256": "0d9fb8b623fda7a53b82d2c81e592a4a86d97b9d573fe8dc823f3cddc64d2336",
           "artifacts": [
             "evidence/local.hardware_changes.full.rerun.20261107.json"
+          ]
+        },
+        {
+          "id": "local.hardware_changes.delete-rule.rerun.20261126",
+          "profileSha256": "20262b60e6e493472684ce7c8ae9cc3dc6fcc726472ce6788388c8db7669f3c9",
+          "artifacts": [
+            "evidence/local.hardware_changes.delete-rule.rerun.20261126.json"
           ]
         }
       ],
@@ -124137,6 +124151,13 @@
           "artifacts": [
             "evidence/local.hardware_changes.full.rerun.20261107.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.drive.rerun.20261126",
+          "profileSha256": "348e1e31659599ca063cf62b5842783800235c6334376e660cd25313c75d264a",
+          "artifacts": [
+            "evidence/local.hardware_changes.drive.rerun.20261126.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -124253,6 +124274,13 @@
           "profileSha256": "7c36c6c01c4d9b660821767fc15ba050bae00bb00f9b3f613725ddd6cb74fc4b",
           "artifacts": [
             "evidence/local.hardware_changes.refusals.rerun.20261107.json"
+          ]
+        },
+        {
+          "id": "local.hardware_changes.drive.rerun.20261126",
+          "profileSha256": "348e1e31659599ca063cf62b5842783800235c6334376e660cd25313c75d264a",
+          "artifacts": [
+            "evidence/local.hardware_changes.drive.rerun.20261126.json"
           ]
         }
       ],
@@ -127267,6 +127295,13 @@
           "profileSha256": "f4d22c0728bdadf19de6fd18d3f7cbd881053fd10d99f6c5f9f6f1fdccde32e1",
           "artifacts": [
             "evidence/local.fingerprint.reuse.20261111.json"
+          ]
+        },
+        {
+          "id": "local.followups.native.20261126",
+          "profileSha256": "a71ed5ff4bc5549583eae9e316c80ef23ea40539b1eff5a3e9244f08dbf2534b",
+          "artifacts": [
+            "evidence/local.followups.native.20261126.json"
           ]
         }
       ],
@@ -131714,6 +131749,13 @@
           "artifacts": [
             "evidence/local.hmi.bridge.rerun.20261029.json"
           ]
+        },
+        {
+          "id": "local.followups.native.20261126",
+          "profileSha256": "a71ed5ff4bc5549583eae9e316c80ef23ea40539b1eff5a3e9244f08dbf2534b",
+          "artifacts": [
+            "evidence/local.followups.native.20261126.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -135148,6 +135190,13 @@
           "profileSha256": "0de435b22b27980ab10486a426706503c316cff8b04f22875dcdc36664fd2216",
           "artifacts": [
             "evidence/local.reopen.20261024.json"
+          ]
+        },
+        {
+          "id": "local.followups.native.20261126",
+          "profileSha256": "a71ed5ff4bc5549583eae9e316c80ef23ea40539b1eff5a3e9244f08dbf2534b",
+          "artifacts": [
+            "evidence/local.followups.native.20261126.json"
           ]
         }
       ],
@@ -144266,6 +144315,13 @@
           "artifacts": [
             "evidence/local.plcsim.output-arrays.20261102.json"
           ]
+        },
+        {
+          "id": "local.followups.native.20261126",
+          "profileSha256": "a71ed5ff4bc5549583eae9e316c80ef23ea40539b1eff5a3e9244f08dbf2534b",
+          "artifacts": [
+            "evidence/local.followups.native.20261126.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -144337,6 +144393,13 @@
           "profileSha256": "e841cce49f70cd4c818a14481693c794911d090d700c7f4cae8a6dbedcdfb9e6",
           "artifacts": [
             "evidence/local.plcsim.signals-ip.20261102.json"
+          ]
+        },
+        {
+          "id": "local.followups.native.20261126",
+          "profileSha256": "a71ed5ff4bc5549583eae9e316c80ef23ea40539b1eff5a3e9244f08dbf2534b",
+          "artifacts": [
+            "evidence/local.followups.native.20261126.json"
           ]
         }
       ],
@@ -144417,6 +144480,13 @@
           "profileSha256": "eba53af995e7dd637e8b6c85fccb4a319203bfce58be88fb5490d6295aa8d2f4",
           "artifacts": [
             "evidence/local.provision.card_move.20261101.json"
+          ]
+        },
+        {
+          "id": "local.followups.native.20261126",
+          "profileSha256": "a71ed5ff4bc5549583eae9e316c80ef23ea40539b1eff5a3e9244f08dbf2534b",
+          "artifacts": [
+            "evidence/local.followups.native.20261126.json"
           ]
         }
       ],
@@ -144921,6 +144991,13 @@
           "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
             "evidence/local.read_contracts.20261028.json"
+          ]
+        },
+        {
+          "id": "local.followups.native.20261126",
+          "profileSha256": "a71ed5ff4bc5549583eae9e316c80ef23ea40539b1eff5a3e9244f08dbf2534b",
+          "artifacts": [
+            "evidence/local.followups.native.20261126.json"
           ]
         }
       ],
@@ -146195,6 +146272,13 @@
           "artifacts": [
             "evidence/local.reliability.20261024.json"
           ]
+        },
+        {
+          "id": "local.followups.native.20261126",
+          "profileSha256": "a71ed5ff4bc5549583eae9e316c80ef23ea40539b1eff5a3e9244f08dbf2534b",
+          "artifacts": [
+            "evidence/local.followups.native.20261126.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -146226,6 +146310,13 @@
           "profileSha256": "0c9681f8682e09e9712f0b22d23cddd20e7993a134920e41e139f90dc9e7f1d3",
           "artifacts": [
             "evidence/local.smoke.20261024.json"
+          ]
+        },
+        {
+          "id": "local.followups.native.20261126",
+          "profileSha256": "a71ed5ff4bc5549583eae9e316c80ef23ea40539b1eff5a3e9244f08dbf2534b",
+          "artifacts": [
+            "evidence/local.followups.native.20261126.json"
           ]
         }
       ],
@@ -146291,6 +146382,13 @@
           "artifacts": [
             "evidence/local.smoke.20261024.json"
           ]
+        },
+        {
+          "id": "local.followups.native.20261126",
+          "profileSha256": "a71ed5ff4bc5549583eae9e316c80ef23ea40539b1eff5a3e9244f08dbf2534b",
+          "artifacts": [
+            "evidence/local.followups.native.20261126.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -146354,6 +146452,13 @@
           "profileSha256": "47ed9fac4b7f8ab8d48188665b6263e2e59444a6bcc9c01000177c55df9b36e9",
           "artifacts": [
             "evidence/local.reliability.20261024.json"
+          ]
+        },
+        {
+          "id": "local.followups.native.20261126",
+          "profileSha256": "a71ed5ff4bc5549583eae9e316c80ef23ea40539b1eff5a3e9244f08dbf2534b",
+          "artifacts": [
+            "evidence/local.followups.native.20261126.json"
           ]
         }
       ],
@@ -149466,6 +149571,11 @@
       "sha256": "0ffbf65e977468e795d7d28f56dea379833996378f3eb0bba55bbcff154b39df"
     },
     {
+      "path": "evidence/local.followups.native.20261126.json",
+      "state": "observed",
+      "sha256": "f0364a98204f0ddcc567c08bd236654db67992a2a6e3b69a0022d4962d1e7b8d"
+    },
+    {
       "path": "evidence/local.graph_changes.20261028.json",
       "state": "observed",
       "sha256": "caa0c90d571556fd6016186c3450f7569c7d31d2e39f83729d9e2474bb3f76b7"
@@ -149501,9 +149611,19 @@
       "sha256": "99cc103429fb91fdfdc90820b06022e4532280b7f82a1056b8a3183eed36f663"
     },
     {
+      "path": "evidence/local.hardware_changes.delete-rule.rerun.20261126.json",
+      "state": "observed",
+      "sha256": "5f2ea19af13d912bb04444bfac4f9d4f5d2ee024846ecde8941795cf490fde01"
+    },
+    {
       "path": "evidence/local.hardware_changes.drive.20261107.json",
       "state": "observed",
       "sha256": "590d84fcadb1d60cc85e19655a5e7e7644307c25eae96394a745db90f8af4281"
+    },
+    {
+      "path": "evidence/local.hardware_changes.drive.rerun.20261126.json",
+      "state": "observed",
+      "sha256": "46a72ec09599db18175f4724c7d5f3184ea54137aae50a15f8c59c013ebf81ce"
     },
     {
       "path": "evidence/local.hardware_changes.families.20261029.json",
@@ -151047,6 +151167,10 @@
       "profileSha256": "f4d22c0728bdadf19de6fd18d3f7cbd881053fd10d99f6c5f9f6f1fdccde32e1"
     },
     {
+      "id": "local.followups.native.20261126",
+      "profileSha256": "a71ed5ff4bc5549583eae9e316c80ef23ea40539b1eff5a3e9244f08dbf2534b"
+    },
+    {
       "id": "local.graph_changes.20261028",
       "profileSha256": "35369847e5ca9d4d4ea76df0f6560a16f36e637bdf5f6f804383ee2f6a7a75a6"
     },
@@ -151075,8 +151199,16 @@
       "profileSha256": "f34136f1372879d321de1e6506d0e27dbfcbf21fb074886feb10ab7d5d1db8e3"
     },
     {
+      "id": "local.hardware_changes.delete-rule.rerun.20261126",
+      "profileSha256": "20262b60e6e493472684ce7c8ae9cc3dc6fcc726472ce6788388c8db7669f3c9"
+    },
+    {
       "id": "local.hardware_changes.drive.20261107",
       "profileSha256": "66226b6d1d87a810a1eae0e5d79366dc899be6f1d4b9969f1b1d90ca86ed30ad"
+    },
+    {
+      "id": "local.hardware_changes.drive.rerun.20261126",
+      "profileSha256": "348e1e31659599ca063cf62b5842783800235c6334376e660cd25313c75d264a"
     },
     {
       "id": "local.hardware_changes.families.20261029",

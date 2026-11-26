@@ -13,7 +13,10 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 `block_import_xml`, each with curated evidence of the same day ([record](../verification/native-runs-20261126.md)).
 The runs found a 0.9.0 regression (every successful `project_snapshot_capture` failed while adding `remoteAccess`;
 fixed), that TIA's `Project.Archive` writes into the open project's folder, and a recurrence of the card-staging
-access denial. The D12 Web API rows stay open: their TCP/IP run was blocked by the PLCSIM adapter's address.
+access denial. The D12 Web API rows stay open: their TCP/IP run was blocked by the PLCSIM adapter's address. Later the
+same day: the V19 adapter requalified (`0.5.3`), the follow-up checks of 14 to 25 November and a hardware smoke passed
+(`0.5.4`), the card-move denial was traced to on-access scanning, and four more defects were fixed (download decline,
+a held download admission, detach of a disposed Portal, unknown fingerprint kinds).
 
 ## 25 November 2026
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.5.3",
+  "catalogVersion": "0.5.4",
   "targetTiaVersions": [
     21
   ],
@@ -6030,6 +6030,56 @@
         "Read-only V19 adapter only, as on 9 November; the error mappings AccessDenied and LicenseUnavailable are not provoked.",
         "One synthetic V19 fixture (CPU 1511-1 PN V3.1); other V19 firmware, HMI and protected projects are not exercised."
       ]
+    },
+    {
+      "id": "local.followups.native.20261126",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "3376e751e21dcee1d77542b012ffc54c0e9f0d86",
+        "passedScope": "scripts/qualify_followup_checks.py (all 16 stages) on Debug builds of ed8a84e3's src (runner at the 'Create the test DB' commit) on owned scratch projects and PLCSIM instances: tia_capabilities workerVersion and physical_plc; a plain tia_attach behind a busy client; ProjectLocked with a second Portal and tia_session_status portals; an exited client in attachedSessions; hmi_inspect page and early target.kind refusals (plain scratch and an HmiSeeder unified-pc baseline); repeated property names refused on sim_write and change_prepare with the session kept; QueueTimeout for a second call during a 47 s change_apply; sim_write_signals refusing both spellings of one tag in a batch on a provisioned running instance (user-authorized first-use trust); simulation_download ticketState unusable, reusable (released instance) and spent (SimulationCredentialRequired) with the spent ticket's retry refused; SimulationRegistrationsPresent with details and tia_detach plcsimRegistrations; the stale change-directory sweep removing only an aged prepared change; LoadableProvider on an added CPU 1518; HmiPreservationUnavailable with its remediation."
+      },
+      "artifacts": [
+        "evidence/local.followups.native.20261126.json"
+      ],
+      "limitations": [
+        "The UMC global-user login, UmacLoginRejected and host_build_identity from an installed package are not part of this run.",
+        "A refused password question in the offline simulation_download still leaves TIA's Portal disposed (the worker throws from the download callback); tia_detach now recovers the session, the decline itself is open in docs/TODO.md."
+      ]
+    },
+    {
+      "id": "local.hardware_changes.delete-rule.rerun.20261126",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "3376e751e21dcee1d77542b012ffc54c0e9f0d86",
+        "passedScope": "scripts/qualify_hardware_changes.py --slice delete-rule on Debug builds of 3376e751 on a German TIA V21 installation (structural item and default-tag-table lookups): one owned scratch CPU 1511-1 PN V4.1, a DI 16x24VDC HF plugged at slot 2 through hardware_plug; hardware_delete of it refused with compile=false before its checkpoint, then applied with compile and save (14 steps). PR 330 hardware smoke."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.delete-rule.rerun.20261126.json"
+      ],
+      "limitations": [
+        "No reopen and no restore in this slice.",
+        "The default tag table's tagCount/constantCount row change is tolerated when its members changed in the same step (fields added 10 November)."
+      ]
+    },
+    {
+      "id": "local.hardware_changes.drive.rerun.20261126",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "3376e751e21dcee1d77542b012ffc54c0e9f0d86",
+        "passedScope": "scripts/qualify_hardware_changes.py --slice drive on Debug builds of 3376e751 on a German TIA V21 installation: a SINAMICS G120C PN added, put on the subnet and assigned to a second CPU's IO system with the exact snapshot diff and checkpoint restore, plus the ET 200MP assignment it needs (52 steps), with every TIA-generated interface, port and rack resolved by structure."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.drive.rerun.20261126.json"
+      ],
+      "limitations": [
+        "One G120C PN on one IO system; the default tag table count change is tolerated as in the delete-rule rerun."
+      ]
     }
   ],
   "features": [
@@ -6093,13 +6143,15 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "Rechecked natively on 26 November 2026 with the follow-up checks of 14 to 25 November (local.followups.native.20261126)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.smoke.20261024"
+          "local.smoke.20261024",
+          "local.followups.native.20261126"
         ]
       },
       "availability": {
@@ -6136,13 +6188,15 @@
         "status": "implemented",
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "20 November 2026 (not curated evidence): the result lists attachedSessions; waitForIdleSeconds waits for other Openness clients to finish their call and otherwise refuses with OpennessClientBusy. Another client is never disconnected. Checked once natively on 20 November with a second Host's busy owned Portal (docs/verification/feedback-20261120.md)."
+          "20 November 2026 (not curated evidence): the result lists attachedSessions; waitForIdleSeconds waits for other Openness clients to finish their call and otherwise refuses with OpennessClientBusy. Another client is never disconnected. Checked once natively on 20 November with a second Host's busy owned Portal (docs/verification/feedback-20261120.md).",
+          "Rechecked natively on 26 November 2026 with the follow-up checks of 14 to 25 November (local.followups.native.20261126)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.reliability.20261024"
+          "local.reliability.20261024",
+          "local.followups.native.20261126"
         ]
       },
       "availability": {
@@ -6179,13 +6233,15 @@
         "status": "implemented",
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "16 November 2026 (not curated evidence): portals lists every visible TIA Portal with its open project (from TiaPortal.GetProcesses). Offline tests only."
+          "16 November 2026 (not curated evidence): portals lists every visible TIA Portal with its open project (from TiaPortal.GetProcesses). Offline tests only.",
+          "Rechecked natively on 26 November 2026 with the follow-up checks of 14 to 25 November (local.followups.native.20261126)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.reliability.20261024"
+          "local.reliability.20261024",
+          "local.followups.native.20261126"
         ]
       },
       "availability": {
@@ -6264,13 +6320,15 @@
         "status": "implemented",
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "14 November 2026 (not curated evidence): for a worker-owned instance the projects are closed without saving and the call waits up to waitForExitSeconds (default 30) on the retained process handle; terminateOwnedIfRunning ends only that process. Checked once: an owned Portal exited within the wait (processExitVerified true)."
+          "14 November 2026 (not curated evidence): for a worker-owned instance the projects are closed without saving and the call waits up to waitForExitSeconds (default 30) on the retained process handle; terminateOwnedIfRunning ends only that process. Checked once: an owned Portal exited within the wait (processExitVerified true).",
+          "Rechecked natively on 26 November 2026 with the follow-up checks of 14 to 25 November (local.followups.native.20261126)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.smoke.20261024"
+          "local.smoke.20261024",
+          "local.followups.native.20261126"
         ]
       },
       "availability": {
@@ -6353,13 +6411,15 @@
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "Qualification covers the default primary open only; readOnly=true is the separate unverified feature project_open.read_only.",
           "16 November 2026 (not curated evidence): when TIA refuses the open and another Portal has the project open, the error is ProjectLocked naming that Portal. Offline tests only.",
-          "20 November 2026 (not curated evidence): the UMAC login (umacUserName, umacUserType, umacCredential) is the separate unverified feature project_open.umac_login."
+          "20 November 2026 (not curated evidence): the UMAC login (umacUserName, umacUserType, umacCredential) is the separate unverified feature project_open.umac_login.",
+          "Rechecked natively on 26 November 2026 with the follow-up checks of 14 to 25 November (local.followups.native.20261126)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.reopen.20261024"
+          "local.reopen.20261024",
+          "local.followups.native.20261126"
         ]
       },
       "availability": {
@@ -8603,7 +8663,8 @@
           "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "16 November 2026 (not curated evidence): payload schemas per kind as tia://change-payloads/{kind}; detail levels summary/standard/full; stageTimings; a Host change_prepare prunes change directories still prepared after 24 h that no worker holds. Offline tests only."
+          "16 November 2026 (not curated evidence): payload schemas per kind as tia://change-payloads/{kind}; detail levels summary/standard/full; stageTimings; a Host change_prepare prunes change directories still prepared after 24 h that no worker holds. Offline tests only.",
+          "Rechecked natively on 26 November 2026 with the follow-up checks of 14 to 25 November (local.followups.native.20261126)."
         ]
       },
       "qualification": {
@@ -8613,7 +8674,8 @@
           "local.read_contracts.20261102",
           "local.plc_object_mutations.audit.20261102",
           "local.plc_object_mutations.audit.20261110",
-          "local.fingerprint.reuse.20261111"
+          "local.fingerprint.reuse.20261111",
+          "local.followups.native.20261126"
         ]
       },
       "availability": {
@@ -8791,7 +8853,8 @@
         "status": "implemented",
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "16 November 2026 (not curated evidence): a failure reports ticketState (reusable, spent, unusable) and a remediation. Offline tests only."
+          "16 November 2026 (not curated evidence): a failure reports ticketState (reusable, spent, unusable) and a remediation. Offline tests only.",
+          "Rechecked natively on 26 November 2026 with the follow-up checks of 14 to 25 November (local.followups.native.20261126)."
         ]
       },
       "qualification": {
@@ -8799,7 +8862,8 @@
         "evidenceIds": [
           "local.sim.provision.20261024",
           "local.runtime.timers.20261029",
-          "local.provision.card_move.20261101"
+          "local.provision.card_move.20261101",
+          "local.followups.native.20261126"
         ]
       },
       "availability": {
@@ -9395,7 +9459,8 @@
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): an output tag, quoted and unquoted, refused with nothing written, and a marker, a DB member and an input still written; the member \"SigOutStruct\".A of a PLC tag of a PLC data type at %Q24.0, which PLCSIM lists as a Struct in the area Output with its members, refused the same way (local.sim.output-refusal-2.20261101).",
-          "Output-array members Values[0] and Values[1] of a structured output tag are natively refused by both write routes without changing its eight bytes (local.plcsim.output-arrays.20261102); other array shapes are not qualified."
+          "Output-array members Values[0] and Values[1] of a structured output tag are natively refused by both write routes without changing its eight bytes (local.plcsim.output-arrays.20261102); other array shapes are not qualified.",
+          "Rechecked natively on 26 November 2026 with the follow-up checks of 14 to 25 November (local.followups.native.20261126)."
         ]
       },
       "qualification": {
@@ -9404,7 +9469,8 @@
           "local.runtime.frozen.20261024",
           "local.sim.output-refusal.20261101",
           "local.sim.output-refusal-2.20261101",
-          "local.plcsim.output-arrays.20261102"
+          "local.plcsim.output-arrays.20261102",
+          "local.followups.native.20261126"
         ]
       },
       "availability": {
@@ -9890,13 +9956,15 @@
         "limitations": [
           "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "The 17 October child-discovery extension includes OutputCamMeasuringInputContainer.OutputCams and MeasuringInputs under owner-relative paths, with explicit ownerPath/composition, shared object/depth bounds and failed-discovery refusal. Existing root paths are unchanged. Other service compositions/associations are not expanded. Current linked-routine and portable store tests use synthetic native shapes; native SDK compilation, child ownership/alias behavior, complete preservation and lifecycle qualification remain open. Historical evidence references do not qualify this expanded source."
+          "The 17 October child-discovery extension includes OutputCamMeasuringInputContainer.OutputCams and MeasuringInputs under owner-relative paths, with explicit ownerPath/composition, shared object/depth bounds and failed-discovery refusal. Existing root paths are unchanged. Other service compositions/associations are not expanded. Current linked-routine and portable store tests use synthetic native shapes; native SDK compilation, child ownership/alias behavior, complete preservation and lifecycle qualification remain open. Historical evidence references do not qualify this expanded source.",
+          "Rechecked natively on 26 November 2026 with the follow-up checks of 14 to 25 November (local.followups.native.20261126)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.read_contracts.20261028"
+          "local.read_contracts.20261028",
+          "local.followups.native.20261126"
         ]
       },
       "availability": {
@@ -10956,7 +11024,8 @@
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
-          "failsafeRuntimeAccess (with configureScratchSecurity, new scratch devices only) gives the generated runtime role the F-CPU right Full access including fail-safe (ProtectionLevelFailsafeAccess) instead of Full access, which an F-CPU compile requires (local.safety_changes.20261028)."
+          "failsafeRuntimeAccess (with configureScratchSecurity, new scratch devices only) gives the generated runtime role the F-CPU right Full access including fail-safe (ProtectionLevelFailsafeAccess) instead of Full access, which an F-CPU compile requires (local.safety_changes.20261028).",
+          "Rerun natively on 26 November 2026 on a German TIA installation with structural item and default-tag-table lookups (PR 330 hardware smoke)."
         ]
       },
       "qualification": {
@@ -10966,7 +11035,8 @@
           "local.hardware_changes.families.20261029",
           "local.hardware_changes.gsd.20261101",
           "local.hardware_changes.drive.20261107",
-          "local.hardware_changes.full.rerun.20261107"
+          "local.hardware_changes.full.rerun.20261107",
+          "local.hardware_changes.drive.rerun.20261126"
         ]
       },
       "availability": {
@@ -11067,7 +11137,8 @@
           "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): the last DI module of the CPU rack removed with its system constant; CPUs and built-in ports refused; reopen and checkpoint restore. A deletion that leaves a gap in an S7-1500 rack fails the device compile. compile=false is refused before the checkpoint (local.hardware_changes.delete-rule.20261102).",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
+          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
+          "Rerun natively on 26 November 2026 on a German TIA installation with structural item and default-tag-table lookups (PR 330 hardware smoke)."
         ]
       },
       "qualification": {
@@ -11076,7 +11147,8 @@
           "local.hardware_changes.20261028",
           "local.hardware_changes.families.20261029",
           "local.hardware_changes.delete-rule.20261102",
-          "local.hardware_changes.full.rerun.20261107"
+          "local.hardware_changes.full.rerun.20261107",
+          "local.hardware_changes.delete-rule.rerun.20261126"
         ]
       },
       "availability": {
@@ -11182,7 +11254,8 @@
           "Apply runs the worker's configured-hardware preservation stage, also with compile=false: only the selected node's requested allowlisted attributes and requested subnet may change. Any other node, attribute, address, I/O-system or connector change refuses, including one TIA couples to the request (for example an address reassigned on a subnet connect), and change_restore compares the retrieved hardware with the prechange manifest. An interrupted apply reconciles on the configured-hardware route.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
-          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107)."
+          "Compile verification (since 7 November 2026, #221): with compile=true the change's compile scope is compiled after the checkpoint and before the mutation, and apply fails only on an introduced or worsened error, a changed compile scope or incomplete diagnostics; unchanged findings elsewhere in that scope are listed in compile.baselineComparison (existing, resolved, introduced) and compilerSucceeded reports the compiler result separately (local.compile-baseline.unrelated-errors.20261107).",
+          "Rerun natively on 26 November 2026 on a German TIA installation with structural item and default-tag-table lookups (PR 330 hardware smoke)."
         ]
       },
       "qualification": {
@@ -11192,7 +11265,8 @@
           "local.hardware_changes.families.20261029",
           "local.compile-baseline.unrelated-errors.20261107",
           "local.hardware_changes.drive.20261107",
-          "local.hardware_changes.full.rerun.20261107"
+          "local.hardware_changes.full.rerun.20261107",
+          "local.hardware_changes.drive.rerun.20261126"
         ]
       },
       "availability": {
@@ -16484,13 +16558,15 @@
           "Opt-in section=model (Unified only, optional modelRoots) walks the public V21 HmiSoftware object model (Screens, ScreenGroups, TagTables, TagTableGroups, SystemTags, Connections, AlarmClasses, Discrete/AnalogAlarms, HmiAlarmAuditClass, OpcUaAlarmTypes, AlarmLogs, DataLogs, AuditTrails, Scripts, text/graphic/system text lists, PlantObjectTags, RuntimeSettings) through typed properties, GetAttributeInfos/GetAttribute and GetCompositionInfos/GetComposition: one hmiModelNode row per composition member (items, dynamizations, event handlers, logging tags, thresholds, interface entries, ...) with parts and MultilingualText inline, IHmiScript code as SHA-256 only and sensitive attribute names excluded. Bounded by maxVisited, the 8 MiB retained-row bound and paging; truncation is explicit. Compiled against the V21 PublicAPI only; not natively qualified. Payloads without a public getter are not observed.",
           "14 November 2026 (user feedback on v0.9.0, not curated evidence): coverage.complete is true only on the last page of a complete capture; captureComplete keeps the capture-only meaning, and totalItems, hasMore, pageCount and a paginationPending reason were added. Checked once on a seeded Unified PC fixture: model 99 rows in 5 pages of 20 and screens 2 rows in 2 pages each report complete=false until the last page; ProjectMismatch now carries the current and supplied identity.",
           "14 November 2026: excludeSystem, rowMode compact and sectionContentSha256 for smaller model reads.",
-          "16 November 2026 (not curated evidence): page (limits, bytes, stoppedBy) first, limit up to 1000, and an explicit target.kind that does not belong to the section is refused before the capture. Offline tests only."
+          "16 November 2026 (not curated evidence): page (limits, bytes, stoppedBy) first, limit up to 1000, and an explicit target.kind that does not belong to the section is refused before the capture. Offline tests only.",
+          "Rechecked natively on 26 November 2026 with the follow-up checks of 14 to 25 November (local.followups.native.20261126)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hmi.bridge.rerun.20261029"
+          "local.hmi.bridge.rerun.20261029",
+          "local.followups.native.20261126"
         ]
       },
       "availability": {
@@ -17554,7 +17630,8 @@
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "The ET 200SP IM 155-6 PN ST V6.4 also passed on the second CPU's existing IO system with the generated server module (local.hardware_changes.topology.20261101), and its BusAdapter ports take SharedDeviceAccessType PLC with the head's items.",
           "An installed I-device GSD (two transfer areas, start -1 and no owner until assigned) joined the second CPU's IO system with compile and save, each transfer area taking a start address owned by that PLC, and restored from its checkpoint (local.hardware_changes.gsd.20261101). Only a range without a start and owner may take one, and only from the assigned PLC.",
-          "A sharedDevice disconnect with several remaining PLCs names the one that takes the leaving PLC's sharedSubmodules in remainingOwnerPath (refused without it, or when it names a PLC that is not another assigned connector's); with one remaining PLC it may be omitted. Natively qualified with three PLCs (local.hardware_changes.shared3.20261107). A first assignment that declares expectedServerModule keeps the clean-compile rule: a baseline compile before it would generate that server module."
+          "A sharedDevice disconnect with several remaining PLCs names the one that takes the leaving PLC's sharedSubmodules in remainingOwnerPath (refused without it, or when it names a PLC that is not another assigned connector's); with one remaining PLC it may be omitted. Natively qualified with three PLCs (local.hardware_changes.shared3.20261107). A first assignment that declares expectedServerModule keeps the clean-compile rule: a baseline compile before it would generate that server module.",
+          "Rerun natively on 26 November 2026 on a German TIA installation with structural item and default-tag-table lookups (PR 330 hardware smoke)."
         ]
       },
       "qualification": {
@@ -17571,7 +17648,8 @@
           "local.hardware_changes.shared3.20261107",
           "local.hardware_changes.full.rerun.20261107",
           "local.hardware_changes.topology_restores.rerun.20261107",
-          "local.hardware_changes.refusals.rerun.20261107"
+          "local.hardware_changes.refusals.rerun.20261107",
+          "local.hardware_changes.drive.rerun.20261126"
         ]
       },
       "availability": {
@@ -29444,7 +29522,8 @@
           "Assignments, not forces; the program scan may overwrite them.",
           "Natively one call wrote all eleven primitive types (SInt..ULInt at their range limits, Real 1.5, LReal -2.25e300), read back by single sim_read calls. A batch with an unknown symbol threw SignalConfigurationError (PartialSimulationWrite, valid items Unknown) and its valid item was written.",
           "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): a batch of a marker, a DB member and an output tag refused whole, nothing written; so did a batch of a marker and the member \"SigOutStruct\".A of a structured output tag (local.sim.output-refusal-2.20261101).",
-          "Output-array members Values[0] and Values[1] of a structured output tag are natively refused by both write routes without changing its eight bytes (local.plcsim.output-arrays.20261102); other array shapes are not qualified."
+          "Output-array members Values[0] and Values[1] of a structured output tag are natively refused by both write routes without changing its eight bytes (local.plcsim.output-arrays.20261102); other array shapes are not qualified.",
+          "Rechecked natively on 26 November 2026 with the follow-up checks of 14 to 25 November (local.followups.native.20261126)."
         ]
       },
       "qualification": {
@@ -29454,7 +29533,8 @@
           "local.sim.output-refusal.20261101",
           "local.sim.output-refusal-2.20261101",
           "local.plcsim.output-arrays.20261102",
-          "local.plcsim.signals-ip.20261102"
+          "local.plcsim.signals-ip.20261102",
+          "local.followups.native.20261126"
         ]
       },
       "availability": {

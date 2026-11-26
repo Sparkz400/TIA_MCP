@@ -1,11 +1,11 @@
 # Current status
 
 TIA MCP is pre-1.0; use it only with offline projects, copies, scratch projects and
-simulators you own (see the [README](../README.md)). Counts from catalog `0.5.3` (26 November 2026: the V19 adapter requalified; the [native runs of 26 November](verification/native-runs-20261126.md) bound the project lifecycle, provisioning recovery, `sim_prune`, `sim_network_mode_set` and `hmi_content_fingerprint` rows; `0.5.0` was the MCP surface redesign of 0.9.0), computed from the catalog and the matrix on 26 November; backlog reconciled on 24 November, decisions of 25 November recorded:
+simulators you own (see the [README](../README.md)). Counts from catalog `0.5.4` (26 November 2026: the follow-up checks of 14 to 25 November and a hardware smoke rerun; the V19 adapter requalified; the [native runs of 26 November](verification/native-runs-20261126.md) bound the project lifecycle, provisioning recovery, `sim_prune`, `sim_network_mode_set` and `hmi_content_fingerprint` rows; `0.5.0` was the MCP surface redesign of 0.9.0), computed from the catalog and the matrix on 26 November; backlog reconciled on 24 November, decisions of 25 November recorded:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.5.3` (26 November): 496 features, 463 verified, 33 unverified; 333 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Feature catalog | `0.5.4` (26 November): 496 features, 463 verified, 33 unverified; 333 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
 | Release matrix rows | 116 shipped, 347 limited, 20 unqualified, 12 unavailable on V21, 1 descoped (out of 1.0 scope) |
 | Matrix cells | 2,105 bound, **60 open**, 72 blocked, 3 descoped ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted; the [TODO](TODO.md) was reconciled on 24 November against catalog `0.4.189` ([ledger](plans/release-obligations-20261015.md), [acceptance rules](plans/release-acceptance.md), [earlier review](verification/release-readiness-20261103.md)) |

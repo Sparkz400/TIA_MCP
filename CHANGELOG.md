@@ -16,7 +16,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ### Changed
 
-- Catalog `0.5.3` requalifies the read-only V19 adapter after the shared-loop link fix. Catalogs `0.5.1` and `0.5.2`: `project_save`, `project_close`, `project_archive`, `project_open_copy`, `simulation_provision_status`, `simulation_provision_recover`, `sim_prune`, `sim_network_mode_set` and `hmi_content_fingerprint` are natively verified on owned scratch projects and instances ([record](docs/verification/native-runs-20261126.md)); `project_archive` documents that TIA's archive writes into the open project's folder.
+- Catalog `0.5.4` adds the native follow-up checks of 14 to 25 November and a hardware smoke on a German installation; `0.5.3` requalifies the read-only V19 adapter after the shared-loop link fix. Catalogs `0.5.1` and `0.5.2`: `project_save`, `project_close`, `project_archive`, `project_open_copy`, `simulation_provision_status`, `simulation_provision_recover`, `sim_prune`, `sim_network_mode_set` and `hmi_content_fingerprint` are natively verified on owned scratch projects and instances ([record](docs/verification/native-runs-20261126.md)); `project_archive` documents that TIA's archive writes into the open project's folder.
 
 ### Fixed
 
