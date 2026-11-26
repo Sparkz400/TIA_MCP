@@ -538,7 +538,7 @@ namespace TiaMcp.Openness.V21
             // open the SecureString, including when credential opening fails.
             report["credentialOpened"] = false;
             report["cardMoves"] = new JArray();
-            report["cardMoveRetryPolicy"] = "Filesystem-only: Windows access/sharing/lock denial, at most 61 move calls and a 15000 ms retry-admission budget from the first failure. Guard/property/file calls may exceed that budget; no native or credential call is retried.";
+            report["cardMoveRetryPolicy"] = "Filesystem-only: Windows access/sharing/lock denial, at most 481 move calls and a 120000 ms retry-admission budget from the first failure. Guard/property/file calls may exceed that budget; no native or credential call is retried.";
             return report;
         }
 
@@ -1048,7 +1048,7 @@ namespace TiaMcp.Openness.V21
             var holders = SimulationCardLockHolders.Find(directory, out error);
             return new JObject { ["holders"] = new JArray(holders.Select(holder => new JObject { ["processId"] = holder.ProcessId, ["appName"] = holder.AppName,
                 ["serviceName"] = holder.ServiceName, ["applicationType"] = holder.ApplicationType })), ["error"] = error,
-                ["basis"] = "Windows Restart Manager holders of files below the move source; file names only, contents not read." };
+                ["basis"] = "Windows Restart Manager holders of files below the move source; file names only, contents not read. A file-system filter such as an on-access malware scanner is never listed: with no holder, exclude the Host's artifacts folder from on-access scanning or retry later." };
         }
 
         private static JArray SimulationProvisionTreeMetadata(string path)

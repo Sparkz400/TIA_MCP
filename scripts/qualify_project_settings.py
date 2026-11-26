@@ -18,6 +18,7 @@ from pathlib import Path
 import re
 
 from library_native_harness import Harness, require
+import plc_tag_tables
 from qualification_owned_scratch import complete_inventory, snapshot
 from qualify_access_changes import Run as StateRun
 from qualify_plc_object_mutations import coverage_gaps, diff, view
@@ -205,6 +206,7 @@ def phase_c(run):
     # TIA refuses exports in a secondary project, so the copy is compared without program exports.
     plain = h.stage("source state without exports", run.state)
     block = next(key.split(":", 1)[1] for key in plain if key.startswith("block:"))
+    table = plain["tagTable:" + plc_tag_tables.default_table_path(plain, run.plc)]["name"]  # Named in the TIA UI language.
     h.stage("close the session before the read-only open", lambda: h.tool("tia_detach"))
     h.owned_portal("read-only copy")
     opened = h.stage("open the copy read-only", lambda: h.tool("project_open", {"path": copy, "readOnly": True}))
@@ -222,7 +224,7 @@ def phase_c(run):
         require(error.get("code") == "ReadOnlyProject", "Expected TIA's export refusal as ReadOnlyProject: %s" % error)
         return error
     h.report["readOnlyExport"] = h.stage("block_read in the read-only copy is refused", export_refused)
-    for kind, payload in (("project_languages_set", {"editingLanguage": plain["project:languages"]["reference"]}), ("tag_create", {"tagTableName": "Default tag table", "name": "RoTag", "dataTypeName": "Bool", "logicalAddress": "%M90.0"})):
+    for kind, payload in (("project_languages_set", {"editingLanguage": plain["project:languages"]["reference"]}), ("tag_create", {"tagTableName": table, "name": "RoTag", "dataTypeName": "Bool", "logicalAddress": "%M90.0"})):
         run.refuse(kind, "a read-only project", payload, "ReadOnlyProject")
     h.report["copy"] = {"opened": opened, "result": copied}
 

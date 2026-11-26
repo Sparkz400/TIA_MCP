@@ -89,6 +89,10 @@ static class GateAdmissionTests
             Reject(() => HmiEngineeringRules.RequireKind("hmi_external_tag_create", null), "no payload");
             Assert(HmiEngineeringRules.IsAdmittedKind("hmi_classic_import") && HmiEngineeringRules.IsAdmittedKind("hmi_external_tag_create") && HmiEngineeringRules.IsAdmittedKind("hmi_screen_create") && !HmiEngineeringRules.IsAdmittedKind("hmi_engineering")
                 && !HmiEngineeringRules.IsAdmittedKind("hmi_text_list_import") && !HmiEngineeringRules.IsAdmittedKind(null), "admitted kinds");
+            Assert(HmiEngineeringRules.IsFingerprintKind("hmi_screen_create") && HmiEngineeringRules.IsFingerprintKind("hmi_classic_import")
+                && HmiEngineeringRules.IsFingerprintKind("hmi_text_list_import") && HmiEngineeringRules.IsFingerprintKind("hmi_classic_screen_edit")
+                && !HmiEngineeringRules.IsFingerprintKind("hmi_not_a_kind") && !HmiEngineeringRules.IsFingerprintKind("hmi_compile") && !HmiEngineeringRules.IsFingerprintKind(null),
+                "fingerprint kinds: known HMI change kinds only (an unknown hmi_* name was fingerprinted natively on 26 November)");
         });
         check("The hmi_engineering gate names the qualified kind and exact profile scope", () => {
             Assert(HmiEngineeringRules.Gate("classic", "classic-comfort", "scalar_property_set").Value<string>("reason").Contains("hmi_classic_import"), "Classic BackColor");

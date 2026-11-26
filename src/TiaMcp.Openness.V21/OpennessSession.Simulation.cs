@@ -114,7 +114,16 @@ namespace TiaMcp.Openness.V21
                     }
                     else if (configuration is PlcMasterSecretPassword masterSecret)
                     {
-                        if (credential == null) throw new BridgeException("SimulationCredentialRequired", "TIA requires validation of the generated scratch CPU configuration password. Supply its credentialMetadataPath; recovered projects also require credentialLineageJournalPaths. No protection was disabled.");
+                        if (credential == null)
+                        {
+                            // Declined by leaving the question unanswered: a worker exception thrown from this callback left TIA's
+                            // Portal disposed (natively, 26 November 2026). The typed refusal is raised once Download returns.
+                            callbackFailure = callbackFailure ?? new BridgeException("SimulationCredentialRequired", "TIA requires validation of the generated scratch CPU configuration password. Supply its credentialMetadataPath; recovered projects also require credentialLineageJournalPaths. No protection was disabled.");
+                            report["callbackFailure"] = new JObject { ["code"] = callbackFailure.Code, ["message"] = callbackFailure.Message,
+                                ["configurationType"] = configuration.GetType().Name, ["declinedBy"] = "unanswered" };
+                            ((JObject)configurations.Last)["action"] = "Left unanswered: no credentialMetadataPath was supplied.";
+                            return;
+                        }
                         using (var password = OpenSimulationCredential(credential)) masterSecret.SetPassword(password);
                         ((JObject)configurations.Last)["action"] = "Validated generated scratch CPU credential through typed SecureString callback.";
                         ((JObject)configurations.Last)["secretReturned"] = false;
@@ -136,6 +145,12 @@ namespace TiaMcp.Openness.V21
                 SimulationDownloadMessages(download.Messages, messages, messageBudget, 0);
                 report["download"] = new JObject { ["state"] = download.State.ToString(), ["errors"] = download.ErrorCount,
                     ["warnings"] = download.WarningCount, ["messages"] = messages, ["truncated"] = messageBudget.Truncated };
+                if (callbackFailure != null)
+                {
+                    // A declined question: whatever TIA did afterwards, the card is not this ticket's program. Record whether files exist.
+                    report["cardFilesAfterDecline"] = Directory.Exists(card) ? Directory.GetFiles(card, "*", SearchOption.AllDirectories).Length : 0;
+                    throw callbackFailure;
+                }
                 if (!CompilationEvidenceRules.IsSuccessfulTarget((JObject)report["download"], "errors", "truncated"))
                     throw new BridgeException("SimulationDownloadFailed", "TIA reported errors or incomplete diagnostic evidence while generating the simulated memory card.", report);
                 VerifySimulationIdentity(instance, marker);

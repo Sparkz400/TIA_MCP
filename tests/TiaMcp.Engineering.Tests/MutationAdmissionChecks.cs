@@ -278,6 +278,32 @@ internal static class MutationAdmissionChecks
             Check(new EngineeringMutationAdmissionStore(dispatcherRoot).Acquire(Scope(upgradeSource) with { Operation = "project_upgrade", ScopeSha256 = new('3', 64) }, new('a', 64)).State == "dispatchIntent",
                 "A returned upgrade failure releases its source for a new attempt");
         }
+        // A simulation download the worker refused before its claim wrote nothing: returned, and the project is free again
+        // (natively on 26 November a held one refused every later download and project_save with ResourceBusy).
+        string downloadProject = Path.Combine(dispatcherRoot, "download-before-claim.ap21");
+        var beforeClaim = new AdmissionNative(Scope(downloadProject) with { Operation = "simulation_download", ScopeSha256 = new('7', 64) }) {
+            DispatchError = new BridgeOperationException("SimulationTargetMismatch", "The instance is not registered",
+                JsonSerializer.SerializeToElement(new { ticketState = "reusable", retrySafe = true })) };
+        try { await new WatchTableDispatcher(beforeClaim, dispatcherRoot).CallAsync("simulation_download", new { downloadTicket = "t" }); throw new Exception("Expected download failure"); }
+        catch (BridgeOperationException error) when (error.Code == "SimulationTargetMismatch")
+        {
+            string id = error.Details!.Value.GetProperty("mutationAdmission").GetProperty("admissionId").GetString()!;
+            Check(new EngineeringMutationAdmissionStore(dispatcherRoot).Read(id).State == "returned", "A download refused before its claim is a returned outcome");
+            Check(new EngineeringMutationAdmissionStore(dispatcherRoot).Acquire(Scope(downloadProject) with { Operation = "simulation_download", ScopeSha256 = new('8', 64) }, new('b', 64)).State == "dispatchIntent",
+                "A download refused before its claim releases its project");
+        }
+        foreach (var details in new object[] { new { ticketState = "spent", retrySafe = false }, new { ticketState = "reusable", retrySafe = false }, new { ticketState = "reusable" } })
+        {
+            string spentProject = Path.Combine(dispatcherRoot, Guid.NewGuid().ToString("N") + ".ap21");
+            var spent = new AdmissionNative(Scope(spentProject) with { Operation = "simulation_download" }) {
+                DispatchError = new BridgeOperationException("SimulationDownloadFailed", "Card generation failed", JsonSerializer.SerializeToElement(details)) };
+            try { await new WatchTableDispatcher(spent, dispatcherRoot).CallAsync("simulation_download", new { }); throw new Exception("Expected failure"); }
+            catch (BridgeOperationException error)
+            {
+                string id = error.Details!.Value.GetProperty("mutationAdmission").GetProperty("admissionId").GetString()!;
+                Check(new EngineeringMutationAdmissionStore(dispatcherRoot).Read(id).State == "outcomeUnknown", "A download failure that may have written stays outcomeUnknown: " + JsonSerializer.Serialize(details));
+            }
+        }
         // Transport loss and deliberate simulator retention stay unknown and keep their reservation.
         foreach (var (route, failure) in new (string, Exception)[] {
             ("project_upgrade", new BridgeException("WorkerDisconnected", "The TIA worker connection failed")),

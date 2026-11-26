@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+import hardware_paths
 from library_native_harness import Harness, require
 from qualify_drives import DEVICE, add_drive, handle, observe, other_handle, outcome
 from qualify_hardware_changes import devices
@@ -131,7 +132,9 @@ def fixture(run):
     """TM PosInput 2 in MotionControl mode; the G120C PN and the CPU on one subnet and IO system."""
     h = run.h
     station = run.base + "ScratchStation"
-    h.apply("hardware_plug", {"hardwarePath": station + "/items/Rail_0", "typeIdentifier": TM, "name": "MoEnc", "positionNumber": 2})
+    # The rail's name follows the TIA UI language (Rail_0, Profilschiene_0): the station's root item beside the CPU.
+    run.rail = hardware_paths.root_rack(run.items(station), station, exclude=(station + "/items/ScratchPLC",))
+    h.apply("hardware_plug", {"hardwarePath": run.rail, "typeIdentifier": TM, "name": "MoEnc", "positionNumber": 2})
     module = station + "/items/MoEnc"
     owners = [p for p, row in run.items(module).items() if any((c["type"], c["ioType"], c["number"]) == tuple(CHANNEL.values()) for c in row["channels"])]
     require(len(owners) == 1, "Expected one technology channel owner under MoEnc: %s" % owners)
@@ -175,7 +178,7 @@ def analog(run, station):
         return
     module = station + "/items/MoAq"
     entry = sorted(entries, key=lambda e: e["typeIdentifier"])[-1]
-    plugged = run.change("plug the AQ 2xU/I ST MoAq", "hardware_plug", {"hardwarePath": station + "/items/Rail_0", "typeIdentifier": entry["typeIdentifier"],
+    plugged = run.change("plug the AQ 2xU/I ST MoAq", "hardware_plug", {"hardwarePath": run.rail, "typeIdentifier": entry["typeIdentifier"],
                                                                          "name": "MoAq", "positionNumber": 3}, plc=False)
     if plugged["outcome"] != "applied":
         return

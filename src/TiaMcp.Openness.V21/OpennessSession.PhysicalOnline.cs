@@ -209,7 +209,10 @@ namespace TiaMcp.Openness.V21
                     if (selection == null)
                     {
                         callbackFailure = callbackFailure ?? new BridgeException(refusal, "TIA asked " + type + " (" + request?.Message + "); " + PhysicalDownloadRules.Remedy(refusal));
-                        entry["selection"] = "refused";
+                        // DataBlockReinitialization is declined through TIA (DeclineDownloadConfiguration, which TIA answers with its own
+                        // exception); a worker exception from the delegate disposed the Portal on PLCSIM. Verified on PLCSIM only.
+                        entry["selection"] = "refused"; entry["refusal"] = refusal;
+                        if (DeclineDownloadConfiguration(request)) return;
                         throw callbackFailure;
                     }
                     switch (request)

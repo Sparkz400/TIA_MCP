@@ -307,6 +307,7 @@ namespace TiaMcp.Openness.V21
                         change.Stages.Add("native_preservation_verified");
                     }
                     if (change.Kind == "graphical_typed_edit") VerifyTypedInstanceReadbacks(change);
+                    if (change.Kind == "block_import_xml" && compile) ReadBackImportedBlocks(change);
                     if (save) { InvalidateHmiObservations(); MeasureChange(change, "changed-project-save", () => { project.Save(); return true; }); change.Stages.Add("changed_project_saved"); WriteChangeJournal(change); }
                     if (change.Kind == "hmi_classic_screen_edit") VerifyHmiEngineeringPreservation(change, project, "after-save");
                     if (change.Kind == TagTableImportRules.Kind && save) VerifyScopedTagImport(change);
@@ -1367,6 +1368,46 @@ namespace TiaMcp.Openness.V21
             MutationBlockGroup(change, plc).Blocks.Import(new FileInfo(change.InputPath), ImportOptions.Override);
             VerifyExpectedBlocksExist(change, plc);
             if (safety) change.SafetyAfter = ReadSafety(plc.Software);
+        }
+
+        // Content readback of block_import_xml after compile (an imported block is exported reliably only once it is consistent):
+        // every supplied block is exported again without DocumentInfo and compared by EngineeringSources.ImportedBlockDifference.
+        // Equal blocks record block_import_content_verified (readbackVerified done). A difference, or an export TIA refuses, is
+        // recorded in the readback row and leaves the milestone notRecorded; it never fails a change that TIA imported and compiled.
+        private void ReadBackImportedBlocks(EngineeringChange change)
+        {
+            var plc = SelectPlc(change.Selector);
+            var supplied = EngineeringSources.ReadXml(File.ReadAllText(change.InputPath)).Root.Elements()
+                .Where(e => e.Name.LocalName.StartsWith("SW.Blocks.", StringComparison.Ordinal)).ToList();
+            var rows = new JArray();
+            bool equal = supplied.Count > 0;
+            for (int index = 0; index < supplied.Count; index++)
+            {
+                string name = supplied[index].Element("AttributeList")?.Element("Name")?.Value;
+                var row = new JObject { ["block"] = name };
+                try
+                {
+                    string readback = Path.Combine(change.Directory, "after-import-" + index + ".xml");
+                    FindBlockByName(plc, name, true, change).Item.Export(new FileInfo(readback), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                    row["artifact"] = ChangeArtifact(readback);
+                    var exported = EngineeringSources.ReadXml(File.ReadAllText(readback)).Root.Elements()
+                        .FirstOrDefault(e => e.Name.LocalName.StartsWith("SW.Blocks.", StringComparison.Ordinal));
+                    string difference = exported == null ? "The export holds no block." : EngineeringSources.ImportedBlockDifference(supplied[index], exported);
+                    row["equal"] = difference == null;
+                    if (difference != null) row["firstDifference"] = difference;
+                }
+                catch (Exception error) when (error is EngineeringException || error is IOException || error is System.Xml.XmlException || error is BridgeException)
+                {
+                    row["equal"] = false;
+                    row["exportFailure"] = error.Message;
+                }
+                equal &= row.Value<bool>("equal");
+                rows.Add(row);
+            }
+            change.Readbacks.Add(new JObject { ["role"] = "block-import-content", ["blocks"] = rows, ["equal"] = equal,
+                ["rule"] = "Export provenance (DocumentInfo), empty multilingual texts, formatting, attribute order and ID numbering are ignored; everything else must be equal." });
+            if (equal) change.Stages.Add("block_import_content_verified");
+            WriteChangeJournal(change);
         }
 
         private void ApplyTypeSourceUpsert(EngineeringChange change)

@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import uuid
 
+import plc_tag_tables
 from smoke_mcp import Client, ROOT
 
 
@@ -37,8 +38,10 @@ def main():
         assert a.tool('tia_start')['ownsPortalProcess'] is True
         record('owned scratch', a.tool('tia_create_scratch'))
         plc = a.tool('project_inventory')['plcs'][0]['path']
+        # Its name follows the TIA UI language ("Default tag table", "Standard-Variablentabelle"): the table holding the system constants.
+        table = plc_tag_tables.default_table(a.tool, plc)['name']
         prepared = a.tool('change_prepare', {'kind': 'tag_create', 'plcPath': plc, 'payload': {
-            'tagTableName': 'Default tag table', 'name': 'Progress', 'dataTypeName': 'Bool', 'logicalAddress': '%M110.0'}})
+            'tagTableName': table, 'name': 'Progress', 'dataTypeName': 'Bool', 'logicalAddress': '%M110.0'}})
         before = a.tool('change_status', {'changeId': prepared['changeId']})['progress']
         assert before['projectEditComplete'] is False and before['summary'].startswith('Prepared only'), before
         record('a prepared-only change reports nothing changed', before)

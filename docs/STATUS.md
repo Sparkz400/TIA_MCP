@@ -1,13 +1,13 @@
 # Current status
 
 TIA MCP is pre-1.0; use it only with offline projects, copies, scratch projects and
-simulators you own (see the [README](../README.md)). Counts from catalog `0.5.0` (25 November 2026: the MCP surface redesign of 0.9.0 folded 27 per-family record tools into four `review_*` tools; `0.4.190` added `sim_network_mode_set`, unqualified), computed from the catalog and the matrix on 25 November (the drives row descoped the same day); backlog reconciled on 24 November, decisions of 25 November recorded:
+simulators you own (see the [README](../README.md)). Counts from catalog `0.5.5` (26 November 2026: the worker page totals cited; the follow-up checks of 14 to 25 November and a hardware smoke rerun; the V19 adapter requalified; the [native runs of 26 November](verification/native-runs-20261126.md) bound the project lifecycle, provisioning recovery, `sim_prune`, `sim_network_mode_set` and `hmi_content_fingerprint` rows; `0.5.0` was the MCP surface redesign of 0.9.0), computed from the catalog and the matrix on 26 November; backlog reconciled on 24 November, decisions of 25 November recorded:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.5.0` (25 November): 496 features, 454 verified, 42 unverified; 333 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 114 shipped, 340 limited, 29 unqualified, 12 unavailable on V21, 1 descoped (out of 1.0 scope) |
-| Matrix cells | 2,080 bound, **85 open**, 72 blocked, 3 descoped ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.5.5` (26 November): 496 features, 463 verified, 33 unverified; 333 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 116 shipped, 347 limited, 20 unqualified, 12 unavailable on V21, 1 descoped (out of 1.0 scope) |
+| Matrix cells | 2,105 bound, **60 open**, 72 blocked, 3 descoped ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted; the [TODO](TODO.md) was reconciled on 24 November against catalog `0.4.189` ([ledger](plans/release-obligations-20261015.md), [acceptance rules](plans/release-acceptance.md), [earlier review](verification/release-readiness-20261103.md)) |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
@@ -35,11 +35,11 @@ Its 13 catalog acceptance cells remain open: bounded fixture evidence does not e
 profile-wide, visual or runtime qualification. See the
 [continuation record](verification/classic-screen-workflow-draft-20261103.md).
 
-53 of the 81 open cells belong to rows added from 14 to 20 November without catalog evidence: project save, close,
-archive, copy and UMAC login (X01), provisioning status and recovery and `sim_prune` (L03), the WinCC Unified runtime
-alarm tools (X13), the Web API download, backup and alarm acknowledgement routes (D12), the real-PLC online tools
-(D09) and `hmi_content_fingerprint` (X07). Several have single native checks that are not curated evidence; the
-others ran offline only.
+Of the rows added from 14 to 20 November without catalog evidence, the project save, close, archive and copy rows
+(X01), provisioning status and recovery, `sim_prune` and `sim_network_mode_set` (L03) and `hmi_content_fingerprint` (X07) were bound natively on
+26 November ([record](verification/native-runs-20261126.md)). Still open from that period: UMAC login (X01), the
+WinCC Unified runtime alarm tools (X13), the Web API download, backup and alarm acknowledgement routes (D12; their
+native run is blocked by the PLCSIM adapter's network setup), and the real-PLC online tools (D09).
 
 [TODO](TODO.md) lists the open work; [open matrix rows by owner](TODO.md#open-matrix-rows-by-owner)
 names every row with an open cell.
@@ -103,7 +103,8 @@ natively. User feedback on v0.9.0 of
 [20 November field findings](TODO.md#field-findings-from-a-physical-download-20-november) added, among others,
 `project_save`, `project_close`, `project_archive`, `project_open_copy`, the provisioning status and recovery tools,
 `hmi_content_fingerprint`, the WinCC Unified runtime alarm tools, the real-PLC online tools, `attachedSessions` and
-the UMAC project login; some ran once natively, none is curated evidence yet. The merges of 20 November (PRs 315–326)
+the UMAC project login; since 26 November the project lifecycle, provisioning recovery, `sim_prune` and
+`hmi_content_fingerprint` rows have curated evidence ([record](verification/native-runs-20261126.md)), the others none yet. The merges of 20 November (PRs 315–326)
 added the Web API download, backup and alarm acknowledgement routes, `sim_prune` and `SingleStep_Bus` capture
 (offline checks only, catalog 0.4.189) and hardened the safety write gates, the OPC UA and Web API clients, PLCSIM
 capture and retention, the artifact stores, `block_export` paging and the tool surface; PR 328 (23 November) made the

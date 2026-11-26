@@ -12,8 +12,9 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+import hardware_paths
 from library_native_harness import Harness, require
-from qualify_hardware_changes import Run as HardwareRun, add_cpu, network
+from qualify_hardware_changes import Run as HardwareRun, add_cpu, interface_of, network
 from qualify_plc_object_mutations import coverage_gaps, diff
 
 KINDS = ("connection_create", "connection_set", "connection_delete")
@@ -51,19 +52,29 @@ class Run(HardwareRun):
         return {**super().domains(), **connections(self.h.tool)}
 
 
+def owners(run):
+    return run.path("ScratchStation", "items", "ScratchPLC"), run.path("HwPeer", "items", "HwPeerCpu")
+
+
 def ends(run):
-    cpu = run.path("ScratchStation", "items", "ScratchPLC")
-    peer = run.path("HwPeer", "items", "HwPeerCpu")
-    return cpu, peer, cpu + "/items/PROFINET%20interface_1", peer + "/items/PROFINET%20interface_1"
+    """Both CPUs and their interfaces; TIA names an interface in the UI language, so it is the CPU's one child with network nodes."""
+    return (*owners(run), interface_of(run, "ScratchStation", "ScratchPLC"), interface_of(run, "HwPeer", "HwPeerCpu"))
+
+
+def nodes(run):
+    """The node names of both interfaces ("X1" on a CPU 1511-1 PN)."""
+    return [hardware_paths.node_name(run.current["view"], path) for path in ends(run)[2:]]
 
 
 def create(run, kind, restore=False):
     cpu, peer, local, partner = ends(run)
-    payload = {"hardwarePath": cpu, "connectionType": kind, "localInterfacePath": local, "localNodeName": "X1",
-               "partnerTargetPath": peer, "partnerInterfacePath": partner, "partnerNodeName": "X1"}
+    local_node, partner_node = nodes(run)
+    payload = {"hardwarePath": cpu, "connectionType": kind, "localInterfacePath": local, "localNodeName": local_node,
+               "partnerTargetPath": peer, "partnerInterfacePath": partner, "partnerNodeName": partner_node}
     before = set(run.current["view"])
     run.apply("create a %s" % kind, "connection_create", payload,
-              {"effects": [{"createConnection": kind, "localInterfacePath": local, "localNodeName": "X1", "partnerTargetPath": peer, "partnerInterfacePath": partner, "partnerNodeName": "X1"}]},
+              {"effects": [{"createConnection": kind, "localInterfacePath": local, "localNodeName": local_node, "partnerTargetPath": peer, "partnerInterfacePath": partner,
+                            "partnerNodeName": partner_node}]},
               added=lambda applied, state: [key for key in state if key.startswith("conn:") and key not in before], restore=restore)
     if restore:
         return None  # The restored copy no longer holds the connection.
@@ -73,17 +84,17 @@ def create(run, kind, restore=False):
 
 
 def own(run, rows):
-    cpu = ends(run)[0]
+    cpu = owners(run)[0]
     return next(row for row in rows if row["id"].startswith(cpu + "/connections/"))
 
 
 def counterpart(run, row):
     """The partner CPU's side of an owner's connection, which TIA keeps in step with it."""
-    return "conn:" + ends(run)[1] + "/connections/" + row["id"].rsplit("/", 1)[1]
+    return "conn:" + owners(run)[1] + "/connections/" + row["id"].rsplit("/", 1)[1]
 
 
 def set_attribute(run, row, name, value, restore=False):
-    cpu = ends(run)[0]
+    cpu = owners(run)[0]
     payload = {"hardwarePath": cpu, "connectionName": row["properties"]["LocalConnectionName"], "attributes": {name: value}}
     run.apply("set %s's %s" % (row["properties"]["LocalConnectionName"], name), "connection_set", payload,
               {"effects": [{"connection": row["id"], "attributes": [{"name": name, "after": value}]}]},
@@ -92,7 +103,7 @@ def set_attribute(run, row, name, value, restore=False):
 
 
 def delete(run, row, restore=False):
-    cpu = ends(run)[0]
+    cpu = owners(run)[0]
     run.apply("delete " + row["properties"]["LocalConnectionName"], "connection_delete", {"hardwarePath": cpu, "connectionName": row["properties"]["LocalConnectionName"]},
               {"effects": [{"deleteConnection": row}]}, removed=["conn:" + row["id"]],
               tolerated=lambda category, key: category == "removed" and key == counterpart(run, row), restore=restore)
@@ -102,7 +113,9 @@ def phase_a(run):
     add_cpu(run, "add CPU HwPeer", "HwPeer")
     network(run)
     cpu, peer, local, partner = ends(run)
-    base = {"hardwarePath": cpu, "localInterfacePath": local, "localNodeName": "X1", "partnerTargetPath": peer, "partnerInterfacePath": partner, "partnerNodeName": "X1"}
+    local_node, partner_node = nodes(run)
+    base = {"hardwarePath": cpu, "localInterfacePath": local, "localNodeName": local_node, "partnerTargetPath": peer, "partnerInterfacePath": partner,
+            "partnerNodeName": partner_node}
     run.refuse("connection_create", "an unknown connection type", {**base, "connectionType": "ModbusConnection"}, "InvalidRequest")
     run.refuse("connection_create", "a missing owner", {**base, "hardwarePath": cpu + "X", "connectionType": "S7Connection"}, "HardwareNotFound")
     s7 = own(run, create(run, "S7Connection"))

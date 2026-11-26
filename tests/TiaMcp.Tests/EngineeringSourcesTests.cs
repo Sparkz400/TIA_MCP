@@ -342,6 +342,33 @@ namespace TiaMcp.Tests
                 EngineeringSources.ReadXml("<Document xmlns:x='urn:changed'><Vendor Value='x:Type'/></Document>")));
         }
 
+        // block_import_xml content readback: the shapes TIA's re-export showed natively on 26 November 2026.
+        internal static Task ImportedBlockReadbackIgnoresProvenanceAndEmptyTexts()
+        {
+            const string supplied = @"<Document><SW.Blocks.FB ID=""0""><AttributeList><Name>Gate</Name><ProgrammingLanguage>LAD</ProgrammingLanguage></AttributeList>
+  <ObjectList><SW.Blocks.CompileUnit ID=""3"" CompositionName=""CompileUnits""><AttributeList><NetworkSource><FlgNet xmlns=""urn:net""><Parts><Part Name=""Contact"" UId=""21""/></Parts></FlgNet></NetworkSource></AttributeList></SW.Blocks.CompileUnit></ObjectList></SW.Blocks.FB></Document>";
+            // TIA adds empty Title/Comment texts around the compile unit and renumbers IDs; DocumentInfo is not exported here.
+            const string exported = @"<Document><SW.Blocks.FB ID=""0""><AttributeList><Name>Gate</Name><ProgrammingLanguage>LAD</ProgrammingLanguage></AttributeList>
+  <ObjectList><MultilingualText ID=""1"" CompositionName=""Comment""><ObjectList><MultilingualTextItem ID=""2""><AttributeList><Culture>de-DE</Culture><Text /></AttributeList></MultilingualTextItem></ObjectList></MultilingualText>
+  <SW.Blocks.CompileUnit ID=""3"" CompositionName=""CompileUnits""><AttributeList><NetworkSource><FlgNet xmlns=""urn:net""><Parts><Part UId=""21"" Name=""Contact""/></Parts></FlgNet></NetworkSource></AttributeList></SW.Blocks.CompileUnit>
+  <MultilingualText ID=""8"" CompositionName=""Title""><ObjectList><MultilingualTextItem ID=""9""><AttributeList><Culture>de-DE</Culture><Text></Text></AttributeList></MultilingualTextItem></ObjectList></MultilingualText></ObjectList></SW.Blocks.FB></Document>";
+            XElement Block(string xml) => EngineeringSources.ReadXml(xml).Root.Elements().First();
+            Check.Equal(null, EngineeringSources.ImportedBlockDifference(Block(supplied), Block(exported)));
+            // An ObjectList that held only empty texts differs only in indentation once they are dropped (native rb4, edited SCL FC).
+            const string onlyTexts = "<SW.Blocks.FC ID=\"0\"><AttributeList><Name>F</Name></AttributeList><ObjectList>\n\n   <MultilingualText ID=\"1\" CompositionName=\"Title\"><ObjectList><MultilingualTextItem ID=\"2\"><AttributeList><Culture>de-DE</Culture><Text /></AttributeList></MultilingualTextItem></ObjectList></MultilingualText>\n\n  </ObjectList></SW.Blocks.FC>";
+            Check.Equal(null, EngineeringSources.ImportedBlockDifference(Block("<Document>" + onlyTexts + "</Document>"), Block("<Document>" + onlyTexts.Replace("\n\n   <Multi", "\n <Multi").Replace("</MultilingualText>\n\n  </ObjectList>", "</MultilingualText>\n</ObjectList>") + "</Document>")));
+            // A supplied list whose texts were removed before the import keeps only indentation; TIA exports it empty (native rb5).
+            Check.Equal(null, EngineeringSources.ImportedBlockDifference(Block("<Document><SW.Blocks.FC><ObjectList>\n   \n  </ObjectList></SW.Blocks.FC></Document>"), Block("<Document><SW.Blocks.FC><ObjectList /></SW.Blocks.FC></Document>")));
+            // Whitespace in a value element still counts.
+            Check.Equal(true, EngineeringSources.ImportedBlockDifference(Block("<Document><SW.Blocks.FC><AttributeList><Comment>  </Comment></AttributeList></SW.Blocks.FC></Document>"), Block("<Document><SW.Blocks.FC><AttributeList><Comment /></AttributeList></SW.Blocks.FC></Document>")) != null);
+            // A real change stays visible: a changed operand, a non-empty title and a missing part are each reported.
+            Check.Equal(true, EngineeringSources.ImportedBlockDifference(Block(supplied), Block(exported.Replace("Name=\"Contact\"", "Name=\"Coil\""))) != null);
+            Check.Equal(true, EngineeringSources.ImportedBlockDifference(Block(supplied), Block(exported.Replace("<Text></Text>", "<Text>Title</Text>"))) != null);
+            Check.Equal(true, EngineeringSources.ImportedBlockDifference(Block(supplied), Block(exported.Replace("<Part UId=\"21\" Name=\"Contact\"/>", ""))) != null);
+            Check.Equal(true, EngineeringSources.ImportedBlockDifference(Block(supplied.Replace("<Name>Gate</Name>", "<Name>Gate</Name><Number>5</Number>")), Block(exported)) != null);
+            return Task.CompletedTask;
+        }
+
         internal static async Task GraphicalFragmentsUseNativeDefaultNamespace()
         {
             var document = DecoratedGraphicalDocument("LAD");

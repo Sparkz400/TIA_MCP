@@ -20,7 +20,7 @@ from pathlib import Path
 
 from library_native_harness import Harness, require
 from qualify_composite_capture import AXIS, Run as CaptureRun, capture, generated, review
-from qualify_hardware_changes import under
+from qualify_hardware_changes import SCRATCH, default_table, rack, under
 from qualify_technology_changes import portable
 
 # TM PosInput 2 V2.0, the module of fixtures/encoder-hardware; channel 0 is its technology channel.
@@ -74,7 +74,7 @@ class Run(CaptureRun):
 
 
 def plug(run, name, slot):
-    rail = run.path("ScratchStation", "items", "Rail_0")
+    rail = rack(run, SCRATCH)  # Rail_0, or Profilschiene_0 on a German installation: resolved by structure.
     module = run.path("ScratchStation", "items", name)
     run.apply("plug " + name, "hardware_plug", {"hardwarePath": rail, "typeIdentifier": ENCODER, "name": name, "positionNumber": slot},
               {"effects": [{"parentPath": rail, "createItem": name, "positionNumber": slot, "typeIdentifier": ENCODER}]},
@@ -93,7 +93,7 @@ def owner(run, module):
 
 def identifier(run, item):
     """TIA may give the reconfigured submodule a new hardware identifier, which its system constant Local~<module> reports."""
-    constant = "member:" + run.plc + "/tags/Default%20tag%20table/systemConstants/Local~" + item.rsplit("/", 1)[1]
+    constant = "member:" + default_table(run, run.plc)[0] + "/systemConstants/Local~" + item.rsplit("/", 1)[1]
     return lambda category, key: category == "changed" and key == constant
 
 
@@ -119,7 +119,7 @@ def create_axis(run):
 def coupled(run, item):
     """TIA puts the connected item's addresses into the servo process image (ProcessImage) and keeps the sensor's PROFIdrive
     interface tags RbAxis_Sensor<n>_Interface_AddressIn/Out (and so their tag table) in step, besides generated()."""
-    table = run.plc + "/tags/Default%20tag%20table"
+    table = default_table(run, run.plc)[0]
     system, renumbered = generated(run), identifier(run, item)
     return lambda category, key: system(category, key) or renumbered(category, key) or category == "changed" and key in ("hw:" + item, "tagTable:" + table) or (
         category in ("added", "removed") and key.startswith("member:" + table + "/tags/RbAxis_Sensor"))

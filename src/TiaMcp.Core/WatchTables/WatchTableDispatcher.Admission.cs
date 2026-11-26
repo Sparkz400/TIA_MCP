@@ -70,7 +70,11 @@ public sealed partial class WatchTableDispatcher
                         // download and provisioning failures stay unknown on purpose (their storage needs reconciliation).
                         // A structured station-upload failure only read the instance and reports its retained destination;
                         // a structured upgrade failure only read its source and reports the owned copy it retains.
-                        bool returned = error is BridgeOperationException && operation is ("change_apply" or "change_restore" or "plc_station_upload" or "project_upgrade");
+                        // A simulation download the worker refused before its claim (ticketState reusable, retrySafe) wrote nothing,
+                        // so there is no storage to reconcile; holding it left every later download and project_save on the project
+                        // refused with ResourceBusy (natively, 26 November 2026).
+                        bool returned = error is BridgeOperationException && (operation is ("change_apply" or "change_restore" or "plc_station_upload" or "project_upgrade")
+                            || operation == "simulation_download" && SimulationDownloadWroteNothing(nativeDetails));
                         // Bind a later independent report check without persisting raw diagnostic text or credentials.
                         string? nativeDetailsHash = nativeDetails is null ? null : CanonicalJson.Sha256(new JsonObject {
                             ["details"] = JsonNode.Parse(nativeDetails.Value.GetRawText()) });
@@ -101,4 +105,10 @@ public sealed partial class WatchTableDispatcher
                 catch { /* Native connection failure cannot release durable unknown ownership. */ }
         }
     }
+
+    // The worker's own verdict that a failed download never reached its claim: ticketState reusable with retrySafe true.
+    internal static bool SimulationDownloadWroteNothing(JsonElement? details) =>
+        details is { ValueKind: JsonValueKind.Object } d
+        && d.TryGetProperty("ticketState", out var state) && state.ValueKind == JsonValueKind.String && state.GetString() == "reusable"
+        && d.TryGetProperty("retrySafe", out var safe) && safe.ValueKind == JsonValueKind.True;
 }

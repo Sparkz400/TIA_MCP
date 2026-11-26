@@ -4,6 +4,7 @@ The fake answers only the shapes the runner reads. It catches flow and contract 
 oracle before an operator TCP/IP window, not native behavior.
 """
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -36,12 +37,20 @@ IM0 = {49: {"order_number": "6ES7 511-1AL03-0AB0 ", "serial_number": "S V-L0X123
 ACTUAL = {49: {"mlfb": "6ES7 511-1AL03-0AB0", "serialNumber": "S V-L0X12345", "hardwareRevision": "3", "firmware": "V4.1.0"}}  # SiemensWebIdentity's row
 ROWS = [{"rowId": "r0", "name": "ScratchStation", "kind": "device"}, {"rowId": "r1", "name": "ScratchPLC", "kind": "cpu"},
         {"rowId": "r2", "name": "PROFINET interface_1", "kind": "builtIn"}, {"rowId": "r3", "name": "Port_1", "kind": "builtIn"}]
+# web-services: what the fake CPU's Api.Browse lists, the device rights a refused grant names, and its ticket methods.
+METHODS = ("Alarms.Acknowledge", "Alarms.Browse", "Api.Browse", "Api.CloseTicket", "Api.GetPermissions", "Api.Login", "Api.Logout",
+           "Modules.DownloadServiceData", "Plc.CreateBackup", "PlcProgram.Browse", "PlcProgram.DownloadProfilingData", "PlcProgram.Read")
+AVAILABLE_RIGHTS = [{"identifier": "OPCUAServerAccess", "name": "OPC UA server access"}, {"identifier": "WebReadSyslog", "name": "Read syslog buffer of the CPU"},
+                    {"identifier": "WebAcknowledgeAlarms", "name": "Acknowledge alarms"}, {"identifier": "WebBackupRestore", "name": "Backup and restore the CPU"},
+                    {"identifier": "WebDownloadServiceData", "name": "Download service data"}]
+TICKETS = {"profiling": "PlcProgram.DownloadProfilingData", "serviceData": "Modules.DownloadServiceData", "backup": "Plc.CreateBackup"}
+ALARM_ID, SYSTEM_ALARM_ID, BINDING = "1001", "17", "b" * 64
 
 
 class Fail(Exception):
-    def __init__(self, code):
+    def __init__(self, code, details=None):
         super().__init__(code)
-        self.code = code
+        self.code, self.details = code, details
 
 
 class Plc:
@@ -52,6 +61,9 @@ class Plc:
         self.memory = {"Marker": 4711, "Cycles": 0, "UaValue": 0, "MethodCalls": 0, "AlarmTrigger": False, "Enable": False, "Active": False}
         self.inspections, self.sessions, self.captures, self.host, self.stale = 0, {}, {}, None, False
         self.token, self.logged_out = None, False
+        # web-services: the Program_Alarm is listed from its rise until it falls, acknowledged or not needing it.
+        self.methods, self.ackable, self.raised, self.acked = list(METHODS), True, False, False
+        self.system_alarm = None  # "not_acknowledged" or "acknowledged": an alarm listed before the run, such as a system diagnostic one.
 
     def web(self, method, params, token):
         """The fake CPU's Web API: Modules.* need the logged-in session."""
@@ -106,7 +118,68 @@ class Plc:
         state = "hostEndedRemoteUnknown" if s["state"] in ("connected", "unknown") and s["host"] != self.host else s["state"]
         key = ("selection", "certificateSha256") if s["channel"] == "ua" else ("login", "peerCertificateSha256")
         return {"schemaVersion": "opcua-runtime-session.v1" if s["channel"] == "ua" else "runtime-web-session.v2", "attemptId": attempt, "state": state,
-                "peerVerified": state == "connected", key[0]: {key[1]: self.cert(s["channel"], s["argument"])}}
+                "peerVerified": state == "connected", key[0]: {key[1]: self.cert(s["channel"], s["argument"])},
+                **({"methods": self.methods} if s["channel"] == "web" else {})}
+
+    def trigger(self, value):
+        if value and not self.memory["AlarmTrigger"]:
+            self.raised, self.acked = True, False
+        elif not value and (self.acked or not self.ackable):
+            self.raised = False
+
+    def alarms(self):
+        ack = {"acknowledgement": {"state": "acknowledged" if self.acked else "not_acknowledged"}} if self.ackable else {}
+        system = [{"id": SYSTEM_ALARM_ID, "status": "incoming", "acknowledgement": {"state": self.system_alarm}}] if self.system_alarm else []
+        return system + ([{"id": ALARM_ID, "alarm_number": 7, "status": "incoming" if self.memory["AlarmTrigger"] else "outgoing", **ack}] if self.raised else [])
+
+    def gate(self, a, flag):
+        """The Host's order: the acknowledgement flag, then the owned-PLCSIM binding, then the session."""
+        if not a[flag]:
+            raise Fail("RuntimeAcknowledgementRequired")
+        if a["bindingSha256"] != BINDING:
+            raise Fail("RuntimeOperationFailed")
+        self.live(a["attemptId"])
+
+    def acknowledge(self, a):
+        self.gate(a, "acknowledgeAlarm")
+        if not {"Alarms.Acknowledge", "Alarms.Browse"} <= set(self.methods):
+            return {"state": "unsupported", "dispatched": False}
+        entry = next((e for e in self.alarms() if e["id"] == a["alarmId"]), None)
+        if entry is None:
+            return {"state": "alarmNotListed", "dispatched": False}
+        if (entry.get("acknowledgement") or {}).get("state") != "not_acknowledged":
+            return {"state": "notAcknowledgeable" if "acknowledgement" not in entry else "alreadyAcknowledged", "dispatched": False}
+        if a["alarmId"] == SYSTEM_ALARM_ID:
+            self.system_alarm = "acknowledged"
+            return {"state": "acknowledged", "dispatched": True, "readbackMatches": True}
+        self.acked = True
+        self.raised = self.memory["AlarmTrigger"]
+        return {"state": "acknowledged", "dispatched": True, "readbackMatches": True}
+
+    def ticket(self, kind, hwid=None):
+        if TICKETS[kind] not in self.methods or "Api.CloseTicket" not in self.methods:
+            return {"state": "unsupported", "dispatched": False}
+        data = ("%s %s|" % (kind, hwid)).encode() * 100
+        sha = hashlib.sha256(data).hexdigest()
+        path = "runtime-web-downloads/web-%s-%s.bin" % (kind, sha[:32])
+        (self.root / path).parent.mkdir(exist_ok=True)
+        (self.root / path).write_bytes(data)
+        return {"state": "downloaded", "dispatched": True, "ticketClosed": True, "artifact": {"path": path, "sha256": sha, "bytes": len(data), "readWith": "artifact_read"}}
+
+    def download(self, a):
+        hwid = a.get("hwid")
+        if a["kind"] not in ("serviceData", "profiling"):
+            raise Fail("RuntimeTicketKindUnsupported")
+        if (a["kind"] == "serviceData") != (hwid is not None) or hwid is not None and not 0 <= hwid <= 0xFFFF:
+            raise Fail("RuntimeTicketSelectionInvalid")
+        self.live(a["attemptId"])
+        return self.ticket(a["kind"], hwid)
+
+    def backup(self, a):
+        self.gate(a, "acknowledgeBackup")
+        if self.state != "Stop":
+            return {"state": "preconditionMismatch", "dispatched": False, "before": {"status": "read", "value": self.state.lower()}}
+        return self.ticket("backup")
 
     def live(self, attempt):
         s = self.sessions.get(attempt)
@@ -245,7 +318,7 @@ class Host:
         try:
             result = {"isError": False, "structuredContent": self.answer(params["name"], params.get("arguments") or {})}
         except Fail as error:
-            result = {"isError": True, "structuredContent": {"error": {"code": error.code, "message": "refused"}}}
+            result = {"isError": True, "structuredContent": {"error": {"code": error.code, "message": "refused", **({"details": error.details} if error.details else {})}}}
         self.tool_calls.append({"name": params["name"], "isError": result["isError"]})
         return result
 
@@ -268,8 +341,12 @@ class Host:
             p.inspections += 1
             return {"devices": [{"certificates": [CERTS["plc"]] + ([CERTS["web"], CERTS["ua"]] if p.inspections > 1 else [])}]}
         if tool == "hardware_inspect":
-            if a["hardwarePath"].endswith("PROFINET%20interface_1"):
-                return {"items": [{"network": {"nodes": [{"name": "X1", "attributes": [{"name": "Address", "value": "192.168.0.1"}]}]}}]}
+            if a.get("hardwarePath") is None:
+                # The whole station: the CPU and its one networked interface (named as a German installation names it).
+                cpu = "/projects/P/devices/ScratchStation/items/ScratchPLC"
+                return {"items": [{"path": cpu, "network": {"nodes": []}},
+                                  {"path": cpu + "/items/PROFINET-Schnittstelle_1",
+                                   "network": {"nodes": [{"name": "X1", "attributes": [{"name": "Address", "value": "192.168.0.1"}]}]}}]}
             return {"items": [{"attributes": [{"name": k, "value": v} for k, v in (("OpcUaServer", True), ("OpcUaAutoAcceptAllClientCertificates", True),
                                                                                   ("OpcUaPort", 4840), ("OpcUaApplicationUri", URI),
                                                                                   ("OpcUaAlarmsAndConditionsEnable", True), ("CentralAlarmManagement", True))]}]}
@@ -317,13 +394,31 @@ class Host:
                     "historyReadRaw": {"serviceStatusCode": None, "statusCode": "0x80720000", "valueCount": None}}
         if tool == "sim_write":
             for w in a["writes"]:
+                if w["symbol"].endswith("AlarmTrigger"):
+                    p.trigger(w["value"])
                 p.memory[w["symbol"].split(".")[-1]] = w["value"]
             return {"written": len(a["writes"])}
         if tool == "runtime_web_browse":
             p.live(a["attemptId"])
             return {"selectionId": a["symbol"], "metadata": []} if a.get("children") is False else {"metadata": []}
         if tool == "change_prepare" and "TiaMcpUnknownRight" in json.dumps(a):
-            raise Fail("ObjectNotFound")
+            raise Fail("ObjectNotFound", {"availableRights": AVAILABLE_RIGHTS})
+        if tool == "runtime_web_alarm_acknowledge":
+            return p.acknowledge(a)
+        if tool == "runtime_web_download":
+            return p.download(a)
+        if tool == "runtime_web_backup":
+            return p.backup(a)
+        if tool == "artifact_read":
+            data = (p.root / a["path"]).read_bytes()
+            return {"relativePath": a["path"].replace("/", "\\"), "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(), "offset": 0, "count": 1,
+                    "nextOffset": 1, "complete": False, "encoding": "base64", "data": base64.b64encode(data[:1]).decode()}
+        if tool == "runtime_web_diagnostics" and a["kind"] in ("languages", "alarms"):
+            p.live(a["attemptId"])
+            if a["kind"] == "languages":
+                return {"status": "read", "value": {"languages": [{"language": "de-DE"}, {"language": "en-US"}]}}
+            assert a["language"] == "en-US"
+            return {"status": "read", "value": {"entries": p.alarms(), "count_current": len(p.alarms())}} if "Alarms.Browse" in p.methods else {"status": "unsupported"}
         if tool == "runtime_web_diagnostics":
             if a["kind"] == "syslog":
                 if not 1 <= a["count"] <= 20:
@@ -396,10 +491,12 @@ class TagRefresh(unittest.TestCase):
 
 
 class Modes(unittest.TestCase):
-    def run_mode(self, mode, inspect=None):
+    def run_mode(self, mode, inspect=None, configure=None):
         with tempfile.TemporaryDirectory() as root:
             root = Path(root)
             plc = Plc(None)
+            if configure:
+                configure(plc)
             plc.user = root / "user.json"
             plc.user.write_text(json.dumps({"username": "TiaMcpTest_1", "protectedPath": "x.dpapi"}), encoding="utf-8")
             originals = {k: getattr(runner, k) for k in ("Client", "unprotect", "save_generated_scratch_project", "verify_download",
@@ -449,6 +546,49 @@ class Modes(unittest.TestCase):
             self.assertEqual([(b["rowId"], b["hardwareId"]) for b in identified["bindings"]], [("r1", 49), ("r2", 64)])
             self.assertEqual((fake.directory / "web-server.cer").read_bytes(), DER)
         self.run_mode("device-inventory", inspect)
+
+    def test_web_services_demonstrates_every_gate_once(self):
+        def inspect(fake, plc):
+            report = json.loads((fake.directory / "qualification.json").read_text(encoding="utf-8"))
+            ws = report["webServices"]
+            self.assertEqual(ws["rights"], {"acknowledgeAlarms": ["WebAcknowledgeAlarms"], "backup": ["WebBackupRestore"], "serviceData": ["WebDownloadServiceData"]})
+            self.assertEqual((ws["hwid"], ws["alarm"]["targetId"], ws["alarm"]["source"]), (49, ALARM_ID, "programAlarm"))
+            self.assertTrue(plc.token and plc.logged_out, "The session borrowed for Modules.Browse was not closed")
+            self.assertFalse([p for p in fake.directory.rglob("*") if p.is_file() and plc.token.encode() in p.read_bytes()])
+            calls = [c["name"] for c in report["toolCalls"]]
+            self.assertEqual(calls.count("runtime_web_alarm_acknowledge"), 6)  # three refusals, the acknowledgement, again, after the fall
+            steps = {s["name"]: s["result"] for s in report["steps"]}
+            self.assertEqual(steps[oracle.ACK_AGAIN], {"state": "alreadyAcknowledged", "dispatched": False})
+            self.assertEqual((steps[oracle.BACKUP_RUN]["state"], steps[oracle.BACKUP_RUN_STATE], steps[oracle.BACKUP_STATE]), ("preconditionMismatch", "Run", "Stop"))
+            self.assertNotIn("data", json.dumps([steps[oracle.STORED % label] for label in (oracle.BACKUP, *oracle.DOWNLOAD.values())]))
+        verification = self.run_mode("web-services", inspect)
+        summary = verification["oracle"]["webServices"]
+        self.assertEqual(summary["gates"], {tool: list(gates) for tool, gates in oracle.GATES.items()})
+        self.assertEqual(set(summary["outcomes"].values()), {"demonstrated"})
+
+    def test_web_services_records_unadvertised_methods_and_an_alarm_without_acknowledgement(self):
+        def configure(plc):
+            plc.methods.remove("Plc.CreateBackup")
+            plc.methods.remove("Modules.DownloadServiceData")
+            plc.ackable = False  # TIA's default Program_Alarm class.
+        verification = self.run_mode("web-services", configure=configure)
+        self.assertTrue(verification["completed"], verification["oracle"]["issues"])
+        summary = verification["oracle"]["webServices"]
+        self.assertEqual(summary["outcomes"], {"runtime_web_alarm_acknowledge": "notAcknowledgeable", "runtime_web_download profiling": "demonstrated",
+                                               "runtime_web_download serviceData": "methodNotAdvertised", "runtime_web_backup": "methodNotAdvertised"})
+        self.assertEqual(summary["gates"], {"runtime_web_download": list(oracle.GATES["runtime_web_download"])})
+
+    def test_web_services_acknowledges_a_listed_alarm_when_the_program_alarm_needs_none(self):
+        def configure(plc):
+            plc.ackable, plc.system_alarm = False, "not_acknowledged"
+        verification = self.run_mode("web-services", configure=configure)
+        self.assertTrue(verification["completed"], verification["oracle"]["issues"])
+        summary = verification["oracle"]["webServices"]
+        self.assertEqual((summary["alarmSource"], summary["alarmId"], summary["outcomes"]["runtime_web_alarm_acknowledge"]),
+                         ("listedAlarm", SYSTEM_ALARM_ID, "demonstrated"))
+        # An alarm that was already acknowledged before the run is never a stand-in.
+        verification = self.run_mode("web-services", configure=lambda plc: setattr(plc, "system_alarm", "acknowledged"))
+        self.assertEqual(verification["oracle"]["webServices"]["alarmSource"], "programAlarm")
 
 
 class Inventory(unittest.TestCase):

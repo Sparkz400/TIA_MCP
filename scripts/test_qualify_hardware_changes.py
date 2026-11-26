@@ -1,11 +1,17 @@
-"""Offline checks of the pure helpers in qualify_hardware_changes.py, qualify_software_unit_changes.py, qualify_project_settings.py and qualify_technology_changes.py; nothing here starts TIA."""
+"""Offline checks of the pure helpers in qualify_hardware_changes.py (and the item lookups of qualify_connection_changes.py, qualify_gsd_export.py, qualify_composite_rebind.py and qualify_motion_connections.py), qualify_software_unit_changes.py, qualify_project_settings.py and qualify_technology_changes.py; nothing here starts TIA."""
 import unittest
 
 import io
+from urllib.parse import unquote
 import zipfile
 
+import hardware_paths
 import qualify_alarm_imports as al
+import qualify_composite_rebind as cr
+import qualify_connection_changes as qc
+import qualify_gsd_export as gs
 import qualify_hardware_changes as q
+import qualify_motion_connections as mc
 import qualify_project_settings as ps
 import qualify_software_unit_changes as u
 import qualify_technology_changes as tc
@@ -18,6 +24,49 @@ def item(path, comment="", ports=None):
     attributes = [{"name": "Comment", "value": comment, "valueComplete": True, "valueStatus": "captured"},
                   {"name": "InstallationDate", "value": {"text": "now"}, "valueComplete": False, "valueStatus": "displayOnly"}]
     return {"path": path, "name": path.rsplit("/", 1)[1], "attributes": attributes, **({"network": {"ports": ports}} if ports is not None else {})}
+
+
+# Item names TIA generates (encoded path segments): an English installation's, and a German one's. "PROFINET-Schnittstelle_1",
+# "Profilschiene_0" and the default tag table "Standard-Variablentabelle" were observed natively; the S7-1200 rack and port names are stand-ins that differ from the English
+# ones, so a runner that builds such a path from a name fails here.
+ENGLISH = {"cpu": "PROFINET%20interface_1", "head": "PROFINET%20interface", "rail": "Rail_0", "rack": "Rack_0", "port": "Port_%d", "table": "Default%20tag%20table"}
+GERMAN = {"cpu": "PROFINET-Schnittstelle_1", "head": "PROFINET-Schnittstelle", "rail": "Profilschiene_0", "rack": "Baugruppentr%C3%A4ger_0", "port": "Anschluss_%d",
+          "table": "Standard-Variablentabelle"}
+
+
+def stations(base, names):
+    """The compared hardware view of the run's stations, named as names: each CPU's or head's one interface with its node and its
+    ports (the ET 200SP head's on its BusAdapter; listed last port first, so order comes from portIndex), and each root rack."""
+    view = {}
+    def row(position, classification="None", network=None, **extra):
+        return {"positionNumber": position, "classification": classification, "attributes": {}, "network": network, **extra}
+    for device, head, kind, rack, count, node in (("ScratchStation", "ScratchPLC", "cpu", "rail", 2, "X1"), ("HwPeer", "HwPeerCpu", "cpu", "rail", 2, "X1"),
+                                                  ("HwThird", "HwThirdCpu", "cpu", "rail", 2, "X1"), ("Hw1200", "Hw1200Cpu", "cpu", "rack", 1, "X1 : PN(LAN)"),
+                                                  ("HwMp", "HwMpHead", "head", "rail", 2, "IE1"), ("HwSp", "HwSpHead", "head", "rail", 2, "X1")):
+        owner = base + device + "/items/" + head
+        interface = owner + "/items/" + names[kind]
+        holder = base + device + "/items/BA%202xRJ45" if device == "HwSp" else interface
+        ports = [holder + "/items/" + names["port"] % number for number in range(1, count + 1)]
+        listed = [{"portIndex": index, "port": {"resolution": "resolved", "ownerHardwarePath": port}, "connectedPorts": []} for index, port in enumerate(ports)]
+        view["hw:" + base + device + "/items/" + names[rack]] = row(0)
+        view["hw:" + owner] = row(0 if device == "HwSp" else 1, "HM" if kind == "head" else "CPU")
+        view["hw:" + owner + "/items/" + head] = row(0)  # The head's submodule, named after it.
+        view["hw:" + interface] = row(32768, network={"nodes": [{"name": node}], "ports": listed[::-1]}, name=unquote(names[kind]))
+        view.update(("hw:" + port, row(32769 + index)) for index, port in enumerate(ports))
+        if holder != interface:
+            view["hw:" + holder] = row(1)
+        if kind == "cpu":  # The PLC's default tag table holds its system constants; a user table beside it holds none.
+            plc = owner + "/plc/" + head
+            for table, member in ((plc + "/tags/" + names["table"], "/systemConstants/Local~Common"), (plc + "/tags/UserTags", "/tags/UserTag")):
+                view["tagTable:" + table] = {"path": table, "name": unquote(table.rsplit("/", 1)[1]), "scopePath": plc}
+                view["member:" + table + member] = {"path": table + member}
+    return view
+
+
+def fixture_run(names=GERMAN, base="/projects/P/devices/"):
+    run = q.Run.__new__(q.Run)
+    run.base, run.current = base, {"view": stations(base, names)}
+    return run
 
 
 class HardwareChangeTests(unittest.TestCase):
@@ -37,36 +86,51 @@ class HardwareChangeTests(unittest.TestCase):
         self.assertFalse(q.port_defaults(["hw:a"])("changed", "hw:b"))
 
     def test_family_links_with_the_cpu_link_form_a_line(self):
-        run = q.Run.__new__(q.Run)
-        run.base = "/projects/P/devices/"
-        links = [*q.family_ports(run).values(), tuple(q.ports(run, 2))]
-        ends = [port for link in links for port in link]
-        self.assertEqual(len(ends), len(set(ends)), "a port is linked twice")
-        devices = [tuple(port[len(run.base):].split("/")[0] for port in link) for link in links]
-        self.assertEqual({("Hw1200", "ScratchStation"), ("HwMp", "HwPeer"), ("ScratchStation", "HwPeer")}, set(devices))
-        self.assertEqual(4, len({d for link in devices for d in link}))  # Four devices joined by three links: a line, no ring.
+        for names in (ENGLISH, GERMAN):
+            run = fixture_run(names)
+            links = [*q.family_ports(run).values(), tuple(q.ports(run, 2))]
+            ends = [port for link in links for port in link]
+            self.assertEqual(len(ends), len(set(ends)), "a port is linked twice")
+            devices = [tuple(port[len(run.base):].split("/")[0] for port in link) for link in links]
+            self.assertEqual({("Hw1200", "ScratchStation"), ("HwMp", "HwPeer"), ("ScratchStation", "HwPeer")}, set(devices))
+            self.assertEqual(4, len({d for link in devices for d in link}))  # Four devices joined by three links: a line, no ring.
+        # English: the paths the runner used to build from names; German: the same structure under the German names.
+        english, german = fixture_run(ENGLISH), fixture_run(GERMAN)
+        self.assertEqual(["/projects/P/devices/ScratchStation/items/ScratchPLC/items/PROFINET%20interface_1/items/Port_1",
+                          "/projects/P/devices/HwPeer/items/HwPeerCpu/items/PROFINET%20interface_1/items/Port_1"], q.ports(english, 1))
+        self.assertEqual(("/projects/P/devices/HwMp/items/HwMpHead/items/PROFINET%20interface/items/Port_1",
+                          "/projects/P/devices/HwPeer/items/HwPeerCpu/items/PROFINET%20interface_1/items/Port_1"), q.family_ports(english)["HwMp"])
+        self.assertEqual("/projects/P/devices/Hw1200/items/Hw1200Cpu/items/PROFINET-Schnittstelle_1/items/Anschluss_1", q.family_ports(german)["Hw1200"][0])
+        self.assertEqual("/projects/P/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1/items/Anschluss_2", q.ports(german, 2)[0])
+        run = english
         self.assertEqual("member:/projects/P/devices/HwPeer/items/HwPeerCpu/plc/HwPeerCpu/tags/Default%20tag%20table/systemConstants/HwMpHead~MpDi",
                          q.constant(run, q.MP, q.MP.prefix + "MpDi"))
+        self.assertEqual("member:/projects/P/devices/HwPeer/items/HwPeerCpu/plc/HwPeerCpu/tags/Standard-Variablentabelle/systemConstants/HwMpHead~MpDi",
+                         q.constant(german, q.MP, q.MP.prefix + "MpDi"))
+        self.assertEqual(("/projects/P/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/Standard-Variablentabelle", "Standard-Variablentabelle"),
+                         q.default_table(german, q.scratch_plc(german)))
 
     def test_ring_link_closes_the_line_into_one_ring(self):
-        run = q.Run.__new__(q.Run)
-        run.base = "/projects/P/devices/"
-        # The CPU 1214C (one port) leaves the line; the IM 155-5's Port_2 then takes the scratch CPU's freed Port_1.
-        links = [q.family_ports(run)["HwMp"], tuple(q.ports(run, 2)), q.ring_ports(run)]
-        ends = [port for link in links for port in link]
-        self.assertEqual(len(ends), len(set(ends)), "a port is linked twice")
-        self.assertIn(q.family_ports(run)["Hw1200"][1], q.ring_ports(run))
-        devices = [tuple(port[len(run.base):].split("/")[0] for port in link) for link in links]
-        degree = {d: sum(link.count(d) for link in devices) for link in devices for d in link}
-        self.assertEqual({"ScratchStation": 2, "HwPeer": 2, "HwMp": 2}, degree)  # Three devices, three links, two each: one ring.
-        managers = [path for path in q.interfaces(run) if path.startswith(run.base + "ScratchStation/")]
-        self.assertEqual(1, len(managers))
-        self.assertEqual({d for link in devices for d in link}, {path[len(run.base):].split("/")[0] for path in q.interfaces(run)})
+        for names in (ENGLISH, GERMAN):
+            run = fixture_run(names)
+            # The CPU 1214C (one port) leaves the line; the IM 155-5's Port_2 then takes the scratch CPU's freed Port_1.
+            links = [q.family_ports(run)["HwMp"], tuple(q.ports(run, 2)), q.ring_ports(run)]
+            ends = [port for link in links for port in link]
+            self.assertEqual(len(ends), len(set(ends)), "a port is linked twice")
+            self.assertIn(q.family_ports(run)["Hw1200"][1], q.ring_ports(run))
+            devices = [tuple(port[len(run.base):].split("/")[0] for port in link) for link in links]
+            degree = {d: sum(link.count(d) for link in devices) for link in devices for d in link}
+            self.assertEqual({"ScratchStation": 2, "HwPeer": 2, "HwMp": 2}, degree)  # Three devices, three links, two each: one ring.
+            managers = [path for path in q.interfaces(run) if path.startswith(run.base + "ScratchStation/")]
+            self.assertEqual(1, len(managers))
+            self.assertEqual({d for link in devices for d in link}, {path[len(run.base):].split("/")[0] for path in q.interfaces(run)})
+        self.assertEqual(["/projects/P/devices/ScratchStation/items/ScratchPLC/items/PROFINET%20interface_1", "/projects/P/devices/HwPeer/items/HwPeerCpu/items/PROFINET%20interface_1",
+                          "/projects/P/devices/HwMp/items/HwMpHead/items/PROFINET%20interface"], q.interfaces(fixture_run(ENGLISH)))
+        self.assertEqual("/projects/P/devices/HwMp/items/HwMpHead/items/PROFINET-Schnittstelle/items/Anschluss_2", q.ring_ports(fixture_run(GERMAN))[0])
 
     def ring(self, refused=()):
         """ring() with mrp/link stubbed; refused names the (device, domain) role changes V21 refuses."""
-        run = q.Run.__new__(q.Run)
-        run.base, run.current, calls = "/projects/P/devices/", {"view": {}}, []
+        run, calls = fixture_run(), []
         run.h = type("H", (), {"report": {}})()
         def mrp(run_, interface, role, domain=None, create=False, restore=False):
             calls.append(("mrp", interface.split("/")[4], role, domain, create, restore))
@@ -103,8 +167,7 @@ class HardwareChangeTests(unittest.TestCase):
                     run.apply("step", "network_mrp_set", {}, boundary=True)
 
     def test_shared_device_reports_whether_it_applied(self):
-        run = q.Run.__new__(q.Run)
-        run.base, calls = "/projects/P/devices/", []
+        run, calls = fixture_run(), []
         for result, expected in (({"changeId": "c"}, True), (None, False)):
             run.apply = lambda *args, result=result, **kwargs: calls.append(kwargs["removed"]) or result
             self.assertIs(expected, q.shared_device(run))
@@ -128,8 +191,8 @@ class HardwareChangeTests(unittest.TestCase):
                     q.profile_gates(run, identifier)
 
     def test_restore_slice_restores_each_topology_change_the_full_run_lacks(self):
-        calls, run = [], q.Run.__new__(q.Run)
-        run.base, run.current, run.coverage = "/projects/P/devices/", {"view": {}}, {}
+        calls, run = [], fixture_run()
+        run.coverage = {}
         run.h = type("H", (), {"report": {}, "args": None})()
         run.expect = lambda ok, label, message, detail=None: calls.append(("expect", bool(ok)))
         def record(name, result=None):
@@ -192,20 +255,20 @@ class HardwareChangeTests(unittest.TestCase):
                 return operation()
             def tool(self, name, arguments):
                 return {"entries": [{"typeIdentifier": "GSD:GSDML-V2.43-SIEMENS-TIAMCPIDEVICE.XML/D/DAP1", "typeName": "TiaMcpIDevice"}]}
-        run = q.Run.__new__(q.Run)
-        run.h, run.base, calls = Fake(), "/projects/P/devices/", []
+        run, calls = fixture_run(), []
+        run.h = Fake()
         interface = run.base + "HwGsd/items/HwGsdHead/items/PROFINET%20interface"
         def apply(label, kind, payload, preview=None, shown=None, plc=None, **expected):
             calls.append((kind, payload))
             if kind == "hardware_add":  # The added device shows its head and interface in the next state.
-                run.current = {"view": {"hw:" + run.base + "HwGsd/items/HwGsdHead": {"network": None},
+                run.current = {"view": {**run.current["view"], "hw:" + run.base + "HwGsd/items/HwGsdHead": {"network": None},
                                         "hw:" + interface: {"network": {"ioConnectors": [{}], "nodes": [{"name": "X1"}]}}}}
-        run.apply, run.current = apply, {"view": {}}
+        run.apply = apply
         q.gsd_device(run)
         self.assertEqual(["hardware_add", "network_configure", "network_io_assign"], [kind for kind, _ in calls])
         self.assertEqual(interface, calls[1][1]["hardwarePath"])
         self.assertEqual({"hardwarePath": interface, "connectorIndex": 0, "controllerIndex": 0,
-                          "controllerHardwarePath": run.base + "HwPeer/items/HwPeerCpu/items/PROFINET%20interface_1"}, calls[2][1])
+                          "controllerHardwarePath": run.base + "HwPeer/items/HwPeerCpu/items/PROFINET-Schnittstelle_1"}, calls[2][1])
         self.assertNotIn("gsdNotInstalled", run.h.report)
         self.assertEqual(interface, run.h.report["gsdDevice"]["hardwarePath"])
 
@@ -276,36 +339,142 @@ class HardwareChangeTests(unittest.TestCase):
         self.assertIs(q.LIMITATIONS, q.heading(type("A", (), {"slice": None, "discover": False})())[1])
 
     def test_gsd_device_restores_its_assignment_once_before_applying_it(self):
-        run = q.Run.__new__(q.Run)
-        run.h, run.base, calls = type("H", (), {"report": {}})(), "/projects/P/devices/", []
+        run, calls = fixture_run(), []
+        run.h = type("H", (), {"report": {}})()
         interface = run.base + "HwGsd/items/HwGsdHead/items/PROFINET%20interface"
+        port = interface + "/items/Port%201"
         def apply(label, kind, payload, preview=None, shown=None, plc=None, **expected):
             calls.append((label, expected.get("restore", False), expected.get("deferred", False)))
             if kind == "hardware_add":
-                run.current = {"view": {"hw:" + interface: {"network": {"ioConnectors": [{}], "nodes": [{"name": "X1"}]}}}}
-        run.apply, run.current = apply, {"view": {}}
+                run.current = {"view": {**run.current["view"], "hw:" + port: {"network": None}, "hw:" + interface: {"network": {
+                    "ioConnectors": [{}], "nodes": [{"name": "X1"}], "ports": [{"portIndex": 0, "port": {"ownerHardwarePath": port}}]}}}}
+            elif kind == "network_io_assign":
+                # The GSD's ports keep their state on assignment: its head items without them change (hg4).
+                self.assertEqual(["hw:" + interface], expected["changed"](None, run.current["view"])[:-1])
+        run.apply = apply
         q.gsd_device(run, [{"typeIdentifier": "GSD:X/D/DAP1"}], restore=True)
         self.assertEqual([("add GSD device HwGsd", False, True), ("put HwGsd on HwNet", False, True),
                           ("assign HwGsd to HwPeerCpu, restored", True, False), ("assign HwGsd to HwPeerCpu", False, False)], calls)
         self.assertEqual({}, run.h.report.get("gsdCatalog", {}))  # Given rows are not searched again.
 
     def test_network_can_leave_the_scratch_cpu_off_hwnet(self):
-        run, labels = q.Run.__new__(q.Run), []
-        run.base, run.apply = "/projects/P/devices/", lambda label, *a, **k: labels.append(label)
+        run, calls = fixture_run(), []
+        run.apply = lambda label, kind, payload, *a, **k: calls.append((label, payload["hardwarePath"], payload["nodeName"]))
         q.network(run, scratch=False)
         q.network(run)
-        self.assertEqual(["put HwPeerCpu on HwNet", "put HwPeerCpu on HwNet", "put ScratchPLC on HwNet"], labels)
+        peer, scratch = run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET-Schnittstelle_1"), run.path("ScratchStation", "items", "ScratchPLC", "items", "PROFINET-Schnittstelle_1")
+        self.assertEqual([("put HwPeerCpu on HwNet", peer, "X1"), ("put HwPeerCpu on HwNet", peer, "X1"), ("put ScratchPLC on HwNet", scratch, "X1")], calls)
+
+    def test_change_payloads_name_the_items_of_a_german_installation(self):
+        """The rewritten steps, run against the German-named fixture with recording apply and refuse: every payload names the
+        structurally resolved items."""
+        run, calls = fixture_run(), []
+        g = run.path
+        scratch, peer = g("ScratchStation", "items", "ScratchPLC", "items", "PROFINET-Schnittstelle_1"), g("HwPeer", "items", "HwPeerCpu", "items", "PROFINET-Schnittstelle_1")
+        mp, sp = g("HwMp", "items", "HwMpHead", "items", "PROFINET-Schnittstelle"), g("HwSp", "items", "HwSpHead", "items", "PROFINET-Schnittstelle")
+        drive = g("HwDrive", "items", "HwDriveItem", "items", "PROFINET-Schnittstelle")
+        def apply(label, kind, payload, preview=None, shown=None, plc=None, **expected):
+            calls.append((kind, payload, expected))
+            if kind == "hardware_add" and payload["deviceName"] == "HwDrive":
+                run.current["view"]["hw:" + drive] = {"network": {"ioConnectors": [{}], "nodes": [{"name": "X150"}]}}
+            return {"changeId": "c"}
+        run.apply, run.expect = apply, lambda ok, label, message, detail=None: None
+        run.refuse = lambda kind, label, payload, code, **top: calls.append((kind, payload, code)) or {"message": "remainingOwnerPath"}
+        run.h = type("H", (), {"report": {}, "stage": lambda self, name, operation: operation(),
+                               "tool": lambda self, name, arguments: {"entries": [{"typeName": "SINAMICS G120C PN", "typeIdentifier": "OrderNumber:6SL3210-1KE/V4.7"}]}})()
+        q.plug(run, "HwDi", 2)
+        q.plug(run, "HwSm", 2, q.S1200, q.SM)
+        q.plug(run, "MpDi", 2, q.MP, changed=q.timing(run, q.MP))
+        self.assertEqual([g("ScratchStation", "items", "Profilschiene_0"), g("Hw1200", "items", "Baugruppentr%C3%A4ger_0"), g("HwMp", "items", "Profilschiene_0")],
+                         [payload["hardwarePath"] for _, payload, _ in calls])
+        self.assertEqual(["hw:" + mp], calls[-1][2]["changed"])
+        calls.clear()
+        q.station(run)
+        (_, added, _), (_, configured, _), (_, assigned, expected) = calls
+        self.assertEqual((mp, "IE1"), (configured["hardwarePath"], configured["nodeName"]))
+        self.assertEqual((mp, peer), (assigned["hardwarePath"], assigned["controllerHardwarePath"]))
+        self.assertIn("hw:" + mp + "/items/Anschluss_2", expected["changed"])
+        calls.clear()
+        q.mrp(run, scratch, "Manager")
+        tolerated = calls[0][2]["tolerated"]
+        self.assertTrue(tolerated("changed", "hw:" + scratch + "/items/Anschluss_1"))
+        self.assertFalse(tolerated("changed", "hw:" + peer + "/items/Anschluss_1"))
+        calls.clear()
+        q.topology_refusals(run)
+        self.assertEqual({sp, scratch, peer, g("ScratchStation", "items", "HwDi"), g("Hw1200", "items", "Hw1200Cpu", "items", "PROFINET-Schnittstelle_1"), g("HwSp", "items", "SpDi3")},
+                         {payload["hardwarePath"] for _, payload, _ in calls})
+        calls.clear()
+        q.third_share(run)
+        self.assertEqual((sp, g("HwThird", "items", "HwThirdCpu", "items", "PROFINET-Schnittstelle_1")), (calls[0][1]["hardwarePath"], calls[0][1]["controllerHardwarePath"]))
+        calls.clear()
+        q.shared_disconnect_to_third(run)
+        self.assertIn("hw:" + scratch, calls[-1][2]["changed"])
+        calls.clear()
+        q.drive_device(run)
+        self.assertEqual([(drive, "X150"), (drive, peer)], [(calls[1][1]["hardwarePath"], calls[1][1]["nodeName"]), (calls[2][1]["hardwarePath"], calls[2][1]["controllerHardwarePath"])])
+
+    def test_other_runners_resolve_the_rail_display_and_interface(self):
+        run, payloads = fixture_run(), []
+        rail, cpu = run.path("ScratchStation", "items", "Profilschiene_0"), run.path("ScratchStation", "items", "ScratchPLC")
+        # qualify_composite_rebind: the encoder module goes into the scratch station's rail.
+        module = run.path("ScratchStation", "items", "Enc")
+        def apply(label, kind, payload, preview=None, **expected):
+            payloads.append(payload)
+            run.current["view"]["hw:" + module] = {"channels": [{"type": "Technology", "ioType": "Complex", "number": 0}]}
+        run.apply = apply
+        self.assertEqual(module, cr.plug(run, "Enc", 2))
+        self.assertEqual(rail, payloads[-1]["hardwarePath"])
+        # qualify_motion_connections: the TM module goes into the rail read from hardware_inspect rows.
+        class Stop(Exception):
+            pass
+        def plugged(kind, payload):
+            payloads.append(payload)
+            raise Stop()
+        motion = mc.Run.__new__(mc.Run)
+        motion.base, motion.items = run.base, lambda prefix: hardware_paths.rows(run.current["view"])
+        motion.h = type("H", (), {"apply": lambda self, kind, payload: plugged(kind, payload)})()
+        with self.assertRaises(Stop):
+            mc.fixture(motion)
+        self.assertEqual((rail, rail), (motion.rail, payloads[-1]["hardwarePath"]))
+        # qualify_gsd_export: the CPU display (its display attributes) and the interface, from the baseline snapshot.
+        run.raw = {**hardware_paths.rows(run.current["view"]), cpu + "/items/CPU-Display_1": {"path": cpu + "/items/CPU-Display_1", "attributes": [{"name": "DisplayProtection"}]}}
+        refused = []
+        stubs = {"refuse_export": lambda run_, label, payload, codes: refused.append(payload["hardwarePath"]), "exportable": lambda run_: [],
+                 "mode_uncompiled": lambda *a: None, "area": lambda *a, **k: None}
+        saved = {name: getattr(gs, name) for name in stubs}
+        run.h, run.refuse = type("H", (), {"report": {}, "stage": lambda self, name, operation: operation()})(), lambda *a, **k: None
+        run.apply = lambda label, kind, payload, **expected: payloads.append(payload)
+        interface = q.interface(run, q.SCRATCH)
+        try:
+            for name, stub in stubs.items():
+                setattr(gs, name, stub)
+            with self.assertRaises(AssertionError):  # No item reports gsdExportAvailable with the stubs: phase_a stops there.
+                gs.phase_a(run, cpu, interface)
+        finally:
+            for name, original in saved.items():
+                setattr(gs, name, original)
+        self.assertEqual([interface + "X", cpu + "/items/CPU-Display_1", interface], refused[:3])
+        self.assertEqual({"hardwarePath": cpu + "/items/PROFINET-Schnittstelle_1", "nodeName": "X1", "subnetName": "GsdNet"}, payloads[-1])
+
+    def test_connection_ends_resolve_both_interfaces_and_nodes(self):
+        for names in (ENGLISH, GERMAN):
+            run = fixture_run(names)
+            cpu, peer = run.path("ScratchStation", "items", "ScratchPLC"), run.path("HwPeer", "items", "HwPeerCpu")
+            self.assertEqual((cpu, peer, cpu + "/items/" + names["cpu"], peer + "/items/" + names["cpu"]), qc.ends(run))
+            self.assertEqual(["X1", "X1"], qc.nodes(run))
 
     def test_rack_is_the_one_root_item_beside_the_head(self):
-        run = q.Run.__new__(q.Run)
-        run.base = "/projects/P/devices/"
+        for names in (ENGLISH, GERMAN):
+            run = fixture_run(names)
+            self.assertEqual(run.path("HwSp", "items", names["rail"]), q.rack(run, q.SP))
+            self.assertEqual(run.path("Hw1200", "items", names["rack"]), q.rack(run, q.S1200))
         row = lambda slot, kind="None": {"positionNumber": slot, "classification": kind}
-        run.current = {"view": {"hw:/projects/P/devices/HwSp/items/Rail_0": row(0), "hw:/projects/P/devices/HwSp/items/HwSpHead": row(0),
-                                "hw:/projects/P/devices/HwSp/items/Rail_0/items/X": row(0), "hw:/projects/P/devices/HwSp/items/Srv": row(4)}}
-        self.assertEqual("Rail_0", q.rack(run, "HwSp", "HwSpHead"))
-        run.current["view"]["hw:/projects/P/devices/HwSp/items/Rail_1"] = row(0)
+        run.current["view"].update({"hw:/projects/P/devices/HwSp/items/HwSpHead": row(0), "hw:/projects/P/devices/HwSp/items/Profilschiene_0/items/X": row(0),
+                                    "hw:/projects/P/devices/HwSp/items/Srv": row(4)})
+        self.assertEqual(run.path("HwSp", "items", "Profilschiene_0"), q.rack(run, q.SP))  # Not the head, a nested item or a module.
+        run.current["view"]["hw:/projects/P/devices/HwSp/items/Profilschiene_1"] = row(0)
         with self.assertRaises(AssertionError):
-            q.rack(run, "HwSp", "HwSpHead")
+            q.rack(run, q.SP)
 
     def test_discovery_records_instead_of_failing(self):
         class Fake:
@@ -356,8 +525,8 @@ class HardwareChangeTests(unittest.TestCase):
 
     def slice_run(self, stubs, coverage=None, report=None):
         """refusal_slice with stubbed steps: the recorded calls (name, string args, restore) and the final gate."""
-        calls, run = [], q.Run.__new__(q.Run)
-        run.base, run.current, run.coverage = "/projects/P/devices/", {"view": {}}, coverage if coverage is not None else {}
+        calls, run = [], fixture_run()
+        run.coverage = coverage if coverage is not None else {}
         run.h = type("H", (), {"report": dict(report or {}), "args": None})()
         run.expect = lambda ok, label, message, detail=None: calls.append(("expect", bool(ok)))
         def record(name, result=None):
@@ -401,17 +570,21 @@ class HardwareChangeTests(unittest.TestCase):
         self.assertEqual(("expect", False), calls[-1])
 
     def test_sp_station_assigns_to_its_own_plc_and_creates_the_io_system(self):
-        run, calls = q.Run.__new__(q.Run), []
-        run.base = "/projects/P/devices/"
-        head, interface = run.hw("HwSp", "items", "HwSpHead"), run.hw("HwSp", "items", *q.SP.interface)
-        run.current = {"view": {interface: {"name": "PROFINET interface", "network": {"nodes": [{"name": "X1"}]}}, head: {"attributes": {"Author": "a"}},
-                                "hw:/projects/P/devices/HwSp/items/Rack_0": {"positionNumber": 0, "classification": "None"}}}
+        run, calls = fixture_run(), []
+        run.current["view"][run.hw("HwSp", "items", "HwSpHead")]["attributes"] = {"Author": "a"}
         run.apply = lambda label, kind, payload, preview=None, shown=None, plc=None, **expected: calls.append((label, kind, payload, preview, shown, plc, expected))
         q.sp_station(run, q.SP2, q.OTHER_IO)
         label, kind, payload, preview, shown, plc, expected = calls[2]
         owner = run.path("ScratchStation", "items", "ScratchPLC")
         self.assertEqual(("assign HwSp to ScratchPLC", "network_io_assign"), (label, kind))
-        self.assertEqual((owner + "/items/PROFINET%20interface_1", q.OTHER_IO), (payload["controllerHardwarePath"], payload["createIoSystemName"]))
+        self.assertEqual((run.path("HwSp", "items", "HwSpHead", "items", "PROFINET-Schnittstelle"), owner + "/items/PROFINET-Schnittstelle_1", q.OTHER_IO),
+                         (payload["hardwarePath"], payload["controllerHardwarePath"], payload["createIoSystemName"]))
+        # The German interface name selects the German server module; the rack is the head's rail.
+        self.assertEqual(("Servermodul_1", run.path("HwSp", "items", "Profilschiene_0")),
+                         (payload["expectedServerModule"]["name"], payload["expectedServerModule"]["containerHardwarePath"]))
+        # The head's ports sit on its BusAdapter and change with the assignment.
+        adapter = ["hw:" + run.path("HwSp", "items", "BA%202xRJ45", "items", "Anschluss_%d" % n) for n in (1, 2)]
+        self.assertEqual(adapter, [key for key in expected["changed"](None, run.current["view"]) if "BA%202xRJ45" in key])
         self.assertEqual((owner, q.scratch_plc(run), q.OTHER_IO), (shown["addressControllerOwnerPath"], plc, preview["effects"][0]["afterIoSystem"]))
         own = [q.constant(run, q.SP2, "Local~" + q.OTHER_IO), q.constant(run, q.SP2, "HwSpHead~HwSpHead")]
         state = dict.fromkeys(own + [q.constant(run, q.SP, "HwSpHead~HwSpHead")], 1)
@@ -422,8 +595,8 @@ class HardwareChangeTests(unittest.TestCase):
         self.assertEqual(q.IO_SYSTEM, calls[2][3]["effects"][0]["afterIoSystem"])
 
     def test_link_refusals_refuse_both_ways_around_the_ring_roles(self):
-        run, calls = q.Run.__new__(q.Run), []
-        run.base, run.h = "/projects/P/devices/", type("H", (), {"report": {}, "args": None})()
+        run, calls = fixture_run(), []
+        run.h = type("H", (), {"report": {}, "args": None})()
         texts = {"a ring role on a port linked to a non-ring port": "A/P2 would be a ring port while linked to B/P2, which is not a ring port; ...",
                  "NotInRing on a port linked to a ring port": "B/P2 would leave the ring while linked to A/P2, a ring port; ..."}
         run.refuse = lambda kind, label, payload, code: calls.append(("refuse", payload["role"], code)) or {"message": texts[label]}
@@ -443,16 +616,17 @@ class HardwareChangeTests(unittest.TestCase):
         self.assertEqual([("expect", False)], calls)
 
     def test_shared_disconnect_names_the_shared_connector_and_both_owners(self):
-        run, calls = q.Run.__new__(q.Run), []
-        run.base = "/projects/P/devices/"
+        run, calls = fixture_run(), []
         proxy = q.constant(run, q.SCRATCH, "HwSpHead~Proxy")
-        run.current = {"view": {proxy: 1, q.constant(run, q.SCRATCH, "Local~" + q.SHARED_IO): 1}}
+        run.current["view"].update({proxy: 1, q.constant(run, q.SCRATCH, "Local~" + q.SHARED_IO): 1})
         run.apply = lambda label, kind, payload, preview=None, shown=None, plc=None, **expected: calls.append((payload, preview, shown, plc, expected)) or {"changeId": "c"}
         self.assertTrue(q.shared_disconnect(run))
         payload, preview, shown, plc, expected = calls[0]
         module, peer = run.path("HwSp", "items", "SpDi3"), run.path("HwPeer", "items", "HwPeerCpu")
         # SpDi3, assigned to the leaving scratch CPU, goes back to HwPeerCpu in the same change (rd1: else the compile fails).
-        self.assertEqual({"hardwarePath": run.path("HwSp", "items", *q.SP.interface), "connectorIndex": 1, "disconnect": True, "sharedDevice": True, "sharedSubmodules": [module]}, payload)
+        self.assertEqual({"hardwarePath": run.path("HwSp", "items", "HwSpHead", "items", "PROFINET-Schnittstelle"), "connectorIndex": 1, "disconnect": True, "sharedDevice": True,
+                          "sharedSubmodules": [module]}, payload)
+        self.assertIn("hw:" + run.path("ScratchStation", "items", "ScratchPLC", "items", "PROFINET-Schnittstelle_1"), expected["changed"])
         self.assertEqual([{"hardwarePath": module, "assignmentTargetBefore": run.path("ScratchStation", "items", "ScratchPLC"), "assignmentTargetAfter": peer}],
                          preview["effects"][0]["sharedSubmodules"])
         self.assertEqual([peer], shown["sharedAddressControllerOwnerPaths"])
@@ -461,18 +635,19 @@ class HardwareChangeTests(unittest.TestCase):
         self.assertIs(run.b0, run.current)
 
     def test_second_project_stations_must_be_complementary(self):
-        def station(base, accesses, external):
+        def station(base, accesses, external, interface):
             prefix = "hw:" + base + "HwSp/items/"
             view = {prefix + name: {"typeIdentifier": "T", "positionNumber": slot, "attributes": {"SharedDeviceAccessType": access}}
                     for (name, slot), access in zip((("SpDi3", 1), ("SpDi", 2), ("SpDi4", 3)), accesses)}
-            view[prefix + "HwSpHead/items/PROFINET%20interface"] = {"attributes": {"NumberOfExternalIoControllers": external}}
+            view[prefix + "HwSpHead/items/" + interface] = {"attributes": {"NumberOfExternalIoControllers": external}, "network": {"nodes": [{"name": "X1"}]}}
             return view
-        first = ("/projects/A/devices/", station("/projects/A/devices/", ("PLC", "PLC", "OutsideOfProject"), 1))
+        # Each project's interface is resolved in its own view: here the first is named in English, the second in German.
+        first = ("/projects/A/devices/", station("/projects/A/devices/", ("PLC", "PLC", "OutsideOfProject"), 1, ENGLISH["head"]))
         for accesses, external, ok in ((("OutsideOfProject", "OutsideOfProject", "PLC"), 2, True), (("OutsideOfProject", "PLC", "PLC"), 2, False),
                                        (("OutsideOfProject", "OutsideOfProject", "PLC"), 1, False)):
             run = q.Run.__new__(q.Run)
             run.base, run.h = "/projects/B/devices/", type("H", (), {"report": {}, "stage": lambda self, name, operation: operation()})()
-            run.current = {"view": station(run.base, accesses, external)}
+            run.current = {"view": station(run.base, accesses, external, GERMAN["head"])}
             if ok:
                 q.complementary(run, first)
                 self.assertEqual([1, 2], run.h.report["secondProject"]["externalIoControllers"])
@@ -481,17 +656,22 @@ class HardwareChangeTests(unittest.TestCase):
                     q.complementary(run, first)
 
     def test_address_change_can_require_a_moved_start(self):
-        for moved, after, ok in ((True, 4, True), (True, 0, False), (False, 0, True)):
-            run, checks = q.Run.__new__(q.Run), []
-            run.base, run.h = "/projects/P/devices/", type("H", (), {"report": {}, "stage": lambda self, name, operation: operation(),
-                                                                     "tool": lambda self, name, arguments: {"entries": [{"typeIdentifier": "W", "articleNumber": "6ES7 521-1BL00", "typeName": "DI 32x24VDC HF"}]}})()
+        for (moved, after, ok), names in zip(((True, 4, True), (True, 0, False), (False, 0, True)), (ENGLISH, GERMAN, GERMAN)):
+            run, checks, created = fixture_run(names), [], []
+            run.h = type("H", (), {"report": {}, "stage": lambda self, name, operation: operation(),
+                                   "tool": lambda self, name, arguments: {"entries": [{"typeIdentifier": "W", "articleNumber": "6ES7 521-1BL00", "typeName": "DI 32x24VDC HF"}]}})()
             module = run.path("ScratchStation", "items", "HwDi")
-            run.current = {"view": {"hw:" + module: {"addresses": [{"ioType": "Input", "startAddress": 0, "length": 16}]}}}
-            tag = q.scratch_plc(run) + "/tags/Default%20tag%20table/tags/HwInput"
+            run.current["view"]["hw:" + module] = {"addresses": [{"ioType": "Input", "startAddress": 0, "length": 16}]}
+            tag = q.scratch_plc(run) + "/tags/" + names["table"] + "/tags/HwInput"
             run.refuse = lambda *a, **k: {"details": {"referencedTags": [{"path": tag}]}}
             run.expect = lambda ok_, *a, **k: None
-            run.apply = lambda label, kind, payload, preview=None, shown=None, plc=None, **expected: checks.append(expected.get("check"))
+            def apply(label, kind, payload, preview=None, shown=None, plc=None, **expected):
+                checks.append(expected.get("check"))
+                created.append((payload.get("tagTableName"), expected.get("added")))
+            run.apply = apply
             q.address_change(run, moved)
+            # English: the literal table name and path the runner used; German: the table holding the system constants.
+            self.assertEqual((unquote(names["table"]), ["member:" + tag]), created[0])
             applied = {"readbacks": [{"role": "hardware-replace-inventory", "addressMap": [{"changed": True}],
                                       "changedReferencedTags": [{"path": tag, "startAddress": 0, "rangeAfter": {"startAddress": after}}]}]}
             if ok:

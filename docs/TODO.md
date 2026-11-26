@@ -51,21 +51,22 @@ data silently and come first.
   and a worker build against the installed V21 assemblies only; its native run is in the
   [25 November box](#audit-follow-ups-25-november).
 - [x] **P2 — PLCSIM TCP/IP dead end:** `sim_status` reports `tcpIpReady`, adapters and remediation (14 November); the mode stays an operator step until the switch tool below exists: on 25 November the maintainer decided to build an explicit, acknowledged one ([decisions](#decisions-for-the-maintainer)). `sim_create` now reports `controllerAddresses` (filled after the download) and the lifecycle. `sim_create` refuses with `TcpIpModeRequired` (`SimulationNetworkAdmission.cs`) and `sim_status` reports only `networkMode`. The PLCSIM V8 API has a public `SimulationRuntimeManager.NetworkMode` setter; the adapter never changes it by policy. Report `tcpIpReady`, adapters and addresses and the exact Control Panel step; decide whether an explicit, acknowledged mode switch tool is wanted. Return the instance's IP, subnet and adapter from `sim_create`.
-- [ ] **PLCSIM network-mode switch tool:** decided on 25 November ([decisions](#decisions-for-the-maintainer)): build an explicit,
-  acknowledged tool that switches PLCSIM V8's network mode (public `SimulationRuntimeManager.NetworkMode` setter),
-  which the adapter so far never changes. Open: the implementation (in progress) and its native qualification on an
-  owned machine where switching the machine-wide mode is acceptable, since the mode applies to every PLCSIM instance
-  on that machine.
+- [x] **PLCSIM network-mode switch tool:** decided on 25 November ([decisions](#decisions-for-the-maintainer)) and built:
+  `sim_network_mode_set` (public `SimulationRuntimeManager.NetworkMode` setter). Natively qualified on 26 November as a
+  standard user (`local.plcsim.network-mode.20261126`, [record](verification/native-runs-20261126.md)); the administrator leg is under its native-run
+  box below.
 - [x] **P3 — HMI row shapes differ by section:** every row now carries top-level `path`, `kind`, `name` and `identity` (follow-up). `screens` rows carry `path: null` with the path under `identity.objectPath` and null `Width`/`Height`; `model` rows carry a top-level `path`. Give every row top-level `path`, `kind`, `name`, `identity` and `attributes`.
 - [x] **P3 — Counts:** done on 16 November: `nodeCount` is the distinct object nodes of the saved review's model (the model is re-exported after relationship observation, so the two agree); the result carries `nodeCountScope`, and the [review guide](guides/project-reviews.md#capture-and-compare) explains `nodeCount` versus `visited`.
 - [x] **P3 — `readbackVerified` milestones:** the milestone carries a `reason` (follow-up); the content readback for `block_import_xml` is the open box below. Earlier text: `block_import_xml` records only an existence check, so it reports `notRecorded` where HMI item creation reports `done` (`ChangeMilestoneRules.cs`). Use `performed`/`notApplicable`/`notRecorded` with a reason, or add a content readback to the import.
-- [ ] **P3 — Content readback for `block_import_xml`:** reopened from the box above on 24 November. The import
-  still checks only that the imported objects exist, inside the write, so an applied `block_import_xml` reports its
-  `readbackVerified` milestone as `notRecorded` (now with a reason, `ChangeMilestoneRules.cs`). Add a content readback
-  of the imported blocks so the milestone can report `done`. Looked at on 25 November and left open: the readback has to
-  compare the supplied XML with TIA's re-export, which TIA normalizes, and no normalizer for block XML is qualified;
-  a rule written without a native run would either fail valid imports or report `done` wrongly. It needs a native
-  session on an owned scratch (LAD, FBD, SCL and a DB) to derive the rule.
+- [x] **P3 — Content readback for `block_import_xml`:** done on 26 November. Native exports on an owned scratch
+  (`scripts/probe_block_import_readback.py`) showed that TIA's re-export of its own export differs only in
+  `DocumentInfo`, and a supplied document additionally lacks the empty Title/Comment texts TIA adds. After compile the
+  import now exports each block again and compares it with `EngineeringSources.ImportedBlockDifference` (provenance,
+  empty multilingual texts, whitespace in `ObjectList`, formatting and ID numbering ignored): equal reports
+  `readbackVerified` `done`, a difference is recorded in the `block-import-content` readback and leaves it
+  `notRecorded` without failing the change (`local.block-import.readback.20261126`, [record](verification/native-runs-20261126.md)). Verified for an
+  SCL FC, an optimized DB and LAD/FBD FBs; STL, GRAPH, instance and standard-access DBs, protected blocks and supplied
+  documents with non-empty texts are not exercised.
 - [x] **P3 — Evidence size:** done on 16 November: `change_prepare`, `change_apply` and `change_status` take `detail` (`summary` default, `standard`, `full`); `standard` is the full view with every HMI preservation artifact map reduced to `artifactCount` and `artifactsSha256`, the manifests keep the paths. The default summary never carried the maps; `includeDetails: true` stays the full view for the qualification runners, which read it.
 - [x] **P3 — Opaque payload schemas:** `contracts/change-kinds.v1.json` lists every kind's documented payload fields and every contract is a `tia://contracts/{name}` resource (14 November). Full per-kind JSON Schemas followed on 16 November: [`change-payloads.v1.schema.json`](../contracts/change-payloads.v1.schema.json) (111 inline, 28 pointing to the HMI, library and typed graphical contracts) as `tia://change-payloads/{kind}`, derived from the worker parsers and audited against them (75 audit payloads, `scripts/tests/test_change_payload_schemas.py`, and 151 distinct payloads the worker accepted in retained journals; the only mismatches were the retired `safety_drive_tags` `tags` form). Undetermined constraints were left out. `change_prepare` already said `hmi_screen_create` covers `item_create`.
 - [x] **P3 — HMI model size:** `excludeSystem`, `rowMode: "compact"` and `sectionContentSha256` added (14 November). Earlier text: a near-empty Unified HMI returns 134 model rows (184 KB for page 1), mostly system tags, text lists and thresholds. Add `excludeSystem`, a compact or hash-only row mode, `totalItems`, a larger page limit and an aggregate content hash at HMI scope. 16 November (offline): `page` at the top of every result (limits, payload bytes, `stoppedBy`), a page limit up to 1000, and an explicit `target.kind` that does not belong to the section is refused before the capture.
@@ -83,11 +84,11 @@ data silently and come first.
 - [x] **Graphical block recovery route:** natively on 14 November an inconsistent LAD block (a global operand that does not exist) refused the SimaticML export and has no generated source, but `block_read format=simaticSd` (`ExportAsDocuments`) exported it with the unresolved operand and left it unchanged. The XML refusal now names that route. Not an Openness gap. Repairing the block still goes through an explicit tag change; no route edits the SIMATIC SD document back in yet.
 - [x] **Batch `call_parameter_set` and the graphical edits:** done on 14 November for `call_parameter_set`, `graphical_operand_set`, `graphical_network_patch` and `graphical_network_insert` (one block per item, per-item readback); natively checked with two LAD blocks. `graphical_typed_edit` and `graph_import` keep their own readbacks and are not batched.
 - [x] **Paging fields and schema depth (16 November leftovers):** done on 25 November: `examples` for 88 of the 111 inline change payload schemas (the other 23 are listed with reasons in `scripts/tests/test_change_payload_schemas.py`) and per-section request rules in `hmi-inspection.v1.schema.json` (`scripts/tests/test_hmi_inspection_sections.py`). The [surface redesign](#audit-follow-ups-25-november) settled the request side: every pager takes `offset` and `count` and returns `nextOffset` ([conventions](reference/mcp-surface.md#parameter-conventions)), and `review_list`/`review_page` apply one limit to every record kind. Done on 26 November (offline tests only): every item pager returns `totalItems` and `pageCount` beside its own total field, null where that total is partial; the output schemas declare both as optional and the surface baseline was re-cut without a breaking change ([conventions](reference/mcp-surface.md#parameter-conventions)). Byte-range readers (`artifact_read`, `review_artifact_read`, `vci_file_read`, `artifact_upload_chunk`) are excluded, and `hmi_inspect` keeps the fields it already had. The worker pagers passed natively on 26 November (`local.paging.worker-pagers.20261126`, `scripts/qualify_paging_native.py`): project model search and project index query at 5 per page (23 rows, 5 pages), an empty search with 0 and 0, `library_query` and `hmi_references` on an HmiSeeder baseline; the null totals are covered offline only. Original item: add `totalItems` and `pageCount` beside each paged family's own total field (`total`, `totalMatches`, `totalRows`, ...; additive, so existing clients keep working); add `examples` to the change payload schemas; give `hmi-inspection.v1.schema.json` per-section rules (which fields each section takes).
-- [ ] **Native run of the worker paging totals (26 November):** `totalItems`/`pageCount` from `hmi_references` (also with
-  a budget-cut traversal: both null), `library_query` (also `uses` with `completeness.truncated`: both null) and the
-  `project_model` search/children and `project_index` pages are covered by offline tests only; one run each on an owned
-  scratch project.
-- [ ] **Native runs of the 16 November worker changes:** each is covered by offline tests only and needs one run on an owned scratch project: `hmi_inspect` `page` and the early `target.kind` refusal (also the early HMI change `target.kind` refusal); `ProjectLocked` with a second Portal holding the project and `tia_session_status` `portals`; a failed `simulation_download` before and after its claim (`ticketState`); and the stale change-directory sweep.
+- [x] **Native run of the worker paging totals (26 November):** run natively on 26 November (`local.paging.worker-pagers.20261126`,
+  `scripts/qualify_paging_native.py`): `project_model` search and `project_index` query at 5 per page (23 rows in 5 pages),
+  an empty search with 0 and 0, `library_query` and `hmi_references` on an HmiSeeder baseline. The null totals (a
+  budget-cut `hmi_references` traversal, a truncated `library_query` `uses`) stay covered by offline tests only.
+- [x] **Native runs of the 16 November worker changes:** run on 26 November (`local.followups.native.20261126`, [record](verification/native-runs-20261126.md#follow-up-checks)); each was covered by offline tests only and needed one run on an owned scratch project: `hmi_inspect` `page` and the early `target.kind` refusal (also the early HMI change `target.kind` refusal); `ProjectLocked` with a second Portal holding the project and `tia_session_status` `portals`; a failed `simulation_download` before and after its claim (`ticketState`); and the stale change-directory sweep.
 
 Kept as they are (the user's "worked well" list): strict `projectCopyId`/`sessionGeneration` and stale-revision checks, the HMI engineering gate with readback, compile/save milestones and checkpoints, typed `hmi_inspect` attributes with per-item `contentSha256`, `project-review.v1` with its content-hash ID, and the simulator tool breadth.
 
@@ -112,7 +113,7 @@ The worker changes below are covered by offline tests only.
 - [x] **P3 — No source commit in `host_build_identity`:** isolated builds record `sourceCommit` and `sourceTreeDirty`, bundle manifests carry them and `host_build_identity` reports them under `bundle` (null with a note for older bundles) (18 November).
 - [x] **P3 — `block_read` inline XML:** already capped at 64 KiB with `includeXml` on main before this feedback; nothing to do.
 - [x] **Golden-path integration run for a protected scratch CPU:** passed natively on 18 November ([record](verification/v090-feedback-20261118.md)): create, download, `project_save`, provisioning with the user's first-use TLS authorization, RUN, reads, writes and a `sim_test` scenario (`scripts/validate_simulation.py --golden-path-checks`), plus the refused-TLS path through `simulation_provision_status` and `simulation_provision_recover` (`scripts/probe_feedback_20261118.py`).
-- [ ] **Native runs of the 18 November worker changes:** run on 18 November ([record](verification/v090-feedback-20261118.md)): `project_save` (saved, nothing to save, refused while held), the `simulation_download` save fields, `projectSave` in change results, `project_inventory` `meaning`, the `LoadableProvider` probe on a CPU 1511, quoted symbols through `sim_read` and `sim_test`, `plcsimRegistrations` on detach, `simulation_provision_status` and `simulation_provision_recover` on a really held attempt. Still open: `SimulationRegistrationsPresent` details, a `sim_write_signals` batch with both spellings of one tag, the probe on a CPU 1518, and `host_build_identity` from an installed package. Matrix rows `project_save` (X01), `simulation_provision_status` and `simulation_provision_recover` (L03) stay unqualified (6 open cells): the record covers each of them once, but it is a probe of Debug builds whose reports (`artifacts/n18b`, `artifacts/n18c`) were not found in the main checkout's `artifacts/` or in another worktree on 24 November; if they are gone, binding needs a rerun whose reports are kept and curated (`scripts/curate_evidence.py`). The matrix was not changed.
+- [x] **Native runs of the 18 November worker changes:** run on 18 November ([record](verification/v090-feedback-20261118.md)): `project_save` (saved, nothing to save, refused while held), the `simulation_download` save fields, `projectSave` in change results, `project_inventory` `meaning`, the `LoadableProvider` probe on a CPU 1511, quoted symbols through `sim_read` and `sim_test`, `plcsimRegistrations` on detach, `simulation_provision_status` and `simulation_provision_recover` on a really held attempt. The rest ran on 26 November (`local.followups.native.20261126`): `SimulationRegistrationsPresent` details, a `sim_write_signals` batch with both spellings of one tag (refused), and the `LoadableProvider` probe on an added CPU 1518; `host_build_identity` of the installed 23 November package reported its bundle, `sourceCommit` and `sourceTreeDirty` the same morning (not curated). Matrix rows `project_save` (X01), `simulation_provision_status` and `simulation_provision_recover` (L03) were bound on 26 November by a curated rerun (`local.platform.lifecycle.20261126`, [record](verification/native-runs-20261126.md)); the 18 November reports (`artifacts/n18b`, `artifacts/n18c`) stay lost.
 - [x] **WinCC Unified runtime alarms:** done on 18 November (offline, scripted GraphQL server): `runtime_unified_credential_binding`, `_connect`, `_alarms` (active and logged), `_alarm_acknowledge`, `_status`, `_disconnect` ([reference](reference/unified-runtime-alarms.md)). Active rows carry the `acknowledge` path (`System::Tag:Alarm`) the server needs, a plain name is refused, languages default to the UMC user's language and never to the server's en-US, fields follow the server's schema, and acknowledging needs `acknowledgeWrite` and a runtime on this PC. The user had seen `activeAlarms.name` (`Alarm_Tag01`) differ from the acknowledge name (`HMI_RT_1::Tag01:Alarm_Tag01`) and an `en-US` filter crash a `de-DE` runtime's GraphQL server.
 - [ ] **Native run of the Unified alarm tools:** blocked on 18 November: the Runtime web server certificate on this PC expired on 27 March 2026 (the tools check validity dates) and no runtime project was running. Needed: on a running Unified PC Runtime project with one alarm: binding, credential CLI, connect (UMC language read), active and logged alarms in de-DE, a filter, acknowledge by path, a plain name refused, and a remote host refused for acknowledge. Matrix rows: the six `runtime_unified_*` rows (X13,
   12 open cells), none with a native record.
@@ -145,7 +146,7 @@ with evidence from an owned fixture.
   a CPU and the download fails with an empty `onlineChallenges`. The challenge does arrive on PLCSIM (owned
   provisioning). Reproduce on an owned bench PLC as part of the real-PLC online access qualification under the 14 November feedback above (B05); if it holds,
   record it as an Openness gap and make the refusal say that no challenge was raised.
-- [ ] **P2 — Download pre-check as data:** the user read the editor's load preview (each entry, its status,
+- [x] **P2 — Download pre-check as data:** the user read the editor's load preview (each entry, its status,
   message and action) from screenshots, and drove the editor with keyboard shortcuts and synthetic clicks, which
   were unreliable. `plc_physical_download` already returns every pre- and post-download prompt with its type,
   message and selection, and configures the PG/PC interface and address (`PhysicalRoute`), but only from a real
@@ -160,7 +161,31 @@ with evidence from an owned fixture.
   `plc_physical_download` already does for a question it does not answer, may stop the download before anything is
   loaded, and that route is untried. Next: on an owned PLCSIM instance (later the bench PLC, B05), abort from the first
   and from a later pre-download callback and check that nothing was loaded; register the gap if the abort loads
-  something or cannot return every pre-download configuration.
+  something or cannot return every pre-download configuration. Runner: `scripts/probe_download_abort.py`
+  (standard-access DB, one fresh owned lifecycle per case, because a refused `simulation_download_online` leaves its
+  change `recovery_required` and blocks further changes on that project; a control download of the same changes shows
+  that the online compare detects a load). Run natively on 26 November ([record](verification/native-runs-20261126.md#download-pre-check-abort)): a
+  layout change of the standard-access DB makes TIA raise `DataBlockReinitialization` as the first pre-download
+  configuration (before `ConsistentBlocksDownload`). Refusing it by throwing a worker exception from the delegate loaded
+  nothing (PLCSIM values, RUN and the watch unchanged) but left the Openness Portal disposed and hid the typed code
+  (twice). The documented `DataBlockReinitializationSelections.NoAction` is refused by V21 ("The configuration provided
+  is invalid"); that Siemens exception ends the download without loading and leaves the Portal usable. Since then
+  `simulation_download_online` and `plc_physical_download` decline a refused `DataBlockReinitialization` that way and
+  report the typed refusal (`SimulationDownloadReinitializationRequired`): nothing loaded, the online compare after the
+  abort ran, and the control download was detected by the compare. A complete run of all three cases on the fixed
+  worker (`artifacts/da6`) gave `noGap` for `first` and `later` and a sensitive control; the probe still reports
+  `inconclusive` because TIA asks `DataBlockReinitialization` before any other question, so an abort at a later
+  callback cannot be provoked with this change set. Answered: a download is stopped from its first pre-download
+  callback before anything is loaded; no Openness gap. Left: `StopModules` (still refused by a worker exception; its
+  `NoAction` is unobserved), a fixture whose refused question comes after an answered one, and the physical route (B05).
+- [x] **Password question refused from the card download's callback disposes the Portal:** found on 26 November
+  (`local.followups.native.20261126`): `simulation_download` without `credentialMetadataPath` on a protected scratch CPU is refused correctly
+  (`SimulationCredentialRequired`, `ticketState` `spent`), but the worker throws from TIA's `PlcMasterSecretPassword`
+  callback, which, as on the online route before its fix, leaves the Openness Portal disposed. `tia_detach` now ends
+  such a session (`portalDisposed`), so it no longer blocks `tia_start`. Fixed the same day: without a credential the
+  worker now leaves the question unanswered and raises its typed refusal when `Download` returns; natively TIA then ends
+  the download with its own exception, the result stays `SimulationCredentialRequired` (`ticketState` `spent`) and the
+  session keeps its project (`artifacts/n26/pw1`, the ticket-state stage of `scripts/qualify_followup_checks.py`).
 - [x] **P2 — Opening a UMAC-protected project:** the user found that `ProjectComposition.Open(FileInfo, UmacDelegate,
   ProjectOpenMode)` works with `UmacCredentials.Name` and `SetPassword(SecureString)` in the callback. `project_open`
   passed no callback, so it could not open such a project. Done on 20 November (offline): `project_open` takes
@@ -182,8 +207,8 @@ with evidence from an owned fixture.
   a global user, read-only and read-write, a wrong password (`UmacLoginFailed` or `UmacLoginRejected`, exactly one
   login attempt) and an unprotected project with a credential (`loginRequested: false`).
 - [ ] **Rest of the 20 November native runs:** split from the box above on 24 November. Not yet run: a global (UMC)
-  user and `UmacLoginRejected` for `project_open`, and for `attachedSessions` a client whose process has exited
-  (`processRunning: false`) and how long a plain attach waits behind a busy client. Matrix row
+  user and `UmacLoginRejected` for `project_open` (no UMC endpoint here). Run on 26 November (`local.followups.native.20261126`): for
+  `attachedSessions` a client whose process has exited, and how long a plain attach waits behind a busy client. Matrix row
   `project_open.umac_login` (X01, 2 open cells) has no catalog evidence: the [record](verification/feedback-20261120.md)
   is a single run of Debug builds, not curated. Its report (`artifacts/s0952`) is in the main checkout, but
   it cannot be curated as it is (checked 25 November): it has no completion flag or tool-call list, so
@@ -203,8 +228,13 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   evidence IDs missing and a local `scripts/Test-Offline.ps1` stops there; CI has no store and skips the audit. Find the
   store (an earlier checkout, the second workstation) and restore it, or record the loss as
   [lost evidence](#lost-evidence). `artifacts/n18b` and `artifacts/n18c` are gone as well; `artifacts/s0952` is present.
-- [ ] **Native runs of the 25 November worker changes:** build a bundle from main (the installed `tia-v21` server ran
-  a bundle of 23 November, 33 commits behind), then one run each: a `sim_write` row and a `change_prepare` payload
+  On 26 November the curation of four new evidence IDs created the store again on LT-PRG2024-03 with only their reports;
+  the earlier ones are still missing (this PC is the second workstation, so the store was not found here either).
+- [x] **Native runs of the 25 November worker changes:** build a bundle from main (the installed `tia-v21` server ran
+  a bundle of 23 November, 33 commits behind), then one run each (26 November: a Release bundle of `956776f4` was
+  packaged, but its worker is not in the Openness AllowList, which needs an elevated `Register-TiaOpennessApplication.ps1`;
+  so the checks ran on Debug builds instead and passed (`local.followups.native.20261126`, [record](verification/native-runs-20261126.md#follow-up-checks)); `QueueTimeout` refused a second call
+  after 5 s during a 47 s apply): a `sim_write` row and a `change_prepare` payload
   with a repeated name (refused, session kept), a second engineering call during a long `change_apply`
   (`QueueTimeout`), an `HmiPreservationUnavailable` refusal with its `remediation`, and `tia_capabilities`
   (`workerVersion`, `physical_plc`).
@@ -239,12 +269,13 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   day: the successful `runtime_unified_connect` path is tested offline end to end, `ProjectReviewStore` refuses
   malformed review XML as `InvalidSnapshot`, the worker's exported-XML reader stops at 512 levels
   (`ExportedXmlTooDeep`), and `npm run test:explorer:scale` runs the 1,000-function browser check on a synthetic snapshot.
-- [ ] **Native runs of `sim_network_mode_set`** (added 25 November, decision 2; offline tests only): with no instance
-  registered, record `sim_status` `networkMode`; switch to `TCPIPSingleAdapter` with `acknowledgeMachineWide` and
-  `expectedCurrentMode`, once as a standard user and once as administrator; note whether the readback is immediate and
-  a Runtime Manager restart is needed; `sim_create` in TCP/IP after the API switch; the refusal with a registered
-  instance; restore the original mode. The same run covers the Runtime-Manager-lost subscription, which never attached
-  before 25 November (the API spells the event `OnRunTimemanagerLost`).
+- [ ] **Native runs of `sim_network_mode_set`** (added 25 November, decision 2): run on 26 November as a standard
+  user (`local.plcsim.network-mode.20261126`, [record](verification/native-runs-20261126.md)): with no instance registered `sim_status` reported
+  Softbus; the refusals (no acknowledgement, stale `expectedCurrentMode`, unknown mode) left it unchanged; the switch to
+  `TCPIPSingleAdapter` read back at once (29 ms, `tcpIpReady`, no Runtime Manager restart); `sim_create` in TCP/IP
+  worked; a switch while it was registered was refused (`SimulationRegistrationsPresent`); Softbus was restored. Still
+  open: the administrator leg (an elevated run; the user skipped elevated steps on 26 November) and the
+  Runtime-Manager-lost subscription (`OnRunTimemanagerLost`), which was not provoked.
 - [ ] **CI and repository upkeep:** the split package job (build once, five legs) still needs its first CI run to confirm
   the timing.
 
@@ -255,9 +286,9 @@ Host path confinement, V21 change apply/restore, runtime session locking, the sh
 scripts/CI clean-up). Nothing here was qualified natively: the changes are covered by the offline suites only.
 
 - [x] **V19/V21 shared worker loop:** merged in PR 279 (request loop, error mapping and traversal shared, `AccessDenied`/`LicenseUnavailable` mapped by exact Siemens type). The V19 worker builds against the V19 SDK on the second workstation, and the read-only V19 qualification passed there on 12 November with the same 53 stages as before (`local.tia.v19-adapter.shared-loop.20261112`); the two error mappings were not provoked natively.
-- [ ] **V19 native rebuild after the link fix:** the V19 worker stopped compiling when the batched capture reads (501a2fb9) made the shared `OpennessTraversal.cs` use `BatchedAttributeReads`, which V19 did not link; PR 330 links it, and the stubless worker check in CI now catches such a forgotten link. Open: build V19 against the V19 SDK on the second workstation and rerun the read-only V19 qualification, the first run of batched reads on V19.
-- [ ] **Native smoke of the code-health refactoring (PR 330):** the `Prepare*`/`Apply*` change-kind extractions, the 11 `SimulationProvision` stages, the `Add*Capabilities` split, the renamed `OpennessSession` methods and the new failure reports of formerly silent catches are compiled and reviewed only. Open: `scripts/Build.ps1` on the workstation, then one native change run per family (block source/XML, hardware, HMI) and one `sim_provision`.
-- [ ] **UA session during a long bind, native confirmation:** decided on 10 November: the client requests a 600 s session timeout and still sends no keep-alive (no background traffic), so a session orphaned by a Host crash lives up to the server's revised timeout, at most 10 minutes. The offline suite checks the requested value only. Open: confirm on an owned PLCSIM instance that a session survives a 2-5 minute `runtime_plcsim_bind`; a server whose configured maximum session timeout is shorter still ends it.
+- [x] **V19 native rebuild after the link fix:** the V19 worker stopped compiling when the batched capture reads (501a2fb9) made the shared `OpennessTraversal.cs` use `BatchedAttributeReads`, which V19 did not link; PR 330 links it, and the stubless worker check in CI now catches such a forgotten link. Done on 26 November on the second workstation (LT-PRG2024-03): the V19 worker built against the V19 SDK and the read-only V19 qualification passed its 53 stages, the first run of batched reads on V19 (`local.tia.v19-adapter.rebuild.20261126`, [record](verification/native-runs-20261126.md#v19-requalification)).
+- [x] **Native smoke of the code-health refactoring (PR 330):** the `Prepare*`/`Apply*` change-kind extractions, the 11 `SimulationProvision` stages, the `Add*Capabilities` split, the renamed `OpennessSession` methods and the new failure reports of formerly silent catches are compiled and reviewed only. Open: `scripts/Build.ps1` on the workstation, then one native change run per family (block source/XML, hardware, HMI) and one `sim_provision`. Largely covered on 26 November by runs on Debug builds that contain PR 330 ([record](verification/native-runs-20261126.md)): `source_upsert` and `block_import_xml` (`local.block-import.readback.20261126`), `hmi_screen_create` on both Unified profiles and `hmi_classic_import` on the three Classic profiles (`local.hmi.content-fingerprint.20261126`), and provisioning refused, held and recovered (`local.platform.lifecycle.20261126`) and trusted (the download-abort probe). Hardware followed the same day on the German installation: `--slice delete-rule` (`local.hardware_changes.delete-rule.rerun.20261126`) and `--slice drive` (`local.hardware_changes.drive.rerun.20261126`).
+- [ ] **UA session during a long bind, native confirmation:** decided on 10 November: the client requests a 600 s session timeout and still sends no keep-alive (no background traffic), so a session orphaned by a Host crash lives up to the server's revised timeout, at most 10 minutes. The offline suite checks the requested value only. Open: confirm on an owned PLCSIM instance that a session survives a 2-5 minute `runtime_plcsim_bind`; a server whose configured maximum session timeout is shorter still ends it. Looked at on 26 November: no runner can make a real bind last that long, and holding a session idle instead would test idle survival, not a bind; it needs a bind against a large program or a deliberately slow PLCSIM, and it is a TCP/IP run (see the D12 box for the adapter setup that blocks those).
 - [x] **OPC UA fixture timing assumptions left after PR 332:** PR 332 fixed two load flakes. `qualify_diagnostic_ua_binding.py` compared the fixture's certificate log, which the Host's own token renewal changes at about 45 s. The fixture's gap and duplicate faults hit keep-alives because they were keyed on the Publish number. The four assumptions it left were closed on 26 November (offline loopback fixture only):
   - **Gap after recovery:** `subscriptionGapAfterRecovery` drops the first data message after the recovery. The recovery probe it refuses is the message after the lost one. The lost response itself (`DropPublishResponses`) is now a data message too: a lost keep-alive left nothing to Republish. That also hardens the reconnect, transfer and event-recovery scenarios.
   - **Values after the first cycle:** the data-subscription checks accept keep-alives before the first values (`SubscriptionChecks.cs`, the Python oracle `opcua_subscription_checks.py`). The keep-alive check waits up to 10 s for its row instead of 600 ms.
@@ -281,7 +312,23 @@ scripts/CI clean-up). Nothing here was qualified natively: the changes are cover
 ## Native admission and runtime
 
 - [x] Fresh-process PLCSIM discovery is integrated into credential provisioning and passed end to end on 24 October. [Production integration](verification/plcsim-startup-discovery-20261024.md#production-integration).
-- [x] Card staging access denied (`0x80070005`), seen once for 15 s on 23 October, did not reproduce in 5 instrumented credential-provisioning runs on 1 November: 30 card moves, each on its first attempt (`local.provision.card_move.20261101`). Every card move now records its time, HRESULT and, on a refusal, the Restart Manager lock holders, so a recurrence names its holder. Closed as not reproduced and reopened on recurrence (decision of 31 October); the cause of the single refusal stays unidentified.
+- [ ] Card staging access denied (`0x80070005`): **recurred on 26 November** (reopened, decision of 31 October); **cause found and retry widened the same day**, native confirmation under load open. Two of
+  five provisioning attempts on LT-PRG2024-03 could not move the original card back after power-off: `IOException`
+  0x80070005 for the whole 15 s retry budget (3 and 22 attempts), Windows Restart Manager naming no holder, Defender
+  real-time protection off; the user-authorized trusted attempt then failed with `SimulationProvisionCardRestoreFailed`,
+  and after the refused-TLS one `simulation_provision_recover` stopped at the reconciliation ("Memory card cannot
+  contain a reparse point"; none was found afterwards and `SIMATIC_MC` was absent). The other attempts restored the
+  card at the first move. Heavy concurrent builds and test runs were active during both failures ([record](verification/native-runs-20261126.md)).
+  A third occurrence on 26 November ended a download-abort probe case the same way.
+  Earlier: seen once for 15 s on 23 October, not reproduced in 5 instrumented runs on 1 November
+  (`local.provision.card_move.20261101`). Cause ([record](verification/native-runs-20261126.md#card-staging-access-denial)): the PC runs Sophos
+  Intercept X with on-access file scanning; `scripts/probe_card_lock.py` showed that renaming a card folder back right
+  after a rename is refused every time for about 100 ms (10 of 10 cycles), and a plain folder for about 10 ms, while
+  the artifacts folder is not in the Windows Search index. A scanner holds freshly moved folders through a file-system
+  filter, which Restart Manager does not list, and under load longer. The card move now retries for up to 120 s
+  (`SimulationCardMoveRetry`, 481 calls, at most every 250 ms) and the holder query names the unlisted filter; the next
+  trusted provisioning restored the card at the first move. Open: a provisioning run under heavy load on the 120 s
+  budget. Excluding the Host's artifacts folder from on-access scanning is an IT decision, documented as the remedy.
 - [x] **Unresolved provisioning reservation:** trusted reconciliation for failed provisioning's `outcomeUnknown` admission is complete on this PC (2 November). `simulation_provision_reconcile` now also requires that the project was last saved before its pre-provision archive (with the fingerprint including the project library), that the storage outside the card matches its pre-attempt inventory by metadata with only the attempt's own and PLCSIM's runtime files added, and that the write-ahead stream never opened or armed the credential; an observer that was never created is unchanged. All five retained admissions, the checkpoint attempt's `f52861ec…` included, were released in fresh sessions with exact process exits and a fresh-Portal reopen of each original project (`local.sim.reconcile.release.20261102`, [record](verification/provision-release-20261102.md)). The updated runner's checkpoint/compile/save passed end to end in the [frozen corpus](verification/runtime-frozen-20261024.md). Opaque runtime files are bounded by metadata and the stream, never read; an attempt that may have submitted the credential stays held. The VM's ticket and zero-address entry stay under [Other native machine](#other-native-machine-vm-not-this-pc).
 - [x] Native requested stop, independent worker exit, lock release and owned cleanup are qualified ([requested stop](verification/requested-stop-20261024.md), [card inventory and lock release](verification/card-inventory-and-lock-release-20261024.md), [FileStorage exit](verification/file-storage-exit-20261024.md)).
 - [x] File-storage helper exit deadline: the 360 s deadline for `Siemens.Automation.ObjectFrame.FileStorage.Server.exe` is defined once in `scripts/retained_native_lifecycle.py` and used by every runner that waits for retained processes (the retained-tree lifecycle, force capture and the Test Suite scope probe), with a unit test. The 24 October recovery-only misses ran before the retained-tree path had it. The native confirmation of 1 November was inconclusive because no headless flow on the current build starts the helper; closed on that basis (decision of 1 November) and reopened if a run shows the helper again.
@@ -330,62 +377,70 @@ Feasible capabilities that had no row or box; under the 15 October scope policy 
 
 ### Open matrix rows by owner
 
-Catalog `0.4.189` (the matrix's `frozenFrom.catalogVersion`, read on 24 November): 81 open cells in 28 `unqualified` rows, each row under its first owner (the matrix summary counts a shared row once per owner, so it also lists X08 with 9 and L06 with 3); the matrix has 2,184 bound, 72 blocked and 3 descoped cells (the descoped cells were deferred until 25 November). Blocked rows are not listed, the descoped row is under [deferred rows](#deferred-rows). The blocker named is the one the catalog records (availability and limitations). The 29 October runs are in the [verification record](verification/native-reruns-20261029.md). Counted from `docs/plans/release-matrix.v1.json` by script on 24 November; the 10 November reconciliation (catalog `0.4.180`, 28 open cells in 6 rows) is superseded by the rows added since, none of them with catalog evidence.
+Catalog `0.5.2` (the matrix's `frozenFrom.catalogVersion`, read on 26 November): 60 open cells in 20 `unqualified` rows, each row under its first owner (the matrix summary counts a shared row once per owner, so it also lists X08 with 9 and L06 with 3); the matrix has 2,105 bound, 72 blocked and 3 descoped cells (the descoped cells were deferred until 25 November). Blocked rows are not listed, the descoped row is under [deferred rows](#deferred-rows). The blocker named is the one the catalog records (availability and limitations). The 29 October runs are in the [verification record](verification/native-reruns-20261029.md). Counted from `docs/plans/release-matrix.v1.json` by script on 26 November, after the [native runs of 26 November](verification/native-runs-20261126.md) bound 25 cells (the rows added from 14 to 20 November had none before); the 10 November reconciliation (catalog `0.4.180`, 28 open cells in 6 rows) is superseded by the rows added since, none of them with catalog evidence.
 
 | Owner | Open cells | Rows | Blocker |
 | --- | --- | --- | --- |
-| X07 HMI | 16 | `change.hmi_classic_screen_edit`, `hmi_classic_screen_capture`, `hmi_classic_screen_compose`, `hmi_content_fingerprint` | Classic screen rows: profile-wide, visual and runtime acceptance of the Classic screen workflow; `hmi_content_fingerprint`: one native check on 14 November, not curated evidence |
-| X01 Platform | 12 | `project_open.umac_login`, `project_archive`, `project_close`, `project_save`, `project_open_copy` | No catalog evidence; the native checks of 14, 18 and 20 November are not curated evidence |
+| X07 HMI | 13 | `change.hmi_classic_screen_edit`, `hmi_classic_screen_capture`, `hmi_classic_screen_compose` | Profile-wide, visual and runtime acceptance of the Classic screen workflow |
 | X13 SDK feasibility | 12 | `runtime_unified_credential_binding`, `_connect`, `_alarms`, `_alarm_acknowledge`, `_status`, `_disconnect` | A running WinCC Unified PC Runtime; not natively run yet |
-| D12 Security and web | 10 | `runtime_web_download`, `runtime_web_backup`, `runtime_web_alarm_acknowledge` | A connected session whose firmware advertises the method; backup and acknowledgement also need a bound owned PLCSIM endpoint (backup in STOP); offline checks only |
+| D12 Security and web | 10 | `runtime_web_download`, `runtime_web_backup`, `runtime_web_alarm_acknowledge` | A connected session whose firmware advertises the method; backup and acknowledgement also need a bound owned PLCSIM endpoint (backup in STOP); the 26 November native run was blocked by the PLCSIM adapter's network setup |
 | D06 Test Suite | 9 | `testsuite_system_plan_prepare` | Operator setup (TS-Q03) |
 | D09 Online diagnostics | 8 | `plc_physical_targets`, `plc_physical_online_compare`, `plc_physical_station_upload`, `plc_physical_download` | Not qualified on a physical PLC (B05) |
-| L03 Runtime | 8 | `simulation_provision_status`, `simulation_provision_recover`, `sim_prune` | Provisioning rows: the 18 November probe is not curated evidence; `sim_prune`: not run against a live PLCSIM installation |
 | D16 Physical runtime | 3 | `runtime.physical_plc` | Owned physical PLC |
 | L05 Qualification and libraries | 3 | `deployment.vm_qualification` | VMware guest |
+| X01 Platform | 2 | `project_open.umac_login` | No catalog evidence; the 20 November check is not curated, and the global (UMC) user needs a UMC endpoint |
 
 - **Compile-only kinds:** closed on 7 November. `fed08202` had demoted `change.plc_compile`, `change.device_compile`, `change.project_compile` and `change.hmi_compile` pending a native regression of its compile-only completion and identity/save-state fingerprint changes; all four passed it on current main (`local.compile-only.requalify.20261107`: engineering gaps 78/78, both desk HMI fixtures 31/31, X11 374/374).
 
 - **D06 Test Suite (9 cells, 1 row):** `testsuite_system_plan_prepare`. TS-Q01 passed natively on 1 November with the operator's scope and license observations (`local.testsuite.style-q01.20261101`, [record](verification/testsuite-style-q01-20261101.md)) and verifies `testsuite_style_job_status`, `_results` and `_stop_request`. Production style execution is a V21 boundary (decision of 1 November): V21 Update 3 cannot re-check a style rule's scope at execution time, so `_execute_next`, `_recover`, `_reconcile`, `testsuite_style_plan_prepare` and `_mark_interrupted` are `unavailable_target` (35 cells, blocked; [record](verification/testsuite-style-q01-20261101.md#v21-boundary)). `testsuite_style_job_prepare`, which also queues application reviews, is verified: on 1 November two TS-Q02 cases queued the fixture case with it from a `testsuite_application_plan_prepare` review and dispatched that job through `qualification_testsuite_execute` (passed; failed, recovered and reconciled; `local.testsuite.job-prepare.20261101`, [record](verification/testsuite-job-prepare-20261101.md)). Application execution passed natively in the TS-Q02 qualification mode (`local.testsuite.application.20261030`). System execution has no qualified result profile; the historical TS-Q03 design of 1 November could not run on its workstation ([record](verification/testsuite-system-blocker-20261101.md)): a system test is an OPC UA client, which reaches a PLCSIM instance only in PLCSIM's TCP/IP mode (this PC is on Softbus); V21's `SystemTestCaseExecutor.Run` and `SetScope` take no credential, so the scratch CPU's UMAC-protected server needs guest access, which V21 Openness cannot set (an operator-made seed); and Test Suite's trust of the server certificate is unobserved. It needs a desk session. Update on 2 November: the operator authorized temporary TCP/IP mode and UI fixture creation; an owned system-test seed is saved. Anonymous server access and certificate trust still need operator setup. Update on 3 November: TS-Q03 has an exploratory qualification-only runner and Host/worker admission ([implementation and setup](verification/testsuite-system-q03-20261103.md)); native fixture import, scope, results and lifecycle remain unqualified. [Current boundary](verification/local-completion-20261102.md#test-suite-operator-seed).
 - **D16 physical runtime (3 cells, 1 row):** `runtime.physical_plc` needs an owned physical PLC. The PLCSIM runtime rows passed against the real servers on 29 October ([record](verification/runtime-real-server-20261029.md)).
 - **L05 deployment (3 cells, 1 row):** `deployment.vm_qualification` needs the VMware guest. The typed TODO's guest boxes (deploy and run both languages remotely) are tracked here (decision of 30 October).
-- **X07 HMI (16 cells, 4 rows):** the Classic screen rows are described below the list; `hmi_content_fingerprint` has its box below.
-- **X01 Platform (12 cells, 5 rows):** `project_save` is tracked by **Native runs of the 18 November worker changes** under the [18 November feedback](#user-feedback-on-v090-18-november), `project_open.umac_login` by **Rest of the 20 November native runs** under the [20 November field findings](#field-findings-from-a-physical-download-20-november); `project_close`, `project_archive` and `project_open_copy` have their box below.
+- **X07 HMI (13 cells, 3 rows):** the Classic screen rows are described below the list; `hmi_content_fingerprint` was bound on 26 November (box below).
+- **X01 Platform (2 cells, 1 row):** `project_open.umac_login` is tracked by **Rest of the 20 November native runs** under the [20 November field findings](#field-findings-from-a-physical-download-20-november). `project_save`, `project_close`, `project_archive` and `project_open_copy` were bound on 26 November (`local.platform.lifecycle.20261126`, [record](verification/native-runs-20261126.md)).
 - **X13 SDK feasibility (12 cells, 6 rows):** the `runtime_unified_*` rows are tracked by **Native run of the Unified alarm tools** under the [18 November feedback](#user-feedback-on-v090-18-november).
 - **D12 Security and web (10 cells, 3 rows):** box below.
 - **D09 Online diagnostics (8 cells, 4 rows):** the `plc_physical_*` rows are tracked by **Real-PLC online access, qualification** under the [14 November feedback](#user-feedback-on-v090-14-november).
-- **L03 Runtime (8 cells, 3 rows):** `simulation_provision_status` and `simulation_provision_recover` are tracked by **Native runs of the 18 November worker changes**; `sim_prune` has its box below.
+- **L03 Runtime:** no open cell since 26 November: `simulation_provision_status` and `simulation_provision_recover` (`local.platform.lifecycle.20261126`), `sim_prune` (`local.plcsim.prune.20261126`) and `sim_network_mode_set` (`local.plcsim.network-mode.20261126`) were bound ([record](verification/native-runs-20261126.md)).
 
 Boxes for the rows that had none (24 November). The native checks they name are single runs, not curated
 evidence; binding a row needs a run whose reports are kept, curated with `scripts/curate_evidence.py` and cited in
 the catalog. The matrix was not changed.
 
-- [ ] **`project_close`, `project_archive`, `project_open_copy` (X01, 8 cells):** `project_close` refused unsaved
-  edits (`UnsavedProject`) and closed with `discardUnsaved: true` on 14 November
-  ([record](verification/v090-followups-20261114.md)). `project_archive`'s 14 November check (an owned 196-block
-  fixture archived, retrieved with `project_retrieve` in a fresh Portal and inventoried, its folder hash unchanged, an
-  unknown mode refused) is recorded only in its catalog limitations; there is no verification record. For
-  `project_open_copy` the 14 November record covers `project_snapshot_capture` `fromTemporaryCopy` on a read-only
-  project (close it, copy the saved folder, open the copy), not a `project_open_copy` call of its own and not the
-  archive-and-retrieve path of a read-write source. Not covered at all: `project_archive` on a read-only or a
-  UMAC-protected project (unprobed, per the catalog).
+- [x] **`project_close`, `project_archive`, `project_open_copy` (X01, 8 cells):** bound on 26 November with
+  `project_save` (`local.platform.lifecycle.20261126`, [record](verification/native-runs-20261126.md)): both archive modes, both `project_open_copy`
+  routes, `project_close` with and without `discardUnsaved`, `project_retrieve` of the archive. `project_archive` on a
+  read-only project is refused by TIA (`ReadOnlyProject`); TIA's `Project.Archive` writes into the open project's
+  folder (the 14 November "folder hash unchanged" does not hold in general), so the runner compares content. Not
+  covered: UMAC-protected projects.
 - [ ] **`runtime_web_download`, `runtime_web_backup`, `runtime_web_alarm_acknowledge` (D12, 10 cells):** added on
   20 November (`f36d7926`) with offline checks against a loopback fake of the Siemens manual only; no native record.
-  Next, per row 16 of the [X13 feasibility table](plans/x13-feasibility.md): run them in the real-server runner on the
-  owned TCP/IP PLCSIM instance, and record each method that instance does not list in `Api.Browse` as a B05 row.
-- [ ] **`sim_prune` (L03, 4 cells):** its file logic is verified offline against temporary folders and it has not run
-  against a live PLCSIM installation (catalog); no native record. Needs a native run on owned instances: the listing,
-  then `delete: true` by name, by age and by size cap, with each refusal (registered or selected instance, changed
-  ownership marker, held link, archive whose hash or size changed).
-- [ ] **`hmi_content_fingerprint` (X07/X08, 3 cells):** one native check on 14 November, recorded only in the catalog
-  limitations: on a seeded Unified PC fixture the fingerprint for `hmi_screen_create` returned `scopeAccepted: true`,
-  and `change_prepare` with that `expectedContentHash` prepared without `StaleRevision` (not applied). Not covered:
-  Unified Comfort and the Classic profiles, other change kinds (`hmi_classic_import` with its operation among them)
-  and the `StaleRevision` refusal after the content changed.
+  Since 26 November `scripts/qualify_runtime_plcsim_tcpip.py --mode web-services` qualifies them (per-tool outcomes in
+  the verifier; offline-tested). Its native run on 26 November ([record](verification/native-runs-20261126.md)) is blocked by the environment: the
+  PLCSIM adapter had only the link-local `169.254.117.125/16` (the 29 October runs had the operator's static
+  `192.168.0.10/24`); with the CPU at `169.254.117.10` provisioning failed in `GoOnline` ("Changing to online mode
+  failed") before any TLS or login callback. Next: the operator restores a static address on the PLCSIM adapter
+  (elevated), then rerun with `--cpu-ip` in that subnet. The run also showed that the runner hardcoded the English
+  item name `PROFINET interface_1` (fixed: it finds the CPU's networked interface); the other runners that hardcoded
+  TIA-generated item names (interfaces, ports, racks, the CPU display) now resolve them structurally through
+  `scripts/hardware_paths.py`, and the eight runners that named the default tag table `Default tag table` (German
+  `Standard-Variablentabelle`) now take the PLC scope's one table holding system constants (`scripts/plc_tag_tables.py`;
+  `software_inspect` does not report Openness' `IsDefault`). Both offline-tested with German-named fixtures; no native rerun yet. Known risk from the mode itself: TIA's default Program_Alarm class
+  needs no acknowledgement (`local.runtime.plcsim-ua-services.20261031`); a stand-in alarm does not bind
+  `runtime_web_alarm_acknowledge`.
+- [x] **`sim_prune` (L03, 4 cells):** bound on 26 November (`local.plcsim.prune.20261126`, [record](verification/native-runs-20261126.md)): listing,
+  delete by name, by age and by size cap, archive delete, and the refusals `ownershipMarkerChanged`,
+  `registeredOrSelected`, `containsReparsePoint` and `archiveReceiptMismatch`. A never-powered instance's card cannot
+  be archived (`ArchiveStorageNotCreated`, -37).
+- [x] **`hmi_content_fingerprint` (X07/X08, 3 cells):** bound on 26 November (`local.hmi.content-fingerprint.20261126`,
+  [record](verification/native-runs-20261126.md#hmi-content-fingerprint)) on HmiSeeder baselines of all five admitted profiles: a usable repeatable hash,
+  a prepare bound to it, a new hash after an applied change, `StaleRevision` for the old one, and an unknown kind
+  refused (the first run found that any `hmi_*` name was accepted; fixed). The hash is the same for both HMIs of a
+  profile and for both Unified kinds: it does not separate HMI targets. Not covered: desk-configured fixtures and the
+  other HMI kinds.
 
 Classic HMI screen work is **unqualified**, not deferred: X07 owns 13 open cells in
 `change.hmi_classic_screen_edit`, `hmi_classic_screen_capture` and
-`hmi_classic_screen_compose` (the two tools also list X08); its other 3 are `hmi_content_fingerprint` (box above). Native two-screen batch
+`hmi_classic_screen_compose` (the two tools also list X08). Native two-screen batch
 success, later-member failure, reverse-order rollback, lost-response reconciliation,
 fresh reopen and measured timing now pass on an owned RT Advanced fixture. The
 [3 November continuation](verification/classic-screen-workflow-draft-20261103.md)

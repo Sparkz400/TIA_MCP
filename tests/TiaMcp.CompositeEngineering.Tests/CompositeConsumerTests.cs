@@ -30,7 +30,11 @@ internal static class CompositeConsumerTests
             ["evidence"] = new JsonObject { ["origin"] = origin, ["resolution"] = "resolved", ["syntheticFixture"] = true } };
         model["edges"] = new JsonArray(Edge("caller", caller, hw), Edge("device", device, caller), Edge("tail", tail, axisUser),
             Edge("unsupported", wrong, hw, "unverified"), Edge("virtual", ghost, hw));
-        string reviewId = (string)new ProjectReviewStore(root).Save(model, new(), new() { ["syntheticFixture"] = true })["reviewId"]!;
+        var savedReview = new ProjectReviewStore(root).Save(model, new(), new() { ["syntheticFixture"] = true });
+        string reviewId = (string)savedReview["reviewId"]!;
+        // project_snapshot_capture reads the byte count as a long for remoteAccess; an int-backed value threw there (native, 26 November 2026).
+        long savedBytes = savedReview["artifact"]!["bytes"]!.GetValue<long>();
+        if (savedBytes != new FileInfo((string)savedReview["artifact"]!["path"]!).Length) throw new InvalidOperationException("Saved review byte count differs from the file.");
         var uploads = new ArtifactUploadStore(root);
         string Upload(byte[] bytes, string name = "fixture.json")
         {

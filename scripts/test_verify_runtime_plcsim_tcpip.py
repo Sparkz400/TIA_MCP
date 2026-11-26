@@ -165,6 +165,45 @@ def device_inventory():
     return report
 
 
+FILE_SHA = "f" * 64
+
+
+def alarm_list(*states):
+    return {"status": "read", "value": {"entries": [{"id": "1001", "acknowledgement": {"state": state}} for state in states]}}
+
+
+def downloaded(kind):
+    return {"state": "downloaded", "dispatched": True, "ticketClosed": True, "artifact": {"path": "runtime-web-downloads/web-%s.bin" % kind, "sha256": FILE_SHA, "bytes": 300}}
+
+
+def web_services(methods=None):
+    """A web-services run in which every operation is demonstrated."""
+    report = normal()
+    status = web_status("2" * 32)
+    status["methods"] = sorted({m for needed in oracle.WS_METHODS.values() for m in needed} if methods is None else methods)
+    refusals = {**oracle.ACK_REFUSALS, **oracle.DOWNLOAD_REFUSALS, **oracle.BACKUP_REFUSALS}
+    stored = {"artifactRead": {"relativePath": "x", "bytes": 300, "sha256": FILE_SHA}, "localBytes": 300, "localSha256": FILE_SHA}
+    steps = report["steps"][:4] + [step("runtime_web_connect", web_status("2" * 32)), step(oracle.WS_STATUS, status), step(oracle.WS_HWID, {"hwid": 49}),
+                                   step(oracle.ALARM_LISTS[0], alarm_list()), step(oracle.ALARM_LISTS[1], alarm_list("not_acknowledged"))]
+    steps += [step(label, {"isError": True, "code": code or "RuntimeOperationFailed"}) for label, code in refusals.items()]
+    steps += [step(oracle.ACK_NOT_LISTED, {"state": "alarmNotListed", "dispatched": False}),
+              step(oracle.ACK, {"state": "acknowledged", "dispatched": True, "readbackMatches": True}),
+              step(oracle.ALARM_LISTS[2], alarm_list("acknowledged")), step(oracle.ACK_AGAIN, {"state": "alreadyAcknowledged", "dispatched": False}),
+              step(oracle.ALARM_LISTS[3], alarm_list()), step(oracle.ACK_FALLEN, {"state": "alarmNotListed", "dispatched": False})]
+    for label, kind in ((oracle.DOWNLOAD["profiling"], "profiling"), (oracle.DOWNLOAD["serviceData"], "serviceData")):
+        steps += [step(label, downloaded(kind)), step(oracle.STORED % label, copy.deepcopy(stored))]
+    steps += [step(oracle.BACKUP_RUN, {"state": "preconditionMismatch", "dispatched": False}), step(oracle.BACKUP_RUN_STATE, "Run"),
+              step(oracle.TO_STOP, {"state": "changed"}), step(oracle.PLCSIM_STOP, "Stop"), step(oracle.BACKUP, downloaded("backup")),
+              step(oracle.BACKUP_STATE, "Stop"), step(oracle.STORED % oracle.BACKUP, copy.deepcopy(stored)), step(oracle.TO_RUN, {"state": "changed"}),
+              step(oracle.PLCSIM_RUN, "Run")]
+    trigger = [{"label": label, "channel": "web", "channelRead": {"status": "read", "value": value},
+                "plcsimRead": {"symbol": "RealServer.AlarmTrigger", "quality": "good", "value": value}} for label, value in zip(oracle.TRIGGER, (False, True))]
+    report.update(mode="web-services", steps=steps, attempts={"ua": [], "web": ["2" * 32]}, comparisons=trigger,
+                  webServices={"alarm": {"targetId": "1001", "source": "programAlarm", "newIds": ["1001"]}},
+                  toolCalls=[{"name": name, "isError": False} for name in oracle.WS_TOOLS])
+    return report
+
+
 class Oracle(unittest.TestCase):
     def issues(self, report, marker=None, stored=None):
         with tempfile.TemporaryDirectory() as root:
@@ -309,6 +348,52 @@ class Oracle(unittest.TestCase):
         self.assertEqual(oracle.identify_issues(denied), ["The CPU row did not answer I&M0"])
         denied["pinned"][0] = pinned(status=401)
         self.assertEqual(oracle.identify_issues(denied), ["The CPU row did not answer I&M0"])
+
+    def verdict(self, report):
+        with tempfile.TemporaryDirectory() as root:
+            root = Path(root)
+            (root / "qualification.json").write_text(json.dumps(report), encoding="utf-8")
+            (root / "runtime-web").mkdir()
+            for attempt in report["attempts"]["web"]:
+                (root / "runtime-web" / (attempt + ".json")).write_text("{}", encoding="utf-8")
+            return oracle.verify(root)
+
+    def test_web_services_report_outcomes_and_only_demonstrated_gates(self):
+        verdict = self.verdict(web_services())
+        self.assertEqual(verdict["issues"], [])
+        self.assertEqual(verdict["webServices"]["gates"], {tool: list(gates) for tool, gates in oracle.GATES.items()})
+        # A finding-only run: nothing advertised, every operation answered unsupported unsent. Complete, but no gate.
+        report = web_services(methods=["Api.Browse", "Api.Login", "PlcProgram.Read"])
+        for label in (oracle.ACK, oracle.DOWNLOAD["profiling"], oracle.DOWNLOAD["serviceData"], oracle.BACKUP):
+            named(report, label)["result"] = {"state": "unsupported", "dispatched": False}
+        report["steps"] = [s for s in report["steps"] if s["name"] not in (oracle.ACK_AGAIN, oracle.ALARM_LISTS[2]) and not s["name"].startswith("artifact_read")]
+        verdict = self.verdict(report)
+        self.assertEqual((verdict["issues"], verdict["webServices"]["gates"]), ([], {}))
+        self.assertEqual(set(verdict["webServices"]["outcomes"].values()), {"methodNotAdvertised"})
+        # No CPU hardware ID: serviceData is not attempted, profiling still carries the download row.
+        report = web_services()
+        named(report, oracle.WS_HWID)["result"] = {"hwid": None, "failure": "no cpu node"}
+        verdict = self.verdict(report)
+        self.assertEqual((verdict["issues"], verdict["webServices"]["outcomes"]["runtime_web_download serviceData"]), ([], "hwidNotFound"))
+        self.assertIn("runtime_web_download", verdict["webServices"]["gates"])
+
+    def test_web_services_refuse_sent_or_inconsistent_requests(self):
+        for change, text in ((lambda r: named(r, oracle.ACK_AGAIN)["result"].update(dispatched=True), "second acknowledgement"),
+                             (lambda r: named(r, oracle.BACKUP_RUN)["result"].update(dispatched=True, state="downloaded"), "backup in RUN"),
+                             (lambda r: named(r, oracle.WS_STATUS)["result"]["methods"].remove("Plc.CreateBackup"), "does not list"),
+                             (lambda r: named(r, oracle.DOWNLOAD["profiling"]).update(result={"state": "unsupported", "dispatched": False}), "although Api.Browse lists"),
+                             (lambda r: named(r, oracle.STORED % oracle.BACKUP)["result"].update(localSha256="e" * 64), "stored file"),
+                             (lambda r: named(r, oracle.ALARM_LISTS[2]).update(result=alarm_list("not_acknowledged")), "independent Alarms.Browse"),
+                             (lambda r: named(r, oracle.ALARM_LISTS[0]).update(result=alarm_list("not_acknowledged")), "listed before the trigger"),
+                             (lambda r: named(r, "runtime_web_backup without acknowledgement").update(result={"state": "downloaded"}), "refused before sending"),
+                             (lambda r: named(r, "runtime_web_download serviceData without a hwid")["result"].update(code="RuntimeOperationFailed"), "RuntimeTicketSelectionInvalid"),
+                             (lambda r: named(r, oracle.BACKUP_STATE).update(result="Run"), "STOP after the backup"),
+                             (lambda r: named(r, oracle.PLCSIM_RUN).update(result="Stop"), "STOP to RUN"),
+                             (lambda r: r["comparisons"].pop(), "trigger raised")):
+            report = web_services()
+            change(report)
+            verdict = self.verdict(report)
+            self.assertTrue(any(text in issue for issue in verdict["issues"]), (text, verdict["issues"]))
 
     def test_a_failed_run_is_never_complete(self):
         report = normal(); report["completed"] = False

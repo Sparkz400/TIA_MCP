@@ -50,7 +50,9 @@ import json
 from pathlib import Path
 import re
 
+import hardware_paths
 import hardware_profiles
+import plc_tag_tables
 from library_native_harness import Harness, require
 from qualification_owned_scratch import snapshot
 from qualify_access_changes import Run as StateRun
@@ -68,15 +70,17 @@ S7_1200, IM = "OrderNumber:6ES7 214-1AG40-0XB0/V4.7", "OrderNumber:6ES7 155-5AA0
 SM, SM_NEXT = "OrderNumber:6ES7 221-1BH30-0XB0/V1.0", "OrderNumber:6ES7 221-1BH32-0XB0/V2.0"
 CONFIGURED = ("hardware_replace", "hardware_port_connect", "hardware_port_disconnect", "network_configure", "hardware_plug", "hardware_move",
               "hardware_transfer_area_create", "hardware_transfer_area_delete", "network_io_assign", "network_mrp_set", "hardware_shared_device_access")
-# A rack, the PLC whose default tag table holds its modules' system constants (named prefix + module name), and an IO device's interface.
-Station = namedtuple("Station", "device rack plc_device plc prefix interface")
-SCRATCH = Station("ScratchStation", "Rail_0", "ScratchStation", "ScratchPLC", "Local~", None)
-S1200 = Station("Hw1200", "Rack_0", "Hw1200", "Hw1200Cpu", "Local~", None)
-MP = Station("HwMp", "Rail_0", "HwPeer", "HwPeerCpu", "HwMpHead~", ("HwMpHead", "items", "PROFINET%20interface"))
+# The station's own item (its CPU or IO device head, which owns the interface), the PLC whose default tag table holds its modules'
+# system constants (named prefix + module name), and whether the head is an IO device. TIA names the rack, interfaces and ports in
+# the UI language (Rail_0 or Profilschiene_0), so those are resolved by structure (hardware_paths), never by name.
+Station = namedtuple("Station", "device head plc_device plc prefix io_device")
+SCRATCH = Station("ScratchStation", "ScratchPLC", "ScratchStation", "ScratchPLC", "Local~", False)
+S1200 = Station("Hw1200", "Hw1200Cpu", "Hw1200", "Hw1200Cpu", "Local~", False)
+MP = Station("HwMp", "HwMpHead", "HwPeer", "HwPeerCpu", "HwMpHead~", True)
 IO_SYSTEM = "HwPeerIo"
-# ET 200SP: the IM with the captured generated-server contract; its rack is read after hardware_add, its DI modules are catalog-selected.
+# ET 200SP: the IM with the captured generated-server contract; its DI modules are catalog-selected.
 IM_SP, SERVER = "OrderNumber:6ES7 155-6AU02-0BN0/V6.4", "OrderNumber:6ES7 193-6PA00-0AA0/V1.2"
-SP = Station("HwSp", None, "HwPeer", "HwPeerCpu", "HwSpHead~", ("HwSpHead", "items", "PROFINET%20interface"))
+SP = Station("HwSp", "HwSpHead", "HwPeer", "HwPeerCpu", "HwSpHead~", True)
 SP_DI, WIDE_DI = ("DI 8x24VDC ST", "6ES7 131-6BF"), ("DI 32x24VDC HF", "6ES7 521-1BL")
 SHARED_IO, RING = "HwScratchIo", "HwRing"
 # The same ET 200SP station in a second project, assigned to that project's own scratch CPU (refusal slice).
@@ -340,31 +344,57 @@ def add_cpu(run, label, name, cpu=CPU, restore=False):
               added=under(run.path(name)), rows={run.hw(name, "items", name + "Cpu"): {"typeIdentifier": cpu, "name": name + "Cpu"}}, restore=restore)
 
 
+def default_table(run, plc):
+    """The PLC's default tag table (its path and name) in the current state; TIA names it in the UI language ("Default tag table",
+    "Standard-Variablentabelle"), so it is the table holding the PLC's system constants (plc_tag_tables)."""
+    view = run.current["view"]
+    cached = getattr(run, "default_tables", {}).get(plc)
+    if cached is None or cached[0] is not view:  # Verification lambdas ask per state key: resolve once per state.
+        path = plc_tag_tables.default_table_path(view, plc)
+        cached = (view, path, view["tagTable:" + path]["name"])
+        run.default_tables = {**getattr(run, "default_tables", {}), plc: cached}
+    return cached[1:]
+
+
 def constant(run, station, name):
     """The system constant of one hardware object in the station's PLC default tag table."""
-    return "member:" + run.path(station.plc_device, "items", station.plc, "plc", station.plc, "tags", "Default%20tag%20table", "systemConstants", name)
+    return "member:" + default_table(run, run.path(station.plc_device, "items", station.plc, "plc", station.plc))[0] + "/systemConstants/" + name
+
+
+def interface_of(run, device, item):
+    """The network interface of one CPU or IO device head (its one child with network nodes), resolved by structure."""
+    return hardware_paths.network_interface(run.current["view"], run.path(device, "items", item))
+
+
+def interface(run, station):
+    return interface_of(run, station.device, station.head)
+
+
+def rack(run, station):
+    """A station's one root rack: the item below the device at position 0 classified None, beside its head (remote-I/O runner rule)."""
+    return hardware_paths.root_rack(run.current["view"], run.path(station.device), exclude=(run.path(station.device, "items", station.head),))
 
 
 def timing(run, station):
     """An IO device's interface recomputes its connector's update and watchdog times when its first module arrives or its last one goes;
     the ET 200SP family modules join and leave beside SpDi3, its first DI module, which stays."""
-    return ["hw:" + run.path(station.device, "items", *station.interface)] if station.interface and station.device != SP.device else []
+    return ["hw:" + interface(run, station)] if station.io_device and station.device != SP.device else []
 
 
 def plug(run, name, slot, station=SCRATCH, module=MODULE, changed=()):
-    rail = run.path(station.device, "items", station.rack)
+    rail = rack(run, station)
     item = run.hw(station.device, "items", name)
     run.apply("plug " + name, "hardware_plug", {"hardwarePath": rail, "typeIdentifier": module, "name": name, "positionNumber": slot},
               {"effects": [{"parentPath": rail, "createItem": name, "positionNumber": slot, "typeIdentifier": module}]},
               added=under(item[3:], constant(run, station, station.prefix + name)), changed=changed, rows={item: {"typeIdentifier": module, "positionNumber": slot}})
 
 
-def node(run, device, interface, address=None, deferred=False):
-    """One more interface on HwNet, with its own address when given; device_inventory shows the address on the device, its head and the
-    interface rows."""
-    path = run.path(device, "items", *interface)
-    name = run.current["view"]["hw:" + path]["network"]["nodes"][0]["name"]  # "X1" on S7-1500, "X1 : PN(LAN)" on S7-1200, "IE1" on IM 155-5.
-    rows = [run.path(device), run.path(device, "items", interface[0]), path] if address else []
+def node(run, device, path, address=None, deferred=False):
+    """One more interface (its exact path) on HwNet, with its own address when given; device_inventory shows the address on the device,
+    its head and the interface rows."""
+    name = hardware_paths.node_name(run.current["view"], path)  # "X1" on S7-1500, "X1 : PN(LAN)" on S7-1200, "IE1" on IM 155-5.
+    head = path[len(run.path(device, "items", "")):].split("/", 1)[0]
+    rows = [run.path(device), run.path(device, "items", head), path] if address else []
     extra = {"attributes": {"Address": address}} if address else {}
     run.apply("put %s on HwNet" % device, "network_configure", {"hardwarePath": path, "nodeName": name, "subnetName": "HwNet", **extra},
               changed=["hw:" + path] + ["inv:" + row for row in rows], deferred=deferred)
@@ -372,32 +402,22 @@ def node(run, device, interface, address=None, deferred=False):
 
 def station(run):
     """The ET 200MP head is added and put on HwNet without compile, then assigned to a new IO system of HwPeerCpu with compile."""
-    interface = MP.interface
     run.apply("add ET 200MP station " + MP.device, "hardware_add", {"typeIdentifier": IM, "deviceName": MP.device, "itemName": "HwMpHead"},
               {"effects": [{"createDevice": MP.device, "typeIdentifier": IM}]}, added=under(run.path(MP.device)),
               rows={run.hw(MP.device, "items", "HwMpHead"): {"typeIdentifier": IM}}, deferred=True)
-    node(run, MP.device, interface, "192.168.0.4", deferred=True)
-    device, controller = run.path(MP.device, "items", *interface), run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET%20interface_1")
+    node(run, MP.device, interface(run, MP), "192.168.0.4", deferred=True)
+    device, controller = interface(run, MP), interface_of(run, "HwPeer", "HwPeerCpu")
     # HwPeerCpu gets system constants for the IO system (Local~HwPeerIo) and the station's head, interface and ports (HwMpHead~...).
     generated = lambda applied, state: [key for key in state if key.startswith((constant(run, MP, MP.prefix), constant(run, MP, "Local~" + IO_SYSTEM)))]
     # Every item of the head reads SharedDeviceAccessType PLC instead of Unknown, and the interface gets its IO-device attributes.
     head = [run.hw(MP.device, "items", *parts) for parts in (("HwMpHead",), ("HwMpHead", "items", "HwMpHead"))] + \
-           ["hw:" + device] + ["hw:" + device + "/items/Port_%d" % number for number in (1, 2)]
+           ["hw:" + device] + ["hw:" + port for port in hardware_paths.ports(run.current["view"], device)]
     payload = {"hardwarePath": device, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0, "createIoSystemName": IO_SYSTEM}
     # The worker records the controller's owning CPU item in the reviewed payload.
     run.apply("assign %s to HwPeerCpu" % MP.device, "network_io_assign", payload,
               {"effects": [{"hardwarePath": device, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False}]},
               shown={**payload, "addressControllerOwnerPath": run.path("HwPeer", "items", "HwPeerCpu")}, changed=head + ["hw:" + controller], added=generated,
               rows={key: {"attributes": {"SharedDeviceAccessType": "PLC"}} for key in head})
-
-
-def rack(run, device, head):
-    """A station's one root rack: the item below the device at position 0 classified None, beside its head (remote-I/O runner rule)."""
-    prefix = run.hw(device, "items", "")
-    racks = [key[len(prefix):] for key, row in run.current["view"].items() if key.startswith(prefix) and "/" not in key[len(prefix):]
-             and key[len(prefix):] != head and row["positionNumber"] == 0 and row["classification"] == "None"]
-    require(len(racks) == 1, "Expected one root rack of %s: %s" % (device, racks))
-    return racks[0]
 
 
 def hw_under(run, path, state):
@@ -413,19 +433,18 @@ def head_items(run, device, head):
 def sp_station(run, station=SP, io_system=None):
     """The ET 200SP head joins the IO system of its station's PLC (HwPeerIo, or io_system, which the assignment creates) with its
     declared generated server module, which then moves to slot 4 to free the DI slots, as in the remote-I/O runner. Returns the
-    station with its rack."""
-    SP = station  # The station's device, head and interface names; its PLC owns the controller.
+    station."""
+    SP = station  # The station's device and head; its PLC owns the controller.
     run.apply("add ET 200SP station " + SP.device, "hardware_add", {"typeIdentifier": IM_SP, "deviceName": SP.device, "itemName": "HwSpHead"},
               {"effects": [{"createDevice": SP.device, "typeIdentifier": IM_SP}]}, added=under(run.path(SP.device)),
               rows={run.hw(SP.device, "items", "HwSpHead"): {"typeIdentifier": IM_SP}}, deferred=True)
-    node(run, SP.device, SP.interface, "192.168.0.5", deferred=True)
-    station_ = SP._replace(rack=rack(run, SP.device, "HwSpHead"))
+    node(run, SP.device, interface(run, SP), "192.168.0.5", deferred=True)
     owner = run.path(SP.plc_device, "items", SP.plc)
-    device, controller = run.path(SP.device, "items", *SP.interface), owner + "/items/PROFINET%20interface_1"
+    device, controller = interface(run, SP), interface_of(run, SP.plc_device, SP.plc)
     view = run.current["view"]
     name = SERVER_MODULE_NAMES.get(view["hw:" + device]["name"])
     require(name, "No captured server-module name for the interface name %r" % view["hw:" + device]["name"])
-    rail, server = run.path(SP.device, "items", station_.rack), run.path(SP.device, "items", quote(name, safe=""))
+    rail, server = rack(run, SP), run.path(SP.device, "items", quote(name, safe=""))
     author = view[run.hw(SP.device, "items", "HwSpHead")]["attributes"]["Author"]
     payload = {"hardwarePath": device, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0, **({"createIoSystemName": io_system} if io_system else {}),
                "expectedServerModule": {"name": name, "typeIdentifier": SERVER, "containerHardwarePath": rail, "positionNumber": 1,
@@ -434,7 +453,7 @@ def sp_station(run, station=SP, io_system=None):
     prefixes = (constant(run, SP, SP.prefix),) + ((constant(run, SP, "Local~" + io_system),) if io_system else ())
     generated = lambda applied, state: [key for key in state if key.startswith(prefixes)] + under(server)(applied, state)
     # The ports of the head's interface sit on the BusAdapter beside it (observed hw2); they take SharedDeviceAccessType PLC as well.
-    adapter = [key for key in run.current["view"] if key.startswith(run.hw(SP.device, "items", "")) and "/items/Port_" in key and "/HwSpHead/" not in key]
+    adapter = ["hw:" + port for port in hardware_paths.ports(view, device)]
     # The second effect is the declared generated server contract.
     run.apply("assign %s to %s" % (SP.device, SP.plc), "network_io_assign", payload,
               {"effects": [{"hardwarePath": device, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": io_system or IO_SYSTEM, "disconnect": False, "sharedDevice": False}, {}]},
@@ -443,14 +462,14 @@ def sp_station(run, station=SP, io_system=None):
     run.apply("move %s's server module to slot 4" % SP.device, "hardware_move", {"hardwarePath": server, "positionNumber": 4},
               {"effects": [{"hardwarePath": server, "positionBefore": 1, "positionAfter": 4}]}, changed=["hw:" + server, "inv:" + server],
               rows={"hw:" + server: {"positionNumber": 4}})
-    return station_
+    return SP
 
 
 def sp_modules(run, station_):
     """The two newest DI 8x24VDC ST catalog entries that plug at slot 2 of the ET 200SP rack (prepare only): the older one is plugged,
     the newer one replaces it."""
     def select():
-        rail, fitting = run.path(station_.device, "items", station_.rack), []
+        rail, fitting = rack(run, station_), []
         entries = run.h.tool("hardware_catalog_search", {"filter": SP_DI[0], "maxItems": 500})["entries"]
         # The exact type name keeps BA variants (DI 8x24VDC BA) out.
         for entry in sorted((e for e in entries if (e.get("articleNumber") or "").startswith(SP_DI[1]) and e.get("typeName") == SP_DI[0]), key=lambda e: e["typeIdentifier"], reverse=True):
@@ -470,7 +489,7 @@ def shared_device(run, restore=False):
     """The ET 200SP interface's connector 1 joins a new IO system of the scratch CPU while connector 0 stays with HwPeerCpu, and SpDi3
     is assigned to the scratch CPU in the same change: V21 compiles a further controller only with a submodule of its own (hw3).
     True when applied."""
-    device, controller = run.path(SP.device, "items", *SP.interface), run.path("ScratchStation", "items", "ScratchPLC", "items", "PROFINET%20interface_1")
+    device, controller = interface(run, SP), interface(run, SCRATCH)
     payload = {"hardwarePath": device, "connectorIndex": 1, "controllerHardwarePath": controller, "controllerIndex": 0, "createIoSystemName": SHARED_IO, "sharedDevice": True,
                "sharedSubmodules": [run.path(SP.device, "items", "SpDi3")]}
     generated = lambda applied, state: [key for key in state if key.startswith((constant(run, SCRATCH, SP.prefix), constant(run, SCRATCH, "Local~" + SHARED_IO)))]
@@ -492,14 +511,14 @@ def shared_access(run, name, access, shared, external=None, target=None, restore
     station's IO systems (its own PLC, HwPeerCpu, and ScratchPLC while the station is shared) as its address owners. external also sets
     NumberOfExternalIoControllers of the station's interface, which TIA may require once a module is accessed outside the project.
     True when applied."""
-    SP = station  # The station's device and interface names; its PLC owns the first IO system.
-    module, interface, own = run.path(SP.device, "items", name), run.path(SP.device, "items", *SP.interface), run.path(SP.plc_device, "items", SP.plc)
+    SP = station  # The station's device and head; its PLC owns the first IO system.
+    module, device, own = run.path(SP.device, "items", name), interface(run, SP), run.path(SP.plc_device, "items", SP.plc)
     payload = {"hardwarePath": module, "accessType": access, **({"assignmentTargetPath": target} if target else {}), **({"externalIoControllers": external} if external else {})}
     owners = sorted([own] + ([run.path("ScratchStation", "items", "ScratchPLC")] if shared else []))
-    shown = {**payload, "addressControllerOwnerPaths": owners, **({"ioDeviceInterfacePath": interface} if external else {})}
+    shown = {**payload, "addressControllerOwnerPaths": owners, **({"ioDeviceInterfacePath": device} if external else {})}
     return run.apply("set %s's shared-device access %s%s" % (name, access, " with %d external controller(s)" % external if external else ""), "hardware_shared_device_access", payload,
                      {"effects": [{"hardwarePath": module, "accessAfter": access}]}, shown=shown,
-                     changed=lambda applied, state: hw_under(run, module, state) + (["hw:" + interface] if external else []), rows={"hw:" + module: {"attributes": {"SharedDeviceAccessType": access}}},
+                     changed=lambda applied, state: hw_under(run, module, state) + (["hw:" + device] if external else []), rows={"hw:" + module: {"attributes": {"SharedDeviceAccessType": access}}},
                      removed=[constant(run, SP, SP.prefix + name)] if access == "OutsideOfProject" else (),
                      added=[constant(run, SP, SP.prefix + name)] if access == "PLC" and target == own else (),
                      restore=restore, boundary=True) is not None
@@ -511,13 +530,12 @@ def scratch_plc(run):
 
 def interfaces(run):
     """The PROFINET interface of each ring member, scratch CPU first: the MRP manager and its two clients."""
-    return [run.path(device, "items", cpu, "items", interface) for device, cpu, interface in (("ScratchStation", "ScratchPLC", "PROFINET%20interface_1"),
-            ("HwPeer", "HwPeerCpu", "PROFINET%20interface_1"), (MP.device, "HwMpHead", "PROFINET%20interface"))]
+    return [interface_of(run, device, item) for device, item in (("ScratchStation", "ScratchPLC"), ("HwPeer", "HwPeerCpu"), (MP.device, "HwMpHead"))]
 
 
 def ring_ports(run):
     """The IM 155-5 PN ST's free Port_2 and the scratch CPU's Port_1, freed from the CPU 1214C: linking them closes the ring."""
-    return ports(run, 2, ((MP.device, "HwMpHead"),), "PROFINET%20interface")[0], ports(run, 1)[0]
+    return ports(run, 2, ((MP.device, "HwMpHead"),))[0], ports(run, 1)[0]
 
 
 def mrp(run, interface, role, domain=None, create=False, restore=False):
@@ -526,7 +544,8 @@ def mrp(run, interface, role, domain=None, create=False, restore=False):
     effect = {"hardwarePath": interface, "roleAfter": role, "createDomain": create, **({"domainAfter": domain} if domain else {})}
     label = "MRP %s %s%s%s" % (interface.split("/devices/", 1)[1].split("/", 1)[0], role, " in " + domain if domain else "", ", restored" if restore else "")
     # A ring role declares RingPort true on the interface's ports and NotInRing withdraws it (hw4): a recorded side effect.
-    ring_port = lambda category, key: category == "changed" and key.startswith("hw:" + interface + "/items/Port_")
+    own = {"hw:" + port for port in hardware_paths.ports(run.current["view"], interface)}
+    ring_port = lambda category, key: category == "changed" and key in own
     return run.apply(label, "network_mrp_set", payload, {"effects": [effect]}, changed=["hw:" + interface], tolerated=ring_port,
                      rows={"hw:" + interface: {"network": {"mrp": [{"role": role, **({"domain": domain} if domain else {})}]}}}, restore=restore, boundary=True) is not None
 
@@ -569,8 +588,8 @@ def ring(run):
 
 
 def topology_refusals(run):
-    sp, scratch = run.path(SP.device, "items", *SP.interface), run.path("ScratchStation", "items", "ScratchPLC", "items", "PROFINET%20interface_1")
-    peer, module = run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET%20interface_1"), run.path("ScratchStation", "items", "HwDi")
+    sp, scratch = interface(run, SP), interface(run, SCRATCH)
+    peer, module = interface_of(run, "HwPeer", "HwPeerCpu"), run.path("ScratchStation", "items", "HwDi")
     second = {"hardwarePath": sp, "connectorIndex": 2, "controllerHardwarePath": scratch, "controllerIndex": 0, "createIoSystemName": "HwOtherIo"}
     run.refuse("network_io_assign", "a further controller without sharedDevice", second, "UnsupportedCapability", plcPath=scratch_plc(run))
     run.refuse("network_io_assign", "a shared device with the controller it already has",
@@ -578,7 +597,7 @@ def topology_refusals(run):
     run.refuse("network_mrp_set", "an unknown role", {"hardwarePath": scratch, "role": "Master"}, "InvalidRequest")
     run.refuse("network_mrp_set", "a module without a network interface", {"hardwarePath": module, "role": "Client"}, "UnsupportedCapability")
     run.refuse("network_mrp_set", "an absent domain without createDomain", {"hardwarePath": peer, "role": "Client", "domainName": "HwNoRing"}, "ObjectNotFound")
-    run.refuse("network_mrp_set", "a ring role on the single-port CPU 1214C", {"hardwarePath": run.path("Hw1200", "items", "Hw1200Cpu", "items", "PROFINET%20interface_1"), "role": "Client"},
+    run.refuse("network_mrp_set", "a ring role on the single-port CPU 1214C", {"hardwarePath": interface(run, S1200), "role": "Client"},
                "UnsupportedCapability")
     run.refuse("hardware_shared_device_access", "the native unassigned access", {"hardwarePath": run.path(SP.device, "items", "SpDi3"), "accessType": "Unknown"}, "InvalidRequest")
     run.refuse("hardware_shared_device_access", "a module of a CPU station", {"hardwarePath": module, "accessType": "OutsideOfProject"}, "UnsupportedCapability")
@@ -591,9 +610,9 @@ def address_change(run, moved=False):
     module, view = run.path("ScratchStation", "items", "HwDi"), run.current["view"]
     start = min(a["startAddress"] for key, row in view.items() if key == "hw:" + module or key.startswith("hw:" + module + "/")
                 for a in row["addresses"] or [] if a["ioType"] == "Input" and a.get("length", 0) > 0)
-    table = scratch_plc(run) + "/tags/Default%20tag%20table"
+    table, name = default_table(run, scratch_plc(run))
     tag = table + "/tags/HwInput"
-    run.apply("tag HwInput on HwDi's input", "tag_create", {"tagTableName": "Default tag table", "name": "HwInput", "dataTypeName": "Bool", "logicalAddress": "%%I%d.0" % start},
+    run.apply("tag HwInput on HwDi's input", "tag_create", {"tagTableName": name, "name": "HwInput", "dataTypeName": "Bool", "logicalAddress": "%%I%d.0" % start},
               plc=scratch_plc(run), added=["member:" + tag], changed=["tagTable:" + table])
     entries = run.h.stage("select DI 32x24VDC HF", lambda: run.h.tool("hardware_catalog_search", {"filter": WIDE_DI[0], "maxItems": 500}))["entries"]
     wide = max((e["typeIdentifier"] for e in entries if (e.get("articleNumber") or "").startswith(WIDE_DI[1]) and e.get("typeName") == WIDE_DI[0]), default=None)
@@ -645,12 +664,13 @@ def gsd_device(run, rows=None, restore=False):
     interface = next(key[3 + len(prefix):] for key, row in sorted(run.current["view"].items()) if key.startswith("hw:" + prefix) and (row.get("network") or {}).get("ioConnectors"))
     # ("HwGsdHead", "items", "Interface"). The I-device GSD reads IpProtocolSelection OtherPath (its own CPU project sets the address),
     # so its node has no Address attribute.
-    node(run, device, tuple(interface.split("/")), deferred=True)
-    path, controller = prefix + interface, run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET%20interface_1")
+    path = prefix + interface
+    node(run, device, path, deferred=True)
+    controller = interface_of(run, "HwPeer", "HwPeerCpu")
     payload = {"hardwarePath": path, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0}
     generated = lambda applied, state: [key for key in state if key.startswith(constant(run, MP, head + "~"))]
     # Unlike the ET 200MP head, the GSD's ports keep their state on assignment (discovery hg4).
-    items = lambda applied, state: [key for key in head_items(run, device, head)(applied, state) if "/items/Port%20" not in key]
+    items = lambda applied, state: [key for key in head_items(run, device, head)(applied, state) if key not in {"hw:" + port for port in hardware_paths.ports(state, path)}]
     def assign(restored):
         return run.apply("assign %s to HwPeerCpu%s" % (device, ", restored" if restored else ""), "network_io_assign", payload,
                          {"effects": [{"hardwarePath": path, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False, "sharedDevice": False}]},
@@ -683,8 +703,9 @@ def drive_device(run, restore=False):
               {"effects": [{"createDevice": device, "typeIdentifier": identifier}]}, added=under(run.path(device)), deferred=True)
     prefix = run.path(device, "items", "")
     interface = next(key[3 + len(prefix):] for key, row in sorted(run.current["view"].items()) if key.startswith("hw:" + prefix) and (row.get("network") or {}).get("ioConnectors"))
-    node(run, device, tuple(interface.split("/")), deferred=True)
-    path, controller = prefix + interface, run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET%20interface_1")
+    path = prefix + interface
+    node(run, device, path, deferred=True)
+    controller = interface_of(run, "HwPeer", "HwPeerCpu")
     payload = {"hardwarePath": path, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0}
     # Observed natively (hd1): only the drive's interface changes, and the controller gains the drive's system constants.
     generated = lambda applied, state: [key for key in state if key.startswith(constant(run, MP, head + "~"))]
@@ -714,11 +735,11 @@ def drive_slice(run):
 def network(run, scratch=True):
     """HwPeerCpu (readdressed; its change creates HwNet) and the scratch CPU on HwNet; scratch=False leaves the scratch CPU off it."""
     for device, cpu, extra in (("HwPeer", "HwPeerCpu", {"attributes": {"Address": "192.168.0.2"}}), ("ScratchStation", "ScratchPLC", {}))[:2 if scratch else 1]:
-        interface = run.path(device, "items", cpu, "items", "PROFINET%20interface_1")
+        path = interface_of(run, device, cpu)
         # device_inventory reports the node address on the device, CPU and interface rows, so only the readdressed peer changes there.
-        rows = [run.path(device), run.path(device, "items", cpu), interface] if extra else []
-        run.apply("put %s on HwNet" % cpu, "network_configure", {"hardwarePath": interface, "nodeName": "X1", "subnetName": "HwNet", **extra},
-                  changed=["hw:" + interface] + ["inv:" + row for row in rows])
+        rows = [run.path(device), run.path(device, "items", cpu), path] if extra else []
+        payload = {"hardwarePath": path, "nodeName": hardware_paths.node_name(run.current["view"], path), "subnetName": "HwNet", **extra}
+        run.apply("put %s on HwNet" % cpu, "network_configure", payload, changed=["hw:" + path] + ["inv:" + row for row in rows])
 
 
 def attributes(run, name, values, restore=False, station=SCRATCH):
@@ -735,14 +756,15 @@ def replace(run, name, before, after, restore=False, station=SCRATCH):
               changed=[module, "inv:" + module[3:]], rows={module: {"typeIdentifier": after}}, restore=restore)
 
 
-def ports(run, number, pairs=(("ScratchStation", "ScratchPLC"), ("HwPeer", "HwPeerCpu")), interface="PROFINET%20interface_1"):
-    return [run.path(device, "items", cpu, "items", interface, "items", "Port_%d" % number) for device, cpu in pairs]
+def ports(run, number, pairs=(("ScratchStation", "ScratchPLC"), ("HwPeer", "HwPeerCpu"))):
+    """Port number (Port_1 is 1, in TIA's port order) of the interface of each (device, CPU or head) pair."""
+    return [hardware_paths.port(run.current["view"], interface_of(run, device, item), number) for device, item in pairs]
 
 
 def family_ports(run):
     """Port_1 of the CPU 1214C to the scratch CPU's, and the IM 155-5's to HwPeerCpu's: with the CPUs' Port_2 link, a line."""
     return {"Hw1200": (ports(run, 1, (("Hw1200", "Hw1200Cpu"),))[0], ports(run, 1)[0]),
-            MP.device: (ports(run, 1, ((MP.device, "HwMpHead"),), "PROFINET%20interface")[0], ports(run, 1)[1])}
+            MP.device: (ports(run, 1, ((MP.device, "HwMpHead"),))[0], ports(run, 1)[1])}
 
 
 def link(run, kind, number, restore=False, pair=None, label=None):
@@ -798,14 +820,14 @@ def phase_a(run):
     add_cpu(run, "add CPU HwOther", "HwOther", restore=True)
     network(run)
     add_cpu(run, "add CPU Hw1200", "Hw1200", S7_1200)
-    node(run, "Hw1200", ("Hw1200Cpu", "items", "PROFINET%20interface_1"), "192.168.0.3")
+    node(run, "Hw1200", interface(run, S1200), "192.168.0.3")
     station(run)
     sp = sp_station(run)
     older, newer = sp_modules(run, sp)
     run.families = FAMILIES + ((sp, ("SpDi", "SpDi2"), older, newer),)
     # The first ET 200SP module needs a new potential group (light BaseUnit), which TIA gives a module at slot 1 (hw2), and it
     # sets the IO device's update time; SpDi3 holds that slot, so the family modules at 2 and 3 continue its potential group.
-    plug(run, "SpDi3", 1, sp, older, changed=["hw:" + run.path(SP.device, "items", *SP.interface)])
+    plug(run, "SpDi3", 1, sp, older, changed=["hw:" + interface(run, SP)])
     for station_, (first, second), module, after in run.families:
         plug(run, first, 2, station_, module, changed=timing(run, station_))
         plug(run, second, 3, station_, module)
@@ -871,7 +893,7 @@ def phase_b(run):
         # With SpDi3 shared to the scratch CPU and SpDi4 outside the project, SpDi is HwPeerCpu's last ET 200SP module: its connector's
         # update time returns to 128 ms (hw5).
         last = station_.device == SP.device and run.shared and run.access
-        delete(run, first, restore=True, station=station_, changed=["hw:" + run.path(SP.device, "items", *SP.interface)] if last else timing(run, station_))
+        delete(run, first, restore=True, station=station_, changed=["hw:" + interface(run, SP)] if last else timing(run, station_))
     if run.ring:
         mrp(run, interfaces(run)[0], "ManagerAuto", restore=True)
     if run.access:
@@ -941,7 +963,7 @@ def restore_slice(run):
     station(run)
     sp = sp_station(run)
     older, _ = sp_modules(run, sp)
-    plug(run, "SpDi3", 1, sp, older, changed=["hw:" + run.path(SP.device, "items", *SP.interface)])
+    plug(run, "SpDi3", 1, sp, older, changed=["hw:" + interface(run, SP)])
     plug(run, "SpDi", 2, sp, older)
     plug(run, "SpDi4", 3, sp, older)
     profile_gates(run, older)
@@ -1035,7 +1057,7 @@ def shared_disconnect(run):
     """The ET 200SP interface's connector 1 leaves the scratch CPU's IO system (sharedDevice disconnect) and gives SpDi3 back to
     HwPeerCpu in the same change: V21 fails the compile of a submodule left assigned to the leaving PLC (rd1). Applied and restored.
     True when applied."""
-    device, owner, peer = run.path(SP.device, "items", *SP.interface), run.path("ScratchStation", "items", "ScratchPLC"), run.path("HwPeer", "items", "HwPeerCpu")
+    device, owner, peer = interface(run, SP), run.path("ScratchStation", "items", "ScratchPLC"), run.path("HwPeer", "items", "HwPeerCpu")
     module = run.path(SP.device, "items", "SpDi3")
     payload = {"hardwarePath": device, "connectorIndex": 1, "disconnect": True, "sharedDevice": True, "sharedSubmodules": [module]}
     run.b0 = run.current
@@ -1043,7 +1065,7 @@ def shared_disconnect(run):
     # emptied IO system HwScratchIo stays with its constant. The scratch CPU's interface lists no assigned connector (and TIA
     # clears its LoadLimitation, rq1).
     gone = [key for key in run.current["view"] if key.startswith(constant(run, SCRATCH, SP.prefix))]
-    controller = owner + "/items/PROFINET%20interface_1"
+    controller = interface(run, SCRATCH)
     return run.apply("disconnect %s's shared connector, restored" % SP.device, "network_io_assign", payload,
                      {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": SHARED_IO, "afterIoSystem": None, "disconnect": True, "sharedDevice": True,
                                    "sharedSubmodules": [{"hardwarePath": module, "assignmentTargetBefore": owner, "assignmentTargetAfter": peer}]}]},
@@ -1055,9 +1077,9 @@ def shared_disconnect(run):
 def third_share(run):
     """The ET 200SP interface's connector 2 joins a new IO system HwThirdIo of HwThirdCpu while connectors 0 and 1 stay with HwPeerCpu and
     the scratch CPU; SpDi goes from HwPeerCpu to HwThirdCpu in the same change. True when applied."""
-    device = run.path(SP.device, "items", *SP.interface)
+    device = interface(run, SP)
     owner = run.path(THIRD.plc_device, "items", THIRD.plc)
-    controller, module = owner + "/items/PROFINET%20interface_1", run.path(SP.device, "items", "SpDi")
+    controller, module = interface_of(run, THIRD.plc_device, THIRD.plc), run.path(SP.device, "items", "SpDi")
     payload = {"hardwarePath": device, "connectorIndex": 2, "controllerHardwarePath": controller, "controllerIndex": 0, "createIoSystemName": THIRD_IO, "sharedDevice": True,
                "sharedSubmodules": [module]}
     generated = lambda applied, state: [key for key in state if key.startswith((constant(run, THIRD, SP.prefix), constant(run, THIRD, "Local~" + THIRD_IO)))]
@@ -1074,7 +1096,7 @@ def third_share(run):
 def shared_disconnect_to_third(run):
     """With HwPeerCpu and HwThirdCpu remaining, the scratch CPU's connector 1 leaves and names HwThirdCpu (remainingOwnerPath) to take
     SpDi3. Without remainingOwnerPath, or naming the leaving PLC, preparation is refused. Applied and restored; True when applied."""
-    device, owner = run.path(SP.device, "items", *SP.interface), run.path("ScratchStation", "items", "ScratchPLC")
+    device, owner = interface(run, SP), run.path("ScratchStation", "items", "ScratchPLC")
     third, module = run.path(THIRD.plc_device, "items", THIRD.plc), run.path(SP.device, "items", "SpDi3")
     payload = {"hardwarePath": device, "connectorIndex": 1, "disconnect": True, "sharedDevice": True, "sharedSubmodules": [module]}
     error = run.refuse("network_io_assign", "a shared disconnect with two remaining PLCs and no remainingOwnerPath", payload, "InvalidRequest", plcPath=scratch_plc(run))
@@ -1084,7 +1106,7 @@ def shared_disconnect_to_third(run):
     payload["remainingOwnerPath"] = third
     run.b0 = run.current
     gone = [key for key in run.current["view"] if key.startswith(constant(run, SCRATCH, SP.prefix))]
-    controller = owner + "/items/PROFINET%20interface_1"
+    controller = interface(run, SCRATCH)
     return run.apply("disconnect %s's shared connector, SpDi3 to %s, restored" % (SP.device, THIRD.plc), "network_io_assign", payload,
                      {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": SHARED_IO, "afterIoSystem": None, "disconnect": True, "sharedDevice": True,
                                    "sharedSubmodules": [{"hardwarePath": module, "assignmentTargetBefore": owner, "assignmentTargetAfter": third}]}]},
@@ -1101,10 +1123,10 @@ def shared3_slice(run):
     add_cpu(run, "add CPU HwPeer", "HwPeer")
     add_cpu(run, "add CPU HwThird", "HwThird")
     network(run)
-    node(run, "HwThird", ("HwThirdCpu", "items", "PROFINET%20interface_1"), "192.168.0.7")
+    node(run, "HwThird", interface_of(run, "HwThird", "HwThirdCpu"), "192.168.0.7")
     sp = sp_station(run, io_system=IO_SYSTEM)
     older, _ = sp_modules(run, sp)
-    plug(run, "SpDi3", 1, sp, older, changed=["hw:" + run.path(SP.device, "items", *SP.interface)])
+    plug(run, "SpDi3", 1, sp, older, changed=["hw:" + interface(run, SP)])
     plug(run, "SpDi", 2, sp, older)
     applied = shared_device(run) and third_share(run) and shared_disconnect_to_third(run)
     assigned = run.coverage.get("network_io_assign", {})
@@ -1133,6 +1155,10 @@ def complementary(run, first):
     def rows(base, view):
         prefix = "hw:" + base + SP.device + "/items/"
         return {key[len(prefix):]: row for key, row in view.items() if key.startswith(prefix)}
+    def external(base, view):
+        # Each project's own interface, resolved by structure in that project's view.
+        row = view["hw:" + hardware_paths.network_interface(view, base + SP.device + "/items/" + SP.head)]
+        return row["attributes"].get("NumberOfExternalIoControllers")
     def check():
         stations, modules = (rows(*first), rows(run.base, run.current["view"])), {}
         for name in ("SpDi3", "SpDi", "SpDi4"):
@@ -1141,8 +1167,7 @@ def complementary(run, first):
             first_, second = modules[name]
             require({**first_, "access": None} == {**second, "access": None} and sorted((first_["access"], second["access"])) == ["OutsideOfProject", "PLC"],
                     "The two projects' %s differ or share an owner: %s" % (name, modules[name]))
-        interface = "/".join(SP.interface)
-        counts = [station_[interface]["attributes"].get("NumberOfExternalIoControllers") for station_ in stations]
+        counts = [external(*first), external(run.base, run.current["view"])]
         # The first project's two PLCs (HwPeerCpu and the scratch CPU) are outside the second; the second's CPU is outside the first.
         require(counts == [1, 2], "External IO controller counts differ: %s" % counts)
         run.h.report["secondProject"] = {"modules": modules, "externalIoControllers": counts}
@@ -1161,9 +1186,9 @@ def second_project(run, module, first):
     run.project, run.base = status["path"], "/projects/%s/devices/" % status["name"]
     run.plc = scratch_plc(run)
     run.current = run.snap("second project baseline")
-    node(run, "ScratchStation", ("ScratchPLC", "items", "PROFINET%20interface_1"), "192.168.0.6")
+    node(run, "ScratchStation", interface(run, SCRATCH), "192.168.0.6")
     station_ = sp_station(run, SP2, OTHER_IO)
-    plug(run, "SpDi3", 1, station_, module, changed=["hw:" + run.path(SP.device, "items", *SP.interface)])
+    plug(run, "SpDi3", 1, station_, module, changed=["hw:" + interface(run, SP)])
     for name, slot in (("SpDi", 2), ("SpDi4", 3)):
         plug(run, name, slot, station_, module)
     shared_access(run, "SpDi3", "OutsideOfProject", False, external=2, station=SP2)
@@ -1182,7 +1207,7 @@ def refusal_slice(run):
     address_change(run, moved=True)
     sp = sp_station(run, io_system=IO_SYSTEM)
     older, _ = sp_modules(run, sp)
-    plug(run, "SpDi3", 1, sp, older, changed=["hw:" + run.path(SP.device, "items", *SP.interface)])
+    plug(run, "SpDi3", 1, sp, older, changed=["hw:" + interface(run, SP)])
     plug(run, "SpDi", 2, sp, older)
     plug(run, "SpDi4", 3, sp, older)
     channel_gate(run, older)

@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import uuid
 
+import plc_tag_tables
 from smoke_mcp import Client, ROOT
 
 DECISION = {"id": "door-reset", "source": "maintainer, qualification run", "target": "Servos", "symbols": ["Reset", "DoorOpen"],
@@ -30,7 +31,7 @@ def main():
 
     def prepare(name, address, intent):
         return client.tool('change_prepare', {'kind': 'tag_create', 'plcPath': plc, 'intent': intent, 'payload': {
-            'tagTableName': 'Default tag table', 'name': name, 'dataTypeName': 'Bool', 'logicalAddress': address}})
+            'tagTableName': table, 'name': name, 'dataTypeName': 'Bool', 'logicalAddress': address}})
 
     def apply(prepared):
         applied = client.tool('change_apply', {'changeId': prepared['changeId'], 'previewHash': prepared['previewHash'], 'idempotencyKey': uuid.uuid4().hex,
@@ -44,6 +45,8 @@ def main():
         assert client.tool('tia_start')['ownsPortalProcess'] is True
         record('owned scratch', client.tool('tia_create_scratch'))
         plc = client.tool('project_inventory')['plcs'][0]['path']
+        # Its name follows the TIA UI language ("Default tag table", "Standard-Variablentabelle"): the table holding the system constants.
+        table = plc_tag_tables.default_table(client.tool, plc)['name']
         intent = {'decisions': [DECISION], 'observedFacts': ['The scratch PLC has no door switch; DoorOpen is a memory bit.'],
                   'assumptions': ['The reset button is wired to Reset.']}
         first = prepare('Reset', '%M100.0', intent)
@@ -68,7 +71,7 @@ def main():
         record('a changed decision is flagged as a conflict', {'conflicts': conflict, 'warnings': changed['preview']['warnings']})
 
         result = client.request('tools/call', {'name': 'change_prepare', 'arguments': {'kind': 'tag_create', 'plcPath': plc, 'intent': {'guess': 'door switch is X1'},
-                                'payload': {'tagTableName': 'Default tag table', 'name': 'Guess', 'dataTypeName': 'Bool', 'logicalAddress': '%M100.3'}}})
+                                'payload': {'tagTableName': table, 'name': 'Guess', 'dataTypeName': 'Bool', 'logicalAddress': '%M100.3'}}})
         error = (result.get('structuredContent') or {}).get('error') or {}
         assert result.get('isError') and error.get('code') == 'InvalidRequest', error
         record('an unstructured guess is refused', error)

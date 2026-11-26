@@ -6,6 +6,7 @@ from pathlib import Path
 import time
 import uuid
 
+import plc_tag_tables
 from smoke_mcp import Client, ROOT
 
 
@@ -32,8 +33,10 @@ def main():
         assert record('owned start', client.tool('tia_start'))['ownsPortalProcess'] is True
         record('owned scratch', client.tool('tia_create_scratch'))
         plc = client.tool('project_inventory')['plcs'][0]['path']
+        # Its name follows the TIA UI language ("Default tag table", "Standard-Variablentabelle"): the table holding the system constants.
+        table = plc_tag_tables.default_table(client.tool, plc)['name']
         prepared = record('prepare tag_create', client.tool('change_prepare', {'kind': 'tag_create', 'plcPath': plc, 'payload': {
-            'tagTableName': 'Default tag table', 'name': 'CancelledOnce', 'dataTypeName': 'Bool', 'logicalAddress': '%M80.0'}}))
+            'tagTableName': table, 'name': 'CancelledOnce', 'dataTypeName': 'Bool', 'logicalAddress': '%M80.0'}}))
         apply = {'changeId': prepared['changeId'], 'previewHash': prepared['previewHash'], 'idempotencyKey': uuid.uuid4().hex,
                  'checkpointSave': True, 'compile': True, 'save': True}
         client.sequence += 1
@@ -79,7 +82,7 @@ def main():
         refused = (result.get('structuredContent') or {}).get('error') or {}
         record('same key refused until reconciliation', refused)
         assert result.get('isError') and refused.get('code') == 'ResourceBusy' and refused['details']['reconciliationTool'] == 'engineering_admission_reconcile', refused
-        table = client.tool('tag_table_read', {'plcPath': plc, 'tagTableName': 'Default tag table'})['xml']
+        table = client.tool('tag_table_read', {'plcPath': plc, 'tagTableName': table})['xml']
         record('tag created exactly once', table.count('<Name>CancelledOnce</Name>'))
         assert table.count('<Name>CancelledOnce</Name>') == 1
         # The cancelled dispatch left its admission outcomeUnknown; the existing fresh-instance route verifies and releases it.
@@ -104,7 +107,7 @@ def main():
         else:
             raise AssertionError('The project lock was not released within three minutes')
         nxt = client.tool('change_prepare', {'kind': 'tag_create', 'plcPath': plc, 'payload': {
-            'tagTableName': 'Default tag table', 'name': 'AfterCancel', 'dataTypeName': 'Bool', 'logicalAddress': '%M80.1'}})
+            'tagTableName': table, 'name': 'AfterCancel', 'dataTypeName': 'Bool', 'logicalAddress': '%M80.1'}})
         done = record('next change applies after reconciliation', client.tool('change_apply', {
             'changeId': nxt['changeId'], 'previewHash': nxt['previewHash'], 'idempotencyKey': uuid.uuid4().hex,
             'checkpointSave': True, 'compile': True, 'save': True}))
