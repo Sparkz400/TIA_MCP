@@ -108,6 +108,9 @@ def main():
         threading.Thread(target=stderr_reader, daemon=True).start()
         check(json.loads(server_lines.get(timeout=30)).get("ready"), "Actual fixture server ready")
         ready = json.loads((out / "server/ready.json").read_text(encoding="utf-8"))
+        # Grant the Host's requested 600 s session timeout: the fixture's default 60 s would end a session across a stretch
+        # without UA requests on a slow machine, and the Host's idle sweep would then retire it mid-qualification.
+        fixture("sessionTimeout", value=600000)
         check(ready["processId"] == server.pid, "Fixture identity bound to original owned child")
         check(abs(dt.datetime.fromisoformat(ready["processBirthUtc"]).timestamp() - birth) < 0.02,
               "Managed fixture birth matches retained original process lifetime")
@@ -235,6 +238,8 @@ def main():
         check(fixture("audit")["audit"] == snapshot["audit"], "Retired credential refuses before any UA request")
         check(call(c, "disconnect", dict(attemptId=attempt))["state"] == "closed", "Retirement still allows owned cleanup")
         final_id = uuid.uuid4().hex
+        # The session the crash orphans gets the fixture's default 60 s again, so its expiry below is observed within 75 s.
+        fixture("sessionTimeout", value=60000)
         check(call(c, "connect", dict(attemptId=final_id, selection=selected))["state"] == "connected", "Fresh healthy capture-independent session for Host disposal")
         interrupted=uuid.uuid4().hex
         crash_request=dict(attemptId=final_id,nodes=[nodes[0]],durationSeconds=60,keepAliveCount=1)
