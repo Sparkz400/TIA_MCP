@@ -6,8 +6,11 @@ namespace TiaMcp.Simulation
 {
     public static class SimulationCardMoveRetry
     {
-        public const int RetryAdmissionBudgetMs = 15000;
-        public const int MaximumMoveCalls = 61;
+        // 120 s: on 26 November 2026 an on-access file scanner (Sophos Intercept X) held a moved card folder for the whole earlier
+        // 15 s budget three times under load (Restart Manager names no file-system filter); a plain folder rename on that PC was
+        // refused for ~10-100 ms every time (scripts/probe_card_lock.py). Only the filesystem move repeats, every 250 ms at most.
+        public const int RetryAdmissionBudgetMs = 120000;
+        public const int MaximumMoveCalls = 481;
 
         // Pure orchestration: only the supplied filesystem move is retried. Native
         // identity reads are guards; password/state calls are outside this method.

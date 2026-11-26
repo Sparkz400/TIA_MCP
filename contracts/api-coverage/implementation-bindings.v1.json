@@ -1567,8 +1567,8 @@
     },
     {
       "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
-      "sha256": "0abe063accc2fbc8d6bfdec5db8704914358aaed5ec52393eaf3d5bc19fd40da",
-      "bytes": 3822
+      "sha256": "8371a342c01d6714111a76860f05e4997985f2091854e9b1be8b1e5786d2edc7",
+      "bytes": 4217
     },
     {
       "path": "src/TiaMcp.Core/SimulationDiscoveryWait.cs",
@@ -3287,8 +3287,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
-      "sha256": "29db36addde9620e14bd983e990127dc0a54bafa743677f333ed31ee2f754aa3",
-      "bytes": 103414
+      "sha256": "020cffd4f0d21fde957ee8bf09a2a35972dbdd09cab8f6250be16a97ec660fd4",
+      "bytes": 103583
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvisionReconcile.cs",
@@ -4364,8 +4364,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -4879,8 +4879,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -5366,8 +5366,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -5881,8 +5881,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -6581,8 +6581,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -6902,8 +6902,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -7301,8 +7301,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -7854,8 +7854,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -8271,8 +8271,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -8670,8 +8670,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -9192,8 +9192,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -9546,8 +9546,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -12040,8 +12040,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -12527,8 +12527,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -13140,8 +13140,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -13655,8 +13655,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -14221,8 +14221,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -14707,8 +14707,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -15222,8 +15222,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -17211,8 +17211,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -18436,8 +18436,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -19302,8 +19302,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -19573,8 +19573,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -20303,8 +20303,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -20623,8 +20623,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -21191,8 +21191,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -22228,8 +22228,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -22743,8 +22743,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -23747,8 +23747,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -24024,8 +24024,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -24352,8 +24352,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -24705,8 +24705,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -25863,8 +25863,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -26378,8 +26378,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -26984,8 +26984,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -27254,8 +27254,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -28883,8 +28883,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -29189,8 +29189,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -29460,8 +29460,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -29752,8 +29752,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -30782,8 +30782,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -31297,8 +31297,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -31770,8 +31770,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -32047,8 +32047,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -32310,8 +32310,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -33146,8 +33146,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -37919,8 +37919,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -38645,8 +38645,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -39160,8 +39160,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -45933,8 +45933,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -46287,8 +46287,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -46803,8 +46803,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -47059,8 +47059,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -47343,8 +47343,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -47746,8 +47746,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -48044,8 +48044,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -48531,8 +48531,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -48808,8 +48808,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -49115,8 +49115,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -49697,8 +49697,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -50352,8 +50352,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -50875,8 +50875,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -51138,8 +51138,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -51429,8 +51429,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -51839,8 +51839,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -52145,8 +52145,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -52416,8 +52416,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -52869,8 +52869,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -53314,8 +53314,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -53613,8 +53613,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -54031,8 +54031,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -54639,8 +54639,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -55050,8 +55050,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -55705,8 +55705,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -56228,8 +56228,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -56491,8 +56491,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -56782,8 +56782,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -57192,8 +57192,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -57635,8 +57635,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -59110,8 +59110,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -59644,8 +59644,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -60084,8 +60084,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -60524,8 +60524,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -60969,8 +60969,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -61275,8 +61275,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -61720,8 +61720,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -61998,8 +61998,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -62444,8 +62444,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -62876,8 +62876,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -63316,8 +63316,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -63734,8 +63734,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -64145,8 +64145,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -64726,8 +64726,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -65664,8 +65664,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -66179,8 +66179,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -71022,8 +71022,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -71537,8 +71537,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -72345,8 +72345,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -72860,8 +72860,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -73347,8 +73347,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -73862,8 +73862,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -78413,8 +78413,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -78676,8 +78676,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -79016,8 +79016,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -79370,8 +79370,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -79719,8 +79719,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -80241,8 +80241,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -80847,8 +80847,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -81672,8 +81672,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -82175,8 +82175,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -82886,8 +82886,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -83226,8 +83226,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -83622,8 +83622,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -83892,8 +83892,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -84162,8 +84162,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -84426,8 +84426,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -84696,8 +84696,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -84966,8 +84966,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -85237,8 +85237,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -85508,8 +85508,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -85771,8 +85771,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -86041,8 +86041,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -86304,8 +86304,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -87200,8 +87200,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -88589,8 +88589,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {
@@ -89104,8 +89104,8 @@
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
           "name": "Run",
-          "line": 14,
-          "endLine": 68,
+          "line": 17,
+          "endLine": 71,
           "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
         },
         {

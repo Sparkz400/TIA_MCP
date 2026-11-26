@@ -8,7 +8,7 @@ Entry points, qualification runners, helper modules and tests. Paths that curate
 | --- | ---: |
 | PowerShell entry points (`*.ps1`) | 44 |
 | Qualification runners (`qualify_*`) | 175 |
-| Probes (`probe_*.py`) | 17 |
+| Probes (`probe_*.py`) | 18 |
 | Verifiers (`verify_*.py`) | 24 |
 | Test harnesses kept in `scripts/` (`test_*.py`) | 160 |
 | Helper modules and tools (`*.py`) | 139 |
@@ -130,6 +130,7 @@ One-off native investigations. Each is cited by a verification record or evidenc
 | Script | Summary |
 | --- | --- |
 | [`probe_block_import_readback.py`](probe_block_import_readback.py) | Native probe for the block_import_xml content readback (TODO: "P3 — Content readback for block_import_xml"). |
+| [`probe_card_lock.py`](probe_card_lock.py) | Measure how long a PLCSIM Advanced V8 instance's virtual memory card folder stays locked after power-off. |
 | [`probe_download_abort.py`](probe_download_abort.py) | Probe: can an Openness download be stopped from inside its pre-download callback before anything is loaded? |
 | [`probe_feedback_20261118.py`](probe_feedback_20261118.py) | Native probe of the 18 November v0.9.0 feedback fixes on one owned scratch (no real project is opened or changed): |
 | [`probe_feedback_20261120.py`](probe_feedback_20261120.py) | Native probe of the 20 November changes on owned scratch projects only (no user project is opened or changed). |
