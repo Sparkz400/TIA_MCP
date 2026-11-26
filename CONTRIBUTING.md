@@ -33,8 +33,8 @@ rather than assuming `dotnet test` executes them.
 
 ```powershell
 # Before every push: the checks the changed files can break (formatting, ruff, the Release build with analyzer
-# errors, the worker compile, contracts and the Python tests that changed or import a changed script), in CI's
-# environment. -Full adds every offline suite.
+# errors, the worker compile, source bindings, contracts and the Python tests that changed or import a changed
+# script), in CI's environment. -Full adds every offline suite.
 .\scripts\Test-BeforePush.ps1
 
 # All offline suites; no Siemens installation required.

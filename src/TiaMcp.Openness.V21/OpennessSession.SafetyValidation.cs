@@ -11,6 +11,7 @@ using Siemens.Engineering;
 using Siemens.Engineering.HW;
 using Siemens.Engineering.Safety;
 using Siemens.Engineering.SafetyValidation;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {

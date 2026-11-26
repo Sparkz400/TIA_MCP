@@ -9,6 +9,7 @@ using Siemens.Engineering;
 using Siemens.Engineering.Compiler;
 using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.SW;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {

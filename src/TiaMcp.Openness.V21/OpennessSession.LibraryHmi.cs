@@ -12,6 +12,7 @@ using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.Library.MasterCopies;
 using Siemens.Engineering.Library.Types;
 using TiaMcp.Model;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {

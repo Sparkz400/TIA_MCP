@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
 using TiaMcp.Simulation;
 using TiaMcp.TestSuite.V21;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {

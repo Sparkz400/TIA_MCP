@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using TiaMcp.Core.WatchTables;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {

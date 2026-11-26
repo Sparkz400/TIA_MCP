@@ -14,6 +14,7 @@ using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Alarm;
 using Siemens.Engineering.SW.Alarm.Exceptions;
 using Siemens.Engineering.SW.Supervision;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {

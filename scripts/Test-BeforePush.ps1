@@ -5,9 +5,10 @@ Runs the offline checks that the files changed on this branch can break, before 
 .DESCRIPTION
 Compares the branch, the working tree and untracked files with the merge base of -Base and runs, in this order:
 C# whitespace formatting of the gated projects, ruff, a Release build with the analyzer errors (when C# or build files
-changed), the stubless worker compile (when worker sources changed), the feature contract checks (when contracts or
-the catalog changed) and the Python test modules that changed or import a changed script, in the same environment as
-scripts/Test-Offline.ps1. -Full runs scripts/Test-Offline.ps1 -Suite All afterwards. Nothing native runs.
+changed), the stubless worker compile (when worker sources changed), the source bindings (when sources changed), the
+feature contract checks and STATUS/TODO counts (when contracts, the matrix or those pages changed) and the Python
+test modules that changed or import a changed script, in the same environment as scripts/Test-Offline.ps1.
+-Full runs scripts/Test-Offline.ps1 -Suite All afterwards. Nothing native runs.
 #>
 param(
     [string]$Base = 'origin/main',
@@ -57,6 +58,10 @@ try {
         Invoke-Check 'Stubless worker compile' { & (Join-Path $PSScriptRoot 'Test-WorkerCompile.ps1') }
     }
 
+    # The bindings pin the SHA-256 of every implementing source file; any source edit needs ./scripts/Refresh-Contracts.ps1.
+    if ($changed -match '^(src/|contracts/|scripts/api_coverage)') {
+        Invoke-Check 'Source bindings' { $env:PYTHONUTF8 = '1'; python -B scripts/api_coverage_bindings.py validate contracts/api-coverage/implementation-bindings.v1.json --allow-missing-evidence | Out-Null }
+    }
     if ($changed -match '^(contracts/|docs/plans/release-(matrix|obligations))') {
         Invoke-Check 'Feature contracts' { $env:PYTHONUTF8 = '1'; python -B scripts/test_contracts.py }
     }

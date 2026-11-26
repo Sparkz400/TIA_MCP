@@ -134,8 +134,8 @@ internal static class SimulationNetworkAdmissionTests
         string Source(params string[] path) => File.ReadAllText(Path.Combine([root?.FullName ?? throw new InvalidOperationException("Source missing."), "src", .. path]));
         Check.Equal(true, Source("TiaMcp.Host", "PlcsimTargets.cs").Contains("RequireEndpoint(recorded, endpoint, connectedRoutes.TryGetValue(session, out var connected) ? connected.Route : null, SimulationNetworkRoute.Adapter(endpoint))", StringComparison.Ordinal));
         // Both connect tools record the route their session opens on, under the key their write gates read.
-        Check.Equal(true, Source("TiaMcp.Host", "PhysicalRuntimeTools.cs").Contains("targets.Connect(\"web:\"+attemptId,login.Endpoint,", StringComparison.Ordinal)
-            && Source("TiaMcp.Host", "PhysicalRuntimeTools.cs").Contains("targets.Require(bindingSha256,\"web:\"+attemptId,", StringComparison.Ordinal));
+        Check.Equal(true, Source("TiaMcp.Host", "PhysicalRuntimeTools.cs").Contains("targets.Connect(\"web:\" + attemptId, login.Endpoint,", StringComparison.Ordinal)
+            && Source("TiaMcp.Host", "PhysicalRuntimeTools.cs").Contains("targets.Require(bindingSha256, \"web:\" + attemptId,", StringComparison.Ordinal));
         Check.Equal(true, Source("TiaMcp.Host", "OpcUaRuntimeTools.cs").Contains("targets.Connect(\"ua:\" + attemptId, selection.Endpoint,", StringComparison.Ordinal));
         Check.Equal(true, Source("TiaMcp.Core", "PhysicalRuntime", "PlcsimTargetBinding.cs").Contains("SimulationNetworkAdmission.RouteRefusal(routeAdapter)", StringComparison.Ordinal));
         // Every mutating UA tool checks the owned-PLCSIM binding before its session call.

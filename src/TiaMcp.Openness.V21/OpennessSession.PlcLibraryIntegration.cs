@@ -8,6 +8,7 @@ using Siemens.Engineering.CrossReference;
 using Siemens.Engineering.Library.Types;
 using Siemens.Engineering.SW.Blocks;
 using Siemens.Engineering.SW.Types;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {

@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
 using Siemens.Engineering.SW.Blocks;
 using Siemens.Engineering.SW.Blocks.Interface;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {

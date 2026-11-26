@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json.Linq;
 using TiaMcp.TestSuite.V21;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {

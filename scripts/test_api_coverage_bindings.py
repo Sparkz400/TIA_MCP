@@ -38,6 +38,18 @@ class OpennessSession {
         x=self.collect(); self.assertEqual({'tools':1,'mutations':1,'features':2},x['counts'])
         tool=x['tools'][0]; self.assertEqual('Foo',tool['host']['name']); self.assertEqual(['real'],tool['bridgeOperations'])
         self.assertEqual(['Run'],[h['name'] for h in tool['workerRoutes'][0]['handlers']]); b.validate(x,self.root)
+    def test_split_dispatcher_follows_stages_in_its_other_files(self):
+        # A stage method moved to another OpennessSession.Change*.cs file is still followed one level, as in one file.
+        self.put('src/TiaMcp.Openness.V21/OpennessSession.cs','class OpennessSession { internal object Execute(string operation) { switch(operation) { case "real": return 1; default: throw new Exception(); } } }')
+        self.put('src/TiaMcp.Openness.V21/OpennessSession.ChangePrepare.cs','class OpennessSession { private object PrepareEngineeringMutation(object change) { switch(change.Kind) {case "change_a": return PrepareA();} } }')
+        self.put('src/TiaMcp.Openness.V21/OpennessSession.ChangeApply.cs','class OpennessSession { private void ApplyEngineeringMutation(object change) { switch(change.Kind) {case "change_a": ApplyA(); break;} }\n private void ApplyA() { Target(); ChangeHash(); } }')
+        self.put('src/TiaMcp.Openness.V21/OpennessSession.ChangeTargets.cs','class OpennessSession { private object PrepareA() => Target(); private void Target() { } }')
+        self.put('src/TiaMcp.Openness.V21/ChangeArguments.cs','static class ChangeArguments { internal static string ChangeHash() => ""; }')
+        handlers={br['phase']:sorted(h['name'] for h in br['handlers']) for br in self.collect()['mutations'][0]['branches']}
+        self.assertEqual(['PrepareA','Target'],handlers['PrepareEngineeringMutation'])
+        self.assertEqual(['ApplyA','ChangeHash','Target'],handlers['ApplyEngineeringMutation'])
+        self.assertTrue(b.same_split('src/TiaMcp.Openness.V21/OpennessSession.Changes.cs','src/TiaMcp.Openness.V21/OpennessSession.ChangeTargets.cs'))
+        self.assertFalse(b.same_split('src/TiaMcp.Openness.V21/OpennessSession.Changes.cs','src/TiaMcp.Openness.V21/OpennessSession.Hmi.cs'))
     def test_nested_expression_method(self):
         ms,_=b.methods('class A { public object F() => Wrap(() => new { X = "}" }); public void G() { if(true) { Do(); } } }','a.cs')
         self.assertEqual(['F','G'],[m['name'] for m in ms])
