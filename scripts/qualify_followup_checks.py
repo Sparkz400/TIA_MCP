@@ -42,7 +42,8 @@ Portal or starts its own; Host C runs inside an owned job (scripts/owned_process
   report): the profile's baseline is retrieved; page and both early refusals on real identities; hmi_engineering with a
   valid payload is refused with HmiPreservationUnavailable and its remediation.
 
-host_build_identity from an installed package and the UMC global user are not covered here. The report has the shape
+Host A's host_build_identity is recorded first (hostBuild: the build that ran). host_build_identity from an installed
+package and the UMC global user are not covered here. The report has the shape
 scripts/curate_evidence.py reads (completed, steps, toolCalls); artifacts stay under the repository's artifacts/ directory.
 """
 import argparse
@@ -408,6 +409,18 @@ class Run:
         return data
 
     def client(self, label, extra=None):
+        existing = self.clients.get(label)
+        if existing is not None and (getattr(existing, "exited", False) or existing.process.poll() is not None):
+            # A Host that ended (its worker session lost) is replaced, so one stage's crash does not fail every later stage.
+            self.record("host %s exited; replaced" % label.upper(), {"exitCode": existing.process.poll(), "stderr": existing.errors[-10:]})
+            try:
+                self.report.setdefault("hostClose", {})["%s-exited-%d" % (label, len(self.report["steps"]))] = existing.close()
+            except Exception as error:  # noqa: BLE001 - the replacement starts regardless
+                self.record("close of the exited host %s" % label.upper(), str(error))
+            del self.clients[label]
+            if label == "a":
+                self.scratch = None
+                self.seeded = None
         if label not in self.clients:
             folder = self.root / label
             folder.mkdir(exist_ok=True)
@@ -522,7 +535,11 @@ class Run:
         return created
 
     def sim_release(self, instance_id):
-        value, failed, _ = self.call(self.a, "sim_release", {"instanceId": instance_id, "deleteOwned": True})
+        """Release with deleteOwned; never raises, so a cleanup cannot hide the stage's own result."""
+        try:
+            value, failed, _ = self.call(self.a, "sim_release", {"instanceId": instance_id, "deleteOwned": True})
+        except Exception as error:  # noqa: BLE001 - recorded; the instance stays listed for the final cleanup
+            return self.record("sim_release %s failed" % instance_id, str(error))
         if instance_id in self.instances and not failed:
             self.instances.remove(instance_id)
         return self.record("sim_release %s" % instance_id, {"failed": failed, "result": value})
@@ -778,9 +795,10 @@ class Run:
     def ticket_states(self, scratch):
         result = {}
         # Unusable: not a ticket at all.
-        value = self.refused("simulation_download with a string that is not a ticket", self.a, "simulation_download",
-                             {"downloadTicket": "not-a-ticket"}, ("InvalidSimulationTicket",))
-        result["unusable"] = details_of(value).get("ticketState")
+        value, failed, _ = self.call(self.a, "simulation_download", {"downloadTicket": "not-a-ticket"})
+        result["unusable"] = self.record("simulation_download with a string that is not a ticket", {
+            "failed": failed, "code": error_of(value).get("code"), "ticketState": details_of(value).get("ticketState"),
+            "remediation": details_of(value).get("remediation")})
         # Before the claim: the exact instance is no longer registered (released), so nothing is written.
         released = self.sim_create()
         self.sim_release(released["instance"]["id"])
@@ -796,11 +814,19 @@ class Run:
         result["spent"] = self.record("simulation_download without credentialMetadataPath", {
             "failed": failed, "code": error_of(value).get("code"), "ticketState": details.get("ticketState"),
             "retrySafe": details.get("retrySafe"), "completed": value.get("completed"), "configurations": details.get("configurations")})
-        value, failed, _ = self.call(self.a, "simulation_download", {"downloadTicket": spent["downloadTicket"], "credentialMetadataPath": scratch["credential"]})
+        # A worker exception thrown from a download callback once left the Portal disposed (online route, 26 November); the
+        # retry needs a session, so it is checked and rebuilt first. Without a credential the retry still reaches the spent check.
+        status, lost, _ = self.call(self.a, "tia_session_status")
+        result["sessionAfterCallbackFailure"] = self.record("tia_session_status after the callback failure", {
+            "failed": lost, "attached": status.get("attached"), "projects": [p.get("path") for p in status.get("projects") or []]})
+        if self.ensure_scratch() is not scratch:
+            self.enable_simulation()
+        value, failed, _ = self.call(self.a, "simulation_download", {"downloadTicket": spent["downloadTicket"]})
         result["spentRetry"] = self.record("the same ticket again", {"failed": failed, "code": error_of(value).get("code"),
                                                                        "ticketState": details_of(value).get("ticketState")})
         self.sim_release(spent["instance"]["id"])
-        require(result["unusable"] == "unusable", "Not ticketState unusable: %s" % result["unusable"])
+        require(result["unusable"]["code"] == "InvalidSimulationTicket" and result["unusable"]["ticketState"] == "unusable",
+                "The non-ticket was not reported unusable: %s" % result["unusable"])
         require(result["reusable"]["failed"] and result["reusable"]["ticketState"] == "reusable" and result["reusable"]["retrySafe"] is True,
                 "The released instance's ticket was not reported reusable")
         require(result["spent"]["failed"], "TIA did not ask for the configuration password, so the after-claim failure was not provoked")
@@ -1010,6 +1036,10 @@ class Run:
         plan = stage_plan(selected, {"running_instance": self.args.running_instance, "seeded_report": self.args.seeded_report is not None})
         self.report["plan"] = plan
         try:
+            try:
+                self.report["hostBuild"] = self.record("host A host_build_identity", self.ok(self.a, "host_build_identity"))
+            except Exception as error:  # noqa: BLE001 - recorded; every stage reports its own failure
+                self.record("host A host_build_identity failed", str(error))
             for name in STAGES:
                 if name == "hmi_inspect_page_and_early_kind_refusal" and "b" in self.clients:
                     self.close_client("b")  # Host B's part ends with the exited client.
@@ -1025,12 +1055,16 @@ class Run:
             print(("PASSED " if self.report["completed"] else "FAILED ") + str(self.root / "report.json"), flush=True)
 
     def close_client(self, label):
+        """Detach and close one Host; never raises, so every Host is closed and the report is written."""
         client = self.clients.pop(label)
         try:
             self.record("host %s tia_detach" % label.upper(), self.call(client, "tia_detach", {"waitForExitSeconds": 120})[:2])
         except Exception as error:  # noqa: BLE001 - the Host is closed regardless
             self.record("host %s tia_detach failed" % label.upper(), str(error))
-        self.report.setdefault("hostClose", {})[label] = client.close()
+        try:
+            self.report.setdefault("hostClose", {})[label] = client.close()
+        except Exception as error:  # noqa: BLE001 - recorded
+            self.report.setdefault("hostClose", {})[label] = {"closeFailed": str(error)}
         self.save()
 
 

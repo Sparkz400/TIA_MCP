@@ -218,6 +218,51 @@ class StageBookkeeping(unittest.TestCase):
             saved = json.loads((Path(folder) / "report.json").read_text(encoding="utf-8"))
             self.assertEqual(len(saved["stages"]), 4)
 
+    def test_an_exited_host_is_replaced(self):
+        class Process:
+            def __init__(self, code):
+                self.code = code
+
+            def poll(self):
+                return self.code
+
+        class Host:
+            made = []
+
+            def __init__(self, executable, timeout, arguments):
+                self.arguments, self.exited, self.errors, self.process, self.closed = arguments, False, [], Process(None), False
+                Host.made.append(self)
+
+            def request(self, method, params=None):
+                return {}
+
+            def notify(self, method, params=None):
+                pass
+
+            def close(self):
+                self.closed = True
+                return {"hostExitCode": 1}
+
+        with tempfile.TemporaryDirectory() as folder:
+            run = self.run_view(folder)
+            run.clients, run.host, run.worker, run.sim_worker = {}, "host.exe", "worker.exe", "sim.exe"
+            run.tool_calls, run.scratch, run.seeded = [], {"path": "x"}, None
+            original = q.Client
+            q.Client = Host
+            try:
+                first = run.client("a")
+                self.assertIs(run.client("a"), first, "a live Host is reused")
+                first.process = Process(3)
+                second = run.client("a")
+                self.assertIsNot(second, first)
+                self.assertTrue(first.closed)
+                self.assertIsNone(run.scratch, "the lost Host's scratch is forgotten")
+                second.exited = True
+                self.assertIsNot(run.client("a"), second)
+                self.assertIs(second.tool_calls, run.tool_calls)
+            finally:
+                q.Client = original
+
     def test_main_refuses_artifacts_outside_the_repository(self):
         with tempfile.TemporaryDirectory() as folder:
             with self.assertRaises(SystemExit):
