@@ -20,8 +20,9 @@ import hashlib
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
+import hardware_paths
 from library_native_harness import Harness, require
-from qualify_hardware_changes import CRITERIA as HARDWARE_CRITERIA, Run
+from qualify_hardware_changes import CRITERIA as HARDWARE_CRITERIA, Run, interface_of
 from qualify_plc_object_mutations import STAGES, coverage_gaps, diff, in_order, matches
 
 DESIGNATION = "TiaMcpIDevice"
@@ -148,12 +149,13 @@ def area(run, kind, interface, name, restore=False):
 
 
 def phase_a(run, cpu, interface):
-    display = cpu + "/items/CPU%20display_1"
+    # The CPU display ("CPU display_1", localized by TIA) is the CPU's one built-in item with the native display attributes.
+    display = hardware_paths.child_with_attribute(run.raw, cpu, "DisplayProtection")
     refuse_export(run, "an invented hardware path", {"hardwarePath": interface + "X", "designation": DESIGNATION}, ["HardwareNotFound"])
     refuse_export(run, "the CPU display, which has no GsdExportProvider", {"hardwarePath": display, "designation": DESIGNATION}, ["UnsupportedCapability"])
     run.h.stage("no item reports gsdExportAvailable before the I-device", lambda: require(exportable(run) == [], "Exportable before the I-device: %s" % exportable(run)) or [])
     refuse_export(run, "the interface before it is an I-device", {"hardwarePath": interface, "designation": DESIGNATION}, ["UnsupportedCapability"])
-    run.apply("put ScratchPLC on GsdNet", "network_configure", {"hardwarePath": interface, "nodeName": "X1", "subnetName": "GsdNet"}, changed=["hw:" + interface])
+    run.apply("put ScratchPLC on GsdNet", "network_configure", {"hardwarePath": interface, "nodeName": hardware_paths.node_name(run.current["view"], interface), "subnetName": "GsdNet"}, changed=["hw:" + interface])
     run.refuse("hardware_attributes", "an unknown name in an operating-mode set", {"hardwarePath": interface, "attributes": {"InterfaceOperatingMode": "IoController, SharedDevice"}}, "InvalidRequest")
     run.refuse("hardware_attributes", "an unknown operating mode", {"hardwarePath": interface, "attributes": {"InterfaceOperatingMode": "SharedDevice"}}, "InvalidRequest")
     run.refuse(KINDS[0], "the interface before it is an I-device", {"hardwarePath": interface, "name": AREA}, "UnsupportedCapability")
@@ -223,8 +225,8 @@ def body(h):
     status = h.tool("tia_session_status")["projects"][0]
     run.project, run.base = status["path"], "/projects/%s/devices/" % status["name"]
     cpu = run.path("ScratchStation", "items", "ScratchPLC")
-    interface = cpu + "/items/PROFINET%20interface_1"
     run.current = run.snap("baseline")
+    interface = interface_of(run, "ScratchStation", "ScratchPLC")
     source, first = phase_a(run, cpu, interface)
     reopen(run, source, first)
     phase_b(run, interface, source, first)

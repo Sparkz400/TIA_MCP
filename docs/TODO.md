@@ -391,8 +391,10 @@ the catalog. The matrix was not changed.
   `192.168.0.10/24`); with the CPU at `169.254.117.10` provisioning failed in `GoOnline` ("Changing to online mode
   failed") before any TLS or login callback. Next: the operator restores a static address on the PLCSIM adapter
   (elevated), then rerun with `--cpu-ip` in that subnet. The run also showed that the runner hardcoded the English
-  item name `PROFINET interface_1` (fixed: it finds the CPU's networked interface); about 20 other runner lines still
-  hardcode it and fail on a German TIA installation. Known risk from the mode itself: TIA's default Program_Alarm class
+  item name `PROFINET interface_1` (fixed: it finds the CPU's networked interface); the other runners that hardcoded
+  TIA-generated item names (interfaces, ports, racks, the CPU display) now resolve them structurally through
+  `scripts/hardware_paths.py` (offline-tested with German-named fixtures; no native rerun yet). Still open: eight runners
+  hardcode the default tag table's name `Default tag table`, which a German installation calls `Standard-Variablentabelle`. Known risk from the mode itself: TIA's default Program_Alarm class
   needs no acknowledgement (`local.runtime.plcsim-ua-services.20261031`); a stand-in alarm does not bind
   `runtime_web_alarm_acknowledge`.
 - [x] **`sim_prune` (L03, 4 cells):** bound on 26 November (`local.plcsim.prune.20261126`, [record](verification/native-runs-20261126.md)): listing,
