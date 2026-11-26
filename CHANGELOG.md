@@ -16,10 +16,11 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ### Changed
 
-- Catalogs `0.5.1` and `0.5.2`: `project_save`, `project_close`, `project_archive`, `project_open_copy`, `simulation_provision_status`, `simulation_provision_recover`, `sim_prune`, `sim_network_mode_set` and `hmi_content_fingerprint` are natively verified on owned scratch projects and instances ([record](docs/verification/native-runs-20261126.md)); `project_archive` documents that TIA's archive writes into the open project's folder.
+- Catalog `0.5.3` requalifies the read-only V19 adapter after the shared-loop link fix. Catalogs `0.5.1` and `0.5.2`: `project_save`, `project_close`, `project_archive`, `project_open_copy`, `simulation_provision_status`, `simulation_provision_recover`, `sim_prune`, `sim_network_mode_set` and `hmi_content_fingerprint` are natively verified on owned scratch projects and instances ([record](docs/verification/native-runs-20261126.md)); `project_archive` documents that TIA's archive writes into the open project's folder.
 
 ### Fixed
 
+- Credential provisioning's card move gave up after 15 s of access denials that an on-access scanner holding the freshly moved folder causes; it now retries for up to 120 s, and the holder report says that a file-system filter is not listed.
 - `simulation_download_online` and `plc_physical_download` refused a `DataBlockReinitialization` question by throwing from TIA's download callback, which loaded nothing but left the TIA Portal session disposed and reported `EngineeringError`; they now decline it through TIA and report `SimulationDownloadReinitializationRequired` (or the physical route's refusal) with the Portal intact.
 - `hmi_content_fingerprint` fingerprinted any kind starting with `hmi_`; an unknown kind is now refused (`InvalidRequest`).
 - `project_snapshot_capture` failed every successful capture with `ProjectReviewFailed` ("System.Int32 cannot be converted to System.Int64") while it added `remoteAccess` to the saved review, since 20 November (in 0.9.0). The review's byte count is now stored as a 64-bit number and read in either width.

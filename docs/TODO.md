@@ -142,7 +142,7 @@ with evidence from an owned fixture.
   a CPU and the download fails with an empty `onlineChallenges`. The challenge does arrive on PLCSIM (owned
   provisioning). Reproduce on an owned bench PLC as part of the real-PLC online access qualification under the 14 November feedback above (B05); if it holds,
   record it as an Openness gap and make the refusal say that no challenge was raised.
-- [ ] **P2 — Download pre-check as data:** the user read the editor's load preview (each entry, its status,
+- [x] **P2 — Download pre-check as data:** the user read the editor's load preview (each entry, its status,
   message and action) from screenshots, and drove the editor with keyboard shortcuts and synthetic clicks, which
   were unreliable. `plc_physical_download` already returns every pre- and post-download prompt with its type,
   message and selection, and configures the PG/PC interface and address (`PhysicalRoute`), but only from a real
@@ -168,10 +168,12 @@ with evidence from an owned fixture.
   is invalid"); that Siemens exception ends the download without loading and leaves the Portal usable. Since then
   `simulation_download_online` and `plc_physical_download` decline a refused `DataBlockReinitialization` that way and
   report the typed refusal (`SimulationDownloadReinitializationRequired`): nothing loaded, the online compare after the
-  abort ran, and the control download was detected by the compare. Open: `StopModules` (still refused by a worker
-  exception; its `NoAction` is unobserved), a complete curated run of all three cases (the `first` case of the last run
-  hit the card-staging access denial), and the physical route (B05). Not an Openness gap: the abort loads nothing and
-  returns every configuration up to the refused one.
+  abort ran, and the control download was detected by the compare. A complete run of all three cases on the fixed
+  worker (`artifacts/da6`) gave `noGap` for `first` and `later` and a sensitive control; the probe still reports
+  `inconclusive` because TIA asks `DataBlockReinitialization` before any other question, so an abort at a later
+  callback cannot be provoked with this change set. Answered: a download is stopped from its first pre-download
+  callback before anything is loaded; no Openness gap. Left: `StopModules` (still refused by a worker exception; its
+  `NoAction` is unobserved), a fixture whose refused question comes after an answered one, and the physical route (B05).
 - [x] **P2 — Opening a UMAC-protected project:** the user found that `ProjectComposition.Open(FileInfo, UmacDelegate,
   ProjectOpenMode)` works with `UmacCredentials.Name` and `SetPassword(SecureString)` in the callback. `project_open`
   passed no callback, so it could not open such a project. Done on 20 November (offline): `project_open` takes
@@ -260,7 +262,7 @@ Host path confinement, V21 change apply/restore, runtime session locking, the sh
 scripts/CI clean-up). Nothing here was qualified natively: the changes are covered by the offline suites only.
 
 - [x] **V19/V21 shared worker loop:** merged in PR 279 (request loop, error mapping and traversal shared, `AccessDenied`/`LicenseUnavailable` mapped by exact Siemens type). The V19 worker builds against the V19 SDK on the second workstation, and the read-only V19 qualification passed there on 12 November with the same 53 stages as before (`local.tia.v19-adapter.shared-loop.20261112`); the two error mappings were not provoked natively.
-- [ ] **V19 native rebuild after the link fix:** the V19 worker stopped compiling when the batched capture reads (501a2fb9) made the shared `OpennessTraversal.cs` use `BatchedAttributeReads`, which V19 did not link; PR 330 links it, and the stubless worker check in CI now catches such a forgotten link. Open: build V19 against the V19 SDK on the second workstation and rerun the read-only V19 qualification, the first run of batched reads on V19.
+- [x] **V19 native rebuild after the link fix:** the V19 worker stopped compiling when the batched capture reads (501a2fb9) made the shared `OpennessTraversal.cs` use `BatchedAttributeReads`, which V19 did not link; PR 330 links it, and the stubless worker check in CI now catches such a forgotten link. Done on 26 November on the second workstation (LT-PRG2024-03): the V19 worker built against the V19 SDK and the read-only V19 qualification passed its 53 stages, the first run of batched reads on V19 (`local.tia.v19-adapter.rebuild.20261126`, [record](verification/native-runs-20261126.md#v19-requalification)).
 - [ ] **Native smoke of the code-health refactoring (PR 330):** the `Prepare*`/`Apply*` change-kind extractions, the 11 `SimulationProvision` stages, the `Add*Capabilities` split, the renamed `OpennessSession` methods and the new failure reports of formerly silent catches are compiled and reviewed only. Open: `scripts/Build.ps1` on the workstation, then one native change run per family (block source/XML, hardware, HMI) and one `sim_provision`. Largely covered on 26 November by runs on Debug builds that contain PR 330 ([record](verification/native-runs-20261126.md)): `source_upsert` and `block_import_xml` (`local.block-import.readback.20261126`), `hmi_screen_create` on both Unified profiles and `hmi_classic_import` on the three Classic profiles (`local.hmi.content-fingerprint.20261126`), and provisioning refused, held and recovered (`local.platform.lifecycle.20261126`) and trusted (the download-abort probe). Still open: a hardware change kind.
 - [ ] **UA session during a long bind, native confirmation:** decided on 10 November: the client requests a 600 s session timeout and still sends no keep-alive (no background traffic), so a session orphaned by a Host crash lives up to the server's revised timeout, at most 10 minutes. The offline suite checks the requested value only. Open: confirm on an owned PLCSIM instance that a session survives a 2-5 minute `runtime_plcsim_bind`; a server whose configured maximum session timeout is shorter still ends it. Looked at on 26 November: no runner can make a real bind last that long, and holding a session idle instead would test idle survival, not a bind; it needs a bind against a large program or a deliberately slow PLCSIM, and it is a TCP/IP run (see the D12 box for the adapter setup that blocks those).
 - [ ] **OPC UA fixture timing assumptions left after PR 332:** PR 332 fixed two load flakes. `qualify_diagnostic_ua_binding.py` compared the fixture's certificate log, which the Host's own token renewal changes at about 45 s. The fixture's gap and duplicate faults hit keep-alives because they were keyed on the Publish number. Still open, none seen failing outside forced delays:
@@ -281,7 +283,7 @@ scripts/CI clean-up). Nothing here was qualified natively: the changes are cover
 ## Native admission and runtime
 
 - [x] Fresh-process PLCSIM discovery is integrated into credential provisioning and passed end to end on 24 October. [Production integration](verification/plcsim-startup-discovery-20261024.md#production-integration).
-- [ ] Card staging access denied (`0x80070005`): **recurred on 26 November** (reopened, decision of 31 October). Two of
+- [ ] Card staging access denied (`0x80070005`): **recurred on 26 November** (reopened, decision of 31 October); **cause found and retry widened the same day**, native confirmation under load open. Two of
   five provisioning attempts on LT-PRG2024-03 could not move the original card back after power-off: `IOException`
   0x80070005 for the whole 15 s retry budget (3 and 22 attempts), Windows Restart Manager naming no holder, Defender
   real-time protection off; the user-authorized trusted attempt then failed with `SimulationProvisionCardRestoreFailed`,
@@ -290,9 +292,14 @@ scripts/CI clean-up). Nothing here was qualified natively: the changes are cover
   card at the first move. Heavy concurrent builds and test runs were active during both failures ([record](verification/native-runs-20261126.md)).
   A third occurrence on 26 November ended a download-abort probe case the same way.
   Earlier: seen once for 15 s on 23 October, not reproduced in 5 instrumented runs on 1 November
-  (`local.provision.card_move.20261101`). Next: identify the holder with a handle listing (Restart Manager does not see
-  directory handles), e.g. Sysinternals `handle` on the card folder during a failure, and decide whether a longer
-  retry budget or a stop of the indexer for the artifacts folder is the fix.
+  (`local.provision.card_move.20261101`). Cause ([record](verification/native-runs-20261126.md#card-staging-access-denial)): the PC runs Sophos
+  Intercept X with on-access file scanning; `scripts/probe_card_lock.py` showed that renaming a card folder back right
+  after a rename is refused every time for about 100 ms (10 of 10 cycles), and a plain folder for about 10 ms, while
+  the artifacts folder is not in the Windows Search index. A scanner holds freshly moved folders through a file-system
+  filter, which Restart Manager does not list, and under load longer. The card move now retries for up to 120 s
+  (`SimulationCardMoveRetry`, 481 calls, at most every 250 ms) and the holder query names the unlisted filter; the next
+  trusted provisioning restored the card at the first move. Open: a provisioning run under heavy load on the 120 s
+  budget. Excluding the Host's artifacts folder from on-access scanning is an IT decision, documented as the remedy.
 - [x] **Unresolved provisioning reservation:** trusted reconciliation for failed provisioning's `outcomeUnknown` admission is complete on this PC (2 November). `simulation_provision_reconcile` now also requires that the project was last saved before its pre-provision archive (with the fingerprint including the project library), that the storage outside the card matches its pre-attempt inventory by metadata with only the attempt's own and PLCSIM's runtime files added, and that the write-ahead stream never opened or armed the credential; an observer that was never created is unchanged. All five retained admissions, the checkpoint attempt's `f52861ec…` included, were released in fresh sessions with exact process exits and a fresh-Portal reopen of each original project (`local.sim.reconcile.release.20261102`, [record](verification/provision-release-20261102.md)). The updated runner's checkpoint/compile/save passed end to end in the [frozen corpus](verification/runtime-frozen-20261024.md). Opaque runtime files are bounded by metadata and the stream, never read; an attempt that may have submitted the credential stays held. The VM's ticket and zero-address entry stay under [Other native machine](#other-native-machine-vm-not-this-pc).
 - [x] Native requested stop, independent worker exit, lock release and owned cleanup are qualified ([requested stop](verification/requested-stop-20261024.md), [card inventory and lock release](verification/card-inventory-and-lock-release-20261024.md), [FileStorage exit](verification/file-storage-exit-20261024.md)).
 - [x] File-storage helper exit deadline: the 360 s deadline for `Siemens.Automation.ObjectFrame.FileStorage.Server.exe` is defined once in `scripts/retained_native_lifecycle.py` and used by every runner that waits for retained processes (the retained-tree lifecycle, force capture and the Test Suite scope probe), with a unit test. The 24 October recovery-only misses ran before the retained-tree path had it. The native confirmation of 1 November was inconclusive because no headless flow on the current build starts the helper; closed on that basis (decision of 1 November) and reopened if a run shows the helper again.

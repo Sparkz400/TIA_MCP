@@ -111,3 +111,27 @@ bound to it, a new hash after the applied change (a Unified screen, a Classic `B
 new hash for a prepare bound to the old one, and `InvalidRequest` for an unknown kind. The hash was identical for
 `HMI_RT_1` and `HMI_RT_2` and for `hmi_screen_create` and `hmi_external_tag_create`, so it covers the family's HMIs of
 the project rather than one target.
+
+The decline was then verified on a complete run of all three cases (`artifacts/da6`, Debug builds of `d1570160`):
+`first` and `later` were both refused at `DataBlockReinitialization` with `SimulationDownloadReinitializationRequired`,
+nothing was loaded and the online compare ran; the control loaded the change and the compare became identical. TIA
+asks `DataBlockReinitialization` before `ConsistentBlocksDownload`, so this change set cannot provoke an abort at a
+later callback; the probe therefore reports `inconclusive` and the run is not curated.
+
+## Card-staging access denial
+
+`scripts/probe_card_lock.py` (10 cycles, owned instances, `artifacts/n26/cl1`): after power-off, renaming the card
+folder away succeeded at once every time, and renaming it straight back was refused with `WinError 5` for about
+100 ms in all 10 cycles; a plain folder with 20 files in the artifacts folder was refused for about 10 ms on most
+renames. The artifacts folder is not in the Windows Search index. The PC runs Sophos Intercept X with on-access file
+scanning (`SophosFileScanner`); Windows Defender real-time protection is off. A scanner's file-system filter is not a
+Restart Manager holder, which matches the "no holder" refusals. The card move now retries for up to 120 s
+(`d1570160`); the next trusted provisioning (`artifacts/n26/p7`) completed with every card move at the first attempt.
+
+## V19 requalification
+
+The V19 worker, which had stopped compiling when the batched capture reads made the shared traversal use
+`BatchedAttributeReads` (linked by PR 330), was rebuilt against the V19 SDK and registered in V19's own Openness
+whitelist by its Debug build. `scripts/qualify_tia_v19.py --run-native` passed all 53 stages, the first V19 run of the
+batched reads, and is curated as
+[`local.tia.v19-adapter.rebuild.20261126`](../../evidence/local.tia.v19-adapter.rebuild.20261126.json) (catalog `0.5.3`).

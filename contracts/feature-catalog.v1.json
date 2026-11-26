@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.5.2",
+  "catalogVersion": "0.5.3",
   "targetTiaVersions": [
     21
   ],
@@ -6013,6 +6013,23 @@
         "Seeded baselines, not desk-configured fixtures; complete is false on every profile (the kinds' standing capture notes), scopeAccepted true. The hash was identical for HMI_RT_1 and HMI_RT_2 and for hmi_screen_create and hmi_external_tag_create: it covers the family's HMIs of the project, not one target, so identity separation between HMIs is not provided by the fingerprint.",
         "Other HMI change kinds (hmi_text_list_import, hmi_dynamization_create, hmi_event_handler_create, hmi_classic_screen_edit) are not fingerprinted in this run."
       ]
+    },
+    {
+      "id": "local.tia.v19-adapter.rebuild.20261126",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "95cc159a4bcbe42b8180dc798243d22092833b9a",
+        "passedScope": "scripts/qualify_tia_v19.py --run-native on Debug builds of d1570160 (src unchanged since; the V19 worker rebuilt against the V19 SDK after PR 330 linked BatchedAttributeReads), 53 stages on LT-PRG2024-03 with TIA Portal V19 and V21: V19ProjectSeeder fixture, the V19 Host's tool surface, owned V19 instance reads of every seeded object (the first V19 run of the batched capture reads), read-only open, a Portal held by the seeder discovered and left running, V19 Portals exiting after detach, and V19-to-V21 project_upgrade of the folder and the archive with content equal to the V19 exports and SourceLocked while V19 holds the fixture."
+      },
+      "artifacts": [
+        "evidence/local.tia.v19-adapter.rebuild.20261126.json"
+      ],
+      "limitations": [
+        "Read-only V19 adapter only, as on 9 November; the error mappings AccessDenied and LicenseUnavailable are not provoked.",
+        "One synthetic V19 fixture (CPU 1511-1 PN V3.1); other V19 firmware, HMI and protected projects are not exercised."
+      ]
     }
   ],
   "features": [
@@ -7237,7 +7254,8 @@
         "evidenceIds": [
           "local.project_upgrade.20261031",
           "local.project_upgrade.interruption.20261101",
-          "local.tia.v19-adapter.20261109"
+          "local.tia.v19-adapter.20261109",
+          "local.tia.v19-adapter.rebuild.20261126"
         ]
       },
       "availability": {
@@ -12689,14 +12707,16 @@
           "Object paths come from the V21 worker's ObjectIdentity, so a V19 path and the path of the same object after project_upgrade differ only in the /projects/<name> segment. Native XML is version-specific.",
           "TIA V19 reads approved Openness applications from HKLM\\SOFTWARE\\Siemens\\Automation\\Openness\\19.0\\Whitelist, not the shared AllowList; V19 Debug builds register there (Register-DevOpennessWorker.ps1 -TiaVersion 19), and the Host's registration check follows --tia-version.",
           "Opening a V19 project lets TIA's background indexer rewrite IM/SearchIndex files of the project; the adapter never saves.",
-          "V15.1, V17, V18 and V20 have no adapter."
+          "V15.1, V17, V18 and V20 have no adapter.",
+          "Requalified on 26 November 2026 after PR 330 linked BatchedAttributeReads into the shared V19 loop (local.tia.v19-adapter.rebuild.20261126): the V19 worker rebuilt against the V19 SDK passed the same 53 read-only stages, the first V19 run of the batched capture reads."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.tia.v19-adapter.20261109",
-          "local.tia.v19-adapter.shared-loop.20261112"
+          "local.tia.v19-adapter.shared-loop.20261112",
+          "local.tia.v19-adapter.rebuild.20261126"
         ]
       },
       "availability": {
