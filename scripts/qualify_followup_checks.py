@@ -829,8 +829,10 @@ class Run:
         if self.ensure_scratch() is not scratch:
             self.enable_simulation()
         value, failed, _ = self.call(self.a, "simulation_download", {"downloadTicket": spent["downloadTicket"]})
+        blocking = [b.get("operation") for b in details_of(value).get("blockingAdmissions") or []]
         result["spentRetry"] = self.record("the same ticket again", {"failed": failed, "code": error_of(value).get("code"),
-                                                                       "ticketState": details_of(value).get("ticketState")})
+                                                                       "ticketState": details_of(value).get("ticketState"),
+                                                                       "blockingOperations": blocking})
         self.sim_release(spent["instance"]["id"])
         require(result["unusable"]["code"] == "InvalidSimulationTicket" and result["unusable"]["ticketState"] == "unusable",
                 "The non-ticket was not reported unusable: %s" % result["unusable"])
@@ -838,8 +840,12 @@ class Run:
                 "The released instance's ticket was not reported reusable")
         require(result["spent"]["failed"], "TIA did not ask for the configuration password, so the after-claim failure was not provoked")
         require(result["spent"]["ticketState"] == "spent", "The after-claim failure was not reported spent")
-        require(result["spentRetry"]["code"] == "FreshSimulationStorageRequired" and result["spentRetry"]["ticketState"] == "spent",
-                "The spent ticket was not refused as spent")
+        # The spent download's admission stays outcomeUnknown (it may have written), so the retry is refused either by the
+        # worker (FreshSimulationStorageRequired) or, natively on 26 November, already by the Host (ResourceBusy naming it).
+        retry = result["spentRetry"]
+        require(retry["failed"] and (retry["code"] == "FreshSimulationStorageRequired" and retry["ticketState"] == "spent"
+                                     or retry["code"] == "ResourceBusy" and retry["blockingOperations"] == ["simulation_download"]),
+                "The spent ticket was not refused: %s" % retry)
         return result
 
     def simulation_registrations_present(self):
