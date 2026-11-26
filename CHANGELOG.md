@@ -10,6 +10,14 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
+### Added
+
+- `block_import_xml` reads every imported block back after compile and compares it with the supplied SimaticML, ignoring export provenance (`DocumentInfo`), empty multilingual texts, formatting and ID numbering; an equal block reports the `readbackVerified` milestone `done` (`block_import_content_verified`), a difference is recorded in the `block-import-content` readback and leaves it `notRecorded` without failing the change. The rule comes from native exports of LAD and FBD FBs, an SCL FC and an optimized DB on 26 November.
+
+### Fixed
+
+- `project_snapshot_capture` failed every successful capture with `ProjectReviewFailed` ("System.Int32 cannot be converted to System.Int64") while it added `remoteAccess` to the saved review, since 20 November (in 0.9.0). The review's byte count is now stored as a 64-bit number and read in either width.
+
 ## [0.9.0] - 2026-11-25
 
 First tagged pre-release. Changes since the repository went public on 23 October 2026, up to feature catalog `0.5.0`

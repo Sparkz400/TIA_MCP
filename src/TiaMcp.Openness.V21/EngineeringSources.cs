@@ -351,6 +351,51 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("NativePreservationMismatch", "The native readback differs from the prepared document beyond export provenance or formatting. Interfaces, comments, IDs, instruction payloads and unsupported elements must be preserved; inspect artifacts and recover the checkpoint.");
         }
 
+        /// <summary>
+        /// Content readback of block_import_xml: is the re-exported block the supplied one? Both sides drop the export provenance
+        /// (DocumentInfo), every MultilingualText whose texts are all empty and whitespace inside ObjectList containers, then compare as RequireNativePreservation does
+        /// (formatting, attribute order and ID numbering ignored). TIA adds empty Title/Comment texts that a supplied document
+        /// omits; an empty text and a missing one carry the same content. Observed natively on 26 November 2026 for LAD and FBD
+        /// FBs, an SCL FC and an optimized global DB (scripts/probe_block_import_readback.py). Returns null when equal, otherwise
+        /// the first difference; never throws for a difference, so a document the rule does not cover is reported, not failed.
+        /// </summary>
+        internal static string ImportedBlockDifference(XElement supplied, XElement exported)
+        {
+            XDocument Normalized(XElement block)
+            {
+                var copy = new XElement(block);
+                foreach (var text in copy.DescendantsAndSelf().Where(e => e.Name.LocalName == "MultilingualText").ToList())
+                {
+                    if (text.Descendants().Where(e => e.Name.LocalName == "Text").All(t => string.IsNullOrWhiteSpace(t.Value))) text.Remove();
+                }
+                // ObjectList is a SimaticML container that never carries a value: whitespace in one (indentation that an
+                // element-free list keeps, e.g. after its empty texts were dropped) is formatting.
+                foreach (var list in copy.DescendantsAndSelf().Where(e => e.Name.LocalName == "ObjectList"))
+                    list.Nodes().OfType<XText>().Where(t => string.IsNullOrWhiteSpace(t.Value)).ToList().ForEach(t => t.Remove());
+                return NormalizeNativeDocument(new XDocument(new XElement("Document", copy)));
+            }
+            var left = Normalized(supplied).Root.Elements().First();
+            var right = Normalized(exported).Root.Elements().First();
+            return FirstDifference(left, right, "/" + left.Name.LocalName);
+        }
+
+        private static string FirstDifference(XElement left, XElement right, string path)
+        {
+            if (left.Name != right.Name) return path + ": element " + left.Name.LocalName + " supplied, " + right.Name.LocalName + " exported";
+            foreach (var name in left.Attributes().Select(a => a.Name).Union(right.Attributes().Select(a => a.Name)))
+                if ((string)left.Attribute(name) != (string)right.Attribute(name)) return path + "@" + name.LocalName + ": '" + (string)left.Attribute(name) + "' supplied, '" + (string)right.Attribute(name) + "' exported";
+            var a = left.Elements().ToList(); var b = right.Elements().ToList();
+            if (!a.Any() && !b.Any() && left.Value != right.Value) return path + ": text '" + Clip(left.Value) + "' supplied, '" + Clip(right.Value) + "' exported";
+            for (int index = 0; index < Math.Min(a.Count, b.Count); index++)
+            {
+                string found = FirstDifference(a[index], b[index], path + "/" + a[index].Name.LocalName + "[" + index + "]");
+                if (found != null) return found;
+            }
+            return a.Count == b.Count ? null : path + ": " + a.Count + " child elements supplied, " + b.Count + " exported";
+        }
+
+        private static string Clip(string value) => value.Length <= 80 ? value : value.Substring(0, 80) + "...";
+
         private static XDocument NormalizeNativeDocument(XDocument document)
         {
             var result = new XDocument();

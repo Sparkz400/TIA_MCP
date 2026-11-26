@@ -84,7 +84,7 @@ namespace TiaMcp.Openness.V21
         {
             var row = Row("readbackVerified", status);
             row["reason"] = status == "done" ? "Read back after the write (stage " + stage + ")."
-                : status == "notRecorded" ? "This change kind checks its result inside the write (for example that the imported objects exist) and records no separate content readback; the compile and the saved project are the remaining checks."
+                : status == "notRecorded" ? "This change kind checks its result inside the write (for example that the imported objects exist) and records no separate content readback, or (block_import_xml) its content readback found a difference or could not export the block, recorded in the block-import-content readback; the compile and the saved project are the remaining checks."
                 : status == "skipped" ? "A compile-only change writes nothing to read back."
                 : status == "pending" ? "Runs after the write."
                 : "The change stopped before a readback.";

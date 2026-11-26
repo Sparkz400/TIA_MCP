@@ -387,6 +387,7 @@ internal static partial class Program
             ("Worker skips the full collect only for a short run of status calls", WorkerLoopTests.LightOperationsCollectOnlyEveryTenth),
             ("UMAC role changes plan exact effects and preserve administrators", UmacRoleRulesTests.PlansExactEffectsAndPreservesAdministrators),
             ("Graphical fragments use the native default namespace", EngineeringSourcesTests.GraphicalFragmentsUseNativeDefaultNamespace),
+            ("Imported block readback ignores provenance and empty texts", EngineeringSourcesTests.ImportedBlockReadbackIgnoresProvenanceAndEmptyTexts),
             ("Native network insertion preserves existing units and checks IDs", EngineeringSourcesTests.NativeNetworkInsertionPreservesExistingUnitsAndChecksIds),
             ("Native calls preserve instances and expose unresolved arguments", EngineeringSourcesTests.NativeCallsPreserveInstancesAndExposeUnresolvedArguments),
             ("Graphical call rewiring does not mutate shared accesses", EngineeringSourcesTests.GraphicalCallRewiringDoesNotMutateSharedAccesses),
