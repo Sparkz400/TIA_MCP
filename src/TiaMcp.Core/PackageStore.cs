@@ -415,7 +415,7 @@ public sealed class PackageStore
         return new PackageFile(relative, bytes, Convert.ToHexStringLower(hash.GetHashAndReset()), role);
     }
 
-    private List<InputFile> EnumerateSource(string root, IntakeBudget budget)
+    private static List<InputFile> EnumerateSource(string root, IntakeBudget budget)
     {
         var inputs = new List<InputFile>();
         var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

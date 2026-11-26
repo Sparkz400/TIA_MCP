@@ -54,12 +54,12 @@ internal static class EditChecks
                 && sequence.Connections.Any(c => c.From is { Kind: "Step", Number: 5 } && c.To is { Kind: "Transition", Number: 6 })
                 && sequence.Connections.Any(c => c.From is { Kind: "Transition", Number: 6 } && c.To is { Kind: "Step", Number: 1 } && c.LinkType == "Jump"), "Connections not spliced");
             string text = Text(result);
-            Require(text.StartsWith(before[..(before.LastIndexOf("</Step>", StringComparison.Ordinal) + "</Step>".Length)]), "Bytes before the edit changed");
-            Require(text.EndsWith(before[before.IndexOf("</Connections>", StringComparison.Ordinal)..]), "Bytes after the edit changed");
+            Require(text.StartsWith(before[..(before.LastIndexOf("</Step>", StringComparison.Ordinal) + "</Step>".Length)], StringComparison.Ordinal), "Bytes before the edit changed");
+            Require(text.EndsWith(before[before.IndexOf("</Connections>", StringComparison.Ordinal)..], StringComparison.Ordinal), "Bytes after the edit changed");
             foreach (var step in source.Inspection.Graphs[0].Sequences[0].Steps)
                 Require(text.Contains(before.Substring(before.IndexOf($"<Step Number=\"{step.Number}\"", StringComparison.Ordinal), 200)), "An unrelated step changed");
             var diff = source.CompareTo(result);
-            Require(diff.Changes.Any(c => c.Identity.EndsWith("Step:5") && c.Field == "added") && diff.Changes.Any(c => c.Identity.EndsWith("Transition:6") && c.Field == "added"), "Comparison misses additions");
+            Require(diff.Changes.Any(c => c.Identity.EndsWith("Step:5", StringComparison.Ordinal) && c.Field == "added") && diff.Changes.Any(c => c.Identity.EndsWith("Transition:6", StringComparison.Ordinal) && c.Field == "added"), "Comparison misses additions");
         });
         test("edit: adding and removing the same chain restores the source structure", () =>
         {

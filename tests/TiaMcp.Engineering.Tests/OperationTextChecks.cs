@@ -65,8 +65,8 @@ internal static class OperationTextChecks
             var (store, plan, proof) = Fixture(); var r = Intent(store, plan, proof, entry != "checkpoint");
             var badArtifact = proof with { RelativePath = "proof-\uD800.json" };
             string key = plan.Resources[0].ResourceKey;
-            if (entry.StartsWith("recovery") || entry.StartsWith("resolution") || entry == "destination") r = store.MarkUnknown(r.Id, r.Revision);
-            if (entry.StartsWith("recovery") || entry.StartsWith("resolution")) r = store.ReserveRecovery(r.Id, r.Revision, [new(key, plan.Target.ProjectFilePath + "\uFFFD.copy")]);
+            if (entry.StartsWith("recovery", StringComparison.Ordinal) || entry.StartsWith("resolution", StringComparison.Ordinal) || entry == "destination") r = store.MarkUnknown(r.Id, r.Revision);
+            if (entry.StartsWith("recovery", StringComparison.Ordinal) || entry.StartsWith("resolution", StringComparison.Ordinal)) r = store.ReserveRecovery(r.Id, r.Revision, [new(key, plan.Target.ProjectFilePath + "\uFFFD.copy")]);
             Action action = entry switch
             {
                 "outcome" => () => store.RecordOutcome(r.Id, r.Revision, true, [new("dispatch.\uD800", proof)]),

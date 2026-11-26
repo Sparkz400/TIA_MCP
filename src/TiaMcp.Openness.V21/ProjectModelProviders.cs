@@ -48,7 +48,7 @@ namespace TiaMcp.Indexing
         private readonly IProjectModelProvider[] _providers;
         internal ProjectModelProviders(IEnumerable<IProjectModelProvider> providers = null)
         {
-            _providers = (providers ?? new IProjectModelProvider[0]).ToArray();
+            _providers = (providers ?? Array.Empty<IProjectModelProvider>()).ToArray();
             if (_providers.Any(p => p == null || string.IsNullOrEmpty(p.ProviderId)) || _providers.Select(p => p.ProviderId).Distinct(StringComparer.Ordinal).Count() != _providers.Length)
                 throw new ArgumentException("Provider identifiers must be present and unique.");
         }

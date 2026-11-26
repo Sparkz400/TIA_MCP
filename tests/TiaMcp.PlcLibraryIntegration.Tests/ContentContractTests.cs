@@ -56,14 +56,14 @@ internal static class ContentContractTests
         test("significant preserved whitespace cannot change in either full tree", () => {
             using var f = new OracleFixture();
             foreach (var key in new[] { "source", "installed", "sourceOracle", "installedOracle" })
-                f.Rewrite(key, d => Attr(d).Add(new XElement("UnknownPayload", new XAttribute(XNamespace.Xml + "space", "preserve"), " a ")), updatePin: key.StartsWith("source"));
+                f.Rewrite(key, d => Attr(d).Add(new XElement("UnknownPayload", new XAttribute(XNamespace.Xml + "space", "preserve"), " a ")), updatePin: key.StartsWith("source", StringComparison.Ordinal));
             f.RecreatePolicy(); f.Validate();
             f.Rewrite("installedOracle", d => Attr(d).Element("UnknownPayload").Value = "a"); Reject(() => f.Validate());
         });
         test("unknown identical content is preserved in full comparisons", () => {
             using var f = new OracleFixture();
             foreach (var key in new[] { "source", "installed", "sourceOracle", "installedOracle" })
-                f.Rewrite(key, d => Attr(d).Add(new XElement("UnknownPayload", new XAttribute("future", "yes"), new XComment("keep"), " content ")), updatePin: key.StartsWith("source"));
+                f.Rewrite(key, d => Attr(d).Add(new XElement("UnknownPayload", new XAttribute("future", "yes"), new XComment("keep"), " content ")), updatePin: key.StartsWith("source", StringComparison.Ordinal));
             f.RecreatePolicy(); Equal(true, f.Validate().Value<bool>("oracleRemainingTreeMatches"));
         });
     }

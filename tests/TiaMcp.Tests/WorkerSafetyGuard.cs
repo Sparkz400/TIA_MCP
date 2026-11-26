@@ -309,6 +309,8 @@ internal static class WorkerSafetyGuard
 }
 
 // These synthetic classes are only read as IL by the guard's self-tests. They are never invoked.
+// Their members stay instance members: the guard's checks look for instance calls (callvirt) on these shapes.
+#pragma warning disable CA1822
 internal static class SafetyFixtures
 {
     internal sealed class GraphicList
@@ -393,3 +395,4 @@ internal static class SafetyFixtures
         public static ProcessDescriptor Inspect() => new();
     }
 }
+#pragma warning restore CA1822

@@ -177,7 +177,7 @@ namespace TiaMcp.Indexing
             var snapshot = Find(id);
             if (parentId != null && !snapshot.Nodes.ContainsKey(parentId)) throw Error("SelectionNotFound", "Parent is absent from this snapshot; repair selection.");
             string[] children;
-            if (!snapshot.Children.TryGetValue(parentId ?? "", out children)) children = new string[0];
+            if (!snapshot.Children.TryGetValue(parentId ?? "", out children)) children = Array.Empty<string>();
             return Page(snapshot, children, "children:" + (parentId ?? ""), maxItems, cursor, false);
         }
 
@@ -259,7 +259,7 @@ namespace TiaMcp.Indexing
             var reasons = new HashSet<string>(StringComparer.Ordinal);
             var scope = new JObject { ["scope"] = "retainedSnapshotEdges", ["status"] = "complete", ["projectCompleteness"] = "notEstablished",
                 ["retainedEdges"] = snapshot.Edges.Length, ["returnedEdges"] = 0, ["direction"] = direction == "out" ? "outgoing" : direction == "in" ? "incoming" : "both",
-                ["kinds"] = new JArray(kinds ?? new string[0]), ["stopReasons"] = new JArray() };
+                ["kinds"] = new JArray(kinds ?? Array.Empty<string>()), ["stopReasons"] = new JArray() };
             result["relationshipScope"] = scope;
             bool truncated = false;
             // Count the complete envelope/coverage and both copies of unresolved
@@ -431,7 +431,7 @@ namespace TiaMcp.Indexing
                 }
                 Ordered = Nodes.Values.OrderBy(n => (string)n["name"], StringComparer.OrdinalIgnoreCase).ThenBy(n => (string)n["nodeId"], StringComparer.Ordinal).ToArray();
                 foreach (var group in Ordered.GroupBy(n => (string)n["parentId"] ?? "", StringComparer.Ordinal)) Children[group.Key] = group.Select(n => (string)n["nodeId"]).ToArray();
-                if (!Children.ContainsKey("")) Children[""] = new string[0];
+                if (!Children.ContainsKey("")) Children[""] = Array.Empty<string>();
                 var edges = document["edges"] as JArray;
                 if (edges == null || edges.Count > MaximumNodes) throw Error("ModelCapacity", "Snapshot edges must be an array of at most 50,000 edges.");
                 Edges = edges.OfType<JObject>().ToArray();

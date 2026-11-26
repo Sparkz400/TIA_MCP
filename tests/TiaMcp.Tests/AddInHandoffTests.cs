@@ -83,7 +83,7 @@ internal static class AddInHandoffTests
         var begun = f.Begin(id, buffer); await entered.Task; Array.Fill(buffer, (byte)' '); release.SetResult();
         var challenge = await begun; f.OnVerify = null; Unqualified(challenge);
         Check.Equal(Hash(original), (string)challenge["selectionSha256"]!);
-        foreach (string file in Directory.GetFiles(Path.Combine(f.Root, "addin-handoffs"), "*", SearchOption.AllDirectories).Where(p => !p.EndsWith("owner.lock")))
+        foreach (string file in Directory.GetFiles(Path.Combine(f.Root, "addin-handoffs"), "*", SearchOption.AllDirectories).Where(p => !p.EndsWith("owner.lock", StringComparison.Ordinal)))
             Check.Equal(false, File.ReadAllText(file).Contains(Challenge(challenge), StringComparison.Ordinal));
         var consuming = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var allowCompletion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);

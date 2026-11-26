@@ -123,7 +123,7 @@ internal static class CategoryScopeChecks
                     foreach (var row in doc.Descendants(s + "row").Where(r => (string?)r.Attribute("r") != "1" && !allowed.Contains((string)r.Attribute("r")!)).ToArray()) row.Remove();
                     if (changeText)
                     {
-                        var cell = doc.Descendants(s + "c").Single(c => ((string?)c.Attribute("r"))?.StartsWith("F") == true && (string?)c.Attribute("r") != "F1");
+                        var cell = doc.Descendants(s + "c").Single(c => ((string?)c.Attribute("r"))?.StartsWith("F", StringComparison.Ordinal) == true && (string?)c.Attribute("r") != "F1");
                         cell.SetAttributeValue("t", "inlineStr"); cell.RemoveNodes(); cell.Add(new XElement(s + "is", new XElement(s + "t", "synthetic changed value")));
                     }
                     data = System.Text.Encoding.UTF8.GetBytes(doc.ToString(SaveOptions.DisableFormatting));

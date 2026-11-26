@@ -50,7 +50,7 @@ namespace TiaMcp.Openness.V21
             // to_create preparation has already parsed the requested version.
             var requested = Version.TryParse(version, out var parsed) ? parsed : throw Contract.Invalid("The requested version is not a version: " + version);
             var cpu = document["cpus"].Children<JObject>().FirstOrDefault(row => row.Value<string>("cpuTypeIdentifier") == cpuTypeIdentifier);
-            var cells = cpu?["cells"].Children<JObject>().Where(row => row.Value<string>("typeIdentifier") == typeIdentifier).ToArray() ?? new JObject[0];
+            var cells = cpu?["cells"].Children<JObject>().Where(row => row.Value<string>("typeIdentifier") == typeIdentifier).ToArray() ?? Array.Empty<JObject>();
             var cell = cells.FirstOrDefault(row => DottedVersion(row.Value<string>("version")) == requested);
             var accepted = new JArray(cells.Where(row => row.Value<string>("outcome") == "accepted").Select(row => row["version"].DeepClone()));
             var profile = new JObject { ["schemaVersion"] = Schema, ["cpuTypeIdentifier"] = cpuTypeIdentifier, ["typeIdentifier"] = typeIdentifier,

@@ -140,7 +140,7 @@ internal static class BroadenedPlanTests
         // A multi-instance caller with dependents (its instance DB, an embedding parent) is refused before admission and claim.
         test("a multi-instance caller with dependents is refused with DependencyProfileUnavailable", () => {
             var plan = ReusedMulti().Build();
-            Equal(null, PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, new string[0]));
+            Equal(null, PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, Array.Empty<string>()));
             Equal(null, PlcComponentQualificationGate.CombinedApplyDependentsRefusal(ReusedRoot().Build(), new[] { "/plc/blocks/Main_DB" }));
             var refused = PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, new[] { "/plc/blocks/Main_DB", "/plc/blocks/Cycle" });
             Equal("DependencyProfileUnavailable", refused.Value<string>("code"));
@@ -156,7 +156,7 @@ internal static class BroadenedPlanTests
         // Passed natively on 2 November (local.library_integrate.candidate_shapes.dependent_db.20261102).
         test("a multi-instance caller with its own instance DB is its own verified combination", () => {
             var f = ReusedMulti();
-            var features = PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller, new string[0], true);
+            var features = PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller, Array.Empty<string>(), true);
             Equal("dependentInstanceDb+fbCaller+multiInstance+reusedComponent", PlcComponentQualificationGate.ShapeKey(features));
             Equal(0, PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller, null, true).Count);
             // The plain multi-instance key does not open its combination with the caller's own DB.
@@ -166,7 +166,7 @@ internal static class BroadenedPlanTests
             Equal("", string.Join(",", PlcComponentQualificationGate.UnverifiedFeatures(ReusedRoot().Build(), ReusedRoot().Payload, ReusedRoot().Caller, null, true).Properties().Select(p => p.Name)));
         });
         test("the reused-FB multi-instance is exactly the verified combination", () => Equal("fbCaller+multiInstance+reusedComponent",
-            PlcComponentQualificationGate.ShapeKey(PlcComponentQualificationGate.UnverifiedFeatures(ReusedMulti().Build(), ReusedMulti().Payload, ReusedMulti().Caller, new string[0]))));
+            PlcComponentQualificationGate.ShapeKey(PlcComponentQualificationGate.UnverifiedFeatures(ReusedMulti().Build(), ReusedMulti().Payload, ReusedMulti().Caller, Array.Empty<string>()))));
         // Passed natively on 2 November (local.library_integrate.candidate_shapes.combinations.20261102): the combinations run too.
         foreach (var (name, shape) in new (string, Func<Fixture>)[] { ("LAD FB caller", ladFb), ("LAD FC with an earlier placement", ladEarlier) })
             test("combined apply admits the verified combination " + name + " in production", () => { Equal(null, Refusal(shape())); Equal("", Features(shape())); });

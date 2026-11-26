@@ -196,7 +196,7 @@ foreach(string defect in new[]{"scope","unknownScope","virtual","duplicatePath",
  var changedReview=consumerReview.DeepClone().AsObject();var ns=changedReview["model"]!["nodes"]!.AsArray();
  if(defect=="scope")ns[3]!["plcPath"]="/another/PLC";else if(defect=="unknownScope")ns[3]!["plcPath"]=null;else if(defect=="virtual")ns[3]!["origin"]="virtual";
  else {var copy=ns[3]!.DeepClone();copy[defect=="duplicatePath"?"nodeId":"objectPath"]="/other";ns.Add(copy);}
- var report=ConsumerReport(saved:changedReview);string expected=defect.StartsWith("duplicate")?"ambiguous":defect=="unknownScope"?"scopeUnknown":"outOfScope";
+ var report=ConsumerReport(saved:changedReview);string expected=defect.StartsWith("duplicate", StringComparison.Ordinal)?"ambiguous":defect=="unknownScope"?"scopeUnknown":"outOfScope";
  Check((string)report["consumers"]![0]!["objectResolution"]! ==expected,"Saved consumer "+defect+" is not silently selected");
  Check(report["impactPaths"]!.AsArray().All(p=>!p!["objectPaths"]!.AsArray().Any(x=>(string?)x==peer)),"Excluded consumer cannot be traversed: "+defect);
 }

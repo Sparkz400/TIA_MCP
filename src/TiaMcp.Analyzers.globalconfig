@@ -72,6 +72,16 @@ dotnet_diagnostic.CA2264.severity = error
 # comparison of Span<T> with null or default
 dotnet_diagnostic.CA2265.severity = error
 
+# Performance and globalization (made errors on 26 November 2026 after their findings were fixed)
+# member that uses no instance data is not static; public members are left alone, since System.Text.Json serializes only
+# instance properties and a constant-valued public property is part of a reply contract
+dotnet_diagnostic.CA1822.severity = error
+dotnet_code_quality.CA1822.api_surface = private, internal
+# zero-length array allocation instead of Array.Empty
+dotnet_diagnostic.CA1825.severity = error
+# string comparison without a StringComparison
+dotnet_diagnostic.CA1310.severity = error
+
 # Security
 # SQL command text built from input
 dotnet_diagnostic.CA2100.severity = error

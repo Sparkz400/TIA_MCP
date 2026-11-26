@@ -38,7 +38,7 @@ internal static class WatchAuthoringProfileChecks
             ["populated force"] = r => r["before"]!["tables"]![0]!["semanticSha256"] = new string('c', 64),
             ["extra watch peer"] = r => r["before"]!["peers"]!["watch:root/Peer"] = new string('d', 64),
             ["hardware network"] = r => r["before"]!["peers"]!["hardware"]![5]!["network"]!["nodes"]![0]!["attributes"]!["Address"] = "192.168.0.2",
-            ["unselected peer"] = r => { var peers = r["before"]!["peers"]!.AsObject(); peers[peers.First(p => p.Key.EndsWith("/blocks/Main")).Key] = new string('f', 64); },
+            ["unselected peer"] = r => { var peers = r["before"]!["peers"]!.AsObject(); peers[peers.First(p => p.Key.EndsWith("/blocks/Main", StringComparison.Ordinal)).Key] = new string('f', 64); },
             ["source hash"] = r => r["generation"]!["capture"]!["binding"]!["blockSha256"] = new string('a', 64),
             ["instance hash"] = r => r["generation"]!["capture"]!["binding"]!["instanceSha256"] = new string('a', 64),
             ["instance scope"] = r => r["generation"]!["capture"]!["binding"]!["instanceDbPath"] = "/Other",

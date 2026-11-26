@@ -289,7 +289,7 @@ public sealed class TranslationImportWorkflow
         return store.Reconcile(id, revision, [original], resolutions);
     }
 
-    private EngineeringOperationPlan Plan(TranslationImportBinding b, EngineeringArtifactReference binding) => new("translation.import", b.Baseline.Target,
+    private static EngineeringOperationPlan Plan(TranslationImportBinding b, EngineeringArtifactReference binding) => new("translation.import", b.Baseline.Target,
         [new(EngineeringResourceKey.ForPath("project", b.Baseline.Target.ProjectFilePath), "project", "translationImportAndCheckpoint", "projectArchiveToNewLocation")],
         [binding, b.Candidate, b.Baseline.Workbook, b.Baseline.Receipt], Probes.ToArray(), Gates.ToArray());
     // An admitted import keeps verifying (and recovering) in the form its review was written with.

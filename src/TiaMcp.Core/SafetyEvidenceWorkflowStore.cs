@@ -112,7 +112,7 @@ public sealed class SafetyEvidenceWorkflowStore(string artifactsRoot)
         EngineeringIdentityGuard.Text(text, "source." + field, maximum); return text;
     }
     private static BridgeException Invalid(string message) => new("InvalidSafetyEvidence", message);
-    private JsonObject Reference(string hash, string extension) => new() { ["path"] = "safety-evidence-reviews/" + hash + extension, ["sha256"] = hash };
+    private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "safety-evidence-reviews/" + hash + extension, ["sha256"] = hash };
     private JsonObject Publish(byte[] bytes, string extension, int limit) =>
         PackageStorage.PublishContent(artifactsRoot, "safety-evidence-reviews", bytes, extension, limit, 512L << 20, "Safety evidence review");
     private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {

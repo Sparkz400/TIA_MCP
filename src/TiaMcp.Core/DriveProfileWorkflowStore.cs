@@ -73,7 +73,7 @@ public sealed class DriveProfileWorkflowStore(string artifactsRoot)
         "drive-profile-review-request.v1" => "drive-profile-review-record.v1",
         "drive-profile-review-request.v2" => "drive-profile-review-record.v2",
         _ => throw new BridgeException("InvalidDriveProfile", "Unsupported request version.") };
-    private JsonObject Reference(string hash, string extension) => new() { ["path"] = "drive-profile-reviews/" + hash + extension, ["sha256"] = hash };
+    private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "drive-profile-reviews/" + hash + extension, ["sha256"] = hash };
     private JsonObject Publish(byte[] bytes, string extension, int limit) =>
         PackageStorage.PublishContent(artifactsRoot, "drive-profile-reviews", bytes, extension, limit, 512L << 20, "Drive profile review");
     private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {

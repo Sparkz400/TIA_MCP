@@ -128,7 +128,7 @@ Check(metadataStore.Get(metadataSnapshot.Metadata.SnapshotId).Metadata.Coverage.
 Fails(() => SiemensWebIdentity.ValidateEndpoint("http://192.0.2.10"), "InvalidRequest");
 Fails(() => SiemensWebIdentity.ValidateEndpoint("https://user:secret@192.0.2.10"), "InvalidRequest");
 Fails(() => SiemensWebIdentity.ValidateEndpoint("https://192.0.2.10/other?token=secret"), "InvalidRequest");
-Check(InventoryExport.CsvCell("=1+1") == "\"'=1+1\"" && InventoryExport.CsvCell("  @SUM(1)").StartsWith("\"'"), "CSV formula neutralization");
+Check(InventoryExport.CsvCell("=1+1") == "\"'=1+1\"" && InventoryExport.CsvCell("  @SUM(1)").StartsWith("\"'", StringComparison.Ordinal), "CSV formula neutralization");
 Check(InventoryExport.CsvCell("quoted,\"text\"\nnew") == "\"quoted,\"\"text\"\"\nnew\"", "CSV quoting/newlines");
 
 var output = Path.Combine(Path.GetTempPath(), "tia-inventory-tests-" + Guid.NewGuid().ToString("N"));

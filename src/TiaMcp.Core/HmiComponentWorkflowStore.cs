@@ -174,7 +174,7 @@ public sealed partial class HmiComponentWorkflowStore(string artifactsRoot)
         }
         report["files"] = rows;
     }
-    private JsonObject Reference(string hash, string extension) => new() { ["path"] = "hmi-component-reviews/" + hash + extension, ["sha256"] = hash };
+    private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "hmi-component-reviews/" + hash + extension, ["sha256"] = hash };
     // Test seam: invoked before each durable artifact publication, so a test can abandon the Host at exactly that boundary.
     internal Action<string, string>? BeforePublish { get; set; }
     private JsonObject Publish(byte[] bytes, string extension, int limit)

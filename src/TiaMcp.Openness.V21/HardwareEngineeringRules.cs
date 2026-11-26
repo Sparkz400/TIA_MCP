@@ -387,7 +387,7 @@ namespace TiaMcp.Openness.V21
                 if (takes) row["attributes"]["SharedDeviceAssignmentTarget"] = becomes.DeepClone();
                 if (row.Value<string>("path") == named && (!takes || JToken.DeepEquals(was, becomes))) Fail("A sharedSubmodules item does not move its assignment target to the selected PLC: " + named);
             }
-            foreach (string item in moving ? sharedItems : new string[0])
+            foreach (string item in moving ? sharedItems : Array.Empty<string>())
                 if (!moved.Contains(item)) Fail("A sharedSubmodules item moves no I/O address to the selected PLC: " + item);
         }
 

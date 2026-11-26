@@ -267,7 +267,7 @@ namespace TiaMcp.Openness.V21
                         PlanOnly("UnsupportedOperandRoute", "The typed call route binds root scalar tags only; a UDT-typed tag member operand is refused at typed preparation.");
                     }
                     if (unit) PlanOnly("UnsupportedScopeReference", "The typed route refuses tag operands inside software units; bind DB members of the unit instead.");
-                    operands.Add(new JObject { ["key"] = key, ["scope"] = "tag", ["ownerPath"] = tag["tablePath"].DeepClone(), ["components"] = new JArray(new[] { name }.Concat(members ?? new string[0])), ["dataType"] = members == null ? tag["dataType"].DeepClone() : mapping["dataType"].DeepClone() });
+                    operands.Add(new JObject { ["key"] = key, ["scope"] = "tag", ["ownerPath"] = tag["tablePath"].DeepClone(), ["components"] = new JArray(new[] { name }.Concat(members ?? System.Array.Empty<string>())), ["dataType"] = members == null ? tag["dataType"].DeepClone() : mapping["dataType"].DeepClone() });
                     writer = tag.Value<string>("path") + (members == null ? "" : "::" + string.Join(".", members));
                 }
                 if (writable && !writers.Add(writer)) Fail("IntegrationWriteAlias", "Multiple writable parameters map to the same operand.");

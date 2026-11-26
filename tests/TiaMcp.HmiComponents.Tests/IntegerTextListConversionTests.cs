@@ -131,7 +131,7 @@ internal static class IntegerTextListConversionTests
                 ["previousRecordId"] = previous["recordId"]!.DeepClone(), ["outputs"] = selected.DeepClone(), ["removeOutputIds"] = removals.DeepClone(),
                 ["retainOutputIds"] = new JsonArray("manual"), ["requireObservedDependencies"] = false };
         }
-        string[] Published() => Directory.GetFiles(Path.Combine(root, "hmi-component-reviews")).Where(p => p.EndsWith(".candidate") || p.EndsWith(".author.json")).Order().ToArray();
+        string[] Published() => Directory.GetFiles(Path.Combine(root, "hmi-component-reviews")).Where(p => p.EndsWith(".candidate", StringComparison.Ordinal) || p.EndsWith(".author.json", StringComparison.Ordinal)).Order().ToArray();
         JsonObject Record(JsonObject request, string label, bool ready = true)
         {
             var before = Published(); JsonObject result;

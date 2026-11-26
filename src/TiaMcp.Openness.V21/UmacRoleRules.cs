@@ -62,7 +62,7 @@ namespace TiaMcp.Openness.V21
             var rights = state["roles"].Where(r => r["identifier"].Type == JTokenType.String)
                 .ToDictionary(r => (string)r["identifier"], r => r["engineeringRights"].Values<string>().ToArray(), StringComparer.Ordinal);
             return state["principals"].Where(p => (string)p["kind"] == "projectUser" && p.Value<bool>("active")).SelectMany(p => p["roles"].Values<string>())
-                .SelectMany(id => rights.TryGetValue(id, out var held) ? held : new string[0]).Distinct(StringComparer.Ordinal).OrderBy(id => id, StringComparer.Ordinal).ToArray();
+                .SelectMany(id => rights.TryGetValue(id, out var held) ? held : Array.Empty<string>()).Distinct(StringComparer.Ordinal).OrderBy(id => id, StringComparer.Ordinal).ToArray();
         }
 
         // Which rights are administrative is not exposed by V21, so every engineering right an active project user holds stays held by one.

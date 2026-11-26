@@ -74,7 +74,7 @@ internal static class LibraryAssociationTests
         {
             byte[] bytes = System.IO.File.ReadAllBytes(Path.Combine(originalRoot, (string)item!["path"]!)); Check(Hash(bytes) == (string)item["sha256"]!, "Original fixture hash: " + item["path"]);
             var candidate = WithFile(bytes);
-            if (((string)item["path"]!).EndsWith("options3.xml")) Check((string?)Report(candidate)["libraryAssociations"]![0]!["identifierAgreement"] == "match", "Both full exports match identifiers without content-equality claim");
+            if (((string)item["path"]!).EndsWith("options3.xml", StringComparison.Ordinal)) Check((string?)Report(candidate)["libraryAssociations"]![0]!["identifierAgreement"] == "match", "Both full exports match identifiers without content-equality claim");
             else Reject(candidate, "Default export lacks required full identity");
         }
         var packets = new JsonArray(request.DeepClone());

@@ -256,7 +256,7 @@ foreach (string fault in new[] { "result", "malformed-result", "log", "compile",
 Test("incomplete " + fault + " never releases ownership", async () => {
     var f = New(); var op = f.Prepare(); f.Adapter.Fault = fault;
     try { await f.Apply(op); throw new Exception("Accepted " + fault); } catch (Exception e) when (e is BridgeException or System.Text.Json.JsonException or IOException) { }
-    True(f.Runner.Status(op.Id).State == (fault == "dispose" || fault.EndsWith("-lost") ? "outcomeUnknown" : "recoveryRequired") && f.Adapter.Imports == 1 && new EngineeringOperationStore(f.Root).Pending().Count == 1);
+    True(f.Runner.Status(op.Id).State == (fault == "dispose" || fault.EndsWith("-lost", StringComparison.Ordinal) ? "outcomeUnknown" : "recoveryRequired") && f.Adapter.Imports == 1 && new EngineeringOperationStore(f.Root).Pending().Count == 1);
 });
 Test("cancel before dispatch never imports; after dispatch token is not forwarded", async () => {
     var f = New(); var op = f.Prepare(); using var cancellation = new CancellationTokenSource();

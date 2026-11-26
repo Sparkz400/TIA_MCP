@@ -105,7 +105,7 @@ namespace TiaMcp.Core.WatchTables
             var row = Row(ordinal);
             if (row.Name != Prefix + (IsForce ? "PlcForceTableEntry" : "PlcWatchTableEntry")) throw new InvalidDataException("A watch or force signal entry is required.");
             var attrs = row.Element("AttributeList");
-            var fields = attrs == null ? new XElement[0] : attrs.Elements(field).ToArray();
+            var fields = attrs == null ? Array.Empty<XElement>() : attrs.Elements(field).ToArray();
             if (fields.Length != 1 || !Plain(fields[0])) throw new InvalidDataException("Field must already exist as plain text in this captured native profile.");
             VerifyText(value);
             if (fields[0].Value == value) return;
@@ -241,7 +241,7 @@ namespace TiaMcp.Core.WatchTables
             };
             Action<XElement, string[]> scalarAttributes = (element, allowed) =>
             {
-                attributes(element, new string[0]); children(element, allowed);
+                attributes(element, Array.Empty<string>()); children(element, allowed);
                 if (element.Elements().Any(e => e.HasAttributes || !Plain(e)))
                     throw new InvalidDataException("Document ID reindex requires plain captured scalar fields.");
             };
@@ -254,14 +254,14 @@ namespace TiaMcp.Core.WatchTables
             attributes(table, IdAttribute); children(table, AttributeAndObjectLists);
             scalarAttributes(table.Element("AttributeList"), NameField);
             if (table.Element("ObjectList") == null) throw new InvalidDataException("Captured row container is required.");
-            attributes(table.Element("ObjectList"), new string[0]);
+            attributes(table.Element("ObjectList"), Array.Empty<string>());
             foreach (var row in Rows())
             {
                 bool commentRow = authoring && row.Name == Prefix + "PlcTableCommentEntry";
                 if (!commentRow && row.Name != Prefix + "PlcWatchTableEntry") throw new InvalidDataException("Only captured watch signal/comment rows support this ID profile.");
                 attributes(row, IdAndCompositionName); children(row, AttributeAndObjectLists);
                 var fields = row.Element("AttributeList");
-                if (commentRow) { if (fields != null) scalarAttributes(fields, new string[0]); }
+                if (commentRow) { if (fields != null) scalarAttributes(fields, Array.Empty<string>()); }
                 else
                 {
                 if (fields == null) throw new InvalidDataException("Captured row attributes required.");
@@ -272,11 +272,11 @@ namespace TiaMcp.Core.WatchTables
                     throw new InvalidDataException("Document ID reindex requires the observed offline Bool row shape.");
                 }
                 var objects = row.Element("ObjectList");
-                children(objects, MultilingualTextElement); attributes(objects, new string[0]);
+                children(objects, MultilingualTextElement); attributes(objects, Array.Empty<string>());
                 var texts = objects.Elements().ToArray();
                 if (texts.Length != 1 || (string)texts[0].Attribute("CompositionName") != "Comment") throw new InvalidDataException("Exactly one captured multilingual comment required.");
                 var text = texts[0]; attributes(text, IdAndCompositionName); children(text, ObjectListElement);
-                var items = text.Element("ObjectList"); children(items, MultilingualTextItemElement); attributes(items, new string[0]);
+                var items = text.Element("ObjectList"); children(items, MultilingualTextItemElement); attributes(items, Array.Empty<string>());
                 var cultures = new HashSet<string>(StringComparer.Ordinal);
                 foreach (var item in items.Elements())
                 {

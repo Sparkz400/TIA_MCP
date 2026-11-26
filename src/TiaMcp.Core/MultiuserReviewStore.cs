@@ -57,7 +57,7 @@ public sealed class MultiuserReviewStore(string artifactsRoot)
         if (JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length > 128 * 1024) throw new BridgeException("ArtifactCapacity", "Page exceeds 128 KiB; download the complete report.");
         return result;
     }
-    private JsonObject Reference(string hash, string extension) => new() { ["path"] = "multiuser-reviews/" + hash + extension, ["sha256"] = hash };
+    private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "multiuser-reviews/" + hash + extension, ["sha256"] = hash };
     private JsonObject Publish(byte[] bytes, string extension, int limit) =>
         PackageStorage.PublishContent(artifactsRoot, "multiuser-reviews", bytes, extension, limit, 512L << 20, "Observation");
     private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {

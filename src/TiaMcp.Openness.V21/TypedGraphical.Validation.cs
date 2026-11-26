@@ -37,7 +37,7 @@ namespace TiaMcp.Openness.V21
             if (node.Negated && node.Kind != "contact") Fail("InvalidTypedGraphicalModel", "Negated is only valid for normally closed LAD contacts; use an explicit FBD not node.");
             // A cross-unit call has its own profile slot; it never reuses the in-unit call profile.
             bool crossUnit = node.Kind == "call" && IsCrossUnit(context, ResolveCallee(context, node.CalleePath));
-            var matches = (context.Profiles ?? new TypedGraphicalProfile[0]).Where(p => p != null && !p.ReaderOnly && p.Language == language && p.Kind == node.Kind
+            var matches = (context.Profiles ?? Array.Empty<TypedGraphicalProfile>()).Where(p => p != null && !p.ReaderOnly && p.Language == language && p.Kind == node.Kind
                 && (p.Instruction ?? "") == (node.Kind == "compare" ? node.Comparison : (node.Instruction ?? ""))
                 && (p.DataType ?? "") == (node.DataType ?? "") && p.TiaVersion == context.TiaVersion && p.CpuFamily == context.CpuFamily && p.Route == context.Route
                 && (p.CalleeNameEncoding == "crossUnitQualified") == crossUnit).ToArray();
@@ -81,9 +81,9 @@ namespace TiaMcp.Openness.V21
                     if (!ScalarTypes.Contains(parameter.DataType ?? "")) Fail("GraphicalCalleeUnsupported", "Structured or indirect callee parameters require a separately implemented profile.");
                     pins.Add(new TypedGraphicalPin { Name = parameter.Name, DataType = parameter.DataType, Direction = direction, Required = parameter.Required });
                 }
-                foreach (var pin in profile.Pins ?? new TypedGraphicalPin[0]) pins.Add(pin);
+                foreach (var pin in profile.Pins ?? Array.Empty<TypedGraphicalPin>()) pins.Add(pin);
             }
-            else pins.AddRange(profile.Pins ?? new TypedGraphicalPin[0]);
+            else pins.AddRange(profile.Pins ?? Array.Empty<TypedGraphicalPin>());
             // A MOVE/arithmetic overload has one exact type: every non-Bool pin carries it, so wires cannot convert.
             if ((node.Kind == "move" || node.Kind == "math") && (pins.Count(p => p?.DataType == node.DataType) < 2 || pins.Any(p => p != null && p.DataType != "Bool" && p.DataType != node.DataType)))
                 Fail("GraphicalProfileUnavailable", "The " + node.Kind + " profile pins do not carry the exact requested type " + node.DataType + ".");
@@ -244,7 +244,7 @@ namespace TiaMcp.Openness.V21
         internal static void RequireCalleeAccess(TypedGraphicalContext context, TypedGraphicalCallee callee)
         {
             if (!IsCrossUnit(context, callee)) return;
-            if (string.IsNullOrEmpty(callee.ScopePath) || !(context.RelatedScopePaths ?? new string[0]).Contains(callee.ScopePath, StringComparer.Ordinal))
+            if (string.IsNullOrEmpty(callee.ScopePath) || !(context.RelatedScopePaths ?? Array.Empty<string>()).Contains(callee.ScopePath, StringComparer.Ordinal))
                 Fail("GraphicalUnitRelationMissing", "The callee " + callee.Path + " belongs to software unit " + callee.ScopePath + ", to which the caller's unit " + context.TargetScopePath + " declares no SoftwareUnit relation.");
             if (callee.UnitAccess != "Published") Fail("GraphicalCalleeUnpublished", "The cross-unit callee " + callee.Path + " is " + (callee.UnitAccess ?? "of unknown access") + "; only Published blocks are visible to related units.");
         }

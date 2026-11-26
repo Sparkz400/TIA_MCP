@@ -97,7 +97,7 @@ public sealed class WebApplicationWorkflowStore(string artifactsRoot)
         }
         finally { PackageStorage.DeleteOwned(analysisRoot, scratch); }
     }
-    private JsonObject Reference(string hash, string extension) => new() { ["path"] = "web-application-reviews/" + hash + extension, ["sha256"] = hash };
+    private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "web-application-reviews/" + hash + extension, ["sha256"] = hash };
     private JsonObject Publish(byte[] bytes, string extension, int limit) =>
         PackageStorage.PublishContent(artifactsRoot, "web-application-reviews", bytes, extension, limit, 512L << 20, "Web application review");
     private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {

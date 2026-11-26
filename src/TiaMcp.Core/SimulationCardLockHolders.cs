@@ -30,22 +30,22 @@ namespace TiaMcp.Simulation
             try
             {
                 var files = Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).Take(MaximumFiles + 1).ToArray();
-                if (files.Length > MaximumFiles) { error = "More than " + MaximumFiles + " files; holders were not queried."; return new Holder[0]; }
-                if (files.Length == 0) return new Holder[0];
+                if (files.Length > MaximumFiles) { error = "More than " + MaximumFiles + " files; holders were not queried."; return Array.Empty<Holder>(); }
+                if (files.Length == 0) return Array.Empty<Holder>();
                 int code = RmStartSession(out session, 0, new StringBuilder(33));
-                if (code != 0) { error = "RmStartSession " + code; return new Holder[0]; }
+                if (code != 0) { error = "RmStartSession " + code; return Array.Empty<Holder>(); }
                 started = true;
                 code = RmRegisterResources(session, (uint)files.Length, files, 0, IntPtr.Zero, 0, null);
-                if (code != 0) { error = "RmRegisterResources " + code; return new Holder[0]; }
+                if (code != 0) { error = "RmRegisterResources " + code; return Array.Empty<Holder>(); }
                 uint needed, count = MaximumHolders, reasons = 0;
                 var found = new RmProcessInfo[MaximumHolders];
                 code = RmGetList(session, out needed, ref count, found, ref reasons);
                 if (code == 234) error = needed + " holders; only the first " + MaximumHolders + " are listed."; // ERROR_MORE_DATA fills nothing
-                else if (code != 0) { error = "RmGetList " + code; return new Holder[0]; }
+                else if (code != 0) { error = "RmGetList " + code; return Array.Empty<Holder>(); }
                 return found.Take(code == 0 ? (int)count : 0).Select(info => new Holder { ProcessId = info.Process.ProcessId,
                     AppName = info.AppName, ServiceName = info.ServiceShortName, ApplicationType = info.ApplicationType }).ToArray();
             }
-            catch (Exception exception) { error = exception.GetType().FullName + ": " + exception.Message; return new Holder[0]; }
+            catch (Exception exception) { error = exception.GetType().FullName + ": " + exception.Message; return Array.Empty<Holder>(); }
             finally { if (started) RmEndSession(session); }
         }
 

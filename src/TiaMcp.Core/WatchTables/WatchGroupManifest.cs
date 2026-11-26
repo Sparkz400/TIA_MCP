@@ -17,7 +17,7 @@ namespace TiaMcp.Core.WatchTables
         { return Encoding.UTF8.GetBytes(Profile + "\n" + string.Concat(lines.OrderBy(l => l, StringComparer.Ordinal).Select(l => l + "\n"))); }
         public static string[] Lines(byte[] bytes)
         {
-            string text = Encoding.UTF8.GetString(bytes ?? new byte[0]);
+            string text = Encoding.UTF8.GetString(bytes ?? Array.Empty<byte>());
             if (!text.StartsWith(Profile + "\n", StringComparison.Ordinal)) throw new FormatException("Not a watch group manifest.");
             return text.Substring(Profile.Length + 1).Split(LineSeparator, StringSplitOptions.RemoveEmptyEntries);
         }

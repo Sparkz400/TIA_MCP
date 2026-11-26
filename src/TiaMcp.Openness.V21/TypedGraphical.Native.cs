@@ -254,7 +254,7 @@ namespace TiaMcp.Openness.V21
             var remap = new Dictionary<string, string>(StringComparer.Ordinal);
             int next = 21;
             foreach (var definition in network.Descendants().Where(IsDefinition)) remap[(string)definition.Attribute("UId")] = (next++).ToString(CultureInfo.InvariantCulture);
-            string[] oldIds = previous == null ? new string[0] : previous.Descendants().Where(IsDefinition).Select(e => (string)e.Attribute("UId")).ToArray();
+            string[] oldIds = previous == null ? Array.Empty<string>() : previous.Descendants().Where(IsDefinition).Select(e => (string)e.Attribute("UId")).ToArray();
             ApplyUidMap(network, remap, ids);
             if (previous != null)
             {
@@ -393,7 +393,7 @@ namespace TiaMcp.Openness.V21
                     bool known = part.Name == Net + "Access" ? IsSupportedAccess(part) : IsSupportedPart(part, language) || matched != null;
                     string uid = (string)part.Attribute("UId"); string nativeName = (string)part.Attribute("Name") ?? part.Name.LocalName;
                     string kind = !known ? "opaque" : part.Name == Net + "Access" ? "operand" : nativeName == "Contact" ? "contact" : nativeName == "Coil" ? (language == "LAD" ? "coil" : "assign") : matched?.Kind ?? "opaque";
-                    nodes.Add(new TypedGraphicalReadNode { Key = "native:" + uid, NativeUid = uid, NativeName = nativeName, Kind = kind, Supported = known, NativeXml = Xml(part), SourceSha256 = Hash(Xml(part)), ProfileId = matched?.Id, Pins = matched == null ? new TypedGraphicalPin[0] : ReadPins(part, matched), NegatedPins = part.Elements(Net + "Negated").Select(n => (string)n.Attribute("Name")).ToArray() });
+                    nodes.Add(new TypedGraphicalReadNode { Key = "native:" + uid, NativeUid = uid, NativeName = nativeName, Kind = kind, Supported = known, NativeXml = Xml(part), SourceSha256 = Hash(Xml(part)), ProfileId = matched?.Id, Pins = matched == null ? Array.Empty<TypedGraphicalPin>() : ReadPins(part, matched), NegatedPins = part.Elements(Net + "Negated").Select(n => (string)n.Attribute("Name")).ToArray() });
                 }
                 var uidNodes = nodes.Where(n => n.NativeUid != null).ToDictionary(n => CanonicalUid(n.NativeUid), StringComparer.Ordinal);
                 foreach (var wire in wires?.Elements() ?? Enumerable.Empty<XElement>())
@@ -436,7 +436,7 @@ namespace TiaMcp.Openness.V21
         private static TypedGraphicalProfile MatchReadProfile(XElement part, string language, TypedGraphicalProfile[] profiles)
         {
             if ((part.Name != Net + "Part" && part.Name != Net + "Call") || part.Attribute("UId") == null) return null;
-            foreach (var profile in profiles ?? new TypedGraphicalProfile[0])
+            foreach (var profile in profiles ?? Array.Empty<TypedGraphicalProfile>())
             {
                 if (profile == null || !profile.NativeFormatValidated || profile.Language != language || string.IsNullOrWhiteSpace(profile.SourceSha256) || string.IsNullOrWhiteSpace(profile.Provenance)) continue;
                 if (part.Name == Net + "Call" && profile.Kind == "call")
@@ -484,14 +484,14 @@ namespace TiaMcp.Openness.V21
             && instance.Elements().Any() && instance.Elements().All(c => c.Name == Net + "Component" && KnownAttributes(c, "Name") && !c.HasElements && !HasPayloadText(c) && !string.IsNullOrWhiteSpace((string)c.Attribute("Name")));
         private static TypedGraphicalPin[] ReadPins(XElement part, TypedGraphicalProfile profile)
         {
-            if (profile.Kind == "call") return (profile.Pins ?? new TypedGraphicalPin[0]).Concat(part.Element(Net + "CallInfo").Elements(Net + "Parameter").Select(p => new TypedGraphicalPin {
+            if (profile.Kind == "call") return (profile.Pins ?? Array.Empty<TypedGraphicalPin>()).Concat(part.Element(Net + "CallInfo").Elements(Net + "Parameter").Select(p => new TypedGraphicalPin {
                 Name = (string)p.Attribute("Name"), DataType = (string)p.Attribute("Type"), Direction = (string)p.Attribute("Section") == "Input" ? "input" : (string)p.Attribute("Section") == "InOut" ? "inout" : "output" })).ToArray();
             if (new[] { "and", "or", "not", "branch" }.Contains(profile.Kind))
             {
                 int card; if (int.TryParse(part.Elements(Net + "TemplateValue").FirstOrDefault(p => (string)p.Attribute("Name") == "Card")?.Value, out card) && card >= 1 && card <= 32)
                     return Enumerable.Range(1, card).Select(i => Port("in" + i, "input", "Bool")).Concat(new[] { Port("out", "output", "Bool") }).ToArray();
             }
-            return profile.Pins ?? new TypedGraphicalPin[0];
+            return profile.Pins ?? Array.Empty<TypedGraphicalPin>();
         }
         private static bool IsSupportedPart(XElement part, string language)
         {

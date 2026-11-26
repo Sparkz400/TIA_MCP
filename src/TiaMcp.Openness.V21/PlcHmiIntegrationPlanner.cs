@@ -88,7 +88,7 @@ namespace TiaMcp.Openness.V21
             var rows = new JArray();
             var sections = export.Descendants().Where(e => e.Name.LocalName == "Sections").Take(1).SelectMany(s => s.Elements().Where(e => e.Name.LocalName == "Section"));
             foreach (var section in sections.Where(s => (string)s.Attribute("Name") != "Temp" && (string)s.Attribute("Name") != "Constant"))
-                Add(rows, section, new string[0], types, 0);
+                Add(rows, section, System.Array.Empty<string>(), types, 0);
             return rows;
         }
 

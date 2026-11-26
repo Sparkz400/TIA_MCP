@@ -9,7 +9,7 @@ internal static class AvailabilityChecks
         const string epoch = "synthetic-session";
         string api = new('a', 64), project = Path.Combine(Path.GetTempPath(), "availability.synthetic.ap21");
         TestSuiteAvailabilityObservation Observation(string operation, string state) => new(epoch, api, project, operation, state,
-            new('b', 64), operation.EndsWith(".run") && state == "returned" ? new('c', 64) : null);
+            new('b', 64), operation.EndsWith(".run", StringComparison.Ordinal) && state == "returned" ? new('c', 64) : null);
         TestSuiteAvailabilityAssessment Assess(params TestSuiteAvailabilityObservation[] o) => TestSuiteAvailability.Assess(epoch, api, project, "style", o);
         void Check(bool condition) { if (!condition) throw new Exception("Availability evidence was incorrectly promoted."); checks++; }
         void Reject(Action action, string code) { try { action(); } catch (BridgeException e) when (e.Code == code) { checks++; return; } throw new Exception("Expected " + code); }

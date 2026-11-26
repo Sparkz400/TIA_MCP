@@ -14,9 +14,9 @@ namespace TiaMcp.Openness.V21
         public string Operation { get; set; }
         public string NetworkId { get; set; }
         public string InsertAfterNetworkId { get; set; }
-        public TypedGraphicalNode[] Nodes { get; set; } = new TypedGraphicalNode[0];
-        public TypedGraphicalConnection[] Connections { get; set; } = new TypedGraphicalConnection[0];
-        public TypedGraphicalOperandRequest[] Operands { get; set; } = new TypedGraphicalOperandRequest[0];
+        public TypedGraphicalNode[] Nodes { get; set; } = Array.Empty<TypedGraphicalNode>();
+        public TypedGraphicalConnection[] Connections { get; set; } = Array.Empty<TypedGraphicalConnection>();
+        public TypedGraphicalOperandRequest[] Operands { get; set; } = Array.Empty<TypedGraphicalOperandRequest>();
         public TypedGraphicalCreation Creation { get; set; }
     }
     internal sealed class TypedGraphicalNode
@@ -39,7 +39,7 @@ namespace TiaMcp.Openness.V21
         public string Key { get; set; }
         public string Scope { get; set; }
         public string OwnerPath { get; set; }
-        public string[] Components { get; set; } = new string[0];
+        public string[] Components { get; set; } = Array.Empty<string>();
         public string DataType { get; set; }
         public string Value { get; set; }
     }
@@ -57,7 +57,7 @@ namespace TiaMcp.Openness.V21
     {
         public string Name { get; set; }
         public string BlockType { get; set; }
-        public TypedGraphicalDeclaration[] Interface { get; set; } = new TypedGraphicalDeclaration[0];
+        public TypedGraphicalDeclaration[] Interface { get; set; } = Array.Empty<TypedGraphicalDeclaration>();
     }
     internal sealed class TypedGraphicalDeclaration
     {
@@ -70,7 +70,7 @@ namespace TiaMcp.Openness.V21
         public string Key { get; set; }
         public string Identity { get; set; }
         public string Scope { get; set; }
-        public string[] Components { get; set; } = new string[0];
+        public string[] Components { get; set; } = Array.Empty<string>();
         public string DataType { get; set; }
         public string Value { get; set; }
         public bool Writable { get; set; }
@@ -83,7 +83,7 @@ namespace TiaMcp.Openness.V21
         public string BlockType { get; set; }
         public string Namespace { get; set; }
         public string InterfaceHash { get; set; }
-        public TypedGraphicalParameter[] Parameters { get; set; } = new TypedGraphicalParameter[0];
+        public TypedGraphicalParameter[] Parameters { get; set; } = Array.Empty<TypedGraphicalParameter>();
         // Software scope that owns the callee; a callee outside TargetScopePath is a cross-unit call.
         public string ScopePath { get; set; }
         // Native UnitAccessType of a cross-unit callee ("Published"/"Unpublished"); null in the caller's own scope.
@@ -100,7 +100,7 @@ namespace TiaMcp.Openness.V21
     {
         public string Identity { get; set; }
         public string Scope { get; set; }
-        public string[] Components { get; set; } = new string[0];
+        public string[] Components { get; set; } = Array.Empty<string>();
         public string CalleePath { get; set; }
         public string DataType { get; set; }
         public string DeclarationHash { get; set; }
@@ -116,11 +116,11 @@ namespace TiaMcp.Openness.V21
         public string TargetNamespace { get; set; }
         public string TargetScopePath { get; set; }
         // Units the caller's unit declares a direct SoftwareUnit relation to, as exact scope paths.
-        public string[] RelatedScopePaths { get; set; } = new string[0];
+        public string[] RelatedScopePaths { get; set; } = Array.Empty<string>();
         public string NetworkTemplateXml { get; set; }
         // An independently observed, validated native template is required for advanced profiles.
         // The resolver loads these from the deployed profile catalog, never the user payload.
-        public TypedGraphicalProfile[] Profiles { get; set; } = new TypedGraphicalProfile[0];
+        public TypedGraphicalProfile[] Profiles { get; set; } = Array.Empty<TypedGraphicalProfile>();
     }
     internal sealed class TypedGraphicalProfile
     {
@@ -150,7 +150,7 @@ namespace TiaMcp.Openness.V21
         public string InstanceDeclarationXml { get; set; }
         public string GlobalInstanceType { get; set; }
         public string GlobalInstanceTemplateXml { get; set; }
-        public TypedGraphicalPin[] Pins { get; set; } = new TypedGraphicalPin[0];
+        public TypedGraphicalPin[] Pins { get; set; } = Array.Empty<TypedGraphicalPin>();
     }
     internal sealed class TypedGraphicalPin
     {
@@ -214,8 +214,8 @@ namespace TiaMcp.Openness.V21
         public string NativeXml { get; set; }
         public string SourceSha256 { get; set; }
         public string ProfileId { get; set; }
-        public TypedGraphicalPin[] Pins { get; set; } = new TypedGraphicalPin[0];
-        public string[] NegatedPins { get; set; } = new string[0];
+        public TypedGraphicalPin[] Pins { get; set; } = Array.Empty<TypedGraphicalPin>();
+        public string[] NegatedPins { get; set; } = Array.Empty<string>();
     }
     internal sealed class TypedGraphicalReadConnection
     {

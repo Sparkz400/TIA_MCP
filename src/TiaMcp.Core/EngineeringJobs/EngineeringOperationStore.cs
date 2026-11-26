@@ -527,7 +527,7 @@ public sealed class EngineeringOperationStore
         if (current.State == "reconciled") ValidateReconciliation(current, previous!.Revision, current.Reconciliation!, current.RecoveryDestinations!, current.RecoveryResolutions!, live);
     }
 
-    private void Write(EngineeringOperationRecord record, string folder)
+    private static void Write(EngineeringOperationRecord record, string folder)
     {
         string path = PackageStorage.Under(folder, record.Revision.ToString("D6", CultureInfo.InvariantCulture) + ".json");
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(record, BridgeProtocol.Json);

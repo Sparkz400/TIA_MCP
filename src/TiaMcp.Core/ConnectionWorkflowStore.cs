@@ -68,7 +68,7 @@ public sealed class ConnectionWorkflowStore(string artifactsRoot)
         if (!JsonNode.DeepEquals(expected, envelope["report"])) throw new BridgeException("ArtifactChanged", "Report differs from its retained input and saved review.");
         return envelope;
     }
-    private JsonObject Reference(string hash, string extension) => new() { ["path"] = "connection-reviews/" + hash + extension, ["sha256"] = hash };
+    private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "connection-reviews/" + hash + extension, ["sha256"] = hash };
     private JsonObject Publish(byte[] bytes, string extension, int limit) =>
         PackageStorage.PublishContent(artifactsRoot, "connection-reviews", bytes, extension, limit, 512L << 20, "Connection review");
     private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {

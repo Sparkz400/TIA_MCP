@@ -227,7 +227,7 @@ internal static class TypedGraphicalCorpusTests
         var cases = JObject.Parse(File.ReadAllText(Path.Combine(root, "fixtures", "typed-graphical", "wave9-cases.v1.json")))["cases"]!;
         bool IsCard(XElement e) => e.Name == TypedGraphical.Net + "TemplateValue" && e.Attribute("Name")?.Value == "Card";
         int count = 0;
-        foreach (var testCase in cases.Where(c => c.Value<string>("blockName")!.StartsWith("Tgp_Sub") || c.Value<string>("blockName")!.StartsWith("Tgp_Div")))
+        foreach (var testCase in cases.Where(c => c.Value<string>("blockName")!.StartsWith("Tgp_Sub", StringComparison.Ordinal) || c.Value<string>("blockName")!.StartsWith("Tgp_Div", StringComparison.Ordinal)))
         {
             var exported = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(root, testCase.Value<string>("referenceXml")!)));
             var imported = new XDocument(exported);

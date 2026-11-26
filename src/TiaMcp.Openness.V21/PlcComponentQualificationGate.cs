@@ -118,7 +118,7 @@ namespace TiaMcp.Openness.V21
         // before the claim. The verified runs were de-DE only; another active language changes the installed FB/UDT exports.
         internal static string CombinedApplyLanguageRefusal(string[] active, string reference, string editing) =>
             active?.Length == 1 && active[0] == "de-DE" && reference == "de-DE" && editing == "de-DE" ? null
-                : "Only de-DE-only projects are verified; this project has active languages " + string.Join(", ", active ?? new string[0]) +
+                : "Only de-DE-only projects are verified; this project has active languages " + string.Join(", ", active ?? Array.Empty<string>()) +
                   " (reference " + reference + ", editing " + editing + ").";
         // A multi-instance changes the caller FB's interface, so the typed step also changes each dependent the typed route finds
         // (its instance DBs, embedding parents and their users). Only the caller's direct instance DBs have a captured effect for
@@ -130,7 +130,7 @@ namespace TiaMcp.Openness.V21
         {
             if (transitiveCovered) return null;
             var covered = new System.Collections.Generic.HashSet<string>(directInstanceDbs ?? Enumerable.Empty<string>(), StringComparer.Ordinal);
-            var paths = plan?["multiInstance"] == null ? new string[0] : dependents.Where(p => !covered.Contains(p)).OrderBy(p => p, StringComparer.Ordinal).ToArray();
+            var paths = plan?["multiInstance"] == null ? Array.Empty<string>() : dependents.Where(p => !covered.Contains(p)).OrderBy(p => p, StringComparer.Ordinal).ToArray();
             if (paths.Length == 0) return null;
             return new JObject { ["code"] = "DependencyProfileUnavailable", ["dependents"] = new JArray(paths),
                 ["message"] = "The multi-instance caller " + plan["caller"]?.Value<string>("blockPath") + " has dependents (" + string.Join(", ", paths.Take(3)) +
