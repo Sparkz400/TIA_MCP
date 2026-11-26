@@ -38,7 +38,11 @@ def main():
                 for record in manifest['records']:
                     check(client.tool('access_review_page', {'recordRef': record['recordId']}) == record['summary'], 'Exact prior summary: ' + str(lifetime))
                     for section, page in record['pages'].items():
-                        check(client.tool('access_review_page', {'recordRef': record['recordId'], 'section': section, 'count': 200}) == page, 'Exact prior page ' + section)
+                        current = client.tool('access_review_page', {'recordRef': record['recordId'], 'section': section, 'count': 200})
+                        # totalItems and pageCount were added to every page later (additive); every recorded field is unchanged.
+                        added = {key: current.pop(key, None) for key in ('totalItems', 'pageCount')}
+                        check(current == page, 'Exact prior page ' + section)
+                        check(added == {'totalItems': page['total'], 'pageCount': -(-page['total'] // 200)}, 'Additive paging totals beside the prior page ' + section)
                     for key in ('input', 'reportArtifact'):
                         reference = record['summary'][key]
                         raw = bytearray()

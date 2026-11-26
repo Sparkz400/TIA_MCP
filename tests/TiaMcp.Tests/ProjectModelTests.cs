@@ -77,6 +77,18 @@ internal static class ProjectModelTests
         var now = new DateTime(2026, 10, 8, 10, 0, 0, DateTimeKind.Utc);
         var store = new ProjectModelStore(() => now); string id = (string)store.Capture(Fixture(), 30)["snapshotId"]!;
         string cursor = (string)store.Children(id, "blocks-a", 1)["nextCursor"]!;
+        // totalItems repeats totalMatches; pageCount counts pages at maxItems, on every page up to the last.
+        var page = store.Children(id, "blocks-a", 1); int matches = (int)page["totalMatches"]!;
+        Check.Equal(true, matches >= 2);
+        for (int pages = 1; ; pages++)
+        {
+            Check.Equal(true, pages <= matches);
+            Check.Equal(matches, (int)page["totalItems"]!); Check.Equal(matches, (int)page["pageCount"]!);
+            if ((string?)page["nextCursor"] is null) break;
+            page = store.Children(id, "blocks-a", 1, (string)page["nextCursor"]!);
+        }
+        var none = store.Search(id, "no-such-object-zz", null!, null!, null!, 50);
+        Check.Equal(0, (int)none["totalMatches"]!); Check.Equal(0, (int)none["totalItems"]!); Check.Equal(0, (int)none["pageCount"]!);
         Expect("InvalidCursor", () => store.Children(id, "blocks-b", 1, cursor));
         Expect("InvalidCursor", () => store.Children(id, "blocks-a", 2, cursor));
         Expect("InvalidCursor", () => store.Search(id, null!, null!, null!, null!, 1, cursor));

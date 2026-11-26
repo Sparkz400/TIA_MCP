@@ -279,7 +279,7 @@ public sealed partial class VciWorkspaceStore
         Require(offset <= branches.Count, "VciInputLimit", "Branch offset exceeds the current inventory.");
         var rows = branches.Skip(offset).Take(count).ToArray();
         var result = new { revisionRef, inventorySha256 = hash, offset, rows, total = branches.Count,
-            nextOffset = offset + rows.Length == branches.Count ? (int?)null : offset + rows.Length,
+            nextOffset = offset + rows.Length == branches.Count ? (int?)null : offset + rows.Length, totalItems = branches.Count, pageCount = PageTotals.PageCount(branches.Count, count),
             nativeQualified = false, scope = "Fresh local refs in this exact revision repository; pin inventorySha256 across pages." };
         Require(JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length <= 65536, "VciOutputLimit", "Branch page exceeds 64 KiB; reduce count.");
         return result;
@@ -392,7 +392,7 @@ public sealed partial class VciWorkspaceStore
             catch (Exception e) when (e is BridgeException or IOException or JsonException or UnauthorizedAccessException) { state = "integrity-failed"; }
             return new { id, recordRef = reference, state };
         }).ToArray();
-        return new { rows, total = entries.Length, nextOffset = offset + rows.Length == entries.Length ? (int?)null : offset + rows.Length,
+        return new { rows, total = entries.Length, nextOffset = offset + rows.Length == entries.Length ? (int?)null : offset + rows.Length, totalItems = entries.Length, pageCount = PageTotals.PageCount(entries.Length, count),
             ordering = "record-id; relist after concurrent additions", nativeQualified = false };
     }
 

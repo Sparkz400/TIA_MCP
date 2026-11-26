@@ -245,6 +245,9 @@ namespace TiaMcp.Openness.V21
             result["libraryId"] = library.Id; result["revision"] = revision; result["query"] = query;
             result["items"] = new JArray(rows.Skip(offset).Take(max)); result["totalCaptured"] = rows.Count;
             result["nextOffset"] = offset + max < rows.Count ? (JToken)(offset + max) : JValue.CreateNull();
+            // A walk that did not complete its scope has a partial total: totalItems and pageCount are then null.
+            result["totalItems"] = complete ? (JToken)rows.Count : JValue.CreateNull();
+            result["pageCount"] = complete ? (JToken)TiaMcp.Core.PageTotals.PageCount(rows.Count, max) : JValue.CreateNull();
             result["completeness"] = new JObject { ["scopeComplete"] = complete, ["truncated"] = !complete, ["scope"] = query == "uses" ? "Native library links in the selected project; other projects and textual references excluded." : "Native library metadata; protected or indirect runtime dependencies are not inferred." };
             // Rows taken from the revision snapshot are consistent with it by construction; other queries walk separately.
             if (snapshot == null && LibraryRevision(library) != revision) throw new BridgeException("PreviewStale", "Library changed during query. Retry inspection.");

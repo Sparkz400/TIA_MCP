@@ -69,6 +69,22 @@ otherwise, so a new tool needs a prefix in `src/TiaMcp.Host/ToolGroups.cs` and a
   binds the page. Caps that bound a single reply without continuation keep their own names
   (`maxItems` on the native inspections, `maxBlocks`, `maxDepth` and the like); the
   `project_model` request object keeps its own `maxItems`/`cursor` fields.
+- **Paging totals:** every item pager also returns `totalItems` and `pageCount` beside its own total
+  field, which keeps its name and meaning (`total`, `totalRows`, `totalMatches`, `totalChanges`,
+  `totalFindings`, `totalObservedHits`, `totalCaptured`, `totalMappedTargets`, `matchedBlocks`,
+  `snapshot.totalRows`; `hmi_references` had none). `totalItems` is the same number;
+  `pageCount` is `ceil(totalItems / count)` at the request's effective `count` (or `maxItems`,
+  `maxBlocks`, `limit`), 0 for an empty result. A byte budget can end a page before `count` rows,
+  so `pageCount` is a lower bound on the calls needed and `nextOffset` stays the continuation
+  signal. Where the family's total is unknown or partial, both are null and the family's own
+  completeness fields say why: `project_snapshot_search` at its 10,000-hit cap (`truncated`),
+  `library_query` with `completeness.truncated`, `hmi_references` without `coverage.scopeComplete`,
+  `device_inventory` with `coverage.truncated` and `block_export` without
+  `completeness.inventoryComplete`. `hmi_inspect` returned both fields before this rule and keeps its
+  meaning: the rows of the captured section, so a truncated capture (`coverage.captureComplete`
+  false) still counts what it holds. Byte-range readers (`artifact_read`, `review_artifact_read`,
+  `vci_file_read`, `artifact_upload_chunk`) page bytes, not items, and report `bytes` and
+  `complete` instead; `sim_area_*` `offset` is an address, not a page.
 - **Handles:** a retained record is addressed by `recordRef`, an upload by `uploadRef` (`upload:<id>`,
   returned by `artifact_upload_begin` and accepted by every upload tool and every consuming tool once
   committed). Receipts that predate the 0.9.0 redesign keep their stored `recordId` field; pass its value as

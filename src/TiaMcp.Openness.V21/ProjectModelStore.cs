@@ -331,6 +331,7 @@ namespace TiaMcp.Indexing
             int next = offset + nodes.Count;
             return new JObject { ["schemaVersion"] = "project-model.v1", ["snapshotId"] = snapshot.Document["snapshotId"], ["sessionGeneration"] = snapshot.Document["sessionGeneration"],
                 ["nodes"] = nodes, ["offset"] = offset, ["totalMatches"] = matches.Length, ["nextCursor"] = next < matches.Length ? Encode(snapshot, binding, next) : null,
+                ["totalItems"] = matches.Length, ["pageCount"] = TiaMcp.Core.PageTotals.PageCount(matches.Length, maxItems),
                 ["rowPayloadBytes"] = bytes, ["freshness"] = "snapshotOnly", ["coverage"] = snapshot.Document["coverage"].DeepClone() };
         }
 

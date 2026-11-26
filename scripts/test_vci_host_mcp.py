@@ -169,6 +169,8 @@ def main():
         second_page=call('vci_branches',dict(revisionRef=named['recordRef'],count=1,offset=page['nextOffset'],expectedInventorySha256=page['inventorySha256']))
         check('paged branches bind parent and named commits exactly',page['rows']==[dict(reference='refs/heads/main',commit=first['commit'])] and
               second_page['rows']==[dict(reference='refs/heads/review/offline',commit=named['commit'])] and second_page['nextOffset'] is None)
+        check('branch pages repeat total as totalItems and count pages at count, the last page included',
+              all(p['total']==p['totalItems']==2 and p['pageCount']==2 for p in (page,second_page)))
         reject('vci_branches',dict(revisionRef=named['recordRef'],offset=1),'VciInputLimit')
         reject('vci_branches',dict(revisionRef=named['recordRef'],expectedInventorySha256='a'*64),'PreviewStale')
         check('parent repository has no child branch',call('vci_branches',dict(revisionRef=first['recordRef']))['total']==1)
@@ -241,6 +243,8 @@ def main():
         while offset is not None:
             page = call('review_list', dict(kind='vci', offset=offset, count=50)); listed += page['rows']; offset = page['nextOffset']
         check('damaged candidates remain discoverable', any(row['recordRef']==damaged['recordRef'] and row['state']=='prepared' for row in listed))
+        check('the last review_list page repeats total as totalItems and counts pages of 50',
+              page['totalItems']==page['total']==len(listed) and page['pageCount']==-(-len(listed)//50))
         reject('review_reopen', dict(kind='vci', recordRef=damaged['recordRef']), 'VciIntegrityFailure')
         check('parent remains independently intact', download(first['recordRef'],path='PLC/Über Motor.s7dcl') == raw)
         # Stop only this harness's live Host tree after its durable dispatch record.
