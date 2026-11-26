@@ -40,18 +40,25 @@ public sealed partial class HmiComponentWorkflowStore
             (string?)selection["action"] is not ("create" or "update")) throw Error("Select one create/update hmiResource and its exact explicit binding.");
         var template = Object(request["template"]);
         if (!numeric) Fields(template, "fileBase textLibrary languages defaultLanguage falseText trueText");
-        var intent = numeric ? HmiNumericTextLists.Intent(template, (string)selection["name"]!) : new JsonObject {
-            ["schemaVersion"] = "unified-text-list-author-request.v1", ["fileBase"] = template["fileBase"]?.DeepClone(),
-            ["textLibrary"] = template["textLibrary"]?.DeepClone(), ["languages"] = template["languages"]?.DeepClone(),
+        var intent = numeric ? HmiNumericTextLists.Intent(template, (string)selection["name"]!) : new JsonObject
+        {
+            ["schemaVersion"] = "unified-text-list-author-request.v1",
+            ["fileBase"] = template["fileBase"]?.DeepClone(),
+            ["textLibrary"] = template["textLibrary"]?.DeepClone(),
+            ["languages"] = template["languages"]?.DeepClone(),
             ["defaultLanguage"] = template["defaultLanguage"]?.DeepClone(),
             ["texts"] = new JsonArray(
                 new JsonObject { ["id"] = "FalseText", ["translations"] = template["falseText"]?.DeepClone() },
                 new JsonObject { ["id"] = "TrueText", ["translations"] = template["trueText"]?.DeepClone() }),
-            ["lists"] = new JsonArray(new JsonObject {
-                ["name"] = selection["name"]!.DeepClone(), ["rangeType"] = "Bool",
+            ["lists"] = new JsonArray(new JsonObject
+            {
+                ["name"] = selection["name"]!.DeepClone(),
+                ["rangeType"] = "Bool",
                 ["entries"] = new JsonArray(
                     new JsonObject { ["id"] = "False", ["type"] = "SingleValue", ["fromValue"] = 0, ["toValue"] = 0, ["isDefault"] = false, ["textId"] = "FalseText" },
-                    new JsonObject { ["id"] = "True", ["type"] = "SingleValue", ["fromValue"] = 1, ["toValue"] = 1, ["isDefault"] = false, ["textId"] = "TrueText" }) }) };
+                    new JsonObject { ["id"] = "True", ["type"] = "SingleValue", ["fromValue"] = 1, ["toValue"] = 1, ["isDefault"] = false, ["textId"] = "TrueText" })
+            })
+        };
         var candidates = UnifiedTextListAuthoring.Build(intent);
         // A set preflight (preparedReport) refuses only when the set itself is new.
         if (retained is null && preparedReport is null) UnifiedTextListAuthoring.RequireNativeImportable(intent);
@@ -139,8 +146,13 @@ public sealed partial class HmiComponentWorkflowStore
             {
                 string name = (string)file!["fileName"]!;
                 if (!names.Add(name)) Conflict("Generated/preserved filenames collide, including case variants: " + name);
-                preserve.Add(new JsonObject { ["outputId"] = id, ["fileName"] = name, ["bytes"] = file["bytes"]!.DeepClone(),
-                    ["artifact"] = Reference((string)file["sha256"]!, ".source") });
+                preserve.Add(new JsonObject
+                {
+                    ["outputId"] = id,
+                    ["fileName"] = name,
+                    ["bytes"] = file["bytes"]!.DeepClone(),
+                    ["artifact"] = Reference((string)file["sha256"]!, ".source")
+                });
             }
         }
         var impacts = new JsonArray();
@@ -177,16 +189,35 @@ public sealed partial class HmiComponentWorkflowStore
                 files.Add(new JsonObject { ["fileName"] = candidate.Name, ["bytes"] = candidate.Bytes.Length, ["artifact"] = artifact });
             }
         }
-        var record = new JsonObject {
-            ["schemaVersion"] = numeric ? "unified-text-list-author-record.v3" : "unified-text-list-author-record.v2", ["input"] = input.DeepClone(), ["profile"] = request["profile"]!.DeepClone(),
-            ["status"] = conflicts.Count == 0 ? "candidatesReady" : "conflict", ["previousRecordId"] = previousId,
-            ["componentContext"] = new JsonObject { ["reviewRecordId"] = reviewId, ["outputId"] = outputId, ["bindingId"] = bindingId,
-                ["afterComponent"] = report["afterComponent"]!.DeepClone(), ["destination"] = report["destination"]!.DeepClone(),
-                ["binding"] = binding.DeepClone(), ["dependencyAssociationIndices"] = impacts },
-            ["intent"] = intent, ["files"] = files, ["preservedFiles"] = preserve, ["conflicts"] = conflicts, ["gaps"] = gaps,
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["preservationVerified"] = false,
-            ["consumerCoverageComplete"] = false, ["ownershipVerified"] = false,
-            ["policy"] = "Offline candidates for one explicitly mapped Bool text list only. Retained peers are exact supplied bytes; preservation after import, native binding, source authenticity, complete dependency/consumer coverage and project ownership remain unverified. Conflicts suppress both candidates. No merge, rename, deletion, native import or runtime execution." };
+        var record = new JsonObject
+        {
+            ["schemaVersion"] = numeric ? "unified-text-list-author-record.v3" : "unified-text-list-author-record.v2",
+            ["input"] = input.DeepClone(),
+            ["profile"] = request["profile"]!.DeepClone(),
+            ["status"] = conflicts.Count == 0 ? "candidatesReady" : "conflict",
+            ["previousRecordId"] = previousId,
+            ["componentContext"] = new JsonObject
+            {
+                ["reviewRecordId"] = reviewId,
+                ["outputId"] = outputId,
+                ["bindingId"] = bindingId,
+                ["afterComponent"] = report["afterComponent"]!.DeepClone(),
+                ["destination"] = report["destination"]!.DeepClone(),
+                ["binding"] = binding.DeepClone(),
+                ["dependencyAssociationIndices"] = impacts
+            },
+            ["intent"] = intent,
+            ["files"] = files,
+            ["preservedFiles"] = preserve,
+            ["conflicts"] = conflicts,
+            ["gaps"] = gaps,
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["preservationVerified"] = false,
+            ["consumerCoverageComplete"] = false,
+            ["ownershipVerified"] = false,
+            ["policy"] = "Offline candidates for one explicitly mapped Bool text list only. Retained peers are exact supplied bytes; preservation after import, native binding, source authenticity, complete dependency/consumer coverage and project ownership remain unverified. Conflicts suppress both candidates. No merge, rename, deletion, native import or runtime execution."
+        };
         if (numeric)
         {
             record["valueCoverage"] = valueCoverage;

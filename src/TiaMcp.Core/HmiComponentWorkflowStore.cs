@@ -51,10 +51,20 @@ public sealed partial class HmiComponentWorkflowStore(string artifactsRoot)
                 throw new BridgeException("ArtifactChanged", "Retained candidate differs from authored intent.");
             files.Add(new JsonObject { ["fileName"] = candidate.Name, ["bytes"] = candidate.Bytes.Length, ["artifact"] = reference });
         }
-        var record = new JsonObject { ["schemaVersion"] = "unified-text-list-author-record.v1", ["input"] = input.DeepClone(), ["files"] = files,
-            ["listCount"] = request["lists"]!.AsArray().Count, ["textCount"] = request["texts"]!.AsArray().Count, ["languageCount"] = request["languages"]!.AsArray().Count,
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["preservationVerified"] = false, ["consumerCoverageComplete"] = false,
-            ["policy"] = "Authored plain Unified text-list YAML candidates only. Download both files. No import, merge, system-list editing, formatted text, project language activation, native numeric-range certification or consumer completeness. Existing-list import can delete/recreate content; use independent baseline/current/proposed component review and native qualification before any import." };
+        var record = new JsonObject
+        {
+            ["schemaVersion"] = "unified-text-list-author-record.v1",
+            ["input"] = input.DeepClone(),
+            ["files"] = files,
+            ["listCount"] = request["lists"]!.AsArray().Count,
+            ["textCount"] = request["texts"]!.AsArray().Count,
+            ["languageCount"] = request["languages"]!.AsArray().Count,
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["preservationVerified"] = false,
+            ["consumerCoverageComplete"] = false,
+            ["policy"] = "Authored plain Unified text-list YAML candidates only. Download both files. No import, merge, system-list editing, formatted text, project language activation, native numeric-range certification or consumer completeness. Existing-list import can delete/recreate content; use independent baseline/current/proposed component review and native qualification before any import."
+        };
         JsonObject artifact;
         if (retained is null)
         {
@@ -139,8 +149,17 @@ public sealed partial class HmiComponentWorkflowStore(string artifactsRoot)
         if (JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length > 128 * 1024) throw new BridgeException("ArtifactCapacity", "Page exceeds 128 KiB; download the complete report.");
         return result;
     }
-    private static string Version(JsonObject request) => (string?)request["schemaVersion"] switch {
-        "hmi-component-review-request.v1" => "v1", "hmi-component-review-request.v2" => "v2", "hmi-component-review-request.v3" => "v3", "hmi-component-review-request.v4" => "v4", "hmi-component-review-request.v5" => "v5", "hmi-component-review-request.v6" => "v6", "hmi-component-review-request.v7" => "v7", _ => throw HmiComponentReview.Error("Unknown request version.") };
+    private static string Version(JsonObject request) => (string?)request["schemaVersion"] switch
+    {
+        "hmi-component-review-request.v1" => "v1",
+        "hmi-component-review-request.v2" => "v2",
+        "hmi-component-review-request.v3" => "v3",
+        "hmi-component-review-request.v4" => "v4",
+        "hmi-component-review-request.v5" => "v5",
+        "hmi-component-review-request.v6" => "v6",
+        "hmi-component-review-request.v7" => "v7",
+        _ => throw HmiComponentReview.Error("Unknown request version.")
+    };
     private JsonObject Build(JsonObject request, Func<JsonObject, byte[]>? readFile = null)
     {
         JsonObject Read(string id) => new ProjectReviewStore(artifactsRoot).Read(id);
@@ -174,7 +193,7 @@ public sealed partial class HmiComponentWorkflowStore(string artifactsRoot)
         }
         report["files"] = rows;
     }
-    private JsonObject Reference(string hash, string extension) => new() { ["path"] = "hmi-component-reviews/" + hash + extension, ["sha256"] = hash };
+    private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "hmi-component-reviews/" + hash + extension, ["sha256"] = hash };
     // Test seam: invoked before each durable artifact publication, so a test can abandon the Host at exactly that boundary.
     internal Action<string, string>? BeforePublish { get; set; }
     private JsonObject Publish(byte[] bytes, string extension, int limit)
@@ -183,10 +202,19 @@ public sealed partial class HmiComponentWorkflowStore(string artifactsRoot)
         BeforePublish?.Invoke(extension, Convert.ToHexStringLower(SHA256.HashData(bytes)));
         return PackageStorage.PublishContent(artifactsRoot, "hmi-component-reviews", bytes, extension, limit, 512L << 20, "HMI component review");
     }
-    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {
-        ["recordId"] = artifact["sha256"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),
-        ["summary"] = record["report"]!["summary"]!.DeepClone(), ["operation"] = record["report"]!["operation"]!.DeepClone(),
-        ["nativeExecutable"] = false, ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["wholeProjectPreservationVerified"] = false,
-        ["componentMemberCoverageComplete"] = false, ["consumerCoverageComplete"] = false,
-        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new()
+    {
+        ["recordId"] = artifact["sha256"]!.DeepClone(),
+        ["input"] = record["input"]!.DeepClone(),
+        ["reportArtifact"] = artifact.DeepClone(),
+        ["summary"] = record["report"]!["summary"]!.DeepClone(),
+        ["operation"] = record["report"]!["operation"]!.DeepClone(),
+        ["nativeExecutable"] = false,
+        ["nativeQualified"] = false,
+        ["sourceAuthenticityVerified"] = false,
+        ["wholeProjectPreservationVerified"] = false,
+        ["componentMemberCoverageComplete"] = false,
+        ["consumerCoverageComplete"] = false,
+        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy
+    };
 }

@@ -35,7 +35,7 @@ public sealed partial class WebRuntimeClient : IDisposable
     public bool LoginRejected { get; private set; }
     public bool LoginDispatched { get; private set; }
     public bool SessionUnusable { get; private set; }
-    public WebRuntimeProfile Profile { get; private set; } = new(null,"unavailable",null,null,null,null,false,null,null,null,null,null,null);
+    public WebRuntimeProfile Profile { get; private set; } = new(null, "unavailable", null, null, null, null, false, null, null, null, null, null, null);
     public TimeSpan IdleLimit { get; private set; } = TimeSpan.FromSeconds(90);
     public bool IdleExpired => Stopwatch.GetElapsedTime(lastUse) >= IdleLimit;
     public string[] Methods { get; private set; } = [];
@@ -48,9 +48,15 @@ public sealed partial class WebRuntimeClient : IDisposable
 
     private HttpClient NewClient(TimeSpan connectionLifetime)
     {
-        var handler = new SocketsHttpHandler { AllowAutoRedirect = false, UseProxy = false, UseCookies = false,
-            AutomaticDecompression = DecompressionMethods.None, MaxConnectionsPerServer = 1,
-            PooledConnectionLifetime = connectionLifetime };
+        var handler = new SocketsHttpHandler
+        {
+            AllowAutoRedirect = false,
+            UseProxy = false,
+            UseCookies = false,
+            AutomaticDecompression = DecompressionMethods.None,
+            MaxConnectionsPerServer = 1,
+            PooledConnectionLifetime = connectionLifetime
+        };
         // A resumed TLS session can retain an old certificate despite a new TCP connection.
         handler.SslOptions.AllowTlsResume = false;
         // Explicit leaf pin is the trust anchor. Name, validity and server usage still have to match.
@@ -76,7 +82,7 @@ public sealed partial class WebRuntimeClient : IDisposable
     {
         string id = Id(); var body = WebRuntimeProtocol.Discover(id);
         var methods = await Exchange(body, bytes => WebRuntimeProtocol.Names(bytes, id), cancellationToken);
-        if (JsonSerializer.SerializeToUtf8Bytes(methods).Length > 64*1024) throw Error("RuntimeDiscoveryLimit");
+        if (JsonSerializer.SerializeToUtf8Bytes(methods).Length > 64 * 1024) throw Error("RuntimeDiscoveryLimit");
         if (!RequiredMethods.All(methods.Contains))
             throw Error("RuntimeMethodsUnavailable");
         Methods = methods;
@@ -92,7 +98,7 @@ public sealed partial class WebRuntimeClient : IDisposable
             var limits = await Query("Api.GetQuantityStructures", cancellationToken);
             long Limit(string name)
             {
-                if (limits.ValueKind != JsonValueKind.Object || !limits.TryGetProperty(name,out var value) ||
+                if (limits.ValueKind != JsonValueKind.Object || !limits.TryGetProperty(name, out var value) ||
                     value.ValueKind != JsonValueKind.Number || !value.TryGetInt64(out var n) || n <= 0)
                     throw Error("RuntimeQuantityProfileUnsupported");
                 return n;
@@ -101,13 +107,18 @@ public sealed partial class WebRuntimeClient : IDisposable
             if (limits.ValueKind == JsonValueKind.Object && limits.EnumerateObject().Any(p => p.Name is
                 "webapi_http_request_body_size" or "webapi_parallel_requests" or "webapi_parallel_user_sessions"))
                 throw Error("RuntimeQuantityProfileUnsupported");
-            Profile = Profile with { QuantityProfile = "siemens-v21-table-max", MaximumRequestBytes = Limit("webapi_max_http_request_body_size"),
-                MaximumParallelRequests = Limit("webapi_max_parallel_requests"), MaximumUserSessions = Limit("webapi_max_parallel_user_sessions") };
+            Profile = Profile with
+            {
+                QuantityProfile = "siemens-v21-table-max",
+                MaximumRequestBytes = Limit("webapi_max_http_request_body_size"),
+                MaximumParallelRequests = Limit("webapi_max_parallel_requests"),
+                MaximumUserSessions = Limit("webapi_max_parallel_user_sessions")
+            };
         }
         if (Methods.Contains("Api.GetAuthenticationMode"))
         {
             var authentication = await Query("Api.GetAuthenticationMode", cancellationToken);
-            if (authentication.ValueKind != JsonValueKind.Object || !authentication.TryGetProperty("authentication_modes",out var modes) ||
+            if (authentication.ValueKind != JsonValueKind.Object || !authentication.TryGetProperty("authentication_modes", out var modes) ||
                 modes.ValueKind != JsonValueKind.Array || modes.GetArrayLength() is < 1 or > 16)
                 throw Error("RuntimeProfileInvalid");
             var names = new List<string>();
@@ -171,7 +182,7 @@ public sealed partial class WebRuntimeClient : IDisposable
                 if (supplied.Length is < 1 or > 8192 || supplied.Any(c => c < 33 || c > 126)) throw Error("RuntimeLoginResponseInvalid");
                 token = supplied;
                 ApplyPolicy(result);
-                if (result.TryGetProperty("has_no_permissions",out var denied))
+                if (result.TryGetProperty("has_no_permissions", out var denied))
                 {
                     if (denied.ValueKind is not (JsonValueKind.True or JsonValueKind.False)) throw Error("RuntimeProfileInvalid");
                     Profile = Profile with { HasNoPermissions = denied.GetBoolean() };
@@ -189,11 +200,11 @@ public sealed partial class WebRuntimeClient : IDisposable
         try
         {
             var info = await Query("Api.GetSessionInfo", cancellationToken, keepAlive: true);
-            if (info.ValueKind != JsonValueKind.Object || !info.TryGetProperty("username",out var username) ||
+            if (info.ValueKind != JsonValueKind.Object || !info.TryGetProperty("username", out var username) ||
                 username.ValueKind != JsonValueKind.String || username.GetString() != user)
                 throw Error("RuntimeSessionIdentityMismatch");
             string? observedMode = null;
-            if (info.TryGetProperty("authentication_mode",out var authentication))
+            if (info.TryGetProperty("authentication_mode", out var authentication))
             {
                 if (authentication.ValueKind != JsonValueKind.String || authentication.GetString() != mode)
                     throw Error("RuntimeSessionIdentityMismatch");
@@ -210,7 +221,7 @@ public sealed partial class WebRuntimeClient : IDisposable
 
     private void ApplyPolicy(JsonElement result)
     {
-        if (result.TryGetProperty("runtime_timeout",out var timeout))
+        if (result.TryGetProperty("runtime_timeout", out var timeout))
         {
             if (timeout.ValueKind != JsonValueKind.String || timeout.GetString()!.Length > 128) throw Error("RuntimeProfileInvalid");
             TimeSpan interval;
@@ -219,12 +230,12 @@ public sealed partial class WebRuntimeClient : IDisposable
             if (interval < IdleLimit) IdleLimit = interval;
             Profile = Profile with { RuntimeTimeout = timeout.GetString() };
         }
-        if (result.TryGetProperty("password_expiration",out var expiration))
+        if (result.TryGetProperty("password_expiration", out var expiration))
         {
-            if (expiration.ValueKind != JsonValueKind.Object || !expiration.TryGetProperty("timestamp",out var timestamp) ||
-                timestamp.ValueKind != JsonValueKind.String || !DateTimeOffset.TryParseExact(timestamp.GetString(),"yyyy-MM-dd'T'HH:mm:ss'Z'",
-                    CultureInfo.InvariantCulture,DateTimeStyles.AssumeUniversal,out var parsed) ||
-                !expiration.TryGetProperty("warning",out var warning) || warning.ValueKind is not (JsonValueKind.True or JsonValueKind.False))
+            if (expiration.ValueKind != JsonValueKind.Object || !expiration.TryGetProperty("timestamp", out var timestamp) ||
+                timestamp.ValueKind != JsonValueKind.String || !DateTimeOffset.TryParseExact(timestamp.GetString(), "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                    CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var parsed) ||
+                !expiration.TryGetProperty("warning", out var warning) || warning.ValueKind is not (JsonValueKind.True or JsonValueKind.False))
                 throw Error("RuntimeProfileInvalid");
             Profile = Profile with { PasswordExpiresUtc = parsed, PasswordExpirationWarning = warning.GetBoolean() };
         }
@@ -233,11 +244,11 @@ public sealed partial class WebRuntimeClient : IDisposable
     private async Task<JsonElement> Query(string method, CancellationToken cancellationToken, bool keepAlive = false)
     {
         string id = Id();
-        return await Exchange(Request(method,id),bytes =>
+        return await Exchange(Request(method, id), bytes =>
         {
-            using var response = WebRuntimeProtocol.Response(bytes,id);
+            using var response = WebRuntimeProtocol.Response(bytes, id);
             return Result(response).Clone();
-        },cancellationToken,keepAlive);
+        }, cancellationToken, keepAlive);
     }
 
     public async Task<string[]> PermissionsAsync(CancellationToken cancellationToken)
@@ -314,7 +325,7 @@ public sealed partial class WebRuntimeClient : IDisposable
         {
             if (requestBytes.Length > Math.Min(64 * 1024, Profile.MaximumRequestBytes ?? 64 * 1024)) throw Error("RuntimeRequestLimit");
             using var request = new HttpRequestMessage(HttpMethod.Post, Context.Endpoint + "/api/jsonrpc")
-                { Content = new ByteArrayContent(requestBytes), Version = HttpVersion.Version11, VersionPolicy = HttpVersionPolicy.RequestVersionExact };
+            { Content = new ByteArrayContent(requestBytes), Version = HttpVersion.Version11, VersionPolicy = HttpVersionPolicy.RequestVersionExact };
             request.Content.Headers.ContentType = new("application/json");
             // The request header asks the peer to close; zero pool lifetime separately prevents local reuse.
             if (!keepAlive) request.Headers.ConnectionClose = true;
@@ -342,29 +353,29 @@ public sealed partial class WebRuntimeClient : IDisposable
             {
                 void RefuseToken(JsonElement node)
                 {
-                    if (node.ValueKind == JsonValueKind.String && node.GetString()!.Contains(token,StringComparison.Ordinal)) throw Error("RuntimeSecretEchoRejected");
+                    if (node.ValueKind == JsonValueKind.String && node.GetString()!.Contains(token, StringComparison.Ordinal)) throw Error("RuntimeSecretEchoRejected");
                     if (node.ValueKind == JsonValueKind.Array) foreach (var child in node.EnumerateArray()) RefuseToken(child);
                     if (node.ValueKind == JsonValueKind.Object) foreach (var property in node.EnumerateObject())
                     {
-                        if (property.Name.Contains(token,StringComparison.Ordinal)) throw Error("RuntimeSecretEchoRejected");
+                        if (property.Name.Contains(token, StringComparison.Ordinal)) throw Error("RuntimeSecretEchoRejected");
                         RefuseToken(property.Value);
                     }
                 }
                 // Error bodies are already discarded by the parsers; inspect only publicly returned results.
                 if (body.ValueKind == JsonValueKind.Object)
                 {
-                    using var inspected = WebRuntimeProtocol.Response(buffer.AsMemory(0,length),body.GetProperty("id").GetString()!);
-                    if (inspected.RootElement.TryGetProperty("result",out var resultNode)) RefuseToken(resultNode);
+                    using var inspected = WebRuntimeProtocol.Response(buffer.AsMemory(0, length), body.GetProperty("id").GetString()!);
+                    if (inspected.RootElement.TryGetProperty("result", out var resultNode)) RefuseToken(resultNode);
                 }
                 else
                 {
                     // A batch reply: every element's result is inspected; its shape is validated by the parser.
                     try
                     {
-                        using var inspected = JsonDocument.Parse(buffer.AsMemory(0,length), new JsonDocumentOptions { MaxDepth = 32 });
+                        using var inspected = JsonDocument.Parse(buffer.AsMemory(0, length), new JsonDocumentOptions { MaxDepth = 32 });
                         if (inspected.RootElement.ValueKind == JsonValueKind.Array)
                             foreach (var element in inspected.RootElement.EnumerateArray())
-                                if (element.ValueKind == JsonValueKind.Object && element.TryGetProperty("result",out var resultNode)) RefuseToken(resultNode);
+                                if (element.ValueKind == JsonValueKind.Object && element.TryGetProperty("result", out var resultNode)) RefuseToken(resultNode);
                     }
                     catch (JsonException) { throw Error("RuntimeResponseInvalid"); }
                 }

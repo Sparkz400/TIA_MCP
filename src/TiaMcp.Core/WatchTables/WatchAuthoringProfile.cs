@@ -77,10 +77,16 @@ public static class WatchAuthoringProfile
         }
         catch (Exception error) when (error is InvalidOperationException or ArgumentException or System.IO.InvalidDataException or NullReferenceException or System.Xml.XmlException)
         { failures.Add("malformedProfileEvidence"); }
-        return new JsonObject { ["profile"] = Key, ["scopeMatched"] = failures.Count == 0, ["mismatches"] = failures,
-            ["productionApplyEnabled"] = false, ["nativeVerified"] = false,
+        return new JsonObject
+        {
+            ["profile"] = Key,
+            ["scopeMatched"] = failures.Count == 0,
+            ["mismatches"] = failures,
+            ["productionApplyEnabled"] = false,
+            ["nativeVerified"] = false,
             ["workerSha256"] = review["before"]?["observation"]?["adapterSha256"]?.DeepClone(),
-            ["requiredEvidence"] = "Current frozen Host/Core/worker package; native collision and stale-source refusal; full peer preservation, saved fresh reopen, recovery to absence and fresh recovered reopen; exact owned terminal proofs. Historical revision-03/binary-01 evidence does not admit this build." };
+            ["requiredEvidence"] = "Current frozen Host/Core/worker package; native collision and stale-source refusal; full peer preservation, saved fresh reopen, recovery to absence and fresh recovered reopen; exact owned terminal proofs. Historical revision-03/binary-01 evidence does not admit this build."
+        };
     }
 
     private static string? Text(JsonNode node, string key) => node[key] is JsonValue value && value.TryGetValue<string>(out var text) ? text : null;

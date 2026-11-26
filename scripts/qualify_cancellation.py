@@ -82,9 +82,9 @@ def main():
         refused = (result.get('structuredContent') or {}).get('error') or {}
         record('same key refused until reconciliation', refused)
         assert result.get('isError') and refused.get('code') == 'ResourceBusy' and refused['details']['reconciliationTool'] == 'engineering_admission_reconcile', refused
-        table = client.tool('tag_table_read', {'plcPath': plc, 'tagTableName': table})['xml']
-        record('tag created exactly once', table.count('<Name>CancelledOnce</Name>'))
-        assert table.count('<Name>CancelledOnce</Name>') == 1
+        table_xml = client.tool('tag_table_read', {'plcPath': plc, 'tagTableName': table})['xml']
+        record('tag created exactly once', table_xml.count('<Name>CancelledOnce</Name>'))
+        assert table_xml.count('<Name>CancelledOnce</Name>') == 1
         # The cancelled dispatch left its admission outcomeUnknown; the existing fresh-instance route verifies and releases it.
         unknown = []
         for folder in sorted((root / 'engineering-admissions').glob('[0-9a-f]*')):

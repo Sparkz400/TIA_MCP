@@ -54,21 +54,38 @@ internal static class HmiComponentConsumers
         void Capture(string scope, string reviewId, JsonObject captured, string[] selected, JsonArray omitted)
         {
             var ordered = selected.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
-            var changes = new JsonArray(ordered.Select(p => (JsonNode?)new JsonObject { ["path"] = p, ["afterObjectPath"] = p,
-                ["change"] = "selectedContextRoot", ["changedFields"] = new JsonArray() }).ToArray());
+            var changes = new JsonArray(ordered.Select(p => (JsonNode?)new JsonObject
+            {
+                ["path"] = p,
+                ["afterObjectPath"] = p,
+                ["change"] = "selectedContextRoot",
+                ["changedFields"] = new JsonArray()
+            }).ToArray());
             // Reuse the shared traversal for one actual snapshot; the empty side is never exposed as captured evidence.
             var empty = new JsonObject { ["nodes"] = new JsonArray(), ["edges"] = new JsonArray() };
             var result = ProjectReviewStore.ObservedImpactPaths(reviewId, reviewId, empty, captured, changes, depth, maximum, visits);
             foreach (var path in result["paths"]!.AsArray())
-                paths.Add(new JsonObject { ["scope"] = scope, ["reviewId"] = reviewId, ["rootObjectPath"] = path!["changedObjectPath"]!.DeepClone(),
-                    ["consumerObjectPath"] = path["affectedObjectPath"]!.DeepClone(), ["distance"] = path["distance"]!.DeepClone(),
-                    ["objectPaths"] = path["objectPaths"]!.DeepClone(), ["edges"] = path["edges"]!.DeepClone() });
+                paths.Add(new JsonObject
+                {
+                    ["scope"] = scope,
+                    ["reviewId"] = reviewId,
+                    ["rootObjectPath"] = path!["changedObjectPath"]!.DeepClone(),
+                    ["consumerObjectPath"] = path["affectedObjectPath"]!.DeepClone(),
+                    ["distance"] = path["distance"]!.DeepClone(),
+                    ["objectPaths"] = path["objectPaths"]!.DeepClone(),
+                    ["edges"] = path["edges"]!.DeepClone()
+                });
             var traversal = result["coverage"]!.DeepClone().AsObject();
             traversal["excludedEdges"] = traversal["excludedEdges"]![1]!["counts"]!.DeepClone();
             traversal["policy"] = "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.";
-            coverage.Add(new JsonObject { ["scope"] = scope, ["reviewId"] = reviewId,
+            coverage.Add(new JsonObject
+            {
+                ["scope"] = scope,
+                ["reviewId"] = reviewId,
                 ["roots"] = new JsonArray(ordered.Select(p => (JsonNode?)JsonValue.Create(p)).ToArray()),
-                ["excludedOutputIds"] = omitted, ["traversal"] = traversal });
+                ["excludedOutputIds"] = omitted,
+                ["traversal"] = traversal
+            });
         }
     }
 }

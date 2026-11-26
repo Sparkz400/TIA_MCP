@@ -32,6 +32,11 @@ These test projects are executable harnesses, so use the repository scripts
 rather than assuming `dotnet test` executes them.
 
 ```powershell
+# Before every push: the checks the changed files can break (formatting, ruff, the Release build with analyzer
+# errors, the worker compile, source bindings, contracts and the Python tests that changed or import a changed
+# script), in CI's environment. -Full adds every offline suite.
+.\scripts\Test-BeforePush.ps1
+
 # All offline suites; no Siemens installation required.
 .\scripts\Test-Offline.ps1
 
@@ -73,6 +78,11 @@ C# analyzer rules listed in `src/TiaMcp.Analyzers.globalconfig` are errors in ev
 non-net48 build (`Directory.Build.props` applies the file), so any build above reports
 them; the remaining analyzer findings stay warnings. Raise a rule there only once
 `dotnet build` shows no finding for it across `src/` and `tests/`.
+
+C# whitespace follows `.editorconfig` and the SDK's default C# formatting rules. CI checks
+`src/TiaMcp.Core/` and `src/TiaMcp.Host/` (job `lint`); format them before committing with
+`dotnet format whitespace --folder --include src/TiaMcp.Core/ src/TiaMcp.Host/`. Further projects join the
+check once they have been formatted in a commit of their own, listed in `.git-blame-ignore-revs`.
 
 Each offline invocation writes a fresh report under `artifacts/offline-validation/`.
 CI uses Windows for Python and .NET and Linux for the explorer browser. It does

@@ -27,9 +27,12 @@ public sealed record AdmissionReconciliation(EngineeringMutationAdmission Record
 
     public JsonObject NativeRequest(string retrieveDirectory) => new()
     {
-        ["operation"] = Record.Scope.Operation, ["scopeSha256"] = Record.Scope.ScopeSha256,
-        ["admittedProcessId"] = Record.Scope.ProcessId, ["admittedAtUtc"] = AdmittedAt.UtcDateTime.ToString("O"),
-        ["observationSha256"] = Record.Scope.ObservationSha256, ["retrieveDirectory"] = retrieveDirectory,
+        ["operation"] = Record.Scope.Operation,
+        ["scopeSha256"] = Record.Scope.ScopeSha256,
+        ["admittedProcessId"] = Record.Scope.ProcessId,
+        ["admittedAtUtc"] = AdmittedAt.UtcDateTime.ToString("O"),
+        ["observationSha256"] = Record.Scope.ObservationSha256,
+        ["retrieveDirectory"] = retrieveDirectory,
         ["resources"] = JsonSerializer.SerializeToNode(Record.Scope.Resources, BridgeProtocol.Json)
     };
 

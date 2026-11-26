@@ -8,10 +8,16 @@ internal static class HmiIntegerConversion
 {
     internal const string TypeChangeConflict = "PLC declaration type text changed; native binding compatibility needs review.";
 
-    private static (long Min, long Max) Domain(string type) => type switch {
-        "SInt" => (-128, 127), "USInt" => (0, 255), "Int" => (-32768, 32767),
-        "UInt" => (0, 65535), "DInt" => (-2147483648, 2147483647), "UDInt" => (0, 4294967295),
-        _ => throw Error("Integer conversion supports exact SInt/USInt/Int/UInt/DInt/UDInt types only.") };
+    private static (long Min, long Max) Domain(string type) => type switch
+    {
+        "SInt" => (-128, 127),
+        "USInt" => (0, 255),
+        "Int" => (-32768, 32767),
+        "UInt" => (0, 65535),
+        "DInt" => (-2147483648, 2147483647),
+        "UDInt" => (0, 4294967295),
+        _ => throw Error("Integer conversion supports exact SInt/USInt/Int/UInt/DInt/UDInt types only.")
+    };
 
     internal static JsonObject Evaluate(JsonObject selection, JsonObject? prior, JsonObject binding, JsonObject intent, string expectedType)
     {
@@ -40,17 +46,32 @@ internal static class HmiIntegerConversion
                 long low = (long)entry!["fromValue"]!, high = (long)entry["toValue"]!;
                 bool represented = low >= source.Min && high <= source.Max && low <= high && low >= target.Min && high <= target.Max;
                 fit &= represented;
-                intervals.Add(new JsonObject { ["stateId"] = entry["id"]!.DeepClone(), ["fromValue"] = low, ["toValue"] = high,
-                    ["targetRepresentable"] = represented });
+                intervals.Add(new JsonObject
+                {
+                    ["stateId"] = entry["id"]!.DeepClone(),
+                    ["fromValue"] = low,
+                    ["toValue"] = high,
+                    ["targetRepresentable"] = represented
+                });
             }
         else fit = false;
         if (!fit) conflicts.Add("Every original listed interval must fit both exact types; overflow, negative-to-unsigned loss and implicit state removal refuse.");
-        return new JsonObject {
-            ["selection"] = selection.DeepClone(), ["sourceMinimum"] = source.Min, ["sourceMaximum"] = source.Max,
-            ["targetMinimum"] = target.Min, ["targetMaximum"] = target.Max, ["listedIntervals"] = intervals,
-            ["allListedValuesRepresentable"] = fit, ["fullSourceDomainRepresentable"] = source.Min >= target.Min && source.Max <= target.Max,
-            ["status"] = conflicts.Count == 0 ? "checkedListedValues" : "conflict", ["conflicts"] = conflicts,
+        return new JsonObject
+        {
+            ["selection"] = selection.DeepClone(),
+            ["sourceMinimum"] = source.Min,
+            ["sourceMaximum"] = source.Max,
+            ["targetMinimum"] = target.Min,
+            ["targetMaximum"] = target.Max,
+            ["listedIntervals"] = intervals,
+            ["allListedValuesRepresentable"] = fit,
+            ["fullSourceDomainRepresentable"] = source.Min >= target.Min && source.Max <= target.Max,
+            ["status"] = conflicts.Count == 0 ? "checkedListedValues" : "conflict",
+            ["conflicts"] = conflicts,
             ["sourceBindingConflicts"] = binding["conflicts"]!.DeepClone(),
-            ["unlistedValuesVerified"] = false, ["runtimeConversionVerified"] = false, ["nativeCompatibilityVerified"] = false };
+            ["unlistedValuesVerified"] = false,
+            ["runtimeConversionVerified"] = false,
+            ["nativeCompatibilityVerified"] = false
+        };
     }
 }

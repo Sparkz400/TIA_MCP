@@ -28,7 +28,8 @@ public sealed class ContractResources
             note = "Schemas describe the public payload; the worker stays authoritative and checks native identities and target-dependent allowlists a schema cannot express.",
             kinds = Payloads.Value["x-change-kinds"]!.AsArray().Select(kind => kind!.GetValue<string>()).Select(kind => new
             {
-                kind, uri = "tia://change-payloads/" + kind,
+                kind,
+                uri = "tia://change-payloads/" + kind,
                 contract = external[kind]?["contract"]?.GetValue<string>() ?? PayloadContract,
             }),
         });
@@ -45,8 +46,12 @@ public sealed class ContractResources
             throw new McpProtocolException("UnknownChangeKind: " + kind + " is not a change_prepare kind; read tia://change-payloads.", McpErrorCode.ResourceNotFound);
         if (document["x-external-payloads"]![kind] is JsonObject external)
         {
-            var reference = new JsonObject { ["kind"] = kind, ["contract"] = external["contract"]!.DeepClone(),
-                ["contractUri"] = "tia://contracts/" + external["contract"]!.GetValue<string>() };
+            var reference = new JsonObject
+            {
+                ["kind"] = kind,
+                ["contract"] = external["contract"]!.DeepClone(),
+                ["contractUri"] = "tia://contracts/" + external["contract"]!.GetValue<string>()
+            };
             if (external["pointer"] is { } pointer) reference["pointer"] = pointer.DeepClone();
             if (external["note"] is { } note) reference["note"] = note.DeepClone();
             return reference;

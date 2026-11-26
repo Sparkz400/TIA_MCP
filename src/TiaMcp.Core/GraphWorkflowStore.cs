@@ -96,8 +96,19 @@ public sealed class GraphWorkflowStore
         Require(node is JsonArray, "GraphInvalidSection", "Selected report value is not an array.");
         var source = (JsonArray)node; Require(offset <= source.Count, "GraphPageLimit", "Offset exceeds this array.");
         var (rows, next) = ReportPageRows.Read(source, offset, count, PageBytes - 4096, "Row exceeds page budget; download report.json.");
-        var result = new { recordRef, reportSha256 = record.Receipt.Artifacts.Single(a => a.Name == "report.json").Sha256,
-            section, offset, total = source.Count, rows, nextOffset = next == source.Count ? (int?)null : next, totalItems = source.Count, pageCount = PageTotals.PageCount(source.Count, count), nativeQualified = false };
+        var result = new
+        {
+            recordRef,
+            reportSha256 = record.Receipt.Artifacts.Single(a => a.Name == "report.json").Sha256,
+            section,
+            offset,
+            total = source.Count,
+            rows,
+            nextOffset = next == source.Count ? (int?)null : next,
+            totalItems = source.Count,
+            pageCount = PageTotals.PageCount(source.Count, count),
+            nativeQualified = false
+        };
         Require(JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length <= PageBytes,
             "GraphPageLimit", "Encoded page exceeds 128 KiB; reduce count or download report.json.");
         return result;
@@ -111,9 +122,18 @@ public sealed class GraphWorkflowStore
         var result = JsonSerializer.SerializeToElement(new ArtifactStore(root).Read(PathFor(record.Receipt.Id, name), offset, count), BridgeProtocol.Json);
         Require(result.GetProperty("sha256").GetString() == artifact.Sha256 && result.GetProperty("bytes").GetInt64() == artifact.Bytes,
             "GraphIntegrityFailure", "Artifact changed during transfer.");
-        return new { sha256 = artifact.Sha256, bytes = artifact.Bytes, offset, count = result.GetProperty("count").GetInt32(),
-            encoding = "base64", data = result.GetProperty("data").GetString(), nextOffset = result.GetProperty("nextOffset").GetInt64(),
-            complete = result.GetProperty("complete").GetBoolean(), nativeQualified = false };
+        return new
+        {
+            sha256 = artifact.Sha256,
+            bytes = artifact.Bytes,
+            offset,
+            count = result.GetProperty("count").GetInt32(),
+            encoding = "base64",
+            data = result.GetProperty("data").GetString(),
+            nextOffset = result.GetProperty("nextOffset").GetInt64(),
+            complete = result.GetProperty("complete").GetBoolean(),
+            nativeQualified = false
+        };
     }
     public object List(int offset = 0, int count = 20)
     {
@@ -132,8 +152,16 @@ public sealed class GraphWorkflowStore
             catch (Exception error) when (error is BridgeException or IOException or JsonException or UnauthorizedAccessException) { state = "integrity-failed"; }
             return new { id, recordRef = reference, state };
         }).ToArray();
-        return new { rows, total = directories.Length, nextOffset = offset + rows.Length == directories.Length ? (int?)null : offset + rows.Length, totalItems = directories.Length, pageCount = PageTotals.PageCount(directories.Length, count),
-            ordering = "record-id; relist after additions", nativeQualified = false };
+        return new
+        {
+            rows,
+            total = directories.Length,
+            nextOffset = offset + rows.Length == directories.Length ? (int?)null : offset + rows.Length,
+            totalItems = directories.Length,
+            pageCount = PageTotals.PageCount(directories.Length, count),
+            ordering = "record-id; relist after additions",
+            nativeQualified = false
+        };
     }
     private Record Document(string reference)
     { var record = Load(reference); Require(record.Receipt.Kind == "document", "GraphInvalidReference", "Comparison inputs must be retained documents."); return record; }
@@ -185,8 +213,12 @@ public sealed class GraphWorkflowStore
     private Record PublishDocument(byte[] bytes, string[]? inputs = null)
     {
         var document = GraphDocument.Parse(bytes);
-        return Publish("document", inputs ?? [], new() { ["original.xml"] = bytes,
-            ["report.json"] = Encoding.UTF8.GetBytes(document.ToJson()), ["viewer.html"] = Encoding.UTF8.GetBytes(document.ToHtml()) });
+        return Publish("document", inputs ?? [], new()
+        {
+            ["original.xml"] = bytes,
+            ["report.json"] = Encoding.UTF8.GetBytes(document.ToJson()),
+            ["viewer.html"] = Encoding.UTF8.GetBytes(document.ToHtml())
+        });
     }
     private byte[] ArtifactBytes(string path, string? sha256)
     {
@@ -200,17 +232,34 @@ public sealed class GraphWorkflowStore
     {
         var report = JsonNode.Parse(record.Files["report.json"])!.AsObject();
         var counts = report.Where(p => p.Value is JsonArray).ToDictionary(p => p.Key, p => ((JsonArray)p.Value!).Count);
-        return new { recordRef = record.Reference, kind = record.Receipt.Kind, state = "complete", inputs = record.Receipt.Inputs,
-            nativeQualified = false, behavioralEquivalenceCertified = false, fullSchemaValidated = false,
-            sourceSha256 = (string?)report["sourceSha256"], beforeSha256 = (string?)report["beforeSha256"], afterSha256 = (string?)report["afterSha256"],
-            hasErrors = (bool?)report["hasErrors"], hasUnsupportedContent = (bool?)report["hasUnsupportedContent"], matchingReliable = (bool?)report["matchingReliable"],
-            sourceBytesChanged = (bool?)report["sourceBytesChanged"], counts, artifacts = record.Receipt.Artifacts, receiptName = "receipt.json" };
+        return new
+        {
+            recordRef = record.Reference,
+            kind = record.Receipt.Kind,
+            state = "complete",
+            inputs = record.Receipt.Inputs,
+            nativeQualified = false,
+            behavioralEquivalenceCertified = false,
+            fullSchemaValidated = false,
+            sourceSha256 = (string?)report["sourceSha256"],
+            beforeSha256 = (string?)report["beforeSha256"],
+            afterSha256 = (string?)report["afterSha256"],
+            hasErrors = (bool?)report["hasErrors"],
+            hasUnsupportedContent = (bool?)report["hasUnsupportedContent"],
+            matchingReliable = (bool?)report["matchingReliable"],
+            sourceBytesChanged = (bool?)report["sourceBytesChanged"],
+            counts,
+            artifacts = record.Receipt.Artifacts,
+            receiptName = "receipt.json"
+        };
     }
     private string PathFor(string id, string? name = null) => PackageStorage.Under(root, name is null ? id : id + "/" + name);
     private static string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
     private static byte[] Read(string path, int limit)
-    { PackageStorage.EnsureNoLinks(path); using var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-        Require(input.Length <= limit, "GraphCapacity", "Input or retained file exceeds its byte bound."); var bytes = new byte[(int)input.Length]; input.ReadExactly(bytes); return bytes; }
+    {
+        PackageStorage.EnsureNoLinks(path); using var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        Require(input.Length <= limit, "GraphCapacity", "Input or retained file exceeds its byte bound."); var bytes = new byte[(int)input.Length]; input.ReadExactly(bytes); return bytes;
+    }
     private static void Write(string path, byte[] bytes)
     { PackageStorage.EnsureNoLinks(path); using var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None); output.Write(bytes); output.Flush(true); }
     private static void Require([DoesNotReturnIf(false)] bool condition, string code, string message)

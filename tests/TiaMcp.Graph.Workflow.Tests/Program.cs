@@ -79,7 +79,7 @@ Reject("GraphInputChanged", () => store.Retain(populated, new string('0', 64)));
 Reject("ArtifactPathDenied", () => store.Retain(Path.Combine(AppContext.BaseDirectory, "fixtures", "native-populated.xml"), new string('0', 64)));
 JsonElement Payload(object value) => JsonSerializer.SerializeToElement(value);
 var byRef = store.ImportPayload(Payload(new { graphRef = Text(exported, "recordRef"), expectedBlockNames = new[] { "GraphQualification" } }));
-Check(byRef["xml"]!.GetValue<string>().StartsWith("<?xml") && byRef["expectedBlockNames"]![0]!.GetValue<string>() == "GraphQualification" &&
+Check(byRef["xml"]!.GetValue<string>().StartsWith("<?xml", StringComparison.Ordinal) && byRef["expectedBlockNames"]![0]!.GetValue<string>() == "GraphQualification" &&
     byRef["sourceSha256"]!.GetValue<string>() == Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(populated))), "retained native GRAPH document becomes an import payload without BOM");
 Check(store.ImportPayload(Payload(new { path = "exports/native-populated.xml" }))["xml"]!.GetValue<string>() == byRef["xml"]!.GetValue<string>(), "artifact-relative path yields the same import payload");
 Reject("GraphImportRefused", () => store.ImportPayload(Payload(new { path = emptyCondition })));

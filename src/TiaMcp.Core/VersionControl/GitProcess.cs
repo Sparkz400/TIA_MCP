@@ -176,8 +176,12 @@ internal sealed class GitProcess
         if (ExecutableSha256 != GitSafety.HashFile(executable)) throw new BridgeException("GitExecutableChanged", "The allowlisted Git executable changed.");
         var start = new ProcessStartInfo(executable)
         {
-            WorkingDirectory = directory, UseShellExecute = false, CreateNoWindow = true,
-            RedirectStandardInput = true, RedirectStandardOutput = true, RedirectStandardError = true
+            WorkingDirectory = directory,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
         };
         start.Environment.Clear();
         foreach (var name in new[] { "SystemRoot", "WINDIR" })

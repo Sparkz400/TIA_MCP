@@ -12,15 +12,24 @@ namespace TiaMcp.Core.Diagnostics;
 /// <summary>Presentation of retained reports, with exact source bytes and no new analysis or native claims.</summary>
 public sealed class DiagnosticReportExport(string artifactsRoot)
 {
-    private static readonly JsonSerializerOptions HandoffJson = new(BridgeProtocol.Json) {
-        PropertyNameCaseInsensitive = false, UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow, RespectRequiredConstructorParameters = true, MaxDepth = 48 };
+    private static readonly JsonSerializerOptions HandoffJson = new(BridgeProtocol.Json)
+    {
+        PropertyNameCaseInsensitive = false,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        RespectRequiredConstructorParameters = true,
+        MaxDepth = 48
+    };
     private const string Limits = "Supplied evidence only. Program identity, clock synchronization and native behavior are not verified. This report does not prove causality or that a fault is fixed. Export presents the retained results; it does not rerun analysis or authenticate their source.";
 
     public JsonObject Export(string reportId, string format)
     {
-        var (extension, mediaType) = format switch {
-            "json" => (".json", "application/json"), "markdown" => (".md", "text/markdown"),
-            "html" => (".html", "text/html"), _ => throw new BridgeException("InvalidRequest", "format must be json, markdown or html.") };
+        var (extension, mediaType) = format switch
+        {
+            "json" => (".json", "application/json"),
+            "markdown" => (".md", "text/markdown"),
+            "html" => (".html", "text/html"),
+            _ => throw new BridgeException("InvalidRequest", "format must be json, markdown or html.")
+        };
         var store = new DiagnosticStore(artifactsRoot);
         byte[] source = store.ReadBytes(reportId);
         var report = JsonNode.Parse(source) as JsonObject ?? throw Invalid();
@@ -56,14 +65,14 @@ public sealed class DiagnosticReportExport(string artifactsRoot)
             foreach (var hypothesis in Rows(report, "hypotheses"))
             {
                 False(hypothesis, "causationProven");
-                if (capture ? D.Text(hypothesis,"verdict")!="unresolved" : D.Text(hypothesis, "verdict") is not ("unresolved" or "supportedPrediction" or "contradictedPrediction")) throw Invalid();
+                if (capture ? D.Text(hypothesis, "verdict") != "unresolved" : D.Text(hypothesis, "verdict") is not ("unresolved" or "supportedPrediction" or "contradictedPrediction")) throw Invalid();
             }
         }
-        if(capture)
+        if (capture)
         {
-            foreach(string field in new[]{"atomicAcrossSignals","scanSynchronized","programMatchVerified","addressMatchVerified","sourceAuthenticityVerified","clockSynchronizationVerified"})False(report,field);
-            if(!Regex.IsMatch(D.Text(report,"snapshotRef"),"\\Acapture:[a-f0-9]{32}:[0-9]{1,6}:[a-f0-9]{64}\\z") || report["plcChangesBetweenPollsUnknown"]?.GetValue<bool>()!=true || report["capture"] is not JsonObject || report["association"] is not JsonObject association)throw Invalid();
-            foreach(string field in new[]{"addressMatchVerified","programMatchVerified","sourceAuthenticityVerified","nativeQualified"})False(association,field);
+            foreach (string field in new[] { "atomicAcrossSignals", "scanSynchronized", "programMatchVerified", "addressMatchVerified", "sourceAuthenticityVerified", "clockSynchronizationVerified" }) False(report, field);
+            if (!Regex.IsMatch(D.Text(report, "snapshotRef"), "\\Acapture:[a-f0-9]{32}:[0-9]{1,6}:[a-f0-9]{64}\\z") || report["plcChangesBetweenPollsUnknown"]?.GetValue<bool>() != true || report["capture"] is not JsonObject || report["association"] is not JsonObject association) throw Invalid();
+            foreach (string field in new[] { "addressMatchVerified", "programMatchVerified", "sourceAuthenticityVerified", "nativeQualified" }) False(association, field);
             if (association.ContainsKey("alarmBindings"))
             {
                 try
@@ -72,7 +81,7 @@ public sealed class DiagnosticReportExport(string artifactsRoot)
                     var signals = report["capture"]!["signals"]!.Deserialize<RuntimeCaptureSignal[]>(HandoffJson)!;
                     var retained = association.Deserialize<RuntimeCaptureAssociation>(HandoffJson)!;
                     if (request is null || signals is null || signals.Length == 0 || retained?.AlarmBindings is null ||
-                        retained.CaseId != D.Text(report,"caseId") || retained.ReviewId != D.Text(report,"reviewId")) throw Invalid();
+                        retained.CaseId != D.Text(report, "caseId") || retained.ReviewId != D.Text(report, "reviewId")) throw Invalid();
                     RuntimeCaptureAssociations.ValidateRequest(request);
                     RuntimeCaptureAssociations.ValidateRetained(request, signals, retained);
                 }
@@ -87,8 +96,8 @@ public sealed class DiagnosticReportExport(string artifactsRoot)
                     var signals = report["capture"]!["signals"]!.Deserialize<RuntimeCaptureSignal[]>(HandoffJson)!;
                     var handoff = report["handoff"]?.Deserialize<RuntimeCaptureHandoff>(HandoffJson);
                     if (request is null || signals is null || signals.Length == 0 || handoff is null ||
-                        handoff.ReviewId != D.Text(report,"reviewId") ||
-                        !JsonNode.DeepEquals(report["capture"]!["context"], JsonSerializer.SerializeToNode(handoff.Session.Context,BridgeProtocol.Json))) throw Invalid();
+                        handoff.ReviewId != D.Text(report, "reviewId") ||
+                        !JsonNode.DeepEquals(report["capture"]!["context"], JsonSerializer.SerializeToNode(handoff.Session.Context, BridgeProtocol.Json))) throw Invalid();
                     RuntimeCaptureHandoffs.ValidateRetained(request, signals, handoff);
                 }
                 catch (Exception error) when (error is BridgeException or JsonException or InvalidOperationException or ArgumentException or NullReferenceException)
@@ -127,18 +136,27 @@ public sealed class DiagnosticReportExport(string artifactsRoot)
     {
         var result = new StringBuilder();
         foreach (char c in text)
-            result.Append(c switch {
-                ':' => "&#58;", '.' => "&#46;", '@' => "&#64;",
-                '&' => "&amp;", '<' => "&lt;", '>' => "&gt;", '\n' => "<br>", '\r' => "", '\t' => "    ",
+            result.Append(c switch
+            {
+                ':' => "&#58;",
+                '.' => "&#46;",
+                '@' => "&#64;",
+                '&' => "&amp;",
+                '<' => "&lt;",
+                '>' => "&gt;",
+                '\n' => "<br>",
+                '\r' => "",
+                '\t' => "    ",
                 '\\' or '`' or '*' or '_' or '{' or '}' or '[' or ']' or '(' or ')' or '#' or '+' or '-' or '!' or '|' or '~' => "\\" + c,
-                _ => char.IsControl(c) ? "\\u" + ((int)c).ToString("x4", CultureInfo.InvariantCulture) : c.ToString() });
+                _ => char.IsControl(c) ? "\\u" + ((int)c).ToString("x4", CultureInfo.InvariantCulture) : c.ToString()
+            });
         return result.ToString();
     }
 
     private static string Render(JsonObject report, string reportId, string raw, bool comparison, bool html)
     {
-        bool capture=D.Text(report,"schemaVersion")=="runtime-capture-analysis.v1";
-        string countKind=capture?"cycles":"samples",countSuffix=capture?"Cycles":"Samples";
+        bool capture = D.Text(report, "schemaVersion") == "runtime-capture-analysis.v1";
+        string countKind = capture ? "cycles" : "samples", countSuffix = capture ? "Cycles" : "Samples";
         var output = new StringBuilder();
         void Add(string text)
         {
@@ -191,7 +209,7 @@ public sealed class DiagnosticReportExport(string artifactsRoot)
             Value(signal["before"]?["samplesInWindow"]) + " → " + Value(signal["after"]?["samplesInWindow"]),
             Value(signal["before"]?["missingValues"]) + " → " + Value(signal["after"]?["missingValues"]),
             Value(signal["before"]?["transitionCount"]) + " → " + Value(signal["after"]?["transitionCount"]) }));
-        else Table(["Hypothesis", "Recorded result", "Matched / contradicted / unknown "+countKind], Rows(report, "hypotheses").Select(h => new[] {
+        else Table(["Hypothesis", "Recorded result", "Matched / contradicted / unknown " + countKind], Rows(report, "hypotheses").Select(h => new[] {
             Value(h["id"]) + ": " + Value(h["statement"]), Value(h["verdict"]), Value(h["matched"+countSuffix]) + " / " + Value(h["contradicted"+countSuffix]) + " / " + Value(h["unknown"+countSuffix]) }));
         Heading(2, "Acquisition and uncertainty");
         if (comparison)
@@ -214,16 +232,16 @@ public sealed class DiagnosticReportExport(string artifactsRoot)
         }
         else
         {
-            if(capture)
+            if (capture)
             {
                 Paragraph("Cycle patterns combine sequential reads, not simultaneous samples. Individual read times and sequences are retained in the examples. All behavioral verdicts remain unresolved.");
-                Fields("Capture progress",report["capture"]?["recordedProgress"]);Fields("Acquisition context",report["capture"]?["context"]);Fields("Polling request",report["capture"]?["request"]);
+                Fields("Capture progress", report["capture"]?["recordedProgress"]); Fields("Acquisition context", report["capture"]?["context"]); Fields("Polling request", report["capture"]?["request"]);
                 if (report["association"]?["alarmBindings"] is JsonObject alarm)
                 {
                     Heading(3, "Saved alarm operand bindings");
                     Paragraph("Original supplied bindings to saved executable source. Selection for capture does not prove a successful observation, active alarm, runtime invocation or running-program match.");
-                    var selected = Rows(report["association"]!.AsObject(),"signals").Select(s=>D.Text(s,"signalId")).ToHashSet(StringComparer.Ordinal);
-                    Table(["Binding", "Diagnostic signal", "Capture selection", "Saved declaration"], Rows(alarm,"bindings").Select(row=>new[] {
+                    var selected = Rows(report["association"]!.AsObject(), "signals").Select(s => D.Text(s, "signalId")).ToHashSet(StringComparer.Ordinal);
+                    Table(["Binding", "Diagnostic signal", "Capture selection", "Saved declaration"], Rows(alarm, "bindings").Select(row => new[] {
                         Value(row["id"]), Value(row["signalId"]), selected.Contains(D.Text(row,"signalId")) ? "Selected for capture" : "Not selected in this capture", Value(row["declaration"]) }));
                 }
                 if (report["handoff"] is JsonObject handoff)
@@ -238,19 +256,19 @@ public sealed class DiagnosticReportExport(string artifactsRoot)
             foreach (var hypothesis in Rows(report, "hypotheses"))
             {
                 Heading(3, Value(hypothesis["id"])); Paragraph(Value(hypothesis["statement"]));
-                Table(["Result", "Matched "+countKind, "Contradicted "+countKind, "Unknown "+countKind], [new[] { Value(hypothesis["verdict"]), Value(hypothesis["matched"+countSuffix]), Value(hypothesis["contradicted"+countSuffix]), Value(hypothesis["unknown"+countSuffix]) }]);
+                Table(["Result", "Matched " + countKind, "Contradicted " + countKind, "Unknown " + countKind], [new[] { Value(hypothesis["verdict"]), Value(hypothesis["matched" + countSuffix]), Value(hypothesis["contradicted" + countSuffix]), Value(hypothesis["unknown" + countSuffix]) }]);
                 Paragraph(Value(hypothesis["reason"]));
             }
-            if(capture)
+            if (capture)
             {
-                Heading(2,"Observed value changes");Paragraph("Total: "+Value(report["observedChangeCount"])+". Retained list truncated: "+Value(report["observedChangesTruncated"])+". Consecutive cycles only; gaps and unavailable values are not bridged. Host completion times do not timestamp PLC transitions.");
-                Table(["Signal","Before read","After read","Host elapsed ms (before → after)","Before","After"],Rows(report,"observedChanges").Select(row=>new[]{Value(row["signalId"]),Value(row["beforeRead"]?["sequence"]),Value(row["afterRead"]?["sequence"]),Value(row["beforeRead"]?["elapsedMilliseconds"])+" → "+Value(row["afterRead"]?["elapsedMilliseconds"]),Value(row["before"]),Value(row["after"])}));
+                Heading(2, "Observed value changes"); Paragraph("Total: " + Value(report["observedChangeCount"]) + ". Retained list truncated: " + Value(report["observedChangesTruncated"]) + ". Consecutive cycles only; gaps and unavailable values are not bridged. Host completion times do not timestamp PLC transitions.");
+                Table(["Signal", "Before read", "After read", "Host elapsed ms (before → after)", "Before", "After"], Rows(report, "observedChanges").Select(row => new[] { Value(row["signalId"]), Value(row["beforeRead"]?["sequence"]), Value(row["afterRead"]?["sequence"]), Value(row["beforeRead"]?["elapsedMilliseconds"]) + " → " + Value(row["afterRead"]?["elapsedMilliseconds"]), Value(row["before"]), Value(row["after"]) }));
             }
             else { Heading(2, "Observed transitions"); Paragraph("Total: " + Value(report["transitionCount"]) + ". Retained list truncated: " + Value(report["transitionsTruncated"])); Transitions(report, Value(report["timeUnit"])); }
             Heading(2, "Coverage and next capture"); Code(report["coverageGaps"]?.ToJsonString() ?? "null"); Paragraph(Value(report["nextCapture"]));
         }
         Heading(2, "Source lineage");
-        string[] identities = comparison ? ["beforeMeasurementId", "afterMeasurementId", "beforeTracePlanId", "afterTracePlanId", "beforeReviewId", "afterReviewId", "sourceChanged", "programIdentityChanged"] : capture ? ["snapshotRef","caseId","reviewId"] : ["measurementId", "tracePlanId", "reviewId"];
+        string[] identities = comparison ? ["beforeMeasurementId", "afterMeasurementId", "beforeTracePlanId", "afterTracePlanId", "beforeReviewId", "afterReviewId", "sourceChanged", "programIdentityChanged"] : capture ? ["snapshotRef", "caseId", "reviewId"] : ["measurementId", "tracePlanId", "reviewId"];
         Table(["Identity", "Recorded value"], identities.Select(key => new[] { key, Value(report[key]) }));
         Heading(2, "Complete source report"); Paragraph("The exact JSON export is identified by the source hash above. This section retains every source field, including fields not projected into the readable tables.");
         if (html) Add("<details><summary>Show complete source JSON</summary>");

@@ -141,8 +141,13 @@ public sealed class AutomationMlDocument
             for (int i = 0; i < result.References.Count; i++)
             {
                 var reference = result.References[i]; if (reference.State == "external-not-loaded") continue;
-                string expected = reference.Attribute switch { "RefBaseSystemUnitPath" => "SystemUnitClass", "RefBaseRoleClassPath" or "RefRoleClassPath" => "RoleClass",
-                    "RefAttributeType" => "AttributeType", _ => elements.TryGetValue(reference.Owner ?? "", out var e) && e.Name.LocalName is "RoleClass" or "SystemUnitClass" ? e.Name.LocalName : "InterfaceClass" };
+                string expected = reference.Attribute switch
+                {
+                    "RefBaseSystemUnitPath" => "SystemUnitClass",
+                    "RefBaseRoleClassPath" or "RefRoleClassPath" => "RoleClass",
+                    "RefAttributeType" => "AttributeType",
+                    _ => elements.TryGetValue(reference.Owner ?? "", out var e) && e.Name.LocalName is "RoleClass" or "SystemUnitClass" ? e.Name.LocalName : "InterfaceClass"
+                };
                 var targets = classes[reference.Value].Where(o => o.Kind == expected).Take(2).ToArray();
                 string state = reference.Value.Contains('@') ? "external-not-loaded" : targets.Length == 1 ? "resolved" : targets.Length == 0 ? "unresolved" : "ambiguous";
                 result.References[i] = reference with { State = state, Target = state == "resolved" ? targets[0].Path : null };
@@ -196,13 +201,28 @@ public sealed class AutomationMlDocument
             foreach (var item in Objects.Where(o => Key(o) is null)) { changes.Add(new { key = (string?)null, kind = "unmatched-before", before = new[] { item }, after = Array.Empty<Item>() }); seedsBefore.Add(item.Path); }
             foreach (var item in after.Objects.Where(o => Key(o) is null)) { changes.Add(new { key = (string?)null, kind = "unmatched-after", before = Array.Empty<Item>(), after = new[] { item } }); seedsAfter.Add(item.Path); }
         }
-        return new { schemaVersion = 1, beforeSha256 = SourceSha256, afterSha256 = after.SourceSha256, beforeProfile = Profile, afterProfile = after.Profile,
-            sourceBytesChanged = changed, matchingReliable = Profile == after.Profile && MatchingReliable && after.MatchingReliable,
-            nativeQualified = false, importabilityCertified = false, impactScopeComplete = false,
-            wholeDocumentReviewRequired = changed, changes,
-            beforeImpacts = Impacts(seedsBefore), afterImpacts = after.Impacts(seedsAfter),
-            beforeDiagnostics = Diagnostics, afterDiagnostics = after.Diagnostics, beforeSchemaValid = SchemaValid, afterSchemaValid = after.SchemaValid,
-            limitations = Limitations };
+        return new
+        {
+            schemaVersion = 1,
+            beforeSha256 = SourceSha256,
+            afterSha256 = after.SourceSha256,
+            beforeProfile = Profile,
+            afterProfile = after.Profile,
+            sourceBytesChanged = changed,
+            matchingReliable = Profile == after.Profile && MatchingReliable && after.MatchingReliable,
+            nativeQualified = false,
+            importabilityCertified = false,
+            impactScopeComplete = false,
+            wholeDocumentReviewRequired = changed,
+            changes,
+            beforeImpacts = Impacts(seedsBefore),
+            afterImpacts = after.Impacts(seedsAfter),
+            beforeDiagnostics = Diagnostics,
+            afterDiagnostics = after.Diagnostics,
+            beforeSchemaValid = SchemaValid,
+            afterSchemaValid = after.SchemaValid,
+            limitations = Limitations
+        };
     }
     private object[] Impacts(HashSet<string> seeds)
     {
@@ -212,8 +232,14 @@ public sealed class AutomationMlDocument
         foreach (var reference in References.Where(r => r.Owner is not null && r.Target is not null)) edges[reference.Target!].Add(reference.Owner!);
         var seen = new HashSet<string>(seeds); var queue = new Queue<string>(seeds);
         while (queue.TryDequeue(out string? path)) foreach (string target in edges[path]) if (seen.Add(target)) queue.Enqueue(target);
-        return Objects.Where(o => seen.Contains(o.Path) && o.Scope == "instance").Select(o => (object)new { o.Path, o.Id, o.Name, o.Kind,
-            reason = seeds.Contains(o.Path) ? "changed-or-unmatched-declaration" : "declared-hierarchy-link-or-class-consumer" }).ToArray();
+        return Objects.Where(o => seen.Contains(o.Path) && o.Scope == "instance").Select(o => (object)new
+        {
+            o.Path,
+            o.Id,
+            o.Name,
+            o.Kind,
+            reason = seeds.Contains(o.Path) ? "changed-or-unmatched-declaration" : "declared-hierarchy-link-or-class-consumer"
+        }).ToArray();
     }
     private static string? ParentKey(Item item, Dictionary<string, Item> items) => item.Parent is null ? null : Key(items[item.Parent]) ?? "unreliable:" + items[item.Parent].Path + ":" + items[item.Parent].Name;
     private static string? Key(Item item) => !string.IsNullOrEmpty(item.Id) ? "id:" + item.Id : item.ClassPath is not null ? item.Kind + ":" + item.ClassPath : null;

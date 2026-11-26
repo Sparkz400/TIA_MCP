@@ -75,8 +75,13 @@ internal static partial class IoMap
         {
             ["project"] = JsonNode.Parse(inventory.GetProperty("project").GetRawText()),
             ["plcPath"] = software.TryGetProperty("plcPath", out var plc) ? plc.GetString() : null,
-            ["summary"] = new JsonObject { ["ranges"] = ranges.Count, ["ioTags"] = tags.Length, ["rangesWithoutTags"] = empty.Count,
-                ["tagsWithoutListedHardware"] = tags.Length - placed.Count },
+            ["summary"] = new JsonObject
+            {
+                ["ranges"] = ranges.Count,
+                ["ioTags"] = tags.Length,
+                ["rangesWithoutTags"] = empty.Count,
+                ["tagsWithoutListedHardware"] = tags.Length - placed.Count
+            },
             ["ranges"] = rows,
             ["rangesWithoutTags"] = empty,
             ["tagsWithoutListedHardware"] = new JsonArray([.. tags.Where(tag => !placed.Contains(tag))
@@ -84,7 +89,10 @@ internal static partial class IoMap
             ["sharedAddresses"] = new JsonArray([.. shared]),
             ["completeness"] = new JsonObject
             {
-                ["complete"] = !tagsCut && !hardwareCut && plcs <= 1, ["hardwareTruncated"] = hardwareCut, ["tagsTruncated"] = tagsCut, ["plcsInProject"] = plcs,
+                ["complete"] = !tagsCut && !hardwareCut && plcs <= 1,
+                ["hardwareTruncated"] = hardwareCut,
+                ["tagsTruncated"] = tagsCut,
+                ["plcsInProject"] = plcs,
                 ["scope"] = "Offline configuration only. A tag is placed by its first byte; a structured tag's full span is not evaluated. "
                     + "Address ranges that the hardware inventory does not expose, such as drive telegrams configured in Startdrive, appear as tags without listed hardware. "
                     + "With several PLCs the address ranges of all of them are listed together; a range without tags may belong to another PLC. "

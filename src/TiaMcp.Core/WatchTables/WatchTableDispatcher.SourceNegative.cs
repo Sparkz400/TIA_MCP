@@ -31,8 +31,14 @@ public sealed partial class WatchTableDispatcher
         if (WatchTableDocument.Hash(receiptBytes) != receipt.Sha256 || !JsonNode.DeepEquals(JsonNode.Parse(receiptBytes), copy))
             throw new BridgeException("ArtifactChanged", "Native baseline receipt changed.");
         var binding = retained["sourceBinding"]!.AsObject();
-        var selector = new JsonObject { ["projectPath"] = project, ["plcPath"] = binding["plcPath"]!.DeepClone(),
-            ["tableName"] = WatchAuthoringProfile.Table, ["group"] = "root", ["allowAbsent"] = true };
+        var selector = new JsonObject
+        {
+            ["projectPath"] = project,
+            ["plcPath"] = binding["plcPath"]!.DeepClone(),
+            ["tableName"] = WatchAuthoringProfile.Table,
+            ["group"] = "root",
+            ["allowAbsent"] = true
+        };
         var current = await Snapshot(selector, token); var actual = Observation(current); NativeTargetGuard.Validate(actual);
         if (actual.SessionEpoch == expected.SessionEpoch || current["processId"]?.GetValue<int>() == record.Scope.ProcessId ||
             actual.AdapterSha256 != expected.AdapterSha256 || actual.ProfileSha256 != expected.ProfileSha256 ||

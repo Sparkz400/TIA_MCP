@@ -74,28 +74,33 @@ public sealed class TechnologyProfileWorkflowStore(string artifactsRoot)
         {
             string[] fields = ["label", "purpose", "phase", "fileName", "uploadRef", "sha256", "bytes"];
             if (item is not JsonObject row || row.Count != fields.Length || fields.Any(f => !row.ContainsKey(f))) throw Invalid("Unexpected source declaration fields.");
-            if (!labels.Add(SourceText(row,"label",256))) throw Invalid("Duplicate exact source label.");
-            SourceText(row,"purpose",1024);
-            if (SourceText(row,"phase",16) is not ("before" or "after" or "context")) throw Invalid("Unknown source phase.");
-            string name = SourceText(row,"fileName",256);
+            if (!labels.Add(SourceText(row, "label", 256))) throw Invalid("Duplicate exact source label.");
+            SourceText(row, "purpose", 1024);
+            if (SourceText(row, "phase", 16) is not ("before" or "after" or "context")) throw Invalid("Unknown source phase.");
+            string name = SourceText(row, "fileName", 256);
             if (PackageStorage.Relative(name) != name || name.Contains('/')) throw Invalid("Source filename must be an exact display filename, not a path.");
-            string reference = SourceText(row,"uploadRef",39);
-            if (reference.Length != 39 || !reference.StartsWith("upload:",StringComparison.Ordinal) || reference.Skip(7).Any(c => !"0123456789abcdef".Contains(c))) throw Invalid("Expected a committed upload reference.");
-            EngineeringIdentityGuard.Sha256(SourceText(row,"sha256",64),"source.sha256");
+            string reference = SourceText(row, "uploadRef", 39);
+            if (reference.Length != 39 || !reference.StartsWith("upload:", StringComparison.Ordinal) || reference.Skip(7).Any(c => !"0123456789abcdef".Contains(c))) throw Invalid("Expected a committed upload reference.");
+            EngineeringIdentityGuard.Sha256(SourceText(row, "sha256", 64), "source.sha256");
             if (row["bytes"] is not JsonValue v || !v.TryGetValue<int>(out int bytes) || bytes is < 1 or > SourceLimit) throw Invalid("Source size must be 1 byte..16 MiB.");
             total += bytes; if (total > SourcesTotalLimit) throw Invalid("Source declarations exceed 64 MiB total, including repeated roles.");
             rows.Add(row);
         }
         return rows.ToArray();
     }
-    private static string SourceText(JsonObject row,string field,int maximum)
+    private static string SourceText(JsonObject row, string field, int maximum)
     {
         if (row[field] is not JsonValue v || !v.TryGetValue<string>(out string? text) || text is null) throw Invalid("Expected source text: " + field);
-        EngineeringIdentityGuard.Text(text,"source."+field,maximum); return text;
+        EngineeringIdentityGuard.Text(text, "source." + field, maximum); return text;
     }
-    private static string Version(JsonObject request) => request["schemaVersion"] is JsonValue v && v.TryGetValue<string>(out string? text) ? text switch {
-        "technology-profile-review-request.v1" => "v1", "technology-profile-review-request.v2" => "v2",
-        "technology-profile-review-request.v3" => "v3", "technology-profile-review-request.v4" => "v4", _ => throw Invalid("Unknown technology request version.") } : throw Invalid("Expected technology request version text.");
+    private static string Version(JsonObject request) => request["schemaVersion"] is JsonValue v && v.TryGetValue<string>(out string? text) ? text switch
+    {
+        "technology-profile-review-request.v1" => "v1",
+        "technology-profile-review-request.v2" => "v2",
+        "technology-profile-review-request.v3" => "v3",
+        "technology-profile-review-request.v4" => "v4",
+        _ => throw Invalid("Unknown technology request version.")
+    } : throw Invalid("Expected technology request version text.");
     private JsonObject Build(string reviewId, JsonObject request, Action<int>? accountBytes = null)
     {
         var review = new ProjectReviewStore(artifactsRoot).Read(reviewId);
@@ -121,7 +126,8 @@ public sealed class TechnologyProfileWorkflowStore(string artifactsRoot)
     private static JsonObject BaseRequest(JsonObject request)
     {
         if (Version(request) == "v1") return request;
-        var baseline = request.DeepClone().AsObject(); baseline.Remove("sources"); if (Version(request) is "v3" or "v4") { baseline.Remove("consumers"); baseline.Remove("impactLimits"); } if (Version(request) == "v4") baseline.Remove("encoders"); baseline["schemaVersion"] = "technology-profile-review-request.v1"; return baseline;
+        var baseline = request.DeepClone().AsObject(); baseline.Remove("sources"); if (Version(request) is "v3" or "v4") { baseline.Remove("consumers"); baseline.Remove("impactLimits"); }
+        if (Version(request) == "v4") baseline.Remove("encoders"); baseline["schemaVersion"] = "technology-profile-review-request.v1"; return baseline;
     }
     private void AddSources(JsonObject report, JsonObject[] sources, Action<int>? accountBytes = null)
     {
@@ -132,8 +138,15 @@ public sealed class TechnologyProfileWorkflowStore(string artifactsRoot)
             var artifact = Reference((string)source["sha256"]!, ".source");
             byte[] bytes = ProjectReviewStore.ReadArtifact(artifactsRoot, artifact, SourceLimit); accountBytes?.Invoke(bytes.Length);
             if (bytes.Length != (int)source["bytes"]!) throw Invalid("Retained source size differs from its declaration.");
-            rows.Add(new JsonObject { ["label"] = source["label"]!.DeepClone(), ["purpose"] = source["purpose"]!.DeepClone(),
-                ["phase"] = source["phase"]!.DeepClone(), ["fileName"] = source["fileName"]!.DeepClone(), ["bytes"] = bytes.Length, ["artifact"] = artifact });
+            rows.Add(new JsonObject
+            {
+                ["label"] = source["label"]!.DeepClone(),
+                ["purpose"] = source["purpose"]!.DeepClone(),
+                ["phase"] = source["phase"]!.DeepClone(),
+                ["fileName"] = source["fileName"]!.DeepClone(),
+                ["bytes"] = bytes.Length,
+                ["artifact"] = artifact
+            });
         }
         if ((string?)report["schemaVersion"] is not ("technology-profile-review.v3" or "technology-profile-review.v4")) report["schemaVersion"] = "technology-profile-review.v2"; report["sources"] = rows;
     }
@@ -160,12 +173,23 @@ public sealed class TechnologyProfileWorkflowStore(string artifactsRoot)
         if (!JsonNode.DeepEquals(expected, envelope["report"])) throw new BridgeException("ArtifactChanged", "Report differs from its retained input and saved review.");
         return envelope;
     }
-    private JsonObject Reference(string hash, string extension) => new() { ["path"] = "technology-profile-reviews/" + hash + extension, ["sha256"] = hash };
+    private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "technology-profile-reviews/" + hash + extension, ["sha256"] = hash };
     private JsonObject Publish(byte[] bytes, string extension, int limit) =>
         PackageStorage.PublishContent(artifactsRoot, "technology-profile-reviews", bytes, extension, limit, 512L << 20, "Technology profile review");
-    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {
-        ["recordId"] = artifact["sha256"]!.DeepClone(), ["reviewId"] = record["reviewId"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),
-        ["summary"] = record["report"]!["summary"]!.DeepClone(), ["nativeExecutable"] = false, ["nativeQualified"] = false,
-        ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["nativeExecuted"] = false, ["targetCompatibilityVerified"] = false, ["wholeObjectAnalysisComplete"] = false,
-        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new()
+    {
+        ["recordId"] = artifact["sha256"]!.DeepClone(),
+        ["reviewId"] = record["reviewId"]!.DeepClone(),
+        ["input"] = record["input"]!.DeepClone(),
+        ["reportArtifact"] = artifact.DeepClone(),
+        ["summary"] = record["report"]!["summary"]!.DeepClone(),
+        ["nativeExecutable"] = false,
+        ["nativeQualified"] = false,
+        ["sourceAuthenticityVerified"] = false,
+        ["liveFreshnessVerified"] = false,
+        ["nativeExecuted"] = false,
+        ["targetCompatibilityVerified"] = false,
+        ["wholeObjectAnalysisComplete"] = false,
+        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy
+    };
 }

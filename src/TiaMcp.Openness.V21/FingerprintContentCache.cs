@@ -79,7 +79,7 @@ namespace TiaMcp.Openness.V21
         internal static string Variant(string kind, System.Collections.Generic.IEnumerable<string> targetBlockNames)
         {
             var names = new System.Collections.Generic.SortedSet<string>(StringComparer.Ordinal);
-            foreach (string name in targetBlockNames ?? new string[0]) names.Add((name ?? "").ToUpperInvariant());
+            foreach (string name in targetBlockNames ?? Array.Empty<string>()) names.Add((name ?? "").ToUpperInvariant());
             return kind + "\n" + string.Join("\n", names);
         }
     }

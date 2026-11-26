@@ -14,10 +14,18 @@ public sealed partial class ProjectReviewStore
         byte[] bytes = ReadArtifact(artifactsRoot, new JsonObject { ["path"] = uploaded.Path, ["sha256"] = uploaded.Sha256 });
         var review = ValidateImport(bytes);
         string path = Publish(bytes), id = Hash(bytes);
-        return new JsonObject { ["reviewId"] = id, ["artifact"] = new JsonObject { ["path"] = path, ["sha256"] = id, ["bytes"] = (long)bytes.Length },
-            ["nodeCount"] = NativeNodes(review["model"]!.AsObject()).Count, ["documentCount"] = Rows(review["documents"]).Count,
-            ["nativeAccessAttempted"] = false, ["sourceAuthenticityVerified"] = false, ["nativeQualified"] = false,
-            ["wholeProjectContentComplete"] = false, ["sourceEvidencePolicy"] = SourceEvidencePolicy };
+        return new JsonObject
+        {
+            ["reviewId"] = id,
+            ["artifact"] = new JsonObject { ["path"] = path, ["sha256"] = id, ["bytes"] = (long)bytes.Length },
+            ["nodeCount"] = NativeNodes(review["model"]!.AsObject()).Count,
+            ["documentCount"] = Rows(review["documents"]).Count,
+            ["nativeAccessAttempted"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["nativeQualified"] = false,
+            ["wholeProjectContentComplete"] = false,
+            ["sourceEvidencePolicy"] = SourceEvidencePolicy
+        };
     }
 
     private string Publish(byte[] data)

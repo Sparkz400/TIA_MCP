@@ -14,8 +14,13 @@ public static class DiagnosticTemplates
         Template("competingWriters", "Does the final storage disagree with an earlier writer's command?", ["internalCommand", "finalOutput", "writerGuard", "enable", "taskState"], "Final output change; end-of-OB sampling may hide intermediate writes."),
         Template("analogNoise", "Do threshold crossings correlate with noise or hysteresis state?", ["rawInput", "filteredInput", "threshold", "hysteresisState", "output"], "One supported threshold; preserve engineering units and time base."),
         Template("communicationTimeout", "Do request, acknowledgement and timeout state diverge?", ["request", "acknowledgement", "sequenceNumber", "timeoutElapsed", "connectionState", "error"], "Timeout/fault edge; preserve clock uncertainty across devices."));
-    private static JsonObject Template(string id, string question, string[] roles, string trigger) => new() {
-        ["id"] = id, ["diagnosticQuestion"] = question, ["signalRoles"] = D.Strings(roles), ["triggerGuidance"] = trigger,
+    private static JsonObject Template(string id, string question, string[] roles, string trigger) => new()
+    {
+        ["id"] = id,
+        ["diagnosticQuestion"] = question,
+        ["signalRoles"] = D.Strings(roles),
+        ["triggerGuidance"] = trigger,
         ["budgetPolicy"] = "Start with the output/command pair and direct hypothesis dependencies; add a role only with captured evidence and a reason. Revalidate substitutions and repeated captures.",
-        ["automaticSignalSelection"] = false };
+        ["automaticSignalSelection"] = false
+    };
 }

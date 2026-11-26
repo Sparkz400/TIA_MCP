@@ -77,7 +77,7 @@ namespace TiaMcp.Openness.V21
             var roots = new List<Tuple<BlockEntry, string[]>>(); var targetDbs = new HashSet<string>(StringComparer.Ordinal);
             bool depthBound = false;
             var queue = new Queue<LookupLevel>();
-            if (isFb) queue.Enqueue(new LookupLevel { Type = target, Suffix = new string[0], Chain = new JArray() });
+            if (isFb) queue.Enqueue(new LookupLevel { Type = target, Suffix = Array.Empty<string>(), Chain = new JArray() });
             while (queue.Count > 0 && !rows.Truncated)
             {
                 var level = queue.Dequeue();
@@ -181,7 +181,7 @@ namespace TiaMcp.Openness.V21
                         if (call.BlockType != (isFb ? "FB" : "FC") || (call.Name != target.Item.Name && call.Name != targetName)) continue;
                         string language = call.Language ?? blockLanguage, support = LookupSupport(language);
                         if (support == "unsupported") continue;
-                        var components = call.InstanceComponents ?? new string[0];
+                        var components = call.InstanceComponents ?? Array.Empty<string>();
                         string dbPath = call.InstanceScope == "GlobalVariable" && targetDbNames.TryGetValue(string.Join(".", components), out var path) ? path : null;
                         bool local = call.InstanceScope == "LocalVariable" && components.Length == 1 && directDeclarations.Any(d => d.Value<string>("ownerPath") == block.Path && d.Value<string>("member") == components[0]);
                         if (!AddRow(callSites, new JObject { ["source"] = "simaticMlExport", ["callerPath"] = block.Path, ["calleePath"] = target.Path,
@@ -191,7 +191,7 @@ namespace TiaMcp.Openness.V21
                             ["instanceDbPath"] = dbPath, ["instanceDeclaration"] = local ? new JObject { ["ownerPath"] = block.Path, ["member"] = components[0] } : null,
                             ["parameterBindings"] = new JArray(call.Parameters.Select(p => new JObject { ["parameter"] = p.Name, ["section"] = p.Section, ["type"] = p.Type,
                                 ["direction"] = p.Direction, ["resolution"] = support == "parsed" ? p.Resolution : "unsupported", ["scope"] = p.Scope,
-                                ["actualComponents"] = new JArray(p.Components ?? new string[0]), ["reason"] = p.Reason })) })) break;
+                                ["actualComponents"] = new JArray(p.Components ?? Array.Empty<string>()), ["reason"] = p.Reason })) })) break;
                     }
                     for (int index = 0; index < units.Length && !rows.Truncated; index++)
                     {

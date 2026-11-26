@@ -26,12 +26,27 @@ public sealed record SimulatorCaptureRead(int InstanceId, string InstanceName, s
 /// <summary>PLCSIM source admission and retained-row validation; the capture journal and poller are shared with the Web source.</summary>
 public static class SimulatorCaptureContracts
 {
-    private static readonly Dictionary<string, string[]> Datatypes = new(StringComparer.Ordinal) {
-        ["bool"] = ["Bool"], ["int8"] = ["SInt"], ["uint8"] = ["USInt", "Byte"], ["int16"] = ["Int"], ["uint16"] = ["UInt", "Word"],
-        ["int32"] = ["DInt"], ["uint32"] = ["UDInt", "DWord"], ["int64"] = ["LInt"], ["uint64"] = ["ULInt", "LWord"],
-        ["float"] = ["Real"], ["double"] = ["LReal"], ["string"] = ["String"], ["wstring"] = ["WString"] };
-    private static readonly JsonSerializerOptions Strict = new(BridgeProtocol.Json) {
-        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow, RespectRequiredConstructorParameters = true };
+    private static readonly Dictionary<string, string[]> Datatypes = new(StringComparer.Ordinal)
+    {
+        ["bool"] = ["Bool"],
+        ["int8"] = ["SInt"],
+        ["uint8"] = ["USInt", "Byte"],
+        ["int16"] = ["Int"],
+        ["uint16"] = ["UInt", "Word"],
+        ["int32"] = ["DInt"],
+        ["uint32"] = ["UDInt", "DWord"],
+        ["int64"] = ["LInt"],
+        ["uint64"] = ["ULInt", "LWord"],
+        ["float"] = ["Real"],
+        ["double"] = ["LReal"],
+        ["string"] = ["String"],
+        ["wstring"] = ["WString"]
+    };
+    private static readonly JsonSerializerOptions Strict = new(BridgeProtocol.Json)
+    {
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        RespectRequiredConstructorParameters = true
+    };
     public static readonly string[] ReadErrors = ["PlcsimCaptureReadFailed", "PlcsimResponseInvalid", "SimulationNotSelected",
         "SimulationTargetMismatch", "SimulationOwnershipUnverified", "SimulationCaptureModeInactive", "SimulationSyncPointTimeout",
         "NativeWorkersDisabled", "BridgeFaulted", "TimeoutOutcomeUnknown", "WorkerDisconnected",
@@ -66,11 +81,18 @@ public static class SimulatorCaptureContracts
             JsonSerializer.SerializeToElement(new { name = s.Symbol, datatype = s.Datatype, simulatorType = s.Type }, BridgeProtocol.Json))).ToArray();
 
     /// <summary>One worker argument shape for begin, sample and end.</summary>
-    public static object Arguments(RuntimeCaptureRequest request) => new { instanceId = request.Simulator!.InstanceId,
-        instanceName = request.Simulator.InstanceName, creationId = request.AttemptId, cycleSynchronous = request.Simulator.CycleSynchronous,
-        syncMode = request.Simulator.SyncMode, spanMilliseconds = request.Simulator.SpanMilliseconds,
-        ioSystemId = request.Simulator.IoSystemId, busCycleMicroseconds = request.Simulator.BusCycleMicroseconds,
-        signals = request.Simulator.Signals.Select(s => new { symbol = s.Symbol, type = s.Type }) };
+    public static object Arguments(RuntimeCaptureRequest request) => new
+    {
+        instanceId = request.Simulator!.InstanceId,
+        instanceName = request.Simulator.InstanceName,
+        creationId = request.AttemptId,
+        cycleSynchronous = request.Simulator.CycleSynchronous,
+        syncMode = request.Simulator.SyncMode,
+        spanMilliseconds = request.Simulator.SpanMilliseconds,
+        ioSystemId = request.Simulator.IoSystemId,
+        busCycleMicroseconds = request.Simulator.BusCycleMicroseconds,
+        signals = request.Simulator.Signals.Select(s => new { symbol = s.Symbol, type = s.Type })
+    };
 
     public static void ValidatePlan(RuntimeCapturePlan plan) =>
         Require(plan.UaContext is null && plan.Handoff is null && JsonElement.DeepEquals(
@@ -126,11 +148,13 @@ public static class SimulatorCaptureContracts
     public static string ReadError(Exception error) =>
         error is BridgeException e && ReadErrors.Contains(e.Code, StringComparer.Ordinal) ? e.Code : "PlcsimCaptureReadFailed";
 
-    internal static bool Value(SimulatorCaptureSignal signal, JsonElement value) => signal.Type switch {
+    internal static bool Value(SimulatorCaptureSignal signal, JsonElement value) => signal.Type switch
+    {
         "bool" => value.ValueKind is JsonValueKind.True or JsonValueKind.False,
         "string" or "wstring" => value.ValueKind == JsonValueKind.String && value.GetString()!.Length <= 16384,
         "float" or "double" => value.ValueKind == JsonValueKind.Number && value.TryGetDouble(out double real) && double.IsFinite(real),
-        _ => value.ValueKind == JsonValueKind.Number && Integer(value.GetRawText(), signal.Datatype) };
+        _ => value.ValueKind == JsonValueKind.Number && Integer(value.GetRawText(), signal.Datatype)
+    };
     private static bool Integer(string text, string datatype)
     {
         if (!decimal.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var number)) return false;

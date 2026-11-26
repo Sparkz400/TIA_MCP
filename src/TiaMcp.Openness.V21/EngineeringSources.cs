@@ -288,8 +288,8 @@ namespace TiaMcp.Openness.V21
             XNamespace ns = candidate.Name.Namespace;
             var parts = candidate.Element(ns + "Parts");
             var wires = candidate.Element(ns + "Wires");
-            var updates = (upsertXml ?? new string[0]).Select(xml => ReadXml(xml).Root).ToArray();
-            var removals = removeUids ?? new string[0];
+            var updates = (upsertXml ?? Array.Empty<string>()).Select(xml => ReadXml(xml).Root).ToArray();
+            var removals = removeUids ?? Array.Empty<string>();
             if (updates.Length + removals.Length == 0 || updates.Length + removals.Length > 100)
                 throw new BridgeException("InvalidNetworkPatch", "Supply between 1 and 100 explicit native node updates/removals.");
             if (updates.Any(e => e == null || e.Name.Namespace != ns || !new[] { "Part", "Access", "Call", "Wire" }.Contains(e.Name.LocalName)
@@ -468,7 +468,7 @@ namespace TiaMcp.Openness.V21
                     XNamespace ns = info.Name.Namespace;
                     bool graphical = info.Parent?.Name == ns + "Call";
                     var instance = info.Element(ns + "Instance");
-                    var instanceComponents = instance?.Elements(ns + "Component").Select(e => e.Attribute("Name")?.Value).ToArray() ?? new string[0];
+                    var instanceComponents = instance?.Elements(ns + "Component").Select(e => e.Attribute("Name")?.Value).ToArray() ?? Array.Empty<string>();
                     string type = info.Attribute("BlockType")?.Value;
                     string scope = instance?.Attribute("Scope")?.Value;
                     bool simpleInstanceSymbol = (scope == "LocalVariable" || scope == "GlobalVariable")
@@ -476,7 +476,7 @@ namespace TiaMcp.Openness.V21
                         && instance.Elements().All(e => e.Name == ns + "Component" && !e.HasElements);
                     // V21 SCL FC exports place the called function symbol in Instance
                     // rather than CallInfo.Name. It is a target symbol, not an FB DB.
-                    var targetComponents = type == "FC" && scope == "GlobalVariable" && simpleInstanceSymbol ? instanceComponents.ToArray() : new string[0];
+                    var targetComponents = type == "FC" && scope == "GlobalVariable" && simpleInstanceSymbol ? instanceComponents.ToArray() : Array.Empty<string>();
                     string declaredName = info.Attribute("Name")?.Value;
                     var call = new NativeCall
                     {
@@ -671,7 +671,7 @@ namespace TiaMcp.Openness.V21
             XNamespace ns = info.Name.Namespace;
             string name = parameter.Attribute("Name")?.Value;
             var result = new NativeParameter { Name = name, Section = parameter.Attribute("Section")?.Value,
-                Type = parameter.Attribute("Type")?.Value, Resolution = "unresolved", Components = new string[0], RawXml = parameter.ToString(SaveOptions.DisableFormatting) };
+                Type = parameter.Attribute("Type")?.Value, Resolution = "unresolved", Components = Array.Empty<string>(), RawXml = parameter.ToString(SaveOptions.DisableFormatting) };
             try
             {
                 XElement access;

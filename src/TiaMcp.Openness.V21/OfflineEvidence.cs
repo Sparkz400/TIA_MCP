@@ -198,7 +198,7 @@ namespace TiaMcp.Analysis
                     if (!take()) break;
                     var normalized = new InterfaceSection { Name = section.Attribute("Name")?.Value, OwnerName = declaration.Name,
                         OwnerKind = declaration.Kind, XmlLine = XmlLine(section) };
-                    ReadMembers(section, normalized.Members, new string[0], normalized.Name, 0, take, truncate);
+                    ReadMembers(section, normalized.Members, Array.Empty<string>(), normalized.Name, 0, take, truncate);
                     result.Sections.Add(normalized);
                 }
             }

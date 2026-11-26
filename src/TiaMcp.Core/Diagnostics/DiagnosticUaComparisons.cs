@@ -53,21 +53,43 @@ public sealed class DiagnosticUaComparisons(string artifactsRoot, DiagnosticUaOb
             if (!usedBefore.Add(a) || !usedAfter.Add(b) || D.Text(am, "unit") != D.Text(bm, "unit") ||
                 D.Text(am["declaration"], "datatype") != D.Text(bm["declaration"], "datatype"))
                 throw new BridgeException("MeasurementLineageMismatch", "Mappings must be one-to-one with exactly matching saved datatypes and unit labels; no casts or unit conversion.");
-            signals.Add(new JsonObject { ["beforeSignalId"] = a, ["afterSignalId"] = b, ["beforeMapping"] = am.DeepClone(), ["afterMapping"] = bm.DeepClone(),
+            signals.Add(new JsonObject
+            {
+                ["beforeSignalId"] = a,
+                ["afterSignalId"] = b,
+                ["beforeMapping"] = am.DeepClone(),
+                ["afterMapping"] = bm.DeepClone(),
                 ["sameNode"] = JsonNode.DeepEquals(am["node"], bm["node"]),
                 ["sameStorage"] = D.Text(am["declaration"], "storagePath") == D.Text(bm["declaration"], "storagePath") && JsonNode.DeepEquals(am["declaration"]!["memberPath"], bm["declaration"]!["memberPath"]),
-                ["before"] = Signal(before, am, request, "before"), ["after"] = Signal(after, bm, request, "after") });
+                ["before"] = Signal(before, am, request, "before"),
+                ["after"] = Signal(after, bm, request, "after")
+            });
         }
         var beforeEvents = Events(before, request, "before"); var afterEvents = Events(after, request, "after");
-        var report = new JsonObject { ["schemaVersion"] = "diagnostic-ua-comparison.v1", ["beforeSnapshotRef"] = beforeSnapshotRef, ["afterSnapshotRef"] = afterSnapshotRef,
-            ["request"] = request.DeepClone(), ["clockBasis"] = "hostElapsedSeconds", ["before"] = before, ["after"] = after,
-            ["sourceChanged"] = changed, ["identicalPrefix"] = beforeSnapshotRef == afterSnapshotRef,
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-ua-comparison.v1",
+            ["beforeSnapshotRef"] = beforeSnapshotRef,
+            ["afterSnapshotRef"] = afterSnapshotRef,
+            ["request"] = request.DeepClone(),
+            ["clockBasis"] = "hostElapsedSeconds",
+            ["before"] = before,
+            ["after"] = after,
+            ["sourceChanged"] = changed,
+            ["identicalPrefix"] = beforeSnapshotRef == afterSnapshotRef,
             ["sameCapture"] = beforeSnapshotRef.Split(':').Take(2).SequenceEqual(afterSnapshotRef.Split(':').Take(2)),
-            ["signals"] = signals, ["beforeWindow"] = Window(before, request, "before"), ["afterWindow"] = Window(after, request, "after"),
-            ["beforeEvents"] = beforeEvents, ["afterEvents"] = afterEvents,
+            ["signals"] = signals,
+            ["beforeWindow"] = Window(before, request, "before"),
+            ["afterWindow"] = Window(after, request, "after"),
+            ["beforeEvents"] = beforeEvents,
+            ["afterEvents"] = afterEvents,
             ["sameEventSelection"] = JsonNode.DeepEquals(beforeEvents["selection"], afterEvents["selection"]),
-            ["eventGroups"] = EventGroups(beforeEvents, afterEvents), ["verdict"] = "unresolved", ["resampled"] = false,
-            ["sourceEvidenceRevalidated"] = true, ["limits"] = Limits };
+            ["eventGroups"] = EventGroups(beforeEvents, afterEvents),
+            ["verdict"] = "unresolved",
+            ["resampled"] = false,
+            ["sourceEvidenceRevalidated"] = true,
+            ["limits"] = Limits
+        };
         foreach (string claim in DiagnosticUaObservations.FalseClaims) report[claim] = false;
         if (Encoding.UTF8.GetByteCount(report.ToJsonString()) > DiagnosticStore.MaxBytes)
             throw new BridgeException("ArtifactCapacity", "Complete comparison exceeds 8 MiB; no source evidence was truncated.");
@@ -93,12 +115,18 @@ public sealed class DiagnosticUaComparisons(string artifactsRoot, DiagnosticUaOb
         if (TraceNumber.SubtractTime(start, TraceQualityMeasurements.Time(request[side + "AnchorSeconds"])) != TraceQualityMeasurements.Time(request["windowStartSeconds"]) ||
             TraceNumber.SubtractTime(end, TraceQualityMeasurements.Time(request[side + "AnchorSeconds"])) != TraceQualityMeasurements.Time(request["windowEndSeconds"]))
             throw new BridgeException("MeasurementFormatUnsupported", "Requested absolute window cannot be represented exactly.");
-        return new JsonObject { ["selectedRowSequences"] = new JsonArray(selected.Select(r => r!["sequence"]!.DeepClone()).ToArray()),
-            ["excludedRows"] = rows.Count - selected.Length, ["firstSelectedElapsedMilliseconds"] = selected.FirstOrDefault()?["elapsedMilliseconds"]?.DeepClone(),
+        return new JsonObject
+        {
+            ["selectedRowSequences"] = new JsonArray(selected.Select(r => r!["sequence"]!.DeepClone()).ToArray()),
+            ["excludedRows"] = rows.Count - selected.Length,
+            ["firstSelectedElapsedMilliseconds"] = selected.FirstOrDefault()?["elapsedMilliseconds"]?.DeepClone(),
             ["lastSelectedElapsedMilliseconds"] = selected.LastOrDefault()?["elapsedMilliseconds"]?.DeepClone(),
             ["recordedRowsSpanRequestedWindow"] = rows.Count > 0 && TraceQualityMeasurements.Time(rows[0]!["elapsedMilliseconds"]) / 1000m <= start && TraceQualityMeasurements.Time(rows[^1]!["elapsedMilliseconds"]) / 1000m >= end,
-            ["fullPrefixEvidence"] = report["events"]!.DeepClone(), ["recordedProgress"] = report["captureSource"]!["recordedProgress"]!.DeepClone(),
-            ["uncommittedDataUnknown"] = report["captureSource"]!["uncommittedDataUnknown"]!.DeepClone(), ["completenessVerified"] = false };
+            ["fullPrefixEvidence"] = report["events"]!.DeepClone(),
+            ["recordedProgress"] = report["captureSource"]!["recordedProgress"]!.DeepClone(),
+            ["uncommittedDataUnknown"] = report["captureSource"]!["uncommittedDataUnknown"]!.DeepClone(),
+            ["completenessVerified"] = false
+        };
     }
     private static JsonObject Signal(JsonObject report, JsonNode mapping, JsonObject request, string side)
     {
@@ -122,25 +150,46 @@ public sealed class DiagnosticUaComparisons(string artifactsRoot, DiagnosticUaOb
         bool Good(JsonNode v) => D.Text(v, "quality") == "Good" && D.Text(v, "outcome") == "value" && D.Text(v, "encoding") != "null";
         var ranges = new JsonArray(); int unrepresentable = 0;
         foreach (var group in values.Where(v => Good(v) && D.Text(v, "encoding") is "decimalInteger" or "roundTripFloat" or "roundTripDouble")
-            .GroupBy(v => new JsonObject { ["builtInType"] = v["builtInType"]?.DeepClone(), ["dataType"] = v["dataType"]?.DeepClone(), ["valueRank"] = v["valueRank"]?.DeepClone(),
-                ["arrayDimensions"] = v["arrayDimensions"]?.DeepClone(), ["encoding"] = v["encoding"]?.DeepClone() }.ToJsonString(), StringComparer.Ordinal))
+            .GroupBy(v => new JsonObject
+            {
+                ["builtInType"] = v["builtInType"]?.DeepClone(),
+                ["dataType"] = v["dataType"]?.DeepClone(),
+                ["valueRank"] = v["valueRank"]?.DeepClone(),
+                ["arrayDimensions"] = v["arrayDimensions"]?.DeepClone(),
+                ["encoding"] = v["encoding"]?.DeepClone()
+            }.ToJsonString(), StringComparer.Ordinal))
         {
             var numbers = new List<(decimal Number, string Text)>();
             foreach (var value in group)
                 try { string text = D.Text(value, "value"); numbers.Add((TraceNumber.Parse(text), text)); }
                 catch (BridgeException e) when (e.Code == "MeasurementFormatUnsupported") { unrepresentable++; }
-            ranges.Add(new JsonObject { ["type"] = JsonNode.Parse(group.Key), ["count"] = numbers.Count,
+            ranges.Add(new JsonObject
+            {
+                ["type"] = JsonNode.Parse(group.Key),
+                ["count"] = numbers.Count,
                 ["minimum"] = numbers.Count == 0 ? null : numbers.OrderBy(n => n.Number).First().Text,
-                ["maximum"] = numbers.Count == 0 ? null : numbers.OrderByDescending(n => n.Number).First().Text });
+                ["maximum"] = numbers.Count == 0 ? null : numbers.OrderByDescending(n => n.Number).First().Text
+            });
         }
-        return new JsonObject { ["selectedRowSequences"] = selectedRows, ["observations"] = values.Count, ["hostReadErrors"] = hostErrors,
-            ["goodValues"] = Count(Good), ["uncertain"] = Count(v => D.Text(v, "quality") == "Uncertain"), ["bad"] = Count(v => D.Text(v, "quality") == "Bad"),
-            ["nullValues"] = Count(v => D.Text(v, "encoding") == "null"), ["unsupported"] = Count(v => D.Text(v, "outcome") == "unsupported"),
-            ["metadataErrors"] = Count(v => D.Text(v, "outcome") == "metadataError"), ["nonScalarValues"] = Count(v => D.Text(v, "encoding") == "array"),
+        return new JsonObject
+        {
+            ["selectedRowSequences"] = selectedRows,
+            ["observations"] = values.Count,
+            ["hostReadErrors"] = hostErrors,
+            ["goodValues"] = Count(Good),
+            ["uncertain"] = Count(v => D.Text(v, "quality") == "Uncertain"),
+            ["bad"] = Count(v => D.Text(v, "quality") == "Bad"),
+            ["nullValues"] = Count(v => D.Text(v, "encoding") == "null"),
+            ["unsupported"] = Count(v => D.Text(v, "outcome") == "unsupported"),
+            ["metadataErrors"] = Count(v => D.Text(v, "outcome") == "metadataError"),
+            ["nonScalarValues"] = Count(v => D.Text(v, "encoding") == "array"),
             ["trueValues"] = Count(v => Good(v) && D.Text(v, "encoding") == "boolean" && v["value"]!.GetValue<bool>()),
             ["falseValues"] = Count(v => Good(v) && D.Text(v, "encoding") == "boolean" && !v["value"]!.GetValue<bool>()),
-            ["numericRanges"] = ranges, ["numericNotRepresentable"] = unrepresentable,
-            ["firstObservation"] = values.FirstOrDefault()?.DeepClone(), ["lastObservation"] = values.LastOrDefault()?.DeepClone() };
+            ["numericRanges"] = ranges,
+            ["numericNotRepresentable"] = unrepresentable,
+            ["firstObservation"] = values.FirstOrDefault()?.DeepClone(),
+            ["lastObservation"] = values.LastOrDefault()?.DeepClone()
+        };
     }
     private static JsonObject Events(JsonObject report, JsonObject request, string side)
     {
@@ -157,23 +206,39 @@ public sealed class DiagnosticUaComparisons(string artifactsRoot, DiagnosticUaOb
                 var key = new JsonArray(KeyFieldIndexes.Select(i => fields[i]!.DeepClone()).ToArray()).ToJsonString();
                 groups[key] = groups.GetValueOrDefault(key) + 1;
             }
-        return new JsonObject { ["selection"] = selection?.DeepClone(), ["monitoringRequested"] = selection is not null,
-            ["notifications"] = count, ["duplicateNotifications"] = duplicate, ["repeatedEventIds"] = repeated, ["overflowNotifications"] = overflow,
-            ["groups"] = new JsonArray(groups.OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => (JsonNode)new JsonObject { ["fields"] = JsonNode.Parse(p.Key), ["count"] = p.Value }).ToArray()) };
+        return new JsonObject
+        {
+            ["selection"] = selection?.DeepClone(),
+            ["monitoringRequested"] = selection is not null,
+            ["notifications"] = count,
+            ["duplicateNotifications"] = duplicate,
+            ["repeatedEventIds"] = repeated,
+            ["overflowNotifications"] = overflow,
+            ["groups"] = new JsonArray(groups.OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => (JsonNode)new JsonObject { ["fields"] = JsonNode.Parse(p.Key), ["count"] = p.Value }).ToArray())
+        };
     }
     private static JsonArray EventGroups(JsonObject before, JsonObject after)
     {
         var a = D.Rows(before["groups"]).ToDictionary(g => g!["fields"]!.ToJsonString(), g => g!["count"]!.GetValue<int>(), StringComparer.Ordinal);
         var b = D.Rows(after["groups"]).ToDictionary(g => g!["fields"]!.ToJsonString(), g => g!["count"]!.GetValue<int>(), StringComparer.Ordinal);
-        return new JsonArray(a.Keys.Union(b.Keys, StringComparer.Ordinal).Order(StringComparer.Ordinal).Select(key => (JsonNode)new JsonObject {
-            ["fields"] = JsonNode.Parse(key), ["beforeCount"] = a.GetValueOrDefault(key), ["afterCount"] = b.GetValueOrDefault(key),
-            ["countDifference"] = b.GetValueOrDefault(key) - a.GetValueOrDefault(key) }).ToArray());
+        return new JsonArray(a.Keys.Union(b.Keys, StringComparer.Ordinal).Order(StringComparer.Ordinal).Select(key => (JsonNode)new JsonObject
+        {
+            ["fields"] = JsonNode.Parse(key),
+            ["beforeCount"] = a.GetValueOrDefault(key),
+            ["afterCount"] = b.GetValueOrDefault(key),
+            ["countDifference"] = b.GetValueOrDefault(key) - a.GetValueOrDefault(key)
+        }).ToArray());
     }
 
     public JsonObject Export(string reportId, string format)
     {
-        var (extension, media) = format switch { "json" => (".json", "application/json"), "markdown" => (".md", "text/markdown"), "html" => (".html", "text/html"),
-            _ => throw new BridgeException("InvalidRequest", "format must be json, markdown or html.") };
+        var (extension, media) = format switch
+        {
+            "json" => (".json", "application/json"),
+            "markdown" => (".md", "text/markdown"),
+            "html" => (".html", "text/html"),
+            _ => throw new BridgeException("InvalidRequest", "format must be json, markdown or html.")
+        };
         var store = new DiagnosticStore(artifactsRoot); byte[] raw = store.ReadBytes(reportId); var saved = JsonNode.Parse(raw)!.AsObject();
         if (D.Text(saved, "schemaVersion") != "diagnostic-ua-comparison.v1") throw new BridgeException("InvalidRequest", "Expected a retained UA comparison.");
         if (!JsonNode.DeepEquals(saved, Build(D.Required(saved, "beforeSnapshotRef", 160), D.Required(saved, "afterSnapshotRef", 160), TraceQualityMeasurements.Object(saved, "request"))))

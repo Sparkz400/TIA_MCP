@@ -29,9 +29,14 @@ public static class TestSuiteAvailability
             throw new BridgeException("InvalidTestSuiteAvailability", "Exact session identity and bounded observations are required.");
         EngineeringIdentityGuard.Sha256(apiSha256, "apiSha256");
         string project = EngineeringJobs.EngineeringResourceKey.ForPath("project", projectFilePath);
-        string run = executionMode switch { "style" => "style.run", "systemManaged" => "application.systemManaged.run",
-            "externallyManaged" => "application.externallyManaged.run", "endpoint" => "system.run",
-            _ => throw new BridgeException("InvalidTestSuiteAvailability", "An exact execution mode is required.") };
+        string run = executionMode switch
+        {
+            "style" => "style.run",
+            "systemManaged" => "application.systemManaged.run",
+            "externallyManaged" => "application.externallyManaged.run",
+            "endpoint" => "system.run",
+            _ => throw new BridgeException("InvalidTestSuiteAvailability", "An exact execution mode is required.")
+        };
         string family = run.Split('.')[0];
         foreach (var item in observations)
         {

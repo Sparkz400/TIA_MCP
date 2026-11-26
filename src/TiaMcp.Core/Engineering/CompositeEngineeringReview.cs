@@ -60,8 +60,14 @@ public static class CompositeEngineeringReview
                     target.Selector, target.Evidence, target.Profile, constraints);
                 if (source.State == "resolvedDeclaration" && target.State == "resolvedDeclaration" && typedState is not null) state = typedState;
             }
-            var mappingResult = new JsonObject { ["mapping"] = mapping.DeepClone(), ["state"] = state,
-                ["sourceState"] = source.State, ["targetState"] = target.State, ["nativeVerified"] = false };
+            var mappingResult = new JsonObject
+            {
+                ["mapping"] = mapping.DeepClone(),
+                ["state"] = state,
+                ["sourceState"] = source.State,
+                ["targetState"] = target.State,
+                ["nativeVerified"] = false
+            };
             if (typed) mappingResult["constraints"] = constraints;
             Add(results, mappingResult);
             if (state != "declaredAssociation") continue;
@@ -88,8 +94,15 @@ public static class CompositeEngineeringReview
             bool profileChanged = !JsonNode.DeepEquals(left.Profile, right.Profile);
             string state = left.State != "resolvedDeclaration" || right.State != "resolvedDeclaration" ? "unresolvedSelection" :
                 crossCopy ? "crossCopyDeclaration" : profileChanged && kind == "continuity" ? "profileMismatch" : "declaredCorrespondence";
-            Add(claims, new JsonObject { ["correspondence"] = claim.DeepClone(), ["state"] = state, ["profileChanged"] = profileChanged,
-                ["beforeState"] = left.State, ["afterState"] = right.State, ["identityEqualityVerified"] = false });
+            Add(claims, new JsonObject
+            {
+                ["correspondence"] = claim.DeepClone(),
+                ["state"] = state,
+                ["profileChanged"] = profileChanged,
+                ["beforeState"] = left.State,
+                ["afterState"] = right.State,
+                ["identityEqualityVerified"] = false
+            });
         }
         var comparison = JsonSerializer.SerializeToNode(before.Aml.CompareTo(after.Aml), BridgeProtocol.Json)!.AsObject();
         ReportCharge(comparison);
@@ -132,9 +145,16 @@ public static class CompositeEngineeringReview
                 if (starts is not null) foreach (string start in starts) Walk(start, 0);
                 var destinations = reached.Where(k => selections.ContainsKey(k) &&
                     !Text(selections[k].Selector, "kind").StartsWith("aml", StringComparison.Ordinal)).Order(StringComparer.Ordinal).ToArray();
-                var declaredImpact = new JsonObject { ["phase"] = context.Phase, ["amlImpact"] = impact!.DeepClone(),
-                    ["state"] = destinations.Length == 0 ? "unmapped" : "declaredMappedImpact", ["destinationKeys"] = Strings(destinations),
-                    ["declaredCycle"] = cycle, ["traversalExhausted"] = exhausted, ["nativeImpactVerified"] = false };
+                var declaredImpact = new JsonObject
+                {
+                    ["phase"] = context.Phase,
+                    ["amlImpact"] = impact!.DeepClone(),
+                    ["state"] = destinations.Length == 0 ? "unmapped" : "declaredMappedImpact",
+                    ["destinationKeys"] = Strings(destinations),
+                    ["declaredCycle"] = cycle,
+                    ["traversalExhausted"] = exhausted,
+                    ["nativeImpactVerified"] = false
+                };
                 if (consumersEnabled) declaredImpact["destinationDepths"] =
                     new JsonObject(destinations.Select(key => new KeyValuePair<string, JsonNode?>(key, JsonValue.Create(declaredDepths[key]))));
                 Add(impacts, declaredImpact);
@@ -143,13 +163,29 @@ public static class CompositeEngineeringReview
         if (crossCopy) Add(gaps, new JsonObject { ["kind"] = "crossCopyDeclaration", ["reason"] = "Saved project declarations differ or are incomplete; no project identity equality is established." });
         if ((bool)comparison["wholeDocumentReviewRequired"]!) Add(gaps, new JsonObject { ["kind"] = "wholeDocumentReviewRequired", ["reason"] = "Original AML bytes changed, including possible opaque content." });
         Add(gaps, new JsonObject { ["kind"] = "declaredMappingGraphOnly", ["reason"] = "Closure follows accepted explicit mapping edges only. Unmapped native and component consumers remain unassessed." });
-        var result = new JsonObject { ["schemaVersion"] = "composite-engineering-review.v1", ["contexts"] = new JsonObject { ["before"] = ContextSummary(before, typed), ["after"] = ContextSummary(after, typed) },
-            ["selections"] = new JsonArray(selections.OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => (JsonNode)new JsonObject {
-                ["key"] = p.Key, ["selector"] = p.Value.Selector.DeepClone(), ["state"] = p.Value.State,
-                ["evidence"] = p.Value.Evidence?.DeepClone(), ["profile"] = p.Value.Profile?.DeepClone() }).ToArray()),
-            ["mappings"] = results, ["correspondences"] = claims, ["amlComparison"] = comparison, ["impacts"] = impacts, ["coverageGaps"] = gaps,
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false,
-            ["liveFreshnessVerified"] = false, ["wholeImpactAnalysisComplete"] = false };
+        var result = new JsonObject
+        {
+            ["schemaVersion"] = "composite-engineering-review.v1",
+            ["contexts"] = new JsonObject { ["before"] = ContextSummary(before, typed), ["after"] = ContextSummary(after, typed) },
+            ["selections"] = new JsonArray(selections.OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => (JsonNode)new JsonObject
+            {
+                ["key"] = p.Key,
+                ["selector"] = p.Value.Selector.DeepClone(),
+                ["state"] = p.Value.State,
+                ["evidence"] = p.Value.Evidence?.DeepClone(),
+                ["profile"] = p.Value.Profile?.DeepClone()
+            }).ToArray()),
+            ["mappings"] = results,
+            ["correspondences"] = claims,
+            ["amlComparison"] = comparison,
+            ["impacts"] = impacts,
+            ["coverageGaps"] = gaps,
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["wholeImpactAnalysisComplete"] = false
+        };
         if (consumersEnabled)
         {
             result["schemaVersion"] = typed ? "composite-engineering-review.v3" : "composite-engineering-review.v2";
@@ -164,9 +200,13 @@ public static class CompositeEngineeringReview
                 consumers.Add(consumer);
             }
             result["consumerContexts"] = consumers;
-            Add(gaps, new JsonObject { ["kind"] = "consumerContextOnly", ["reason"] = typed
+            Add(gaps, new JsonObject
+            {
+                ["kind"] = "consumerContextOnly",
+                ["reason"] = typed
                 ? "Version 3 adds exact supplied telegram/encoder references. Context candidates and consistent declarations do not prove native eligibility, wiring, signal geometry, effects or complete consumers."
-                : "Version 2 expands bounded exact saved and supplied component context separately. Context candidates do not prove native effects, typed member/telegram compatibility or complete consumers." });
+                : "Version 2 expands bounded exact saved and supplied component context separately. Context candidates do not prove native effects, typed member/telegram compatibility or complete consumers."
+            });
         }
         Require(JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length <= ReportLimit, "Combined report exceeds 32 MiB.");
         return result;
@@ -207,8 +247,12 @@ public static class CompositeEngineeringReview
             if (kind is "amlObject" or "amlAttribute" or "amlLink")
             {
                 Fields(selector, "kind phase recordRef path"); Require(Text(selector, "recordRef") == c.AmlRef, "AML selector is outside its phase context."); string path = Text(selector, "path");
-                object? selected = kind switch { "amlObject" => c.Aml.Objects.SingleOrDefault(r => r.Path == path),
-                    "amlAttribute" => c.Aml.Attributes.SingleOrDefault(r => r.Path == path), _ => c.Aml.Links.SingleOrDefault(r => r.Path == path) };
+                object? selected = kind switch
+                {
+                    "amlObject" => c.Aml.Objects.SingleOrDefault(r => r.Path == path),
+                    "amlAttribute" => c.Aml.Attributes.SingleOrDefault(r => r.Path == path),
+                    _ => c.Aml.Links.SingleOrDefault(r => r.Path == path)
+                };
                 if (selected is not null)
                 {
                     evidence = JsonSerializer.SerializeToNode(selected, BridgeProtocol.Json); state = "resolvedDeclaration";
@@ -227,8 +271,15 @@ public static class CompositeEngineeringReview
             }
             else
             {
-                var records = kind switch { "connectionEndpoint" => c.Connections, "driveParameter" => c.Drives, "technologyRelationship" => c.Technology,
-                    "driveTelegram" or "driveTelegramAddress" when typed => c.Drives, "technologyEncoder" when typed => c.Technology, _ => throw Error("Unknown selector kind.") };
+                var records = kind switch
+                {
+                    "connectionEndpoint" => c.Connections,
+                    "driveParameter" => c.Drives,
+                    "technologyRelationship" => c.Technology,
+                    "driveTelegram" or "driveTelegramAddress" when typed => c.Drives,
+                    "technologyEncoder" when typed => c.Technology,
+                    _ => throw Error("Unknown selector kind.")
+                };
                 string recordRef = Text(selector, "recordRef"); Require(records.TryGetValue(recordRef, out var report), "Component selector is outside its phase context.");
                 if (kind == "connectionEndpoint")
                 {
@@ -247,8 +298,11 @@ public static class CompositeEngineeringReview
                 {
                     Fields(selector, "kind phase recordRef id"); string id = Text(selector, "id", 256);
                     var row = report!["relationships"]!.AsArray().SingleOrDefault(r => (string?)r?["phase"] == phase && (string?)r?["relationship"]?["id"] == id);
-                    if (row is not null) { evidence = row; state = (string?)row["relationship"]?["state"] == "disconnected" ? "disconnected" :
-                        (string?)row["relationship"]?["state"] == "declared" && (string?)row["sourceResolution"] == "capturedObject" && (string?)row["targetResolution"] == "capturedObject" ? "resolvedDeclaration" : "unresolved"; }
+                    if (row is not null)
+                    {
+                        evidence = row; state = (string?)row["relationship"]?["state"] == "disconnected" ? "disconnected" :
+                        (string?)row["relationship"]?["state"] == "declared" && (string?)row["sourceResolution"] == "capturedObject" && (string?)row["targetResolution"] == "capturedObject" ? "resolvedDeclaration" : "unresolved";
+                    }
                 }
                 else if (kind is "driveTelegram" or "driveTelegramAddress")
                 {
@@ -279,8 +333,12 @@ public static class CompositeEngineeringReview
                     }
                 }
                 if (kind is "driveParameter" or "technologyRelationship" or "driveTelegram" or "driveTelegramAddress" or "technologyEncoder")
-                    profile = new JsonObject { ["identity"] = report!["identity"]!.DeepClone(),
-                        ["valueDomain"] = report[phase + "ValueDomain"]!.DeepClone(), ["selectionPath"] = report[kind.StartsWith("drive", StringComparison.Ordinal) ? "hardwarePath" : "technologyPath"]!.DeepClone() };
+                    profile = new JsonObject
+                    {
+                        ["identity"] = report!["identity"]!.DeepClone(),
+                        ["valueDomain"] = report[phase + "ValueDomain"]!.DeepClone(),
+                        ["selectionPath"] = report[kind.StartsWith("drive", StringComparison.Ordinal) ? "hardwarePath" : "technologyPath"]!.DeepClone()
+                    };
             }
             ReportCharge(new JsonObject { ["key"] = key, ["selector"] = selector.DeepClone(), ["state"] = state, ["evidence"] = evidence?.DeepClone(), ["profile"] = profile?.DeepClone() });
             var selection = new Selection(selector.DeepClone().AsObject(), state, evidence?.DeepClone(), profile); selections.Add(key, selection); return selection;
@@ -302,16 +360,31 @@ public static class CompositeEngineeringReview
         foreach (var (kind, records) in new[] { ("connection", c.Connections), ("drive", c.Drives), ("technology", c.Technology) })
             foreach (var pair in records)
             {
-                var component = new JsonObject { ["kind"] = kind, ["recordRef"] = pair.Key,
-                ["schemaVersion"] = pair.Value["schemaVersion"]!.DeepClone(), ["afterKind"] = pair.Value["afterKind"]!.DeepClone(),
-                ["summary"] = pair.Value["summary"]!.DeepClone(), ["coverage"] = pair.Value["coverage"]!.DeepClone(), ["limits"] = pair.Value["limits"]!.DeepClone() };
+                var component = new JsonObject
+                {
+                    ["kind"] = kind,
+                    ["recordRef"] = pair.Key,
+                    ["schemaVersion"] = pair.Value["schemaVersion"]!.DeepClone(),
+                    ["afterKind"] = pair.Value["afterKind"]!.DeepClone(),
+                    ["summary"] = pair.Value["summary"]!.DeepClone(),
+                    ["coverage"] = pair.Value["coverage"]!.DeepClone(),
+                    ["limits"] = pair.Value["limits"]!.DeepClone()
+                };
                 if (typed) foreach (string field in new[] { "telegramPolicy", "encoderPolicy", "encoderCoverage" })
                     if (pair.Value[field] is JsonNode value) component[field] = value.DeepClone();
                 components.Add(component);
             }
-        return new() { ["reviewId"] = c.ReviewId, ["projectDeclaration"] = c.Review["model"]!["project"]!.DeepClone(),
-            ["automationMlRef"] = c.AmlRef, ["automationMlSha256"] = c.Aml.SourceSha256, ["connections"] = Strings(c.Connections.Keys),
-            ["drives"] = Strings(c.Drives.Keys), ["technology"] = Strings(c.Technology.Keys), ["components"] = components };
+        return new()
+        {
+            ["reviewId"] = c.ReviewId,
+            ["projectDeclaration"] = c.Review["model"]!["project"]!.DeepClone(),
+            ["automationMlRef"] = c.AmlRef,
+            ["automationMlSha256"] = c.Aml.SourceSha256,
+            ["connections"] = Strings(c.Connections.Keys),
+            ["drives"] = Strings(c.Drives.Keys),
+            ["technology"] = Strings(c.Technology.Keys),
+            ["components"] = components
+        };
     }
     private static string Key(JsonObject value) => CanonicalJson.Serialize(value);
     private static JsonArray Strings(IEnumerable<string> values) => new(values.Select(v => (JsonNode)JsonValue.Create(v)!).ToArray());

@@ -8,6 +8,7 @@ using Siemens.Engineering.CrossReference;
 using Siemens.Engineering.Library.Types;
 using Siemens.Engineering.SW.Blocks;
 using Siemens.Engineering.SW.Types;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {
@@ -147,7 +148,7 @@ namespace TiaMcp.Openness.V21
             try { PlcCombinedApplyDependents(change, out dependents, out directInstanceDbs); }
             catch (BridgeException error) { return NotQualified(error.Message); }
             dependentInstanceDb = directInstanceDbs?.Length > 0;
-            embeddingParent = dependents != null && dependents.Except(directInstanceDbs ?? new string[0], StringComparer.Ordinal).Any();
+            embeddingParent = dependents != null && dependents.Except(directInstanceDbs ?? Array.Empty<string>(), StringComparer.Ordinal).Any();
             string shape = PlcComponentQualificationGate.CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change), dependentInstanceDb, embeddingParent) ??
                 (change.Source == null || change.Source.Project != null || string.IsNullOrEmpty(change.Source.SourcePath) || change.Source.Writable
                     ? "Only the verified read-only global source with its retained snapshot is eligible." : null);

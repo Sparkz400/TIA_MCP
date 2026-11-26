@@ -216,6 +216,8 @@ if __name__ == "__main__":
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
     args.runner = __file__
+    # Scratch only: since 20 November the Host refuses safety writes unless it is launched with --enable-safety-changes.
+    args.host_args = ("--enable-safety-changes",)
     Harness(args, "ps_", "Exploratory native probe of safety_fparameter_set and safety_printout on an owned scratch F-CPU with ET 200SP F-DI",
             ["Exploratory probe: observations of one scratch project, not feature qualification.",
              "No safety login, password, activation-test execution or download; a password-protected F-program stops the F-parameter probes."], []).run(body)

@@ -66,7 +66,7 @@ namespace TiaMcp.Openness.V21
 
         private static string[] ProjectTextList(JObject args, string name, int maximum)
         {
-            var values = (args[name] as JArray)?.Select(x => x.Type == JTokenType.String ? x.Value<string>() : null).ToArray() ?? new string[0];
+            var values = (args[name] as JArray)?.Select(x => x.Type == JTokenType.String ? x.Value<string>() : null).ToArray() ?? Array.Empty<string>();
             if (values.Length > maximum || values.Any(string.IsNullOrWhiteSpace) || values.Distinct(StringComparer.Ordinal).Count() != values.Length)
                 throw new BridgeException("InvalidRequest", name + " requires at most " + maximum + " distinct nonempty values.");
             return values;
@@ -79,7 +79,7 @@ namespace TiaMcp.Openness.V21
         // Exact paths as project_inventory reports them: hardware items, PLC software (/plc/) and HMI software (/hmi/).
         private static IEngineeringObject[] ProjectTextOwners(Project project, string[] paths)
         {
-            if (paths.Length == 0) return new IEngineeringObject[0];
+            if (paths.Length == 0) return Array.Empty<IEngineeringObject>();
             var budget = new ScanBudget(50000);
             var found = new Dictionary<string, IEngineeringObject>(StringComparer.Ordinal);
             var ambiguous = new HashSet<string>(StringComparer.Ordinal);

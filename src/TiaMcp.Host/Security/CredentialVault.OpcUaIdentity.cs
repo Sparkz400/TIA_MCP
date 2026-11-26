@@ -9,9 +9,9 @@ namespace TiaMcp.Host;
 internal sealed record UaClientIdentityStatus(string SchemaVersion, string ApplicationUri, string CertificateSha256,
     string CertificateDerBase64, DateTime NotBefore, DateTime ExpiresAt, string State)
 {
-    public string PrivateKeyStorage => "windowsDpapiCurrentUser";
-    public bool PrivateKeyExported => false;
-    public bool PhysicalQualified => false;
+    public string PrivateKeyStorage { get; } = "windowsDpapiCurrentUser";
+    public bool PrivateKeyExported { get; } = false;
+    public bool PhysicalQualified { get; } = false;
 }
 
 internal sealed class UaClientIdentityLease(X509Certificate2 certificate, IDisposable owner) : IDisposable

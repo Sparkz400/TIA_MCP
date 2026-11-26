@@ -79,8 +79,14 @@ public sealed class ArtifactUploadStore
         stream.Position = offset;
         stream.Write(bytes);
         stream.Flush(true);
-        status = status with { ReceivedBytes = offset + bytes.Length, RemainingBytes = status.ExpectedBytes - offset - bytes.Length,
-            AcceptedOffset = offset, AcceptedBytes = bytes.Length, ChunkSha256 = Convert.ToHexStringLower(SHA256.HashData(bytes)) };
+        status = status with
+        {
+            ReceivedBytes = offset + bytes.Length,
+            RemainingBytes = status.ExpectedBytes - offset - bytes.Length,
+            AcceptedOffset = offset,
+            AcceptedBytes = bytes.Length,
+            ChunkSha256 = Convert.ToHexStringLower(SHA256.HashData(bytes))
+        };
         PackageStorage.Save(Path.Combine(directory, "upload.json"), status);
         return status;
     }

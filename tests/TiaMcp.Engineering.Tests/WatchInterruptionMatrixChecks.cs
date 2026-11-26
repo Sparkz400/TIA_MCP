@@ -68,7 +68,7 @@ internal static class WatchInterruptionMatrixChecks
             native.LoseRestoreResponse = true;
             try { await dispatcher.CallAsync("watch_recover", new { operationId = id }); throw new Exception("Expected lost retrieval"); } catch (IOException) { passed++; }
             var store = new EngineeringOperationStore(root); var r = store.Read(id);
-            Check(r.State == "outcomeUnknown" && r.Evidence.Any(e => e.Gate.StartsWith("interruption.")), "Lost retrieval diagnostics are bound in durable chain");
+            Check(r.State == "outcomeUnknown" && r.Evidence.Any(e => e.Gate.StartsWith("interruption.", StringComparison.Ordinal)), "Lost retrieval diagnostics are bound in durable chain");
             var restarted = new WatchTableDispatcher(native, root);
             await Reject(() => restarted.CallAsync("watch_recover", new { operationId = id }), "RecoveryRequired");
             await Reject(() => restarted.CallAsync("watch_reconcile_recovery", new { operationId = id, role = "original" }), "RecoveryObservationRequired");
@@ -80,7 +80,7 @@ internal static class WatchInterruptionMatrixChecks
             r = store.Read(id);
             Check(r.State == "reconciled" && r.RecoveryResolutions.Single().Disposition == "verifiedRestored" && native.RestoreCount == 1,
                 "Lost receipt resolved through fresh original/restored evidence without repeated retrieval");
-            var failure = r.Evidence.Single(e => e.Gate.StartsWith("interruption.")).Artifact;
+            var failure = r.Evidence.Single(e => e.Gate.StartsWith("interruption.", StringComparison.Ordinal)).Artifact;
             File.AppendAllText(Path.Combine(root, failure.RelativePath), "tampered");
             try { store.Read(id); throw new Exception("Missing diagnostic integrity check"); } catch (BridgeException e) when (e.Code == "ArtifactChanged") { passed++; }
         }

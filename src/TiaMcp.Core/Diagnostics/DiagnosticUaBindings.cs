@@ -45,16 +45,34 @@ public sealed class DiagnosticUaBindings(string artifactsRoot)
             var matches = signals.Where(s => D.Text(s, "id") == id).ToArray();
             if (!ids.Add(id) || !nodes.Add(node) || matches.Length != 1 || D.Text(matches[0], "resolution") != "capturedDeclaration")
                 throw new BridgeException("UaDiagnosticBindingMismatch", "Mappings require distinct exact nodes and distinct resolved signals from this experiment.");
-            selected.Add(new JsonObject { ["signalId"] = id, ["node"] = JsonSerializer.SerializeToNode(node, BridgeProtocol.Json),
-                ["unit"] = mapping["unit"]!.DeepClone(), ["reason"] = mapping["reason"]!.DeepClone(),
-                ["declaration"] = matches[0]!.DeepClone() });
+            selected.Add(new JsonObject
+            {
+                ["signalId"] = id,
+                ["node"] = JsonSerializer.SerializeToNode(node, BridgeProtocol.Json),
+                ["unit"] = mapping["unit"]!.DeepClone(),
+                ["reason"] = mapping["reason"]!.DeepClone(),
+                ["declaration"] = matches[0]!.DeepClone()
+            });
         }
-        var result = new JsonObject { ["schemaVersion"] = "diagnostic-ua-binding.v1", ["experimentId"] = experimentId,
-            ["attemptId"] = attemptId, ["request"] = request.DeepClone(), ["experiment"] = experiment,
-            ["mappings"] = selected, ["associationKind"] = "callerSelectedObservationIntent",
-            ["programMatchVerified"] = false, ["addressMatchVerified"] = false, ["datatypeMatchVerified"] = false,
-            ["sourceAuthenticityVerified"] = false, ["physicalQualified"] = false, ["clockSynchronizationVerified"] = false,
-            ["assertionsAdmitted"] = false, ["nativeAccessAttempted"] = false, ["limits"] = Limits };
+        var result = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-ua-binding.v1",
+            ["experimentId"] = experimentId,
+            ["attemptId"] = attemptId,
+            ["request"] = request.DeepClone(),
+            ["experiment"] = experiment,
+            ["mappings"] = selected,
+            ["associationKind"] = "callerSelectedObservationIntent",
+            ["programMatchVerified"] = false,
+            ["addressMatchVerified"] = false,
+            ["datatypeMatchVerified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["physicalQualified"] = false,
+            ["clockSynchronizationVerified"] = false,
+            ["assertionsAdmitted"] = false,
+            ["nativeAccessAttempted"] = false,
+            ["limits"] = Limits
+        };
         D.Bound(result, DiagnosticStore.MaxBytes);
         return result;
     }

@@ -106,8 +106,12 @@ public static class ChangeResultCompaction
             {
                 if (insideHmiEvidence && name == "artifacts" && value is JsonObject map && map.Count > 0 && map.All(entry => entry.Value is JsonObject artifact && artifact["sha256"] is not null))
                 {
-                    item["artifacts"] = new JsonObject { ["artifactCount"] = map.Count,
-                        ["artifactsSha256"] = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(map.ToJsonString()))), ["omitted"] = true };
+                    item["artifacts"] = new JsonObject
+                    {
+                        ["artifactCount"] = map.Count,
+                        ["artifactsSha256"] = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(map.ToJsonString()))),
+                        ["omitted"] = true
+                    };
                     replaced++;
                 }
                 else replaced += ReplaceArtifactMaps(value, insideHmiEvidence || name == "hmiEvidence");
@@ -120,7 +124,9 @@ public static class ChangeResultCompaction
     // Worker phase timings as {phase, state, elapsedMs}; start and finish timestamps stay in the full view and progress.json.
     internal static JsonArray StageTimings(JsonArray phases) => new(phases.OfType<JsonObject>().Take(MaxArray).Select(phase => (JsonNode)new JsonObject
     {
-        ["phase"] = phase["phase"]?.DeepClone(), ["state"] = phase["state"]?.DeepClone(), ["elapsedMs"] = phase["elapsedMilliseconds"]?.DeepClone(),
+        ["phase"] = phase["phase"]?.DeepClone(),
+        ["state"] = phase["state"]?.DeepClone(),
+        ["elapsedMs"] = phase["elapsedMilliseconds"]?.DeepClone(),
     }).ToArray());
 
     // Requested source/XML and other long values become length and hash, so the client can match them to what it sent.
@@ -133,8 +139,11 @@ public static class ChangeResultCompaction
 
     private static JsonArray Artifacts(JsonArray backups) => new(backups.OfType<JsonObject>().Take(MaxArray).Select(b => (JsonNode)new JsonObject
     {
-        ["role"] = b["role"]?.DeepClone(), ["blockName"] = b["blockName"]?.DeepClone(), ["blockPath"] = b["blockPath"]?.DeepClone(),
-        ["path"] = b["artifact"]?["path"]?.DeepClone(), ["sha256"] = b["artifact"]?["sha256"]?.DeepClone(),
+        ["role"] = b["role"]?.DeepClone(),
+        ["blockName"] = b["blockName"]?.DeepClone(),
+        ["blockPath"] = b["blockPath"]?.DeepClone(),
+        ["path"] = b["artifact"]?["path"]?.DeepClone(),
+        ["sha256"] = b["artifact"]?["sha256"]?.DeepClone(),
     }).ToArray());
 
     private static JsonObject Compile(JsonObject compile)
@@ -175,17 +184,17 @@ public static class ChangeResultCompaction
             case JsonValue value when value.TryGetValue(out string? text) && text.Length > MaxString:
                 return new JsonObject { ["omitted"] = true, ["characters"] = text.Length, ["sha256"] = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(text))) };
             case JsonArray array:
-            {
-                var result = new JsonArray(array.Take(MaxArray).Select(item => Bound(item?.DeepClone())).ToArray());
-                if (array.Count > MaxArray) result.Add(new JsonObject { ["truncated"] = true, ["totalItems"] = array.Count });
-                return result;
-            }
+                {
+                    var result = new JsonArray(array.Take(MaxArray).Select(item => Bound(item?.DeepClone())).ToArray());
+                    if (array.Count > MaxArray) result.Add(new JsonObject { ["truncated"] = true, ["totalItems"] = array.Count });
+                    return result;
+                }
             case JsonObject obj:
-            {
-                var result = new JsonObject();
-                foreach (var (name, value) in obj) result[name] = Bound(value?.DeepClone());
-                return result;
-            }
+                {
+                    var result = new JsonObject();
+                    foreach (var (name, value) in obj) result[name] = Bound(value?.DeepClone());
+                    return result;
+                }
             default: return node;
         }
     }

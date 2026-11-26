@@ -48,15 +48,34 @@ public static class TeamcenterReview
             {
                 oldRows[section].TryGetValue(identity, out var old); newRows[section].TryGetValue(identity, out var next);
                 if (old is not null && next is not null && CanonicalJson.ExactlyEqual(old, next)) continue;
-                changes.Add(new JsonObject { ["section"] = section, ["identity"] = identity,
-                    ["status"] = old is null ? "onlyAfter" : next is null ? "onlyBefore" : "differentObservation", ["before"] = old?.DeepClone(), ["after"] = next?.DeepClone() });
+                changes.Add(new JsonObject
+                {
+                    ["section"] = section,
+                    ["identity"] = identity,
+                    ["status"] = old is null ? "onlyAfter" : next is null ? "onlyBefore" : "differentObservation",
+                    ["before"] = old?.DeepClone(),
+                    ["after"] = next?.DeepClone()
+                });
             }
         var b = Metadata(before); var a = Metadata(after);
         if (!JsonNode.DeepEquals(b, a)) changes.Add(new JsonObject { ["section"] = "metadata", ["identity"] = "capture", ["status"] = "differentObservation", ["before"] = b, ["after"] = a });
-        return new JsonObject { ["schemaVersion"] = "teamcenter-report.v1", ["observations"] = observations, ["changes"] = changes, ["issues"] = issues, ["manifests"] = manifests,
+        return new JsonObject
+        {
+            ["schemaVersion"] = "teamcenter-report.v1",
+            ["observations"] = observations,
+            ["changes"] = changes,
+            ["issues"] = issues,
+            ["manifests"] = manifests,
             ["summary"] = new JsonObject { ["observationCount"] = observations.Count, ["changeCount"] = changes.Count, ["issueCount"] = issues.Count, ["manifestCount"] = manifests.Count, ["scope"] = "suppliedDeclarationsOnly" },
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false,
-            ["checkoutOwnershipVerified"] = false, ["fileBytesVerified"] = false, ["nativeCacheVerified"] = false, ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["checkoutOwnershipVerified"] = false,
+            ["fileBytesVerified"] = false,
+            ["nativeCacheVerified"] = false,
+            ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy
+        };
 
         Dictionary<string, Dictionary<string, JsonObject>> Inspect(JsonObject snapshot, string phase)
         {
@@ -72,11 +91,13 @@ public static class TeamcenterReview
             NullableText(connection, "group"); NullableText(connection, "role");
             var indexed = new Dictionary<string, Dictionary<string, JsonObject>>(StringComparer.Ordinal);
             Read("items", 256, row => { Fields(row, "itemType itemId name properties"); string key = Item(row); Text(row, "name"); Properties(row); return key; });
-            Read("revisions", 512, row => {
+            Read("revisions", 512, row =>
+            {
                 Fields(row, "itemType itemId revisionId properties"); string key = Revision(row); Properties(row);
                 if (!indexed["items"].ContainsKey(Item(row))) Issue("revisions", key, "itemNotSupplied"); return key;
             });
-            Read("datasets", 1024, row => {
+            Read("datasets", 1024, row =>
+            {
                 Fields(row, "itemType itemId revisionId datasetType name version lock properties"); string key = Dataset(row); NullableText(row, "version"); Properties(row);
                 if (row["version"] is null) Issue("datasets", key, "unknownDatasetVersion");
                 if (!indexed["revisions"].ContainsKey(Revision(row))) Issue("datasets", key, "revisionNotSupplied");
@@ -84,7 +105,8 @@ public static class TeamcenterReview
                 if ((status == "checkedOut") != (state["owner"] is not null)) throw Error("Lock owner is required exactly when reported checked out.");
                 if (status != "checkedIn") Issue("datasets", key, status == "checkedOut" ? "reportedCheckout" : "unknownLock"); return key;
             });
-            Read("localCopies", 128, row => {
+            Read("localCopies", 128, row =>
+            {
                 Fields(row, "dataset purpose path cacheVersion serverVersion manifest"); var dataset = Object(row["dataset"]); Fields(dataset, "itemType itemId revisionId datasetType name");
                 string datasetKey = Dataset(dataset); string key = Key(datasetKey, Choice(row, "purpose", "source cache"), Text(row, "path", 4096));
                 if (!indexed["datasets"].ContainsKey(datasetKey)) Issue("localCopies", key, "datasetNotSupplied");

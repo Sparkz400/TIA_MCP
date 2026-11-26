@@ -64,7 +64,7 @@ internal static class DocumentChecks
     private static byte[] Bytes(string? xml = null) => Encoding.UTF8.GetBytes(xml ?? Fixture);
     private static WatchTableDocument Open(string? xml = null) => new(Bytes(xml));
     private static XDocument Parse(byte[] bytes) => XDocument.Load(new MemoryStream(bytes), LoadOptions.PreserveWhitespace);
-    private static XElement Table(XDocument doc) => doc.Root!.Elements().Single(e => e.Name.LocalName.StartsWith(Prefix));
+    private static XElement Table(XDocument doc) => doc.Root!.Elements().Single(e => e.Name.LocalName.StartsWith(Prefix, StringComparison.Ordinal));
     private static XElement[] Rows(XDocument doc) => Table(doc).Element("ObjectList")!.Elements().ToArray();
     private static void True(bool value) { if (!value) throw new Exception("Document oracle assertion failed."); }
     private static void Equal<T>(T before, T after) { if (!EqualityComparer<T>.Default.Equals(before, after)) throw new Exception($"Expected [{before}], observed [{after}]"); }

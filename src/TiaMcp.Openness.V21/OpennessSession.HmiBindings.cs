@@ -15,6 +15,7 @@ using Siemens.Engineering.SW.Blocks;
 using Siemens.Engineering.SW.Tags;
 using TiaMcp.Analysis;
 using NativeHmiConnection = Siemens.Engineering.HW.CommunicationConnections.HmiConnection;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {

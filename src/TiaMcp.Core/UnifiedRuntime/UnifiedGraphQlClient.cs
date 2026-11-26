@@ -49,8 +49,15 @@ public sealed class UnifiedGraphQlClient : IDisposable
     {
         if (pin is not { Length: 64 } || pin.Any(c => c is not (>= '0' and <= '9' or >= 'a' and <= 'f')))
             throw new BridgeException("UnifiedCertificatePinInvalid", "peerCertificateSha256 is the lowercase SHA-256 of the Runtime web server's leaf certificate.");
-        var handler = new SocketsHttpHandler { AllowAutoRedirect = false, UseProxy = false, UseCookies = false,
-            AutomaticDecompression = DecompressionMethods.None, MaxConnectionsPerServer = 1, PooledConnectionLifetime = TimeSpan.Zero };
+        var handler = new SocketsHttpHandler
+        {
+            AllowAutoRedirect = false,
+            UseProxy = false,
+            UseCookies = false,
+            AutomaticDecompression = DecompressionMethods.None,
+            MaxConnectionsPerServer = 1,
+            PooledConnectionLifetime = TimeSpan.Zero
+        };
         handler.SslOptions.AllowTlsResume = false;
         handler.SslOptions.RemoteCertificateValidationCallback = PeerValidation(pin, out verified);
         return handler;

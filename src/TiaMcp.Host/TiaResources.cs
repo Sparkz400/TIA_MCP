@@ -25,8 +25,15 @@ public sealed class TiaResources(HostOptions options)
     private static readonly Lazy<FeatureCatalog> Catalog = new(FeatureCatalog.LoadBundled);
     private static readonly Dictionary<string, string> TextTypes = new(StringComparer.OrdinalIgnoreCase)
     {
-        [".json"] = "application/json", [".xml"] = "application/xml", [".aml"] = "application/xml", [".csv"] = "text/csv",
-        [".md"] = "text/markdown", [".html"] = "text/html", [".txt"] = "text/plain", [".log"] = "text/plain", [".scl"] = "text/plain",
+        [".json"] = "application/json",
+        [".xml"] = "application/xml",
+        [".aml"] = "application/xml",
+        [".csv"] = "text/csv",
+        [".md"] = "text/markdown",
+        [".html"] = "text/html",
+        [".txt"] = "text/plain",
+        [".log"] = "text/plain",
+        [".scl"] = "text/plain",
     };
 
     [McpServerResource(UriTemplate = ArtifactTemplate, Name = "artifact", Title = "Retained artifact")]
@@ -81,8 +88,10 @@ public sealed class TiaResources(HostOptions options)
         catalogVersion = Catalog.Value.Version,
         features = Catalog.Value.Features.Select(feature => new
         {
-            featureId = feature.GetProperty("featureId").GetString(), domain = feature.GetProperty("domain").GetString(),
-            title = feature.GetProperty("title").GetString(), mcpTools = feature.GetProperty("mcpTools"),
+            featureId = feature.GetProperty("featureId").GetString(),
+            domain = feature.GetProperty("domain").GetString(),
+            title = feature.GetProperty("title").GetString(),
+            mcpTools = feature.GetProperty("mcpTools"),
             implementation = feature.GetProperty("implementation").GetProperty("status").GetString(),
             qualification = feature.GetProperty("qualification").GetProperty("status").GetString()
         })
@@ -132,16 +141,23 @@ public sealed class TiaResources(HostOptions options)
             var template => ContractResources.Completions(template, request.Argument.Name) ?? OutputSchemaResources.Completions(template, request.Argument.Name) ?? []
         };
         var matches = values.Where(value => value.StartsWith(prefix.Replace('\\', '/'), StringComparison.OrdinalIgnoreCase)).Take(MaxCompletions + 1).ToList();
-        return ValueTask.FromResult(new CompleteResult { Completion = new Completion
-            { Values = matches.Take(MaxCompletions).ToList(), HasMore = matches.Count > MaxCompletions } });
+        return ValueTask.FromResult(new CompleteResult
+        {
+            Completion = new Completion
+            { Values = matches.Take(MaxCompletions).ToList(), HasMore = matches.Count > MaxCompletions }
+        });
     }
 
     // Names only, never contents; links are not followed and the walk is bounded, so completion stays cheap and inside the root.
     internal static IEnumerable<string> ArtifactPaths(string directory)
     {
         if (!Directory.Exists(directory)) return [];
-        var options = new EnumerationOptions { RecurseSubdirectories = true, IgnoreInaccessible = true,
-            AttributesToSkip = FileAttributes.ReparsePoint | FileAttributes.Hidden | FileAttributes.System };
+        var options = new EnumerationOptions
+        {
+            RecurseSubdirectories = true,
+            IgnoreInaccessible = true,
+            AttributesToSkip = FileAttributes.ReparsePoint | FileAttributes.Hidden | FileAttributes.System
+        };
         return Directory.EnumerateFiles(directory, "*", options).Take(20000)
             .Select(file => Path.GetRelativePath(directory, file).Replace('\\', '/')).Order(StringComparer.Ordinal);
     }

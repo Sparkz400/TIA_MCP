@@ -19,8 +19,12 @@ internal static class HmiComponentXml
             throw new BridgeException("ArtifactChanged", "Component XML bytes differ from the retained descriptor.");
         string text = new UTF8Encoding(false, true).GetString(bytes);
         if (text.StartsWith('\uFEFF')) text = text[1..];
-        using var reader = XmlReader.Create(new StringReader(text), new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit,
-            XmlResolver = null, MaxCharactersInDocument = FileLimit });
+        using var reader = XmlReader.Create(new StringReader(text), new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null,
+            MaxCharactersInDocument = FileLimit
+        });
         int events = 0;
         while (reader.Read()) if (reader.Depth > 64 || ++events > 200000) throw Error("Component XML exceeds depth/event bounds.");
         var document = HmiPreservationRules.ReadXml(text);
@@ -29,6 +33,11 @@ internal static class HmiComponentXml
         return document;
     }
 
-    internal static JsonObject Descriptor(JsonObject file) => new() { ["id"] = file["id"]!.DeepClone(), ["fileName"] = file["fileName"]!.DeepClone(),
-        ["sha256"] = file["sha256"]!.DeepClone(), ["bytes"] = file["bytes"]!.DeepClone() };
+    internal static JsonObject Descriptor(JsonObject file) => new()
+    {
+        ["id"] = file["id"]!.DeepClone(),
+        ["fileName"] = file["fileName"]!.DeepClone(),
+        ["sha256"] = file["sha256"]!.DeepClone(),
+        ["bytes"] = file["bytes"]!.DeepClone()
+    };
 }

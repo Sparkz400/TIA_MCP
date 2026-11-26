@@ -13,10 +13,18 @@ internal sealed class TestSuiteWorkerAdapter(IBridgeClient bridge, Action<TestSu
         RequireQualification(context, "openExclusive");
         var response = await bridge.CallAsync("testsuite_style_begin", new
         {
-            context.ArtifactRoot, context.Run, context.Operation, context.ExecutionProfile,
+            context.ArtifactRoot,
+            context.Run,
+            context.Operation,
+            context.ExecutionProfile,
             definitionBundle = context.Definitions.Bytes,
-            application = context.Application is null ? null : new { context.Application.ExecutionMode, context.Application.SimulatorTicket,
-                context.Application.ServerAddress, route = TestSuiteApplicationRun.Route(context.Run, context.Application.WholeGroup) }
+            application = context.Application is null ? null : new
+            {
+                context.Application.ExecutionMode,
+                context.Application.SimulatorTicket,
+                context.Application.ServerAddress,
+                route = TestSuiteApplicationRun.Route(context.Run, context.Application.WholeGroup)
+            }
         }, token);
         var opened = TestSuiteStyleJobs.Parse<Opened>(JsonSerializer.SerializeToUtf8Bytes(response));
         if (string.IsNullOrWhiteSpace(opened.LeaseToken) || opened.OperationId != context.Operation.Id ||

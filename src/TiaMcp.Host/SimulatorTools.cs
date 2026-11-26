@@ -114,8 +114,16 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
     [McpServerTool(Name = "sim_prune", Destructive = true, OpenWorld = false)]
     [Description("Opt-in retention of what this adapter created: scope storage (owned instance folders) or archives. Without delete it only lists candidates and eligibility. delete:true permanently deletes selected eligible ones: names, or olderThanDays (1-3650) and/or maxTotalMegabytes; names cannot be combined; max 200 per call. Registered, running, selected or orphaned instances and anything not created here are never deleted. Deleted archives cannot be retrieved.")]
     public Task<CallToolResult> Prune(string scope, CancellationToken cancellationToken, JsonElement? names = null, int? olderThanDays = null, int? maxTotalMegabytes = null, bool delete = false)
-        => Call("sim_prune", new { scope, names, olderThanDays, maxTotalMegabytes, delete,
-            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation"), archiveDirectory = Path.Combine(options.ArtifactsDirectory, "simulation-archives") }, cancellationToken);
+        => Call("sim_prune", new
+        {
+            scope,
+            names,
+            olderThanDays,
+            maxTotalMegabytes,
+            delete,
+            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation"),
+            archiveDirectory = Path.Combine(options.ArtifactsDirectory, "simulation-archives")
+        }, cancellationToken);
 
     [McpServerTool(Name = "sim_network_mode_set", Destructive = true, OpenWorld = false)]
     [Description("Switch PLCSIM Advanced V8's network mode. MACHINE-WIDE: it applies to every PLCSIM instance and Windows user on this PC; ask the user first. mode: Softbus, TCPIPSingleAdapter (what sim_create TCPIP needs) or TCPIPMultipleAdapter. Requires acknowledgeMachineWide true and expectedCurrentMode as sim_status reported it. Refused with SimulationRegistrationsPresent while any PLCSIM instance is registered. A matching mode is left alone (changed false); otherwise it is set and read back for up to 5 s. Adapters and IPs are never changed. Not natively qualified yet.")]

@@ -42,7 +42,7 @@ internal static class TagBatchChecks
         Check(Refused(() => TagBatchRules.Items(Batch(new JObject { ["tagTableName"] = "Tags", ["memberName"] = "A", ["attributes"] = new JObject { ["Name"] = 5 } }))) == "InvalidRequest"
               && Refused(() => TagBatchRules.Items(Batch(Edit("A", " ")))) == "InvalidRequest" && Refused(() => TagBatchRules.Items(Batch(Edit("A", new string('n', 129))))) == "InvalidRequest",
               "attribute values are nonempty bounded strings");
-        Check(Message(() => TagBatchRules.Items(Batch(Edit("A", "B"), Edit("C", "D"), new JObject { ["tagTableName"] = "Tags", ["memberName"] = "E" }))).StartsWith("items[2] "), "a refusal names the item's index");
+        Check(Message(() => TagBatchRules.Items(Batch(Edit("A", "B"), Edit("C", "D"), new JObject { ["tagTableName"] = "Tags", ["memberName"] = "E" }))).StartsWith("items[2] ", StringComparison.Ordinal), "a refusal names the item's index");
 
         // Collisions: one refused item refuses the whole batch.
         var scope = new[] { "A", "B", "C", "Limit", "SystemConst" };
@@ -56,7 +56,7 @@ internal static class TagBatchChecks
               "a swap or a chain onto a name another item renames away refuses");
         Check(Refused(() => Plan(Edit("A", "A2"), Edit("A", address: "%M3.0"))) == "InvalidRequest", "one tag edited by two items refuses");
         Check(Refused(() => Plan(Edit("A", "A2"), Edit("A", address: "%M3.0", table: "Other"))) == null, "the same member name in two tag tables is two tags");
-        Check(Message(() => Plan(Edit("A", "A2"), Edit("B", "Limit"))).StartsWith("items[1]: "), "a collision names the item's index");
+        Check(Message(() => Plan(Edit("A", "A2"), Edit("B", "Limit"))).StartsWith("items[1]: ", StringComparison.Ordinal), "a collision names the item's index");
         return count;
     }
 

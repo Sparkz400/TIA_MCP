@@ -80,17 +80,17 @@ internal sealed class AddInHandoffReceiver : IAsyncDisposable
     private async Task AcceptAsync(NamedPipeServerStream pipe, CancellationTokenSource lifetime)
     {
         using (pipe)
-        try
-        {
-            while (!lifetime.IsCancellationRequested)
+            try
             {
-                await pipe.WaitForConnectionAsync(lifetime.Token);
-                await ServeAsync(pipe, lifetime.Token);
-                pipe.Disconnect();
+                while (!lifetime.IsCancellationRequested)
+                {
+                    await pipe.WaitForConnectionAsync(lifetime.Token);
+                    await ServeAsync(pipe, lifetime.Token);
+                    pipe.Disconnect();
+                }
             }
-        }
-        catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
-        catch { await lifetime.CancelAsync(); throw; }
+            catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
+            catch { await lifetime.CancelAsync(); throw; }
     }
 
     private async Task ServeAsync(NamedPipeServerStream pipe, CancellationToken stop)
@@ -127,7 +127,8 @@ internal sealed class AddInHandoffReceiver : IAsyncDisposable
             if (!deadline.IsCancellationRequested)
             {
                 string code = error is BridgeException bridge ? bridge.Code : "HandoffRequestRejected";
-                try {
+                try
+                {
                     await ReplyAsync(pipe, new() { ["protocolVersion"] = 1, ["success"] = false, ["error"] = code }, deadline.Token);
                     disconnected ??= WatchDisconnectAsync(pipe, deadline);
                     await disconnected;
@@ -174,13 +175,18 @@ internal sealed class AddInHandoffReceiver : IAsyncDisposable
             if (!names.Add(field.Name) || (field.Name != "protocolVersion" && field.Value.ValueKind != JsonValueKind.String)) throw new JsonException();
         var request = JsonNode.Parse(frame)!.AsObject();
         if ((int?)request["protocolVersion"] != 1) throw new JsonException();
-        string fields = (string?)request["action"] switch {
-            "status" => "protocolVersion action", "begin" => "protocolVersion action requestId reviewId selectionBase64",
-            "complete" or "cancel" => "protocolVersion action requestId challenge", "read" => "protocolVersion action requestId",
-            _ => throw new JsonException() };
+        string fields = (string?)request["action"] switch
+        {
+            "status" => "protocolVersion action",
+            "begin" => "protocolVersion action requestId reviewId selectionBase64",
+            "complete" or "cancel" => "protocolVersion action requestId challenge",
+            "read" => "protocolVersion action requestId",
+            _ => throw new JsonException()
+        };
         if (!names.SetEquals(fields.Split(' '))) throw new JsonException();
         foreach (string key in new[] { "requestId", "reviewId", "challenge" })
-            if (request[key] is not null) {
+            if (request[key] is not null)
+            {
                 string value = (string)request[key]!;
                 if (value.Length != (key == "requestId" ? 32 : 64) || !value.All(char.IsAsciiHexDigitLower)) throw new JsonException();
             }
@@ -219,13 +225,24 @@ internal sealed class AddInHandoffReceiver : IAsyncDisposable
         if (!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException();
         using var self = Process.GetCurrentProcess();
         using var identity = WindowsIdentity.GetCurrent();
-        return new() { ["schemaVersion"] = "addin-handoff-discovery.v1", ["protocolVersion"] = 1, ["state"] = state,
-            ["receiverInstanceId"] = handoff.InstanceId, ["pipeName"] = PipeName,
+        return new()
+        {
+            ["schemaVersion"] = "addin-handoff-discovery.v1",
+            ["protocolVersion"] = 1,
+            ["state"] = state,
+            ["receiverInstanceId"] = handoff.InstanceId,
+            ["pipeName"] = PipeName,
             ["host"] = JsonSerializer.SerializeToNode(Identity(self), BridgeProtocol.Json),
-            ["userSid"] = identity.User!.Value, ["authorityConfigured"] = authorityConfigured,
-            ["maximumConnections"] = Connections, ["requestBytes"] = RequestLimit, ["responseBytes"] = ResponseLimit,
+            ["userSid"] = identity.User!.Value,
+            ["authorityConfigured"] = authorityConfigured,
+            ["maximumConnections"] = Connections,
+            ["requestBytes"] = RequestLimit,
+            ["responseBytes"] = ResponseLimit,
             ["connectionLifetimeMilliseconds"] = (int)ConnectionLifetime.TotalMilliseconds,
-            ["producerAuthenticated"] = false, ["liveSelectionVerified"] = false, ["nativeQualified"] = false };
+            ["producerAuthenticated"] = false,
+            ["liveSelectionVerified"] = false,
+            ["nativeQualified"] = false
+        };
     }
     private void PublishDiscovery(string state) => PackageStorage.Save(discoveryPath, Discovery(state));
 

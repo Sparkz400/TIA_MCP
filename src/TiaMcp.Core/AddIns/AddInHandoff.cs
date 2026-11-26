@@ -34,9 +34,13 @@ internal sealed class AddInHandoff : IAsyncDisposable
     private readonly string instanceId = Guid.NewGuid().ToString("N");
     internal string InstanceId => instanceId;
     private bool disposed;
-    private static readonly JsonSerializerOptions Json = new(BridgeProtocol.Json) {
-        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow, PropertyNameCaseInsensitive = false,
-        RespectRequiredConstructorParameters = true, MaxDepth = 24 };
+    private static readonly JsonSerializerOptions Json = new(BridgeProtocol.Json)
+    {
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        PropertyNameCaseInsensitive = false,
+        RespectRequiredConstructorParameters = true,
+        MaxDepth = 24
+    };
 
     internal AddInHandoff(string artifactsRoot,
         Func<AddInHandoffPeer, string, string, CancellationToken, Task<AddInHandoffBinding>> verifyAuthority,
@@ -75,10 +79,19 @@ internal sealed class AddInHandoff : IAsyncDisposable
             token.ThrowIfCancellationRequested();
             string challenge = Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(32));
             pending.Add(requestId, new(challenge, clock.GetTimestamp(), Hash(planBytes), peer));
-            return new() { ["schemaVersion"] = "addin-handoff-challenge.v1", ["requestId"] = requestId,
-                ["receiverInstanceId"] = instanceId, ["challenge"] = challenge, ["lifetimeMilliseconds"] = 30000,
-                ["selectionSha256"] = digest, ["syntheticAuthority"] = binding.SyntheticAuthority,
-                ["producerAuthenticated"] = false, ["liveSelectionVerified"] = false, ["nativeQualified"] = false };
+            return new()
+            {
+                ["schemaVersion"] = "addin-handoff-challenge.v1",
+                ["requestId"] = requestId,
+                ["receiverInstanceId"] = instanceId,
+                ["challenge"] = challenge,
+                ["lifetimeMilliseconds"] = 30000,
+                ["selectionSha256"] = digest,
+                ["syntheticAuthority"] = binding.SyntheticAuthority,
+                ["producerAuthenticated"] = false,
+                ["liveSelectionVerified"] = false,
+                ["nativeQualified"] = false
+            };
         }
         finally { gate.Release(); }
     }
@@ -173,11 +186,22 @@ internal sealed class AddInHandoff : IAsyncDisposable
             }
         }
         else Require(!File.Exists(PathFor(requestId, "receipt.json")) && !File.Exists(PathFor(requestId, "completed.json")), "HandoffIntegrityFailure");
-        return new() { ["schemaVersion"] = "addin-handoff-status.v1", ["requestId"] = requestId,
-            ["state"] = state, ["receiverInstanceId"] = plan.ReceiverInstanceId, ["hostProcessId"] = plan.HostProcessId,
-            ["reviewId"] = plan.ReviewId, ["selectionSha256"] = plan.SelectionSha256,
-            ["binding"] = JsonSerializer.SerializeToNode(plan.Binding, Json), ["selection"] = selection,
-            ["automaticReplay"] = false, ["producerAuthenticated"] = false, ["liveSelectionVerified"] = false, ["nativeQualified"] = false };
+        return new()
+        {
+            ["schemaVersion"] = "addin-handoff-status.v1",
+            ["requestId"] = requestId,
+            ["state"] = state,
+            ["receiverInstanceId"] = plan.ReceiverInstanceId,
+            ["hostProcessId"] = plan.HostProcessId,
+            ["reviewId"] = plan.ReviewId,
+            ["selectionSha256"] = plan.SelectionSha256,
+            ["binding"] = JsonSerializer.SerializeToNode(plan.Binding, Json),
+            ["selection"] = selection,
+            ["automaticReplay"] = false,
+            ["producerAuthenticated"] = false,
+            ["liveSelectionVerified"] = false,
+            ["nativeQualified"] = false
+        };
     }
 
     private (Plan Plan, byte[] Bytes, string Hash) ReadPlan(string id)

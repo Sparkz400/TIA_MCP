@@ -21,9 +21,9 @@ foreach (string path in Directory.GetFiles(Path.Combine(AppContext.BaseDirectory
     Check(document.SchemaValid, "independent upstream schema-valid " + Path.GetFileName(path));
     Check(!document.NativeQualified && !document.ImportabilityCertified && !document.ImpactScopeComplete, "upstream fixture is not native evidence");
     Check(document.SourceSha256 == Hash(bytes), "upstream source identity");
-    if (path.EndsWith("9_ExtInt_IntLink.aml"))
+    if (path.EndsWith("9_ExtInt_IntLink.aml", StringComparison.Ordinal))
         Check(document.Links.Count == 1 && document.Links.All(l => l.TargetA is not null && l.TargetB is not null), "independent CAEX 2.15 IE-ID/interface-name endpoints");
-    if (path.EndsWith("medium-valid-robot-cell.aml"))
+    if (path.EndsWith("medium-valid-robot-cell.aml", StringComparison.Ordinal))
         Check(document.Links.Count > 0 && document.Links.All(l => l.TargetA is not null && l.TargetB is not null), "independent CAEX 3.0 direct interface-ID endpoints");
     inputs.Add(new { name = Path.GetFileName(path), sha256 = Hash(bytes), document.Profile, document.SchemaSha256, document.SchemaValid, objects = document.Objects.Count, links = document.Links.Count });
 }

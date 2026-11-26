@@ -257,7 +257,7 @@ namespace TiaMcp.Openness.V21
                         report["connectionInventory"] = SimulationProvisionConnectionInventory(configuration);
                         throw new BridgeException("SimulationProvisionRouteUnavailable", "The explicit PN/IE / PLCSIM (1) connection is unavailable after owned simulator startup. No alternate adapter or address was selected.");
                     }
-                    var originalAddresses = instance.ControllerIP ?? new string[0];
+                    var originalAddresses = instance.ControllerIP ?? Array.Empty<string>();
                     var ips = originalAddresses.Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
                     report["originalControllerAddresses"] = new JArray(originalAddresses);
                     report["controllerName"] = instance.ControllerName;
@@ -288,7 +288,7 @@ namespace TiaMcp.Openness.V21
                         if (budgetSpent && network != "TCPIP")
                             throw new BridgeException("SimulationProvisionTargetAmbiguous", "The bounded read-only PLCSIM discovery interval expired without an exact runtime address match. No credential was submitted.");
                         VerifySimulationProvisionIdentity(instance, marker, false);
-                        var currentIps = (instance.ControllerIP ?? new string[0]).Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
+                        var currentIps = (instance.ControllerIP ?? Array.Empty<string>()).Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
                         if (instance.OperatingState != EOperatingState.Stop || provider.State != OnlineState.Offline ||
                             currentIps.Length != ips.Length || currentIps.Any(ip => !ips.Contains(ip, StringComparer.Ordinal)))
                             throw new BridgeException("SimulationProvisionTargetMismatch", "The owned CPU identity, state, or runtime addresses changed during read-only discovery.");
@@ -352,7 +352,7 @@ namespace TiaMcp.Openness.V21
                     var target = SelectSimulationProvisionTargetInterface(pc, report);
                     VerifySimulationProvisionIdentity(instance, marker, false);
                     if (instance.OperatingState != EOperatingState.Stop || provider.State != OnlineState.Offline ||
-                        !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
+                        !(instance.ControllerIP ?? Array.Empty<string>()).Contains(address, StringComparer.Ordinal))
                         throw new BridgeException("SimulationProvisionTargetMismatch", "The owned runtime or scratch engineering state changed before applying its sole PLCSIM target interface.");
                     report["stage"] = "applyTargetInterfaceConfiguration";
                     checkpoint("beforeApplyTargetInterfaceConfiguration");
@@ -363,7 +363,7 @@ namespace TiaMcp.Openness.V21
                     checkpoint("afterApplyTargetInterfaceConfiguration");
                     report["stage"] = "revalidateBeforeCredentialSubmission";
                     VerifySimulationProvisionIdentity(instance, marker, false);
-                    if (instance.OperatingState != EOperatingState.Stop || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
+                    if (instance.OperatingState != EOperatingState.Stop || !(instance.ControllerIP ?? Array.Empty<string>()).Contains(address, StringComparer.Ordinal))
                         throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state or controller address changed before credential submission.");
                     var read = observer.Read(3, network);
                     var rechecked = WithoutSimulationPlaceholder(read, AcceptedSimulationPlaceholder(discoveryBaseline), read.Length > 2);
@@ -392,7 +392,7 @@ namespace TiaMcp.Openness.V21
                         throw new BridgeException("SimulationProvisionOnlineRequired", "The explicit owned PLCSIM connection did not reach Online. No credential was opened or submitted.");
                     report["stage"] = "revalidateAfterGoOnline";
                     VerifySimulationProvisionIdentity(instance, marker, false);
-                    if (instance.OperatingState != EOperatingState.Stop || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
+                    if (instance.OperatingState != EOperatingState.Stop || !(instance.ControllerIP ?? Array.Empty<string>()).Contains(address, StringComparer.Ordinal))
                         throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state or controller address changed while establishing the scratch connection.");
                     read = observer.Read(3, network);
                     rechecked = WithoutSimulationPlaceholder(read, AcceptedSimulationPlaceholder(discoveryBaseline), read.Length > 2);
@@ -408,7 +408,7 @@ namespace TiaMcp.Openness.V21
                             throw new BridgeException("SimulationCredentialUnavailable", "The generated scratch credential is empty; no password was submitted.");
                         VerifySimulationProvisionIdentity(instance, marker, false);
                         if (provider.State != OnlineState.Online || instance.OperatingState != EOperatingState.Stop ||
-                            !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
+                            !(instance.ControllerIP ?? Array.Empty<string>()).Contains(address, StringComparer.Ordinal))
                             throw new BridgeException("SimulationProvisionTargetMismatch", "The owned online connection or simulator state changed immediately before credential submission.");
                         if (callbackFailure != null) throw callbackFailure;
                         if (failure != null) throw failure;
@@ -611,7 +611,7 @@ namespace TiaMcp.Openness.V21
             string bootstrapAddress = documentedStartupAddress;
             report["postStartupDiscovery"]["causalTargetVerified"] = true;
             report["targetIdentityBasis"] = "PLCSIM route absent or successfully queried empty (apart from only the exact pre-registration Runtime Manager placeholder, if recorded) before sole owned OFF-to-STOP startup; one new S7-1500 default endpoint observed by a fresh owned discovery-only Portal; exact IInstance address assignment and readback; fresh exact discovery match.";
-            var originalSuites = instance.ControllerIPSuite4 ?? new SIPSuite4[0];
+            var originalSuites = instance.ControllerIPSuite4 ?? Array.Empty<SIPSuite4>();
             report["addressBootstrap"] = new JObject {
                 ["purpose"] = "Align the exact owned virtual CPU with its newly observed default Softbus endpoint after verified absent-to-present startup; no physical or shared adapter configuration.",
                 ["addressSource"] = "Unique newly observed S7-1500 endpoint, constrained to documented PLCSIM startup default; no alternative address attempted.",
@@ -624,7 +624,7 @@ namespace TiaMcp.Openness.V21
                 ["softbusIgnoresSubnetGatewayAndRemanence"] = network != "TCPIP", ["observedStartupAddress"] = before[0].Address, ["readbackVerified"] = false,
                 ["scope"] = "Owned simulator runtime only; owned instance is powered off on every exit and its storage is retained." };
             VerifySimulationProvisionIdentity(instance, marker, false);
-            if (instance.OperatingState != EOperatingState.Stop || (instance.ControllerIP ?? new string[0]).Any(SimulationProvisionUsableIPv4))
+            if (instance.OperatingState != EOperatingState.Stop || (instance.ControllerIP ?? Array.Empty<string>()).Any(SimulationProvisionUsableIPv4))
                 throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state or initially empty address changed before bootstrap assignment.");
             report["stage"] = "assignOwnedBootstrapAddress";
             checkpoint("beforeSetOwnedIpSuite");
@@ -634,7 +634,7 @@ namespace TiaMcp.Openness.V21
                 DefaultGateway = new SIP { IPString = "0.0.0.0" } }, false);
             checkpoint("afterSetOwnedIpSuite");
             VerifySimulationProvisionIdentity(instance, marker, false);
-            ips = (instance.ControllerIP ?? new string[0]).Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
+            ips = (instance.ControllerIP ?? Array.Empty<string>()).Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
             report["addressBootstrap"]["observedAddresses"] = new JArray(ips);
             if (instance.OperatingState != EOperatingState.Stop || ips.Length != 1 || ips[0] != bootstrapAddress)
                 throw new BridgeException("SimulationProvisionAddressUnavailable", "The exact owned simulator did not read back the requested bootstrap address in STOP. No credential was submitted.");
@@ -709,7 +709,7 @@ namespace TiaMcp.Openness.V21
                 {
                     VerifySimulationProvisionIdentity(instance, marker, false);
                     VerifySimulationProvisionChild(storage, stagedCard, true);
-                    var callbackIps = (instance.ControllerIP ?? new string[0]).Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
+                    var callbackIps = (instance.ControllerIP ?? Array.Empty<string>()).Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
                     ownedTargetVerified = explicitRouteApplied && report.Value<string>("stage") == "goOnline" &&
                         report.Value<bool>("emptyStartupVerified") && !report.Value<bool>("originalProgramCardRestored") &&
                         instance.OperatingState == EOperatingState.Stop && callbackIps.Length == 1 && callbackIps[0] == address;
@@ -807,7 +807,7 @@ namespace TiaMcp.Openness.V21
                 checkpoint("goOnlineRetryScheduled");
                 Thread.Sleep(retryDelayMs);
                 VerifySimulationProvisionIdentity(instance, marker, false);
-                if (instance.OperatingState != EOperatingState.Stop || provider.State != OnlineState.Offline || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
+                if (instance.OperatingState != EOperatingState.Stop || provider.State != OnlineState.Offline || !(instance.ControllerIP ?? Array.Empty<string>()).Contains(address, StringComparer.Ordinal))
                     throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state, connection or controller address changed before the GoOnline retry.");
                 var retryRead = observer.Read(3, network);
                 var retryChecked = WithoutSimulationPlaceholder(retryRead, AcceptedSimulationPlaceholder(discoveryBaseline), retryRead.Length > 2);

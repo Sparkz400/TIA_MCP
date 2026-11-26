@@ -241,7 +241,7 @@ internal static class TagTableImportTests
         var intent = JObject.Parse("""{"decisions":[{"id":"door-reset","source":"user, 7 Nov","statement":"Reset is only allowed with the door closed.","target":"Servos","symbols":["Reset","DoorOpen"]}],"observedFacts":["Drive1 telegram 1 at byte 256"],"assumptions":["SS1 ramp time is set in the drive"]}""");
         var recorded = IntentRules.Normalize(intent);
         Check.Equal("door-reset", recorded["decisions"]![0]!["id"]!.Value<string>());
-        Check.Equal(true, recorded["verificationScope"]!["machineSafetyBehavior"]!.Value<string>()!.StartsWith("Not verified"));
+        Check.Equal(true, recorded["verificationScope"]!["machineSafetyBehavior"]!.Value<string>()!.StartsWith("Not verified", StringComparison.Ordinal));
         var earlier = new[] { JObject.Parse("""{"id":"door-reset","changeId":"c1","statement":"Reset is only allowed with the door closed.","target":"Servos"}""") };
         IntentRules.Compare(recorded, earlier);
         Check.Equal(1, ((JArray)recorded["previouslyConfirmed"]!).Count);
@@ -266,9 +266,9 @@ internal static class TagTableImportTests
         Check.Equal("notReached", failed["milestones"]!.Single(m => m.Value<string>("milestone") == "saved")!.Value<string>("status"));
         var prepared = ChangeMilestoneRules.From("prepared", Stages(), null);
         Check.Equal(false, prepared.Value<bool>("projectEditComplete"));
-        Check.Equal(true, prepared.Value<string>("summary")!.StartsWith("Prepared only"));
+        Check.Equal(true, prepared.Value<string>("summary")!.StartsWith("Prepared only", StringComparison.Ordinal));
         var notApplied = ChangeMilestoneRules.From("not_applied", Stages("change_finished_with_failure"), null);
-        Check.Equal(true, notApplied.Value<string>("summary")!.StartsWith("The change failed before the project was changed"));
+        Check.Equal(true, notApplied.Value<string>("summary")!.StartsWith("The change failed before the project was changed", StringComparison.Ordinal));
         // readbackVerified reports what ran: a verified stage (also one after the save), no readback for a compile, or none recorded.
         static string Readback(JObject progress) => progress["milestones"]!.Single(m => m.Value<string>("milestone") == "readbackVerified").Value<string>("status")!;
         string[] head = ["prechange_project_saved", "recovery_archive_created"];

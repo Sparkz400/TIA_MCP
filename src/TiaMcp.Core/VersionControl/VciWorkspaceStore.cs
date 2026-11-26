@@ -206,23 +206,48 @@ public sealed partial class VciWorkspaceStore
         {
             var export = Read<VciGitExport>(recordRef, "export");
             VerifyArtifacts(export.Directory, export.Value.Artifacts, "revision.zip", "files.json");
-            return new { recordRef, kind = "export", state = "complete", nativeQualified = false,
-                revisionRef = export.Value.RevisionRef, commit = export.Value.Result.Commit,
-                fileCount = export.Value.Result.Files.Count, artifacts = export.Value.Artifacts, receiptName = "receipt.json" };
+            return new
+            {
+                recordRef,
+                kind = "export",
+                state = "complete",
+                nativeQualified = false,
+                revisionRef = export.Value.RevisionRef,
+                commit = export.Value.Result.Commit,
+                fileCount = export.Value.Result.Files.Count,
+                artifacts = export.Value.Artifacts,
+                receiptName = "receipt.json"
+            };
         }
         var preview = parsed.Kind == "revision" ? Preview(Revision(recordRef).Value.PreviewRef) : Preview(recordRef);
         var committed = parsed.Kind == "revision" ? Revision(recordRef).Value : null;
         string? revisionRef = File.Exists(Path.Combine(preview.Directory, "commit.json"))
             ? Reference("revision", preview.Value.Id, Path.Combine(preview.Directory, "commit.json")) : null;
         if (committed is null && revisionRef is not null) committed = Revision(revisionRef).Value;
-        return new { recordRef, kind = parsed.Kind, previewRef = committed?.PreviewRef ?? recordRef, revisionRef,
+        return new
+        {
+            recordRef,
+            kind = parsed.Kind,
+            previewRef = committed?.PreviewRef ?? recordRef,
+            revisionRef,
             state = committed is not null ? "committed" : HasCommitIntent(preview.Directory) ? "outcomeUnknown" : "prepared",
-            nativeQualified = false, preview.Value.ParentRef, preview.Value.PlanSha256, preview.Value.Author, preview.Value.Message, preview.Value.HeadReference,
-            fileCount = preview.Value.Files.Length, changeCount = preview.Value.Changes.Length,
-            commit = committed?.Result.Commit, tree = committed?.Result.Tree, artifacts = preview.Value.Artifacts,
-            receiptName = "receipt.json", executableSha256 = preview.Value.ExecutableSha256, gitVersion = committed?.Result.GitVersion,
+            nativeQualified = false,
+            preview.Value.ParentRef,
+            preview.Value.PlanSha256,
+            preview.Value.Author,
+            preview.Value.Message,
+            preview.Value.HeadReference,
+            fileCount = preview.Value.Files.Length,
+            changeCount = preview.Value.Changes.Length,
+            commit = committed?.Result.Commit,
+            tree = committed?.Result.Tree,
+            artifacts = preview.Value.Artifacts,
+            receiptName = "receipt.json",
+            executableSha256 = preview.Value.ExecutableSha256,
+            gitVersion = committed?.Result.GitVersion,
             commitJournal = Journal.Read(Path.Combine(preview.Directory, "commit-journal"), preview.Value, preview.Repository),
-            diffCoverage = "Tracked changes only; new files and exact raw contents are retained in files.json and file reads." };
+            diffCoverage = "Tracked changes only; new files and exact raw contents are retained in files.json and file reads."
+        };
     }
 
     public async Task<object> ReconcileAsync(string previewRef, string expectedCallbackSha256, CancellationToken token = default)
@@ -256,8 +281,14 @@ public sealed partial class VciWorkspaceStore
             (await runner.InspectAsync(revision.Repository, token)).Matches(revision.SnapshotSha256),
             "PreviewStale", "History no longer belongs to the selected immutable revision.");
         Require(Encoding.UTF8.GetByteCount(history) <= 65536, "VciOutputLimit", "History exceeds 64 KiB; request fewer commits.");
-        return new { revisionRef, nativeQualified = false, maximumCommits = count, history,
-            format = "One LF-separated row per commit; NUL-separated commit, tree, parents, author, email, subject and empty terminator." };
+        return new
+        {
+            revisionRef,
+            nativeQualified = false,
+            maximumCommits = count,
+            history,
+            format = "One LF-separated row per commit; NUL-separated commit, tree, parents, author, email, subject and empty terminator."
+        };
     }
 
     public async Task<object> BranchesAsync(string revisionRef, int offset = 0, int count = 20, string? expectedInventorySha256 = null,
@@ -278,9 +309,19 @@ public sealed partial class VciWorkspaceStore
             "PreviewStale", "Branch inventory changed; restart from the first page.");
         Require(offset <= branches.Count, "VciInputLimit", "Branch offset exceeds the current inventory.");
         var rows = branches.Skip(offset).Take(count).ToArray();
-        var result = new { revisionRef, inventorySha256 = hash, offset, rows, total = branches.Count,
-            nextOffset = offset + rows.Length == branches.Count ? (int?)null : offset + rows.Length, totalItems = branches.Count, pageCount = PageTotals.PageCount(branches.Count, count),
-            nativeQualified = false, scope = "Fresh local refs in this exact revision repository; pin inventorySha256 across pages." };
+        var result = new
+        {
+            revisionRef,
+            inventorySha256 = hash,
+            offset,
+            rows,
+            total = branches.Count,
+            nextOffset = offset + rows.Length == branches.Count ? (int?)null : offset + rows.Length,
+            totalItems = branches.Count,
+            pageCount = PageTotals.PageCount(branches.Count, count),
+            nativeQualified = false,
+            scope = "Fresh local refs in this exact revision repository; pin inventorySha256 across pages."
+        };
         Require(JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length <= 65536, "VciOutputLimit", "Branch page exceeds 64 KiB; reduce count.");
         return result;
     }
@@ -392,8 +433,16 @@ public sealed partial class VciWorkspaceStore
             catch (Exception e) when (e is BridgeException or IOException or JsonException or UnauthorizedAccessException) { state = "integrity-failed"; }
             return new { id, recordRef = reference, state };
         }).ToArray();
-        return new { rows, total = entries.Length, nextOffset = offset + rows.Length == entries.Length ? (int?)null : offset + rows.Length, totalItems = entries.Length, pageCount = PageTotals.PageCount(entries.Length, count),
-            ordering = "record-id; relist after concurrent additions", nativeQualified = false };
+        return new
+        {
+            rows,
+            total = entries.Length,
+            nextOffset = offset + rows.Length == entries.Length ? (int?)null : offset + rows.Length,
+            totalItems = entries.Length,
+            pageCount = PageTotals.PageCount(entries.Length, count),
+            ordering = "record-id; relist after concurrent additions",
+            nativeQualified = false
+        };
     }
 
     private (VciGitReview Value, string Directory, string Repository) Preview(string reference)
@@ -453,8 +502,15 @@ public sealed partial class VciWorkspaceStore
     private string DirectoryFor(string id) => PackageStorage.Under(records, id);
     private static bool HasCommitIntent(string directory) => File.Exists(Path.Combine(directory, "commit-intent.json")) || Directory.Exists(Path.Combine(directory, "commit-journal"));
     private static string Receipt(string kind) => kind switch
-    { "preview" => "review.json", "revision" => "commit.json", "manifest" => "manifest-receipt.json", "comparison" => "comparison-receipt.json",
-      "fetch" => "fetch.json", "push" => "push.json", _ => "export.json" };
+    {
+        "preview" => "review.json",
+        "revision" => "commit.json",
+        "manifest" => "manifest-receipt.json",
+        "comparison" => "comparison-receipt.json",
+        "fetch" => "fetch.json",
+        "push" => "push.json",
+        _ => "export.json"
+    };
     private static string Reference(string kind, string id, string path) => "vci:" + kind + ":" + id + ":" + PackageStorage.FileHash(path);
     private FileStream Lock() => PackageStorage.Lock(PackageStorage.Under(root, "store.lock"));
     private (string Id, string Path) NewEntry()
@@ -543,9 +599,18 @@ public sealed partial class VciWorkspaceStore
         var result = JsonSerializer.SerializeToElement(store.Read(path, offset, count), BridgeProtocol.Json);
         Require(result.GetProperty("sha256").GetString() == expected && result.GetProperty("bytes").GetInt64() == length,
             "VciIntegrityFailure", "Downloaded bytes no longer match this record.");
-        return new { sha256 = expected, bytes = length, offset, count = result.GetProperty("count").GetInt32(),
-            data = result.GetProperty("data").GetString(), encoding = "base64", nextOffset = result.GetProperty("nextOffset").GetInt64(),
-            complete = result.GetProperty("complete").GetBoolean(), nativeQualified = false };
+        return new
+        {
+            sha256 = expected,
+            bytes = length,
+            offset,
+            count = result.GetProperty("count").GetInt32(),
+            data = result.GetProperty("data").GetString(),
+            encoding = "base64",
+            nextOffset = result.GetProperty("nextOffset").GetInt64(),
+            complete = result.GetProperty("complete").GetBoolean(),
+            nativeQualified = false
+        };
     }
     private static void Require([DoesNotReturnIf(false)] bool condition, string code, string message) { if (!condition) throw new BridgeException(code, message); }
     private sealed class ReadOnlyJournal : IGitOperationJournal

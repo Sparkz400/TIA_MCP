@@ -96,9 +96,14 @@ public sealed class TraceMeasurements(string artifactsRoot)
                 else ValidateNumericSample(Number(pair.Value), D.Text(signals[pair.Key], "datatype"));
             }
         }
-        var imported = new JsonObject { ["schemaVersion"] = "trace-import.v1", ["tracePlanId"] = tracePlanId,
-            ["inputArtifact"] = artifact.DeepClone(), ["measurement"] = measurement.DeepClone(),
-            ["qualityAssessment"] = AssessQuality(measurement) };
+        var imported = new JsonObject
+        {
+            ["schemaVersion"] = "trace-import.v1",
+            ["tracePlanId"] = tracePlanId,
+            ["inputArtifact"] = artifact.DeepClone(),
+            ["measurement"] = measurement.DeepClone(),
+            ["qualityAssessment"] = AssessQuality(measurement)
+        };
         return imported;
     }
 
@@ -125,8 +130,13 @@ public sealed class TraceMeasurements(string artifactsRoot)
         foreach (var hypothesis in D.Rows(plan["hypotheses"]))
         {
             var rule = hypothesis?["prediction"] as JsonObject;
-            var finding = new JsonObject { ["id"] = hypothesis!["id"]!.DeepClone(), ["statement"] = hypothesis["statement"]!.DeepClone(),
-                ["verdict"] = "unresolved", ["causationProven"] = false };
+            var finding = new JsonObject
+            {
+                ["id"] = hypothesis!["id"]!.DeepClone(),
+                ["statement"] = hypothesis["statement"]!.DeepClone(),
+                ["verdict"] = "unresolved",
+                ["causationProven"] = false
+            };
             findings.Add(finding);
             if (rule is null) { finding["reason"] = "No explicit bounded prediction supplied."; continue; }
             var when = Conditions(rule["when"], signals); var expect = Conditions(rule["expect"], signals);
@@ -158,25 +168,49 @@ public sealed class TraceMeasurements(string artifactsRoot)
                 var before = samples[index - 1]!["values"]![signal]; var after = samples[index]!["values"]![signal];
                 if (before is null || after is null || Equal(before, after)) continue;
                 transitionCount++;
-                if (transitions.Count < 200) transitions.Add(new JsonObject { ["signalId"] = signal, ["afterTime"] = samples[index - 1]!["time"]!.DeepClone(),
-                    ["byTime"] = samples[index]!["time"]!.DeepClone(), ["before"] = before.DeepClone(), ["after"] = after.DeepClone() });
+                if (transitions.Count < 200) transitions.Add(new JsonObject
+                {
+                    ["signalId"] = signal,
+                    ["afterTime"] = samples[index - 1]!["time"]!.DeepClone(),
+                    ["byTime"] = samples[index]!["time"]!.DeepClone(),
+                    ["before"] = before.DeepClone(),
+                    ["after"] = after.DeepClone()
+                });
             }
-        var report = new JsonObject { ["schemaVersion"] = "diagnostic-report.v1", ["measurementId"] = measurementId,
-            ["tracePlanId"] = imported["tracePlanId"]!.DeepClone(), ["reviewId"] = plan["reviewId"]!.DeepClone(),
-            ["symptom"] = plan["report"]!.DeepClone(), ["mode"] = m["mode"]!.DeepClone(), ["hypotheses"] = findings,
-            ["transitions"] = transitions, ["transitionCount"] = transitionCount, ["transitionsTruncated"] = transitionCount > 200,
-            ["timeUnit"] = m["timeUnit"]!.DeepClone(), ["units"] = m["units"]!.DeepClone(),
-            ["acquisitionQuality"] = q.DeepClone(), ["qualityAssessment"] = assessment,
-            ["acquisitionContext"] = AcquisitionContext(m), ["clockSynchronizationVerified"] = false,
-            ["coverageGaps"] = plan["coverageGaps"]!.DeepClone(), ["causationProven"] = false, ["nativeQualification"] = false,
-            ["nextCapture"] = "Resolve quality and source-program uncertainty, reproduce the specified condition, and choose a target-qualified sample task/window capable of observing the shortest relevant event. Replan changed signals or instances." };
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-report.v1",
+            ["measurementId"] = measurementId,
+            ["tracePlanId"] = imported["tracePlanId"]!.DeepClone(),
+            ["reviewId"] = plan["reviewId"]!.DeepClone(),
+            ["symptom"] = plan["report"]!.DeepClone(),
+            ["mode"] = m["mode"]!.DeepClone(),
+            ["hypotheses"] = findings,
+            ["transitions"] = transitions,
+            ["transitionCount"] = transitionCount,
+            ["transitionsTruncated"] = transitionCount > 200,
+            ["timeUnit"] = m["timeUnit"]!.DeepClone(),
+            ["units"] = m["units"]!.DeepClone(),
+            ["acquisitionQuality"] = q.DeepClone(),
+            ["qualityAssessment"] = assessment,
+            ["acquisitionContext"] = AcquisitionContext(m),
+            ["clockSynchronizationVerified"] = false,
+            ["coverageGaps"] = plan["coverageGaps"]!.DeepClone(),
+            ["causationProven"] = false,
+            ["nativeQualification"] = false,
+            ["nextCapture"] = "Resolve quality and source-program uncertainty, reproduce the specified condition, and choose a target-qualified sample task/window capable of observing the shortest relevant event. Replan changed signals or instances."
+        };
         return report;
     }
 
-    internal static JsonObject AcquisitionContext(JsonNode measurement) => new() {
-        ["mode"] = measurement["mode"]!.DeepClone(), ["clock"] = measurement["clock"]!.DeepClone(),
-        ["timeUnit"] = measurement["timeUnit"]!.DeepClone(), ["programIdentity"] = measurement["programIdentity"]!.DeepClone(),
-        ["identityVerified"] = false };
+    internal static JsonObject AcquisitionContext(JsonNode measurement) => new()
+    {
+        ["mode"] = measurement["mode"]!.DeepClone(),
+        ["clock"] = measurement["clock"]!.DeepClone(),
+        ["timeUnit"] = measurement["timeUnit"]!.DeepClone(),
+        ["programIdentity"] = measurement["programIdentity"]!.DeepClone(),
+        ["identityVerified"] = false
+    };
 
     // Reassess retained samples too; immutable older imports may contain rounded gap counts.
     internal static JsonObject AssessQuality(JsonNode measurement)
@@ -189,9 +223,15 @@ public sealed class TraceMeasurements(string artifactsRoot)
             if (previous is not null && expected is not null && TraceNumber.HasIntervalGap(previous.Value, time, expected.Value)) gaps++;
             previous = time; missing += sample["values"]!.AsObject().Count(p => p.Value is null);
         }
-        return new JsonObject { ["missingValues"] = missing, ["detectedIntervalGaps"] = gaps,
-            ["qualityOrigin"] = "callerAttestedPlusStructuralChecks", ["nativeQualification"] = false,
-            ["settingsIndependentlyVerifiedByTool"] = false, ["sourceProgramIndependentlyVerifiedByTool"] = false };
+        return new JsonObject
+        {
+            ["missingValues"] = missing,
+            ["detectedIntervalGaps"] = gaps,
+            ["qualityOrigin"] = "callerAttestedPlusStructuralChecks",
+            ["nativeQualification"] = false,
+            ["settingsIndependentlyVerifiedByTool"] = false,
+            ["sourceProgramIndependentlyVerifiedByTool"] = false
+        };
     }
 
     internal static JsonObject[] Conditions(JsonNode? node, Dictionary<string, JsonObject> signals)
@@ -228,11 +268,18 @@ public sealed class TraceMeasurements(string artifactsRoot)
     }
     internal static void ValidateNumericSample(decimal number, string datatype)
     {
-        (decimal min, decimal max)? range = datatype.ToUpperInvariant() switch {
-            "SINT" => (sbyte.MinValue, sbyte.MaxValue), "USINT" or "BYTE" => (0, byte.MaxValue),
-            "INT" => (short.MinValue, short.MaxValue), "UINT" or "WORD" => (0, ushort.MaxValue),
-            "DINT" => (int.MinValue, int.MaxValue), "UDINT" or "DWORD" => (0, uint.MaxValue),
-            "LINT" => (long.MinValue, long.MaxValue), "ULINT" or "LWORD" => (0, ulong.MaxValue), _ => null };
+        (decimal min, decimal max)? range = datatype.ToUpperInvariant() switch
+        {
+            "SINT" => (sbyte.MinValue, sbyte.MaxValue),
+            "USINT" or "BYTE" => (0, byte.MaxValue),
+            "INT" => (short.MinValue, short.MaxValue),
+            "UINT" or "WORD" => (0, ushort.MaxValue),
+            "DINT" => (int.MinValue, int.MaxValue),
+            "UDINT" or "DWORD" => (0, uint.MaxValue),
+            "LINT" => (long.MinValue, long.MaxValue),
+            "ULINT" or "LWORD" => (0, ulong.MaxValue),
+            _ => null
+        };
         if (range is not null && (number < range.Value.min || number > range.Value.max || decimal.Truncate(number) != number))
             throw new BridgeException("MeasurementFormatUnsupported", "Numeric sample is outside the declared integer type/range.");
     }
@@ -243,9 +290,16 @@ public sealed class TraceMeasurements(string artifactsRoot)
         {
             var observed = values[D.Text(c, "signalId")]; if (observed is null) { unknown = true; continue; }
             var expected = c["value"]!; string op = D.Text(c, "op");
-            bool result = op switch { "eq" => Equal(observed, expected), "ne" => !Equal(observed, expected),
-                "lt" => Number(observed) < Number(expected), "le" => Number(observed) <= Number(expected),
-                "gt" => Number(observed) > Number(expected), "ge" => Number(observed) >= Number(expected), _ => false };
+            bool result = op switch
+            {
+                "eq" => Equal(observed, expected),
+                "ne" => !Equal(observed, expected),
+                "lt" => Number(observed) < Number(expected),
+                "le" => Number(observed) <= Number(expected),
+                "gt" => Number(observed) > Number(expected),
+                "ge" => Number(observed) >= Number(expected),
+                _ => false
+            };
             if (!result) return false;
         }
         return unknown ? null : true;

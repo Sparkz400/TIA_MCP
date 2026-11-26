@@ -129,7 +129,7 @@ internal static class PreservationChecks
             }
             var actual = Directory.GetFiles(directory, "*", SearchOption.AllDirectories).Select(p => Path.GetRelativePath(directory, p).Replace('\\', '/')).Order().ToArray();
             True(actual.SequenceEqual(files.Select(f => f.RelativePath).Order()));
-            string primary = files.Single(f => !f.RelativePath.StartsWith(".vci/")).RelativePath;
+            string primary = files.Single(f => !f.RelativePath.StartsWith(".vci/", StringComparison.Ordinal)).RelativePath;
             var required = files.Select(f => new VciExpectedFile(f.RelativePath, f.RelativePath == primary ? "document" : "auxiliary")).ToList();
             if (format == "SimaticSD") required.Add(new("fixture.s7res", "resources"));
             var oracle = new VciBlockCommentOracle(block, block == "TiaMcp_IsEnabled" ? "FC" : "FB", 1,

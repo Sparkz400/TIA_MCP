@@ -356,7 +356,7 @@ internal static class SimulationRuntimeControlTests
             && release.Contains("selected.CaptureHeld && !restoreHeld) throw new SimulatorException(\"SimulationCaptureModeActive\"", StringComparison.Ordinal));
         // Only RuntimeCaptures sets restoreHeldCapture, and it refuses first while one of its captures is live on that instance.
         string hostCaptures = File.ReadAllText(Path.Combine(root.FullName, "src", "TiaMcp.Host", "RuntimeCaptures.cs"));
-        Check.Equal(true, hostCaptures.IndexOf("x.InstanceId==instanceId))", StringComparison.Ordinal) is > 0 and var live && hostCaptures.IndexOf("restoreHeldCapture=true", StringComparison.Ordinal) > live);
+        Check.Equal(true, hostCaptures.IndexOf("x.InstanceId == instanceId))", StringComparison.Ordinal) is > 0 and var live && hostCaptures.IndexOf("restoreHeldCapture = true", StringComparison.Ordinal) > live);
         Check.Equal(1, Directory.GetFiles(Path.Combine(root.FullName, "src", "TiaMcp.Host"), "*.cs").Count(f => File.ReadAllText(f).Contains("restoreHeldCapture", StringComparison.Ordinal)));
         // Only a running capture or scenario holds the instance: every restore, also a failed one, ends the hold first, so release can retry it.
         Check.Equal(true, Body(session, "static void RestoreCaptureMode(").Contains("{\n            selected.CaptureHeld = false;\n            if (selected.CaptureRestoreMode == null) return;", StringComparison.Ordinal));

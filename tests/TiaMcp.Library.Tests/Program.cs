@@ -224,7 +224,7 @@ Test("staged companion drift blocks native use", work =>
     var status = StageZip(work, Zip(("Lib.zal21", [1], null), ("payload.bin", [2], null)));
     var store = new PackageStore(Path.Combine(work, "artifacts"));
     var candidate = (PackageCandidate)store.Inspect(status.PackageId).Items[0];
-    var file = store.Inspect(status.PackageId, "files").Items.Cast<PackageFile>().Single(x => x.RelativePath.EndsWith("payload.bin"));
+    var file = store.Inspect(status.PackageId, "files").Items.Cast<PackageFile>().Single(x => x.RelativePath.EndsWith("payload.bin", StringComparison.Ordinal));
     File.WriteAllBytes(Path.Combine(Path.GetDirectoryName(status.ManifestPath)!, file.RelativePath), [3]);
     Reject("PackageChanged", () => store.ResolveCandidate(status.PackageId, candidate.CandidateId));
 });
@@ -498,7 +498,7 @@ Test("CLI native disabling preserves normal defaults and refuses qualification m
     Equal(false, HostOptions.Parse([]).NoNativeWorkers);
     // A source build resolves its workers and artifacts from the checkout root, not from bin/.
     Equal(true, File.Exists(Path.Combine(Path.GetDirectoryName(HostOptions.Parse([]).ArtifactsDirectory)!, "TiaMcp.slnx")));
-    Equal(true, HostOptions.Parse([]).WorkerPath.EndsWith(Path.Combine("src", "TiaMcp.Openness.V21", "bin", "Debug", "net48", "TiaMcp.Openness.V21.exe")));
+    Equal(true, HostOptions.Parse([]).WorkerPath.EndsWith(Path.Combine("src", "TiaMcp.Openness.V21", "bin", "Debug", "net48", "TiaMcp.Openness.V21.exe"), StringComparison.Ordinal));
     Equal(true, HostOptions.Parse(["--no-native-workers", "--worker", Path.Combine(work, "worker.exe")]).NoNativeWorkers);
     // F-parameter discovery exists only in -p:SafetyFParameterDiscovery=true builds; this (and every packaged) build refuses it.
     Equal(false, HostOptions.Parse([]).SafetyFParameterDiscovery);

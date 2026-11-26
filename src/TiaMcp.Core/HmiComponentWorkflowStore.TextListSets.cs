@@ -72,9 +72,12 @@ public sealed partial class HmiComponentWorkflowStore
             string outputId = Text(row, "outputId", 128), bindingId = Text(row, "bindingId", 128), profile = Text(row, "profile", 128);
             if (!outputIds.Add(outputId) || !bindingIds.Add(bindingId) || retainedIds.Contains(outputId, StringComparer.Ordinal))
                 throw Error("Generated outputs and bindings must be unique and separate from retained outputs.");
-            string version = profile switch {
-                "unified-bool-binding-text-list.v1" => "v2", "unified-integer-state-text-list.v1" => "v3",
-                _ => throw Error("Only established Bool and integer-state paired text-list profiles are supported.") };
+            string version = profile switch
+            {
+                "unified-bool-binding-text-list.v1" => "v2",
+                "unified-integer-state-text-list.v1" => "v3",
+                _ => throw Error("Only established Bool and integer-state paired text-list profiles are supported.")
+            };
             string? priorAuthor = row["previousAuthorRecordId"] is null ? null : Text(row, "previousAuthorRecordId", 64);
             if (previous is not null)
             {
@@ -84,10 +87,17 @@ public sealed partial class HmiComponentWorkflowStore
                 if (prior is null || (string?)prior["bindingId"] != bindingId || (string?)prior["profile"] != profile)
                     Conflict("Set regeneration cannot add/remove outputs or change binding/profile identities: " + outputId);
             }
-            var childRequest = new JsonObject {
-                ["schemaVersion"] = "unified-text-list-author-request." + version, ["profile"] = profile,
-                ["componentReviewId"] = reviewId, ["outputId"] = outputId, ["bindingId"] = bindingId,
-                ["previousRecordId"] = priorAuthor, ["template"] = row["template"]?.DeepClone(), ["retainOutputIds"] = new JsonArray() };
+            var childRequest = new JsonObject
+            {
+                ["schemaVersion"] = "unified-text-list-author-request." + version,
+                ["profile"] = profile,
+                ["componentReviewId"] = reviewId,
+                ["outputId"] = outputId,
+                ["bindingId"] = bindingId,
+                ["previousRecordId"] = priorAuthor,
+                ["template"] = row["template"]?.DeepClone(),
+                ["retainOutputIds"] = new JsonArray()
+            };
             byte[] childBytes = JsonSerializer.SerializeToUtf8Bytes(childRequest, BridgeProtocol.Json);
             var childInput = Reference(Convert.ToHexStringLower(SHA256.HashData(childBytes)), ".author-input");
             var child = AuthorBoundTextLists(childRequest, childBytes, childInput, null, null, depth, budget, report);
@@ -119,12 +129,21 @@ public sealed partial class HmiComponentWorkflowStore
                     (string?)p!["scope"] == s.Item1 && (string?)p["reviewId"] == (string?)report[s.Item1]?["selection"]?["reviewId"] &&
                     ((string?)p["rootObjectPath"] == (string?)binding["selection"]?[s.Item2]?["objectPath"] ||
                      (string?)p["consumerObjectPath"] == (string?)binding["selection"]?[s.Item2]?["objectPath"]))).Select(p => p!.DeepClone()).ToArray());
-            outputs.Add(new JsonObject {
-                ["outputId"] = outputId, ["bindingId"] = bindingId, ["profile"] = profile, ["authorRecordId"] = null,
-                ["componentContext"] = child["componentContext"]!.DeepClone(), ["intent"] = intent.DeepClone(),
-                ["dependencyCoverage"] = dependencies, ["consumerPaths"] = paths,
-                ["valueCoverage"] = child["valueCoverage"]?.DeepClone(), ["stateChanges"] = child["stateChanges"]?.DeepClone(),
-                ["conflicts"] = child["conflicts"]!.DeepClone(), ["gaps"] = child["gaps"]!.DeepClone() });
+            outputs.Add(new JsonObject
+            {
+                ["outputId"] = outputId,
+                ["bindingId"] = bindingId,
+                ["profile"] = profile,
+                ["authorRecordId"] = null,
+                ["componentContext"] = child["componentContext"]!.DeepClone(),
+                ["intent"] = intent.DeepClone(),
+                ["dependencyCoverage"] = dependencies,
+                ["consumerPaths"] = paths,
+                ["valueCoverage"] = child["valueCoverage"]?.DeepClone(),
+                ["stateChanges"] = child["stateChanges"]?.DeepClone(),
+                ["conflicts"] = child["conflicts"]!.DeepClone(),
+                ["gaps"] = child["gaps"]!.DeepClone()
+            });
         }
         var declaredOutputs = report["outputs"]!.AsArray().OfType<JsonObject>().ToArray();
         var declaredBindings = report["bindings"]!.AsArray().OfType<JsonObject>().ToArray();
@@ -144,8 +163,13 @@ public sealed partial class HmiComponentWorkflowStore
             {
                 string name = (string)file!["fileName"]!;
                 if (!names.Add(name)) Conflict("Generated/preserved filenames collide, including case variants: " + name);
-                preserved.Add(new JsonObject { ["outputId"] = id, ["fileName"] = name, ["bytes"] = file["bytes"]!.DeepClone(),
-                    ["artifact"] = Reference((string)file["sha256"]!, ".source") });
+                preserved.Add(new JsonObject
+                {
+                    ["outputId"] = id,
+                    ["fileName"] = name,
+                    ["bytes"] = file["bytes"]!.DeepClone(),
+                    ["artifact"] = Reference((string)file["sha256"]!, ".source")
+                });
                 outputBytes += (int)file["bytes"]!;
             }
         }
@@ -193,21 +217,39 @@ public sealed partial class HmiComponentWorkflowStore
                 }
             }
         }
-        var record = new JsonObject {
-            ["schemaVersion"] = "unified-text-list-set-record.v1", ["input"] = input.DeepClone(), ["componentReviewId"] = reviewId,
-            ["previousRecordId"] = previousId, ["status"] = ready ? "candidatesReady" : "conflict",
-            ["outputs"] = outputs, ["files"] = files, ["preservedFiles"] = preserved, ["conflicts"] = conflicts, ["gaps"] = gaps,
-            ["coverage"] = new JsonObject {
+        var record = new JsonObject
+        {
+            ["schemaVersion"] = "unified-text-list-set-record.v1",
+            ["input"] = input.DeepClone(),
+            ["componentReviewId"] = reviewId,
+            ["previousRecordId"] = previousId,
+            ["status"] = ready ? "candidatesReady" : "conflict",
+            ["outputs"] = outputs,
+            ["files"] = files,
+            ["preservedFiles"] = preserved,
+            ["conflicts"] = conflicts,
+            ["gaps"] = gaps,
+            ["coverage"] = new JsonObject
+            {
                 ["declaredOutputIds"] = new JsonArray(declaredOutputs.Select(o => o["id"]!.DeepClone()).ToArray()),
                 ["declaredBindingIds"] = new JsonArray(declaredBindings.Select(o => o["id"]!.DeepClone()).ToArray()),
                 ["uncoveredOutputIds"] = new JsonArray(uncoveredOutputs.Select(o => o["id"]!.DeepClone()).ToArray()),
                 ["uncoveredBindingIds"] = new JsonArray(uncoveredBindings.Select(o => o["id"]!.DeepClone()).ToArray()),
                 ["allDeclaredOutputsCovered"] = uncoveredOutputs.Length == 0,
-                ["allDeclaredBindingsCovered"] = uncoveredBindings.Length == 0, ["members"] = memberCoverage,
-                ["sourceConsumerCoverage"] = report["consumerCoverage"]!.DeepClone(), ["sourceDependencyImpactCoverage"] = report["dependencyImpactCoverage"]!.DeepClone(),
-                ["consumerCoverageComplete"] = false, ["dependencyClosureVerified"] = false, ["componentMemberCoverageComplete"] = false },
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["preservationVerified"] = false, ["ownershipVerified"] = false,
-            ["policy"] = "Coordinated offline candidates for 2..16 explicit paired Bool/integer lists, one supplied v7 review, fixed output/binding/profile/file/list/library identities during regeneration. Every declared output and binding must be accounted for. Any relevant conflict suppresses all candidates and child records. Selected retained peer bytes remain exact. Completion is the final immutable set record; interrupted publication may leave unreferenced immutable artifacts. No native import, merge, rename, removal, project completeness, authenticated source, native dependency closure or preservation qualification." };
+                ["allDeclaredBindingsCovered"] = uncoveredBindings.Length == 0,
+                ["members"] = memberCoverage,
+                ["sourceConsumerCoverage"] = report["consumerCoverage"]!.DeepClone(),
+                ["sourceDependencyImpactCoverage"] = report["dependencyImpactCoverage"]!.DeepClone(),
+                ["consumerCoverageComplete"] = false,
+                ["dependencyClosureVerified"] = false,
+                ["componentMemberCoverageComplete"] = false
+            },
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["preservationVerified"] = false,
+            ["ownershipVerified"] = false,
+            ["policy"] = "Coordinated offline candidates for 2..16 explicit paired Bool/integer lists, one supplied v7 review, fixed output/binding/profile/file/list/library identities during regeneration. Every declared output and binding must be accounted for. Any relevant conflict suppresses all candidates and child records. Selected retained peer bytes remain exact. Completion is the final immutable set record; interrupted publication may leave unreferenced immutable artifacts. No native import, merge, rename, removal, project completeness, authenticated source, native dependency closure or preservation qualification."
+        };
         byte[] recordBytes = JsonSerializer.SerializeToUtf8Bytes(record, BridgeProtocol.Json);
         if (recordBytes.Length > ReportLimit) throw new BridgeException("ArtifactCapacity", "Coordinated record exceeds 16 MiB.");
         JsonObject artifact;
@@ -252,12 +294,19 @@ public sealed partial class HmiComponentWorkflowStore
         }
         var coverage = new JsonArray(report["dependencyCoverage"]!.AsArray().Where(r => selected.Contains(((string)r!["scope"]!, (string)r["objectPath"]!))).Select(r => r!.DeepClone()).ToArray());
         var missing = selected.Where(s => !coverage.Any(c => (string?)c!["scope"] == s.Scope && (string?)c["objectPath"] == s.Path)).OrderBy(s => s.Scope, StringComparer.Ordinal).ThenBy(s => s.Path, StringComparer.Ordinal);
-        return new JsonObject { ["selectedScopes"] = coverage, ["associations"] = associations, ["contradictionCount"] = contradictions,
+        return new JsonObject
+        {
+            ["selectedScopes"] = coverage,
+            ["associations"] = associations,
+            ["contradictionCount"] = contradictions,
             ["unobservedScopes"] = new JsonArray(missing.Select(s => (JsonNode?)new JsonObject { ["scope"] = s.Scope, ["objectPath"] = s.Path }).ToArray()),
             ["allObservedSelectedIndicesMatched"] = coverage.Count == selected.Count && coverage.Count > 0 && coverage.All(c => (bool?)c!["allObservedIndicesMatched"] == true),
-            ["dependencyClosureVerified"] = false, ["consumerCoverageComplete"] = false,
-            ["sourceImpactCoverage"] = report["dependencyImpactCoverage"]!.DeepClone(), ["sourceConsumerCoverage"] = report["consumerCoverage"]!.DeepClone(),
-            ["policy"] = "All original associations touching exact selected members or nodes on their bounded same-scope saved consumer paths. Missing dependency observations for those nodes stay explicit; no transitive graph completion, foreign-snapshot join or native closure." };
+            ["dependencyClosureVerified"] = false,
+            ["consumerCoverageComplete"] = false,
+            ["sourceImpactCoverage"] = report["dependencyImpactCoverage"]!.DeepClone(),
+            ["sourceConsumerCoverage"] = report["consumerCoverage"]!.DeepClone(),
+            ["policy"] = "All original associations touching exact selected members or nodes on their bounded same-scope saved consumer paths. Missing dependency observations for those nodes stay explicit; no transitive graph completion, foreign-snapshot join or native closure."
+        };
     }
 
     private JsonObject SetMemberCoverage(JsonObject report, HashSet<string> bindingIds)
@@ -284,17 +333,30 @@ public sealed partial class HmiComponentWorkflowStore
                             (string?)b["selection"]?[scope == "beforeComponent" ? "beforeMember" : "afterMember"]?["objectPath"] == path &&
                             b["selection"]?[scope == "beforeComponent" ? "beforeMember" : "afterMember"]?["memberPath"] is JsonArray parts &&
                             parts.Select(p => (string)p!).SequenceEqual(memberPath)).Select(b => b["id"]!.DeepClone()).ToArray();
-                        observations.Add(new JsonObject { ["scope"] = scope, ["reviewId"] = selection["reviewId"]!.DeepClone(), ["objectPath"] = path,
+                        observations.Add(new JsonObject
+                        {
+                            ["scope"] = scope,
+                            ["reviewId"] = selection["reviewId"]!.DeepClone(),
+                            ["objectPath"] = path,
                             ["memberPath"] = new JsonArray(memberPath.Select(p => (JsonNode?)JsonValue.Create(p)).ToArray()),
-                            ["dataType"] = (string?)member.Attribute("Datatype"), ["bindingIds"] = new JsonArray(ids),
-                            ["evidence"] = source.Evidence(path, member) });
+                            ["dataType"] = (string?)member.Attribute("Datatype"),
+                            ["bindingIds"] = new JsonArray(ids),
+                            ["evidence"] = source.Evidence(path, member)
+                        });
                         Visit(member, memberPath);
                     }
                 }
                 Visit(interfaces[0], []);
             }
         }
-        return new JsonObject { ["observations"] = observations, ["unavailableObjects"] = unavailable, ["truncated"] = truncated,
-            ["maximumObservations"] = 4096, ["maximumDepth"] = 16, ["componentMemberCoverageComplete"] = false };
+        return new JsonObject
+        {
+            ["observations"] = observations,
+            ["unavailableObjects"] = unavailable,
+            ["truncated"] = truncated,
+            ["maximumObservations"] = 4096,
+            ["maximumDepth"] = 16,
+            ["componentMemberCoverageComplete"] = false
+        };
     }
 }

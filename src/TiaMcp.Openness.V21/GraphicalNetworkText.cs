@@ -287,7 +287,7 @@ namespace TiaMcp.Openness.V21
             private static string Key(XElement end) => (string)end.Attribute("UId") + "|" + ((string)end.Attribute("Name") ?? "");
             private static bool IsCoil(Node n) => n.Kind == "part" && n.Name.EndsWith("Coil", StringComparison.Ordinal);
             private static bool IsContact(Node n) => n.Kind == "part" && n.Name.EndsWith("Contact", StringComparison.Ordinal);
-            private bool IsInline(Node n) => IsContact(n) || n.Kind == "part" && (Gates.ContainsKey(n.Name) || Comparators.ContainsKey(n.Name));
+            private static bool IsInline(Node n) => IsContact(n) || n.Kind == "part" && (Gates.ContainsKey(n.Name) || Comparators.ContainsKey(n.Name));
 
             internal string Render()
             {

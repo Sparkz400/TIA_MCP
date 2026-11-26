@@ -159,7 +159,7 @@ namespace Siemens.Engineering.Library.Types
         internal Func<Guid> ReadGuid;
         internal int TypeReads, GuidReads;
         internal int DependencyReads;
-        internal Func<IEnumerable<LibraryTypeVersion>> ReadDependencies = () => new LibraryTypeVersion[0];
+        internal Func<IEnumerable<LibraryTypeVersion>> ReadDependencies = () => Array.Empty<LibraryTypeVersion>();
         internal IEnumerable<LibraryTypeVersion> Dependencies { get { DependencyReads++; return ReadDependencies(); } }
         internal LibraryType TypeObject { get { TypeReads++; return ReadType(); } }
         internal Guid Guid { get { GuidReads++; return ReadGuid == null ? Identity : ReadGuid(); } }

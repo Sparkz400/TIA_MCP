@@ -130,15 +130,24 @@ public sealed partial class HmiComponentWorkflowStore
                 (string?)p!["scope"] == s.Item1 && (string?)p["reviewId"] == (string?)report[s.Item1]?["selection"]?["reviewId"] &&
                 ((string?)p["rootObjectPath"] == (string?)binding["selection"]?[s.Item2]?["objectPath"] ||
                  (string?)p["consumerObjectPath"] == (string?)binding["selection"]?[s.Item2]?["objectPath"]))).Select(p => p!.DeepClone()).ToArray());
-        JsonObject Context(string id, string bindingId, JsonObject binding) => new() {
-            ["reviewRecordId"] = reviewId, ["outputId"] = id, ["bindingId"] = bindingId,
-            ["afterComponent"] = report["afterComponent"]!.DeepClone(), ["destination"] = report["destination"]!.DeepClone(),
-            ["binding"] = binding.DeepClone() };
-        JsonObject Comparison(JsonObject output, JsonArray proposed) => new() {
-            ["baselineFiles"] = output["baselineFiles"]!.DeepClone(), ["currentFiles"] = output["currentFiles"]!.DeepClone(),
-            ["suppliedProposedFiles"] = output["proposedFiles"]!.DeepClone(), ["proposedFiles"] = proposed.DeepClone(),
+        JsonObject Context(string id, string bindingId, JsonObject binding) => new()
+        {
+            ["reviewRecordId"] = reviewId,
+            ["outputId"] = id,
+            ["bindingId"] = bindingId,
+            ["afterComponent"] = report["afterComponent"]!.DeepClone(),
+            ["destination"] = report["destination"]!.DeepClone(),
+            ["binding"] = binding.DeepClone()
+        };
+        JsonObject Comparison(JsonObject output, JsonArray proposed) => new()
+        {
+            ["baselineFiles"] = output["baselineFiles"]!.DeepClone(),
+            ["currentFiles"] = output["currentFiles"]!.DeepClone(),
+            ["suppliedProposedFiles"] = output["proposedFiles"]!.DeepClone(),
+            ["proposedFiles"] = proposed.DeepClone(),
             ["suppliedProposedStatus"] = output["proposedFiles"]!.AsArray().Count == 0 && !(bool)output["selection"]!["proposedComplete"]! ? "notSupplied" :
-                (bool)output["selection"]!["proposedComplete"]! && Pair(output["proposedFiles"]!.AsArray(), proposed) ? "exact" : "conflict" };
+                (bool)output["selection"]!["proposedComplete"]! && Pair(output["proposedFiles"]!.AsArray(), proposed) ? "exact" : "conflict"
+        };
         foreach (var item in selections)
         {
             var row = Object(item);
@@ -207,8 +216,13 @@ public sealed partial class HmiComponentWorkflowStore
             {
                 if (!names.Add(file.Name)) Conflict("Proposed filenames collide, including case variants: " + file.Name);
                 totalBytes += file.Bytes.Length; candidateBytes.Add((file.Name, file.Bytes));
-                var fileRow = new JsonObject { ["outputId"] = id, ["fileName"] = file.Name, ["bytes"] = file.Bytes.Length,
-                    ["artifact"] = Reference(Convert.ToHexStringLower(SHA256.HashData(file.Bytes)), ".candidate") };
+                var fileRow = new JsonObject
+                {
+                    ["outputId"] = id,
+                    ["fileName"] = file.Name,
+                    ["bytes"] = file.Bytes.Length,
+                    ["artifact"] = Reference(Convert.ToHexStringLower(SHA256.HashData(file.Bytes)), ".candidate")
+                };
                 proposed.Add(fileRow.DeepClone()); proposals.Add(fileRow);
             }
             var comparison = Comparison(output, proposed);
@@ -220,16 +234,37 @@ public sealed partial class HmiComponentWorkflowStore
                 gaps.Add(id + ": Explicit numeric states leave unlisted values; defaults do not prove native handling.");
                 if (Boolean(template, "requireFullTypeCoverage")) Conflict(id + ": Required full integer coverage has gaps.");
             }
-            outputs.Add(new JsonObject { ["outputId"] = id, ["previousOutputId"] = priorId, ["operation"] = op, ["bindingId"] = bindingId,
-                ["bindingAction"] = bindingAction, ["profile"] = profile, ["componentContext"] = Context(id, bindingId, binding),
-                ["intent"] = intent, ["comparison"] = comparison, ["dependencyCoverage"] = Dependencies(id, binding), ["consumerPaths"] = Consumers(binding),
-                ["valueCoverage"] = valueCoverage, ["stateChanges"] = numeric ? HmiNumericTextLists.Changes(prior?["intent"] as JsonObject, intent) : null });
+            outputs.Add(new JsonObject
+            {
+                ["outputId"] = id,
+                ["previousOutputId"] = priorId,
+                ["operation"] = op,
+                ["bindingId"] = bindingId,
+                ["bindingAction"] = bindingAction,
+                ["profile"] = profile,
+                ["componentContext"] = Context(id, bindingId, binding),
+                ["intent"] = intent,
+                ["comparison"] = comparison,
+                ["dependencyCoverage"] = Dependencies(id, binding),
+                ["consumerPaths"] = Consumers(binding),
+                ["valueCoverage"] = valueCoverage,
+                ["stateChanges"] = numeric ? HmiNumericTextLists.Changes(prior?["intent"] as JsonObject, intent) : null
+            });
             if (conversions) outputs[^1]!["typeConversion"] = conversionEvidence;
-            effects.Add(new JsonObject { ["operation"] = op, ["previousOutputId"] = priorId, ["outputId"] = id,
-                ["bindingAction"] = bindingAction, ["currentObjectPath"] = selection["objectPath"]?.DeepClone(),
-                ["previousListName"] = prior?["intent"]?["lists"]?[0]?["name"]?.DeepClone(), ["proposedListName"] = listName,
-                ["retireFiles"] = priorId is null ? new JsonArray() : PriorFiles(priorId), ["proposedFiles"] = proposed.DeepClone(),
-                ["destructiveEffectPreviewOnly"] = priorId is not null, ["nativeExecutable"] = false });
+            effects.Add(new JsonObject
+            {
+                ["operation"] = op,
+                ["previousOutputId"] = priorId,
+                ["outputId"] = id,
+                ["bindingAction"] = bindingAction,
+                ["currentObjectPath"] = selection["objectPath"]?.DeepClone(),
+                ["previousListName"] = prior?["intent"]?["lists"]?[0]?["name"]?.DeepClone(),
+                ["proposedListName"] = listName,
+                ["retireFiles"] = priorId is null ? new JsonArray() : PriorFiles(priorId),
+                ["proposedFiles"] = proposed.DeepClone(),
+                ["destructiveEffectPreviewOnly"] = priorId is not null,
+                ["nativeExecutable"] = false
+            });
         }
         foreach (string id in removeIds)
         {
@@ -244,12 +279,27 @@ public sealed partial class HmiComponentWorkflowStore
             if ((string?)selection["action"] != "remove" || (string?)selection["kind"] != "hmiResource" || (string?)selection["ownership"] != "generated" ||
                 binding["selection"]?["afterMember"] is not null || output["proposedFiles"]!.AsArray().Count != 0 || !(bool)selection["proposedComplete"]!)
                 Conflict(id + ": Removal requires generated hmiResource remove, a before-only binding and a complete empty proposed set.");
-            removed.Add(new JsonObject { ["outputId"] = id, ["bindingId"] = bindingId, ["priorOutput"] = prior.DeepClone(),
-                ["comparison"] = Comparison(output, new()), ["binding"] = binding.DeepClone(), ["dependencyCoverage"] = Dependencies(id, binding),
-                ["consumerPaths"] = Consumers(binding) });
-            effects.Add(new JsonObject { ["operation"] = "remove", ["previousOutputId"] = id, ["outputId"] = null,
-                ["currentObjectPath"] = selection["objectPath"]?.DeepClone(), ["retireFiles"] = PriorFiles(id), ["proposedFiles"] = new JsonArray(),
-                ["destructiveEffectPreviewOnly"] = true, ["nativeExecutable"] = false });
+            removed.Add(new JsonObject
+            {
+                ["outputId"] = id,
+                ["bindingId"] = bindingId,
+                ["priorOutput"] = prior.DeepClone(),
+                ["comparison"] = Comparison(output, new()),
+                ["binding"] = binding.DeepClone(),
+                ["dependencyCoverage"] = Dependencies(id, binding),
+                ["consumerPaths"] = Consumers(binding)
+            });
+            effects.Add(new JsonObject
+            {
+                ["operation"] = "remove",
+                ["previousOutputId"] = id,
+                ["outputId"] = null,
+                ["currentObjectPath"] = selection["objectPath"]?.DeepClone(),
+                ["retireFiles"] = PriorFiles(id),
+                ["proposedFiles"] = new JsonArray(),
+                ["destructiveEffectPreviewOnly"] = true,
+                ["nativeExecutable"] = false
+            });
         }
         foreach (string id in retainIds)
         {
@@ -291,8 +341,13 @@ public sealed partial class HmiComponentWorkflowStore
         foreach (var proposed in proposals)
             foreach (var old in previous["files"]!.AsArray().Where(f => string.Equals((string?)f!["fileName"], (string?)proposed!["fileName"], StringComparison.OrdinalIgnoreCase)))
                 if ((string?)old!["outputId"] != (string?)outputs.OfType<JsonObject>().Single(o => (string?)o["outputId"] == (string?)proposed!["outputId"])["previousOutputId"])
-                    nameTransfers.Add(new JsonObject { ["fileName"] = proposed!["fileName"]!.DeepClone(), ["fromOutputId"] = old["outputId"]!.DeepClone(),
-                        ["toOutputId"] = proposed["outputId"]!.DeepClone(), ["previewOnly"] = true });
+                    nameTransfers.Add(new JsonObject
+                    {
+                        ["fileName"] = proposed!["fileName"]!.DeepClone(),
+                        ["fromOutputId"] = old["outputId"]!.DeepClone(),
+                        ["toOutputId"] = proposed["outputId"]!.DeepClone(),
+                        ["previewOnly"] = true
+                    });
         var members = SetMemberCoverage(report, accountedBindings);
         gaps.Add("Exact declared predecessor/current scope only. Unselected members, unobserved project content, omitted/truncated consumers and dependencies remain unqualified.");
         if (conversions) foreach (var effect in effects)
@@ -301,24 +356,45 @@ public sealed partial class HmiComponentWorkflowStore
             effect["plcValueConversionPerformed"] = false;
         }
         bool ready = conflicts.Count == 0;
-        var record = new JsonObject {
-            ["schemaVersion"] = conversions ? "unified-text-list-set-record.v3" : "unified-text-list-set-record.v2", ["input"] = input.DeepClone(), ["componentReviewId"] = reviewId,
-            ["previousRecordId"] = previousId, ["previousRecordArtifact"] = previous["recordArtifact"]!.DeepClone(),
-            ["status"] = ready ? "candidatesReady" : "conflict", ["outputs"] = outputs, ["removedOutputs"] = removed,
-            ["files"] = ready ? proposals.DeepClone() : new JsonArray(), ["preservedFiles"] = preserved,
-            ["effectsPreview"] = effects, ["filenameTransfers"] = nameTransfers, ["conflicts"] = conflicts, ["gaps"] = gaps,
-            ["coverage"] = new JsonObject {
+        var record = new JsonObject
+        {
+            ["schemaVersion"] = conversions ? "unified-text-list-set-record.v3" : "unified-text-list-set-record.v2",
+            ["input"] = input.DeepClone(),
+            ["componentReviewId"] = reviewId,
+            ["previousRecordId"] = previousId,
+            ["previousRecordArtifact"] = previous["recordArtifact"]!.DeepClone(),
+            ["status"] = ready ? "candidatesReady" : "conflict",
+            ["outputs"] = outputs,
+            ["removedOutputs"] = removed,
+            ["files"] = ready ? proposals.DeepClone() : new JsonArray(),
+            ["preservedFiles"] = preserved,
+            ["effectsPreview"] = effects,
+            ["filenameTransfers"] = nameTransfers,
+            ["conflicts"] = conflicts,
+            ["gaps"] = gaps,
+            ["coverage"] = new JsonObject
+            {
                 ["declaredOutputIds"] = new JsonArray(declaredOutputs.Keys.Select(s => (JsonNode?)JsonValue.Create(s)).ToArray()),
                 ["declaredBindingIds"] = new JsonArray(declaredBindings.Keys.Select(s => (JsonNode?)JsonValue.Create(s)).ToArray()),
                 ["uncoveredPredecessorOutputIds"] = new JsonArray(uncoveredPrior.Select(s => (JsonNode?)JsonValue.Create(s)).ToArray()),
                 ["uncoveredOutputIds"] = new JsonArray(uncoveredOutputs.Select(s => (JsonNode?)JsonValue.Create(s)).ToArray()),
                 ["uncoveredBindingIds"] = new JsonArray(uncoveredBindings.Select(s => (JsonNode?)JsonValue.Create(s)).ToArray()),
-                ["allPredecessorOutputsCovered"] = uncoveredPrior.Length == 0, ["allDeclaredOutputsCovered"] = uncoveredOutputs.Length == 0,
-                ["allDeclaredBindingsCovered"] = uncoveredBindings.Length == 0, ["members"] = members,
-                ["sourceConsumerCoverage"] = report["consumerCoverage"]!.DeepClone(), ["sourceDependencyImpactCoverage"] = report["dependencyImpactCoverage"]!.DeepClone(),
-                ["consumerCoverageComplete"] = false, ["dependencyClosureVerified"] = false, ["componentMemberCoverageComplete"] = false },
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["preservationVerified"] = false, ["ownershipVerified"] = false,
-            ["policy"] = "Explicit offline set evolution over exact prior v1/v2 records. Add/update/rename/remove and same-type member rebinding are complete declared-scope previews only. Baseline/current files must equal the predecessor pair; optional independent proposed pairs must match. Conflicts suppress all published candidates. Retained peers remain exact. No merge, implicit conversion, native rename/deletion/import, project completeness, ownership or preservation qualification. Final immutable record marks completion; interruption may leave unreferenced immutable artifacts." };
+                ["allPredecessorOutputsCovered"] = uncoveredPrior.Length == 0,
+                ["allDeclaredOutputsCovered"] = uncoveredOutputs.Length == 0,
+                ["allDeclaredBindingsCovered"] = uncoveredBindings.Length == 0,
+                ["members"] = members,
+                ["sourceConsumerCoverage"] = report["consumerCoverage"]!.DeepClone(),
+                ["sourceDependencyImpactCoverage"] = report["dependencyImpactCoverage"]!.DeepClone(),
+                ["consumerCoverageComplete"] = false,
+                ["dependencyClosureVerified"] = false,
+                ["componentMemberCoverageComplete"] = false
+            },
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["preservationVerified"] = false,
+            ["ownershipVerified"] = false,
+            ["policy"] = "Explicit offline set evolution over exact prior v1/v2 records. Add/update/rename/remove and same-type member rebinding are complete declared-scope previews only. Baseline/current files must equal the predecessor pair; optional independent proposed pairs must match. Conflicts suppress all published candidates. Retained peers remain exact. No merge, implicit conversion, native rename/deletion/import, project completeness, ownership or preservation qualification. Final immutable record marks completion; interruption may leave unreferenced immutable artifacts."
+        };
         if (conversions) record["policy"] = "Explicit offline v3 set evolution. Integer conversions require the integer-value-preserving.v1 profile, exact captured before/after types, unchanged state entries/translations, exact predecessor/current pairs and preserved binding/output identities. Only listed intervals are representable; unlisted values, PLC conversion, runtime compatibility and native import remain unqualified. Original binding conflicts remain retained; all other conflicts suppress every candidate. No implicit conversion, truncation, wrapping, clamping or native execution.";
         byte[] recordBytes = JsonSerializer.SerializeToUtf8Bytes(record, BridgeProtocol.Json);
         if (recordBytes.Length > ReportLimit) throw new BridgeException("ArtifactCapacity", "Evolution record exceeds 16 MiB.");
@@ -345,16 +421,24 @@ public sealed partial class HmiComponentWorkflowStore
     {
         if (numeric) return HmiNumericTextLists.Intent(template, listName);
         Fields(template, "fileBase textLibrary languages defaultLanguage falseText trueText");
-        return new JsonObject {
-            ["schemaVersion"] = "unified-text-list-author-request.v1", ["fileBase"] = template["fileBase"]?.DeepClone(),
-            ["textLibrary"] = template["textLibrary"]?.DeepClone(), ["languages"] = template["languages"]?.DeepClone(),
+        return new JsonObject
+        {
+            ["schemaVersion"] = "unified-text-list-author-request.v1",
+            ["fileBase"] = template["fileBase"]?.DeepClone(),
+            ["textLibrary"] = template["textLibrary"]?.DeepClone(),
+            ["languages"] = template["languages"]?.DeepClone(),
             ["defaultLanguage"] = template["defaultLanguage"]?.DeepClone(),
             ["texts"] = new JsonArray(
                 new JsonObject { ["id"] = "FalseText", ["translations"] = template["falseText"]?.DeepClone() },
                 new JsonObject { ["id"] = "TrueText", ["translations"] = template["trueText"]?.DeepClone() }),
-            ["lists"] = new JsonArray(new JsonObject {
-                ["name"] = listName, ["rangeType"] = "Bool", ["entries"] = new JsonArray(
+            ["lists"] = new JsonArray(new JsonObject
+            {
+                ["name"] = listName,
+                ["rangeType"] = "Bool",
+                ["entries"] = new JsonArray(
                     new JsonObject { ["id"] = "False", ["type"] = "SingleValue", ["fromValue"] = 0, ["toValue"] = 0, ["isDefault"] = false, ["textId"] = "FalseText" },
-                    new JsonObject { ["id"] = "True", ["type"] = "SingleValue", ["fromValue"] = 1, ["toValue"] = 1, ["isDefault"] = false, ["textId"] = "TrueText" }) }) };
+                    new JsonObject { ["id"] = "True", ["type"] = "SingleValue", ["fromValue"] = 1, ["toValue"] = 1, ["isDefault"] = false, ["textId"] = "TrueText" })
+            })
+        };
     }
 }

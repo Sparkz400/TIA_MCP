@@ -6,5 +6,4 @@ internal sealed class DelegateBridge(Func<string, JsonObject, JsonObject> callba
 {
     public Task<JsonElement> CallAsync(string operation, object? arguments = null, CancellationToken cancellationToken = default)
         => Task.FromResult(JsonSerializer.SerializeToElement(callback(operation, JsonSerializer.SerializeToNode(arguments ?? new { }, BridgeProtocol.Json)!.AsObject()), BridgeProtocol.Json));
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }

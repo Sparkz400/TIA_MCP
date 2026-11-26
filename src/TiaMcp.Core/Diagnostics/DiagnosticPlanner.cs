@@ -58,10 +58,17 @@ public sealed class DiagnosticPlanner(string artifactsRoot)
                 }
             }
             if (score == 0) continue;
-            candidates.Add(new JsonObject { ["objectPath"] = path, ["name"] = node["name"]?.DeepClone(), ["score"] = score,
-                ["plcPath"] = node["plcPath"]?.DeepClone(), ["scopePath"] = node["scopePath"]?.DeepClone(),
-                ["reasons"] = reasons, ["sourceStatus"] = doc?["status"]?.DeepClone() ?? JsonValue.Create("notCaptured"),
-                ["metadata"] = node["metadata"]?.DeepClone() });
+            candidates.Add(new JsonObject
+            {
+                ["objectPath"] = path,
+                ["name"] = node["name"]?.DeepClone(),
+                ["score"] = score,
+                ["plcPath"] = node["plcPath"]?.DeepClone(),
+                ["scopePath"] = node["scopePath"]?.DeepClone(),
+                ["reasons"] = reasons,
+                ["sourceStatus"] = doc?["status"]?.DeepClone() ?? JsonValue.Create("notCaptured"),
+                ["metadata"] = node["metadata"]?.DeepClone()
+            });
         }
         string blockPath = D.Text(request, "blockPath");
         if (blockPath.Length > 0 && (!source.Nodes.TryGetValue(blockPath, out var chosen) || D.Text(chosen, "kind") != "block"))
@@ -92,7 +99,7 @@ public sealed class DiagnosticPlanner(string artifactsRoot)
             automaticSelection = new DiagnosticSignalSelector(source, selected, hypotheses).Select(auto);
             foreach (var proposed in D.Rows(automaticSelection["signals"])) requests.Add(proposed!.DeepClone());
         }
-        var signals = ResolveSignals(source,reviewId,selected,requests,hypothesisIds);
+        var signals = ResolveSignals(source, reviewId, selected, requests, hypothesisIds);
         if (signals.Count > 0) TraceMeasurements.ValidatePredictions(hypotheses, signals);
         var gaps = new JsonArray(ProjectReviewStore.SourceEvidencePolicy, "Saved evidence is sequential and may be stale; online program identity is unknown.",
             "Report extraction/ranking is lexical. Automatic selection uses conservative compile-unit/network dependencies and simple explicit call bindings, not full program semantics.",
@@ -107,20 +114,43 @@ public sealed class DiagnosticPlanner(string artifactsRoot)
         if (signals.Count == 0) questions.Add("Select a minimal signal set justified by the hypotheses and captured references.");
         if (request["context"]?["timing"] is null) questions.Add("What is the shortest relevant fault duration or task interval? This changes sampling requirements.");
         if (automaticSelection?["truncated"]?.GetValue<bool>() == true) questions.Add("The automatic signal budget/depth was exhausted; review omitted coverage before preparing a capture.");
-        var plan = new JsonObject { ["schemaVersion"] = "diagnostic-case.v1", ["reviewId"] = reviewId, ["report"] = report,
+        var plan = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-case.v1",
+            ["reviewId"] = reviewId,
+            ["report"] = report,
             ["template"] = template?.DeepClone(),
             ["lineage"] = request["lineage"]?.DeepClone(),
-            ["context"] = request["context"]?.DeepClone(), ["observations"] = request["observations"]?.DeepClone(),
-            ["hypotheses"] = hypotheses.DeepClone(), ["project"] = review["model"]?["project"]?.DeepClone(),
-            ["sourceRevision"] = new JsonObject { ["reviewId"] = reviewId, ["documents"] = new JsonArray(source.Documents.Values.Select(d => (JsonNode?)new JsonObject {
-                ["objectPath"] = d["objectPath"]?.DeepClone(), ["status"] = d["status"]?.DeepClone(), ["utf8Sha256"] = d["utf8Sha256"]?.DeepClone() }).ToArray()), ["onlineVerified"] = false },
+            ["context"] = request["context"]?.DeepClone(),
+            ["observations"] = request["observations"]?.DeepClone(),
+            ["hypotheses"] = hypotheses.DeepClone(),
+            ["project"] = review["model"]?["project"]?.DeepClone(),
+            ["sourceRevision"] = new JsonObject
+            {
+                ["reviewId"] = reviewId,
+                ["documents"] = new JsonArray(source.Documents.Values.Select(d => (JsonNode?)new JsonObject
+                {
+                    ["objectPath"] = d["objectPath"]?.DeepClone(),
+                    ["status"] = d["status"]?.DeepClone(),
+                    ["utf8Sha256"] = d["utf8Sha256"]?.DeepClone()
+                }).ToArray()),
+                ["onlineVerified"] = false
+            },
             ["candidates"] = new JsonArray(candidates.OrderByDescending(c => c["score"]!.GetValue<int>()).ThenBy(c => D.Text(c, "objectPath"), StringComparer.Ordinal).Take(25).Select(c => (JsonNode?)c).ToArray()),
-            ["candidateCount"] = candidates.Count, ["rankingTruncated"] = candidates.Count > 25,
-            ["blockPath"] = blockPath, ["instances"] = instances, ["selectedInstance"] = selected?.DeepClone(),
-            ["signals"] = signals, ["questions"] = questions, ["coverageGaps"] = gaps, ["nativeExecutable"] = false,
+            ["candidateCount"] = candidates.Count,
+            ["rankingTruncated"] = candidates.Count > 25,
+            ["blockPath"] = blockPath,
+            ["instances"] = instances,
+            ["selectedInstance"] = selected?.DeepClone(),
+            ["signals"] = signals,
+            ["questions"] = questions,
+            ["coverageGaps"] = gaps,
+            ["nativeExecutable"] = false,
             ["automaticSelection"] = automaticSelection,
-            ["coverage"] = review["capture"]?.DeepClone(), ["instanceTraversal"] = source.Traversal(),
-            ["qualification"] = "offlinePlanningOnly" };
+            ["coverage"] = review["capture"]?.DeepClone(),
+            ["instanceTraversal"] = source.Traversal(),
+            ["qualification"] = "offlinePlanningOnly"
+        };
         if (testSuiteEvidence is not null) plan["testSuiteEvidence"] = testSuiteEvidence;
         if (alarmEvidence is not null) plan["alarmEvidence"] = alarmEvidence;
         if (request.ContainsKey("alarmBindings"))
@@ -163,8 +193,12 @@ public sealed class DiagnosticPlanner(string artifactsRoot)
         {
             string reviewId = D.Required(plan, "reviewId", 64);
             var source = new DiagnosticEvidence(review);
-            var documents = new JsonArray(source.Documents.Values.Select(d => (JsonNode?)new JsonObject {
-                ["objectPath"] = d["objectPath"]?.DeepClone(), ["status"] = d["status"]?.DeepClone(), ["utf8Sha256"] = d["utf8Sha256"]?.DeepClone() }).ToArray());
+            var documents = new JsonArray(source.Documents.Values.Select(d => (JsonNode?)new JsonObject
+            {
+                ["objectPath"] = d["objectPath"]?.DeepClone(),
+                ["status"] = d["status"]?.DeepClone(),
+                ["utf8Sha256"] = d["utf8Sha256"]?.DeepClone()
+            }).ToArray());
             void Same(JsonNode? retained, JsonNode? derived)
             {
                 if (!JsonNode.DeepEquals(retained, derived)) throw new BridgeException("CaptureMismatch", "Diagnostic evidence differs from its retained saved source.");
@@ -244,17 +278,35 @@ public sealed class DiagnosticPlanner(string artifactsRoot)
                         (string?)a.Attribute("Name") is "ExternalAccessible" or "ExternalVisible" && a.Value == "false")))
                     unavailable = "Captured access attributes restrict this member; backend/target access must be resolved.";
             }
-            signals.Add(new JsonObject { ["id"] = id, ["role"] = role, ["reason"] = reason, ["hypothesisIds"] = D.Strings(links),
-                ["storagePath"] = storage, ["memberPath"] = D.Strings(memberPath), ["datatype"] = datatype,
+            signals.Add(new JsonObject
+            {
+                ["id"] = id,
+                ["role"] = role,
+                ["reason"] = reason,
+                ["hypothesisIds"] = D.Strings(links),
+                ["storagePath"] = storage,
+                ["memberPath"] = D.Strings(memberPath),
+                ["datatype"] = datatype,
                 ["symbolComponents"] = D.Strings(tag ? [DiagnosticEvidence.QualifiedName(storageNode)] : new[] { DiagnosticEvidence.QualifiedName(storageNode) }.Concat(memberPath)),
-                ["namespace"] = storageNode["metadata"]?["namespace"]?.DeepClone(), ["scopePath"] = storageNode["scopePath"]?.DeepClone(),
-                ["resolution"] = unavailable is null ? "capturedDeclaration" : "unavailable", ["unavailableReason"] = unavailable,
+                ["namespace"] = storageNode["metadata"]?["namespace"]?.DeepClone(),
+                ["scopePath"] = storageNode["scopePath"]?.DeepClone(),
+                ["resolution"] = unavailable is null ? "capturedDeclaration" : "unavailable",
+                ["unavailableReason"] = unavailable,
                 ["traceability"] = unavailable is null ? "requiresTargetValidation" : "unavailable",
-                ["evidence"] = tag ? new JsonObject { ["origin"] = "savedNativeTagMetadata", ["reviewId"] = reviewId, ["objectPath"] = storage,
-                    ["nodeId"] = storageNode["nodeId"]?.DeepClone(), ["logicalAddress"] = storageNode["metadata"]?["logicalAddress"]?.DeepClone(), ["liveVerified"] = false }
+                ["evidence"] = tag ? new JsonObject
+                {
+                    ["origin"] = "savedNativeTagMetadata",
+                    ["reviewId"] = reviewId,
+                    ["objectPath"] = storage,
+                    ["nodeId"] = storageNode["nodeId"]?.DeepClone(),
+                    ["logicalAddress"] = storageNode["metadata"]?["logicalAddress"]?.DeepClone(),
+                    ["liveVerified"] = false
+                }
                     : member is null ? null : source.Evidence(storage, member),
-                ["onlineAddress"] = null, ["inclusionOrigin"] = D.Text(signal, "selectionOrigin") == "boundedDependencyEvidence" ? "boundedDependencyEvidence" : "callerProposedWithDeclarationEvidence",
-                ["selectionEvidence"] = signal["selectionEvidence"]?.DeepClone() });
+                ["onlineAddress"] = null,
+                ["inclusionOrigin"] = D.Text(signal, "selectionOrigin") == "boundedDependencyEvidence" ? "boundedDependencyEvidence" : "callerProposedWithDeclarationEvidence",
+                ["selectionEvidence"] = signal["selectionEvidence"]?.DeepClone()
+            });
         }
         return signals;
     }

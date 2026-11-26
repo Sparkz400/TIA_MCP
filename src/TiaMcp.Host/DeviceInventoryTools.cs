@@ -24,8 +24,13 @@ public sealed class DeviceInventoryTools(IBridgeClient bridge, HostOptions optio
             if (snapshotId == null)
             {
                 if (offset != 0) throw new BridgeException("InvalidRequest", "offset requires its snapshotId.");
-                var result = await bridge.CallAsync("device_inventory_capture", new { projectName, maxVisited, devicePath,
-                    artifactDirectory = Path.Combine(options.ArtifactsDirectory, "inventory") }, cancellationToken);
+                var result = await bridge.CallAsync("device_inventory_capture", new
+                {
+                    projectName,
+                    maxVisited,
+                    devicePath,
+                    artifactDirectory = Path.Combine(options.ArtifactsDirectory, "inventory")
+                }, cancellationToken);
                 var artifact = result.GetProperty("artifact");
                 string path = artifact.GetProperty("path").GetString()!;
                 // Reuse the artifact-store path/junction boundary before opening the native spool.
@@ -65,8 +70,14 @@ public sealed class DeviceInventoryTools(IBridgeClient bridge, HostOptions optio
             using var provider = identityFactory.Create(endpoint, ReadSession(endpoint, sessionEnvironmentVariable));
             await provider.ProbeAsync(cancellationToken);
             var result = await provider.BrowseAsync(hardwareId, cancellationToken);
-            return Format(new { provider = SiemensWebIdentity.Provider, endpoint = provider.Endpoint,
-                observedAtUtc = DateTimeOffset.UtcNow, source = "onlineControllerConfiguration", result });
+            return Format(new
+            {
+                provider = SiemensWebIdentity.Provider,
+                endpoint = provider.Endpoint,
+                observedAtUtc = DateTimeOffset.UtcNow,
+                source = "onlineControllerConfiguration",
+                result
+            });
         }
         catch (Exception error) when (IsExpected(error)) { return Failure(error); }
     }
@@ -121,9 +132,13 @@ public sealed class DeviceInventoryTools(IBridgeClient bridge, HostOptions optio
             }
             var enriched = store.Capture(rows.Select(r => byId[r.RowId]), snapshot.Metadata.ProjectPath,
                 snapshot.Metadata.Coverage, snapshot.Metadata.CapturedAtUtc, snapshotId);
-            return Format(new { snapshot = enriched.Metadata, selectedRows = bindings.Select(b => byId[b.RowId]),
+            return Format(new
+            {
+                snapshot = enriched.Metadata,
+                selectedRows = bindings.Select(b => byId[b.RowId]),
                 onlineScopeComplete = bindings.All(b => byId[b.RowId].Online.Status == "read"),
-                note = "Actual observations have per-row timestamps. Unselected rows retain their previous observation state. Mismatch means differing captured values, not an assessment of firmware compatibility." });
+                note = "Actual observations have per-row timestamps. Unselected rows retain their previous observation state. Mismatch means differing captured values, not an assessment of firmware compatibility."
+            });
         }
         catch (Exception error) when (IsExpected(error)) { return Failure(error); }
     }
@@ -182,8 +197,14 @@ public sealed class DeviceInventoryTools(IBridgeClient bridge, HostOptions optio
 
     private static BridgeException Deadline() => new("OnlineTimeout", "The 60-second identification budget expired; remaining selected rows were not read.");
     private static bool IsExpected(Exception error) => error is BridgeException or IOException or UnauthorizedAccessException or JsonException or ArgumentException;
-    private static CallToolResult Failure(Exception error) => Format(new { error = new { code = (error as BridgeException)?.Code ?? "InventoryFailure",
-        message = error is BridgeException ? error.Message : "Inventory input or artifact could not be processed." } }, true);
+    private static CallToolResult Failure(Exception error) => Format(new
+    {
+        error = new
+        {
+            code = (error as BridgeException)?.Code ?? "InventoryFailure",
+            message = error is BridgeException ? error.Message : "Inventory input or artifact could not be processed."
+        }
+    }, true);
     private static CallToolResult Format(object value, bool error = false)
     {
         var element = JsonSerializer.SerializeToElement(value, InventoryStore.Json);

@@ -40,7 +40,7 @@ internal static class ChangeBatchChecks
         Check(Refused(() => ChangeBatchRules.Members(Batch(Batch(Create("A"))))) == "InvalidRequest", "an item cannot nest items");
         var otherScope = Create("A"); otherScope["scopePath"] = "/plc/units/U";
         Check(Refused(() => ChangeBatchRules.Members(new JObject { ["scopePath"] = "/plc", ["items"] = new JArray(otherScope) })) == "ScopeMismatch", "an item cannot name another scope than the batch");
-        Check(Message(() => ChangeBatchRules.Members(Batch(Create("A"), new JObject()))).StartsWith("items[1] "), "a refusal names the item's index");
+        Check(Message(() => ChangeBatchRules.Members(Batch(Create("A"), new JObject()))).StartsWith("items[1] ", StringComparison.Ordinal), "a refusal names the item's index");
 
         // Names an item produces.
         Check(ChangeBatchRules.ProducedName("tag_create", Create("A")) == "A" && ChangeBatchRules.ProducedName("constant_create", Create("C")) == "C", "created tags and constants produce their name");
@@ -58,7 +58,7 @@ internal static class ChangeBatchChecks
         Check(Refused(() => ChangeBatchRules.RequireDistinct(new[] { ("t/A", "X"), ("t/B", "x") })) == "ObjectExists", "two items producing the same name refuse, case-insensitively");
         Check(Refused(() => ChangeBatchRules.RequireDistinct(new[] { ((string)null, "X"), ((string)null, "X") })) == "ObjectExists", "two created objects with one name refuse");
         Check(Refused(() => ChangeBatchRules.RequireDistinct(new[] { ((string)null, (string)null), ((string)null, (string)null) })) == null, "items without target or name never collide");
-        Check(Message(() => ChangeBatchRules.RequireDistinct(new[] { ("t/A", "A2"), ("t/B", "B2"), ("t/A", "A3") })).StartsWith("items[0] and items[2] "), "a collision names both item indexes");
+        Check(Message(() => ChangeBatchRules.RequireDistinct(new[] { ("t/A", "A2"), ("t/B", "B2"), ("t/A", "A3") })).StartsWith("items[0] and items[2] ", StringComparison.Ordinal), "a collision names both item indexes");
         Check(Refused(() => ChangeBatchRules.RequireDistinct(new[] { ("block\n\nA", "blockNumber\nFC\n7"), ("block\n\nB", "blockNumber\nFC\n7") }, "BlockNumberCollision", "block number")) == "BlockNumberCollision"
               && Message(() => ChangeBatchRules.RequireDistinct(new[] { ("block\n\nA", "blockNumber\nFC\n7"), ("block\n\nB", "blockNumber\nFC\n7") }, "BlockNumberCollision", "block number")).Contains("the same block number")
               && Refused(() => ChangeBatchRules.RequireDistinct(new[] { ("block\n\nA", "blockNumber\nFC\n7"), ("block\n\nB", "blockNumber\nFB\n7") }, "BlockNumberCollision", "block number")) == null,
@@ -79,7 +79,7 @@ internal static class ChangeBatchChecks
         string[] Targets(params string[] paths) => paths.Select(path => path == null ? null : ChangeBatchRules.GroupTarget("group_rename", Group("blocks", path, "N"))).ToArray();
         Check(Refused(() => ChangeBatchRules.RequireUnnested(Targets("/plc/blocks/groups/A", "/plc/blocks/groups/AB", null, "/plc/blocks/groups/B/groups/A"))) == null, "sibling groups and a shared name prefix are not nested");
         Check(Refused(() => ChangeBatchRules.RequireUnnested(Targets("/plc/blocks/groups/A/groups/B", "/plc/blocks/groups/a"))) == "InvalidRequest", "a group inside another item's group refuses, in either order and case-insensitively");
-        Check(Message(() => ChangeBatchRules.RequireUnnested(Targets("/plc/blocks/groups/A/groups/B", "/plc/blocks/groups/X", "/plc/blocks/groups/A"))).StartsWith("items[0] renames a group inside the group that items[2] renames"), "the nesting refusal names both item indexes");
+        Check(Message(() => ChangeBatchRules.RequireUnnested(Targets("/plc/blocks/groups/A/groups/B", "/plc/blocks/groups/X", "/plc/blocks/groups/A"))).StartsWith("items[0] renames a group inside the group that items[2] renames", StringComparison.Ordinal), "the nesting refusal names both item indexes");
         Check(Refused(() => ChangeBatchRules.RequireUnnested(new[] { "group\nblocks\n/plc/blocks/groups/A", "group\ntypes\n/plc/blocks/groups/A/groups/B" })) == null, "groups of different kinds never nest");
         return count;
     }

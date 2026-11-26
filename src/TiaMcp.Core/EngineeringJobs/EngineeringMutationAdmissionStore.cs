@@ -51,11 +51,22 @@ public sealed class EngineeringMutationAdmissionStore
 
     private static BridgeOperationException Busy(EngineeringMutationAdmission[] blocking, string[] operations, string[] windows) =>
         new("ResourceBusy", "An unreconciled engineering operation or mutation admission owns a requested resource. Inspect and reconcile the recorded owner; do not retry the write.",
-            JsonSerializer.SerializeToElement(new {
-                blockingAdmissionIds = blocking.Select(r => r.Id).ToArray(), blockingOperationIds = operations, blockingComponentWindowIds = windows,
-                blockingAdmissions = blocking.Select(r => new { admissionId = r.Id, operation = r.Scope.Operation, state = r.State,
-                    reconciliationTool = ReconciliationTool(r.Scope.Operation), remediation = Remediation(r.Scope.Operation) }).ToArray(),
-                statusTool = "engineering_operation_status", reconciliationTool = "engineering_admission_reconcile", automaticRetryAllowed = false
+            JsonSerializer.SerializeToElement(new
+            {
+                blockingAdmissionIds = blocking.Select(r => r.Id).ToArray(),
+                blockingOperationIds = operations,
+                blockingComponentWindowIds = windows,
+                blockingAdmissions = blocking.Select(r => new
+                {
+                    admissionId = r.Id,
+                    operation = r.Scope.Operation,
+                    state = r.State,
+                    reconciliationTool = ReconciliationTool(r.Scope.Operation),
+                    remediation = Remediation(r.Scope.Operation)
+                }).ToArray(),
+                statusTool = "engineering_operation_status",
+                reconciliationTool = "engineering_admission_reconcile",
+                automaticRetryAllowed = false
             }, BridgeProtocol.Json));
 
     /// <summary>project_save is not an admitted mutation (a failed save would have no reconciliation adapter), but saving a project
@@ -94,21 +105,24 @@ public sealed class EngineeringMutationAdmissionStore
     }
 
     public EngineeringMutationAdmission Returned(string id, int revision, EngineeringArtifactReference response) =>
-        Change(id, revision, current => {
+        Change(id, revision, current =>
+        {
             State(current, "dispatchIntent"); VerifyArtifact(artifacts, response);
             // Only the dispatch reservation ends. No readback, reopen, restoration or native qualification is asserted.
             return current with { State = "returned", Response = response };
         });
 
     public EngineeringMutationAdmission Unknown(string id, int revision, EngineeringArtifactReference? failure = null) =>
-        Change(id, revision, current => {
+        Change(id, revision, current =>
+        {
             State(current, "dispatchIntent"); if (failure is not null) VerifyArtifact(artifacts, failure);
             return current with { State = "outcomeUnknown", Response = failure };
         });
 
     /// <summary>Trusted adapters provide independently validated evidence. This is not a public arbitrary-string reconciliation endpoint.</summary>
     public EngineeringMutationAdmission Reconcile(string id, int revision, IReadOnlyList<ResourceReconciliation> evidence) =>
-        Change(id, revision, current => {
+        Change(id, revision, current =>
+        {
             if (current.State is not ("dispatchIntent" or "outcomeUnknown")) throw new BridgeException("InvalidOperationState", "Only an unresolved dispatch may be reconciled.");
             evidence = Freeze(evidence); ValidateReconciliation(artifacts, current.ResourceKeys, evidence);
             return current with { State = "reconciled", Reconciliation = evidence };

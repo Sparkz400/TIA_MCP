@@ -70,7 +70,7 @@ internal static class TranslationCategoryProbe
         probe("plc-hardware", hardware, plcObjects, "plc:" + plc.Name);
         probe("plc-comments", comments, plcObjects, "plc:" + plc.Name);
         probe("plc-alarms", alarms, plcObjects, "plc:" + plc.Name);
-        probe("plc-empty-categories", new TextCategory[0], plcObjects, "plc:" + plc.Name);
+        probe("plc-empty-categories", Array.Empty<TextCategory>(), plcObjects, "plc:" + plc.Name);
         probe("plc-null-categories", null, plcObjects, "plc:" + plc.Name);
         probe("block-all", all, blockObjects, "block:" + block.Name);
         probe("block-hardware", hardware, blockObjects, "block:" + block.Name);
@@ -78,7 +78,7 @@ internal static class TranslationCategoryProbe
         probe("owner-all", all, ownerObjects, "deviceItem:" + owner.Name);
         probe("owner-hardware", hardware, ownerObjects, "deviceItem:" + owner.Name);
         probe("owner-comments", comments, ownerObjects, "deviceItem:" + owner.Name);
-        probe("empty-objects", all, new IEngineeringObject[0], "empty");
+        probe("empty-objects", all, Array.Empty<IEngineeringObject>(), "empty");
         probe("null-objects", all, null, "null");
         result["completed"] = true; Save(output, result); return result;
     }

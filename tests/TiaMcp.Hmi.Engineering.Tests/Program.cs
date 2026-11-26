@@ -63,7 +63,7 @@ Check("An HmiPreservationUnavailable refusal carries a remediation on a copy of 
         HmiPreservationRemediation.CompleteCoverage, HmiPreservationRemediation.ManifestWrite })
     {
         var details = HmiPreservationRemediation.With(manifest, text);
-        Assert(details.Value<string>("remediation") == text && text.StartsWith("No change was made.") && details["nativeFailure"]!.Value<string>("message") == "x");
+        Assert(details.Value<string>("remediation") == text && text.StartsWith("No change was made.", StringComparison.Ordinal) && details["nativeFailure"]!.Value<string>("message") == "x");
     }
     Assert(manifest.ToString() == before); // The captured manifest is evidence and stays as captured.
     Assert(HmiPreservationRemediation.With(null, HmiPreservationRemediation.Gate).Count == 1);
@@ -396,7 +396,7 @@ Check("Unrelated content preservation catches deletion, addition and resource ch
 Check("Every exact family/profile operation retains unpassed qualification gates", () => {
     foreach (string profile in new[] { "classic-comfort", "classic-rt-advanced", "classic-basic", "classic-rt-professional", "unified-comfort", "unified-pc" })
         foreach (string operation in HmiEngineeringRules.Operations) {
-            var gate = HmiEngineeringRules.Gate(profile.StartsWith("classic-") ? "classic" : "unified", profile, operation);
+            var gate = HmiEngineeringRules.Gate(profile.StartsWith("classic-", StringComparison.Ordinal) ? "classic" : "unified", profile, operation);
             Assert(!gate.Value<bool>("available") && !gate.Value<bool>("runtimeVerified") && gate.Value<string>("nativeQualification") == "unverified");
             Assert(((JArray)gate["requiredGates"]).Count >= 8 && !string.IsNullOrWhiteSpace(gate.Value<string>("reason")));
         }

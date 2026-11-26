@@ -24,7 +24,9 @@ internal static class ToolResult
 
     internal static CallToolResult Of(JsonElement element, bool isError = false) => new()
     {
-        IsError = isError, StructuredContent = element, Content = [new TextContentBlock { Text = element.GetRawText() }]
+        IsError = isError,
+        StructuredContent = element,
+        Content = [new TextContentBlock { Text = element.GetRawText() }]
     };
 
     /// <summary>For a worker response or other text that is already JSON.</summary>

@@ -26,7 +26,7 @@ internal static class OpennessRegistrationTests
         {
             var report = OpennessRegistration.Evaluate(Worker, [entry]);
             Require(report.Status == "stale" && report.Mismatches.SequenceEqual(expected), "Stale reason must identify exactly the changed/malformed fields.");
-            Require(report.Message.Contains(Worker.Path) && report.RegistryEntry!.EndsWith(@"\Entry"), "Diagnostic must identify executable and saved entry.");
+            Require(report.Message.Contains(Worker.Path) && report.RegistryEntry!.EndsWith(@"\Entry", StringComparison.Ordinal), "Diagnostic must identify executable and saved entry.");
         }
         return Task.CompletedTask;
     }
@@ -37,7 +37,7 @@ internal static class OpennessRegistrationTests
         foreach (var order in new[] { entries, entries.Reverse().ToArray() })
         {
             var report = OpennessRegistration.Evaluate(Worker, order);
-            Require(report.Status == "registered" && report.RegistryEntry!.EndsWith(@"\Entry (8)"), "An obsolete duplicate must not hide a valid saved identity; path comparison is case-insensitive.");
+            Require(report.Status == "registered" && report.RegistryEntry!.EndsWith(@"\Entry (8)", StringComparison.Ordinal), "An obsolete duplicate must not hide a valid saved identity; path comparison is case-insensitive.");
         }
         return Task.CompletedTask;
     }

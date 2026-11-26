@@ -4,9 +4,13 @@ param(
     [ValidateSet('All','Python','Managed')][string]$Suite = 'All',
     # CI splits the managed suites across parallel runners; the default runs every suite.
     [ValidateRange(1, 16)][int]$ShardCount = 1,
-    [ValidateRange(0, 15)][int]$ShardIndex = 0
+    [ValidateRange(0, 15)][int]$ShardIndex = 0,
+    # Only these Python test modules (file names with or without .py), in the same environment as a full run; the contract
+    # group is skipped. Requires -Suite Python. scripts/Test-BeforePush.ps1 selects them from the changed files.
+    [string[]]$PythonTest
 )
 if ($ShardIndex -ge $ShardCount) { throw 'ShardIndex must be below ShardCount.' }
+if ($PythonTest -and $Suite -ne 'Python') { throw '-PythonTest requires -Suite Python.' }
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
 if (-not $OutputDirectory) {
@@ -145,8 +149,14 @@ try {
         if ($duplicateTests.Count) { throw "Python test modules exist in both scripts/ and scripts/tests/: $($duplicateTests -join ', ')" }
         $pythonPlan = Get-ShardPlan $pythonTests $PythonTestSeconds 0.4 @(@{seconds=75; suites=@()}) $ShardCount
         $pythonTests = @($pythonTests | Where-Object { $pythonPlan[$_] -eq $ShardIndex })
+        if ($PythonTest) {
+            $selected = @($PythonTest | ForEach-Object { if ($_ -like '*.py') { $_ } else { "$_.py" } } | Sort-Object -Unique)
+            $unknown = @($selected | Where-Object { $_ -notin $pythonTests })
+            if ($unknown.Count) { throw "Unknown Python test module(s): $($unknown -join ', ')" }
+            $pythonTests = $selected
+        }
         $result.pythonShard = @{index=$ShardIndex;count=$ShardCount;tests=$pythonTests}
-        if ($pythonPlan['group:0'] -eq $ShardIndex) {
+        if ($pythonPlan['group:0'] -eq $ShardIndex -and -not $PythonTest) {
             python -B scripts/test_contracts.py
             if ($LASTEXITCODE -ne 0) { throw 'Feature contract validation failed.' }
             $result.contracts = 'passed'

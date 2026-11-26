@@ -27,8 +27,13 @@ internal static class RuntimeCaptureAcquisitionSource
             originalBytes = checked(originalBytes + bytes.Length);
             if (originalBytes > MaximumOriginalBytes)
                 throw new BridgeException("ArtifactCapacity", "Acquisition original chain exceeds 3 MiB; the complete runtime capture remains available without diagnostic truncation.");
-            originals.Add(new JsonObject { ["relativePath"] = relative.Replace('\\', '/'), ["sha256"] = hash,
-                ["bytes"] = bytes.Length, ["base64"] = Convert.ToBase64String(bytes) });
+            originals.Add(new JsonObject
+            {
+                ["relativePath"] = relative.Replace('\\', '/'),
+                ["sha256"] = hash,
+                ["bytes"] = bytes.Length,
+                ["base64"] = Convert.ToBase64String(bytes)
+            });
             return bytes;
         }
         for (int index = count; index > 0; index--)
@@ -43,12 +48,21 @@ internal static class RuntimeCaptureAcquisitionSource
         foreach (var row in snapshot.Rows) rows.Add(JsonSerializer.SerializeToNode(row, BridgeProtocol.Json));
         if (rows.Count != snapshot.Progress.Rows)
             throw new BridgeException("RuntimeCaptureIntegrityFailure", "The selected committed prefix changed while reading.");
-        return new JsonObject { ["snapshotRef"] = snapshotRef, ["originalFiles"] = new JsonArray(originals.ToArray()),
-            ["originalByteCount"] = originalBytes, ["plan"] = JsonSerializer.SerializeToNode(snapshot.Plan, BridgeProtocol.Json),
+        return new JsonObject
+        {
+            ["snapshotRef"] = snapshotRef,
+            ["originalFiles"] = new JsonArray(originals.ToArray()),
+            ["originalByteCount"] = originalBytes,
+            ["plan"] = JsonSerializer.SerializeToNode(snapshot.Plan, BridgeProtocol.Json),
             ["recordedProgress"] = JsonSerializer.SerializeToNode(snapshot.Progress, BridgeProtocol.Json),
-            ["rows"] = rows, ["rowsTruncated"] = false,
-            ["chainSha256"] = parts[3], ["planSha256"] = expected, ["segmentCount"] = count,
-            ["currentHeadConsulted"] = false, ["uncommittedDataUnknown"] = snapshot.Progress.State == "running" };
+            ["rows"] = rows,
+            ["rowsTruncated"] = false,
+            ["chainSha256"] = parts[3],
+            ["planSha256"] = expected,
+            ["segmentCount"] = count,
+            ["currentHeadConsulted"] = false,
+            ["uncommittedDataUnknown"] = snapshot.Progress.State == "running"
+        };
     }
 
     internal static string Id(JsonObject value) =>

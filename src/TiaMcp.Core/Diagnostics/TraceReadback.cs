@@ -63,10 +63,19 @@ public sealed class TraceReadback(string artifactsRoot)
             differences.Add(new JsonObject { ["field"] = "sampleEvery", ["reason"] = "Requested sampling reduction exceeds supplied limits." });
         if (observed["triggerSupported"]?.GetValue<bool>() != true || observed["samplingTaskVerified"]?.GetValue<bool>() != true)
             differences.Add(new JsonObject { ["field"] = "acquisition", ["reason"] = "Trigger/task support was not positively observed." });
-        var report = new JsonObject { ["schemaVersion"] = "trace-readback-check.v1", ["tracePlanId"] = tracePlanId, ["readbackArtifact"] = artifact.DeepClone(),
-            ["matchesSuppliedReadback"] = differences.Count == 0, ["differences"] = differences, ["observation"] = observed,
-            ["nativeProbePerformed"] = false, ["nativeQualification"] = false, ["mutationAttempted"] = false,
-            ["limits"] = "Checks independent artifact fields, not authenticity or live target state. Sample-window semantics and CPU effects remain observer/target responsibilities; this receipt never authorizes transfer/arming or proves capture." };
+        var report = new JsonObject
+        {
+            ["schemaVersion"] = "trace-readback-check.v1",
+            ["tracePlanId"] = tracePlanId,
+            ["readbackArtifact"] = artifact.DeepClone(),
+            ["matchesSuppliedReadback"] = differences.Count == 0,
+            ["differences"] = differences,
+            ["observation"] = observed,
+            ["nativeProbePerformed"] = false,
+            ["nativeQualification"] = false,
+            ["mutationAttempted"] = false,
+            ["limits"] = "Checks independent artifact fields, not authenticity or live target state. Sample-window semantics and CPU effects remain observer/target responsibilities; this receipt never authorizes transfer/arming or proves capture."
+        };
         var receipt = store.Save(report); receipt["readbackCheck"] = report; return receipt;
     }
 }

@@ -10,6 +10,7 @@ using Siemens.Engineering.Library.Compare;
 using Siemens.Engineering.Library.MasterCopies;
 using Siemens.Engineering.Library.Types;
 using Siemens.Engineering.HW.Features;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {

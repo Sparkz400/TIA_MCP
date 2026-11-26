@@ -381,7 +381,7 @@ namespace TiaMcp.Simulator.V8
             result["creationId"] = selected.CreationReceipt.Value<string>("creationId");
             using (var sha = System.Security.Cryptography.SHA256.Create())
                 result["markerSha256"] = BitConverter.ToString(sha.ComputeHash(File.ReadAllBytes(marker.FullName))).Replace("-", "").ToLowerInvariant();
-            result["controllerAddresses"] = new JArray(selected.Instance.ControllerIP ?? new string[0]);
+            result["controllerAddresses"] = new JArray(selected.Instance.ControllerIP ?? Array.Empty<string>());
             result["communicationInterface"] = EnsureAdmitted(selected);
             return result;
         }
@@ -950,7 +950,7 @@ namespace TiaMcp.Simulator.V8
                 result["communicationInterface"] = selected.Instance.CommunicationInterface.ToString();
                 result["cpuType"] = selected.Instance.CPUType.ToString();
                 // Addresses come from the downloaded hardware configuration; a fresh instance has none until simulation_download.
-                try { result["controllerAddresses"] = new JArray(selected.Instance.ControllerIP ?? new string[0]); }
+                try { result["controllerAddresses"] = new JArray(selected.Instance.ControllerIP ?? Array.Empty<string>()); }
                 catch (Exception ex) { result["controllerAddresses"] = null; result["controllerAddressesReason"] = ex.Message; }
                 try { result["licenseStatus"] = selected.Instance.LicenseStatus.ToString(); }
                 catch (Exception ex) { result["licenseStatus"] = "unverified"; result["licenseReason"] = ex.Message; }

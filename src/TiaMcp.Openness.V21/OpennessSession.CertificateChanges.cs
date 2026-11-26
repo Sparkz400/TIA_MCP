@@ -14,6 +14,7 @@ using Siemens.Engineering;
 using Siemens.Engineering.HW;
 using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.Security;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {
@@ -124,7 +125,7 @@ namespace TiaMcp.Openness.V21
                 certificate.Delete();
             }
             change.Stages.Add("certificate_mutation_dispatched");
-            var expected = before.Where(id => id != removed).Concat(expectedNew.HasValue && !before.Contains(expectedNew.Value) ? new[] { expectedNew.Value } : new uint[0]).OrderBy(id => id).ToArray();
+            var expected = before.Where(id => id != removed).Concat(expectedNew.HasValue && !before.Contains(expectedNew.Value) ? new[] { expectedNew.Value } : Array.Empty<uint>()).OrderBy(id => id).ToArray();
             var actual = store.Certificates.Select(c => c.Id).OrderBy(id => id).ToArray();
             bool created = change.Kind == "certificate_create" || change.Kind == "certificate_import";
             if (!actual.SequenceEqual(expected) || created && (result == null || before.Contains(result.Id)))
@@ -289,7 +290,7 @@ namespace TiaMcp.Openness.V21
                         rows.Add(Reference(entry.Path, info.Name, () =>
                         {
                             object value = item.GetAttribute(info.Name);
-                            return value is Certificate single ? new[] { single.Id } : value is IEnumerable many && !(value is string) ? many.OfType<Certificate>().Select(c => c.Id).ToArray() : new uint[0];
+                            return value is Certificate single ? new[] { single.Id } : value is IEnumerable many && !(value is string) ? many.OfType<Certificate>().Select(c => c.Id).ToArray() : Array.Empty<uint>();
                         }));
                     var management = item.GetService<CertificateManagementConfiguration>();
                     if (management != null) rows.Add(Reference(entry.Path, "CertificateSupportedServices", () => management.CertificateSupportedServices.Select(s => s.Id).ToArray()));

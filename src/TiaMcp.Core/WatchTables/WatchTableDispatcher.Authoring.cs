@@ -19,8 +19,15 @@ public sealed partial class WatchTableDispatcher
         var generation = JsonSerializer.SerializeToUtf8Bytes(new { capture, plan }, BridgeProtocol.Json);
         if (generation.Length > 16 * 1024 * 1024) throw new BridgeException("WatchTableLimitExceeded", "Complete generation exceeds 16 MiB.");
         var artifact = SaveBytes(directory, id + ".json", generation);
-        return new { generationId = id, generationSha256 = artifact.Sha256, artifact, plan,
-            materializationProfile = "Symbolic scalar rows from captured native row grammar; each scalar datatype requires its own native verification.", nativeMutationAttempted = false };
+        return new
+        {
+            generationId = id,
+            generationSha256 = artifact.Sha256,
+            artifact,
+            plan,
+            materializationProfile = "Symbolic scalar rows from captured native row grammar; each scalar datatype requires its own native verification.",
+            nativeMutationAttempted = false
+        };
     }
 
     private async Task<object> PrepareAuthoring(JsonObject args, CancellationToken token)
@@ -43,8 +50,15 @@ public sealed partial class WatchTableDispatcher
             if (Text(destination, field) != Text(binding, field)) throw new BridgeException("IdentityMismatch", "Source and destination must identify the same exact project/PLC.");
         if (Text(destination, "tableName") != Text(generated, "tableName")) throw new BridgeException("IdentityMismatch", "Destination name differs from the generated plan.");
         _ = Text(destination, "group");
-        var selector = new JsonObject { ["projectPath"] = Text(destination, "projectPath"), ["plcPath"] = Text(destination, "plcPath"),
-            ["group"] = Text(destination, "group"), ["tableName"] = Text(destination, "tableName"), ["allowAbsent"] = mode == "create", ["sourceBinding"] = binding.DeepClone() };
+        var selector = new JsonObject
+        {
+            ["projectPath"] = Text(destination, "projectPath"),
+            ["plcPath"] = Text(destination, "plcPath"),
+            ["group"] = Text(destination, "group"),
+            ["tableName"] = Text(destination, "tableName"),
+            ["allowAbsent"] = mode == "create",
+            ["sourceBinding"] = binding.DeepClone()
+        };
         // Capture again before preparing; the worker repeats this under the exclusive mutation lease.
         var currentRequest = (JsonObject)binding.DeepClone(); currentRequest["tableName"] = Text(destination, "tableName");
         currentRequest["artifactDirectory"] = Path.Combine(root, "watch-source-captures");
@@ -84,9 +98,14 @@ public sealed partial class WatchTableDispatcher
         else
         {
             templateArtifact = SaveBytes(directory, "native-template.xml", WatchTableNativeTemplate.Read());
-            templateSnapshot = new JsonObject { ["origin"] = "packagedGenuineNativeCapture", ["profile"] = WatchTableNativeTemplate.Profile,
-                ["sourceSha256"] = WatchTableNativeTemplate.Sha256, ["artifact"] = JsonSerializer.SerializeToNode(templateArtifact, BridgeProtocol.Json),
-                ["nativeAuthoringQualified"] = false };
+            templateSnapshot = new JsonObject
+            {
+                ["origin"] = "packagedGenuineNativeCapture",
+                ["profile"] = WatchTableNativeTemplate.Profile,
+                ["sourceSha256"] = WatchTableNativeTemplate.Sha256,
+                ["artifact"] = JsonSerializer.SerializeToNode(templateArtifact, BridgeProtocol.Json),
+                ["nativeAuthoringQualified"] = false
+            };
             if (mode == "create")
             {
                 var export = before["tables"]?.AsArray().FirstOrDefault()?["artifact"]?.AsObject()
@@ -110,10 +129,19 @@ public sealed partial class WatchTableDispatcher
         string expected = WatchTableDocument.SemanticHash(document.ToBytes());
         if (expected == observation.Reference.ContentSha256) throw new BridgeException("NoChange", "The complete proposed document is unchanged.");
         var input = SaveBytes(directory, "reviewed.xml", document.ToBytes());
-        var proposal = new JsonObject { ["selector"] = selector, ["mode"] = mode, ["before"] = before, ["edit"] = edit,
-            ["generation"] = generation.DeepClone(), ["generationArtifact"] = JsonSerializer.SerializeToNode(generationRef, BridgeProtocol.Json),
-            ["template"] = templateSnapshot.DeepClone(), ["expectedSemanticSha256"] = expected, ["input"] = JsonSerializer.SerializeToNode(input, BridgeProtocol.Json),
-            ["profileGates"] = new JsonArray(edit["requiredProfiles"]!.AsArray().Select(p => (JsonNode)WatchMutationProfiles.Status(p!.GetValue<string>())).ToArray()) };
+        var proposal = new JsonObject
+        {
+            ["selector"] = selector,
+            ["mode"] = mode,
+            ["before"] = before,
+            ["edit"] = edit,
+            ["generation"] = generation.DeepClone(),
+            ["generationArtifact"] = JsonSerializer.SerializeToNode(generationRef, BridgeProtocol.Json),
+            ["template"] = templateSnapshot.DeepClone(),
+            ["expectedSemanticSha256"] = expected,
+            ["input"] = JsonSerializer.SerializeToNode(input, BridgeProtocol.Json),
+            ["profileGates"] = new JsonArray(edit["requiredProfiles"]!.AsArray().Select(p => (JsonNode)WatchMutationProfiles.Status(p!.GetValue<string>())).ToArray())
+        };
         proposal["exactProfileCandidate"] = WatchAuthoringProfile.Assess(proposal, document.ToBytes());
         if (System.Text.Encoding.UTF8.GetByteCount(proposal.ToJsonString()) > 16 * 1024 * 1024)
             throw new BridgeException("WatchTableLimitExceeded", "Complete authoring review exceeds 16 MiB.");
@@ -129,8 +157,14 @@ public sealed partial class WatchTableDispatcher
             new[] { review, input, generationRef, templateArtifact }.Concat(sourceArtifacts).Concat(captures).Distinct().ToArray(),
             ["offline", "watchImport"], ["readback", "preservation", "saved", "freshReopen"]);
         var record = store.Prepare(plan, Text(args, "idempotencyKey"));
-        return new { operation = record, review = proposal, reviewArtifact = review, productionApplyEnabled = false,
-            applyRequires = "Exact operationId/reviewedPlanSha256 and native verification of every required mutation profile." };
+        return new
+        {
+            operation = record,
+            review = proposal,
+            reviewArtifact = review,
+            productionApplyEnabled = false,
+            applyRequires = "Exact operationId/reviewedPlanSha256 and native verification of every required mutation profile."
+        };
     }
 
     private void ValidateCapturedContent(JsonObject snapshot, string expected)

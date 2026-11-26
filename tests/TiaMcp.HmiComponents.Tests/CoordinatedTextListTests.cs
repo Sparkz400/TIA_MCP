@@ -89,7 +89,7 @@ internal static class CoordinatedTextListTests
                     new JsonObject { ["outputId"] = "run", ["bindingId"] = "run-binding", ["profile"] = "unified-bool-binding-text-list.v1", ["template"] = boolTemplate, ["previousAuthorRecordId"] = null },
                     new JsonObject { ["outputId"] = "state", ["bindingId"] = "state-binding", ["profile"] = "unified-integer-state-text-list.v1", ["template"] = numericTemplate, ["previousAuthorRecordId"] = null }) };
         }
-        HashSet<string> Published() => Directory.GetFiles(Path.Combine(root, "hmi-component-reviews")).Where(p => p.EndsWith(".candidate") || p.EndsWith(".author.json")).Select(Path.GetFileName).ToHashSet()!;
+        HashSet<string> Published() => Directory.GetFiles(Path.Combine(root, "hmi-component-reviews")).Where(p => p.EndsWith(".candidate", StringComparison.Ordinal) || p.EndsWith(".author.json", StringComparison.Ordinal)).Select(Path.GetFileName).ToHashSet()!;
         JsonObject Record(JsonObject request, string label, bool ready = true)
         {
             var publishedBefore = Published(); JsonObject result;

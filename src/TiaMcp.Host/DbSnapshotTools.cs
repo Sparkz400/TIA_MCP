@@ -15,8 +15,15 @@ public sealed class DbSnapshotTools(HostOptions options, IBridgeClient bridge)
     public async Task<CallToolResult> Capture(string reviewId, string objectPath, CancellationToken cancellationToken, string? projectName = null)
     {
         JsonObject? export = null; BridgeException? failure = null;
-        try { export = JsonNode.Parse((await bridge.CallAsync("db_snapshot_export", new { projectName, blockPath = objectPath,
-            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "exports") }, cancellationToken)).GetRawText()) as JsonObject; }
+        try
+        {
+            export = JsonNode.Parse((await bridge.CallAsync("db_snapshot_export", new
+            {
+                projectName,
+                blockPath = objectPath,
+                artifactDirectory = Path.Combine(options.ArtifactsDirectory, "exports")
+            }, cancellationToken)).GetRawText()) as JsonObject;
+        }
         catch (BridgeException error) { failure = error; }
         return Run(s => s.Capture(reviewId, objectPath, export ?? throw failure ?? new BridgeException("InvalidDbSnapshot", "The worker returned no export.")), true);
     }

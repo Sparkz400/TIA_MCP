@@ -44,39 +44,39 @@ public sealed class PackageStore
         var gate = PackageStorage.Lock(Path.Combine(_root, "intake.lock"));
         try
         {
-        if (artifactRef is not null)
-        {
-            var artifact = new ArtifactUploadStore(_artifacts, _limits).ResolveCommittedUnderLock(artifactRef);
-            (source, label, expectedHash) = artifact;
-        }
-        else
-        {
-            source = Path.GetFullPath(hostPath!);
-            PackageStorage.EnsureNoLinks(source);
-            label = Path.GetFileName(Path.TrimEndingDirectorySeparator(source));
-            // GetFullPath expands an 8.3 alias (SECRET~1.ZIP for secret.zipx) only when it can; the extension rule below must see the
-            // name as stored, so the entry has to exist under exactly this name.
-            var parent = Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(source));
-            if (parent is null || !new DirectoryInfo(parent).EnumerateFileSystemInfos(label).Any(entry => entry.Name.Equals(label, StringComparison.OrdinalIgnoreCase)))
-                throw new BridgeException("PackageInvalid", "hostPath must name an existing file or directory by its full name.");
-            // Staged originals are readable through artifact_read, so a host path may only name a library input.
-            if (Directory.Exists(source) ? !Directory.EnumerateFiles(source).Any(file => IsNative(file) && !Path.GetExtension(file).StartsWith(".z", StringComparison.OrdinalIgnoreCase))
-                : !Path.GetExtension(source).Equals(".zip", StringComparison.OrdinalIgnoreCase) && !IsNative(source))
-                throw new BridgeException("PackageInvalid", "hostPath must be a .zip, a native .alXX/.zalXX/.apXX/.zapXX file, or a native library or project directory with an .alXX/.apXX marker at its top level.");
-        }
-        if (Directory.EnumerateDirectories(_packages).Count() >= _limits.MaxPackages)
-            throw new BridgeException("PackageLimitExceeded", "Package count limit reached; release unreferenced packages explicitly.");
-        isDirectory = Directory.Exists(source);
-        if (isDirectory && (_root.Equals(source, StringComparison.OrdinalIgnoreCase) || _root.StartsWith(Path.TrimEndingDirectorySeparator(source) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)))
-            throw new BridgeException("PackageInvalid", "A source directory cannot contain the managed intake root.");
-        budget = new IntakeBudget(_limits, _root, ReservedUploadBytes(), cancellationToken);
-        inputs = isDirectory ? EnumerateSource(source, budget) : [new InputFile(source, PackageStorage.Relative(label))];
-        if (!isDirectory) budget.Entry();
-        if (inputs.Count == 0) throw new BridgeException("PackageInvalid", "Package directory contains no files.");
-        id = Guid.NewGuid().ToString("N");
-        directory = PackageStorage.Under(_packages, id);
-        Directory.CreateDirectory(directory);
-        PackageStorage.Save(Path.Combine(directory, "state.json"), new { schemaVersion = 1, packageId = id, state = "staging", createdUtc = DateTimeOffset.UtcNow });
+            if (artifactRef is not null)
+            {
+                var artifact = new ArtifactUploadStore(_artifacts, _limits).ResolveCommittedUnderLock(artifactRef);
+                (source, label, expectedHash) = artifact;
+            }
+            else
+            {
+                source = Path.GetFullPath(hostPath!);
+                PackageStorage.EnsureNoLinks(source);
+                label = Path.GetFileName(Path.TrimEndingDirectorySeparator(source));
+                // GetFullPath expands an 8.3 alias (SECRET~1.ZIP for secret.zipx) only when it can; the extension rule below must see the
+                // name as stored, so the entry has to exist under exactly this name.
+                var parent = Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(source));
+                if (parent is null || !new DirectoryInfo(parent).EnumerateFileSystemInfos(label).Any(entry => entry.Name.Equals(label, StringComparison.OrdinalIgnoreCase)))
+                    throw new BridgeException("PackageInvalid", "hostPath must name an existing file or directory by its full name.");
+                // Staged originals are readable through artifact_read, so a host path may only name a library input.
+                if (Directory.Exists(source) ? !Directory.EnumerateFiles(source).Any(file => IsNative(file) && !Path.GetExtension(file).StartsWith(".z", StringComparison.OrdinalIgnoreCase))
+                    : !Path.GetExtension(source).Equals(".zip", StringComparison.OrdinalIgnoreCase) && !IsNative(source))
+                    throw new BridgeException("PackageInvalid", "hostPath must be a .zip, a native .alXX/.zalXX/.apXX/.zapXX file, or a native library or project directory with an .alXX/.apXX marker at its top level.");
+            }
+            if (Directory.EnumerateDirectories(_packages).Count() >= _limits.MaxPackages)
+                throw new BridgeException("PackageLimitExceeded", "Package count limit reached; release unreferenced packages explicitly.");
+            isDirectory = Directory.Exists(source);
+            if (isDirectory && (_root.Equals(source, StringComparison.OrdinalIgnoreCase) || _root.StartsWith(Path.TrimEndingDirectorySeparator(source) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)))
+                throw new BridgeException("PackageInvalid", "A source directory cannot contain the managed intake root.");
+            budget = new IntakeBudget(_limits, _root, ReservedUploadBytes(), cancellationToken);
+            inputs = isDirectory ? EnumerateSource(source, budget) : [new InputFile(source, PackageStorage.Relative(label))];
+            if (!isDirectory) budget.Entry();
+            if (inputs.Count == 0) throw new BridgeException("PackageInvalid", "Package directory contains no files.");
+            id = Guid.NewGuid().ToString("N");
+            directory = PackageStorage.Under(_packages, id);
+            Directory.CreateDirectory(directory);
+            PackageStorage.Save(Path.Combine(directory, "state.json"), new { schemaVersion = 1, packageId = id, state = "staging", createdUtc = DateTimeOffset.UtcNow });
         }
         finally { gate.Dispose(); }
         var files = new List<PackageFile>();
@@ -131,8 +131,14 @@ public sealed class PackageStore
             // A failed host directory leaves no partial copy of its files. Other sources keep their original bytes as failure
             // evidence. Never publish a partial extraction as ready.
             if (isDirectory) PackageStorage.DeleteOwned(_packages, directory);
-            else PackageStorage.Save(Path.Combine(directory, "state.json"), new { schemaVersion = 1, packageId = id, state = "failed", createdUtc = DateTimeOffset.UtcNow,
-                error = new { code = (error as BridgeException)?.Code ?? "PackageInvalid", message = error.Message } });
+            else PackageStorage.Save(Path.Combine(directory, "state.json"), new
+            {
+                schemaVersion = 1,
+                packageId = id,
+                state = "failed",
+                createdUtc = DateTimeOffset.UtcNow,
+                error = new { code = (error as BridgeException)?.Code ?? "PackageInvalid", message = error.Message }
+            });
             if (error is OperationCanceledException) throw;
             throw new BridgeOperationException((error as BridgeException)?.Code ?? "PackageInvalid", error.Message,
                 JsonSerializer.SerializeToElement(new { packageId = id, state = "failed", recoveryPath = isDirectory ? null : directory, retrySafe = true }, BridgeProtocol.Json));
@@ -171,8 +177,17 @@ public sealed class PackageStore
         var directory = DirectoryFor(packageId);
         var state = PackageStorage.Load<JsonElement>(Path.Combine(directory, "state.json"));
         if (state.GetProperty("state").GetString() != "ready")
-            return new { schemaVersion = 1, packageId, state = state.GetProperty("state").GetString(), evidence = state, host = Environment.MachineName, hostPath = directory,
-                retention = "Retained until explicit release; staging after process restart is incomplete and never automatically replayed.", limits = _limits };
+            return new
+            {
+                schemaVersion = 1,
+                packageId,
+                state = state.GetProperty("state").GetString(),
+                evidence = state,
+                host = Environment.MachineName,
+                hostPath = directory,
+                retention = "Retained until explicit release; staging after process restart is incomplete and never automatically replayed.",
+                limits = _limits
+            };
         return ToStatus(directory, ReadReady(directory, packageId));
     }
 
@@ -415,7 +430,7 @@ public sealed class PackageStore
         return new PackageFile(relative, bytes, Convert.ToHexStringLower(hash.GetHashAndReset()), role);
     }
 
-    private List<InputFile> EnumerateSource(string root, IntakeBudget budget)
+    private static List<InputFile> EnumerateSource(string root, IntakeBudget budget)
     {
         var inputs = new List<InputFile>();
         var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

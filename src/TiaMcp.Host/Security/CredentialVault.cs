@@ -15,8 +15,8 @@ namespace TiaMcp.Host;
 internal sealed record CredentialOperationReference(string ArtifactRoot, string OperationId, string PlanSha256);
 internal sealed record CredentialStatus(CredentialReference Reference, CredentialBinding Binding, string State, bool DecryptionVerified)
 {
-    public string Protection => "Windows DPAPI CurrentUser";
-    public bool SecretReturned => false;
+    public string Protection { get; } = "Windows DPAPI CurrentUser";
+    public bool SecretReturned { get; } = false;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IReadOnlyList<CredentialOperationReference>? OperationReferences { get; init; }
 }
@@ -37,8 +37,10 @@ internal sealed partial class CredentialVault
     }
     internal static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
     {
-        PropertyNameCaseInsensitive = false, UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
-        RespectRequiredConstructorParameters = true, MaxDepth = 8
+        PropertyNameCaseInsensitive = false,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        RespectRequiredConstructorParameters = true,
+        MaxDepth = 8
     };
 
     internal CredentialVault(string path)

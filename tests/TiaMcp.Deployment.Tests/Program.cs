@@ -69,7 +69,7 @@ Test("Capture sorts canonical paths and isolates source/warning arrays", () =>
     var result = Query(store, snapshot);
     Check(result.Rows.Select(row => row.Path).SequenceEqual(["/a", "/z"]), "Capture retained mutable source alias or failed ordinal sorting.");
     Check(!snapshot.ScopeComplete && snapshot.Warnings[0] == "Unit enumeration incomplete", "Completeness evidence changed.");
-    Check(snapshot.Revision == "revision-1" && snapshot.ProjectPath.EndsWith("Project.ap21"), "Snapshot provenance lost.");
+    Check(snapshot.Revision == "revision-1" && snapshot.ProjectPath.EndsWith("Project.ap21", StringComparison.Ordinal), "Snapshot provenance lost.");
 });
 
 Test("Captured row and warning collections reject mutation through IList", () =>

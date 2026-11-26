@@ -33,8 +33,11 @@ public sealed class AutomationMlWorkflowStore
         var bytes = Read(path, AutomationMlDocument.MaxInputBytes);
         Require(Hash(bytes) == sha256, "AutomationMlInputChanged", "Input bytes changed during reading.");
         var document = AutomationMlDocument.Parse(bytes);
-        return Summary(Publish("document", [], new() { ["original.aml"] = bytes,
-            ["report.json"] = Encoding.UTF8.GetBytes(document.ToJson()) }));
+        return Summary(Publish("document", [], new()
+        {
+            ["original.aml"] = bytes,
+            ["report.json"] = Encoding.UTF8.GetBytes(document.ToJson())
+        }));
     }
     public object Compare(string beforeRef, string afterRef)
     {
@@ -65,8 +68,19 @@ public sealed class AutomationMlWorkflowStore
             Require(node is JsonArray, "AutomationMlInvalidSection", "Selected report value is not an array.");
             var source = (JsonArray)node; Require(offset <= source.Count, "AutomationMlPageLimit", "Offset exceeds this array.");
             var (rows, next) = ReportPageRows.Read(source, offset, count, PageBytes - 4096, "Row exceeds page budget; download report.json.");
-            var result = new { recordRef, reportSha256 = reportArtifact.Sha256,
-                section, offset, total = source.Count, rows, nextOffset = next == source.Count ? (int?)null : next, totalItems = source.Count, pageCount = PageTotals.PageCount(source.Count, count), nativeQualified = false };
+            var result = new
+            {
+                recordRef,
+                reportSha256 = reportArtifact.Sha256,
+                section,
+                offset,
+                total = source.Count,
+                rows,
+                nextOffset = next == source.Count ? (int?)null : next,
+                totalItems = source.Count,
+                pageCount = PageTotals.PageCount(source.Count, count),
+                nativeQualified = false
+            };
             Require(JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length <= PageBytes,
                 "AutomationMlPageLimit", "Encoded page exceeds 128 KiB; reduce count or download report.json.");
             return result;
@@ -95,9 +109,18 @@ public sealed class AutomationMlWorkflowStore
         var result = JsonSerializer.SerializeToElement(new ArtifactStore(root).Read(PathFor(receipt.Id, name), offset, count), BridgeProtocol.Json);
         Require(result.GetProperty("sha256").GetString() == artifact.Sha256 && result.GetProperty("bytes").GetInt64() == artifact.Bytes,
             "AutomationMlIntegrityFailure", "Artifact changed during transfer.");
-        return new { sha256 = artifact.Sha256, bytes = artifact.Bytes, offset, count = result.GetProperty("count").GetInt32(),
-            encoding = "base64", data = result.GetProperty("data").GetString(), nextOffset = result.GetProperty("nextOffset").GetInt64(),
-            complete = result.GetProperty("complete").GetBoolean(), nativeQualified = false };
+        return new
+        {
+            sha256 = artifact.Sha256,
+            bytes = artifact.Bytes,
+            offset,
+            count = result.GetProperty("count").GetInt32(),
+            encoding = "base64",
+            data = result.GetProperty("data").GetString(),
+            nextOffset = result.GetProperty("nextOffset").GetInt64(),
+            complete = result.GetProperty("complete").GetBoolean(),
+            nativeQualified = false
+        };
     }
     public object List(int offset = 0, int count = 20)
     {
@@ -116,8 +139,16 @@ public sealed class AutomationMlWorkflowStore
             catch (Exception error) when (error is BridgeException or IOException or JsonException or UnauthorizedAccessException) { state = "integrity-failed"; }
             return new { id, recordRef = reference, state };
         }).ToArray();
-        return new { rows, total = directories.Length, nextOffset = offset + rows.Length == directories.Length ? (int?)null : offset + rows.Length, totalItems = directories.Length, pageCount = PageTotals.PageCount(directories.Length, count),
-            ordering = "record-id; relist after additions", nativeQualified = false };
+        return new
+        {
+            rows,
+            total = directories.Length,
+            nextOffset = offset + rows.Length == directories.Length ? (int?)null : offset + rows.Length,
+            totalItems = directories.Length,
+            pageCount = PageTotals.PageCount(directories.Length, count),
+            ordering = "record-id; relist after additions",
+            nativeQualified = false
+        };
     }
     /// <summary>The verified original.aml of a retained document record, for a native import that reads by path.</summary>
     public (string Path, string Sha256) ResolveDocument(string reference)
@@ -200,18 +231,35 @@ public sealed class AutomationMlWorkflowStore
     {
         var report = JsonNode.Parse(record.Files["report.json"])!.AsObject();
         var counts = report.Where(p => p.Value is JsonArray).ToDictionary(p => p.Key, p => ((JsonArray)p.Value!).Count);
-        return new { recordRef = record.Reference, kind = record.Receipt.Kind, state = "complete", inputs = record.Receipt.Inputs,
-            nativeQualified = false, importabilityCertified = false, impactScopeComplete = false,
-            profile = (string?)report["profile"], schemaValid = (bool?)report["schemaValid"],
-            sourceSha256 = (string?)report["sourceSha256"], beforeSha256 = (string?)report["beforeSha256"], afterSha256 = (string?)report["afterSha256"],
-            hasErrors = (bool?)report["hasErrors"], matchingReliable = (bool?)report["matchingReliable"],
-            sourceBytesChanged = (bool?)report["sourceBytesChanged"], counts, artifacts = record.Receipt.Artifacts, receiptName = "receipt.json" };
+        return new
+        {
+            recordRef = record.Reference,
+            kind = record.Receipt.Kind,
+            state = "complete",
+            inputs = record.Receipt.Inputs,
+            nativeQualified = false,
+            importabilityCertified = false,
+            impactScopeComplete = false,
+            profile = (string?)report["profile"],
+            schemaValid = (bool?)report["schemaValid"],
+            sourceSha256 = (string?)report["sourceSha256"],
+            beforeSha256 = (string?)report["beforeSha256"],
+            afterSha256 = (string?)report["afterSha256"],
+            hasErrors = (bool?)report["hasErrors"],
+            matchingReliable = (bool?)report["matchingReliable"],
+            sourceBytesChanged = (bool?)report["sourceBytesChanged"],
+            counts,
+            artifacts = record.Receipt.Artifacts,
+            receiptName = "receipt.json"
+        };
     }
     private string PathFor(string id, string? name = null) => PackageStorage.Under(root, name is null ? id : id + "/" + name);
     private static string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
     private static byte[] Read(string path, int limit)
-    { PackageStorage.EnsureNoLinks(path); using var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-        Require(input.Length <= limit, "AutomationMlCapacity", "Input or retained file exceeds its byte bound."); var bytes = new byte[(int)input.Length]; input.ReadExactly(bytes); return bytes; }
+    {
+        PackageStorage.EnsureNoLinks(path); using var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        Require(input.Length <= limit, "AutomationMlCapacity", "Input or retained file exceeds its byte bound."); var bytes = new byte[(int)input.Length]; input.ReadExactly(bytes); return bytes;
+    }
     private static void Write(string path, byte[] bytes) => PackageStorage.WriteNew(path, bytes);
     private static void Require([DoesNotReturnIf(false)] bool condition, string code, string message)
     { if (!condition) throw new BridgeException(code, message); }

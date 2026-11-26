@@ -19,8 +19,12 @@ public static class DiagnosticUaCaptureSource
 
     public static JsonObject Retain(string root, string mode, string snapshotRef, object plan, object progress, IEnumerable<object> rows)
     {
-        string prefix = mode switch { "polling" => "capture", "subscription" => "ua-subscription",
-            _ => throw new BridgeException("InvalidRequest", "Expected polling or subscription capture.") };
+        string prefix = mode switch
+        {
+            "polling" => "capture",
+            "subscription" => "ua-subscription",
+            _ => throw new BridgeException("InvalidRequest", "Expected polling or subscription capture.")
+        };
         var parts = snapshotRef.Split(':');
         if (parts.Length != 4 || parts[0] != prefix || !Regex.IsMatch(parts[1], "\\A[a-f0-9]{32}\\z") ||
             !Regex.IsMatch(parts[3], "\\A[a-f0-9]{64}\\z") || !int.TryParse(parts[2], NumberStyles.None, CultureInfo.InvariantCulture, out int count) ||
@@ -37,8 +41,13 @@ public static class DiagnosticUaCaptureSource
                 new JsonObject { ["path"] = Path.Combine(Path.GetFullPath(root), relative), ["sha256"] = hash }, maximum);
             bytesRead = checked(bytesRead + bytes.Length);
             if (bytesRead > MaximumOriginalBytes) throw Capacity();
-            originals.Add(new JsonObject { ["relativePath"] = relative, ["sha256"] = hash,
-                ["bytes"] = bytes.Length, ["base64"] = Convert.ToBase64String(bytes) });
+            originals.Add(new JsonObject
+            {
+                ["relativePath"] = relative,
+                ["sha256"] = hash,
+                ["bytes"] = bytes.Length,
+                ["base64"] = Convert.ToBase64String(bytes)
+            });
             return JsonNode.Parse(bytes)!.AsObject();
         }
         for (int i = count; i > 0; i--)
@@ -60,11 +69,22 @@ public static class DiagnosticUaCaptureSource
             !JsonNode.DeepEquals(originalRows, observedRows) || observedRows.Count != progressJson["rows"]!.GetValue<long>() ||
             count > 0 && !JsonNode.DeepEquals(decoded[^1]["progress"], progressJson))
             throw new BridgeException("UaDiagnosticSourceMismatch", "Original chain bytes differ from the backend-validated plan, progress or rows.");
-        return new JsonObject { ["snapshotRef"] = snapshotRef, ["acquisitionMode"] = mode,
-            ["originalFiles"] = new JsonArray(originals.ToArray()), ["originalByteCount"] = bytesRead,
-            ["plan"] = originalPlan, ["recordedProgress"] = progressJson, ["rows"] = observedRows,
-            ["rowsTruncated"] = false, ["chainSha256"] = parts[3], ["planSha256"] = expected, ["segmentCount"] = count,
-            ["currentHeadConsulted"] = false, ["uncommittedDataUnknown"] = D.Text(progressJson, "state") == "running" };
+        return new JsonObject
+        {
+            ["snapshotRef"] = snapshotRef,
+            ["acquisitionMode"] = mode,
+            ["originalFiles"] = new JsonArray(originals.ToArray()),
+            ["originalByteCount"] = bytesRead,
+            ["plan"] = originalPlan,
+            ["recordedProgress"] = progressJson,
+            ["rows"] = observedRows,
+            ["rowsTruncated"] = false,
+            ["chainSha256"] = parts[3],
+            ["planSha256"] = expected,
+            ["segmentCount"] = count,
+            ["currentHeadConsulted"] = false,
+            ["uncommittedDataUnknown"] = D.Text(progressJson, "state") == "running"
+        };
     }
 
     private static BridgeException Capacity() => new("ArtifactCapacity", "Diagnostic observations retain at most 10,000 complete rows and 3 MiB of original chain bytes. Use raw capture export for larger prefixes; no diagnostic rows are silently truncated.");

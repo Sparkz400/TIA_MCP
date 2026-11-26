@@ -84,20 +84,41 @@ public static partial class ServoCallPlan
                 if (trace["completeness"]?["scopeComplete"]?.GetValue<bool>() == false)
                     blockers.Add(Blocker("writerCoverage", path, "The writer trace of " + Text(controlTag["name"]) + " is incomplete."));
             }
-            rows.Add(new JsonObject { ["hardwarePath"] = path, ["instanceName"] = instance, ["faultName"] = faultName,
-                ["statusTag"] = statusTag?["name"]?.DeepClone(), ["controlTag"] = controlTag?["name"]?.DeepClone(), ["existingControlWriters"] = writers });
+            rows.Add(new JsonObject
+            {
+                ["hardwarePath"] = path,
+                ["instanceName"] = instance,
+                ["faultName"] = faultName,
+                ["statusTag"] = statusTag?["name"]?.DeepClone(),
+                ["controlTag"] = controlTag?["name"]?.DeepClone(),
+                ["existingControlWriters"] = writers
+            });
         }
 
-        var result = new JsonObject { ["schemaVersion"] = "servo-call-plan.v1", ["plcPath"] = plc, ["callerName"] = caller, ["wrapperName"] = wrapper,
-            ["parameters"] = map.DeepClone(), ["resetExpression"] = resetExpression, ["ss1Expression"] = ss1Expression, ["drives"] = rows,
-            ["blockers"] = blockers, ["writeReady"] = blockers.Count == 0,
-            ["intent"] = "Reset and SS1 expressions are applied as given and treated as confirmed design; the plan does not judge machine safety behavior." };
+        var result = new JsonObject
+        {
+            ["schemaVersion"] = "servo-call-plan.v1",
+            ["plcPath"] = plc,
+            ["callerName"] = caller,
+            ["wrapperName"] = wrapper,
+            ["parameters"] = map.DeepClone(),
+            ["resetExpression"] = resetExpression,
+            ["ss1Expression"] = ss1Expression,
+            ["drives"] = rows,
+            ["blockers"] = blockers,
+            ["writeReady"] = blockers.Count == 0,
+            ["intent"] = "Reset and SS1 expressions are applied as given and treated as confirmed design; the plan does not judge machine safety behavior."
+        };
         if (blockers.Count == 0)
         {
             var source = Source(caller, wrapper, rows, members, status, control, reset, ss1, fault, resetExpression, ss1Expression);
             result["source"] = source;
-            result["change"] = new JsonObject { ["kind"] = "source_upsert", ["plcPath"] = plc,
-                ["payload"] = new JsonObject { ["language"] = "SCL", ["source"] = source, ["expectedBlockNames"] = new JsonArray(caller) } };
+            result["change"] = new JsonObject
+            {
+                ["kind"] = "source_upsert",
+                ["plcPath"] = plc,
+                ["payload"] = new JsonObject { ["language"] = "SCL", ["source"] = source, ["expectedBlockNames"] = new JsonArray(caller) }
+            };
         }
         return result;
     }

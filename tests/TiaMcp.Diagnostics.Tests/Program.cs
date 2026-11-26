@@ -219,10 +219,10 @@ static void Ambiguity()
     // Duplicate unnamespaced FB names prevent silent first-match selection.
     var duplicate = f.Model["nodes"]![3]!.DeepClone(); duplicate["objectPath"] = Fixture.Plc + "/groups/Other/FB_Conveyor"; duplicate["nodeId"] = "other";
     f.Model["nodes"]!.AsArray().Add(duplicate);
-    var doc = f.Documents.Single(d => d!["objectPath"]!.GetValue<string>().EndsWith("/FB_Conveyor"))!.DeepClone(); doc["objectPath"] = duplicate["objectPath"]!.DeepClone(); f.Documents.Add(doc);
+    var doc = f.Documents.Single(d => d!["objectPath"]!.GetValue<string>().EndsWith("/FB_Conveyor", StringComparison.Ordinal))!.DeepClone(); doc["objectPath"] = duplicate["objectPath"]!.DeepClone(); f.Documents.Add(doc);
     f.SaveReview(); Error("InstanceResolutionIncomplete", () => f.Plan());
     f.Model["nodes"]!.AsArray().Remove(duplicate); f.Documents.Remove(doc);
-    var line = f.Documents.Single(d => d!["objectPath"]!.GetValue<string>().EndsWith("/FB_Line"))!;
+    var line = f.Documents.Single(d => d!["objectPath"]!.GetValue<string>().EndsWith("/FB_Line", StringComparison.Ordinal))!;
     line["status"] = "unavailable"; f.SaveReview(); Error("InstanceResolutionIncomplete", () => f.Plan());
     line["status"] = "exported"; f.Model["nodes"]![2]!["metadata"]!["isKnowHowProtected"] = true;
     f.SaveReview(); Error("InstanceResolutionIncomplete", () => f.Plan());
@@ -723,7 +723,7 @@ sealed class Fixture : IDisposable
         foreach (string name in new[] { "Main", "FB_Line", "FB_Conveyor", "DB_Line", "DB_IO" })
         {
             nodes.Add(new JsonObject { ["nodeId"] = name, ["kind"] = "block", ["objectPath"] = Block(name), ["name"] = name, ["plcPath"] = Plc, ["scopePath"] = Plc,
-                ["metadata"] = new JsonObject { ["namespace"] = "", ["programmingLanguage"] = name.StartsWith("DB_") ? "DB" : "SCL" } });
+                ["metadata"] = new JsonObject { ["namespace"] = "", ["programmingLanguage"] = name.StartsWith("DB_", StringComparison.Ordinal) ? "DB" : "SCL" } });
             string xml = File.ReadAllText(Path.Combine(fixture, name + ".xml"));
             Documents.Add(new JsonObject { ["objectPath"] = Block(name), ["status"] = "exported", ["xml"] = xml,
                 ["utf8Sha256"] = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(xml))) });

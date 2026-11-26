@@ -42,8 +42,14 @@ public sealed class OpcUaSubscriptionTools(OpcUaRuntimeSessions sessions)
         {
             // Only the exception type reaches stderr (never the message, which may carry remote text); stdout is the MCP transport.
             if (e is not BridgeException) Console.Error.WriteLine($"runtime_ua_subscription tool failed: {e.GetType().FullName}");
-            return Format(new { error = new { code = e is BridgeException b ? b.Code : "UaOperationFailed",
-                message = "OPC UA subscription refused or incomplete; no remote error text or secret returned." } }, true);
+            return Format(new
+            {
+                error = new
+                {
+                    code = e is BridgeException b ? b.Code : "UaOperationFailed",
+                    message = "OPC UA subscription refused or incomplete; no remote error text or secret returned."
+                }
+            }, true);
         }
     }
 

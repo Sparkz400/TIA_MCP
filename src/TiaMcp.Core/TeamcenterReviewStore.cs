@@ -17,7 +17,8 @@ public sealed class TeamcenterReviewStore(string artifactsRoot)
         byte[] bytes = ProjectReviewStore.ReadArtifact(artifactsRoot, new() { ["path"] = upload.Path, ["sha256"] = upload.Sha256 }, TeamcenterReview.InputLimit);
         var request = TeamcenterReview.Parse(bytes);
         var sources = new Dictionary<string, byte[]>(StringComparer.Ordinal);
-        var report = TeamcenterReview.Build(request, reference => {
+        var report = TeamcenterReview.Build(request, reference =>
+        {
             var manifest = new ArtifactUploadStore(artifactsRoot).ResolveCommitted(reference);
             var data = ProjectReviewStore.ReadArtifact(artifactsRoot, new() { ["path"] = manifest.Path, ["sha256"] = manifest.Sha256 }, TeamcenterReview.ManifestLimit);
             sources.Add(reference, data); return data;
@@ -42,7 +43,8 @@ public sealed class TeamcenterReviewStore(string artifactsRoot)
         // A report saved before RFC 8785 re-derives its identity keys in the form it was written with.
         var expected = CanonicalJson.Compatible(() =>
         {
-            var built = TeamcenterReview.Build(request, reference => {
+            var built = TeamcenterReview.Build(request, reference =>
+            {
                 if (!manifests.ContainsKey(reference)) throw new BridgeException("ArtifactChanged", "Retained manifest is missing.");
                 usedManifests.Add(reference); return ProjectReviewStore.ReadArtifact(artifactsRoot, manifests[reference]!.AsObject(), TeamcenterReview.ManifestLimit);
             });
@@ -69,12 +71,23 @@ public sealed class TeamcenterReviewStore(string artifactsRoot)
         if (JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length > 128 * 1024) throw new BridgeException("ArtifactCapacity", "Page exceeds 128 KiB; download the complete report.");
         return result;
     }
-    private JsonObject Reference(string hash, string extension) => new() { ["path"] = "teamcenter-reviews/" + hash + extension, ["sha256"] = hash };
+    private static JsonObject Reference(string hash, string extension) => new() { ["path"] = "teamcenter-reviews/" + hash + extension, ["sha256"] = hash };
     private JsonObject Publish(byte[] bytes, string extension, int limit) =>
         PackageStorage.PublishContent(artifactsRoot, "teamcenter-reviews", bytes, extension, limit, 512L << 20, "Observation");
-    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {
-        ["recordId"] = artifact["sha256"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["manifestArtifacts"] = record["manifests"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),
-        ["summary"] = record["report"]!["summary"]!.DeepClone(), ["nativeExecutable"] = false, ["nativeQualified"] = false,
-        ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["checkoutOwnershipVerified"] = false, ["fileBytesVerified"] = false, ["nativeCacheVerified"] = false,
-        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new()
+    {
+        ["recordId"] = artifact["sha256"]!.DeepClone(),
+        ["input"] = record["input"]!.DeepClone(),
+        ["manifestArtifacts"] = record["manifests"]!.DeepClone(),
+        ["reportArtifact"] = artifact.DeepClone(),
+        ["summary"] = record["report"]!["summary"]!.DeepClone(),
+        ["nativeExecutable"] = false,
+        ["nativeQualified"] = false,
+        ["sourceAuthenticityVerified"] = false,
+        ["liveFreshnessVerified"] = false,
+        ["checkoutOwnershipVerified"] = false,
+        ["fileBytesVerified"] = false,
+        ["nativeCacheVerified"] = false,
+        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy
+    };
 }

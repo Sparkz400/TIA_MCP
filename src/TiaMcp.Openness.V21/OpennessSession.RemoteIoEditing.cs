@@ -9,6 +9,7 @@ using Siemens.Engineering.HW;
 using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Blocks;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {
@@ -117,7 +118,7 @@ namespace TiaMcp.Openness.V21
             var plcs = DeviceItems(project, budget).Where(entry => entry.Path.StartsWith(device + "/items/", StringComparison.Ordinal))
                 .Select(entry => new { entry.Path, Software = entry.Item.GetService<SoftwareContainer>()?.Software as PlcSoftware }).Where(row => row.Software != null).Take(2).ToArray();
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "PLC lookup of the module's device is incomplete.");
-            var blocks = plcs.Length != 1 ? new BlockEntry[0] : AllBlocks(new PlcSelection { Project = project, Software = plcs[0].Software, Path = plcs[0].Path + "/plc/" + Segment(plcs[0].Software.Name) }, budget)
+            var blocks = plcs.Length != 1 ? Array.Empty<BlockEntry>() : AllBlocks(new PlcSelection { Project = project, Software = plcs[0].Software, Path = plcs[0].Path + "/plc/" + Segment(plcs[0].Software.Name) }, budget)
                 .Where(block => string.Equals(block.Item.Name, name, StringComparison.Ordinal)).Take(2).ToArray();
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Block lookup of the module's PLC is incomplete.");
             HardwareEngineeringRules.RequireInterruptOb(name, plcs.Length, blocks.Select(block => block.Item is OB ob ? ob.SecondaryType : null).ToArray());
@@ -261,11 +262,11 @@ namespace TiaMcp.Openness.V21
         {
             var list = payload["sharedSubmodules"];
             string owner = payload.Value<string>("addressControllerOwnerPath");
-            var leaving = shared && disconnect ? hardware.Where(row => row.Path.StartsWith(station + "/items/", StringComparison.Ordinal) && SharedTargetPath(row.Item, hardware) == owner).ToArray() : new HardwareEntry[0];
+            var leaving = shared && disconnect ? hardware.Where(row => row.Path.StartsWith(station + "/items/", StringComparison.Ordinal) && SharedTargetPath(row.Item, hardware) == owner).ToArray() : Array.Empty<HardwareEntry>();
             if (!shared || disconnect && leaving.Length == 0)
             {
                 if (list != null || payload["remainingOwnerPath"] != null) throw new BridgeException("InvalidRequest", "sharedSubmodules and remainingOwnerPath apply only to a sharedDevice connection, or to its disconnect while items are assigned to the leaving PLC.");
-                return new HardwareEntry[0];
+                return Array.Empty<HardwareEntry>();
             }
             if (disconnect && newOwner == null) throw new BridgeException("InvalidRequest", "Several other PLCs control the device; name the one that takes the leaving PLC's items in remainingOwnerPath.");
             if (!(list is JArray paths) || paths.Count == 0 || paths.Count > 64 || paths.Any(path => path.Type != JTokenType.String) || paths.Select(path => path.Value<string>()).Distinct(StringComparer.Ordinal).Count() != paths.Count)

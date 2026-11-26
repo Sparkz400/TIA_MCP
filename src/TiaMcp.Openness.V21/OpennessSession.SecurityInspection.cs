@@ -21,7 +21,7 @@ namespace TiaMcp.Openness.V21
     internal sealed partial class OpennessSession
     {
         private const string SecretPolicy = "Never reads or returns passwords, password hashes, secrets, tokens or private keys. Attributes whose names match password|credential|privatekey|secret|token are excluded by name; certificates are returned only as their re-encoded public DER.";
-        private static readonly (string Id, string Scope)[] NoRights = new (string, string)[0];
+        private static readonly (string Id, string Scope)[] NoRights = Array.Empty<(string, string)>();
 
         private JObject AccessInspect(JObject args)
         {
@@ -60,12 +60,12 @@ namespace TiaMcp.Openness.V21
                 foreach (CustomRole role in umac.CustomRoles)
                 {
                     roleNames["role:" + role.Identifier] = role.Name;
-                    if (!snapshot.Add("role:" + role.Identifier, id => AccessEntity(id, "role", null, RoleRights(role.AssignedEngineeringRights, role.GetAssignedDeviceFunctionRights), !lookup.Truncated, new string[0], true))) break;
+                    if (!snapshot.Add("role:" + role.Identifier, id => AccessEntity(id, "role", null, RoleRights(role.AssignedEngineeringRights, role.GetAssignedDeviceFunctionRights), !lookup.Truncated, Array.Empty<string>(), true))) break;
                 }
                 foreach (SystemRole role in umac.SystemRoles)
                 {
                     roleNames["role:" + role.Identifier] = role.Name;
-                    if (!snapshot.Add("role:" + role.Identifier, id => AccessEntity(id, "role", null, RoleRights(role.AssignedEngineeringRights, role.GetAssignedSystemDeviceFunctionRights), !lookup.Truncated, new string[0], true))) break;
+                    if (!snapshot.Add("role:" + role.Identifier, id => AccessEntity(id, "role", null, RoleRights(role.AssignedEngineeringRights, role.GetAssignedSystemDeviceFunctionRights), !lookup.Truncated, Array.Empty<string>(), true))) break;
                 }
                 projectUmac = new JObject { ["anonymousUserActive"] = anonymous == null ? null : SecurityValue(() => anonymous.IsActive) };
             }
@@ -98,11 +98,11 @@ namespace TiaMcp.Openness.V21
                     var web = new AccessSnapshot(budget, warnings, entry.Path);
                     if (full != null)
                         foreach (WebserverUser user in full.WebserverUsers)
-                            if (!web.Add("webUser:" + user.UserName, id => AccessEntity(id, "user", null, WebRights(user.Permissions, entry.Path), KnownWebRights(user.Permissions), new string[0], true))) break;
+                            if (!web.Add("webUser:" + user.UserName, id => AccessEntity(id, "user", null, WebRights(user.Permissions, entry.Path), KnownWebRights(user.Permissions), Array.Empty<string>(), true))) break;
                     if (simple != null)
                         foreach (SimpleWebserverUser user in simple.WebserverUsers)
                             if (!web.Add("webUser:" + user.UserName, id => AccessEntity(id, "user", user.Active,
-                                user.Permissions == SimpleWebserverUserPermissions.None ? NoRights : new[] { (user.Permissions.ToString(), entry.Path) }, true, new string[0], true))) break;
+                                user.Permissions == SimpleWebserverUserPermissions.None ? NoRights : new[] { (user.Permissions.ToString(), entry.Path) }, true, Array.Empty<string>(), true))) break;
                     row["legacyWeb"] = web.Observation("hardware", AccessIdentity("legacyWeb", entry.Path, "V21 Openness exposes no legacy web user-management version or security mode."));
                 }
                 catch (Exception error) { warnings.Add(SecurityWarning(entry.Path, error)); }

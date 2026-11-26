@@ -68,7 +68,7 @@ var interruptOff = new JObject { ["hardwarePath"] = module, ["channelNumber"] = 
 Check("disabling undeclares the OB link", "hardware_channel_attributes", interruptOff, Undeclared, true, rows => { Undeclared(rows); Linked(rows); });
 Check("disabling that keeps the OB link rejected", "hardware_channel_attributes", interruptOff, rows => rows[1]["channels"][0]["attributes"]["HardwareInterruptRisingEdgeActive"] = false, false, rows => { Undeclared(rows); Linked(rows); });
 foreach (var (label, plcs, types, code) in new[] { ("no PLC in the device", 0, new[] { "HardwareInterrupt" }, "UnsupportedCapability"), ("two PLCs", 2, new[] { "HardwareInterrupt" }, "UnsupportedCapability"),
-    ("missing block", 1, new string[0], "BlockNotFound"), ("ambiguous name", 1, new[] { "HardwareInterrupt", "HardwareInterrupt" }, "AmbiguousTarget"),
+    ("missing block", 1, Array.Empty<string>(), "BlockNotFound"), ("ambiguous name", 1, new[] { "HardwareInterrupt", "HardwareInterrupt" }, "AmbiguousTarget"),
     ("a non-OB block", 1, new string[] { null }, "InvalidRequest"), ("another OB event class", 1, new[] { "DiagnosticErrorInterrupt" }, "InvalidRequest") })
 {
     try { HardwareEngineeringRules.RequireInterruptOb("GapHardwareInterrupt", plcs, types); throw new Exception("Interrupt OB accepted: " + label); }
@@ -440,7 +440,7 @@ Check("MRP createDomain adding another domain rejected", "network_mrp_set", mrpC
 Check("MRP createDomain of an existing name rejected", "network_mrp_set", mrpCreate, rows => rows[2]["mrp"] = Mrp("Manager", "Ring"), false, rows => { MrpCaptured(rows); Domains(rows, "Ring"); });
 Check("MRP createDomain without captured domains rejected", "network_mrp_set", mrpCreate, rows => rows[2]["mrp"] = Mrp("Manager", "Ring"), false, MrpCaptured);
 // A port link joins two ring ports or two other ports; a role that would make one end a ring port and not the other is refused.
-HardwareEngineeringRules.RequireRingLinks(new (string, bool, string, bool)[0]);
+HardwareEngineeringRules.RequireRingLinks(Array.Empty<(string, bool, string, bool)>());
 HardwareEngineeringRules.RequireRingLinks(new[] { ("A/P1", true, "B/P2", true), ("A/P2", false, "C/P1", false) });
 count += 2;
 foreach (var (label, link) in new[] { ("a ring port linked to another port", ("A/P1", true, "B/P1", false)), ("leaving the ring while linked to a ring port", ("A/P1", false, "B/P1", true)) })
@@ -524,7 +524,7 @@ foreach (var (label, path, selector, name) in new[] { ("read-only attribute", ""
     try { HardwareEngineeringRules.RequireProfileWritable(profile, path, selector, new[] { name }); throw new Exception("Profile accepted " + label); }
     catch (BridgeException error) when (error.Code == "AttributeNotWritable") { count++; Console.WriteLine("PASS profile refuses " + label); }
 }
-if (HardwareEngineeringRules.ProfilePath(new string[0], "Di") != "" || HardwareEngineeringRules.ProfilePath(new[] { "Di", "PROFINET%20interface", "Port_1" }, "Di") != "items/{module}/items/PROFINET%20interface/items/Port_1")
+if (HardwareEngineeringRules.ProfilePath(Array.Empty<string>(), "Di") != "" || HardwareEngineeringRules.ProfilePath(new[] { "Di", "PROFINET%20interface", "Port_1" }, "Di") != "items/{module}/items/PROFINET%20interface/items/Port_1")
     throw new InvalidOperationException("Profile row paths differ.");
 count++; Console.WriteLine("PASS profile row paths name the module's own segment {module}");
 if (HardwareEngineeringRules.ProfileKey("OrderNumber:X/V1.0", "V9") != "OrderNumber:X/V1.0" || HardwareEngineeringRules.ProfileKey("System:Rail", null) != null || HardwareEngineeringRules.ProfileKey("GSD:F/D", "V1.0") != "GSD:F/D|V1.0")
@@ -639,7 +639,7 @@ Credential("truncated never-armed stream still proves it", new[] { Record("attem
 Credential("armed submission holds", new[] { Record("attemptPrepared"), Record("beforeSetPlcMasterSecret", true, true) }, "credentialOpened");
 Credential("opened credential holds", new[] { Record("attemptPrepared"), Record("openValidatedScratchCredential", true) }, "credentialOpened");
 Credential("torn record holds", new[] { Record("attemptPrepared"), "{\"phase\":\"beforeSetPl" }, "unreadable");
-Credential("empty stream holds", new string[0], "missing");
+Credential("empty stream holds", Array.Empty<string>(), "missing");
 Credential("missing flag holds", new[] { Record("attemptPrepared"), "{\"phase\":\"x\"}" }, "credentialOpened");
 foreach (var kind in new[] { "hmi_engineering", "hmi_text_list_import", "hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create", "hmi_dynamization_create", "hmi_event_handler_create", "hardware_attributes", "tag_set", "constant_set", "to_create", "to_parameters", "to_delete" })
     if (AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new InvalidOperationException("Target kind treated as recomputable: " + kind); else count++;
@@ -666,6 +666,8 @@ count += ChangeBatchChecks.Run();
 count += SafetyTagRenameChecks.Run();
 count += DriveObjectChecks.Run();
 count += SafetyDriveGuardChecks.Run();
+count += ChangeArgumentsChecks.Run();
+count += ProfileRowPathChecks.Run();
 // A project-wide setting compiles every device: one PLC's compile left the other PLC inconsistent and its fingerprint unavailable (sl2).
 foreach (var kind in new[] { "project_simulation_enable", "safety_import_xml", "safety_fparameter_set", "hardware_plug", "connection_create", "certificate_create", "opcua_server_settings_set", "network_mrp_set", "hardware_shared_device_access" })
     if (!CompileOnlyRules.CompilesEveryDevice(kind)) throw new InvalidOperationException("Device-compiled kind compiles one PLC: " + kind); else count++;

@@ -243,4 +243,6 @@ if __name__ == "__main__":
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
     args.runner = __file__
+    # Scratch only: since 20 November the Host refuses safety writes unless it is launched with --enable-safety-changes.
+    args.host_args = ("--enable-safety-changes",)
     Harness(args, "sl_", "safety.logic_changes: changed F-logic of an F-CPU 1511F-1 PN in PLCSIM Advanced V8", LIMITATIONS, []).run(body)

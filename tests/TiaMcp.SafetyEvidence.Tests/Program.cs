@@ -155,7 +155,7 @@ Refuse(() => Build(Changed(s => s["block"]!["path"] = plc + "Other/blocks/Main")
 Refuse(() => SafetyEvidenceReview.Parse(Encoding.UTF8.GetBytes("{\"nested\":{\"a\":1,\"a\":2}}")), "Nested duplicate field");
 Refuse(() => SafetyEvidenceReview.Parse(Encoding.UTF8.GetBytes(new string('[',33) + new string(']',33))), "Depth limit");
 foreach (string section in new[] { "programSignatures", "blockSignatures", "settings", "runtimeGroups" })
-    Refuse(() => Build(Changed(s => s[section] = new JsonArray(Enumerable.Range(0, section.EndsWith("Signatures") ? 129 : 4097).Select(i => (JsonNode)new JsonObject { ["type"] = i.ToString(CultureInfo.InvariantCulture), ["name"] = i.ToString(CultureInfo.InvariantCulture), ["value"] = 1UL }).ToArray()))), "Row bound " + section);
+    Refuse(() => Build(Changed(s => s[section] = new JsonArray(Enumerable.Range(0, section.EndsWith("Signatures", StringComparison.Ordinal) ? 129 : 4097).Select(i => (JsonNode)new JsonObject { ["type"] = i.ToString(CultureInfo.InvariantCulture), ["name"] = i.ToString(CultureInfo.InvariantCulture), ["value"] = 1UL }).ToArray()))), "Row bound " + section);
 var noBlock = Changed(s => { s.Remove("block"); s.Remove("blockSignatures"); s.Remove("blockSignatureServiceAvailable"); s["programSignatures"] = new JsonArray(); });
 var withoutBlock = SafetyEvidenceReview.Build(id, review, plc, Bytes(noBlock), Bytes(noBlock));
 Check((int)withoutBlock["summary"]!["changeCount"]! == 0 && (int)withoutBlock["summary"]!["issueCount"]! == 2, "Whole PLC capture with empty signatures remains incomplete evidence");

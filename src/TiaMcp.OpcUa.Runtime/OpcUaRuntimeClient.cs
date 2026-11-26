@@ -357,7 +357,7 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
     }
     public async ValueTask DisposeAsync() { await Close(); }
     private void ForgetPassword() { if (passwordBytes is not null) CryptographicOperations.ZeroMemory(passwordBytes); passwordBytes = null; }
-    private void CheckOutput(object value)
+    private static void CheckOutput(object value)
     {
         var bytes = JsonSerializer.SerializeToUtf8Bytes(value);
         // No password-echo scan: the password travels only inside the encrypted identity token, and a short one matched ordinary values.

@@ -52,12 +52,37 @@ public static class WebApplicationReview
         var archiveChanges = new JsonArray();
         foreach (string field in new[] { "sha256", "rootRelative", "defaultPage", "purpose", "unavailableReason" })
             if (!JsonNode.DeepEquals(before["archive"]![field], after["archive"]![field])) archiveChanges.Add(field);
-        return new JsonObject { ["schemaVersion"] = "web-application-review.v1", ["reviewId"] = reviewId, ["owner"] = owner.DeepClone(), ["selectedApplicationId"] = selected, ["afterKind"] = afterKind,
-            ["observations"] = new JsonArray(before, after), ["configurationChanges"] = configurationChanges, ["applicationChanges"] = applications, ["fileChanges"] = files, ["archiveChanges"] = archiveChanges,
-            ["summary"] = new JsonObject { ["filesComparable"] = comparable, ["fileComparisonState"] = comparable ? "comparedSuppliedRoots" : before["content"] is null || after["content"] is null ? "contentUnavailable" : "purposeChanged", ["changedFiles"] = files.Count(x => (string?)x?["status"] != "unchanged"), ["changedApplications"] = applications.Count(x => (string?)x?["status"] != "unchanged"), ["configurationChanges"] = configurationChanges.Count,
-                ["unavailableArchives"] = new[] { before, after }.Count(x => x["content"] is null), ["findings"] = before["findings"]!.AsArray().Count + after["findings"]!.AsArray().Count },
-            ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["associationVerified"] = false, ["siemensCompatibilityVerified"] = false, ["generatedBlocksVerified"] = false, ["deploymentVerified"] = false, ["endpointVerified"] = false,
-            ["limits"] = "Supplied configuration and public archive bytes only. Application IDs are caller-declared within the exact saved owner; missing rows do not authorize deletion. File add/remove describes the selected archive roots, not deployed files. Generation properties are opaque declarations, not validated target settings. No script execution, browser rendering, network, block generation, import, native configuration or deployment. ZIP/script content is retained untrusted and never certified safe." };
+        return new JsonObject
+        {
+            ["schemaVersion"] = "web-application-review.v1",
+            ["reviewId"] = reviewId,
+            ["owner"] = owner.DeepClone(),
+            ["selectedApplicationId"] = selected,
+            ["afterKind"] = afterKind,
+            ["observations"] = new JsonArray(before, after),
+            ["configurationChanges"] = configurationChanges,
+            ["applicationChanges"] = applications,
+            ["fileChanges"] = files,
+            ["archiveChanges"] = archiveChanges,
+            ["summary"] = new JsonObject
+            {
+                ["filesComparable"] = comparable,
+                ["fileComparisonState"] = comparable ? "comparedSuppliedRoots" : before["content"] is null || after["content"] is null ? "contentUnavailable" : "purposeChanged",
+                ["changedFiles"] = files.Count(x => (string?)x?["status"] != "unchanged"),
+                ["changedApplications"] = applications.Count(x => (string?)x?["status"] != "unchanged"),
+                ["configurationChanges"] = configurationChanges.Count,
+                ["unavailableArchives"] = new[] { before, after }.Count(x => x["content"] is null),
+                ["findings"] = before["findings"]!.AsArray().Count + after["findings"]!.AsArray().Count
+            },
+            ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["associationVerified"] = false,
+            ["siemensCompatibilityVerified"] = false,
+            ["generatedBlocksVerified"] = false,
+            ["deploymentVerified"] = false,
+            ["endpointVerified"] = false,
+            ["limits"] = "Supplied configuration and public archive bytes only. Application IDs are caller-declared within the exact saved owner; missing rows do not authorize deletion. File add/remove describes the selected archive roots, not deployed files. Generation properties are opaque declarations, not validated target settings. No script execution, browser rendering, network, block generation, import, native configuration or deployment. ZIP/script content is retained untrusted and never certified safe."
+        };
     }
     private static JsonObject Phase(JsonObject phase, string name, string selected)
     {

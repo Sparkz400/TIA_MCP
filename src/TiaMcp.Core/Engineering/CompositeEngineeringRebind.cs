@@ -53,15 +53,34 @@ internal static class CompositeEngineeringRebind
                 else if (channelIndex is not null) payload["channelIndex"] = channelIndex;
                 change = new JsonObject { ["kind"] = "to_connect", ["payload"] = payload };
             }
-            entries.Add(new JsonObject { ["technologyRecordRef"] = record, ["technologyPath"] = path, ["relationshipId"] = id, ["role"] = role, ["beforeTargetPath"] = target,
-                ["afterState"] = afterState, ["replacementHardwarePaths"] = new JsonArray(paths.Select(p => (JsonNode)p).ToArray()),
+            entries.Add(new JsonObject
+            {
+                ["technologyRecordRef"] = record,
+                ["technologyPath"] = path,
+                ["relationshipId"] = id,
+                ["role"] = role,
+                ["beforeTargetPath"] = target,
+                ["afterState"] = afterState,
+                ["replacementHardwarePaths"] = new JsonArray(paths.Select(p => (JsonNode)p).ToArray()),
                 ["correspondenceIds"] = new JsonArray(candidates.Select(c => c.Id).Distinct(StringComparer.Ordinal).Select(c => (JsonNode)c).ToArray()),
-                ["selectorCarriedOver"] = channel is not null || channelIndex is not null, ["state"] = state, ["change"] = change });
+                ["selectorCarriedOver"] = channel is not null || channelIndex is not null,
+                ["state"] = state,
+                ["change"] = change
+            });
         }
-        return new JsonObject { ["schemaVersion"] = "composite-engineering-rebind-plan.v1", ["recordRef"] = recordRef, ["toConnectAvailable"] = toConnectAvailable,
-            ["brokenConnectionCount"] = broken, ["notCapturedAfterCount"] = uncovered, ["truncated"] = broken > MaxEntries, ["entries"] = entries,
-            ["applied"] = false, ["nativeVerified"] = false,
-            ["limits"] = "Output only; nothing is prepared or applied. Breakage is the after-phase TO relationship being missing, disconnected, unknown or unresolved; replacements come only from declared correspondences. A carried-over channel or channel index is the before selector on the replacement, not a verified equivalent. Each change must still pass change_prepare/apply with its own preview, checkpoint and compile." };
+        return new JsonObject
+        {
+            ["schemaVersion"] = "composite-engineering-rebind-plan.v1",
+            ["recordRef"] = recordRef,
+            ["toConnectAvailable"] = toConnectAvailable,
+            ["brokenConnectionCount"] = broken,
+            ["notCapturedAfterCount"] = uncovered,
+            ["truncated"] = broken > MaxEntries,
+            ["entries"] = entries,
+            ["applied"] = false,
+            ["nativeVerified"] = false,
+            ["limits"] = "Output only; nothing is prepared or applied. Breakage is the after-phase TO relationship being missing, disconnected, unknown or unresolved; replacements come only from declared correspondences. A carried-over channel or channel index is the before selector on the replacement, not a verified equivalent. Each change must still pass change_prepare/apply with its own preview, checkpoint and compile."
+        };
     }
 
     private static string? Text(JsonNode? node) => node is JsonValue value && value.TryGetValue<string>(out string? text) ? text : null;

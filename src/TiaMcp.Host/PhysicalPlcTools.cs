@@ -29,8 +29,15 @@ public sealed class PhysicalPlcTools(IBridgeClient bridge, HostOptions options)
     [Description("Upload the station of a real PLC at expectedAddress into a new project under the host's uploads artifacts, in an empty worker-owned instance (project_close or tia_start first). Never uploads into an open project; writes nothing to the PLC. Route, TLS and login rules as plc_physical_online_compare; missing products are reported, not uploaded." + Unqualified)]
     public Task<CallToolResult> StationUpload(string pcInterface, string expectedAddress, CancellationToken cancellationToken, int pcInterfaceNumber = 1, string mode = "PN/IE",
         string? trustedCertificateSha256 = null)
-        => Call("plc_physical_station_upload", new { pcInterface, pcInterfaceNumber, mode, expectedAddress, trustedCertificateSha256,
-            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "uploads") }, cancellationToken);
+        => Call("plc_physical_station_upload", new
+        {
+            pcInterface,
+            pcInterfaceNumber,
+            mode,
+            expectedAddress,
+            trustedCertificateSha256,
+            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "uploads")
+        }, cancellationToken);
 
     [McpServerTool(Name = "plc_physical_download", Destructive = true, OpenWorld = true)]
     [Description("Download the selected PLC's software (softwareScope changes or all; hardware:true adds the hardware configuration) to a REAL PLC. This can stop the PLC and move the machine: confirm a safe state first. Requires acknowledgeLiveTarget:true, expectedPlcName, the route as in plc_physical_online_compare and a saved project. A stop needs acknowledgeStop, a DB reinitialization also acknowledgeReinitialize; any other question, password or login stops it. Notes: docs/reference/tool-notes.md." + Unqualified)]
@@ -40,8 +47,24 @@ public sealed class PhysicalPlcTools(IBridgeClient bridge, HostOptions options)
         string? trustedCertificateSha256 = null)
     {
         if (softwareScope is not ("changes" or "all")) throw new McpException("softwareScope must be changes or all.");
-        return Call("plc_physical_download", new { projectName, plcPath, pcInterface, pcInterfaceNumber, targetInterface, mode, expectedAddress, expectedPlcName,
-            acknowledgeLiveTarget, softwareScope, hardware, acknowledgeStop, acknowledgeReinitialize, startAfterDownload, trustedCertificateSha256 }, cancellationToken);
+        return Call("plc_physical_download", new
+        {
+            projectName,
+            plcPath,
+            pcInterface,
+            pcInterfaceNumber,
+            targetInterface,
+            mode,
+            expectedAddress,
+            expectedPlcName,
+            acknowledgeLiveTarget,
+            softwareScope,
+            hardware,
+            acknowledgeStop,
+            acknowledgeReinitialize,
+            startAfterDownload,
+            trustedCertificateSha256
+        }, cancellationToken);
     }
 
     private async Task<CallToolResult> Call(string operation, object? arguments, CancellationToken cancellationToken)

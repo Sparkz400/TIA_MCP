@@ -79,20 +79,40 @@ public sealed class CompositeEngineeringWorkflowStore
         var record = Load(recordRef, reverify: offset == 0); var report = JsonNode.Parse(record.Report)!.AsObject();
         bool consumers = section is "consumerContexts" or "consumerCoverage" || section.Contains("Consumer", StringComparison.Ordinal);
         Require(!consumers || report["consumerContexts"] is JsonArray, "CompositeInvalidSection", "Consumer context sections require a retained v2 or v3 request; v1 records keep their original evaluation.");
-        var source = (section switch {
-            "beforeComponents" => report["contexts"]!["before"]!["components"], "afterComponents" => report["contexts"]!["after"]!["components"],
-            "amlChanges" => report["amlComparison"]!["changes"], "beforeAmlImpacts" => report["amlComparison"]!["beforeImpacts"],
+        var source = (section switch
+        {
+            "beforeComponents" => report["contexts"]!["before"]!["components"],
+            "afterComponents" => report["contexts"]!["after"]!["components"],
+            "amlChanges" => report["amlComparison"]!["changes"],
+            "beforeAmlImpacts" => report["amlComparison"]!["beforeImpacts"],
             "afterAmlImpacts" => report["amlComparison"]!["afterImpacts"],
             "consumerCoverage" => new JsonArray(report["consumerContexts"]!.AsArray().Select(c => (JsonNode)new JsonObject { ["phase"] = c!["phase"]!.DeepClone(), ["coverage"] = c["coverage"]!.DeepClone() }).ToArray()),
-            "beforeConsumerRoots" => report["consumerContexts"]![0]!["rootBindings"], "afterConsumerRoots" => report["consumerContexts"]![1]!["rootBindings"],
-            "beforeConsumerAssociations" => report["consumerContexts"]![0]!["associations"], "afterConsumerAssociations" => report["consumerContexts"]![1]!["associations"],
-            "beforeConsumerSavedLinks" => report["consumerContexts"]![0]!["savedLinks"], "afterConsumerSavedLinks" => report["consumerContexts"]![1]!["savedLinks"],
-            "beforeConsumerCandidates" => report["consumerContexts"]![0]!["candidates"], "afterConsumerCandidates" => report["consumerContexts"]![1]!["candidates"],
-            _ => report[section] })!.AsArray();
+            "beforeConsumerRoots" => report["consumerContexts"]![0]!["rootBindings"],
+            "afterConsumerRoots" => report["consumerContexts"]![1]!["rootBindings"],
+            "beforeConsumerAssociations" => report["consumerContexts"]![0]!["associations"],
+            "afterConsumerAssociations" => report["consumerContexts"]![1]!["associations"],
+            "beforeConsumerSavedLinks" => report["consumerContexts"]![0]!["savedLinks"],
+            "afterConsumerSavedLinks" => report["consumerContexts"]![1]!["savedLinks"],
+            "beforeConsumerCandidates" => report["consumerContexts"]![0]!["candidates"],
+            "afterConsumerCandidates" => report["consumerContexts"]![1]!["candidates"],
+            _ => report[section]
+        })!.AsArray();
         Require(offset <= source.Count, "CompositePageLimit", "Offset exceeds this report array.");
         var (rows, next) = ReportPageRows.Read(source, offset, count, PageBytes - 4096, "Row exceeds page budget; download report.json.");
-        var result = new { recordRef, reportSha256 = record.Receipt.Artifacts[1].Sha256, section, offset, total = source.Count,
-            rows, nextOffset = next == source.Count ? (int?)null : next, totalItems = source.Count, pageCount = PageTotals.PageCount(source.Count, count), nativeQualified = false, wholeImpactAnalysisComplete = false };
+        var result = new
+        {
+            recordRef,
+            reportSha256 = record.Receipt.Artifacts[1].Sha256,
+            section,
+            offset,
+            total = source.Count,
+            rows,
+            nextOffset = next == source.Count ? (int?)null : next,
+            totalItems = source.Count,
+            pageCount = PageTotals.PageCount(source.Count, count),
+            nativeQualified = false,
+            wholeImpactAnalysisComplete = false
+        };
         Require(JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length <= PageBytes, "CompositePageLimit", "Page exceeds 128 KiB; reduce count or download the report.");
         return result;
     }
@@ -105,8 +125,20 @@ public sealed class CompositeEngineeringWorkflowStore
         byte[] bytes = name switch { "request.json" => record.Request, "report.json" => record.Report, _ => record.ReceiptData };
         Require(offset <= bytes.Length, "CompositePageLimit", "Offset exceeds the selected artifact.");
         int length = (int)Math.Min(count, bytes.Length - offset);
-        return new { recordRef, name, sha256 = Hash(bytes), bytes = bytes.Length, offset, count = length, nextOffset = offset + length,
-            complete = offset + length == bytes.Length, encoding = "base64", data = Convert.ToBase64String(bytes, (int)offset, length), nativeQualified = false };
+        return new
+        {
+            recordRef,
+            name,
+            sha256 = Hash(bytes),
+            bytes = bytes.Length,
+            offset,
+            count = length,
+            nextOffset = offset + length,
+            complete = offset + length == bytes.Length,
+            encoding = "base64",
+            data = Convert.ToBase64String(bytes, (int)offset, length),
+            nativeQualified = false
+        };
     }
 
     public object List(int offset = 0, int count = 20)
@@ -128,8 +160,16 @@ public sealed class CompositeEngineeringWorkflowStore
             { state = "verificationFailed"; errorCode = e is BridgeException b ? b.Code : "CompositeVerificationFailed"; }
             return new { id, recordRef = reference, state, errorCode };
         }).ToArray();
-        return new { rows, total = directories.Length, nextOffset = offset + rows.Length == directories.Length ? (int?)null : offset + rows.Length, totalItems = directories.Length, pageCount = PageTotals.PageCount(directories.Length, count),
-            ordering = "record-id; relist after additions", nativeQualified = false };
+        return new
+        {
+            rows,
+            total = directories.Length,
+            nextOffset = offset + rows.Length == directories.Length ? (int?)null : offset + rows.Length,
+            totalItems = directories.Length,
+            pageCount = PageTotals.PageCount(directories.Length, count),
+            ordering = "record-id; relist after additions",
+            nativeQualified = false
+        };
     }
 
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> Derived = new(StringComparer.Ordinal);
@@ -172,11 +212,24 @@ public sealed class CompositeEngineeringWorkflowStore
     {
         var report = JsonNode.Parse(record.Report)!.AsObject();
         var counts = report.Where(p => p.Value is JsonArray).ToDictionary(p => p.Key, p => ((JsonArray)p.Value!).Count);
-        return new { recordRef = record.Reference, state = "complete", requestSha256 = record.Receipt.Artifacts[0].Sha256,
-            reportSha256 = record.Receipt.Artifacts[1].Sha256, beforeReviewId = (string)report["contexts"]!["before"]!["reviewId"]!,
-            afterReviewId = (string)report["contexts"]!["after"]!["reviewId"]!, sourceBytesChanged = (bool)report["amlComparison"]!["sourceBytesChanged"]!,
-            counts, artifacts = record.Receipt.Artifacts, receiptName = "receipt.json", nativeExecutable = false, nativeQualified = false,
-            sourceAuthenticityVerified = false, liveFreshnessVerified = false, wholeImpactAnalysisComplete = false };
+        return new
+        {
+            recordRef = record.Reference,
+            state = "complete",
+            requestSha256 = record.Receipt.Artifacts[0].Sha256,
+            reportSha256 = record.Receipt.Artifacts[1].Sha256,
+            beforeReviewId = (string)report["contexts"]!["before"]!["reviewId"]!,
+            afterReviewId = (string)report["contexts"]!["after"]!["reviewId"]!,
+            sourceBytesChanged = (bool)report["amlComparison"]!["sourceBytesChanged"]!,
+            counts,
+            artifacts = record.Receipt.Artifacts,
+            receiptName = "receipt.json",
+            nativeExecutable = false,
+            nativeQualified = false,
+            sourceAuthenticityVerified = false,
+            liveFreshnessVerified = false,
+            wholeImpactAnalysisComplete = false
+        };
     }
 
     private void Inventory(long additionalBytes = 0, int additionalEntries = 0, int additionalRecords = 0)

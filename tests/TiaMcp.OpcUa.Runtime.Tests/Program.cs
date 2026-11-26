@@ -440,7 +440,7 @@ finally
         realLoopbackServer = true, physicalQualified = false, writesExposed = false, nativeStarted = false,
         processId = Environment.ProcessId, processBirthUtc = Process.GetCurrentProcess().StartTime.ToUniversalTime(),
         binaries = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location) &&
-            (a.GetName().Name!.StartsWith("TiaMcp") || a.GetName().Name!.StartsWith("Opc.Ua"))).Select(a => new {
+            (a.GetName().Name!.StartsWith("TiaMcp", StringComparison.Ordinal) || a.GetName().Name!.StartsWith("Opc.Ua", StringComparison.Ordinal))).Select(a => new {
                 name = a.GetName().Name, path = a.Location, sha256 = Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(a.Location))) }) });
 }
 Console.WriteLine($"OPC UA qualification passed: {checks.Count} checks.");

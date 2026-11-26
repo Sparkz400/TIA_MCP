@@ -52,19 +52,34 @@ internal static class TraceCsvReader
                 string value = fields[c.Index];
                 if (missing.Contains(value)) { values[c.Id] = null; continue; }
                 if (D.Text(signals[c.Id], "datatype").Equals("Bool", StringComparison.OrdinalIgnoreCase))
-                    values[c.Id] = value switch { "1" or "true" or "TRUE" => true, "0" or "false" or "FALSE" => false,
-                        _ => throw new BridgeException("MeasurementFormatUnsupported", "Bool CSV value must be 0/1 or true/false, not an inferred numeric conversion.") };
+                    values[c.Id] = value switch
+                    {
+                        "1" or "true" or "TRUE" => true,
+                        "0" or "false" or "FALSE" => false,
+                        _ => throw new BridgeException("MeasurementFormatUnsupported", "Bool CSV value must be 0/1 or true/false, not an inferred numeric conversion.")
+                    };
                 else values[c.Id] = Number(value, separator);
             }
             samples.Add(new JsonObject { ["time"] = Number(fields[timeColumn], separator), ["values"] = values });
             if (samples.Count > 10000) throw new BridgeException("ArtifactCapacity", "CSV import exceeds 10000 samples; split explicitly without losing lineage.");
         }
-        return new JsonObject { ["schemaVersion"] = "trace-measurement.v1", ["tracePlanId"] = tracePlanId, ["reviewId"] = plan["reviewId"]!.DeepClone(),
-            ["mode"] = D.Required(options, "mode", 40), ["timeUnit"] = D.Required(options, "timeUnit", 16), ["clock"] = D.Required(options, "clock", 512),
-            ["programIdentity"] = D.Required(options, "programIdentity", 2000), ["quality"] = options["quality"]?.DeepClone(),
-            ["settingsReadbackEvidence"] = options["settingsReadbackEvidence"]?.DeepClone(), ["units"] = units, ["samples"] = samples,
-            ["originalArtifact"] = original.DeepClone(), ["conversion"] = "Explicit UTF-8 CSV column mapping; delimiters/decimal mark/units/clock supplied by caller. No vendor dialect or native quality qualification.",
-            ["csvMapping"] = options.DeepClone() };
+        return new JsonObject
+        {
+            ["schemaVersion"] = "trace-measurement.v1",
+            ["tracePlanId"] = tracePlanId,
+            ["reviewId"] = plan["reviewId"]!.DeepClone(),
+            ["mode"] = D.Required(options, "mode", 40),
+            ["timeUnit"] = D.Required(options, "timeUnit", 16),
+            ["clock"] = D.Required(options, "clock", 512),
+            ["programIdentity"] = D.Required(options, "programIdentity", 2000),
+            ["quality"] = options["quality"]?.DeepClone(),
+            ["settingsReadbackEvidence"] = options["settingsReadbackEvidence"]?.DeepClone(),
+            ["units"] = units,
+            ["samples"] = samples,
+            ["originalArtifact"] = original.DeepClone(),
+            ["conversion"] = "Explicit UTF-8 CSV column mapping; delimiters/decimal mark/units/clock supplied by caller. No vendor dialect or native quality qualification.",
+            ["csvMapping"] = options.DeepClone()
+        };
     }
     private static decimal Number(string value, string separator)
     {

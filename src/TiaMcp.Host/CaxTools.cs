@@ -26,8 +26,14 @@ public sealed partial class TiaTools
         catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException or JsonException or InvalidOperationException)
         {
             // The native export and its hashes stay valid; only the store publication failed.
-            json["automationml"] = new JsonObject { ["error"] = new JsonObject { ["code"] = (error as BridgeException)?.Code ?? "AutomationMlWorkflowFailed",
-                ["message"] = error is BridgeException ? error.Message : "AutomationML publication failed. The native export is retained." } };
+            json["automationml"] = new JsonObject
+            {
+                ["error"] = new JsonObject
+                {
+                    ["code"] = (error as BridgeException)?.Code ?? "AutomationMlWorkflowFailed",
+                    ["message"] = error is BridgeException ? error.Message : "AutomationML publication failed. The native export is retained."
+                }
+            };
         }
         return Result(json.ToJsonString(BridgeProtocol.Json), false);
     }

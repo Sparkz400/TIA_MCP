@@ -10,19 +10,33 @@ public static class WatchTableAuthoring
 {
     public const int MaxSteps = 128;
     public const int MaxRows = 256;
-    private static string DisplayFormat(string datatype) => datatype.ToUpperInvariant() switch {
-        "BOOL" => "Bool", "BYTE" or "WORD" or "DWORD" or "LWORD" => "Hex",
-        "SINT" or "INT" or "DINT" or "LINT" => "DEC_signed", "USINT" or "UINT" or "UDINT" or "ULINT" => "DEC_unsigned",
-        "REAL" or "LREAL" => "Float", "TIME" or "LTIME" => "Time", "CHAR" => "Character", "WCHAR" => "Unicode_character",
-        "DATE" => "Date", "TIME_OF_DAY" => "TIME_OF_DAY",
-        _ => throw new BridgeException("UnsupportedProfile", "No explicit native display-format profile for this scalar type.") };
+    private static string DisplayFormat(string datatype) => datatype.ToUpperInvariant() switch
+    {
+        "BOOL" => "Bool",
+        "BYTE" or "WORD" or "DWORD" or "LWORD" => "Hex",
+        "SINT" or "INT" or "DINT" or "LINT" => "DEC_signed",
+        "USINT" or "UINT" or "UDINT" or "ULINT" => "DEC_unsigned",
+        "REAL" or "LREAL" => "Float",
+        "TIME" or "LTIME" => "Time",
+        "CHAR" => "Character",
+        "WCHAR" => "Unicode_character",
+        "DATE" => "Date",
+        "TIME_OF_DAY" => "TIME_OF_DAY",
+        _ => throw new BridgeException("UnsupportedProfile", "No explicit native display-format profile for this scalar type.")
+    };
     public static JsonObject Rows(WatchTableDocument document) => new()
     {
         ["name"] = document.Name,
-        ["rows"] = new JsonArray(Enumerable.Range(0, document.Count).Select(i => (JsonNode)new JsonObject {
-            ["ordinal"] = i, ["kind"] = document.RowKind(i), ["name"] = document.Field(i, "Name"),
-            ["address"] = document.Field(i, "Address"), ["displayFormat"] = document.Field(i, "DisplayFormat"),
-            ["modifyValue"] = document.Field(i, "ModifyValue"), ["comments"] = JsonSerializer.SerializeToNode(document.Comments(i)) }).ToArray())
+        ["rows"] = new JsonArray(Enumerable.Range(0, document.Count).Select(i => (JsonNode)new JsonObject
+        {
+            ["ordinal"] = i,
+            ["kind"] = document.RowKind(i),
+            ["name"] = document.Field(i, "Name"),
+            ["address"] = document.Field(i, "Address"),
+            ["displayFormat"] = document.Field(i, "DisplayFormat"),
+            ["modifyValue"] = document.Field(i, "ModifyValue"),
+            ["comments"] = JsonSerializer.SerializeToNode(document.Comments(i))
+        }).ToArray())
     };
 
     public static JsonObject Edit(WatchTableDocument document, WatchTableDocument template, JsonObject plan,
@@ -39,10 +53,14 @@ public static class WatchTableAuthoring
         {
             if (raw is not JsonObject step) throw new BridgeException("InvalidRequest", "Each step must be an object.");
             string kind = Required(step, "kind");
-            var allowed = kind switch {
+            var allowed = kind switch
+            {
                 "add" => new[] { "kind", "candidateId", "templateOrdinal", "insertAt", "comments" },
-                "remove" => ["kind", "ordinal"], "reorder" => ["kind", "order"], "comment" => ["kind", "ordinal", "comments"],
-                _ => throw new BridgeException("InvalidRequest", "Step must be add, remove, reorder or comment.") };
+                "remove" => ["kind", "ordinal"],
+                "reorder" => ["kind", "order"],
+                "comment" => ["kind", "ordinal", "comments"],
+                _ => throw new BridgeException("InvalidRequest", "Step must be add, remove, reorder or comment.")
+            };
             if (step.Any(p => !allowed.Contains(p.Key))) throw new BridgeException("InvalidRequest", "Unknown authoring step field.");
             var before = Rows(document);
             int ordinal = step["ordinal"]?.GetValue<int>() ?? -1;
@@ -104,8 +122,14 @@ public static class WatchTableAuthoring
         }
         // Reparse to enforce the byte/depth/ID budgets after all changes.
         _ = new WatchTableDocument(document.ToBytes());
-        return new JsonObject { ["before"] = original, ["after"] = Rows(document), ["steps"] = changes,
-            ["documentIdMapping"] = mapping, ["requiredProfiles"] = new JsonArray(profiles.Order(StringComparer.Ordinal).Select(p => (JsonNode?)JsonValue.Create(p)).ToArray()) };
+        return new JsonObject
+        {
+            ["before"] = original,
+            ["after"] = Rows(document),
+            ["steps"] = changes,
+            ["documentIdMapping"] = mapping,
+            ["requiredProfiles"] = new JsonArray(profiles.Order(StringComparer.Ordinal).Select(p => (JsonNode?)JsonValue.Create(p)).ToArray())
+        };
     }
     private static string Required(JsonObject value, string key) => value[key]?.GetValue<string>() ?? throw new BridgeException("InvalidRequest", key + " is required.");
 }
@@ -127,8 +151,13 @@ internal static class WatchTableNativeTemplate
 /// <summary>Production admission is explicit per mutation profile. Managed tests cannot promote native qualification.</summary>
 public static class WatchMutationProfiles
 {
-    public static JsonObject Status(string profile) => new() { ["profile"] = profile, ["nativeVerified"] = false,
-        ["productionApplyEnabled"] = false, ["requiredEvidence"] = "Exact delta, typed/XML readback, unchanged peers, saved fresh reopen, checkpoint recovery and fresh recovered reopen on the exact target profile." };
+    public static JsonObject Status(string profile) => new()
+    {
+        ["profile"] = profile,
+        ["nativeVerified"] = false,
+        ["productionApplyEnabled"] = false,
+        ["requiredEvidence"] = "Exact delta, typed/XML readback, unchanged peers, saved fresh reopen, checkpoint recovery and fresh recovered reopen on the exact target profile."
+    };
 
     public static void RequireVerified(JsonArray profiles, bool qualificationHarness)
     {

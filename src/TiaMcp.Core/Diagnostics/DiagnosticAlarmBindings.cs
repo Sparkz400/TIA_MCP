@@ -14,11 +14,21 @@ internal static class DiagnosticAlarmBindings
         if (value is not JsonArray selectors || selectors.Count is < 1 or > 16)
             throw new BridgeException("InvalidRequest", "alarmBindings requires 1..16 explicit operand selections.");
         var rows = new JsonArray(); var ids = new HashSet<string>(StringComparer.Ordinal);
-        var result = new JsonObject { ["schemaVersion"] = "diagnostic-alarm-bindings.v1", ["reviewId"] = alarm["reviewId"]!.DeepClone(),
-            ["alarmSelector"] = alarm["selector"]!.DeepClone(), ["selectors"] = selectors.DeepClone(), ["bindings"] = rows,
-            ["allSelectedMatched"] = false, ["sourceAuthenticityVerified"] = false, ["nativeQualified"] = false,
-            ["runtimeAlarmAssociationVerified"] = false, ["coverageComplete"] = false, ["maxBytes"] = MaxBytes,
-            ["policy"] = "Normalized supplied alarm operands and declared relationship paths, independently checked against saved executable source. Matching declarations do not prove alarm generation, runtime invocation, causality or complete consumers." };
+        var result = new JsonObject
+        {
+            ["schemaVersion"] = "diagnostic-alarm-bindings.v1",
+            ["reviewId"] = alarm["reviewId"]!.DeepClone(),
+            ["alarmSelector"] = alarm["selector"]!.DeepClone(),
+            ["selectors"] = selectors.DeepClone(),
+            ["bindings"] = rows,
+            ["allSelectedMatched"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["nativeQualified"] = false,
+            ["runtimeAlarmAssociationVerified"] = false,
+            ["coverageComplete"] = false,
+            ["maxBytes"] = MaxBytes,
+            ["policy"] = "Normalized supplied alarm operands and declared relationship paths, independently checked against saved executable source. Matching declarations do not prove alarm generation, runtime invocation, causality or complete consumers."
+        };
         foreach (var item in selectors)
         {
             var selector = ExactObject(item, "id", "signalId", "operand", "edgeIndices");
@@ -39,10 +49,22 @@ internal static class DiagnosticAlarmBindings
             if (selectedSignals.Length != 1) throw new BridgeException("InvalidRequest", "Select exactly one existing diagnostic signal by ID.");
             if (!ExactEndpoint(source, endpoint) || !source.Nodes.TryGetValue(path, out var node))
                 throw new BridgeException("InvalidRequest", "Operand selection must match an exact nonvirtual saved node and path.");
-            var edges = new JsonArray(edgeIndices.Select(i => (JsonNode?)new JsonObject { ["index"] = i,
-                ["edge"] = source.Review["model"]!["edges"]![i]!.DeepClone() }).ToArray());
-            var row = new JsonObject { ["id"] = id, ["signalId"] = signalId, ["operand"] = node.DeepClone(), ["relationships"] = edges,
-                ["signal"] = selectedSignals[0].DeepClone(), ["status"] = "observationUnavailable", ["declaration"] = null, ["storage"] = null };
+            var edges = new JsonArray(edgeIndices.Select(i => (JsonNode?)new JsonObject
+            {
+                ["index"] = i,
+                ["edge"] = source.Review["model"]!["edges"]![i]!.DeepClone()
+            }).ToArray());
+            var row = new JsonObject
+            {
+                ["id"] = id,
+                ["signalId"] = signalId,
+                ["operand"] = node.DeepClone(),
+                ["relationships"] = edges,
+                ["signal"] = selectedSignals[0].DeepClone(),
+                ["status"] = "observationUnavailable",
+                ["declaration"] = null,
+                ["storage"] = null
+            };
             rows.Add(row);
             row["status"] = Evaluate(source, alarm, instance, selectedSignals[0], node, edges, row);
             if (Encoding.UTF8.GetByteCount(result.ToJsonString(BridgeProtocol.Json)) > MaxBytes)

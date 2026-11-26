@@ -453,10 +453,17 @@ public sealed class EngineeringOperationStore
             Fail("JournalInvalid", "Missing durable checkpoint/evidence collections.");
         string[] allowed = previous?.State switch
         {
-            null => ["prepared"], "prepared" => ["acquired", "stopped"], "acquired" => ["checkpointIntent", "stopped", "outcomeUnknown"],
-            "checkpointIntent" => ["ready", "outcomeUnknown", "reconciled"], "ready" => ["dispatchIntent", "reconciled", "recoveryIntent", "outcomeUnknown"],
+            null => ["prepared"],
+            "prepared" => ["acquired", "stopped"],
+            "acquired" => ["checkpointIntent", "stopped", "outcomeUnknown"],
+            "checkpointIntent" => ["ready", "outcomeUnknown", "reconciled"],
+            "ready" => ["dispatchIntent", "reconciled", "recoveryIntent", "outcomeUnknown"],
             "dispatchIntent" => ["dispatchIntent", "succeeded", "recoveryRequired", "outcomeUnknown", "reconciled"],
-            "outcomeUnknown" => ["reconciled", "recoveryIntent", "outcomeUnknown"], "recoveryRequired" => ["reconciled", "recoveryIntent"], "succeeded" => ["recoveryIntent"], "recoveryIntent" => ["reconciled", "outcomeUnknown", "recoveryIntent"], _ => []
+            "outcomeUnknown" => ["reconciled", "recoveryIntent", "outcomeUnknown"],
+            "recoveryRequired" => ["reconciled", "recoveryIntent"],
+            "succeeded" => ["recoveryIntent"],
+            "recoveryIntent" => ["reconciled", "outcomeUnknown", "recoveryIntent"],
+            _ => []
         };
         if (!allowed.Contains(current.State)) Fail("JournalInvalid", "An impossible persisted state transition cannot release ownership.");
         if (previous?.State == "succeeded" && current.Plan.Credentials is not null)
@@ -527,7 +534,7 @@ public sealed class EngineeringOperationStore
         if (current.State == "reconciled") ValidateReconciliation(current, previous!.Revision, current.Reconciliation!, current.RecoveryDestinations!, current.RecoveryResolutions!, live);
     }
 
-    private void Write(EngineeringOperationRecord record, string folder)
+    private static void Write(EngineeringOperationRecord record, string folder)
     {
         string path = PackageStorage.Under(folder, record.Revision.ToString("D6", CultureInfo.InvariantCulture) + ".json");
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(record, BridgeProtocol.Json);

@@ -20,8 +20,13 @@ public sealed partial class WatchTableDispatcher
                 throw new BridgeException("InvalidRequest", "Names must be 1..128 characters without control characters.");
         if (operation.StartsWith("rename", StringComparison.Ordinal) != (newName is not null) || newName == name)
             throw new BridgeException("InvalidRequest", "Rename requires a different newName; other operations take none.");
-        var selector = new JsonObject { ["projectName"] = args["projectName"]?.DeepClone(), ["plcPath"] = args["plcPath"]?.DeepClone(),
-            ["group"] = args["group"]?.GetValue<string>() ?? "root", ["targetKind"] = "watchTableGroup" };
+        var selector = new JsonObject
+        {
+            ["projectName"] = args["projectName"]?.DeepClone(),
+            ["plcPath"] = args["plcPath"]?.DeepClone(),
+            ["group"] = args["group"]?.GetValue<string>() ?? "root",
+            ["targetKind"] = "watchTableGroup"
+        };
         var before = await Snapshot(selector, token); var observation = Observation(before);
         NativeTargetGuard.Validate(observation);
         if (!observation.Offline || before["projectModified"]?.GetValue<bool>() != false || before["target"]?["isConsistent"]?.GetValue<bool>() != true)
@@ -51,10 +56,23 @@ public sealed partial class WatchTableDispatcher
         var expected = WatchGroupManifest.Expect(ReadRecoverySnapshot(Resolve(capture)), operation, name, newName, renamed, out string? refusal)
             ?? throw new BridgeException(refusal!, "The lifecycle operation does not fit the observed group subtree.");
         string profile = "watch." + operation[^5..].ToLowerInvariant() + "-" + operation[..^5] + ".v1"; // e.g. watch.table-create.v1
-        var edit = new JsonObject { ["operation"] = operation, ["name"] = name, ["newName"] = newName, ["renamedSemanticSha256"] = renamed,
-            ["expectedGroup"] = new JsonArray(expected.Select(l => (JsonNode?)l).ToArray()), ["requiredProfiles"] = new JsonArray(profile) };
-        var proposal = new JsonObject { ["selector"] = selector, ["mode"] = "lifecycle", ["before"] = before, ["edit"] = edit,
-            ["profileGates"] = new JsonArray(WatchMutationProfiles.Status(profile)) };
+        var edit = new JsonObject
+        {
+            ["operation"] = operation,
+            ["name"] = name,
+            ["newName"] = newName,
+            ["renamedSemanticSha256"] = renamed,
+            ["expectedGroup"] = new JsonArray(expected.Select(l => (JsonNode?)l).ToArray()),
+            ["requiredProfiles"] = new JsonArray(profile)
+        };
+        var proposal = new JsonObject
+        {
+            ["selector"] = selector,
+            ["mode"] = "lifecycle",
+            ["before"] = before,
+            ["edit"] = edit,
+            ["profileGates"] = new JsonArray(WatchMutationProfiles.Status(profile))
+        };
         string directory = Path.Combine(root, "watch", Guid.NewGuid().ToString("N")[..12]); Directory.CreateDirectory(directory);
         var review = Save(directory, "review.json", proposal);
         var inputs = new List<EngineeringArtifactReference> { review, capture };
@@ -63,7 +81,13 @@ public sealed partial class WatchTableDispatcher
             [new(EngineeringResourceKey.ForPath("project", observation.ProjectFilePath), "project", "reviewedWatchLifecycle:" + operation, "projectArchiveToNewLocation")],
             inputs.ToArray(), ["offline", "watchImport"], ["readback", "preservation", "saved", "freshReopen"]);
         var record = store.Prepare(plan, Text(args, "idempotencyKey"));
-        return new { operation = record, review = proposal, reviewArtifact = review, productionApplyEnabled = false,
-            applyRequires = "Exact operationId/reviewedPlanSha256 and native verification of the required mutation profile." };
+        return new
+        {
+            operation = record,
+            review = proposal,
+            reviewArtifact = review,
+            productionApplyEnabled = false,
+            applyRequires = "Exact operationId/reviewedPlanSha256 and native verification of the required mutation profile."
+        };
     }
 }

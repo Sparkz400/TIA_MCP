@@ -7,6 +7,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
 using TiaMcp.Model;
+using static TiaMcp.Openness.V21.ChangeArguments;
 
 namespace TiaMcp.Openness.V21
 {
@@ -142,7 +143,7 @@ namespace TiaMcp.Openness.V21
         private static string[] ExportUnifiedTextLists(Siemens.Engineering.HW.Software software, string directory)
         {
             var hmi = (Siemens.Engineering.HmiUnified.HmiSoftware)software;
-            if (hmi.HmiTextLists.Count == 0) return new string[0];
+            if (hmi.HmiTextLists.Count == 0) return Array.Empty<string>();
             hmi.HmiTextLists.Export(new DirectoryInfo(directory), "TextLists");
             var files = Directory.GetFiles(directory).Select(Path.GetFileName).ToArray();
             string configuration = Path.Combine(directory, "TextLists.hmi.yml"), library = Path.Combine(directory, "TextLists.TextLibrary.hmi.yml");

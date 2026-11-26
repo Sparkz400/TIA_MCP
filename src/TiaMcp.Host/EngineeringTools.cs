@@ -36,8 +36,16 @@ public sealed partial class TiaTools
     [Description("Compare the PLC's offline software with its ticket-bound owned PLCSIM Advanced instance (sim_create downloadTicket) in a worker-owned TIA. The instance must be in STOP or RUN and the only registered Softbus simulator. Returns a bounded compare tree and fingerprints (optional expectedFingerprintSha256). Refuses TLS trust and passwords; runtimeCredentialMetadataPath answers the one login. Always goes offline; never powers, writes, downloads or saves; never a physical PLC.")]
     public Task<CallToolResult> PlcOnlineCompare(string downloadTicket, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null,
         int maxItems = 500, string? expectedFingerprintSha256 = null, string? runtimeCredentialMetadataPath = null)
-        => Call("plc_online_compare", new { downloadTicket, projectName, plcPath, maxItems = Limit(maxItems), expectedFingerprintSha256, runtimeCredentialMetadataPath,
-            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "online") }, cancellationToken);
+        => Call("plc_online_compare", new
+        {
+            downloadTicket,
+            projectName,
+            plcPath,
+            maxItems = Limit(maxItems),
+            expectedFingerprintSha256,
+            runtimeCredentialMetadataPath,
+            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "online")
+        }, cancellationToken);
 
     [McpServerTool(Name = "plc_station_upload", Destructive = false, OpenWorld = false)]
     [Description("Upload the station from a ticket-bound owned PLCSIM Advanced instance into a new worker-owned project, in an empty TIA started with tia_start (guards as plc_online_compare). Saves the new project even when partial and returns its path. Never opens or changes an existing project, never powers or writes the instance. Passwords and TLS trust refused by default; trustOwnedSimulationCertificate needs explicit user authorization. runtimeCredentialMetadataPath answers the login.")]
@@ -372,8 +380,13 @@ public sealed partial class TiaTools
     [McpServerTool(Name = "change_restore", Destructive = true, OpenWorld = false)]
     [Description("Recover a change checkpoint into a new project directory in a worker-owned TIA instance. Preserves the current state first; never overwrites the original archive or closes a user-owned TIA instance.")]
     public Task<CallToolResult> ChangeRestore(string changeId, string previewHash, CancellationToken cancellationToken)
-        => Call("change_restore", new { changeId, previewHash, artifactDirectory = Path.Combine(options.ArtifactsDirectory,
-            changeId.StartsWith("lib-", StringComparison.Ordinal) ? "changes" : "recovery") }, cancellationToken);
+        => Call("change_restore", new
+        {
+            changeId,
+            previewHash,
+            artifactDirectory = Path.Combine(options.ArtifactsDirectory,
+            changeId.StartsWith("lib-", StringComparison.Ordinal) ? "changes" : "recovery")
+        }, cancellationToken);
 
     private string ExportDirectory => Path.Combine(options.ArtifactsDirectory, "exports");
 

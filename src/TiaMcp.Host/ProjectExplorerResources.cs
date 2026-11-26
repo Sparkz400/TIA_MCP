@@ -30,12 +30,15 @@ public sealed class ProjectExplorerResources
         if (!Supported(server)) throw new McpException("MCP Apps support was not negotiated. Use project_model_export with format html for a portable viewer.");
         var assets = ProjectExplorerArtifacts.FindAssets();
         var html = ProjectExplorerArtifacts.Render(File.ReadAllText(Path.Combine(assets, "index.template.html")), assets, "null");
-        return new ReadResourceResult { Contents = [new TextResourceContents {
+        return new ReadResourceResult
+        {
+            Contents = [new TextResourceContents {
             Uri = Uri, MimeType = Mime, Text = html,
             Meta = new JsonObject { ["ui"] = new JsonObject { ["csp"] = new JsonObject {
                 ["connectDomains"] = new JsonArray(), ["resourceDomains"] = new JsonArray(), ["frameDomains"] = new JsonArray()
             } } }
-        }] };
+        }]
+        };
     }
 
     internal static void Configure(IMcpRequestFilterBuilder filters)

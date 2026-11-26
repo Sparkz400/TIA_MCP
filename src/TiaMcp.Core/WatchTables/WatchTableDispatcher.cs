@@ -113,14 +113,29 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
             default: throw new BridgeException("UnsupportedProfile", "Unsupported reviewed watch edit kind.");
         }
         if (reindexDocumentIds)
-            edit["documentIdReindex"] = new JsonObject { ["profile"] = "v21-watch-reference-free-preorder-1",
-                ["mapping"] = JsonSerializer.SerializeToNode(document.ReindexReferenceFreeDocumentIds()) };
+            edit["documentIdReindex"] = new JsonObject
+            {
+                ["profile"] = "v21-watch-reference-free-preorder-1",
+                ["mapping"] = JsonSerializer.SerializeToNode(document.ReindexReferenceFreeDocumentIds())
+            };
         if (WatchTableDocument.SemanticHash(bytes) == WatchTableDocument.SemanticHash(document.ToBytes())) throw new BridgeException("NoChange", "The proposed document is unchanged.");
         string directory = Path.Combine(root, "watch", Guid.NewGuid().ToString("N")[..12]); Directory.CreateDirectory(directory);
         var input = SaveBytes(directory, "reviewed.xml", document.ToBytes());
-        var proposal = new { selector = new { projectName = args["projectName"]?.GetValue<string>(), plcPath = observation.Reference.Object.PlcPath,
-                group = args["group"]?.GetValue<string>() ?? "root", tableName = document.Name, targetKind }, before,
-            edit, expectedSemanticSha256 = WatchTableDocument.SemanticHash(document.ToBytes()), input };
+        var proposal = new
+        {
+            selector = new
+            {
+                projectName = args["projectName"]?.GetValue<string>(),
+                plcPath = observation.Reference.Object.PlcPath,
+                group = args["group"]?.GetValue<string>() ?? "root",
+                tableName = document.Name,
+                targetKind
+            },
+            before,
+            edit,
+            expectedSemanticSha256 = WatchTableDocument.SemanticHash(document.ToBytes()),
+            input
+        };
         var review = Save(directory, "review.json", proposal);
         var plan = new EngineeringOperationPlan(kind == "modifyValue" ? "watchLiteralEdit" : "watchDocumentEdit", observation,
             [new(EngineeringResourceKey.ForPath("project", observation.ProjectFilePath), "project", (force ? "oneReviewedForceEdit:" : "oneReviewedWatchEdit:") + kind, "projectArchiveToNewLocation")],
@@ -171,8 +186,14 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
             try
             {
                 record = store.Read(record.Id);
-                var failure = Save(directory, "failure-" + record.Revision + ".json", new { error = error.Message, type = error.GetType().FullName,
-                    code = (error as BridgeException)?.Code, details = (error as BridgeOperationException)?.Details, automaticReplay = false });
+                var failure = Save(directory, "failure-" + record.Revision + ".json", new
+                {
+                    error = error.Message,
+                    type = error.GetType().FullName,
+                    code = (error as BridgeException)?.Code,
+                    details = (error as BridgeOperationException)?.Details,
+                    automaticReplay = false
+                });
                 if (record.State == "dispatchIntent" && error is BridgeOperationException) store.RecordOutcome(record.Id, record.Revision, false, [new("failure", failure)]);
                 else if (record.State is "dispatchIntent" or "checkpointIntent" || record.State == "acquired" && lease is null && error is not BridgeOperationException)
                     store.MarkUnknown(record.Id, record.Revision, failure);
@@ -381,9 +402,19 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
                 observation.SessionEpoch == record.Plan.Target.SessionEpoch)
                 throw new BridgeException("RecoveryVerificationFailed", "The saved baseline project must be independently observed within the exact admitted destination.");
             ValidateCapturedContent(snapshot, record.Plan.Target.Reference.ContentSha256!);
-            var proof = Save(directory, "recovery-located-" + Guid.NewGuid().ToString("N") + ".json", new { recovered = new { project = new { path = observation.ProjectFilePath },
-                    processId = snapshot["processId"]!.GetValue<int>(), sessionEpoch = observation.SessionEpoch },
-                restored = snapshot, retrievalResponseRetained = false, nativeRestoreInvoked = false, automaticReplay = false });
+            var proof = Save(directory, "recovery-located-" + Guid.NewGuid().ToString("N") + ".json", new
+            {
+                recovered = new
+                {
+                    project = new { path = observation.ProjectFilePath },
+                    processId = snapshot["processId"]!.GetValue<int>(),
+                    sessionEpoch = observation.SessionEpoch
+                },
+                restored = snapshot,
+                retrievalResponseRetained = false,
+                nativeRestoreInvoked = false,
+                automaticReplay = false
+            });
             record = store.RecordRecoveryEvidence(record.Id, record.Revision, new("recovery.located", proof));
             return new { operation = record, located = true, evidence = proof, next = "Close and reopen this located project in another fresh instance, then verify restored and original separately." };
         }

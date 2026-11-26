@@ -21,6 +21,7 @@ import re
 
 from compilation_evidence import require_clean_compile, require_plc_compile
 from library_native_harness import Harness, require
+import plc_tag_tables
 from preview_payload import preview_payload
 from qualification_owned_scratch import complete_inventory, snapshot
 from qualify_plc_object_mutations import STAGES, coverage_gaps, diff, in_order, matches, view
@@ -264,16 +265,9 @@ class Run:
             state = self.current["view"]
             wanted = {c: sorted(v(applied, state) if callable(v) else v) for c, v in (("added", added), ("removed", removed), ("changed", changed))}
             observed = diff(before["view"], state)
-            # Since 10 November tag table rows carry tagCount and constantCount, so a table whose members this step added or
-            # removed (a plugged module's system constant, a created tag) changes its row by those counts alone.
-            def counted(category, key):
-                if category != "changed" or not key.startswith("tagTable:"):
-                    return False
-                fields = {f for f in set(before["view"][key]) | set(state[key]) if before["view"][key].get(f) != state[key].get(f)}
-                members = "member:" + key[len("tagTable:"):] + "/"
-                return fields <= {"tagCount", "constantCount"} and any(k.startswith(members) for k in observed["added"] + observed["removed"])
             base = tolerated or (lambda category, key: False)
-            side, unexpected = split(observed, wanted, lambda category, key: base(category, key) or counted(category, key))
+            side, unexpected = split(observed, wanted, lambda category, key: base(category, key)
+                                     or plc_tag_tables.count_follows_members(before["view"], state, observed, category, key))
             missing = {c: sorted(set(keys) - set(observed[c])) for c, keys in wanted.items() if set(keys) - set(observed[c])}
             self.expect(not missing and not unexpected, label, "Native effect of %s differs: missing %s, unexpected %s" % (label, missing, unexpected),
                         {c: {k: {"before": before["view"].get(k), "after": state.get(k)} for k in keys} for c, keys in unexpected.items()})

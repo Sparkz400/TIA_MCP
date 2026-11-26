@@ -145,8 +145,15 @@ internal sealed class CredentialRoute(IBridgeClient inner, Func<string, Credenti
         catch (Exception error) when (error is IOException or UnauthorizedAccessException) { throw ProtectedCredentialGuard.Error("CredentialUnavailable"); }
         if (!password) throw ProtectedCredentialGuard.Error("CredentialFormatInvalid");
         envelope = sealedLogin ?? throw ProtectedCredentialGuard.Error("CredentialUnavailable");
-        request["umac"] = new JsonObject { ["userName"] = user, ["userType"] = type, ["credentialId"] = reference.CredentialId, ["bindingSha256"] = reference.BindingSha256,
-            ["nonce"] = nonce, ["envelope"] = Convert.ToBase64String(envelope) };
+        request["umac"] = new JsonObject
+        {
+            ["userName"] = user,
+            ["userType"] = type,
+            ["credentialId"] = reference.CredentialId,
+            ["bindingSha256"] = reference.BindingSha256,
+            ["nonce"] = nonce,
+            ["envelope"] = Convert.ToBase64String(envelope)
+        };
         return request;
     }
 

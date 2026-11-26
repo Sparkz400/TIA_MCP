@@ -193,7 +193,7 @@ namespace TiaMcp.Model
         {
             if (reference.Type == JTokenType.Null) return JValue.CreateNull();
             string text = reference.Type == JTokenType.String ? (string)reference : null;
-            var owners = text == null ? new KeyValuePair<string, object>[0] : libraries.Where(l => text.StartsWith(l.Key + ".", StringComparison.Ordinal)).ToArray();
+            var owners = text == null ? Array.Empty<KeyValuePair<string, object>>() : libraries.Where(l => text.StartsWith(l.Key + ".", StringComparison.Ordinal)).ToArray();
             if (owners.Length == 1)
             {
                 var owner = AsMapping(owners[0].Value, "library");

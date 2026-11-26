@@ -64,8 +64,14 @@ internal static class UnifiedTextListAuthoring
                 if (!textIds.Contains(text)) throw new BridgeException("HmiTextListUnresolvedText", $"List {name}, entry {id}: text {text} is not declared.");
                 usedTexts.Add(text);
                 long? from = Number(entry, "fromValue"), to = Number(entry, "toValue");
-                bool valid = type switch { "SingleValue" => from.HasValue && from == to, "Range" => from.HasValue && to.HasValue && from <= to,
-                    "From" => from.HasValue && !to.HasValue, "To" => !from.HasValue && to.HasValue, _ => false };
+                bool valid = type switch
+                {
+                    "SingleValue" => from.HasValue && from == to,
+                    "Range" => from.HasValue && to.HasValue && from <= to,
+                    "From" => from.HasValue && !to.HasValue,
+                    "To" => !from.HasValue && to.HasValue,
+                    _ => false
+                };
                 if (!valid) throw Error("Entry bounds contradict SingleValue/Range/From/To; unused bounds must be null.");
                 if (range != "Decimal" && (type != "SingleValue" || from < 0 || (range == "Bool" && from > 1))) throw Error("Bool and BitNumber use nonnegative SingleValue entries; Bool selects 0 or 1.");
                 var interval = (From: from ?? long.MinValue, To: to ?? long.MaxValue);

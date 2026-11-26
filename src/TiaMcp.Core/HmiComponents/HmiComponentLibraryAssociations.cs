@@ -38,10 +38,20 @@ internal static class HmiComponentLibraryAssociations
                 Guid.TryParseExact(String(observation?["typeGuid"]), "D", out var type) && type != Guid.Empty &&
                 Guid.TryParseExact(String(observation?["versionGuid"]), "D", out var version) && version != Guid.Empty)
                 status = type.ToString("D") == (string?)identity["typeGuid"] && version.ToString("D") == (string?)identity["versionGuid"] ? "match" : "different";
-            rows.Add(new JsonObject { ["selection"] = selection.DeepClone(), ["reviewId"] = component["selection"]!["reviewId"]!.DeepClone(),
-                ["file"] = HmiComponentXml.Descriptor(file), ["exportIdentity"] = identity, ["capturedObservation"] = observation?.DeepClone(),
-                ["identifierAgreement"] = status, ["sourceAuthenticityVerified"] = false, ["libraryIdentityVerified"] = false,
-                ["contentAssociationVerified"] = false, ["dependencyClosureVerified"] = false, ["runtimeInstanceVerified"] = false });
+            rows.Add(new JsonObject
+            {
+                ["selection"] = selection.DeepClone(),
+                ["reviewId"] = component["selection"]!["reviewId"]!.DeepClone(),
+                ["file"] = HmiComponentXml.Descriptor(file),
+                ["exportIdentity"] = identity,
+                ["capturedObservation"] = observation?.DeepClone(),
+                ["identifierAgreement"] = status,
+                ["sourceAuthenticityVerified"] = false,
+                ["libraryIdentityVerified"] = false,
+                ["contentAssociationVerified"] = false,
+                ["dependencyClosureVerified"] = false,
+                ["runtimeInstanceVerified"] = false
+            });
         }
         foreach (string scope in new[] { "beforeComponent", "afterComponent" })
         {
@@ -49,8 +59,14 @@ internal static class HmiComponentLibraryAssociations
             foreach (var item in component["objects"]!.AsArray())
             {
                 string path = (string)item!["capturedObject"]!["objectPath"]!;
-                coverage.Add(new JsonObject { ["scope"] = scope, ["reviewId"] = component["selection"]!["reviewId"]!.DeepClone(),
-                    ["objectPath"] = path, ["associationSelected"] = selected.Contains((scope, path)), ["libraryIdentityVerified"] = false });
+                coverage.Add(new JsonObject
+                {
+                    ["scope"] = scope,
+                    ["reviewId"] = component["selection"]!["reviewId"]!.DeepClone(),
+                    ["objectPath"] = path,
+                    ["associationSelected"] = selected.Contains((scope, path)),
+                    ["libraryIdentityVerified"] = false
+                });
             }
         }
         report["schemaVersion"] = "hmi-component-review.v5";
@@ -84,8 +100,14 @@ internal static class HmiComponentLibraryAssociations
             throw new ArgumentException("Content name and committed type version must agree.");
         var ids = document.Descendants().Attributes("ID").Select(a => a.Value).ToArray();
         if (ids.Any(id => string.IsNullOrWhiteSpace(id) || id != id.Trim()) || ids.Distinct(StringComparer.Ordinal).Count() != ids.Length) throw new ArgumentException("Duplicate or empty XML identities.");
-        return new JsonObject { ["profile"] = "v21-full-fb-library-version.v1", ["typeGuid"] = typeGuid.ToString("D"),
-            ["versionGuid"] = versionGuid.ToString("D"), ["typeName"] = name, ["versionNumber"] = Scalar(attributes, "VersionNumber", false) };
+        return new JsonObject
+        {
+            ["profile"] = "v21-full-fb-library-version.v1",
+            ["typeGuid"] = typeGuid.ToString("D"),
+            ["versionGuid"] = versionGuid.ToString("D"),
+            ["typeName"] = name,
+            ["versionNumber"] = Scalar(attributes, "VersionNumber", false)
+        };
     }
     private static XElement One(XContainer parent, XName name)
     {

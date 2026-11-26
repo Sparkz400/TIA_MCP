@@ -34,12 +34,12 @@ namespace TiaMcp.Indexing
             {
                 bool library = kind == "block" || kind == "type";
                 providers = library ? new[] { "nativeCrossReference", "plcLibraryInstances" } : new[] { "nativeCrossReference" };
-                edges = CommonEdges.Concat(kind == "tag" ? TagEdges : library ? LibraryEdges : new string[0]).ToArray();
+                edges = CommonEdges.Concat(kind == "tag" ? TagEdges : library ? LibraryEdges : Array.Empty<string>()).ToArray();
             }
             else if ((kind ?? "").StartsWith("hmi", StringComparison.OrdinalIgnoreCase)) { providers = new[] { "hmi.relationships" }; edges = new[] { "hmiBinding", "screenNavigation", "libraryVersion" }; }
             else
             {
-                providers = new string[0]; edges = new string[0];
+                providers = Array.Empty<string>(); edges = Array.Empty<string>();
                 reason = kind == "project" || kind == "folder" || kind == "deviceGroup" || kind == "namespace" || kind == "library" || kind == "libraryTypeFolder" || kind == "masterCopyFolder"
                     ? "Containment is the captured tree itself; this organizational node has no native relationship service."
                     : kind == "device" ? "A device has no native relationship service; select its hardware items for configured I/O and network associations."

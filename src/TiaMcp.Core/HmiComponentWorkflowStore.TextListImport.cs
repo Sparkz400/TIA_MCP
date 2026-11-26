@@ -50,12 +50,29 @@ public sealed partial class HmiComponentWorkflowStore
             var artifact = Object(files[i]!["artifact"]);
             byte[] bytes = ProjectReviewStore.ReadArtifact(artifactsRoot, artifact, UnifiedTextListAuthoring.OutputLimit);
             if (!bytes.AsSpan().SequenceEqual(built[i].Bytes)) throw new BridgeException("ArtifactChanged", "Retained candidate differs from its intent.");
-            rows.Add(new JsonObject { ["fileName"] = built[i].Name, ["bytes"] = bytes.Length, ["sha256"] = artifact["sha256"]!.DeepClone(),
-                ["path"] = Path.GetFullPath(Path.Combine(artifactsRoot, (string)artifact["path"]!)) });
+            rows.Add(new JsonObject
+            {
+                ["fileName"] = built[i].Name,
+                ["bytes"] = bytes.Length,
+                ["sha256"] = artifact["sha256"]!.DeepClone(),
+                ["path"] = Path.GetFullPath(Path.Combine(artifactsRoot, (string)artifact["path"]!))
+            });
         }
-        return new JsonObject { ["schemaVersion"] = 1, ["target"] = target.DeepClone(), ["expectedContentHash"] = request["expectedContentHash"]?.DeepClone(),
-            ["candidate"] = new JsonObject { ["recordId"] = recordId, ["recordKind"] = author ? "author" : "set", ["outputId"] = outputId,
-                ["recordSchemaVersion"] = record["schemaVersion"]!.DeepClone(), ["languages"] = intent["languages"]!.DeepClone(),
-                ["lists"] = new JsonArray(intent["lists"]!.AsArray().Select(l => (JsonNode?)l!["name"]!.DeepClone()).ToArray()), ["files"] = rows } };
+        return new JsonObject
+        {
+            ["schemaVersion"] = 1,
+            ["target"] = target.DeepClone(),
+            ["expectedContentHash"] = request["expectedContentHash"]?.DeepClone(),
+            ["candidate"] = new JsonObject
+            {
+                ["recordId"] = recordId,
+                ["recordKind"] = author ? "author" : "set",
+                ["outputId"] = outputId,
+                ["recordSchemaVersion"] = record["schemaVersion"]!.DeepClone(),
+                ["languages"] = intent["languages"]!.DeepClone(),
+                ["lists"] = new JsonArray(intent["lists"]!.AsArray().Select(l => (JsonNode?)l!["name"]!.DeepClone()).ToArray()),
+                ["files"] = rows
+            }
+        };
     }
 }

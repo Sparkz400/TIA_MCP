@@ -127,6 +127,18 @@ def source_bytes(path,data):
     # Dependency bumps change only PackageReference versions; they must not stale implementation bindings.
     return PACKAGE_VERSION.sub(rb'\1\2',data) if path.endswith(('.csproj','.props')) else data
 
+# The engineering change dispatcher is one partial class split over several files (26 November 2026); a stage method
+# in any of them counts as being in the dispatcher's file. ChangeArguments.cs holds the session's argument checks and
+# hashes, moved out of the session so tests can compile them.
+CHANGE_SPLIT=re.compile(r'src/TiaMcp\.Openness\.V21/OpennessSession\.Change[A-Za-z]*\.cs')
+WORKER_HELPERS={'src/TiaMcp.Openness.V21/ChangeArguments.cs'}
+
+def same_split(a, b):
+    return a==b or bool(CHANGE_SPLIT.fullmatch(a) and CHANGE_SPLIT.fullmatch(b))
+
+def worker_handler(path):
+    return path.startswith('src/TiaMcp.Openness.V21/OpennessSession') or path in WORKER_HELPERS
+
 def collect(repo):
     # Reuse the inventory's bounded file reader, path guard, hashing and catalog semantics.
     source_rows,texts=inventory.source_inventory(repo)
@@ -203,11 +215,11 @@ def collect(repo):
                 direct=any(t[0]=='str' and t[1]==kind and i>=4 and [x[1] for x in ts[i-4:i]]==['change','.','Kind','=='] for i,t in enumerate(ts)) and not cases
                 if cases or direct:
                     body=ts if direct else cases[0]
-                    worker=lambda tokens:[h for call in calls(tokens) for h in byname.get(call,[]) if h['path'].startswith('src/TiaMcp.Openness.V21/OpennessSession')]
+                    worker=lambda tokens:[h for call in calls(tokens) for h in byname.get(call,[]) if worker_handler(h['path'])]
                     found=worker(body)
-                    # Stage methods split out of the dispatcher live in its file; follow them one level so a split
-                    # does not hide the handlers its stages call.
-                    found+=[h for s in found if s['path']==m['path'] and s['name'] not in method_names for h in worker(s['_tokens'])]
+                    # Stage methods split out of the dispatcher live in its file, or in the other files of its split;
+                    # follow them one level so a split does not hide the handlers its stages call.
+                    found+=[h for s in found if same_split(s['path'],m['path']) and s['name'] not in method_names for h in worker(s['_tokens'])]
                     branches.append({'phase':name,'routeKind':'direct_early_route' if direct else 'switch_case','anchor':anchor(m),
                        'handlers':[anchor(h) for h in found]})
         mutations.append({'changeKind':kind,'featureId':f['featureId'],'dispatcherFamily':'library_delegation' if library else 'engineering',

@@ -134,8 +134,8 @@ internal static class SimulationNetworkAdmissionTests
         string Source(params string[] path) => File.ReadAllText(Path.Combine([root?.FullName ?? throw new InvalidOperationException("Source missing."), "src", .. path]));
         Check.Equal(true, Source("TiaMcp.Host", "PlcsimTargets.cs").Contains("RequireEndpoint(recorded, endpoint, connectedRoutes.TryGetValue(session, out var connected) ? connected.Route : null, SimulationNetworkRoute.Adapter(endpoint))", StringComparison.Ordinal));
         // Both connect tools record the route their session opens on, under the key their write gates read.
-        Check.Equal(true, Source("TiaMcp.Host", "PhysicalRuntimeTools.cs").Contains("targets.Connect(\"web:\"+attemptId,login.Endpoint,", StringComparison.Ordinal)
-            && Source("TiaMcp.Host", "PhysicalRuntimeTools.cs").Contains("targets.Require(bindingSha256,\"web:\"+attemptId,", StringComparison.Ordinal));
+        Check.Equal(true, Source("TiaMcp.Host", "PhysicalRuntimeTools.cs").Contains("targets.Connect(\"web:\" + attemptId, login.Endpoint,", StringComparison.Ordinal)
+            && Source("TiaMcp.Host", "PhysicalRuntimeTools.cs").Contains("targets.Require(bindingSha256, \"web:\" + attemptId,", StringComparison.Ordinal));
         Check.Equal(true, Source("TiaMcp.Host", "OpcUaRuntimeTools.cs").Contains("targets.Connect(\"ua:\" + attemptId, selection.Endpoint,", StringComparison.Ordinal));
         Check.Equal(true, Source("TiaMcp.Core", "PhysicalRuntime", "PlcsimTargetBinding.cs").Contains("SimulationNetworkAdmission.RouteRefusal(routeAdapter)", StringComparison.Ordinal));
         // Every mutating UA tool checks the owned-PLCSIM binding before its session call.
@@ -150,7 +150,7 @@ internal static class SimulationNetworkAdmissionTests
         foreach (var (tool, send) in new[] { ("runtime_web_write", "sessions.Write("), ("runtime_web_operating_mode", "sessions.ChangeOperatingMode("),
             ("runtime_web_alarm_acknowledge", "sessions.AcknowledgeAlarm("), ("runtime_web_backup", "sessions.Backup(") })
         {
-            int start = web.IndexOf("Name=\"" + tool + "\"", StringComparison.Ordinal), gate = web.IndexOf("await Gate(attemptId,bindingSha256,", Math.Max(start, 0), StringComparison.Ordinal);
+            int start = web.IndexOf("Name = \"" + tool + "\"", StringComparison.Ordinal), gate = web.IndexOf("await Gate(attemptId, bindingSha256,", Math.Max(start, 0), StringComparison.Ordinal);
             Check.Equal(true, start >= 0 && gate > start && gate < web.IndexOf(send, start, StringComparison.Ordinal));
         }
         string system = Source("TiaMcp.Openness.V21", "OpennessSession.TestSuiteSystem.cs");

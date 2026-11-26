@@ -537,7 +537,7 @@ internal static class CoordinatorTests
         }
         public JObject Apply(JObject arguments)
         {
-            BeforeApply?.Invoke(); Applies++; string id = arguments.Value<string>("changeId"); var p = _prepared[id]; bool library = id.StartsWith("lib-");
+            BeforeApply?.Invoke(); Applies++; string id = arguments.Value<string>("changeId"); var p = _prepared[id]; bool library = id.StartsWith("lib-", StringComparison.Ordinal);
             var result = new JObject { ["changeId"] = id, ["previewHash"] = p["previewHash"].DeepClone(), ["state"] = "applied" };
             result["componentIdempotencyKeyHash"] = LibraryJournalStore.Hash(arguments.Value<string>("idempotencyKey"));
             if (library) result["journal"] = new JObject { ["changeId"] = id, ["previewHash"] = p["previewHash"].DeepClone(), ["state"] = "applied", ["idempotencyKeyHash"] = result["componentIdempotencyKeyHash"].DeepClone(), ["compile"] = SuccessfulCompilation(),

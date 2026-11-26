@@ -73,9 +73,15 @@ public static class TechnologyProfileReview
                     }
                 }
                 unresolved += (sr == "unresolved" ? 1 : 0) + (tr == "unresolved" ? 1 : 0); if (cycle) cycles++;
-                relationships.Add(new JsonObject { ["phase"] = phase, ["relationship"] = row.DeepClone(), ["sourceResolution"] = sr,
-                    ["targetResolution"] = tr, ["memberResolution"] = row["targetMember"] is null ? "notDeclared" : "notVerified",
-                    ["inDeclaredCycle"] = cycle });
+                relationships.Add(new JsonObject
+                {
+                    ["phase"] = phase,
+                    ["relationship"] = row.DeepClone(),
+                    ["sourceResolution"] = sr,
+                    ["targetResolution"] = tr,
+                    ["memberResolution"] = row["targetMember"] is null ? "notDeclared" : "notVerified",
+                    ["inDeclaredCycle"] = cycle
+                });
             }
         }
         Compare("parameter", before.Parameters, after.Parameters, "nativeType access value metadata");
@@ -92,20 +98,54 @@ public static class TechnologyProfileReview
         }
         bool SelectedEndpoint(JsonNode? endpoint) => endpoint is JsonObject row && (string?)row["nodeId"] == (string?)selected[0]["nodeId"] && (string?)row["objectPath"] == path;
         var direct = review["model"]!["edges"]!.AsArray().Where(e => SelectedEndpoint(e?["source"]) || SelectedEndpoint(e?["target"])).ToArray();
-        return new JsonObject { ["schemaVersion"] = "technology-profile-review.v1", ["reviewId"] = reviewId, ["technologyPath"] = path,
-            ["identity"] = identity.DeepClone(), ["afterKind"] = afterKind, ["beforeValueDomain"] = b["valueDomain"]!.DeepClone(), ["afterValueDomain"] = a["valueDomain"]!.DeepClone(),
-            ["coverage"] = new JsonObject { ["beforeParametersComplete"] = Boolean(b,"parametersComplete"), ["afterParametersComplete"] = Boolean(a,"parametersComplete"),
-                ["beforeRelationshipsComplete"] = Boolean(b,"relationshipsComplete"), ["afterRelationshipsComplete"] = Boolean(a,"relationshipsComplete") },
-            ["observations"] = observations, ["relationships"] = relationships, ["changes"] = changes,
-            ["context"] = new JsonObject { ["selectionAndAncestors"] = selection, ["ancestorTraversalStopped"] = current is not null || ancestryEnd != "root", ["ancestorTraversalEnd"] = current is not null ? "cycleOrLimit" : ancestryEnd,
-                ["directCapturedEdges"] = new JsonArray(direct.Take(1024).Select(e => e!.DeepClone()).ToArray()), ["directEdgesTruncated"] = direct.Length > 1024 },
-            ["summary"] = new JsonObject { ["beforeParameterCount"] = before.Parameters.Count, ["afterParameterCount"] = after.Parameters.Count,
-                ["beforeRelationshipCount"] = before.Relationships.Count, ["afterRelationshipCount"] = after.Relationships.Count,
-                ["changedCount"] = changed, ["readOnlyConflictCount"] = readOnly, ["unknownAccessChangeCount"] = unknownAccess,
-                ["unresolvedEndpointCount"] = unresolved, ["declaredCycleRecordCount"] = cycles },
-            ["nativeExecutable"] = false, ["nativeQualified"] = false, ["nativeExecuted"] = false, ["targetCompatibilityVerified"] = false,
-            ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["wholeObjectAnalysisComplete"] = false,
-            ["limits"] = "Supplied values and declarations only. Text values and opaque metadata are not coerced or interpreted. Missing rows do not prove creation/deletion. Captured endpoints are saved identities, not fresh native references; member/type/route/CPU/version/license eligibility and connection direction/units are unverified. Cycles describe supplied edges, not native invalidity. No write, tuning, motion, compile, XML-preservation or save/reopen qualification." };
+        return new JsonObject
+        {
+            ["schemaVersion"] = "technology-profile-review.v1",
+            ["reviewId"] = reviewId,
+            ["technologyPath"] = path,
+            ["identity"] = identity.DeepClone(),
+            ["afterKind"] = afterKind,
+            ["beforeValueDomain"] = b["valueDomain"]!.DeepClone(),
+            ["afterValueDomain"] = a["valueDomain"]!.DeepClone(),
+            ["coverage"] = new JsonObject
+            {
+                ["beforeParametersComplete"] = Boolean(b, "parametersComplete"),
+                ["afterParametersComplete"] = Boolean(a, "parametersComplete"),
+                ["beforeRelationshipsComplete"] = Boolean(b, "relationshipsComplete"),
+                ["afterRelationshipsComplete"] = Boolean(a, "relationshipsComplete")
+            },
+            ["observations"] = observations,
+            ["relationships"] = relationships,
+            ["changes"] = changes,
+            ["context"] = new JsonObject
+            {
+                ["selectionAndAncestors"] = selection,
+                ["ancestorTraversalStopped"] = current is not null || ancestryEnd != "root",
+                ["ancestorTraversalEnd"] = current is not null ? "cycleOrLimit" : ancestryEnd,
+                ["directCapturedEdges"] = new JsonArray(direct.Take(1024).Select(e => e!.DeepClone()).ToArray()),
+                ["directEdgesTruncated"] = direct.Length > 1024
+            },
+            ["summary"] = new JsonObject
+            {
+                ["beforeParameterCount"] = before.Parameters.Count,
+                ["afterParameterCount"] = after.Parameters.Count,
+                ["beforeRelationshipCount"] = before.Relationships.Count,
+                ["afterRelationshipCount"] = after.Relationships.Count,
+                ["changedCount"] = changed,
+                ["readOnlyConflictCount"] = readOnly,
+                ["unknownAccessChangeCount"] = unknownAccess,
+                ["unresolvedEndpointCount"] = unresolved,
+                ["declaredCycleRecordCount"] = cycles
+            },
+            ["nativeExecutable"] = false,
+            ["nativeQualified"] = false,
+            ["nativeExecuted"] = false,
+            ["targetCompatibilityVerified"] = false,
+            ["sourceAuthenticityVerified"] = false,
+            ["liveFreshnessVerified"] = false,
+            ["wholeObjectAnalysisComplete"] = false,
+            ["limits"] = "Supplied values and declarations only. Text values and opaque metadata are not coerced or interpreted. Missing rows do not prove creation/deletion. Captured endpoints are saved identities, not fresh native references; member/type/route/CPU/version/license eligibility and connection direction/units are unverified. Cycles describe supplied edges, not native invalidity. No write, tuning, motion, compile, XML-preservation or save/reopen qualification."
+        };
 
         void Compare(string kind, Dictionary<string, JsonObject> left, Dictionary<string, JsonObject> right, string fields)
         {
@@ -118,8 +158,8 @@ public static class TechnologyProfileReview
                 string assessment = afterKind == "proposal" ? "notAssessed" : "notProposal";
                 if (afterKind == "proposal" && kind == "parameter" && old is not null && next is not null && !JsonNode.DeepEquals(old["value"], next["value"]))
                 {
-                    if (Text(old,"access") == "readOnly") { assessment = "contradictsSuppliedReadOnly"; readOnly++; }
-                    else if (Text(old,"access") == "unknown") { assessment = "accessUnknown"; unknownAccess++; }
+                    if (Text(old, "access") == "readOnly") { assessment = "contradictsSuppliedReadOnly"; readOnly++; }
+                    else if (Text(old, "access") == "unknown") { assessment = "accessUnknown"; unknownAccess++; }
                 }
                 changes.Add(new JsonObject { ["kind"] = kind, ["key"] = key, ["status"] = status, ["changedFields"] = differences, ["proposalAssessment"] = assessment });
             }
@@ -129,38 +169,38 @@ public static class TechnologyProfileReview
     private static State Snapshot(JsonObject snapshot)
     {
         Fields(snapshot, "identity valueDomain parametersComplete relationshipsComplete parameters relationships");
-        if (Text(snapshot,"valueDomain") is not ("offline" or "online")) throw Error("Unknown value domain.");
-        Boolean(snapshot,"parametersComplete"); Boolean(snapshot,"relationshipsComplete");
-        var identity = Object(snapshot["identity"]); Fields(identity,"plcPath orderNumber firmware technologyType technologyVersion options unknownReason");
-        Text(identity,"plcPath"); string? unknown = NullableText(identity,"unknownReason",1024);
-        foreach (string key in new[] { "orderNumber","firmware","technologyType","technologyVersion" })
-            if (NullableText(identity,key,256) is null && unknown is null) throw Error("Unknown profile fields require a reason.");
-        var options = Array(identity,"options",64); var optionSet = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var option in options) { var holder = new JsonObject { ["option"] = option?.DeepClone() }; if (!optionSet.Add(Text(holder,"option",256))) throw Error("Duplicate exact option."); }
+        if (Text(snapshot, "valueDomain") is not ("offline" or "online")) throw Error("Unknown value domain.");
+        Boolean(snapshot, "parametersComplete"); Boolean(snapshot, "relationshipsComplete");
+        var identity = Object(snapshot["identity"]); Fields(identity, "plcPath orderNumber firmware technologyType technologyVersion options unknownReason");
+        Text(identity, "plcPath"); string? unknown = NullableText(identity, "unknownReason", 1024);
+        foreach (string key in new[] { "orderNumber", "firmware", "technologyType", "technologyVersion" })
+            if (NullableText(identity, key, 256) is null && unknown is null) throw Error("Unknown profile fields require a reason.");
+        var options = Array(identity, "options", 64); var optionSet = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var option in options) { var holder = new JsonObject { ["option"] = option?.DeepClone() }; if (!optionSet.Add(Text(holder, "option", 256))) throw Error("Duplicate exact option."); }
         var parameters = new Dictionary<string, JsonObject>(StringComparer.Ordinal);
-        foreach (var item in Array(snapshot,"parameters",4096))
+        foreach (var item in Array(snapshot, "parameters", 4096))
         {
-            var row=Object(item); Fields(row,"name nativeType access value metadata");
-            if (!parameters.TryAdd(Text(row,"name",256),row)) throw Error("Duplicate exact parameter name.");
-            NullableText(row,"nativeType",256); if (Text(row,"access") is not ("readOnly" or "readWrite" or "unknown")) throw Error("Unknown access declaration.");
-            Object(row["metadata"]); var value=Object(row["value"]);
-            if (Text(value,"kind") is "scalar" or "opaque") { Fields(value,"kind text"); Scalar(value,"text",InputLimit); }
-            else if (Text(value,"kind") == "unavailable") { Fields(value,"kind reason"); Text(value,"reason",1024); }
+            var row = Object(item); Fields(row, "name nativeType access value metadata");
+            if (!parameters.TryAdd(Text(row, "name", 256), row)) throw Error("Duplicate exact parameter name.");
+            NullableText(row, "nativeType", 256); if (Text(row, "access") is not ("readOnly" or "readWrite" or "unknown")) throw Error("Unknown access declaration.");
+            Object(row["metadata"]); var value = Object(row["value"]);
+            if (Text(value, "kind") is "scalar" or "opaque") { Fields(value, "kind text"); Scalar(value, "text", InputLimit); }
+            else if (Text(value, "kind") == "unavailable") { Fields(value, "kind reason"); Text(value, "reason", 1024); }
             else throw Error("Expected scalar/opaque text or an unavailable reason.");
         }
         var relations = new Dictionary<string, JsonObject>(StringComparer.Ordinal);
-        foreach (var item in Array(snapshot,"relationships",1024))
+        foreach (var item in Array(snapshot, "relationships", 1024))
         {
-            var row=Object(item); Fields(row,"id kind sourcePath targetPath targetMember state reason metadata");
-            if (!relations.TryAdd(Text(row,"id",256),row)) throw Error("Duplicate exact relationship ID.");
-            if (Text(row,"kind") is not ("hardware" or "coupling" or "mapping" or "dependency" or "child" or "cam" or "interpreter")) throw Error("Unknown declared relationship kind.");
-            Text(row,"sourcePath"); string? target=NullableText(row,"targetPath"); NullableText(row,"targetMember",1024); string? reason=NullableText(row,"reason",1024);
-            string state=Text(row,"state");
+            var row = Object(item); Fields(row, "id kind sourcePath targetPath targetMember state reason metadata");
+            if (!relations.TryAdd(Text(row, "id", 256), row)) throw Error("Duplicate exact relationship ID.");
+            if (Text(row, "kind") is not ("hardware" or "coupling" or "mapping" or "dependency" or "child" or "cam" or "interpreter")) throw Error("Unknown declared relationship kind.");
+            Text(row, "sourcePath"); string? target = NullableText(row, "targetPath"); NullableText(row, "targetMember", 1024); string? reason = NullableText(row, "reason", 1024);
+            string state = Text(row, "state");
             if (state is not ("declared" or "disconnected" or "unknown") || state == "declared" && target is null || state == "disconnected" && (target is not null || row["targetMember"] is not null) || state == "unknown" && reason is null)
                 throw Error("Contradictory or unexplained relationship state.");
             Object(row["metadata"]);
         }
-        return new(parameters,relations);
+        return new(parameters, relations);
     }
     private static void Scalar(JsonObject value, string field, int max)
     { if (value[field] is not JsonValue v || !v.TryGetValue<string>(out string? text) || text is null || text.Length > max) throw Error("Expected bounded scalar text: " + field); _ = Utf8.GetByteCount(text); }

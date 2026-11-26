@@ -48,17 +48,24 @@ public sealed class FeatureCatalog
             .Select(v => v.GetString()).ToHashSet(StringComparer.Ordinal);
         return new
         {
-            schemaVersion = 1, catalogVersion = _catalog.GetProperty("catalogVersion").GetString(),
+            schemaVersion = 1,
+            catalogVersion = _catalog.GetProperty("catalogVersion").GetString(),
             origin = "Bundled TIA MCP feature contracts and recorded fixture evidence",
             qualificationScope = _catalog.GetProperty("qualificationScope").GetString(),
             targetAvailabilityProbed = false,
             features = page,
             evidence = _catalog.GetProperty("evidence").EnumerateArray().Where(e => evidenceIds.Contains(e.GetProperty("id").GetString())).ToArray(),
             criteria = _catalog.GetProperty("criteria").EnumerateArray().Where(c => criteriaIds.Contains(c.GetProperty("id").GetString())).ToArray(),
-            pagination = new { offset, returned = page.Length, total = matches.Length,
+            pagination = new
+            {
+                offset,
+                returned = page.Length,
+                total = matches.Length,
                 nextOffset = offset + page.Length < matches.Length ? (int?)(offset + page.Length) : null,
-                totalItems = matches.Length, pageCount = PageTotals.PageCount(matches.Length, maxItems),
-                complete = offset + page.Length >= matches.Length }
+                totalItems = matches.Length,
+                pageCount = PageTotals.PageCount(matches.Length, maxItems),
+                complete = offset + page.Length >= matches.Length
+            }
         };
     }
 

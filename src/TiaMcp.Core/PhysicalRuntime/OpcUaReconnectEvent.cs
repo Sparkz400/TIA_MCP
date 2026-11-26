@@ -19,18 +19,22 @@ public sealed class OpcUaReconnectHistory(int maximumAttempts)
     public static void Validate(OpcUaReconnectEvent e, int maximumAttempts)
     {
         Require(e.Attempt >= 1 && e.Attempt <= maximumAttempts && maximumAttempts <= 3);
-        Require(e.State switch {
+        Require(e.State switch
+        {
             "starting" => Retryable(e.ErrorCode),
             "succeeded" => e.ErrorCode is null,
             "failed" => e.ErrorCode is { Length: >= 1 and <= 80 } && e.ErrorCode.StartsWith("Ua", StringComparison.Ordinal) && !e.ErrorCode.Any(char.IsControl),
-            _ => false });
-        Require(e.Transfer switch {
+            _ => false
+        });
+        Require(e.Transfer switch
+        {
             null => e.TransferStatusCode is null,
             "transferred" => e.State == "succeeded" && e.TransferStatusCode is null,
             "refused" => e.State == "succeeded" && e.TransferStatusCode is { Length: 10 } s && s.StartsWith("0x", StringComparison.Ordinal) &&
                 uint.TryParse(s.AsSpan(2), System.Globalization.NumberStyles.AllowHexSpecifier, null, out uint code) &&
                 s == $"0x{code:x8}" && (code & 0xC0000000) == 0x80000000,
-            _ => false });
+            _ => false
+        });
     }
     public void Apply(OpcUaReconnectEvent e)
     {

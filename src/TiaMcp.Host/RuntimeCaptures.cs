@@ -7,9 +7,9 @@ using TiaMcp.Core.PhysicalRuntime;
 namespace TiaMcp.Host;
 
 /// <summary>One bounded polling worker per selected session or owned PLCSIM instance. Restart reopens evidence, never acquisition.</summary>
-public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOptions options,TimeProvider? timeProvider,IBridgeClient? simulator=null) : IAsyncDisposable
+public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOptions options, TimeProvider? timeProvider, IBridgeClient? simulator = null) : IAsyncDisposable
 {
-    public RuntimeCaptures(PhysicalRuntimeSessions sessions,HostOptions options):this(sessions,options,TimeProvider.System){}
+    public RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOptions options) : this(sessions, options, TimeProvider.System) { }
     private sealed class Running(string attemptId)
     {
         internal string AttemptId = attemptId;
@@ -22,9 +22,9 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
     /// <summary>Pause between attempts to end a cycle-synchronous capture while the simulator bridge is still busy.</summary>
     public TimeSpan EndRetryDelay { get; set; } = TimeSpan.FromSeconds(2);
     private const int EndAttempts = 4;
-    private readonly TimeProvider clock=timeProvider??TimeProvider.System;
-    private readonly RuntimeCaptureStore store = new(options.ArtifactsDirectory,timeProvider);
-    private readonly Dictionary<string,Running> running = new(StringComparer.Ordinal);
+    private readonly TimeProvider clock = timeProvider ?? TimeProvider.System;
+    private readonly RuntimeCaptureStore store = new(options.ArtifactsDirectory, timeProvider);
+    private readonly Dictionary<string, Running> running = new(StringComparer.Ordinal);
     private readonly SemaphoreSlim gate = new(1);
     private readonly string hostId = Guid.NewGuid().ToString("N");
     private bool disposed;
@@ -39,27 +39,27 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
             if (store.Exists(captureId))
             {
                 var original = store.Plan(captureId).Request;
-                if (!JsonElement.DeepEquals(JsonSerializer.SerializeToElement(original,BridgeProtocol.Json),JsonSerializer.SerializeToElement(request,BridgeProtocol.Json)))
+                if (!JsonElement.DeepEquals(JsonSerializer.SerializeToElement(original, BridgeProtocol.Json), JsonSerializer.SerializeToElement(request, BridgeProtocol.Json)))
                     throw Error("RuntimeCaptureRequestChanged");
                 return Observe(captureId);
             }
             Prune();
-            if (running.Values.Count(x=>!x.Work.IsCompleted)>=4 || running.Values.Any(x=>!x.Work.IsCompleted && x.AttemptId==request.AttemptId))
+            if (running.Values.Count(x => !x.Work.IsCompleted) >= 4 || running.Values.Any(x => !x.Work.IsCompleted && x.AttemptId == request.AttemptId))
                 throw Error("RuntimeCaptureSessionBusy");
             bool plcsim = request.Simulator is not null;
             if (plcsim && simulator is null) throw Error("RuntimeCaptureSourceUnavailable");
-            var context = plcsim ? default : await sessions.CaptureContext(request.AttemptId,request.SelectionIds,request.Representation,cancellationToken);
+            var context = plcsim ? default : await sessions.CaptureContext(request.AttemptId, request.SelectionIds, request.Representation, cancellationToken);
             var signals = plcsim ? SimulatorCaptureContracts.Signals(request) : context.Signals;
             if (request.ReviewId is not null) _ = new ProjectReviewStore(options.ArtifactsDirectory).Read(request.ReviewId);
-            var association = RuntimeCaptureAssociations.Resolve(options.ArtifactsDirectory,request,signals);
+            var association = RuntimeCaptureAssociations.Resolve(options.ArtifactsDirectory, request, signals);
             var handoff = plcsim ? null : RuntimeCaptureHandoffs.Resolve(options.ArtifactsDirectory, request, context.Session, signals);
-            var plan = new RuntimeCapturePlan(captureId,hostId,clock.GetUtcNow(),request,signals,association,handoff);
+            var plan = new RuntimeCapturePlan(captureId, hostId, clock.GetUtcNow(), request, signals, association, handoff);
             // The worker refuses anything but the exact owned instance and enters sync-point mode before durable intent exists.
-            if (plcsim) await simulator!.CallAsync("sim_capture_begin",SimulatorCaptureContracts.Arguments(request),CancellationToken.None);
+            if (plcsim) await simulator!.CallAsync("sim_capture_begin", SimulatorCaptureContracts.Arguments(request), CancellationToken.None);
             RuntimeCaptureStore.Writer writer;
             try { writer = store.Create(plan); } catch { await EndSimulator(request); throw; }
-            var entry = new Running(request.AttemptId){InstanceId=request.Simulator?.InstanceId}; running.Add(captureId,entry);
-            entry.Work = Task.Run(()=>Poll(plan,writer,entry));
+            var entry = new Running(request.AttemptId) { InstanceId = request.Simulator?.InstanceId }; running.Add(captureId, entry);
+            entry.Work = Task.Run(() => Poll(plan, writer, entry));
             return Observe(captureId);
         }
         finally { gate.Release(); }
@@ -67,199 +67,199 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
     // Finished captures without a local failure are only evidence on disk; their status needs nothing from memory. A failed one keeps its entry for the failure text.
     private void Prune()
     {
-        foreach(var id in running.Where(x=>x.Value.Work.IsCompleted && x.Value.Failure is null).Select(x=>x.Key).ToArray())
+        foreach (var id in running.Where(x => x.Value.Work.IsCompleted && x.Value.Failure is null).Select(x => x.Key).ToArray())
         { running[id].Stop.Dispose(); running.Remove(id); }
     }
     /// <summary>sim_release through the Host: refused while a live capture holds the instance; otherwise the worker may also end a capture hold
     /// that a failed end left behind (the Host has no live capture to protect). Not natively verified.</summary>
-    public async Task<object> ReleaseSimulator(int instanceId,bool deleteOwned,CancellationToken cancellationToken)
+    public async Task<object> ReleaseSimulator(int instanceId, bool deleteOwned, CancellationToken cancellationToken)
     {
-        if(simulator is null)throw Error("RuntimeCaptureSourceUnavailable");
+        if (simulator is null) throw Error("RuntimeCaptureSourceUnavailable");
         await gate.WaitAsync(cancellationToken);
         try
         {
-            if(running.Values.Any(x=>!x.Work.IsCompleted && x.InstanceId==instanceId))
-                throw new BridgeException("SimulationCaptureModeActive","A Host capture is still running on this instance. Stop it with runtime_capture_stop first; nothing was sent.");
-            return await simulator.CallAsync("sim_release",new{instanceId,deleteOwned,restoreHeldCapture=true},CancellationToken.None);
+            if (running.Values.Any(x => !x.Work.IsCompleted && x.InstanceId == instanceId))
+                throw new BridgeException("SimulationCaptureModeActive", "A Host capture is still running on this instance. Stop it with runtime_capture_stop first; nothing was sent.");
+            return await simulator.CallAsync("sim_release", new { instanceId, deleteOwned, restoreHeldCapture = true }, CancellationToken.None);
         }
-        finally{gate.Release();}
+        finally { gate.Release(); }
     }
     /// <summary>Deletes a finished capture's retained evidence; a running capture is refused.</summary>
-    public async Task<object> Delete(string captureId,CancellationToken cancellationToken)
+    public async Task<object> Delete(string captureId, CancellationToken cancellationToken)
     {
         await gate.WaitAsync(cancellationToken);
         try
         {
-            if(running.TryGetValue(captureId,out var entry) && !entry.Work.IsCompleted)throw Error("RuntimeCaptureSessionBusy");
+            if (running.TryGetValue(captureId, out var entry) && !entry.Work.IsCompleted) throw Error("RuntimeCaptureSessionBusy");
             store.Delete(captureId);
-            if(running.Remove(captureId,out var gone))gone.Stop.Dispose();
-            return new{captureId,deleted=true,note="Local capture evidence was removed. Exports and diagnostic acquisitions that cite its snapshotRef no longer resolve."};
+            if (running.Remove(captureId, out var gone)) gone.Stop.Dispose();
+            return new { captureId, deleted = true, note = "Local capture evidence was removed. Exports and diagnostic acquisitions that cite its snapshotRef no longer resolve." };
         }
-        finally{gate.Release();}
+        finally { gate.Release(); }
     }
-    public async Task<object> Status(string captureId,CancellationToken cancellationToken)
+    public async Task<object> Status(string captureId, CancellationToken cancellationToken)
     { await gate.WaitAsync(cancellationToken); try { return Observe(captureId); } finally { gate.Release(); } }
-    public async Task<object> Stop(string captureId,CancellationToken cancellationToken)
+    public async Task<object> Stop(string captureId, CancellationToken cancellationToken)
     {
         Task? worker = null;
         await gate.WaitAsync(cancellationToken);
-        try { if(running.TryGetValue(captureId,out var entry)){entry.Stop.Cancel();worker=entry.Work;} }
+        try { if (running.TryGetValue(captureId, out var entry)) { entry.Stop.Cancel(); worker = entry.Work; } }
         finally { gate.Release(); }
-        if(worker is not null)await worker;
-        return await Status(captureId,cancellationToken);
+        if (worker is not null) await worker;
+        return await Status(captureId, cancellationToken);
     }
-    public object Page(string snapshotRef,int offset,int count) => store.Page(snapshotRef,offset,count);
-    public object Analyze(string snapshotRef,JsonObject units)=>new RuntimeCaptureAnalysis(options.ArtifactsDirectory).Analyze(store,snapshotRef,units);
-    public object AcquireDiagnostic(string experimentId,string snapshotRef,JsonObject request)
-        =>new DiagnosticRuntimeAcquisitions(options.ArtifactsDirectory).Acquire(store,experimentId,snapshotRef,request);
-    public object ExportDiagnosticAcquisition(string acquisitionId,string format)
-        =>new DiagnosticRuntimeAcquisitions(options.ArtifactsDirectory).Export(store,acquisitionId,format);
-    public object CompareDiagnosticAcquisitions(string beforeAcquisitionId,string afterAcquisitionId,JsonObject request)
-        =>new DiagnosticRuntimeAcquisitions(options.ArtifactsDirectory).Compare(store,beforeAcquisitionId,afterAcquisitionId,request);
+    public object Page(string snapshotRef, int offset, int count) => store.Page(snapshotRef, offset, count);
+    public object Analyze(string snapshotRef, JsonObject units) => new RuntimeCaptureAnalysis(options.ArtifactsDirectory).Analyze(store, snapshotRef, units);
+    public object AcquireDiagnostic(string experimentId, string snapshotRef, JsonObject request)
+        => new DiagnosticRuntimeAcquisitions(options.ArtifactsDirectory).Acquire(store, experimentId, snapshotRef, request);
+    public object ExportDiagnosticAcquisition(string acquisitionId, string format)
+        => new DiagnosticRuntimeAcquisitions(options.ArtifactsDirectory).Export(store, acquisitionId, format);
+    public object CompareDiagnosticAcquisitions(string beforeAcquisitionId, string afterAcquisitionId, JsonObject request)
+        => new DiagnosticRuntimeAcquisitions(options.ArtifactsDirectory).Compare(store, beforeAcquisitionId, afterAcquisitionId, request);
     /// <summary>Diagnostic-case signal writes on the exact owned PLCSIM instance; refused while a capture holds that instance.</summary>
-    public async Task<object> WriteDiagnosticPlcsim(string caseId,int instanceId,string instanceName,string creationId,DiagnosticPlcsimWrite[] writes,CancellationToken cancellationToken)
+    public async Task<object> WriteDiagnosticPlcsim(string caseId, int instanceId, string instanceName, string creationId, DiagnosticPlcsimWrite[] writes, CancellationToken cancellationToken)
     {
-        var (arguments,association)=DiagnosticPlcsimWrites.Admit(options.ArtifactsDirectory,caseId,instanceId,instanceName,creationId,writes);
-        if(simulator is null)throw Error("RuntimeCaptureSourceUnavailable");
+        var (arguments, association) = DiagnosticPlcsimWrites.Admit(options.ArtifactsDirectory, caseId, instanceId, instanceName, creationId, writes);
+        if (simulator is null) throw Error("RuntimeCaptureSourceUnavailable");
         await gate.WaitAsync(cancellationToken);
         try
         {
-            if(disposed)throw Error("RuntimeCaptureHostStopping");
-            if(running.Values.Any(x=>!x.Work.IsCompleted && x.AttemptId==creationId))throw Error("RuntimeCaptureSessionBusy");
+            if (disposed) throw Error("RuntimeCaptureHostStopping");
+            if (running.Values.Any(x => !x.Work.IsCompleted && x.AttemptId == creationId)) throw Error("RuntimeCaptureSessionBusy");
             // Native calls are never cancelled: a cancelled bridge call is parked and every later call is refused with PreviousOperationRunning until it finishes.
-            return DiagnosticPlcsimWrites.Receipt(arguments,association,await simulator.CallAsync("sim_write_owned",arguments,CancellationToken.None));
+            return DiagnosticPlcsimWrites.Receipt(arguments, association, await simulator.CallAsync("sim_write_owned", arguments, CancellationToken.None));
         }
-        finally{gate.Release();}
+        finally { gate.Release(); }
     }
-    public async Task<object> Export(string snapshotRef,string format,CancellationToken cancellationToken)
+    public async Task<object> Export(string snapshotRef, string format, CancellationToken cancellationToken)
     {
-        bool live=false;await gate.WaitAsync(cancellationToken);
-        try { var id=snapshotRef.Split(':').ElementAtOrDefault(1);live=id is not null && running.TryGetValue(id,out var entry) && !entry.Work.IsCompleted; }
-        finally {gate.Release();}
-        return store.Export(snapshotRef,format,live);
+        bool live = false; await gate.WaitAsync(cancellationToken);
+        try { var id = snapshotRef.Split(':').ElementAtOrDefault(1); live = id is not null && running.TryGetValue(id, out var entry) && !entry.Work.IsCompleted; }
+        finally { gate.Release(); }
+        return store.Export(snapshotRef, format, live);
     }
     private object Observe(string id)
     {
-        running.TryGetValue(id,out var entry);
-        return store.Status(id,entry is not null && !entry.Work.IsCompleted,entry?.Failure);
+        running.TryGetValue(id, out var entry);
+        return store.Status(id, entry is not null && !entry.Work.IsCompleted, entry?.Failure);
     }
-    private async Task Poll(RuntimeCapturePlan plan,RuntimeCaptureStore.Writer writer,Running entry)
+    private async Task Poll(RuntimeCapturePlan plan, RuntimeCaptureStore.Writer writer, Running entry)
     {
-        long started=clock.GetTimestamp(), cycle=0, lastReadCycle=-1,accountedThrough=-1; string reason="durationLimit";
-        using var duration=new CancellationTokenSource(TimeSpan.FromSeconds(plan.Request.DurationSeconds),clock);
-        using var deadline=CancellationTokenSource.CreateLinkedTokenSource(entry.Stop.Token,duration.Token);
-        double durationMilliseconds=plan.Request.DurationSeconds*1000d;
-        double Elapsed()=>clock.GetElapsedTime(started).TotalMilliseconds;
-        double stoppedElapsed=double.PositiveInfinity;
-        using var stopObservation=entry.Stop.Token.Register(()=>Volatile.Write(ref stoppedElapsed,Elapsed()));
+        long started = clock.GetTimestamp(), cycle = 0, lastReadCycle = -1, accountedThrough = -1; string reason = "durationLimit";
+        using var duration = new CancellationTokenSource(TimeSpan.FromSeconds(plan.Request.DurationSeconds), clock);
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(entry.Stop.Token, duration.Token);
+        double durationMilliseconds = plan.Request.DurationSeconds * 1000d;
+        double Elapsed() => clock.GetElapsedTime(started).TotalMilliseconds;
+        double stoppedElapsed = double.PositiveInfinity;
+        using var stopObservation = entry.Stop.Token.Register(() => Volatile.Write(ref stoppedElapsed, Elapsed()));
         // Timer callbacks can run late; elapsed time must independently prevent new reads.
-        bool Expired()=>deadline.IsCancellationRequested || Elapsed()>=durationMilliseconds;
+        bool Expired() => deadline.IsCancellationRequested || Elapsed() >= durationMilliseconds;
         void RecordElapsedGaps()
         {
-            if(lastReadCycle<0)return;
-            double elapsed=Elapsed();
-            long through=RuntimeCaptureStore.NextCycle(lastReadCycle,Math.Min(Math.Min(elapsed,Volatile.Read(ref stoppedElapsed)),durationMilliseconds-0.000001),plan.Request.IntervalMilliseconds)-1;
-            if(through<=accountedThrough)return;
-            writer.Append(new(writer.Rows,"gap",null,lastReadCycle,lastReadCycle*(double)plan.Request.IntervalMilliseconds,elapsed,clock.GetUtcNow(),null,null,through-accountedThrough));
-            accountedThrough=through;
+            if (lastReadCycle < 0) return;
+            double elapsed = Elapsed();
+            long through = RuntimeCaptureStore.NextCycle(lastReadCycle, Math.Min(Math.Min(elapsed, Volatile.Read(ref stoppedElapsed)), durationMilliseconds - 0.000001), plan.Request.IntervalMilliseconds) - 1;
+            if (through <= accountedThrough) return;
+            writer.Append(new(writer.Rows, "gap", null, lastReadCycle, lastReadCycle * (double)plan.Request.IntervalMilliseconds, elapsed, clock.GetUtcNow(), null, null, through - accountedThrough));
+            accountedThrough = through;
         }
         try
         {
-            while(!Expired())
+            while (!Expired())
             {
-                double scheduled=cycle*(double)plan.Request.IntervalMilliseconds;
-                double due=Math.Min(scheduled,durationMilliseconds);
+                double scheduled = cycle * (double)plan.Request.IntervalMilliseconds;
+                double due = Math.Min(scheduled, durationMilliseconds);
                 // Timer completion is only a wake-up: it may occur before the
                 // requested slot. Recheck monotonic time and keep waits positive.
-                while(!Expired())
+                while (!Expired())
                 {
-                    double remaining=due-Elapsed();
-                    if(remaining<=0)break;
-                    await Task.Delay(TimeSpan.FromMilliseconds(Math.Max(1,Math.Ceiling(remaining))),clock,deadline.Token);
+                    double remaining = due - Elapsed();
+                    if (remaining <= 0) break;
+                    await Task.Delay(TimeSpan.FromMilliseconds(Math.Max(1, Math.Ceiling(remaining))), clock, deadline.Token);
                 }
-                if(scheduled>=durationMilliseconds || Expired())break;
-                bool finish=false;
+                if (scheduled >= durationMilliseconds || Expired()) break;
+                bool finish = false;
                 // PLCSIM: one worker call per cycle reads every signal (after stepping one sync point in cycle-synchronous mode).
                 // One session check and one batched request per cycle for a Web API session. A finished read is always recorded:
                 // expiry is checked before the request, never between the rows of one answered cycle.
-                var sample=plan.Request.Simulator is null?await WebSample(plan,deadline.Token):await SimulatorSample(plan);
-                for(int index=0;index<plan.Signals.Length;index++)
+                var sample = plan.Request.Simulator is null ? await WebSample(plan, deadline.Token) : await SimulatorSample(plan);
+                for (int index = 0; index < plan.Signals.Length; index++)
                 {
-                    var signal=plan.Signals[index];
-                    lastReadCycle=cycle;accountedThrough=cycle;
-                    var (result,error)=sample[index];
-                    if(plan.Request.Simulator is null && result is null && error is null)break;
-                    try { writer.Append(new(writer.Rows,"read",signal.SelectionId,cycle,scheduled,Elapsed(),clock.GetUtcNow(),result,error,0)); }
-                    catch(BridgeException failure) when(failure.Code is "RuntimeCaptureByteLimit" or "RuntimeCaptureValueLimit") {writer.RecordDroppedResult();throw;}
-                    if(writer.ReadAttempts>=plan.Request.MaximumSamples){reason="sampleLimit";finish=true;break;}
-                    if(error is not (null or "RuntimeTimeout" or "RuntimeTransportFailure" or "RuntimeCancelled" or "QueueTimeout" or "PreviousOperationRunning")) {reason="sessionUnavailable";finish=true;break;}
+                    var signal = plan.Signals[index];
+                    lastReadCycle = cycle; accountedThrough = cycle;
+                    var (result, error) = sample[index];
+                    if (plan.Request.Simulator is null && result is null && error is null) break;
+                    try { writer.Append(new(writer.Rows, "read", signal.SelectionId, cycle, scheduled, Elapsed(), clock.GetUtcNow(), result, error, 0)); }
+                    catch (BridgeException failure) when (failure.Code is "RuntimeCaptureByteLimit" or "RuntimeCaptureValueLimit") { writer.RecordDroppedResult(); throw; }
+                    if (writer.ReadAttempts >= plan.Request.MaximumSamples) { reason = "sampleLimit"; finish = true; break; }
+                    if (error is not (null or "RuntimeTimeout" or "RuntimeTransportFailure" or "RuntimeCancelled" or "QueueTimeout" or "PreviousOperationRunning")) { reason = "sessionUnavailable"; finish = true; break; }
                 }
                 RecordElapsedGaps();
-                cycle=Math.Max(cycle+1,accountedThrough+1);
-                if(finish)break;
+                cycle = Math.Max(cycle + 1, accountedThrough + 1);
+                if (finish) break;
             }
         }
-        catch(OperationCanceledException) when(deadline.IsCancellationRequested) { }
-        catch(BridgeException error) when(error.Code is "RuntimeCaptureByteLimit" or "RuntimeCaptureValueLimit") {reason=error.Code=="RuntimeCaptureByteLimit"?"byteLimit":"valueLimit";}
-        catch(Exception) {entry.Failure="RuntimeCaptureStorageFailure";reason="storageFailure";}
+        catch (OperationCanceledException) when (deadline.IsCancellationRequested) { }
+        catch (BridgeException error) when (error.Code is "RuntimeCaptureByteLimit" or "RuntimeCaptureValueLimit") { reason = error.Code == "RuntimeCaptureByteLimit" ? "byteLimit" : "valueLimit"; }
+        catch (Exception) { entry.Failure = "RuntimeCaptureStorageFailure"; reason = "storageFailure"; }
         finally
         {
             try
             {
-                if(entry.Failure is null)
+                if (entry.Failure is null)
                     try { RecordElapsedGaps(); }
-                    catch(BridgeException error) when(error.Code is "RuntimeCaptureByteLimit" or "RuntimeCaptureValueLimit") {reason=error.Code=="RuntimeCaptureByteLimit"?"byteLimit":"valueLimit";}
-                    catch {entry.Failure="RuntimeCaptureStorageFailure";reason="storageFailure";}
-                if(entry.Stop.IsCancellationRequested)reason=entry.Reason;
-                writer.Finish(reason,Elapsed());
+                    catch (BridgeException error) when (error.Code is "RuntimeCaptureByteLimit" or "RuntimeCaptureValueLimit") { reason = error.Code == "RuntimeCaptureByteLimit" ? "byteLimit" : "valueLimit"; }
+                    catch { entry.Failure = "RuntimeCaptureStorageFailure"; reason = "storageFailure"; }
+                if (entry.Stop.IsCancellationRequested) reason = entry.Reason;
+                writer.Finish(reason, Elapsed());
             }
-            catch {entry.Failure="RuntimeCaptureStorageFailure";}
-            if(!await EndSimulator(plan.Request))entry.Failure??="PlcsimOperatingModeRestoreFailed";
+            catch { entry.Failure = "RuntimeCaptureStorageFailure"; }
+            if (!await EndSimulator(plan.Request)) entry.Failure ??= "PlcsimOperatingModeRestoreFailed";
         }
     }
     // Native calls are never cancelled: a cancelled bridge call is parked and every later call is refused with PreviousOperationRunning until it finishes.
-    private async Task<(string? Result,string? Error)[]> SimulatorSample(RuntimeCapturePlan plan)
+    private async Task<(string? Result, string? Error)[]> SimulatorSample(RuntimeCapturePlan plan)
     {
-        try { return SimulatorCaptureContracts.Reads(plan.Request,await simulator!.CallAsync("sim_capture_sample",SimulatorCaptureContracts.Arguments(plan.Request),CancellationToken.None)); }
-        catch(Exception failure) { string code=SimulatorCaptureContracts.ReadError(failure);return plan.Signals.Select(_=>((string?)null,(string?)code)).ToArray(); }
+        try { return SimulatorCaptureContracts.Reads(plan.Request, await simulator!.CallAsync("sim_capture_sample", SimulatorCaptureContracts.Arguments(plan.Request), CancellationToken.None)); }
+        catch (Exception failure) { string code = SimulatorCaptureContracts.ReadError(failure); return plan.Signals.Select(_ => ((string?)null, (string?)code)).ToArray(); }
     }
-    private async Task<(string? Result,string? Error)[]> WebSample(RuntimeCapturePlan plan,CancellationToken token)
+    private async Task<(string? Result, string? Error)[]> WebSample(RuntimeCapturePlan plan, CancellationToken token)
     {
         try
         {
-            var items=await sessions.ReadValues(plan.Request.AttemptId,plan.Signals.Select(x=>x.SelectionId).ToArray(),plan.Request.Representation,token,plan.Handoff);
-            return items.Select(x=>x is null?((string?)null,(string?)null):x.Result is not null?(JsonSerializer.Serialize(x.Result,BridgeProtocol.Json),(string?)null):((string?)null,ReadFailure(new BridgeException(x.ErrorCode!,"Symbol read refused.")))).ToArray();
+            var items = await sessions.ReadValues(plan.Request.AttemptId, plan.Signals.Select(x => x.SelectionId).ToArray(), plan.Request.Representation, token, plan.Handoff);
+            return items.Select(x => x is null ? ((string?)null, (string?)null) : x.Result is not null ? (JsonSerializer.Serialize(x.Result, BridgeProtocol.Json), (string?)null) : ((string?)null, ReadFailure(new BridgeException(x.ErrorCode!, "Symbol read refused.")))).ToArray();
         }
         // A request-level failure is every signal's failure for this cycle.
         // A cancelled cycle (stop, deadline) is one cancelled in-flight read: the first signal's row, as before; the others were never read.
-        catch(OperationCanceledException) { return plan.Signals.Select((_,i)=>((string?)null,i==0?"RuntimeCancelled":null)).ToArray(); }
-        catch(Exception failure) { string code=ReadFailure(failure);return plan.Signals.Select(_=>((string?)null,(string?)code)).ToArray(); }
+        catch (OperationCanceledException) { return plan.Signals.Select((_, i) => ((string?)null, i == 0 ? "RuntimeCancelled" : null)).ToArray(); }
+        catch (Exception failure) { string code = ReadFailure(failure); return plan.Signals.Select(_ => ((string?)null, (string?)code)).ToArray(); }
     }
     /// <summary>Restores the operating mode recorded at begin; free-running captures never changed it.</summary>
     private async Task<bool> EndSimulator(RuntimeCaptureRequest request)
     {
-        if(request.Simulator is not { CycleSynchronous: true })return true;
-        for(int attempt=1;;attempt++)
+        if (request.Simulator is not { CycleSynchronous: true }) return true;
+        for (int attempt = 1; ; attempt++)
         {
-            try { await simulator!.CallAsync("sim_capture_end",SimulatorCaptureContracts.Arguments(request),CancellationToken.None);return true; }
+            try { await simulator!.CallAsync("sim_capture_end", SimulatorCaptureContracts.Arguments(request), CancellationToken.None); return true; }
             // The shared bridge may still be busy (a long sim_test or observe): the end was not sent, so try again once it settles.
-            catch(BridgeException error) when(attempt<EndAttempts && !disposed && error.Code is "QueueTimeout" or "PreviousOperationRunning" or "SimulationOperatingModeNotRestored")
-            { try { await Task.Delay(EndRetryDelay,clock); } catch(OperationCanceledException){return false;} }
+            catch (BridgeException error) when (attempt < EndAttempts && !disposed && error.Code is "QueueTimeout" or "PreviousOperationRunning" or "SimulationOperatingModeNotRestored")
+            { try { await Task.Delay(EndRetryDelay, clock); } catch (OperationCanceledException) { return false; } }
             // The caller reports the unrestored mode; stderr keeps why (code or type only).
-            catch(Exception error) { Console.Error.WriteLine($"runtime capture: sim_capture_end failed: {(error is BridgeException bridge?bridge.Code:error.GetType().FullName)}");return false; }
+            catch (Exception error) { Console.Error.WriteLine($"runtime capture: sim_capture_end failed: {(error is BridgeException bridge ? bridge.Code : error.GetType().FullName)}"); return false; }
         }
     }
     private static string ReadFailure(Exception failure) => failure is BridgeException error && error.Code is
         "RuntimeTimeout" or "RuntimeTransportFailure" or "RuntimeCancelled" or "RuntimePermissionDenied" or "RuntimeSessionUnavailable" or
         "RuntimeSessionExpired" or "RuntimeSessionIdentityMismatch" or "RuntimeSymbolMetadataChanged" or "RuntimeRecordChanged" or "CredentialRetired" or "RuntimeCaptureHandoffMismatch" or "RuntimeCaptureHandoffUnavailable"
         ? error.Code : "RuntimeCaptureReadFailed";
-    private static BridgeException Error(string code) => new(code,"Capture request refused. Retained data is not resumed and no PLC values are written.");
+    private static BridgeException Error(string code) => new(code, "Capture request refused. Retained data is not resumed and no PLC values are written.");
     public async ValueTask DisposeAsync()
     {
         await gate.WaitAsync(); Task[] workers;
-        try { disposed=true;foreach(var entry in running.Values){entry.Reason="hostShutdown";entry.Stop.Cancel();} workers=running.Values.Select(x=>x.Work).ToArray(); }
+        try { disposed = true; foreach (var entry in running.Values) { entry.Reason = "hostShutdown"; entry.Stop.Cancel(); } workers = running.Values.Select(x => x.Work).ToArray(); }
         finally { gate.Release(); }
         await Task.WhenAll(workers);
-        foreach(var entry in running.Values)entry.Stop.Dispose();store.Dispose();gate.Dispose();
+        foreach (var entry in running.Values) entry.Stop.Dispose(); store.Dispose(); gate.Dispose();
     }
 }

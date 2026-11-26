@@ -40,8 +40,13 @@ internal static class CompositeEngineeringConsumers
             else
             {
                 if (reached.Count == MaxCandidates) { bounds.Add("maxCandidates"); omittedCandidates++; return; }
-                var row = new JsonObject { ["objectPath"] = path, ["nodeId"] = byPath[path].Single()["nodeId"]!.DeepClone(),
-                    ["discoveryDepth"] = depth, ["nativeImpactVerified"] = false };
+                var row = new JsonObject
+                {
+                    ["objectPath"] = path,
+                    ["nodeId"] = byPath[path].Single()["nodeId"]!.DeepClone(),
+                    ["discoveryDepth"] = depth,
+                    ["nativeImpactVerified"] = false
+                };
                 reached.Add(path, row); Add(candidates, row);
             }
             if (!pending.TryGetValue(depth, out var paths)) pending[depth] = paths = new(StringComparer.Ordinal);
@@ -52,10 +57,22 @@ internal static class CompositeEngineeringConsumers
             if (associations.Count == MaxAssociations) { bounds.Add("maxAssociations"); omittedAssociations++; return; }
             string fromState = Resolve(from, plc), toState = Resolve(to, plc);
             bool eligible = sourceState == "declared" && fromState == "capturedObject" && toState == "capturedObject";
-            var row = new JsonObject { ["kind"] = kind, ["recordRef"] = record, ["sourceIndex"] = index, ["role"] = role,
-                ["fromObjectPath"] = from, ["toObjectPath"] = to, ["sourceState"] = sourceState,
-                ["fromResolution"] = fromState, ["toResolution"] = toState, ["eligible"] = eligible,
-                ["traversed"] = false, ["evidence"] = evidence.DeepClone(), ["nativeLinkVerified"] = false };
+            var row = new JsonObject
+            {
+                ["kind"] = kind,
+                ["recordRef"] = record,
+                ["sourceIndex"] = index,
+                ["role"] = role,
+                ["fromObjectPath"] = from,
+                ["toObjectPath"] = to,
+                ["sourceState"] = sourceState,
+                ["fromResolution"] = fromState,
+                ["toResolution"] = toState,
+                ["eligible"] = eligible,
+                ["traversed"] = false,
+                ["evidence"] = evidence.DeepClone(),
+                ["nativeLinkVerified"] = false
+            };
             Add(associations, row);
             if (eligible) { if (!adjacent.TryGetValue(from!, out var list)) adjacent[from!] = list = []; list.Add(row); }
         }
@@ -147,8 +164,16 @@ internal static class CompositeEngineeringConsumers
                 void Root(string? path, string role, string? plc = null)
                 {
                     string state = Resolve(path, plc); int depth = (int)impact["destinationDepths"]![key]!;
-                    Add(roots, new() { ["selectorKey"] = key, ["amlImpactPath"] = impact["amlImpact"]!["path"]!.DeepClone(),
-                        ["role"] = role, ["objectPath"] = path, ["declaredDepth"] = depth, ["resolution"] = state, ["nativeImpactVerified"] = false });
+                    Add(roots, new()
+                    {
+                        ["selectorKey"] = key,
+                        ["amlImpactPath"] = impact["amlImpact"]!["path"]!.DeepClone(),
+                        ["role"] = role,
+                        ["objectPath"] = path,
+                        ["declaredDepth"] = depth,
+                        ["resolution"] = state,
+                        ["nativeImpactVerified"] = false
+                    });
                     if (state == "capturedObject") Candidate(path!, depth);
                 }
                 if (kind == "model") Root((string)selector["objectPath"]!, "mappedObject");
@@ -179,8 +204,11 @@ internal static class CompositeEngineeringConsumers
                     }
                 }
             }
-        var captured = new JsonObject { ["nodes"] = new JsonArray(nodes.Where(n => Resolve((string?)n["objectPath"]) == "capturedObject").Select(n => n.DeepClone()).ToArray()),
-            ["edges"] = model["edges"]!.DeepClone() };
+        var captured = new JsonObject
+        {
+            ["nodes"] = new JsonArray(nodes.Where(n => Resolve((string?)n["objectPath"]) == "capturedObject").Select(n => n.DeepClone()).ToArray()),
+            ["edges"] = model["edges"]!.DeepClone()
+        };
         var empty = new JsonObject { ["nodes"] = new JsonArray(), ["edges"] = new JsonArray() };
         JsonNode? excludedEdges = null;
         while (pending.Count > 0 && visits < edgeBudget)
@@ -198,8 +226,13 @@ internal static class CompositeEngineeringConsumers
                 }
             if (visits < edgeBudget && saved.Count < MaxSavedLinks)
             {
-                var changes = new JsonArray(frontier.Order(StringComparer.Ordinal).Select(p => (JsonNode)new JsonObject {
-                    ["path"] = p, ["afterObjectPath"] = p, ["change"] = "compositeContextRoot", ["changedFields"] = new JsonArray() }).ToArray());
+                var changes = new JsonArray(frontier.Order(StringComparer.Ordinal).Select(p => (JsonNode)new JsonObject
+                {
+                    ["path"] = p,
+                    ["afterObjectPath"] = p,
+                    ["change"] = "compositeContextRoot",
+                    ["changedFields"] = new JsonArray()
+                }).ToArray());
                 var observed = ProjectReviewStore.ObservedImpactPaths(reviewId, reviewId, empty, captured, changes, 1, MaxSavedLinks - saved.Count, edgeBudget - visits);
                 var coverage = observed["coverage"]!; visits += (int)coverage["visitedEdges"]!;
                 excludedEdges ??= coverage["excludedEdges"]![1]!["counts"]!.DeepClone();
@@ -216,19 +249,42 @@ internal static class CompositeEngineeringConsumers
             else if (saved.Count == MaxSavedLinks) bounds.Add("maxSavedLinks");
         }
         if (pending.Count > 0 && visits == edgeBudget) bounds.Add("maxImpactEdgeVisits");
-        var result = new JsonObject { ["phase"] = phase, ["reviewId"] = reviewId, ["rootBindings"] = roots,
-            ["associations"] = associations, ["savedLinks"] = saved, ["candidates"] = candidates,
-            ["coverage"] = new JsonObject { ["complete"] = false, ["truncated"] = bounds.Count > 0,
+        var result = new JsonObject
+        {
+            ["phase"] = phase,
+            ["reviewId"] = reviewId,
+            ["rootBindings"] = roots,
+            ["associations"] = associations,
+            ["savedLinks"] = saved,
+            ["candidates"] = candidates,
+            ["coverage"] = new JsonObject
+            {
+                ["complete"] = false,
+                ["truncated"] = bounds.Count > 0,
                 ["truncationReasons"] = new JsonArray(bounds.Order(StringComparer.Ordinal).Select(s => (JsonNode)JsonValue.Create(s)!).ToArray()),
-                ["visitedEdges"] = visits, ["rounds"] = rounds, ["candidateCount"] = candidates.Count, ["omittedCandidateEncounters"] = omittedCandidates,
-                ["omittedAssociations"] = omittedAssociations, ["excludedNodeCount"] = originalNodes.Count - captured["nodes"]!.AsArray().Count,
-                ["savedEdgesInspected"] = excludedEdges is not null, ["excludedSavedEdges"] = excludedEdges,
+                ["visitedEdges"] = visits,
+                ["rounds"] = rounds,
+                ["candidateCount"] = candidates.Count,
+                ["omittedCandidateEncounters"] = omittedCandidates,
+                ["omittedAssociations"] = omittedAssociations,
+                ["excludedNodeCount"] = originalNodes.Count - captured["nodes"]!.AsArray().Count,
+                ["savedEdgesInspected"] = excludedEdges is not null,
+                ["excludedSavedEdges"] = excludedEdges,
                 ["technologyRecordsWithoutConsumerDeclarations"] = new JsonArray(technology.Where(p => p.Value["consumers"] is not JsonArray)
                     .Select(p => p.Key).Order(StringComparer.Ordinal).Select(s => (JsonNode)JsonValue.Create(s)!).ToArray()),
-                ["limits"] = new JsonObject { ["edgeVisitsRemainingAtStart"] = edgeBudget, ["maxAssociations"] = MaxAssociations,
-                    ["maxCandidates"] = MaxCandidates, ["maxSavedLinks"] = MaxSavedLinks, ["maxContextDepth"] = MaxDepth },
+                ["limits"] = new JsonObject
+                {
+                    ["edgeVisitsRemainingAtStart"] = edgeBudget,
+                    ["maxAssociations"] = MaxAssociations,
+                    ["maxCandidates"] = MaxCandidates,
+                    ["maxSavedLinks"] = MaxSavedLinks,
+                    ["maxContextDepth"] = MaxDepth
+                },
                 ["policy"] = "Exact phase-local context only. Explicit AML mapping destinations seed saved objects or component selection context at their retained declared-witness depth; the 128-hop limit is not reset. Captured hardware children, declared connection consumers and same-PLC declared TO relationships/consumers expand candidates. Original saved dependency evidence stays separate; supplied links never become captured edges. Equal names, members or values do not establish identity or compatibility. Candidates are review context, not verified effects; unsupported/missing capture and bounds prevent whole-impact claims.",
-                ["nativeImpactVerified"] = false, ["memberCompatibilityVerified"] = false } };
+                ["nativeImpactVerified"] = false,
+                ["memberCompatibilityVerified"] = false
+            }
+        };
         charge(result["coverage"]!); return result;
     }
     private static bool ValidIdentity(string text)

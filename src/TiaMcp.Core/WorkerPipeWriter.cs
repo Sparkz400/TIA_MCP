@@ -18,7 +18,8 @@ namespace TiaMcp.Transport
         {
             try { base.Dispose(disposing); }
             catch (IOException error) when (disposing && PeerEofReceived &&
-                (IsClosedPipe(error.HResult) || (_underlying is PipeStream pipe && !pipe.IsConnected))) { }
+                (IsClosedPipe(error.HResult) || (_underlying is PipeStream pipe && !pipe.IsConnected)))
+            { }
         }
 
         private static bool IsClosedPipe(int result)

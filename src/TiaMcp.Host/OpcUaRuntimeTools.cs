@@ -120,8 +120,15 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
         {
             // The client sees only the fixed code; the type (never the message, which may carry remote text) goes to stderr, not the MCP stdout.
             if (e is not BridgeException) Console.Error.WriteLine($"runtime_ua tool failed: {e.GetType().FullName}");
-            return Format(new { error = new { code = e is BridgeException b ? b.Code : "UaOperationFailed",
-            message = "OPC UA operation refused or incomplete; no remote error text or secret returned." } }, true); }
+            return Format(new
+            {
+                error = new
+                {
+                    code = e is BridgeException b ? b.Code : "UaOperationFailed",
+                    message = "OPC UA operation refused or incomplete; no remote error text or secret returned."
+                }
+            }, true);
+        }
     }
     private static CallToolResult Format(object value, bool error = false)
     {

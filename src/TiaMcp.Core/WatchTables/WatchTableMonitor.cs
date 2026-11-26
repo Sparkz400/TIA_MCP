@@ -58,16 +58,42 @@ public static class WatchTableMonitor
         return new JsonObject
         {
             ["schemaVersion"] = "watch-table-monitor.v1",
-            ["table"] = new JsonObject { ["kind"] = target.GetProperty("kind").GetString(), ["group"] = target.GetProperty("group").GetString(),
-                ["name"] = target.GetProperty("name").GetString(), ["semanticSha256"] = target.GetProperty("semanticSha256").GetString(),
-                ["isConsistent"] = target.GetProperty("isConsistent").GetBoolean(), ["rowCount"] = all.GetArrayLength(),
-                ["reference"] = JsonNode.Parse(snapshot.GetProperty("observation").GetProperty("reference").GetRawText()) },
-            ["target"] = new JsonObject { ["instanceId"] = instanceId, ["instanceName"] = instanceName, ["creationId"] = creationId,
-                ["origin"] = identity.GetProperty("origin").GetString(), ["communicationInterface"] = JsonNode.Parse(identity.GetProperty("communicationInterface").GetRawText()) },
-            ["page"] = new JsonObject { ["offset"] = offset, ["returned"] = rows.Count, ["total"] = all.GetArrayLength(), ["nextOffset"] = end < all.GetArrayLength() ? (int?)end : null,
-                ["totalItems"] = all.GetArrayLength(), ["pageCount"] = PageTotals.PageCount(all.GetArrayLength(), count) },
-            ["rows"] = rows, ["intervalMs"] = intervalMs, ["samples"] = sampled,
-            ["readOnly"] = true, ["modified"] = false, ["forced"] = false, ["physicalPlc"] = false, ["programMatchVerified"] = false, ["note"] = Note,
+            ["table"] = new JsonObject
+            {
+                ["kind"] = target.GetProperty("kind").GetString(),
+                ["group"] = target.GetProperty("group").GetString(),
+                ["name"] = target.GetProperty("name").GetString(),
+                ["semanticSha256"] = target.GetProperty("semanticSha256").GetString(),
+                ["isConsistent"] = target.GetProperty("isConsistent").GetBoolean(),
+                ["rowCount"] = all.GetArrayLength(),
+                ["reference"] = JsonNode.Parse(snapshot.GetProperty("observation").GetProperty("reference").GetRawText())
+            },
+            ["target"] = new JsonObject
+            {
+                ["instanceId"] = instanceId,
+                ["instanceName"] = instanceName,
+                ["creationId"] = creationId,
+                ["origin"] = identity.GetProperty("origin").GetString(),
+                ["communicationInterface"] = JsonNode.Parse(identity.GetProperty("communicationInterface").GetRawText())
+            },
+            ["page"] = new JsonObject
+            {
+                ["offset"] = offset,
+                ["returned"] = rows.Count,
+                ["total"] = all.GetArrayLength(),
+                ["nextOffset"] = end < all.GetArrayLength() ? (int?)end : null,
+                ["totalItems"] = all.GetArrayLength(),
+                ["pageCount"] = PageTotals.PageCount(all.GetArrayLength(), count)
+            },
+            ["rows"] = rows,
+            ["intervalMs"] = intervalMs,
+            ["samples"] = sampled,
+            ["readOnly"] = true,
+            ["modified"] = false,
+            ["forced"] = false,
+            ["physicalPlc"] = false,
+            ["programMatchVerified"] = false,
+            ["note"] = Note,
         };
     }
 
@@ -91,8 +117,12 @@ public static class WatchTableMonitor
         string key = Key(name);
         var matches = list.GetProperty("tags").EnumerateArray().Where(t => Key(t.GetProperty("symbol").GetString()!) == key).ToArray();
         if (matches.Length != 1)
-            return new() { ["status"] = "unresolved", ["reason"] = matches.Length > 1 ? "ambiguousInTargetTagList"
-                : list.GetProperty("truncated").GetBoolean() ? "targetTagListTruncated" : "notInTargetTagList" };
+            return new()
+            {
+                ["status"] = "unresolved",
+                ["reason"] = matches.Length > 1 ? "ambiguousInTargetTagList"
+                : list.GetProperty("truncated").GetBoolean() ? "targetTagListTruncated" : "notInTargetTagList"
+            };
         var tag = matches[0];
         string dataType = tag.GetProperty("dataType").GetString()!;
         string? type = Type(tag.GetProperty("primitiveDataType").GetString()!, dataType);
@@ -123,8 +153,14 @@ public static class WatchTableMonitor
         var value = new JsonObject { ["ordinal"] = row.Ordinal, ["address"] = row.Address, ["area"] = access["area"]!.GetValue<string>(), ["offset"] = access["offset"]!.GetValue<int>() };
         try
         {
-            var read = await simulator.CallAsync("sim_area_read", new { instanceId, area = access["area"]!.GetValue<string>(), offset = access["offset"]!.GetValue<int>(),
-                length = access["bit"] is null ? access["length"]!.GetValue<int>() : (int?)null, bit = access["bit"]?.GetValue<int>() }, CancellationToken.None);
+            var read = await simulator.CallAsync("sim_area_read", new
+            {
+                instanceId,
+                area = access["area"]!.GetValue<string>(),
+                offset = access["offset"]!.GetValue<int>(),
+                length = access["bit"] is null ? access["length"]!.GetValue<int>() : (int?)null,
+                bit = access["bit"]?.GetValue<int>()
+            }, CancellationToken.None);
             if (read.GetProperty("instanceId").GetInt32() != instanceId || read.GetProperty("instanceName").GetString() != instanceName)
                 throw new BridgeException("PlcsimResponseInvalid", "The simulator worker returned an area read for another instance; nothing is reported.");
             if (access["bit"] is not null) { value["bit"] = access["bit"]!.GetValue<int>(); value["value"] = read.GetProperty("value").GetBoolean(); }

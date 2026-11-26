@@ -190,7 +190,7 @@ internal static class ResultIntakeChecks
         foreach (var message in bulkPacket["results"]![0]!["messages"]!.AsArray()) message!["path"] = null;
         var bulk = reviews.ImportTestSuiteResults(reviewId, Upload(bulkPacket).Reference);
         var tail = Page(bulk, "findings", 99999, 1);
-        Check(bulk["summary"]!["findingCount"]!.GetValue<int>() == 100000 && tail["rows"]![0]!["value"]!["finding"]!["description"]!.GetValue<string>().EndsWith("99999") && tail["nextOffset"] is null,
+        Check(bulk["summary"]!["findingCount"]!.GetValue<int>() == 100000 && tail["rows"]![0]!["value"]!["finding"]!["description"]!.GetValue<string>().EndsWith("99999", StringComparison.Ordinal) && tail["nextOffset"] is null,
             "100000 supplied messages retain all findings and the exact terminal row within artifact bounds");
         File.WriteAllText(Path.Combine(root, "mcp-fixture.json"), JsonSerializer.Serialize(new { artifactRoot = root, reviewId, packet, review = reviews.Read(reviewId) }, BridgeProtocol.Json));
         File.WriteAllText(Path.Combine(root, "checks.json"), JsonSerializer.Serialize(new { checks = names.Count, names, nativeExecuted = false, nativeQualified = false }, BridgeProtocol.Json));
