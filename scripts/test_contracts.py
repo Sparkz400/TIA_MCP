@@ -110,7 +110,9 @@ def check_contracts():
     assert set(tools) <= features.keys(), "Public tool missing feature contract: " + str(set(tools) - features.keys())
     bindings = {tool for feature in features.values() for tool in feature["mcpTools"]}
     assert bindings == set(tools), "Catalog/tool binding mismatch"
-    change_source = (ROOT / "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs").read_text(encoding="utf-8")
+    # The change dispatcher is split over these files (26 November 2026); their switches name every prepared kind.
+    change_source = "\n".join((ROOT / "src/TiaMcp.Openness.V21" / ("OpennessSession." + part + ".cs")).read_text(encoding="utf-8")
+                              for part in ("Changes", "ChangePrepare", "ChangeApply", "ChangeTargets", "ChangeFingerprint"))
     kinds = set(re.findall(r'case "([^"]+)":', change_source))
     # Some independently typed families dispatch before the legacy switch.
     kinds |= set(re.findall(r'if \(change.Kind == "([^"]+)"\) return Prepare\w+Mutation\(change, project\);', change_source))
