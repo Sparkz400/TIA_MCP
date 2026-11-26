@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -191,11 +192,11 @@ Test("invalid identities and XML retain parser defenses", () => {
 });
 Test("source and capacity bounds fail explicitly", () => {
     Reject("OpcUaCapacity", () => OpcUaDependencyAnalysis.Analyze([]));
-    Reject("OpcUaCapacity", () => OpcUaDependencyAnalysis.Analyze(Enumerable.Range(0, 33).Select(i => Xml(i.ToString(), "")).ToArray()));
+    Reject("OpcUaCapacity", () => OpcUaDependencyAnalysis.Analyze(Enumerable.Range(0, 33).Select(i => Xml(i.ToString(CultureInfo.InvariantCulture), "")).ToArray()));
     Reject("OpcUaInvalidSources", () => OpcUaDependencyAnalysis.Analyze([Xml("g", ""), Xml("g", "")]));
     Reject("OpcUaCapacity", () => OpcUaDependencyAnalysis.Analyze([new("g", new byte[OpcUaModelReview.MaxBytes + 1])]));
     var oversized = new byte[OpcUaModelReview.MaxBytes];
-    Reject("OpcUaCapacity", () => OpcUaDependencyAnalysis.Analyze(Enumerable.Range(0, 5).Select(i => new OpcUaNodeSetSource(i.ToString(), oversized)).ToArray()));
+    Reject("OpcUaCapacity", () => OpcUaDependencyAnalysis.Analyze(Enumerable.Range(0, 5).Select(i => new OpcUaNodeSetSource(i.ToString(CultureInfo.InvariantCulture), oversized)).ToArray()));
 });
 Test("unresolved-row bound applies after cross-file resolution", () => {
     string variables = string.Concat(Enumerable.Range(1, 10001).Select(i => $"<UAVariable NodeId=\"ns=1;i={i}\" BrowseName=\"1:V{i}\" DataType=\"i=10\"/>"));

@@ -87,7 +87,7 @@ namespace TiaMcp.Model
                 throw new ArgumentException("Local TargetID links require a preserving remapper; this composer supports native @OpenLink components only.");
             NormalizeTabIndexes(result);
             int id = 0;
-            foreach (var attribute in result.Descendants().Attributes("ID")) attribute.Value = (id++).ToString("X");
+            foreach (var attribute in result.Descendants().Attributes("ID")) attribute.Value = (id++).ToString("X", CultureInfo.InvariantCulture);
             return result;
         }
 

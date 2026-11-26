@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO.Compression;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -569,7 +570,7 @@ public sealed partial class VciWorkspaceStore
             foreach (var path in paths)
             {
                 var bytes = ReadBytes(path); var row = JsonSerializer.Deserialize<Callback>(bytes, BridgeProtocol.Json);
-                Require(row is not null && row.Sequence == ++count && Path.GetFileName(path) == count.ToString("D4") + ".json" &&
+                Require(row is not null && row.Sequence == ++count && Path.GetFileName(path) == count.ToString("D4", CultureInfo.InvariantCulture) + ".json" &&
                     row.PreviousSha256 == priorHash && GitWorkspaceSnapshot.Matches(row.Record.BindingSha256, intent) && row.Record.Operation == operation &&
                     row.Record.RepositoryRoot == repository && (previousRecord is null || row.Record.OperationId == previousRecord.OperationId) &&
                     Allowed(operation, previousRecord?.Phase, row.Record.Phase), "VciIntegrityFailure", "Callback sequence or hash chain changed.");
@@ -606,7 +607,7 @@ public sealed partial class VciWorkspaceStore
                 record.Operation == binding.Operation && (latest is null || record.OperationId == latest.OperationId), "VciJournalMismatch", "Callback differs from admitted local intent.");
             Require(Allowed(binding.Operation, latest?.Phase, record.Phase), "VciJournalSequence", "Invalid callback sequence.");
             // The number advances only once its record is published, so a later outcomeUnknown takes the slot of a failed one.
-            string path = Path.Combine(directory, (sequence + 1).ToString("D4") + ".json");
+            string path = Path.Combine(directory, (sequence + 1).ToString("D4", CultureInfo.InvariantCulture) + ".json");
             Publish(path, new { sequence = sequence + 1, previousSha256 = previous, record }); sequence++; previous = PackageStorage.FileHash(path); latest = record;
             return Task.CompletedTask;
         }

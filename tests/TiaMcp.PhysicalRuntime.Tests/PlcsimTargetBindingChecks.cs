@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using TiaMcp.Core;
@@ -17,7 +18,7 @@ public static class PlcsimTargetBindingChecks
         const string Plcsim = "Siemens PLCSIM Virtual Ethernet Adapter"; // the Windows adapter description
         string Identity(string name = "Sim1", bool owned = true, string addresses = "\"192.168.0.10\",\"0.0.0.0\",\"10.0.0.1\"", string communication = "TCPIP") =>
             $$$"""{"instanceId":3,"instanceName":"{{{name}}}","creationId":"{{{creation}}}","markerSha256":"{{{marker}}}","controllerAddresses":[{{{addresses}}}],"communicationInterface":"{{{communication}}}","instance":{"id":3,"name":"{{{name}}}","owned":{{{(owned ? "true" : "false")}}},"storagePath":"C:\\sim\\Sim1"}}""";
-        var observed = DateTimeOffset.Parse("2026-10-27T12:00:00Z");
+        var observed = DateTimeOffset.Parse("2026-10-27T12:00:00Z", CultureInfo.InvariantCulture);
         var binding = PlcsimTargetBindings.Observed(Json(Identity()), 3, "Sim1", creation, observed);
         Check(binding.ControllerAddresses.SequenceEqual(["10.0.0.1", "192.168.0.10"]), "Placeholder address dropped and addresses ordered");
         Fails(() => PlcsimTargetBindings.Observed(Json(Identity()), 3, "Sim2", creation, observed), "PlcsimTargetBindingInvalid");

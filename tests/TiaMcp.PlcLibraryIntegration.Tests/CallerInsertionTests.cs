@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Xml.Linq;
 using TiaMcp.Openness.V21;
 
@@ -22,10 +23,10 @@ internal static class CallerInsertionTests
         var target = installed.Descendants("SW.Blocks.CompileUnit").Single(e => (string)e.Attribute("ID") == "3");
         var following = installed.Descendants().Where(e => XNode.DocumentOrderComparer.Compare(e, target) > 0 && !e.Ancestors().Contains(target)).Attributes("ID").ToArray();
         int start = following.Length == 0 ? installed.Descendants().Attributes("ID").Max(a => Convert.ToInt32(a.Value, 16)) + 1 : Convert.ToInt32(following[0].Value, 16);
-        var unit = new XElement("SW.Blocks.CompileUnit", new XAttribute("ID", (start).ToString("X")), new XAttribute("CompositionName", "CompileUnits"),
+        var unit = new XElement("SW.Blocks.CompileUnit", new XAttribute("ID", (start).ToString("X", CultureInfo.InvariantCulture)), new XAttribute("CompositionName", "CompileUnits"),
             new XElement("AttributeList", new XElement("ProgrammingLanguage", "FBD")),
-            new XElement("ObjectList", Enumerable.Range(1, 4).Select(i => new XElement("MultilingualText", new XAttribute("ID", (start + i).ToString("X"))))));
-        foreach (var a in following) a.Value = (Convert.ToInt32(a.Value, 16) + (shiftOverride == 0 ? 5 : shiftOverride)).ToString("X");
+            new XElement("ObjectList", Enumerable.Range(1, 4).Select(i => new XElement("MultilingualText", new XAttribute("ID", (start + i).ToString("X", CultureInfo.InvariantCulture))))));
+        foreach (var a in following) a.Value = (Convert.ToInt32(a.Value, 16) + (shiftOverride == 0 ? 5 : shiftOverride)).ToString("X", CultureInfo.InvariantCulture);
         // A whitespace-preserved export indents the new unit like its neighbours.
         if (target.NextNode is XText indent && string.IsNullOrWhiteSpace(indent.Value)) target.AddAfterSelf(new XText(indent.Value), unit); else target.AddAfterSelf(unit);
         return installed;

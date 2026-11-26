@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -60,7 +61,7 @@ internal static class MultiuserReviewChecks
         Bad(x => x["after"]!["projects"]!["rows"]![0]!["lock"]!["owner"] = null);
         Bad(x => x["after"]!["projects"]!["rows"]![0]!["lock"]!["state"] = "unlocked");
         Bad(x => x["after"]!["sessions"]!["rows"]![0]!["upToDate"] = "true");
-        Bad(x => x["after"]!["groups"]!["rows"]![0]!["path"] = new JsonArray(Enumerable.Range(0, 17).Select(i => (JsonNode?)JsonValue.Create(i.ToString())).ToArray()));
+        Bad(x => x["after"]!["groups"]!["rows"]![0]!["path"] = new JsonArray(Enumerable.Range(0, 17).Select(i => (JsonNode?)JsonValue.Create(i.ToString(CultureInfo.InvariantCulture))).ToArray()));
         foreach (var bound in new[] { ("groups", 128), ("projects", 256), ("sessions", 512), ("markings", 2048) })
             Bad(x => { var rows = x["after"]![bound.Item1]!["rows"]!.AsArray(); var row = rows[0]!.DeepClone(); while (rows.Count <= bound.Item2) rows.Add(row.DeepClone()); });
         var large = Request(); large["after"]!["captureId"] = new string('b', 32);

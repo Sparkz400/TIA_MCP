@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -56,7 +57,7 @@ internal static class CaptureChecks
             check(items[0].GetProperty("sourcePicoseconds").GetInt32()==12 && items[0].GetProperty("serverPicoseconds").GetInt32()==34,"UA capture picoseconds preserved");
             check(items[8].GetProperty("encoding").GetString()=="array","UA capture array retained");
             // Sixteen nodes whose answers together pass the 1 MiB output limit, though each is far below it: the capture reads node by node.
-            string bigCapture=Id();var bigNodes=Enumerable.Range(0,16).Select(i=>FixtureServer.Node("big"+i.ToString("00"))).ToArray();
+            string bigCapture=Id();var bigNodes=Enumerable.Range(0,16).Select(i=>FixtureServer.Node("big"+i.ToString("00", CultureInfo.InvariantCulture))).ToArray();
             int bigAudit=server.Audit.Count;
             await captures.Start(bigCapture,new(attempt,bigNodes,100,10,32),default);
             var bigStatus=await End(captures,bigCapture);

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -109,7 +110,7 @@ internal static class InterruptedWatchRecoveryChecks
         }
 
         var bounded = await New("bounded"); string boundedDestination = AdmitDestination(bounded); Directory.CreateDirectory(boundedDestination);
-        for (int i = 0; i < 4097; i++) File.WriteAllBytes(Path.Combine(boundedDestination, i.ToString("D4") + ".bin"), []);
+        for (int i = 0; i < 4097; i++) File.WriteAllBytes(Path.Combine(boundedDestination, i.ToString("D4", CultureInfo.InvariantCulture) + ".bin"), []);
         bounded.Native.NewInstance(); await Reject(() => Reconcile(bounded, "retainedPartial"), "RecoveryInspectionLimit");
 
         foreach (var change in new (string Name, string Code, Action<JsonObject> Alter)[]

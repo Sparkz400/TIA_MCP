@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO.Compression;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -430,7 +431,7 @@ internal sealed class Fixture
         XElement CellNode(string address, string text) => new(S + "c", new XAttribute("r", address), new XAttribute("t", "inlineStr"), new XElement(S + "is", new XElement(S + "t", text)));
         var headers = new[] { "Category", "ViewPath", "Internal ID", "Substitutions", "de-DE*", "en-GB" }.Concat(Enumerable.Range(0, 16).Select(n => "ref=\"" + n + "\""));
         XElement Header() => new(S + "row", new XAttribute("r", 1), headers.Select((v, i) => CellNode(((char)('A' + i)) + "1", v)));
-        XElement RowNode(int row, string[] values) => new(S + "row", new XAttribute("r", row), values.Select((v, i) => CellNode(((char)('A' + i)) + row.ToString(), v)));
+        XElement RowNode(int row, string[] values) => new(S + "row", new XAttribute("r", row), values.Select((v, i) => CellNode(((char)('A' + i)) + row.ToString(CultureInfo.InvariantCulture), v)));
         var sheets = new XElement(S + "workbook", new XAttribute(XNamespace.Xmlns + "r", D), new XElement(S + "sheets",
             new[] { "User Texts", "System Texts" }.Select((n, i) => new XElement(S + "sheet", new XAttribute("name", n), new XAttribute("sheetId", i + 1), new XAttribute(D + "id", "rId" + (i + 1))))));
         var p = new Dictionary<string, byte[]>();

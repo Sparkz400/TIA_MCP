@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
 using TiaMcp.Core;
@@ -147,7 +148,7 @@ internal static class RuntimeAcquisitionChecks
         string previousHash = Convert.ToHexStringLower(SHA256.HashData(planBytes));
         for (int index = 1; index <= 3; index++)
         {
-            string segmentPath = Path.Combine(byteDirectory, index.ToString("D6") + ".segment");
+            string segmentPath = Path.Combine(byteDirectory, index.ToString("D6", CultureInfo.InvariantCulture) + ".segment");
             var segment = JsonNode.Parse(File.ReadAllBytes(segmentPath))!.AsObject(); segment["previousSha256"] = previousHash;
             byte[] body = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(segment, BridgeProtocol.Json);
             byte[] padded = Enumerable.Repeat((byte)' ', (1 << 20) - (index == 3 ? planBytes.Length : 0)).ToArray();

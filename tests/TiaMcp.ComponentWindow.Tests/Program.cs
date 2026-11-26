@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -29,7 +30,7 @@ if (args.Length > 0)
             }
             Console.WriteLine(JsonSerializer.Serialize(new { pair.Reservation.Id, pair.Capability }, BridgeProtocol.Json));
         }
-        else if (args[0] == "resume") { childStore.Resume(args[2], int.Parse(args[3]), args[4]); Console.WriteLine("resumed"); }
+        else if (args[0] == "resume") { childStore.Resume(args[2], int.Parse(args[3], CultureInfo.InvariantCulture), args[4]); Console.WriteLine("resumed"); }
         else if (args[0] == "compete") { new EngineeringMutationAdmissionStore(root).Acquire(Scope(args[2]), new('c', 64)); Console.WriteLine("unexpectedly-admitted"); }
     }
     catch (BridgeException error) { Console.WriteLine(error.Code); }
@@ -179,7 +180,7 @@ var window = finishedStore.Acquire(finished.Manifest).Reservation; var receipt =
 ComponentWindowReservation Next(ComponentWindowReservation prior, string transition, Func<ComponentWindowReservation, ComponentWindowReservation> change)
 {
     var next = change(prior) with { Revision = prior.Revision + 1, PreviousSha256 = CanonicalJson.Sha256(JsonSerializer.SerializeToNode(prior, BridgeProtocol.Json)!), Transition = transition };
-    File.WriteAllText(Path.Combine(finished.Root, "engineering-component-windows", next.Id, next.Revision.ToString("D8") + ".json"), JsonSerializer.Serialize(next, BridgeProtocol.Json));
+    File.WriteAllText(Path.Combine(finished.Root, "engineering-component-windows", next.Id, next.Revision.ToString("D8", CultureInfo.InvariantCulture) + ".json"), JsonSerializer.Serialize(next, BridgeProtocol.Json));
     return next;
 }
 foreach (string step in new[] { "start", "applyLibrary", "recover", "observeRestored", "observeRecoveryOriginal" })

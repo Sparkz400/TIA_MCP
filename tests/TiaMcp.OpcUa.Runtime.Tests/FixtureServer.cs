@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Opc.Ua;
@@ -256,7 +257,7 @@ internal sealed partial class FixtureServer : StandardServer
             if (Mode == "arrayShapeMismatch" && request.NodeId.Identifier as string == "int64Matrix" && request.AttributeId == Attributes.ArrayDimensions)
                 result.Results[i].Value = new uint[] { 1, 3 };
             if (request.NodeId.NamespaceIndex <= 1 || request.AttributeId != Attributes.Value) continue;
-            string name = Convert.ToString(request.NodeId.Identifier)!;
+            string name = Convert.ToString(request.NodeId.Identifier, CultureInfo.InvariantCulture)!;
             if (!Values.ContainsKey(name)) continue;
             var value = result.Results[i];
             if (name == "byteArray") value.WrappedValue = new Variant(new byte[] { 1, 2, 3 }, new TypeInfo(BuiltInType.Byte, ValueRanks.OneDimension));
@@ -317,8 +318,8 @@ internal sealed partial class FixtureServer : StandardServer
             // Sixteen 60,000-byte values: each fits the 1 MiB output limit, all sixteen read together do not. They hang off no folder, so
             // "every fixture value" reads and browses are unchanged; they are reachable by their node id only.
             for (int i = 0; i < 16; i++)
-                AddPredefinedNode(SystemContext, new BaseDataVariableState(null) { NodeId = new NodeId("big" + i.ToString("00"), NamespaceIndex),
-                    BrowseName = new QualifiedName("big" + i.ToString("00"), NamespaceIndex), DisplayName = "big" + i.ToString("00"),
+                AddPredefinedNode(SystemContext, new BaseDataVariableState(null) { NodeId = new NodeId("big" + i.ToString("00", CultureInfo.InvariantCulture), NamespaceIndex),
+                    BrowseName = new QualifiedName("big" + i.ToString("00", CultureInfo.InvariantCulture), NamespaceIndex), DisplayName = "big" + i.ToString("00", CultureInfo.InvariantCulture),
                     TypeDefinitionId = VariableTypeIds.BaseDataVariableType, DataType = DataTypeIds.ByteString, ValueRank = ValueRanks.Scalar,
                     Value = new byte[60_000], AccessLevel = AccessLevels.CurrentRead, UserAccessLevel = AccessLevels.CurrentRead,
                     StatusCode = StatusCodes.Good, Timestamp = SourceTime });

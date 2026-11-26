@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -183,7 +184,7 @@ public sealed class DiagnosticExperimentReportExport(string artifactsRoot)
                 ':' => "&#58;", '.' => "&#46;", '@' => "&#64;",
                 '&' => "&amp;", '<' => "&lt;", '>' => "&gt;", '\n' => "<br>", '\r' => "", '\t' => "    ",
                 '\\' or '`' or '*' or '_' or '{' or '}' or '[' or ']' or '(' or ')' or '#' or '+' or '-' or '!' or '|' or '~' => "\\" + c,
-                _ => char.IsControl(c) ? "\\u" + ((int)c).ToString("x4") : c.ToString() });
+                _ => char.IsControl(c) ? "\\u" + ((int)c).ToString("x4", CultureInfo.InvariantCulture) : c.ToString() });
         return result.ToString();
     }
 

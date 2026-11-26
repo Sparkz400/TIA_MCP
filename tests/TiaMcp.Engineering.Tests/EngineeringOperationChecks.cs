@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Json;
 using TiaMcp.Core;
@@ -129,7 +130,7 @@ internal static class EngineeringOperationChecks
         File.WriteAllText(history, original.Replace("watch.update", "watch.delete"));
         Reject(() => store.Read(third.Id), "JournalInvalid");
         File.WriteAllText(history, original);
-        string tail = Path.Combine(root, "engineering-operations", wide.Id, wide.Revision.ToString("D6") + ".json");
+        string tail = Path.Combine(root, "engineering-operations", wide.Id, wide.Revision.ToString("D6", CultureInfo.InvariantCulture) + ".json");
         string tailOriginal = File.ReadAllText(tail);
         File.WriteAllText(tail, tailOriginal.Replace("checkpointIntent", "succeeded"));
         Reject(() => store.Read(wide.Id), "JournalInvalid");

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Xml.Linq;
 using TiaMcp.Core.WatchTables;
@@ -22,7 +23,7 @@ foreach (var test in new[] { (Name: "reorder", Bytes: reorder, Count: 16), (Name
     Check(test.Name + " explicit preorder candidate and immutable source", () => {
         var document = new WatchTableDocument(test.Bytes); var original = document.ToBytes();
         var mapping = document.ReindexReferenceFreeDocumentIds();
-        Require(mapping.Count == test.Count && mapping.Values.SequenceEqual(Enumerable.Range(0, test.Count).Select(i => i.ToString("X"))));
+        Require(mapping.Count == test.Count && mapping.Values.SequenceEqual(Enumerable.Range(0, test.Count).Select(i => i.ToString("X", CultureInfo.InvariantCulture))));
         Require(test.Bytes.SequenceEqual(original));
         File.WriteAllBytes(Path.Combine(destination, test.Name + ".xml"), document.ToBytes());
         File.WriteAllText(Path.Combine(destination, test.Name + "-mapping.json"), JsonSerializer.Serialize(mapping));

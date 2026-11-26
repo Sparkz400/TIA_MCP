@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,7 +21,7 @@ var passed = 0;
 var failed = 0;
 void Test(string name, Action<string> test)
 {
-    var work = Path.Combine(root, (passed + failed).ToString());
+    var work = Path.Combine(root, (passed + failed).ToString(CultureInfo.InvariantCulture));
     Directory.CreateDirectory(work);
     try { test(work); passed++; Console.WriteLine("PASS " + name); }
     catch (Exception error) { failed++; Console.WriteLine("FAIL " + name + ": " + error); }

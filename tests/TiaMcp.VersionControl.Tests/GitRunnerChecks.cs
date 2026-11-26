@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using TiaMcp.Core;
@@ -365,7 +366,7 @@ internal static class GitRunnerChecks
         if (!string.Equals(Path.GetFileName(Environment.ProcessPath), "git.exe", StringComparison.OrdinalIgnoreCase) || !File.Exists(Path.Combine(AppContext.BaseDirectory, "slow-process-fixture"))) return false;
         // Timeout may interrupt startup; publish only a complete PID receipt.
         var receipt = Path.Combine(AppContext.BaseDirectory, "child.pid");
-        File.WriteAllText(receipt + ".tmp", Environment.ProcessId.ToString());
+        File.WriteAllText(receipt + ".tmp", Environment.ProcessId.ToString(CultureInfo.InvariantCulture));
         File.Move(receipt + ".tmp", receipt);
         Thread.Sleep(30000); return true;
     }
@@ -382,7 +383,7 @@ internal static class GitRunnerChecks
     {
         var path = Path.Combine(directory, "child.pid");
         if (!File.Exists(path)) return; // A short timeout may stop the host before managed entry.
-        try { using var child = Process.GetProcessById(int.Parse(File.ReadAllText(path))); True(child.HasExited); } catch (ArgumentException) { }
+        try { using var child = Process.GetProcessById(int.Parse(File.ReadAllText(path), CultureInfo.InvariantCulture)); True(child.HasExited); } catch (ArgumentException) { }
     }
     private sealed record Fixture(GitWorkspaceRunner Runner, string Root, string Directory, Journal Journal);
     private sealed class Journal(string directory) : IGitOperationJournal
@@ -392,7 +393,7 @@ internal static class GitRunnerChecks
         public async Task RecordAsync(GitOperationRecord record, CancellationToken cancellationToken)
         {
             Directory.CreateDirectory(directory);
-            var path = Path.Combine(directory, Records.Count.ToString("D4") + "-" + record.OperationId + "-" + record.Phase + ".json");
+            var path = Path.Combine(directory, Records.Count.ToString("D4", CultureInfo.InvariantCulture) + "-" + record.OperationId + "-" + record.Phase + ".json");
             await File.WriteAllTextAsync(path, JsonSerializer.Serialize(record, BridgeProtocol.Json), cancellationToken);
             Records.Add(record);
             if (AfterRecord is not null) await AfterRecord(record);

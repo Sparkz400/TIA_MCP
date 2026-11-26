@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using System.Globalization;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
@@ -58,7 +59,7 @@ string? ExpectedCell(byte[] bytes, string address)
     var output = Unzip(bytes); var doc = XDocument.Parse(Encoding.UTF8.GetString(output[sheetPart]));
     var cell = doc.Descendants(ss + "c").SingleOrDefault(c => (string?)c.Attribute("r") == address);
     if (cell is null) return null;
-    if ((string?)cell.Attribute("t") == "s") return XDocument.Parse(Encoding.UTF8.GetString(output["xl/sharedStrings.xml"])).Descendants(ss + "si").ElementAt(int.Parse(cell.Element(ss + "v")!.Value)).Value;
+    if ((string?)cell.Attribute("t") == "s") return XDocument.Parse(Encoding.UTF8.GetString(output["xl/sharedStrings.xml"])).Descendants(ss + "si").ElementAt(int.Parse(cell.Element(ss + "v")!.Value, CultureInfo.InvariantCulture)).Value;
     return string.Concat(cell.Descendants(ss + "t").Select(t => t.Value));
 }
 

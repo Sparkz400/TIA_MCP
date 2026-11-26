@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using TiaMcp.Core.Engineering;
@@ -157,7 +158,7 @@ public sealed partial class WatchTableDispatcher
 
     private (string Path, string Sha256) ComponentReservationProof(ComponentWindowReservation record)
     {
-        string path = PackageStorage.Under(root, "engineering-component-windows/" + record.Id + "/" + record.Revision.ToString("D8") + ".json");
+        string path = PackageStorage.Under(root, "engineering-component-windows/" + record.Id + "/" + record.Revision.ToString("D8", CultureInfo.InvariantCulture) + ".json");
         return (path, PackageStorage.FileHash(path));
     }
     private string ComponentResponseDirectory(ComponentWindowReservation record)

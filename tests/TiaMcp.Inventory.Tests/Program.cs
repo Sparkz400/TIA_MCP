@@ -429,7 +429,7 @@ Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties
     const string plc = "/projects/P/devices/D/items/CPU/plc/CPU";
     string ExportRoot() => Path.Combine(output, "block-export-host");
     var hostOptions = new HostOptions("", ExportRoot(), null, 60, false, "", null);
-    string BlockJson(int i, bool isProtected = false) => "{\"path\":\"" + plc + "/blocks/FB" + i.ToString("D3") + "\",\"plcPath\":\"" + plc + "\",\"name\":\"FB" + i.ToString("D3")
+    string BlockJson(int i, bool isProtected = false) => "{\"path\":\"" + plc + "/blocks/FB" + i.ToString("D3", CultureInfo.InvariantCulture) + "\",\"plcPath\":\"" + plc + "\",\"name\":\"FB" + i.ToString("D3", CultureInfo.InvariantCulture)
         + "\",\"number\":" + i + ",\"kind\":\"FB\",\"programmingLanguage\":\"SCL\",\"isConsistent\":true,\"isKnowHowProtected\":" + (isProtected ? "true" : "false") + "}";
     JsonElement Inventory(int count, int protectedAt = -1) => JsonDocument.Parse("{\"project\":{\"name\":\"P\"},\"plcs\":[{\"path\":\"" + plc + "\"}],\"completeness\":{\"truncated\":false},\"blocks\":["
         + string.Join(",", Enumerable.Range(0, count).Select(i => BlockJson(i, i == protectedAt))) + "]}").RootElement;

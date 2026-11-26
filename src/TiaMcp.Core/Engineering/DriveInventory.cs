@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
@@ -190,7 +191,7 @@ public static partial class DriveInventory
         // Byte, word and double word take no bit; a bit address (X or no size) needs one.
         if ((size is "B" or "W" or "D") == match.Groups["bit"].Success) return null;
         bool input = match.Groups["area"].Value.ToUpperInvariant() is "I" or "E";
-        return new Address(input, int.Parse(match.Groups["byte"].Value), size == "W" ? 2 : size == "D" ? 4 : 1);
+        return new Address(input, int.Parse(match.Groups["byte"].Value, CultureInfo.InvariantCulture), size == "W" ? 2 : size == "D" ? 4 : 1);
     }
 
     private static string? Text(JsonNode? node) => node is JsonValue v && v.TryGetValue<string>(out string? s) ? s : null;

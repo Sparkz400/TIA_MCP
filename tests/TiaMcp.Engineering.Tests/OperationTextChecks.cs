@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Json;
 using TiaMcp.Core;
@@ -15,7 +16,7 @@ internal static class OperationTextChecks
         void Check(bool ok, string name) { if (!ok) failures.Add(name); else checks.Add(name); }
         (EngineeringOperationStore Store, EngineeringOperationPlan Plan, EngineeringArtifactReference Proof) Fixture()
         {
-            string folder = Path.Combine(root, (++sequence).ToString()); Directory.CreateDirectory(folder);
+            string folder = Path.Combine(root, (++sequence).ToString(CultureInfo.InvariantCulture)); Directory.CreateDirectory(folder);
             string proof = Path.Combine(folder, "proof-\uFFFD.json"); File.WriteAllText(proof, "synthetic evidence only");
             var artifact = new EngineeringArtifactReference(Path.GetFileName(proof), Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(proof))));
             string project = Path.Combine(folder, "project.ap21");
@@ -33,7 +34,7 @@ internal static class OperationTextChecks
         }
         void Reject(Action action, string name, EngineeringOperationStore store, EngineeringOperationRecord? before = null)
         {
-            string folder = Path.Combine(root, sequence.ToString());
+            string folder = Path.Combine(root, sequence.ToString(CultureInfo.InvariantCulture));
             string Snapshot() => string.Join("\n", Directory.GetFiles(folder, "*.json", SearchOption.AllDirectories).Order(StringComparer.Ordinal)
                 .Select(p => p + ":" + Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(p)))));
             string original = Snapshot();

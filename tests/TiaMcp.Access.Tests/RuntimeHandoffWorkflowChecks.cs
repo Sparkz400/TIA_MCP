@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -201,7 +202,7 @@ internal static class RuntimeHandoffWorkflowChecks
         Reject(() => ReportPageRows.Read(pageSource, 2, 1, 1, "Download original."), "Impossible omission budget refuses instead of stalling", "ArtifactCapacity");
         Check(pageSource[0] is null && (string)pageSource[2]! == new string('x', 500), "Paging never changes original rows");
         var large = JsonNode.Parse(sourceBytes["baseline.session.json"])!.AsObject(); var permissionRows = new JsonArray();
-        for (int i = 0; i < 140; i++) permissionRows.Add(new JsonObject { ["id"] = i.ToString(), ["scope"] = "scope", ["outcome"] = "denied" });
+        for (int i = 0; i < 140; i++) permissionRows.Add(new JsonObject { ["id"] = i.ToString(CultureInfo.InvariantCulture), ["scope"] = "scope", ["outcome"] = "denied" });
         large["permissions"] = permissionRows;
         var boundaryRow = new JsonObject { ["role"] = "session", ["observation"] = large };
         int padding = (128 << 10) - 4096 - JsonSerializer.SerializeToUtf8Bytes(boundaryRow, BridgeProtocol.Json).Length;

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -55,7 +56,7 @@ internal static class AcceptanceChecks
                 ["languages"] = new JsonObject { ["active"] = new JsonArray("de-DE", "en-US"), ["reference"] = "de-DE", ["editing"] = "en-US" } };
             var watchTables = new JsonObject { ["watch:root/Peer"] = new JsonObject { ["kind"] = "watch", ["path"] = "root/Peer", ["group"] = "root", ["name"] = "Peer",
                 ["artifact"] = Artifact(Path.Combine(m.Workspace, "captures", phase, "watch.xml"), "<Document><WatchTable ID=\"8\"><Comment>保持</Comment></WatchTable></Document>") } };
-            return new() { ["projectPath"] = project, ["plcPath"] = m.PlcPath, ["processId"] = identity, ["nativeBirthUtc"] = "2026-01-01T00:" + (identity - 999).ToString("D2") + ":00Z", ["sessionEpoch"] = identity == 999 ? m.InitialNativeSessionEpoch : "fresh-" + identity,
+            return new() { ["projectPath"] = project, ["plcPath"] = m.PlcPath, ["processId"] = identity, ["nativeBirthUtc"] = "2026-01-01T00:" + (identity - 999).ToString("D2", CultureInfo.InvariantCulture) + ":00Z", ["sessionEpoch"] = identity == 999 ? m.InitialNativeSessionEpoch : "fresh-" + identity,
                 ["scopeComplete"] = true, ["isModified"] = false, ["projectFileSha256"] = Hash("synthetic project"), ["componentVersions"] = new JsonArray(version), ["objects"] = objects,
                 ["peerMetadata"] = metadata, ["watchForceTables"] = watchTables,
                 ["inventory"] = new JsonObject { ["completeness"] = new JsonObject { ["scopeComplete"] = true, ["truncated"] = false }, ["softwareScopes"] = new JsonArray(new JsonObject()), ["technologyObjects"] = new JsonArray(), ["blocks"] = inventory, ["types"] = new JsonArray(), ["tagTables"] = new JsonArray() } };

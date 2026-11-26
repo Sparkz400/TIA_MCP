@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -87,7 +88,7 @@ Reject(() => Build(Mutate(p => p["before"]!["consumersComplete"] = "true")), "No
 Reject(() => Build(Mutate(p => p["nativeQualified"] = true)), "Unknown request field refused");
 Reject(() => Build(Mutate(p => p["before"]!["connections"]![0]!["id"] = "bad\nID")), "Control-bearing selector refused");
 Reject(() => Build(Mutate(p => p["before"]!["connections"]![0]!["properties"] = new JsonArray())), "Nonobject property payload refused");
-Reject(() => Build(Mutate(p => p["before"]!["connections"] = new JsonArray(Enumerable.Range(0,513).Select(i => (JsonNode?)Connection(i.ToString(),"TCP")).ToArray()))), "Connection count bounded");
+Reject(() => Build(Mutate(p => p["before"]!["connections"] = new JsonArray(Enumerable.Range(0,513).Select(i => (JsonNode?)Connection(i.ToString(CultureInfo.InvariantCulture),"TCP")).ToArray()))), "Connection count bounded");
 Reject(() => Build(Mutate(p => p["before"]!["consumers"] = new JsonArray(Enumerable.Range(0,2049).Select(i => (JsonNode?)Consumer(block,"s7")).ToArray()))), "Consumer count bounded");
 Reject(() => ConnectionReview.Parse(Encoding.UTF8.GetBytes("{\"properties\":{\"x\":1,\"x\":2}}")), "Nested duplicate opaque fields refused");
 Reject(() => ConnectionReview.Parse(new byte[ConnectionReview.InputLimit+1]), "Input byte bound enforced");
@@ -132,7 +133,7 @@ Check(((string)full["report"]!["observations"]![0]!["connection"]!["properties"]
 var maximum=Mutate(p=> {p["before"]!["consumers"]=new JsonArray(Enumerable.Range(0,2048).Select(_=>(JsonNode?)Consumer(block,"s7")).ToArray());p["after"]!["consumers"]=p["before"]!["consumers"]!.DeepClone();});
 var maxUpload=Upload(maximum);var maxReceipt=store.Review(id,maxUpload.Ref);var maxPage=store.Page((string)maxReceipt["recordId"]!,"consumers",0,200);
 Check((int)maxPage["total"]! == 4096 && maxPage["nextOffset"] is not null && JsonSerializer.SerializeToUtf8Bytes(maxPage,BridgeProtocol.Json).Length<=128*1024,"Maximum consumers page within byte budget");
-var many = Mutate(p => { foreach (string phase in new[] { "before", "after" }) { p[phase]!["connections"] = new JsonArray(Enumerable.Range(0,512).Select(i => (JsonNode?)Connection(i.ToString(),"TCP")).ToArray()); p[phase]!["consumers"] = new JsonArray(); } p["matches"] = new JsonArray(Enumerable.Range(0,512).Select(i => (JsonNode?)new JsonObject { ["beforeId"] = i.ToString(), ["afterId"] = i.ToString() }).ToArray()); });
+var many = Mutate(p => { foreach (string phase in new[] { "before", "after" }) { p[phase]!["connections"] = new JsonArray(Enumerable.Range(0,512).Select(i => (JsonNode?)Connection(i.ToString(CultureInfo.InvariantCulture),"TCP")).ToArray()); p[phase]!["consumers"] = new JsonArray(); } p["matches"] = new JsonArray(Enumerable.Range(0,512).Select(i => (JsonNode?)new JsonObject { ["beforeId"] = i.ToString(CultureInfo.InvariantCulture), ["afterId"] = i.ToString(CultureInfo.InvariantCulture) }).ToArray()); });
 var manyUpload=Upload(many);var manyReceipt=store.Review(id,manyUpload.Ref);var manyPage=store.Page((string)manyReceipt["recordId"]!,"observations",0,200);
 Check((int)manyReceipt["summary"]!["matchedCount"]! == 512 && (int)manyPage["total"]! == 1024 && manyPage["nextOffset"] is not null, "Maximum connections and mappings remain navigable");
 string filler=Path.Combine(root,"connection-reviews","capacity.partial");using(var f=File.Create(filler))f.SetLength(512L*1024*1024);

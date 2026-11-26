@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -85,7 +86,7 @@ internal static class ProductionRecoveryChecks
         Reject(() => new EngineeringOperationStore(root).Read(unknown.Id), "ArtifactChanged");
         File.WriteAllText(Path.Combine(root, firstProof.RelativePath), "Immutable initial recovery observation");
         unknown = store.RecordRecoveryEvidence(unknown.Id, unknown.Revision, new("recovery.restored", proof));
-        string last = Path.Combine(root, "engineering-operations", unknown.Id, unknown.Revision.ToString("D6") + ".json");
+        string last = Path.Combine(root, "engineering-operations", unknown.Id, unknown.Revision.ToString("D6", CultureInfo.InvariantCulture) + ".json");
         byte[] beforeTamper = File.ReadAllBytes(last); var altered = JsonNode.Parse(beforeTamper)!;
         altered["evidence"]![0]!["gate"] = "replaced-old-evidence";
         File.WriteAllText(last, altered.ToJsonString(BridgeProtocol.Json));

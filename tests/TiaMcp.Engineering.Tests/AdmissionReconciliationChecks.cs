@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using TiaMcp.Core;
@@ -61,7 +62,7 @@ internal static class AdmissionReconciliationChecks
         var request = native.Requests.Last();
         Check(request["operation"]!.GetValue<string>() == "change_apply" && request["admittedProcessId"]!.GetValue<int>() == 123 &&
             request["resources"]!.AsArray().Count == 3 && request["observationSha256"]!.GetValue<string>() == scope.ObservationSha256, "Native request carries the exact admitted scope");
-        Check(DateTimeOffset.Parse(request["admittedAtUtc"]!.GetValue<string>()) == store.AdmittedAt(admissionId) &&
+        Check(DateTimeOffset.Parse(request["admittedAtUtc"]!.GetValue<string>(), CultureInfo.InvariantCulture) == store.AdmittedAt(admissionId) &&
             store.AdmittedAt(admissionId) < store.Read(admissionId).RecordedAt, "Write-time evidence is bound to the dispatch intent, not the later unknown outcome");
         try { store.Acquire(scope with { ScopeSha256 = new('e', 64) }, new('a', 64)); throw new Exception("Expected ResourceBusy"); }
         catch (BridgeOperationException error) when (error.Code == "ResourceBusy") {
