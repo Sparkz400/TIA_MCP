@@ -20,6 +20,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ### Fixed
 
+- `tia_detach` failed on a Portal TIA had already disposed ("Access to a disposed object"), so the session could not be ended and `tia_start` stayed refused with `AlreadyAttached`; detach now clears the session and reports `portalDisposed`.
 - A `simulation_download` the worker refused before its claim (`ticketState` `reusable`, nothing written) kept its admission `outcomeUnknown`, so every later download and `project_save` on that project was refused with `ResourceBusy`; it is now a returned outcome. Failures that may have written stay held.
 - Credential provisioning's card move gave up after 15 s of access denials that an on-access scanner holding the freshly moved folder causes; it now retries for up to 120 s, and the holder report says that a file-system filter is not listed.
 - `simulation_download_online` and `plc_physical_download` refused a `DataBlockReinitialization` question by throwing from TIA's download callback, which loaded nothing but left the TIA Portal session disposed and reported `EngineeringError`; they now decline it through TIA and report `SimulationDownloadReinitializationRequired` (or the physical route's refusal) with the Portal intact.

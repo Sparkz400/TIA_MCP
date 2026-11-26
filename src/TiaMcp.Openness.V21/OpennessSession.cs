@@ -336,16 +336,24 @@ namespace TiaMcp.Openness.V21
             int? pid = _processId;
             var identity = owned ? _portalProcessIdentity : null;
             var closed = new JArray(); var closeFailures = new JArray();
+            bool portalDisposed = false;
+            // A Portal TIA has already disposed (natively after a worker exception thrown from a download callback, 26 November
+            // 2026) refuses every access; detach must still end the session, or tia_start stays refused with AlreadyAttached.
             if (owned && _ownedQualificationPortal == null)
-                foreach (var project in _portal.Projects.ToArray())
+                try
                 {
-                    string name = project.Name; bool modified = project.IsModified;
-                    try { project.Close(); closed.Add(new JObject { ["name"] = name, ["unsavedEditsDiscarded"] = modified }); }
-                    catch (Exception error) { closeFailures.Add(new JObject { ["name"] = name, ["error"] = error.Message }); }
+                    foreach (var project in _portal.Projects.ToArray())
+                    {
+                        string name = project.Name; bool modified = project.IsModified;
+                        try { project.Close(); closed.Add(new JObject { ["name"] = name, ["unsavedEditsDiscarded"] = modified }); }
+                        catch (Exception error) { closeFailures.Add(new JObject { ["name"] = name, ["error"] = error.Message }); }
+                    }
                 }
+                catch (EngineeringObjectDisposedException) { portalDisposed = true; }
             if (owned) _portalProcessIdentity = null; // kept for the wait below; DetachPortalConnection would dispose it
-            DetachPortalConnection();
+            portalDisposed |= DetachPortalConnection();
             var result = ReadSessionStatus();
+            if (portalDisposed) result["portalDisposed"] = true;
             result["disposedOwnedPortalConnection"] = owned;
             result["portalProcessId"] = pid;
             result["projectsClosed"] = closed;
@@ -373,17 +381,24 @@ namespace TiaMcp.Openness.V21
             finally { _simulationRuntimeLifetime.Dispose(); }
         }
 
-        private void DetachPortalConnection()
+        // Returns true when a step found the Portal already disposed; the session is cleared either way.
+        private bool DetachPortalConnection()
         {
-            TranslationRelease();
-            TestSuiteRelease();
-            SharedMutationRelease();
-            WatchRelease();
+            bool disposed = false;
+            void Release(Action step)
+            {
+                try { step(); }
+                catch (EngineeringObjectDisposedException) { disposed = true; }
+            }
+            Release(TranslationRelease);
+            Release(TestSuiteRelease);
+            Release(SharedMutationRelease);
+            Release(WatchRelease);
             _watchEpoch = Guid.NewGuid().ToString("N");
-            CloseManagedLibraries();
+            Release(CloseManagedLibraries);
             _projectIndexes.Invalidate("dispose");
             _indexRequests.Clear();
-            ReleaseResolvedChanges();
+            Release(ReleaseResolvedChanges);
             var portal = _portal;
             var ownedQualificationPortal = _ownedQualificationPortal;
             var processIdentity = _portalProcessIdentity;
@@ -399,7 +414,9 @@ namespace TiaMcp.Openness.V21
                 if (ownedQualificationPortal != null) ownedQualificationPortal.Dispose();
                 else portal?.Dispose();
             }
+            catch (EngineeringObjectDisposedException) { disposed = true; }
             finally { processIdentity?.Dispose(); }
+            return disposed;
         }
 
         private JObject Inventory(JObject args)

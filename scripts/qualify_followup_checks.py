@@ -759,9 +759,11 @@ class Run:
     def queue_timeout_during_change_apply(self):
         scratch = self.ensure_scratch()
         # The apply must outlast the queue timeout (5 s minimum): a plc_compile of an unchanged scratch took 1.8 s natively, so
-        # the timed apply generates and compiles 300 functions instead.
-        names = ["QtFc%03d" % i for i in range(300)]
-        source = "\n".join('FUNCTION "%s" : Int\nVERSION : 0.1\nBEGIN\n   #%s := %d;\nEND_FUNCTION\n' % (name, name, i) for i, name in enumerate(names))
+        # the timed apply generates and compiles 100 functions (change_prepare's limit) of 200 statements each instead.
+        names = ["QtFc%03d" % i for i in range(100)]
+        body = "".join("   #T := #T + %d;\n" % k for k in range(200))
+        source = "\n".join('FUNCTION "%s" : Int\nVERSION : 0.1\n   VAR_TEMP\n      T : Int;\n   END_VAR\nBEGIN\n   #T := %d;\n%s   #%s := #T;\nEND_FUNCTION\n'
+                           % (name, i, body, name) for i, name in enumerate(names))
         prepared = self.ok(self.a, "change_prepare", {"kind": "source_upsert", "plcPath": scratch["plcPath"],
                                                        "payload": {"language": "SCL", "source": source, "expectedBlockNames": names}})
         raw = RawCalls(self.a)
