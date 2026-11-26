@@ -231,7 +231,7 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   instance; restore the original mode. The same run covers the Runtime-Manager-lost subscription, which never attached
   before 25 November (the API spells the event `OnRunTimemanagerLost`).
 - [ ] **CI and repository upkeep:** the split package job (build once, five legs) still needs its first CI run to confirm
-  the timing; the [status log](history/status-log.md) has no entry between 3 and 25 November.
+  the timing.
 
 ## Code audit follow-ups (9 November)
 
