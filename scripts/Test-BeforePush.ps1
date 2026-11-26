@@ -59,7 +59,7 @@ try {
     }
 
     # The bindings pin the SHA-256 of every implementing source file; any source edit needs ./scripts/Refresh-Contracts.ps1.
-    if ($changed -match '^(src/|contracts/|scripts/api_coverage)') {
+    if ($changed -match '^(src/|contracts/|scripts/(test_)?api_coverage|scripts/public_api_metadata/|scripts/Inspect-PublicApi\.ps1$|global\.json$|Directory\.Build\.props$)') {
         Invoke-Check 'Source bindings' { $env:PYTHONUTF8 = '1'; python -B scripts/api_coverage_bindings.py validate contracts/api-coverage/implementation-bindings.v1.json --allow-missing-evidence | Out-Null }
     }
     if ($changed -match '^(contracts/|docs/plans/release-(matrix|obligations))') {

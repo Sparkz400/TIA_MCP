@@ -847,8 +847,8 @@
     },
     {
       "path": "scripts/test_api_coverage_bindings.py",
-      "sha256": "80cfb843b00cf2f92b015da35a1d484ace4c40983657bba172fbc7877f3a3a4e",
-      "bytes": 13740
+      "sha256": "504a9377a0837a15d4d3e8a27e1b1e994b84eb0c12bebcfeec4c28e00e0dbfb6",
+      "bytes": 15549
     },
     {
       "path": "src/TiaMcp.AddIn.V21/HandoffJson.cs",
