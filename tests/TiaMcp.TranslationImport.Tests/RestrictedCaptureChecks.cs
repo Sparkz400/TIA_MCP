@@ -15,7 +15,7 @@ internal static class RestrictedCaptureChecks
 
     internal static void Register(Action<string, Func<Task>> test, string output)
     {
-        static void True(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
+        static void True(bool value, string message) { if (!value) throw new Exception(message); }
         // 28 October shape: every category request on the PLC returned all six rows (five block comments, one hardware comment).
         string[][] Over() => [ProjectTextExportChecks.Values("K-0", "<" + Hardware + ">", 1),
             .. Enumerable.Range(1, 5).Select(i => ProjectTextExportChecks.Values("K-" + i, "<" + Comments + ">", 1))];

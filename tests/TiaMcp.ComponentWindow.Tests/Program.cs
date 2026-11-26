@@ -38,7 +38,7 @@ if (args.Length > 0)
 }
 
 int passed = 0;
-void Check(bool value, string label) { if (!value) throw new InvalidOperationException(label); passed++; }
+void Check(bool value, string label) { if (!value) throw new Exception(label); passed++; }
 void Reject(Action action, string code)
 { try { action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; } throw new InvalidOperationException("Expected " + code); }
 string basis = Path.Combine(Path.GetTempPath(), "component-window-offline-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(basis);

@@ -417,7 +417,7 @@ internal static class CoordinatorTests
         });
     }
 
-    private static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}; got {actual}"); }
+    private static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new Exception($"Expected {expected}; got {actual}"); }
 
     // A crashed combined apply's step workspace in the 31 October layout: the coordinator after the import step, the import step's
     // claim, journal, recorded archive, lock manifest and checks, the typed step's journal, recorded archive and exports, readback captures.
@@ -446,10 +446,10 @@ internal static class CoordinatorTests
     {
         var start = new System.Diagnostics.ProcessStartInfo("cmd.exe", "/c mklink /J \"" + link + "\" \"" + target + "\"") { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
         using var process = System.Diagnostics.Process.Start(start); process.WaitForExit();
-        if (process.ExitCode != 0 || (File.GetAttributes(link) & FileAttributes.ReparsePoint) == 0) throw new InvalidOperationException("Could not create the test junction " + link);
+        if (process.ExitCode != 0 || (File.GetAttributes(link) & FileAttributes.ReparsePoint) == 0) throw new Exception("Could not create the test junction " + link);
     }
-    private static void Reject(string code, Action action) { try { action(); } catch (PlcComponentException e) when (e.Code == code) { return; } throw new InvalidOperationException("Expected " + code); }
-    private static void Throws<T>(Action action) where T : Exception { try { action(); } catch (T) { return; } throw new InvalidOperationException("Expected " + typeof(T).Name); }
+    private static void Reject(string code, Action action) { try { action(); } catch (PlcComponentException e) when (e.Code == code) { return; } throw new Exception("Expected " + code); }
+    private static void Throws<T>(Action action) where T : Exception { try { action(); } catch (T) { return; } throw new Exception("Expected " + typeof(T).Name); }
 
     private static Scenario OracleScenario(ContentContractTests.OracleFixture oracle)
     {

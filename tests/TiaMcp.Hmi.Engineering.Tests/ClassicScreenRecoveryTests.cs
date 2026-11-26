@@ -51,7 +51,7 @@ static class ClassicScreenRecoveryTests
 
     public static void Run(Action<string, Action> check)
     {
-        void Reject(Action action) { try { action(); } catch (ArgumentException) { return; } throw new InvalidOperationException("Expected recovery refusal"); }
+        void Reject(Action action) { try { action(); } catch (ArgumentException) { return; } throw new Exception("Expected recovery refusal"); }
         check("Screen recovery and composition reject file links and linked ancestors", () => {
             string root = Path.Combine(Path.GetTempPath(), "screen-links-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(root);

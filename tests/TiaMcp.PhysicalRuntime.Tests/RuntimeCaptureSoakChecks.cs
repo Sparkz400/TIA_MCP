@@ -14,7 +14,7 @@ internal static partial class RuntimeCaptureSoakChecks
             throw new ArgumentException("Windows resource soak requires 30..120 real seconds.");
         NewRoot(root);
         var checks = new List<string>();
-        void Check(bool value, string name) { if (!value) throw new InvalidOperationException(name); checks.Add(name); }
+        void Check(bool value, string name) { if (!value) throw new Exception(name); checks.Add(name); }
         var watch = Stopwatch.StartNew();
         await using var fixture = new Fixture(root, 4, 16);
         var captures = Enumerable.Range(0, 4).Select(i => fixture.Case(i, seconds + 30, 100000)).ToArray();

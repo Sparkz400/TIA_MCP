@@ -7,7 +7,7 @@ static class ClassicScreenEditTests
     public static void Run(Action<string, Action> check)
     {
         const string kind = "hmi_classic_screen_edit", hmi = "/projects/Test/devices/HMI/hmi/Runtime";
-        void Assert(bool value) { if (!value) throw new InvalidOperationException("Screen scope assertion failed"); }
+        void Assert(bool value) { if (!value) throw new Exception("Screen scope assertion failed"); }
         check("Screen edit admits only existing regular RT Advanced screens and XML import", () => {
             foreach (string family in new[] { "classic", "unified" })
             foreach (string profile in new[] { "classic-rt-advanced", "classic-basic", "classic-comfort", "unified-pc" })

@@ -10,9 +10,9 @@ public static class PlcsimTargetBindingChecks
     public static int Run(string root)
     {
         int checks = 0;
-        void Check(bool condition, string label) { checks++; if (!condition) throw new InvalidOperationException(label); }
+        void Check(bool condition, string label) { checks++; if (!condition) throw new Exception(label); }
         void Fails(Action action, string code)
-        { try { action(); } catch (BridgeException e) when (e.Code == code) { checks++; return; } throw new InvalidOperationException("Expected " + code); }
+        { try { action(); } catch (BridgeException e) when (e.Code == code) { checks++; return; } throw new Exception("Expected " + code); }
         JsonElement Json(string text) { using var doc = JsonDocument.Parse(text); return doc.RootElement.Clone(); }
         string creation = new('a', 32), marker = new('b', 64);
         const string Plcsim = "Siemens PLCSIM Virtual Ethernet Adapter"; // the Windows adapter description

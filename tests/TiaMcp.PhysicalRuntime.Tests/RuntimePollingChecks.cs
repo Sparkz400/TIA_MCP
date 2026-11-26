@@ -11,7 +11,7 @@ internal static class RuntimePollingChecks
     internal static async Task<int> Run(string root)
     {
         int checks=0;var passed=new List<string>();
-        void Check(bool value,string label){if(!value)throw new InvalidOperationException(label);checks++;passed.Add(label);}
+        void Check(bool value,string label){if(!value)throw new Exception(label);checks++;passed.Add(label);}
         await using(var f=new PollFixture(root,2))
         {
             f.Sessions.BeforeRead=(_,_)=>{f.Clock.Advance(1500,fire:false);return Task.CompletedTask;};

@@ -5,7 +5,7 @@ internal static class QualificationTests
 {
     internal static void Run(Action<string, Action> test)
     {
-        void Reject(string code, Action action) { try { action(); } catch (PlcComponentException e) when (e.Code == code) { return; } throw new InvalidOperationException("Expected " + code); }
+        void Reject(string code, Action action) { try { action(); } catch (PlcComponentException e) when (e.Code == code) { return; } throw new Exception("Expected " + code); }
         test("qualification launch flag is mandatory even in an owned scratch", () => Reject("ComponentQualificationDisabled", () => PlcComponentQualificationGate.RequireOwned(false, true, true, 1)));
         foreach (var row in new[] { (false, true, 1), (true, false, 1), (true, true, 0), (true, true, 2) })
             test("qualification rejects ownership boundary " + row, () => Reject("OwnedScratchRequired", () => PlcComponentQualificationGate.RequireOwned(true, row.Item1, row.Item2, row.Item3)));

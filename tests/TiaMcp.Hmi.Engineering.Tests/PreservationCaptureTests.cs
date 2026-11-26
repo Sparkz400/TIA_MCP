@@ -5,7 +5,7 @@ using TiaMcp.Openness.V21;
 static class PreservationCaptureTests
 {
     const string HmiPath = "/projects/fixture/hmi/Runtime";
-    static void Assert(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
+    static void Assert(bool value, string message) { if (!value) throw new Exception(message); }
     static JObject Artifacts() => new JObject { [HmiPath + "/screens/Main"] = new JObject { ["sha256"] = new string('a', 64), ["bytes"] = 12 } };
     static JArray Targets(string family = "classic") => new JArray(new JObject { ["family"] = family });
     static JObject Manifest(HmiPreservationCapture capture) => capture.Manifest("hmi_classic_import", Artifacts(),

@@ -15,7 +15,7 @@ internal static class RuntimeConnectionReuseChecks
     internal static async Task<int> Run()
     {
         int checks = 0;
-        void Check(bool condition, string label) { if (!condition) throw new InvalidOperationException(label); checks++; }
+        void Check(bool condition, string label) { if (!condition) throw new Exception(label); checks++; }
         using var key = RSA.Create(2048);
         var request = new CertificateRequest("CN=Runtime connection reuse fixture", key, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
         var san = new SubjectAlternativeNameBuilder(); san.AddIpAddress(IPAddress.Loopback);

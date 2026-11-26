@@ -416,7 +416,7 @@ internal static class GitRunnerChecks
         if (input is not null) await process.StandardInput.BaseStream.WriteAsync(input);
         process.StandardInput.Close();
         await Task.WhenAll(read, process.WaitForExitAsync());
-        if (process.ExitCode != 0) throw new InvalidOperationException("Fixture Git failed: " + await error);
+        if (process.ExitCode != 0) throw new Exception("Fixture Git failed: " + await error);
         return output.ToArray();
     }
     private static async Task Reject(string code, Func<Task> run)

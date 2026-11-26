@@ -7,7 +7,7 @@ internal static class TranslationAdmissionChecks
     internal static void Register(Action<string, Func<Task>> test, Func<Fixture> fixture, Func<string[], string[], Fixture> restricted)
     {
         static void Refuse(string code, Action action)
-        { try { action(); } catch (BridgeException e) when (e.Code == code) { return; } throw new InvalidOperationException("Expected " + code); }
+        { try { action(); } catch (BridgeException e) when (e.Code == code) { return; } throw new Exception("Expected " + code); }
         static (TranslationAdmissionKey Key, TranslationAdmissionProfile Profile) Key(Fixture f)
         {
             var op = f.Prepare();

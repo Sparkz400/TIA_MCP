@@ -38,7 +38,7 @@ internal static class CallerInsertionTests
     {
         try { PlcComponentCallerInsertion.Verify(original, installed, "3"); }
         catch (PlcComponentException e) when (e.Code == "ComponentCallerPreservationMismatch") { return; }
-        throw new InvalidOperationException("Expected ComponentCallerPreservationMismatch");
+        throw new Exception("Expected ComponentCallerPreservationMismatch");
     }
 
     internal static void Run(Action<string, Action> test)
@@ -101,5 +101,5 @@ internal static class CallerInsertionTests
         });
     }
 
-    static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}; got {actual}"); }
+    static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new Exception($"Expected {expected}; got {actual}"); }
 }

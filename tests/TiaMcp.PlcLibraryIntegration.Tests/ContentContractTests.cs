@@ -69,8 +69,8 @@ internal static class ContentContractTests
     }
     static XElement Attr(XDocument d) => d.Descendants("SW.Blocks.FB").Single().Element("AttributeList");
     static XElement VersionAttr(XDocument d) => d.Root.Element("SW.Blocks.CodeBlockLibraryTypeVersion").Element("AttributeList");
-    static void Equal<T>(T a, T b) { if (!Equals(a, b)) throw new InvalidOperationException("Expected " + a + "; got " + b); }
-    static void Reject(Action body) { try { body(); } catch (PlcComponentException e) when (e.Code == "ComponentReadbackMismatch") { return; } throw new InvalidOperationException("Expected fail-closed content contract rejection."); }
+    static void Equal<T>(T a, T b) { if (!Equals(a, b)) throw new Exception("Expected " + a + "; got " + b); }
+    static void Reject(Action body) { try { body(); } catch (PlcComponentException e) when (e.Code == "ComponentReadbackMismatch") { return; } throw new Exception("Expected fail-closed content contract rejection."); }
 
     internal sealed class OracleFixture : IDisposable
     {

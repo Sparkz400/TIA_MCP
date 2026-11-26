@@ -8,7 +8,7 @@ static class GateAdmissionTests
     static readonly string[] Kinds = { "hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create", "hmi_dynamization_create", "hmi_event_handler_create" };
     const string Screen = "Siemens.Engineering.Hmi.Screen.Screen", TagTable = "Siemens.Engineering.Hmi.Tag.TagTable";
     static string Family(string profile) => profile.StartsWith("classic-", StringComparison.Ordinal) ? "classic" : "unified";
-    static void Assert(bool value, string label) { if (!value) throw new InvalidOperationException(label); }
+    static void Assert(bool value, string label) { if (!value) throw new Exception(label); }
     // The natively qualified scope of each kind (1 November 2026): what production admits, with or without a qualification profile.
     static bool Qualified(string kind, string profile, string operation, string type)
         => kind == "hmi_classic_import" ? profile is "classic-comfort" or "classic-rt-advanced" or "classic-basic" && (operation == "scalar_property_set" || operation == "classic_xml_import" && (type == Screen || type == TagTable))
@@ -167,6 +167,6 @@ static class GateAdmissionTests
     static void Reject(Action action, string label)
     {
         try { action(); } catch (ArgumentException) { return; }
-        throw new InvalidOperationException("Expected a refusal: " + label);
+        throw new Exception("Expected a refusal: " + label);
     }
 }

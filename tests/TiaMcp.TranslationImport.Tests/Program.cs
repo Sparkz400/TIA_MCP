@@ -40,7 +40,7 @@ Directory.CreateDirectory(output);
 var tests = new List<(string Name, Func<Task> Body)>();
 void Test(string name, Func<Task> body) => tests.Add((name, body));
 Fixture New(bool edit = true) => new(Path.Combine(output, Guid.NewGuid().ToString("N")), edit);
-void True(bool value, string message = "assertion failed") { if (!value) throw new InvalidOperationException(message); }
+void True(bool value, string message = "assertion failed") { if (!value) throw new Exception(message); }
 async Task Reject(string code, Func<Task> action)
 {
     try { await action(); } catch (BridgeException error) when (error.Code == code) { return; }

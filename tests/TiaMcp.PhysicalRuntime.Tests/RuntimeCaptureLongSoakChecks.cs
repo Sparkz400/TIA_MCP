@@ -70,7 +70,7 @@ internal static partial class RuntimeCaptureSoakChecks
             crossEpochHandleAllowance = 32, crossEpochManagedAllowance = 64L << 20,
             crossEpochPrivateAllowance = 384L << 20, nativeExecuted = false
         });
-        void Check(bool value, string label) { if (!value) throw new InvalidOperationException(label); checks.Add(label); }
+        void Check(bool value, string label) { if (!value) throw new Exception(label); checks.Add(label); }
         try
         {
             for (int index = 0; index < epochs; index++)

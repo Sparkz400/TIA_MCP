@@ -15,12 +15,12 @@ if (args is ["--plcsim-binding", var bindingRoot]) { Console.WriteLine($"PASS {P
 if (args is ["--disk-full", var volumeRoot, var ownerToken, var evidenceRoot]) { await RuntimeCaptureDiskFullChecks.Run(volumeRoot,ownerToken,Path.GetFullPath(evidenceRoot)); return; }
 
 int checks = 0;
-void Check(bool condition, string label) { checks++; if (!condition) throw new InvalidOperationException(label); }
+void Check(bool condition, string label) { checks++; if (!condition) throw new Exception(label); }
 void Fails(Action action, string code)
 {
     try { action(); } catch (BridgeException e) when (e.Code == code)
     { Check(!e.Message.Contains("remote-secret"), "No remote error text"); return; }
-    throw new InvalidOperationException("Expected " + code);
+    throw new Exception("Expected " + code);
 }
 JsonElement Json(string text) { using var doc = JsonDocument.Parse(text); return doc.RootElement.Clone(); }
 string connection = new('1', 32), epoch = new('2', 32), certificate = new('3', 64), id = new('4', 32);
