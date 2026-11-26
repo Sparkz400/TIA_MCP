@@ -7,6 +7,15 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 26 November 2026
 
+**Quality pass (evening):** CA1822 (non-public members), CA1825 and CA1310 are build errors; `src/TiaMcp.Core` and
+`src/TiaMcp.Host` are formatted and CI checks their whitespace; `scripts/Test-BeforePush.ps1` runs the checks a branch's
+changed files can break; `scripts/status_counts.py` keeps the STATUS and TODO counts in step with the catalog and the
+matrix; `OpennessSession.Changes.cs` is split into five files and its argument checks are tested offline. The nine
+runners that resolve German TIA names passed natively after four fixes, among them a product defect: hardware capability
+profiles keyed by English item names refused attribute writes to built-in items on a German installation. Five safety
+runners lacked `--enable-safety-changes` since 20 November. A provisioning run under heavy load moved every card at the
+first attempt ([record](../verification/native-runs-20261126.md#german-name-runners-and-card-staging-under-load-evening)).
+
 **Native runs on owned scratch projects:** catalog `0.5.2` binds `project_save`, `project_close`, `project_archive`,
 `project_open_copy`, `simulation_provision_status`, `simulation_provision_recover`, `sim_prune`,
 `sim_network_mode_set` and `hmi_content_fingerprint` (2,105 bound, 60 open, 72 blocked, 3 descoped cells) and adds a content readback to

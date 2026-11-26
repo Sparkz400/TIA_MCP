@@ -204,6 +204,10 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   worked; a switch while it was registered was refused (`SimulationRegistrationsPresent`); Softbus was restored. Still
   open: the administrator leg (an elevated run; the user skipped elevated steps on 26 November) and the
   Runtime-Manager-lost subscription (`OnRunTimemanagerLost`), which was not provoked.
+- [ ] **Safety runners, native rerun:** `qualify_safety_changes.py`, `qualify_safety_drive_tags.py`,
+  `probe_safety_kinds.py` and `probe_safety_logic.py` could not have run natively since the safety write gate of
+  20 November: they did not launch the Host with `--enable-safety-changes` (fixed on 26 November;
+  `qualify_unrelated_errors.py` passed natively with the fix). Rerun them once on an owned scratch F-CPU.
 - [ ] **CI and repository upkeep:** the split package job (build once, five legs) still needs its first CI run to confirm
   the timing.
 
@@ -336,7 +340,7 @@ the catalog. The matrix was not changed.
   TIA-generated item names (interfaces, ports, racks, the CPU display) now resolve them structurally through
   `scripts/hardware_paths.py`, and the eight runners that named the default tag table `Default tag table` (German
   `Standard-Variablentabelle`) now take the PLC scope's one table holding system constants (`scripts/plc_tag_tables.py`;
-  `software_inspect` does not report Openness' `IsDefault`). Both offline-tested with German-named fixtures; no native rerun yet. Known risk from the mode itself: TIA's default Program_Alarm class
+  `software_inspect` does not report Openness' `IsDefault`). Both offline-tested with German-named fixtures; the nine runners using them passed natively on the German installation on 26 November, after four fixes the runs found ([record](verification/native-runs-20261126.md#german-name-runners-and-card-staging-under-load-evening); single runs, not curated). Known risk from the mode itself: TIA's default Program_Alarm class
   needs no acknowledgement (`local.runtime.plcsim-ua-services.20261031`); a stand-in alarm does not bind
   `runtime_web_alarm_acknowledge`.
 - [x] **`sim_prune` (L03, 4 cells):** bound on 26 November (`local.plcsim.prune.20261126`, [record](verification/native-runs-20261126.md)): listing,

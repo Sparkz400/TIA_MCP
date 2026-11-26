@@ -100,6 +100,8 @@ The last weeks in short:
 - **26 November:** [native runs](verification/native-runs-20261126.md) bound the project lifecycle, provisioning
   recovery, `sim_prune`, `sim_network_mode_set` and `hmi_content_fingerprint` rows; the V19 adapter requalified;
   the follow-up checks of 14 to 25 November and a hardware smoke passed (catalog `0.5.2` to `0.5.5`).
+  A quality pass made three more analyzer rules errors, added a formatting gate and fixed hardware attribute writes on
+  non-English TIA installations.
 - **25 November:** `v0.9.0`, the first tagged pre-release, with the MCP surface redesign (catalog `0.5.0`); the
   [audit follow-ups](TODO.md#audit-follow-ups-25-november) and six maintainer decisions.
 - **14 to 20 November:** user feedback on v0.9.0 ([14 November](history/todo-closed-20261126.md#user-feedback-on-v090-14-november),

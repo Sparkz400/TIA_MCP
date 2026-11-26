@@ -163,3 +163,46 @@ table rows carry `tagCount` and `constantCount`, which a plugged module's system
 check now tolerates exactly that. `--slice delete-rule` (14 steps) and `--slice drive` (52 steps) then passed and are
 curated as [`local.hardware_changes.delete-rule.rerun.20261126`](../../evidence/local.hardware_changes.delete-rule.rerun.20261126.json)
 and [`local.hardware_changes.drive.rerun.20261126`](../../evidence/local.hardware_changes.drive.rerun.20261126.json).
+
+## German-name runners and card staging under load (evening)
+
+Debug builds of the quality-pass branch (`claude/quality-pass-20261126`) on the same workstation, owned scratch projects
+only. These are single runs whose reports stay under the ignored `artifacts/q26/`; none is curated, so the matrix is
+unchanged.
+
+The runners that resolve TIA-generated names through `scripts/hardware_paths.py` and the default tag table through
+`scripts/plc_tag_tables.py` ran on the German installation:
+
+| Runner | Result |
+| --- | --- |
+| `qualify_project_settings.py` | passed, 64 steps |
+| `qualify_technology_changes.py` | passed, 132 steps |
+| `qualify_connection_changes.py` | passed, 76 steps |
+| `qualify_motion_connections.py` | passed, 56 steps |
+| `qualify_confirmed_intent.py` | passed, 6 steps |
+| `qualify_progress_reporting.py` | passed, 8 steps |
+| `qualify_unrelated_errors.py` | passed, 30 steps, after the safety-flag fix below |
+| `qualify_cancellation.py` | passed, 14 steps, after the variable fix below |
+| `qualify_gsd_export.py` | passed, 80 steps, after the profile and tolerance fixes below |
+
+The first runs found four defects, all fixed on that branch:
+
+- **Safety runners without `--enable-safety-changes`:** since the safety write gate of 20 November the Host refuses
+  `safety_import_xml`, `safety_fparameter_set`, `safety_drive_tags` and safety tag renames (`SafetyChangesDisabled`)
+  unless launched with that option; no runner passed it. Five runners now do; an offline test checks every runner that
+  requests a safety write. `qualify_safety_changes.py`, `qualify_safety_drive_tags.py`, `probe_safety_kinds.py` and
+  `probe_safety_logic.py` were not rerun natively.
+- **Capability profiles keyed by English item names (product defect):** `hardware_attributes` on the CPU's
+  `PROFINET-Schnittstelle_1` was refused with `AttributeNotWritable`, because the bundled profile names the row
+  `PROFINET interface_1`. A built-in item without an exact row now finds its row by position number
+  (`HardwareEngineeringRules.ProfileRowPath`); the I-device write then applied and read back.
+- **Tag table counts in the GSD runner:** the I-device interface adds `Local~PROFINET-Schnittstelle_1~IODevice` to the
+  default tag table, whose row then changes by `constantCount`; the tolerance `3376e751` added to one runner is now the
+  shared `plc_tag_tables.count_follows_members`.
+- **`qualify_cancellation.py`** overwrote the default tag table's name with the table's XML (since `4511474d`), so its
+  second `tag_create` was refused (`InvalidRequest`).
+
+Card staging under load: a `qualify_platform_lifecycle.py` run without `--trust-owned-empty-cpu-certificate`
+(`artifacts/q26/p1`) passed while the full offline suite, a second native runner with its own Portal and a Release build
+of the solution and workers ran. Its provisioning's three card moves (the original card away and back, the opaque
+runtime card) completed at the first attempt (`retryElapsedMs` 0), so the 120 s budget was not needed.
