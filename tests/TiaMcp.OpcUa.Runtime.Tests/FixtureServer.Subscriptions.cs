@@ -1,5 +1,6 @@
 using System.Globalization;
 using Opc.Ua;
+using Opc.Ua.Server;
 
 namespace TiaMcp.OpcUa.Runtime.Tests;
 
@@ -9,11 +10,25 @@ internal sealed partial class FixtureServer
     private int publishOrdinal, dataOrdinal, duplicateOrdinal, activePublishes;
     internal int ActivePublishes=>Volatile.Read(ref activePublishes);
     private NotificationMessage? firstMessage;
+    /// <summary>
+    /// Forced timing for robustness runs, off by default: with TIAMCP_UA_FIXTURE_HOLD_DATA_MS set, every Publish a new
+    /// subscription receives within that many milliseconds of its creation is answered, one publishing interval later, with a
+    /// keep-alive, as a server answers whose first values or events are not queued yet (a loaded machine). No check may then
+    /// depend on values or events arriving in the first publishing cycle.
+    /// </summary>
+    internal static readonly int HoldDataMs=int.TryParse(Environment.GetEnvironmentVariable("TIAMCP_UA_FIXTURE_HOLD_DATA_MS"),out int hold) && hold>0 ? hold : 0;
+    private long subscriptionCreatedAt;
+    private bool basePublished;
+    private uint lostSequence;
+    private int lostOrdinal;
+    private uint currentSubscription;
+    private double currentInterval;
     public override async Task<CreateSubscriptionResponse> CreateSubscriptionAsync(SecureChannelContext channel,RequestHeader header,
         double interval,uint lifetime,uint keepAlive,uint maximum,bool enabled,byte priority,CancellationToken ct)
     {
-        publishOrdinal=0;dataOrdinal=0;duplicateOrdinal=0;firstMessage=null;subscriptionHandles.Clear();
+        publishOrdinal=0;dataOrdinal=0;duplicateOrdinal=0;basePublished=false;lostSequence=0;lostOrdinal=0;firstMessage=null;subscriptionHandles.Clear();
         var response=await base.CreateSubscriptionAsync(channel,header,Mode=="subscriptionLongKeepAlive"?1000:Math.Max(200,interval),Math.Max(60,lifetime),Math.Max(2,keepAlive),maximum,enabled,priority,ct);
+        currentSubscription=response.SubscriptionId;currentInterval=response.RevisedPublishingInterval;subscriptionCreatedAt=System.Diagnostics.Stopwatch.GetTimestamp();
         Audit.Enqueue(new {operation="SubscriptionCreated",requestedInterval=interval,requestedLifetime=lifetime,requestedKeepAlive=keepAlive,
             maximumNotifications=maximum,subscriptionId=response.SubscriptionId,revisedInterval=response.RevisedPublishingInterval,
             revisedLifetime=response.RevisedLifetimeCount,revisedKeepAlive=response.RevisedMaxKeepAliveCount});
@@ -50,19 +65,25 @@ internal sealed partial class FixtureServer
         try
         {
         if(Mode=="subscriptionPublishDenied")throw new ServiceResultException(StatusCodes.BadUserAccessDenied);
-        var response=await base.PublishAsync(channel,header,acks,ct);publishOrdinal++;
+        // A held keep-alive goes through the same faults as one the server sends on its own.
+        bool held=HoldDataMs>0 && !basePublished && acks.Count==0 && System.Diagnostics.Stopwatch.GetElapsedTime(subscriptionCreatedAt).TotalMilliseconds<HoldDataMs;
+        var response=held?await HeldKeepAlive(channel,header,ct):await base.PublishAsync(channel,header,acks,ct);publishOrdinal++;basePublished|=!held;
         // Faults that drop or repeat "the first message" key on the first message that carries data. Whether a
         // keep-alive precedes it depends on whether the first values or events were queued before the
         // server's first publishing cycle, which is timing the test does not own (load delays it past 200 ms).
-        bool firstData=dataOrdinal==0 && response.NotificationMessage.NotificationData.Count>0;
-        if(response.NotificationMessage.NotificationData.Count>0)dataOrdinal++;
-        if(DropPublishResponses>0)
+        bool data=response.NotificationMessage.NotificationData.Count>0;
+        if(data)dataOrdinal++;
+        bool firstData=data && dataOrdinal==1;
+        // A lost response is a data message too: a lost keep-alive leaves nothing to Republish.
+        if(DropPublishResponses>0 && data)
         {
-            Interlocked.Decrement(ref DropPublishResponses);
+            Interlocked.Decrement(ref DropPublishResponses);lostSequence=response.NotificationMessage.SequenceNumber;lostOrdinal=dataOrdinal;
             Audit.Enqueue(new {operation="FixtureLostPublishResponse",sequence=response.NotificationMessage.SequenceNumber});
             throw new ServiceResultException(StatusCodes.BadConnectionClosed);
         }
-        if(Mode is "subscriptionGap" or "subscriptionRepublishUnavailable" or "subscriptionRepublishStatus" && firstData || Mode=="subscriptionGapAfterRecovery" && publishOrdinal==2)
+        // After a lost response, subscriptionGapAfterRecovery drops the first data message that follows the recovery.
+        bool firstAfterRecovery=data && lostOrdinal!=0 && dataOrdinal==lostOrdinal+1;
+        if(Mode is "subscriptionGap" or "subscriptionRepublishUnavailable" or "subscriptionRepublishStatus" && firstData || Mode=="subscriptionGapAfterRecovery" && firstAfterRecovery)
         {
             Audit.Enqueue(new {operation="FixtureDroppedPublish",sequence=response.NotificationMessage.SequenceNumber});
             var acknowledgementResults=response.Results;
@@ -89,10 +110,24 @@ internal sealed partial class FixtureServer
         }
         finally {Audit.Enqueue(new {operation="PublishCompleted",requestHandle=header.RequestHandle,at=DateTimeOffset.UtcNow});Interlocked.Decrement(ref activePublishes);}
     }
+    /// <summary>The keep-alive of a subscription that has sent nothing yet: it carries the next sequence number, 1.</summary>
+    private async Task<PublishResponse> HeldKeepAlive(SecureChannelContext channel,RequestHeader header,CancellationToken ct)
+    {
+        var context=ValidateRequest(channel,header,RequestType.Publish);
+        try
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(currentInterval),ct);
+            return new PublishResponse {ResponseHeader=CreateResponse(header,StatusCodes.Good),SubscriptionId=currentSubscription,
+                AvailableSequenceNumbers=[],MoreNotifications=false,Results=[],DiagnosticInfos=[],
+                NotificationMessage=new NotificationMessage {SequenceNumber=1,PublishTime=DateTime.UtcNow,NotificationData=[]}};
+        }
+        finally {OnRequestComplete(context);}
+    }
     public override async Task<RepublishResponse> RepublishAsync(SecureChannelContext channel,RequestHeader header,uint subscription,uint sequence,CancellationToken ct)
     {
         Audit.Enqueue(new {operation="RepublishRequested",subscription,sequence});
-        if(Mode=="subscriptionGapAfterRecovery" && publishOrdinal==1 && sequence==2)throw new ServiceResultException(StatusCodes.BadMessageNotAvailable);
+        // The recovery probe for the message after the lost one, before any further data message, finds nothing to retransmit.
+        if(Mode=="subscriptionGapAfterRecovery" && lostOrdinal!=0 && dataOrdinal==lostOrdinal && sequence==lostSequence+1)throw new ServiceResultException(StatusCodes.BadMessageNotAvailable);
         if(Mode=="subscriptionRepublishUnavailable")throw new ServiceResultException(StatusCodes.BadMessageNotAvailable);
         var response=await base.RepublishAsync(channel,header,subscription,sequence,ct);Normalize(response.NotificationMessage);
         if(Mode=="subscriptionRepublishStatus")response.NotificationMessage.NotificationData=[new ExtensionObject(new StatusChangeNotification {Status=StatusCodes.BadTimeout})];

@@ -12,7 +12,11 @@ def verify_subscription(rows, attempt, expected_count=14):
     require(created["revisedPublishingInterval"] == 200 and created["revisedKeepAliveCount"] == 3 and created["revisedLifetimeCount"] >= 60, "independent revised subscription settings")
     require(len(created["items"]) == expected_count + 1 and created["items"][-1]["statusCode"] == "0x80340000" and created["items"][-1]["monitoredItemId"] == 0, "independent per-item failure")
     require(all(i["revisedSamplingInterval"] == 200 and i["revisedQueueSize"] == 4 for i in created["items"][:-1]), "independent revised item settings")
-    messages = [e for e in events if e["kind"] == "publish"]
+    publishes = [e for e in events if e["kind"] == "publish"]
+    # Values queued after the first publishing cycle (a loaded machine) arrive after keep-alives, which carry the next sequence number, 1.
+    leading = next((i for i, e in enumerate(publishes) if not e["keepAlive"]), len(publishes))
+    require(all(e["keepAlive"] and e["sequenceNumber"] == 1 and not e.get("notifications") and not e["duplicate"] for e in publishes[:leading]), "keep-alives only precede the first values")
+    messages = publishes[leading:]
     # A Publish message carries up to maximumNotificationsPerPublish (default 32) notifications; one row keeps one message exactly.
     require([e["sequenceNumber"] for e in messages] == list(range(1, len(messages) + 1)) and messages, "independent original sequence oracle")
     require(all(not e["duplicate"] and not e["keepAlive"] and 1 <= len(e["notifications"]) <= 32 for e in messages), "bounded original notifications per service")
@@ -38,9 +42,10 @@ def verify_subscription_audit(audit, healthy=False):
 
 def subscription_controls(rows, attempt, audit, expected_count=14):
     refused = []
-    def value(r): return next(x["event"]["notifications"][0] for x in r if x["event"]["kind"] == "publish")
+    def first(r): return next(x["event"] for x in r if x["event"]["kind"] == "publish" and not x["event"]["keepAlive"])
+    def value(r): return first(r)["notifications"][0]
     for name, mutate in [
-        ("sequence", lambda r: next(x["event"] for x in r if x["event"]["kind"] == "publish").update(sequenceNumber=999)),
+        ("sequence", lambda r: first(r).update(sequenceNumber=999)),
         ("itemAssociation", lambda r: value(r).update(monitoredItemId=999999)),
         ("roundedInteger", lambda r: value(r)["value"].update(value="-9223372036854776000")),
         ("overflow", lambda r: value(r).update(overflow=True)),

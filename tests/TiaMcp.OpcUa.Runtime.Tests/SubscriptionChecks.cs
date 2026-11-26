@@ -41,7 +41,9 @@ internal static class SubscriptionChecks
             check(values["missingTimes"].SourceTimestamp is null && values["missingTimes"].ServerTimestamp is null,"Subscription absent clocks remain null");
             check(values["array"].Encoding=="array" && values["byteArray"].Encoding=="array" && values["byteString"].Outcome=="value","Subscription arrays and ByteString distinction");
             check(status.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="notificationLimit" && status.GetProperty("recordedProgress").GetProperty("remoteCleanupConfirmed").GetBoolean(),"Notification bound and confirmed remote deletion retained");
-            var actual=events.Where(x=>x.Kind=="publish").ToArray();
+            // Values queued after the first publishing cycle (a loaded machine) arrive after keep-alives; those precede them at sequence 1.
+            var publishes=events.Where(x=>x.Kind=="publish").ToArray();var actual=publishes.SkipWhile(x=>x.KeepAlive).ToArray();
+            check(publishes.TakeWhile(x=>x.KeepAlive).All(x=>x.SequenceNumber==1 && (x.Notifications?.Length??0)==0) && actual.All(x=>!x.KeepAlive),"Keep-alives only precede the first values, at the first sequence number");
             check(actual.Select(x=>x.SequenceNumber).SequenceEqual(Enumerable.Range(1,14).Select(x=>(uint?)x)),"Original actual Publish sequence numbers");
             check(actual.Skip(1).All(x=>x.AcknowledgedSequenceNumbers!.Length==1 && x.AcknowledgementResults!.SequenceEqual(["0x00000000"])),"Original acknowledgement results retained after commit");
             var export=Json(await subscriptions.Export(status.GetProperty("snapshotRef").GetString()!,"csv",default));
@@ -62,7 +64,10 @@ internal static class SubscriptionChecks
             await Refuse(()=>sessions.Disconnect(attempt),"UaSessionAcquisitionBusy",check);
             await Refuse(()=>polling.Start(Id(),new(attempt,[FixtureServer.Node("bool")],100,1),default),"UaSessionAcquisitionBusy",check);
             await Refuse(()=>subscriptions.Start(Id(),request,default),"UaSessionAcquisitionBusy",check);
-            await Task.Delay(600);var stopped=Json(await subscriptions.Stop(active,default));
+            // Wait for a keep-alive rather than assume one within 600 ms: created, the value and one keep-alive are three rows.
+            var keepAliveDeadline=Stopwatch.StartNew();
+            while(Json(await subscriptions.Status(active,default)).GetProperty("recordedProgress").GetProperty("rows").GetInt64()<3 && keepAliveDeadline.Elapsed<TimeSpan.FromSeconds(10))await Task.Delay(50);
+            var stopped=Json(await subscriptions.Stop(active,default));
             check(stopped.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="stopped" && stopped.GetProperty("recordedProgress").GetProperty("remoteCleanupConfirmed").GetBoolean(),"Stop waits for bounded Publish and deletes exact subscription");
             check(Events(subscriptions,stopped).Any(x=>x.KeepAlive),"Keepalive retained separately without sample or duplicate");
             check((await sessions.Status(attempt)).State=="connected","Clean subscription stop leaves original session usable");
@@ -169,7 +174,8 @@ internal static class SubscriptionChecks
             ("created envelope with hidden data",segments=>segments[0]["rows"]![0]!["event"]!["notifications"]=First(segments)["notifications"]!.DeepClone()),
             ("nonmonotonic elapsed",segments=>segments[^1]["rows"]![0]!["elapsedMilliseconds"]=0)
         };
-        static JsonObject First(JsonObject[] segments)=>segments.SelectMany(s=>s["rows"]!.AsArray()).Select(r=>r!["event"]!.AsObject()).First(e=>e["kind"]!.GetValue<string>()=="publish");
+        // The first Publish that carries values: keep-alives may precede it.
+        static JsonObject First(JsonObject[] segments)=>segments.SelectMany(s=>s["rows"]!.AsArray()).Select(r=>r!["event"]!.AsObject()).First(e=>e["kind"]!.GetValue<string>()=="publish" && e["notifications"] is JsonArray {Count:>0});
         foreach(var mutation in mutations)
         {
             string directory=Path.Combine(root,"tamper-"+mutation.Name.Replace(' ','-'));
