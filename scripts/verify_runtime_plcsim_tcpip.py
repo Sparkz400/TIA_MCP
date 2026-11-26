@@ -6,7 +6,11 @@ stores with the attempts the runner opened (nothing reconnects or logs in on its
 boundaries: an interrupted acquisition is never resumed, a lost write is never replayed and only an explicit read
 decides it. ua-services adds the server-method call counted by the PLCSIM API, its refusals, the HistoryRead boundary
 and the ConditionRefresh snapshots around a PLCSIM-raised alarm. device-inventory compares every device_online_browse and
-device_identify result field by field with the pinned Modules.Browse and I&M0 reads retained beside it.
+device_identify result field by field with the pinned Modules.Browse and I&M0 reads retained beside it. web-services checks
+runtime_web_alarm_acknowledge, runtime_web_download and runtime_web_backup: every refusal before sending, every result
+against the methods the session's Api.Browse advertised, every stored file against artifact_read and the file's own hash,
+and the PLCSIM API's operating state around the backup; it reports per tool the outcome and the release-matrix gates the
+run demonstrated, so a run that only records a missing method is never read as a qualification.
 """
 import argparse
 import datetime
@@ -15,9 +19,10 @@ import json
 from pathlib import Path
 
 SIEMENS_NS = "http://www.siemens.com/simatic-s7-opcua"
-MODES = ("normal", "host-loss-capture", "server-restart", "ua-write-loss", "web-write-loss", "ua-services", "device-inventory")
+MODES = ("normal", "host-loss-capture", "server-restart", "ua-write-loss", "web-write-loss", "ua-services", "device-inventory", "web-services")
 POINTS = {"ua-write-loss": "ua.write.afterSend", "web-write-loss": "web.write.afterSend"}
-HOSTS = {"normal": 1, "server-restart": 1, "host-loss-capture": 3, "ua-write-loss": 3, "web-write-loss": 3, "ua-services": 1, "device-inventory": 2}
+HOSTS = {"normal": 1, "server-restart": 1, "host-loss-capture": 3, "ua-write-loss": 3, "web-write-loss": 3, "ua-services": 1, "device-inventory": 2,
+         "web-services": 1}
 MARKER = "runtime-interruption-marker.json"
 COMPILES = ("apply ", "simulation_download", "save the generated state")
 PIN_STEP = "certificate_inspect after the last compile"
@@ -60,6 +65,36 @@ INVENTORY_TOOLS = ("device_inventory", "device_online_browse", "device_identify"
 ACTUAL = ("mlfb", "serialNumber", "hardwareRevision", "firmware")
 # SiemensWebIdentity's row state for a JSON-RPC error code of Modules.ReadIdentificationMaintenance; any other code is readError.
 IM_FAILURES = {2: "permissionDenied", -32601: "unsupported", 1100: "identityMismatch", 1102: "unreachable", 1103: "unsupported"}
+# web-services: the Web API methods each operation needs in the session's Api.Browse list (the Host sends nothing otherwise),
+# its step names, and the release-matrix gates a demonstrated outcome stands for. A gated step's result is the tool's answer
+# or, for a tool error, {"isError": true, "code": ...}.
+WS_METHODS = {"alarm": ("Alarms.Acknowledge", "Alarms.Browse"), "profiling": ("PlcProgram.DownloadProfilingData", "Api.CloseTicket"),
+              "serviceData": ("Modules.DownloadServiceData", "Api.CloseTicket"), "backup": ("Plc.CreateBackup", "Api.CloseTicket")}
+WS_STATUS, WS_HWID = "runtime_web_status of the web-services session", "the CPU's hardware ID from the pinned Modules.Browse"
+LANGUAGES = "runtime_web_diagnostics languages"
+ALARM_LISTS = ("runtime_web_diagnostics alarms before the trigger", "runtime_web_diagnostics alarms with the trigger raised",
+               "runtime_web_diagnostics alarms after the acknowledgement", "runtime_web_diagnostics alarms after the trigger fell")
+TRIGGER = ("AlarmTrigger before the trigger", "AlarmTrigger with the trigger raised")
+ACK, ACK_AGAIN = "runtime_web_alarm_acknowledge", "runtime_web_alarm_acknowledge again"
+ACK_NOT_LISTED, ACK_FALLEN = "runtime_web_alarm_acknowledge of an alarm that is not listed", "runtime_web_alarm_acknowledge after the trigger fell"
+NOT_LISTED_ALARM = "999999999"
+UNRETAINED_BINDING = "0" * 64
+# None: any refusal code (an unretained binding fails reading the binding artifact, whose code the run records).
+ACK_REFUSALS = {"runtime_web_alarm_acknowledge without acknowledgement": "RuntimeAcknowledgementRequired",
+                "runtime_web_alarm_acknowledge with an unretained binding": None}
+DOWNLOAD = {"profiling": "runtime_web_download profiling", "serviceData": "runtime_web_download serviceData of the CPU"}
+DOWNLOAD_REFUSALS = {"runtime_web_download of kind backup": "RuntimeTicketKindUnsupported",
+                     "runtime_web_download serviceData without a hwid": "RuntimeTicketSelectionInvalid",
+                     "runtime_web_download profiling with a hwid": "RuntimeTicketSelectionInvalid",
+                     "runtime_web_download serviceData with hwid 65536": "RuntimeTicketSelectionInvalid"}
+BACKUP_REFUSALS = {"runtime_web_backup without acknowledgement": "RuntimeAcknowledgementRequired", "runtime_web_backup with an unretained binding": None}
+BACKUP_RUN, BACKUP_RUN_STATE = "runtime_web_backup in RUN", "PLCSIM still reports RUN after the refused backup"
+BACKUP, BACKUP_STATE = "runtime_web_backup in STOP", "PLCSIM still reports STOP after the backup"
+STORED = "artifact_read and the file hash of %s"
+WS_TOOLS = ("runtime_plcsim_bind", "runtime_web_credential_binding", "runtime_web_connect", "runtime_web_status", "runtime_web_browse", "runtime_web_read",
+            "runtime_web_diagnostics", "runtime_web_operating_mode", "runtime_web_disconnect")
+GATES = {"runtime_web_download": ("AC-identity", "AC-evidence"), "runtime_web_backup": ("AC-identity", "AC-preview", "AC-recovery", "AC-evidence"),
+         "runtime_web_alarm_acknowledge": ("AC-identity", "AC-preview", "AC-recovery", "AC-evidence")}
 
 
 def name(base, channel):
@@ -150,9 +185,133 @@ def identify_issues(identified):
     return issues
 
 
+def alarm_entries(listed):
+    """The Alarms.Browse entries of one runtime_web_diagnostics kind alarms result, by id; empty unless it was read."""
+    if not isinstance(listed, dict) or listed.get("status") != "read" or not isinstance(listed.get("value"), dict):
+        return {}
+    return {e["id"]: e for e in listed["value"].get("entries") or [] if isinstance(e, dict) and isinstance(e.get("id"), str)}
+
+
+def acknowledgement(entry):
+    """An alarm entry's acknowledgement state; None when it has none (an alarm class without acknowledgement)."""
+    ack = entry.get("acknowledgement") if isinstance(entry, dict) else None
+    return ack.get("state") if isinstance(ack, dict) else None
+
+
+def sent_nothing(answer):
+    """A tool error (refused before or without a request) or an answer that says nothing was dispatched."""
+    return bool(answer.get("isError")) or answer.get("dispatched") is False
+
+
+def outcome(advertised, answer, demonstrated):
+    """One operation's recorded outcome: demonstrated, methodNotAdvertised (a B05 row), permissionDenied, or what the tool answered."""
+    if not advertised:
+        return "methodNotAdvertised"
+    if answer.get("isError"):
+        return "permissionDenied" if answer.get("code") == "RuntimePermissionDenied" else "error " + str(answer.get("code"))
+    # A provider refusal keeps its mapped status, for example "refused unsupportedMethod" for a listed method the CPU rejects.
+    return "demonstrated" if demonstrated else " ".join(str(x) for x in (answer.get("state"), answer.get("status")) if x is not None)
+
+
+def stored(answer, check):
+    """A downloaded file whose ticket was closed and whose size and hash agree in the tool result, artifact_read and the runner's own hash."""
+    artifact = answer.get("artifact") or {}
+    read = check.get("artifactRead") or {}
+    return (answer.get("state") == "downloaded" and answer.get("ticketClosed") is True and isinstance(artifact.get("bytes"), int) and artifact["bytes"] > 0
+            and isinstance(artifact.get("sha256"), str) and read.get("sha256") == check.get("localSha256") == artifact["sha256"]
+            and read.get("bytes") == check.get("localBytes") == artifact["bytes"])
+
+
+def web_services(report, result, need, issues):
+    """Outcomes and demonstrated gates of runtime_web_alarm_acknowledge, runtime_web_download and runtime_web_backup."""
+    methods = set(result(WS_STATUS).get("methods") or [])
+    advertised = {kind: all(m in methods for m in needed) for kind, needed in WS_METHODS.items()}
+    outcomes, gates = {}, {}
+
+    def refused(labels):
+        return all([need(result(label).get("isError") is True and result(label).get("code") and code in (None, result(label).get("code")),
+                         "%s was not refused before sending%s" % (label, "" if code is None else " with " + code)) for label, code in labels.items()])
+
+    def consistent(kind, label, answer):
+        """An unsupported answer exactly when Api.Browse lacks a needed method, and never a request for a method it lacks."""
+        if answer.get("state") == "unsupported":
+            need(not advertised[kind], "%s answered unsupported although Api.Browse lists %s" % (label, " and ".join(WS_METHODS[kind])))
+        if not advertised[kind] or answer.get("state") == "unsupported":
+            need(sent_nothing(answer), "%s sent a request for a method Api.Browse does not list" % label)
+
+    def verified(label, answer):
+        return answer.get("state") == "downloaded" and need(stored(answer, result(STORED % label)), "%s: the stored file does not match artifact_read and its hash" % label)
+
+    # runtime_web_alarm_acknowledge: the alarm the PLCSIM trigger raised (or, recorded as such, another listed unacknowledged alarm).
+    alarm = (report.get("webServices") or {}).get("alarm") or {}
+    target, lists = alarm.get("targetId"), [alarm_entries(result(label)) for label in ALARM_LISTS[:2]]
+    triggered = {r["label"]: r["plcsimRead"].get("value") for r in report.get("comparisons", []) if r["label"] in TRIGGER}
+    need(triggered == dict(zip(TRIGGER, (False, True))), "The PLCSIM API does not show the trigger raised: %s" % triggered)
+    ack_gated = refused(ACK_REFUSALS)
+    if target is None:
+        outcomes["runtime_web_alarm_acknowledge"] = "noAlarmListed" if advertised["alarm"] else "methodNotAdvertised"
+    else:
+        answer = result(ACK)
+        consistent("alarm", ACK, answer)
+        listed = need(target in lists[1], "The acknowledged alarm %s was not listed with the trigger raised" % target)
+        if alarm.get("source") == "programAlarm":
+            need(target not in lists[0], "The alarm %s was listed before the trigger" % target)
+        done = answer.get("state") == "acknowledged"
+        if answer.get("state") == "notAcknowledgeable" or answer.get("state") == "alreadyAcknowledged":
+            need(answer.get("dispatched") is False, "%s was sent for an alarm that was not unacknowledged" % ACK)
+        if done:
+            start = len(issues)
+            need(listed and acknowledgement(lists[1][target]) == "not_acknowledged", "The alarm was not listed as not_acknowledged before %s" % ACK)
+            need(answer.get("dispatched") is True and answer.get("readbackMatches") is True, "%s was not read back as acknowledged" % ACK)
+            after = alarm_entries(result(ALARM_LISTS[2]))
+            need(acknowledgement(after.get(target)) == "acknowledged", "An independent Alarms.Browse does not list %s as acknowledged" % target)
+            again = result(ACK_AGAIN)
+            need(again.get("dispatched") is False and again.get("state") in ("alreadyAcknowledged", "alarmNotListed"), "A second acknowledgement was sent")
+            missing = result(ACK_NOT_LISTED)
+            need(sent_nothing(missing) and missing.get("state") != "acknowledged", "An alarm that is not listed was acknowledged")
+            need(sent_nothing(result(ACK_FALLEN)), "The fallen alarm was acknowledged again")
+            done = len(issues) == start
+        outcomes["runtime_web_alarm_acknowledge"] = outcome(advertised["alarm"], answer, done)
+
+    # runtime_web_download: selection refusals before any request, then each kind's stored file.
+    gated, any_done = refused(DOWNLOAD_REFUSALS), False
+    hwid = result(WS_HWID).get("hwid")
+    for kind, label in DOWNLOAD.items():
+        if kind == "serviceData" and hwid is None:
+            outcomes["runtime_web_download " + kind] = "hwidNotFound"
+            continue
+        answer = result(label)
+        consistent(kind, label, answer)
+        done = verified(label, answer)
+        any_done = any_done or done
+        outcomes["runtime_web_download " + kind] = outcome(advertised[kind], answer, done)
+    if gated and any_done:
+        gates["runtime_web_download"] = list(GATES["runtime_web_download"])
+
+    # runtime_web_backup: refused in RUN without a request, the PLCSIM API sees no mode change; stored in STOP; RUN again afterwards.
+    gated = refused(BACKUP_REFUSALS)
+    in_run = result(BACKUP_RUN)
+    consistent("backup", BACKUP_RUN, in_run)
+    precondition = bool(in_run.get("isError")) or need(in_run.get("state") == "preconditionMismatch" and in_run.get("dispatched") is False,
+                                                       "The backup in RUN was not refused before sending")
+    need(result(BACKUP_RUN_STATE) == "Run", "PLCSIM does not report RUN after the refused backup")
+    modes = all([need(result(request).get("state") == "changed" and result(observed) == state, "%s is not confirmed by PLCSIM" % request)
+                 for request, observed, state in ((TO_STOP, PLCSIM_STOP, "Stop"), (TO_RUN, PLCSIM_RUN, "Run"))])
+    answer = result(BACKUP)
+    consistent("backup", BACKUP, answer)
+    done = verified(BACKUP, answer) and need(result(BACKUP_STATE) == "Stop", "PLCSIM does not report STOP after the backup")
+    outcomes["runtime_web_backup"] = outcome(advertised["backup"], in_run if in_run.get("isError") else answer, done and precondition and modes)
+    if gated and outcomes["runtime_web_backup"] == "demonstrated":
+        gates["runtime_web_backup"] = list(GATES["runtime_web_backup"])
+    if ack_gated and outcomes.get("runtime_web_alarm_acknowledge") == "demonstrated":
+        gates["runtime_web_alarm_acknowledge"] = list(GATES["runtime_web_alarm_acknowledge"])
+    # Which alarm was acknowledged: the one the PLCSIM trigger raised, or another the Web API listed as not_acknowledged.
+    return {"advertised": advertised, "outcomes": outcomes, "gates": gates, "alarmSource": alarm.get("source"), "alarmId": target}
+
+
 def verify(root):
     root = Path(root).resolve()
-    issues = []
+    issues, summary = [], None
 
     def need(condition, message):
         if not condition:
@@ -183,7 +342,7 @@ def verify(root):
             need(plcsim.get("quality") == "good" and same(value, plcsim.get("value")),
                  "%s: the %s read %r differs from the PLCSIM API read %r" % (row["label"], row["channel"], value, plcsim.get("value")))
             compared.add(row["channel"])
-        for channel in {"ua-write-loss": ("ua",), "web-write-loss": ("web",), "ua-services": ("ua",), "device-inventory": ()}.get(mode, ("ua", "web")):
+        for channel in {"ua-write-loss": ("ua",), "web-write-loss": ("web",), "ua-services": ("ua",), "device-inventory": (), "web-services": ("web",)}.get(mode, ("ua", "web")):
             need(channel in compared, "No %s value is compared with the PLCSIM API" % channel)
 
         # Pins come from certificate_inspect after the last compile and every connected session uses them.
@@ -315,9 +474,17 @@ def verify(root):
             if need(browsed and not browsed[0]["tool"]["isError"], "The top-level device_online_browse did not answer"):
                 issues.extend(issue for row in browsed for issue in browse_issues(row))
             issues.extend(identify_issues(result(IDENTIFY)))
+        elif mode == "web-services":
+            passed = {c["name"] for c in report.get("toolCalls", []) if not c["isError"]}
+            for tool in WS_TOOLS:
+                need(tool in passed, "No successful call of " + tool)
+            summary = web_services(report, result, need, issues)
     except (OSError, ValueError, KeyError, TypeError, IndexError, AttributeError) as error:
         issues.append("%s: %s" % (type(error).__name__, error))
-    return {"completed": not issues, "kind": "runtime-plcsim-tcpip", "nativeInvoked": False, "issues": issues}
+    verdict = {"completed": not issues, "kind": "runtime-plcsim-tcpip", "nativeInvoked": False, "issues": issues}
+    if summary is not None:  # web-services: per operation what the run showed; only "gates" may be curated as matrix cells.
+        verdict["webServices"] = {**summary, "gates": summary["gates"] if not issues else {}}
+    return verdict
 
 
 def main():

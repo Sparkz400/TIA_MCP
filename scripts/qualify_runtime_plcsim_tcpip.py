@@ -33,6 +33,17 @@ concurrent UA and web acquisitions share, and retired at the end.
   runtime user logs in over the pinned connection and a TIA_INVENTORY_PLCSIM record of that token is in the next Host's
   environment only. That Host reopens the saved scratch for its device_inventory snapshot, browses and identifies; every result is
   compared field by field with pinned Modules.Browse and I&M0 reads of the same hardware IDs.
+--mode web-services: runtime_web_alarm_acknowledge, runtime_web_download and runtime_web_backup. The scratch also holds the
+  Program_Alarm of ua-services (FB AlarmGate on RealServer.AlarmTrigger, no OPC UA Alarms and Conditions), and the runtime role
+  also gets the device rights for acknowledging alarms, backups and service data that the refused grant's list names. The CPU's
+  hardware ID comes from a pinned Modules.Browse (a session borrowed like device-inventory's only when one is required, logged
+  out at once). Each tool is refused first without its acknowledgement, with an unretained binding or with an invalid
+  selection; then, in RUN, a PLCSIM write raises the alarm, the Web API lists it, it is acknowledged once, an independent
+  Alarms.Browse reads it back and a second acknowledgement is refused unsent; profiling and service data are downloaded; the
+  backup is refused unsent in RUN, the Web API stops the CPU (PLCSIM confirms), the backup is stored in STOP, PLCSIM still
+  reads STOP, the Web API starts the CPU again (PLCSIM confirms). Every stored file is compared with artifact_read and its
+  own SHA-256. A method the instance's Api.Browse does not list is recorded as methodNotAdvertised (a B05 row), not a
+  failure; the oracle reports per tool the outcome and the gates the run demonstrated.
 
 PLCSIM's network mode, adapters and IP addresses are operator settings and are never changed, nor are certificate stores.
 verify_runtime_plcsim_tcpip checks the retained run; verification.json is written only when it passes.
@@ -171,6 +182,7 @@ END_FUNCTION_BLOCK
 
 '''
 SERVICES_MAIN = '    "ServerMethod_DB"();\n    "AlarmGate_DB"();\n'
+ALARM_MAIN = '    "AlarmGate_DB"();\n'
 HYPOTHESES = [
     {"id": "follows", "statement": "Active is true whenever Enable is true.",
      "prediction": {"when": [{"signalId": "enable", "op": "eq", "value": True}], "expect": [{"signalId": "active", "op": "eq", "value": True}]}},
@@ -202,6 +214,15 @@ LIMITATIONS = [
     "Scalar DInt, Int and Bool tags only; arrays and structures are not exercised. ua-services adds one user-program server method with "
     "Int/Bool arguments and one Program_Alarm with TIA's default text and class; Acknowledge, AddComment and history access are not product routes.",
 ]
+# web-services: words naming a device function right in the refused grant's availableRights (identifier and display name). V21
+# does not document these identifiers for a CPU 1511-1 PN V4.1; every right whose text holds all the words is granted.
+WEB_SERVICE_RIGHTS = {"acknowledgeAlarms": ("ack", "alarm"), "backup": ("backup",), "serviceData": ("service", "data")}
+WEB_SERVICES_LIMITATION = (
+    "web-services: one owned PLCSIM CPU 1511 instance; Plc.RestoreBackup is not a product route; the stored files are compared by size and hash, "
+    "never parsed. A lost reply (state unknown) is not exercised: only runtime_web_write has a fault point, so 'sent once, never retried' rests on the "
+    "unsent refusals, the single acknowledgement and the offline tests. The alarm is one Program_Alarm; if its alarm class needs no acknowledgement the "
+    "run acknowledges another alarm the Web API lists as not_acknowledged and records it, or records notAcknowledgeable. A method this instance's "
+    "Api.Browse does not list is recorded as methodNotAdvertised and stays open for a physical CPU (B05).")
 INVENTORY_LIMITATION = ("Web API module configuration and I&M0 of one PLCSIM CPU 1511 only, through the operator's temporary CurrentUser\\Root trust "
                         "of that instance's self-signed web certificate; physical CPUs, distributed I/O and other families are not covered.")
 SESSION = "TIA_INVENTORY_PLCSIM"  # sessionEnvironmentVariable of the device_* tools; the record lives in the inventory Host's environment only.
@@ -239,7 +260,8 @@ class Runner(Harness):
     def __init__(self, args):
         args.artifacts, args.runner = args.root, __file__
         super().__init__(args, "rs_", "Runtime UA, web and capture tools on an owned PLCSIM Advanced V8 CPU in TCP/IP mode (%s)" % args.mode,
-                         LIMITATIONS + ([INVENTORY_LIMITATION] if args.mode == "device-inventory" else []), [])
+                         LIMITATIONS + ([INVENTORY_LIMITATION] if args.mode == "device-inventory" else [])
+                         + ([WEB_SERVICES_LIMITATION] if args.mode == "web-services" else []), [])
         self.report["simWorker"] = {"path": str(args.sim_worker.resolve()), "sha256": hashlib.sha256(args.sim_worker.read_bytes()).hexdigest()}
         self.report.update(mode=args.mode, cpuIp=args.cpu_ip, hosts=[], comparisons=[], pins={}, attempts={"ua": [], "web": []})
         self.calls, self.credentials, self.password, self.selections, self.watched = [], [], None, {}, []
@@ -396,9 +418,13 @@ def setup(r):
     r.username, r.protected = user["username"], user["protectedPath"]
 
     def address():
-        interface = r.cpu + "/items/PROFINET%20interface_1"
-        rows = t("hardware_inspect", {"hardwarePath": interface, "maxItems": 50})["items"]
-        nodes = rows[0]["network"]["nodes"] if len(rows) == 1 else []
+        # The interface's name is language-dependent ("PROFINET interface_1", "PROFINET-Schnittstelle_1"): take the CPU's one
+        # item with a network node instead of guessing it.
+        rows = [row for row in t("hardware_inspect", {"maxItems": 500})["items"]
+                if row.get("path", "").startswith(r.cpu + "/") and (row.get("network") or {}).get("nodes")]
+        require(len(rows) == 1, "Expected one networked interface below %s: %s" % (r.cpu, [row.get("path") for row in rows]))
+        interface = rows[0]["path"]
+        nodes = rows[0]["network"]["nodes"]
         require(len(nodes) == 1, "Expected one network node on %s: %s" % (interface, nodes))
         current = {a["name"]: a.get("value") for a in nodes[0]["attributes"]}.get("Address")
         if current != r.args.cpu_ip:
@@ -411,11 +437,12 @@ def setup(r):
     change(r, "instance_db_create", {"name": "DiagGate_DB", "instanceOfName": "DiagGate"})
     change(r, "source_upsert", {"language": "SCL", "source": DB, "expectedBlockNames": ["RealServer"]})
     services = r.args.mode == "ua-services"
-    if services:
-        for block, source in (("ServerMethod", SERVER_METHOD), ("AlarmGate", ALARM_GATE)):
-            change(r, "source_upsert", {"language": "SCL", "source": source, "expectedBlockNames": [block]})
-            change(r, "instance_db_create", {"name": block + "_DB", "instanceOfName": block})
-    change(r, "source_upsert", {"language": "SCL", "source": MAIN % (SERVICES_MAIN if services else ""), "expectedBlockNames": ["Main"]})
+    alarm = services or r.args.mode == "web-services"  # web-services: the Program_Alarm only, raised for the Web API's alarm list.
+    for block, source in ((("ServerMethod", SERVER_METHOD),) if services else ()) + ((("AlarmGate", ALARM_GATE),) if alarm else ()):
+        change(r, "source_upsert", {"language": "SCL", "source": source, "expectedBlockNames": [block]})
+        change(r, "instance_db_create", {"name": block + "_DB", "instanceOfName": block})
+    calls = SERVICES_MAIN if services else ALARM_MAIN if alarm else ""
+    change(r, "source_upsert", {"language": "SCL", "source": MAIN % calls, "expectedBlockNames": ["Main"]})
 
     umac = r.stage("access_inspect", lambda: t("access_inspect", {"maxItems": 2000}))["projectUmac"]
     roles, scopes = [n for n in umac["roleNames"].values() if n.startswith("TiaMcpRuntime_")], umac["deviceRightScopes"]
@@ -430,7 +457,11 @@ def setup(r):
     rights = r.stage("umac_role_set lists the available device rights", available)
     r.report["availableDeviceRights"] = rights
     r.syslog_rights = [x["identifier"] for x in rights if "syslog" in (x["identifier"] + " " + (x.get("name") or "")).lower()]
-    change(r, "umac_role_set", {"action": "grant", "roleName": roles[0], "deviceRights": [{"device": scopes[0], "identifier": i} for i in RIGHTS + tuple(r.syslog_rights)]}, plc=False)
+    # web-services only. A right the list does not name stays ungranted; the tool's permissionDenied is then the recorded outcome.
+    r.web_rights = {key: [x["identifier"] for x in rights if all(w in (x["identifier"] + " " + (x.get("name") or "")).lower() for w in words)]
+                    for key, words in WEB_SERVICE_RIGHTS.items()} if r.args.mode == "web-services" else {}
+    granted = list(dict.fromkeys(RIGHTS + tuple(r.syslog_rights) + tuple(i for ids in r.web_rights.values() for i in ids)))
+    change(r, "umac_role_set", {"action": "grant", "roleName": roles[0], "deviceRights": [{"device": scopes[0], "identifier": i} for i in granted]}, plc=False)
 
     r.before_servers = certificates(r, "certificate_inspect before the servers")
     # V21 turns the system pages on with the server (29 October 2026); activation alone fails its readback, so both are named.
@@ -859,6 +890,13 @@ def write_loss(r, channel):
     r.stage("close the deciding session", lambda: r.tool("runtime_%s_disconnect" % channel, {"attemptId": fresh_session})["state"])
 
 
+def set_trigger(r, value):
+    """The Program_Alarm's signal through the PLCSIM API, then read back there."""
+    r.stage("sim_write AlarmTrigger %s" % value, lambda: r.tool("sim_write", {"instanceId": r.instance["id"], "writes": [
+        {"symbol": r.symbols["AlarmTrigger"], "type": "bool", "value": value}]}))
+    settle(r, "AlarmTrigger", value)
+
+
 def plc_methods(r, ua, limit=300):
     """Every Method the PLC namespace exposes below Objects, by a bounded walk over its Object nodes: runtime_ua_call admits any of
     them, so the run shows whether system methods sit beside the user program's."""
@@ -918,14 +956,10 @@ def services(r):
         require(result["refresh"]["startObserved"] and result["refresh"]["endObserved"], "%s lacks the ConditionRefresh boundaries" % label)
         return {json.dumps(e["conditionId"], sort_keys=True) for e in result["events"] if e["kind"] == "condition" and e.get("activeState") is True}
 
-    def trigger(value):
-        r.stage("sim_write AlarmTrigger %s" % value, lambda: t("sim_write", {"instanceId": r.instance["id"], "writes": [
-            {"symbol": r.symbols["AlarmTrigger"], "type": "bool", "value": value}]}))
-        settle(r, "AlarmTrigger", value)
     idle = snapshot(oracle.CONDITIONS[0])
-    trigger(True)
+    set_trigger(r, True)
     raised = snapshot(oracle.CONDITIONS[1]) - idle
-    trigger(False)
+    set_trigger(r, False)
     fallen = snapshot(oracle.CONDITIONS[2])
     # PLCSIM may not raise A&C conditions at all; that stays a recorded observation, never a product failure.
     r.report["alarmCondition"] = {"raised": len(raised) == 1, "conditionIds": sorted(raised), "activeAfterFall": sorted(raised & fallen)}
@@ -1125,6 +1159,185 @@ def inventory(r):
                 r.report["logoutFailure"] = str(error)
 
 
+def call(r, tool, arguments):
+    """The tool's answer, or {"isError": true, "code": ...} for a tool error."""
+    result = r.client.request("tools/call", {"name": tool, "arguments": arguments})
+    content = result.get("structuredContent") or {}
+    return {"isError": True, "code": (content.get("error") or {}).get("code")} if result.get("isError") else content
+
+
+def answer(r, label, tool, arguments):
+    """One call whose result is retained whatever it is. The oracle, not the runner, decides what each answer shows, so a refused or
+    unadvertised method never aborts the native window."""
+    return r.stage(label, lambda: call(r, tool, arguments))
+
+
+def check_stored(r, label, result):
+    """A stored download beside artifact_read (one byte, so no content is retained) and the runner's own SHA-256 of the file the Host
+    wrote under the run directory, its artifact root."""
+    artifact = result.get("artifact")
+    if result.get("state") != "downloaded" or not isinstance(artifact, dict):
+        return None
+
+    def check():
+        # Recorded, never raised: a refused read or a missing file is the oracle's issue, and the backup still runs.
+        read = call(r, "artifact_read", {"path": artifact["path"], "offset": 0, "count": 1})
+        digest, size = hashlib.sha256(), 0
+        try:
+            with open(r.directory / artifact["path"], "rb") as stream:
+                for chunk in iter(lambda: stream.read(1 << 20), b""):
+                    digest.update(chunk)
+                    size += len(chunk)
+        except OSError as error:
+            return {"path": artifact["path"], "artifactRead": {k: read.get(k) for k in ("relativePath", "bytes", "sha256", "isError", "code")},
+                    "localFailure": type(error).__name__}
+        return {"path": artifact["path"], "artifactRead": {k: read.get(k) for k in ("relativePath", "bytes", "sha256", "isError", "code")},
+                "localBytes": size, "localSha256": digest.hexdigest()}
+    return r.stage(oracle.STORED % label, check)
+
+
+def cpu_hwid(r):
+    """The CPU's hardware ID from pinned Modules.Browse calls, the route device-inventory compares device_online_browse with. A session
+    is borrowed only when the web server requires one and is logged out at once; its token stays in memory and in the leak check.
+    A failure is recorded (serviceData is then not attempted), never raised."""
+    rows, borrowed = [], False
+
+    def browse(hwid=None):
+        answer = pinned_call(r, "Modules.Browse", {"mode": "children", **({} if hwid is None else {"hwid": hwid})})
+        rows.append({"hardwareId": hwid, "pinned": answer})
+        return answer
+    try:
+        first = browse()
+        error = first["response"].get("error") if isinstance(first["response"], dict) else None
+        borrowed = first["httpStatus"] in (401, 403) or isinstance(error, dict) and error.get("code") == 2
+        try:
+            if borrowed:
+                login = pinned_call(r, "Api.Login", {"user": r.username, "password": r.password, "mode": "local"})
+                result = oracle.answered(login)
+                require(isinstance(result, dict) and isinstance(result.get("token"), str) and result["token"], "Api.Login was refused (HTTP %s)" % login["httpStatus"])
+                r.token = result["token"]
+                first = browse()
+            nodes = list(flatten((oracle.answered(first) or {}).get("nodes") or []))
+            # PLCSIM nests the CPU under the station; a server that lists only the station answers for the station's hardware ID.
+            for station in [n for n in nodes if n.get("type") == "device" and isinstance(n.get("hwid"), int) and not n.get("children")][:4]:
+                nodes += list(flatten((oracle.answered(browse(station["hwid"])) or {}).get("nodes") or []))
+        finally:
+            if r.token:
+                rows.append({"logout": pinned_call(r, "Api.Logout")})
+        cpus = sorted({n["hwid"] for n in nodes if n.get("subtype") == "cpu" and isinstance(n.get("hwid"), int)})
+        return {"hwid": cpus[0] if len(cpus) == 1 else None, "cpuHardwareIds": cpus, "sessionBorrowed": borrowed, "browsed": rows}
+    except Exception as error:
+        return {"hwid": None, "failure": str(error), "sessionBorrowed": borrowed, "browsed": rows}
+
+
+def change_mode(r, web, label, expected, mode, state, observed):
+    changed = r.stage(label, lambda: r.tool("runtime_web_operating_mode", {"attemptId": web, "bindingSha256": r.binding, "expectedMode": expected, "mode": mode,
+                                                                          "acknowledgeModeChange": True}))
+    require(changed["state"] == "changed", "%s did not change the mode: %s" % (label, changed))
+    require(r.stage(observed, lambda: operating_state(r)) == state, "PLCSIM does not report " + state)
+
+
+def web_alarm(r, web):
+    """runtime_web_alarm_acknowledge on the alarm a PLCSIM write raises, found by the difference of two Alarms.Browse lists."""
+    tool, ws = "runtime_web_alarm_acknowledge", r.report["webServices"]
+
+    def language():
+        read = call(r, "runtime_web_diagnostics", {"attemptId": web, "kind": "languages"})
+        tags = [row.get("language") for row in (read.get("value") or {}).get("languages") or [] if isinstance(row, dict)] if read.get("status") == "read" else []
+        r.language = "en-US" if "en-US" in tags or not tags else tags[0]
+        return {**read, "selected": r.language}
+    r.stage(oracle.LANGUAGES, language)
+
+    def listed(label, wait_for_new=None):
+        def read():
+            deadline = time.monotonic() + 10
+            while True:
+                # A failed list is retained as such (the alarm outcome is then noAlarmListed); the downloads and the backup still run.
+                result = call(r, "runtime_web_diagnostics", {"attemptId": web, "kind": "alarms", "language": r.language, "count": 100})
+                if wait_for_new is None or result.get("isError") or set(oracle.alarm_entries(result)) - wait_for_new or time.monotonic() > deadline:
+                    return result
+                time.sleep(0.5)
+        return oracle.alarm_entries(r.stage(label, read))
+    compare(r, "web", oracle.TRIGGER[0], web, "AlarmTrigger")
+    before = listed(oracle.ALARM_LISTS[0])
+    set_trigger(r, True)
+    compare(r, "web", oracle.TRIGGER[1], web, "AlarmTrigger")
+    raised = listed(oracle.ALARM_LISTS[1], set(before))
+    new = sorted(set(raised) - set(before))
+    # The default Program_Alarm class needs no acknowledgement (run rs_013a5a7a); another listed unacknowledged alarm then stands in.
+    pending = [i for i in new if oracle.acknowledgement(raised[i]) == "not_acknowledged"]
+    others = sorted(i for i in raised if i not in new and oracle.acknowledgement(raised[i]) == "not_acknowledged")
+    target, source = (pending[0], "programAlarm") if pending else (others[0], "listedAlarm") if others else (new[0], "programAlarm") if new else (None, None)
+    ws["alarm"] = {"language": r.language, "newIds": new, "targetId": target, "source": source, "acknowledgeable": bool(pending or others)}
+    r.persist()
+    gate = {"attemptId": web, "bindingSha256": r.binding, "language": r.language, "alarmId": target or oracle.NOT_LISTED_ALARM, "acknowledgeAlarm": True}
+    unacknowledged, unbound = oracle.ACK_REFUSALS
+    answer(r, unacknowledged, tool, {**gate, "acknowledgeAlarm": False})
+    answer(r, unbound, tool, {**gate, "bindingSha256": oracle.UNRETAINED_BINDING})
+    answer(r, oracle.ACK_NOT_LISTED, tool, {**gate, "alarmId": oracle.NOT_LISTED_ALARM})
+    if target is not None:
+        if answer(r, oracle.ACK, tool, gate).get("state") == "acknowledged":
+            listed(oracle.ALARM_LISTS[2])
+            answer(r, oracle.ACK_AGAIN, tool, gate)
+    set_trigger(r, False)
+    listed(oracle.ALARM_LISTS[3])
+    if target is not None:
+        answer(r, oracle.ACK_FALLEN, tool, gate)
+
+
+def web_download(r, web, hwid):
+    """runtime_web_download: its selection refusals before any request, then profiling data and the CPU's service data."""
+    tool = "runtime_web_download"
+    refusals = dict(zip(oracle.DOWNLOAD_REFUSALS, ({"kind": "backup"}, {"kind": "serviceData"}, {"kind": "profiling", "hwid": hwid or 1},
+                                                   {"kind": "serviceData", "hwid": 65536})))
+    for label, arguments in refusals.items():
+        answer(r, label, tool, {"attemptId": web, **arguments})
+    for kind, label in oracle.DOWNLOAD.items():
+        if kind == "serviceData" and hwid is None:
+            continue
+        check_stored(r, label, answer(r, label, tool, {"attemptId": web, "kind": kind, **({"hwid": hwid} if kind == "serviceData" else {})}))
+
+
+def web_backup(r, web):
+    """runtime_web_backup: refused unsent in RUN (PLCSIM still RUN), stored in STOP (PLCSIM still STOP), then RUN again, which also
+    shows that the backup ticket was closed."""
+    tool = "runtime_web_backup"
+    gate = {"attemptId": web, "bindingSha256": r.binding, "acknowledgeBackup": True}
+    unacknowledged, unbound = oracle.BACKUP_REFUSALS
+    answer(r, unacknowledged, tool, {**gate, "acknowledgeBackup": False})
+    answer(r, unbound, tool, {**gate, "bindingSha256": oracle.UNRETAINED_BINDING})
+    answer(r, oracle.BACKUP_RUN, tool, gate)
+    r.stage(oracle.BACKUP_RUN_STATE, lambda: operating_state(r))
+    change_mode(r, web, oracle.TO_STOP, "run", "stop", "Stop", oracle.PLCSIM_STOP)
+    try:
+        stored = answer(r, oracle.BACKUP, tool, gate)
+        r.stage(oracle.BACKUP_STATE, lambda: operating_state(r))
+        check_stored(r, oracle.BACKUP, stored)
+    finally:
+        change_mode(r, web, oracle.TO_RUN, "stop", "run", "Run", oracle.PLCSIM_RUN)
+
+
+def web_services(r):
+    """The three D12 Web API tools through one pinned session of the runtime user: alarm first (a Program_Alarm runs only in RUN), then
+    the downloads, then the backup with its STOP and RUN."""
+    t = r.tool
+    ws = r.report["webServices"] = {"rights": r.web_rights}
+    bind(r)
+    ws["hwid"] = r.stage(oracle.WS_HWID, lambda: cpu_hwid(r))["hwid"]
+    r.web_credential = r.credential("web", r.stage("runtime_web_credential_binding", lambda: t("runtime_web_credential_binding", {
+        "endpoint": "https://" + r.args.cpu_ip, "peerCertificateSha256": r.report["pins"]["web"]["sha256"], "user": r.username, "mode": "local"})), r.vault)
+    web = connect(r, "web", "runtime_web_connect", web_login(r))
+    methods = r.stage(oracle.WS_STATUS, lambda: t("runtime_web_status", {"attemptId": web}))["methods"]
+    ws["advertised"] = {kind: {m: m in methods for m in needed} for kind, needed in oracle.WS_METHODS.items()}
+    r.persist()
+    select(r, web)
+    compare(r, "web", "Marker read through the Web API", web, "Marker")
+    web_alarm(r, web)
+    web_download(r, web, ws["hwid"])
+    web_backup(r, web)
+    require(r.stage("runtime_web_disconnect", lambda: t("runtime_web_disconnect", {"attemptId": web}))["state"] == "closed", "The web session did not close")
+
+
 def release(r):
     """Stop, switch off and release the owned instance from the current Host (a new one adopts it when none is open)."""
     if getattr(r, "instance", None) is None:
@@ -1144,7 +1357,7 @@ def release(r):
 
 MODES = {"normal": normal, "host-loss-capture": host_loss_capture, "server-restart": server_restart,
          "ua-write-loss": lambda r: write_loss(r, "ua"), "web-write-loss": lambda r: write_loss(r, "web"), "ua-services": services,
-         "device-inventory": inventory}
+         "device-inventory": inventory, "web-services": web_services}
 
 
 def body(r):
