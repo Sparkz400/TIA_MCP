@@ -609,7 +609,7 @@ namespace TiaMcp.Openness.V21
                 var filter = new CrossReferenceMemberFilter(memberPath);
                 var walk = new ScanBudget(MemberWalkLimit);
                 var counts = new JObject { ["exact"] = 0, ["indirect"] = 0, ["wholeArray"] = 0, ["container"] = 0 };
-                AddMemberSources(native.Sources, new string[0], filter, rows, budget, walk, counts, 0, blockTarget);
+                AddMemberSources(native.Sources, Array.Empty<string>(), filter, rows, budget, walk, counts, 0, blockTarget);
                 result["memberPath"] = filter.MemberPath;
                 result["matchCounts"] = counts;
                 result["memberCoverage"] = "Locations are matched by TIA's referenced-as text and the member chain of nested native sources. exact: the member, or a constant index inside the range. indirect: a variable or expression index that may hit the range. wholeArray: the array is used without an index (e.g. passed as a parameter). container: a containing structure is used as a whole. Only exact proves a use; absence of rows proves no use only when completeness.complete is true.";

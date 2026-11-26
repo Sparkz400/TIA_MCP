@@ -347,7 +347,7 @@ namespace TiaMcp.Openness.V21
             VerifySimulationProvisionIdentity(instance, marker, false);
             if (instance.OperatingState != EOperatingState.Stop && instance.OperatingState != EOperatingState.Run)
                 throw new BridgeException("SimulationPowerRequired", "The owned simulator must already be powered in STOP or RUN; this operation never powers, starts or stops it.");
-            var ips = (instance.ControllerIP ?? new string[0]).Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
+            var ips = (instance.ControllerIP ?? Array.Empty<string>()).Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
             if (ips.Length == 0 || address != null && !ips.Contains(address, StringComparer.Ordinal))
                 throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator has no usable controller address or its address changed. No substitute target is selected.");
             return ips;
@@ -501,7 +501,7 @@ namespace TiaMcp.Openness.V21
                 try
                 {
                     var authentication = request as OnlineAuthenticationConfiguration;
-                    var offered = authentication?.GetSupportedAuthenticationTypes().Take(8).Select(item => item.CurrentUserType).ToArray() ?? new UserType[0];
+                    var offered = authentication?.GetSupportedAuthenticationTypes().Take(8).Select(item => item.CurrentUserType).ToArray() ?? Array.Empty<UserType>();
                     if (authentication != null) entry["offered"] = new JArray(offered.Select(item => item.ToString()));
                     if (SimulationOnlineLogin.Decide(type, _login != null, _answered, offered.Contains(UserType.ProjectUser)) == SimulationOnlineLogin.ProjectUser)
                     {

@@ -188,7 +188,7 @@ namespace TiaMcp.Openness.V21
             string source = ChangeText(payload, "htmlDirectory", 4096), page = ChangeText(payload, "defaultPage", 1024), application = ChangeText(payload, "applicationName", 128);
             if (!ProjectPathIsAbsolute(source) || !Directory.Exists(source)) throw new BridgeException("InvalidRequest", "htmlDirectory must name an existing absolute directory.");
             bool overwrite = ExplicitChangeBool(payload, "override");
-            var named = overwrite ? ChangeNames(payload, "overrideBlocks") : payload["overrideBlocks"] == null ? new string[0] : throw new BridgeException("InvalidRequest", "overrideBlocks requires override=true.");
+            var named = overwrite ? ChangeNames(payload, "overrideBlocks") : payload["overrideBlocks"] == null ? Array.Empty<string>() : throw new BridgeException("InvalidRequest", "overrideBlocks requires override=true.");
             string snapshot = WebSourceSnapshot(change);
             Directory.CreateDirectory(snapshot);
             LibraryCopyDirectory(source, snapshot);
@@ -296,7 +296,7 @@ namespace TiaMcp.Openness.V21
 
         private static JObject[] UmacRequestedDeviceRights(JObject payload)
         {
-            if (payload["deviceRights"] == null) return new JObject[0];
+            if (payload["deviceRights"] == null) return Array.Empty<JObject>();
             var rows = payload["deviceRights"] as JArray;
             if (rows == null || rows.Count > 64 || rows.Any(r => !(r is JObject row) || row.Count != 2 || row["device"]?.Type != JTokenType.String || row["identifier"]?.Type != JTokenType.String))
                 throw new BridgeException("InvalidRequest", "deviceRights must list at most 64 { device, identifier } entries; device is a deviceRightScopes path from access_inspect.");
@@ -336,7 +336,7 @@ namespace TiaMcp.Openness.V21
             var umac = project.GetService<UmacConfigurator>() ?? throw new BridgeException("UnsupportedCapability", "The project exposes no UmacConfigurator.");
             if (umac.SystemRoles.Any(r => string.Equals(r.Name, roleName, StringComparison.OrdinalIgnoreCase))) throw new BridgeException("ProtectedObject", "System roles are never changed, assigned or unassigned.");
             string userName = action == "assign" || action == "unassign" ? ChangeText(payload, "userName", 128) : null;
-            var engineering = payload["engineeringRights"] == null ? new string[0] : ChangeStringArray(payload, "engineeringRights", 64, 256);
+            var engineering = payload["engineeringRights"] == null ? Array.Empty<string>() : ChangeStringArray(payload, "engineeringRights", 64, 256);
             var device = UmacRequestedDeviceRights(payload);
             if ((action == "grant" || action == "revoke") && engineering.Length + device.Length == 0) throw new BridgeException("InvalidRequest", "Name at least one engineeringRights or deviceRights entry.");
             var before = UmacState(project, umac);

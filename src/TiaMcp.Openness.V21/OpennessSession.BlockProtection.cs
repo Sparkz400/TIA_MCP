@@ -19,7 +19,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "action must be define, change, enable or disable.");
             // The allowlist keeps any stray plaintext field out of the preview, journal and response.
             var allowed = new[] { "blockName", "blockPath", "scopePath", "namespace", "groupPath", "vaultName", "credential" }
-                .Concat(write ? new[] { "action" } : new string[0]).Concat(action == "change" ? new[] { "newCredential" } : new string[0]);
+                .Concat(write ? new[] { "action" } : Array.Empty<string>()).Concat(action == "change" ? new[] { "newCredential" } : Array.Empty<string>());
             if (payload.Properties().Any(property => !allowed.Contains(property.Name, StringComparer.Ordinal)))
                 throw new BridgeException("CredentialInputInvalid", "Block protection payloads accept only block selectors, vaultName, action and protected credential references; plaintext passwords are never accepted.");
             RoutedCredentials.RequireVaultName(payload);

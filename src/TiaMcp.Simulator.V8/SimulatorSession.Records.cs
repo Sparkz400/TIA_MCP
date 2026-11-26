@@ -67,7 +67,7 @@ namespace TiaMcp.Simulator.V8
             Delegate_II_EREC_DT_SDR write = (sender, code, time, record) =>
             {
                 var entry = new JObject { ["kind"] = "write", ["hardwareId"] = record.Info.HardwareId, ["recordIndex"] = record.Info.RecordIdx, ["dataSize"] = record.Info.DataSize,
-                    ["data"] = new JArray((record.Data ?? new byte[0]).Select(b => (int)b)), ["errorCode"] = code.ToString() };
+                    ["data"] = new JArray((record.Data ?? Array.Empty<byte>()).Select(b => (int)b)), ["errorCode"] = code.ToString() };
                 var row = Row(record.Info, "write");
                 try
                 {

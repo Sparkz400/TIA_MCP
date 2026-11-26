@@ -321,7 +321,7 @@ namespace TiaMcp.Simulator.V8
                 result["hasDisplay"] = available;
                 if (!available) return result;
                 var data = selected.Instance.GetDisplayData();
-                var bytes = data.displayData ?? new byte[0];
+                var bytes = data.displayData ?? Array.Empty<byte>();
                 int length = (int)Math.Min(data.dataLength, (uint)bytes.Length);
                 result["dataLength"] = data.dataLength;
                 using (var sha = SHA256.Create()) result["sha256"] = BitConverter.ToString(sha.ComputeHash(bytes, 0, length)).Replace("-", "").ToLowerInvariant();

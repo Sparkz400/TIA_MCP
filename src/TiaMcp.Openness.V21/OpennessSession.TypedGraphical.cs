@@ -246,12 +246,12 @@ namespace TiaMcp.Openness.V21
                 string cpuType = TypedCpuIdentifier(Plc);
                 var context = new TypedGraphicalContext { CpuFamily = cpuType, Route = TypedRoute(scope, Change.Namespace), TargetNamespace = Change.Namespace ?? "", TargetScopePath = scope.Path };
                 context.Profiles = LoadTypedProfiles(Change);
-                foreach (var requested in model.Operands ?? new TypedGraphicalOperandRequest[0])
+                foreach (var requested in model.Operands ?? Array.Empty<TypedGraphicalOperandRequest>())
                 {
                     if (requested == null || string.IsNullOrEmpty(requested.Key) || context.Operands.ContainsKey(requested.Key)) throw new BridgeException("DuplicateOperand", "Operand keys must be nonempty and unique.");
                     context.Operands.Add(requested.Key, ResolveOperand(requested));
                 }
-                foreach (string path in (model.Nodes ?? new TypedGraphicalNode[0]).Where(n => n != null && n.Kind == "call").Select(n => n.CalleePath).Distinct(StringComparer.Ordinal))
+                foreach (string path in (model.Nodes ?? Array.Empty<TypedGraphicalNode>()).Where(n => n != null && n.Kind == "call").Select(n => n.CalleePath).Distinct(StringComparer.Ordinal))
                 {
                     var callee = Block(path, call: true);
                     if (!(callee.Item is FC) && !(callee.Item is FB)) throw new BridgeException("UnsupportedCallee", "A typed call requires an exact FC or FB.");
@@ -280,7 +280,7 @@ namespace TiaMcp.Openness.V21
             {
                 if (request.Scope == "constant")
                     return new TypedGraphicalOperand { Key = request.Key, Scope = "LiteralConstant", DataType = request.DataType, Value = request.Value, Writable = false, Identity = "constant:" + request.DataType + ":" + request.Value, DeclarationHash = ChangeHash(request.DataType + ":" + request.Value) };
-                string[] components = request.Components ?? new string[0];
+                string[] components = request.Components ?? Array.Empty<string>();
                 if (components.Length == 0 || components.Length > 32 || components.Any(c => string.IsNullOrEmpty(c) || c.Length > 128)) throw new BridgeException("InvalidOperand", "A symbolic operand requires bounded literal name components.");
                 if (components.Any(c => c.IndexOfAny(new[] { '[', ']', '^', '%' }) >= 0)) throw new BridgeException("UnsupportedIndexing", "Indirect, address and indexed operands are not enabled by this typed profile; symbolic array bounds are never guessed.");
                 if (request.Scope == "tag")
@@ -372,7 +372,7 @@ namespace TiaMcp.Openness.V21
                 sourceHashes.Add(source.Value<string>("sha256"));
                 change?.TypedDependencies.Add(new JObject { ["kind"] = "profileCatalog", ["artifact"] = ChangeArtifact(file) });
             }
-            var profiles = json["profiles"]?.ToObject<TypedGraphicalProfile[]>() ?? new TypedGraphicalProfile[0];
+            var profiles = json["profiles"]?.ToObject<TypedGraphicalProfile[]>() ?? Array.Empty<TypedGraphicalProfile>();
             if (profiles.Any(p => !sourceHashes.Contains(p.SourceSha256))) throw new BridgeException("ProfileCatalogInvalid", "A profile does not reference a hash-verified independent native fixture.");
             return profiles;
         }

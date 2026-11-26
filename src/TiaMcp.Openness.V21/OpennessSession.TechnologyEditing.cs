@@ -155,7 +155,7 @@ namespace TiaMcp.Openness.V21
             var reads = slot is AxisEncoderHardwareConnectionInterface axis ? new Func<object>[] { () => axis.Channel, () => axis.InputModule, () => axis.OutputModule, () => axis.InputOutputModule, () => axis.OutputTag }
                 : slot is TorqueHardwareConnectionInterface torque ? new Func<object>[] { () => torque.InputModule, () => torque.OutputModule, () => torque.InputOutputModule }
                 : slot is MeasuringInputHardwareConnectionProvider measuring ? new Func<object>[] { () => measuring.Channel, () => measuring.InputModule }
-                : slot is OutputCamHardwareConnectionProvider output ? new Func<object>[] { () => output.Channel, () => output.OutputTag } : new Func<object>[0];
+                : slot is OutputCamHardwareConnectionProvider output ? new Func<object>[] { () => output.Channel, () => output.OutputTag } : Array.Empty<Func<object>>();
             foreach (var read in reads)
             {
                 object value;

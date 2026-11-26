@@ -36,7 +36,7 @@ namespace TiaMcp.Openness.V21
                 var upgraded = Directory.GetFiles(directory, "*_V21.al21", SearchOption.AllDirectories);
                 if (upgraded.Length != 1) throw;
                 string logDirectory = Path.Combine(Path.GetDirectoryName(upgraded[0]), "Logs");
-                var logs = Directory.Exists(logDirectory) ? Directory.GetFiles(logDirectory, "ConversionLog_*_to_21.0.0.0.xml") : new string[0];
+                var logs = Directory.Exists(logDirectory) ? Directory.GetFiles(logDirectory, "ConversionLog_*_to_21.0.0.0.xml") : Array.Empty<string>();
                 if (logs.Length != 1 || !File.ReadAllText(logs[0]).Contains("ConversionInfoTabLibrarySucceeded")) throw;
                 GlobalLibrary opened = null;
                 try { opened = _portal.GlobalLibraries.FirstOrDefault(x => string.Equals(x.Path?.FullName, upgraded[0], StringComparison.OrdinalIgnoreCase)); }

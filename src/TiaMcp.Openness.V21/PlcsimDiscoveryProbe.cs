@@ -110,7 +110,7 @@ namespace TiaMcp.Openness.V21
                                 VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
                                 var sample = Observe("startup", provider, projectDiscovery, 1);
                                 sample["elapsedMs"] = clock.ElapsedMilliseconds;
-                                sample["controllerAddresses"] = new JArray(owned.ControllerIP ?? new string[0]);
+                                sample["controllerAddresses"] = new JArray(owned.ControllerIP ?? Array.Empty<string>());
                                 sample["controllerName"] = owned.ControllerName;
                                 sample["communicationInterface"] = owned.CommunicationInterface.ToString();
                                 ((JArray)startup["snapshots"]).Add(sample);

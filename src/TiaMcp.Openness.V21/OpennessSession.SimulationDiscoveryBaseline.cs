@@ -166,7 +166,7 @@ namespace TiaMcp.Openness.V21
         {
             var pc = provider.Configuration.Modes.Find("PN/IE")?.PcInterfaces.Find("PLCSIM", 1);
             routePresent = pc != null;
-            return pc == null ? new Device[0] : pc.GetAccessibleDevices().Take(65).Select(ToDevice).ToArray();
+            return pc == null ? Array.Empty<Device>() : pc.GetAccessibleDevices().Take(65).Select(ToDevice).ToArray();
         }
 
         private static Device ToDevice(ConfigurationAccessibleDevice device) =>

@@ -106,9 +106,9 @@ namespace TiaMcp.Openness.V21
                     IList<EngineeringAttributeInfo> attributes = null; IList<EngineeringCompositionInfo> compositions = null;
                     try { attributes = native.GetAttributeInfos(); compositions = native.GetCompositionInfos(); }
                     catch (Exception error) { Error(path, "GetAttributeInfos", error); }
-                    foreach (var info in (attributes ?? new EngineeringAttributeInfo[0]).OrderBy(a => a.Name, StringComparer.Ordinal))
+                    foreach (var info in (attributes ?? Array.Empty<EngineeringAttributeInfo>()).OrderBy(a => a.Name, StringComparer.Ordinal))
                         if ((info.AccessMode & EngineeringAttributeAccessMode.Read) != 0 && seen.Add(info.Name)) Read(path, info.Name, () => native.GetAttribute(info.Name), result, depth);
-                    foreach (var info in (compositions ?? new EngineeringCompositionInfo[0]).OrderBy(c => c.Name, StringComparer.Ordinal))
+                    foreach (var info in (compositions ?? Array.Empty<EngineeringCompositionInfo>()).OrderBy(c => c.Name, StringComparer.Ordinal))
                         if (seen.Add(info.Name)) Read(path, info.Name, () => native.GetComposition(info.Name), result, depth);
                 }
                 finally { _parts.RemoveAt(_parts.Count - 1); }

@@ -231,7 +231,7 @@ namespace TiaMcp.Openness.V21
             // unfinished upgrade (receipt copying or upgrading) is held without opening its possibly half-written project in TIA.
             string upgraded = ProjectUpgradeRules.ReceiptProject(receipt, root, path, source.Value<string>("kind") == "workspace", hash);
             // Destination opens the one .ap21 it finds; anything but the receipt's project is held unopened.
-            var found = upgraded != null && Directory.Exists(root) ? Directory.GetFiles(root, "*.ap21", SearchOption.AllDirectories) : new string[0];
+            var found = upgraded != null && Directory.Exists(root) ? Directory.GetFiles(root, "*.ap21", SearchOption.AllDirectories) : Array.Empty<string>();
             if (found.Length != 1 || !SameSimulationPath(found[0], upgraded)) upgraded = null;
             string name = (receipt?["project"] as JObject)?.Value<string>("name");
             check.Destination(destination, () => { check.Hold(destination, "No completed upgrade receipt of this source names the V21 project at the observed layout; a partial copy or unfinished upgrade is not opened."); return null; },
@@ -304,7 +304,7 @@ namespace TiaMcp.Openness.V21
             {
                 // A directory counts by its newest file; a missing path or a later write holds.
                 string path = row.Value<string>("path");
-                var files = File.Exists(path) ? new[] { path } : Directory.Exists(path) ? Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories).Take(100001).ToArray() : new string[0];
+                var files = File.Exists(path) ? new[] { path } : Directory.Exists(path) ? Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories).Take(100001).ToArray() : Array.Empty<string>();
                 if (files.Length == 0 || files.Length > 100000) { Hold(row, "The file or directory is missing, empty or too large to inspect."); return; }
                 var written = files.Max(File.GetLastWriteTimeUtc);
                 Evidence(row, "lastWriteUtc", written.ToString("O"));
@@ -375,7 +375,7 @@ namespace TiaMcp.Openness.V21
                 if (Directory.Exists(root) && !Directory.EnumerateFileSystemEntries(root, "*", SearchOption.AllDirectories)
                     .Any(entry => !string.Equals(entry, Path.Combine(root, "recovery-intent.json"), StringComparison.OrdinalIgnoreCase)))
                 { Prove(row, "unchanged", "The new destination holds no content; no project or library was created."); return; }
-                var projects = Directory.Exists(root) ? Directory.GetFiles(root, library != null ? "*.al21" : "*.ap21", SearchOption.AllDirectories) : new string[0];
+                var projects = Directory.Exists(root) ? Directory.GetFiles(root, library != null ? "*.al21" : "*.ap21", SearchOption.AllDirectories) : Array.Empty<string>();
                 if (projects.Length != 1) { Hold(row, "The destination holds partial content without exactly one project or library."); return; }
                 if (library != null)
                 {

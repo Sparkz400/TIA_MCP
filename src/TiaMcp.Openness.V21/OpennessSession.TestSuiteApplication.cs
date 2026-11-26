@@ -41,8 +41,8 @@ namespace TiaMcp.Openness.V21
             if (extension != ".tat" && extension != ".ttst" || !file.Exists || (file.Attributes & FileAttributes.ReparsePoint) != 0 || file.Length < 1 || file.Length > 16 * 1024 * 1024)
                 throw new BridgeException("InvalidRequest", "sourcePath must be an existing plain .tat or .ttst file of at most 16 MiB.");
             if (extension == ".tat" && payload["expectedTestSetNames"] != null) throw new BridgeException("InvalidRequest", ".tat files carry test cases only.");
-            string[] cases = extension == ".tat" || payload["expectedTestCaseNames"] != null ? ChangeNames(payload, "expectedTestCaseNames") : new string[0];
-            string[] sets = extension == ".ttst" ? ChangeNames(payload, "expectedTestSetNames") : new string[0];
+            string[] cases = extension == ".tat" || payload["expectedTestCaseNames"] != null ? ChangeNames(payload, "expectedTestCaseNames") : Array.Empty<string>();
+            string[] sets = extension == ".ttst" ? ChangeNames(payload, "expectedTestSetNames") : Array.Empty<string>();
             var existing = ApplicationTestDefinitions.Existing(project, cases, sets);
             if (existing.Length != 0) throw new BridgeException("ObjectExists", "Strict import refuses existing test cases/sets: " + string.Join(", ", existing));
             change.ObjectNames = cases.Concat(sets).ToArray();
@@ -82,7 +82,7 @@ namespace TiaMcp.Openness.V21
             {
                 return new JObject { ["instanceId"] = marker["instanceId"], ["instanceName"] = marker["instanceName"],
                     ["storagePath"] = marker["storagePath"], ["operatingState"] = instance.OperatingState.ToString(),
-                    ["controllerAddresses"] = new JArray(instance.ControllerIP ?? new string[0]) };
+                    ["controllerAddresses"] = new JArray(instance.ControllerIP ?? Array.Empty<string>()) };
             }
             finally { RetainSimulationInterface(instance); }
         }
