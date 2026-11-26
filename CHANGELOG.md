@@ -20,6 +20,11 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 - Catalog `0.5.4` adds the native follow-up checks of 14 to 25 November and a hardware smoke on a German installation; `0.5.3` requalifies the read-only V19 adapter after the shared-loop link fix. Catalogs `0.5.1` and `0.5.2`: `project_save`, `project_close`, `project_archive`, `project_open_copy`, `simulation_provision_status`, `simulation_provision_recover`, `sim_prune`, `sim_network_mode_set` and `hmi_content_fingerprint` are natively verified on owned scratch projects and instances ([record](docs/verification/native-runs-20261126.md)); `project_archive` documents that TIA's archive writes into the open project's folder.
 - `scripts/Measure-Coverage.ps1` now measures worker and Host sources that test projects compile in with `<Compile Include … Link>` (test assemblies are instrumented, their own code under `tests/` is left out), and its summary (schema 2) adds `sources`, line coverage per `src/` project that counts each source line once across every assembly that compiles it.
 - CI: the ruff gate also enforces F401, F841 and F402 (unused imports and locals, imports shadowed by a loop variable) now that the scripts have none.
+- Analyzer rules CA1822 (non-public members only), CA1825 and CA1310 are build errors after their findings were fixed.
+- CI checks the whitespace formatting of `src/TiaMcp.Core` and `src/TiaMcp.Host` (`dotnet format whitespace`, the SDK's default C# rules); both were formatted in one whitespace-only commit listed in `.git-blame-ignore-revs`.
+- `scripts/Test-BeforePush.ps1` runs the offline checks the changed files can break before a push; `Test-Offline.ps1 -PythonTest` runs selected Python test modules in CI's environment.
+- `scripts/status_counts.py` checks the counts in STATUS and the TODO against the catalog and the release matrix (`--write` updates them); the offline suite runs it.
+- The worker's change pipeline (`OpennessSession.Changes.cs`, 2,250 lines) is split into five files; its argument checks and hashes moved to `ChangeArguments`, which the offline suite now tests.
 
 ### Fixed
 
@@ -29,6 +34,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 - Credential provisioning's card move gave up after 15 s of access denials that an on-access scanner holding the freshly moved folder causes; it now retries for up to 120 s, and the holder report says that a file-system filter is not listed.
 - `simulation_download_online` and `plc_physical_download` refused a `DataBlockReinitialization` question by throwing from TIA's download callback, which loaded nothing but left the TIA Portal session disposed and reported `EngineeringError`; they now decline it through TIA and report `SimulationDownloadReinitializationRequired` (or the physical route's refusal) with the Portal intact.
 - `hmi_content_fingerprint` fingerprinted any kind starting with `hmi_`; an unknown kind is now refused (`InvalidRequest`).
+- Hardware attribute writes to built-in items (a CPU's PROFINET interface and its ports, for example) were refused with `AttributeNotWritable` on a TIA Portal whose UI language is not the one the bundled capability profiles were captured in, because the profile rows are keyed by the items' TIA-generated names (`PROFINET interface_1`, `PROFINET-Schnittstelle_1`); a built-in item without an exact row now finds its row by position number, as long as exactly one row matches.
 - `project_snapshot_capture` failed every successful capture with `ProjectReviewFailed` ("System.Int32 cannot be converted to System.Int64") while it added `remoteAccess` to the saved review, since 20 November (in 0.9.0). The review's byte count is now stored as a 64-bit number and read in either width.
 
 ## [0.9.0] - 2026-11-25

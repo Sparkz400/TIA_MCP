@@ -101,6 +101,7 @@ namespace TiaMcp.Openness.V21
         private static JObject ReadItemProfile(DeviceItem item, out string relativePath)
         {
             var segments = new System.Collections.Generic.List<string>();
+            var chain = new System.Collections.Generic.List<(int Position, bool BuiltIn)>();
             IEngineeringInstance cursor = item;
             for (int depth = 0; cursor is DeviceItem device && depth < 64; depth++, cursor = device.Parent)
             {
@@ -110,8 +111,14 @@ namespace TiaMcp.Openness.V21
                 string firmware = versionless ? FirmwareVersion(device) : null;
                 var profile = HardwareEngineeringRules.Profile(type, firmware);
                 if (profile == null && versionless) HardwareEngineeringRules.RequireVersionlessMatch(HardwareEngineeringRules.BundledProfileList, type, firmware);
-                if (profile != null) { relativePath = HardwareEngineeringRules.ProfilePath(segments, Segment(device.Name)); return profile; }
+                if (profile != null)
+                {
+                    // Built-in items carry UI-language names; ProfileRowPath finds their row by position when the name differs.
+                    relativePath = HardwareEngineeringRules.ProfileRowPath(profile, HardwareEngineeringRules.ProfilePath(segments, Segment(device.Name)), chain);
+                    return profile;
+                }
                 segments.Insert(0, Segment(device.Name));
+                chain.Insert(0, (device.PositionNumber, device.IsBuiltIn));
             }
             relativePath = null;
             return null;

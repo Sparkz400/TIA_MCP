@@ -616,6 +616,34 @@ namespace TiaMcp.Openness.V21
         internal static string ProfilePath(IEnumerable<string> segments, string moduleSegment) =>
             string.Join("/", segments.Select(segment => "items/" + (segment == moduleSegment ? "{module}" : segment)));
 
+        // The profile row for an item path. TIA names built-in items in the UI language ("PROFINET interface_1",
+        // "PROFINET-Schnittstelle_1") and the bundled profiles were captured on one language, so when no row has the exact path,
+        // a row matches structurally: the same depth, each built-in segment by its row's isBuiltIn and positionNumber and every other
+        // segment by name. Exactly one such row is used; otherwise the exact path is returned, which then names no row.
+        // chain: positionNumber and isBuiltIn of each segment of relativePath, in order.
+        internal static string ProfileRowPath(JObject profile, string relativePath, IList<(int Position, bool BuiltIn)> chain)
+        {
+            var rows = (profile?["items"] as JArray ?? new JArray()).OfType<JObject>().Where(row => row.Value<string>("relativePath") != null)
+                .ToDictionary(row => row.Value<string>("relativePath"), StringComparer.Ordinal);
+            if (relativePath == null || rows.ContainsKey(relativePath) || chain == null) return relativePath;
+            string[] wanted = relativePath.Length == 0 ? Array.Empty<string>() : relativePath.Split('/');
+            if (wanted.Length != chain.Count * 2 || !chain.Any(segment => segment.BuiltIn)) return relativePath;
+            var matches = rows.Keys.Where(path =>
+            {
+                string[] parts = path.Split('/');
+                if (parts.Length != wanted.Length) return false;
+                for (int i = 0; i < chain.Count; i++)
+                {
+                    if (parts[2 * i] != "items" || wanted[2 * i] != "items") return false;
+                    if (!chain[i].BuiltIn) { if (parts[2 * i + 1] != wanted[2 * i + 1]) return false; continue; }
+                    if (!rows.TryGetValue(string.Join("/", parts.Take(2 * i + 2)), out var ancestor)) return false;
+                    if (ancestor.Value<bool?>("isBuiltIn") != true || ancestor.Value<int?>("positionNumber") != chain[i].Position) return false;
+                }
+                return true;
+            }).ToArray();
+            return matches.Length == 1 ? matches[0] : relativePath;
+        }
+
         internal const string ProfileContract = "contracts/hardware-catalog-profiles.v1.json";
         private static readonly Lazy<Dictionary<string, JObject>> BundledProfiles = new Lazy<Dictionary<string, JObject>>(() =>
         {

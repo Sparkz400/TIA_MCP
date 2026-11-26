@@ -2717,8 +2717,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HardwareEngineeringRules.cs",
-      "sha256": "774be73db5c150a3b250ca776fc9029b79f02eb253642148fcb0b2358e0e632c",
-      "bytes": 60411
+      "sha256": "28f8b3b4008642081a74b1ff2739a90d71a8c056a14a16ff2676307763d47433",
+      "bytes": 62576
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiAssemblyIdentityRules.cs",
@@ -3032,8 +3032,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
-      "sha256": "e353e9f29d23c10aa7266bbaeb1487a28cc651cf3991a7bd14baceb96a5f8e27",
-      "bytes": 41185
+      "sha256": "f2f24e632e3590d2ca684576a0bf2f78dc2822bb5bf74fcfd89525e34f0848b6",
+      "bytes": 41612
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Hmi.cs",
@@ -92813,8 +92813,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ReadItemProfile",
               "line": 101,
-              "endLine": 118,
-              "sha256": "5867ffdf8c599f518b7bc81d2ea5abe9de11759392e6a9b8955434140772a320"
+              "endLine": 125,
+              "sha256": "b3ee0cbc76796bff81d1b010a1e524d9e75ef6f0937ea16bf057a59f57c06a5b"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ScalarValues.cs",
@@ -93436,8 +93436,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyHardwareReplace",
-              "line": 371,
-              "endLine": 377,
+              "line": 378,
+              "endLine": 384,
               "sha256": "402676cb876846a5180531705b73aa70b7caae3f5b645fd3a24dfbea1b7745e7"
             }
           ]
@@ -93467,8 +93467,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareSharedDeviceAccess",
-              "line": 292,
-              "endLine": 354,
+              "line": 299,
+              "endLine": 361,
               "sha256": "ffa0ea762842c0172541d00f441dde28b1b2b5a4e28b034fdf56fafb18f3150d"
             }
           ]
@@ -93487,8 +93487,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplySharedDeviceAccess",
-              "line": 356,
-              "endLine": 369,
+              "line": 363,
+              "endLine": 376,
               "sha256": "c1c97b73fe33da77ca98bfe02531a1c36e22f03d90fd71a63c6cb08b5176d90a"
             }
           ]
@@ -93518,8 +93518,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareTransferArea",
-              "line": 396,
-              "endLine": 413,
+              "line": 403,
+              "endLine": 420,
               "sha256": "da76096b35537d4fe4b7cf4f644dc5403b95b5a40b49842ee88b962f39021a7a"
             }
           ]
@@ -93538,8 +93538,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyTransferArea",
-              "line": 415,
-              "endLine": 426,
+              "line": 422,
+              "endLine": 433,
               "sha256": "85d825a19bb95dd6ad7e5ec8091c1cc19f888aefacf67871147ad113755340e3"
             }
           ]
@@ -93569,8 +93569,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareTransferArea",
-              "line": 396,
-              "endLine": 413,
+              "line": 403,
+              "endLine": 420,
               "sha256": "da76096b35537d4fe4b7cf4f644dc5403b95b5a40b49842ee88b962f39021a7a"
             }
           ]
@@ -93589,8 +93589,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyTransferArea",
-              "line": 415,
-              "endLine": 426,
+              "line": 422,
+              "endLine": 433,
               "sha256": "85d825a19bb95dd6ad7e5ec8091c1cc19f888aefacf67871147ad113755340e3"
             }
           ]
@@ -93886,8 +93886,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareMrp",
-              "line": 212,
-              "endLine": 253,
+              "line": 219,
+              "endLine": 260,
               "sha256": "3263adc14f80bd972efb645bf8cfebada561418a0e162a66a750885503cbcc0c"
             },
             {
@@ -93935,8 +93935,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareSharedDeviceAccess",
-              "line": 292,
-              "endLine": 354,
+              "line": 299,
+              "endLine": 361,
               "sha256": "ffa0ea762842c0172541d00f441dde28b1b2b5a4e28b034fdf56fafb18f3150d"
             },
             {
@@ -94012,8 +94012,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareTransferArea",
-              "line": 396,
-              "endLine": 413,
+              "line": 403,
+              "endLine": 420,
               "sha256": "da76096b35537d4fe4b7cf4f644dc5403b95b5a40b49842ee88b962f39021a7a"
             },
             {
@@ -94076,8 +94076,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ReadItemProfile",
               "line": 101,
-              "endLine": 118,
-              "sha256": "5867ffdf8c599f518b7bc81d2ea5abe9de11759392e6a9b8955434140772a320"
+              "endLine": 125,
+              "sha256": "b3ee0cbc76796bff81d1b010a1e524d9e75ef6f0937ea16bf057a59f57c06a5b"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ChangeTargets.cs",
@@ -95012,8 +95012,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyHardwareReplace",
-              "line": 371,
-              "endLine": 377,
+              "line": 378,
+              "endLine": 384,
               "sha256": "402676cb876846a5180531705b73aa70b7caae3f5b645fd3a24dfbea1b7745e7"
             },
             {
@@ -95047,8 +95047,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyMrp",
-              "line": 255,
-              "endLine": 272,
+              "line": 262,
+              "endLine": 279,
               "sha256": "c0c849ed37fc9cc6e84030c776ba75a6fe1b82840efcbfa53c43ee593a22d32e"
             },
             {
@@ -95103,8 +95103,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplySharedDeviceAccess",
-              "line": 356,
-              "endLine": 369,
+              "line": 363,
+              "endLine": 376,
               "sha256": "c1c97b73fe33da77ca98bfe02531a1c36e22f03d90fd71a63c6cb08b5176d90a"
             },
             {
@@ -95180,8 +95180,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyTransferArea",
-              "line": 415,
-              "endLine": 426,
+              "line": 422,
+              "endLine": 433,
               "sha256": "85d825a19bb95dd6ad7e5ec8091c1cc19f888aefacf67871147ad113755340e3"
             },
             {
@@ -96016,8 +96016,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareMrp",
-              "line": 212,
-              "endLine": 253,
+              "line": 219,
+              "endLine": 260,
               "sha256": "3263adc14f80bd972efb645bf8cfebada561418a0e162a66a750885503cbcc0c"
             },
             {
@@ -96065,8 +96065,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareSharedDeviceAccess",
-              "line": 292,
-              "endLine": 354,
+              "line": 299,
+              "endLine": 361,
               "sha256": "ffa0ea762842c0172541d00f441dde28b1b2b5a4e28b034fdf56fafb18f3150d"
             },
             {
@@ -96142,8 +96142,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareTransferArea",
-              "line": 396,
-              "endLine": 413,
+              "line": 403,
+              "endLine": 420,
               "sha256": "da76096b35537d4fe4b7cf4f644dc5403b95b5a40b49842ee88b962f39021a7a"
             },
             {
@@ -96206,8 +96206,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ReadItemProfile",
               "line": 101,
-              "endLine": 118,
-              "sha256": "5867ffdf8c599f518b7bc81d2ea5abe9de11759392e6a9b8955434140772a320"
+              "endLine": 125,
+              "sha256": "b3ee0cbc76796bff81d1b010a1e524d9e75ef6f0937ea16bf057a59f57c06a5b"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ChangeTargets.cs",
@@ -97142,8 +97142,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyHardwareReplace",
-              "line": 371,
-              "endLine": 377,
+              "line": 378,
+              "endLine": 384,
               "sha256": "402676cb876846a5180531705b73aa70b7caae3f5b645fd3a24dfbea1b7745e7"
             },
             {
@@ -97177,8 +97177,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyMrp",
-              "line": 255,
-              "endLine": 272,
+              "line": 262,
+              "endLine": 279,
               "sha256": "c0c849ed37fc9cc6e84030c776ba75a6fe1b82840efcbfa53c43ee593a22d32e"
             },
             {
@@ -97233,8 +97233,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplySharedDeviceAccess",
-              "line": 356,
-              "endLine": 369,
+              "line": 363,
+              "endLine": 376,
               "sha256": "c1c97b73fe33da77ca98bfe02531a1c36e22f03d90fd71a63c6cb08b5176d90a"
             },
             {
@@ -97310,8 +97310,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyTransferArea",
-              "line": 415,
-              "endLine": 426,
+              "line": 422,
+              "endLine": 433,
               "sha256": "85d825a19bb95dd6ad7e5ec8091c1cc19f888aefacf67871147ad113755340e3"
             },
             {
@@ -98177,8 +98177,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareMrp",
-              "line": 212,
-              "endLine": 253,
+              "line": 219,
+              "endLine": 260,
               "sha256": "3263adc14f80bd972efb645bf8cfebada561418a0e162a66a750885503cbcc0c"
             },
             {
@@ -98226,8 +98226,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareSharedDeviceAccess",
-              "line": 292,
-              "endLine": 354,
+              "line": 299,
+              "endLine": 361,
               "sha256": "ffa0ea762842c0172541d00f441dde28b1b2b5a4e28b034fdf56fafb18f3150d"
             },
             {
@@ -98303,8 +98303,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareTransferArea",
-              "line": 396,
-              "endLine": 413,
+              "line": 403,
+              "endLine": 420,
               "sha256": "da76096b35537d4fe4b7cf4f644dc5403b95b5a40b49842ee88b962f39021a7a"
             },
             {
@@ -98367,8 +98367,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ReadItemProfile",
               "line": 101,
-              "endLine": 118,
-              "sha256": "5867ffdf8c599f518b7bc81d2ea5abe9de11759392e6a9b8955434140772a320"
+              "endLine": 125,
+              "sha256": "b3ee0cbc76796bff81d1b010a1e524d9e75ef6f0937ea16bf057a59f57c06a5b"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ChangeTargets.cs",
@@ -99303,8 +99303,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyHardwareReplace",
-              "line": 371,
-              "endLine": 377,
+              "line": 378,
+              "endLine": 384,
               "sha256": "402676cb876846a5180531705b73aa70b7caae3f5b645fd3a24dfbea1b7745e7"
             },
             {
@@ -99338,8 +99338,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyMrp",
-              "line": 255,
-              "endLine": 272,
+              "line": 262,
+              "endLine": 279,
               "sha256": "c0c849ed37fc9cc6e84030c776ba75a6fe1b82840efcbfa53c43ee593a22d32e"
             },
             {
@@ -99394,8 +99394,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplySharedDeviceAccess",
-              "line": 356,
-              "endLine": 369,
+              "line": 363,
+              "endLine": 376,
               "sha256": "c1c97b73fe33da77ca98bfe02531a1c36e22f03d90fd71a63c6cb08b5176d90a"
             },
             {
@@ -99471,8 +99471,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyTransferArea",
-              "line": 415,
-              "endLine": 426,
+              "line": 422,
+              "endLine": 433,
               "sha256": "85d825a19bb95dd6ad7e5ec8091c1cc19f888aefacf67871147ad113755340e3"
             },
             {
@@ -100307,8 +100307,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareMrp",
-              "line": 212,
-              "endLine": 253,
+              "line": 219,
+              "endLine": 260,
               "sha256": "3263adc14f80bd972efb645bf8cfebada561418a0e162a66a750885503cbcc0c"
             },
             {
@@ -100356,8 +100356,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareSharedDeviceAccess",
-              "line": 292,
-              "endLine": 354,
+              "line": 299,
+              "endLine": 361,
               "sha256": "ffa0ea762842c0172541d00f441dde28b1b2b5a4e28b034fdf56fafb18f3150d"
             },
             {
@@ -100433,8 +100433,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareTransferArea",
-              "line": 396,
-              "endLine": 413,
+              "line": 403,
+              "endLine": 420,
               "sha256": "da76096b35537d4fe4b7cf4f644dc5403b95b5a40b49842ee88b962f39021a7a"
             },
             {
@@ -100497,8 +100497,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ReadItemProfile",
               "line": 101,
-              "endLine": 118,
-              "sha256": "5867ffdf8c599f518b7bc81d2ea5abe9de11759392e6a9b8955434140772a320"
+              "endLine": 125,
+              "sha256": "b3ee0cbc76796bff81d1b010a1e524d9e75ef6f0937ea16bf057a59f57c06a5b"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ChangeTargets.cs",
@@ -101433,8 +101433,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyHardwareReplace",
-              "line": 371,
-              "endLine": 377,
+              "line": 378,
+              "endLine": 384,
               "sha256": "402676cb876846a5180531705b73aa70b7caae3f5b645fd3a24dfbea1b7745e7"
             },
             {
@@ -101468,8 +101468,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyMrp",
-              "line": 255,
-              "endLine": 272,
+              "line": 262,
+              "endLine": 279,
               "sha256": "c0c849ed37fc9cc6e84030c776ba75a6fe1b82840efcbfa53c43ee593a22d32e"
             },
             {
@@ -101524,8 +101524,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplySharedDeviceAccess",
-              "line": 356,
-              "endLine": 369,
+              "line": 363,
+              "endLine": 376,
               "sha256": "c1c97b73fe33da77ca98bfe02531a1c36e22f03d90fd71a63c6cb08b5176d90a"
             },
             {
@@ -101601,8 +101601,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyTransferArea",
-              "line": 415,
-              "endLine": 426,
+              "line": 422,
+              "endLine": 433,
               "sha256": "85d825a19bb95dd6ad7e5ec8091c1cc19f888aefacf67871147ad113755340e3"
             },
             {
@@ -102437,8 +102437,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareMrp",
-              "line": 212,
-              "endLine": 253,
+              "line": 219,
+              "endLine": 260,
               "sha256": "3263adc14f80bd972efb645bf8cfebada561418a0e162a66a750885503cbcc0c"
             },
             {
@@ -102486,8 +102486,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareSharedDeviceAccess",
-              "line": 292,
-              "endLine": 354,
+              "line": 299,
+              "endLine": 361,
               "sha256": "ffa0ea762842c0172541d00f441dde28b1b2b5a4e28b034fdf56fafb18f3150d"
             },
             {
@@ -102563,8 +102563,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareTransferArea",
-              "line": 396,
-              "endLine": 413,
+              "line": 403,
+              "endLine": 420,
               "sha256": "da76096b35537d4fe4b7cf4f644dc5403b95b5a40b49842ee88b962f39021a7a"
             },
             {
@@ -102627,8 +102627,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ReadItemProfile",
               "line": 101,
-              "endLine": 118,
-              "sha256": "5867ffdf8c599f518b7bc81d2ea5abe9de11759392e6a9b8955434140772a320"
+              "endLine": 125,
+              "sha256": "b3ee0cbc76796bff81d1b010a1e524d9e75ef6f0937ea16bf057a59f57c06a5b"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ChangeTargets.cs",
@@ -103563,8 +103563,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyHardwareReplace",
-              "line": 371,
-              "endLine": 377,
+              "line": 378,
+              "endLine": 384,
               "sha256": "402676cb876846a5180531705b73aa70b7caae3f5b645fd3a24dfbea1b7745e7"
             },
             {
@@ -103598,8 +103598,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyMrp",
-              "line": 255,
-              "endLine": 272,
+              "line": 262,
+              "endLine": 279,
               "sha256": "c0c849ed37fc9cc6e84030c776ba75a6fe1b82840efcbfa53c43ee593a22d32e"
             },
             {
@@ -103654,8 +103654,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplySharedDeviceAccess",
-              "line": 356,
-              "endLine": 369,
+              "line": 363,
+              "endLine": 376,
               "sha256": "c1c97b73fe33da77ca98bfe02531a1c36e22f03d90fd71a63c6cb08b5176d90a"
             },
             {
@@ -103731,8 +103731,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyTransferArea",
-              "line": 415,
-              "endLine": 426,
+              "line": 422,
+              "endLine": 433,
               "sha256": "85d825a19bb95dd6ad7e5ec8091c1cc19f888aefacf67871147ad113755340e3"
             },
             {
@@ -104567,8 +104567,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareMrp",
-              "line": 212,
-              "endLine": 253,
+              "line": 219,
+              "endLine": 260,
               "sha256": "3263adc14f80bd972efb645bf8cfebada561418a0e162a66a750885503cbcc0c"
             },
             {
@@ -104616,8 +104616,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareSharedDeviceAccess",
-              "line": 292,
-              "endLine": 354,
+              "line": 299,
+              "endLine": 361,
               "sha256": "ffa0ea762842c0172541d00f441dde28b1b2b5a4e28b034fdf56fafb18f3150d"
             },
             {
@@ -104693,8 +104693,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareTransferArea",
-              "line": 396,
-              "endLine": 413,
+              "line": 403,
+              "endLine": 420,
               "sha256": "da76096b35537d4fe4b7cf4f644dc5403b95b5a40b49842ee88b962f39021a7a"
             },
             {
@@ -104757,8 +104757,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ReadItemProfile",
               "line": 101,
-              "endLine": 118,
-              "sha256": "5867ffdf8c599f518b7bc81d2ea5abe9de11759392e6a9b8955434140772a320"
+              "endLine": 125,
+              "sha256": "b3ee0cbc76796bff81d1b010a1e524d9e75ef6f0937ea16bf057a59f57c06a5b"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ChangeTargets.cs",
@@ -105693,8 +105693,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyHardwareReplace",
-              "line": 371,
-              "endLine": 377,
+              "line": 378,
+              "endLine": 384,
               "sha256": "402676cb876846a5180531705b73aa70b7caae3f5b645fd3a24dfbea1b7745e7"
             },
             {
@@ -105728,8 +105728,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyMrp",
-              "line": 255,
-              "endLine": 272,
+              "line": 262,
+              "endLine": 279,
               "sha256": "c0c849ed37fc9cc6e84030c776ba75a6fe1b82840efcbfa53c43ee593a22d32e"
             },
             {
@@ -105784,8 +105784,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplySharedDeviceAccess",
-              "line": 356,
-              "endLine": 369,
+              "line": 363,
+              "endLine": 376,
               "sha256": "c1c97b73fe33da77ca98bfe02531a1c36e22f03d90fd71a63c6cb08b5176d90a"
             },
             {
@@ -105861,8 +105861,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyTransferArea",
-              "line": 415,
-              "endLine": 426,
+              "line": 422,
+              "endLine": 433,
               "sha256": "85d825a19bb95dd6ad7e5ec8091c1cc19f888aefacf67871147ad113755340e3"
             },
             {
@@ -106697,8 +106697,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareMrp",
-              "line": 212,
-              "endLine": 253,
+              "line": 219,
+              "endLine": 260,
               "sha256": "3263adc14f80bd972efb645bf8cfebada561418a0e162a66a750885503cbcc0c"
             },
             {
@@ -106746,8 +106746,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareSharedDeviceAccess",
-              "line": 292,
-              "endLine": 354,
+              "line": 299,
+              "endLine": 361,
               "sha256": "ffa0ea762842c0172541d00f441dde28b1b2b5a4e28b034fdf56fafb18f3150d"
             },
             {
@@ -106823,8 +106823,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareTransferArea",
-              "line": 396,
-              "endLine": 413,
+              "line": 403,
+              "endLine": 420,
               "sha256": "da76096b35537d4fe4b7cf4f644dc5403b95b5a40b49842ee88b962f39021a7a"
             },
             {
@@ -106887,8 +106887,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ReadItemProfile",
               "line": 101,
-              "endLine": 118,
-              "sha256": "5867ffdf8c599f518b7bc81d2ea5abe9de11759392e6a9b8955434140772a320"
+              "endLine": 125,
+              "sha256": "b3ee0cbc76796bff81d1b010a1e524d9e75ef6f0937ea16bf057a59f57c06a5b"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ChangeTargets.cs",
@@ -107823,8 +107823,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyHardwareReplace",
-              "line": 371,
-              "endLine": 377,
+              "line": 378,
+              "endLine": 384,
               "sha256": "402676cb876846a5180531705b73aa70b7caae3f5b645fd3a24dfbea1b7745e7"
             },
             {
@@ -107858,8 +107858,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyMrp",
-              "line": 255,
-              "endLine": 272,
+              "line": 262,
+              "endLine": 279,
               "sha256": "c0c849ed37fc9cc6e84030c776ba75a6fe1b82840efcbfa53c43ee593a22d32e"
             },
             {
@@ -107914,8 +107914,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplySharedDeviceAccess",
-              "line": 356,
-              "endLine": 369,
+              "line": 363,
+              "endLine": 376,
               "sha256": "c1c97b73fe33da77ca98bfe02531a1c36e22f03d90fd71a63c6cb08b5176d90a"
             },
             {
@@ -107991,8 +107991,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyTransferArea",
-              "line": 415,
-              "endLine": 426,
+              "line": 422,
+              "endLine": 433,
               "sha256": "85d825a19bb95dd6ad7e5ec8091c1cc19f888aefacf67871147ad113755340e3"
             },
             {
@@ -108827,8 +108827,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareMrp",
-              "line": 212,
-              "endLine": 253,
+              "line": 219,
+              "endLine": 260,
               "sha256": "3263adc14f80bd972efb645bf8cfebada561418a0e162a66a750885503cbcc0c"
             },
             {
@@ -108876,8 +108876,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareSharedDeviceAccess",
-              "line": 292,
-              "endLine": 354,
+              "line": 299,
+              "endLine": 361,
               "sha256": "ffa0ea762842c0172541d00f441dde28b1b2b5a4e28b034fdf56fafb18f3150d"
             },
             {
@@ -108953,8 +108953,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareTransferArea",
-              "line": 396,
-              "endLine": 413,
+              "line": 403,
+              "endLine": 420,
               "sha256": "da76096b35537d4fe4b7cf4f644dc5403b95b5a40b49842ee88b962f39021a7a"
             },
             {
@@ -109017,8 +109017,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ReadItemProfile",
               "line": 101,
-              "endLine": 118,
-              "sha256": "5867ffdf8c599f518b7bc81d2ea5abe9de11759392e6a9b8955434140772a320"
+              "endLine": 125,
+              "sha256": "b3ee0cbc76796bff81d1b010a1e524d9e75ef6f0937ea16bf057a59f57c06a5b"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ChangeTargets.cs",
@@ -109953,8 +109953,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyHardwareReplace",
-              "line": 371,
-              "endLine": 377,
+              "line": 378,
+              "endLine": 384,
               "sha256": "402676cb876846a5180531705b73aa70b7caae3f5b645fd3a24dfbea1b7745e7"
             },
             {
@@ -109988,8 +109988,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyMrp",
-              "line": 255,
-              "endLine": 272,
+              "line": 262,
+              "endLine": 279,
               "sha256": "c0c849ed37fc9cc6e84030c776ba75a6fe1b82840efcbfa53c43ee593a22d32e"
             },
             {
@@ -110044,8 +110044,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplySharedDeviceAccess",
-              "line": 356,
-              "endLine": 369,
+              "line": 363,
+              "endLine": 376,
               "sha256": "c1c97b73fe33da77ca98bfe02531a1c36e22f03d90fd71a63c6cb08b5176d90a"
             },
             {
@@ -110121,8 +110121,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyTransferArea",
-              "line": 415,
-              "endLine": 426,
+              "line": 422,
+              "endLine": 433,
               "sha256": "85d825a19bb95dd6ad7e5ec8091c1cc19f888aefacf67871147ad113755340e3"
             },
             {
@@ -113394,8 +113394,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareMrp",
-              "line": 212,
-              "endLine": 253,
+              "line": 219,
+              "endLine": 260,
               "sha256": "3263adc14f80bd972efb645bf8cfebada561418a0e162a66a750885503cbcc0c"
             }
           ]
@@ -113414,8 +113414,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyMrp",
-              "line": 255,
-              "endLine": 272,
+              "line": 262,
+              "endLine": 279,
               "sha256": "c0c849ed37fc9cc6e84030c776ba75a6fe1b82840efcbfa53c43ee593a22d32e"
             }
           ]

@@ -180,6 +180,12 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   lambdas or try blocks, or reachable from product code or a handler that treats `InvalidOperationException`
   differently; CA1861 in `tests/` (349), which needs fields named by hand; CA1305 in user-facing text
   (`GraphHtml.cs`, simulated TIA messages). Ruff F401/F841/F402 were cleaned up and are part of the gate.
+  Later on 26 November CA1822 (private and internal members; public constant-valued properties are reply contracts
+  that System.Text.Json serializes), CA1825 and CA1310 became errors once their findings were fixed, and the 60
+  CA1825 sites in net48-only worker code were fixed as well. Counted over the whole solution, net48 workers included
+  (which `latest-recommended` analyzes although the gate does not): 1,678 before, 1,532 after (CA1822 170 → 143, all
+  public or net48-only; CA1825 126 → 0; CA1310 61 → 0). CI also checks the whitespace of `src/TiaMcp.Core` and
+  `src/TiaMcp.Host` (job `lint`); the other projects are not formatted yet.
   `Measure-Coverage.ps1` now also measures worker and Host sources linked into test assemblies and reports coverage
   per `src/` project. Measured locally on 26 November over all 45 managed suites (two full runs merged, each with one
   suite failing for environmental reasons): Core 95.8 %, Translations 98.9 %, Graph 98.5 %, OpcUa 97.8 %,
@@ -243,8 +249,11 @@ scripts/CI clean-up). Nothing here was qualified natively: the changes are cover
   the artifacts folder is not in the Windows Search index. A scanner holds freshly moved folders through a file-system
   filter, which Restart Manager does not list, and under load longer. The card move now retries for up to 120 s
   (`SimulationCardMoveRetry`, 481 calls, at most every 250 ms) and the holder query names the unlisted filter; the next
-  trusted provisioning restored the card at the first move. Open: a provisioning run under heavy load on the 120 s
-  budget. Excluding the Host's artifacts folder from on-access scanning is an IT decision, documented as the remedy.
+  trusted provisioning restored the card at the first move. Under heavy load later the same day (the full offline
+  suite, a second native runner with its own Portal and a Release build of the solution and workers running), the
+  provisioning of a platform-lifecycle run without the trust flag passed with all three card moves at the first attempt
+  (`retryElapsedMs` 0; run `artifacts/q26/p1`, not curated). Open: a denial that the 120 s retry absorbs has not been
+  observed yet. Excluding the Host's artifacts folder from on-access scanning is an IT decision, documented as the remedy.
 - [x] **Unresolved provisioning reservation:** trusted reconciliation for failed provisioning's `outcomeUnknown` admission is complete on this PC (2 November). `simulation_provision_reconcile` now also requires that the project was last saved before its pre-provision archive (with the fingerprint including the project library), that the storage outside the card matches its pre-attempt inventory by metadata with only the attempt's own and PLCSIM's runtime files added, and that the write-ahead stream never opened or armed the credential; an observer that was never created is unchanged. All five retained admissions, the checkpoint attempt's `f52861ec…` included, were released in fresh sessions with exact process exits and a fresh-Portal reopen of each original project (`local.sim.reconcile.release.20261102`, [record](verification/provision-release-20261102.md)). The updated runner's checkpoint/compile/save passed end to end in the [frozen corpus](verification/runtime-frozen-20261024.md). Opaque runtime files are bounded by metadata and the stream, never read; an attempt that may have submitted the credential stays held. The VM's ticket and zero-address entry stay under [Other native machine](#other-native-machine-vm-not-this-pc).
 - [x] Native requested stop, independent worker exit, lock release and owned cleanup are qualified ([requested stop](verification/requested-stop-20261024.md), [card inventory and lock release](verification/card-inventory-and-lock-release-20261024.md), [FileStorage exit](verification/file-storage-exit-20261024.md)).
 - [x] File-storage helper exit deadline: the 360 s deadline for `Siemens.Automation.ObjectFrame.FileStorage.Server.exe` is defined once in `scripts/retained_native_lifecycle.py` and used by every runner that waits for retained processes (the retained-tree lifecycle, force capture and the Test Suite scope probe), with a unit test. The 24 October recovery-only misses ran before the retained-tree path had it. The native confirmation of 1 November was inconclusive because no headless flow on the current build starts the helper; closed on that basis (decision of 1 November) and reopened if a run shows the helper again.
