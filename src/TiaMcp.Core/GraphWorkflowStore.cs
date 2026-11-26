@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -89,7 +90,7 @@ public sealed class GraphWorkflowStore
         foreach (var part in parts)
         {
             if (node is JsonObject obj) node = obj[part];
-            else if (node is JsonArray array && int.TryParse(part, out int index) && index >= 0 && index < array.Count && index.ToString() == part) node = array[index];
+            else if (node is JsonArray array && int.TryParse(part, out int index) && index >= 0 && index < array.Count && index.ToString(CultureInfo.InvariantCulture) == part) node = array[index];
             else throw new BridgeException("GraphInvalidSection", "Use an exact report array pointer, such as /graphs/0/sequences/0/steps.");
         }
         Require(node is JsonArray, "GraphInvalidSection", "Selected report value is not an array.");

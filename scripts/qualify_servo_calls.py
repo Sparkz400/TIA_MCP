@@ -4,7 +4,6 @@ and a second writer of a control tag blocks a new plan. Owned scratch only."""
 from __future__ import annotations
 
 import argparse
-import uuid
 from pathlib import Path
 
 from library_native_harness import Harness, require

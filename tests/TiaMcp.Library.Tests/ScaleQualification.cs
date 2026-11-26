@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
@@ -44,7 +45,7 @@ internal static class ScaleQualification
         try
         {
             _ = LibraryReferenceReachability.RequireReachable(["/plc/blocks/Main"], ["/plc/blocks/Main"], [], [], true);
-            string[] known = Enumerable.Range(0, 10000).Select(i => "/plc/blocks/B" + i.ToString("D5")).ToArray();
+            string[] known = Enumerable.Range(0, 10000).Select(i => "/plc/blocks/B" + i.ToString("D5", CultureInfo.InvariantCulture)).ToArray();
             var edges = Enumerable.Range(0, 999).Select(i => new LibraryReferenceEdge(known[i], known[i + 1])).ToArray();
             var reachable = Measure("graph1000NodesIn10000Objects", () => LibraryReferenceReachability.RequireReachable(known, [known[0]], edges, [known[999]], true));
             Require(reachable.SequenceEqual(known.Take(1000)), "Reference traversal lost or invented reachable objects.");

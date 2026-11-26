@@ -12,7 +12,7 @@ internal static class RuntimeCaptureHandoffChecks
         var checks = new List<string>();
         void Check(bool value, string label) { if (!value) throw new Exception(label); checks.Add(label); }
         void Reject(Action action, string label)
-        { try { action(); } catch (BridgeException) { Check(true, label); return; } throw new Exception("Expected refusal: " + label); }
+        { try { action(); } catch (BridgeException) { Check(true, label); return; } throw new InvalidOperationException("Expected refusal: " + label); }
         var uploads = new ArtifactUploadStore(root); var handoffs = new RuntimeHandoffWorkflowStore(root);
         JsonObject Json(object value) => JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!.AsObject();
         string Upload(JsonObject value)

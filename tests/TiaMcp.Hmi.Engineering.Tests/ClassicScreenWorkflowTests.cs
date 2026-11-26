@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 using TiaMcp.Model;
@@ -114,10 +115,10 @@ static class ClassicScreenWorkflowTests
             for (int i = 0; i < composed.Length; i++)
                 list.Add(XElement.Parse($"<Hmi.Screen.Rectangle><AttributeList><ObjectName>Item{i}</ObjectName><TabIndex>{composed[i]}</TabIndex></AttributeList></Hmi.Screen.Rectangle>"));
             ClassicScreenComposer.NormalizeTabIndexes(screen);
-            var result = ClassicScreenPreflight.Items(screen).Select(x => int.Parse(x.Element("AttributeList").Element("TabIndex").Value)).ToArray();
+            var result = ClassicScreenPreflight.Items(screen).Select(x => int.Parse(x.Element("AttributeList").Element("TabIndex").Value, CultureInfo.InvariantCulture)).ToArray();
             Assert(result.SequenceEqual(native));
             ClassicScreenComposer.NormalizeTabIndexes(screen);
-            Assert(ClassicScreenPreflight.Items(screen).Select(x => int.Parse(x.Element("AttributeList").Element("TabIndex").Value)).SequenceEqual(native));
+            Assert(ClassicScreenPreflight.Items(screen).Select(x => int.Parse(x.Element("AttributeList").Element("TabIndex").Value, CultureInfo.InvariantCulture)).SequenceEqual(native));
         });
         check("Preflight admits native horizontal/vertical lines but no zero-area line or other item", () => {
             foreach(var (type,w,h,ok) in new[]{("Hmi.Screen.Line",530,0,true),("Hmi.Screen.Line",0,40,true),("Hmi.Screen.Line",0,0,false),("Hmi.Screen.Line",-1,40,false),("Hmi.Screen.Rectangle",530,0,false)}) {

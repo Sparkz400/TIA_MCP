@@ -160,7 +160,7 @@ def body(h):
     h.stage("reopen the saved project", lambda: h.reopen_project(run.project))
     run.current = run.b0 = run.snap("reopened")
     h.stage("reopened state equals the fixture", lambda: require(run.b0["view"] == final["view"], "Reopened state differs: %s" % diff(final["view"], run.b0["view"])) or len(final["view"]))
-    again = capture(run, "after the fresh reopen", first_review)
+    capture(run, "after the fresh reopen", first_review)
     h.stage("the reopened project captures the same content", lambda: require(h.report["captures"]["after the fresh reopen"] == h.report["captures"]["of the fixture"], "Captures differ") or True)
 
     delete_connection(run, s7, restore=True)

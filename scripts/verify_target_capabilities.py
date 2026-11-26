@@ -84,7 +84,7 @@ def main():
         before_hardware = call("hardware_inspect", {"maxItems": 2000}, "hardware before discovery")
         block = next(block for block in before_inventory["blocks"] if block["name"] == "TiaMcp_EnableGate")
         before_export = call("block_read", {"blockPath": block["path"]}, "native block before discovery")
-        project_cap = probe({"kind": "project", "maxItems": 500}, "project capability metadata")
+        probe({"kind": "project", "maxItems": 500}, "project capability metadata")
         plc_cap = probe({"kind": "plc", "maxItems": 500}, "PLC service observations")
         block_cap = probe({"kind": "block", "objectPath": block["path"], "maxItems": 500}, "SCL block capabilities")
         features = {feature["featureId"]: feature for feature in block_cap["features"]}

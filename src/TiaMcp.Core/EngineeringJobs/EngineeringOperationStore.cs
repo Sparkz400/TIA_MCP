@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -434,7 +435,7 @@ public sealed class EngineeringOperationStore
             if (new FileInfo(files[i]).Length > 8 * 1024 * 1024) Fail("JournalInvalid", "A persisted revision exceeds 8 MiB.");
             var record = i == files.Length - 1 ? last : PackageStorage.Load<EngineeringOperationRecord>(files[i]);
             ValidatePlan(record.Plan, live);
-            if (Path.GetFileName(files[i]) != i.ToString("D6") + ".json" || record.Id != id || record.Revision != i ||
+            if (Path.GetFileName(files[i]) != i.ToString("D6", CultureInfo.InvariantCulture) + ".json" || record.Id != id || record.Revision != i ||
                 !Matches(record.PlanSha256, record.Plan) || (previous is null ? record.PreviousSha256 is not null : !Matches(record.PreviousSha256, previous)) ||
                 previous is not null && (record.PlanSha256 != previous.PlanSha256 || record.IdempotencyKey != previous.IdempotencyKey))
                 Fail("JournalInvalid", "The operation revision chain or immutable plan is invalid.");
@@ -528,7 +529,7 @@ public sealed class EngineeringOperationStore
 
     private void Write(EngineeringOperationRecord record, string folder)
     {
-        string path = PackageStorage.Under(folder, record.Revision.ToString("D6") + ".json");
+        string path = PackageStorage.Under(folder, record.Revision.ToString("D6", CultureInfo.InvariantCulture) + ".json");
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(record, BridgeProtocol.Json);
         if (bytes.Length > 8 * 1024 * 1024) Fail("OperationStoreLimit", "The operation record exceeds 8 MiB.");
         // A crash leaves a .tmp; only a fully flushed rename becomes a committed revision.

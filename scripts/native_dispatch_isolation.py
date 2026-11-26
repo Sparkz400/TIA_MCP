@@ -6,7 +6,7 @@ No arbitrary unresolved ticket, current PID absence or supplied boot JSON admits
 execution. This policy is not a security boundary against a malicious local user.
 """
 import ctypes
-from datetime import datetime, timezone
+from datetime import datetime
 import math
 import os
 from pathlib import Path

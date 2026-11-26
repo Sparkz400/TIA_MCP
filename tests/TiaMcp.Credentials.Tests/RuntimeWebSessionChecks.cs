@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Globalization;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -198,7 +199,7 @@ internal static class RuntimeWebSessionChecks
                     }
                     string headers = Encoding.ASCII.GetString(head.ToArray());
                     var lengthHeader = Regex.Match(headers, @"Content-Length:\s*(\d+)", RegexOptions.IgnoreCase);
-                    int length = lengthHeader.Success ? int.Parse(lengthHeader.Groups[1].Value) : 0;
+                    int length = lengthHeader.Success ? int.Parse(lengthHeader.Groups[1].Value, CultureInfo.InvariantCulture) : 0;
                     if (headers.StartsWith("GET /api/ticket?id=", StringComparison.Ordinal)) { await ServeTicket(ssl, headers); return; }
                     bool close = Regex.IsMatch(headers, @"Connection:\s*close", RegexOptions.IgnoreCase);
                     var body = new byte[length]; await ssl.ReadExactlyAsync(body);

@@ -21,7 +21,6 @@ def main():
     fixture = json.loads(args.fixture.read_text(encoding='utf-8'))
     packet = fixture['packet']
     review_bytes = (Path(fixture['artifactRoot']) / 'project-reviews' / (fixture['reviewId'] + '.json')).read_bytes()
-    packet_bytes = (json.dumps(packet, ensure_ascii=False) + '\n').encode()
     schema = json.loads((ROOT / 'contracts/public-certificate-review.v1.schema.json').read_text(encoding='utf-8'))
     Draft202012Validator.check_schema(schema)
     def validate(value, kind):

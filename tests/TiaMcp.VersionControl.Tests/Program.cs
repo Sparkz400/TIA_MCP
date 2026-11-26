@@ -27,12 +27,12 @@ if (args.Length == 4 && args[0] == "--retained-native-evidence" && args[2] == "-
 }
 var tests = new List<(string, Action)>();
 void Test(string name, Action run) => tests.Add((name, run));
-void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected {expected}, got {actual}."); }
-void True(bool value) { if (!value) throw new Exception("Expected true."); }
+void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}, got {actual}."); }
+void True(bool value) { if (!value) throw new InvalidOperationException("Expected true."); }
 void Reject(string code, Action run)
 {
     try { run(); } catch (BridgeException e) { Equal(code, e.Code); return; }
-    throw new Exception("Expected " + code);
+    throw new InvalidOperationException("Expected " + code);
 }
 string H(char c) => new(c, 64);
 EngineeringSnapshotIdentity Snapshot(string id) => new(id, H('a'));

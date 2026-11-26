@@ -8,6 +8,7 @@ namespace TiaMcp.Core.Engineering;
 /// <summary>Declared cross-domain associations bound to independently reopened retained inputs.</summary>
 public static class CompositeEngineeringReview
 {
+    private static readonly string[] CrossCopyProjectFields = new[] { "host", "projectPath" };
     public const int InputLimit = 4 << 20, ReportLimit = 32 << 20;
     private const int EvidenceLimit = 128 << 20;
     private static readonly UTF8Encoding Utf8 = new(false, true);
@@ -33,7 +34,7 @@ public static class CompositeEngineeringReview
         Require(count <= 64, "At most 64 component references across both phases.");
         long resolvedBytes = 0, reportBytes = 0;
         var before = Load("before"); var after = Load("after");
-        bool crossCopy = new[] { "host", "projectPath" }.Any(k => before.Review["model"]!["project"]?[k] is not JsonValue b ||
+        bool crossCopy = CrossCopyProjectFields.Any(k => before.Review["model"]!["project"]?[k] is not JsonValue b ||
             !b.TryGetValue<string>(out string? text) || string.IsNullOrWhiteSpace(text) || !JsonNode.DeepEquals(b, after.Review["model"]!["project"]?[k]));
         Require(!crossCopy || (bool)request["allowDifferentProjectCopy"]!, "Different or incomplete project-copy declarations require explicit admission.");
         var selections = new Dictionary<string, Selection>(StringComparer.Ordinal);

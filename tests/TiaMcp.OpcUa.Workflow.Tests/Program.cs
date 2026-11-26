@@ -7,11 +7,11 @@ using TiaMcp.OpcUa;
 
 var tests = new List<(string Name, Action Run)>();
 void Test(string name, Action run) => tests.Add((name, run));
-void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected {expected}, got {actual}"); }
+void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}, got {actual}"); }
 void Reject(string code, Action run)
 {
     try { run(); } catch (BridgeException error) { Equal(code, error.Code); return; }
-    throw new Exception("Expected rejection: " + code);
+    throw new InvalidOperationException("Expected rejection: " + code);
 }
 string Text(JsonNode? value) => value!.GetValue<string>();
 byte[] Fixture(string name) => File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "fixtures", name));

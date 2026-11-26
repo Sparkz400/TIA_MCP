@@ -7,6 +7,8 @@ namespace TiaMcp.Core.Drives;
 /// <summary>Supplied drive parameter evidence; no native writeability or target compatibility certification.</summary>
 public static class DriveProfileReview
 {
+    private static readonly string[] IdentityFields = new[] { "family", "orderNumber", "firmware" };
+    private static readonly string[] SelectorFields = new[] { "number", "arrayIndex", "parentName" };
     public const int InputLimit = 4 * 1024 * 1024;
     private static readonly UTF8Encoding Utf8 = new(false, true);
     public static JsonObject Parse(byte[] bytes)
@@ -93,7 +95,7 @@ public static class DriveProfileReview
                 foreach (string field in new[] { "number", "arrayIndex", "parentName", "unit", "access", "value", "metadata" })
                     if (!JsonNode.DeepEquals(old[field], next[field])) fields.Add(field);
                 status = fields.Count == 0 ? "unchanged" : "changed";
-                if (new[] { "number", "arrayIndex", "parentName" }.Any(k => !JsonNode.DeepEquals(old[k], next[k]))) { status = "selectorConflict"; identityConflicts++; }
+                if (SelectorFields.Any(k => !JsonNode.DeepEquals(old[k], next[k]))) { status = "selectorConflict"; identityConflicts++; }
             }
             string proposal = afterKind != "proposal" ? "notProposal" : "notAssessed";
             if (afterKind == "proposal" && old is not null && next is not null && !JsonNode.DeepEquals(old["value"], next["value"]))
@@ -124,7 +126,7 @@ public static class DriveProfileReview
             foreach (string key in new[] { "family", "orderNumber", "firmware" }) NullableText(identity, key, 256);
             NullableText(identity, "parameterSet", 256);
             string? unknownReason = NullableText(identity, "unknownReason", 1024);
-            if (new[] { "family", "orderNumber", "firmware" }.Any(k => identity[k] is null) && unknownReason is null)
+            if (IdentityFields.Any(k => identity[k] is null) && unknownReason is null)
                 throw Error("Unknown drive family/order/firmware requires an explicit reason.");
             var rows = new Dictionary<string, JsonObject>(StringComparer.Ordinal);
             foreach (var item in Array(snapshot, "parameters", 4096))

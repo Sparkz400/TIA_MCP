@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -12,12 +13,12 @@ const string reading = "nsu=urn%3Aexample%3Atypes;i=1002";
 const string a = "nsu=urn%3Atest;s=A", c = "nsu=urn%3Atest;s=C";
 var tests = new List<(string Name, Action Run)>();
 void Test(string name, Action run) => tests.Add((name, run));
-void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected {expected}, got {actual}"); }
+void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}, got {actual}"); }
 string? Text(JsonNode? value) => value?.GetValue<string>();
 void Reject(string code, Action action)
 {
     try { action(); } catch (BridgeException ex) { Equal(code, ex.Code); return; }
-    throw new Exception("Expected rejection: " + code);
+    throw new InvalidOperationException("Expected rejection: " + code);
 }
 OpcUaNodeSetSource Xml(string id, string body, string namespaces = "<Uri>urn:test</Uri>") => new(id,
     Encoding.UTF8.GetBytes($"<UANodeSet xmlns=\"{ns}\"><NamespaceUris>{namespaces}</NamespaceUris>{body}</UANodeSet>"));
@@ -191,11 +192,11 @@ Test("invalid identities and XML retain parser defenses", () => {
 });
 Test("source and capacity bounds fail explicitly", () => {
     Reject("OpcUaCapacity", () => OpcUaDependencyAnalysis.Analyze([]));
-    Reject("OpcUaCapacity", () => OpcUaDependencyAnalysis.Analyze(Enumerable.Range(0, 33).Select(i => Xml(i.ToString(), "")).ToArray()));
+    Reject("OpcUaCapacity", () => OpcUaDependencyAnalysis.Analyze(Enumerable.Range(0, 33).Select(i => Xml(i.ToString(CultureInfo.InvariantCulture), "")).ToArray()));
     Reject("OpcUaInvalidSources", () => OpcUaDependencyAnalysis.Analyze([Xml("g", ""), Xml("g", "")]));
     Reject("OpcUaCapacity", () => OpcUaDependencyAnalysis.Analyze([new("g", new byte[OpcUaModelReview.MaxBytes + 1])]));
     var oversized = new byte[OpcUaModelReview.MaxBytes];
-    Reject("OpcUaCapacity", () => OpcUaDependencyAnalysis.Analyze(Enumerable.Range(0, 5).Select(i => new OpcUaNodeSetSource(i.ToString(), oversized)).ToArray()));
+    Reject("OpcUaCapacity", () => OpcUaDependencyAnalysis.Analyze(Enumerable.Range(0, 5).Select(i => new OpcUaNodeSetSource(i.ToString(CultureInfo.InvariantCulture), oversized)).ToArray()));
 });
 Test("unresolved-row bound applies after cross-file resolution", () => {
     string variables = string.Concat(Enumerable.Range(1, 10001).Select(i => $"<UAVariable NodeId=\"ns=1;i={i}\" BrowseName=\"1:V{i}\" DataType=\"i=10\"/>"));
@@ -217,7 +218,7 @@ if (args.Length == 1)
         foreach (string argument in arguments) start.ArgumentList.Add(argument);
         using var process = Process.Start(start)!;
         var stdout = process.StandardOutput.ReadToEndAsync(); var stderr = process.StandardError.ReadToEndAsync();
-        if (!process.WaitForExit(30000)) { process.Kill(entireProcessTree: true); throw new Exception("Owned CLI process timed out."); }
+        if (!process.WaitForExit(30000)) { process.Kill(entireProcessTree: true); throw new InvalidOperationException("Owned CLI process timed out."); }
         return (process.ExitCode, stdout.GetAwaiter().GetResult(), stderr.GetAwaiter().GetResult());
     }
     void WithDirectory(Action<string> run)

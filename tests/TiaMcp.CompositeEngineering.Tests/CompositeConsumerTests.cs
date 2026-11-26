@@ -10,7 +10,7 @@ internal static class CompositeConsumerTests
     {
         string root = Path.Combine(parent, "consumer-v2"); Directory.CreateDirectory(root);
         var checks = new List<string>();
-        void Check(bool ok, string label) { if (!ok) throw new Exception(label); checks.Add(label); }
+        void Check(bool ok, string label) { if (!ok) throw new InvalidOperationException(label); checks.Add(label); }
         byte[] Bytes(JsonNode value) => JsonSerializer.SerializeToUtf8Bytes(value, BridgeProtocol.Json);
         JsonObject Read(string path) => JsonNode.Parse(File.ReadAllBytes(path))!.AsObject();
         JsonObject Json(object value) => JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!.AsObject();

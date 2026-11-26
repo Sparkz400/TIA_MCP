@@ -19,7 +19,7 @@ from pathlib import Path, PurePosixPath
 import time
 import zipfile
 
-from library_native_harness import Harness, identity, require
+from library_native_harness import Harness, require
 from qualify_library_vendor import all_items
 
 DMC_V17_BYTES = 149_771_810  # Siemens-Open-Library-V17-V5.0.zip, docs/verification/vendor-intake-review-20261025.json

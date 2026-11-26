@@ -86,6 +86,7 @@ namespace TiaMcp.Openness.V21
     // exactly from its text first, as the Host reads it, and Newtonsoft parses a placeholder in its place.
     internal sealed class ExactNumberReader : JsonTextReader
     {
+        private static readonly char[] FractionOrExponentChars = new[] { '.', 'e', 'E' };
         private readonly Queue<double> _floats;
         internal ExactNumberReader(string line) : this(Scan(line)) { }
         private ExactNumberReader(Tuple<string, Queue<double>, bool> scanned) : base(new StringReader(scanned.Item1)) { _floats = scanned.Item2; OutOfRange = scanned.Item3; }
@@ -125,7 +126,7 @@ namespace TiaMcp.Openness.V21
                 int start = i;
                 while (i + 1 < line.Length && "0123456789+-.eE".IndexOf(line[i + 1]) >= 0) i++;
                 string literal = line.Substring(start, i - start + 1);
-                if (literal.IndexOfAny(new[] { '.', 'e', 'E' }) < 0 || literal == "-") { text.Append(literal); continue; }
+                if (literal.IndexOfAny(FractionOrExponentChars) < 0 || literal == "-") { text.Append(literal); continue; }
                 double? exact;
                 try { exact = CanonicalJsonText.ParseNumber(literal); }
                 catch (FormatException) { text.Append(literal); continue; } // not a number; Newtonsoft refuses it

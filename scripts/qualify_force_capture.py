@@ -6,7 +6,6 @@ command. No online/force action or programmatic row authoring exists here.
 """
 import argparse
 import copy
-import ctypes
 from datetime import datetime, timezone
 import importlib.util
 import json
@@ -21,7 +20,7 @@ import uuid
 import psutil
 from block_test_process import OwnedTiaProcessWatcher, _WindowsProcessApi
 from smoke_mcp import Client
-from retained_native_lifecycle import (FILE_STORAGE_SERVER, FILE_STORAGE_TERMINAL_SECONDS,
+from retained_native_lifecycle import (FILE_STORAGE_SERVER as FILE_STORAGE_SERVER, FILE_STORAGE_TERMINAL_SECONDS as FILE_STORAGE_TERMINAL_SECONDS,
                                        terminal_deadline_seconds as _deadline)
 from qualify_worker_startup_exact import identity
 from qualification_root import ENVIRONMENT as SHORT_ROOT_ENVIRONMENT, short_root

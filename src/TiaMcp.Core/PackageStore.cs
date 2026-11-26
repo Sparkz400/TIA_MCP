@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Buffers.Binary;
+using System.Globalization;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
@@ -102,7 +103,7 @@ public sealed class PackageStore
                 throw new BridgeException("PackageChanged", "Committed artifact changed between resolution and staging.");
             var nested = 0;
             foreach (var file in originals.Where(x => Path.GetExtension(x.RelativePath).Equals(".zip", StringComparison.OrdinalIgnoreCase)))
-                Extract(directory, file.RelativePath, "content/" + (++nested).ToString("D6"), 1, budget, files, diagnostics, ref nested);
+                Extract(directory, file.RelativePath, "content/" + (++nested).ToString("D6", CultureInfo.InvariantCulture), 1, budget, files, diagnostics, ref nested);
             var sorted = files.OrderBy(x => x.RelativePath, StringComparer.Ordinal).ToArray();
             var candidates = sorted.Select(file => Classify(file, sorted)).Where(x => x is not null).Cast<PackageCandidate>().ToArray();
             var documents = sorted.Where(x => IsDocumentation(x.RelativePath)).Select(x => x.RelativePath).ToArray();
@@ -323,7 +324,7 @@ public sealed class PackageStore
             if (Path.GetExtension(relative).Equals(".zip", StringComparison.OrdinalIgnoreCase)) toExtract.Add(storedRelative);
         }
         foreach (var inner in toExtract)
-            Extract(package, inner, "nested/" + (++nested).ToString("D6"), depth + 1, budget, files, diagnostics, ref nested);
+            Extract(package, inner, "nested/" + (++nested).ToString("D6", CultureInfo.InvariantCulture), depth + 1, budget, files, diagnostics, ref nested);
     }
 
     // ZipArchive materializes its complete central directory. Reject excessive counts before it can allocate entries.

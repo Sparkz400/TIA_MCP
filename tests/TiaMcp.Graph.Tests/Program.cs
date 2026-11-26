@@ -18,13 +18,13 @@ GraphDocument Mutate(Action<XElement> change, string fixture = "sequence-v1.xml"
     change(xml.Root!);
     return Parse(xml.ToString(SaveOptions.DisableFormatting));
 }
-void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected {expected}; got {actual}"); }
+void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}; got {actual}"); }
 void True(bool value, string message = "Assertion failed") { if (!value) throw new Exception(message); }
 void Code(GraphDocument d, string code) => True(d.Inspection.Diagnostics.Any(x => x.Code == code), $"Missing diagnostic {code}");
 void Reject(string code, Action action)
 {
     try { action(); } catch (GraphException e) { Equal(code, e.Code); return; }
-    throw new Exception("Expected rejection " + code);
+    throw new InvalidOperationException("Expected rejection " + code);
 }
 XElement First(XElement root, string name) => root.DescendantsAndSelf().First(e => e.Name.LocalName == name);
 XElement AddSecondSequence(XElement root)

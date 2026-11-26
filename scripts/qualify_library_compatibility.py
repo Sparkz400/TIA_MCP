@@ -8,7 +8,6 @@ import hashlib
 import os
 from pathlib import Path
 import shutil
-import uuid
 
 from library_native_harness import Harness, require
 from qualify_cpu_memory_bytes import add_cpu, version_key

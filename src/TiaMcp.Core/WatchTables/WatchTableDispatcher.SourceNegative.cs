@@ -6,6 +6,7 @@ namespace TiaMcp.Core.WatchTables;
 
 public sealed partial class WatchTableDispatcher
 {
+    private static readonly string[] SourceNegativeProbes = new[] { "offline", "watchImport" };
     private async Task<object> ReconcileSourceNegative(JsonObject args, CancellationToken token)
     {
         var admissions = new EngineeringMutationAdmissionStore(root);
@@ -38,7 +39,7 @@ public sealed partial class WatchTableDispatcher
             actual.HardwareIdentity != expected.HardwareIdentity || actual.NativeIdentity != expected.NativeIdentity ||
             actual.ProjectFilePath != project || actual.Reference.Object != expected.Reference.Object || !actual.Offline ||
             actual.Reference.Snapshot.TiaVersion != expected.Reference.Snapshot.TiaVersion ||
-            new[] { "offline", "watchImport" }.Any(name => !actual.Probes.Any(p => p.Name == name && p.State == "observed")) ||
+            SourceNegativeProbes.Any(name => !actual.Probes.Any(p => p.Name == name && p.State == "observed")) ||
             current["projectModified"]?.GetValue<bool>() != false || current["target"]?["isConsistent"]?.GetValue<bool>() != true ||
             current["target"]?["exists"]?.GetValue<bool>() != false || current["target"]?["name"]?.GetValue<string>() != WatchAuthoringProfile.Table ||
             current["target"]?["group"]?.GetValue<string>() != "root" ||

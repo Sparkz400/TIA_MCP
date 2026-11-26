@@ -14,6 +14,16 @@ namespace TiaMcp.Core.WatchTables
     // Shared with the net48 native adapter. This is an observed V21 profile, not a vendor XSD.
     public sealed class WatchTableDocument
     {
+        private static readonly string[] IdAttribute = new[] { "ID" };
+        private static readonly string[] AttributeAndObjectLists = new[] { "AttributeList", "ObjectList" };
+        private static readonly string[] NameField = new[] { "Name" };
+        private static readonly string[] IdAndCompositionName = new[] { "ID", "CompositionName" };
+        private static readonly string[] SignalRowFields = new[] { "Address", "DisplayFormat", "ModifyTrigger", "ModifyValue", "MonitorTrigger", "Name" };
+        private static readonly string[] MultilingualTextElement = new[] { "MultilingualText" };
+        private static readonly string[] ObjectListElement = new[] { "ObjectList" };
+        private static readonly string[] MultilingualTextItemElement = new[] { "MultilingualTextItem" };
+        private static readonly string[] AttributeListElement = new[] { "AttributeList" };
+        private static readonly string[] CultureAndTextFields = new[] { "Culture", "Text" };
         public const string Profile = "v21-watch-withdefaults-preserving-1";
         private const string Prefix = "SW.WatchAndForceTables.";
         private readonly byte[] original;
@@ -241,39 +251,39 @@ namespace TiaMcp.Core.WatchTables
                     (a.Name.LocalName.EndsWith("Id", StringComparison.OrdinalIgnoreCase) && a.Name != "ID")) ||
                 document.Descendants().Any(e => e.Name.LocalName.IndexOf("Ref", StringComparison.OrdinalIgnoreCase) >= 0 || e.Name.LocalName.EndsWith("Id", StringComparison.OrdinalIgnoreCase)))
                 throw new InvalidDataException("Referenced payload requires a separate explicit reference-remapping profile.");
-            attributes(table, new[] { "ID" }); children(table, new[] { "AttributeList", "ObjectList" });
-            scalarAttributes(table.Element("AttributeList"), new[] { "Name" });
+            attributes(table, IdAttribute); children(table, AttributeAndObjectLists);
+            scalarAttributes(table.Element("AttributeList"), NameField);
             if (table.Element("ObjectList") == null) throw new InvalidDataException("Captured row container is required.");
             attributes(table.Element("ObjectList"), new string[0]);
             foreach (var row in Rows())
             {
                 bool commentRow = authoring && row.Name == Prefix + "PlcTableCommentEntry";
                 if (!commentRow && row.Name != Prefix + "PlcWatchTableEntry") throw new InvalidDataException("Only captured watch signal/comment rows support this ID profile.");
-                attributes(row, new[] { "ID", "CompositionName" }); children(row, new[] { "AttributeList", "ObjectList" });
+                attributes(row, IdAndCompositionName); children(row, AttributeAndObjectLists);
                 var fields = row.Element("AttributeList");
                 if (commentRow) { if (fields != null) scalarAttributes(fields, new string[0]); }
                 else
                 {
                 if (fields == null) throw new InvalidDataException("Captured row attributes required.");
-                scalarAttributes(fields, new[] { "Address", "DisplayFormat", "ModifyTrigger", "ModifyValue", "MonitorTrigger", "Name" });
+                scalarAttributes(fields, SignalRowFields);
                 if ((!authoring && ((string)fields.Element("DisplayFormat") != "Bool" || !new[] { "FALSE", "TRUE" }.Contains((string)fields.Element("ModifyValue")))) ||
                     (authoring && (fields.Element("DisplayFormat") == null || fields.Element("ModifyValue") == null)) ||
                     (string)fields.Element("ModifyTrigger") != "Permanent" || (string)fields.Element("MonitorTrigger") != "Permanent" || fields.Element("Name") == null)
                     throw new InvalidDataException("Document ID reindex requires the observed offline Bool row shape.");
                 }
                 var objects = row.Element("ObjectList");
-                children(objects, new[] { "MultilingualText" }); attributes(objects, new string[0]);
+                children(objects, MultilingualTextElement); attributes(objects, new string[0]);
                 var texts = objects.Elements().ToArray();
                 if (texts.Length != 1 || (string)texts[0].Attribute("CompositionName") != "Comment") throw new InvalidDataException("Exactly one captured multilingual comment required.");
-                var text = texts[0]; attributes(text, new[] { "ID", "CompositionName" }); children(text, new[] { "ObjectList" });
-                var items = text.Element("ObjectList"); children(items, new[] { "MultilingualTextItem" }); attributes(items, new string[0]);
+                var text = texts[0]; attributes(text, IdAndCompositionName); children(text, ObjectListElement);
+                var items = text.Element("ObjectList"); children(items, MultilingualTextItemElement); attributes(items, new string[0]);
                 var cultures = new HashSet<string>(StringComparer.Ordinal);
                 foreach (var item in items.Elements())
                 {
-                    attributes(item, new[] { "ID", "CompositionName" }); children(item, new[] { "AttributeList" });
+                    attributes(item, IdAndCompositionName); children(item, AttributeListElement);
                     var values = item.Element("AttributeList");
                     if (values == null || (string)item.Attribute("CompositionName") != "Items") throw new InvalidDataException("Captured language item required.");
-                    scalarAttributes(values, new[] { "Culture", "Text" });
+                    scalarAttributes(values, CultureAndTextFields);
                     if (values.Element("Text") == null || string.IsNullOrWhiteSpace((string)values.Element("Culture")) || !cultures.Add((string)values.Element("Culture")))
                         throw new InvalidDataException("Distinct captured cultures and exact text fields required.");
                 }

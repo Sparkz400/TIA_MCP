@@ -14,7 +14,7 @@ internal static class ProductionAdapterChecks
         {
             try { await action(); }
             catch (BridgeException error) when (error.Code == code) { passed++; return; }
-            throw new Exception("Expected refusal: " + code);
+            throw new InvalidOperationException("Expected refusal: " + code);
         }
         async Task<Fixture> Prepare(string name)
         {

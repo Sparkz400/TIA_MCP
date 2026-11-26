@@ -1,7 +1,6 @@
 """Independent actual watch-main/close-path tests; every process is synthetic."""
 import copy
 import importlib
-from pathlib import Path
 import sys
 from types import SimpleNamespace
 from unittest.mock import Mock, patch

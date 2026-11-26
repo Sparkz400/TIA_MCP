@@ -1,6 +1,5 @@
 """Controller cancellation, cleanup and immutable-package admission boundaries."""
 import argparse
-import json
 from pathlib import Path
 import tempfile
 import unittest

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Json;
 using TiaMcp.Core;
@@ -27,7 +28,7 @@ internal static class EngineeringOperationChecks
         void Reject(Action action, string code)
         {
             try { action(); } catch (BridgeException e) when (e.Code == code) { passed++; return; }
-            throw new Exception("Expected " + code);
+            throw new InvalidOperationException("Expected " + code);
         }
         string root = Path.Combine(Path.GetTempPath(), "engineering-operations-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
@@ -129,7 +130,7 @@ internal static class EngineeringOperationChecks
         File.WriteAllText(history, original.Replace("watch.update", "watch.delete"));
         Reject(() => store.Read(third.Id), "JournalInvalid");
         File.WriteAllText(history, original);
-        string tail = Path.Combine(root, "engineering-operations", wide.Id, wide.Revision.ToString("D6") + ".json");
+        string tail = Path.Combine(root, "engineering-operations", wide.Id, wide.Revision.ToString("D6", CultureInfo.InvariantCulture) + ".json");
         string tailOriginal = File.ReadAllText(tail);
         File.WriteAllText(tail, tailOriginal.Replace("checkpointIntent", "succeeded"));
         Reject(() => store.Read(wide.Id), "JournalInvalid");
@@ -143,7 +144,7 @@ internal static class EngineeringOperationChecks
         {
             string originalFile = Path.Combine(root, "hard-link-original.ap21"), aliasFile = Path.Combine(root, "hard-link-alias.ap21");
             File.WriteAllText(originalFile, "authored filesystem identity fixture");
-            if (!CreateHardLink(aliasFile, originalFile, IntPtr.Zero)) throw new Exception("Could not create the isolated hard-link regression fixture.");
+            if (!CreateHardLink(aliasFile, originalFile, IntPtr.Zero)) throw new InvalidOperationException("Could not create the isolated hard-link regression fixture.");
             Reject(() => EngineeringResourceKey.ForPath("project", originalFile), "InvalidResourceKey");
             Reject(() => EngineeringResourceKey.ForPath("project", aliasFile), "InvalidResourceKey");
         }
@@ -199,15 +200,15 @@ internal static class EngineeringOperationChecks
         string file=Path.Combine(directory,"journal.json");File.WriteAllText(file,"{}");
         string expected="workspace:"+Path.GetFullPath(file).ToUpperInvariant();
         if(EngineeringResourceKey.ForPath("workspace",file)!=expected || EngineeringResourceKey.ForPath("workspace",file.ToUpperInvariant())!=expected)
-            throw new Exception("Long local file aliases must retain one native resource identity");
+            throw new InvalidOperationException("Long local file aliases must retain one native resource identity");
         string absent=Path.Combine(directory,"future","journal.json");
         if(EngineeringResourceKey.ForPath("workspace",absent)!="workspace:"+absent.ToUpperInvariant())
-            throw new Exception("Long missing descendant must resolve from its existing ancestor");
+            throw new InvalidOperationException("Long missing descendant must resolve from its existing ancestor");
         foreach(string prefix in new[]{@"\\?\",@"\\.\"})
         {
             try { EngineeringResourceKey.ForPath("workspace",prefix+file); }
             catch(BridgeException error) when(error.Code=="InvalidResourceKey") { continue; }
-            throw new Exception("Caller-supplied device namespaces must remain refused");
+            throw new InvalidOperationException("Caller-supplied device namespaces must remain refused");
         }
         // Revision renames are write-through and keep File.Move's semantics: no silent overwrite, an explicit replace, long paths.
         string revision=Path.Combine(directory,"000001.json"),temporary=revision+".tmp";
@@ -216,12 +217,12 @@ internal static class EngineeringOperationChecks
         try { PackageStorage.MoveDurably(temporary,revision); throw new Exception("A durable rename must not overwrite a committed revision"); }
         catch(IOException error) when(error.HResult==unchecked((int)0x800700B7)) { }
         PackageStorage.MoveDurably(temporary,revision,replace:true);
-        if(File.ReadAllText(revision)!="second" || File.Exists(temporary)) throw new Exception("A durable replace must publish the new bytes");
+        if(File.ReadAllText(revision)!="second" || File.Exists(temporary)) throw new InvalidOperationException("A durable replace must publish the new bytes");
         // Revision 0 is a whole staged directory: it renames the same way and never lands on an existing record.
         string staged=Path.Combine(directory,".preparing-record"),record=Path.Combine(directory,"record");
         Directory.CreateDirectory(staged);File.WriteAllText(Path.Combine(staged,"000000.json"),"intent");
         PackageStorage.MoveDurably(staged,record);
-        if(Directory.Exists(staged) || File.ReadAllText(Path.Combine(record,"000000.json"))!="intent") throw new Exception("A durable directory rename must publish the staged record");
+        if(Directory.Exists(staged) || File.ReadAllText(Path.Combine(record,"000000.json"))!="intent") throw new InvalidOperationException("A durable directory rename must publish the staged record");
         Directory.CreateDirectory(staged);
         try { PackageStorage.MoveDurably(staged,record); throw new Exception("A durable directory rename must not replace a published record"); }
         catch(IOException error) when(error.HResult==unchecked((int)0x800700B7)) { }
@@ -235,7 +236,7 @@ internal static class EngineeringOperationChecks
         start.ArgumentList.Add(root); start.ArgumentList.Add(id); if (acquire) start.ArgumentList.Add("acquire");
         using var process = Process.Start(start)!;
         string output = process.StandardOutput.ReadToEnd(); string error = process.StandardError.ReadToEnd();
-        if (!process.WaitForExit(10000) || process.ExitCode != 0) throw new Exception("Durable child process failed: " + error);
+        if (!process.WaitForExit(10000) || process.ExitCode != 0) throw new InvalidOperationException("Durable child process failed: " + error);
         return output.Trim();
     }
 

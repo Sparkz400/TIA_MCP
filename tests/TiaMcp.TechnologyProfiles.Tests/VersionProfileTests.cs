@@ -9,11 +9,11 @@ internal static class VersionProfileTests
     internal static void Run()
     {
         int count = 0;
-        void Check(bool ok, string label) { if (!ok) throw new Exception(label); count++; }
+        void Check(bool ok, string label) { if (!ok) throw new InvalidOperationException(label); count++; }
         void Malformed(string json, string label)
         {
             try { TechnologyVersionProfileRules.Parse(json); } catch (Exception e) when (e is FormatException or Newtonsoft.Json.JsonException) { count++; return; }
-            throw new Exception("Expected a malformed profile document: " + label);
+            throw new InvalidOperationException("Expected a malformed profile document: " + label);
         }
         var shipped = TechnologyVersionProfileRules.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "technology-version-profiles.v1.json")));
 

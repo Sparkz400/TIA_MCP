@@ -7,6 +7,7 @@ namespace TiaMcp.Model
     /// <summary>Pure fail-closed validation shared by the HMI adapters and offline tests.</summary>
     internal static class HmiRecipeRules
     {
+        private static readonly char[] PathSeparators = new[] { '/', '\\' };
         internal static void RequireFamily(string family)
         {
             if (family != "classic" && family != "unified")
@@ -22,7 +23,7 @@ namespace TiaMcp.Model
         internal static void RequireName(string value, string field)
         {
             if (string.IsNullOrWhiteSpace(value) || value.Length > 256 || value.Any(char.IsControl)
-                || value.IndexOfAny(new[] { '/', '\\' }) >= 0 || value == "." || value == "..")
+                || value.IndexOfAny(PathSeparators) >= 0 || value == "." || value == "..")
                 throw new ArgumentException(field + " must be an explicit native name, without path separators or control characters (1–256 characters).");
         }
 

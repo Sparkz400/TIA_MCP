@@ -12,7 +12,6 @@ must have its capture refused in the fresh worker (ProjectIsolationRequired): it
 import argparse
 from contextlib import ExitStack
 import json
-import os
 from pathlib import Path
 import shutil
 import sys
@@ -384,7 +383,7 @@ class Run:
                     self.call('qualification_translation_apply', {**request, 'revision': applied['revision']}, expect_error=True)
                     destination = self.artifacts / ('recovery-' + self.root.name + '-' + label) / Path(project).parent.name / Path(project).name
                     recovery_request = {**request, 'revision': applied['revision'], 'newProjectPath': str(destination), 'loseRestoreReply': label == 'edit'}
-                    recovered = self.call('qualification_translation_recover', recovery_request, expect_error=label == 'edit')
+                    self.call('qualification_translation_recover', recovery_request, expect_error=label == 'edit')
                     status = self.call('qualification_translation_status', {'operationId': op['id']})
                     require(status['state'] == ('outcomeUnknown' if label == 'edit' else 'recoveryIntent'), 'Unexpected restoration disposition')
                     done = self.call('qualification_translation_reconcile', {**request, 'revision': status['revision']})

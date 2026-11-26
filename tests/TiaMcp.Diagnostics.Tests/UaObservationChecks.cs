@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using TiaMcp.Core;
@@ -23,7 +24,7 @@ internal static class UaObservationChecks
         using var captures = new RuntimeCaptureStore(Path.Combine(f.Root, "runtime-ua-acquisition"));
         var service = new DiagnosticUaObservations(f.Root, r => DiagnosticUaCaptureSource.ReadPolling(f.Root, captures, r));
         var request = new OpcUaCaptureRequest(new('a',32), nodes, 100, 10, DiagnosticBindingId: binding);
-        var time = DateTimeOffset.Parse("2026-10-22T00:00:00Z");
+        var time = DateTimeOffset.Parse("2026-10-22T00:00:00Z", CultureInfo.InvariantCulture);
         var session = new OpcUaRuntimeStatus("opcua-runtime-session.v1", request.AttemptId, new('b',32),
             new("opc.tcp://localhost:4840", "urn:fixture", new('a',64)), "connected", null, true, time);
         var plan = new RuntimeCapturePlan(new('c',32), session.HostId, time, OpcUaCaptureContracts.StorageRequest(request), [], UaContext: new(request, session));

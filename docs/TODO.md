@@ -215,8 +215,15 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   first time (tagged-commit gate, package and strict verify, build provenance and SBOM attestation, draft). The 1.0
   tag still comes after acceptance under [release mechanics](#release-mechanics-and-policy).
 - [ ] **Remaining quality gates:** the bundle has no Authenticode signature (no code-signing certificate; the hash
-  list, provenance and SBOM attestations are the integrity evidence); 1,825 `latest-recommended` analyzer findings
-  (CA2201 771, CA1861 419, CA1305 142, ...) and ruff F401/F841/F402 await a clean-up before more rules become errors;
+  list, provenance and SBOM attestations are the integrity evidence); `latest-recommended` analyzer findings await
+  the rest of a clean-up before more rules become errors. Measured 26 November with a Release build of the 57
+  non-net48 projects in `src/` and `tests/` plus `scripts/native/ReliabilityWorker` and `WatchWorkflow`
+  (`-p:AnalysisLevel=latest-recommended -p:TreatWarningsAsErrors=false`, findings counted once per file, line, column
+  and rule, compiler warnings excluded): 1,821 before the clean-up (1,825 on 25 November), 1,368 after (CA2201
+  774 → 503, CA1861 421 → 357, CA1305 142 → 30; next CA1822 77, CA1825 65, CA1310 58). Left: CA2201 sites inside
+  lambdas or try blocks, or reachable from product code or a handler that treats `InvalidOperationException`
+  differently; CA1861 in `tests/` (349), which needs fields named by hand; CA1305 in user-facing text
+  (`GraphHtml.cs`, simulated TIA messages). Ruff F401/F841/F402 were cleaned up and are part of the gate.
   `Measure-Coverage.ps1` now also measures worker and Host sources linked into test assemblies and reports coverage
   per `src/` project. Measured locally on 26 November over all 45 managed suites (two full runs merged, each with one
   suite failing for environmental reasons): Core 95.8 %, Translations 98.9 %, Graph 98.5 %, OpcUa 97.8 %,

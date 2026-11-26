@@ -29,7 +29,7 @@ internal static class OperationChecks
         void Reject(Action action, string code, string label)
         {
             try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, label); return; }
-            throw new Exception("Expected " + code + ": " + label);
+            throw new InvalidOperationException("Expected " + code + ": " + label);
         }
         EngineeringArtifactReference Save(string name, object value)
         {
@@ -112,7 +112,7 @@ internal static class OperationChecks
         using (var child = Process.Start(start)!)
         {
             var stdout = child.StandardOutput.ReadToEndAsync(); var stderr = child.StandardError.ReadToEndAsync();
-            if (!child.WaitForExit(15000)) { child.Kill(true); throw new Exception("Lost reply test timed out"); }
+            if (!child.WaitForExit(15000)) { child.Kill(true); throw new InvalidOperationException("Lost reply test timed out"); }
             Check(child.ExitCode == 17, "Actual child exits after durable intent and synthetic side effect: " + stderr.GetAwaiter().GetResult());
         }
         ready = store.Read(ready.Id);

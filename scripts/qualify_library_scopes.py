@@ -8,7 +8,7 @@ from pathlib import Path
 import shutil
 
 from engineering_preservation import native_payload_hash
-from library_native_harness import Harness, identity, require
+from library_native_harness import Harness, require
 
 ROOT = Path(__file__).resolve().parents[1]
 FB, UDT = "TiaMcpLibraryGate", "TiaMcpLibraryState"
