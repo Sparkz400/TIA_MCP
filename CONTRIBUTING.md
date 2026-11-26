@@ -56,8 +56,9 @@ ruff check
 # Compile the Siemens-dependent workers without Siemens assemblies.
 .\scripts\Test-WorkerCompile.ps1
 
-# Managed line coverage (report only, nothing gates on it): Cobertura XML and a per-assembly summary
-# under artifacts/coverage/. Shard parameters as for Test-Offline.ps1 give a quick partial run.
+# Managed line coverage (report only, nothing gates on it): Cobertura XML and a summary per assembly and per
+# src/ project (worker sources linked into test assemblies count for their source file) under artifacts/coverage/.
+# Shard parameters as for Test-Offline.ps1 give a quick partial run.
 .\scripts\Measure-Coverage.ps1
 .\scripts\Measure-Coverage.ps1 -ShardCount 16 -ShardIndex 15
 ```

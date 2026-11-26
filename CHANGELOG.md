@@ -10,6 +10,10 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
+### Changed
+
+- `scripts/Measure-Coverage.ps1` now measures worker and Host sources that test projects compile in with `<Compile Include … Link>` (test assemblies are instrumented, their own code under `tests/` is left out), and its summary (schema 2) adds `sources`, line coverage per `src/` project that counts each source line once across every assembly that compiles it.
+
 ## [0.9.0] - 2026-11-25
 
 First tagged pre-release. Changes since the repository went public on 23 October 2026, up to feature catalog `0.5.0`

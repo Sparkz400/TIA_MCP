@@ -217,8 +217,12 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
 - [ ] **Remaining quality gates:** the bundle has no Authenticode signature (no code-signing certificate; the hash
   list, provenance and SBOM attestations are the integrity evidence); 1,825 `latest-recommended` analyzer findings
   (CA2201 771, CA1861 419, CA1305 142, ...) and ruff F401/F841/F402 await a clean-up before more rules become errors;
-  coverage does not measure worker sources linked into test assemblies (first local numbers: Translations 84.7 %,
-  Core 6 % from seven suites only).
+  `Measure-Coverage.ps1` now also measures worker and Host sources linked into test assemblies and reports coverage
+  per `src/` project. Measured locally on 26 November over all 45 managed suites (two full runs merged, each with one
+  suite failing for environmental reasons): Core 95.8 %, Translations 98.9 %, Graph 98.5 %, OpcUa 97.8 %,
+  OpcUa.Runtime 93.2 %, Host 47.4 % (suites only: the post-suite Python checks that start the Host did not run), and
+  Openness.V21 95.7 % of the 8,858 lines in the 124 of its 242 files that some test assembly compiles; the other
+  118 worker files are not measured.
 - [ ] **Found by the new tests, left open:** `plc_physical_*` has no Host-side gate (only tool registration behind
   `--physical-plc-online` and the worker refuse; the maintainer has not decided whether to add one). Closed the same
   day: the successful `runtime_unified_connect` path is tested offline end to end, `ProjectReviewStore` refuses
