@@ -135,6 +135,7 @@ public sealed partial class HmiComponentWorkflowStore(string artifactsRoot)
             rows.Add(row); used += size; next++;
         }
         result["section"] = section; result["offset"] = offset; result["total"] = source.Count; result["rows"] = rows; result["nextOffset"] = next < source.Count ? next : null;
+        result["totalItems"] = source.Count; result["pageCount"] = PageTotals.PageCount(source.Count, count);
         if (JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length > 128 * 1024) throw new BridgeException("ArtifactCapacity", "Page exceeds 128 KiB; download the complete report.");
         return result;
     }

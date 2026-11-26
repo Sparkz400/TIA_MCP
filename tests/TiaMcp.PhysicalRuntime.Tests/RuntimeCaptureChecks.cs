@@ -29,6 +29,9 @@ internal static class RuntimeCaptureChecks
             writer.Append(Row(2,1003) with{ReadResultJson=null,ErrorCode="RuntimeTimeout"});writer.Finish("stopped",1004);finalRef=writer.Reference;
             Check(Json(store.Page(oldRef)).GetProperty("totalRows").GetInt64()==1,"Pinned prefix stays immutable");
             var page=Json(store.Page(finalRef,0,2));Check(page.GetProperty("nextOffset").GetInt32()==2,"Stable page cursor");
+            Check(page.GetProperty("totalRows").GetInt64()==3&&page.GetProperty("totalItems").GetInt64()==3&&page.GetProperty("pageCount").GetInt64()==2,"totalItems repeats totalRows; pageCount is ceil(3/2)");
+            var lastPage=Json(store.Page(finalRef,2,2));Check(lastPage.GetProperty("nextOffset").ValueKind==JsonValueKind.Null&&lastPage.GetProperty("rows").GetArrayLength()==1
+                &&lastPage.GetProperty("totalItems").GetInt64()==3&&lastPage.GetProperty("pageCount").GetInt64()==2,"The last page keeps the totals and ends paging");
             Check(page.GetProperty("rows")[0].GetProperty("readResultJson").GetString()==exact,"Exact UInt64 JSON survives storage");
             var status=Json(store.Status(id,false));Check(status.GetProperty("state").GetString()=="ended" && status.GetProperty("recordedProgress").GetProperty("skippedPolls").GetInt64()==9,"Final progress retains gaps");
             var export=Json(store.Export(finalRef,"csv",false));Check(export.GetProperty("artifacts").GetArrayLength()==2,"CSV always has full JSON companion");

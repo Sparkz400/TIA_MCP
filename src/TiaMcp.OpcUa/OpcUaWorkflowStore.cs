@@ -116,7 +116,7 @@ public sealed class OpcUaWorkflowStore
         int next = offset + rows.Count;
         return new JsonObject { ["recordRef"] = record.Ref, ["reportSha256"] = reportHash, ["section"] = section,
             ["offset"] = offset, ["total"] = all.Count, ["rows"] = rows,
-            ["nextOffset"] = next == all.Count ? null : next,
+            ["nextOffset"] = next == all.Count ? null : next, ["totalItems"] = all.Count, ["pageCount"] = TiaMcp.Core.PageTotals.PageCount(all.Count, count),
             ["completeArtifactRef"] = record.Ref + ":report.json", ["nativeQualified"] = false,
             ["compatibilityCertified"] = false, ["dependencyClosureComplete"] = false };
     }
@@ -167,7 +167,7 @@ public sealed class OpcUaWorkflowStore
             rows.Add(row); bytes += length;
         }
         return new JsonObject { ["rows"] = rows, ["total"] = directories.Length,
-            ["nextOffset"] = offset + rows.Count == directories.Length ? null : offset + rows.Count,
+            ["nextOffset"] = offset + rows.Count == directories.Length ? null : offset + rows.Count, ["totalItems"] = directories.Length, ["pageCount"] = TiaMcp.Core.PageTotals.PageCount(directories.Length, count),
             ["ordering"] = "publication-id; discovery only, relist after concurrent additions", ["nativeQualified"] = false };
     }
 

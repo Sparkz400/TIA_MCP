@@ -104,10 +104,18 @@ var upload=Upload(packet);var receipt=store.Review(id,upload.Ref);string record=
 Check(JsonNode.DeepEquals(receipt,store.Review(id,upload.Ref)),"Idempotent immutable review");
 Check(ProjectReviewStore.ReadArtifact(root,receipt["input"]!.AsObject()).SequenceEqual(upload.Bytes),"Exact public input bytes retained");
 new ArtifactUploadStore(root).Release(upload.UploadId);Check(JsonNode.DeepEquals(receipt,new AccessWorkflowStore(root).Page(record)),"Released upload and fresh store preserve review");
+Check(receipt["totalItems"] is null&&receipt["pageCount"] is null,"The summary is not a page and carries no paging totals");
 foreach(string section in new[]{"observations","assessments","changes"})
 {
-    var rows=new JsonArray();int offset=0;do{var page=store.Page(record,section,offset,1);foreach(var row in page["rows"]!.AsArray())rows.Add(row!["value"]!.DeepClone());if(page["nextOffset"] is null)break;offset=(int)page["nextOffset"]!;}while(true);
+    int total=expected[section]!.AsArray().Count;
+    var rows=new JsonArray();int offset=0;do{var page=store.Page(record,section,offset,1);
+        Check((int)page["total"]! ==total&&(int)page["totalItems"]! ==total&&(int)page["pageCount"]! ==total,"totalItems repeats total and pageCount counts one-row pages "+section);
+        foreach(var row in page["rows"]!.AsArray())rows.Add(row!["value"]!.DeepClone());if(page["nextOffset"] is null)break;offset=(int)page["nextOffset"]!;}while(true);
     Check(JsonNode.DeepEquals(rows,expected[section]),"Exact complete paging "+section);
+    var whole=store.Page(record,section,0,200);
+    Check((int)whole["totalItems"]! ==total&&(int)whole["pageCount"]! ==(total==0?0:1)&&whole["nextOffset"] is null,"One page of 200 holds the whole section "+section);
+    var tail=store.Page(record,section,total,1);
+    Check(tail["rows"]!.AsArray().Count==0&&tail["nextOffset"] is null&&(int)tail["totalItems"]! ==total,"A page at the end is empty and keeps the totals "+section);
 }
 foreach(var (section,offset,count) in new[]{("bad",0,1),("changes",999,1),("changes",-1,1),("changes",0,201)})Reject(()=>store.Page(record,section,offset,count),"Bad page refused","InvalidRequest");
 foreach(string defect in new[]{"report","input-path","extra"})

@@ -81,6 +81,8 @@ public sealed partial class TranslationWorkflowStore
         page["profileArtifactRef"] = ArtifactRef(record, "profile.json");
         page.Remove("nextCursor");
         page["nextOffset"] = next == page["totalMappedTargets"]!.GetValue<int>() ? null : next;
+        int totalMappedTargets = page["totalMappedTargets"]!.GetValue<int>();
+        page["totalItems"] = totalMappedTargets; page["pageCount"] = TiaMcp.Core.PageTotals.PageCount(totalMappedTargets, count);
         page.Remove("pageSha256");
         page["pageSha256"] = CanonicalJson.Sha256(page);
         return page;
@@ -150,6 +152,7 @@ public sealed partial class TranslationWorkflowStore
             ["offset"] = offset, ["total"] = all.Count, ["rows"] = rows,
             ["completeArtifactRef"] = ArtifactRef(record, artifact),
             ["nextOffset"] = next == all.Count ? null : next,
+            ["totalItems"] = all.Count, ["pageCount"] = TiaMcp.Core.PageTotals.PageCount(all.Count, count),
             ["nativeImportAllowed"] = false };
     }
 

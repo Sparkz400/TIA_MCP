@@ -157,7 +157,7 @@ public sealed class PackageStore
         var end = Math.Min(items.Length, offset + count);
         return new PackagePage(1, packageId, section, offset, items.Length, end < items.Length ? end : null,
             Enumerable.Range(offset, end - offset).Select(index => InspectionItem(items.GetValue(index))).ToArray(),
-            Path.Combine(directory, "manifest.json"), Environment.MachineName);
+            Path.Combine(directory, "manifest.json"), Environment.MachineName, items.Length, PageTotals.PageCount(items.Length, count));
     }
 
     private static object InspectionItem(object? item) => item is PackageCandidate candidate

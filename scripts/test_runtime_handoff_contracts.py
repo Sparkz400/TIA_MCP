@@ -146,7 +146,10 @@ class HandoffContractTests(unittest.TestCase):
                     self.assertLessEqual(set(value['required']), set(value['properties']))
                 else:
                     # The owned-PLCSIM binding is optional so retained requests and reports keep their original bytes.
-                    optional = {'request': {'plcsimBinding'}, 'report': {'targetBinding'}}.get(name, set())
+                    # The paging totals were added to v1 later and stay optional, as in every other paged contract.
+                    paging = {'totalItems', 'pageCount'}
+                    optional = {'request': {'plcsimBinding'}, 'report': {'targetBinding'},
+                                'handoffPage': paging, 'handoffList': paging}.get(name, set())
                     self.assertEqual(set(value['required']), set(value['properties']) - optional)
         for key in FLAGS:
             self.assertEqual(schema['$defs']['report']['properties'][key], {'const': False})

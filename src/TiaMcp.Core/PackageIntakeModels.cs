@@ -41,7 +41,7 @@ public sealed record PackageManifest(int SchemaVersion, string PackageId, string
     long InputBytes, long ExpandedBytes, PackageIntakeLimits Limits, PackageFile[] Files,
     PackageCandidate[] Candidates, string[] Documents, string[] Diagnostics);
 public sealed record PackagePage(int SchemaVersion, string PackageId, string Section, int Offset, int Total,
-    int? NextOffset, object[] Items, string ManifestPath, string Host);
+    int? NextOffset, object[] Items, string ManifestPath, string Host, long? TotalItems = null, long? PageCount = null);
 public sealed record PackageStatus(int SchemaVersion, string PackageId, string State, DateTimeOffset CreatedUtc,
     string SourceSha256, long InputBytes, long ExpandedBytes, int Files, int Candidates, string[] References,
     string Retention, string ManifestPath, string Host, PackageIntakeLimits Limits);
