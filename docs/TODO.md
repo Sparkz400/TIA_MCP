@@ -174,13 +174,14 @@ with evidence from an owned fixture.
   callback cannot be provoked with this change set. Answered: a download is stopped from its first pre-download
   callback before anything is loaded; no Openness gap. Left: `StopModules` (still refused by a worker exception; its
   `NoAction` is unobserved), a fixture whose refused question comes after an answered one, and the physical route (B05).
-- [ ] **Password question refused from the card download's callback disposes the Portal:** found on 26 November
+- [x] **Password question refused from the card download's callback disposes the Portal:** found on 26 November
   (`local.followups.native.20261126`): `simulation_download` without `credentialMetadataPath` on a protected scratch CPU is refused correctly
   (`SimulationCredentialRequired`, `ticketState` `spent`), but the worker throws from TIA's `PlcMasterSecretPassword`
   callback, which, as on the online route before its fix, leaves the Openness Portal disposed. `tia_detach` now ends
-  such a session (`portalDisposed`), so it no longer blocks `tia_start`. Open: decline the question through TIA (a
-  Siemens exception, as `DataBlockReinitialization` is declined) instead of a worker exception; needs a native check of
-  what `PlcMasterSecretPassword` accepts.
+  such a session (`portalDisposed`), so it no longer blocks `tia_start`. Fixed the same day: without a credential the
+  worker now leaves the question unanswered and raises its typed refusal when `Download` returns; natively TIA then ends
+  the download with its own exception, the result stays `SimulationCredentialRequired` (`ticketState` `spent`) and the
+  session keeps its project (`artifacts/n26/pw1`, the ticket-state stage of `scripts/qualify_followup_checks.py`).
 - [x] **P2 — Opening a UMAC-protected project:** the user found that `ProjectComposition.Open(FileInfo, UmacDelegate,
   ProjectOpenMode)` works with `UmacCredentials.Name` and `SetPassword(SecureString)` in the callback. `project_open`
   passed no callback, so it could not open such a project. Done on 20 November (offline): `project_open` takes

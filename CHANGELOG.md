@@ -20,6 +20,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ### Fixed
 
+- `simulation_download` without `credentialMetadataPath` refused TIA's password question by throwing from its callback, which left the Portal disposed; it now leaves the question unanswered and reports `SimulationCredentialRequired` with the Portal intact.
 - `tia_detach` failed on a Portal TIA had already disposed ("Access to a disposed object"), so the session could not be ended and `tia_start` stayed refused with `AlreadyAttached`; detach now clears the session and reports `portalDisposed`.
 - A `simulation_download` the worker refused before its claim (`ticketState` `reusable`, nothing written) kept its admission `outcomeUnknown`, so every later download and `project_save` on that project was refused with `ResourceBusy`; it is now a returned outcome. Failures that may have written stay held.
 - Credential provisioning's card move gave up after 15 s of access denials that an on-access scanner holding the freshly moved folder causes; it now retries for up to 120 s, and the holder report says that a file-system filter is not listed.
