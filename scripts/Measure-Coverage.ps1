@@ -1,20 +1,24 @@
 <#
 .SYNOPSIS
-Measures line coverage of the managed offline suites and writes a Cobertura report with a per-assembly summary.
+Measures line coverage of the managed offline suites and writes a Cobertura report with per-assembly and per-source-project summaries.
 
 .DESCRIPTION
 Runs scripts/Test-Offline.ps1 -Suite Managed (the same suite selection, sharding and post-suite checks) under
-`dotnet-coverage collect`, whose profiler is inherited by the .NET processes the runner starts. Only TiaMcp product
-assemblies are measured; test assemblies and third-party code are left out. Host processes started by the Python
-checks inherit the profiler too, but a Host that is killed rather than exited may not flush its counts; local runs on
-25 November 2026 covered only shards without those checks, so Host figures are unverified.
+`dotnet-coverage collect`, whose profiler is inherited by the .NET processes the runner starts. TiaMcp assemblies are
+measured, test assemblies included, because several suites compile worker and Host sources (src/TiaMcp.Openness.V21/*.cs
+and others) into the test assembly itself; the test code under tests/ is left out, as is third-party code. Host
+processes started by the Python checks inherit the profiler too, but a Host that is killed rather than exited may not
+flush its counts. The runner skips those checks when any suite fails, and no local run up to 26 November 2026 reached
+them, so Host figures come from the suites alone.
 
 The tool is installed into artifacts/tools/dotnet-coverage at the pinned version below (no global install). Results go to
 <OutputDirectory>/coverage.cobertura.xml and <OutputDirectory>/coverage-summary.json; the runner's own output goes to
 <OutputDirectory>/offline-validation. The report measures; it gates nothing.
 
-Limit: several suites compile worker sources (src/TiaMcp.Openness.V21/*.cs and others) into the test assembly itself.
-Test assemblies are excluded, so that linked worker code is not measured; only code in product assemblies is.
+The summary has two views. `assemblies` lists product assemblies as loaded (test assemblies left out, generated
+sources such as RegexGenerator.g.cs included). `sources` groups by source project, src/<project>: each line of a file
+under src/ counts once, covered if any assembly that compiles it ran it, so worker code linked into test assemblies is
+attributed to its source file. Only files compiled into an assembly that a selected suite loaded are counted.
 
 .EXAMPLE
 ./scripts/Measure-Coverage.ps1                              # every managed suite
@@ -56,7 +60,9 @@ if ($MergeReports) {
     if ($LASTEXITCODE -ne 0) { throw 'Merging the coverage reports failed.' }
     $testExit = 0
 } else {
-# Product assemblies only. ModulePaths are regular expressions over the full module path.
+# TiaMcp assemblies, test assemblies included: they compile linked src/ files. ModulePaths and Sources are regular
+# expressions over the full module or source path; the test code itself (tests/, and generated files of test projects)
+# is left out by source path.
 $settings = Join-Path $output 'coverage.settings.xml'
 @'
 <?xml version="1.0" encoding="utf-8"?>
@@ -66,14 +72,17 @@ $settings = Join-Path $output 'coverage.settings.xml'
       <Include>
         <ModulePath>.*[\\/]TiaMcp\.[^\\/]*\.(dll|exe)$</ModulePath>
       </Include>
-      <Exclude>
-        <ModulePath>.*\.Tests\.(dll|exe)$</ModulePath>
-      </Exclude>
     </ModulePaths>
-    <IncludeTestAssembly>false</IncludeTestAssembly>
+    <Sources>
+      <Exclude>
+        <Source>{0}[\\/]tests[\\/].*</Source>
+        <Source>.*[\\/]obj[\\/][^\\/]*\.Tests[\\/].*</Source>
+      </Exclude>
+    </Sources>
+    <IncludeTestAssembly>true</IncludeTestAssembly>
   </CodeCoverage>
 </Configuration>
-'@ | Set-Content -LiteralPath $settings -Encoding UTF8
+'@ -f [Security.SecurityElement]::Escape([regex]::Escape($repoRoot)) | Set-Content -LiteralPath $settings -Encoding UTF8
 
 $runner = Join-Path $PSScriptRoot 'Test-Offline.ps1'
 $pwsh = (Get-Process -Id $PID).Path
@@ -89,7 +98,11 @@ try {
 if (-not (Test-Path -LiteralPath $report)) { throw "dotnet-coverage wrote no report (exit $testExit)." }
 
 # Cobertura packages are assemblies; count each source line once per assembly (a line can appear in several methods).
+# Lines of files under src/ are also counted once per source project, whichever assemblies compile the file. Matching the
+# last src/TiaMcp.* segment keeps this independent of the checkout path (a merge may read reports from other machines).
 $lines = @{}
+$sourceLines = @{}
+$sourcePattern = [regex]'^.*[\\/]src[\\/](TiaMcp\.[^\\/]+)[\\/](.+)$'
 $reader = [Xml.XmlReader]::Create($report, [Xml.XmlReaderSettings]@{DtdProcessing = 'Prohibit'; XmlResolver = $null})
 try {
     $package = $null; $file = $null
@@ -97,31 +110,51 @@ try {
         if ($reader.NodeType -ne [Xml.XmlNodeType]::Element) { continue }
         switch ($reader.LocalName) {
             'package' { $package = $reader.GetAttribute('name'); if (-not $lines.ContainsKey($package)) { $lines[$package] = @{} } }
-            'class' { $file = $reader.GetAttribute('filename') }
+            'class' {
+                $file = $reader.GetAttribute('filename')
+                $match = $sourcePattern.Match([string]$file)
+                $project = $null; $relative = $null
+                if ($match.Success) {
+                    $project = 'src/' + $match.Groups[1].Value
+                    $relative = ($project + '/' + ($match.Groups[2].Value -replace '\\', '/')).ToLowerInvariant()
+                    if (-not $sourceLines.ContainsKey($project)) { $sourceLines[$project] = @{} }
+                }
+            }
             'line' {
                 if ($package) {
-                    $key = $file + ':' + $reader.GetAttribute('number')
+                    $number = $reader.GetAttribute('number')
+                    $key = $file + ':' + $number
                     $hit = [long]$reader.GetAttribute('hits') -gt 0
                     $lines[$package][$key] = $hit -or [bool]$lines[$package][$key]
+                    if ($project) {
+                        $sourceKey = $relative + ':' + $number
+                        $sourceLines[$project][$sourceKey] = $hit -or [bool]$sourceLines[$project][$sourceKey]
+                    }
                 }
             }
         }
     }
 } finally { $reader.Dispose() }
 
-$assemblies = [ordered]@{}
-foreach ($name in @($summaryAssemblies + @($lines.Keys | Sort-Object)) | Select-Object -Unique) {
-    $set = $lines[$name]
+function Get-LineSummary($set) {
     $valid = if ($set) { $set.Count } else { 0 }
     $covered = if ($set) { @($set.Values | Where-Object { $_ }).Count } else { 0 }
-    $assemblies[$name] = [ordered]@{
+    [ordered]@{
         linesValid = $valid
         linesCovered = $covered
         lineCoveragePercent = $(if ($valid) { [math]::Round(100.0 * $covered / $valid, 1) } else { $null })
     }
 }
+$assemblies = [ordered]@{}
+foreach ($name in @($summaryAssemblies + @($lines.Keys | Where-Object { $_ -notlike '*.Tests' } | Sort-Object)) | Select-Object -Unique) {
+    $assemblies[$name] = Get-LineSummary $lines[$name]
+}
+$sources = [ordered]@{}
+foreach ($name in @(@($summaryAssemblies + 'TiaMcp.Openness.V21' | ForEach-Object { "src/$_" }) + @($sourceLines.Keys | Sort-Object)) | Select-Object -Unique) {
+    $sources[$name] = Get-LineSummary $sourceLines[$name]
+}
 $summary = [ordered]@{
-    schemaVersion = 1
+    schemaVersion = 2
     tool = "dotnet-coverage $toolVersion"
     configuration = $Configuration
     shard = $(if ($MergeReports) { $null } else { [ordered]@{index = $ShardIndex; count = $ShardCount} })
@@ -130,10 +163,14 @@ $summary = [ordered]@{
     testExitCode = $testExit
     report = 'coverage.cobertura.xml'
     assemblies = $assemblies
+    sources = $sources
 }
 $summary | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $output 'coverage-summary.json') -Encoding UTF8
 $assemblies.GetEnumerator() | ForEach-Object {
     [pscustomobject]@{Assembly = $_.Key; Lines = $_.Value.linesValid; Covered = $_.Value.linesCovered; Percent = $_.Value.lineCoveragePercent}
+} | Format-Table -AutoSize | Out-String -Width 200 | Write-Host
+$sources.GetEnumerator() | ForEach-Object {
+    [pscustomobject]@{Source = $_.Key; Lines = $_.Value.linesValid; Covered = $_.Value.linesCovered; Percent = $_.Value.lineCoveragePercent}
 } | Format-Table -AutoSize | Out-String -Width 200 | Write-Host
 Write-Host "Coverage report: $report"
 if ($testExit -ne 0) {

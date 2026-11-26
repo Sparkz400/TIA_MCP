@@ -257,9 +257,13 @@ remediation, the fixed `workerVersion`, the release gate, pinned actions and the
   774 → 503, CA1861 421 → 357, CA1305 142 → 30; next CA1822 77, CA1825 65, CA1310 58). Left: CA2201 sites inside
   lambdas or try blocks, or reachable from product code or a handler that treats `InvalidOperationException`
   differently; CA1861 in `tests/` (349), which needs fields named by hand; CA1305 in user-facing text
-  (`GraphHtml.cs`, simulated TIA messages). Ruff F401/F841/F402 were cleaned up and are part of the gate. Coverage
-  does not measure worker sources linked into test assemblies (first local numbers: Translations 84.7 %, Core 6 % from
-  seven suites only).
+  (`GraphHtml.cs`, simulated TIA messages). Ruff F401/F841/F402 were cleaned up and are part of the gate.
+  `Measure-Coverage.ps1` now also measures worker and Host sources linked into test assemblies and reports coverage
+  per `src/` project. Measured locally on 26 November over all 45 managed suites (two full runs merged, each with one
+  suite failing for environmental reasons): Core 95.8 %, Translations 98.9 %, Graph 98.5 %, OpcUa 97.8 %,
+  OpcUa.Runtime 93.2 %, Host 47.4 % (suites only: the post-suite Python checks that start the Host did not run), and
+  Openness.V21 95.7 % of the 8,858 lines in the 124 of its 242 files that some test assembly compiles; the other
+  118 worker files are not measured.
 - [ ] **Found by the new tests, left open:** `plc_physical_*` has no Host-side gate (only tool registration behind
   `--physical-plc-online` and the worker refuse; the maintainer has not decided whether to add one). Closed the same
   day: the successful `runtime_unified_connect` path is tested offline end to end, `ProjectReviewStore` refuses

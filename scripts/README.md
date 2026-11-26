@@ -48,7 +48,7 @@ Documented user commands; run them from the repository root, for example `./scri
 
 | Script | Synopsis |
 | --- | --- |
-| [`Measure-Coverage.ps1`](Measure-Coverage.ps1) | Measures line coverage of the managed offline suites and writes a Cobertura report with a per-assembly summary. |
+| [`Measure-Coverage.ps1`](Measure-Coverage.ps1) | Measures line coverage of the managed offline suites and writes a Cobertura report with per-assembly and per-source-project summaries. |
 | [`Test-AddInOwner.ps1`](Test-AddInOwner.ps1) |  |
 | [`Test-AddInSandbox.ps1`](Test-AddInSandbox.ps1) |  |
 | [`Test-Deployment.ps1`](Test-Deployment.ps1) |  |
