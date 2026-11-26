@@ -79,10 +79,12 @@ STAGES = (
     "repeated_name_sim_write",
     "repeated_name_change_prepare",
     "queue_timeout_during_change_apply",
+    # Before the ticket stage: its spent download stays outcomeUnknown, and project_save (which this stage needs) refuses
+    # while any held admission holds a project.
+    "sim_write_signals_both_spellings",
     "simulation_download_ticket_state",
     "simulation_registrations_present",
     "stale_change_directory_sweep",
-    "sim_write_signals_both_spellings",
     "loadable_provider_cpu_1518",
     "hmi_seeded_page_and_kind_refusals",
     "hmi_preservation_unavailable_remediation",
