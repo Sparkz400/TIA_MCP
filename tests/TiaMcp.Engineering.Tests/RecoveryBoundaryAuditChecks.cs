@@ -142,7 +142,7 @@ internal static class RecoveryBoundaryAuditChecks
         try { await new WatchTableDispatcher(gateNative, gateRoot).CallAsync("watch_apply", new { operationId = (string)expanded["operation"]!["id"]!, reviewedPlanSha256 = (string)expanded["operation"]!["planSha256"]! }); }
         catch (BridgeException) { gated = true; }
         Check(gated && gateNative.CheckpointCount == 0 && gateNative.ApplyCount == 0, "Production dispatcher cannot apply a harness-prepared expanded plan");
-        if (failures.Count != 0) throw new Exception("Recovery boundary audit failures:\n" + string.Join("\n", failures));
+        if (failures.Count != 0) throw new InvalidOperationException("Recovery boundary audit failures:\n" + string.Join("\n", failures));
         Console.WriteLine($"PASS Recovery boundary independent audit: {passed} checks; fake bridge only, no native execution.");
     }
 

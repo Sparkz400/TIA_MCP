@@ -11,11 +11,11 @@ byte[] Xml(string body, string namespaces = "<Uri>urn:test</Uri>") => Encoding.U
     $"<UANodeSet xmlns=\"{ns}\"><NamespaceUris>{namespaces}</NamespaceUris>{body}</UANodeSet>");
 byte[] Variable(string extra = "", string content = "") => Xml($"<UAVariable NodeId=\"ns=1;s=Speed\" BrowseName=\"1:Speed\" DataType=\"i=10\" {extra}>{content}</UAVariable>");
 byte[] Fixture(string name) => File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "fixtures", name));
-void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected {expected}, got {actual}"); }
+void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}, got {actual}"); }
 void Reject(string code, Action action)
 {
     try { action(); } catch (BridgeException ex) { Equal(code, ex.Code); return; }
-    throw new Exception("Expected rejection: " + code);
+    throw new InvalidOperationException("Expected rejection: " + code);
 }
 JsonArray Changes(byte[] a, byte[] b) => OpcUaModelReview.Compare(a, b)["changes"]!.AsArray();
 

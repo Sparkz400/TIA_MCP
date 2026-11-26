@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,23 +21,23 @@ var passed = 0;
 var failed = 0;
 void Test(string name, Action<string> test)
 {
-    var work = Path.Combine(root, (passed + failed).ToString());
+    var work = Path.Combine(root, (passed + failed).ToString(CultureInfo.InvariantCulture));
     Directory.CreateDirectory(work);
     try { test(work); passed++; Console.WriteLine("PASS " + name); }
     catch (Exception error) { failed++; Console.WriteLine("FAIL " + name + ": " + error); }
 }
-static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new Exception($"Expected {expected}, got {actual}."); }
+static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}, got {actual}."); }
 static void Reject(string code, Action action)
 {
     try { action(); }
     catch (BridgeException error) when (error.Code == code) { return; }
-    throw new Exception("Expected bridge error " + code);
+    throw new InvalidOperationException("Expected bridge error " + code);
 }
 static void RejectReachability(string message, Action action)
 {
     try { action(); }
     catch (ArgumentException error) when (error.Message.Contains(message, StringComparison.Ordinal)) { return; }
-    throw new Exception("Expected reference-proof rejection containing: " + message);
+    throw new InvalidOperationException("Expected reference-proof rejection containing: " + message);
 }
 static string Write(string work, string name, byte[] bytes) { Directory.CreateDirectory(work); var path = Path.Combine(work, name); File.WriteAllBytes(path, bytes); return path; }
 static byte[] Zip(params (string Name, byte[] Bytes, int? Attributes)[] files)
@@ -817,6 +818,6 @@ Test("native reference proof refuses over-limit evidence instead of truncating",
 Console.WriteLine($"Library intake tests: {passed} passed, {failed} failed.");
 // Validate the concrete generated path before deleting only this run's owned fixture directory.
 if (!Path.GetFullPath(root).StartsWith(testParent + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
-    throw new Exception("Test cleanup path escaped its fixture root.");
+    throw new InvalidOperationException("Test cleanup path escaped its fixture root.");
 Directory.Delete(root, true);
 return failed == 0 ? 0 : 1;

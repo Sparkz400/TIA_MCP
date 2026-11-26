@@ -141,13 +141,13 @@ public static class InventoryExport
         xml.WriteStartElement("cols");
         for (int c = 1; c <= columns; c++)
         {
-            xml.WriteStartElement("col"); xml.WriteAttributeString("min", c.ToString()); xml.WriteAttributeString("max", c.ToString());
+            xml.WriteStartElement("col"); xml.WriteAttributeString("min", c.ToString(CultureInfo.InvariantCulture)); xml.WriteAttributeString("max", c.ToString(CultureInfo.InvariantCulture));
             xml.WriteAttributeString("width", !filter && c == 2 ? "120" : c >= 21 && c <= 24 ? "65" : "24"); xml.WriteAttributeString("customWidth", "1"); xml.WriteEndElement();
         }
         xml.WriteEndElement(); xml.WriteStartElement("sheetData"); int rowNumber = 0;
         foreach (var row in rows)
         {
-            rowNumber++; xml.WriteStartElement("row"); xml.WriteAttributeString("r", rowNumber.ToString());
+            rowNumber++; xml.WriteStartElement("row"); xml.WriteAttributeString("r", rowNumber.ToString(CultureInfo.InvariantCulture));
             if (rowNumber == 1) { xml.WriteAttributeString("ht", "32"); xml.WriteAttributeString("customHeight", "1"); }
             for (int c = 0; c < row.Length; c++)
             {

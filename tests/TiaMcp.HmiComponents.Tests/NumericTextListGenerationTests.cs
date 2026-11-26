@@ -13,7 +13,7 @@ internal static class NumericTextListGenerationTests
         var reviews = new ProjectReviewStore(root); var uploads = new ArtifactUploadStore(root); var store = new HmiComponentWorkflowStore(root);
         var uploadIds = new List<string>(); int checks = 0;
         void Check(bool condition, string label) { if (!condition) throw new Exception(label); checks++; }
-        void Reject(Action action, string label) { try { action(); } catch (Exception e) when (e is BridgeException or JsonException or InvalidOperationException or ArgumentException) { checks++; return; } throw new Exception("Expected refusal: " + label); }
+        void Reject(Action action, string label) { try { action(); } catch (Exception e) when (e is BridgeException or JsonException or InvalidOperationException or ArgumentException) { checks++; return; } throw new InvalidOperationException("Expected refusal: " + label); }
         string Upload(byte[] data)
         {
             var started = uploads.Begin("input.json", data.Length, Hash(data)); uploadIds.Add(started.UploadId);
@@ -96,7 +96,7 @@ internal static class NumericTextListGenerationTests
             try { Author(request); }
             catch (BridgeException e) when (e.Code == "HmiTextListValueOutOfRange" && e.Message.Contains("List States, entry"))
             { Check(Directory.GetFiles(Path.Combine(root, "hmi-component-reviews")).Length == published, "Nothing published: " + label); return; }
-            throw new Exception("Expected HmiTextListValueOutOfRange: " + label);
+            throw new InvalidOperationException("Expected HmiTextListValueOutOfRange: " + label);
         }
         var installRequest = Request(Packet()); var first = Record(installRequest, "initial bounded states");
         Check(first["valueCoverage"]!["unlistedIntervals"]!.AsArray().Count == 2, "Both negative and high unlisted intervals remain visible");

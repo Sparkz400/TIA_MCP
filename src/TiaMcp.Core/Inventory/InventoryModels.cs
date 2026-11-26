@@ -15,6 +15,7 @@ public sealed record InventoryOnline(string Status, string? Endpoint = null, uin
 public sealed record InventoryRow(string RowId, string Name, string DeviceName, string Kind, string Path,
     string? ParentPath, string ProjectPath, Dictionary<string, InventoryField> Configured)
 {
+    private static readonly string[] ComparisonKeys = new[] { "mlfb", "firmware", "hardwareRevision" };
     public Dictionary<string, InventoryField> Actual { get; init; } = ActualUnavailable("notRead", "Online identification has not been requested.");
     public InventoryOnline Online { get; init; } = new("notRead");
     public Dictionary<string, string> Comparisons { get; init; } = new();
@@ -25,7 +26,7 @@ public sealed record InventoryRow(string RowId, string Name, string DeviceName, 
 
     public InventoryRow Compare() => this with
     {
-        Comparisons = new[] { "mlfb", "firmware", "hardwareRevision" }.ToDictionary(k => k,
+        Comparisons = ComparisonKeys.ToDictionary(k => k,
             k => CompareField(k, Configured.GetValueOrDefault(k), Actual.GetValueOrDefault(k)))
     };
 

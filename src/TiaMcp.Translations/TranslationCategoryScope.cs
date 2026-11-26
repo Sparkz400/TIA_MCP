@@ -10,6 +10,7 @@ public sealed record TranslationCategoryBinding(string Identifier, string Export
 /// <summary>File-only comparison of the narrow, observed V21 bilingual layout. It grants no import permission.</summary>
 public static class TranslationCategoryScope
 {
+    private static readonly string[] CompleteWorksheetNames = new[] { "User Texts", "System Texts" };
     public static JsonObject Compare(TranslationWorkbook allCategoriesForSameObjects,
         TranslationWorkbook selectedCategoriesForSameObjects, string[] requestedCategoryIds,
         TranslationCategoryBinding[] categoryBindings)
@@ -59,7 +60,7 @@ public static class TranslationCategoryScope
             ["categoryBindings"] = Node(categoryBindings.OrderBy(b => b.Identifier, StringComparer.Ordinal).ToArray()),
             ["baselineRows"] = before.Count, ["expectedSelectedRows"] = expected.Count, ["observedSelectedRows"] = after.Count,
             ["sourceCulture"] = baseline.Mapping.SourceCulture, ["targetCulture"] = beforeLayout.TargetCulture,
-            ["completeWorksheetNames"] = Node(new[] { "User Texts", "System Texts" }),
+            ["completeWorksheetNames"] = Node(CompleteWorksheetNames),
             ["unexpectedKeys"] = Node(unexpected), ["missingKeys"] = Node(missing), ["changedKeys"] = Node(changed),
             ["outOfCategoryKeys"] = Node(outside), ["matchesRequestedCategoryIntersection"] = matches,
             ["restrictiveFilteringDemonstrated"] = matches && expected.Count > 0 && expected.Count < before.Count,

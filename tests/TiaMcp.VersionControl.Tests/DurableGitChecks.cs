@@ -12,7 +12,7 @@ internal static class DurableGitChecks
     internal static void Register(List<(string, Action)> tests, string executable, string fixtures)
     {
         string basePath = Path.GetFullPath(fixtures + "-durable");
-        if (Directory.Exists(basePath)) throw new Exception("Use a new durable fixture directory.");
+        if (Directory.Exists(basePath)) throw new InvalidOperationException("Use a new durable fixture directory.");
         Directory.CreateDirectory(basePath);
         string executableHash = Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(executable)));
         void Test(string name, Func<Task> action) => tests.Add(("Durable Git " + name, () => action().GetAwaiter().GetResult()));
@@ -183,10 +183,10 @@ internal static class DurableGitChecks
         byte[] bytes = Encoding.UTF8.GetBytes(content); File.WriteAllBytes(Path.Combine(root, path), bytes);
         return new(path, Convert.ToHexStringLower(SHA256.HashData(bytes)));
     }
-    private static void True(bool value) { if (!value) throw new Exception("Expected true."); }
-    private static void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected {expected}, got {actual}."); }
+    private static void True(bool value) { if (!value) throw new InvalidOperationException("Expected true."); }
+    private static void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}, got {actual}."); }
     private static void Reject(string code, Action action)
-    { try { action(); } catch (BridgeException e) when (e.Code == code) { return; } throw new Exception("Expected " + code); }
+    { try { action(); } catch (BridgeException e) when (e.Code == code) { return; } throw new InvalidOperationException("Expected " + code); }
     private static async Task RejectAsync(string code, Func<Task> action)
-    { try { await action(); } catch (BridgeException e) when (e.Code == code) { return; } throw new Exception("Expected " + code); }
+    { try { await action(); } catch (BridgeException e) when (e.Code == code) { return; } throw new InvalidOperationException("Expected " + code); }
 }

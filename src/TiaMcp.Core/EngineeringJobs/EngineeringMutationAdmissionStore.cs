@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using TiaMcp.Core.Engineering;
@@ -172,7 +173,7 @@ public sealed class EngineeringMutationAdmissionStore
         EngineeringMutationAdmission? previous = null;
         for (int i = 0; i < files.Length; i++)
         {
-            if (Path.GetFileName(files[i]) != i.ToString("D8") + ".json" || new FileInfo(files[i]).Length > 1024 * 1024)
+            if (Path.GetFileName(files[i]) != i.ToString("D8", CultureInfo.InvariantCulture) + ".json" || new FileInfo(files[i]).Length > 1024 * 1024)
                 throw new BridgeException("JournalInvalid", "Mutation admission revisions must be contiguous and bounded.");
             var next = i == files.Length - 1 ? last : PackageStorage.Load<EngineeringMutationAdmission>(files[i]);
             if (next.Id != id || next.Revision != i) throw new BridgeException("JournalInvalid", "Mutation admission revision identity differs.");
@@ -250,7 +251,7 @@ public sealed class EngineeringMutationAdmissionStore
     private static bool Matches<T>(string? stored, T value) => CanonicalJson.Matches(stored, JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!);
     private static void Write(EngineeringMutationAdmission record, string directory)
     {
-        string path = PackageStorage.Under(directory, record.Revision.ToString("D8") + ".json");
+        string path = PackageStorage.Under(directory, record.Revision.ToString("D8", CultureInfo.InvariantCulture) + ".json");
         string temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
         { JsonSerializer.Serialize(stream, record, BridgeProtocol.Json); stream.Flush(true); }

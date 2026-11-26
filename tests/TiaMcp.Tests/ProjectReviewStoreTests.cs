@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -209,7 +210,7 @@ internal static class ProjectReviewStoreTests
 
     private static JsonObject ImportFixture(Fixture source)
     {
-        var model = Model(); int index = 0; foreach (var row in model["nodes"]!.AsArray()) row!["nodeId"] = (index++).ToString();
+        var model = Model(); int index = 0; foreach (var row in model["nodes"]!.AsArray()) row!["nodeId"] = (index++).ToString(CultureInfo.InvariantCulture);
         model["edges"] = new JsonArray();
         return source.Store.Read(source.Store.Save(model, Documents(Xml), new JsonObject { ["syntheticFixture"] = true })["reviewId"]!.GetValue<string>());
     }

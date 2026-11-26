@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -253,7 +254,7 @@ public sealed class ComponentQualificationWindowStore
         ComponentWindowReservation? previous = null;
         for (int i = 0; i < files.Length; i++)
         {
-            if (Path.GetFileName(files[i]) != i.ToString("D8") + ".json" || new FileInfo(files[i]).Length > 2 * 1024 * 1024) Fail("JournalInvalid", "Component revisions must be contiguous and bounded.");
+            if (Path.GetFileName(files[i]) != i.ToString("D8", CultureInfo.InvariantCulture) + ".json" || new FileInfo(files[i]).Length > 2 * 1024 * 1024) Fail("JournalInvalid", "Component revisions must be contiguous and bounded.");
             var record = i == files.Length - 1 ? last : PackageStorage.Load<ComponentWindowReservation>(files[i]);
             if (record.Id != id || record.Revision != i) Fail("JournalInvalid", "Component reservation identity changed.");
             ValidateRecord(root, previous, record, live); previous = record;
@@ -365,7 +366,7 @@ public sealed class ComponentQualificationWindowStore
     private static bool Matches<T>(string? stored, T value) => CanonicalJson.Matches(stored, JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!);
     private static void Write(ComponentWindowReservation r, string directory)
     {
-        string path = Path.Combine(directory, r.Revision.ToString("D8") + ".json"), temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        string path = Path.Combine(directory, r.Revision.ToString("D8", CultureInfo.InvariantCulture) + ".json"), temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         PackageStorage.EnsureNoLinks(path);
         using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
         { JsonSerializer.Serialize(stream, r, BridgeProtocol.Json); stream.Flush(true); }

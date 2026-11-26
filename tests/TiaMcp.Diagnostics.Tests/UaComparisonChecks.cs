@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using TiaMcp.Core;
@@ -26,7 +27,7 @@ internal static class UaComparisonChecks
         using var captures = new RuntimeCaptureStore(Path.Combine(f.Root, "runtime-ua-acquisition"));
         var observe = new DiagnosticUaObservations(f.Root, r => DiagnosticUaCaptureSource.ReadPolling(f.Root, captures, r));
         var comparisons = new DiagnosticUaComparisons(f.Root, observe);
-        var time = DateTimeOffset.Parse("2026-10-25T00:00:00Z");
+        var time = DateTimeOffset.Parse("2026-10-25T00:00:00Z", CultureInfo.InvariantCulture);
         string Capture(char id, string bind, bool after, bool empty = false)
         {
             var request = new OpcUaCaptureRequest(new('a',32), nodes, 100, 10, DiagnosticBindingId: bind);

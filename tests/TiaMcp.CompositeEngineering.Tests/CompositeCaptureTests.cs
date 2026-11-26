@@ -18,7 +18,7 @@ internal static class CompositeCaptureTests
     {
         string root = Path.Combine(parent, "capture"); Directory.CreateDirectory(root);
         var checks = new List<string>();
-        void Check(bool ok, string label) { if (!ok) throw new Exception(label); checks.Add(label); }
+        void Check(bool ok, string label) { if (!ok) throw new InvalidOperationException(label); checks.Add(label); }
         const string project = "/projects/Plant", plc = project + "/PLC", module = plc + "/Module", replacement = plc + "/Module2", peer = plc + "/Peer", axis = plc + "/technology/Axis";
         const string projectPath = "D:/Plant/Plant.ap21", amlPath = "/CAEXFile[1]/InstanceHierarchy[1]/InternalElement[1]";
         JsonObject Node(string path, string kind, string? owner) => new() { ["nodeId"] = path, ["objectPath"] = path, ["kind"] = kind, ["name"] = path[(path.LastIndexOf('/') + 1)..],

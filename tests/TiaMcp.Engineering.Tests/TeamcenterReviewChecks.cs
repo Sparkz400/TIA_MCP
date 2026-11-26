@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -11,7 +12,7 @@ internal static class TeamcenterReviewChecks
     {
         int checks = 0;
         void Check(bool value, string label) { if (!value) throw new Exception(label); checks++; }
-        void Reject(Action action) { try { action(); } catch (Exception e) when (e is BridgeException or JsonException or ArgumentException or InvalidOperationException) { checks++; return; } throw new Exception("Expected Teamcenter review refusal."); }
+        void Reject(Action action) { try { action(); } catch (Exception e) when (e is BridgeException or JsonException or ArgumentException or InvalidOperationException) { checks++; return; } throw new InvalidOperationException("Expected Teamcenter review refusal."); }
         var input = TeamcenterReview.Parse(File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "fixtures/teamcenter/observations.json")));
         byte[] manifest = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "fixtures/teamcenter/local-manifest.json"));
         JsonObject Request() => input.DeepClone().AsObject();
@@ -77,9 +78,9 @@ internal static class TeamcenterReviewChecks
         for (int i = 0; i < 1024; i++) { var row = sample.DeepClone(); row["name"] = "Dataset" + i; datasets.Add(row); }
         Check(Build(large)["observations"]!.AsArray().Count(x => (string?)x!["phase"] == "after" && (string?)x!["section"] == "datasets") == 1024, "Maximum dataset scope retained.");
         var manyManifests = Request(); var copies = manyManifests["after"]!["localCopies"]!["rows"]!.AsArray(); var local = copies[0]!.DeepClone(); copies.Clear();
-        for (int i = 0; i < 15; i++) { var row = local.DeepClone(); row["dataset"]!["name"] = "Copy" + i; row["manifest"]!["uploadRef"] = "upload:" + i.ToString("x32"); copies.Add(row); }
+        for (int i = 0; i < 15; i++) { var row = local.DeepClone(); row["dataset"]!["name"] = "Copy" + i; row["manifest"]!["uploadRef"] = "upload:" + i.ToString("x32", CultureInfo.InvariantCulture); copies.Add(row); }
         Check((int)Build(manyManifests)["summary"]!["manifestCount"]! == 16, "Sixteen distinct uploaded manifests accepted, including original before phase.");
-        var seventeenth = local.DeepClone(); seventeenth["dataset"]!["name"] = "Copy16"; seventeenth["manifest"]!["uploadRef"] = "upload:" + 16.ToString("x32"); copies.Add(seventeenth); Reject(() => Build(manyManifests));
+        var seventeenth = local.DeepClone(); seventeenth["dataset"]!["name"] = "Copy16"; seventeenth["manifest"]!["uploadRef"] = "upload:" + 16.ToString("x32", CultureInfo.InvariantCulture); copies.Add(seventeenth); Reject(() => Build(manyManifests));
         var overBytes = Request(); byte[] oversized = new byte[TeamcenterReview.ManifestLimit + 1];
         foreach (string phase in new[] { "before", "after" }) overBytes[phase]!["localCopies"]!["rows"]![0]!["manifest"]!["sha256"] = Convert.ToHexStringLower(SHA256.HashData(oversized));
         Reject(() => TeamcenterReview.Build(overBytes, _ => oversized));

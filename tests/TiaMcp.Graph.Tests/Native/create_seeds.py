@@ -1,6 +1,5 @@
 """Generate independently authored GRAPH import seeds; never native exports."""
 from pathlib import Path
-from copy import deepcopy
 import xml.etree.ElementTree as ET
 
 fixtures = Path(__file__).resolve().parent.parent / 'fixtures'

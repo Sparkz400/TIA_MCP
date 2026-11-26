@@ -1,5 +1,4 @@
 """Pure checks for optional-startup evidence validation; not native qualification."""
-import copy
 import unittest
 
 from qualify_hmi_optional_startup import verify_absence_response, verify_wrong_version_response, verify_wrong_identity_response, verify_detached_response, record_host_exit, ps_literal

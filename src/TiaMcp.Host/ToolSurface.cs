@@ -13,6 +13,7 @@ namespace TiaMcp.Host;
 /// <summary>Applies --toolsets, titles, output schemas, server identity and progress heartbeats to the advertised MCP surface.</summary>
 internal static class ToolSurface
 {
+    private static readonly string[] SchemaKeywords = new[] { "type", "$ref", "anyOf", "oneOf", "allOf", "enum", "const" };
     internal static readonly TimeSpan HeartbeatInterval = TimeSpan.FromSeconds(10);
 
     // Workflow contracts whose per-tool x-tool-contracts outputs the offline Host tests validate on every call.
@@ -130,7 +131,7 @@ internal static class ToolSurface
         foreach (var (property, schema) in properties.ToArray())
         {
             bool unconstrained = schema is JsonValue flag && flag.TryGetValue<bool>(out var any) && any
-                || schema is JsonObject declared && !new[] { "type", "$ref", "anyOf", "oneOf", "allOf", "enum", "const" }.Any(declared.ContainsKey);
+                || schema is JsonObject declared && !SchemaKeywords.Any(declared.ContainsKey);
             if (!unconstrained && property != objectArgument) continue;
             names.Add(property);
             if (property == objectArgument || property == "request")

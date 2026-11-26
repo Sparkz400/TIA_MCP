@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 
 from jsonschema import Draft202012Validator
 from hmi_text_list_author_checks import expected_documents, parse_candidate, ROOT
-from hmi_text_list_generation_checks import local_reader, expected_intent as bool_intent
+from hmi_text_list_generation_checks import local_reader as local_reader, expected_intent as bool_intent
 from hmi_dependency_impact_checks import verify as verify_dependencies
 
 DOMAINS = {'SInt': (-128, 127), 'USInt': (0, 255), 'Int': (-32768, 32767),

@@ -19,7 +19,7 @@ from block_test_runtime import canonical, utc_now
 from qualification_owned_scratch import assert_snapshot, complete_inventory, native_hash, require, snapshot
 from component_exact_lifetime import ComponentOwnedScratch as OwnedScratch
 from qualify_typed_resolution import artifact_policy, empty_tag_template, select, tag_fixture
-from run_conformance import native_document, safe_xml, structural_xml
+from run_conformance import safe_xml
 from run_block_tests import save_json
 from smoke_mcp import Client, ROOT
 from typed_graphical_transport import artifact_bytes
@@ -325,8 +325,8 @@ def verify_preserved_installation(before, after, caller, added, added_member=Non
     from engineering_preservation import native_payload
     from xml.dom import Node, minidom
     documents = []
-    for snapshot in (before, after):
-        row = snapshot["objects"]["block:" + caller]
+    for captured in (before, after):
+        row = captured["objects"]["block:" + caller]
         count = row.get("bytes")
         require(type(count) is int and 0 <= count <= 4 * 1024 * 1024,
                 "Caller snapshot requires an exact bounded byte count.")

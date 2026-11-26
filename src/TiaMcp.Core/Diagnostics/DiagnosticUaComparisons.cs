@@ -9,6 +9,7 @@ namespace TiaMcp.Core.Diagnostics;
 /// <summary>Descriptive comparison of two revalidated prefixes; no acquisition or inferred sample joins.</summary>
 public sealed class DiagnosticUaComparisons(string artifactsRoot, DiagnosticUaObservations observations)
 {
+    private static readonly int[] KeyFieldIndexes = new[] { 1, 2, 3, 7 };
     public const string Limits = "Caller-selected windows use each capture's Host elapsed clock, in seconds relative to its explicit anchor. Alignment does not synchronize clocks. Original source/server timestamps remain unchanged. Only Good scalar Boolean and exactly representable numeric observations enter statistics; other values remain in the original evidence. No interpolation, rates, causal inference, successful-fix verdict or complete alarm inventory. Event groups compare recorded type/source/severity fields, not alarm identities. Different filters, gaps, overflow, duplicates and incomplete prefixes remain explicit.";
 
     public JsonObject Compare(string beforeSnapshotRef, string afterSnapshotRef, JsonObject request)
@@ -153,7 +154,7 @@ public sealed class DiagnosticUaComparisons(string artifactsRoot, DiagnosticUaOb
                 var fields = e!["fields"]!.AsArray(); count++;
                 if (!ids.Add(D.Text(fields[0], "text"))) repeated++;
                 if (e["overflow"]!.GetValue<bool>()) overflow++;
-                var key = new JsonArray(new[] { 1, 2, 3, 7 }.Select(i => fields[i]!.DeepClone()).ToArray()).ToJsonString();
+                var key = new JsonArray(KeyFieldIndexes.Select(i => fields[i]!.DeepClone()).ToArray()).ToJsonString();
                 groups[key] = groups.GetValueOrDefault(key) + 1;
             }
         return new JsonObject { ["selection"] = selection?.DeepClone(), ["monitoringRequested"] = selection is not null,

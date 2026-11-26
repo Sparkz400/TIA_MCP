@@ -12,9 +12,9 @@ internal static class WatchAuthoringChecks
         int passed = 0;
         void Check(bool condition, string message) { if (!condition) throw new Exception(message); passed++; }
         async Task Reject(Func<Task> action, string code)
-        { try { await action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; } throw new Exception("Expected " + code); }
+        { try { await action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; } throw new InvalidOperationException("Expected " + code); }
         var repo = AppContext.BaseDirectory;
-        while (!File.Exists(Path.Combine(repo, "fixtures/watch-tables/native-owned-v21/MilestoneWatch.before.xml"))) repo = Path.GetDirectoryName(repo) ?? throw new Exception("Native fixture absent");
+        while (!File.Exists(Path.Combine(repo, "fixtures/watch-tables/native-owned-v21/MilestoneWatch.before.xml"))) repo = Path.GetDirectoryName(repo) ?? throw new InvalidOperationException("Native fixture absent");
         WatchAuthoringProfileChecks.Run(repo);
         await WatchSourceNegativeRecoveryChecks.Run();
         byte[] template = File.ReadAllBytes(Path.Combine(repo, "fixtures/watch-tables/native-owned-v21/MilestoneWatch.before.xml"));

@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 from component_window_lifetime import ComponentLifetime, scan_component_reservations
-from qualify_translation_category_probe import StoreExclusiveWindow, resource_key, safe_path
+from qualify_translation_category_probe import StoreExclusiveWindow, safe_path
 from qualification_owned_scratch import require
 
 

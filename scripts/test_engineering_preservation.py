@@ -1,5 +1,4 @@
 """Pure tests of native equality and saved/recovered reopen qualification."""
-import pathlib
 import unittest
 
 from engineering_preservation import native_payload_hash, recover_and_reopen, reopen_owned_project

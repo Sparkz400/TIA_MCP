@@ -56,7 +56,7 @@ class SoftwarePeerTests(unittest.TestCase):
         self.assertEqual(5, len(original['softwarePeers']['exports']))
         self.assertNotEqual(original['project']['path'], source['recovery']['nativeRecovered']['project']['path'])
         companion = case.run_companion()
-        result = case.audit_companion(companion)
+        case.audit_companion(companion)
         self.assertTrue(companion['completed'])
 
     def test_changed_peer_exports_refuse_and_restore(self):

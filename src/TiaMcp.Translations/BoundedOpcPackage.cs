@@ -10,6 +10,8 @@ namespace TiaMcp.Translations;
 
 internal sealed class BoundedOpcPackage
 {
+    private static readonly string[] ForbiddenRelationshipTypes = new[] { "vba", "oleObject", "activeX", "externalLink" };
+    private static readonly string[] ForbiddenContentTypes = new[] { "macro", "vba", "oleobject", "activex", "externallink" };
     internal static readonly XNamespace Sheet = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
     internal static readonly XNamespace Relations = "http://schemas.openxmlformats.org/package/2006/relationships";
     internal static readonly XNamespace Content = "http://schemas.openxmlformats.org/package/2006/content-types";
@@ -75,7 +77,7 @@ internal sealed class BoundedOpcPackage
             string key = type.Name.LocalName + ":" + (string?)(type.Attribute("PartName") ?? type.Attribute("Extension"));
             Require(contentKeys.Add(key), "WorkbookIntegrityFailure", "Duplicate content type declaration.");
             string mime = (string?)type.Attribute("ContentType") ?? "";
-            Require(!new[] { "macro", "vba", "oleobject", "activex", "externallink" }.Any(x => mime.Contains(x, StringComparison.OrdinalIgnoreCase)),
+            Require(!ForbiddenContentTypes.Any(x => mime.Contains(x, StringComparison.OrdinalIgnoreCase)),
                 "ActiveWorkbookContent", "Executable, macro or linked content is not accepted.");
             if (type.Name.LocalName == "Override")
             {
@@ -101,7 +103,7 @@ internal sealed class BoundedOpcPackage
                 Require(rel.Attribute("TargetMode") is null || (string?)rel.Attribute("TargetMode") == "Internal",
                     "ExternalWorkbookRelationship", "External relationships are never followed.");
                 string target = (string?)rel.Attribute("Target") ?? "";
-                Require(!new[] { "vba", "oleObject", "activeX", "externalLink" }.Any(x => ((string?)rel.Attribute("Type") ?? "").Contains(x, StringComparison.OrdinalIgnoreCase)),
+                Require(!ForbiddenRelationshipTypes.Any(x => ((string?)rel.Attribute("Type") ?? "").Contains(x, StringComparison.OrdinalIgnoreCase)),
                     "ActiveWorkbookContent", "Active relationship types are rejected.");
                 string resolved = ResolveRelationship(pair.Key, target);
                 Require(Parts.ContainsKey(resolved), "WorkbookIntegrityFailure", "Relationship references an absent part.");

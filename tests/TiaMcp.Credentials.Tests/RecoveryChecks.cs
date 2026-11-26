@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -34,7 +35,7 @@ internal static class RecoveryChecks
         void Reject(Action action, string code, string label)
         {
             try { action(); } catch (BridgeException e) when (e.Code == code) { Check(e.InnerException is null, label); return; }
-            throw new Exception("Expected " + code + ": " + label);
+            throw new InvalidOperationException("Expected " + code + ": " + label);
         }
         EngineeringArtifactReference Save(string name, object value)
         {
@@ -125,7 +126,7 @@ internal static class RecoveryChecks
             first with { RecoveryTarget = null } })
         {
             var next = forged with { Revision=first.Revision+1, PreviousSha256=CanonicalJson.Sha256(JsonSerializer.SerializeToNode(first,BridgeProtocol.Json)!), RecordedAt=DateTimeOffset.UtcNow };
-            string path=Path.Combine(root,"engineering-operations",first.Id,next.Revision.ToString("D6")+".json");
+            string path=Path.Combine(root,"engineering-operations",first.Id,next.Revision.ToString("D6", CultureInfo.InvariantCulture)+".json");
             try
             {
                 File.WriteAllBytes(path,JsonSerializer.SerializeToUtf8Bytes(next,BridgeProtocol.Json));
@@ -146,7 +147,7 @@ internal static class RecoveryChecks
         using (var child = Process.Start(start)!)
         {
             var stdout = child.StandardOutput.ReadToEndAsync(); var stderr = child.StandardError.ReadToEndAsync();
-            if (!child.WaitForExit(15000)) { child.Kill(true); throw new Exception("Recovery child timeout"); }
+            if (!child.WaitForExit(15000)) { child.Kill(true); throw new InvalidOperationException("Recovery child timeout"); }
             Check(child.ExitCode == 18, "Actual child loses reply after recovery intent and fixture side effect: " + stderr.GetAwaiter().GetResult());
         }
         lost = new EngineeringOperationStore(root).Read(lost.Id);
@@ -188,7 +189,7 @@ internal static class RecoveryChecks
         var legacy = Unknown("legacy-admitted-copy"); string legacyDestination = Path.Combine(root,"legacy-copy");
         var oldIntent = legacy with { State="recoveryIntent",Revision=legacy.Revision+1,PreviousSha256=CanonicalJson.Sha256(JsonSerializer.SerializeToNode(legacy,BridgeProtocol.Json)!),
             RecoveryDestinations=[new(legacy.Plan.Resources[0].ResourceKey,legacyDestination)],RecordedAt=DateTimeOffset.UtcNow };
-        File.WriteAllBytes(Path.Combine(root,"engineering-operations",legacy.Id,oldIntent.Revision.ToString("D6")+".json"),JsonSerializer.SerializeToUtf8Bytes(oldIntent,BridgeProtocol.Json));
+        File.WriteAllBytes(Path.Combine(root,"engineering-operations",legacy.Id,oldIntent.Revision.ToString("D6", CultureInfo.InvariantCulture)+".json"),JsonSerializer.SerializeToUtf8Bytes(oldIntent,BridgeProtocol.Json));
         legacy=store.Read(legacy.Id);
         Check(legacy.State=="recoveryIntent" && legacy.RecoveryTarget is null,"Historical credential-bearing local recovery remains readable without inventing a context");
         var legacyReview=Review(legacy);

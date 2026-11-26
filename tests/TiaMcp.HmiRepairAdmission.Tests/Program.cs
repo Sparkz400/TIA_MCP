@@ -49,12 +49,12 @@ internal static class AdmissionChecks
         bool rejected = false; string reason = null;
         try { Program.ValidateRepairUiAdmission(input, Helper); }
         catch (Exception error) { rejected = true; reason = error.Message; }
-        if (rejected != reject) throw new Exception("Unexpected admission: " + name + ": " + reason);
+        if (rejected != reject) throw new InvalidOperationException("Unexpected admission: " + name + ": " + reason);
         Results.Add(new { name, passed = true, rejected, reason, nativeInvoked = false });
     }
     private static int Main(string[] args)
     {
-        if (args.Length != 1 || Directory.Exists(args[0])) throw new Exception("New test output directory required.");
+        if (args.Length != 1 || Directory.Exists(args[0])) throw new InvalidOperationException("New test output directory required.");
         Root = Path.GetFullPath(args[0]); Directory.CreateDirectory(Root);
         Helper = Path.Combine(Root, "helper.bin"); File.WriteAllText(Helper, "pure helper pin");
         Check("valid-exact-reviewed-owners", _ => { }, false);
@@ -99,7 +99,7 @@ internal static class AdmissionChecks
             try { capture = Program.RepairUiCaptureRequested(command, new string('a', 64), 42, "owned.ap21"); }
             catch (InvalidOperationException) { refused = true; }
             if (refused != (action == "unknown") || capture != (action == "capture-saved-close"))
-                throw new Exception("Command dispatch mismatch: " + action);
+                throw new InvalidOperationException("Command dispatch mismatch: " + action);
             Results.Add(new { name = "command-" + action, passed = true, rejected = refused, nativeInvoked = false });
         }
         foreach (string field in new[] { "reviewSha256", "processId", "projectPath" })
@@ -110,7 +110,7 @@ internal static class AdmissionChecks
             bool refused = false;
             try { Program.RepairUiCaptureRequested(command, new string('a', 64), 42, "owned.ap21"); }
             catch (InvalidOperationException) { refused = true; }
-            if (!refused) throw new Exception("Unbound abort accepted: " + field);
+            if (!refused) throw new InvalidOperationException("Unbound abort accepted: " + field);
             Results.Add(new { name = "abort-missing-" + field, passed = true, rejected = true, nativeInvoked = false });
         }
         Results.AddRange(ConfiguredVerifyChecks.Run(Root, Helper));

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Xml;
 using System.Xml.Linq;
 using TiaMcp.Openness.V21;
@@ -214,7 +215,7 @@ namespace TiaMcp.Tests
             var before = new XDocument(document);
             await SourceError("InvalidSimaticML", () => EngineeringSources.InsertGraphicalNetwork(document, "1", incoming.ToString()));
             AssertSameXml(before, document);
-            foreach (var id in incoming.DescendantsAndSelf().Attributes("ID")) id.Value = (int.Parse(id.Value) + 100).ToString();
+            foreach (var id in incoming.DescendantsAndSelf().Attributes("ID")) id.Value = (int.Parse(id.Value, CultureInfo.InvariantCulture) + 100).ToString(CultureInfo.InvariantCulture);
             var malicious = new XElement(incoming);
             malicious.Add(new XElement("ObjectList", new XElement("SW.Tags.PlcTagTable", new XElement("AttributeList", new XElement("Name", "Hidden")))));
             await SourceError("XmlScopeMismatch", () => EngineeringSources.InsertGraphicalNetwork(document, "1", malicious.ToString()));
@@ -358,7 +359,7 @@ namespace TiaMcp.Tests
             AssertSameXml(before, document);
 
             var incoming = new XElement(document.Descendants("SW.Blocks.CompileUnit").Single());
-            foreach (var id in incoming.DescendantsAndSelf().Attributes("ID")) id.Value = (int.Parse(id.Value) + 100).ToString();
+            foreach (var id in incoming.DescendantsAndSelf().Attributes("ID")) id.Value = (int.Parse(id.Value, CultureInfo.InvariantCulture) + 100).ToString(CultureInfo.InvariantCulture);
             foreach (var declaration in incoming.DescendantsAndSelf().Attributes().Where(a => a.IsNamespaceDeclaration && a.Value == Net.NamespaceName).ToArray()) declaration.Remove();
             incoming.Add(new XAttribute(XNamespace.Xmlns + "ns0", Net.NamespaceName));
             string incomingXml = incoming.ToString(SaveOptions.DisableFormatting);

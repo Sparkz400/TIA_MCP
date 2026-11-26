@@ -194,7 +194,7 @@ def main():
             assert scratch["completed"] and scratch["compile"]["errorCount"] == 0
             report["scratchProject"] = scratch["project"]["path"]
             credential_metadata = scratch["scratchSecurity"]["cpus"][0].get("credentialMetadataPath")
-        inventory = call("project_inventory", {"maxItems": 2000})
+        call("project_inventory", {"maxItems": 2000})
         call("software_inspect", {"maxItems": 2000})
         call("hardware_inspect", {"maxItems": 2000})
         call("technology_read")

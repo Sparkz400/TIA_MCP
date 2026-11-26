@@ -9,11 +9,11 @@ internal static class FParameterAllowlistChecks
     internal static int Run()
     {
         int count = 0;
-        void Check(bool ok, string label) { if (!ok) throw new Exception(label); count++; Console.WriteLine("PASS " + label); }
+        void Check(bool ok, string label) { if (!ok) throw new InvalidOperationException(label); count++; Console.WriteLine("PASS " + label); }
         void Malformed(string json, string label)
         {
             try { FParameterAllowlistRules.Parse(json); } catch (Exception e) when (e is FormatException or Newtonsoft.Json.JsonException) { Check(true, "malformed allowlist refused: " + label); return; }
-            throw new Exception("Expected a malformed allowlist: " + label);
+            throw new InvalidOperationException("Expected a malformed allowlist: " + label);
         }
         foreach (var name in new[] { "Failsafe_FSourceAddress", "Failsafe_CentralFSourceAddress", "Failsafe_FParameterSignatureWithAddresses", "Failsafe_FIODBNumber",
                      "Failsafe_ManualAssignmentFIODBNumber", "Failsafe_FSIL", "Failsafe_F_CRC_Length", "Failsafe_FParVersion", "Failsafe_FCheckiPar", "Failsafe_FBlockID", "Name", null })

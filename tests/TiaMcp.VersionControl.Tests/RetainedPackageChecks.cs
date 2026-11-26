@@ -63,7 +63,7 @@ internal static class RetainedPackageChecks
             Reject("VciInvalidPreservationReview", () => VciRetainedPackagePreservation.Inspect([], files));
         });
     }
-    private static void True(bool value) { if (!value) throw new Exception("Expected true."); }
-    private static void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected {expected}, got {actual}."); }
-    private static void Reject(string code, Action action) { try { action(); } catch (BridgeException e) when (e.Code == code) { return; } throw new Exception("Expected " + code); }
+    private static void True(bool value) { if (!value) throw new InvalidOperationException("Expected true."); }
+    private static void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}, got {actual}."); }
+    private static void Reject(string code, Action action) { try { action(); } catch (BridgeException e) when (e.Code == code) { return; } throw new InvalidOperationException("Expected " + code); }
 }

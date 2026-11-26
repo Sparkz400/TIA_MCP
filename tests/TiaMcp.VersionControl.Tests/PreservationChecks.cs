@@ -141,7 +141,7 @@ internal static class PreservationChecks
         File.WriteAllText(output, JsonSerializer.Serialize(new { retainedNativeResultSha256 = Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(resultPath))),
             nativeCalls = 0, scope = "twoSeededBlocksThreeFormats", reports, nativeImportEnabled = false }, BridgeProtocol.Json));
     }
-    private static void True(bool condition) { if (!condition) throw new Exception("Expected true."); }
-    private static void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new Exception($"Expected {expected}, got {actual}."); }
-    private static void Reject(string code, Action action) { try { action(); } catch (BridgeException e) when (e.Code == code) { return; } throw new Exception("Expected " + code); }
+    private static void True(bool condition) { if (!condition) throw new InvalidOperationException("Expected true."); }
+    private static void Equal<T>(T expected, T actual) { if (!EqualityComparer<T>.Default.Equals(expected, actual)) throw new InvalidOperationException($"Expected {expected}, got {actual}."); }
+    private static void Reject(string code, Action action) { try { action(); } catch (BridgeException e) when (e.Code == code) { return; } throw new InvalidOperationException("Expected " + code); }
 }

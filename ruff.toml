@@ -1,11 +1,10 @@
 # Ruff gate for the Python scripts and harnesses (CI job `lint-python` in .github/workflows/offline.yml).
-# Correctness only: syntax errors and every Pyflakes rule that has no findings today. Style rules stay off.
+# Correctness only: syntax errors and every Pyflakes rule. Style rules stay off.
 target-version = "py313"
 # Ruff also skips everything .gitignore names (artifacts/, .venv/, node_modules/).
 extend-exclude = ["third-party"]
 
 [lint]
+# F401, F841 and F402 were ignored until their 84 findings were cleaned up on 26 November 2026. A name another module
+# imports from a script that does not use it itself is re-exported with a redundant alias (`name as name`).
 select = ["E9", "F"]
-# Measured on 25 November 2026 and left for a separate clean-up: F401 unused import (65), F841 unused local (18),
-# F402 import shadowed by a loop variable (1). Remove an entry once its findings are gone.
-ignore = ["F401", "F841", "F402"]

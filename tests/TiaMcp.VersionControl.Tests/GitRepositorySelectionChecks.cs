@@ -7,7 +7,7 @@ internal static class GitRepositorySelectionChecks
     internal static async Task Run(string executable, string fixture)
     {
         fixture = Path.GetFullPath(fixture);
-        if (Directory.Exists(fixture)) throw new Exception("Use a fresh repository-selection fixture.");
+        if (Directory.Exists(fixture)) throw new InvalidOperationException("Use a fresh repository-selection fixture.");
         Directory.CreateDirectory(fixture);
         var journal = new Journal();
         var runner = new GitWorkspaceRunner(executable, Path.Combine(fixture, "control"), journal);
@@ -30,9 +30,9 @@ internal static class GitRepositorySelectionChecks
         await task;
         var result = task.GetType().GetProperty("Result")!.GetValue(task)!;
         int exit = (int)result.GetType().GetProperty("ExitCode")!.GetValue(result)!;
-        if (exit == 0) throw new Exception("Missing child metadata selected the enclosing repository HEAD.");
+        if (exit == 0) throw new InvalidOperationException("Missing child metadata selected the enclosing repository HEAD.");
         if ((await runner.InspectAsync(repository)).Sha256 != before.Sha256)
-            throw new Exception("Repository selection probe changed the owned outer repository.");
+            throw new InvalidOperationException("Repository selection probe changed the owned outer repository.");
 
         if (OperatingSystem.IsWindows())
         {
@@ -43,7 +43,7 @@ internal static class GitRepositorySelectionChecks
             try { await runner.InitializeAsync(target, "main"); throw new Exception("Startup metadata path bound was not enforced."); }
             catch (BridgeException refusal) when (refusal.Code == "GitWorkingDirectoryTooLong") { }
             if (Directory.Exists(target) || journal.Count != count)
-                throw new Exception("Unsupported metadata path reached mutation dispatch.");
+                throw new InvalidOperationException("Unsupported metadata path reached mutation dispatch.");
         }
         Console.WriteLine("PASS Git exact repository selection: missing child metadata refuses, parent unchanged, startup bound refuses before dispatch; outer commit " + committed.Commit);
     }

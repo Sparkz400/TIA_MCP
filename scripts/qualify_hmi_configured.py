@@ -4,7 +4,6 @@ Compares captured inventories/scalars and available exports. Missing native
 coverage remains explicit; never enables production mutation or runtime.
 """
 import argparse
-import copy
 import json
 import math
 from pathlib import Path
