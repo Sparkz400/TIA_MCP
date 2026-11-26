@@ -66,7 +66,7 @@ public sealed class AutomationMlWorkflowStore
             var source = (JsonArray)node; Require(offset <= source.Count, "AutomationMlPageLimit", "Offset exceeds this array.");
             var (rows, next) = ReportPageRows.Read(source, offset, count, PageBytes - 4096, "Row exceeds page budget; download report.json.");
             var result = new { recordRef, reportSha256 = reportArtifact.Sha256,
-                section, offset, total = source.Count, rows, nextOffset = next == source.Count ? (int?)null : next, nativeQualified = false };
+                section, offset, total = source.Count, rows, nextOffset = next == source.Count ? (int?)null : next, totalItems = source.Count, pageCount = PageTotals.PageCount(source.Count, count), nativeQualified = false };
             Require(JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length <= PageBytes,
                 "AutomationMlPageLimit", "Encoded page exceeds 128 KiB; reduce count or download report.json.");
             return result;
@@ -116,7 +116,7 @@ public sealed class AutomationMlWorkflowStore
             catch (Exception error) when (error is BridgeException or IOException or JsonException or UnauthorizedAccessException) { state = "integrity-failed"; }
             return new { id, recordRef = reference, state };
         }).ToArray();
-        return new { rows, total = directories.Length, nextOffset = offset + rows.Length == directories.Length ? (int?)null : offset + rows.Length,
+        return new { rows, total = directories.Length, nextOffset = offset + rows.Length == directories.Length ? (int?)null : offset + rows.Length, totalItems = directories.Length, pageCount = PageTotals.PageCount(directories.Length, count),
             ordering = "record-id; relist after additions", nativeQualified = false };
     }
     /// <summary>The verified original.aml of a retained document record, for a native import that reads by path.</summary>

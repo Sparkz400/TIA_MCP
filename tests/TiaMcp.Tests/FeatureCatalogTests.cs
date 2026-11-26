@@ -6,6 +6,20 @@ namespace TiaMcp.Tests;
 
 internal static partial class Program
 {
+    private static Task PageTotalsArithmetic()
+    {
+        Check.Equal<long?>(0, PageTotals.PageCount(0, 50));
+        Check.Equal<long?>(1, PageTotals.PageCount(1, 50));
+        Check.Equal<long?>(1, PageTotals.PageCount(50, 50));
+        Check.Equal<long?>(2, PageTotals.PageCount(51, 50));
+        Check.Equal<long?>(174, PageTotals.PageCount(30000, 173));
+        Check.Equal<long?>(null, PageTotals.PageCount(null, 50));
+        Check.Equal<long?>(4_294_967_296L, PageTotals.PageCount(4_294_967_296L, 1));
+        try { PageTotals.PageCount(1, 0); throw new InvalidOperationException("A zero count must be refused."); }
+        catch (ArgumentOutOfRangeException) { }
+        return Task.CompletedTask;
+    }
+
     private static async Task FeatureCatalogPagination()
     {
         var catalog = FeatureCatalog.LoadBundled();
@@ -17,6 +31,14 @@ internal static partial class Program
         var ids = first.GetProperty("features").EnumerateArray().Concat(second.GetProperty("features").EnumerateArray())
             .Select(f => f.GetProperty("featureId").GetString()).ToArray();
         Check.Equal(4, ids.Distinct().Count());
+        // totalItems repeats pagination.total and pageCount counts pages at the requested count, the last page included.
+        int total = first.GetProperty("pagination").GetProperty("total").GetInt32();
+        Check.Equal(total, first.GetProperty("pagination").GetProperty("totalItems").GetInt32());
+        Check.Equal((total + 1) / 2, first.GetProperty("pagination").GetProperty("pageCount").GetInt32());
+        var lastPage = JsonSerializer.SerializeToElement(catalog.Query(offset: total - 1, maxItems: 2)).GetProperty("pagination");
+        Check.Equal(JsonValueKind.Null, lastPage.GetProperty("nextOffset").ValueKind);
+        Check.Equal(total, lastPage.GetProperty("totalItems").GetInt32());
+        Check.Equal((total + 1) / 2, lastPage.GetProperty("pageCount").GetInt32());
         var gaps = JsonSerializer.SerializeToElement(catalog.Query(implementationStatus: "not_implemented", maxItems: 200));
         foreach (var feature in gaps.GetProperty("features").EnumerateArray())
         {

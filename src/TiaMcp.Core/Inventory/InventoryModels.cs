@@ -64,4 +64,7 @@ public sealed record InventoryMetadata(string SnapshotId, DateTimeOffset Capture
     int TotalRows, InventoryCoverage Coverage, string? ParentSnapshotId = null,
     string Freshness = "snapshotOnly", string HardwareQualification = "unverified", int SchemaVersion = 1);
 
-public sealed record InventoryPage(InventoryMetadata Snapshot, InventoryRow[] Rows, int Offset, int? NextOffset);
+/// <summary>TotalItems repeats Snapshot.TotalRows and PageCount counts pages at the requested count; both are null when the
+/// capture stopped at maxVisited (Coverage.Truncated), whose row total is partial.</summary>
+public sealed record InventoryPage(InventoryMetadata Snapshot, InventoryRow[] Rows, int Offset, int? NextOffset,
+    long? TotalItems = null, long? PageCount = null);

@@ -214,6 +214,7 @@ internal static partial class Program
             ("Project model typed preview preserves exact native source and partial bounds", ProjectModelTypedPreviewTests.AdaptationAndBounds),
             ("Project model measures 1k/10k/50k cached performance", ProjectModelTests.CachedPerformance),
             ("Feature catalog preserves target/evidence separation and bounded pagination", FeatureCatalogPagination),
+            ("Paging totals: pageCount is ceil(totalItems / count), 0 when empty, null when the total is unknown", PageTotalsArithmetic),
             ("Feature catalog rejects invented evidence and unimplemented support claims", FeatureCatalogValidation),
             ("Target capabilities separate API, implementation and qualification", CapabilityRulesTests.AvailabilitySeparatesEvidence),
             ("Target capabilities preserve native blockers and unavailable services", CapabilityRulesTests.AvailabilityPreservesTargetBlockers),

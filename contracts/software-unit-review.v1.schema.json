@@ -1010,6 +1010,30 @@
                   "type": "null"
                 }
               ]
+            },
+            "totalItems": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The same number as this family's own total field; null when that total is unknown or partial."
+            },
+            "pageCount": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
             }
           }
         },
@@ -1144,6 +1168,30 @@
                   "type": "null"
                 }
               ]
+            },
+            "totalItems": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The same number as this family's own total field; null when that total is unknown or partial."
+            },
+            "pageCount": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
             }
           }
         },
@@ -1278,6 +1326,30 @@
                   "type": "null"
                 }
               ]
+            },
+            "totalItems": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The same number as this family's own total field; null when that total is unknown or partial."
+            },
+            "pageCount": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
             }
           }
         },
@@ -1412,6 +1484,30 @@
                   "type": "null"
                 }
               ]
+            },
+            "totalItems": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The same number as this family's own total field; null when that total is unknown or partial."
+            },
+            "pageCount": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
             }
           }
         },
@@ -1546,6 +1642,30 @@
                   "type": "null"
                 }
               ]
+            },
+            "totalItems": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The same number as this family's own total field; null when that total is unknown or partial."
+            },
+            "pageCount": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
             }
           }
         },
@@ -1680,6 +1800,30 @@
                   "type": "null"
                 }
               ]
+            },
+            "totalItems": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The same number as this family's own total field; null when that total is unknown or partial."
+            },
+            "pageCount": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
             }
           }
         },
@@ -1814,6 +1958,30 @@
                   "type": "null"
                 }
               ]
+            },
+            "totalItems": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The same number as this family's own total field; null when that total is unknown or partial."
+            },
+            "pageCount": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
             }
           }
         }

@@ -89,11 +89,13 @@ namespace TiaMcp.Openness.V21
                     if (verify) status["freshness"] = "metadataVerifiedAtResponse";
                     return status;
                 }
+                int maxItems = IndexInteger(args, "maxItems", 100, 1, 200);
                 var page = _projectIndexes.Query(id, args.Value<string>("text"), args.Value<string>("kind"),
-                    args.Value<string>("plcPath"), args.Value<string>("scopePath"), IndexInteger(args, "maxItems", 100, 1, 200), args.Value<string>("cursor"));
+                    args.Value<string>("plcPath"), args.Value<string>("scopePath"), maxItems, args.Value<string>("cursor"));
                 var response = IndexHeader(page.Snapshot);
                 response["rows"] = new JArray(page.Rows.Select(row => JObject.Parse(row.Json)));
                 response["offset"] = page.Offset; response["totalMatches"] = page.Total;
+                response["totalItems"] = page.Total; response["pageCount"] = TiaMcp.Core.PageTotals.PageCount(page.Total, maxItems);
                 response["nextCursor"] = page.NextCursor; response["rowPayloadBytes"] = page.PayloadBytes;
                 response["freshness"] = verify ? "metadataVerifiedAtResponse" : "snapshotOnly";
                 return response;

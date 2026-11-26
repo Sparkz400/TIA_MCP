@@ -1,0 +1,74 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.paging.worker-pagers.20261126",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-26T11:18:16+00:00",
+  "source": {
+    "commit": "11b178d639382ec0af78368d18f3b227dbd750ca",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "LT-PRG2024-03",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_paging_native.py on Debug builds of the paging branch (src of 54fd7b87) in one owned TIA V21 scratch with 23 generated SCL functions: project_model search and project_index query paged at 5 (23 rows in 5 pages, totalItems 23 = totalMatches, pageCount 5 on every page), an empty project_model search with 0 and 0, library_query of the project library (2 rows, 1 page), and hmi_references of HMI_RT_1 on a retrieved HmiSeeder unified-pc baseline paged at 5 (6 rows, 2 pages).",
+  "limitations": [
+    "Null totals (a truncated library walk, an incomplete hmi_references scope, the project_snapshot_search hit cap) are not provoked natively; they are covered offline.",
+    "Host-side pagers are covered by the offline Host harnesses only."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "a5ff60a2c839625806a8277c98e5f3832e9db47e51c46a404d34e84883566ca7"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "8d757fbf442d7fdda1e614d0dbc9cfabbdff7832cd77b9f9115062c8d2bf5a6f"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "b53ee925a600ecb9a494969aa23dd200e1a1dd8a131021ec9738225747409f8e"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "4a930d52953179828321dc2c60a567d5674426e994de35415098d416e7d56d13",
+      "bytes": 28756,
+      "completed": true,
+      "steps": [
+        "host_build_identity",
+        "tia_create_scratch",
+        "23 functions created",
+        "project_model search paged",
+        "project_model search empty",
+        "project_index query paged",
+        "library_query paged",
+        "hmi_references paged",
+        "tia_detach"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "hmi_inspect",
+        "hmi_references",
+        "host_build_identity",
+        "library_open",
+        "library_query",
+        "project_close",
+        "project_index",
+        "project_inventory",
+        "project_model",
+        "project_retrieve",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

@@ -31,7 +31,9 @@
       }
     },
     "rows": {"type": "array", "maxItems": 200, "items": {"$ref": "#/$defs/row"}},
-    "offset": {"type": "integer", "minimum": 0}, "nextOffset": {"type": ["integer", "null"], "minimum": 1}
+    "offset": {"type": "integer", "minimum": 0}, "nextOffset": {"type": ["integer", "null"], "minimum": 1},
+    "totalItems": {"type": ["integer", "null"], "minimum": 0, "description": "snapshot.totalRows; null when the capture stopped at maxVisited (coverage.truncated), whose total is partial."},
+    "pageCount": {"type": ["integer", "null"], "minimum": 0, "description": "ceil(totalItems / count), 0 when empty, null with totalItems. The 256 KiB budget can end a page early; nextOffset stays the continuation signal."}
   },
   "$defs": {
     "field": {

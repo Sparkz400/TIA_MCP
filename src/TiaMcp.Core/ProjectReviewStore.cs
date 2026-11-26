@@ -208,6 +208,7 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
         return new JsonObject { ["beforeReviewId"] = beforeId, ["afterReviewId"] = afterId,
             ["changes"] = new JsonArray(changes.Skip(offset).Take(maxItems).Select(n => n!.DeepClone()).ToArray()),
             ["totalChanges"] = changes.Count, ["nextOffset"] = offset + maxItems < changes.Count ? offset + maxItems : null,
+            ["totalItems"] = changes.Count, ["pageCount"] = PageTotals.PageCount(changes.Count, maxItems),
             ["contentComparedBlocks"] = contentCompared, ["contentUnknownBlocks"] = unknownContent,
             ["contentComparedTypes"] = typesCompared, ["contentUnknownTypes"] = unknownTypes,
             ["directObservedImpacts"] = new JsonArray(impacts.Take(200).Select(n => n!.DeepClone()).ToArray()),
@@ -351,6 +352,8 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
             ["hits"] = new JsonArray(hits.Skip(offset).Take(maxItems).Select(n => n!.DeepClone()).ToArray()),
             ["totalObservedHits"] = hits.Count, ["truncated"] = hits.Count >= 10000,
             ["nextOffset"] = offset + maxItems < hits.Count ? offset + maxItems : null, ["freshness"] = "savedSnapshotOnly",
+            // Search stops at 10,000 hits; a capped search has no known total.
+            ["totalItems"] = hits.Count >= 10000 ? null : hits.Count, ["pageCount"] = PageTotals.PageCount(hits.Count >= 10000 ? (int?)null : hits.Count, maxItems),
             ["sourceCoverage"] = review["capture"]?.DeepClone() };
     }
 
@@ -389,6 +392,7 @@ public sealed partial class ProjectReviewStore(string artifactsRoot)
                 Add("unresolved-reference", "coverage", Text(edge?["source"], "objectPath"), "A captured relationship lacks supported resolved evidence or exact endpoints; this alone does not prove a broken reference.");
         var result = new JsonObject { ["reviewId"] = reviewId, ["findings"] = new JsonArray(findings.Skip(offset).Take(maxItems).Select(n => n!.DeepClone()).ToArray()),
             ["totalFindings"] = findings.Count, ["nextOffset"] = offset + maxItems < findings.Count ? offset + maxItems : null,
+            ["totalItems"] = findings.Count, ["pageCount"] = PageTotals.PageCount(findings.Count, maxItems),
             ["freshness"] = "savedSnapshotOnly", ["coverage"] = model["coverage"]?.DeepClone(),
             ["rules"] = new JsonArray("native-inconsistent", "content-protected", "inspection-unavailable", "source-unavailable", "unresolved-reference"),
             ["limitations"] = "No live compile, unused-object verdict, safety validation or physical network inspection. No findings does not establish project correctness." };

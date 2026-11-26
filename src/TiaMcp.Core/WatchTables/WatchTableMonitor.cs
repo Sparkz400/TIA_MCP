@@ -64,7 +64,8 @@ public static class WatchTableMonitor
                 ["reference"] = JsonNode.Parse(snapshot.GetProperty("observation").GetProperty("reference").GetRawText()) },
             ["target"] = new JsonObject { ["instanceId"] = instanceId, ["instanceName"] = instanceName, ["creationId"] = creationId,
                 ["origin"] = identity.GetProperty("origin").GetString(), ["communicationInterface"] = JsonNode.Parse(identity.GetProperty("communicationInterface").GetRawText()) },
-            ["page"] = new JsonObject { ["offset"] = offset, ["returned"] = rows.Count, ["total"] = all.GetArrayLength(), ["nextOffset"] = end < all.GetArrayLength() ? (int?)end : null },
+            ["page"] = new JsonObject { ["offset"] = offset, ["returned"] = rows.Count, ["total"] = all.GetArrayLength(), ["nextOffset"] = end < all.GetArrayLength() ? (int?)end : null,
+                ["totalItems"] = all.GetArrayLength(), ["pageCount"] = PageTotals.PageCount(all.GetArrayLength(), count) },
             ["rows"] = rows, ["intervalMs"] = intervalMs, ["samples"] = sampled,
             ["readOnly"] = true, ["modified"] = false, ["forced"] = false, ["physicalPlc"] = false, ["programMatchVerified"] = false, ["note"] = Note,
         };

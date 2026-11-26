@@ -10,6 +10,8 @@
     "relationships": {"type": "array", "maxItems": 200, "items": {"$ref": "#/$defs/edge"}},
     "offset": {"type": "integer", "minimum": 0, "maximum": 50000},
     "nextOffset": {"type": ["integer", "null"], "minimum": 0},
+    "totalItems": {"type": ["integer", "null"], "minimum": 0, "description": "Relationships found; null when the traversal did not complete its scope (coverage.scopeComplete false), so the total is partial."},
+    "pageCount": {"type": ["integer", "null"], "minimum": 0, "description": "ceil(totalItems / limit), 0 when empty, null with totalItems. Byte budgets can end a page early; nextOffset stays the continuation signal."},
     "metadataRevision": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "observedAtUtc": {"type": "string", "format": "date-time"},
     "diagnostics": {"type": "array", "items": {"type": "object"}},

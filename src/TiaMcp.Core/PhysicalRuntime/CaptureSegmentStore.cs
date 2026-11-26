@@ -104,7 +104,7 @@ public abstract class CaptureSegmentStore<TPlan,TProgress,TRow> : IDisposable wh
             rows.Add(item); used += size; next++;
         }
         return new { schemaVersion = Schema(snapshot.Plan,"page"), snapshotRef, offset, totalRows = total, rows,
-            nextOffset = next == total ? (int?)null : next, nativeQualified = false };
+            nextOffset = next == total ? (int?)null : next, totalItems = total, pageCount = PageTotals.PageCount(total, count), nativeQualified = false };
     }
     /// <summary>Writes the JSON export, an optional CSV companion and an optional timeline; each is published by rename.</summary>
     protected object Export(Snapshot snapshot, string format, bool live, string section, string csvHeader, Func<TRow,string[]> csvCells, string? timeline = null, string? timelineExtension = null)

@@ -95,7 +95,7 @@ public sealed class RuntimeHandoffWorkflowStore
         Require(offset <= source.Count, "HandoffPageLimit", "Offset exceeds the selected report array.");
         var (rows, next) = ReportPageRows.Read(source, offset, count, PageBytes - 4096, "Row exceeds page budget; download report.json or the original observation.");
         var result = new { recordRef, reportSha256 = record.Receipt.Artifacts[1].Sha256, section, offset, total = source.Count,
-            rows, nextOffset = next == source.Count ? (int?)null : next, nativeQualified = false, operationAdmitted = false, assertionsAdmitted = false };
+            rows, nextOffset = next == source.Count ? (int?)null : next, totalItems = source.Count, pageCount = PageTotals.PageCount(source.Count, count), nativeQualified = false, operationAdmitted = false, assertionsAdmitted = false };
         Require(JsonSerializer.SerializeToUtf8Bytes(result, BridgeProtocol.Json).Length <= PageBytes, "HandoffPageLimit", "Page exceeds 128 KiB; download the complete report.");
         return result;
     }
@@ -133,7 +133,7 @@ public sealed class RuntimeHandoffWorkflowStore
             { state = "verificationFailed"; errorCode = e is BridgeException b ? b.Code : "HandoffVerificationFailed"; }
             return new { id, recordRef = reference, state, errorCode };
         }).ToArray();
-        return new { rows, total = directories.Length, nextOffset = offset + rows.Length == directories.Length ? (int?)null : offset + rows.Length,
+        return new { rows, total = directories.Length, nextOffset = offset + rows.Length == directories.Length ? (int?)null : offset + rows.Length, totalItems = directories.Length, pageCount = PageTotals.PageCount(directories.Length, count),
             retainedObservationFiles = Directory.EnumerateFiles(observationsRoot, "*.json").Count(),
             incompleteObservationFiles = Directory.EnumerateFiles(observationsRoot, "*.tmp").Count(),
             ordering = "record-id; relist after additions", nativeQualified = false, operationAdmitted = false, assertionsAdmitted = false };

@@ -886,6 +886,18 @@
                 "minimum": 0,
                 "type": "integer"
               },
+              "pageCount": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+              },
               "recordId": {
                 "pattern": "^[a-f0-9]{64}$",
                 "type": "string"
@@ -972,6 +984,18 @@
               "total": {
                 "minimum": 0,
                 "type": "integer"
+              },
+              "totalItems": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The same number as this family's own total field; null when that total is unknown or partial."
               }
             },
             "required": [
@@ -1403,6 +1427,18 @@
                 "minimum": 0,
                 "type": "integer"
               },
+              "pageCount": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+              },
               "producerAuthenticated": {
                 "const": false
               },
@@ -1484,6 +1520,18 @@
               "total": {
                 "minimum": 0,
                 "type": "integer"
+              },
+              "totalItems": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The same number as this family's own total field; null when that total is unknown or partial."
               }
             },
             "required": [
@@ -4390,6 +4438,18 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "pageCount": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+                  },
                   "recordId": {
                     "pattern": "^[a-f0-9]{64}$",
                     "type": "string"
@@ -4469,6 +4529,18 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "totalItems": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "The same number as this family's own total field; null when that total is unknown or partial."
+                  },
                   "wholeProjectAnalysisComplete": {
                     "const": false
                   }
@@ -4522,6 +4594,18 @@
                   "offset": {
                     "minimum": 0,
                     "type": "integer"
+                  },
+                  "pageCount": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
                   },
                   "recordId": {
                     "pattern": "^[a-f0-9]{64}$",
@@ -4602,6 +4686,18 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "totalItems": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "The same number as this family's own total field; null when that total is unknown or partial."
+                  },
                   "wholeProjectAnalysisComplete": {
                     "const": false
                   }
@@ -4655,6 +4751,18 @@
                   "offset": {
                     "minimum": 0,
                     "type": "integer"
+                  },
+                  "pageCount": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
                   },
                   "recordId": {
                     "pattern": "^[a-f0-9]{64}$",
@@ -4735,6 +4843,18 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "totalItems": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "The same number as this family's own total field; null when that total is unknown or partial."
+                  },
                   "wholeProjectAnalysisComplete": {
                     "const": false
                   }
@@ -4788,6 +4908,18 @@
                   "offset": {
                     "minimum": 0,
                     "type": "integer"
+                  },
+                  "pageCount": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
                   },
                   "recordId": {
                     "pattern": "^[a-f0-9]{64}$",
@@ -4867,6 +4999,18 @@
                   "total": {
                     "minimum": 0,
                     "type": "integer"
+                  },
+                  "totalItems": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "The same number as this family's own total field; null when that total is unknown or partial."
                   },
                   "wholeProjectAnalysisComplete": {
                     "const": false
@@ -5444,6 +5588,18 @@
                 "minimum": 0,
                 "type": "integer"
               },
+              "pageCount": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+              },
               "programIdentityVerified": {
                 "const": false
               },
@@ -5532,6 +5688,18 @@
               "total": {
                 "minimum": 0,
                 "type": "integer"
+              },
+              "totalItems": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The same number as this family's own total field; null when that total is unknown or partial."
               }
             },
             "required": [
@@ -8228,6 +8396,18 @@
                   "update"
                 ]
               },
+              "pageCount": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+              },
               "recordId": {
                 "$ref": "#/$defs/hash"
               },
@@ -8275,6 +8455,18 @@
               "total": {
                 "minimum": 0,
                 "type": "integer"
+              },
+              "totalItems": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The same number as this family's own total field; null when that total is unknown or partial."
               },
               "wholeProjectPreservationVerified": {
                 "const": false
@@ -10220,6 +10412,18 @@
                 "minimum": 0,
                 "type": "integer"
               },
+              "pageCount": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+              },
               "recordId": {
                 "pattern": "^[a-f0-9]{64}$",
                 "type": "string"
@@ -10345,6 +10549,18 @@
               "total": {
                 "minimum": 0,
                 "type": "integer"
+              },
+              "totalItems": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The same number as this family's own total field; null when that total is unknown or partial."
               }
             },
             "required": [
@@ -13249,6 +13465,18 @@
                 "minimum": 0,
                 "type": "integer"
               },
+              "pageCount": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+              },
               "privateKeyAvailabilityVerified": {
                 "const": false
               },
@@ -13332,6 +13560,18 @@
               "total": {
                 "minimum": 0,
                 "type": "integer"
+              },
+              "totalItems": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The same number as this family's own total field; null when that total is unknown or partial."
               },
               "usagePolicyVerified": {
                 "const": false
@@ -14510,6 +14750,18 @@
                 "ordering": {
                   "const": "record-id; relist after additions"
                 },
+                "pageCount": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+                },
                 "rows": {
                   "items": {
                     "additionalProperties": false,
@@ -14550,6 +14802,18 @@
                 "total": {
                   "minimum": 0,
                   "type": "integer"
+                },
+                "totalItems": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The same number as this family's own total field; null when that total is unknown or partial."
                 }
               },
               "required": [
@@ -14649,6 +14913,18 @@
                 "ordering": {
                   "const": "record-id; relist after additions"
                 },
+                "pageCount": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+                },
                 "rows": {
                   "items": {
                     "additionalProperties": false,
@@ -14700,6 +14976,18 @@
                   "maximum": 128,
                   "minimum": 0,
                   "type": "integer"
+                },
+                "totalItems": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The same number as this family's own total field; null when that total is unknown or partial."
                 }
               },
               "required": [
@@ -14791,6 +15079,18 @@
                 "ordering": {
                   "const": "record-id; relist after additions"
                 },
+                "pageCount": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+                },
                 "rows": {
                   "items": {
                     "additionalProperties": false,
@@ -14831,6 +15131,18 @@
                 "total": {
                   "minimum": 0,
                   "type": "integer"
+                },
+                "totalItems": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The same number as this family's own total field; null when that total is unknown or partial."
                 }
               },
               "required": [
@@ -14935,6 +15247,18 @@
                 "ordering": {
                   "type": "string"
                 },
+                "pageCount": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+                },
                 "rows": {
                   "items": {
                     "$ref": "#/$defs/listRow"
@@ -14946,6 +15270,18 @@
                   "maximum": 1000,
                   "minimum": 0,
                   "type": "integer"
+                },
+                "totalItems": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The same number as this family's own total field; null when that total is unknown or partial."
                 }
               },
               "required": [
@@ -15127,6 +15463,18 @@
                 "ordering": {
                   "const": "record-id; relist after additions"
                 },
+                "pageCount": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+                },
                 "retainedObservationFiles": {
                   "maximum": 2048,
                   "minimum": 0,
@@ -15185,6 +15533,18 @@
                   "maximum": 128,
                   "minimum": 0,
                   "type": "integer"
+                },
+                "totalItems": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The same number as this family's own total field; null when that total is unknown or partial."
                 }
               },
               "required": [
@@ -15310,6 +15670,18 @@
                 "ordering": {
                   "type": "string"
                 },
+                "pageCount": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+                },
                 "rows": {
                   "items": {
                     "additionalProperties": false,
@@ -15352,6 +15724,18 @@
                   "maximum": 128,
                   "minimum": 0,
                   "type": "integer"
+                },
+                "totalItems": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The same number as this family's own total field; null when that total is unknown or partial."
                 }
               },
               "required": [
@@ -15495,6 +15879,18 @@
                   "minimum": 0,
                   "type": "integer"
                 },
+                "pageCount": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+                },
                 "recordRef": {
                   "pattern": "^automationml:[a-f0-9]{32}:[a-f0-9]{64}$",
                   "type": "string"
@@ -15553,6 +15949,18 @@
                 "total": {
                   "minimum": 0,
                   "type": "integer"
+                },
+                "totalItems": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The same number as this family's own total field; null when that total is unknown or partial."
                 }
               },
               "required": [
@@ -15656,6 +16064,18 @@
                   "minimum": 0,
                   "type": "integer"
                 },
+                "pageCount": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+                },
                 "recordRef": {
                   "pattern": "^composite-engineering:[a-f0-9]{32}:[a-f0-9]{64}$",
                   "type": "string"
@@ -15735,6 +16155,18 @@
                 "total": {
                   "minimum": 0,
                   "type": "integer"
+                },
+                "totalItems": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The same number as this family's own total field; null when that total is unknown or partial."
                 },
                 "wholeImpactAnalysisComplete": {
                   "const": false
@@ -15834,6 +16266,18 @@
                   "minimum": 0,
                   "type": "integer"
                 },
+                "pageCount": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+                },
                 "recordRef": {
                   "pattern": "^graph:[a-f0-9]{32}:[a-f0-9]{64}$",
                   "type": "string"
@@ -15892,6 +16336,18 @@
                 "total": {
                   "minimum": 0,
                   "type": "integer"
+                },
+                "totalItems": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The same number as this family's own total field; null when that total is unknown or partial."
                 }
               },
               "required": [
@@ -16005,6 +16461,18 @@
                   "minimum": 0,
                   "type": "integer"
                 },
+                "pageCount": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+                },
                 "recordRef": {
                   "$ref": "#/$defs/recordRef"
                 },
@@ -16022,6 +16490,18 @@
                 "total": {
                   "minimum": 0,
                   "type": "integer"
+                },
+                "totalItems": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The same number as this family's own total field; null when that total is unknown or partial."
                 }
               },
               "required": [
@@ -16249,6 +16729,18 @@
                 "operationAdmitted": {
                   "const": false
                 },
+                "pageCount": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+                },
                 "recordRef": {
                   "pattern": "^runtime-handoff:[0-9a-f]{32}:[0-9a-f]{64}$",
                   "type": "string"
@@ -16326,6 +16818,18 @@
                   "maximum": 128,
                   "minimum": 0,
                   "type": "integer"
+                },
+                "totalItems": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The same number as this family's own total field; null when that total is unknown or partial."
                 }
               },
               "required": [
@@ -22910,6 +23414,18 @@
                 "minimum": 0,
                 "type": "integer"
               },
+              "pageCount": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+              },
               "rows": {
                 "items": {
                   "oneOf": [
@@ -22931,6 +23447,18 @@
               "snapshotRef": {
                 "pattern": "^ua-subscription:[0-9a-f]{32}:(0|[1-9][0-9]{0,5}):[0-9a-f]{64}$",
                 "type": "string"
+              },
+              "totalItems": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The same number as this family's own total field; null when that total is unknown or partial."
               },
               "totalRows": {
                 "maximum": 200000,
@@ -27570,6 +28098,18 @@
                 "minimum": 0,
                 "type": "integer"
               },
+              "pageCount": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+              },
               "plcPath": {
                 "type": "string"
               },
@@ -27666,6 +28206,18 @@
               "total": {
                 "minimum": 0,
                 "type": "integer"
+              },
+              "totalItems": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The same number as this family's own total field; null when that total is unknown or partial."
               },
               "wholeProgramAnalysisComplete": {
                 "const": false
@@ -29365,6 +29917,18 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "pageCount": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+                  },
                   "recordId": {
                     "pattern": "^[a-f0-9]{64}$",
                     "type": "string"
@@ -29445,6 +30009,18 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "totalItems": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "The same number as this family's own total field; null when that total is unknown or partial."
+                  },
                   "wholeProjectAnalysisComplete": {
                     "const": false
                   }
@@ -29498,6 +30074,18 @@
                   "offset": {
                     "minimum": 0,
                     "type": "integer"
+                  },
+                  "pageCount": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
                   },
                   "recordId": {
                     "pattern": "^[a-f0-9]{64}$",
@@ -29579,6 +30167,18 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "totalItems": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "The same number as this family's own total field; null when that total is unknown or partial."
+                  },
                   "wholeProjectAnalysisComplete": {
                     "const": false
                   }
@@ -29632,6 +30232,18 @@
                   "offset": {
                     "minimum": 0,
                     "type": "integer"
+                  },
+                  "pageCount": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
                   },
                   "recordId": {
                     "pattern": "^[a-f0-9]{64}$",
@@ -29713,6 +30325,18 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "totalItems": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "The same number as this family's own total field; null when that total is unknown or partial."
+                  },
                   "wholeProjectAnalysisComplete": {
                     "const": false
                   }
@@ -29766,6 +30390,18 @@
                   "offset": {
                     "minimum": 0,
                     "type": "integer"
+                  },
+                  "pageCount": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
                   },
                   "recordId": {
                     "pattern": "^[a-f0-9]{64}$",
@@ -29847,6 +30483,18 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "totalItems": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "The same number as this family's own total field; null when that total is unknown or partial."
+                  },
                   "wholeProjectAnalysisComplete": {
                     "const": false
                   }
@@ -29900,6 +30548,18 @@
                   "offset": {
                     "minimum": 0,
                     "type": "integer"
+                  },
+                  "pageCount": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
                   },
                   "recordId": {
                     "pattern": "^[a-f0-9]{64}$",
@@ -29981,6 +30641,18 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "totalItems": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "The same number as this family's own total field; null when that total is unknown or partial."
+                  },
                   "wholeProjectAnalysisComplete": {
                     "const": false
                   }
@@ -30034,6 +30706,18 @@
                   "offset": {
                     "minimum": 0,
                     "type": "integer"
+                  },
+                  "pageCount": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
                   },
                   "recordId": {
                     "pattern": "^[a-f0-9]{64}$",
@@ -30115,6 +30799,18 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "totalItems": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "The same number as this family's own total field; null when that total is unknown or partial."
+                  },
                   "wholeProjectAnalysisComplete": {
                     "const": false
                   }
@@ -30168,6 +30864,18 @@
                   "offset": {
                     "minimum": 0,
                     "type": "integer"
+                  },
+                  "pageCount": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
                   },
                   "recordId": {
                     "pattern": "^[a-f0-9]{64}$",
@@ -30248,6 +30956,18 @@
                   "total": {
                     "minimum": 0,
                     "type": "integer"
+                  },
+                  "totalItems": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "The same number as this family's own total field; null when that total is unknown or partial."
                   },
                   "wholeProjectAnalysisComplete": {
                     "const": false
@@ -31967,6 +32687,18 @@
                 "minimum": 0,
                 "type": "integer"
               },
+              "pageCount": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+              },
               "recordId": {
                 "maxLength": 64,
                 "minLength": 64,
@@ -32102,6 +32834,18 @@
               "total": {
                 "minimum": 0,
                 "type": "integer"
+              },
+              "totalItems": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The same number as this family's own total field; null when that total is unknown or partial."
               }
             },
             "required": [
@@ -34954,6 +35698,18 @@
                 "minimum": 0,
                 "type": "integer"
               },
+              "pageCount": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+              },
               "recordId": {
                 "pattern": "^[a-f0-9]{64}$",
                 "type": "string"
@@ -35078,6 +35834,18 @@
               "total": {
                 "minimum": 0,
                 "type": "integer"
+              },
+              "totalItems": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The same number as this family's own total field; null when that total is unknown or partial."
               },
               "wholeObjectAnalysisComplete": {
                 "const": false
@@ -38600,6 +39368,18 @@
                 "minimum": 0,
                 "type": "integer"
               },
+              "pageCount": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+              },
               "revisionRef": {
                 "$ref": "#/$defs/revisionRef"
               },
@@ -38631,6 +39411,18 @@
               "total": {
                 "minimum": 0,
                 "type": "integer"
+              },
+              "totalItems": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The same number as this family's own total field; null when that total is unknown or partial."
               }
             },
             "required": [
@@ -42330,6 +43122,18 @@
                 "minimum": 0,
                 "type": "integer"
               },
+              "pageCount": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "ceil(totalItems / effective count), 0 for an empty result; null when totalItems is null. Byte budgets can end a page early, so nextOffset stays the continuation signal."
+              },
               "recordId": {
                 "pattern": "^[a-f0-9]{64}$",
                 "type": "string"
@@ -42427,6 +43231,18 @@
               "total": {
                 "minimum": 0,
                 "type": "integer"
+              },
+              "totalItems": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The same number as this family's own total field; null when that total is unknown or partial."
               }
             },
             "required": [
